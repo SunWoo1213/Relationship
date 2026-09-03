@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# git pre-commit — 비밀 파일·비밀 문자열·대용량 파일 커밋 차단 (Claude 훅과 별개로 git 자체가 집행)
+# 활성화: git config core.hooksPath .githooks   (클론 직후 한 번)
+# 우회(--no-verify)는 .claude/hooks/commit-guard.sh 와 safety-guard.sh 가 막는다.
+set -u
+export PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LC_ALL=C.UTF-8
+fail=0
+say() { printf '[pre-commit] %s\n' "$1" >&2; fail=1; }
+
+files="$(git diff --cached --name-only --diff-filter=ACMR)"
+[ -n "$files" ] || exit 0
+
+while IFS= read -r f; do
+  base="${f##*/}"
+  case "$base" in
+    .env.example|.env.sample|.env.template) ;;
+    .env|.env.*) say "비밀 파일 스테이징: $f" ;;
+    *.pem|*.key|*.p12|*.pfx|*.jks|id_rsa|id_rsa.*|id_ed25519|id_ed25519.*|*.tfstate|*.tfstate.*|*.tfvars|.netrc|.git-credentials)
+      say "비밀·상태 파일 스테이징: $f" ;;
+  esac
+  case "$f" in
+    .claude/.commit-approved|.claude/.push-approved|.claude/commit-draft.txt|.claude/settings.local.json)
+      say "승인 절차 임시 파일은 커밋하지 않는다: $f" ;;
+  esac
+  if [ -f "$f" ]; then
+    size="$(wc -c < "$f" | tr -d '[:space:]')"
+    if [ "${size:-0}" -gt 5242880 ]; then say "5MB 초과 파일: $f ($size bytes). 데이터는 Git LFS 또는 저장소 밖으로" ; fi
+  fi
+done <<< "$files"
+
+# 추가된 줄에서 비밀 패턴 검사
+added="$(git diff --cached -U0 --diff-filter=ACMR | grep -E '^[+]' | grep -Ev '^[+]{3}' || true)"
+if [ -n "$added" ]; then
+  for p in \
+    'sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}' \
+    'AKIA[0-9A-Z]{16}' \
+    'aws_secret_access_key[[:space:]]*[=:][[:space:]]*[A-Za-z0-9/+]{40}' \
+    'ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{40,}' \
+    '-----BEGIN [A-Z ]*PRIVATE KEY-----' \
+    'xox[baprs]-[A-Za-z0-9-]{20,}' \
+    'AIza[0-9A-Za-z_-]{35}' \
+    'postgres(ql)?://[^:/[:space:]]+:[^@[:space:]]{8,}@' ; do
+    if printf '%s' "$added" | grep -Eq -- "$p"; then
+      say "비밀로 보이는 문자열이 커밋 내용에 있다 (패턴: $p). 환경변수로 옮기라"
+    fi
+  done
+fi
+
+if [ "$fail" -ne 0 ]; then
+  printf '[pre-commit] 커밋을 중단했다. 근거: docs/wiki/security.md\n' >&2
+  exit 1
+fi
+exit 0

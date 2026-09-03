@@ -1,0 +1,45 @@
+# 커밋·푸시 승인 절차의 임시 파일 (절대 커밋하지 않음)
+.claude/.commit-approved
+.claude/.push-approved
+.claude/commit-draft.txt
+.claude/settings.local.json
+
+# 비밀 (에이전트는 읽지도 쓰지도 않는다 — docs/wiki/security.md)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa*
+id_ed25519*
+.aws/
+.netrc
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+build/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
