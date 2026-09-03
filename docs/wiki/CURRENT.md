@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: none
+active: P0-embed-pilot
 frozen: none
 
 <!--
@@ -12,4 +12,4 @@ frozen: none
 -->
 
 ## 메모
-- 하네스 구축 완료, 첫 커밋 승인 대기. 다음: P0 착수 준비(`/devlog start P0-embed-pilot`).
+- 하네스 첫 커밋 e062986 완료·푸시됨. P0-embed-pilot 계획 승인(2026-09-03) → U1 구현 중.

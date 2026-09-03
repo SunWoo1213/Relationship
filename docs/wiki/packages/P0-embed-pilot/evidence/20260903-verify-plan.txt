@@ -1,0 +1,25 @@
+== verify-plan P0-embed-pilot  (2026-09-03 19:05) ==
+PASS  존재: docs/wiki/packages/P0-embed-pilot/01-plan.md
+PASS  존재: docs/wiki/packages/P0-embed-pilot/02-plan-verify.md
+PASS  카드 존재: D04
+PASS  카드 존재: D4
+PASS  카드 존재: D5
+PASS  패키지 id 등록됨: P0-embed-pilot
+PASS  검증 항목 존재: R5
+PASS  Refs 있음: - [ ] U1 스크립트·테스트 작성: `scripts/embed_pilo
+PASS  Refs 있음: - [ ] U2 파일럿 실행·리포트: 모델 2개로 실행�
+PASS  Refs 있음: - [ ] U3 카드 반영: D04 카드 갱신 이력에 확정 �
+PASS  backlog 일치: 한국어 짧은 호칭 30개 유사도 행렬 2종, 선택 
+PASS  점검표 8행 존재
+PASS  점검표 모든 행에 판정(통과/보류) 있음
+PASS  보류 0건
+PASS  결과: 줄 존재
+PASS  점검표 모든 행에 근거 있음
+PASS  registry 중복 없음: scripts/embed_pilot.py
+PASS  registry 중복 없음: tests/test_embed_pilot.py
+PASS  registry 중복 없음: reports/embed_pilot.md
+PASS  registry 중복 없음: reports/embed_pilot/text-embedding-3-small.json
+PASS  registry 중복 없음: reports/embed_pilot/text-embedding-3-large.json
+PASS  registry 중복 없음: docs/wiki/decisions/D04-embedding-provider.md
+PASS  registry 중복 없음: docs/wiki/specs/S3.1-schema-v2.md
+== 결과: FAIL=0 WARN=0 ==
