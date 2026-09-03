@@ -20,3 +20,4 @@
 - 2026-09-03 19:42 | DECISION | D4 확정: OpenAI text-embedding-3-small, N=1536 (파일럿 두 모델 모두 기준 통과, small 이 오병합 후보 적고 pgvector 인덱스 한도 내) reports/embed_pilot.md | P0-embed-pilot D4 R5
 - 2026-09-03 19:52 | DONE | P0-embed-pilot 완료 승인(사용자). 수용 기준 통과, verify-impl FAIL 0 (evidence/20260903-verify-impl-2.txt). R5 구현완료 | P0-embed-pilot D4 R5
 - 2026-09-03 19:37 | COMMIT | a66f1e2 eval(P0-embed-pilot): U2 파일럿 실행 — small/large 둘 다 기준 통과, N=1536 확정 근거
+- 2026-09-03 19:37 | COMMIT | e4ab0a4 docs(P0-embed-pilot): U3 카드 반영·완료 검토 — D4 확정, S3.1 vector(1536), R5 구현완료

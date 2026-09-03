@@ -66,7 +66,7 @@ fi
 
 # 5 04-review 증거 열
 if [ -f "$P/04-review.md" ]; then
-  rows="$(awk '/^## 수용 기준 대조/{f=1;next} /^## /{f=0} f && /^\|/ && !/^\| *기준|^\|-/ {print}' "$P/04-review.md")"
+  rows="$(awk '/^## ([0-9]+[.] )?수용 기준 대조/{f=1;next} /^## /{f=0} f && /^\|/ && !/^\| *기준|^\|-/ {print}' "$P/04-review.md")"
   [ -n "$rows" ] || bad "04-review 수용 기준 표에 행이 없다"
   while IFS= read -r r; do
     [ -n "$r" ] || continue
