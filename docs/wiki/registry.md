@@ -29,3 +29,4 @@
 | 에이전트 | verifier — 계획 검증·완료 검토·코드 리뷰 전담(fable, 구현자와 다른 모델) | .claude/agents/verifier.md | 하네스 | pending | L-002 |
 | 문서 | 교훈 L-002 역할별 모델 분리(계획 opus · 구현 sonnet · 검증 fable) | docs/wiki/lessons/L-002-role-model-separation.md | 하네스 | pending | verify-plan/impl 이 검증자=verifier 강제 |
 | 문서 | 교훈 L-003 dev 푸시 뒤 사용자 결정까지 멈춤 | docs/wiki/lessons/L-003-stop-after-dev-push.md | 하네스 | pending | .awaiting-decision 마커 |
+| 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·실행법) | README.md | 하네스 | pending | 패키지 완료마다 진행 상태 표 갱신 |

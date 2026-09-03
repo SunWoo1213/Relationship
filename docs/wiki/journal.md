@@ -26,3 +26,6 @@
 - 2026-09-03 20:05 | DECISION | L-002 역할별 모델 분리: 계획 architect=opus, 구현 backend-agent=sonnet, 평가 eval-agent=opus, 검증 verifier(신설)=fable. 메인 세션은 조율·승인·커밋만. verify-plan/verify-impl 이 검증자=verifier 를 강제 (사용자 지시: 같은 컨텍스트·모델의 자기 평가는 후하다) | L-002
 - 2026-09-03 20:20 | DECISION | L-003 dev 푸시 뒤 멈춤: 사용자가 main 승격/수정을 정하기 전에는 다음 작업·커밋 금지. 훅(.awaiting-decision 마커, stage-gate·commit-guard)으로 강제 (사용자 지시) | L-003 security
 - 2026-09-03 19:47 | COMMIT | 64f92e4 harness(L-002): 계획·구현·검증 역할별 모델 분리 — verifier 에이전트 신설, 검증자 강제
+- 2026-09-03 19:48 | COMMIT | 4df323f harness(L-003): dev 푸시 뒤 사용자 결정(승격/수정) 전까지 다음 작업 금지 게이트
+- 2026-09-03 19:48 | PUSH | origin dev 4df323f — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-03 19:50 | RELEASE | origin main ← dev 4df323f
