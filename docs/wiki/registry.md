@@ -26,3 +26,6 @@
 | 스크립트 | 임베딩 파일럿(결정용 코드): EmbeddingProvider·OpenAIEmbeddingProvider·코사인 행렬·D4 판정 | scripts/embed_pilot.py | P0-embed-pilot | pending | EmbeddingProvider 는 P2/P3 에서 백엔드 모듈로 이동 |
 | 테스트 | 임베딩 파일럿 순수 로직(가짜 공급자, 네트워크 없음) | tests/test_embed_pilot.py | P0-embed-pilot | pending | pytest 10 passed |
 | 리포트 | 임베딩 파일럿 결과(행렬 2종·선택 근거·N=1536) | reports/embed_pilot.md, reports/embed_pilot/*.json | P0-embed-pilot | pending | 실행 출력 evidence/20260903-embed-pilot-run.txt |
+| 에이전트 | verifier — 계획 검증·완료 검토·코드 리뷰 전담(fable, 구현자와 다른 모델) | .claude/agents/verifier.md | 하네스 | pending | L-002 |
+| 문서 | 교훈 L-002 역할별 모델 분리(계획 opus · 구현 sonnet · 검증 fable) | docs/wiki/lessons/L-002-role-model-separation.md | 하네스 | pending | verify-plan/impl 이 검증자=verifier 강제 |
+| 문서 | 교훈 L-003 dev 푸시 뒤 사용자 결정까지 멈춤 | docs/wiki/lessons/L-003-stop-after-dev-push.md | 하네스 | pending | .awaiting-decision 마커 |

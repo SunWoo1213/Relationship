@@ -21,3 +21,8 @@
 - 2026-09-03 19:52 | DONE | P0-embed-pilot 완료 승인(사용자). 수용 기준 통과, verify-impl FAIL 0 (evidence/20260903-verify-impl-2.txt). R5 구현완료 | P0-embed-pilot D4 R5
 - 2026-09-03 19:37 | COMMIT | a66f1e2 eval(P0-embed-pilot): U2 파일럿 실행 — small/large 둘 다 기준 통과, N=1536 확정 근거
 - 2026-09-03 19:37 | COMMIT | e4ab0a4 docs(P0-embed-pilot): U3 카드 반영·완료 검토 — D4 확정, S3.1 vector(1536), R5 구현완료
+- 2026-09-03 19:38 | COMMIT | 3abe513 harness(verify-impl): 04-review 수용 기준 표를 번호 있는 제목에서도 찾도록 수정
+- 2026-09-03 19:38 | PUSH | origin 3abe513
+- 2026-09-03 20:05 | DECISION | L-002 역할별 모델 분리: 계획 architect=opus, 구현 backend-agent=sonnet, 평가 eval-agent=opus, 검증 verifier(신설)=fable. 메인 세션은 조율·승인·커밋만. verify-plan/verify-impl 이 검증자=verifier 를 강제 (사용자 지시: 같은 컨텍스트·모델의 자기 평가는 후하다) | L-002
+- 2026-09-03 20:20 | DECISION | L-003 dev 푸시 뒤 멈춤: 사용자가 main 승격/수정을 정하기 전에는 다음 작업·커밋 금지. 훅(.awaiting-decision 마커, stage-gate·commit-guard)으로 강제 (사용자 지시) | L-003 security
+- 2026-09-03 19:47 | COMMIT | 64f92e4 harness(L-002): 계획·구현·검증 역할별 모델 분리 — verifier 에이전트 신설, 검증자 강제

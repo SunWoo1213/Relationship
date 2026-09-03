@@ -7,6 +7,8 @@
       "Edit(.claude/.push-approved)",
       "Write(.claude/.release-approved)",
       "Edit(.claude/.release-approved)",
+      "Write(.claude/.awaiting-decision)",
+      "Edit(.claude/.awaiting-decision)",
       "Read(./.env)",
       "Read(.env)",
       "Read(**/.env)",

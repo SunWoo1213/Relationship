@@ -34,6 +34,12 @@ deny() {
 
 [ -n "$cmd" ] || exit 0
 
+# L-003: dev 푸시 후 사용자 결정 전에는 새 커밋 금지
+AWAIT="$ROOT/.claude/.awaiting-decision"
+if [ -f "$AWAIT" ] && printf '%s' "$cmd" | grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-[^[:space:]]+([[:space:]]+[^[:space:]]+)?)*[[:space:]]+commit([[:space:]]|$)'; then
+  deny "dev 푸시 후 사용자 결정(main 승격 / 수정) 대기 중이라 새 커밋을 만들 수 없다 (L-003). AskUserQuestion 으로 결정을 받고 approve-commit.sh --release 또는 --decision fix 를 실행하라."
+fi
+
 # 5. 마커 직접 조작 금지
 case "$cmd" in
   *".commit-approved"*) deny "commit 승인 마커는 직접 조작할 수 없다. /commit 절차(초안 → 사용자 승인 → approve-commit.sh)를 따르라." ;;

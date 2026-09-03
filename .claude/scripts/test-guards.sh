@@ -117,6 +117,16 @@ else
   echo "skip active=$act (product code gate not tested)"
 fi
 
+echo "== stage-gate: dev 푸시 후 결정 대기(L-003) =="
+AW=".claude/.awaiting-decision"
+if [ -f "$AW" ]; then echo "skip (실제 결정 대기 마커가 있음)"; else
+  echo testhash > "$AW"
+  expect_deny  "$H/stage-gate.sh" 'awaiting: plan doc denied' "$(gate 'C:/Capstone2/docs/wiki/packages/x/01-plan.md')"
+  expect_allow "$H/stage-gate.sh" 'awaiting: HANDOFF allowed' "$(gate 'C:/Capstone2/docs/wiki/HANDOFF.md')"
+  expect_deny  "$H/commit-guard.sh" 'awaiting: commit denied' "$(mk 'git commit -F .claude/commit-draft.txt')"
+  rm -f "$AW"
+fi
+
 echo "== findings.py 왕복 =="
 T="docs/wiki/packages/_selftest"; mkdir -p "$T"
 printf 'PASS  a\nFAIL  없음: docs/wiki/packages/x/01-plan.md\nWARN  보류 2 건\nFAILED tests/test_x.py::test_y - AssertionError\n' > "$T/out1.txt"

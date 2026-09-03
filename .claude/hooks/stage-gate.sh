@@ -49,6 +49,15 @@ case "$fp_lc" in "$root_lc"/*) rel="${fp:$((${#root_drive}+1))}" ;; esac
 # 프로젝트 밖 파일은 게이트 대상 아님
 case "$fp" in "$root_fwd"/*|"$root_drive"/*) ;; *) case "$fp_lc" in "$root_lc"/*) ;; *) exit 0 ;; esac ;; esac
 
+# L-003: dev 푸시 후 사용자 결정(승격/수정) 전에는 다음 작업 금지 — HANDOFF·journal·초안·gitlog 만 허용
+AWAIT="$ROOT/.claude/.awaiting-decision"
+if [ -f "$AWAIT" ]; then
+  case "$rel" in
+    docs/wiki/HANDOFF.md|docs/wiki/journal.md|.claude/commit-draft.txt|.claude/gitlog.md) ;;
+    *) deny "dev 푸시($(head -c 12 "$AWAIT" 2>/dev/null)) 후 사용자 결정 대기 중이다. main 승격(/commit release) 또는 수정 계속(approve-commit.sh --decision fix)을 AskUserQuestion 으로 정하기 전에는 다음 작업을 시작하지 않는다 (L-003). 허용: HANDOFF.md, journal.md, commit-draft.txt" ;;
+  esac
+fi
+
 # 면제 경로
 case "$rel" in
   docs/*|.claude/*|.githooks/*|.github/*|reports/*|CLAUDE.md|README.md|.gitignore|.gitattributes|.env.example|LICENSE) exit 0 ;;

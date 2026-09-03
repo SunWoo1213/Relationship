@@ -17,13 +17,14 @@ except Exception:
 
 PUSH_MARK="$ROOT/.claude/.push-approved"
 RELEASE_MARK="$ROOT/.claude/.release-approved"
+AWAIT="$ROOT/.claude/.awaiting-decision"
 # 푸시가 일어났으면 푸시 마커를 지운다 (1회용)
 if printf '%s' "$cmd" | grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-[^[:space:]]+([[:space:]]+[^[:space:]]+)?)*[[:space:]]+push([[:space:]]|$)'; then
   # main 승격(dev:main)이 실제로 반영됐으면 승격 마커를 지우고 RELEASE 를 기록한다 (L-001)
   if printf '%s' "$cmd" | grep -Eq 'origin[[:space:]]+dev:main([[:space:]]|$)' && [ -f "$RELEASE_MARK" ]; then
     git -C "$ROOT" fetch -q origin main 2>/dev/null || true
     if [ "$(git -C "$ROOT" rev-parse origin/main 2>/dev/null)" = "$(git -C "$ROOT" rev-parse dev 2>/dev/null)" ]; then
-      rm -f "$RELEASE_MARK"
+      rm -f "$RELEASE_MARK" "$AWAIT"
       [ -f "$JOURNAL" ] && printf -- '- %s | RELEASE | origin main ← dev %s\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short dev 2>/dev/null || true)" >> "$JOURNAL"
     fi
     exit 0
@@ -31,8 +32,10 @@ if printf '%s' "$cmd" | grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-[^[:space:]
   if [ -f "$PUSH_MARK" ] && git -C "$ROOT" status -sb 2>/dev/null | head -n1 | grep -Evq 'ahead'; then
     rm -f "$PUSH_MARK"
     if [ -f "$JOURNAL" ]; then
-      printf -- '- %s | PUSH | origin %s\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)" >> "$JOURNAL"
+      printf -- '- %s | PUSH | origin dev %s — 사용자 결정 대기(승격/수정) L-003\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)" >> "$JOURNAL"
     fi
+    # L-003: dev 푸시 뒤에는 사용자가 승격/수정을 정할 때까지 다음 작업을 막는다
+    git -C "$ROOT" rev-parse --short HEAD 2>/dev/null > "$AWAIT" || date +%s > "$AWAIT"
   fi
   exit 0
 fi

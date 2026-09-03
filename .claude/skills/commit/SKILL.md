@@ -73,6 +73,12 @@ git push origin dev
 ```
 `safety-guard.sh`는 `origin dev` 이외(main 직접 푸시 포함)·강제 옵션·마커 없는 푸시를 거부한다. 푸시가 끝나면 cleanup이 푸시 마커를 지운다. 로컬 작업 브랜치는 항상 `dev`다(`git branch --show-current`로 확인, 아니면 `git checkout dev`).
 
+### 6.1 dev 푸시 뒤에는 멈춘다 (L-003)
+푸시가 끝나면 cleanup 훅이 `.claude/.awaiting-decision` 마커를 만든다. 이 마커가 있는 동안 stage-gate 는 HANDOFF·journal·초안 외 모든 쓰기를, commit-guard 는 새 커밋을 거부한다.
+1. `HANDOFF.md`를 갱신하고 **즉시 `AskUserQuestion`**: "dev 에 <hash> 푸시됨. 실서버에서 확인 후 결정해 주세요" — 선택지: **main 승격** / **수정 필요(내용)** / **보류(나중에 결정)**.
+2. 승격 → §7. 수정 → `bash .claude/hooks/approve-commit.sh --decision fix` 로 마커를 지우고 FIX/작업 계속. 보류 → 마커를 둔 채 턴을 끝낸다(다음 세션 재개 시 다시 묻는다).
+3. 사용자가 정하기 전에는 다음 패키지·작업 단위를 시작하지 않는다.
+
 ### 7. main 승격 — `/commit release` (L-001 브랜치 전략: dev → 실서버 검증 → main)
 `main`은 배포 브랜치다. `dev`를 실제 서버에서 돌려 본 뒤에만 올린다.
 1. 사용자에게 승격 대상을 보인다: `git log --oneline origin/main..dev`(승격될 커밋), 실서버 검증 근거(사용자가 말한 결과·evidence 파일 경로).

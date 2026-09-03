@@ -18,11 +18,16 @@
 
 이 문서와 `.claude/`는 **개발 하네스**다. 제품 속 에이전트는 이 팀이 작성하는 결과물이다.
 
-## 팀 구성 (현재 활성 3)
+## 팀 구성 (현재 활성 4) — 역할별 모델 분리 (L-002)
 
-- `.claude/agents/architect.md` — 감독. 기획서를 작업으로 분해하고 순서·리스크를 관리한다.
-- `.claude/agents/backend-agent.md` — 백엔드. 툴 7종·에이전트 루프·엔티티 해석 4단계.
-- `.claude/agents/eval-agent.md` — 평가. 한국어 대화 150건 데이터셋·지표·베이스라인.
+| 에이전트 | 역할 | 모델 | 이유 |
+|---------|------|------|------|
+| `.claude/agents/architect.md` | 계획. 기획서를 작업으로 분해, 01-plan 초안, backlog | opus | 문서·의존성 분해 |
+| `.claude/agents/backend-agent.md` | 구현. 툴 7종·에이전트 루프·엔티티 해석 4단계 | sonnet | 코드 생산, 비용 |
+| `.claude/agents/eval-agent.md` | 평가 데이터·지표. 한국어 대화 150건 데이터셋·베이스라인 | opus | 라벨 품질, 구현자와 다른 모델 |
+| `.claude/agents/verifier.md` | **검증 전담.** 02-plan-verify 점검표·04-review·코드 리뷰 | fable | 가장 강한 모델을 가장 비판적인 자리에. 구현자와 다른 모델·새 컨텍스트 |
+
+- **같은 컨텍스트·같은 모델이 계획→구현→검증을 다 하면 평가가 후해진다.** 그래서 점검표·완료 검토는 verifier 만 쓰고, `verify-plan.sh`/`verify-impl.sh` 가 `검증자:`/`검토자:` 줄에 `verifier` 가 없으면 FAIL 한다. 메인 세션은 조율·승인·커밋만 한다.
 
 > `db-agent`, `frontend-agent`, `infra-agent`는 아직 만들지 않았다. 필요해지면 architect가 청사진의 역할표를 근거로 추가한다.
 
@@ -109,5 +114,5 @@ agent_traces(id, session_id, step, tool_name, input, output, tokens_in, tokens_o
 - **기획서가 바뀌면 `/devlog change`.** CR 문서 → 태그로 영향 범위(R→D→S→P→`git log --grep`) → 사용자 결정 → `CURRENT.md frozen` 동결 → 카드·CLAUDE.md·backlog 갱신 → 코드 revert/FIX → 해제. 기획서 본문은 원본 유지, 상단 안내문에만 한 줄.
 - **컨텍스트 소진 대비.** 작업 단위 종료·큰 읽기 전·대화가 길어졌을 때 `HANDOFF.md`를 갱신한다. Stop 훅이 변경 파일보다 오래된 HANDOFF를 막는다. 남은 토큰 표시가 20% 미만이면 새 단위를 시작하지 않고 마무리·HANDOFF·`/commit`만 한다.
 - **보안**: `docs/wiki/security.md`. 비밀 파일 읽기·쓰기, 키 문자열 삽입, 강제 푸시, 이력 파괴, 재귀 삭제, `sudo`, destroy/prune/DROP, 외부 전송은 훅이 막는다. 막히면 우회하지 않고 사용자에게 명령을 보여 직접 실행을 요청한다.
-- 저장소: `https://github.com/SunWoo1213/Relationship.git`. **브랜치 전략(L-001)**: 작업·푸시는 `dev`로만, `main`은 배포 브랜치. dev를 실서버에서 검증한 뒤 `/commit release`(사용자 승인 → `git push origin dev:main`)로만 승격한다. 훅이 main 직접 푸시를 막는다. 임베딩은 OpenAI로 시작(D4), 추후 다른 공급자와 비교.
+- 저장소: `https://github.com/SunWoo1213/Relationship.git`. **브랜치 전략(L-001)**: 작업·푸시는 `dev`로만, `main`은 배포 브랜치. dev를 실서버에서 검증한 뒤 `/commit release`(사용자 승인 → `git push origin dev:main`)로만 승격한다. 훅이 main 직접 푸시를 막는다. **dev 푸시 뒤에는 멈춘다(L-003)**: 사용자가 승격/수정을 정하기 전에는 다음 작업·커밋을 시작하지 않는다(`.claude/.awaiting-decision` 마커를 훅이 강제). 임베딩은 OpenAI로 시작(D4), 추후 다른 공급자와 비교.
 - **git log 연동**: 세션 시작·커밋마다 훅이 `.claude/gitlog.md`(최근 커밋·태그별 커밋·마지막 커밋 파일 목록)를 갱신한다. Bash가 없는 에이전트(architect)는 이 파일을 읽고, Bash가 있는 에이전트는 `bash .claude/scripts/gitlog.sh [태그]`를 직접 실행한다. 계획(01-plan)·계획 검증(02-plan-verify)·구현 전에 반드시 본다.

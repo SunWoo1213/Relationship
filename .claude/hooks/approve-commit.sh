@@ -14,9 +14,19 @@ DRAFT="$ROOT/.claude/commit-draft.txt"
 MARK="$ROOT/.claude/.commit-approved"
 PUSH_MARK="$ROOT/.claude/.push-approved"
 RELEASE_MARK="$ROOT/.claude/.release-approved"
+AWAIT="$ROOT/.claude/.awaiting-decision"
+
+# L-003: dev 푸시 후 사용자가 "수정 계속"을 택한 경우 — 결정 대기 마커만 지운다
+if [ "${1:-}" = "--decision" ]; then
+  case "${2:-}" in
+    fix) rm -f "$AWAIT"; echo "결정 기록: 수정 계속. 결정 대기 마커 해제됨 — 이제 새 작업·커밋 가능"; exit 0 ;;
+    *) echo "usage: approve-commit.sh --decision fix   (승격은 --release)" >&2; exit 1 ;;
+  esac
+fi
 
 if [ "${1:-}" = "--release" ]; then
   date +%s > "$RELEASE_MARK"
+  rm -f "$AWAIT"
   echo "승격 마커 생성됨. 다음 명령만 허용된다 (dev → main, fast-forward 만):"
   echo "  git push origin dev:main"
   exit 0
