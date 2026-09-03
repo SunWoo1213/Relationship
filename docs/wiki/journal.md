@@ -14,3 +14,4 @@
 - 2026-09-03 19:09 | COMMIT | b4ddfef docs(P0-embed-pilot): 계획·계획검증 승인, 패키지 착수
 - 2026-09-03 19:09 | PUSH | origin b4ddfef
 - 2026-09-03 19:20 | DECISION | L-001 브랜치 전략: 작업·푸시는 dev, main 은 실서버 검증 후 /commit release(dev:main)로만 승격. 에이전트 git log 연동(gitlog.sh · .claude/gitlog.md, agents 3종·devlog 단계 추가). 자가 점검 68 ok (docs/wiki/evidence/20260903-test-guards-L001.txt) (사용자 지시) | L-001 security
+- 2026-09-03 19:23 | COMMIT | d6d1afb harness(L-001): 브랜치 전략 dev→실서버 검증→main 승격, 에이전트 git log 연동

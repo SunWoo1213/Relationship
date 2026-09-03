@@ -29,7 +29,7 @@
 - docs/wiki/specs/S3.1-schema-v2.md — `vector(N)` 주석에 확정 N 기입
 
 ## 작업 단위 (단위 하나 = 커밋 하나 후보. 끝나면 /commit)
-- [ ] U1 스크립트·테스트 작성: `scripts/embed_pilot.py`(호칭 30개, `EmbeddingProvider` 인터페이스, OpenAI 구현, 코사인 행렬, 팀장↔부장님>팀장↔이모 판정, JSON 저장, 키 없으면 명확한 메시지로 종료), `tests/test_embed_pilot.py` 통과 / Refs: P0-embed-pilot D4 D5 S3.3 R5
+- [x] U1 스크립트·테스트 작성: `scripts/embed_pilot.py`(호칭 30개, `EmbeddingProvider` 인터페이스, OpenAI 구현, 코사인 행렬, 팀장↔부장님>팀장↔이모 판정, JSON 저장, 키 없으면 명확한 메시지로 종료), `tests/test_embed_pilot.py` 통과 / Refs: P0-embed-pilot D4 D5 S3.3 R5
 - [ ] U2 파일럿 실행·리포트: 모델 2개로 실행해 `reports/embed_pilot/*.json`과 실행 출력을 `packages/P0-embed-pilot/evidence/`에 남기고 `reports/embed_pilot.md`(행렬 2종 요약·판정 결과·선택 근거 1문단·확정 N) 작성 / Refs: P0-embed-pilot D4 R5 원칙8
 - [ ] U3 카드 반영: D04 카드 갱신 이력에 확정 모델·N, S3.1 카드 `vector(N)` 주석, review-index R5 상태, registry 행 추가, `.env.example`의 `EMBEDDING_MODEL` 기본값 확인 / Refs: P0-embed-pilot D4 S3.1 R5
 

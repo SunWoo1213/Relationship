@@ -9,3 +9,10 @@
 - 정합성 확인: 원칙3·8·9 / D4·D5 / S3.1·S3.3 / 보안 §1·§4 — 위반 없음 (02-plan-verify 점검표)
 - 남은 것 · 다음 단위: U1 scripts/embed_pilot.py + tests/test_embed_pilot.py 작성
 - Refs: P0-embed-pilot D4 D5 S3.1 S3.3 R5
+
+## 2026-09-03 19:22 · feat(P0-embed-pilot): U1 임베딩 파일럿 스크립트·단위 테스트 · pending
+- 변경: scripts/embed_pilot.py(호칭 30개, EmbeddingProvider 프로토콜 + OpenAIEmbeddingProvider, 코사인 행렬, D4 판정 + 보조 4쌍, JSON 저장, 키 없으면 rc=2), tests/test_embed_pilot.py(가짜 공급자, 10 테스트). 01-plan U1 [x].
+- 이유(기획서·카드 연결): D04 "임베딩 호출은 반드시 EmbeddingProvider 인터페이스 뒤에 둔다", "파일럿 검증 기준은 동일: 팀장↔부장님 유사도 > 팀장↔이모". resolution-plan §1 D4 "유일하게 허용되는 결정용 코드".
+- 정합성 확인: 원칙3(결합식·임계치 불변) / D4·D5 / S3.3 1단계 코사인 유사도 / 보안 §1(키는 환경변수, 값 미출력) — 위반 없음
+- 남은 것 · 다음 단위: U2 실제 실행(OPENAI_API_KEY 필요) → reports/embed_pilot.md
+- Refs: P0-embed-pilot D4 D5 S3.3 R5
