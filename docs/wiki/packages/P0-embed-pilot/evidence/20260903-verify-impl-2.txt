@@ -1,0 +1,19 @@
+== verify-impl P0-embed-pilot  (20260903-1933) ==
+..........                                                               [100%]
+10 passed in 0.07s
+PASS  pytest 통과 → evidence/20260903-1933-pytest.txt
+PASS  compileall 통과 → evidence/20260903-1933-lint.txt
+PASS  태그 P0-embed-pilot 커밋 3 건 → evidence/20260903-1933-commits.txt
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: D5
+PASS  커밋에 태그 존재: R5
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.3
+PASS  증거 확인:  한국어 짧은 호칭 30개 유사도 행렬 2� ← reports/embed_pilot.md
+PASS  증거 확인:  (세부) 호칭 30개 유사도 행렬 2종 — t ← reports/embed_pilot/text-embedding-3-sma
+PASS  증거 확인:  (세부) 선택 근거 1문단 — reports/embed_ ← reports/embed_pilot.md
+PASS  증거 확인:  (세부) 확정 차원 N 기록 — N=1536, D04 � ← docs/wiki/decisions/D04-embedding-provid
+PASS  증거 확인:  (설계 준수) D4 "EmbeddingProvider 인터페� ← scripts/embed_pilot.py, 876a450, evidenc
+PASS  registry 에 P0-embed-pilot 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=0 → evidence/20260903-1933-summary.txt ==

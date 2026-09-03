@@ -1,0 +1,3 @@
+876a450 feat(P0-embed-pilot): U1 임베딩 파일럿 스크립트·단위 테스트
+d6d1afb harness(L-001): 브랜치 전략 dev→실서버 검증→main 승격, 에이전트 git log 연동
+b4ddfef docs(P0-embed-pilot): 계획·계획검증 승인, 패키지 착수

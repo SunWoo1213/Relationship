@@ -16,3 +16,17 @@
 - 정합성 확인: 원칙3(결합식·임계치 불변) / D4·D5 / S3.3 1단계 코사인 유사도 / 보안 §1(키는 환경변수, 값 미출력) — 위반 없음
 - 남은 것 · 다음 단위: U2 실제 실행(OPENAI_API_KEY 필요) → reports/embed_pilot.md
 - Refs: P0-embed-pilot D4 D5 S3.3 R5
+
+## 2026-09-03 19:40 · eval(P0-embed-pilot): U2 파일럿 실행·리포트 — small/large 둘 다 통과, N=1536 · pending
+- 변경: reports/embed_pilot.md(결론·선택 근거 1문단·관찰·한계·행렬 2종), reports/embed_pilot/{text-embedding-3-small,text-embedding-3-large}.json, evidence/20260903-embed-pilot-run.txt·report-tables.md, scripts/embed_pilot.py 콘솔 UTF-8 고정(작은 수정). 01-plan U2 [x].
+- 이유(기획서·카드 연결): D04 "그 출력 차원으로 person_aliases.embedding vector(N)의 N을 확정", "근거를 reports/embed_pilot.md에 남긴다".
+- 정합성 확인: 원칙1(오병합 후보 적은 쪽 선택 근거) / 원칙8(수치 원본 JSON 보관) / D4 / 보안 §1(키 미출력) — 위반 없음
+- 남은 것 · 다음 단위: U3 카드 반영
+- Refs: P0-embed-pilot D4 R5 원칙8
+
+## 2026-09-03 19:42 · docs(P0-embed-pilot): U3 카드 반영 — D04 확정·S3.1 vector(1536)·R5 해소 · pending
+- 변경: decisions/D04-embedding-provider.md(확정 절·상태), specs/S3.1-schema-v2.md(vector(1536) 주석), review-index.md R5 상태, registry.md 리포트 행, .env.example EMBEDDING_MODEL=text-embedding-3-small 확인(변경 없음). 01-plan U3 [x].
+- 이유(기획서·카드 연결): S3.1 "N: D4 파일럿 후 확정". review-index R5 "D4 → P0-embed-pilot".
+- 정합성 확인: D4·D5·S3.1 — 위반 없음. 스키마 v2 구조 변경 없음(N 값만 확정)
+- 남은 것 · 다음 단위: /devlog done (verify-impl, 04-review)
+- Refs: P0-embed-pilot D4 S3.1 R5

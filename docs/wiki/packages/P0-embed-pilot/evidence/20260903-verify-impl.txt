@@ -1,0 +1,15 @@
+== verify-impl P0-embed-pilot  (20260903-1932) ==
+..........                                                               [100%]
+10 passed in 0.07s
+PASS  pytest 통과 → evidence/20260903-1932-pytest.txt
+PASS  compileall 통과 → evidence/20260903-1932-lint.txt
+PASS  태그 P0-embed-pilot 커밋 3 건 → evidence/20260903-1932-commits.txt
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: D5
+PASS  커밋에 태그 존재: R5
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.3
+FAIL  04-review 수용 기준 표에 행이 없다
+PASS  registry 에 P0-embed-pilot 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=1 WARN=0 → evidence/20260903-1932-summary.txt ==

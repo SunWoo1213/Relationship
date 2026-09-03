@@ -1,0 +1,2 @@
+verify-impl P0-embed-pilot 20260903-1933
+FAIL=0 WARN=0

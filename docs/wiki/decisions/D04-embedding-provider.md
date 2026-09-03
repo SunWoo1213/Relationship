@@ -1,6 +1,6 @@
 # D4 · 임베딩 공급자와 차원
 
-상태: 유효(부분 확정) | 해결하는 검증: R5 | 원문: `docs/resolution-plan.md` §1 D4
+상태: 유효(확정 2026-09-03, N=1536) | 해결하는 검증: R5 | 원문: `docs/resolution-plan.md` §1 D4
 
 **결정 (2026-09-03 사용자 지시로 갱신)**
 - **1차 공급자: OpenAI 임베딩 API로 시작한다.** 모델은 P0-embed-pilot에서 OpenAI 모델 중 선택하고(기본 후보 `text-embedding-3-small`), 그 출력 차원으로 `person_aliases.embedding vector(N)`의 N을 확정한다.
@@ -16,3 +16,5 @@
 - 환경변수: `OPENAI_API_KEY`(임베딩), `ANTHROPIC_API_KEY`(LLM). `.env.example` 참조.
 
 **갱신 이력** 2026-09-03 — 사용자: "OpenAI API 키로 우선 시작, 추후 다른 모델 API 키로 성능 비교".
+
+**확정 (2026-09-03, P0-embed-pilot U2·U3)** 모델 `text-embedding-3-small`, **N = 1536**. 근거: `reports/embed_pilot.md` — 두 모델 모두 검증 기준 통과, small 이 여유폭(+0.272 vs +0.190)·비대각 평균(0.311 vs 0.365)에서 오병합 후보가 덜 섞이고, 3072 는 pgvector HNSW 한도(2000) 초과. 상태: 유효(확정). 공급자 교체 시 `person_aliases.embedding` 재임베딩 마이그레이션 필요.

@@ -10,7 +10,7 @@
 | R2 | H | 기획서 일정 ↔ 하네스 마일스톤 불일치 | 폐기 | 일정 전면 삭제 |
 | R3 | H | 임계치 방향 문장이 반대 | 해소(문서) | D10 |
 | R4 | H | "LLM 출력 확률"은 Claude API에 없음 | 해소(문서) | D3 |
-| R5 | H | 임베딩 공급자 미정, 차원 1536은 가정 | 파일럿대기 | D4 → P0-embed-pilot |
+| R5 | H | 임베딩 공급자 미정, 차원 1536은 가정 | 구현완료(876a450, reports/embed_pilot.md: OpenAI text-embedding-3-small, N=1536) | D4 → P0-embed-pilot |
 | R6 | M | 신규 인물 자동등록 vs 확인형 불일치 | 결정완료 | D1 → S3.4 → P2-tools, P5-loop |
 | R7 | M | ask_user 동기 반환 불가 | 결정완료 | D2 → S3.4 → P2-tools, P5-loop |
 | R8 | M | 시맨틱→원문 링크 없음 | 결정완료 | S3.1 `fact_sources` → P1-schema, P6-memory |

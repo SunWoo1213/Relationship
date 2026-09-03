@@ -25,3 +25,4 @@
 | 문서 | 교훈 L-001 브랜치 전략·git log 연동 | docs/wiki/lessons/L-001-dev-branch.md | 하네스 | pending | dev→실서버 검증→main 승격 |
 | 스크립트 | 임베딩 파일럿(결정용 코드): EmbeddingProvider·OpenAIEmbeddingProvider·코사인 행렬·D4 판정 | scripts/embed_pilot.py | P0-embed-pilot | pending | EmbeddingProvider 는 P2/P3 에서 백엔드 모듈로 이동 |
 | 테스트 | 임베딩 파일럿 순수 로직(가짜 공급자, 네트워크 없음) | tests/test_embed_pilot.py | P0-embed-pilot | pending | pytest 10 passed |
+| 리포트 | 임베딩 파일럿 결과(행렬 2종·선택 근거·N=1536) | reports/embed_pilot.md, reports/embed_pilot/*.json | P0-embed-pilot | pending | 실행 출력 evidence/20260903-embed-pilot-run.txt |

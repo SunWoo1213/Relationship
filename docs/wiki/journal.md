@@ -15,3 +15,8 @@
 - 2026-09-03 19:09 | PUSH | origin b4ddfef
 - 2026-09-03 19:20 | DECISION | L-001 브랜치 전략: 작업·푸시는 dev, main 은 실서버 검증 후 /commit release(dev:main)로만 승격. 에이전트 git log 연동(gitlog.sh · .claude/gitlog.md, agents 3종·devlog 단계 추가). 자가 점검 68 ok (docs/wiki/evidence/20260903-test-guards-L001.txt) (사용자 지시) | L-001 security
 - 2026-09-03 19:23 | COMMIT | d6d1afb harness(L-001): 브랜치 전략 dev→실서버 검증→main 승격, 에이전트 git log 연동
+- 2026-09-03 19:24 | COMMIT | 876a450 feat(P0-embed-pilot): U1 임베딩 파일럿 스크립트·단위 테스트
+- 2026-09-03 19:24 | PUSH | origin 876a450
+- 2026-09-03 19:42 | DECISION | D4 확정: OpenAI text-embedding-3-small, N=1536 (파일럿 두 모델 모두 기준 통과, small 이 오병합 후보 적고 pgvector 인덱스 한도 내) reports/embed_pilot.md | P0-embed-pilot D4 R5
+- 2026-09-03 19:52 | DONE | P0-embed-pilot 완료 승인(사용자). 수용 기준 통과, verify-impl FAIL 0 (evidence/20260903-verify-impl-2.txt). R5 구현완료 | P0-embed-pilot D4 R5
+- 2026-09-03 19:37 | COMMIT | a66f1e2 eval(P0-embed-pilot): U2 파일럿 실행 — small/large 둘 다 기준 통과, N=1536 확정 근거
