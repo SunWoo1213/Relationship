@@ -16,6 +16,17 @@ PUSH_MARK="$ROOT/.claude/.push-approved"
 RELEASE_MARK="$ROOT/.claude/.release-approved"
 AWAIT="$ROOT/.claude/.awaiting-decision"
 
+# L-004: 계획·구현·검증 단계 위임은 사용자가 AskUserQuestion 으로 "시작"을 택한 직후에만.
+#        1회용 마커(.claude/.stage-approved = 에이전트 이름)를 만든다. delegate-guard.sh 가 Agent 호출 시 검사·소비한다.
+if [ "${1:-}" = "--stage" ]; then
+  case "${2:-}" in
+    architect|backend-agent|eval-agent|verifier)
+      printf '%s\n' "$2" > "$ROOT/.claude/.stage-approved"
+      echo "단계 승인 기록: $2 — 이제 Agent(subagent_type=$2) 를 1회 띄울 수 있다"; exit 0 ;;
+    *) echo "usage: approve-commit.sh --stage architect|backend-agent|eval-agent|verifier" >&2; exit 1 ;;
+  esac
+fi
+
 # L-003: dev 푸시 후 사용자가 "수정 계속"을 택한 경우 — 결정 대기 마커만 지운다
 if [ "${1:-}" = "--decision" ]; then
   case "${2:-}" in

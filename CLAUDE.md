@@ -107,6 +107,7 @@ agent_traces(id, session_id, step, tool_name, input, output, tokens_in, tokens_o
 
 - **위키는 꺼내 보는 참고자료다.** 세션 시작 시 `docs/wiki/HANDOFF.md`(자동 주입)와 `docs/wiki/INDEX.md`·`CURRENT.md`만 읽고, 태그(P/D/R/S/원칙)가 가리키는 카드만 연다. 원문 전체를 읽지 않는다.
 - **재개 규칙**: 중단된 작업이나 커밋 안 된 변경이 있으면 **다른 어떤 일보다 먼저** 사용자에게 목록을 보이고 우선순위(이어서 완료 / 보류 / 폐기)를 묻는다 (`/devlog resume`).
+- **계획·구현·검증 단계는 자동 시작하지 않는다(L-004).** architect·backend-agent·eval-agent·verifier 를 띄우기 전에 매번 AskUserQuestion 으로 시작 승인을 받고 `approve-commit.sh --stage <에이전트>` 마커를 만든다. `delegate-guard.sh`(PreToolUse Agent)가 강제한다.
 - **제품 코드는 활성 작업이 있어야 쓸 수 있다.** `/devlog start <id>` → 01-plan → 02-plan-verify(기계 검증 `verify-plan.sh` + 점검표 8행 + 카드 인용) → 사용자 승인 → `CURRENT.md active`. `stage-gate.sh`가 막는다. 한 번에 활성 패키지 하나. P4 파일럿 평가 전에 P5 이후 시작 금지.
 - **작업 단위(사소한 수정 포함)마다 `/commit`.** LLM이 초안(변경·이유·정합성·검증·Refs)을 쓰고 사용자가 AskUserQuestion으로 승인한 뒤에만 커밋한다. `git add`는 명시 경로만. 푸시도 승인 필요. 서브에이전트는 커밋하지 않는다.
 - **계획·검증·구현은 모두 위키에 남긴다.** `packages/<id>/01~05`, `registry.md`(무엇이 있는가 — 단위 시작 전 grep, 중복 구현 금지), `journal.md`(시간순), `HANDOFF.md`(지금 어디·다음 무엇).

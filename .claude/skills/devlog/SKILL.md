@@ -12,6 +12,7 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 - 기획서 정합성은 **계획 단계에서** 검증한다. 코드가 생긴 뒤 검증하면 늦다.
 - **검증은 증거로만** (`verification.md`). 기계 검증 스크립트 출력을 그대로 붙이고, FAIL/WARN 은 `findings.py`로 소견을 만들어 조치 계획을 쓴다. "확인했습니다"는 빈 칸으로 간주한다.
 - 승인은 `AskUserQuestion`으로 받고, 문서의 `승인:` 줄에 "사용자 (YYYY-MM-DD)"를 적는다. 훅은 이 줄이 있어야 코드 쓰기를 허용한다.
+- **단계는 자동으로 시작하지 않는다(L-004).** 계획(architect)·구현(backend-agent, eval-agent)·검증(verifier)을 띄우기 전에 **매번** `AskUserQuestion`으로 "무엇을 누구에게 위임해 시작할지"를 보이고 시작 승인을 받는다. 승인 직후 `bash .claude/hooks/approve-commit.sh --stage <에이전트>` → 그 에이전트를 1회 띄운다. `delegate-guard.sh`(PreToolUse Agent)가 마커 없는 위임을 거부한다. 재검증·개정 같은 반복도 매번 묻는다.
 - 계획·검증·구현은 모두 위키에 남긴다. 만들기 전에 `registry.md`를 grep 한다(중복 방지). 날짜·마일스톤은 쓰지 않는다.
 
 ## 하위 명령

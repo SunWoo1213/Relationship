@@ -127,6 +127,18 @@ if [ -f "$AW" ]; then echo "skip (실제 결정 대기 마커가 있음)"; else
   rm -f "$AW"
 fi
 
+echo "== delegate-guard: 단계 위임 승인(L-004) =="
+ag() { python -c "import json,sys;print(json.dumps({'tool_name':'Agent','tool_input':{'subagent_type':sys.argv[1],'description':'x','prompt':'y'}}))" "$1"; }
+SA=".claude/.stage-approved"
+if [ -f "$SA" ]; then echo "skip (실제 단계 승인 마커가 있음)"; else
+  expect_deny  "$H/delegate-guard.sh" 'verifier without marker' "$(ag verifier)"
+  expect_allow "$H/delegate-guard.sh" 'Explore not gated' "$(ag Explore)"
+  echo architect > "$SA"
+  expect_deny  "$H/delegate-guard.sh" 'marker=architect but backend-agent' "$(ag backend-agent)"
+  expect_allow "$H/delegate-guard.sh" 'marker=architect, architect allowed (consumed)' "$(ag architect)"
+  [ ! -f "$SA" ] && echo "ok   marker consumed after allow" || { echo "XX   marker not consumed"; fails=$((fails+1)); rm -f "$SA"; }
+fi
+
 echo "== findings.py 왕복 =="
 T="docs/wiki/packages/_selftest"; mkdir -p "$T"
 printf 'PASS  a\nFAIL  없음: docs/wiki/packages/x/01-plan.md\nWARN  보류 2 건\nFAILED tests/test_x.py::test_y - AssertionError\n' > "$T/out1.txt"

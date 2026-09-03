@@ -3,6 +3,7 @@
 .claude/.push-approved
 .claude/.release-approved
 .claude/.awaiting-decision
+.claude/.stage-approved
 .claude/commit-draft.txt
 # 훅이 자동 생성하는 git log 스냅샷 (에이전트 참고용, 커밋하지 않음)
 .claude/gitlog.md

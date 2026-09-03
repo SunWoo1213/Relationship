@@ -30,3 +30,5 @@
 | 문서 | 교훈 L-002 역할별 모델 분리(계획 opus · 구현 sonnet · 검증 fable) | docs/wiki/lessons/L-002-role-model-separation.md | 하네스 | pending | verify-plan/impl 이 검증자=verifier 강제 |
 | 문서 | 교훈 L-003 dev 푸시 뒤 사용자 결정까지 멈춤 | docs/wiki/lessons/L-003-stop-after-dev-push.md | 하네스 | pending | .awaiting-decision 마커 |
 | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·실행법) | README.md | 하네스 | pending | 패키지 완료마다 진행 상태 표 갱신 |
+| 훅 | 단계 위임 게이트(Agent 호출 전 사용자 승인 마커) | .claude/hooks/delegate-guard.sh | 하네스 | pending | L-004 |
+| 문서 | 교훈 L-004 단계는 묻고 시작 | docs/wiki/lessons/L-004-ask-before-stage.md | 하네스 | pending | |
