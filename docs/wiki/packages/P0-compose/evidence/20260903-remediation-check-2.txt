@@ -1,0 +1,56 @@
+== remediation 완료 판정 명령 실행 (verifier, 2026-09-03 20:08) ==
+
+--- F-033bb1 #1: grep -n "^- .env.example" docs/wiki/packages/P0-compose/01-plan.md
+26:- .env.example — DB 절에 이름 4개 추가(`POSTGRES_USER=app`, `POSTGRES_PASSWORD=pass`, `POSTGRES_DB=relationship`, `POSTGRES_PORT=5432` — 기존 `DATABASE_URL`과 같은 예시값 + "`DATABASE_URL`과 같은 값 유지, 실제 비밀번호는 `.env`에만" 주석)
+exit=0
+
+--- F-033bb1 #2: grep -n "U1 .*\.env\.example" docs/wiki/packages/P0-compose/01-plan.md
+35:- [ ] U1 `.env.example` 갱신 + compose 파일 + initdb: 먼저 `.env.example` DB 절에 이름 4개(`POSTGRES_USER=
+exit=0
+
+--- F-033bb1 #3: grep -n "POSTGRES_PORT:-5432" docs/wiki/packages/P0-compose/01-plan.md
+13:  - `docker-compose.yml` — 서비스 1개(postgres). 이미지는 pgvector 
+35:- [ ] U1 `.env.example` 갱신 + compose 파일 + initdb: 먼저 `.env.exampl
+44:- **5432 포트 충돌 · 값 출처 이원화(F-033bb1 결정 (a))**: 로컬
+count=3
+
+--- F-033bb1 #4: grep -c "불일치" docs/wiki/packages/P0-compose/01-plan.md
+5
+
+--- F-033bb1 #5 (구현, 대기 확인): grep -c "POSTGRES_" .env.example
+0
+exit=1
+
+--- F-033bb1 #6 (구현, 대기 확인): ls docker-compose.yml
+ls: cannot access 'docker-compose.yml': No such file or directory
+exit=2
+
+--- F-033bb1 #7 (구현, 대기 확인): ls scripts/db_check.py scripts/db_check.sh
+ls: cannot access 'scripts/db_check.py': No such file or directory
+ls: cannot access 'scripts/db_check.sh': No such file or directory
+exit=2
+
+--- F-0ffff5 #1: grep -n "새 행 금지" docs/wiki/packages/P0-compose/01-plan.md
+17:  - 문서 반영 두 곳: **README 로컬 DB 절**(`READ
+32:- docs/wiki/registry.md — compose·initdb·db_check 행
+37:- [ ] U3 registry·문서 반영: `docs/wiki/registry.md`
+65:- 2026-09-03 개정 1 (architect): 02-plan-verify 보류(
+count=4
+
+--- F-0ffff5 #2: grep -n "기존 32행\|기존 README 행" docs/wiki/packages/P0-compose/01-plan.md
+17:  - 문서 반영 두 곳: **README 로컬 DB 절**(`READ
+32:- docs/wiki/registry.md — compose·initdb·db_check 행
+37:- [ ] U3 registry·문서 반영: `docs/wiki/registry.md`
+47:- 미결 1 — **이미지 태그 고정**: `pgvector/pgv
+65:- 2026-09-03 개정 1 (architect): 02-plan-verify 보류(
+count=5
+
+--- F-0ffff5 #3: grep -n "U3 .*비고 갱신" docs/wiki/packages/P0-compose/01-plan.md
+37:- [ ] U3 registry·문서 반영: `docs/wiki/registry.md`에 compose·initdb�
+exit=0
+
+--- F-0ffff5 #4 (구현, 대기 확인): grep -c "| README.md |" docs/wiki/registry.md
+1
+
+--- F-0ffff5 #5 (구현, 대기 확인): grep -n "docker compose up -d" README.md
+exit=1

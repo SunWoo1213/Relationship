@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: none
+active: P0-compose
 frozen: none
 
 <!--
@@ -12,4 +12,4 @@ frozen: none
 -->
 
 ## 메모
-- P0-embed-pilot 완료(2026-09-03, D4 확정 N=1536). 다음: P0-compose.
+- P0-compose 계획 승인(2026-09-03, verifier 2회 검증). U1 구현 중. 팀 밑작업 L-004 는 보류.

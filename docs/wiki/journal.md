@@ -29,3 +29,5 @@
 - 2026-09-03 19:48 | COMMIT | 4df323f harness(L-003): dev 푸시 뒤 사용자 결정(승격/수정) 전까지 다음 작업 금지 게이트
 - 2026-09-03 19:48 | PUSH | origin dev 4df323f — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-03 19:50 | RELEASE | origin main ← dev 4df323f
+- 2026-09-03 19:59 | COMMIT | ae2076f docs(readme): 프로젝트 전체 소개 README 추가
+- 2026-09-03 22:00 | START | P0-compose 착수: architect(opus) 계획 → verifier(fable) 보류 1건(F-033bb1 .env.example POSTGRES_* 없음) → 사용자 결정 (a) → 개정 → 재검증 통과(FAIL 0/WARN 1) → 사용자 승인. L-002 첫 적용 | P0-compose D4 D5 S3.1

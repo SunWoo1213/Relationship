@@ -5,38 +5,35 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-03 21:10
-active: none | frozen: none | 브랜치: dev (origin/dev = 4df323f, **main = 4df323f** 승격 완료, 승격 대기 0)
+갱신: 2026-09-03 22:05
+active: P0-compose | frozen: none | 브랜치: dev (로컬 dev = ae2076f + 계획 커밋 예정, origin/dev = main = 4df323f)
 
 ## 지금 어디까지
-- 마지막으로 끝낸 것: P0-embed-pilot **완료·승인·커밋·dev 푸시**(a66f1e2 U2, e4ab0a4 U3+done, 3abe513 verify-impl 수정). 이어서 하네스 L-002(역할별 모델 분리: architect=opus, backend=sonnet, eval=opus, verifier(신설)=fable, verify-plan/impl 이 검증자=verifier 강제) 작성, 자가 점검 68 ok (evidence/20260903-test-guards-L002.txt).
-- (이전) P0-embed-pilot U2·U3 완료. 파일럿 실행 결과 두 모델 모두 D4 기준 통과, **확정: OpenAI text-embedding-3-small, N=1536** (`reports/embed_pilot.md`). D04·S3.1·review-index R5·registry·backlog 반영. 04-review 작성, verify-impl FAIL 0 (`evidence/20260903-verify-impl-2.txt`; 1차 FAIL 은 verify-impl.sh 제목 패턴 버그 → 소견 F-445cda 해소, 스크립트 수정).
-- 이어서 하네스 L-003(dev 푸시 뒤 멈춤: `.awaiting-decision` 마커, stage-gate·commit-guard 강제, commit 스킬 §6.1) 작성, 자가 점검 72 ok (evidence/20260903-test-guards-L003.txt).
-- L-002(64f92e4)·L-003(4df323f) 커밋 후 dev 푸시 완료. `.claude/.awaiting-decision` 생성됨.
-- 사용자가 dev 4df323f 를 **main 으로 승격**(2026-09-03, `git push origin dev:main`, RELEASE 기록). 결정 대기 마커 해제.
-- 진행 중인 것: `/devlog start P0-compose` 착수. architect(opus)가 `packages/P0-compose/01-plan.md` 초안 작성 완료(U1 compose+initdb / U2 db_check / U3 registry·README, 미결: 이미지 태그 pg16·드라이버 psycopg·포트 변수화). **verifier(fable)가 02-plan-verify 작성 중(서브에이전트 실행 중, 완료 알림 대기)**. Docker 데몬 실행 확인됨(사용자가 켬).
-- 사용자 요청으로 루트 `README.md`(프로젝트 전체 소개) 작성 — **커밋 승인 대기**. 클로드 팀(teammates) 밑작업 질문은 claude-code-guide 에이전트가 조사 중(완료 알림 대기).
-- 커밋 안 된 변경: 없음.
+- 사용자가 dev 4df323f 를 main 으로 승격(2026-09-03). 그 뒤 README(ae2076f, 로컬, 미푸시) 커밋.
+- **P0-compose 계획 승인(2026-09-03)** — L-002 첫 적용: architect(opus) 초안 → verifier(fable) 보류 1건(F-033bb1) → 사용자 결정 (a) → architect 개정 → verifier 재검증 통과(FAIL 0/WARN 1, `packages/P0-compose/evidence/20260903-verify-plan-2-final.txt`). CURRENT active: P0-compose.
+- 진행 중인 것: **계획 문서 커밋(커밋만, 사용자 승인됨) 진행 중.** 그 다음 backend-agent(sonnet)에 U1 위임.
+- 커밋 안 된 변경: packages/P0-compose/*(01·02·03·05·evidence), CURRENT.md, journal.md, HANDOFF.md.
+- 팀 밑작업(L-004, Agent Teams): 사용자 결정 **보류**. 조사 요약은 이 세션 답변에 있음(env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1, teammateMode, TaskCompleted 훅, 팀메이트별 담당 파일 분할). 필요 시 다시 꺼낸다.
 
 ## 바로 다음에 할 것 (순서대로)
-1. README 커밋(푸시는 P0-compose 계획 커밋과 함께 — L-003 마커가 verifier 작업을 막지 않도록). verifier 완료 알림 → 02-plan-verify 결과(통과/보류) 확인(검증자 줄 verifier 필수) → 사용자 승인 → CURRENT active → 계획 커밋 → backend-agent(sonnet) 구현 → verifier 04-review.
-2. 이후 커밋·dev 푸시 뒤에는 다시 멈추고 승격/수정을 묻는다(L-003).(사용자 선택). **새 흐름**: architect(opus)에 01-plan 초안 위임 → verifier(fable)에 02-plan-verify 위임 → 사용자 승인 → backend-agent(sonnet) 구현 → verifier 04-review. 메인 세션은 점검표를 직접 쓰지 않는다.
-3. 사용자 직접: AWS Budgets $10/$30/$50. main 승격은 dev 실서버 검증 후 `/commit release`.
+1. 계획 문서 `/commit`(커밋만. 푸시는 구현 커밋과 함께 — L-003).
+2. U1: backend-agent(sonnet)에 위임 — `.env.example` 이름 4개(POSTGRES_USER/PASSWORD/DB/PORT, 예시값 app/pass/relationship/5432) + `docker-compose.yml`(pgvector/pgvector:pg16, `${VAR:-기본값}`, `${POSTGRES_PORT:-5432}:5432`, 이름 있는 볼륨, healthcheck) + `docker/initdb/01-vector.sql`. Docker 데몬 실행 중. → `/commit`.
+3. U2: `scripts/db_check.py`(psycopg 우선, 대안은 compose exec psql — 결정은 03-log) — CREATE EXTENSION + `SELECT '[1,2,3]'::vector`, POSTGRES_* 부재 시 compose 기본값과 비교, 어긋난 변수 이름만 경고. 실행 출력을 `packages/P0-compose/evidence/`에 tee → `/commit`.
+4. U3: README "로컬에서 해 보기" 절에 로컬 DB(up/check/down, 볼륨 삭제 금지, 포트 바꾸면 DATABASE_URL 도), registry 기존 README 행 비고 갱신(새 행 금지) + compose·initdb·db_check 행 추가 → `/commit` → verifier 04-review → `/devlog done` → dev 푸시 → L-003 멈춤(승격/수정 질문).
 
 ## 재개 시 읽을 카드 (이것만)
 - `docs/wiki/CURRENT.md`, `docs/wiki/INDEX.md`, `.claude/gitlog.md`
-- `packages/P0-embed-pilot/04-review.md` §7(다음 패키지에 넘기는 것), `reports/embed_pilot.md` 결론
+- `packages/P0-compose/01-plan.md` 작업 단위·리스크, `02-plan-verify.md` §3 참고사항, `03-log.md` 마지막 2항목
 - `lessons/L-001-dev-branch.md`, `L-002-role-model-separation.md`, `L-003-stop-after-dev-push.md`
 
 ## 열린 질문 · 사용자 결정 대기
-- 없음. (다음 패키지 P0-compose 로 결정됨)
+- 없음.
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)
 - 재개 시 커밋 안 된 변경·진행 중 항목이 있으면 **먼저 사용자에게 목록을 보이고 우선순위를 묻는다**(`/devlog resume`).
-- **푸시는 `git push origin dev` 만**. main 직접 푸시는 훅이 거부. 승격은 `/commit release` → `git push origin dev:main`.
+- **점검표·완료 검토는 verifier 에게 위임**(L-002). 메인 세션이 직접 쓰면 verify-plan/impl 이 FAIL.
+- **푸시는 `git push origin dev` 만**. 푸시 뒤 `.claude/.awaiting-decision` 이 생기면 승격/수정을 묻고 멈춘다(L-003). 승격은 `approve-commit.sh --release` → `git push origin dev:main`.
 - 승인 마커는 커밋 명령과 **다른 Bash 호출**에서 먼저 만든다. 정리 훅은 PostToolUse.
-- **dev 푸시 뒤 `.claude/.awaiting-decision` 이 있으면** 새 작업·커밋이 막힌다. 사용자에게 승격/수정을 물어 `approve-commit.sh --release` 또는 `--decision fix` 로 푼다.
-- Bash 도구는 `\` 를 하나로 줄인다. 백슬래시가 든 패치는 Write 로 파일에 쓴 뒤 실행한다(L-003 패치에서 SyntaxError 로 한 번 실패).
-- `.env` 존재 확인(`test -f .env`)도 safety-guard 가 막는다. 키는 이제 채워져 있다(사용자 확인 2026-09-03).
-- Windows 콘솔: 파이썬 출력은 스크립트에서 UTF-8 로 reconfigure. evidence 에 `cut -c` 로 잘린 한글은 깨져 보일 수 있다(내용 문제 아님).
-- 임계치 T_merge/T_new 는 모델별 스케일이 달라 P4 에서 보정한다(reports/embed_pilot.md 관찰).
+- Bash 명령 문자열에 훅 금지 문구(예: 볼륨을 지우는 compose 옵션, 강제 푸시 옵션)가 **텍스트로라도** 들어가면 차단된다. 그런 문구가 든 문서는 Write 도구로 쓴다. `\\` 도 하나로 줄어드니 패치는 파일로 써서 실행.
+- `.env` 존재 확인(`test -f .env`)도 safety-guard 가 막는다. 스크립트가 키 부재를 스스로 보고하게 한다.
+- registry 에 README 행이 이미 있다(하네스 소유). P0-compose U3 는 새 행을 만들지 말고 비고만 갱신한다.
