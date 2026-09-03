@@ -18,11 +18,12 @@
 | 규칙 | 대신 |
 |------|------|
 | 강제 푸시(`--force`, `-f`, `+ref`, `--mirror`, `--delete`) 금지 | 새 커밋으로 고친다. 잘못된 커밋은 `git revert` |
-| 푸시는 `origin` 으로만, `/commit` 절차에서 사용자가 승인한 뒤에만 | `/commit` 의 "커밋 + 푸시" 선택 |
+| 푸시는 `origin dev` 로만, `/commit` 절차에서 사용자가 승인한 뒤에만 | `/commit` 의 "커밋 + 푸시" 선택 → `git push -u origin dev` |
+| `main` 직접 푸시 금지 (L-001 브랜치 전략: dev → 실서버 검증 → main) | `/commit release` — 사용자 승인 → `approve-commit.sh --release` → `git push origin dev:main` (fast-forward 만, 강제 옵션은 별도 차단) |
 | 커밋은 승인된 초안 파일로만, `--amend`·`--no-verify` 금지 | `/commit` |
 | `reset --hard`, `checkout -- .`, `restore .`, `clean`, `branch -D`, `stash drop`, `filter-branch` 금지 | 되돌리기는 `git revert`. 정말 필요하면 사용자가 직접 |
 | 원격·자격·사용자 설정 변경(`remote set-url`, `config credential…`) 금지 | 사용자가 직접 |
-| 저장소: `https://github.com/SunWoo1213/Relationship.git` (origin). 브랜치 `main` | |
+| 저장소: `https://github.com/SunWoo1213/Relationship.git` (origin). 작업 브랜치 `dev`, 배포 브랜치 `main` | 로컬은 항상 `dev` 에서 작업. `main` 은 승격 뒤 `git fetch origin main:main` 으로만 맞춘다 |
 
 ## 3. 파일 시스템
 

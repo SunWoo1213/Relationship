@@ -27,7 +27,7 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 ### `/devlog start <패키지 id>`   (id는 INDEX.md "패키지 id" 표의 것만)
 1. 선행 조건: `CURRENT.md active`가 none(한 번에 하나), `frozen`이 none.
 2. `docs/backlog.md`에서 해당 항목(의존·수용기준)을 읽는다. 선행 패키지 `04-review.md` `결과: 완료` 확인. **P5 이후는 `P4-pilot-eval` 완료 없이 시작하지 않는다.**
-3. `review-index.md`에서 이 패키지가 닫는 R → "다음 카드"(D, S)를 연다. 원문은 카드가 지시하는 절만. `registry.md`를 grep 해 이미 있는 산출물을 확인한다.
+3. `review-index.md`에서 이 패키지가 닫는 R → "다음 카드"(D, S)를 연다. 원문은 카드가 지시하는 절만. `registry.md`를 grep 해 이미 있는 산출물을 확인한다. **git log 를 본다(L-001)**: `bash .claude/scripts/gitlog.sh <id> <D/S 태그>` — 선행 패키지 완료 커밋, 같은 태그의 기존 커밋, 미커밋 변경을 확인하고 02-plan-verify 점검표 5·7 의 근거에 커밋 해시를 적는다. 현재 브랜치가 `dev` 인지 확인한다.
 4. `packages/<id>/01-plan.md`를 `templates/plan.md`로 작성. 작업 단위(U1, U2 …)마다 `Refs:`. 수용 기준은 backlog와 **글자 그대로**.
 5. **기계 검증**: `mkdir -p packages/<id>/evidence` 후
    `bash .claude/scripts/verify-plan.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt`

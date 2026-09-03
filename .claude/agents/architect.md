@@ -60,3 +60,4 @@ model: opus
 - 검증은 증거로만: 실행한 명령과 출력을 `packages/<id>/evidence/`에 파일로 남기고 경로를 보고한다. "확인했습니다"만 쓰지 않는다. FAIL 은 `findings.py` 소견으로.
 - 커밋·푸시·사용자 승인은 하지 않는다(메인 세션이 `/commit`, `AskUserQuestion`). 작업 단위가 끝나면 변경 파일 목록·Refs 태그·증거 경로를 보고하고 멈춘다.
 - 비밀(.env, 키), 강제 푸시, 재귀 삭제, destroy/prune/DROP 금지 — `docs/wiki/security.md`.
+- **git log 를 본다 (L-001)**: 이 에이전트는 Bash 가 없으므로 훅이 갱신하는 `.claude/gitlog.md`(브랜치 상태·최근 커밋 20건·활성 패키지 태그 커밋·마지막 커밋 파일·미커밋 변경)를 **계획 분해·backlog 갱신·계획 검증 전에 Read** 한다. 특정 태그(D5, P3-er 등)의 커밋 이력이 필요하면 위임 보고에 "gitlog.sh <태그> 실행 요청"이라고 적어 메인 세션이 실행하게 한다. backlog 체크·의존성 판단은 위키 문장이 아니라 커밋 해시를 근거로 한다.

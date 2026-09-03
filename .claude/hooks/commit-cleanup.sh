@@ -16,8 +16,18 @@ except Exception:
     print("")' 2>/dev/null)"
 
 PUSH_MARK="$ROOT/.claude/.push-approved"
+RELEASE_MARK="$ROOT/.claude/.release-approved"
 # 푸시가 일어났으면 푸시 마커를 지운다 (1회용)
 if printf '%s' "$cmd" | grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-[^[:space:]]+([[:space:]]+[^[:space:]]+)?)*[[:space:]]+push([[:space:]]|$)'; then
+  # main 승격(dev:main)이 실제로 반영됐으면 승격 마커를 지우고 RELEASE 를 기록한다 (L-001)
+  if printf '%s' "$cmd" | grep -Eq 'origin[[:space:]]+dev:main([[:space:]]|$)' && [ -f "$RELEASE_MARK" ]; then
+    git -C "$ROOT" fetch -q origin main 2>/dev/null || true
+    if [ "$(git -C "$ROOT" rev-parse origin/main 2>/dev/null)" = "$(git -C "$ROOT" rev-parse dev 2>/dev/null)" ]; then
+      rm -f "$RELEASE_MARK"
+      [ -f "$JOURNAL" ] && printf -- '- %s | RELEASE | origin main ← dev %s\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short dev 2>/dev/null || true)" >> "$JOURNAL"
+    fi
+    exit 0
+  fi
   if [ -f "$PUSH_MARK" ] && git -C "$ROOT" status -sb 2>/dev/null | head -n1 | grep -Evq 'ahead'; then
     rm -f "$PUSH_MARK"
     if [ -f "$JOURNAL" ]; then
@@ -40,5 +50,7 @@ if [ -n "$head_subject" ] && [ "$head_subject" = "$draft_subject" ]; then
   if [ -f "$JOURNAL" ]; then
     printf -- '- %s | COMMIT | %s %s\n' "$(date +%Y-%m-%d\ %H:%M)" "$hash" "$draft_subject" >> "$JOURNAL"
   fi
+  # git log 스냅샷 갱신 (L-001) — 에이전트가 최신 커밋을 .claude/gitlog.md 로 본다
+  [ -f "$ROOT/.claude/scripts/gitlog.sh" ] && bash "$ROOT/.claude/scripts/gitlog.sh" --write 2>/dev/null || true
 fi
 exit 0

@@ -58,3 +58,4 @@ skills: eval-harness
 - 검증은 증거로만: 실행한 명령과 출력을 `packages/<id>/evidence/`에 파일로 남기고 경로를 보고한다. "확인했습니다"만 쓰지 않는다. FAIL 은 `findings.py` 소견으로.
 - 커밋·푸시·사용자 승인은 하지 않는다(메인 세션이 `/commit`, `AskUserQuestion`). 작업 단위가 끝나면 변경 파일 목록·Refs 태그·증거 경로를 보고하고 멈춘다.
 - 비밀(.env, 키), 강제 푸시, 재귀 삭제, destroy/prune/DROP 금지 — `docs/wiki/security.md`.
+- **git log 를 본다 (L-001)**: 평가 계획·데이터셋·리포트 작업 전에 `bash .claude/scripts/gitlog.sh <패키지 id> [태그]` 를 실행해 평가 대상 코드가 어느 커밋인지 확인하고, 리포트(`reports/*.md`, `metrics.json`)에 **평가한 커밋 해시**를 적는다(재현성, 원칙8). 작업은 `dev` 브랜치에서만 한다.

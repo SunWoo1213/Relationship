@@ -1,7 +1,10 @@
 # 커밋·푸시 승인 절차의 임시 파일 (절대 커밋하지 않음)
 .claude/.commit-approved
 .claude/.push-approved
+.claude/.release-approved
 .claude/commit-draft.txt
+# 훅이 자동 생성하는 git log 스냅샷 (에이전트 참고용, 커밋하지 않음)
+.claude/gitlog.md
 .claude/settings.local.json
 
 # 비밀 (에이전트는 읽지도 쓰지도 않는다 — docs/wiki/security.md)

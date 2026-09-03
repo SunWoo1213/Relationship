@@ -109,4 +109,5 @@ agent_traces(id, session_id, step, tool_name, input, output, tokens_in, tokens_o
 - **기획서가 바뀌면 `/devlog change`.** CR 문서 → 태그로 영향 범위(R→D→S→P→`git log --grep`) → 사용자 결정 → `CURRENT.md frozen` 동결 → 카드·CLAUDE.md·backlog 갱신 → 코드 revert/FIX → 해제. 기획서 본문은 원본 유지, 상단 안내문에만 한 줄.
 - **컨텍스트 소진 대비.** 작업 단위 종료·큰 읽기 전·대화가 길어졌을 때 `HANDOFF.md`를 갱신한다. Stop 훅이 변경 파일보다 오래된 HANDOFF를 막는다. 남은 토큰 표시가 20% 미만이면 새 단위를 시작하지 않고 마무리·HANDOFF·`/commit`만 한다.
 - **보안**: `docs/wiki/security.md`. 비밀 파일 읽기·쓰기, 키 문자열 삽입, 강제 푸시, 이력 파괴, 재귀 삭제, `sudo`, destroy/prune/DROP, 외부 전송은 훅이 막는다. 막히면 우회하지 않고 사용자에게 명령을 보여 직접 실행을 요청한다.
-- 저장소: `https://github.com/SunWoo1213/Relationship.git` (origin/main). 임베딩은 OpenAI로 시작(D4), 추후 다른 공급자와 비교.
+- 저장소: `https://github.com/SunWoo1213/Relationship.git`. **브랜치 전략(L-001)**: 작업·푸시는 `dev`로만, `main`은 배포 브랜치. dev를 실서버에서 검증한 뒤 `/commit release`(사용자 승인 → `git push origin dev:main`)로만 승격한다. 훅이 main 직접 푸시를 막는다. 임베딩은 OpenAI로 시작(D4), 추후 다른 공급자와 비교.
+- **git log 연동**: 세션 시작·커밋마다 훅이 `.claude/gitlog.md`(최근 커밋·태그별 커밋·마지막 커밋 파일 목록)를 갱신한다. Bash가 없는 에이전트(architect)는 이 파일을 읽고, Bash가 있는 에이전트는 `bash .claude/scripts/gitlog.sh [태그]`를 직접 실행한다. 계획(01-plan)·계획 검증(02-plan-verify)·구현 전에 반드시 본다.

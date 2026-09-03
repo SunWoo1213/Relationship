@@ -37,6 +37,11 @@ for c in \
   'git push -f origin main' \
   'git push upstream main' \
   'git push origin main' \
+  'git push -u origin main' \
+  'git push origin HEAD:main' \
+  'git push origin dev:main' \
+  'git push origin dev' \
+  'git push origin' \
   'git reset --hard HEAD~1' \
   'git checkout -- app/main.py' \
   'git checkout .' \
@@ -124,7 +129,7 @@ if [ "$rc1" -eq 1 ] && [ "$n_open" -eq 3 ] && [ "$rc2" -eq 0 ] && [ "$n_closed" 
 rm -f "$T/out1.txt" "$T/out2.txt" "$T/05-remediation.md"; rmdir "$T" 2>/dev/null
 
 echo "== verify-plan (없는 패키지 → FAIL 종료 1) =="
-bash .claude/scripts/verify-plan.sh P0-embed-pilot >/dev/null 2>&1; rc=$?
+bash .claude/scripts/verify-plan.sh ZZ-no-such-package >/dev/null 2>&1; rc=$?
 [ "$rc" -eq 1 ] && echo "ok   verify-plan exits 1 on missing package" || { echo "XX   verify-plan rc=$rc"; fails=$((fails+1)); }
 
 echo "== handoff-check (stop_hook_active=true → 통과) =="

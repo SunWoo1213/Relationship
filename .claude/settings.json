@@ -5,6 +5,8 @@
       "Edit(.claude/.commit-approved)",
       "Write(.claude/.push-approved)",
       "Edit(.claude/.push-approved)",
+      "Write(.claude/.release-approved)",
+      "Edit(.claude/.release-approved)",
       "Read(./.env)",
       "Read(.env)",
       "Read(**/.env)",

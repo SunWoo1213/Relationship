@@ -48,7 +48,7 @@ Claude-Session: <이 세션의 URL>
 ### 3. 사용자 승인 (AskUserQuestion)
 초안 전문과 `git diff --stat`을 보여주고 묻는다. 선택지:
 - **커밋** — 커밋만
-- **커밋 + 푸시** — origin main 으로 푸시까지
+- **커밋 + 푸시** — origin **dev** 로 푸시까지 (main 직접 푸시는 없다 — §7)
 - **초안 수정** — 사용자의 수정 내용을 반영해 2번부터 다시
 - **취소**
 
@@ -66,12 +66,20 @@ bash .claude/hooks/approve-commit.sh --push     # 커밋 + 푸시
 4. `.githooks/pre-commit`이 비밀·대용량을 검사한다. 실패하면 원인을 고치고 3번(승인)부터 다시 — `--no-verify`는 금지.
 5. 성공하면 `commit-cleanup.sh`가 마커를 지우고 `journal.md`에 `COMMIT | <hash> <제목>` 줄을 붙인다. `03-log.md`의 `pending`을 해시로 바꾸는 것은 **다음 커밋**에 포함한다(고쳐 쓰지 않아도 journal에 해시가 있다).
 
-### 6. 푸시 (승인한 경우만)
+### 6. 푸시 (승인한 경우만) — 항상 `dev`
 ```
-git push -u origin main      # 첫 푸시
-git push origin main
+git push -u origin dev       # 첫 푸시
+git push origin dev
 ```
-`safety-guard.sh`는 `origin` 이외·강제 옵션·마커 없는 푸시를 거부한다. 푸시가 끝나면 cleanup이 푸시 마커를 지운다.
+`safety-guard.sh`는 `origin dev` 이외(main 직접 푸시 포함)·강제 옵션·마커 없는 푸시를 거부한다. 푸시가 끝나면 cleanup이 푸시 마커를 지운다. 로컬 작업 브랜치는 항상 `dev`다(`git branch --show-current`로 확인, 아니면 `git checkout dev`).
+
+### 7. main 승격 — `/commit release` (L-001 브랜치 전략: dev → 실서버 검증 → main)
+`main`은 배포 브랜치다. `dev`를 실제 서버에서 돌려 본 뒤에만 올린다.
+1. 사용자에게 승격 대상을 보인다: `git log --oneline origin/main..dev`(승격될 커밋), 실서버 검증 근거(사용자가 말한 결과·evidence 파일 경로).
+2. `AskUserQuestion` — 선택지: **승격** / 취소. 실서버 검증을 했는지 명시적으로 묻는다.
+3. 승인 시 `bash .claude/hooks/approve-commit.sh --release` → `git push origin dev:main` (fast-forward 만. 강제 옵션은 별도 차단) → `git fetch origin main:main` 으로 로컬 main 을 맞춘다.
+4. cleanup 훅이 승격 마커를 지우고 `journal.md`에 `RELEASE` 줄을 붙인다. `HANDOFF.md`에 "main = <hash>" 를 적는다.
+- 되돌리기: main 에서 문제가 나면 dev 에 `git revert` 커밋을 만들어 다시 승격한다. main 을 직접 고치지 않는다.
 
 ## 하지 말 것
 - `git commit -m` (초안 파일 외 경로), `--amend`, `--no-verify`, `git add -A/.`, 강제 푸시.
@@ -83,3 +91,4 @@ git push origin main
 - `git config core.hooksPath .githooks`가 설정돼 있는지 확인(`git config core.hooksPath`).
 - 원격이 `https://github.com/SunWoo1213/Relationship.git`인지 확인(`git remote -v`).
 - 하네스 전체를 `harness(wiki): …` 한 커밋으로. 이후부터는 작업 단위별.
+- 작업 브랜치 `dev`가 없으면 `git checkout -b dev`로 만들고 이후 모든 커밋·푸시는 dev 에서 한다(§6·§7).

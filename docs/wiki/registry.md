@@ -21,3 +21,5 @@
 | 스킬 | commit · devlog | .claude/skills/commit, .claude/skills/devlog | 하네스 | pending | |
 | 스킬 | entity-resolution · eval-harness · agent-observability | .claude/skills/* | 하네스 | pending | 제품 작업법 |
 | 에이전트 | architect · backend-agent · eval-agent | .claude/agents/*.md | 하네스 | pending | |
+| 스크립트 | git log 요약(에이전트용) · .claude/gitlog.md 스냅샷 | .claude/scripts/gitlog.sh | 하네스 | pending | L-001. session-start·commit-cleanup 훅이 --write 로 갱신 |
+| 문서 | 교훈 L-001 브랜치 전략·git log 연동 | docs/wiki/lessons/L-001-dev-branch.md | 하네스 | pending | dev→실서버 검증→main 승격 |

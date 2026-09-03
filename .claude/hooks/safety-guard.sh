@@ -21,6 +21,7 @@ set -u
 export PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LC_ALL=C.UTF-8
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 PUSH_MARK="$ROOT/.claude/.push-approved"
+RELEASE_MARK="$ROOT/.claude/.release-approved"
 
 input="$(cat)"
 cmd="$(printf '%s' "$input" | python -c 'import sys,json
@@ -60,7 +61,14 @@ GIT="${W}git([[:space:]]+-[^[:space:]]+([[:space:]]+[^[:space:]]+)?)*[[:space:]]
 if has "${GIT}push([[:space:]]|$)"; then
   has "${GIT}push[^;|&]*([[:space:]]-f([[:space:]]|$)|--force|--mirror|--delete|[[:space:]][+][a-zA-Z])" && deny "강제 푸시(--force, -f, +ref, --mirror, --delete) 금지. 새 커밋으로 고치라"
   has "${GIT}push[^;|&]*[[:space:]](-u[[:space:]]+|--set-upstream[[:space:]]+)?origin([[:space:]]|$)" || deny "푸시는 origin 으로만 허용한다"
-  [ -f "$PUSH_MARK" ] || deny "푸시 승인 마커가 없다. /commit 절차에서 사용자가 푸시를 승인해야 한다"
+  # 브랜치 전략(L-001): 일상 푸시는 origin dev 로만. main 은 dev 를 실서버에서 검증한 뒤 /commit release 로 승격(dev:main)한다.
+  if has "${GIT}push[^;|&]*[[:space:]]origin[[:space:]]+dev:main([[:space:]]|$)"; then
+    [ -f "$RELEASE_MARK" ] || deny "main 승격(dev:main)은 dev 를 실서버에서 검증한 뒤 /commit release 에서 사용자가 승인해야 한다"
+  elif has "${GIT}push[^;|&]*[[:space:]]origin[[:space:]]+dev([[:space:]]|$)"; then
+    [ -f "$PUSH_MARK" ] || deny "푸시 승인 마커가 없다. /commit 절차에서 사용자가 푸시를 승인해야 한다"
+  else
+    deny "푸시는 origin dev 로만 한다. main 직접 푸시 금지 - dev 를 실서버에서 검증한 뒤 /commit release 로 승격(git push origin dev:main)"
+  fi
 fi
 has "${GIT}reset[^;|&]*--hard" && deny "git reset --hard 금지. 되돌리려면 git revert 또는 사용자 요청"
 has "${GIT}checkout[[:space:]]+(--[[:space:]]+|[.]([[:space:]]|$))|${GIT}checkout[[:space:]]+[^-][^;|&]*[[:space:]]--[[:space:]]" && deny "git checkout -- <경로> / checkout . 은 작업 내용을 버린다. 금지"
