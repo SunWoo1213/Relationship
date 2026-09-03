@@ -1,0 +1,16 @@
+[text-embedding-3-small] dimension=1536 labels=30 usage={'prompt_tokens': 118, 'total_tokens': 118}
+  PASS (필수) 팀장↔부장님 0.5290 > 팀장↔이모 0.2568  margin=+0.2722
+  PASS (보조) 팀장↔김팀장 0.6780 > 팀장↔엄마 0.3546  margin=+0.3234
+  PASS (보조) 부장님↔김부장 0.5479 > 부장님↔삼촌 0.3224  margin=+0.2255
+  PASS (보조) 여자친구↔남친 0.5639 > 여자친구↔과장님 0.3453  margin=+0.2186
+  PASS (보조) 그 사람↔그분 0.5547 > 그 사람↔할머니 0.3133  margin=+0.2414
+  필수 기준: 통과 · 보조 4/4
+  saved: reports\embed_pilot\text-embedding-3-small.json
+[text-embedding-3-large] dimension=3072 labels=30 usage={'prompt_tokens': 118, 'total_tokens': 118}
+  PASS (필수) 팀장↔부장님 0.5314 > 팀장↔이모 0.3418  margin=+0.1897
+  PASS (보조) 팀장↔김팀장 0.7167 > 팀장↔엄마 0.3518  margin=+0.3649
+  PASS (보조) 부장님↔김부장 0.5875 > 부장님↔삼촌 0.3396  margin=+0.2479
+  PASS (보조) 여자친구↔남친 0.6914 > 여자친구↔과장님 0.2886  margin=+0.4028
+  PASS (보조) 그 사람↔그분 0.4718 > 그 사람↔할머니 0.3235  margin=+0.1483
+  필수 기준: 통과 · 보조 4/4
+  saved: reports\embed_pilot\text-embedding-3-large.json

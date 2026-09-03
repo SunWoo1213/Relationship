@@ -204,7 +204,17 @@ def _load_dotenv_quietly() -> None:
         pass
 
 
+def _force_utf8_console() -> None:
+    """Windows 콘솔(cp949)에서 한국어 출력이 깨지지 않게 한다. 실패해도 무시."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
+
 def main(argv: Sequence[str] | None = None) -> int:
+    _force_utf8_console()
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--models", nargs="+", default=list(DEFAULT_MODELS))
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
