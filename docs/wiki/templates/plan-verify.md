@@ -1,6 +1,6 @@
 # <패키지 id> · 계획 검증 (02-plan-verify)
 
-대상: 01-plan.md | 검증자: | 날짜: YYYY-MM-DD
+대상: 01-plan.md | 검증자: verifier (fable) — 계획 작성자와 다른 모델·컨텍스트(L-002) | 날짜: YYYY-MM-DD
 
 ## 1. 기계 검증 출력 (그대로 붙인다 — 요약 금지)
 명령: `bash .claude/scripts/verify-plan.sh <패키지 id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt`

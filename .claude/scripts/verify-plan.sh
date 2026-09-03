@@ -5,7 +5,7 @@
 # PASS/FAIL/WARN 줄로 출력한다. 출력은 02-plan-verify.md 의 "기계 검증 출력" 절에 그대로 붙인다.
 #   1 필수 파일 존재            2 태그(D/S/R)가 가리키는 카드 존재
 #   3 작업 단위마다 Refs        4 수용 기준이 backlog 와 글자 그대로 일치
-#   5 의존 패키지 완료 + P4 게이트   6 점검표 8행 판정 존재
+#   5 의존 패키지 완료 + P4 게이트   6 검증자=verifier(L-002) + 점검표 8행 판정 존재
 #   7 산출물 경로가 registry 에 다른 패키지로 이미 있는지(중복 구현 경고)
 # 종료 코드: FAIL 이 하나라도 있으면 1
 set -u
@@ -73,6 +73,8 @@ fi
 
 # 6 점검표 8행
 if [ -f "$PV" ]; then
+  # L-002 자기 평가 금지: 점검표는 verifier(계획 작성자와 다른 모델)가 써야 한다
+  grep -Eq '^대상:.*검증자:[^|]*verifier' "$PV" && ok "검증자 = verifier (L-002)" || bad "02-plan-verify 검증자 줄에 verifier 가 없다 — 계획을 쓴 쪽이 점검표를 채우면 안 된다 (L-002, verifier 에이전트에 위임)"
   rows="$(grep -cE '^\| [1-8] \|' "$PV" || true)"
   [ "$rows" -eq 8 ] && ok "점검표 8행 존재" || bad "점검표 행 수 $rows (8 필요)"
   undecided="$(grep -E '^\| [1-8] \|' "$PV" | grep -Evc '통과|보류' || true)"

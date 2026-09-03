@@ -2,7 +2,7 @@
 name: backend-agent
 description: 제품 백엔드 담당. FastAPI로 툴 7종, 다단계 에이전트 루프, 엔티티 해석 4단계 파이프라인, 3계층 메모리를 구현한다. "툴 구현", "에이전트 루프", "인물 해석", "메모리 승격", "발화 처리" 같은 요청에 쓴다.
 tools: Read, Write, Edit, Glob, Grep, Bash, TodoWrite
-model: opus
+model: sonnet
 skills: entity-resolution, agent-observability
 ---
 

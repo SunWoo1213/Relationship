@@ -1,6 +1,6 @@
 # <패키지 id> · 완료 검토 (04-review)
 
-날짜: | 검토자:
+날짜: | 검토자: verifier (fable) — 구현자와 다른 모델·컨텍스트(L-002)
 
 ## 1. 기계 검증 출력 (그대로 붙인다)
 명령: `bash .claude/scripts/verify-impl.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt`

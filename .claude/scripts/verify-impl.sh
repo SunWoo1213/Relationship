@@ -66,6 +66,8 @@ fi
 
 # 5 04-review 증거 열
 if [ -f "$P/04-review.md" ]; then
+  # L-002 자기 평가 금지: 완료 검토는 verifier(구현자와 다른 모델)가 써야 한다
+  grep -Eq '^날짜:.*검토자:[^|]*verifier' "$P/04-review.md" && ok "검토자 = verifier (L-002)" || bad "04-review 검토자 줄에 verifier 가 없다 — 구현한 쪽이 완료 검토를 쓰면 안 된다 (L-002, verifier 에이전트에 위임)"
   rows="$(awk '/^## ([0-9]+[.] )?수용 기준 대조/{f=1;next} /^## /{f=0} f && /^\|/ && !/^\| *기준|^\|-/ {print}' "$P/04-review.md")"
   [ -n "$rows" ] || bad "04-review 수용 기준 표에 행이 없다"
   while IFS= read -r r; do

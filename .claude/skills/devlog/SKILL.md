@@ -32,7 +32,7 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 5. **기계 검증**: `mkdir -p packages/<id>/evidence` 후
    `bash .claude/scripts/verify-plan.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt`
    FAIL/WARN 이 있으면 `python .claude/scripts/findings.py <id> <그 파일> --source verify-plan` → `05-remediation.md` 소견을 채우고 계획을 고친 뒤 다시 실행(FAIL 0 까지, 3회 한도).
-6. `02-plan-verify.md`를 `templates/plan-verify.md`로 작성: 1절에 기계 검증 출력 전체, 2절 점검표 8행은 각각 **카드 파일명 + 인용 문장**을 근거로 판정. 보류가 하나라도 있으면 `결과: 보류`로 두고 사용자에게 보고하고 멈춘다.
+6. **`verifier` 에이전트에 위임**(L-002: 계획을 쓴 쪽이 점검표를 채우지 않는다)하여 `02-plan-verify.md`를 `templates/plan-verify.md`로 작성: `검증자: verifier (fable)`, 1절에 기계 검증 출력 전체, 2절 점검표 8행은 각각 **카드 파일명 + 인용 문장**을 근거로 판정. 위임 프롬프트에는 패키지 id·읽을 카드 목록·evidence 경로를 적는다. `verify-plan.sh`는 검증자 줄에 `verifier`가 없으면 FAIL 한다. 보류가 하나라도 있으면 `결과: 보류`로 두고 사용자에게 보고하고 멈춘다.
 7. 통과면 `AskUserQuestion`으로 계획 요약(목표·작업 단위·수용 기준·기계 검증 결과·읽은 카드)을 보여주고 승인을 받는다. 선택지: 승인 / 수정 요청 / 보류.
 8. 승인되면 `02-plan-verify.md`에 `승인: 사용자 (날짜)`, `CURRENT.md`에 `active: <id>`, `03-log.md`를 템플릿으로 생성, `journal.md`에 `START` 줄, `HANDOFF.md` 갱신, `/commit`(계획 문서 커밋).
 9. 이 시점부터 제품 코드를 쓸 수 있다. 작업 단위 하나가 끝날 때마다 `/commit`. 새 산출물은 `registry.md`에 행 추가.
@@ -54,7 +54,7 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 
 ### `/devlog done`
 1. `bash .claude/scripts/verify-impl.sh <id> | tee …/evidence/<ts>-verify-impl.txt` → FAIL 은 루프로. 열린 [필수] 소견이 있으면 완료가 아니다.
-2. `04-review.md`를 `templates/package-review.md`로 작성: 1절 기계 검증 출력 전체, 2절 수용 기준마다 증거(evidence 파일·해시·경로 — 문장 금지), 3절 부정 케이스, 5절 registry 등록 목록.
+2. **`verifier` 에이전트에 위임**(L-002: 구현한 쪽이 완료 검토를 쓰지 않는다)하여 `04-review.md`를 `templates/package-review.md`로 작성: `검토자: verifier (fable)`, 1절 기계 검증 출력 전체, 2절 수용 기준마다 증거(evidence 파일·해시·경로 — 문장 금지), 3절 부정 케이스(verifier 가 직접 실행), 5절 registry 등록 목록. `verify-impl.sh`는 검토자 줄에 `verifier`가 없으면 FAIL 한다. 1단계의 verify-impl 실행도 verifier 가 한다.
 3. 닫힌 R의 `review-index.md` 상태를 "구현완료(해시)"로. `docs/backlog.md` 체크박스. 열린 문제는 FIX/L 로 이관.
 4. `AskUserQuestion` 완료 승인 → `승인:` → `CURRENT.md active: none` → `journal.md` `DONE` → `HANDOFF.md` → `/commit`.
 5. P4-pilot-eval 미달이면 "부분완료 + 실패 케이스 분석 산출물"로 기록하고 `S3.3` 재설계를 `/devlog change` 또는 새 D 카드로 올린다(원칙8).
@@ -90,5 +90,19 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 
 ## 서브에이전트에게 위임할 때
 
-- architect/backend-agent/eval-agent 는 `AskUserQuestion`이 없다. **승인·우선순위 결정 단계는 메인 세션이 한다.** 서브에이전트는 계획 초안·검증표 초안·코드·증거 파일을 만들고 돌아온다.
+### 역할별 모델 분리 (L-002 — 같은 컨텍스트·같은 모델의 자기 평가는 후하다)
+
+| 단계 | 에이전트 | 모델 | 쓰는 문서 | 하지 않는 것 |
+|------|---------|------|-----------|-------------|
+| 계획 | `architect` | opus | 01-plan 초안, backlog | 점검표 판정, 코드 |
+| 구현 | `backend-agent` | sonnet | 코드·테스트, 03-log 초안, 05 해결 단계 | 02-plan-verify·04-review 판정 |
+| 평가 데이터·지표 | `eval-agent` | opus | 데이터셋·metrics·리포트 | 자기 데이터셋의 완료 검토 |
+| 검증 | `verifier` | fable | 02-plan-verify 점검표, 04-review, 05 원인 분석, 코드 리뷰 | 코드·계획·카드 수정 |
+| 조율 | 메인 세션 | (현재 모델) | 위임, AskUserQuestion 승인, /commit, HANDOFF | 점검표·완료 검토를 직접 채우기 |
+
+- 한 패키지에서 같은 에이전트가 두 단계 이상을 맡지 않는다. 메인 세션이 급하다고 점검표를 직접 쓰면 `verify-plan.sh`/`verify-impl.sh`가 `검증자:`/`검토자:` 줄로 잡는다.
+- verifier 는 새 컨텍스트로 띄운다(이전 대화를 잇지 않는다). 위임 프롬프트에 구현자의 자기 평가("잘 됐다")를 넣지 않고 파일 경로만 준다.
+- 모델을 바꾸려면 `.claude/agents/<name>.md` 의 `model:` 과 이 표·CLAUDE.md 팀 표를 같은 커밋에서 고친다.
+
+- architect/backend-agent/eval-agent/verifier 는 `AskUserQuestion`이 없다. **승인·우선순위 결정 단계는 메인 세션이 한다.** 서브에이전트는 계획 초안·검증표·코드·증거 파일을 만들고 돌아온다.
 - 위임 프롬프트에는 패키지 id, 읽을 카드 목록(전문 금지), 작업 단위 번호, 증거를 남길 경로(`packages/<id>/evidence/`)를 명시한다.
