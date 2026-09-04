@@ -66,7 +66,7 @@
 | 단계 | 내용 | 상태 |
 |---|---|---|
 | P0 | 임베딩 공급자 파일럿 (D4) | **완료** — small/large 모두 기준 통과, `text-embedding-3-small` N=1536 확정 |
-| P0 | 로컬 docker-compose (pgvector) | 계획 검증 중 |
+| P0 | 로컬 docker-compose (pgvector) | 구현 완료 · 검증 대기 |
 | P0 | LLM 비용 실측 | 대기 |
 | P1 | 스키마 v2 마이그레이션 · 파일럿 데이터셋 | 대기 |
 | P2~P3 | 툴 7종 · 엔티티 해석 4단계 · 베이스라인 | 대기 |
@@ -118,7 +118,30 @@ python -m pytest -q tests/
 python scripts/embed_pilot.py
 ```
 
-로컬 DB(docker-compose + pgvector)와 백엔드 서버 실행 방법은 해당 패키지가 완료되면 이 절에 추가한다.
+### 로컬 DB (docker-compose + pgvector)
+
+사전 조건: Docker Desktop 실행 중. `.env`가 없다면 `.env.example`을 복사해 시작하고, DB 절의 `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` / `POSTGRES_PORT` 4개와 `DATABASE_URL`을 **같은 값**으로 유지한다(포트를 바꾸면 둘 다 바꾼다).
+
+```bash
+# 1. 기동
+docker compose up -d
+
+# 2. 상태 확인 (STATUS 열이 healthy 인지 확인)
+docker compose ps
+
+# 3. 접속 검사 (psycopg 설치 후 실행)
+pip install "psycopg[binary]"
+python scripts/db_check.py
+# 기대 출력: extversion, SELECT '[1,2,3]'::vector -> [1,2,3], 종료 코드 0
+
+# 4. 중지 (컨테이너만 내린다 — 데이터 볼륨은 유지)
+docker compose down
+```
+
+- **볼륨 삭제 금지**: 데이터 볼륨 `pgdata`를 지우는 옵션(`security.md` §4가 금지하는 compose 옵션·`docker volume rm`·prune)은 쓰지 않는다. `docker compose down`만 쓴다.
+- **5432 포트 충돌**: 로컬에 이미 다른 PostgreSQL이 5432를 쓰고 있으면 기동이 실패한다. `.env`의 `POSTGRES_PORT`와 `DATABASE_URL`의 포트를 **같이** 다른 값(예: 5433)으로 바꾼다. `db_check.py`는 두 값이 어긋나면 변수 이름만 경고하고(비밀번호 값은 출력하지 않는다) 종료 코드는 바꾸지 않는다.
+- **이미지 태그 메모(미결)**: `pgvector/pgvector:pg16`으로 시작한다. RDS PostgreSQL 메이저 버전이 정해지는 P9-infra에서 이 태그를 재확인한다.
+- P1-schema(스키마 마이그레이션)는 이 로컬 DB가 떠 있는 것을 선행 조건으로 쓴다.
 
 ## 문서 안내
 

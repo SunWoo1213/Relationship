@@ -1,0 +1,4 @@
+0ee6e25 feat(P0-compose): U2 db_check.py — pgvector 접속 검사·테스트·실행 증거
+749bb8e feat(P0-compose): U1 로컬 pgvector compose — .env.example 이름 4개·compose·initdb
+9d23fd7 harness(L-004): 계획·구현·검증 단계는 사용자에게 묻고 시작 — 위임 게이트 훅
+23d8700 docs(P0-compose): 계획·계획검증 승인, 패키지 착수 — L-002 역할 분리 첫 적용

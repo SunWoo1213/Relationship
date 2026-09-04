@@ -29,6 +29,9 @@
 | 에이전트 | verifier — 계획 검증·완료 검토·코드 리뷰 전담(fable, 구현자와 다른 모델) | .claude/agents/verifier.md | 하네스 | pending | L-002 |
 | 문서 | 교훈 L-002 역할별 모델 분리(계획 opus · 구현 sonnet · 검증 fable) | docs/wiki/lessons/L-002-role-model-separation.md | 하네스 | pending | verify-plan/impl 이 검증자=verifier 강제 |
 | 문서 | 교훈 L-003 dev 푸시 뒤 사용자 결정까지 멈춤 | docs/wiki/lessons/L-003-stop-after-dev-push.md | 하네스 | pending | .awaiting-decision 마커 |
-| 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·실행법) | README.md | 하네스 | pending | 패키지 완료마다 진행 상태 표 갱신 |
+| 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·실행법) | README.md | 하네스 | pending | 패키지 완료마다 진행 상태 표 갱신. P0-compose: 로컬 DB 절 추가(2026-09-04), pg16 태그는 P9-infra 에서 재확인 |
 | 훅 | 단계 위임 게이트(Agent 호출 전 사용자 승인 마커) | .claude/hooks/delegate-guard.sh | 하네스 | pending | L-004 |
 | 문서 | 교훈 L-004 단계는 묻고 시작 | docs/wiki/lessons/L-004-ask-before-stage.md | 하네스 | pending | |
+| 스크립트 | 로컬 pgvector compose(postgres 서비스, `${VAR:-기본값}` 4개, healthcheck) | docker-compose.yml | P0-compose | pending | pgvector/pgvector:pg16, P9-infra 에서 RDS 메이저 버전과 재확인 |
+| 스크립트 | pgvector 확장 최초 기동 초기화 | docker/initdb/01-vector.sql | P0-compose | pending | CREATE EXTENSION IF NOT EXISTS vector |
+| 스크립트 | DB 접속 검사(psycopg, `POSTGRES_*`↔`DATABASE_URL` 불일치 경고) | scripts/db_check.py | P0-compose | pending | 테스트 tests/test_db_check.py |

@@ -38,3 +38,6 @@
 - 2026-09-04 11:12 | PUSH | origin dev 749bb8e — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-04 11:17 | RELEASE | origin main ← dev 749bb8e
 - 2026-09-04 11:19 | DECISION | .env.example 추적 유지 확정: GitHub 업로드 우려 → 확인 결과 e062986 부터 추적, 이름·예시값뿐. 추적 해제·.gitignore 예외 제거는 사용자가 하지 말라고 결정 | P0-compose 보안§1
+- 2026-09-04 11:56 | COMMIT | 0ee6e25 feat(P0-compose): U2 db_check.py — pgvector 접속 검사·테스트·실행 증거
+- 2026-09-04 11:56 | PUSH | origin dev 0ee6e25 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-04 11:57 | RELEASE | origin main ← dev 0ee6e25

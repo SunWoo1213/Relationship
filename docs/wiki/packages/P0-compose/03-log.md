@@ -25,3 +25,10 @@
 - **발견(리스크 "5432 포트 충돌" 현실화)**: 이 프로젝트와 무관한 로컬 컨테이너(finance_postgres)가 5432 점유 → 에이전트가 .env 를 건드리지 않고 셸 변수 `POSTGRES_PORT=5433` 을 up·db_check 앞에 1회성으로 붙여 실행(evidence ps 의 5433 매핑이 그 흔적). **영구 해결은 사용자 몫**: .env 의 POSTGRES_PORT 와 DATABASE_URL 포트를 같이 5433 으로 바꾸거나 무관 컨테이너 정리. U3 README 로컬 DB 절에 이 안내를 넣는다.
 - 남은 것 · 다음 단위: U3 README "로컬에서 해 보기" 로컬 DB 절 + registry(기존 README 행 비고 갱신, compose·initdb·db_check 행 추가) → verifier 04-review.
 - Refs: P0-compose D4 D5 S3.1 F-033bb1
+
+## 2026-09-04 · docs(P0-compose): U3 README 로컬 DB 절·registry 반영, verify-impl 사전 실행 · pending
+- 변경: README.md("로컬에서 해 보기" 예약 문장 → 로컬 DB 소절: 사전 조건·up/ps/db_check/down·볼륨 삭제 금지·5432 충돌 시 POSTGRES_PORT 와 DATABASE_URL 포트 동시 변경·pg16 태그 P9-infra 재확인·P1-schema 선행 조건; 진행 상태 표 P0 행 "구현 완료 · 검증 대기"), registry.md(README 행 비고 갱신 — 새 행 아님; docker-compose.yml·docker/initdb/01-vector.sql·scripts/db_check.py 행 3개 추가, 소유 P0-compose), 01-plan U3 체크, evidence/20260904-verify-impl-pre.txt + 20260904-1233-{pytest,lint,commits,summary}.txt. 구현: backend-agent(sonnet).
+- 이유(기획서·카드 연결): 01-plan U3 행·F-0ffff5(README 로컬 DB 절 + registry 기존 README 행 비고 갱신, 새 행 금지). U2 발견(5432 충돌)과 미결 1(pg16 태그)을 사용자 안내로 닫는다.
+- 정합성 확인: 원칙7 / D4 D5 / S3.1 / 보안 §4(README 에 볼륨 삭제 옵션 문자열을 적지 않고 풀어 씀) — 위반 없음. verify-impl 사전 실행: PASS 8 / WARN 1(04-review 없음, 검토 전 정상) / FAIL 0.
+- 남은 것 · 다음 단위: 구현 단위 U1~U3 모두 완료. verifier(fable) 04-review(수용 기준 `SELECT '[1,2,3]'::vector` 성공 ↔ evidence/20260904-db-check.txt 대조, 코드 리뷰) → `/devlog done` → 푸시 → L-003.
+- Refs: P0-compose D4 D5 S3.1 F-0ffff5
