@@ -1,0 +1,22 @@
+# Refs: P0-compose D4 D5 S3.1
+# 볼륨을 지우는 옵션 금지(security.md §4) — `docker compose down -v` / `volume rm` / `prune` 은 사용자만.
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pass}
+      POSTGRES_DB: ${POSTGRES_DB:-relationship}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-relationship}"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata:

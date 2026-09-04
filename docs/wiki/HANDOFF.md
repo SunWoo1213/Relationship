@@ -5,21 +5,21 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-03 22:25
-active: P0-compose | frozen: none | 브랜치: dev (로컬 dev = 23d8700, origin/dev = main = 4df323f, 미푸시 2커밋)
+갱신: 2026-09-04 (U1 커밋 직전)
+active: P0-compose | frozen: none | 브랜치: dev (로컬 dev = 9d23fd7 + U1 커밋 진행 중, origin/dev = main = 4df323f, 미푸시 3커밋 → U1 커밋 뒤 4커밋 푸시 예정, 커밋+푸시 마커 있음)
 
 ## 지금 어디까지
-- 사용자가 dev 4df323f 를 main 으로 승격(2026-09-03). 그 뒤 README(ae2076f, 로컬, 미푸시) 커밋.
-- **P0-compose 계획 승인(2026-09-03)** — L-002 첫 적용: architect(opus) 초안 → verifier(fable) 보류 1건(F-033bb1) → 사용자 결정 (a) → architect 개정 → verifier 재검증 통과(FAIL 0/WARN 1, `packages/P0-compose/evidence/20260903-verify-plan-2-final.txt`). CURRENT active: P0-compose.
-- 계획 문서 커밋 23d8700(로컬). **backend-agent(sonnet)가 U1 구현 중(서브에이전트 실행 중, 완료 알림 대기)** — .env.example 이름 4개, docker-compose.yml, docker/initdb/01-vector.sql, compose 기동·healthcheck·확장 버전 evidence.
-- **사용자 지시(L-004)**: 계획·구현·검증 단계는 자동 시작 금지 — 위임 전 매번 AskUserQuestion. 훅 `delegate-guard.sh`(PreToolUse Agent) + `approve-commit.sh --stage` 마커로 강제. 하네스 변경 작성 완료, **커밋 승인 대기**.
-- 커밋 안 된 변경: L-004 묶음(delegate-guard.sh, approve-commit.sh, settings.json, .gitignore, devlog 스킬, CLAUDE.md, lessons/L-004, test-guards, registry, journal, evidence) + U1 산출물(생성 중).
-- 팀 밑작업(L-004, Agent Teams): 사용자 결정 **보류**. 조사 요약은 이 세션 답변에 있음(env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1, teammateMode, TaskCompleted 훅, 팀메이트별 담당 파일 분할). 필요 시 다시 꺼낸다.
+- 사용자가 dev 4df323f 를 main 으로 승격(2026-09-03). 그 뒤 README(ae2076f), P0-compose 계획(23d8700), L-004 하네스(9d23fd7) 로컬 커밋, 미푸시.
+- **P0-compose 계획 승인(2026-09-03)** — L-002 첫 적용: architect(opus) 초안 → verifier(fable) 보류 1건(F-033bb1) → 사용자 결정 (a) → 개정 → 재검증 통과(FAIL 0/WARN 1, `packages/P0-compose/evidence/20260903-verify-plan-2-final.txt`). CURRENT active: P0-compose.
+- **U1 완료(backend-agent sonnet, 2026-09-03)** — .env.example POSTGRES_* 4개, docker-compose.yml, docker/initdb/01-vector.sql, evidence 4개(compose-config/up/ps healthy, vector-ext 0.8.6). 2026-09-04 세션 재개: 사용자 "이어서 완료" → 03-log U1 항목·01-plan U1 체크 → 커밋 초안 승인(커밋+푸시) → **커밋·푸시 실행 중**.
+- **L-004**: 계획·구현·검증 단계는 자동 시작 금지 — 위임 전 매번 AskUserQuestion + `approve-commit.sh --stage` 마커. `delegate-guard.sh` 강제.
+- Docker 데몬: 2026-09-04 세션 시작 시 **꺼져 있음**. U2 실행 전 사용자에게 Docker Desktop 실행을 요청한다(security.md §6, 우회 금지).
+- 팀 밑작업(L-004, Agent Teams): 사용자 결정 **보류**. 조사 요약(env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1, teammateMode, TaskCompleted 훅, 팀메이트별 담당 파일 분할). 필요 시 다시 꺼낸다.
 
 ## 바로 다음에 할 것 (순서대로)
-1. L-004 하네스 `/commit`(커밋만). U1 완료 알림 → 산출물·evidence 확인 → 03-log 항목 → `/commit`(커밋만). **이후 U2·U3·verifier 04-review 위임은 매번 사용자에게 묻고 `--stage` 마커 후 시작.** U1 내용: `.env.example` 이름 4개(POSTGRES_USER/PASSWORD/DB/PORT, 예시값 app/pass/relationship/5432) + `docker-compose.yml`(pgvector/pgvector:pg16, `${VAR:-기본값}`, `${POSTGRES_PORT:-5432}:5432`, 이름 있는 볼륨, healthcheck) + `docker/initdb/01-vector.sql`. Docker 데몬 실행 중. → `/commit`.
-3. U2: `scripts/db_check.py`(psycopg 우선, 대안은 compose exec psql — 결정은 03-log) — CREATE EXTENSION + `SELECT '[1,2,3]'::vector`, POSTGRES_* 부재 시 compose 기본값과 비교, 어긋난 변수 이름만 경고. 실행 출력을 `packages/P0-compose/evidence/`에 tee → `/commit`.
-4. U3: README "로컬에서 해 보기" 절에 로컬 DB(up/check/down, 볼륨 삭제 금지, 포트 바꾸면 DATABASE_URL 도), registry 기존 README 행 비고 갱신(새 행 금지) + compose·initdb·db_check 행 추가 → `/commit` → verifier 04-review → `/devlog done` → dev 푸시 → L-003 멈춤(승격/수정 질문).
+1. U1 커밋 → `git push origin dev` → `.claude/.awaiting-decision` 생기면 L-003 승격/수정/보류 질문 후 멈춤. (커밋·푸시가 이미 끝났으면 journal 의 COMMIT 줄과 `git status -sb` 로 확인.)
+2. U2 (사용자 승인 → `--stage backend-agent` 마커 → backend-agent): Docker Desktop 실행 확인 → `scripts/db_check.py`(psycopg 우선, 대안은 compose exec psql — 결정은 03-log) — CREATE EXTENSION + `SELECT '[1,2,3]'::vector`, POSTGRES_* 부재 시 compose 기본값과 비교, 어긋난 변수 이름만 경고(비밀번호 값 출력 금지). 실행 출력을 `packages/P0-compose/evidence/`에 tee → `/commit`.
+3. U3: README "로컬에서 해 보기" 절에 로컬 DB(up/check/down, 볼륨 삭제 금지, 포트 바꾸면 DATABASE_URL 도), registry 기존 README 행 비고 갱신(새 행 금지) + compose·initdb·db_check 행 추가 → `/commit` → verifier 04-review → `/devlog done` → dev 푸시 → L-003 멈춤(승격/수정 질문).
 
 ## 재개 시 읽을 카드 (이것만)
 - `docs/wiki/CURRENT.md`, `docs/wiki/INDEX.md`, `.claude/gitlog.md`

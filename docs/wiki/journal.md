@@ -33,3 +33,4 @@
 - 2026-09-03 22:00 | START | P0-compose 착수: architect(opus) 계획 → verifier(fable) 보류 1건(F-033bb1 .env.example POSTGRES_* 없음) → 사용자 결정 (a) → 개정 → 재검증 통과(FAIL 0/WARN 1) → 사용자 승인. L-002 첫 적용 | P0-compose D4 D5 S3.1
 - 2026-09-03 20:17 | COMMIT | 23d8700 docs(P0-compose): 계획·계획검증 승인, 패키지 착수 — L-002 역할 분리 첫 적용
 - 2026-09-03 22:20 | DECISION | L-004 단계 자동 시작 금지: architect/backend-agent/eval-agent/verifier 위임 전 매번 AskUserQuestion, approve-commit.sh --stage 마커, delegate-guard.sh(PreToolUse Agent) 강제 (사용자 지시) | L-004 L-002
+- 2026-09-03 20:22 | COMMIT | 9d23fd7 harness(L-004): 계획·구현·검증 단계는 사용자에게 묻고 시작 — 위임 게이트 훅

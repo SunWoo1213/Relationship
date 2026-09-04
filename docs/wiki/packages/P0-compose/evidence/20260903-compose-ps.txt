@@ -1,0 +1,2 @@
+NAME                   IMAGE                    COMMAND                   SERVICE    CREATED          STATUS                    PORTS
+capstone2-postgres-1   pgvector/pgvector:pg16   "docker-entrypoint.s…"   postgres   17 seconds ago   Up 16 seconds (healthy)   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
