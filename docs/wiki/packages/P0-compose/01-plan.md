@@ -33,7 +33,7 @@
 
 ## 작업 단위 (단위 하나 = 커밋 하나 후보. 끝나면 /commit)
 - [x] U1 `.env.example` 갱신 + compose 파일 + initdb: 먼저 `.env.example` DB 절에 이름 4개(`POSTGRES_USER=app`, `POSTGRES_PASSWORD=pass`, `POSTGRES_DB=relationship`, `POSTGRES_PORT=5432`)와 "`DATABASE_URL`과 같은 값 유지 · 실제 비밀번호는 `.env`에만" 주석을 추가한다(`.env` 는 읽지도 쓰지도 않는다). 그다음 `docker-compose.yml`(pgvector/pgvector:pg16 계열, 포트 `${POSTGRES_PORT:-5432}:5432`, 이름 있는 볼륨, healthcheck, 위 4개를 `${VAR:-기본값}`으로 읽기)과 `docker/initdb/01-vector.sql`(확장 생성) 작성. compose 기본값이 `.env.example`의 사용자·비밀번호·DB 이름·포트와 같은지 대조 / Refs: P0-compose D4 D5 S3.1
-- [ ] U2 접속 검사 스크립트 + 실행 증거: `scripts/db_check.py`(psycopg, 실패 시 비정상 종료, `DATABASE_URL`↔`POSTGRES_*` 불일치 시 변수 이름만 경고·비밀번호 값 출력 금지) 작성 → `docker compose up -d` → healthcheck 통과 확인 → `db_check` 실행 출력에 `SELECT '[1,2,3]'::vector` 결과가 보이도록 `docs/wiki/packages/P0-compose/evidence/`에 tee / Refs: P0-compose D4 D5 S3.1
+- [x] U2 접속 검사 스크립트 + 실행 증거: `scripts/db_check.py`(psycopg, 실패 시 비정상 종료, `DATABASE_URL`↔`POSTGRES_*` 불일치 시 변수 이름만 경고·비밀번호 값 출력 금지) 작성 → `docker compose up -d` → healthcheck 통과 확인 → `db_check` 실행 출력에 `SELECT '[1,2,3]'::vector` 결과가 보이도록 `docs/wiki/packages/P0-compose/evidence/`에 tee / Refs: P0-compose D4 D5 S3.1
 - [ ] U3 registry·문서 반영: `docs/wiki/registry.md`에 compose·initdb·db_check 행 추가 + **README 로컬 DB 절 + registry 기존 README 행(32행) 비고 갱신(새 행 금지)** — README "로컬에서 해 보기" 절 121행 예약 자리에 기동·검사·중지 명령, `.env`의 `POSTGRES_*` 4개와 `DATABASE_URL`을 같은 값으로 유지하라는 안내(포트를 바꾸면 둘 다 바꾼다), `down -v` 금지 주의, P1-schema가 이 산출물을 선행 조건으로 쓴다는 메모 / Refs: P0-compose D4 D5 S3.1
 
 ## 수용 기준 (`docs/backlog.md`의 해당 항목과 글자 그대로 같아야 한다)

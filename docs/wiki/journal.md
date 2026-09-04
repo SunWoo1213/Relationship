@@ -34,3 +34,7 @@
 - 2026-09-03 20:17 | COMMIT | 23d8700 docs(P0-compose): 계획·계획검증 승인, 패키지 착수 — L-002 역할 분리 첫 적용
 - 2026-09-03 22:20 | DECISION | L-004 단계 자동 시작 금지: architect/backend-agent/eval-agent/verifier 위임 전 매번 AskUserQuestion, approve-commit.sh --stage 마커, delegate-guard.sh(PreToolUse Agent) 강제 (사용자 지시) | L-004 L-002
 - 2026-09-03 20:22 | COMMIT | 9d23fd7 harness(L-004): 계획·구현·검증 단계는 사용자에게 묻고 시작 — 위임 게이트 훅
+- 2026-09-04 11:11 | COMMIT | 749bb8e feat(P0-compose): U1 로컬 pgvector compose — .env.example 이름 4개·compose·initdb
+- 2026-09-04 11:12 | PUSH | origin dev 749bb8e — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-04 11:17 | RELEASE | origin main ← dev 749bb8e
+- 2026-09-04 11:19 | DECISION | .env.example 추적 유지 확정: GitHub 업로드 우려 → 확인 결과 e062986 부터 추적, 이름·예시값뿐. 추적 해제·.gitignore 예외 제거는 사용자가 하지 말라고 결정 | P0-compose 보안§1

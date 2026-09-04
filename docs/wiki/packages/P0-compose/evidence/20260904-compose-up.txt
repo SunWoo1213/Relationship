@@ -1,0 +1,6 @@
+ Network capstone2_default Creating 
+ Network capstone2_default Created 
+ Container capstone2-postgres-1 Creating 
+ Container capstone2-postgres-1 Created 
+ Container capstone2-postgres-1 Starting 
+ Container capstone2-postgres-1 Started 

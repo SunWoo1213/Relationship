@@ -1,0 +1,5 @@
+[info] 접속 대상: user=app host=localhost port=5433 dbname=relationship (source=POSTGRES_*)
+[ok] CREATE EXTENSION IF NOT EXISTS vector;
+[ok] extversion = 0.8.6
+[ok] SELECT '[1,2,3]'::vector -> [1,2,3]
+exit code: 0

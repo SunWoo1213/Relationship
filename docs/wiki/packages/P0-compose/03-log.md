@@ -16,3 +16,12 @@
 - 정합성 확인: 원칙7 / D4 D5 / S3.1(확장만, 테이블은 P1-schema) / 보안 §1(예시값만, .env 미접촉) §4(볼륨 삭제 옵션 없음) — 위반 없음
 - 남은 것 · 다음 단위: U2 scripts/db_check.py(psycopg 우선, 대안 compose exec psql — 결정을 여기 기록) + `SELECT '[1,2,3]'::vector` evidence. Docker 데몬은 2026-09-04 세션 시작 시 꺼져 있었음 — U2 전 사용자에게 실행 요청. 미결 1(pg16 태그 고정)은 U3 README·registry 비고에 메모.
 - Refs: P0-compose D4 D5 S3.1 F-033bb1
+
+## 2026-09-04 · feat(P0-compose): U2 db_check.py — pgvector 접속 검사·테스트·실행 증거 · pending
+- 변경: scripts/db_check.py(psycopg v3, DATABASE_URL 우선·없으면 POSTGRES_* → compose 기본값, 불일치 시 변수 이름만 경고, CREATE EXTENSION → extversion → `SELECT '[1,2,3]'::vector`, rc 0/1/2), tests/test_db_check.py(DB 없이 6건: 조립·기본값·불일치 경고에 비밀번호 값 부재), evidence/20260904-compose-up·compose-ps(healthy)·db-check(`[1,2,3]`, exit 0)·pip-psycopg(3.3.5)·pytest-db-check(6 passed). 01-plan U2 체크. 구현: backend-agent(sonnet).
+- 이유(기획서·카드 연결): 01-plan U2 행 그대로. 수용 기준 "`SELECT '[1,2,3]'::vector` 성공"을 재현 가능한 스크립트와 출력 파일로 남긴다(원칙8). F-033bb1 결정 (a)의 두 번째 장치(불일치 경고) 구현.
+- 정합성 확인: 원칙8(재현) / D4 D5 / S3.1(테이블 없음) / 보안 §1(접속 문자열·비밀번호 미출력, 키워드 인자 접속 — URL 조립은 secret-guard 오탐으로 막혀 채택 안 함) §4(볼륨 삭제 없음) — 위반 없음
+- **미결 2 결정**: psycopg[binary] 채택(사용자 site 에 설치 정상, 백엔드도 psycopg 사용 예정). db_check.sh 대안은 만들지 않음. requirements 파일은 P1/P2 백엔드 골격에서 추가.
+- **발견(리스크 "5432 포트 충돌" 현실화)**: 이 프로젝트와 무관한 로컬 컨테이너(finance_postgres)가 5432 점유 → 에이전트가 .env 를 건드리지 않고 셸 변수 `POSTGRES_PORT=5433` 을 up·db_check 앞에 1회성으로 붙여 실행(evidence ps 의 5433 매핑이 그 흔적). **영구 해결은 사용자 몫**: .env 의 POSTGRES_PORT 와 DATABASE_URL 포트를 같이 5433 으로 바꾸거나 무관 컨테이너 정리. U3 README 로컬 DB 절에 이 안내를 넣는다.
+- 남은 것 · 다음 단위: U3 README "로컬에서 해 보기" 로컬 DB 절 + registry(기존 README 행 비고 갱신, compose·initdb·db_check 행 추가) → verifier 04-review.
+- Refs: P0-compose D4 D5 S3.1 F-033bb1

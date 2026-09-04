@@ -1,0 +1,11 @@
+$ pip install "psycopg[binary]"
+Defaulting to user installation because normal site-packages is not writeable
+Collecting psycopg[binary]
+  Downloading psycopg-3.3.5-py3-none-any.whl.metadata (4.3 kB)
+Requirement already satisfied: tzdata in C:\Users\swsj1\AppData\Roaming\Python\Python313\site-packages (from psycopg[binary]) (2025.3)
+Collecting psycopg-binary==3.3.5 (from psycopg[binary])
+  Downloading psycopg_binary-3.3.5-cp313-cp313-win_amd64.whl.metadata (2.7 kB)
+Downloading psycopg-3.3.5-py3-none-any.whl (213 kB)
+Downloading psycopg_binary-3.3.5-cp313-cp313-win_amd64.whl (3.6 MB)
+Installing collected packages: psycopg-binary, psycopg
+Successfully installed psycopg-3.3.5 psycopg-binary-3.3.5
