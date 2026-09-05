@@ -41,3 +41,4 @@
 - 2026-09-04 11:56 | COMMIT | 0ee6e25 feat(P0-compose): U2 db_check.py — pgvector 접속 검사·테스트·실행 증거
 - 2026-09-04 11:56 | PUSH | origin dev 0ee6e25 — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-04 11:57 | RELEASE | origin main ← dev 0ee6e25
+- 2026-09-04 12:36 | COMMIT | 7397966 docs(P0-compose): U3 README 로컬 DB 절·registry 반영, verify-impl 사전 실행

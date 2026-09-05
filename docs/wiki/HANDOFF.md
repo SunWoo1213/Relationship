@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-04 (U3 커밋 직전)
-active: P0-compose | frozen: none | 브랜치: dev (dev = origin/dev = **main = 0ee6e25**, 2026-09-04 승격 완료. 대기 마커 없음. 미커밋: HANDOFF·journal 뿐)
+갱신: 2026-09-05 (세션 재개, 위키 정리 커밋)
+active: P0-compose | frozen: none | 브랜치: dev (dev = origin/dev = **main = 0ee6e25**, 2026-09-04 승격 완료. 대기 마커 없음. 미커밋 없음 — 이 커밋으로 정리)
 
 ## 지금 어디까지
 - 2026-09-03 dev 4df323f → main 승격. 그 뒤 README(ae2076f), P0-compose 계획(23d8700), L-004 하네스(9d23fd7) 커밋 → 2026-09-04 U1 과 함께 dev 푸시·main 승격(749bb8e).
@@ -18,7 +18,7 @@ active: P0-compose | frozen: none | 브랜치: dev (dev = origin/dev = **main = 
 - 팀 밑작업(L-004, Agent Teams): 사용자 결정 **보류**. 조사 요약(env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1, teammateMode, TaskCompleted 훅, 팀메이트별 담당 파일 분할). 필요 시 다시 꺼낸다.
 
 ## 바로 다음에 할 것 (순서대로)
-1. **U3 완료(backend-agent, 2026-09-04)** — README 로컬 DB 절·진행 상태 표, registry 비고+3행, verify-impl 사전 PASS 8/WARN 1/FAIL 0. 03-log U3 항목 작성됨. **커밋 초안 승인 대기 → 커밋 → 사용자 승인 후 `--stage verifier` → verifier 04-review → `/devlog done` → 푸시 → L-003.** 원래 U3 내용: README 로컬 DB 절·진행 상태 표, registry README 행 비고 + 3행, 01-plan U3 체크, verify-impl 사전 실행 evidence. 완료 후: 산출물 확인 → 03-log U3 항목 → `/commit` → 사용자 승인 후 `--stage verifier` → verifier 04-review → `/devlog done` → 푸시 → L-003.
+1. **U3 커밋 7397966(로컬, 미푸시)** — README 로컬 DB 절·진행 상태 표, registry 비고+3행, verify-impl 사전 PASS 8/WARN 1/FAIL 0. 03-log U3 항목 작성됨. **사용자 승인 후 `--stage verifier` → verifier 04-review → `/devlog done` → 푸시 → L-003.** 원래 U3 내용: README 로컬 DB 절·진행 상태 표, registry README 행 비고 + 3행, 01-plan U3 체크, verify-impl 사전 실행 evidence. 완료 후: 산출물 확인 → 03-log U3 항목 → `/commit` → 사용자 승인 후 `--stage verifier` → verifier 04-review → `/devlog done` → 푸시 → L-003.
 1-1. (완료) **U2 커밋 0ee6e25 · dev 푸시 완료(2026-09-04)** — scripts/db_check.py(psycopg 3.3.5 채택, 미결 2 닫힘)·tests/test_db_check.py 6건·evidence 5개(`20260904-*`). 5432 충돌로 셸 변수 POSTGRES_PORT=5433 1회성 사용(영구 해결은 사용자 몫 — .env 의 POSTGRES_PORT·DATABASE_URL 포트를 같이 바꾸거나 무관 컨테이너 정리). 03-log U2 항목 작성됨. main 승격 완료(0ee6e25).
 2. U3(사용자 승인 → `--stage backend-agent`): README "로컬에서 해 보기" 절에 로컬 DB(up/check/down, 볼륨 삭제 금지, 포트 바꾸면 DATABASE_URL 도), registry 기존 README 행 비고 갱신(새 행 금지) + compose·initdb·db_check 행 추가 → `/commit` → verifier 04-review → `/devlog done` → dev 푸시 → L-003 멈춤(승격/수정 질문). README 로컬 DB 절에 **5432 충돌 시 POSTGRES_PORT 와 DATABASE_URL 포트를 같이 바꾸라**는 안내와 pg16 태그(미결 1) 메모 포함.
 
@@ -28,7 +28,8 @@ active: P0-compose | frozen: none | 브랜치: dev (dev = origin/dev = **main = 
 - `lessons/L-001-dev-branch.md`, `L-002-role-model-separation.md`, `L-003-stop-after-dev-push.md`
 
 ## 열린 질문 · 사용자 결정 대기
-- 없음.
+- **verifier 04-review 시작**: 2026-09-04 사용자 "나중에" — 다음 세션에서 다시 묻는다. 시작 시 `--stage verifier` 마커 필수(L-004).
+- U3 커밋 7397966 은 미푸시. 04-review·`/devlog done` 커밋과 함께 푸시 예정.
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)
 - 재개 시 커밋 안 된 변경·진행 중 항목이 있으면 **먼저 사용자에게 목록을 보이고 우선순위를 묻는다**(`/devlog resume`).
