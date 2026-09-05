@@ -3,7 +3,7 @@
 > `findings.py` 가 검증 출력에서 만든다. 소견 본문(원인·해결 단계·재검증·영향)은 에이전트가 채우고, 해결 단계의 완료 판정 명령을 실제로 실행한 출력이 증거다. 소견은 지우지 않는다(해소만 한다).
 > 루프: 검증 → 소견 → 단계별 조치 → 재검증(같은 명령) → 해소. 같은 소견이 3회 재검증 후에도 열려 있으면 사용자에게 보고한다.
 
-갱신: 2026-09-05 15:22 | 출처: verify-plan | 열림: 15 (필수 0) | 해소: 1
+갱신: 2026-09-05 19:49 | 출처: verify-impl | 열림: 3 (필수 0) | 해소: 16
 
 ## F-8041b0 · [필수] 없음: docs/wiki/packages/P2-tools/02-plan-verify.md
 상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-05
@@ -32,7 +32,7 @@ FAIL  없음: docs/wiki/packages/P2-tools/02-plan-verify.md
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-673d47 · [권고] registry 에 다른 패키지로 이미 있음: app/db/models.py → | 모듈 | 스키마 v2 SQLAlchemy 모델 9개 | app/db/models.py | P1-schema |
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-05 (04-review, verifier 판정)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -51,14 +51,14 @@ WARN  registry 에 다른 패키지로 이미 있음: app/db/models.py → | 모
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): `grep -c "| app/db/models.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
+- 결과 파일(evidence/): `grep -c "| app/db/models.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인; verifier 재확인 2026-09-05 04-review — evidence/20260905-1941-review-static.txt: 공유 파일 7개 행 수 각 1, requirements 행은 'requirements.txt, requirements-dev.txt' 한 행)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-ca32f5 · [권고] registry 에 다른 패키지로 이미 있음: app/config.py → | 모듈 | 백엔드 패키지 골격(DB 접속 설정) | app/config.py | P1-sch
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-05 (04-review, verifier 판정)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -77,14 +77,14 @@ WARN  registry 에 다른 패키지로 이미 있음: app/config.py → | 모듈
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): `grep -c "| app/config.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
+- 결과 파일(evidence/): `grep -c "| app/config.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인; verifier 재확인 2026-09-05 04-review — evidence/20260905-1941-review-static.txt: 공유 파일 7개 행 수 각 1, requirements 행은 'requirements.txt, requirements-dev.txt' 한 행)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-127d01 · [권고] registry 에 다른 패키지로 이미 있음: tests/conftest.py → | 테스트 | 저장소 루트 `sys.path` 등록(공용 fixture) | tests/conftes
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-05 (04-review, verifier 판정)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -103,14 +103,14 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/conftest.py → | �
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): `grep -c "| tests/conftest.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
+- 결과 파일(evidence/): `grep -c "| tests/conftest.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인; verifier 재확인 2026-09-05 04-review — evidence/20260905-1941-review-static.txt: 공유 파일 7개 행 수 각 1, requirements 행은 'requirements.txt, requirements-dev.txt' 한 행)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-320519 · [권고] registry 에 다른 패키지로 이미 있음: tests/test_config.py → | 테스트 | 접속 설정 해석(DB 없이) | tests/test_config.py | P1-schema
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-05 (04-review, verifier 판정)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -129,14 +129,14 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/test_config.py → |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): `grep -c "| tests/test_config.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
+- 결과 파일(evidence/): `grep -c "| tests/test_config.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인; verifier 재확인 2026-09-05 04-review — evidence/20260905-1941-review-static.txt: 공유 파일 7개 행 수 각 1, requirements 행은 'requirements.txt, requirements-dev.txt' 한 행)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-0ffff5 · [권고] registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-05 (04-review, verifier 판정)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -155,14 +155,14 @@ WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | �
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): `grep -c "| README.md |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
+- 결과 파일(evidence/): `grep -c "| README.md |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인; verifier 재확인 2026-09-05 04-review — evidence/20260905-1941-review-static.txt: 공유 파일 7개 행 수 각 1, requirements 행은 'requirements.txt, requirements-dev.txt' 한 행)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-2c37bd · [권고] registry 에 다른 패키지로 이미 있음: requirements.txt → | 문서/설정 | 런타임·개발 의존성 선언(첫 도입, `==` 고정) |
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-05 (04-review, verifier 판정)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -181,14 +181,14 @@ WARN  registry 에 다른 패키지로 이미 있음: requirements.txt → | 문
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): `grep -c "| requirements.txt" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
+- 결과 파일(evidence/): `grep -c "| requirements.txt" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인; verifier 재확인 2026-09-05 04-review — evidence/20260905-1941-review-static.txt: 공유 파일 7개 행 수 각 1, requirements 행은 'requirements.txt, requirements-dev.txt' 한 행)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-08b3db · [권고] 판정 방법 표의 'trace 기록(원칙9)'·'D1 강제(R6)' 두 행이 POSTGRES_PORT=5433 과 -rs 없이 pytest 를 부른다 — 로컬 5433 이 아닌 기본 5432 로 붙어 dbtest 가 조용히 skip 되고 초록으로 끝날 수 있다(계획 자신의 리스크 '실 DB 테스트가 조용히 skip 된다' 대응 (a)와 모순). 04-review 는 이 두 행도 POSTGRES_PORT=5433 … -rs 로 실행한 출력만 증거로 받는다
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -214,7 +214,7 @@ WARN  판정 방법 표의 'trace 기록(원칙9)'·'D1 강제(R6)' 두 행이 P
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-b97a06 · [권고] D1 강제 검사가 '답했는가'만 보고 '무엇이라 답했는가'를 보지 않는다 — new_person 질문에 부정 선택지로 답해도 answered_at 이 채워지므로 create_person 이 통과한다. D1 '승인 시에만 create_person'. U4 또는 P5-loop 01-plan 에서 긍정 선택지 규약(예: options 첫 항목 또는 context.affirmative)을 정하고 어느 쪽이 검사하는지 03-log 에 남긴다
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -240,7 +240,7 @@ WARN  D1 강제 검사가 '답했는가'만 보고 '무엇이라 답했는가'�
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-4d8d96 · [권고] @traced 의 step='tool_error' 행은 같은 세션에 flush 되므로 호출자(session_scope·get_session)가 예외 시 rollback 하면 함께 사라진다 — 운영에서는 오류 trace 가 남지 않는다. 결정 2(툴은 commit 하지 않음)와 U2 테스트(롤백 전 조회)는 서로 맞지만 원칙9 관점의 한계다. 03-log 에 '오류 trace 는 트랜잭션과 함께 롤백된다'를 명시하거나 별도 커넥션 기록을 P5 로 넘길지 결정
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -259,14 +259,14 @@ WARN  @traced 의 step='tool_error' 행은 같은 세션에 flush 되므로 호�
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `grep -n F-4d8d96 app/tools/context.py` → 16행(모듈 docstring 절 제목)·120행. verifier 04-review 2026-09-05 확인. 후속: 같은 경로의 추가 결함(DB 유래 예외 가림)은 F-ca12ad 로 분리
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-3c8d4a · [권고] 결정 4·5 의 'U8 에서'(registry 26행 비고 좁히기, S3.1 카드 한 줄 추가)는 개정 1 전 번호다 — 개정 후 U8 은 FastAPI 골격이고 문서 단위는 U9. S3.1 카드 갱신(ALIAS_SOURCES 값 집합)은 산출물 목록과 U9 본문 어디에도 없다. 구현자는 U9 에서 docs/wiki/specs/S3.1-schema-v2.md 에 '(P2 결정 5)' 주석으로 한 줄 추가하고 03-log 에 적는다(CR 불필요 — S3.1 의 N=1536 주석과 같은 방식)
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -318,7 +318,7 @@ WARN  결정 12 '없는 id·다른 사용자 → 404' 중 '다른 사용자'는 
 - FIX/CR 로 올려야 하는가: 아니오 (P5-loop 01-plan 이 세션→사용자 귀속 계층으로 이 사각지대를 메울지 결정)
 
 ## F-0010e6 · [권고] ALIAS_SOURCES 상수를 U4 에서 추가하지만 U3(search_person) 테스트가 이미 person_aliases 행(source NOT NULL)을 만든다 — U3 픽스처가 문자열을 직접 쓰면 이중 출처. ALIAS_SOURCES 는 U2(툴 공통) 또는 U3 첫머리로 당긴다
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -337,14 +337,14 @@ WARN  ALIAS_SOURCES 상수를 U4 에서 추가하지만 U3(search_person) 테스
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `python -c "from app.db.models import ALIAS_SOURCES; print(ALIAS_SOURCES)"` → `('user_said', 'confirmed', 'system')`, 도입 커밋 `git log -S ALIAS_SOURCES -- app/db/models.py` → 4eca3e9(U2). verifier 04-review 2026-09-05 확인
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-2418ef · [권고] U4 는 두 툴 + D1 검사 + D6 + 별칭 upsert(미결 7) + 사실 upsert(결정 6) + 임베딩 채우기 — 단위 중 가장 크다. 커밋 하나로 두되 03-log 에 소단계(별칭 보조 → create → update)를 나눠 적고, D6 에서 update_person(display_name=X) 시 X 를 별칭으로도 누적하는지(D5 '새 별칭 확정 시 즉시 임베딩') U4 착수 전에 정한다
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -389,14 +389,14 @@ WARN  security.md §5 'DELETE /persons/{id}' 는 backlog 어느 항목에도 없
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): 04-review(2026-09-05, verifier) 시점에도 `grep -nE 'DELETE|delete_person|완전 삭제' docs/backlog.md` 0건 — 열림 유지, architect 인계(04-review §6). P2-tools 완료 판정을 막지 않는다(P2 범위 밖, 사용자 결정으로 제외).
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-107a50 · [권고] CLAUDE.md 표의 반환형(Person/Event/Schedule/Briefing/PendingQuestion)과 계획의 반환형(PersonOut 등)이 이름이 다르다 — tools_check 는 매개변수만 대조하므로 수용 기준 판정에는 영향 없음. 04-review 는 tools_check 출력에 실제 시그니처가 ctx 포함 그대로 찍혀 있을 것(예: actual=(ctx, query, hints=None))을 요구한다 — ctx 편차가 기록에 남아야 한다
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -420,4 +420,82 @@ WARN  CLAUDE.md 표의 반환형(Person/Event/Schedule/Briefing/PendingQuestion)
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오
+
+## F-14f3ef · [권고] 04-review.md 없음 (완료 검토 전이면 정상)
+상태: 해소 | 발견: 2026-09-05 (verify-impl) | 해소: 2026-09-05
+
+### 증상 (검증 출력 인용)
+```
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+```
+
+### 원인 분석
+- 가설: verify-impl 5번은 04-review.md 부재를 WARN 으로 낸다. 완료 검토(verifier)가 쓰기 전 사전 실행이므로 절차상 정상 — 04-review.md 를 쓴 뒤 같은 명령을 다시 돌리면 사라진다.
+- 확인 방법(명령): `ls docs/wiki/packages/P2-tools/04-review.md`; `POSTGRES_PORT=5433 bash .claude/scripts/verify-impl.sh P2-tools`
+- 확인 결과: 1차 실행(evidence/20260905-1936-verify-impl.txt) FAIL 0 / WARN 1 (이 소견). 04-review.md 작성 후 재실행 결과는 04-review §1 과 재검증 결과 파일에 있다.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 |  |  |  | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
+- 결과 파일(evidence/):
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+
+## F-ca12ad · [권고] @traced 의 tool_error 경로가 DB 유래 예외(flush 실패)를 가린다 — 실패한 flush 뒤 같은 세션에 AgentTrace add+flush 를 시도해 PendingRollbackError 가 원래 예외(예: DataError 'expected 1536 dimensions, not 1535')를 대체하고 tool_error 행도 남지 않는다. P2 의 자체 예외는 flush 전 검증 오류라 수용 기준에는 영향 없으나, P3-er 가 실제 임베딩 공급자를 꽂는 순간 도달 가능. 조치는 P3-er 첫 단위(begin_nested 세이브포인트 안에서 tool_error 기록 또는 F-4d8d96 의 별도 커넥션 결정과 묶음) — 근거 evidence/20260905-1942-review-tool-error-probe.txt
+상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  @traced 의 tool_error 경로가 DB 유래 예외(flush 실패)를 가린다 — 실패한 flush 뒤 같은 세션에 AgentTrace add+flush 를 시도해 PendingRollbackError 가 원래 예외(예: DataError 'expected 1536 dimensions, not 1535')를 대체하고 tool_error 행도 남지 않는다. P2 의 자체 예외는 flush 전 검증 오류라 수용 기준에는 영향 없으나, P3-er 가 실제 임베딩 공급자를 꽂는 순간 도달 가능. 조치는 P3-er 첫 단위(begin_nested 세이브포인트 안에서 tool_error 기록 또는 F-4d8d96 의 별도 커넥션 결정과 묶음) — 근거 evidence/20260905-1942-review-tool-error-probe.txt
+```
+
+### 원인 분석
+- 가설: `app/tools/context.py` `traced()` 의 `except Exception` 블록이 실패한 flush 뒤 **같은 세션**에 `AgentTrace` 를 `add()`+`flush()` 한다. SQLAlchemy 2.0 은 flush 실패 후 세션 트랜잭션을 비활성으로 두므로 두 번째 flush 가 `PendingRollbackError` 를 올리고, `raise`(원래 예외 재발생) 줄에 도달하지 못한다 — 호출자는 원래 `DataError` 를 `__context__` 로만 본다. P2 자체 예외(`InvalidValue`/`PersonNotFound`/`ConfirmationRequired`/`QuestionNotAnswerable`)는 모두 flush 전에 나므로 P2 수용 기준·기존 206 테스트는 영향 없음. 도달 조건은 DB 가 거부하는 값(벡터 차원 불일치·CHECK·NOT NULL) — P3-er 가 `OpenAIEmbeddingProvider` 를 `ctx.embedder` 에 꽂으면 현실이 된다(D4 '공급자 바꾸면 재임베딩' 과 같은 축).
+- 확인 방법(명령): `POSTGRES_PORT=5433 python <scratchpad>/tool_error_probe.py` — answered new_person 질문 + 1535차원을 돌려주는 가짜 embedder 로 `create_person` 호출, 롤백 픽스처 안에서 실행
+- 확인 결과: 호출자에게 올라온 예외 = `sqlalchemy.exc.PendingRollbackError`, `__context__` = `DataError (psycopg.errors.DataException) expected 1536 dimensions, not 1535`. tool_error 행 없음. evidence/20260905-1942-review-tool-error-probe.txt. 조치 후보(구현자 판단): (1) tool_error 기록을 `ctx.session.begin_nested()` 세이브포인트 안에서 시도하고 실패하면 무시한 채 원래 예외를 올린다, (2) F-4d8d96 의 '별도 커넥션 기록' 결정과 묶어 P5-loop 에서 처리. 어느 쪽이든 원래 예외가 그대로 올라와야 한다(`raise` 가 `from`/`__context__` 로 가려지지 않게). P3-er 01-plan 첫 단위 또는 FIX 로.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 |  |  |  | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
+- 결과 파일(evidence/):
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+
+## F-5d554d · [권고] registry P2-tools 행 2개(scripts/tools_check.py 63행, tests/test_tool_signatures.py 73행)의 커밋 열이 'pending' 이고 03-log 항목 10개 제목이 모두 '· pending' 이다 — 실제 해시는 f2e9e05(두 행) 및 7b793ba f217190 4eca3e9 a9cb254 f318d58 9cb35b6 8162e09 7c94aad 4d5817e f2e9e05. 패키지 닫는 커밋에서 메인 세션이 채운다(P0-compose 7d20a34 '03-log 해시 채움' 과 같은 처리) — 근거 evidence/20260905-1941-review-static.txt
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  registry P2-tools 행 2개(scripts/tools_check.py 63행, tests/test_tool_signatures.py 73행)의 커밋 열이 'pending' 이고 03-log 항목 10개 제목이 모두 '· pending' 이다 — 실제 해시는 f2e9e05(두 행) 및 7b793ba f217190 4eca3e9 a9cb254 f318d58 9cb35b6 8162e09 7c94aad 4d5817e f2e9e05. 패키지 닫는 커밋에서 메인 세션이 채운다(P0-compose 7d20a34 '03-log 해시 채움' 과 같은 처리) — 근거 evidence/20260905-1941-review-static.txt
+```
+
+### 원인 분석
+- 가설: U9 커밋(f2e9e05)이 `scripts/tools_check.py`·`tests/test_tool_signatures.py` 를 처음 추가하면서 같은 커밋에 registry 행을 넣었으므로 그 시점에는 해시를 알 수 없어 'pending' 으로 남겼다. 03-log 제목의 '· pending' 도 /commit 규약상 커밋 뒤에 채우는 자리다(P0-compose 는 7d20a34 에서 '03-log 해시 채움' 으로 처리). 기능 결함 아님 — 문서 정확성.
+- 확인 방법(명령): `grep -n '| pending |' docs/wiki/registry.md`; `grep -nE '· pending$' docs/wiki/packages/P2-tools/03-log.md`; `git log --format=%h -- scripts/tools_check.py tests/test_tool_signatures.py`
+- 확인 결과: registry 63·73행 'pending' 2건, 03-log 제목 10건 'pending'. 실제 해시: 두 registry 행 → f2e9e05; 03-log 순서대로 7b793ba f217190 4eca3e9 a9cb254 f318d58 9cb35b6 8162e09 7c94aad 4d5817e f2e9e05 (evidence/20260905-1941-review-static.txt, 20260905-1936-commits.txt). 패키지 닫는 docs 커밋에서 메인 세션이 채운다.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | registry 63·73행 커밋 열 pending → f2e9e05, 03-log 제목 10개 pending → 실제 해시(메인 세션, /devlog done) | `grep -c "· pending" docs/wiki/packages/P2-tools/03-log.md; grep -c "| P2-tools | pending" docs/wiki/registry.md` | 0, 0 | 완료 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
+- 결과 파일(evidence/):
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 

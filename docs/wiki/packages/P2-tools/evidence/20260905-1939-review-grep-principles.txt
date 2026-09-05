@@ -1,0 +1,68 @@
+== verifier principle-boundary grep over app/ (code lines only; docstring/comment hits listed separately) ==
+
+--- 원칙2·3·4: threshold / confidence formula tokens (expect only DEFAULT_FACT_CONFIDENCE & doc mentions) ---
+app/tools/persons.py:4:한다. 이 함수는 확신도(`s_llm`/`s_emb`/`s_rule`/`confidence`)를 계산하지
+app/tools/persons.py:5:않고, 임계치(`T_merge`/`T_new`)로 후보를 배제하거나 자동으로 인물을
+app/tools/questions.py:4:이 모듈은 "언제 물을지"(임계치 `T_merge`/`T_new`, 확신도 판정)를 다루지 않는다
+Binary file app/tools/__pycache__/persons.cpython-313.pyc matches
+Binary file app/tools/__pycache__/questions.cpython-313.pyc matches
+
+--- same, excluding docstring/comment lines (lines starting with #, or inside module docstring: heuristic: lines containing 'P3-er' or '--' are doc) ---
+Binary file app/tools/__pycache__/persons.cpython-313.pyc matches
+Binary file app/tools/__pycache__/questions.cpython-313.pyc matches
+
+--- 원칙6: pattern: ---
+app/tools/records.py:4:한다. **패턴 감지(`pattern:{type}`)·시맨틱 승격(`person_facts` upsert)·
+Binary file app/tools/__pycache__/records.cpython-313.pyc matches
+
+--- 원칙7: summary|suggestion|advice|제안 in app/tools/briefing.py & types.py (code lines) ---
+app/tools/briefing.py:4:문장화·요약·"한 줄 행동 제안"·감정/고민 언급·주기 작업(1분)·
+app/tools/briefing.py:7:'제안'은 기록된 사실에서 도출되는 한 줄 행동 제안으로 한정한다. 감정·고민에
+app/tools/briefing.py:8:대한 대화는 하지 않는다"는 P6-briefing 이 지킬 제약이며, P2 는 그 제안조차
+app/tools/briefing.py:11:`schedule`/`generated_at`) 뿐이고 `summary`/`suggestion`/`advice` 같은
+app/tools/briefing.py:70:    (`_owned_person`). 문장화·제안·LLM 호출 없음(모듈 docstring). `schedule_id`
+app/tools/types.py:137:    "한 줄 행동 제안"·감정 언급은 이 DTO 에 없다(P6-briefing 몫, 원칙7 경계
+BriefingOut.to_dict keys:
+['aliases', 'facts', 'generated_at', 'person', 'recent_events', 'schedule', 'upcoming_schedules']
+
+--- openai|anthropic import ---
+(no matches)
+(not in requirements.txt)
+
+--- D2: time.sleep / polling ---
+app/tools/questions.py:53:이 모듈의 어떤 함수도 `time.sleep`·폴링 루프·응답 대기를 하지 않는다.
+Binary file app/tools/__pycache__/questions.cpython-313.pyc matches
+
+--- D6: alias deletion ---
+(no matches)
+
+--- routes present (P5 boundary: no chat/loop/messages/persons/briefings routes) ---
+app/api/routes.py:27:@router.get("/health", response_model=HealthOut)
+app/api/routes.py:53:@router.post("/answers/{question_id}", response_model=AnswerOut)
+(no non-doc route hits)
+
+--- LLM / prompt tokens in app/ ---
+app/tools/persons.py:3:`.claude/skills/entity-resolution` 의 4단계 중 **1단계(후보 검색)만** 여기서
+Binary file app/tools/__pycache__/persons.cpython-313.pyc matches
+
+--- trace coverage: @traced decorators ---
+app/tools/briefing.py:63:@traced("get_briefing")
+app/tools/persons.py:138:@traced("search_person")
+app/tools/persons.py:403:@traced("create_person")
+app/tools/persons.py:466:@traced("update_person")
+app/tools/questions.py:183:@traced("ask_user")
+app/tools/questions.py:236:@traced("answer_question")
+app/tools/records.py:69:@traced("add_event")
+app/tools/records.py:116:@traced("add_schedule")
+
+--- secret-ish string patterns in repo (tracked files) ---
+(0 matches)
+(0 matches in md)
+
+--- alembic.ini url blank ---
+93:sqlalchemy.url =
+
+--- .env.example lines with values (P2 diff only) ---
++
++# 로컬 단일 사용자 식별자 (P2-tools 결정9). 값은 예시 -- 비밀 아님.
++APP_USER_ID=local

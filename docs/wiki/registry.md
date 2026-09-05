@@ -60,7 +60,7 @@
 | 엔드포인트 | 요청 단위 세션·ToolContext 조립 | app/api/deps.py | P2-tools | 4d5817e | `get_session()`(요청 단위 세션, commit/rollback/close), `build_ctx()`(답할 `pending_questions` 행의 `session_id` 사용, 결정12) |
 | 엔드포인트 | GET /health · POST /answers/{id} | app/api/routes.py | P2-tools | 4d5817e | `/health`: SELECT 1 + `alembic_version`, 실패 시 `main.py` 캐치올이 503; `/answers/{id}`: `answer_question` 호출까지(재개는 P5-loop, R7·D2) |
 | 엔드포인트 | API 요청/응답 스키마 | app/api/schemas.py | P2-tools | 4d5817e | `AnswerIn`·`AnswerOut`·`HealthOut`(pydantic v2, 접속 정보·비밀 필드 없음) |
-| 스크립트 | 툴 시그니처 기계 검증 | scripts/tools_check.py | P2-tools | pending | CLAUDE.md "툴 7종" 표 파싱 → `inspect.signature` 대조(ctx 포함 실제 시그니처 출력, F-107a50), rc 0/1, `--claude-md` 옵션(테스트용 가짜 표 주입) |
+| 스크립트 | 툴 시그니처 기계 검증 | scripts/tools_check.py | P2-tools | f2e9e05 | CLAUDE.md "툴 7종" 표 파싱 → `inspect.signature` 대조(ctx 포함 실제 시그니처 출력, F-107a50), rc 0/1, `--claude-md` 옵션(테스트용 가짜 표 주입) |
 | 테스트 | 설정값 해석(DB 없이) | tests/test_settings.py | P2-tools | f217190 | `app_user_id()` 기본값·환경변수 |
 | 테스트 | 엔진 URL 조립·session_scope 계약(DB 없이 가능한 범위) | tests/test_db_session.py | P2-tools | f217190 | 4건 |
 | 테스트 | 툴 반환 DTO·예외(DB 없이) | tests/test_tools_types.py | P2-tools | 4eca3e9 | `to_dict()` 직렬화, 예외 속성(`reason`/`code`) |
@@ -70,4 +70,4 @@
 | 테스트 | ask_user 저장·`{question_id,status:"pending"}`·24h 만료·answer_question | tests/test_tools_questions.py | P2-tools | 8162e09 | |
 | 테스트 | 브리핑 구성·briefed_at 기록 | tests/test_tools_briefing.py | P2-tools | 7c94aad | |
 | 테스트 | HTTP: /health·/answers 200/404/409/422 | tests/test_api.py | P2-tools | 4d5817e | `TestClient` + `dependency_overrides[get_session]`(결정13) |
-| 테스트 | CLAUDE.md 툴 표 ↔ 실제 시그니처(DB 없이) | tests/test_tool_signatures.py | P2-tools | pending | 15건 — (a) 7툴 parametrize (b) 실제 파일 7행 파싱 (c) 부정 케이스(이름 변경/옵션 제거/6행/절 없음) (d) ctx 아닌 첫 인자 |
+| 테스트 | CLAUDE.md 툴 표 ↔ 실제 시그니처(DB 없이) | tests/test_tool_signatures.py | P2-tools | f2e9e05 | 15건 — (a) 7툴 parametrize (b) 실제 파일 7행 파싱 (c) 부정 케이스(이름 변경/옵션 제거/6행/절 없음) (d) ctx 아닌 첫 인자 |

@@ -1,0 +1,7 @@
+ask_user returned: {'question_id': 1092, 'status': 'pending', 'kind': 'new_person', 'question': 'verifier 검증용: 이 사람을 기억해둘까요?', 'options': ['예', '아니오']}
+row in same scope: {'id': 1092, 'session_id': 'verifier-04review-evidence', 'kind': 'new_person', 'question': 'verifier 검증용: 이 사람을 기억해둘까요?', 'options': ['예', '아니오'], 'context': {'utterance': '검증 발화', 'affirmative_options': ['예']}, 'answered_at': None}
+trace row in same scope: {'step': 'tool_call', 'tool_name': 'ask_user', 'tokens_in': 0, 'tokens_out': 0}
+rolled back on purpose (session_scope except-path)
+row after rollback (expect None): None
+trace rows after rollback (expect 0): 0
+exit=0

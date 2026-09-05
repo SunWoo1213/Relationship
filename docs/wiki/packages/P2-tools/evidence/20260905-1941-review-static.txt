@@ -1,0 +1,110 @@
+== verifier static checks ==
+
+--- requirements.txt pins vs pip freeze ---
+2:SQLAlchemy==2.0.50
+3:alembic==1.19.2
+4:psycopg[binary]==3.3.5
+5:pgvector==0.5.0
+7:fastapi==0.135.1
+8:uvicorn[standard]==0.41.0
+9:httpx==0.28.1  # TestClient 용 (런타임에는 쓰지 않음, Starlette TestClient 의 필수 의존성)
+pip freeze (web 5):
+fastapi==0.135.1
+httpx==0.28.1
+pydantic==2.12.5
+starlette==0.52.1
+uvicorn==0.41.0
+
+--- evidence exit= lines (expected all exit=0 except mutation files which show FAILED intentionally) ---
+20260905-1535-alembic-check-u1.txt:10:exit=0
+20260905-1535-pytest-u1.txt:3:exit=0
+20260905-1535-schema-check-after-u1.txt:17:exit=0
+20260905-1554-alembic-check-u2.txt:10:exit=0
+20260905-1554-mutation-u2.txt:29:exit=1
+20260905-1554-pytest-u2.txt:4:exit=0
+20260905-1606-alembic-check-u3.txt:10:exit=0
+20260905-1606-mutation-u3.txt:21:exit=1
+20260905-1606-pytest-u3.txt:4:exit=0
+20260905-1606-search-sql.txt:7:exit=0
+20260905-1620-alembic-check-u4.txt:10:exit=0
+20260905-1620-pytest-u4.txt:4:exit=0
+20260905-1633-alembic-check-u5.txt:10:exit=0
+20260905-1633-mutation-u5.txt:32:exit=1
+20260905-1633-mutation-u5.txt:38:exit=0
+20260905-1633-pytest-u5.txt:4:exit=0
+20260905-1645-alembic-check-u6.txt:10:exit=0
+20260905-1645-pytest-u6-final.txt:5:exit=0
+20260905-1645-pytest-u6.txt:5:exit=0
+20260905-1837-alembic-check-u7.txt:10:exit=0
+20260905-1837-mutation-u7.txt:52:exit=1
+20260905-1837-pytest-u7-final.txt:5:exit=0
+20260905-1837-pytest-u7.txt:5:exit=0
+20260905-1908-alembic-check-u9.txt:10:exit=0
+20260905-1908-mutation-u9.txt:31:exit=1
+20260905-1908-pytest-all.txt:5:exit=0
+20260905-1908-pytest-api.txt:3:exit=0
+20260905-1908-pytest-questions.txt:3:exit=0
+20260905-1908-pytest-signatures.txt:3:exit=0
+20260905-1908-pytest-trace-d1.txt:3:exit=0
+20260905-1908-tools-check.txt:9:exit=0
+20260905-1930-alembic-check-u8.txt:10:exit=0
+20260905-1930-mutation-u8.txt:49:exit=1
+20260905-1930-pytest-u8-final.txt:5:exit=0
+20260905-1930-pytest-u8.txt:5:exit=0
+20260905-1936-review-tools-check.txt:9:exit=0
+20260905-1936-verify-impl.txt:26:exit=0
+20260905-1937-review-ask-user-row.txt:7:exit=0
+20260905-1937-review-signatures-independent.txt:36:exit=0
+20260905-1939-review-alembic-check.txt:11:exit=0
+20260905-1939-review-pytest-all.txt:6:exit=0
+20260905-1939-review-pytest-api-wrongport.txt:45:exit=0
+
+--- evidence mutation files: FAILED lines present? ---
+20260905-1554-mutation-u2.txt: 1 failed-lines
+20260905-1606-mutation-u3.txt: 1 failed-lines
+20260905-1620-mutation-u4.txt: 2 failed-lines
+20260905-1633-mutation-u5.txt: 1 failed-lines
+20260905-1645-mutation-u6.txt: 2 failed-lines
+20260905-1837-mutation-u7.txt: 1 failed-lines
+20260905-1908-mutation-u9.txt: 1 failed-lines
+20260905-1930-mutation-u8.txt: 1 failed-lines
+20260905-1938-review-mutations.txt: 4 failed-lines
+
+--- registry: P2-tools rows ---
+26
+--- registry: single-row check for shared files ---
+README.md              1
+scripts/db_check.py    1
+requirements.txt       0
+app/db/models.py       1
+app/config.py          1
+tests/conftest.py      1
+tests/test_config.py   1
+
+--- registry P2-tools rows: commit column vs git log (last commit touching path) ---
+app/db/session.py                      registry=f217190 first=f217190 last=f217190 ok(last)
+app/settings.py                        registry=f217190 first=f217190 last=7c94aad ok(first)
+app/embedding.py                       registry=a9cb254 first=a9cb254 last=a9cb254 ok(last)
+app/tools/__init__.py                  registry=4eca3e9 first=4eca3e9 last=7c94aad ok(first)
+app/tools/types.py                     registry=4eca3e9 first=4eca3e9 last=7c94aad ok(first)
+app/tools/context.py                   registry=4eca3e9 first=4eca3e9 last=a9cb254 ok(first)
+app/tools/persons.py                   registry=a9cb254 first=a9cb254 last=9cb35b6 ok(first)
+app/tools/records.py                   registry=9cb35b6 first=9cb35b6 last=9cb35b6 ok(last)
+app/tools/questions.py                 registry=8162e09 first=8162e09 last=8162e09 ok(last)
+app/tools/briefing.py                  registry=7c94aad first=7c94aad last=7c94aad ok(last)
+app/main.py                            registry=4d5817e first=4d5817e last=4d5817e ok(last)
+app/api/__init__.py                    registry=4d5817e first=4d5817e last=4d5817e ok(last)
+app/api/deps.py                        registry=4d5817e first=4d5817e last=4d5817e ok(last)
+app/api/routes.py                      registry=4d5817e first=4d5817e last=4d5817e ok(last)
+app/api/schemas.py                     registry=4d5817e first=4d5817e last=4d5817e ok(last)
+scripts/tools_check.py                 registry= first=f2e9e05 last=f2e9e05 ok(in-history)
+tests/test_settings.py                 registry=f217190 first=f217190 last=f217190 ok(last)
+tests/test_db_session.py               registry=f217190 first=f217190 last=f217190 ok(last)
+tests/test_tools_types.py              registry=4eca3e9 first=4eca3e9 last=7c94aad ok(first)
+tests/test_tools_context.py            registry=4eca3e9 first=4eca3e9 last=4eca3e9 ok(last)
+tests/test_tools_persons.py            registry=a9cb254 first=a9cb254 last=f318d58 ok(first)
+tests/test_tools_records.py            registry=9cb35b6 first=9cb35b6 last=9cb35b6 ok(last)
+tests/test_tools_questions.py          registry=8162e09 first=8162e09 last=8162e09 ok(last)
+tests/test_tools_briefing.py           registry=7c94aad first=7c94aad last=7c94aad ok(last)
+tests/test_api.py                      registry=4d5817e first=4d5817e last=4d5817e ok(last)
+tests/test_tool_signatures.py          registry= first=f2e9e05 last=f2e9e05 ok(in-history)

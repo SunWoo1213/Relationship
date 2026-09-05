@@ -11,11 +11,11 @@
 | R3 | H | 임계치 방향 문장이 반대 | 해소(문서) | D10 |
 | R4 | H | "LLM 출력 확률"은 Claude API에 없음 | 해소(문서) | D3 |
 | R5 | H | 임베딩 공급자 미정, 차원 1536은 가정 | 구현완료(876a450, reports/embed_pilot.md: OpenAI text-embedding-3-small, N=1536) | D4 → P0-embed-pilot |
-| R6 | M | 신규 인물 자동등록 vs 확인형 불일치 | 결정완료 | D1 → S3.4 → P2-tools, P5-loop |
-| R7 | M | ask_user 동기 반환 불가 | 결정완료 | D2 → S3.4 → P2-tools, P5-loop |
+| R6 | M | 신규 인물 자동등록 vs 확인형 불일치 | 구현완료(f318d58, 8162e09 — create_person 은 answered new_person 질문+긍정 답 없이는 ConfirmationRequired; P5-loop 가 1회 소비·대상 바인딩 결정) | D1 → S3.4 → P2-tools, P5-loop |
+| R7 | M | ask_user 동기 반환 불가 | 구현완료(8162e09, 4d5817e — pending_questions 저장 후 {question_id,status:pending} 반환, POST /answers 답 저장; 재개 흐름은 P5-loop) | D2 → S3.4 → P2-tools, P5-loop |
 | R8 | M | 시맨틱→원문 링크 없음 | 구현완료(4dfaf33, 09c2bd1 — fact_sources(fact_id, event_id) 복합 PK·FK CASCADE 2; P6-memory 가 승격 시 채움) | S3.1 `fact_sources` → P1-schema, P6-memory |
 | R9 | M | 인물당 임베딩 1개 | 구현완료(4dfaf33, 09c2bd1 — person_aliases.embedding vector(1536) nullable, person_embeddings 없음; P3-er 가 후보 검색에 사용) | D5 → S3.1 → P1-schema, P3-er |
-| R10 | M | 툴 시그니처 ↔ 스키마 불일치 | 해소(문서) | S3.2 |
+| R10 | M | 툴 시그니처 ↔ 스키마 불일치 | 구현완료(f2e9e05 — tools_check 7/7, CLAUDE.md 표 = 실제 시그니처) | S3.2 |
 | R11 | M | 반복 패턴 감지 메커니즘 없음 | 결정완료 | D9 → S3.5 → P6-memory |
 | R12 | M | 브리핑 트리거·푸시 구독 저장소 없음 | 결정완료 | S3.6 → P6-briefing, P7-push |
 | R13 | M | LLM·임베딩 비용 미산정 | 결정완료 | P0-cost |
@@ -23,7 +23,7 @@
 | R15 | L | 데모 날짜 9/10(화) 달력 불일치 | 결정완료 | P11-demo |
 | R16 | L | 부록 수치가 결과처럼 읽힘 | 해소(문서) | proposal.md 상단 안내 |
 | R17 | L | 제목 "관계 그래프" ↔ A–B 제외 | 해소(문서) | D8 |
-| R18 | L | 승진 후 display_name 정책 없음 | 결정완료 | D6 → S3.2 → P2-tools |
+| R18 | L | 승진 후 display_name 정책 없음 | 구현완료(f318d58 — update_person: 별칭 누적·삭제 없음, display_name 변경은 확인 필요+새 이름 별칭 누적) | D6 → S3.2 → P2-tools |
 | R19 | L | 브리핑 제안 ↔ 상담 제외 경계 | 해소(문서) | 원칙7 → S3.6 |
 | R20 | L | AWS 크레딧 조건부 | 결정완료 | 착수 준비(사용자) |
 

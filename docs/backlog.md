@@ -24,7 +24,7 @@
 
 ### P2
 
-- [ ] [backend-agent] 툴 7종 v2 구현 + 단위 테스트 / 의존: P1 스키마 / 수용기준: 시그니처가 CLAUDE.md와 일치, `ask_user`가 `pending_questions`에 저장
+- [x] [backend-agent] 툴 7종 v2 구현 + 단위 테스트 / 의존: P1 스키마 / 수용기준: 시그니처가 CLAUDE.md와 일치, `ask_user`가 `pending_questions`에 저장 — 완료(2026-09-05, 04-review 완료, verify-impl FAIL 0, R6 R7 R10 R18 구현완료; FastAPI 골격 health·answers 포함)
 
 ### P3
 

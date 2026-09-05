@@ -1,0 +1,11 @@
+f2e9e05 docs(P2-tools): U9 tools_check 시그니처 기계 검증·registry·README 실행 절·S3.1 alias source, verify-impl 사전 실행
+4d5817e feat(P2-tools): U8 FastAPI 골격 — GET /health·POST /answers/{id} 답 저장(200/404/409/422), 예외 매핑, 요청 단위 세션
+7c94aad feat(P2-tools): U7 get_briefing — 자료 조회(facts·최근 events 5·다가오는 schedules 3)·schedule_id 시 briefed_at 기록, 문장화 없음
+8162e09 feat(P2-tools): U6 ask_user·answer_question — pending_questions 저장·{question_id,status:pending}·24h 만료·긍정 답 규약
+9cb35b6 feat(P2-tools): U5 add_event·add_schedule — EVENT_TYPES 검사·raw_utterance 원문 보존·aware 시각만·패턴 감지 없음
+f318d58 feat(P2-tools): U4 create_person·update_person — D1 확인 강제(긍정 답 규약)·D6 별칭 누적·facts upsert
+a9cb254 feat(P2-tools): U3 search_person — 별칭 일치·cosine top-K 인물별 max·rule_flags(신호만, 판정은 P3-er)
+4eca3e9 feat(P2-tools): U2 툴 공통 — ToolContext·@traced(agent_traces 원칙9)·types·ALIAS_SOURCES
+f217190 feat(P2-tools): U1 기반 — fastapi·uvicorn·httpx 핀, ConnInfo repr 비밀 제거, 세션·설정, DB 롤백 픽스처
+7b793ba docs(P2-tools): 계획·계획검증 승인, 패키지 착수 — 툴 7종 v2 + FastAPI 골격
+5dc95bb docs(P1-schema): 완료 — verifier 04-review 완료 판정·사용자 승인, R8 R9 구현완료, 패키지 닫음

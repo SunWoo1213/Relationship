@@ -1,0 +1,6 @@
+exception type surfaced to caller: sqlalchemy.exc PendingRollbackError
+message head: This Session's transaction has been rolled back due to a previous exception during flush. To begin a new transaction with this Session, first issue Session.roll
+__context__/__cause__ type: DataError
+  underlying head: (psycopg.errors.DataException) expected 1536 dimensions, not 1535
+rolled back
+exit=0

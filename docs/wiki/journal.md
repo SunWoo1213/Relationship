@@ -71,3 +71,5 @@
 - 2026-09-05 16:53 | COMMIT | 8162e09 feat(P2-tools): U6 ask_user·answer_question — pending_questions 저장·{question_id,status:pending}·24h 만료·긍정 답 규약
 - 2026-09-05 18:45 | COMMIT | 7c94aad feat(P2-tools): U7 get_briefing — 자료 조회(facts·최근 events 5·다가오는 schedules 3)·schedule_id 시 briefed_at 기록, 문장화 없음
 - 2026-09-05 19:02 | COMMIT | 4d5817e feat(P2-tools): U8 FastAPI 골격 — GET /health·POST /answers/{id} 답 저장(200/404/409/422), 예외 매핑, 요청 단위 세션
+- 2026-09-05 19:26 | COMMIT | f2e9e05 docs(P2-tools): U9 tools_check 시그니처 기계 검증·registry·README 실행 절·S3.1 alias source, verify-impl 사전 실행
+- 2026-09-05 22:55 | DONE | P2-tools 완료 승인(사용자). 수용 기준 통과(tools_check 7/7 + verifier 독립 대조, ask_user 저장 독립 쿼리), verify-impl PASS/WARN 0/FAIL 0 (evidence/20260905-1948-verify-impl.txt), 변이 4종·원칙 grep·uvicorn 직접 실행, R6 R7 R10 R18 구현완료. 열림: F-4d2507→architect, F-ca12ad→P3-er | P2-tools R6 R7 R10 R18 D1 D2 D6 S3.2 S3.4

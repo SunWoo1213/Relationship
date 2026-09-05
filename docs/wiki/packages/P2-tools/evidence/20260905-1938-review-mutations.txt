@@ -1,0 +1,61 @@
+== verifier mutation tests (each applied, tested, restored from pristine copy; git diff --stat must be empty) ==
+
+--- (a) persons.py: remove answered_at check in _require_confirmation ---
+warning: in the working copy of 'app/tools/persons.py', LF will be replaced by CRLF the next time Git touches it
+ app/tools/persons.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+>       with pytest.raises(ConfirmationRequired):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+
+tests\test_tools_persons.py:302: Failed
+1 failed, 31 deselected in 0.64s
+warning: in the working copy of 'app/tools/persons.py', LF will be replaced by CRLF the next time Git touches it
+restored; git diff --stat -> []
+
+--- (b) persons.py: hints exclude candidates in search_person ---
+mutation applied
+ app/tools/persons.py | 2 ++
+ 1 file changed, 2 insertions(+)
+>       assert len(candidates_ha) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_tools_persons.py:186: AssertionError
+1 failed, 31 deselected in 0.65s
+warning: in the working copy of 'app/tools/persons.py', LF will be replaced by CRLF the next time Git touches it
+restored; git diff --stat -> []
+
+--- (c) questions.py: let already_answered pass in answer_question ---
+warning: in the working copy of 'app/tools/questions.py', LF will be replaced by CRLF the next time Git touches it
+ app/tools/questions.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+>       assert resp.status_code == 409
+E       assert 200 == 409
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests\test_api.py:186: AssertionError
+1 failed, 9 deselected in 0.99s
+warning: in the working copy of 'app/tools/questions.py', LF will be replaced by CRLF the next time Git touches it
+restored; git diff --stat -> []
+
+--- (d) records.py: neutralise _require_aware naive check ---
+warning: in the working copy of 'app/tools/records.py', LF will be replaced by CRLF the next time Git touches it
+ app/tools/records.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+        naive = datetime(2026, 5, 1, 9, 30)
+    
+>       with pytest.raises(InvalidValue):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'app.tools.types.InvalidValue'>
+
+tests\test_tools_records.py:282: Failed
+2 failed, 24 deselected in 0.65s
+warning: in the working copy of 'app/tools/records.py', LF will be replaced by CRLF the next time Git touches it
+restored; git diff --stat -> []
+
+--- post-restore: git status --short (app/ tests/ scripts/) ---
+--- post-restore full suite ---
+........................................................................ [ 69%]
+..............................................................           [100%]
+206 passed in 2.89s

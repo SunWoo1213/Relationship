@@ -1,0 +1,43 @@
+== verifier uvicorn live check (port 8791) ==
+pre-check: listeners on 8791:
+(none)
+uvicorn bash pid=1601
+$ curl -s -w '\n%{http_code}' http://127.0.0.1:8791/health
+{"status":"ok","db":"up","alembic_revision":"0001"}
+200
+$ curl -s -w '\n%{http_code}' -X POST http://127.0.0.1:8791/answers/999999999 -H 'content-type: application/json' -d '{"answer":"예"}'   (expect 404 not_found)
+{"detail":"There was an error parsing the body"}
+400
+$ curl -s -w '\n%{http_code}' -X POST http://127.0.0.1:8791/answers/1 -H 'content-type: application/json' -d '{"nope":1}'   (expect 422 fastapi default or 404)
+{"detail":[{"type":"missing","loc":["body","answer"],"msg":"Field required","input":{"nope":1}}]}
+422
+-- shutting down --
+post-check: listeners on 8791:
+(none)
+-- server log --
+INFO:     Started server process [34924]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8791 (Press CTRL+C to quit)
+INFO:     127.0.0.1:61778 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61782 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61783 - "POST /answers/999999999 HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:61784 - "POST /answers/1 HTTP/1.1" 422 Unprocessable Content
+-- secret scan of server log + responses (password / postgresql://): 0 --
+
+== follow-up (port 8792): the 400 above was the Git-Bash shell sending '예' in a non-UTF-8 codepage (client-side); retry with ASCII body from file ==
+$ curl -s -w '\n%{http_code}' -X POST http://127.0.0.1:8792/answers/999999999 -H 'content-type: application/json' --data-binary @ans.json   (expect 404 {"detail":{"code":"not_found"}})
+{"detail":{"code":"not_found"}}
+404
+post-check: listeners on 8792:
+(none)
+post-check: listeners on 8791:
+(none)
+-- server log --
+INFO:     Started server process [14600]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8792 (Press CTRL+C to quit)
+INFO:     127.0.0.1:61785 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61789 - "POST /answers/999999999 HTTP/1.1" 404 Not Found
+-- secret scan (password / postgresql://): 0 --

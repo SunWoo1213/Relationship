@@ -1,0 +1,26 @@
+== verify-impl P2-tools  (20260905-1936) ==
+........................................................................ [ 69%]
+..............................................................           [100%]
+206 passed in 3.08s
+PASS  pytest 통과 → evidence/20260905-1936-pytest.txt
+PASS  compileall 통과 → evidence/20260905-1936-lint.txt
+PASS  태그 P2-tools 커밋 11 건 → evidence/20260905-1936-commits.txt
+PASS  커밋에 태그 존재: D1
+PASS  커밋에 태그 존재: D2
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: D5
+PASS  커밋에 태그 존재: D6
+PASS  커밋에 태그 존재: R10
+PASS  커밋에 태그 존재: R18
+PASS  커밋에 태그 존재: R6
+PASS  커밋에 태그 존재: R7
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.3
+PASS  커밋에 태그 존재: S3.4
+PASS  커밋에 태그 존재: S3.6
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P2-tools 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=1 → evidence/20260905-1936-summary.txt ==
+exit=0

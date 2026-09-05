@@ -1,0 +1,36 @@
+== CLAUDE.md rows (verbatim, lines 60-66) ==
+| `search_person` | `(query: str, hints?: {hierarchy?, relation_tag?}) → Candidate[]` |
+| `create_person` | `(display_name, aliases: str[], relation_tag, hierarchy) → Person` |
+| `update_person` | `(person_id, facts?: {key,value}[], new_alias?: str, display_name?: str) → Person` |
+| `add_event` | `(person_id, type, content, occurred_at, raw_utterance) → Event` |
+| `add_schedule` | `(person_id, title, scheduled_at) → Schedule` |
+| `get_briefing` | `(person_id, schedule_id?) → Briefing` |
+| `ask_user` | `(kind, question, options, context) → PendingQuestion` |
+
+== inspect.signature (raw, including annotations) ==
+search_person(ctx: 'ToolContext', query: 'str', hints: 'dict[str, str] | None' = None) -> 'list[Candidate]'
+   __wrapped__ present: True, __name__=search_person
+create_person(ctx: 'ToolContext', display_name: 'str', aliases: 'list[str]', relation_tag: 'str', hierarchy: 'str') -> 'PersonOut'
+   __wrapped__ present: True, __name__=create_person
+update_person(ctx: 'ToolContext', person_id: 'int', facts: 'list[dict[str, str]] | None' = None, new_alias: 'str | None' = None, display_name: 'str | None' = None) -> 'PersonOut'
+   __wrapped__ present: True, __name__=update_person
+add_event(ctx: 'ToolContext', person_id: 'int', type: 'str', content: 'str', occurred_at: 'datetime', raw_utterance: 'str') -> 'EventOut'
+   __wrapped__ present: True, __name__=add_event
+add_schedule(ctx: 'ToolContext', person_id: 'int', title: 'str', scheduled_at: 'datetime') -> 'ScheduleOut'
+   __wrapped__ present: True, __name__=add_schedule
+get_briefing(ctx: 'ToolContext', person_id: 'int', schedule_id: 'int | None' = None) -> 'BriefingOut'
+   __wrapped__ present: True, __name__=get_briefing
+ask_user(ctx: 'ToolContext', kind: 'str', question: 'str', options: 'list[str]', context: 'dict') -> 'PendingQuestionOut'
+   __wrapped__ present: True, __name__=ask_user
+
+== hand comparison table (verifier) ==
+OK  search_person: first='ctx' rest=[('query', False), ('hints', True)] expected=[('query', False), ('hints', True)]
+OK  create_person: first='ctx' rest=[('display_name', False), ('aliases', False), ('relation_tag', False), ('hierarchy', False)] expected=[('display_name', False), ('aliases', False), ('relation_tag', False), ('hierarchy', False)]
+OK  update_person: first='ctx' rest=[('person_id', False), ('facts', True), ('new_alias', True), ('display_name', True)] expected=[('person_id', False), ('facts', True), ('new_alias', True), ('display_name', True)]
+OK  add_event: first='ctx' rest=[('person_id', False), ('type', False), ('content', False), ('occurred_at', False), ('raw_utterance', False)] expected=[('person_id', False), ('type', False), ('content', False), ('occurred_at', False), ('raw_utterance', False)]
+OK  add_schedule: first='ctx' rest=[('person_id', False), ('title', False), ('scheduled_at', False)] expected=[('person_id', False), ('title', False), ('scheduled_at', False)]
+OK  get_briefing: first='ctx' rest=[('person_id', False), ('schedule_id', True)] expected=[('person_id', False), ('schedule_id', True)]
+OK  ask_user: first='ctx' rest=[('kind', False), ('question', False), ('options', False), ('context', False)] expected=[('kind', False), ('question', False), ('options', False), ('context', False)]
+MISMATCH=0
+TOOL_NAMES = ('search_person', 'create_person', 'update_person', 'add_event', 'add_schedule', 'get_briefing', 'ask_user')
+exit=0

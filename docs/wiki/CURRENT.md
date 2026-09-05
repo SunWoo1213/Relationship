@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: P2-tools
+active: none
 frozen: none
 
 <!--
@@ -12,4 +12,4 @@ frozen: none
 -->
 
 ## 메모
-- P2-tools 계획 승인(2026-09-05, architect 초안→개정 1(FastAPI 골격 포함, 사용자 결정)→verifier 통과 FAIL 0/WARN 6 의도, 권고 9). U1 부터 backend-agent. 미착수: P1-pilot-dataset·P0-cost(eval-agent). 팀 밑작업(Agent Teams) 보류.
+- P2-tools 완료(2026-09-05, U1~U9 → verifier 04-review 완료·verify-impl FAIL 0, R6 R7 R10 R18 구현완료). 다음 후보: P3-er(backend-agent, 의존 P2; 인계 F-ca12ad) / P1-pilot-dataset(eval-agent) / P0-cost(eval-agent). 열림: F-4d2507(architect, DELETE /persons backlog). 팀 밑작업 보류.
