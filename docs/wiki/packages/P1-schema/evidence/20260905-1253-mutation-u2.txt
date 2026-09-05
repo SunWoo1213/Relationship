@@ -1,0 +1,37 @@
+...F.............                                                        [100%]
+================================== FAILURES ===================================
+____________ test_events_type_check_contains_all_seven_event_types ____________
+
+    def test_events_type_check_contains_all_seven_event_types():
+        """events.type CHECK 이 EVENT_TYPES 7개 값을 모두 포함한다."""
+        checks = _check_constraints("events")
+        assert len(checks) == 1
+        sql_text = str(checks[0].sqltext)
+>       assert len(m.EVENT_TYPES) == 7
+E       AssertionError: assert 6 == 7
+E        +  where 6 = len(('conflict', 'praise', 'meal', 'meeting', 'personal_share', 'favor'))
+E        +    where ('conflict', 'praise', 'meal', 'meeting', 'personal_share', 'favor') = m.EVENT_TYPES
+
+tests\test_schema_models.py:157: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_schema_models.py::test_events_type_check_contains_all_seven_event_types
+1 failed, 16 passed in 1.13s
+........F........                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_all_six_foreign_keys_have_ondelete_cascade _______________
+
+    def test_all_six_foreign_keys_have_ondelete_cascade():
+        """FK 6개 모두 ondelete='CASCADE' 이고 기대한 (table, col, ref_table, ref_col) 집합과 같다."""
+        found = set()
+        for table in Base.metadata.tables.values():
+            for fk in table.foreign_keys:
+>               assert fk.ondelete == "CASCADE", f"{table.name}.{fk.parent.name} ondelete={fk.ondelete}"
+E               AssertionError: person_aliases.person_id ondelete=None
+E               assert None == 'CASCADE'
+E                +  where None = ForeignKey('persons.id').ondelete
+
+tests\test_schema_models.py:209: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_schema_models.py::test_all_six_foreign_keys_have_ondelete_cascade
+1 failed, 16 passed in 1.18s
+

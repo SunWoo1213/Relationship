@@ -49,3 +49,4 @@
 - 2026-09-05 11:52 | RELEASE | origin main ← dev 819e1ac
 - 2026-09-05 12:40 | START | P1-schema 착수: architect(opus) 계획 → verify-plan 1차 FAIL 4(수용 기준 절 구조) → 절 분리 → verifier(fable) 점검표 8행 통과(FAIL 0/WARN 4 의도, 권고 4건) → 사용자 승인 | P1-schema R8 R9 D4 D5 S3.1
 - 2026-09-05 12:35 | COMMIT | 9397066 docs(P1-schema): 계획·계획검증 승인, 패키지 착수 — 스키마 v2 Alembic
+- 2026-09-05 12:47 | COMMIT | d7113e9 feat(P1-schema): U1 백엔드 골격·requirements·app.config 접속 설정 단일화

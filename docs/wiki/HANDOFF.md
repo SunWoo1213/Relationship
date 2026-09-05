@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-05 12:50 (P1-schema U1 구현 완료, 커밋 직전)
-active: **P1-schema** | frozen: none | 브랜치: dev (dev = origin/dev = **main = 819e1ac**). 착수 커밋 9397066(로컬, 미푸시). 미커밋: U1 산출물(app/, requirements*, tests/conftest·test_config, db_check 리팩터, .env.example POSTGRES_HOST) + 위키 — U1 커밋으로 정리 중
+갱신: 2026-09-05 13:15 (P1-schema U2 구현 완료, 커밋 직전)
+active: **P1-schema** | frozen: none | 브랜치: dev (dev = origin/dev = **main = 819e1ac**). 미푸시 로컬 커밋: 9397066(착수)·d7113e9(U1). 미커밋: U2 산출물(app/db/models.py, tests/test_schema_models.py, evidence 4, 위키) — U2 커밋으로 정리 중
 
 ## 지금 어디까지
 - **P1-schema 착수 진행 중(2026-09-05)**: 사용자 "P1-schema 시작해줘" → 선행 확인(P0-embed-pilot·P0-compose 04-review 완료, R8 R9, registry 중복 없음) → `--stage architect` → architect(opus) 01-plan 초안(U1 골격·requirements / U2 모델 9개+테스트 / U3 Alembic 0001 / U4 schema_check+왕복 evidence / U5 registry·README·db_check version()) → verify-plan 1차 FAIL 4/WARN 4 → 수용 기준 절의 판정 방법 불릿 3개를 `## 판정 방법` 절로 분리(구조만) → 2차 FAIL 1(02-plan-verify 부재)/WARN 4(README·db_check 기존 행, 의도) → 05-remediation 소견 7건 원인·조치 기입 → `--stage verifier` → verifier 02-plan-verify **통과**(FAIL 0/WARN 4 의도, 점검표 8행, 권고 4건 F-ace4dd 접속조립 단일구현 / F-081752 expired 파생은 P2 / F-08e812 NOT NULL 정책 U2 / F-75c1c1 POSTGRES_HOST U5) → **사용자 계획 승인(2026-09-05)** → active: P1-schema.
@@ -19,8 +19,9 @@ active: **P1-schema** | frozen: none | 브랜치: dev (dev = origin/dev = **main
 - 팀 밑작업(Agent Teams): 사용자 결정 **보류**.
 
 ## 바로 다음에 할 것 (순서대로)
-1. (완료) 착수 커밋 9397066. **U1 구현 완료(backend-agent, 2026-09-05)**: requirements.txt(SQLAlchemy 2.0.50·alembic 1.19.2·psycopg[binary] 3.3.5·pgvector 0.5.0)·requirements-dev(pytest 9.0.3), app/config.py(접속 조립 단일 구현 — F-ace4dd, POSTGRES_HOST 선택 — F-75c1c1, sqlalchemy_url), app/db/base.py(Base+naming_convention), db_check.py 는 app.config import·re-export(기존 테스트 6건 무수정), tests/test_config.py 5건. pytest 21 passed, db_check 5433 재현 exit 0. evidence 20260905-1239/1242/1243-*. 03-log U1 항목·01-plan U1 [x]. → `/commit` 진행 중.
-2. U2(사용자 승인 → `--stage backend-agent`): app/db/models.py 모델 9개(S3.1 컬럼 1:1, CHECK 4종, FK CASCADE 6, fact_sources 복합 PK, Vector(1536) nullable, 인덱스 9종 + 부분 인덱스, JSONB·timestamptz·IDENTITY, NOT NULL 정책 결정 F-08e812) + tests/test_schema_models.py(DB 없이 메타데이터 검사) → `/commit`. 이후 U3 → U4 → U5. 단위마다 `/commit`, 마이그레이션·schema_check 파일은 Write 도구로(Bash heredoc 에 DROP 문자열 금지).
+1. (완료) 착수 커밋 9397066. **U1 구현 완료(backend-agent, 2026-09-05)**: requirements.txt(SQLAlchemy 2.0.50·alembic 1.19.2·psycopg[binary] 3.3.5·pgvector 0.5.0)·requirements-dev(pytest 9.0.3), app/config.py(접속 조립 단일 구현 — F-ace4dd, POSTGRES_HOST 선택 — F-75c1c1, sqlalchemy_url), app/db/base.py(Base+naming_convention), db_check.py 는 app.config import·re-export(기존 테스트 6건 무수정), tests/test_config.py 5건. pytest 21 passed, db_check 5433 재현 exit 0. evidence 20260905-1239/1242/1243-*. **커밋 d7113e9**.
+2. **U2 구현 완료(backend-agent, 2026-09-05)**: app/db/models.py 9모델(S3.1 컬럼 56개 1:1 — 7+6+6+2+7+5+9+5+9, CHECK 4 `ck_<table>_<col>_valid`, FK CASCADE 6, fact_sources 복합 PK, Vector(1536) nullable, 인덱스 10(부분 1), 값 집합 상수 EVENT_TYPES 등, NOT NULL 정책: nullable 은 embedding·confirmed_at·briefed_at·answer·answered_at 만 — F-08e812 닫음), tests/test_schema_models.py 17건, 변이 2건 FAILED 확인 후 원복. pytest 38 passed. evidence 20260905-1253-*. → `/commit` 진행 중.
+3. U3(사용자 승인 → `--stage backend-agent`): alembic.ini(url 공란)·alembic/env.py(app.config 주입, target_metadata, compare_type, render_item 으로 Vector 렌더)·script.py.mako·versions/0001_schema_v2.py(autogenerate 초안 → 손보정: Vector import, 부분 인덱스 WHERE, CHECK 이름 4개, upgrade 첫 줄 CREATE EXTENSION IF NOT EXISTS vector, downgrade 역순, 확장 미삭제). 마이그레이션 파일은 **Write 도구로**. 이후 U4(schema_check + 왕복 evidence + alembic check) → U5. 단위마다 `/commit`, 마이그레이션·schema_check 파일은 Write 도구로(Bash heredoc 에 DROP 문자열 금지).
 
 ## 재개 시 읽을 카드 (이것만)
 - `docs/wiki/CURRENT.md`, `docs/wiki/INDEX.md`, `.claude/gitlog.md`
@@ -28,7 +29,7 @@ active: **P1-schema** | frozen: none | 브랜치: dev (dev = origin/dev = **main
 - `lessons/L-001-dev-branch.md`, `L-002-role-model-separation.md`, `L-003-stop-after-dev-push.md`, `L-004`(위임 게이트)
 
 ## 열린 질문 · 사용자 결정 대기
-- U1 커밋 승인 → U2 시작 승인(L-004). P0-cost(eval-agent) 착수 시점 — P1 과 병행할지 사용자 결정.
+- U2 커밋 승인 → U3 시작 승인(L-004). 푸시 시점(U2 뒤 묶어서?) 사용자 결정. P0-cost(eval-agent) 착수 시점 — P1 과 병행할지 사용자 결정.
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)
 - 재개 시 커밋 안 된 변경·진행 중 항목이 있으면 **먼저 사용자에게 목록을 보이고 우선순위를 묻는다**(`/devlog resume`).

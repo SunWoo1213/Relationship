@@ -257,15 +257,19 @@ WARN  NULL 허용 정책이 타임스탬프 계열에만 명시 (01-plan 114행)
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | `app/db/models.py` 모듈 docstring 에 NOT NULL 정책 규칙 명문화: 식별자·FK·툴 시그니처(S3.2) 필수 인자에 대응하는 컬럼은 NOT NULL, 비동기로 나중에 채워지는 컬럼만 nullable(`embedding, confirmed_at, briefed_at, answer, answered_at`) | `grep -n "NOT NULL 정책" app/db/models.py` | docstring 절 존재 | 완료 |
+| 2 | `tests/test_schema_models.py::test_nullable_columns_are_exactly_the_five_deferred_fields` — nullable 컬럼 집합이 정확히 5개뿐임을 전수 검사 | `python -m pytest tests/test_schema_models.py -q -k nullable_columns_are_exactly` | `1 passed` | 완료 |
+| 3 | `tests/test_schema_models.py::test_not_null_columns_cover_all_tool_signature_required_arguments` — S3.2 필수 인자(`add_event`/`add_schedule`/`ask_user`)에 대응하는 컬럼이 NOT NULL 인지 검사 | `python -m pytest tests/test_schema_models.py -q -k not_null_columns_cover` | `1 passed` | 완료 |
+
+결정 근거: S3.2 툴 시그니처의 필수 인자(`add_event(person_id, type, content, occurred_at, raw_utterance)`, `add_schedule(person_id, title, scheduled_at)`, `ask_user(kind, question, options, context)`)는 호출 시점에 값이 반드시 있으므로 대응 컬럼을 NOT NULL 로 강제해 스키마가 잘못된 호출을 조기에 잡는다. 반대로 `embedding`(별칭 확정 전)·`confirmed_at`(별칭 검증 전)·`briefed_at`(브리핑 전)·`answer`/`answered_at`(답변 전)는 정상적으로 값이 없는 상태가 존재하므로 nullable 로 둔다.
 
 ### 재검증
-- 명령: `bash .claude/scripts/verify-impl.sh P1-schema` (계획 단계면 `verify-plan.sh P1-schema`)
-- 결과 파일(evidence/):
+- 명령: `python -m pytest tests/test_schema_models.py -q`
+- 결과 파일(evidence/): `docs/wiki/packages/P1-schema/evidence/20260905-1253-pytest-u2-models.txt`(17 passed, nullable/NOT NULL 검사 포함), `docs/wiki/packages/P1-schema/evidence/20260905-1253-pytest-u2-all.txt`(38 passed)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-75c1c1 · [권고] POSTGRES_HOST(P0-compose O5) 처리 미결정 — app/config.py 가 읽으면 .env.example 에 이름 추가, 아니면 db_check.py 132행 정리 여부를 03-log 에
 상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
