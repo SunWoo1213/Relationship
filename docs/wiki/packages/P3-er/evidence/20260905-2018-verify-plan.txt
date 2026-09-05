@@ -1,0 +1,59 @@
+== verify-plan P3-er  (2026-09-05 20:18) ==
+PASS  존재: docs/wiki/packages/P3-er/01-plan.md
+FAIL  없음: docs/wiki/packages/P3-er/02-plan-verify.md
+PASS  카드 존재: D1
+PASS  카드 존재: D10
+PASS  카드 존재: D2
+PASS  카드 존재: D3
+PASS  카드 존재: D4
+PASS  카드 존재: D5
+PASS  카드 존재: D6
+PASS  패키지 id 등록됨: P0-cost
+PASS  패키지 id 등록됨: P1-schema
+PASS  패키지 id 등록됨: P2-tools
+PASS  패키지 id 등록됨: P3-er
+PASS  패키지 id 등록됨: P4-pilot-eval
+PASS  패키지 id 등록됨: P5-loop
+PASS  패키지 id 등록됨: P9-infra
+PASS  검증 항목 존재: R3
+PASS  검증 항목 존재: R4
+PASS  검증 항목 존재: R9
+PASS  Refs 있음: - [ ] U1 F-ca12ad 수정 + `@traced` 확장: `app/tools/cont
+PASS  Refs 있음: - [ ] U2 임베딩 런타임 공급자: `OpenAIEmbeddingProv
+PASS  Refs 있음: - [ ] U3 호칭 사전 + 규칙 필터(2단계): `app/er/typ
+PASS  Refs 있음: - [ ] U4 확신도·두 임계치(4단계): `app/er/confiden
+PASS  Refs 있음: - [ ] U5 후보 검색 어댑터(1단계) + LLM 판정(3단�
+PASS  Refs 있음: - [ ] U6 파이프라인·trace·실행 분리: `app/er/pipe
+PASS  Refs 있음: - [ ] U7 백필·스모크 스크립트: `scripts/backfill_e
+PASS  Refs 있음: - [ ] U8 수용 기준 기계 검증 + 문서: 전체 `POSTG
+PASS  backlog 일치: 승진 회귀 테스트 통과, trace에 `confidence_breakdo
+PASS  의존 완료: P2-tools
+PASS  registry 중복 없음: app/er/__init__.py
+PASS  registry 중복 없음: app/er/types.py
+PASS  registry 중복 없음: app/er/dictionary.py
+PASS  registry 중복 없음: app/er/candidates.py
+PASS  registry 중복 없음: app/er/rules.py
+PASS  registry 중복 없음: app/er/judge.py
+PASS  registry 중복 없음: app/er/confidence.py
+PASS  registry 중복 없음: app/er/pipeline.py
+WARN  registry 에 다른 패키지로 이미 있음: app/settings.py → | 모듈 | 런타임 설정값 | app/settings.py | P2-tools | f217190 | `app_use
+WARN  registry 에 다른 패키지로 이미 있음: app/embedding.py → | 스크립트 | 임베딩 파일럿(결정용 코드): EmbeddingProvider·OpenA
+| 모듈 | 임베딩 Protocol | app/embedding.py | P2-tools | a9cb254 | `Embeddi
+WARN  registry 에 다른 패키지로 이미 있음: app/tools/context.py → | 모듈 | ToolContext·@traced | app/tools/context.py | P2-tools | 4eca3e9 | �
+WARN  registry 에 다른 패키지로 이미 있음: scripts/embed_pilot.py → | 스크립트 | 임베딩 파일럿(결정용 코드): EmbeddingProvider·OpenA
+PASS  registry 중복 없음: app.embed
+PASS  registry 중복 없음: scripts/backfill_embeddings.py
+PASS  registry 중복 없음: scripts/er_smoke.py
+WARN  registry 에 다른 패키지로 이미 있음: requirements.txt → | 문서/설정 | 런타임·개발 의존성 선언(첫 도입, `==` 고정) | 
+WARN  registry 에 다른 패키지로 이미 있음: tests/conftest.py → | 테스트 | 저장소 루트 `sys.path` 등록(공용 fixture) | tests/conftes
+PASS  registry 중복 없음: tests/test_er_dictionary.py
+PASS  registry 중복 없음: tests/test_er_rules.py
+PASS  registry 중복 없음: tests/test_er_confidence.py
+PASS  registry 중복 없음: tests/test_er_judge.py
+PASS  registry 중복 없음: tests/test_er_pipeline.py
+PASS  registry 중복 없음: tests/test_embedding_provider.py
+PASS  registry 중복 없음: tests/test_backfill_embeddings.py
+WARN  registry 에 다른 패키지로 이미 있음: tests/test_tools_context.py → | 테스트 | trace 행 기록·예외 시 tool_error·문자열 절단 | tests/
+PASS  registry 중복 없음: docs/wiki/registry.md
+WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
+== 결과: FAIL=1 WARN=8 ==

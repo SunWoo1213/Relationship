@@ -1,0 +1,11 @@
+== verifier(fable) 계획 검증 소견 P3-er 01-plan (2026-09-05 20:35) — 카드 대조 결과, FAIL=보류 / WARN=권고 ==
+FAIL  계획 미정: confidence 의 s_emb·s_rule 이 어느 후보의 값인지(matched_person_id 귀속)와 matched_person_id=null 일 때의 구간(merge 금지)이 01-plan 에 없다 — U5 "s_emb = 최고 후보의 인물별 max 유사도" 는 LLM 이 고른 후보와 다를 수 있다(원칙1·D3)
+FAIL  계획 모순: resolve() 는 부수효과 없이 trace 행 1개를 쓰는데 그 행의 decision.applied·pending_question_id 는 apply_resolution 뒤에만 정해진다 — 같은 행 갱신 / er_apply 행 추가 / 필드 제거 중 무엇인지 미정(원칙9·결정 5 행 1개 계약)
+FAIL  계획 미정: 승진 회귀(a)가 "엄격 필터 위계 불일치 탈락 → 완화 1회" 를 실제로 거치려면 저장 인물 hierarchy 와 호칭 사전이 "부장님" 에 유도하는 위계가 달라야 하는데(상/동/하 모델에서 팀장·부장은 모두 상) 픽스처 값과 직급→위계 규칙이 01-plan 에 없다 — 완화 없이 통과하는 테스트 위험(원칙8)
+WARN  LLM 실패 강등(identity 강제)·후보 0건 경로에서 decision.band 가 confidence→구간 산식과 달라진다 — trace decision 에 band_by_threshold 와 forced_reason 을 분리 기록해야 P4 곡선 재계산이 어긋나지 않는다(S3.7)
+WARN  U1 F-ca12ad 재현 테스트(1535차원 → flush 실패)는 U2 의 check_dimension() 이 flush 전에 잡으면 더 이상 flush 실패 경로를 타지 않는다 — 판정 방법 표 "원래 DB 오류" 기대와 어긋남, flush 자체를 실패시키는 다른 수단으로 재현할 것
+WARN  완화 재평가 뒤 s_rule 계산에서 완화로 통과한 위계 검사를 통과로 셀지 미통과로 셀지 미정 — rule_passed 와 함께 계획에 명시(원칙3 재계산 가능성)
+WARN  U6 이 커밋 하나 크기를 넘는다(파이프라인+trace+apply+회귀 3종+테스트 5종) — U6a(resolve·trace·stages·no_side_effect) / U6b(apply_resolution·회귀 3종) 분할 권고
+WARN  er_smoke 가 사용자 실행이라 키 없이도 완료 판정이 가능하지만 R4 의 실 API 구조화 출력 파싱은 스텁으로만 검증된다 — 04-review 에서 R4 를 "구현완료(스텁 검증)·실호출 evidence 유무" 로 구분 표기하도록 계획에 적을 것
+WARN  OpenAIEmbeddingProvider 이동 시 scripts/embed_pilot.py 의 _load_dotenv_quietly() 는 스크립트에만 남기고 app/embedding.py·backfill 은 .env 를 읽지 않아야 한다(security.md §1, app/settings.py 규약) — 계획에 명시 없음
+WARN  "후보 0건" 이 규칙 통과 후보 0 인지 검색 후보 0 인지 문구가 갈린다(범위 32행 vs 회귀 39행) — LLM 생략·new_person 분기 조건을 통과 후보 0 으로 명시

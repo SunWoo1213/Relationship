@@ -73,3 +73,9 @@
 - 2026-09-05 19:02 | COMMIT | 4d5817e feat(P2-tools): U8 FastAPI 골격 — GET /health·POST /answers/{id} 답 저장(200/404/409/422), 예외 매핑, 요청 단위 세션
 - 2026-09-05 19:26 | COMMIT | f2e9e05 docs(P2-tools): U9 tools_check 시그니처 기계 검증·registry·README 실행 절·S3.1 alias source, verify-impl 사전 실행
 - 2026-09-05 22:55 | DONE | P2-tools 완료 승인(사용자). 수용 기준 통과(tools_check 7/7 + verifier 독립 대조, ask_user 저장 독립 쿼리), verify-impl PASS/WARN 0/FAIL 0 (evidence/20260905-1948-verify-impl.txt), 변이 4종·원칙 grep·uvicorn 직접 실행, R6 R7 R10 R18 구현완료. 열림: F-4d2507→architect, F-ca12ad→P3-er | P2-tools R6 R7 R10 R18 D1 D2 D6 S3.2 S3.4
+- 2026-09-05 19:55 | COMMIT | b676799 docs(P2-tools): 완료 — verifier 04-review 완료 판정·사용자 승인, R6 R7 R10 R18 구현완료, 패키지 닫음
+- 2026-09-05 19:55 | PUSH | origin dev b676799 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-05 19:56 | RELEASE | origin main ← dev b676799
+- 2026-09-05 23:45 | DECISION | P3-er 계획 확인(사용자): merge 구간은 별칭만 누적·display_name 은 확인 후(D6·P2 규약 유지, suggested_display_name 으로 P5 인계); agent_traces.tool_name="er"·step="er_resolve" 확정(P4·P5 import); 벡터 인덱스 P3 연기(P4 측정 오염 방지); OpenAI 공급자 app/embedding.py 로 이동·embed_pilot import 교체; openai·anthropic requirements 추가; er_smoke 는 사용자 직접 실행 | P3-er D6 D3 D10 S3.3
+- 2026-09-06 00:10 | DECISION | P3-er 계획 보류 3건 결정(사용자): F-138665 confidence 는 LLM 이 고른 인물의 s_emb·s_rule, null 이면 s_llm=0·병합 금지(후보 있으면 identity, 없으면 new_person); F-f43a9d apply_resolution 이 er_resolve 같은 행에 applied·pending_question_id·applied_at 갱신; F-8c6354 승진 픽스처 인물 hierarchy=동, 호칭 사전이 부장님→상 유도 → 1칸 차이 완화 경로 | P3-er D3 D10 S3.3
+- 2026-09-06 01:00 | START | P3-er 착수: architect(opus) 계획 → 사용자 확인 3 → verifier(fable) 보류 3(F-138665 귀속·F-f43a9d trace 갱신·F-8c6354 승진 픽스처) → 사용자 결정 → 개정 1(권고 7 반영, U1~U9) → 재검증 통과(FAIL 0/WARN 8 의도, 권고 6) → 사용자 승인 | P3-er R4 R9 D3 D5 D10 S3.3
