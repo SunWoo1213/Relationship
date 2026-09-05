@@ -47,15 +47,15 @@ WARN  registry 에 다른 패키지로 이미 있음: app/db/models.py → | 모
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음 — 마지막 단위(U9)에서 기존 행 비고 갱신, 새 행 금지(04-review §5 에서 확인) | `grep -c "| <경로> |" docs/wiki/registry.md` | 1 (행 수 불변) | 대기(U9) |
+| 1 | U9 에서 `app/db/models.py` 를 확장(`ALIAS_SOURCES` 상수 추가)만 하고 registry 기존 행(40행) 비고만 갱신, 새 행 없음 | `grep -c "| app/db/models.py |" docs/wiki/registry.md` | 1 (행 수 불변) | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): U9 후 verify-impl 출력
+- 결과 파일(evidence/): `grep -c "| app/db/models.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-ca32f5 · [권고] registry 에 다른 패키지로 이미 있음: app/config.py → | 모듈 | 백엔드 패키지 골격(DB 접속 설정) | app/config.py | P1-sch
 상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
@@ -73,15 +73,15 @@ WARN  registry 에 다른 패키지로 이미 있음: app/config.py → | 모듈
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음 — 마지막 단위(U9)에서 기존 행 비고 갱신, 새 행 금지(04-review §5 에서 확인) | `grep -c "| <경로> |" docs/wiki/registry.md` | 1 (행 수 불변) | 대기(U9) |
+| 1 | U9 에서 `app/config.py` 를 확장(`ConnInfo.password` repr=False, U1)만 하고 registry 기존 행(38행) 비고만 갱신, 새 행 없음 | `grep -c "| app/config.py |" docs/wiki/registry.md` | 1 (행 수 불변) | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): U9 후 verify-impl 출력
+- 결과 파일(evidence/): `grep -c "| app/config.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-127d01 · [권고] registry 에 다른 패키지로 이미 있음: tests/conftest.py → | 테스트 | 저장소 루트 `sys.path` 등록(공용 fixture) | tests/conftes
 상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
@@ -99,15 +99,15 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/conftest.py → | �
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음 — 마지막 단위(U9)에서 기존 행 비고 갱신, 새 행 금지(04-review §5 에서 확인) | `grep -c "| <경로> |" docs/wiki/registry.md` | 1 (행 수 불변) | 대기(U9) |
+| 1 | U9 에서 `tests/conftest.py` 를 확장(DB 롤백 픽스처, U1)만 하고 registry 기존 행(47행) 비고만 갱신, 새 행 없음 | `grep -c "| tests/conftest.py |" docs/wiki/registry.md` | 1 (행 수 불변) | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): U9 후 verify-impl 출력
+- 결과 파일(evidence/): `grep -c "| tests/conftest.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-320519 · [권고] registry 에 다른 패키지로 이미 있음: tests/test_config.py → | 테스트 | 접속 설정 해석(DB 없이) | tests/test_config.py | P1-schema
 상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
@@ -125,15 +125,15 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/test_config.py → |
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음 — 마지막 단위(U9)에서 기존 행 비고 갱신, 새 행 금지(04-review §5 에서 확인) | `grep -c "| <경로> |" docs/wiki/registry.md` | 1 (행 수 불변) | 대기(U9) |
+| 1 | U9 에서 `tests/test_config.py` 를 확장(`repr` 검사 1건, U1)만 하고 registry 기존 행(44행) 비고만 갱신, 새 행 없음 | `grep -c "| tests/test_config.py |" docs/wiki/registry.md` | 1 (행 수 불변) | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): U9 후 verify-impl 출력
+- 결과 파일(evidence/): `grep -c "| tests/test_config.py |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-0ffff5 · [권고] registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
 상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
@@ -151,15 +151,15 @@ WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | �
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음 — 마지막 단위(U9)에서 기존 행 비고 갱신, 새 행 금지(04-review §5 에서 확인) | `grep -c "| <경로> |" docs/wiki/registry.md` | 1 (행 수 불변) | 대기(U9) |
+| 1 | U9 에서 `README.md` 에 진행 표 P2 행·"백엔드 실행(FastAPI)" 절만 추가하고 registry 기존 행(32행) 비고만 갱신, 새 행 없음 | `grep -c "| README.md |" docs/wiki/registry.md` | 1 (행 수 불변) | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): U9 후 verify-impl 출력
+- 결과 파일(evidence/): `grep -c "| README.md |" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-2c37bd · [권고] registry 에 다른 패키지로 이미 있음: requirements.txt → | 문서/설정 | 런타임·개발 의존성 선언(첫 도입, `==` 고정) |
 상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
@@ -177,15 +177,15 @@ WARN  registry 에 다른 패키지로 이미 있음: requirements.txt → | 문
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음 — U9 에서 기존 행 비고 갱신, 새 행 금지 | `grep -c "| requirements.txt" docs/wiki/registry.md` | 1 | 대기(U9) |
+| 1 | U9 에서 `requirements.txt` 에 `fastapi`·`uvicorn[standard]`·`httpx` 3줄만 추가(U1)하고 registry 기존 행(43행) 비고만 갱신, 새 행 없음 | `grep -c "| requirements.txt" docs/wiki/registry.md` | 1 | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/): U9 후 verify-impl 출력
+- 결과 파일(evidence/): `grep -c "| requirements.txt" docs/wiki/registry.md` → 1 (2026-09-05 U9 확인)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-08b3db · [권고] 판정 방법 표의 'trace 기록(원칙9)'·'D1 강제(R6)' 두 행이 POSTGRES_PORT=5433 과 -rs 없이 pytest 를 부른다 — 로컬 5433 이 아닌 기본 5432 로 붙어 dbtest 가 조용히 skip 되고 초록으로 끝날 수 있다(계획 자신의 리스크 '실 DB 테스트가 조용히 skip 된다' 대응 (a)와 모순). 04-review 는 이 두 행도 POSTGRES_PORT=5433 … -rs 로 실행한 출력만 증거로 받는다
 상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
@@ -203,15 +203,15 @@ WARN  판정 방법 표의 'trace 기록(원칙9)'·'D1 강제(R6)' 두 행이 P
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | 계획 문서(01-plan 117·118행)는 승인 문서라 고치지 않는다. U9 증거 절차가 두 행을 `POSTGRES_PORT=5433 … -q -rs` 로 직접 실행해 skip 0 을 evidence 로 남긴다 | `POSTGRES_PORT=5433 python -m pytest tests/test_tools_context.py tests/test_tools_persons.py -q -rs` | `39 passed`(또는 그 이상), `-rs` 요약에 skip 없음 | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `docs/wiki/packages/P2-tools/evidence/20260905-1908-pytest-trace-d1.txt`(39 passed, skip 0)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-b97a06 · [권고] D1 강제 검사가 '답했는가'만 보고 '무엇이라 답했는가'를 보지 않는다 — new_person 질문에 부정 선택지로 답해도 answered_at 이 채워지므로 create_person 이 통과한다. D1 '승인 시에만 create_person'. U4 또는 P5-loop 01-plan 에서 긍정 선택지 규약(예: options 첫 항목 또는 context.affirmative)을 정하고 어느 쪽이 검사하는지 03-log 에 남긴다
 상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
@@ -281,15 +281,15 @@ WARN  결정 4·5 의 'U8 에서'(registry 26행 비고 좁히기, S3.1 카드 �
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | `docs/wiki/specs/S3.1-schema-v2.md` 에 `person_aliases.source ∈ {user_said, confirmed, system}` 한 줄을 `relation_tag`/`hierarchy` 값 집합 불릿 옆에 추가하고 "(P2-tools 결정 5, 앱 검증·DB CHECK 없음)" 주석을 붙인다(U9, `N=1536: D4 확정` 주석과 같은 방식 — CR 아님) | `grep -n "person_aliases.source" docs/wiki/specs/S3.1-schema-v2.md` | 1건, `{user_said, confirmed, system}`·`P2-tools 결정 5` 문구 포함 | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `docs/wiki/specs/S3.1-schema-v2.md`(카드 자체가 증거, 커밋 시 해시로 대체) — 01-plan 135·136행의 "U8 에서" 표기 자체는 승인된 계획 문서라 고치지 않고 03-log·본 소견에 사실만 남긴다
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음(카드 갱신이며 기획서 변경 아님, S3.1 원문은 alias source 값 집합을 정하지 않았음)
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-fbaaae · [권고] 결정 12 '없는 id·다른 사용자 → 404' 중 '다른 사용자'는 강제할 수 없다 — pending_questions 에는 user_id 컬럼이 없다(session_id 만, app/db/models.py 201~217행). security.md §5 'user_id 조건'은 persons 경유 조회에만 적용된다. 계획 문구를 '없는 id → 404'로 읽고, pending_questions·agent_traces 의 사용자 격리 부재를 03-log·P5 인계에 명시한다
 상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05 (U6)
@@ -411,13 +411,13 @@ WARN  CLAUDE.md 표의 반환형(Person/Event/Schedule/Briefing/PendingQuestion)
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | `scripts/tools_check.py`(U9) `format_actual()` 이 `inspect.signature` 원형(`ctx` 포함)을 그대로 문자열화해 각 툴 출력 줄에 `actual (ctx, ...)` 형태로 찍는다 — 반환형 이름은 비교하지 않되(위 원인 분석 결론 유지) `ctx` 편차만 기록에 드러나게 한다 | `python scripts/tools_check.py` | 7줄 모두 `actual (ctx, ...)` 포함, 예: `[ok] search_person: CLAUDE.md (query, hints?) == actual (ctx, query, hints=None)` | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `docs/wiki/packages/P2-tools/evidence/20260905-1908-tools-check.txt`(7/7 ok, 각 줄에 `actual (ctx, ...)` 포함)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- FIX/CR 로 올려야 하는가: 아니오
 

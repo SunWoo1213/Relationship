@@ -70,3 +70,4 @@
 - 2026-09-05 16:38 | COMMIT | 9cb35b6 feat(P2-tools): U5 add_event·add_schedule — EVENT_TYPES 검사·raw_utterance 원문 보존·aware 시각만·패턴 감지 없음
 - 2026-09-05 16:53 | COMMIT | 8162e09 feat(P2-tools): U6 ask_user·answer_question — pending_questions 저장·{question_id,status:pending}·24h 만료·긍정 답 규약
 - 2026-09-05 18:45 | COMMIT | 7c94aad feat(P2-tools): U7 get_briefing — 자료 조회(facts·최근 events 5·다가오는 schedules 3)·schedule_id 시 briefed_at 기록, 문장화 없음
+- 2026-09-05 19:02 | COMMIT | 4d5817e feat(P2-tools): U8 FastAPI 골격 — GET /health·POST /answers/{id} 답 저장(200/404/409/422), 예외 매핑, 요청 단위 세션

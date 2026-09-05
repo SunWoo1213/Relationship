@@ -70,7 +70,8 @@
 | P0 | LLM 비용 실측 | 대기 |
 | P1 | 스키마 v2 마이그레이션 (Alembic) | **완료** — 9테이블·CHECK 4·FK CASCADE 6·`vector(1536)`·인덱스 10, upgrade/downgrade 왕복·`alembic check` 통과, verifier 04-review 완료 |
 | P1 | 파일럿 데이터셋 | 대기 |
-| P2~P3 | 툴 7종 · 엔티티 해석 4단계 · 베이스라인 | 대기 |
+| P2 | 툴 7종 v2 + FastAPI 골격 | **구현 완료 · 검증 대기**(04-review 전이라 완료라 쓰지 않음) — 시그니처 CLAUDE.md 일치(`scripts/tools_check.py` 7/7), `ask_user`가 `pending_questions`에 저장, `GET /health`·`POST /answers/{id}` |
+| P3 | 엔티티 해석 4단계 · 베이스라인 | 대기 |
 | P4 | **파일럿 평가(게이트)** — 여기서 임계치·보정표 확정 | 대기 |
 | P5~P9 | 에이전트 루프 · 메모리 · 브리핑 · 푸시 · 프론트 · 인프라 | P4 통과 후 |
 
@@ -175,6 +176,43 @@ $env:POSTGRES_PORT="5433"; alembic upgrade head
 ```
 
 서버 버전은 로컬 pg16 기준으로 검증했다(`scripts/schema_check.py`·`scripts/db_check.py`의 `SELECT version()` 출력). RDS 메이저 버전은 P9-infra에서 재확인한다.
+
+### 백엔드 실행 (FastAPI)
+
+사전 조건: 로컬 DB가 기동 중이고(위 절) `alembic upgrade head`가 적용되어 있다(9개 테이블). `pip install -r requirements.txt`로 `fastapi`·`uvicorn[standard]`·`httpx`가 설치되어 있어야 한다.
+
+```bash
+# bash — 로컬 포트가 5432가 아니면(위 절의 5433 예시) 셸 변수로 앞에 붙인다
+POSTGRES_PORT=5433 python -m uvicorn app.main:app --reload
+```
+
+```powershell
+# PowerShell
+$env:POSTGRES_PORT="5433"; python -m uvicorn app.main:app --reload
+```
+
+```bash
+curl http://localhost:8000/health
+```
+
+기대 출력: `{"status":"ok","db":"up","alembic_revision":"0001"}` (DB 접속이 안 되면 503 `{"status":"degraded","db":"down"}` — 접속 문자열·비밀번호는 어떤 경우에도 본문에 나오지 않는다).
+
+`ask_user`가 저장한 질문에 답하는 예:
+
+```bash
+curl -X POST http://localhost:8000/answers/1 \
+  -H "Content-Type: application/json" \
+  -d '{"answer": "응, 기억해줘"}'
+```
+
+| 상태 코드 | 의미 |
+|---|---|
+| 200 | 정상 저장 — `{"question_id": 1, "status": "answered"}` |
+| 404 | 그런 `question_id`가 없음 |
+| 409 | 이미 답했거나(already_answered) 24시간이 지나 만료됨(expired) |
+| 422 | 저장된 `options` 밖의 답, 요청 본문 형식 오류 |
+
+이 두 엔드포인트(`GET /health`, `POST /answers/{question_id}`)는 답 저장까지만 한다 — 채팅·에이전트 루프(발화 → 툴 선택 → 응답, 저장된 context로 루프 재개)는 P5 에서 붙는다.
 
 ## 문서 안내
 

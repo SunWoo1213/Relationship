@@ -1,0 +1,6 @@
+GET /health -> body + status code
+{"status":"ok","db":"up","alembic_revision":"0001"}
+status code:
+
+200
+process terminated after kill: confirmed (ps -p pid found none)

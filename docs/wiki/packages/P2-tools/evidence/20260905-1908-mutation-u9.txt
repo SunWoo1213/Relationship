@@ -1,0 +1,31 @@
+..........F....                                                          [100%]
+================================== FAILURES ===================================
+_______________ test_negative_optionality_marker_removed_fails ________________
+
+tmp_path = WindowsPath('C:/Users/swsj1/AppData/Local/Temp/pytest-of-swsj1/pytest-72/test_negative_optionality_mark0')
+
+    def test_negative_optionality_marker_removed_fails(tmp_path):
+        """search_person 의 `hints?` 에서 `?` 를 제거하면(필수로 바뀜) 옵션 불일치로 FAIL."""
+        lines = _real_row_lines()
+        assert lines[0].startswith("| `search_person` |")
+        lines[0] = lines[0].replace("hints?:", "hints:")
+    
+        fake = tmp_path / "CLAUDE.md"
+        fake.write_text(_wrap_as_claude_md(lines), encoding="utf-8")
+    
+        rc = tc.main(["--claude-md", str(fake)])
+>       assert rc == 1
+E       assert 0 == 1
+
+tests\test_tool_signatures.py:117: AssertionError
+---------------------------- Captured stdout call -----------------------------
+[ok] search_person: CLAUDE.md (query, hints) == actual (ctx, query, hints=None)
+[ok] create_person: CLAUDE.md (display_name, aliases, relation_tag, hierarchy) == actual (ctx, display_name, aliases, relation_tag, hierarchy)
+[ok] update_person: CLAUDE.md (person_id, facts?, new_alias?, display_name?) == actual (ctx, person_id, facts=None, new_alias=None, display_name=None)
+[ok] add_event: CLAUDE.md (person_id, type, content, occurred_at, raw_utterance) == actual (ctx, person_id, type, content, occurred_at, raw_utterance)
+[ok] add_schedule: CLAUDE.md (person_id, title, scheduled_at) == actual (ctx, person_id, title, scheduled_at)
+[ok] get_briefing: CLAUDE.md (person_id, schedule_id?) == actual (ctx, person_id, schedule_id=None)
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+1 failed, 14 passed in 0.49s
+exit=1
