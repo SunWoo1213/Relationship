@@ -39,6 +39,11 @@ QUESTION_TTL = timedelta(hours=QUESTION_TTL_HOURS)
 #: 쓰인다.
 DEFAULT_FACT_CONFIDENCE = 1.0
 
+#: `get_briefing`(U7)이 돌려주는 `recent_events`/`upcoming_schedules` 상한
+#: (01-plan 결정 7: `recent_events[N=5]`·`upcoming_schedules[3]`).
+BRIEFING_RECENT_EVENTS = 5
+BRIEFING_UPCOMING_SCHEDULES = 3
+
 
 def app_user_id(env: dict[str, str] | None = None) -> str:
     """`APP_USER_ID` 환경변수를 읽는다. 없으면 `"local"`.

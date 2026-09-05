@@ -130,22 +130,34 @@ class PendingQuestionOut:
 
 @dataclass(frozen=True)
 class BriefingOut:
-    """골격만 -- U7 이 person_facts·recent_events·upcoming_schedules 세부
-    구성(결정 7: person/aliases/facts[]/recent_events[N=5]/
-    upcoming_schedules[3]/schedule?/generated_at)을 채운다. 문장화·"한 줄
-    행동 제안"은 이 DTO 에 없다(P6-briefing 몫, 원칙7)."""
+    """U7(`get_briefing`)이 채운다(01-plan 결정 7): `person`·`aliases`·
+    `facts[]`·`recent_events[N=5]`·`upcoming_schedules[3]`·`schedule?`·
+    `generated_at`. `aliases` 는 `PersonOut.aliases` 와 값이 같더라도 결정
+    7 이 명시한 별도 최상위 필드로 둔다(BriefingOut 자체의 계약). 문장화·
+    "한 줄 행동 제안"·감정 언급은 이 DTO 에 없다(P6-briefing 몫, 원칙7 경계
+    -- get_briefing 은 자료만 돌려준다, LLM 호출 없음).
+
+    `generated_at`(필수) 은 기본값이 있는 필드들보다 먼저 두되(dataclass
+    규칙 -- 기본값 없는 필드가 기본값 있는 필드보다 앞에 와야 한다), 실제
+    직렬화 키 순서는 `to_dict()` 가 결정 7 문장 순서 그대로 정한다."""
 
     person: PersonOut
+    generated_at: datetime
+    aliases: list[str] = field(default_factory=list)
     facts: list[dict[str, Any]] = field(default_factory=list)
     recent_events: list[EventOut] = field(default_factory=list)
     upcoming_schedules: list[ScheduleOut] = field(default_factory=list)
+    schedule: ScheduleOut | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "person": self.person.to_dict(),
+            "aliases": list(self.aliases),
             "facts": [dict(f) for f in self.facts],
             "recent_events": [e.to_dict() for e in self.recent_events],
             "upcoming_schedules": [s.to_dict() for s in self.upcoming_schedules],
+            "schedule": self.schedule.to_dict() if self.schedule is not None else None,
+            "generated_at": self.generated_at.isoformat(),
         }
 
 
@@ -156,6 +168,14 @@ class ToolError(Exception):
 
 class PersonNotFound(ToolError):
     """`person_id` 가 없거나 다른 `user_id` 소유(security.md §5 격리)."""
+
+
+class ScheduleNotFound(ToolError):
+    """`get_briefing` 의 `schedule_id` 가 없거나 다른 인물(따라서 다른
+    `user_id`)의 일정 -- U7. `person_id` 로 이미 소유가 확인된 인물과
+    `schedule.person_id` 가 다르면 존재 여부를 흘리지 않기 위해 `PersonNotFound`
+    가 아니라 이 예외를 쓴다(`ConfirmationRequired`/`QuestionNotFound` 와 같은
+    "다른 소유는 없음과 같게 취급" 패턴)."""
 
 
 class QuestionNotFound(ToolError):

@@ -68,3 +68,4 @@
 - 2026-09-05 16:11 | COMMIT | a9cb254 feat(P2-tools): U3 search_person — 별칭 일치·cosine top-K 인물별 max·rule_flags(신호만, 판정은 P3-er)
 - 2026-09-05 16:29 | COMMIT | f318d58 feat(P2-tools): U4 create_person·update_person — D1 확인 강제(긍정 답 규약)·D6 별칭 누적·facts upsert
 - 2026-09-05 16:38 | COMMIT | 9cb35b6 feat(P2-tools): U5 add_event·add_schedule — EVENT_TYPES 검사·raw_utterance 원문 보존·aware 시각만·패턴 감지 없음
+- 2026-09-05 16:53 | COMMIT | 8162e09 feat(P2-tools): U6 ask_user·answer_question — pending_questions 저장·{question_id,status:pending}·24h 만료·긍정 답 규약

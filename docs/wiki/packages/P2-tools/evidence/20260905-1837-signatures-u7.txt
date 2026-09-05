@@ -1,0 +1,1 @@
+get_briefing (ctx: 'ToolContext', person_id: 'int', schedule_id: 'int | None' = None) -> 'BriefingOut'

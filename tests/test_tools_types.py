@@ -20,6 +20,7 @@ from app.tools.types import (
     PersonOut,
     QuestionNotAnswerable,
     QuestionNotFound,
+    ScheduleNotFound,
     ScheduleOut,
     ToolError,
 )
@@ -102,10 +103,15 @@ def test_pending_question_out_to_dict():
 
 
 def test_briefing_out_to_dict_nests_lists():
-    person = PersonOut(id=3, display_name="박부장", relation_tag="직장", hierarchy="상", aliases=[])
+    """U7 이 `generated_at`(필수)·`aliases`·`schedule` 을 추가했다(01-plan
+    결정 7). 이 테스트는 U2 시점의 골격 형태를 U7 의 실제 필드 집합으로
+    갱신한다."""
+    person = PersonOut(id=3, display_name="박부장", relation_tag="직장", hierarchy="상", aliases=["부장님"])
     when = datetime(2026, 7, 1, tzinfo=timezone.utc)
     briefing = BriefingOut(
         person=person,
+        generated_at=when,
+        aliases=["부장님"],
         facts=[{"key": "생일", "value": "3월"}],
         recent_events=[
             EventOut(id=1, person_id=3, type="meal", content="점심", occurred_at=when, created_at=when)
@@ -114,9 +120,25 @@ def test_briefing_out_to_dict_nests_lists():
     )
     d = briefing.to_dict()
     assert d["person"] == person.to_dict()
+    assert d["aliases"] == ["부장님"]
     assert d["facts"] == [{"key": "생일", "value": "3월"}]
     assert d["recent_events"][0]["type"] == "meal"
     assert d["upcoming_schedules"][0]["title"] == "회의"
+    assert d["schedule"] is None
+    assert d["generated_at"] == when.isoformat()
+
+
+def test_briefing_out_to_dict_includes_schedule_when_set():
+    person = PersonOut(id=3, display_name="박부장", relation_tag="직장", hierarchy="상", aliases=[])
+    when = datetime(2026, 7, 1, tzinfo=timezone.utc)
+    schedule = ScheduleOut(id=9, person_id=3, title="브리핑용 일정", scheduled_at=when, briefed_at=when)
+    briefing = BriefingOut(person=person, generated_at=when, schedule=schedule)
+
+    assert briefing.to_dict()["schedule"] == schedule.to_dict()
+
+
+def test_schedule_not_found_inherits_tool_error():
+    assert issubclass(ScheduleNotFound, ToolError)
 
 
 def test_exception_hierarchy_all_inherit_tool_error():
@@ -126,6 +148,7 @@ def test_exception_hierarchy_all_inherit_tool_error():
         QuestionNotAnswerable,
         ConfirmationRequired,
         InvalidValue,
+        ScheduleNotFound,
     ):
         assert issubclass(exc_cls, ToolError)
     assert issubclass(ToolError, Exception)

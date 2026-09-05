@@ -1,0 +1,52 @@
+.....FF......                                                            [100%]
+================================== FAILURES ===================================
+_____ test_get_briefing_without_schedule_id_does_not_write_any_briefed_at _____
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000002442E7E7BF0>
+
+    def test_get_briefing_without_schedule_id_does_not_write_any_briefed_at(db_session):
+        person = _make_person(db_session)
+        s1 = _add_schedule(db_session, person, scheduled_at=_NOW + timedelta(days=1))
+        s2 = _add_schedule(db_session, person, scheduled_at=_NOW + timedelta(days=2))
+        ctx = _ctx(db_session)
+    
+        result = get_briefing(ctx, person.id)
+    
+        assert result.schedule is None
+        db_session.expire_all()
+>       assert db_session.get(Schedule, s1.id).briefed_at is None
+E       AssertionError: assert datetime.datetime(2026, 5, 1, 12, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')) is None
+E        +  where datetime.datetime(2026, 5, 1, 12, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')) = <app.db.models.Schedule object at 0x000002442E8E1750>.briefed_at
+E        +    where <app.db.models.Schedule object at 0x000002442E8E1750> = get(Schedule, 73)
+E        +      where get = <sqlalchemy.orm.session.Session object at 0x000002442E7E7BF0>.get
+E        +      and   73 = <app.db.models.Schedule object at 0x000002442E8E1750>.id
+
+tests\test_tools_briefing.py:191: AssertionError
+_____ test_get_briefing_with_schedule_id_marks_only_that_schedule_briefed _____
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000002442E7F38A0>
+
+    def test_get_briefing_with_schedule_id_marks_only_that_schedule_briefed(db_session):
+        person = _make_person(db_session)
+        target = _add_schedule(db_session, person, scheduled_at=_NOW + timedelta(days=1))
+        other = _add_schedule(db_session, person, scheduled_at=_NOW + timedelta(days=2))
+        ctx = _ctx(db_session)
+    
+        result = get_briefing(ctx, person.id, schedule_id=target.id)
+    
+        assert result.schedule is not None
+        assert result.schedule.id == target.id
+        assert result.schedule.briefed_at == _NOW
+    
+        db_session.expire_all()
+        assert db_session.get(Schedule, target.id).briefed_at == _NOW
+>       assert db_session.get(Schedule, other.id).briefed_at is None
+E       AssertionError: assert datetime.datetime(2026, 5, 1, 12, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')) is None
+E        +  where datetime.datetime(2026, 5, 1, 12, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')) = <app.db.models.Schedule object at 0x000002442E89A300>.briefed_at
+E        +    where <app.db.models.Schedule object at 0x000002442E89A300> = get(Schedule, 76)
+E        +      where get = <sqlalchemy.orm.session.Session object at 0x000002442E7F38A0>.get
+E        +      and   76 = <app.db.models.Schedule object at 0x000002442E89A300>.id
+
+tests\test_tools_briefing.py:209: AssertionError
+2 failed, 11 passed in 1.05s
+exit=1
