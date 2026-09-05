@@ -66,3 +66,4 @@
 - 2026-09-05 15:47 | COMMIT | f217190 feat(P2-tools): U1 기반 — fastapi·uvicorn·httpx 핀, ConnInfo repr 비밀 제거, 세션·설정, DB 롤백 픽스처
 - 2026-09-05 15:59 | COMMIT | 4eca3e9 feat(P2-tools): U2 툴 공통 — ToolContext·@traced(agent_traces 원칙9)·types·ALIAS_SOURCES
 - 2026-09-05 16:11 | COMMIT | a9cb254 feat(P2-tools): U3 search_person — 별칭 일치·cosine top-K 인물별 max·rule_flags(신호만, 판정은 P3-er)
+- 2026-09-05 16:29 | COMMIT | f318d58 feat(P2-tools): U4 create_person·update_person — D1 확인 강제(긍정 답 규약)·D6 별칭 누적·facts upsert

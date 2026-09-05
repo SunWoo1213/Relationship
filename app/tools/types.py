@@ -69,11 +69,17 @@ class Candidate:
 
 @dataclass(frozen=True)
 class EventOut:
+    """U5(`add_event`) 확장 -- `created_at` 추가(01-plan U5 산출물 목록).
+    `raw_utterance` 는 여기 담지 않는다(원문 보존은 DB 컬럼·`fact_sources`
+    근거 추적의 일이지, 툴 반환 DTO 의 일이 아니다 -- 01-plan 산출물 목록
+    "id·person_id·type·content·occurred_at·created_at" 그대로)."""
+
     id: int
     person_id: int
     type: str
     content: str
     occurred_at: datetime
+    created_at: datetime
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -82,6 +88,7 @@ class EventOut:
             "type": self.type,
             "content": self.content,
             "occurred_at": self.occurred_at.isoformat(),
+            "created_at": self.created_at.isoformat(),
         }
 
 

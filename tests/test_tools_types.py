@@ -55,13 +55,17 @@ def test_candidate_to_dict_nests_person_and_flags():
 
 def test_event_out_to_dict_serializes_datetime_isoformat():
     when = datetime(2026, 5, 1, 9, 30, tzinfo=timezone.utc)
-    event = EventOut(id=10, person_id=2, type="meal", content="점심", occurred_at=when)
+    created = datetime(2026, 5, 1, 9, 31, tzinfo=timezone.utc)
+    event = EventOut(
+        id=10, person_id=2, type="meal", content="점심", occurred_at=when, created_at=created
+    )
     assert event.to_dict() == {
         "id": 10,
         "person_id": 2,
         "type": "meal",
         "content": "점심",
         "occurred_at": when.isoformat(),
+        "created_at": created.isoformat(),
     }
 
 
@@ -103,7 +107,9 @@ def test_briefing_out_to_dict_nests_lists():
     briefing = BriefingOut(
         person=person,
         facts=[{"key": "생일", "value": "3월"}],
-        recent_events=[EventOut(id=1, person_id=3, type="meal", content="점심", occurred_at=when)],
+        recent_events=[
+            EventOut(id=1, person_id=3, type="meal", content="점심", occurred_at=when, created_at=when)
+        ],
         upcoming_schedules=[ScheduleOut(id=1, person_id=3, title="회의", scheduled_at=when)],
     )
     d = briefing.to_dict()

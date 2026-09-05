@@ -367,6 +367,21 @@ def _add_alias(
     return row
 
 
+def _owned_person(session: Session, person_id: int, user_id: str) -> Person:
+    """`person_id` 를 `user_id` 소유로 조회한다(security.md §5 인물 조회 격리).
+
+    없거나 다른 `user_id` 소유면 `PersonNotFound`. `update_person` 과
+    `app/tools/records.py`(U5 `add_event`/`add_schedule`)가 이 helper 를
+    공유한다 -- 소유 확인 로직을 두 곳에 중복 구현하지 않는다.
+    """
+    person = session.execute(
+        select(Person).where(Person.id == person_id).where(Person.user_id == user_id)
+    ).scalar_one_or_none()
+    if person is None:
+        raise PersonNotFound("person_not_found")
+    return person
+
+
 def _person_out(session: Session, person: Person) -> PersonOut:
     """`person` 의 현재 별칭 전체를 조회해 `PersonOut` 으로 만든다."""
     aliases = (
@@ -475,11 +490,7 @@ def update_person(
     if facts is None and new_alias is None and display_name is None:
         raise InvalidValue("update_person: at least one of facts/new_alias/display_name required")
 
-    person = ctx.session.execute(
-        select(Person).where(Person.id == person_id).where(Person.user_id == ctx.user_id)
-    ).scalar_one_or_none()
-    if person is None:
-        raise PersonNotFound("person_not_found")
+    person = _owned_person(ctx.session, person_id, ctx.user_id)
 
     if display_name is not None:
         if not display_name.strip():

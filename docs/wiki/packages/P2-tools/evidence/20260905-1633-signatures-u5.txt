@@ -1,0 +1,2 @@
+add_event(ctx: 'ToolContext', person_id: 'int', type: 'str', content: 'str', occurred_at: 'datetime', raw_utterance: 'str') -> 'EventOut'
+add_schedule(ctx: 'ToolContext', person_id: 'int', title: 'str', scheduled_at: 'datetime') -> 'ScheduleOut'
