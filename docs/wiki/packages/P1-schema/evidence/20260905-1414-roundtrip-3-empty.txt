@@ -1,0 +1,8 @@
+[info] 접속 대상: user=app host=localhost port=5433 dbname=relationship (source=POSTGRES_*)
+[info] server version -> PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+[PASS] vector extension installed -> extversion=0.8.6
+[PASS] 9 tables absent (--expect-empty) -> 0 tables (as expected)
+[skip] CHECK/PK/FK/vector/index structural checks -> 9 테이블이 모두 있지 않아 테이블 의존 검사를 건너뜀
+[PASS] person_embeddings / person-person relation tables absent (R9, 원칙7) -> none found
+[info] alembic_version -> (empty)
+exit=0

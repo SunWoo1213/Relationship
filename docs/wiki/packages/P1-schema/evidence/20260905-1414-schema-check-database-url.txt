@@ -1,0 +1,17 @@
+[info] 접속 대상: user=app host=localhost port=5433 dbname=relationship (source=DATABASE_URL)
+[info] server version -> PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+[PASS] vector extension installed -> extversion=0.8.6
+[PASS] 9 tables exist exactly -> got 9: ['agent_traces', 'events', 'fact_sources', 'pending_questions', 'person_aliases', 'person_facts', 'persons', 'push_subscriptions', 'schedules']
+[PASS] events.type CHECK has all EVENT_TYPES values -> CHECK ((type = ANY (ARRAY['conflict'::text, 'praise'::text, 'meal'::text, 'meeting'::text, 'personal_share'::text, 'favor'::text, 'other'::text])))
+[PASS] persons.relation_tag CHECK has all RELATION_TAGS values -> CHECK ((hierarchy = ANY (ARRAY['상'::text, '동'::text, '하'::text]))) | CHECK ((relation_tag = ANY (ARRAY['가족'::text, '연인'::text, '친구'::text, '직장'::text, '지인'::text])))
+[PASS] persons.hierarchy CHECK has all HIERARCHIES values -> CHECK ((hierarchy = ANY (ARRAY['상'::text, '동'::text, '하'::text]))) | CHECK ((relation_tag = ANY (ARRAY['가족'::text, '연인'::text, '친구'::text, '직장'::text, '지인'::text])))
+[PASS] pending_questions.kind CHECK has all QUESTION_KINDS values -> CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text])))
+[PASS] person_aliases.embedding format_type is vector(1536) -> vector(1536)
+[PASS] fact_sources PK is (fact_id, event_id) with no surrogate id -> PRIMARY KEY (fact_id, event_id)
+[PASS] 6 foreign keys all confdeltype='c' (ON DELETE CASCADE) -> count=6 events.fk_events_person_id_persons=c; fact_sources.fk_fact_sources_event_id_events=c; fact_sources.fk_fact_sources_fact_id_person_facts=c; person_aliases.fk_person_aliases_person_id_persons=c; person_facts.fk_person_facts_person_id_persons=c; schedules.fk_schedules_person_id_persons=c
+[PASS] all model index names exist in DB -> expected=10 missing=[]
+[PASS] total index count >= 10 -> count=19
+[PASS] partial index ix_pending_questions_session_id_unanswered has WHERE answered_at IS NULL -> CREATE INDEX ix_pending_questions_session_id_unanswered ON public.pending_questions USING btree (session_id) WHERE (answered_at IS NULL)
+[PASS] person_embeddings / person-person relation tables absent (R9, 원칙7) -> none found
+[info] alembic_version -> 0001
+exit=0
