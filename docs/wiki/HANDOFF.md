@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-05 17:35 (P2-tools 계획 승인, 착수 커밋 직전)
-active: **P2-tools** | frozen: none | 브랜치: dev (dev = origin/dev = **main = 5dc95bb**). 미커밋: packages/P2-tools/*(계획 문서 일체)·CURRENT·HANDOFF·journal — 착수 커밋으로 정리 중
+갱신: 2026-09-05 18:05 (P2-tools U1 구현 완료, 커밋 직전)
+active: **P2-tools** | frozen: none | 브랜치: dev (dev = origin/dev = **main = 5dc95bb**). 착수 커밋 7b793ba(로컬, 미푸시). 미커밋: U1 산출물(app/settings.py, app/db/session.py, config repr, conftest 픽스처, tests 2, requirements, .env.example APP_USER_ID, evidence 7, 위키) — U1 커밋으로 정리 중
 
 ## 지금 어디까지
 - **P2-tools 착수 진행 중(2026-09-05)**: 사용자 "P2-tools 시작해줘" → 선행 확인(P1-schema 완료 5dc95bb, 닫는 R6 R7 R10 R18, 카드 S3.2 S3.4 D1 D2 D6, registry 툴·세션 없음) → architect(opus) 01-plan 초안(U1~U8: 세션·ToolContext 주입, 임베딩 인터페이스만(공급자 P3), D1 DB 검사, source=user_said/confirmed/system, facts upsert, 실 DB 5433 롤백 픽스처, tools_check.py 시그니처 기계 대조) → verify-plan 1차 FAIL 1(02-plan-verify 부재)/WARN 5(기존 행 비고만, 의도) → 05-remediation 기입 → **사용자 결정: FastAPI 골격(app/main.py, GET /health, POST /answers 답 저장만)을 P2 포함, delete_person 은 제외·미결** → `--stage architect` 2회차 → 개정 1(U1~U9: U8 FastAPI 골격 app/api/·GET /health·POST /answers 404/409/422/200 신설, requirements +fastapi·uvicorn·httpx 는 U1, 결정 10~13) → verify-plan 2차 FAIL 1(02-plan-verify 부재)/WARN 6(기존 행 비고만) → 05 기입 → `--stage verifier` → verifier 02-plan-verify **통과**(FAIL 0/WARN 6 의도, 점검표 8행, 보류 0, 권고 9: F-08b3db 판정 표 포트 변수 / F-b97a06 D1 긍정 답 규약 / F-4d8d96 tool_error trace rollback 한계 / F-3c8d4a "U8" 참조→U9·S3.1 한 줄 / F-fbaaae pending_questions 에 user_id 없음 / F-0010e6 ALIAS_SOURCES 를 U2 로 / F-2418ef display_name 변경 시 별칭 누적 / F-4d2507 DELETE /persons backlog 항목 없음 / F-107a50 tools_check 출력) → **사용자 계획 승인(2026-09-05 17:30)** → active: P2-tools.
@@ -18,8 +18,9 @@ active: **P2-tools** | frozen: none | 브랜치: dev (dev = origin/dev = **main 
 
 ## 바로 다음에 할 것 (순서대로)
 1. (완료) 완료 커밋 5dc95bb → dev 푸시 → main 승격(사용자 승인, 2026-09-05).
-2. 착수 커밋 `/commit`(계획 문서·CURRENT·03-log·journal·HANDOFF) — 진행 중.
-3. U1(사용자 승인 → `--stage backend-agent`): requirements +fastapi·uvicorn[standard]·httpx 실제 설치·핀·pip freeze evidence(리스크 B: httpx↔TestClient 호환 즉시 확인), ConnInfo.password `field(repr=False)`+테스트(F-8eeb9b), app/db/session.py(engine=sqlalchemy_url, SessionLocal, session_scope), app/settings.py(APP_USER_ID 기본 local), tests/conftest.py DB 롤백 픽스처·`dbtest` 마커(POSTGRES_PORT=5433, 없으면 skip + `-rs`). 이후 U2(types·ToolContext·@traced + **ALIAS_SOURCES 상수 여기서**, F-0010e6) → U3 → … → U9. 단위마다 `/commit`. 미착수: P1-pilot-dataset·P0-cost(eval-agent).
+2. (완료) 착수 커밋 7b793ba.
+3. **U1 구현 완료(backend-agent, 2026-09-05)**: fastapi 0.135.1·starlette 0.52.1·uvicorn 0.41.0·httpx 0.28.1·pydantic 2.12.5 핀, TestClient smoke 200(리스크 B 해소), ConnInfo.password repr=False + 테스트(F-8eeb9b 해결 단계 완료), app/db/session.py(지연 get_engine·pool_pre_ping·connect_timeout 5, SessionLocal 지연 프록시, session_scope), app/settings.py app_user_id(APP_USER_ID 기본 local), .env.example APP_USER_ID 이름, conftest: dbtest 마커·db_engine(skip 사유)·db_session(외부 트랜잭션+savepoint 롤백)·fake_embedder(SHA-256 시드 1536차원). pytest 5433: 56 passed / 5599: 52 passed 4 skipped(사유 표시, 비밀 0회). schema_check·alembic check 무변경. evidence 20260905-1535-*. → `/commit` 진행 중.
+4. U2(사용자 승인 → `--stage backend-agent`): app/tools/__init__.py, app/tools/types.py(Candidate·*Out dataclass·예외 PersonNotFound/ConfirmationRequired/InvalidValue 등), app/tools/context.py(ToolContext: session·user_id·session_id·embedder·now·confirmed_question_id; `@traced` 데코레이터 — agent_traces 에 step/tool_name/input/output/tokens 0, JSON 절단 규칙, tool_error 기록은 호출자 rollback 으로 사라질 수 있음 F-4d8d96 명시), **ALIAS_SOURCES=user_said/confirmed/system 상수를 app/db/models.py 에 여기서 추가(F-0010e6)**, tests/test_tool_context.py(dbtest: trace 행 생성·절단·session_id). 이후 U3 → … → U9.
 
 ## 재개 시 읽을 카드 (이것만)
 - `docs/wiki/CURRENT.md`, `docs/wiki/INDEX.md`, `.claude/gitlog.md`
@@ -27,7 +28,7 @@ active: **P2-tools** | frozen: none | 브랜치: dev (dev = origin/dev = **main 
 - `lessons/L-001`~`L-004`
 
 ## 열린 질문 · 사용자 결정 대기
-- U1 시작 승인(L-004). P1-pilot-dataset·P0-cost 착수 시점.
+- U1 커밋 승인 → U2 시작 승인(L-004). P1-pilot-dataset·P0-cost 착수 시점.
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)
 - 재개 시 커밋 안 된 변경·진행 중 항목이 있으면 **먼저 사용자에게 목록을 보이고 우선순위를 묻는다**(`/devlog resume`).

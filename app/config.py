@@ -24,7 +24,7 @@ SQLAlchemy 가 쓸 접속 URL 은 `ConnInfo.sqlalchemy_url()` (또는 모듈 함
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from urllib.parse import quote, urlsplit
 
 DEFAULT_USER = "app"
@@ -39,7 +39,7 @@ class ConnInfo:
     """접속 정보. 이 값을 출력할 때는 password 필드를 절대 포함하지 않는다."""
 
     user: str
-    password: str
+    password: str = field(repr=False)
     host: str
     port: str
     dbname: str

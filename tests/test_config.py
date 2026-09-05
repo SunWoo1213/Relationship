@@ -90,3 +90,23 @@ def test_sqlalchemy_url_uses_psycopg_driver_and_hides_password_in_summary():
 
     # 모듈 함수 경로도 동일 URL 을 낸다.
     assert cfg.sqlalchemy_url(fake) == url
+
+
+def test_conninfo_repr_and_str_never_contain_password_value():
+    """F-8eeb9b -- ConnInfo.password 는 field(repr=False) 이므로 기본
+    dataclass repr/str(예외 메시지·로그에 그대로 찍힐 수 있는 경로) 어디에도
+    비밀번호 값이 나타나지 않는다(security.md §1)."""
+    secret = "UNIQUE_MARKER_9f3a21"
+    fake = {
+        "POSTGRES_USER": "app",
+        "POSTGRES_PASSWORD": secret,
+        "POSTGRES_DB": "relationship",
+        "POSTGRES_PORT": "5433",
+    }
+    conn, _warnings = cfg.resolve_connection(fake)
+
+    assert secret not in repr(conn)
+    assert secret not in str(conn)
+    assert secret not in f"{conn}"
+    # 필드 자체는 여전히 살아 있다 -- 접속에는 필요하다.
+    assert conn.password == secret

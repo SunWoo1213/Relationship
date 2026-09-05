@@ -365,11 +365,11 @@ WARN  app/config.py ConnInfo 기본 dataclass repr/str 에 password 필드 포�
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | `app/config.py` `ConnInfo.password` 필드를 `field(repr=False)` 로(P2-tools U1). `tests/test_config.py` 에 `test_conninfo_repr_and_str_never_contain_password_value` 추가 — 고유 문자열(`UNIQUE_MARKER_9f3a21`, 다른 테스트 값 `pass`/`pwone` 등과 헷갈리지 않게)이 `repr(conn)`·`str(conn)`·f-string 어디에도 없음을 검사 | `python -c "import app.config as cfg; c,_=cfg.resolve_connection({'POSTGRES_PASSWORD':'FAKE_SECRET_XYZ'}); print('FAKE_SECRET_XYZ' in repr(c), 'FAKE_SECRET_XYZ' in str(c))"` 및 `POSTGRES_PORT=5433 python -m pytest tests/test_config.py -q` | `False False` / 6 passed(기존 5건 + 신규 1건, 회귀 없음) | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P1-schema` (계획 단계면 `verify-plan.sh P1-schema`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `docs/wiki/packages/P2-tools/evidence/20260905-1535-pytest-u1.txt`(56 passed, `tests/test_config.py` 신규 1건 포함 — P2-tools U1 착수 단위에서 함께 실행) — P1-schema 자체의 `verify-impl.sh` 재실행은 하지 않음(권고 항목이며 해결이 P2-tools U1 에서 이뤄졌기 때문. 패키지 상태 줄은 검증자 재확인 전까지 "열림" 유지)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
