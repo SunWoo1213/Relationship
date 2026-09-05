@@ -54,3 +54,4 @@
 - 2026-09-05 13:54 | PUSH | origin dev 4dfaf33 — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-05 13:58 | DECISION | dev 4dfaf33 승격 보류 — P1-schema U3~U5 완료 후 패키지 단위로 승격(사용자). 작업 계속을 위해 대기 마커 해제(--decision fix) | P1-schema L-003
 - 2026-09-05 14:06 | COMMIT | 09c2bd1 feat(P1-schema): U3 Alembic 도입·0001 스키마 v2 마이그레이션 — 로컬 upgrade head 9테이블
+- 2026-09-05 14:19 | COMMIT | 03e3ce3 feat(P1-schema): U4 schema_check.py + upgrade→downgrade base→upgrade 왕복 증거·alembic check

@@ -1,4 +1,4 @@
-"""Refs: P0-compose D4 D5 S3.1 · P1-schema(F-ace4dd 접속 조립을 app.config 로 단일화) -- 로컬 pgvector 접속 검사.
+"""Refs: P0-compose D4 D5 S3.1 · P1-schema(F-ace4dd 접속 조립을 app.config 로 단일화, U5 SELECT version() 추가) -- 로컬 pgvector 접속 검사.
 
 설치(필요 시): pip install "psycopg[binary]"
 사용:
@@ -13,10 +13,13 @@
      경고로 찍는다 (예: "[warn] POSTGRES_PORT 가 DATABASE_URL 과 다르다").
      비밀번호 값·접속 문자열 전체는 어떤 경우에도 출력하지 않는다. 경고는 종료 코드를
      바꾸지 않는다(수용 기준은 쿼리 성공 여부로만 판정한다 -- 01-plan U2).
-  3. CREATE EXTENSION IF NOT EXISTS vector; 실행
-  4. SELECT extversion FROM pg_extension WHERE extname='vector' 조회·출력
-  5. SELECT '[1,2,3]'::vector 실행·결과를 그대로 출력 (수용 기준 문장)
-  6. 실패(접속 불가·확장 없음·캐스트 실패) 시 비정상 종료(rc=1).
+  3. SELECT version() 조회·"[ok] server = …" 한 줄로 출력 (P1-schema U5 관찰 O1 —
+     이 접속 검사가 어느 서버 버전 위에서 통과했는지 evidence 에 남긴다.
+     scripts/schema_check.py 의 "server version" 항목과 같은 조회)
+  4. CREATE EXTENSION IF NOT EXISTS vector; 실행
+  5. SELECT extversion FROM pg_extension WHERE extname='vector' 조회·출력
+  6. SELECT '[1,2,3]'::vector 실행·결과를 그대로 출력 (수용 기준 문장)
+  7. 실패(접속 불가·확장 없음·캐스트 실패) 시 비정상 종료(rc=1).
      psycopg 가 설치되어 있지 않으면 설치 명령을 안내하고 rc=2 로 종료한다.
 
 종료 코드:
@@ -77,6 +80,10 @@ def run_checks(conn: ConnInfo) -> int:
         # 키워드 인자로 접속한다 -- URL 문자열을 조립해 로그·소스에 남기지 않는다.
         with psycopg.connect(connect_timeout=5, **conn.as_keywords()) as pg_conn:
             with pg_conn.cursor() as cur:
+                cur.execute("SELECT version()")
+                row = cur.fetchone()
+                print(f"[ok] server = {row[0]}")
+
                 cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
                 pg_conn.commit()
                 print("[ok] CREATE EXTENSION IF NOT EXISTS vector;")

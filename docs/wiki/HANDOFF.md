@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-05 14:45 (U4 구현 완료, 커밋 직전)
+갱신: 2026-09-05 15:10 (U5 구현 완료 — 구현 단위 U1~U5 전부 끝, 커밋 직전)
 active: **P1-schema** | frozen: none | 브랜치: dev (dev = origin/dev = **main = 819e1ac**). dev = origin/dev = **4dfaf33**(9397066 착수·d7113e9 U1·4dfaf33 U2 푸시됨). main = 819e1ac. **사용자 결정(2026-09-05): 승격은 P1-schema 완료 후 한 번에** — 대기 마커 해제, U3 진행
 
 ## 지금 어디까지
@@ -22,8 +22,9 @@ active: **P1-schema** | frozen: none | 브랜치: dev (dev = origin/dev = **main
 1. (완료) 착수 커밋 9397066. **U1 구현 완료(backend-agent, 2026-09-05)**: requirements.txt(SQLAlchemy 2.0.50·alembic 1.19.2·psycopg[binary] 3.3.5·pgvector 0.5.0)·requirements-dev(pytest 9.0.3), app/config.py(접속 조립 단일 구현 — F-ace4dd, POSTGRES_HOST 선택 — F-75c1c1, sqlalchemy_url), app/db/base.py(Base+naming_convention), db_check.py 는 app.config import·re-export(기존 테스트 6건 무수정), tests/test_config.py 5건. pytest 21 passed, db_check 5433 재현 exit 0. evidence 20260905-1239/1242/1243-*. **커밋 d7113e9**.
 2. **U2 구현 완료(backend-agent, 2026-09-05)**: app/db/models.py 9모델(S3.1 컬럼 56개 1:1 — 7+6+6+2+7+5+9+5+9, CHECK 4 `ck_<table>_<col>_valid`, FK CASCADE 6, fact_sources 복합 PK, Vector(1536) nullable, 인덱스 10(부분 1), 값 집합 상수 EVENT_TYPES 등, NOT NULL 정책: nullable 은 embedding·confirmed_at·briefed_at·answer·answered_at 만 — F-08e812 닫음), tests/test_schema_models.py 17건, 변이 2건 FAILED 확인 후 원복. pytest 38 passed. evidence 20260905-1253-*. **커밋 4dfaf33, dev 푸시.**
 3. **U3 구현 완료(backend-agent, 2026-09-05)**: alembic.ini(url 공란, 주석은 영어 — cp949 configparser 가 한글 주석에서 UnicodeDecodeError), alembic/env.py(app.config 주입·render_item Vector), versions/0001_schema_v2.py(autogenerate 초안 대비 손보정은 CREATE EXTENSION 첫 줄 1건뿐 — 로컬 DB 에 확장이 이미 있어 diff 에 안 나옴; Vector·CHECK 4 이름·부분 인덱스·CASCADE 6·복합 PK 는 초안부터 정확). 로컬 5433 `upgrade head` exit 0 → 9테이블·CHECK·vector(1536)·FK c·부분 인덱스·version 0001 확인(PostgreSQL 16.15), `alembic check` "No new upgrade operations detected", pytest 38. evidence 20260905-1400/1401-*. **커밋 09c2bd1(로컬, 미푸시).**
-4. **U4 구현 완료(backend-agent, 2026-09-05)**: scripts/schema_check.py(기대값은 app.db.models 상수·Base.metadata 에서 import — 단일 출처, 13 PASS 항목, `--expect-empty`, exit 0/1/2, 비밀 미출력), tests/test_schema_check.py 11건. 왕복 8단계 evidence 20260905-1414-roundtrip-1~5·alembic-check-after-roundtrip·schema-check-badport(exit 2, 비밀번호 0회)·schema-check-database-url(source=DATABASE_URL) 모두 기대 exit. DB 는 0001(head) 상태로 복귀. pytest 49. 메인 세션 재실행 exit 0(PASS 13/FAIL 0). → `/commit` 진행 중.
-5. U5(사용자 승인 → `--stage backend-agent`): registry 신규 행(app/, app/config.py, app/db/base.py, app/db/models.py, alembic/(env.py·0001), requirements.txt·-dev, scripts/schema_check.py, tests/test_config·test_schema_models·test_schema_check) + 기존 행 비고 갱신(README, scripts/db_check.py — **새 행 금지**), README 진행 표 P1 행·"로컬에서 해 보기" 에 마이그레이션 절(alembic upgrade head / schema_check / downgrade base, POSTGRES_PORT 셸 변수), scripts/db_check.py 에 `SELECT version()` 한 줄(P0-compose O1). 그 뒤 verifier 04-review → `/devlog done` → 푸시 → 승격. 단위마다 `/commit`, 마이그레이션·schema_check 파일은 Write 도구로(Bash heredoc 에 DROP 문자열 금지).
+4. **U4 구현 완료(backend-agent, 2026-09-05)**: scripts/schema_check.py(기대값은 app.db.models 상수·Base.metadata 에서 import — 단일 출처, 13 PASS 항목, `--expect-empty`, exit 0/1/2, 비밀 미출력), tests/test_schema_check.py 11건. 왕복 8단계 evidence 20260905-1414-roundtrip-1~5·alembic-check-after-roundtrip·schema-check-badport(exit 2, 비밀번호 0회)·schema-check-database-url(source=DATABASE_URL) 모두 기대 exit. DB 는 0001(head) 상태로 복귀. pytest 49. 메인 세션 재실행 exit 0(PASS 13/FAIL 0). **커밋 03e3ce3(로컬, 미푸시).**
+5. **U5 구현 완료(backend-agent, 2026-09-05)**: registry 신규 11행 + README·db_check 행 비고 갱신(각 1행 유지), README 진행 표 P1 행 분리("구현 완료·검증 대기"/데이터셋 대기)·`### 스키마 마이그레이션 (Alembic)` 소절, db_check `SELECT version()` 한 줄. pytest 49, db_check server=PostgreSQL 16.15, verify-impl 사전 FAIL 0/WARN 2(04-review 없음·U5 미체크 시점 — 둘 다 정상). evidence 20260905-1423/1425-*. → `/commit` 진행 중.
+6. **구현 단위 U1~U5 전부 완료.** 다음: 사용자 승인 → `--stage verifier` → verifier 04-review(수용 기준 "9개 테이블 생성, events.type 제약 존재" ↔ evidence/20260905-1414-roundtrip-5·1401-tables-after-upgrade, 부정 케이스 직접 실행, 권고 F-081752 P2 인계 확인) → `/devlog done`(R8 R9 review-index "구현완료(해시)", backlog 체크, CURRENT none) → 푸시 → main 승격. 단위마다 `/commit`, 마이그레이션·schema_check 파일은 Write 도구로(Bash heredoc 에 DROP 문자열 금지).
 
 ## 재개 시 읽을 카드 (이것만)
 - `docs/wiki/CURRENT.md`, `docs/wiki/INDEX.md`, `.claude/gitlog.md`
@@ -31,7 +32,7 @@ active: **P1-schema** | frozen: none | 브랜치: dev (dev = origin/dev = **main
 - `lessons/L-001-dev-branch.md`, `L-002-role-model-separation.md`, `L-003-stop-after-dev-push.md`, `L-004`(위임 게이트)
 
 ## 열린 질문 · 사용자 결정 대기
-- U4 커밋 승인 → U5 시작 승인(L-004). 미푸시: 09c2bd1 + U4. 승격은 P1-schema `/devlog done` 뒤. P0-cost(eval-agent) 착수 시점 — P1 과 병행할지 사용자 결정.
+- U5 커밋 승인 → verifier 04-review 시작 승인(L-004) → `/devlog done` → 푸시(미푸시 09c2bd1·03e3ce3·U5·done) → 승격. 승격은 P1-schema `/devlog done` 뒤. P0-cost(eval-agent) 착수 시점 — P1 과 병행할지 사용자 결정.
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)
 - 재개 시 커밋 안 된 변경·진행 중 항목이 있으면 **먼저 사용자에게 목록을 보이고 우선순위를 묻는다**(`/devlog resume`).

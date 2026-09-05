@@ -68,7 +68,8 @@
 | P0 | 임베딩 공급자 파일럿 (D4) | **완료** — small/large 모두 기준 통과, `text-embedding-3-small` N=1536 확정 |
 | P0 | 로컬 docker-compose (pgvector) | **완료** — `SELECT '[1,2,3]'::vector` 통과, pgvector 0.8.6 (pg16) |
 | P0 | LLM 비용 실측 | 대기 |
-| P1 | 스키마 v2 마이그레이션 · 파일럿 데이터셋 | 대기 |
+| P1 | 스키마 v2 마이그레이션 (Alembic) | **구현 완료 · 검증 대기** — 9테이블·CHECK 4·FK CASCADE 6·`vector(1536)`·인덱스 10, upgrade/downgrade 왕복 확인. 04-review(verifier) 전 |
+| P1 | 파일럿 데이터셋 | 대기 |
 | P2~P3 | 툴 7종 · 엔티티 해석 4단계 · 베이스라인 | 대기 |
 | P4 | **파일럿 평가(게이트)** — 여기서 임계치·보정표 확정 | 대기 |
 | P5~P9 | 에이전트 루프 · 메모리 · 브리핑 · 푸시 · 프론트 · 인프라 | P4 통과 후 |
@@ -142,6 +143,38 @@ docker compose down
 - **5432 포트 충돌**: 로컬에 이미 다른 PostgreSQL이 5432를 쓰고 있으면 기동이 실패한다. `.env`의 `POSTGRES_PORT`와 `DATABASE_URL`의 포트를 **같이** 다른 값(예: 5433)으로 바꾼다. `db_check.py`는 두 값이 어긋나면 변수 이름만 경고하고(비밀번호 값은 출력하지 않는다) 종료 코드는 바꾸지 않는다.
 - **이미지 태그 메모(미결)**: `pgvector/pgvector:pg16`으로 시작한다. RDS PostgreSQL 메이저 버전이 정해지는 P9-infra에서 이 태그를 재확인한다.
 - P1-schema(스키마 마이그레이션)는 이 로컬 DB가 떠 있는 것을 선행 조건으로 쓴다.
+
+### 스키마 마이그레이션 (Alembic)
+
+사전 조건: 로컬 DB가 기동 중(위 절)이고 `pip install -r requirements-dev.txt`로 SQLAlchemy·Alembic·psycopg·pgvector·pytest가 설치되어 있다. `alembic.ini`의 `sqlalchemy.url`은 비어 있다 — `alembic/env.py`가 `app.config`를 통해 환경변수에서 접속 정보를 읽는다(`.env`는 읽지 않는다).
+
+```bash
+# 적용 (9개 테이블 + CHECK 4 + FK CASCADE 6 + vector(1536) + 인덱스 10)
+alembic upgrade head
+
+# 검사 (서버 버전·확장·9테이블·CHECK·FK·인덱스·person_embeddings 부재)
+python scripts/schema_check.py
+
+# 모델↔마이그레이션 일치 확인 (변경 없음이 기대값)
+alembic check
+
+# 되돌리기 — 빈 개발 DB에서만. 데이터가 있는 DB에서는 사용자가 직접 판단한다(볼륨 삭제 대신 이 명령을 쓴다)
+alembic downgrade base
+```
+
+로컬 포트가 5432가 아니면(위 절의 5433 예시) 셸 변수로 앞에 붙인다:
+
+```bash
+# bash
+POSTGRES_PORT=5433 alembic upgrade head
+```
+
+```powershell
+# PowerShell
+$env:POSTGRES_PORT="5433"; alembic upgrade head
+```
+
+서버 버전은 로컬 pg16 기준으로 검증했다(`scripts/schema_check.py`·`scripts/db_check.py`의 `SELECT version()` 출력). RDS 메이저 버전은 P9-infra에서 재확인한다.
 
 ## 문서 안내
 

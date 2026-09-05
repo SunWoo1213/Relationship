@@ -1,0 +1,9 @@
+03e3ce3 feat(P1-schema): U4 schema_check.py + upgrade→downgrade base→upgrade 왕복 증거·alembic check
+09c2bd1 feat(P1-schema): U3 Alembic 도입·0001 스키마 v2 마이그레이션 — 로컬 upgrade head 9테이블
+4dfaf33 feat(P1-schema): U2 스키마 v2 모델 9개 — CHECK·CASCADE·복합 PK·vector(1536)·인덱스, DB 없는 테스트
+d7113e9 feat(P1-schema): U1 백엔드 골격·requirements·app.config 접속 설정 단일화
+9397066 docs(P1-schema): 계획·계획검증 승인, 패키지 착수 — 스키마 v2 Alembic
+819e1ac docs(P0-compose): 완료 — verifier 04-review 완료 판정·사용자 승인, 패키지 닫음
+7397966 docs(P0-compose): U3 README 로컬 DB 절·registry 반영, verify-impl 사전 실행
+749bb8e feat(P0-compose): U1 로컬 pgvector compose — .env.example 이름 4개·compose·initdb
+23d8700 docs(P0-compose): 계획·계획검증 승인, 패키지 착수 — L-002 역할 분리 첫 적용
