@@ -1,14 +1,17 @@
 """Refs: P2-tools S3.2 원칙9 -- ToolContext 실행 맥락 + @traced 관측성 데코레이터.
 
-## embedder 타입 결정 (U2, F-0010e6 와 별개 -- 03-log 에 기록)
-`ToolContext.embedder` 는 `app.embedding.EmbeddingProvider` Protocol 이
-**아니라** `Callable[[list[str]], list[list[float]]] | None` 로 둔다.
-01-plan 은 `app/embedding.py`(Protocol 정의)를 U3 산출물로 명시하므로,
-U2 에서 그 파일을 먼저 만들면 U3 의 산출물 목록·registry 신규 행과
-어긋난다(파일 소유 단위가 흐려진다). U3 가 `EmbeddingProvider` 를 정의하면
-이 자리의 타입 별칭을 그 Protocol 로 좁힌다(TODO: U3). `tests/conftest.py`
-의 `fake_embedder` 는 이미 이 Callable 형태(`list[str] -> list[list[float]]`)
-를 따르므로 U3 에서 그대로 주입할 수 있다.
+## embedder 타입 결정 (U3 에서 좁힘 -- U2 의 TODO 해소)
+`ToolContext.embedder` 는 `app.embedding.EmbeddingProvider | EmbedderCallable
+| None` 이다. U2 시점에는 `app/embedding.py` 가 아직 없어 로컬 콜러블 타입
+별칭만 두었으나(F-0010e6 와 별개 기록), U3 가 그 모듈을 만들면서 이 자리를
+좁힌다. 두 형태를 모두 받는 이유는 `tests/conftest.py` 의 `fake_embedder`
+(평범한 콜러블)와 향후 P3-er 가 꽂을 `OpenAIEmbeddingProvider`(`.embed()`
+메서드를 가진 객체) 를 모두 그대로 받기 위해서다 -- 실제 사용 시점(예:
+`search_person`)에서 `app.embedding.as_provider(ctx.embedder)` 로 정규화해
+`EmbeddingProvider` 하나로 통일한다. `ToolContext` 자체는 정규화하지
+않는다 -- 정규화 시점을 앞당기면 `embedder=None` 인지 아닌지를 툴마다
+`as_provider` 를 거쳐야 판별하게 되어 "임베딩 단계를 건너뛴다"는 신호
+(`None`)가 흐려진다.
 
 ## tool_error 행의 한계 (F-4d8d96 -- 우회 구현 금지)
 01-plan 결정 2 는 "툴은 commit 하지 않고 `flush()` 까지만 한다"고 정하고,
@@ -40,15 +43,12 @@ from typing import Any, TypeVar
 from sqlalchemy.orm import Session
 
 from app.db.models import AgentTrace
+from app.embedding import EmbedderCallable, EmbeddingProvider
 from app.settings import app_user_id
 
 #: agent_traces.input/output 에 들어가는 개별 문자열 값의 최대 길이. 초과분은
 #: 잘라내고 "…[truncated N chars]" 표식을 붙인다(N = 잘려나간 문자 수).
 TRACE_MAX_STRING = 2000
-
-#: U3 가 `app.embedding.EmbeddingProvider` Protocol 을 정의할 때까지 쓰는
-#: 자리표시자 타입. `list[str] -> list[list[float]]`.
-EmbedderCallable = Callable[[list[str]], list[list[float]]]
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -65,7 +65,7 @@ class ToolContext:
     session: Session = field(repr=False)
     session_id: str
     user_id: str = field(default_factory=app_user_id)
-    embedder: EmbedderCallable | None = None
+    embedder: EmbeddingProvider | EmbedderCallable | None = None
     now: Callable[[], datetime] = lambda: datetime.now(timezone.utc)
     confirmed_question_id: int | None = None
 

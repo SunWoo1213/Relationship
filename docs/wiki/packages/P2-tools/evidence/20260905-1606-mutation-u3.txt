@@ -1,0 +1,21 @@
+....F.....                                                               [100%]
+================================== FAILURES ===================================
+__________ test_hints_do_not_exclude_candidates_only_set_rule_flags ___________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000001DC31992EA0>
+
+    def test_hints_do_not_exclude_candidates_only_set_rule_flags(db_session):
+        """오탐지 배제 금지(원칙1) 회귀: hints 로 후보를 걸러내면 이 테스트가
+        실패해야 한다(U3 검증 절차의 변이 테스트 대상)."""
+        person = _make_person(db_session, display_name="김상무", hierarchy="상")
+        _add_alias(db_session, person, "동료")
+        ctx = _ctx(db_session)
+    
+        candidates_ha = search_person(ctx, "동료", hints={"hierarchy": "하"})
+>       assert len(candidates_ha) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_tools_persons.py:131: AssertionError
+1 failed, 9 passed in 0.98s
+exit=1

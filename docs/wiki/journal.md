@@ -64,3 +64,4 @@
 - 2026-09-05 17:30 | START | P2-tools 착수: architect(opus) 초안 → 사용자 결정(FastAPI 골격 포함·delete_person 제외) → 개정 1 → verifier(fable) 점검표 8행 통과(FAIL 0/WARN 6 의도, 권고 9) → 사용자 승인 | P2-tools R6 R7 R10 R18 D1 D2 D6 S3.2 S3.4
 - 2026-09-05 15:27 | COMMIT | 7b793ba docs(P2-tools): 계획·계획검증 승인, 패키지 착수 — 툴 7종 v2 + FastAPI 골격
 - 2026-09-05 15:47 | COMMIT | f217190 feat(P2-tools): U1 기반 — fastapi·uvicorn·httpx 핀, ConnInfo repr 비밀 제거, 세션·설정, DB 롤백 픽스처
+- 2026-09-05 15:59 | COMMIT | 4eca3e9 feat(P2-tools): U2 툴 공통 — ToolContext·@traced(agent_traces 원칙9)·types·ALIAS_SOURCES
