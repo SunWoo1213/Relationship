@@ -1,0 +1,6 @@
+== plan-review P1-schema (verifier, 2026-09-05 12:28) — 02-plan-verify §3 권고 관찰 (통과를 막지 않음) ==
+WARN  접속 해석 규칙 이중 구현 위험: app/config.py 와 scripts/db_check.py resolve_connection() — 재사용/재구현 미결정 (01-plan 16행, CLAUDE.md 중복 구현 금지, P0-compose 04-review O5)
+WARN  pending_questions status 파생 규칙 불완전: S3.4 status=expired 는 answered_at IS NULL 외에 created_at 필요 (01-plan 116행) — 스키마 변경 불필요, P2-tools 인계
+WARN  NULL 허용 정책이 타임스탬프 계열에만 명시 (01-plan 114행) — U2 결정을 03-log·tests/test_schema_models.py 에 남길 것
+WARN  POSTGRES_HOST(P0-compose O5) 처리 미결정 — app/config.py 가 읽으면 .env.example 에 이름 추가, 아니면 db_check.py 132행 정리 여부를 03-log 에
+== 결과: FAIL=0 WARN=4 ==

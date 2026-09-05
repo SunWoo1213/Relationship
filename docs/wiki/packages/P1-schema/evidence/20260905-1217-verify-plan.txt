@@ -1,0 +1,50 @@
+== verify-plan P1-schema  (2026-09-05 12:17) ==
+PASS  존재: docs/wiki/packages/P1-schema/01-plan.md
+FAIL  없음: docs/wiki/packages/P1-schema/02-plan-verify.md
+PASS  카드 존재: D4
+PASS  카드 존재: D5
+PASS  카드 존재: D8
+PASS  패키지 id 등록됨: P0-compose
+PASS  패키지 id 등록됨: P0-embed-pilot
+PASS  패키지 id 등록됨: P1-schema
+PASS  패키지 id 등록됨: P2-tools
+PASS  패키지 id 등록됨: P3-er
+PASS  패키지 id 등록됨: P6-memory
+PASS  패키지 id 등록됨: P9-infra
+PASS  검증 항목 존재: R8
+PASS  검증 항목 존재: R9
+PASS  Refs 있음: - [ ] U1 백엔드 골격 최소 + DB 접속 설정: `requir
+PASS  Refs 있음: - [ ] U2 모델 9개 + 제약·인덱스: `app/db/models.py`
+PASS  Refs 있음: - [ ] U3 Alembic 도입 + 초기 마이그레이션: `alembi
+PASS  Refs 있음: - [ ] U4 스키마 검사 스크립트 + 왕복 증거: `scr
+PASS  Refs 있음: - [ ] U5 문서·registry 반영 + db_check 서버 버전 �
+PASS  backlog 일치: 9개 테이블 생성, `events.type` 제약 존재
+FAIL  backlog 에 같은 문장이 없다: **DB 없이 도는 테스트**(`pytest tests/test_config.py 
+FAIL  backlog 에 같은 문장이 없다: **DB 가 필요한 검증**: 위 표의 `alembic`·`pg_const
+FAIL  backlog 에 같은 문장이 없다: 증거 경로: `docs/wiki/packages/P1-schema/evidence/`.
+PASS  의존 완료: P0-compose
+PASS  의존 완료: P0-embed-pilot
+PASS  registry 중복 없음: requirements.txt
+PASS  registry 중복 없음: requirements-dev.txt
+PASS  registry 중복 없음: app/__init__.py
+PASS  registry 중복 없음: app/config.py
+PASS  registry 중복 없음: app/db/__init__.py
+PASS  registry 중복 없음: app/db/base.py
+PASS  registry 중복 없음: app/db/models.py
+PASS  registry 중복 없음: alembic.ini
+PASS  registry 중복 없음: sqlalchemy.url
+PASS  registry 중복 없음: alembic/env.py
+PASS  registry 중복 없음: app.confi
+PASS  registry 중복 없음: alembic/script.py.mako
+PASS  registry 중복 없음: alembic/versions/0001_schema_v2.py
+PASS  registry 중복 없음: scripts/schema_check.py
+PASS  registry 중복 없음: tests/conftest.py
+PASS  registry 중복 없음: sys.path
+PASS  registry 중복 없음: tests/test_schema_models.py
+PASS  registry 중복 없음: tests/test_config.py
+PASS  registry 중복 없음: docs/wiki/registry.md
+WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
+WARN  registry 에 다른 패키지로 이미 있음: db_check.py → | 스크립트 | DB 접속 검사(psycopg, `POSTGRES_*`↔`DATABASE_URL` 불일�
+WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
+WARN  registry 에 다른 패키지로 이미 있음: scripts/db_check.py → | 스크립트 | DB 접속 검사(psycopg, `POSTGRES_*`↔`DATABASE_URL` 불일�
+== 결과: FAIL=4 WARN=4 ==

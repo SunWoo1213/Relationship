@@ -44,3 +44,7 @@
 - 2026-09-04 12:36 | COMMIT | 7397966 docs(P0-compose): U3 README 로컬 DB 절·registry 반영, verify-impl 사전 실행
 - 2026-09-05 11:18 | COMMIT | 7d20a34 docs(wiki): P0-compose U3 커밋 반영 — HANDOFF·journal 정리, 03-log 해시 채움
 - 2026-09-05 11:35 | DONE | P0-compose 완료 승인(사용자). 수용 기준 통과, verify-impl PASS 10/WARN 0/FAIL 0 (evidence/20260905-1127-verify-impl.txt), 부정 케이스 5종 evidence/20260905-1121-review-*.txt, 소견 F-033bb1·F-0ffff5 해소. 닫는 R 없음 | P0-compose D4 D5 S3.1
+- 2026-09-05 11:50 | COMMIT | 819e1ac docs(P0-compose): 완료 — verifier 04-review 완료 판정·사용자 승인, 패키지 닫음
+- 2026-09-05 11:50 | PUSH | origin dev 819e1ac — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-05 11:52 | RELEASE | origin main ← dev 819e1ac
+- 2026-09-05 12:40 | START | P1-schema 착수: architect(opus) 계획 → verify-plan 1차 FAIL 4(수용 기준 절 구조) → 절 분리 → verifier(fable) 점검표 8행 통과(FAIL 0/WARN 4 의도, 권고 4건) → 사용자 승인 | P1-schema R8 R9 D4 D5 S3.1
