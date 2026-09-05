@@ -1,0 +1,49 @@
+....FF....                                                               [100%]
+================================== FAILURES ===================================
+__________________ test_answer_already_answered_returns_409 ___________________
+
+client = <starlette.testclient.TestClient object at 0x000001D67B8AA9E0>
+db_session = <sqlalchemy.orm.session.Session object at 0x000001D67B8A8770>
+
+    @dbtest
+    def test_answer_already_answered_returns_409(client: TestClient, db_session) -> None:
+        row = _make_question_row(
+            db_session,
+            created_at=_BASE_TIME,
+            answer="예",
+            answered_at=_BASE_TIME + timedelta(minutes=5),
+        )
+    
+        resp = client.post(f"/answers/{row.id}", json={"answer": "아니오"})
+    
+>       assert resp.status_code == 409
+E       assert 200 == 409
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests\test_api.py:186: AssertionError
+_________ test_answer_expired_returns_409_and_answered_at_stays_null __________
+
+client = <starlette.testclient.TestClient object at 0x000001D67B4E2B10>
+db_session = <sqlalchemy.orm.session.Session object at 0x000001D67B8A9350>
+
+    @dbtest
+    def test_answer_expired_returns_409_and_answered_at_stays_null(
+        client: TestClient, db_session
+    ) -> None:
+        row = _make_question_row(
+            db_session,
+            created_at=_BASE_TIME,
+        )
+        # 25시간 전으로 갱신해 만료시킨다.
+        row.created_at = datetime.now(timezone.utc) - timedelta(hours=25)
+        db_session.flush()
+    
+        resp = client.post(f"/answers/{row.id}", json={"answer": "예"})
+    
+>       assert resp.status_code == 409
+E       assert 200 == 409
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests\test_api.py:206: AssertionError
+2 failed, 8 passed in 1.14s
+exit=1
