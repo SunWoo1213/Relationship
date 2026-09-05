@@ -1,0 +1,17 @@
+== verify-impl P1-schema  (20260905-1439) ==
+.................................................                        [100%]
+49 passed in 0.82s
+PASS  pytest 통과 → evidence/20260905-1439-pytest.txt
+PASS  compileall 통과 → evidence/20260905-1439-lint.txt
+PASS  태그 P1-schema 커밋 10 건 → evidence/20260905-1439-commits.txt
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: D5
+PASS  커밋에 태그 존재: R8
+PASS  커밋에 태그 존재: R9
+PASS  커밋에 태그 존재: S3.1
+PASS  검토자 = verifier (L-002)
+PASS  증거 확인:  9개 테이블 생성  ← evidence/20260905-1433-verifier-independ
+PASS  증거 확인:  `events.type` 제약 존재  ← evidence/20260905-1433-verifier-independ
+PASS  registry 에 P1-schema 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=0 → evidence/20260905-1439-summary.txt ==

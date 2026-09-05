@@ -13,8 +13,8 @@
 | R5 | H | 임베딩 공급자 미정, 차원 1536은 가정 | 구현완료(876a450, reports/embed_pilot.md: OpenAI text-embedding-3-small, N=1536) | D4 → P0-embed-pilot |
 | R6 | M | 신규 인물 자동등록 vs 확인형 불일치 | 결정완료 | D1 → S3.4 → P2-tools, P5-loop |
 | R7 | M | ask_user 동기 반환 불가 | 결정완료 | D2 → S3.4 → P2-tools, P5-loop |
-| R8 | M | 시맨틱→원문 링크 없음 | 결정완료 | S3.1 `fact_sources` → P1-schema, P6-memory |
-| R9 | M | 인물당 임베딩 1개 | 결정완료 | D5 → S3.1 → P1-schema, P3-er |
+| R8 | M | 시맨틱→원문 링크 없음 | 구현완료(4dfaf33, 09c2bd1 — fact_sources(fact_id, event_id) 복합 PK·FK CASCADE 2; P6-memory 가 승격 시 채움) | S3.1 `fact_sources` → P1-schema, P6-memory |
+| R9 | M | 인물당 임베딩 1개 | 구현완료(4dfaf33, 09c2bd1 — person_aliases.embedding vector(1536) nullable, person_embeddings 없음; P3-er 가 후보 검색에 사용) | D5 → S3.1 → P1-schema, P3-er |
 | R10 | M | 툴 시그니처 ↔ 스키마 불일치 | 해소(문서) | S3.2 |
 | R11 | M | 반복 패턴 감지 메커니즘 없음 | 결정완료 | D9 → S3.5 → P6-memory |
 | R12 | M | 브리핑 트리거·푸시 구독 저장소 없음 | 결정완료 | S3.6 → P6-briefing, P7-push |

@@ -1,0 +1,5 @@
+== impl-review P1-schema (verifier, 2026-09-05 14:46) — 04-review §6 권고 관찰 (완료를 막지 않음) ==
+WARN  registry.md 커밋 열 부정확: app/config.py 행(38)에 9397066·4dfaf33·09c2bd1·03e3ce3, app/db/base.py 행(39)에 4dfaf33 이 적혔으나 두 파일을 건드린 커밋은 d7113e9 뿐(git log -- app/config.py app/db/base.py). 03-log U5 "신규 행 11개" 도 실제 P1-schema 소유 행 10개(requirements 2파일이 1행)
+WARN  app/config.py ConnInfo 기본 dataclass repr/str 에 password 필드 포함 — 객체를 로그·예외 메시지에 찍으면 비밀 유출 경로(security.md §1). tests/test_config.py 는 safe_summary 만 검사. P0-compose db_check.py 에서 그대로 옮겨진 기존 결함(P2-tools 세션·엔진 도입 전에 field(repr=False) 권고)
+WARN  alembic/script.py.mako 가 docstring 에 "Refs: P1-schema R8 R9 D4 D5 S3.1" 을 고정 — 후속 revision(P3-er 벡터 인덱스 등)이 P1-schema Refs 를 상속해 태그 추적(git log --grep)이 오염됨. revision 생성 시 Refs 줄을 그 패키지 태그로 고쳐 쓰는 절차 필요
+== 결과: FAIL=0 WARN=3 ==

@@ -3,7 +3,7 @@
 > `findings.py` 가 검증 출력에서 만든다. 소견 본문(원인·해결 단계·재검증·영향)은 에이전트가 채우고, 해결 단계의 완료 판정 명령을 실제로 실행한 출력이 증거다. 소견은 지우지 않는다(해소만 한다).
 > 루프: 검증 → 소견 → 단계별 조치 → 재검증(같은 명령) → 해소. 같은 소견이 3회 재검증 후에도 열려 있으면 사용자에게 보고한다.
 
-갱신: 2026-09-05 12:27 | 출처: review | 열림: 7 (필수 0) | 해소: 4
+갱신: 2026-09-05 14:40 | 출처: verify-impl | 열림: 6 (필수 0) | 해소: 9
 
 ## F-b3534b · [필수] 없음: docs/wiki/packages/P1-schema/02-plan-verify.md
 상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-05
@@ -188,7 +188,7 @@ WARN  registry 에 다른 패키지로 이미 있음: scripts/db_check.py → | 
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-ace4dd · [권고] 접속 해석 규칙 이중 구현 위험: app/config.py 와 scripts/db_check.py resolve_connection() — 재사용/재구현 미결정 (01-plan 16행, CLAUDE.md 중복 구현 금지, P0-compose 04-review O5)
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -216,7 +216,7 @@ WARN  접속 해석 규칙 이중 구현 위험: app/config.py 와 scripts/db_ch
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-081752 · [권고] pending_questions status 파생 규칙 불완전: S3.4 status=expired 는 answered_at IS NULL 외에 created_at 필요 (01-plan 116행) — 스키마 변경 불필요, P2-tools 인계
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -242,7 +242,7 @@ WARN  pending_questions status 파생 규칙 불완전: S3.4 status=expired 는 
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-08e812 · [권고] NULL 허용 정책이 타임스탬프 계열에만 명시 (01-plan 114행) — U2 결정을 03-log·tests/test_schema_models.py 에 남길 것
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -272,7 +272,7 @@ WARN  NULL 허용 정책이 타임스탬프 계열에만 명시 (01-plan 114행)
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-75c1c1 · [권고] POSTGRES_HOST(P0-compose O5) 처리 미결정 — app/config.py 가 읽으면 .env.example 에 이름 추가, 아니면 db_check.py 132행 정리 여부를 03-log 에
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
 
 ### 증상 (검증 출력 인용)
 ```
@@ -292,6 +292,110 @@ WARN  POSTGRES_HOST(P0-compose O5) 처리 미결정 — app/config.py 가 읽으
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P1-schema` (계획 단계면 `verify-plan.sh P1-schema`)
 - 결과 파일(evidence/): 20260905-1243-remediation-f-ace4dd-f-75c1c1.txt
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+
+## F-14f3ef · [권고] 04-review.md 없음 (완료 검토 전이면 정상)
+상태: 해소 | 발견: 2026-09-05 (verify-impl) | 해소: 2026-09-05
+
+### 증상 (검증 출력 인용)
+```
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+```
+
+### 원인 분석
+- 가설: verify-impl 5번은 04-review.md 부재를 WARN 으로 낸다. 이 실행(evidence/20260905-1431-verify-impl.txt)은 verifier 가 04-review 를 쓰기 전의 사전 실행이라 절차상 정상. 04-review.md 작성 후 같은 명령을 재실행하면 사라진다.
+- 확인 방법(명령): `ls docs/wiki/packages/P1-schema/04-review.md`
+- 확인 결과: 2026-09-05 14:31 시점 부재(01~03·05 만 존재). verifier 가 04-review.md 를 쓴 뒤 재실행 — 결과 파일은 04-review §1 최종 출력.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 |  |  |  | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P1-schema` (계획 단계면 `verify-plan.sh P1-schema`)
+- 결과 파일(evidence/):
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+
+## F-36bed6 · [권고] registry.md 커밋 열 부정확: app/config.py 행(38)에 9397066·4dfaf33·09c2bd1·03e3ce3, app/db/base.py 행(39)에 4dfaf33 이 적혔으나 두 파일을 건드린 커밋은 d7113e9 뿐(git log -- app/config.py app/db/base.py). 03-log U5 "신규 행 11개" 도 실제 P1-schema 소유 행 10개(requirements 2파일이 1행)
+상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  registry.md 커밋 열 부정확: app/config.py 행(38)에 9397066·4dfaf33·09c2bd1·03e3ce3, app/db/base.py 행(39)에 4dfaf33 이 적혔으나 두 파일을 건드린 커밋은 d7113e9 뿐(git log -- app/config.py app/db/base.py). 03-log U5 "신규 행 11개" 도 실제 P1-schema 소유 행 10개(requirements 2파일이 1행)
+```
+
+### 원인 분석
+- 가설: U5(ec2fe8c)가 registry 신규 행의 커밋 열을 파일별 실제 변경 커밋이 아니라 '패키지 진행 중 커밋 누적'으로 적었다. app/config.py 행(38)의 5개 해시 중 d7113e9 만 이 파일을 건드렸고, base.py 행(39)의 4dfaf33 은 models.py 만 추가한 커밋이다. 03-log U5 의 '신규 행 11개' 는 산출물 파일 수(requirements 2개)를 행 수로 센 오기. 코드·DDL 과 무관한 기록 정확성 문제.
+- 확인 방법(명령): `git log --oneline -- app/config.py app/db/base.py` ; `grep -cE '^\|[^|]*\|[^|]*\|[^|]*\| P1-schema \|' docs/wiki/registry.md`
+- 확인 결과: git log: d7113e9 한 건뿐(evidence/20260905-1440-verifier-static-checks.txt [S10]). P1-schema 소유 행 10개. 해결은 메인 세션/backend-agent — registry 38·39행 커밋 열을 `d7113e9` 로, 03-log 는 고쳐 쓰지 않으므로(형식 고정) 04-review §5 에 정정 기록.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | docs/wiki/registry.md 38·39행 커밋 열을 `d7113e9` 로 정정(메인 세션, /devlog done). 03-log U5 항목은 고쳐 쓰지 않음(로그 원칙) — 실제 신규 행 수 10 을 이 소견에 기록 | `git log --oneline --format=%h -- app/config.py app/db/base.py` 와 registry 38·39행 커밋 열 비교 | 둘 다 `d7113e9` 만 | 완료 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P1-schema` (계획 단계면 `verify-plan.sh P1-schema`)
+- 결과 파일(evidence/): 완료 커밋(/devlog done) 해시 — journal DONE 줄 참조
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+
+## F-8eeb9b · [권고] app/config.py ConnInfo 기본 dataclass repr/str 에 password 필드 포함 — 객체를 로그·예외 메시지에 찍으면 비밀 유출 경로(security.md §1). tests/test_config.py 는 safe_summary 만 검사. P0-compose db_check.py 에서 그대로 옮겨진 기존 결함(P2-tools 세션·엔진 도입 전에 field(repr=False) 권고)
+상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  app/config.py ConnInfo 기본 dataclass repr/str 에 password 필드 포함 — 객체를 로그·예외 메시지에 찍으면 비밀 유출 경로(security.md §1). tests/test_config.py 는 safe_summary 만 검사. P0-compose db_check.py 에서 그대로 옮겨진 기존 결함(P2-tools 세션·엔진 도입 전에 field(repr=False) 권고)
+```
+
+### 원인 분석
+- 가설: `ConnInfo` 는 `@dataclass` 기본 `__repr__` 을 쓰므로 `repr(conn)`/`str(conn)`/f-string 에 password 필드가 그대로 들어간다. 현재 코드 경로(db_check·schema_check·alembic env.py)는 `safe_summary()` 만 출력해 실제 유출은 없으나, P2-tools 가 예외 메시지나 로그에 객체를 찍는 순간 security.md §1 '로그에 비밀을 남기지 않는다' 위반이 된다. P0-compose 의 db_check.py 정의를 그대로 옮긴 것(03-log U1 'byte 단위로 옮김')이라 P1 에서 새로 생긴 결함은 아니다.
+- 확인 방법(명령): `python - <<'PY' … resolve_connection({'POSTGRES_PASSWORD':'FAKE_SECRET_XYZ'}) ; 'FAKE_SECRET_XYZ' in repr(conn)`
+- 확인 결과: repr/str 모두 True, safe_summary False (evidence/20260905-1445-verifier-conninfo-repr.txt). 해결은 backend-agent(P2-tools 착수 단위) — `password: str = field(repr=False)` + tests/test_config.py 에 `repr(conn)` 검사 1건 추가.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 |  |  |  | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P1-schema` (계획 단계면 `verify-plan.sh P1-schema`)
+- 결과 파일(evidence/):
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+
+## F-c7078e · [권고] alembic/script.py.mako 가 docstring 에 "Refs: P1-schema R8 R9 D4 D5 S3.1" 을 고정 — 후속 revision(P3-er 벡터 인덱스 등)이 P1-schema Refs 를 상속해 태그 추적(git log --grep)이 오염됨. revision 생성 시 Refs 줄을 그 패키지 태그로 고쳐 쓰는 절차 필요
+상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  alembic/script.py.mako 가 docstring 에 "Refs: P1-schema R8 R9 D4 D5 S3.1" 을 고정 — 후속 revision(P3-er 벡터 인덱스 등)이 P1-schema Refs 를 상속해 태그 추적(git log --grep)이 오염됨. revision 생성 시 Refs 줄을 그 패키지 태그로 고쳐 쓰는 절차 필요
+```
+
+### 원인 분석
+- 가설: U3 가 위임 요구('모듈 docstring 첫 줄 Refs')를 revision 파일이 아니라 템플릿(script.py.mako 3행)에 고정 문자열로 넣었다. `alembic revision` 이 만드는 모든 후속 파일이 P1-schema 태그를 갖게 되어 `git log --grep P1-schema`·카드 영향 범위 계산(INDEX '태그 어휘')이 오염된다. 0001 자체는 올바른 Refs.
+- 확인 방법(명령): `grep -n 'Refs:' alembic/script.py.mako alembic/versions/*.py`
+- 확인 결과: script.py.mako:3 에 고정 `Refs: P1-schema R8 R9 D4 D5 S3.1`, 0001_schema_v2.py:1 동일(정상). 해결은 P3-er 첫 revision 작성 시 — 템플릿을 `Refs: ${message}` 류 자리표시자로 바꾸거나 생성 직후 Refs 줄을 그 패키지 태그로 교체하는 절차를 P2/P3 01-plan 에 명시.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 |  |  |  | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P1-schema` (계획 단계면 `verify-plan.sh P1-schema`)
+- 결과 파일(evidence/):
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드

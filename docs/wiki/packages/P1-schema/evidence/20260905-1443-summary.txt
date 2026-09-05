@@ -1,0 +1,2 @@
+verify-impl P1-schema 20260905-1443
+FAIL=0 WARN=0

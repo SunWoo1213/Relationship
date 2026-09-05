@@ -55,3 +55,5 @@
 - 2026-09-05 13:58 | DECISION | dev 4dfaf33 승격 보류 — P1-schema U3~U5 완료 후 패키지 단위로 승격(사용자). 작업 계속을 위해 대기 마커 해제(--decision fix) | P1-schema L-003
 - 2026-09-05 14:06 | COMMIT | 09c2bd1 feat(P1-schema): U3 Alembic 도입·0001 스키마 v2 마이그레이션 — 로컬 upgrade head 9테이블
 - 2026-09-05 14:19 | COMMIT | 03e3ce3 feat(P1-schema): U4 schema_check.py + upgrade→downgrade base→upgrade 왕복 증거·alembic check
+- 2026-09-05 14:27 | COMMIT | ec2fe8c docs(P1-schema): U5 registry·README 마이그레이션 절·db_check version(), verify-impl 사전 실행
+- 2026-09-05 15:50 | DONE | P1-schema 완료 승인(사용자). 수용 기준 통과(독립 쿼리 9테이블·events CHECK 7값), verify-impl PASS/WARN 0/FAIL 0 (evidence/20260905-1439-verify-impl-final.txt), 변이 4종·expect-empty·badport·alembic check 직접 실행, R8 R9 구현완료(4dfaf33, 09c2bd1). 권고 F-8eeb9b(ConnInfo repr)→P2-tools, F-c7078e(mako Refs)→P3-er, F-36bed6 registry 정정 | P1-schema R8 R9 D4 D5 S3.1

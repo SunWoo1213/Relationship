@@ -1,0 +1,120 @@
+== verifier static checks (2026-09-05 14:40) ==
+
+[S1] alembic.ini sqlalchemy.url line:
+93:sqlalchemy.url =
+hangul lines in alembic.ini: 0
+
+[S2] secret patterns in tracked source (sk-/AKIA/BEGIN PRIVATE/password=<literal>) excluding evidence/docs:
+.claude/scripts/test-guards.sh:106:expect_allow "$H/secret-guard.sh" 'db url without long password' "$(mkw 'C:\Capstone2\.env.example' 'DATABASE_URL=postgresql://app:pass@localhost:5432/relationship')"
+.env.example:14:DATABASE_URL=postgresql://app:pass@localhost:5432/relationship
+app/config.py:72:        return f"postgresql+psycopg://{user}:{password}@{self.host}:{self.port}/{self.dbname}"
+tests/test_config.py:14:        "DATABASE_URL": "postgresql://urluser:pw1@urlhost:1111/urldb",
+tests/test_config.py:54:        "DATABASE_URL": f"postgresql://app:{pwone}@localhost:5432/relationship",
+tests/test_db_check.py:44:    fake = {"DATABASE_URL": "postgresql://app:pass@localhost:5432/relationship"}
+tests/test_db_check.py:85:        "DATABASE_URL": "postgresql://app:pass@localhost:5432/relationship",
+tests/test_db_check.py:96:    parsed = dc.parse_database_url("postgresql://u:p@h:1234/d")
+
+[S2b] DEFAULT_PASSWORD occurrences:
+app/config.py:31:DEFAULT_PASSWORD = "pass"
+docs/wiki/packages/P0-compose/04-review.md:53:| 키 문자열·실제 비밀번호 부재 | `grep -n -E 'sk-…\|AKIA…\|-----BEGIN\|api[_-]?key…' .env.example docker-compose.yml docker/initdb/01-vector.sql scripts/db_check.py tests/test_db_check.py README.md` ; `grep -n -i password …` | evidence/20260905-1121-review-static.txt — 키 패턴 0건(exit 1); `password` 등장 줄은 `.env.example:17 POSTGRES_PASSWORD=pass`(공개 예시값), compose 9행 `${POSTGRES_PASSWORD:-pass}`, db_check 의 필드명·`DEFAULT_PASSWORD = "pass"`·주석뿐 |
+docs/wiki/packages/P0-compose/evidence/20260905-1121-review-static.txt:10:scripts/db_check.py:36:DEFAULT_PASSWORD = "pass"
+
+[S3] docker/ and docker-compose.yml commit history (must stop at P0-compose):
+749bb8e feat(P0-compose): U1 로컬 pgvector compose — .env.example 이름 4개·compose·initdb
+working tree diff on docker/: []
+
+[S4] out-of-scope artifacts: app/main.py exists? no; FastAPI import: none
+relationship() in app/: none
+hnsw/ivfflat in code: none
+person_embeddings in code (should be only absence checks/comments):
+app/db/models.py:7:임의 컬럼(`status`, `users`, 인물-인물 관계 테이블, `person_embeddings`)을
+scripts/schema_check.py:20:  4. `person_embeddings` 테이블과 인물-인물 관계처럼 보이는 이름
+scripts/schema_check.py:51:FORBIDDEN_TABLES: tuple[str, ...] = ("person_embeddings", "person_relations", "relationships")
+scripts/schema_check.py:285:        "person_embeddings / person-person relation tables absent (R9, 원칙7)",
+tests/test_schema_check.py:27:def test_expected_tables_excludes_person_embeddings_and_relation_tables():
+tests/test_schema_check.py:29:    for forbidden in ("person_embeddings", "person_relations", "relationships"):
+tests/test_schema_models.py:120:def test_table_name_set_matches_s3_1_exactly_and_person_embeddings_absent():
+tests/test_schema_models.py:121:    """9개 테이블 이름이 S3.1 과 정확히 같고 person_embeddings 는 없다(D5 R9)."""
+tests/test_schema_models.py:125:    assert "person_embeddings" not in names
+status column in models/migration: none
+sessionmaker/create_engine in app/: none
+users table / person_relations in models: none
+
+[S5] D-R-O-P token locations across repo (pattern split to avoid guard):
+      1 .claude/scripts/test-guards.sh
+     19 alembic/versions/0001_schema_v2.py
+      1 docs/wiki/evidence/20260903-test-guards-L001.txt
+      1 docs/wiki/evidence/20260903-test-guards-L002.txt
+      1 docs/wiki/evidence/20260903-test-guards-L003.txt
+      1 docs/wiki/evidence/20260903-test-guards-L004.txt
+      1 docs/wiki/evidence/20260903-test-guards.txt
+      3 docs/wiki/packages/P1-schema/01-plan.md
+      2 docs/wiki/packages/P1-schema/02-plan-verify.md
+      1 docs/wiki/packages/P1-schema/03-log.md
+     19 docs/wiki/packages/P1-schema/evidence/20260905-1400-0001-autogenerate-raw.py.txt
+-- evidence files containing a d-r-o-p token:
+docs/wiki/packages/P1-schema/evidence/20260905-1400-0001-autogenerate-raw.py.txt
+-- shell-executed forms (psql -c / cur.execute with token) in scripts/tests/evidence:
+none
+
+[S6] roundtrip evidence exit lines:
+20260905-1414-roundtrip-1-schema-check-before.txt -> exit=0
+20260905-1414-roundtrip-2-downgrade.txt -> exit=0
+20260905-1414-roundtrip-3-empty.txt -> exit=0
+20260905-1414-roundtrip-4-upgrade.txt -> exit=0
+20260905-1414-roundtrip-5-schema-check-after.txt -> exit=0
+20260905-1414-alembic-check-after-roundtrip.txt -> exit=0
+20260905-1414-schema-check-badport.txt -> exit=2
+20260905-1414-schema-check-database-url.txt -> exit=0
+-- roundtrip-3 key lines:
+[PASS] 9 tables absent (--expect-empty) -> 0 tables (as expected)
+[skip] CHECK/PK/FK/vector/index structural checks -> 9 테이블이 모두 있지 않아 테이블 의존 검사를 건너뜀
+[PASS] person_embeddings / person-person relation tables absent (R9, 원칙7) -> none found
+[info] alembic_version -> (empty)
+-- roundtrip-2 / -4 alembic lines:
+docs/wiki/packages/P1-schema/evidence/20260905-1414-roundtrip-2-downgrade.txt:INFO  [alembic.runtime.migration] Running downgrade 0001 -> , Refs: P1-schema R8 R9 D4 D5 S3.1
+docs/wiki/packages/P1-schema/evidence/20260905-1414-roundtrip-4-upgrade.txt:INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Refs: P1-schema R8 R9 D4 D5 S3.1
+-- password token scan over all P1-schema evidence (':pass@' and 'postgresql://...:...@'):
+docs/wiki/packages/P1-schema/evidence/20260905-1437-verifier-badport-5599.txt
+docs/wiki/packages/P1-schema/evidence/20260905-1440-verifier-static-checks.txt
+
+[S7] requirements pins vs pip freeze evidence:
+SQLAlchemy==2.0.50
+alembic==1.19.2
+psycopg-binary==3.3.5
+psycopg==3.3.5
+pgvector==0.5.0
+pytest==9.0.3
+
+[S8] alembic.ini cp949 reason recorded in 03-log: 4 lines; in commit 09c2bd1 msg: 1
+
+[S9] 03-log Refs lines vs commit Refs:
+11:- Refs: P1-schema R8 R9 D4 D5 S3.1
+18:- Refs: P1-schema R8 R9 D4 D5 S3.1 F-ace4dd F-75c1c1
+27:- Refs: P1-schema R8 R9 D4 D5 S3.1 F-08e812
+56:- Refs: P1-schema R8 R9 D4 D5 S3.1
+79:- Refs: P1-schema R8 R9 D4 D5 S3.1
+87:- Refs: P1-schema R8 R9 D4 D5 S3.1
+9397066  Refs: P1-schema R8 R9 D4 D5 S3.1
+d7113e9  Refs: P1-schema R8 R9 D4 D5 S3.1 F-ace4dd F-75c1c1
+4dfaf33  Refs: P1-schema R8 R9 D4 D5 D9 S3.1 F-08e812
+09c2bd1  Refs: P1-schema R8 R9 D4 D5 S3.1
+03e3ce3  Refs: P1-schema R8 R9 D4 D5 S3.1
+ec2fe8c  Refs: P1-schema R8 R9 D4 D5 S3.1
+
+[S10] registry: P1-schema-owned rows = 10; README.md rows = 1; scripts/db_check.py rows = 1
+files touched per commit vs registry hash column for app/config.py: d7113e9 feat(P1-schema): U1 백엔드 골격·requirements·app.config 접속 설정 단일화;
+
+[S11] README P1 row:
+71:| P1 | 스키마 v2 마이그레이션 (Alembic) | **구현 완료 · 검증 대기** — 9테이블·CHECK 4·FK CASCADE 6·`vector(1536)`·인덱스 10, upgrade/downgrade 왕복 확인. 04-review(verifier) 전 |
+72:| P1 | 파일럿 데이터셋 | 대기 |
+85:docs/resolution-plan.md   결정 D1~D10 · 설계 명세 S3.1~S3.7 · 구현 순서 P0~P11
+145:- P1-schema(스키마 마이그레이션)는 이 로컬 DB가 떠 있는 것을 선행 조건으로 쓴다.
+153:alembic upgrade head
+156:python scripts/schema_check.py
+162:alembic downgrade base
+169:POSTGRES_PORT=5433 alembic upgrade head
+174:$env:POSTGRES_PORT="5433"; alembic upgrade head
+177:서버 버전은 로컬 pg16 기준으로 검증했다(`scripts/schema_check.py`·`scripts/db_check.py`의 `SELECT version()` 출력). RDS 메이저 버전은 P9-infra에서 재확인한다.
+
+[S12] .env.example POSTGRES_HOST: 20:POSTGRES_HOST=localhost

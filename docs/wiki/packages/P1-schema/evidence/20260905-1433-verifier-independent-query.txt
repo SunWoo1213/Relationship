@@ -1,0 +1,37 @@
+[info] host=localhost port=5433 dbname=relationship user=app
+[Q1] information_schema.tables 9-set rows=9 -> ['agent_traces', 'events', 'fact_sources', 'pending_questions', 'person_aliases', 'person_facts', 'persons', 'push_subscriptions', 'schedules']
+[Q1b] all public tables (10) -> ['agent_traces', 'alembic_version', 'events', 'fact_sources', 'pending_questions', 'person_aliases', 'person_facts', 'persons', 'push_subscriptions', 'schedules']
+[Q2] events CHECK -> [('ck_events_type_valid', "CHECK ((type = ANY (ARRAY['conflict'::text, 'praise'::text, 'meal'::text, 'meeting'::text, 'personal_share'::text, 'favor'::text, 'other'::text])))")]
+[Q3] all CHECK constraints (4):
+       ('events', 'ck_events_type_valid', "CHECK ((type = ANY (ARRAY['conflict'::text, 'praise'::text, 'meal'::text, 'meeting'::text, 'personal_share'::text, 'favor'::text, 'other'::text])))")
+       ('pending_questions', 'ck_pending_questions_kind_valid', "CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text])))")
+       ('persons', 'ck_persons_hierarchy_valid', "CHECK ((hierarchy = ANY (ARRAY['상'::text, '동'::text, '하'::text])))")
+       ('persons', 'ck_persons_relation_tag_valid', "CHECK ((relation_tag = ANY (ARRAY['가족'::text, '연인'::text, '친구'::text, '직장'::text, '지인'::text])))")
+[Q4] person_aliases.embedding (format_type, attnotnull) -> ('vector(1536)', False)
+[Q5] person_embeddings count -> 0
+[Q6] fact_sources PK -> [('pk_fact_sources', 'PRIMARY KEY (fact_id, event_id)')]
+[Q7] FK rows=6 all_cascade=True
+       ('events', 'fk_events_person_id_persons', 'c')
+       ('fact_sources', 'fk_fact_sources_event_id_events', 'c')
+       ('fact_sources', 'fk_fact_sources_fact_id_person_facts', 'c')
+       ('person_aliases', 'fk_person_aliases_person_id_persons', 'c')
+       ('person_facts', 'fk_person_facts_person_id_persons', 'c')
+       ('schedules', 'fk_schedules_person_id_persons', 'c')
+[Q8] ix_* indexes=10
+       ('agent_traces', 'ix_agent_traces_session_id_created_at')
+       ('events', 'ix_events_person_id_occurred_at')
+       ('fact_sources', 'ix_fact_sources_event_id')
+       ('pending_questions', 'ix_pending_questions_session_id_created_at')
+       ('pending_questions', 'ix_pending_questions_session_id_unanswered')
+       ('person_aliases', 'ix_person_aliases_alias')
+       ('person_aliases', 'ix_person_aliases_person_id')
+       ('person_facts', 'ix_person_facts_person_id_key')
+       ('persons', 'ix_persons_user_id')
+       ('schedules', 'ix_schedules_scheduled_at')
+[Q9] column counts per table -> [('agent_traces', 9), ('events', 7), ('fact_sources', 2), ('pending_questions', 9), ('person_aliases', 6), ('person_facts', 6), ('persons', 7), ('push_subscriptions', 5), ('schedules', 5)] total=56
+[Q10] nullable columns -> [('pending_questions', 'answer'), ('pending_questions', 'answered_at'), ('person_aliases', 'confirmed_at'), ('person_aliases', 'embedding'), ('schedules', 'briefed_at')]
+[Q11] vector indexes (hnsw/ivfflat) -> 0
+[Q12] pending_questions.status column -> []
+[Q13] alembic_version -> [('0001',)]
+[Q14] vector extversion -> ('0.8.6',)
+exit=0

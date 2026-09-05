@@ -1,0 +1,47 @@
+== verifier mutation check on app/db/models.py (2026-09-05 14:35) ==
+baseline: 
+baseline git diff --stat app/db/models.py: []
+
+--- M1: remove "other" from EVENT_TYPES tuple ---
+ app/db/models.py | 1 -
+ 1 file changed, 1 deletion(-)
+FAILED tests/test_schema_models.py::test_events_type_check_contains_all_seven_event_types
+FAILED tests/test_schema_check.py::test_check_value_constants_are_the_same_object_as_models_not_redefined
+2 failed, 26 passed in 0.93s
+M1 pytest rc=1
+warning: in the working copy of 'app/db/models.py', LF will be replaced by CRLF the next time Git touches it
+restored -> git diff --stat: []
+
+--- M2: remove 'other' from the events CheckConstraint SQL literal (EVENT_TYPES untouched) ---
+ app/db/models.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+FAILED tests/test_schema_models.py::test_events_type_check_contains_all_seven_event_types
+1 failed, 16 passed in 0.81s
+M2 pytest rc=1
+warning: in the working copy of 'app/db/models.py', LF will be replaced by CRLF the next time Git touches it
+restored -> git diff --stat: []
+
+--- M3: drop ondelete=CASCADE on schedules.person_id FK ---
+ app/db/models.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+FAILED tests/test_schema_models.py::test_all_six_foreign_keys_have_ondelete_cascade
+1 failed, 16 passed in 0.83s
+M3 pytest rc=1
+warning: in the working copy of 'app/db/models.py', LF will be replaced by CRLF the next time Git touches it
+restored -> git diff --stat: []
+
+--- M4: make embedding NOT NULL + dim 3072 ---
+ app/db/models.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+FAILED tests/test_schema_models.py::test_person_aliases_embedding_is_nullable_vector_of_dimension_1536
+FAILED tests/test_schema_models.py::test_nullable_columns_are_exactly_the_five_deferred_fields
+FAILED tests/test_schema_models.py::test_ddl_compiles_with_vector_1536_and_on_delete_cascade_in_postgresql_dialect
+3 failed, 14 passed in 0.85s
+M4 pytest rc=1
+warning: in the working copy of 'app/db/models.py', LF will be replaced by CRLF the next time Git touches it
+restored -> git diff --stat: []
+
+--- post-restore full suite ---
+49 passed in 0.60s
+final: cmp orig = IDENTICAL
+final git status --short (code paths):

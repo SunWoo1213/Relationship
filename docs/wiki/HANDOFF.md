@@ -5,42 +5,34 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-05 15:10 (U5 구현 완료 — 구현 단위 U1~U5 전부 끝, 커밋 직전)
-active: **P1-schema** | frozen: none | 브랜치: dev (dev = origin/dev = **main = 819e1ac**). dev = origin/dev = **4dfaf33**(9397066 착수·d7113e9 U1·4dfaf33 U2 푸시됨). main = 819e1ac. **사용자 결정(2026-09-05): 승격은 P1-schema 완료 후 한 번에** — 대기 마커 해제, U3 진행
+갱신: 2026-09-05 15:55 (P1-schema 완료 처리, 완료 커밋 직전)
+active: none | frozen: none | 브랜치: dev (origin/dev = 4dfaf33, main = 819e1ac. 로컬 dev 는 09c2bd1·03e3ce3·ec2fe8c + 완료 커밋 = 4개 앞섬, **미푸시**)
 
 ## 지금 어디까지
-- **P1-schema 착수 진행 중(2026-09-05)**: 사용자 "P1-schema 시작해줘" → 선행 확인(P0-embed-pilot·P0-compose 04-review 완료, R8 R9, registry 중복 없음) → `--stage architect` → architect(opus) 01-plan 초안(U1 골격·requirements / U2 모델 9개+테스트 / U3 Alembic 0001 / U4 schema_check+왕복 evidence / U5 registry·README·db_check version()) → verify-plan 1차 FAIL 4/WARN 4 → 수용 기준 절의 판정 방법 불릿 3개를 `## 판정 방법` 절로 분리(구조만) → 2차 FAIL 1(02-plan-verify 부재)/WARN 4(README·db_check 기존 행, 의도) → 05-remediation 소견 7건 원인·조치 기입 → `--stage verifier` → verifier 02-plan-verify **통과**(FAIL 0/WARN 4 의도, 점검표 8행, 권고 4건 F-ace4dd 접속조립 단일구현 / F-081752 expired 파생은 P2 / F-08e812 NOT NULL 정책 U2 / F-75c1c1 POSTGRES_HOST U5) → **사용자 계획 승인(2026-09-05)** → active: P1-schema.
-- **P0-compose 완료(2026-09-05)** — verifier(fable) 04-review `결과: 완료`, 사용자 승인. verify-impl PASS 10/WARN 0/FAIL 0 (`evidence/20260905-1127-verify-impl.txt`). 부정 케이스 5종을 verifier 가 직접 실행(`evidence/20260905-1121-review-{compose,db-check,mutation,pytest,static}.txt`). 소견 F-033bb1·F-0ffff5 해소, 열린 소견 0. 닫는 R 없음.
-- 이번 세션 커밋: 7d20a34(위키 정리), 819e1ac(P0-compose 완료). 2026-09-05 dev 푸시 → 사용자 승격 결정 → main = 819e1ac.
-- 04-review §6 관찰 O1~O7 은 조치 없이 기록(P1-schema 인계): db_check.py 서버 버전 미출력(`SELECT version()` 권고), `POSTGRES_HOST` 이름이 .env.example 에 없음, tests/test_db_check.py registry 독립 행 없음, evidence 에 compose config 해석값(예시값) 포함 → 앞으로 `--quiet`, 5432 영구 해결은 사용자 몫.
-- **P1-schema 인계(04-review §7)**: 이름 4개 + `DATABASE_URL` 동일값, compose 기본값 = `.env.example` 예시값; `vector` 0.8.6 / `pgvector/pgvector:pg16`; `person_aliases.embedding vector(1536)` 은 Alembic 으로(initdb 에 SQL 추가 금지); 볼륨 삭제는 사용자만; pg16↔RDS 메이저는 P9-infra 재확인; 의존성 선언 파일 없음(`psycopg[binary]` 3.3.5 가 첫 항목).
-- .env.example 은 추적 유지 확정(2026-09-04). 다시 꺼내지 않는다.
-- Docker: 컨테이너 capstone2-postgres-1 은 **호스트 5433**(5432 는 무관한 finance_postgres). 셸 변수 없이 `docker compose up -d` 하면 충돌 — README 로컬 DB 절 안내대로 .env 포트를 바꾸거나 무관 컨테이너 정리(사용자 몫).
-- 팀 밑작업(Agent Teams): 사용자 결정 **보류**.
+- **P1-schema 완료(2026-09-05)** — U1~U5 커밋(d7113e9 골격·config / 4dfaf33 모델 9개 / 09c2bd1 Alembic 0001 / 03e3ce3 schema_check·왕복 / ec2fe8c registry·README·db_check version) → verifier(fable) 04-review `결과: 완료`, 사용자 승인. verify-impl 최종 PASS/WARN 0/FAIL 0(`evidence/20260905-1439-verify-impl-final.txt`, done 후 재실행 `1552-verify-impl-done.txt` 동일). 수용 기준 "9개 테이블 생성, events.type 제약 존재" 를 verifier 독립 쿼리로 확인(컬럼 56). 변이 4종·expect-empty at head(exit 1)·badport(exit 2, 비밀 0회)·alembic check 직접 실행. R8 R9 → review-index "구현완료(4dfaf33, 09c2bd1)". backlog 체크, README P1 행 "완료", CURRENT none.
+- 권고 인계(조치 안 함): **F-8eeb9b** `app/config.py` ConnInfo dataclass 기본 repr 에 password 포함(현재 호출부는 safe_summary 만 사용 — 유출 없음) → **P2-tools 엔진·세션 도입 전 `field(repr=False)` + 테스트**. **F-c7078e** `alembic/script.py.mako` 에 P1-schema Refs 고정 → P3-er 첫 revision 때 교체. F-36bed6(registry 38·39행 커밋 열) 은 done 에서 정정 완료. F-081752(ask_user status=expired 파생에 created_at 24h 조건) → P2-tools.
+- P2-tools 인계(04-review §7): 모델·값 집합 상수는 `app.db.models` 에서 import(재정의 금지), 접속은 `app.config.resolve_connection()`/`sqlalchemy_url()`(엔진·sessionmaker·FastAPI 는 미구현 = P2), NOT NULL 계약(`person_aliases.source` 값 집합 미정), `agent_traces.tool_name/tokens` NOT NULL 과 툴 아닌 ER 단계 trace 규약(P3-er), 인물 삭제 사각지대(pending_questions·agent_traces 는 person FK 없음), `user_id` 출처, `person_facts` UNIQUE 미설정, 벡터 인덱스는 P3-er, requirements→pyproject 재검토.
+- 로컬 DB: capstone2-postgres-1 호스트 5433, 스키마 `0001 (head)` 적용 상태. 명령 앞에 `POSTGRES_PORT=5433`. 한글 출력은 `PYTHONIOENCODING=utf-8` + 파일 리다이렉트.
+- P0-compose 완료(819e1ac, main). .env.example 추적 유지 확정. 팀 밑작업(Agent Teams) 보류.
 
 ## 바로 다음에 할 것 (순서대로)
-1. (완료) 착수 커밋 9397066. **U1 구현 완료(backend-agent, 2026-09-05)**: requirements.txt(SQLAlchemy 2.0.50·alembic 1.19.2·psycopg[binary] 3.3.5·pgvector 0.5.0)·requirements-dev(pytest 9.0.3), app/config.py(접속 조립 단일 구현 — F-ace4dd, POSTGRES_HOST 선택 — F-75c1c1, sqlalchemy_url), app/db/base.py(Base+naming_convention), db_check.py 는 app.config import·re-export(기존 테스트 6건 무수정), tests/test_config.py 5건. pytest 21 passed, db_check 5433 재현 exit 0. evidence 20260905-1239/1242/1243-*. **커밋 d7113e9**.
-2. **U2 구현 완료(backend-agent, 2026-09-05)**: app/db/models.py 9모델(S3.1 컬럼 56개 1:1 — 7+6+6+2+7+5+9+5+9, CHECK 4 `ck_<table>_<col>_valid`, FK CASCADE 6, fact_sources 복합 PK, Vector(1536) nullable, 인덱스 10(부분 1), 값 집합 상수 EVENT_TYPES 등, NOT NULL 정책: nullable 은 embedding·confirmed_at·briefed_at·answer·answered_at 만 — F-08e812 닫음), tests/test_schema_models.py 17건, 변이 2건 FAILED 확인 후 원복. pytest 38 passed. evidence 20260905-1253-*. **커밋 4dfaf33, dev 푸시.**
-3. **U3 구현 완료(backend-agent, 2026-09-05)**: alembic.ini(url 공란, 주석은 영어 — cp949 configparser 가 한글 주석에서 UnicodeDecodeError), alembic/env.py(app.config 주입·render_item Vector), versions/0001_schema_v2.py(autogenerate 초안 대비 손보정은 CREATE EXTENSION 첫 줄 1건뿐 — 로컬 DB 에 확장이 이미 있어 diff 에 안 나옴; Vector·CHECK 4 이름·부분 인덱스·CASCADE 6·복합 PK 는 초안부터 정확). 로컬 5433 `upgrade head` exit 0 → 9테이블·CHECK·vector(1536)·FK c·부분 인덱스·version 0001 확인(PostgreSQL 16.15), `alembic check` "No new upgrade operations detected", pytest 38. evidence 20260905-1400/1401-*. **커밋 09c2bd1(로컬, 미푸시).**
-4. **U4 구현 완료(backend-agent, 2026-09-05)**: scripts/schema_check.py(기대값은 app.db.models 상수·Base.metadata 에서 import — 단일 출처, 13 PASS 항목, `--expect-empty`, exit 0/1/2, 비밀 미출력), tests/test_schema_check.py 11건. 왕복 8단계 evidence 20260905-1414-roundtrip-1~5·alembic-check-after-roundtrip·schema-check-badport(exit 2, 비밀번호 0회)·schema-check-database-url(source=DATABASE_URL) 모두 기대 exit. DB 는 0001(head) 상태로 복귀. pytest 49. 메인 세션 재실행 exit 0(PASS 13/FAIL 0). **커밋 03e3ce3(로컬, 미푸시).**
-5. **U5 구현 완료(backend-agent, 2026-09-05)**: registry 신규 11행 + README·db_check 행 비고 갱신(각 1행 유지), README 진행 표 P1 행 분리("구현 완료·검증 대기"/데이터셋 대기)·`### 스키마 마이그레이션 (Alembic)` 소절, db_check `SELECT version()` 한 줄. pytest 49, db_check server=PostgreSQL 16.15, verify-impl 사전 FAIL 0/WARN 2(04-review 없음·U5 미체크 시점 — 둘 다 정상). evidence 20260905-1423/1425-*. → `/commit` 진행 중.
-6. **구현 단위 U1~U5 전부 완료.** 다음: 사용자 승인 → `--stage verifier` → verifier 04-review(수용 기준 "9개 테이블 생성, events.type 제약 존재" ↔ evidence/20260905-1414-roundtrip-5·1401-tables-after-upgrade, 부정 케이스 직접 실행, 권고 F-081752 P2 인계 확인) → `/devlog done`(R8 R9 review-index "구현완료(해시)", backlog 체크, CURRENT none) → 푸시 → main 승격. 단위마다 `/commit`, 마이그레이션·schema_check 파일은 Write 도구로(Bash heredoc 에 DROP 문자열 금지).
+1. 완료 커밋 `/commit`(04-review·05·evidence·registry·review-index·backlog·README·CURRENT·journal·HANDOFF) — 진행 중 → **dev 푸시**(4커밋) → L-003: 사용자 결정 "P1-schema 완료 후 승격"이므로 **main 승격** 제안(`approve-commit.sh --release` → `git push origin dev:main`).
+2. 다음 패키지는 사용자 선택: **P2-tools**(backend-agent, 툴 7종 v2 + 단위 테스트, 의존 P1 스키마 충족) / **P1-pilot-dataset**(eval-agent, 30~50건, 의존 S3.7) / **P0-cost**(eval-agent, LLM 비용 실측, R13). `/devlog start <id>` — architect 위임 전 AskUserQuestion + `--stage architect`(L-004). P4 게이트: P5 이후는 P4-pilot-eval 전 시작 금지.
 
 ## 재개 시 읽을 카드 (이것만)
 - `docs/wiki/CURRENT.md`, `docs/wiki/INDEX.md`, `.claude/gitlog.md`
-- `packages/P1-schema/01-plan.md`(작업 단위·판정 방법·리스크), `02-plan-verify.md` §3, `05-remediation.md` 권고 4건, `packages/P0-compose/04-review.md` §7(인계)
-- `lessons/L-001-dev-branch.md`, `L-002-role-model-separation.md`, `L-003-stop-after-dev-push.md`, `L-004`(위임 게이트)
+- `packages/P1-schema/04-review.md` §6·§7(권고·인계), `docs/backlog.md` P1/P2 절
+- `lessons/L-001`~`L-004`
 
 ## 열린 질문 · 사용자 결정 대기
-- U5 커밋 승인 → verifier 04-review 시작 승인(L-004) → `/devlog done` → 푸시(미푸시 09c2bd1·03e3ce3·U5·done) → 승격. 승격은 P1-schema `/devlog done` 뒤. P0-cost(eval-agent) 착수 시점 — P1 과 병행할지 사용자 결정.
+- dev 푸시 뒤 main 승격(L-003).
+- 다음 패키지 선택(P2-tools / P1-pilot-dataset / P0-cost).
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)
 - 재개 시 커밋 안 된 변경·진행 중 항목이 있으면 **먼저 사용자에게 목록을 보이고 우선순위를 묻는다**(`/devlog resume`).
-- **점검표·완료 검토는 verifier 에게 위임**(L-002). 메인 세션이 직접 쓰면 verify-plan/impl 이 FAIL.
-- **위임은 묻고 시작**(L-004): architect/backend-agent/eval-agent/verifier 는 AskUserQuestion → `approve-commit.sh --stage <이름>` → Agent 1회. 마커 없으면 delegate-guard 가 거부.
-- **푸시는 `git push origin dev` 만**. 푸시 뒤 `.claude/.awaiting-decision` 이 생기면 승격/수정을 묻고 멈춘다(L-003). 승격은 `approve-commit.sh --release` → `git push origin dev:main`.
-- 승인 마커는 커밋 명령과 **다른 Bash 호출**에서 먼저 만든다. 정리 훅은 PostToolUse.
-- Bash 명령 문자열에 훅 금지 문구(볼륨을 지우는 compose 옵션, 강제 푸시 옵션, DROP)가 **텍스트로라도** 들어가면 차단된다. 그런 문구가 든 문서는 Write 도구로 쓴다.
-- `.env` 존재 확인(`test -f .env`)도 safety-guard 가 막는다. 스크립트가 키 부재를 스스로 보고하게 한다.
-- registry 에 README 행이 이미 있다(하네스 소유). 새 행을 만들지 말고 비고만 갱신한다. db_check.py 행(P0-compose 소유)도 같다.
-- `findings.py` 는 `PYTHONUTF8=1 PYTHONIOENCODING=utf-8` 를 붙여 실행(콘솔 cp949 에서 출력 중 UnicodeEncodeError — 파일은 써진 뒤라 결과는 유효). verify-plan.sh 의 `## 수용 기준` 절에는 backlog 문장 불릿만 둔다(설명 불릿은 FAIL).
+- **점검표·완료 검토는 verifier 에게 위임**(L-002). **위임은 묻고 시작**(L-004): AskUserQuestion → `approve-commit.sh --stage <이름>` → Agent 1회.
+- **푸시는 `git push origin dev` 만**. 푸시 뒤 `.claude/.awaiting-decision` 이 생기면 승격/수정을 묻고 멈춘다(L-003). "계속 작업" 결정은 `--decision fix` 로 마커 해제(2026-09-05 U2 뒤 그렇게 함). 승격은 `--release` → `git push origin dev:main` → `git fetch origin main:main`.
+- 승인 마커는 커밋 명령과 **다른 Bash 호출**에서 먼저 만든다.
+- Bash 명령 문자열에 훅 금지 문구(볼륨 삭제 옵션, 강제 푸시, DROP)가 **텍스트로라도** 들어가면 차단. 마이그레이션·README 는 Write 도구로. `.env` 존재 확인도 금지.
+- `findings.py` 는 `PYTHONUTF8=1 PYTHONIOENCODING=utf-8` 앞에 붙여 실행. `## 수용 기준` 절에는 backlog 문장 불릿만(설명 불릿은 verify-plan FAIL). `alembic.ini` 주석은 영어(cp949 configparser).
+- registry 에 README·db_check 행은 각 1개(새 행 금지, 비고만). registry 커밋 열은 **그 파일을 실제로 바꾼 커밋**만(F-36bed6).

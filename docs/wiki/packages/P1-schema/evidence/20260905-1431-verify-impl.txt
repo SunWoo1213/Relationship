@@ -1,0 +1,15 @@
+== verify-impl P1-schema  (20260905-1431) ==
+.................................................                        [100%]
+49 passed in 0.74s
+PASS  pytest 통과 → evidence/20260905-1431-pytest.txt
+PASS  compileall 통과 → evidence/20260905-1431-lint.txt
+PASS  태그 P1-schema 커밋 10 건 → evidence/20260905-1431-commits.txt
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: D5
+PASS  커밋에 태그 존재: R8
+PASS  커밋에 태그 존재: R9
+PASS  커밋에 태그 존재: S3.1
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P1-schema 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=1 → evidence/20260905-1431-summary.txt ==

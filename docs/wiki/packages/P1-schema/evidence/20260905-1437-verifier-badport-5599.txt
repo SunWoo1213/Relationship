@@ -1,0 +1,8 @@
+[info] 접속 대상: user=app host=localhost port=5599 dbname=relationship (source=POSTGRES_*)
+[error] DB 접속 실패: ConnectionTimeout: connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: '5599', hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: '5599', hostaddr: '127.0.0.1': connection timeout expired
+exit=2
+-- password-token scan (default password value is the .env.example example; word-boundary match):
+count(:pass@)=0  count(word pass)=0  count(password)=1  count(postgresql://)=0

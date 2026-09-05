@@ -1,0 +1,5 @@
+repr contains fake password: True
+str  contains fake password: True
+safe_summary contains fake password: False
+repr (masked): ConnInfo(user='app', password='<redacted>', host='localhost', port='5433', dbname='relationship', source='POSTGRES_*')
+exit=0
