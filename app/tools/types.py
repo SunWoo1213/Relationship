@@ -164,7 +164,13 @@ class QuestionNotFound(ToolError):
 
 class QuestionNotAnswerable(ToolError):
     """이미 답했거나(already_answered) 24h 만료된(expired) 질문에 대한 답변
-    시도. `reason` 문자열을 메시지에 담되 옵션 문자열 자체는 넣지 않는다."""
+    시도. `code`(`"already_answered"` | `"expired"`)를 속성으로 담되 질문
+    원문·옵션 문자열 자체는 절대 넣지 않는다(U6, `ConfirmationRequired.reason`
+    과 같은 패턴)."""
+
+    def __init__(self, code: str) -> None:
+        self.code = code
+        super().__init__(code)
 
 
 class ConfirmationRequired(ToolError):

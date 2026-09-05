@@ -292,7 +292,7 @@ WARN  결정 4·5 의 'U8 에서'(registry 26행 비고 좁히기, S3.1 카드 �
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-fbaaae · [권고] 결정 12 '없는 id·다른 사용자 → 404' 중 '다른 사용자'는 강제할 수 없다 — pending_questions 에는 user_id 컬럼이 없다(session_id 만, app/db/models.py 201~217행). security.md §5 'user_id 조건'은 persons 경유 조회에만 적용된다. 계획 문구를 '없는 id → 404'로 읽고, pending_questions·agent_traces 의 사용자 격리 부재를 03-log·P5 인계에 명시한다
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05 (U6)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -307,15 +307,15 @@ WARN  결정 12 '없는 id·다른 사용자 → 404' 중 '다른 사용자'는 
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | `app/tools/questions.py` 모듈 docstring "user_id 격리 부재(F-fbaaae, 열린 소견)" 절에 `pending_questions`(및 `agent_traces`)가 `user_id` 컬럼이 없어 "다른 사용자의 질문"을 걸러낼 수 없다는 사실과, 이 격리는 P5-loop 의 세션→사용자 귀속 계층이 대신 맡아야 한다는 인계를 명문화(코드 변경 없음, U8 이 만들 `POST /answers/{id}` 는 이 전제를 그대로 상속 — "없는 id → 404"만 강제 가능) | `grep -n "user_id 격리 부재" app/tools/questions.py` | 1건 이상 매치 | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `docs/wiki/packages/P2-tools/evidence/20260905-1645-pytest-u6-final.txt`(166 passed, `answer_question`·`ask_user` 모두 `user_id` 조건 없이 `question_id`/`session_id` 로만 동작함을 테스트가 전제)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음 (S3.1 이 `pending_questions` 에 `user_id` 를 두지 않은 것은 P1-schema 결정이며, 이 소견은 그 사실을 문서화하는 것으로 해소한다 — 스키마 변경 아님)
+- FIX/CR 로 올려야 하는가: 아니오 (P5-loop 01-plan 이 세션→사용자 귀속 계층으로 이 사각지대를 메울지 결정)
 
 ## F-0010e6 · [권고] ALIAS_SOURCES 상수를 U4 에서 추가하지만 U3(search_person) 테스트가 이미 person_aliases 행(source NOT NULL)을 만든다 — U3 픽스처가 문자열을 직접 쓰면 이중 출처. ALIAS_SOURCES 는 U2(툴 공통) 또는 U3 첫머리로 당긴다
 상태: 열림 | 발견: 2026-09-05 (review) | 해소: -

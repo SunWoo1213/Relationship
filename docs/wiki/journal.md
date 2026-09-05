@@ -67,3 +67,4 @@
 - 2026-09-05 15:59 | COMMIT | 4eca3e9 feat(P2-tools): U2 툴 공통 — ToolContext·@traced(agent_traces 원칙9)·types·ALIAS_SOURCES
 - 2026-09-05 16:11 | COMMIT | a9cb254 feat(P2-tools): U3 search_person — 별칭 일치·cosine top-K 인물별 max·rule_flags(신호만, 판정은 P3-er)
 - 2026-09-05 16:29 | COMMIT | f318d58 feat(P2-tools): U4 create_person·update_person — D1 확인 강제(긍정 답 규약)·D6 별칭 누적·facts upsert
+- 2026-09-05 16:38 | COMMIT | 9cb35b6 feat(P2-tools): U5 add_event·add_schedule — EVENT_TYPES 검사·raw_utterance 원문 보존·aware 시각만·패턴 감지 없음

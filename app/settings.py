@@ -19,11 +19,19 @@
 from __future__ import annotations
 
 import os
+from datetime import timedelta
 
 DEFAULT_APP_USER_ID = "local"
 
 #: 후보 검색(`search_person`)의 별칭 임베딩 top-K (D5/S3.3).
 SEARCH_TOP_K = 10
+
+#: `ask_user`/`question_status`(U6)가 쓰는 미답변 질문 만료 기한(S3.4
+#: "미답변 24시간 후 만료"). `datetime` 산술에 바로 쓸 수 있도록 `timedelta`
+#: 로 둔다 -- 시간 수 자체가 필요하면 `.total_seconds() / 3600` 대신 이
+#: 상수를 그대로 더/빼는 쪽을 쓴다(단일 출처).
+QUESTION_TTL_HOURS = 24
+QUESTION_TTL = timedelta(hours=QUESTION_TTL_HOURS)
 
 #: `update_person(facts=[{key,value}])` 로 사용자 발화에서 직접 온 사실의
 #: 기본 확신도(01-plan 결정 6). 승격(P6-memory)이 만드는 사실의 confidence

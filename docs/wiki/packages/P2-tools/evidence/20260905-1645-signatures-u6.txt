@@ -1,0 +1,4 @@
+ask_user (ctx: 'ToolContext', kind: 'str', question: 'str', options: 'list[str]', context: 'dict') -> 'PendingQuestionOut'
+answer_question (ctx: 'ToolContext', question_id: 'int', answer: 'str') -> 'PendingQuestionOut'
+question_status (q: 'PendingQuestion', now: 'datetime') -> 'str'
+list_pending (ctx: 'ToolContext', session_id: 'str | None' = None) -> 'list[PendingQuestionOut]'

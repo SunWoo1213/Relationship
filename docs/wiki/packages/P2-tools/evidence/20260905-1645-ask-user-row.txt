@@ -1,0 +1,10 @@
+ask_user returned: PendingQuestionOut(question_id=321, status='pending', kind='new_person', question='독립 세션 증거용 질문', options=['예', '아니오'])
+row.id: 321
+row.session_id: evidence-independent-session
+row.kind: new_person
+row.question: 독립 세션 증거용 질문
+row.options: ['예', '아니오']
+row.context: {'affirmative_options': ['예']}
+row.answered_at: None
+intentionally rolled back -- no permanent row left in DB
+row after rollback (expect None): None

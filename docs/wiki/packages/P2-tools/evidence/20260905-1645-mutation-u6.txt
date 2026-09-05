@@ -1,0 +1,79 @@
+......................F....F......F                                      [100%]
+================================== FAILURES ===================================
+____________ test_question_status_expired_exactly_at_24h_and_after ____________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000271A0161C70>
+
+    def test_question_status_expired_exactly_at_24h_and_after(db_session):
+        row = _make_question_row(db_session, created_at=_BASE_TIME)
+        exactly_at_ttl = _BASE_TIME + QUESTION_TTL
+        after_ttl = _BASE_TIME + QUESTION_TTL + timedelta(seconds=1)
+>       assert question_status(row, exactly_at_ttl) == "expired"
+E       AssertionError: assert 'pending' == 'expired'
+E         
+E         - expired
+E         + pending
+
+tests\test_tools_questions.py:307: AssertionError
+_______ test_answer_question_expired_raises_and_keeps_answered_at_null ________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000271A0162E40>
+
+    def test_answer_question_expired_raises_and_keeps_answered_at_null(db_session):
+        row = _make_question_row(db_session, created_at=_BASE_TIME)
+        after_ttl = _BASE_TIME + QUESTION_TTL + timedelta(minutes=1)
+        ctx = _ctx(db_session, now=lambda: after_ttl)
+    
+>       with pytest.raises(QuestionNotAnswerable) as excinfo:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'app.tools.types.QuestionNotAnswerable'>
+
+tests\test_tools_questions.py:363: Failed
+_______________ test_list_pending_excludes_answered_and_expired _______________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000271A05A4050>
+
+    def test_list_pending_excludes_answered_and_expired(db_session):
+        session_id = "list-pending-test"
+        pending_row = _make_question_row(
+            db_session, session_id=session_id, created_at=_BASE_TIME, question="대기중"
+        )
+        _make_question_row(
+            db_session,
+            session_id=session_id,
+            created_at=_BASE_TIME,
+            question="답변됨",
+            answer="예",
+            answered_at=_BASE_TIME + timedelta(minutes=1),
+        )
+        _make_question_row(
+            db_session,
+            session_id=session_id,
+            created_at=_BASE_TIME - QUESTION_TTL - timedelta(hours=1),
+            question="만료됨",
+        )
+        ctx = _ctx(db_session, session_id=session_id, now=lambda: _BASE_TIME + timedelta(minutes=1))
+    
+        result = list_pending(ctx)
+    
+>       assert len(result) == 1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len([PendingQuestionOut(question_id=218, status='pending', kind='new_person', question='만료됨', options=['예', '아니오']), PendingQuestionOut(question_id=216, status='pending', kind='new_person', question='대기중', options=['예', '아니오'])])
+
+tests\test_tools_questions.py:510: AssertionError
+3 failed, 32 passed in 1.37s
+---MUTATION-A---
+..........F........................                                      [100%]
+================================== FAILURES ===================================
+__________ test_ask_user_affirmative_options_outside_options_raises ___________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000200CB9F1C70>
+
+    def test_ask_user_affirmative_options_outside_options_raises(db_session):
+        ctx = _ctx(db_session)
+>       with pytest.raises(InvalidValue):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'app.tools.types.InvalidValue'>
+
+tests\test_tools_questions.py:204: Failed
+1 failed, 34 passed in 1.04s
