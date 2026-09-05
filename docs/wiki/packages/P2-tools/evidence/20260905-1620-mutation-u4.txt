@@ -1,0 +1,58 @@
+=== 변이 (a): _require_confirmation 의 answered_at 검사 제거 ===
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_create_person_with_unanswered_question_raises ______________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000001870713DD30>
+
+    def test_create_person_with_unanswered_question_raises(db_session):
+        question = _make_pending_question(db_session, answered=False)
+        ctx = _ctx(db_session, session_id=question.session_id, confirmed_question_id=question.id)
+    
+>       with pytest.raises(ConfirmationRequired):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+
+tests\test_tools_persons.py:302: Failed
+1 failed, 31 deselected in 0.65s
+.                                                                        [100%]
+1 passed, 31 deselected in 0.35s
+
+=== 원복 확인: 위 (a) 이후 재실행 ===
+=== 변이 (b): 긍정 답(affirmative) 검사 제거 ===
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_______________ test_create_person_with_negative_answer_raises ________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x0000029B352ADD30>
+
+    def test_create_person_with_negative_answer_raises(db_session):
+        """F-b97a06: 답은 했지만 부정 선택지 -- D1 '승인 시에만' 을 통과시키지
+        않는다."""
+        question = _make_pending_question(db_session, answer="아니오")
+        ctx = _ctx(db_session, session_id=question.session_id, confirmed_question_id=question.id)
+    
+>       with pytest.raises(ConfirmationRequired):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+
+tests\test_tools_persons.py:320: Failed
+______ test_create_person_without_affirmative_options_in_context_raises _______
+
+db_session = <sqlalchemy.orm.session.Session object at 0x0000029B3537A210>
+
+    def test_create_person_without_affirmative_options_in_context_raises(db_session):
+        """context 에 affirmative_options 키가 아예 없으면 안전한 기본값(거부)."""
+        question = _make_pending_question(db_session, context={})
+        ctx = _ctx(db_session, session_id=question.session_id, confirmed_question_id=question.id)
+    
+>       with pytest.raises(ConfirmationRequired):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+
+tests\test_tools_persons.py:329: Failed
+2 failed, 30 deselected in 0.67s
+=== 원복 확인: 위 (b) 이후 전체 재실행 ===
+........................................................................ [ 68%]
+.................................                                        [100%]
+105 passed in 1.33s

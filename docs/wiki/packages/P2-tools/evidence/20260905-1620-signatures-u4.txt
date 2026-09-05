@@ -1,0 +1,2 @@
+(ctx: 'ToolContext', display_name: 'str', aliases: 'list[str]', relation_tag: 'str', hierarchy: 'str') -> 'PersonOut'
+(ctx: 'ToolContext', person_id: 'int', facts: 'list[dict[str, str]] | None' = None, new_alias: 'str | None' = None, display_name: 'str | None' = None) -> 'PersonOut'

@@ -25,6 +25,46 @@
 별칭이 top-K 안에 하나도 없었던 경우에도(순수 별칭 매칭으로만 후보가 된
 경우) `similarity = 0.0` 이 된다 -- "검색을 안 했다"와 "검색했지만 상위
 K 안에 없었다"는 다른 사실이므로 플래그를 나누지 않고 전자만 표시한다.
+
+## `create_person`/`update_person` -- 긍정 답 규약 (F-b97a06, U4 에서 확정)
+
+D1("승인 시에만 `create_person`")과 D6("확인을 거친 경우에만 `display_name`
+갱신")은 **답했는가**가 아니라 **무엇이라 답했는가**를 요구한다. 이 모듈은
+그 판별 규약을 다음과 같이 정한다 -- `app/tools/questions.py`(U6)의
+`ask_user` 가 같은 규약으로 `pending_questions.context` 를 채워야 한다:
+
+- `pending_questions.context`(JSONB)에 `app.tools.types.AFFIRMATIVE_KEY`
+  (`"affirmative_options"`) 키로 긍정 선택지 문자열 목록을 넣는다.
+  예: `{"affirmative_options": ["응, 기억해줘"]}`.
+- 이 키가 없으면(구버전 질문, 호출자 실수) **거부가 기본값**이다 -- 원칙1과
+  같은 비대칭: "긍정인지 알 수 없음"을 "긍정 아님"으로 취급한다.
+- `pending_questions.answer` 가 `affirmative_options` 안에 있어야만
+  `_require_confirmation` 이 통과한다.
+
+`_require_confirmation(ctx, kinds=...)` 은 이 규약과 D1 강제의 나머지 조건
+(존재·`kind`·`answered_at`·`session_id`)을 한 곳에서 검사한다. 예외
+(`ConfirmationRequired`) 메시지에는 사유 코드(`reason` 속성)만 담고 질문
+원문·답 문자열은 절대 넣지 않는다 -- `question_id` 가 아예 없는 경우와
+있지만 조건 미충족인 경우를 같은 방식으로 다뤄, 존재 여부 자체를 흘리지
+않는다.
+
+## 별칭 격상 규칙 (미결 7, D5)
+
+같은 인물에 같은 문자열 별칭이 이미 있으면 새 행을 만들지 않고 `source`
+(필요하면 `confirmed_at`)만 **격상**한다 -- 별칭은 삭제·격하하지 않는다.
+격상 순서는 `ALIAS_SOURCES = ("user_said", "confirmed", "system")` 의
+튜플 순서 그대로다(인덱스가 클수록 상위):
+
+| 기존 \\ 신규 | user_said | confirmed | system |
+|---|---|---|---|
+| `user_said` | 유지(같은 값, 변화 없음) | **confirmed 로 격상** | **system 으로 격상** |
+| `confirmed` | 유지(격하 없음) | 유지(같은 값) | **system 으로 격상** |
+| `system` | 유지(격하 없음) | 유지(격하 없음) | 유지(같은 값) |
+
+`confirmed_at` 은 격상 결과가 `confirmed` 이고 아직 비어 있을 때만 채운다.
+`system` 으로 격상되어도 기존 `confirmed_at` 값은 지우지 않는다(확인
+이력을 잃지 않는다). 다른 인물의 같은 별칭 문자열은 이 규칙과 무관하다
+(동명이인 허용, 막지 않는다).
 """
 
 from __future__ import annotations
@@ -32,12 +72,33 @@ from __future__ import annotations
 from collections import defaultdict
 
 from sqlalchemy import func, select
+from sqlalchemy.orm import Session
 
-from app.db.models import HIERARCHIES, Person, PersonAlias, RELATION_TAGS
-from app.embedding import as_provider
-from app.settings import SEARCH_TOP_K
+from app.db.models import (
+    ALIAS_SOURCES,
+    HIERARCHIES,
+    PendingQuestion,
+    Person,
+    PersonAlias,
+    PersonFact,
+    RELATION_TAGS,
+)
+from app.embedding import EmbedderCallable, EmbeddingProvider, as_provider
+from app.settings import DEFAULT_FACT_CONFIDENCE, SEARCH_TOP_K
 from app.tools.context import ToolContext, traced
-from app.tools.types import Candidate, InvalidValue, PersonOut
+from app.tools.types import (
+    AFFIRMATIVE_KEY,
+    Candidate,
+    ConfirmationRequired,
+    InvalidValue,
+    PersonNotFound,
+    PersonOut,
+)
+
+#: 별칭 격상 순서(모듈 docstring "별칭 격상 규칙" 표 참고). 인덱스가 클수록
+#: 상위 -- `ALIAS_SOURCES` 튜플 순서 그대로다(단일 출처: 이 상수를 재정의하지
+#: 않는다).
+_ALIAS_RANK = {source: index for index, source in enumerate(ALIAS_SOURCES)}
 
 #: S3.3 1단계 "승진 완화 재검색"이 쓰는 인접 관계 -- 상↔동, 동↔하 만 인접.
 #: 상↔하 는 인접이 아니다(두 단계 차이).
@@ -200,3 +261,286 @@ def search_person(
         key=lambda c: (0 if c.rule_flags["exact_alias"] else 1, -c.similarity, c.person.id)
     )
     return candidates
+
+
+def _require_confirmation(
+    ctx: ToolContext, *, kinds: tuple[str, ...]
+) -> PendingQuestion:
+    """D1/D6 확인 검사 + F-b97a06 긍정 답 규약(모듈 docstring 참고).
+
+    `create_person`/`update_person(display_name=...)` 가 진행되려면 다음이
+    **모두** 참이어야 한다. 하나라도 아니면 `ConfirmationRequired`(사유는
+    `reason` 속성에만 -- 질문 원문·답 문자열은 예외 메시지에 담지 않는다):
+
+    1. `ctx.confirmed_question_id` 가 `None` 이 아니다 (`no_confirmation`).
+    2. 그 id 의 `pending_questions` 행이 존재한다 -- 없으면 존재 여부를
+       흘리지 않기 위해 `QuestionNotFound` 가 아니라 이 예외를 그대로 쓴다
+       (`not_found`).
+    3. `kind` 가 `kinds` 안에 있다 (`wrong_kind`).
+    4. `answered_at IS NOT NULL` (`not_answered`).
+    5. `session_id == ctx.session_id` (`session_mismatch`).
+    6. `context` 에 `AFFIRMATIVE_KEY` 가 있고 `answer` 가 그 목록 안에 있다
+       (`not_affirmative`) -- 키가 없으면 안전한 기본값으로 거부한다.
+
+    통과하면 그 `PendingQuestion` 행을 돌려준다(호출자가 재사용할 일은
+    없지만, 검사 결과를 재조회 없이 넘길 수 있게 한다).
+    """
+    if ctx.confirmed_question_id is None:
+        raise ConfirmationRequired("no_confirmation")
+
+    question = ctx.session.get(PendingQuestion, ctx.confirmed_question_id)
+    if question is None:
+        raise ConfirmationRequired("not_found")
+
+    if question.kind not in kinds:
+        raise ConfirmationRequired("wrong_kind")
+
+    if question.answered_at is None:
+        raise ConfirmationRequired("not_answered")
+
+    if question.session_id != ctx.session_id:
+        raise ConfirmationRequired("session_mismatch")
+
+    context = question.context if isinstance(question.context, dict) else {}
+    affirmative_options = context.get(AFFIRMATIVE_KEY)
+    if not affirmative_options or question.answer not in affirmative_options:
+        raise ConfirmationRequired("not_affirmative")
+
+    return question
+
+
+def _dedupe_aliases(raw: list[str]) -> list[str]:
+    """strip → 빈 값 제외 → 중복 제거(대소문자 구분 유지, 첫 등장 순서 보존)."""
+    seen: set[str] = set()
+    result: list[str] = []
+    for item in raw:
+        stripped = item.strip() if isinstance(item, str) else ""
+        if not stripped or stripped in seen:
+            continue
+        seen.add(stripped)
+        result.append(stripped)
+    return result
+
+
+def _add_alias(
+    session: Session,
+    person: Person,
+    alias: str,
+    *,
+    source: str,
+    embedder: "EmbeddingProvider | EmbedderCallable | None" = None,
+    confirmed_at=None,
+) -> PersonAlias:
+    """별칭 upsert(모듈 docstring "별칭 격상 규칙" 표). 같은 인물에 같은
+    문자열이 이미 있으면 새 행을 만들지 않고 격상만 한다 -- 삭제·격하 없음
+    (미결 7, D6). 새로 만들 때 `embedder` 가 있으면(`app.embedding.as_provider`
+    로 정규화) 그 자리에서 임베딩을 채운다(D5 "확정되면 즉시 임베딩").
+    """
+    existing = session.execute(
+        select(PersonAlias)
+        .where(PersonAlias.person_id == person.id)
+        .where(PersonAlias.alias == alias)
+    ).scalar_one_or_none()
+
+    if existing is not None:
+        if _ALIAS_RANK[source] > _ALIAS_RANK[existing.source]:
+            existing.source = source
+            if source == ALIAS_SOURCES[1] and existing.confirmed_at is None:
+                existing.confirmed_at = confirmed_at
+            session.flush()
+        return existing
+
+    embedding = None
+    provider = as_provider(embedder)
+    if provider is not None:
+        embedding = provider.embed([alias])[0]
+
+    row = PersonAlias(
+        person_id=person.id,
+        alias=alias,
+        source=source,
+        embedding=embedding,
+        confirmed_at=confirmed_at if source == ALIAS_SOURCES[1] else None,
+    )
+    session.add(row)
+    session.flush()
+    return row
+
+
+def _person_out(session: Session, person: Person) -> PersonOut:
+    """`person` 의 현재 별칭 전체를 조회해 `PersonOut` 으로 만든다."""
+    aliases = (
+        session.execute(
+            select(PersonAlias.alias).where(PersonAlias.person_id == person.id)
+        )
+        .scalars()
+        .all()
+    )
+    return PersonOut(
+        id=person.id,
+        display_name=person.display_name,
+        relation_tag=person.relation_tag,
+        hierarchy=person.hierarchy,
+        aliases=sorted(aliases),
+    )
+
+
+@traced("create_person")
+def create_person(
+    ctx: ToolContext,
+    display_name: str,
+    aliases: list[str],
+    relation_tag: str,
+    hierarchy: str,
+) -> PersonOut:
+    """S3.2 시그니처: `(display_name, aliases, relation_tag, hierarchy) -> Person`.
+
+    D1(원칙1): **answered `new_person` 질문을 거치지 않으면 절대 실행하지
+    않는다.** 직접 호출은 `_require_confirmation` 에서 `ConfirmationRequired`
+    로 실패해야 한다(D01 카드 "코드에서 지켜야 할 것"). 확신도·후보 검색·
+    다른 인물과의 병합은 이 함수의 일이 아니다 -- `search_person`/P3-er 가
+    이미 끝낸 판정의 결과로서만 호출된다.
+
+    별칭 처리: `aliases` 는 strip·중복 제거 후 각각 `confirmed`
+    (`confirmed_at=ctx.now()`, 확인 질문을 거쳤으므로) 로, `display_name`
+    자체는 `system` 별칭으로 누적한다(격상 규칙이 중복을 정리한다).
+    """
+    _require_confirmation(ctx, kinds=("new_person",))
+
+    if display_name is None or not display_name.strip():
+        raise InvalidValue("create_person: display_name must not be empty")
+    normalized_display_name = display_name.strip()
+
+    if relation_tag not in RELATION_TAGS:
+        raise InvalidValue(f"create_person: invalid relation_tag '{relation_tag}'")
+    if hierarchy not in HIERARCHIES:
+        raise InvalidValue(f"create_person: invalid hierarchy '{hierarchy}'")
+
+    person = Person(
+        user_id=ctx.user_id,
+        display_name=normalized_display_name,
+        relation_tag=relation_tag,
+        hierarchy=hierarchy,
+    )
+    ctx.session.add(person)
+    ctx.session.flush()
+
+    confirmed_at = ctx.now()
+    for alias in _dedupe_aliases(list(aliases or [])):
+        _add_alias(
+            ctx.session,
+            person,
+            alias,
+            source=ALIAS_SOURCES[1],
+            embedder=ctx.embedder,
+            confirmed_at=confirmed_at,
+        )
+
+    _add_alias(
+        ctx.session,
+        person,
+        normalized_display_name,
+        source=ALIAS_SOURCES[2],
+        embedder=ctx.embedder,
+    )
+
+    ctx.session.flush()
+    return _person_out(ctx.session, person)
+
+
+@traced("update_person")
+def update_person(
+    ctx: ToolContext,
+    person_id: int,
+    facts: list[dict[str, str]] | None = None,
+    new_alias: str | None = None,
+    display_name: str | None = None,
+) -> PersonOut:
+    """S3.2 시그니처: `(person_id, facts?, new_alias?, display_name?) -> Person`.
+
+    확신도·병합·다른 인물로의 연결은 이 함수에 **없다**(원칙1) -- 여기서
+    다루는 것은 오직 "이미 정해진 이 `person_id`" 하나의 별칭 누적·사실
+    upsert·표시 이름 갱신뿐이다.
+
+    - `display_name` 은 현재 값과 다를 때만 확인(answered `identity` 또는
+      `new_person` 질문, D6)을 요구하고, 통과하면 갱신 + 새 이름을 `system`
+      별칭으로 누적한다(F-2418ef). 이전 표시 이름의 별칭 행은 지우지 않는다.
+      같은 값이면 확인도 변경도 없다.
+    - `new_alias` 는 `user_said` 로 upsert(격상 규칙, 미결 7). 다른 인물의
+      같은 별칭 문자열은 막지 않는다(동명이인).
+    - `facts` 는 `(person_id, key)` 애플리케이션 upsert(결정 6) --
+      `DEFAULT_FACT_CONFIDENCE` 로 값·확신도를 갱신하거나 새로 만든다.
+    - 세 인자 모두 `None` 이면 `InvalidValue`.
+    """
+    if facts is None and new_alias is None and display_name is None:
+        raise InvalidValue("update_person: at least one of facts/new_alias/display_name required")
+
+    person = ctx.session.execute(
+        select(Person).where(Person.id == person_id).where(Person.user_id == ctx.user_id)
+    ).scalar_one_or_none()
+    if person is None:
+        raise PersonNotFound("person_not_found")
+
+    if display_name is not None:
+        if not display_name.strip():
+            raise InvalidValue("update_person: display_name must not be empty")
+        normalized_display_name = display_name.strip()
+        if normalized_display_name != person.display_name:
+            _require_confirmation(ctx, kinds=("identity", "new_person"))
+            person.display_name = normalized_display_name
+            _add_alias(
+                ctx.session,
+                person,
+                normalized_display_name,
+                source=ALIAS_SOURCES[2],
+                embedder=ctx.embedder,
+            )
+            ctx.session.flush()
+
+    if new_alias is not None:
+        if not new_alias.strip():
+            raise InvalidValue("update_person: new_alias must not be empty")
+        _add_alias(
+            ctx.session,
+            person,
+            new_alias.strip(),
+            source=ALIAS_SOURCES[0],
+            embedder=ctx.embedder,
+        )
+
+    if facts is not None:
+        for fact in facts:
+            key = fact.get("key") if isinstance(fact, dict) else None
+            value = fact.get("value") if isinstance(fact, dict) else None
+            if not isinstance(key, str) or not key.strip():
+                raise InvalidValue("update_person: fact key must be a non-empty string")
+            if not isinstance(value, str) or not value.strip():
+                raise InvalidValue("update_person: fact value must be a non-empty string")
+            normalized_key = key.strip()
+            normalized_value = value.strip()
+
+            existing_fact = (
+                ctx.session.execute(
+                    select(PersonFact)
+                    .where(PersonFact.person_id == person.id)
+                    .where(PersonFact.key == normalized_key)
+                    .order_by(PersonFact.updated_at.desc())
+                )
+                .scalars()
+                .first()
+            )
+            if existing_fact is not None:
+                existing_fact.value = normalized_value
+                existing_fact.confidence = DEFAULT_FACT_CONFIDENCE
+            else:
+                ctx.session.add(
+                    PersonFact(
+                        person_id=person.id,
+                        key=normalized_key,
+                        value=normalized_value,
+                        confidence=DEFAULT_FACT_CONFIDENCE,
+                    )
+                )
+
+    ctx.session.flush()
+    return _person_out(ctx.session, person)

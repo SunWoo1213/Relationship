@@ -19,6 +19,16 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
+#: F-b97a06 -- "긍정 답 규약". `ask_user`(U6)가 `pending_questions.context`
+#: (JSONB)에 이 키로 긍정 선택지 목록(`list[str]`)을 넣는다. D1/D6 확인 검사
+#: (`app/tools/persons.py` 의 `_require_confirmation`)는 답(`answer`)이 이
+#: 목록 안에 있을 때만 통과시킨다. 이 키가 `context` 에 없으면(구버전 질문,
+#: 호출자 실수 등) **안전한 기본값으로 거부**한다 -- 원칙1(오병합은
+#: 미검출보다 훨씬 나쁘다)과 같은 이유로, "긍정으로 판단할 근거가 없으면
+#: 확인되지 않은 것으로 취급"한다. `app/tools/questions.py`(U6)도 같은 키를
+#: 쓴다(단일 출처).
+AFFIRMATIVE_KEY = "affirmative_options"
+
 
 @dataclass(frozen=True)
 class PersonOut:
@@ -152,7 +162,18 @@ class QuestionNotAnswerable(ToolError):
 
 class ConfirmationRequired(ToolError):
     """D1/D6 -- answered `new_person`/`identity` 질문 없이 `create_person`
-    또는 `update_person(display_name=...)` 를 호출."""
+    또는 `update_person(display_name=...)` 를 호출.
+
+    `reason` 은 사유 코드만 담는다(질문 원문·답 문자열은 절대 넣지 않는다 --
+    `question_id` 가 존재하는지조차 메시지로 흘리지 않기 위해 "질문 없음"과
+    "질문은 있지만 조건 미충족"을 같은 사유 집합으로 다룬다). 사유 코드:
+    `no_confirmation` / `not_found` / `wrong_kind` / `not_answered` /
+    `session_mismatch` / `not_affirmative`.
+    """
+
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+        super().__init__(reason)
 
 
 class InvalidValue(ToolError):

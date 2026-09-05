@@ -25,6 +25,12 @@ DEFAULT_APP_USER_ID = "local"
 #: 후보 검색(`search_person`)의 별칭 임베딩 top-K (D5/S3.3).
 SEARCH_TOP_K = 10
 
+#: `update_person(facts=[{key,value}])` 로 사용자 발화에서 직접 온 사실의
+#: 기본 확신도(01-plan 결정 6). 승격(P6-memory)이 만드는 사실의 confidence
+#: 는 그 패키지가 별도로 정한다 -- 이 값은 U4 의 애플리케이션 upsert 에만
+#: 쓰인다.
+DEFAULT_FACT_CONFIDENCE = 1.0
+
 
 def app_user_id(env: dict[str, str] | None = None) -> str:
     """`APP_USER_ID` 환경변수를 읽는다. 없으면 `"local"`.

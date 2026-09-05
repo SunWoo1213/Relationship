@@ -229,14 +229,14 @@ WARN  D1 강제 검사가 '답했는가'만 보고 '무엇이라 답했는가'�
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | 긍정 답 규약 확정(U4) — `pending_questions.context`(JSONB)에 `AFFIRMATIVE_KEY = "affirmative_options"`(`app/tools/types.py`) 키로 긍정 선택지 목록을 넣는 것으로 규약을 정한다(`ask_user`(U6)가 이 키를 채운다). `app/tools/persons.py` 의 `_require_confirmation(ctx, kinds=...)` 가 `question.answer in context["affirmative_options"]` 를 검사하고, 키가 없으면 안전한 기본값으로 거부(`ConfirmationRequired("not_affirmative")`) | `POSTGRES_PORT=5433 python -m pytest tests/test_tools_persons.py -q -k "negative_answer or without_affirmative"` | 2 passed (부정 답·키 없음 각각 `ConfirmationRequired`) | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `docs/wiki/packages/P2-tools/evidence/20260905-1620-{pytest-u4,mutation-u4}.txt` — 변이 (b)(긍정 답 검사 제거)에서 두 테스트가 `DID NOT RAISE` 로 FAILED 하는 것을 확인 후 원복, 전체 105 passed 로 재확인
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- 관련 카드(D/S/원칙)와 충돌: 없음(D01 "승인 시에만" 을 코드로 구현) | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-4d8d96 · [권고] @traced 의 step='tool_error' 행은 같은 세션에 flush 되므로 호출자(session_scope·get_session)가 예외 시 rollback 하면 함께 사라진다 — 운영에서는 오류 trace 가 남지 않는다. 결정 2(툴은 commit 하지 않음)와 U2 테스트(롤백 전 조회)는 서로 맞지만 원칙9 관점의 한계다. 03-log 에 '오류 trace 는 트랜잭션과 함께 롤백된다'를 명시하거나 별도 커넥션 기록을 P5 로 넘길지 결정
@@ -359,14 +359,14 @@ WARN  U4 는 두 툴 + D1 검사 + D6 + 별칭 upsert(미결 7) + 사실 upsert(
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | U4 구현 결정: `update_person(display_name=X)` 확인 통과 시 `X` 를 (D05 가 제안한 `confirmed` 가 아니라) **`system`** 별칭으로 upsert — `create_person` 의 "display_name → system 별칭" 규칙과 대칭을 맞춘다(둘 다 "그 순간의 표시 이름"이라는 같은 의미의 파생 별칭이며, `confirmed` 는 사용자가 개별 확인한 *호칭*(`aliases[]`/`new_alias`) 전용으로 남긴다). 이전 표시 이름의 별칭 행은 지우지 않는다(D6). `app/tools/persons.py` `update_person` 구현 | `POSTGRES_PORT=5433 python -m pytest tests/test_tools_persons.py -q -k "display_name_with_confirmation"` | 1 passed — 새 이름이 별칭에 존재, 이전 이름 별칭 유지(행 삭제 0) | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `docs/wiki/packages/P2-tools/evidence/20260905-1620-pytest-u4.txt`(105 passed 안에 포함)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- 관련 카드(D/S/원칙)와 충돌: 없음(D06 "별칭은 절대 삭제하지 않는다" 그대로 유지) | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-4d2507 · [권고] security.md §5 'DELETE /persons/{id}' 는 backlog 어느 항목에도 없다(grep 0건) — P2 제외는 사용자 결정이나 갈 곳이 없다. architect 가 backlog 에 항목(P5-loop 묶음 또는 별도)을 세운다. 미결 8 의 JSONB 참조 정리 요건을 그 항목에 옮긴다
