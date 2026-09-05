@@ -25,3 +25,32 @@
 - 검증: `python -m pytest tests/test_schema_models.py -q` → 17 passed(evidence/20260905-1253-pytest-u2-models.txt); `python -m pytest tests/ -q` → 38 passed(신규 17 + 기존 21, evidence/20260905-1253-pytest-u2-all.txt); **변이 확인 2건**(evidence/20260905-1253-mutation-u2.txt) — (1) `EVENT_TYPES` 에서 `"other"` 제거 → `test_events_type_check_contains_all_seven_event_types` FAILED, (2) `person_aliases.person_id` FK 의 `ondelete="CASCADE"` 제거 → `test_all_six_foreign_keys_have_ondelete_cascade` FAILED, 두 변이 모두 원복 후 `pytest tests/ -q` 재확인 38 passed; DDL 프리뷰 9테이블 PostgreSQL dialect 컴파일(evidence/20260905-1253-ddl-preview.txt) — `VECTOR(1536)`·`ON DELETE CASCADE`·`ck_*`/`fk_*`/`pk_*` 이름 확인. DB 접속 없음(계획대로).
 - 남은 것 · 다음 단위: U3 Alembic 도입 + 초기 마이그레이션(`alembic.ini`·`env.py`·`0001_schema_v2.py`, autogenerate 초안 + Vector import·부분 인덱스·CHECK 이름 손보정). U2 의 인덱스 이름·CHECK 이름·부분 인덱스 `postgresql_where` 를 그대로 참조.
 - Refs: P1-schema R8 R9 D4 D5 S3.1 F-08e812
+
+## 2026-09-05 14:01 · feat(P1-schema): U3 Alembic 도입·0001 스키마 v2 마이그레이션 — 로컬 upgrade head 9테이블 · pending
+- 변경: `alembic.ini`(`alembic init` 골격 + `script_location = alembic`, `sqlalchemy.url =` 값 공란, 영문 주석으로 이유 명시 — 한글 주석은 Windows 기본 cp949 로 `configparser` 가 읽다 `UnicodeDecodeError` 를 내서 영문으로 교체), `alembic/env.py`(신설 — `app.config.resolve_connection()` 으로 `os.environ` 에서 URL 해석해 `config.set_main_option` 주입, `target_metadata = app.db.base.Base.metadata`(`app.db.models` import 로 테이블 등록), `compare_type=True`·`render_as_batch=False`, `render_item` 훅으로 `pgvector.sqlalchemy.Vector` → `Vector(N)` 렌더 + `autogen_context.imports` 추가, online/offline 둘 다 지원), `alembic/script.py.mako`(Refs 주석 한 줄 추가), `alembic/versions/0001_schema_v2.py`(신설 — `POSTGRES_PORT=5433 alembic revision --autogenerate -m "schema v2"` 초안을 손보정. 원본은 `evidence/20260905-1400-autogenerate-raw.txt`(콘솔 로그)·`evidence/20260905-1400-0001-autogenerate-raw.py.txt`(원본 파일 복사본)로 보존. `revision="0001"`/`down_revision=None`으로 고정, 파일명 `0001_schema_v2.py`, 모듈 docstring 첫 줄 `Refs: P1-schema R8 R9 D4 D5 S3.1`), evidence/20260905-1401-{alembic-upgrade,alembic-check,tables-after-upgrade,pytest-u3}.txt, `01-plan.md` U3 `[x]`
+- **autogenerate 초안 대비 손보정 항목**(원본 evidence 대조 가능):
+
+  | 항목 | 초안(autogenerate raw) | 최종(0001_schema_v2.py) | 이유 |
+  |------|------------------------|--------------------------|------|
+  | `CREATE EXTENSION IF NOT EXISTS vector` | 없음 — 로컬 DB 에 확장이 이미 있어 diff 에 안 잡힘 | `upgrade()` 첫 줄에 추가 | 01-plan U3·리스크 항목: 새 환경(RDS 등 확장 미설치)에서도 멱등하게 동작해야 함 |
+  | `Vector(1536)` 렌더·import | 이미 정확(`from pgvector.sqlalchemy import Vector`, `Vector(1536)`) | 그대로 유지 | `env.py` 의 `render_item` 훅이 선반영되어 있어 초안부터 올바르게 나옴(NullType 리스크 미발생) |
+  | CHECK 4개 이름(`ck_persons_relation_tag_valid` 등) | 이미 정확(`op.f(...)`, naming_convention 반영) | 그대로 유지 | `app/db/base.py` 의 `MetaData(naming_convention=...)` 가 U2 부터 이미 적용돼 있어 autogenerate 가 올바른 이름을 냄 |
+  | 부분 인덱스 `postgresql_where` | 이미 정확(`sa.text('answered_at IS NULL')`, upgrade·downgrade 양쪽) | 그대로 유지 | 동일(모델의 `Index(..., postgresql_where=text(...))` 를 그대로 반영) |
+  | FK 6개 `ondelete="CASCADE"` | 이미 정확 | 그대로 유지 | 모델의 `ForeignKey(..., ondelete="CASCADE")` 그대로 반영 |
+  | `fact_sources` 복합 PK | 이미 정확(`PrimaryKeyConstraint('fact_id', 'event_id', ...)`, id 없음) | 그대로 유지 | 동일 |
+  | `server_default=sa.text('now()')`/Identity | 이미 정확 | 그대로 유지 | 동일 |
+  | `downgrade()` 순서 | 이미 의존 역순(`fact_sources → schedules → person_facts → person_aliases → events → push_subscriptions → persons → pending_questions → agent_traces`), 확장 미삭제 | 그대로 유지 | autogenerate 의 기본 역순 생성이 이미 의존관계를 만족 |
+  | 리비전 식별자·파일명 | `a34ea2e32977_schema_v2.py`, `revision='a34ea2e32977'` | `0001_schema_v2.py`, `revision="0001"` | 01-plan 산출물 파일명 고정, 향후 리비전(0002…)과의 순번 관리 |
+  | 모듈 docstring | `"""schema v2\n\nRevision ID: ...` | 첫 줄 `Refs: P1-schema R8 R9 D4 D5 S3.1`, 보정 내역 설명 추가 | 위임 프롬프트 4번 요구, 손보정 근거를 파일 자체에 남김 |
+
+  실질적으로 "고쳐야 했던" 항목은 `CREATE EXTENSION` 한 줄뿐이었다 — `render_item` 훅과 U2 의 `naming_convention`/`ForeignKey(ondelete=...)`/`Index(postgresql_where=...)` 가 이미 정확해 autogenerate 초안이 대부분 올바르게 나왔다.
+- 이유(기획서·카드 연결): 01-plan U3(R8 R9 D4 D5 S3.1) — 모델(U2)을 진실의 원천으로 Alembic revision 초안화 후 보정(결정 1). `alembic.ini` 의 `sqlalchemy.url` 공란(비밀 금지, security.md §1) + `env.py` 가 `app.config` 로 런타임 주입(F-ace4dd 단일 구현 재사용).
+- **위임 프롬프트와 다르게 한 것**: (1) `alembic.ini` 의 `sqlalchemy.url` 안내 주석을 한글에서 영문으로 바꿨다 — Windows 기본 로케일(cp949)에서 `configparser` 가 UTF-8 한글 주석을 읽다 `UnicodeDecodeError` 를 내는 것을 로컬에서 직접 확인했다(재현: `POSTGRES_PORT=5433 python -m alembic current` 실패 → 한글 주석 제거 후 통과). alembic.ini 자체의 인코딩을 강제하는 옵션이 없어 주석 언어를 바꾸는 쪽을 택했다. 그 외 계획과 다르게 한 것 없음.
+- 정합성 확인: 원칙9(에이전트 판정 근거와는 무관 — 이 단계는 DDL) / 보안 §1(`.env` 미접촉, `os.environ` 에서만 읽음, `alembic.ini`·`env.py`·evidence 어디에도 접속 문자열·비밀번호 미출현 — grep 재확인) §4(`DROP TABLE` 은 `downgrade()` 안에만, 셸에서 DROP/TRUNCATE 실행 없음, 볼륨·initdb·compose 미변경) — 위반 없음. S3.1 밖 컬럼·테이블·벡터 인덱스 추가 없음.
+- 검증:
+  - `POSTGRES_PORT=5433 alembic upgrade head` → 종료 코드 0, `Running upgrade  -> 0001, Refs: P1-schema R8 R9 D4 D5 S3.1`(evidence/20260905-1401-alembic-upgrade.txt)
+  - 확인 쿼리(psycopg, `PYTHONIOENCODING=utf-8` 로 한글 CHECK 값 정상 출력 — 최초 시도는 콘솔 cp949 로 한글이 깨져 재실행) → 서버 `PostgreSQL 16.15`, 테이블 9개 정확 일치, `events` CHECK 값 7개, `persons` CHECK 2개(관계태그 5·위계 3) 정상 한글, `pending_questions` CHECK 3값, `embedding` = `vector(1536)`, `person_embeddings` 0행, `fact_sources` PK `(fact_id, event_id)`, FK 6행 전부 `confdeltype='c'`, 부분 인덱스 `WHERE (answered_at IS NULL)` 존재, `alembic_version.version_num = '0001'` (evidence/20260905-1401-tables-after-upgrade.txt). 접속 문자열·비밀번호 미출력(`safe_summary()` 만 사용)
+  - `POSTGRES_PORT=5433 alembic check` → `No new upgrade operations detected.`(evidence/20260905-1401-alembic-check.txt) — 모델↔마이그레이션 완전 일치, 손보정이 모델과 어긋나지 않음을 기계적으로 확인
+  - `python -m pytest tests/ -q` → 38 passed(evidence/20260905-1401-pytest-u3.txt), U2 대비 회귀 없음
+- 남은 것 · 다음 단위: U4 스키마 검사 스크립트(`scripts/schema_check.py`) + `downgrade base → upgrade head` 왕복 증거(이번 U3 는 upgrade 만 실행, downgrade 왕복은 U4 몫). U4 유의점 — (1) `alembic check` 가 이미 "변경 없음"을 U3 에서 확인했으므로 U4 는 downgrade→upgrade 왕복 후 같은 확인 쿼리 재실행 + `alembic check` 재확인이면 충분하다. (2) 콘솔 출력에 한글 CHECK 값이 섞이면 Windows 기본 로케일에서 깨질 수 있으니 evidence 로 남길 때 `PYTHONIOENCODING=utf-8` 을 쓰거나 파일에 직접 쓰기(`>` 리다이렉트)를 쓰고 `tee`(콘솔 경유)는 피한다. (3) `downgrade base` 실행 후 `alembic_version` 테이블 자체도 비워지므로(Alembic 이 관리) `information_schema.tables` 9개 부재 확인 시 `alembic_version` 은 원래도 집합 밖이라 영향 없음.
+- Refs: P1-schema R8 R9 D4 D5 S3.1

@@ -1,0 +1,18 @@
+[info] user=app host=localhost port=5433 dbname=relationship (source=POSTGRES_*)
+[ok] server = PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+[check] 9 tables -> got 9: ['agent_traces', 'events', 'fact_sources', 'pending_questions', 'person_aliases', 'person_facts', 'persons', 'push_subscriptions', 'schedules']
+[check] events CHECK: [('ck_events_type_valid', "CHECK ((type = ANY (ARRAY['conflict'::text, 'praise'::text, 'meal'::text, 'meeting'::text, 'personal_share'::text, 'favor'::text, 'other'::text])))")]
+[check] persons CHECK: [('ck_persons_hierarchy_valid', "CHECK ((hierarchy = ANY (ARRAY['상'::text, '동'::text, '하'::text])))"), ('ck_persons_relation_tag_valid', "CHECK ((relation_tag = ANY (ARRAY['가족'::text, '연인'::text, '친구'::text, '직장'::text, '지인'::text])))")]
+[check] pending_questions CHECK: [('ck_pending_questions_kind_valid', "CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text])))")]
+[check] embedding type: ('vector(1536)',)
+[check] person_embeddings absent -> 0 rows (expect 0)
+[check] fact_sources PK: [('pk_fact_sources', 'PRIMARY KEY (fact_id, event_id)')]
+[check] FK count -> 6 (expect 6)
+    ('events', 'fk_events_person_id_persons', 'c')
+    ('fact_sources', 'fk_fact_sources_event_id_events', 'c')
+    ('fact_sources', 'fk_fact_sources_fact_id_person_facts', 'c')
+    ('person_aliases', 'fk_person_aliases_person_id_persons', 'c')
+    ('person_facts', 'fk_person_facts_person_id_persons', 'c')
+    ('schedules', 'fk_schedules_person_id_persons', 'c')
+[check] partial index: [('ix_pending_questions_session_id_unanswered', 'CREATE INDEX ix_pending_questions_session_id_unanswered ON public.pending_questions USING btree (session_id) WHERE (answered_at IS NULL)')]
+[check] alembic_version: ('0001',)

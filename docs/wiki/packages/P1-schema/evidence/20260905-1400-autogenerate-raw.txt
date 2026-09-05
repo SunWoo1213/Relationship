@@ -1,0 +1,28 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+INFO  [alembic.autogenerate.compare.tables] Detected added table 'agent_traces'
+INFO  [alembic.autogenerate.compare.constraints] Detected added index 'ix_agent_traces_session_id_created_at' on '('session_id', 'created_at')'
+INFO  [alembic.autogenerate.compare.tables] Detected added table 'pending_questions'
+INFO  [alembic.autogenerate.compare.constraints] Detected added index 'ix_pending_questions_session_id_created_at' on '('session_id', 'created_at')'
+INFO  [alembic.autogenerate.compare.constraints] Detected added index 'ix_pending_questions_session_id_unanswered' on '('session_id',)'
+INFO  [alembic.autogenerate.compare.tables] Detected added table 'persons'
+INFO  [alembic.autogenerate.compare.constraints] Detected added index 'ix_persons_user_id' on '('user_id',)'
+INFO  [alembic.autogenerate.compare.tables] Detected added table 'push_subscriptions'
+INFO  [alembic.autogenerate.compare.tables] Detected added table 'events'
+INFO  [alembic.autogenerate.compare.constraints] Detected added index 'ix_events_person_id_occurred_at' on '('person_id', 'occurred_at')'
+INFO  [alembic.autogenerate.compare.tables] Detected added table 'person_aliases'
+INFO  [alembic.autogenerate.compare.constraints] Detected added index 'ix_person_aliases_alias' on '('alias',)'
+INFO  [alembic.autogenerate.compare.constraints] Detected added index 'ix_person_aliases_person_id' on '('person_id',)'
+INFO  [alembic.autogenerate.compare.tables] Detected added table 'person_facts'
+INFO  [alembic.autogenerate.compare.constraints] Detected added index 'ix_person_facts_person_id_key' on '('person_id', 'key')'
+INFO  [alembic.autogenerate.compare.tables] Detected added table 'schedules'
+INFO  [alembic.autogenerate.compare.constraints] Detected added index 'ix_schedules_scheduled_at' on '('scheduled_at',)'
+INFO  [alembic.autogenerate.compare.tables] Detected added table 'fact_sources'
+INFO  [alembic.autogenerate.compare.constraints] Detected added index 'ix_fact_sources_event_id' on '('event_id',)'
+Generating C:\Capstone2\alembic\versions\a34ea2e32977_schema_v2.py ...  done

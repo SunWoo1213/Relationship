@@ -1,0 +1,299 @@
+"""Refs: P1-schema R8 R9 D4 D5 S3.1
+
+schema v2 -- 9 tables (persons, person_aliases, person_facts, fact_sources,
+events, schedules, pending_questions, push_subscriptions, agent_traces).
+
+Draft produced by `POSTGRES_PORT=5433 alembic revision --autogenerate -m
+"schema v2"` against `app.db.models` (see
+docs/wiki/packages/P1-schema/evidence/20260905-1400-0001-autogenerate-raw.py.txt
+for the untouched autogenerate output). Hand corrections applied on top of
+the draft (01-plan U3, see 03-log for the diff table):
+
+  (a) `pgvector.sqlalchemy.Vector` import and `Vector(1536)` rendering for
+      `person_aliases.embedding` -- already correct in the draft thanks to
+      the `render_item` hook in alembic/env.py, kept as-is.
+  (b) `upgrade()` first statement: `CREATE EXTENSION IF NOT EXISTS vector`
+      (idempotent) -- ADDED, the draft did not include it because the
+      extension already existed on the inspected database.
+  (c) The four CHECK constraints keep the names the naming_convention in
+      app/db/base.py renders (`ck_persons_relation_tag_valid`,
+      `ck_persons_hierarchy_valid`, `ck_events_type_valid`,
+      `ck_pending_questions_kind_valid`) -- already correct in the draft.
+  (d) Partial index `ix_pending_questions_session_id_unanswered` keeps
+      `postgresql_where=sa.text("answered_at IS NULL")` -- already correct.
+  (e) All 6 foreign keys keep `ondelete="CASCADE"` -- already correct.
+  (f) `fact_sources` composite primary key `(fact_id, event_id)`, no
+      surrogate key -- already correct.
+  (g) `server_default=sa.text("now()")` and `sa.Identity(always=False)` for
+      BIGINT identity primary keys -- already correct.
+  (h) `downgrade()` drops the 9 tables in dependency-safe reverse order and
+      does NOT drop the `vector` extension -- already correct order in the
+      draft, kept as-is.
+
+Revision ID: 0001
+Revises:
+Create Date: 2026-09-05 14:00:04.923230
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+from pgvector.sqlalchemy import Vector
+from sqlalchemy.dialects import postgresql
+
+# revision identifiers, used by Alembic.
+revision: str = "0001"
+down_revision: Union[str, Sequence[str], None] = None
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    """Upgrade schema."""
+    # pgvector must exist before any `vector` column is created. Idempotent
+    # (P0-compose 04-review §7 confirmed this is harmless to re-run).
+    op.execute("CREATE EXTENSION IF NOT EXISTS vector")
+
+    op.create_table(
+        "agent_traces",
+        sa.Column("id", sa.BigInteger(), sa.Identity(always=False), nullable=False),
+        sa.Column("session_id", sa.Text(), nullable=False),
+        sa.Column("step", sa.Text(), nullable=False),
+        sa.Column("tool_name", sa.Text(), nullable=False),
+        sa.Column("input", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("output", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("tokens_in", sa.Integer(), nullable=False),
+        sa.Column("tokens_out", sa.Integer(), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_agent_traces")),
+    )
+    op.create_index(
+        "ix_agent_traces_session_id_created_at",
+        "agent_traces",
+        ["session_id", "created_at"],
+        unique=False,
+    )
+    op.create_table(
+        "pending_questions",
+        sa.Column("id", sa.BigInteger(), sa.Identity(always=False), nullable=False),
+        sa.Column("session_id", sa.Text(), nullable=False),
+        sa.Column("kind", sa.Text(), nullable=False),
+        sa.Column("question", sa.Text(), nullable=False),
+        sa.Column("options", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("context", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("answer", sa.Text(), nullable=True),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.Column("answered_at", sa.DateTime(timezone=True), nullable=True),
+        sa.CheckConstraint(
+            "kind IN ('identity', 'new_person', 'schedule')",
+            name=op.f("ck_pending_questions_kind_valid"),
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_pending_questions")),
+    )
+    op.create_index(
+        "ix_pending_questions_session_id_created_at",
+        "pending_questions",
+        ["session_id", "created_at"],
+        unique=False,
+    )
+    op.create_index(
+        "ix_pending_questions_session_id_unanswered",
+        "pending_questions",
+        ["session_id"],
+        unique=False,
+        postgresql_where=sa.text("answered_at IS NULL"),
+    )
+    op.create_table(
+        "persons",
+        sa.Column("id", sa.BigInteger(), sa.Identity(always=False), nullable=False),
+        sa.Column("user_id", sa.Text(), nullable=False),
+        sa.Column("display_name", sa.Text(), nullable=False),
+        sa.Column("relation_tag", sa.Text(), nullable=False),
+        sa.Column("hierarchy", sa.Text(), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.CheckConstraint(
+            "hierarchy IN ('상', '동', '하')",
+            name=op.f("ck_persons_hierarchy_valid"),
+        ),
+        sa.CheckConstraint(
+            "relation_tag IN ('가족', '연인', '친구', '직장', '지인')",
+            name=op.f("ck_persons_relation_tag_valid"),
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_persons")),
+    )
+    op.create_index("ix_persons_user_id", "persons", ["user_id"], unique=False)
+    op.create_table(
+        "push_subscriptions",
+        sa.Column("id", sa.BigInteger(), sa.Identity(always=False), nullable=False),
+        sa.Column("user_id", sa.Text(), nullable=False),
+        sa.Column("endpoint", sa.Text(), nullable=False),
+        sa.Column("keys", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_push_subscriptions")),
+    )
+    op.create_table(
+        "events",
+        sa.Column("id", sa.BigInteger(), sa.Identity(always=False), nullable=False),
+        sa.Column("person_id", sa.BigInteger(), nullable=False),
+        sa.Column("type", sa.Text(), nullable=False),
+        sa.Column("content", sa.Text(), nullable=False),
+        sa.Column("raw_utterance", sa.Text(), nullable=False),
+        sa.Column("occurred_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.CheckConstraint(
+            "type IN ('conflict', 'praise', 'meal', 'meeting', 'personal_share', "
+            "'favor', 'other')",
+            name=op.f("ck_events_type_valid"),
+        ),
+        sa.ForeignKeyConstraint(
+            ["person_id"],
+            ["persons.id"],
+            name=op.f("fk_events_person_id_persons"),
+            ondelete="CASCADE",
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_events")),
+    )
+    op.create_index(
+        "ix_events_person_id_occurred_at", "events", ["person_id", "occurred_at"], unique=False
+    )
+    op.create_table(
+        "person_aliases",
+        sa.Column("id", sa.BigInteger(), sa.Identity(always=False), nullable=False),
+        sa.Column("person_id", sa.BigInteger(), nullable=False),
+        sa.Column("alias", sa.Text(), nullable=False),
+        sa.Column("source", sa.Text(), nullable=False),
+        sa.Column("embedding", Vector(1536), nullable=True),
+        sa.Column("confirmed_at", sa.DateTime(timezone=True), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["person_id"],
+            ["persons.id"],
+            name=op.f("fk_person_aliases_person_id_persons"),
+            ondelete="CASCADE",
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_person_aliases")),
+    )
+    op.create_index("ix_person_aliases_alias", "person_aliases", ["alias"], unique=False)
+    op.create_index("ix_person_aliases_person_id", "person_aliases", ["person_id"], unique=False)
+    op.create_table(
+        "person_facts",
+        sa.Column("id", sa.BigInteger(), sa.Identity(always=False), nullable=False),
+        sa.Column("person_id", sa.BigInteger(), nullable=False),
+        sa.Column("key", sa.Text(), nullable=False),
+        sa.Column("value", sa.Text(), nullable=False),
+        sa.Column("confidence", sa.Double(), nullable=False),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.ForeignKeyConstraint(
+            ["person_id"],
+            ["persons.id"],
+            name=op.f("fk_person_facts_person_id_persons"),
+            ondelete="CASCADE",
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_person_facts")),
+    )
+    op.create_index(
+        "ix_person_facts_person_id_key", "person_facts", ["person_id", "key"], unique=False
+    )
+    op.create_table(
+        "schedules",
+        sa.Column("id", sa.BigInteger(), sa.Identity(always=False), nullable=False),
+        sa.Column("person_id", sa.BigInteger(), nullable=False),
+        sa.Column("title", sa.Text(), nullable=False),
+        sa.Column("scheduled_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("briefed_at", sa.DateTime(timezone=True), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["person_id"],
+            ["persons.id"],
+            name=op.f("fk_schedules_person_id_persons"),
+            ondelete="CASCADE",
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_schedules")),
+    )
+    op.create_index("ix_schedules_scheduled_at", "schedules", ["scheduled_at"], unique=False)
+    op.create_table(
+        "fact_sources",
+        sa.Column("fact_id", sa.BigInteger(), nullable=False),
+        sa.Column("event_id", sa.BigInteger(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["event_id"],
+            ["events.id"],
+            name=op.f("fk_fact_sources_event_id_events"),
+            ondelete="CASCADE",
+        ),
+        sa.ForeignKeyConstraint(
+            ["fact_id"],
+            ["person_facts.id"],
+            name=op.f("fk_fact_sources_fact_id_person_facts"),
+            ondelete="CASCADE",
+        ),
+        sa.PrimaryKeyConstraint("fact_id", "event_id", name=op.f("pk_fact_sources")),
+    )
+    op.create_index("ix_fact_sources_event_id", "fact_sources", ["event_id"], unique=False)
+
+
+def downgrade() -> None:
+    """Downgrade schema.
+
+    Drops the 9 tables in dependency-safe reverse order. Does NOT drop the
+    `vector` extension (01-plan: "확장은 지우지 않는다" -- other schemas/
+    databases on the same server may depend on it).
+    """
+    op.drop_index("ix_fact_sources_event_id", table_name="fact_sources")
+    op.drop_table("fact_sources")
+    op.drop_index("ix_schedules_scheduled_at", table_name="schedules")
+    op.drop_table("schedules")
+    op.drop_index("ix_person_facts_person_id_key", table_name="person_facts")
+    op.drop_table("person_facts")
+    op.drop_index("ix_person_aliases_person_id", table_name="person_aliases")
+    op.drop_index("ix_person_aliases_alias", table_name="person_aliases")
+    op.drop_table("person_aliases")
+    op.drop_index("ix_events_person_id_occurred_at", table_name="events")
+    op.drop_table("events")
+    op.drop_table("push_subscriptions")
+    op.drop_index("ix_persons_user_id", table_name="persons")
+    op.drop_table("persons")
+    op.drop_index(
+        "ix_pending_questions_session_id_unanswered",
+        table_name="pending_questions",
+        postgresql_where=sa.text("answered_at IS NULL"),
+    )
+    op.drop_index("ix_pending_questions_session_id_created_at", table_name="pending_questions")
+    op.drop_table("pending_questions")
+    op.drop_index("ix_agent_traces_session_id_created_at", table_name="agent_traces")
+    op.drop_table("agent_traces")
