@@ -1,0 +1,2 @@
+verify-impl P0-compose 20260905-1127
+FAIL=0 WARN=0

@@ -1,0 +1,64 @@
+# verifier 2026-09-05 정적 검사 (비밀·금지 옵션·범위)
+
+$ grep -n -E 'sk-[A-Za-z0-9]{8,}|AKIA[0-9A-Z]{12,}|-----BEGIN|api[_-]?key *= *["'\''][^"'\'']{8,}' .env.example docker-compose.yml docker/initdb/01-vector.sql scripts/db_check.py tests/test_db_check.py README.md   (키 패턴; 0건 기대)
+exit=1 (1 = 매치 없음)
+
+$ grep -n -i 'password' .env.example docker-compose.yml scripts/db_check.py README.md   (비밀번호 등장 줄 — 값은 예시값 pass 또는 이름뿐이어야 함)
+.env.example:17:POSTGRES_PASSWORD=pass
+docker-compose.yml:9:      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pass}
+scripts/db_check.py:9:     POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB / POSTGRES_PORT
+scripts/db_check.py:36:DEFAULT_PASSWORD = "pass"
+scripts/db_check.py:44:    """접속 정보. 이 값을 출력할 때는 password 필드를 절대 포함하지 않는다."""
+scripts/db_check.py:47:    password: str
+scripts/db_check.py:57:            "password": self.password,
+scripts/db_check.py:72:    """DATABASE_URL 을 user/password/host/port/dbname 으로 분해한다."""
+scripts/db_check.py:77:        "password": parts.password or "",
+scripts/db_check.py:94:        k in env for k in ("POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB", "POSTGRES_PORT")
+scripts/db_check.py:98:        "password": env.get("POSTGRES_PASSWORD", DEFAULT_PASSWORD),
+scripts/db_check.py:107:            password=parsed["password"] or postgres["password"],
+scripts/db_check.py:118:                env.get("POSTGRES_PASSWORD") is not None
+scripts/db_check.py:119:                and parsed["password"] != env["POSTGRES_PASSWORD"]
+scripts/db_check.py:121:                warnings.append("[warn] POSTGRES_PASSWORD 가 DATABASE_URL 과 다르다")
+scripts/db_check.py:131:        password=postgres["password"],
+README.md:123:사전 조건: Docker Desktop 실행 중. `.env`가 없다면 `.env.example`을 복사해 시작하고, DB 절의 `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` / `POSTGRES_PORT` 4개와 `DATABASE_URL`을 **같은 값**으로 유지한다(포트를 바꾸면 둘 다 바꾼다).
+
+$ grep -n -E 'down +-v|volume +rm|prune|--force|DROP |TRUNCATE' docker-compose.yml docker/initdb/01-vector.sql scripts/db_check.py   (금지 옵션·문장을 실행 파일에 담고 있는가; 주석 경고문만 허용)
+docker-compose.yml:2:# 볼륨을 지우는 옵션 금지(security.md §4) — `docker compose down -v` / `volume rm` / `prune` 은 사용자만.
+exit=0
+
+$ grep -n -i -E 'CREATE TABLE|ALTER TABLE|alembic' docker/initdb/*.sql scripts/db_check.py docker-compose.yml   (범위 밖: 테이블 생성·Alembic — 0건 기대)
+exit=1 (1 = 매치 없음)
+
+$ ls docker/initdb alembic* Dockerfile 2>&1
+01-vector.sql
+ls: cannot access 'alembic*': No such file or directory
+ls: cannot access 'Dockerfile': No such file or directory
+
+$ grep -c 'POSTGRES_' .env.example   (F-033bb1 5단계 기대 4)
+4
+$ grep -c 'POSTGRES_.*:-' docker-compose.yml   (F-033bb1 6단계 기대 4; healthcheck 줄에도 있어 5 이상 가능)
+5
+8:      POSTGRES_USER: ${POSTGRES_USER:-app}
+9:      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pass}
+10:      POSTGRES_DB: ${POSTGRES_DB:-relationship}
+12:      - "${POSTGRES_PORT:-5432}:5432"
+17:      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-relationship}"]
+$ grep -c '| README.md |' docs/wiki/registry.md   (F-0ffff5 4단계 기대 1)
+1
+$ grep -n 'docker compose up -d' README.md   (F-0ffff5 5단계)
+127:docker compose up -d
+$ grep -n 'P0-compose' docs/wiki/registry.md | cut -c1-120
+32:| 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·실행법) | README.md | 하네스 | 
+35:| 스크립트 | 로컬 pgvector compose(postgres 서비스, `${VAR:-기본값}` 4개, healthcheck) | docker-compose.
+36:| 스크립트 | pgvector 확장 최초 기동 초기화 | docker/initdb/01-vector.sql | P0-compose | pending | CREAT
+37:| 스크립트 | DB 접속 검사(psycopg, `POSTGRES_*`↔`DATABASE_URL` 불일치 경고) | scripts/db_check.py | P0
+
+$ 03-log Refs ↔ 커밋 본문 Refs
+23d8700 commit: Refs: P0-compose D4 D5 S3.1 F-033bb1 F-0ffff5 L-002
+749bb8e commit: Refs: P0-compose D4 D5 S3.1 F-033bb1
+0ee6e25 commit: Refs: P0-compose D4 D5 S3.1 F-033bb1
+7397966 commit: Refs: P0-compose D4 D5 S3.1 F-0ffff5
+11:- Refs: P0-compose D4 D5 S3.1 F-033bb1 F-0ffff5
+18:- Refs: P0-compose D4 D5 S3.1 F-033bb1
+27:- Refs: P0-compose D4 D5 S3.1 F-033bb1
+34:- Refs: P0-compose D4 D5 S3.1 F-0ffff5

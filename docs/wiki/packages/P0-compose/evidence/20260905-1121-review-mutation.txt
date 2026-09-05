@@ -1,0 +1,24 @@
+# 변이 검사 1: 경고 문장에 비밀번호 값을 붙이도록 db_check.py 복사본을 바꾼 뒤 같은 테스트 실행 (원본은 수정하지 않음)
+        assert "POSTGRES_USER" not in joined
+        assert "POSTGRES_DB" not in joined
+    
+        assert url_pw not in joined
+>       assert star_pw not in joined
+E       AssertionError: assert 'pwtwo' not in '[warn] POST...SE_URL �� �ٸ���'
+E         
+E         'pwtwo' is contained here:
+E           RL �� �ٸ���: pwtwo [warn] POSTGRES_PORT �� DATABASE_URL �� �ٸ���
+E         ?           +++++
+
+tests\test_db_check.py:75: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_db_check.py::test_mismatch_warns_variable_name_only_no_secret_value
+1 failed, 5 passed in 0.53s
+
+# 변이 검사 2: POSTGRES_PORT 불일치 비교를 항상 거짓으로 바꾼 복사본
+E       AssertionError: assert 'POSTGRES_PORT' in '[warn] POSTGRES_PASSWORD �� DATABASE_URL �� �ٸ���'
+
+tests\test_db_check.py:69: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_db_check.py::test_mismatch_warns_variable_name_only_no_secret_value
+1 failed, 5 passed in 0.48s

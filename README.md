@@ -66,7 +66,7 @@
 | 단계 | 내용 | 상태 |
 |---|---|---|
 | P0 | 임베딩 공급자 파일럿 (D4) | **완료** — small/large 모두 기준 통과, `text-embedding-3-small` N=1536 확정 |
-| P0 | 로컬 docker-compose (pgvector) | 구현 완료 · 검증 대기 |
+| P0 | 로컬 docker-compose (pgvector) | **완료** — `SELECT '[1,2,3]'::vector` 통과, pgvector 0.8.6 (pg16) |
 | P0 | LLM 비용 실측 | 대기 |
 | P1 | 스키마 v2 마이그레이션 · 파일럿 데이터셋 | 대기 |
 | P2~P3 | 툴 7종 · 엔티티 해석 4단계 · 베이스라인 | 대기 |

@@ -42,3 +42,5 @@
 - 2026-09-04 11:56 | PUSH | origin dev 0ee6e25 — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-04 11:57 | RELEASE | origin main ← dev 0ee6e25
 - 2026-09-04 12:36 | COMMIT | 7397966 docs(P0-compose): U3 README 로컬 DB 절·registry 반영, verify-impl 사전 실행
+- 2026-09-05 11:18 | COMMIT | 7d20a34 docs(wiki): P0-compose U3 커밋 반영 — HANDOFF·journal 정리, 03-log 해시 채움
+- 2026-09-05 11:35 | DONE | P0-compose 완료 승인(사용자). 수용 기준 통과, verify-impl PASS 10/WARN 0/FAIL 0 (evidence/20260905-1127-verify-impl.txt), 부정 케이스 5종 evidence/20260905-1121-review-*.txt, 소견 F-033bb1·F-0ffff5 해소. 닫는 R 없음 | P0-compose D4 D5 S3.1

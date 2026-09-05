@@ -1,0 +1,32 @@
+# verifier 2026-09-05 재현·부정 케이스 (PYTHONIOENCODING=utf-8, 컨테이너 capstone2-postgres-1 healthy, 5433 매핑)
+
+$ POSTGRES_PORT=5433 python scripts/db_check.py   (재현. 03-log U2 발견과 동일 방식)
+[info] 접속 대상: user=app host=localhost port=5433 dbname=relationship (source=POSTGRES_*)
+[ok] CREATE EXTENSION IF NOT EXISTS vector;
+[ok] extversion = 0.8.6
+[ok] SELECT '[1,2,3]'::vector -> [1,2,3]
+exit=0
+
+$ POSTGRES_PORT=5599 python scripts/db_check.py   (부정: 아무것도 없는 포트 → rc 1, 비밀번호 값 미출력)
+[info] 접속 대상: user=app host=localhost port=5599 dbname=relationship (source=POSTGRES_*)
+[error] DB 접속/쿼리 실패: ConnectionTimeout: connection timeout expired
+Multiple connection attempts failed. All failures were:
+exit=1
+
+$ POSTGRES_PORT=5433 POSTGRES_DB=nonexistent_db python scripts/db_check.py   (부정: 없는 DB → rc 1)
+[info] 접속 대상: user=app host=localhost port=5433 dbname=nonexistent_db (source=POSTGRES_*)
+[error] DB 접속/쿼리 실패: OperationalError: connection failed: connection to server at "127.0.0.1", port 5433 failed: FATAL:  database "nonexistent_db" does not exist
+exit=1
+
+$ DATABASE_URL=<.env.example 14행 공개 예시값> POSTGRES_PORT=5433 python scripts/db_check.py   (부정: URL 포트 5432 vs POSTGRES_PORT 5433 → 변수 이름만 경고. 5432 는 무관 컨테이너라 인증 실패 rc 1 — 기대된 결과)
+[warn] POSTGRES_PORT 가 DATABASE_URL 과 다르다
+[info] 접속 대상: user=app host=localhost port=5432 dbname=relationship (source=DATABASE_URL)
+[error] DB 접속/쿼리 실패: OperationalError: connection failed: connection to server at "127.0.0.1", port 5432 failed: FATAL:  password authentication failed for user "app"
+exit=1
+
+$ DATABASE_URL=<.env.example 14행 예시값의 포트만 5433 으로 치환> python scripts/db_check.py   (DATABASE_URL 경로로 수용 기준 쿼리 성공 확인; POSTGRES_* 미설정 → 경고 없음)
+[info] 접속 대상: user=app host=localhost port=5433 dbname=relationship (source=DATABASE_URL)
+[ok] CREATE EXTENSION IF NOT EXISTS vector;
+[ok] extversion = 0.8.6
+[ok] SELECT '[1,2,3]'::vector -> [1,2,3]
+exit=0

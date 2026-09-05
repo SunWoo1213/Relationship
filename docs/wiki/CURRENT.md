@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: P0-compose
+active: none
 frozen: none
 
 <!--
@@ -12,4 +12,4 @@ frozen: none
 -->
 
 ## 메모
-- P0-compose 계획 승인(2026-09-03, verifier 2회 검증). U1 구현 중. 팀 밑작업 L-004 는 보류.
+- P0-compose 완료(2026-09-05, 04-review 완료·verify-impl FAIL 0). 다음 후보: P0-cost(eval-agent) 또는 P1-schema(backend-agent) — /devlog start 로 사용자 선택. 팀 밑작업(Agent Teams) 은 보류.

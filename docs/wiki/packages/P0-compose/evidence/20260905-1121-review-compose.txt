@@ -1,0 +1,47 @@
+$ docker compose config --quiet   (유효성만; 값 출력 없음)
+exit=0
+
+$ docker compose config | grep -v -i password   (구조 확인. 비밀번호 줄은 제외)
+name: capstone2
+services:
+  postgres:
+    environment:
+      POSTGRES_DB: relationship
+      POSTGRES_USER: app
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U app -d relationship
+      interval: 5s
+      retries: 10
+    image: pgvector/pgvector:pg16
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "5432"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: pgdata
+        target: /var/lib/postgresql/data
+        volume: {}
+      - type: bind
+        source: C:\Capstone2\docker\initdb
+        target: /docker-entrypoint-initdb.d
+        read_only: true
+        bind: {}
+networks:
+  default:
+    name: capstone2_default
+volumes:
+  pgdata:
+    name: capstone2_pgdata
+exit=0
+
+$ docker compose ps
+NAME                   IMAGE                    COMMAND                   SERVICE    CREATED        STATUS                   PORTS
+capstone2-postgres-1   pgvector/pgvector:pg16   "docker-entrypoint.s…"   postgres   24 hours ago   Up 5 minutes (healthy)   0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+exit=0

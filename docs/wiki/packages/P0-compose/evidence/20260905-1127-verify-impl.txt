@@ -1,0 +1,14 @@
+== verify-impl P0-compose  (20260905-1127) ==
+................                                                         [100%]
+16 passed in 0.11s
+PASS  pytest 통과 → evidence/20260905-1127-pytest.txt
+PASS  compileall 통과 → evidence/20260905-1127-lint.txt
+PASS  태그 P0-compose 커밋 6 건 → evidence/20260905-1127-commits.txt
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: D5
+PASS  커밋에 태그 존재: S3.1
+PASS  검토자 = verifier (L-002)
+PASS  증거 확인:  `SELECT '[1,2,3]'::vector` 성공  ← evidence/20260904-db-check.txt (구현�
+PASS  registry 에 P0-compose 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=0 → evidence/20260905-1127-summary.txt ==

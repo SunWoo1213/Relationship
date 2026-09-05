@@ -13,7 +13,7 @@
 - [ ] [사용자] AWS Budgets 알림 $10/$30/$50 설정, 크레딧 잔액 확인 / 의존: 없음 / 수용기준: 알림 3개 활성, 잔액 메모 또는 스크린샷
 - [x] [backend-agent] 임베딩 공급자 파일럿 (D4) — `scripts/embed_pilot.py`, `reports/embed_pilot.md` / 의존: 없음 / 수용기준: 한국어 짧은 호칭 30개 유사도 행렬 2종, 선택 근거 1문단, 확정 차원 N 기록
 - [ ] [eval-agent] LLM 비용 실측 — `reports/cost_estimate.md` / 의존: 없음 / 수용기준: 시나리오 1건당 토큰 실측, 150건 × 4방식 × 10임계치 총액 추정
-- [ ] [backend-agent] 로컬 docker-compose (pgvector) / 의존: 없음 / 수용기준: `SELECT '[1,2,3]'::vector` 성공
+- [x] [backend-agent] 로컬 docker-compose (pgvector) / 의존: 없음 / 수용기준: `SELECT '[1,2,3]'::vector` 성공 — 완료(2026-09-05, 04-review 완료, verify-impl FAIL 0)
 
 ## 구현 순서 (P1~P11, 날짜 없음 — 같은 번호는 병렬 가능)
 
