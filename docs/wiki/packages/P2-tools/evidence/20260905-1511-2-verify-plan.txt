@@ -1,0 +1,73 @@
+== verify-plan P2-tools  (2026-09-05 15:11) ==
+PASS  존재: docs/wiki/packages/P2-tools/01-plan.md
+FAIL  없음: docs/wiki/packages/P2-tools/02-plan-verify.md
+PASS  카드 존재: D1
+PASS  카드 존재: D2
+PASS  카드 존재: D4
+PASS  카드 존재: D5
+PASS  카드 존재: D6
+PASS  카드 존재: D9
+PASS  패키지 id 등록됨: P0-compose
+PASS  패키지 id 등록됨: P0-embed-pilot
+PASS  패키지 id 등록됨: P1-schema
+PASS  패키지 id 등록됨: P2-tools
+PASS  패키지 id 등록됨: P3-er
+PASS  패키지 id 등록됨: P5-loop
+PASS  패키지 id 등록됨: P6-briefing
+PASS  패키지 id 등록됨: P6-memory
+PASS  패키지 id 등록됨: P7-push
+PASS  패키지 id 등록됨: P8-frontend
+PASS  검증 항목 존재: R10
+PASS  검증 항목 존재: R18
+PASS  검증 항목 존재: R6
+PASS  검증 항목 존재: R7
+PASS  Refs 있음: - [ ] U1 기반: `requirements.txt` 에 `fastapi`·`uvicorn[
+PASS  Refs 있음: - [ ] U2 툴 공통: `app/tools/types.py`(Candidate·*Out·�
+PASS  Refs 있음: - [ ] U3 `search_person`: `app/embedding.py`(Protocol), `app
+PASS  Refs 있음: - [ ] U4 `create_person`·`update_person`: D1 강제(`ctx.co
+PASS  Refs 있음: - [ ] U5 `add_event`·`add_schedule`: `app/tools/records.py`
+PASS  Refs 있음: - [ ] U6 `ask_user`·`answer_question`: `app/tools/questions
+PASS  Refs 있음: - [ ] U7 `get_briefing`: `app/tools/briefing.py` — 인물�
+PASS  Refs 있음: - [ ] U8 FastAPI 골격: `app/main.py`(`create_app()`·예�
+PASS  Refs 있음: - [ ] U9 수용 기준 기계 검증 + 문서: `scripts/tool
+PASS  backlog 일치: 시그니처가 CLAUDE.md와 일치, `ask_user`가 `pending_
+PASS  의존 완료: P0-compose
+PASS  의존 완료: P1-schema
+PASS  registry 중복 없음: app/settings.py
+PASS  registry 중복 없음: app/db/session.py
+PASS  registry 중복 없음: app.config.sqlal
+PASS  registry 중복 없음: app/embedding.py
+PASS  registry 중복 없음: app/tools/__init__.py
+PASS  registry 중복 없음: app/tools/types.py
+PASS  registry 중복 없음: app/tools/context.py
+PASS  registry 중복 없음: app/tools/persons.py
+PASS  registry 중복 없음: app/tools/records.py
+PASS  registry 중복 없음: app/tools/questions.py
+PASS  registry 중복 없음: app/tools/briefing.py
+PASS  registry 중복 없음: app/main.py
+PASS  registry 중복 없음: app/api/__init__.py
+PASS  registry 중복 없음: app/api/deps.py
+PASS  registry 중복 없음: app/api/routes.py
+PASS  registry 중복 없음: app/api/schemas.py
+WARN  registry 에 다른 패키지로 이미 있음: requirements.txt → | 문서/설정 | 런타임·개발 의존성 선언(첫 도입, `==` 고정) | 
+WARN  registry 에 다른 패키지로 이미 있음: app/db/models.py → | 모듈 | 스키마 v2 SQLAlchemy 모델 9개 | app/db/models.py | P1-schema | 
+WARN  registry 에 다른 패키지로 이미 있음: app/config.py → | 모듈 | 백엔드 패키지 골격(DB 접속 설정) | app/config.py | P1-sch
+PASS  registry 중복 없음: ConnInfo.passw
+PASS  registry 중복 없음: scripts/tools_check.py
+PASS  registry 중복 없음: CLAUDE.md
+PASS  registry 중복 없음: inspect.signa
+WARN  registry 에 다른 패키지로 이미 있음: tests/conftest.py → | 테스트 | 저장소 루트 `sys.path` 등록(공용 fixture) | tests/conftes
+WARN  registry 에 다른 패키지로 이미 있음: tests/test_config.py → | 테스트 | 접속 설정 해석(DB 없이) | tests/test_config.py | P1-schema
+PASS  registry 중복 없음: tests/test_settings.py
+PASS  registry 중복 없음: tests/test_db_session.py
+PASS  registry 중복 없음: tests/test_tools_context.py
+PASS  registry 중복 없음: tests/test_tools_persons.py
+PASS  registry 중복 없음: tests/test_tools_records.py
+PASS  registry 중복 없음: tests/test_tools_questions.py
+PASS  registry 중복 없음: tests/test_tools_briefing.py
+PASS  registry 중복 없음: tests/test_tool_signatures.py
+PASS  registry 중복 없음: CLAUDE.md
+PASS  registry 중복 없음: tests/test_api.py
+PASS  registry 중복 없음: docs/wiki/registry.md
+WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
+== 결과: FAIL=1 WARN=6 ==

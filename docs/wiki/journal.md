@@ -57,3 +57,8 @@
 - 2026-09-05 14:19 | COMMIT | 03e3ce3 feat(P1-schema): U4 schema_check.py + upgrade→downgrade base→upgrade 왕복 증거·alembic check
 - 2026-09-05 14:27 | COMMIT | ec2fe8c docs(P1-schema): U5 registry·README 마이그레이션 절·db_check version(), verify-impl 사전 실행
 - 2026-09-05 15:50 | DONE | P1-schema 완료 승인(사용자). 수용 기준 통과(독립 쿼리 9테이블·events CHECK 7값), verify-impl PASS/WARN 0/FAIL 0 (evidence/20260905-1439-verify-impl-final.txt), 변이 4종·expect-empty·badport·alembic check 직접 실행, R8 R9 구현완료(4dfaf33, 09c2bd1). 권고 F-8eeb9b(ConnInfo repr)→P2-tools, F-c7078e(mako Refs)→P3-er, F-36bed6 registry 정정 | P1-schema R8 R9 D4 D5 S3.1
+- 2026-09-05 14:46 | COMMIT | 5dc95bb docs(P1-schema): 완료 — verifier 04-review 완료 판정·사용자 승인, R8 R9 구현완료, 패키지 닫음
+- 2026-09-05 14:46 | PUSH | origin dev 5dc95bb — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-05 14:47 | RELEASE | origin main ← dev 5dc95bb
+- 2026-09-05 16:40 | DECISION | P2-tools 범위: FastAPI 골격(app/main.py, GET /health, POST /answers/{question_id} 답 저장만)을 P2 에 포함(사용자, P1 인계 존중). 루프 재개·채팅 엔드포인트는 P5. delete_person 은 P2 제외·미결 인계(사용자) | P2-tools S3.4 D2
+- 2026-09-05 17:30 | START | P2-tools 착수: architect(opus) 초안 → 사용자 결정(FastAPI 골격 포함·delete_person 제외) → 개정 1 → verifier(fable) 점검표 8행 통과(FAIL 0/WARN 6 의도, 권고 9) → 사용자 승인 | P2-tools R6 R7 R10 R18 D1 D2 D6 S3.2 S3.4
