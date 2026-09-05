@@ -255,7 +255,7 @@ WARN  @traced 의 step='tool_error' 행은 같은 세션에 flush 되므로 호�
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | `app/tools/context.py` 모듈 docstring 에 "tool_error 행의 한계(F-4d8d96 — 우회 구현 금지)" 절을 명시 — 별도 커넥션 기록 여부는 고치지 않고 P5-loop 01-plan 결정 사항으로 명문 인계 | `grep -n "F-4d8d96" app/tools/context.py` | 모듈 docstring 안에 "F-4d8d96"·"P5-loop 01-plan 이 결정한다" 문구 존재 | 완료(별도 커넥션 기록 여부는 P5-loop 로 인계, 이 소견 자체는 문서화로 닫되 근본 설계는 유지) |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)
@@ -333,7 +333,7 @@ WARN  ALIAS_SOURCES 상수를 U4 에서 추가하지만 U3(search_person) 테스
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | `ALIAS_SOURCES` 상수를 U4 가 아니라 **U2**(`app/db/models.py`, `QUESTION_KINDS` 다음 자리)에 추가 — U3(`search_person`)가 `person_aliases` 행을 만들 때 리터럴 문자열이 아니라 이 상수를 import 하게 함(03-log U2 항목에 기록) | `python -c "from app.db.models import ALIAS_SOURCES; print(ALIAS_SOURCES)"` | `('user_said', 'confirmed', 'system')` | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P2-tools` (계획 단계면 `verify-plan.sh P2-tools`)

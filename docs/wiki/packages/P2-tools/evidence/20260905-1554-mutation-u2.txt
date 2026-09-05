@@ -1,0 +1,29 @@
+F......                                                                  [100%]
+================================== FAILURES ===================================
+____________ test_traced_success_writes_exactly_one_tool_call_row _____________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000214EAD85BE0>
+
+    def test_traced_success_writes_exactly_one_tool_call_row(db_session):
+        session_id = "trace-success-1"
+        ctx = ToolContext(session=db_session, session_id=session_id)
+        when = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    
+        result = _dummy_success(ctx, "±èÆÀÀå", when=when)
+    
+        rows = _rows_for(db_session, session_id)
+        assert len(rows) == 1
+        row = rows[0]
+        assert row.step == "tool_call"
+        assert row.tool_name == "dummy_success"
+        assert row.session_id == session_id
+        assert "ctx" not in row.input
+        assert row.input == {"name": "±èÆÀÀå", "when": when.isoformat()}
+        assert row.output == result.to_dict()
+>       assert row.tokens_in == 0
+E       assert 1 == 0
+E        +  where 1 = <app.db.models.AgentTrace object at 0x00000214EAD4BED0>.tokens_in
+
+tests\test_tools_context.py:62: AssertionError
+1 failed, 6 passed in 0.70s
+exit=1

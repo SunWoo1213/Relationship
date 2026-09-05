@@ -63,3 +63,4 @@
 - 2026-09-05 16:40 | DECISION | P2-tools 범위: FastAPI 골격(app/main.py, GET /health, POST /answers/{question_id} 답 저장만)을 P2 에 포함(사용자, P1 인계 존중). 루프 재개·채팅 엔드포인트는 P5. delete_person 은 P2 제외·미결 인계(사용자) | P2-tools S3.4 D2
 - 2026-09-05 17:30 | START | P2-tools 착수: architect(opus) 초안 → 사용자 결정(FastAPI 골격 포함·delete_person 제외) → 개정 1 → verifier(fable) 점검표 8행 통과(FAIL 0/WARN 6 의도, 권고 9) → 사용자 승인 | P2-tools R6 R7 R10 R18 D1 D2 D6 S3.2 S3.4
 - 2026-09-05 15:27 | COMMIT | 7b793ba docs(P2-tools): 계획·계획검증 승인, 패키지 착수 — 툴 7종 v2 + FastAPI 골격
+- 2026-09-05 15:47 | COMMIT | f217190 feat(P2-tools): U1 기반 — fastapi·uvicorn·httpx 핀, ConnInfo repr 비밀 제거, 세션·설정, DB 롤백 픽스처
