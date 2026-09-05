@@ -1,0 +1,35 @@
+=== grep DATABASE_URL / POSTGRES_ in scripts/db_check.py app/config.py ===
+scripts/db_check.py:8:  1. 환경변수 DATABASE_URL 이 있으면 그것으로 접속한다. 없으면
+scripts/db_check.py:9:     POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB / POSTGRES_PORT
+scripts/db_check.py:12:  2. DATABASE_URL 과 POSTGRES_* 가 둘 다 있고 값이 어긋나면 어긋난 변수 이름만
+scripts/db_check.py:13:     경고로 찍는다 (예: "[warn] POSTGRES_PORT 가 DATABASE_URL 과 다르다").
+app/config.py:8:  1. 환경변수 `DATABASE_URL` 이 있으면 그것으로 접속 정보를 만든다. 없으면
+app/config.py:9:     `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` / `POSTGRES_PORT`
+app/config.py:11:     `POSTGRES_HOST`(선택, 기본값 `localhost` -- 컨테이너 밖에서 접속할 때만 바꾼다)로
+app/config.py:13:  2. `DATABASE_URL` 과 `POSTGRES_*` 가 둘 다 있고 값이 어긋나면 어긋난 변수
+app/config.py:46:    source: str  # "DATABASE_URL" | "POSTGRES_*"
+app/config.py:76:    """DATABASE_URL 을 user/password/host/port/dbname 으로 분해한다."""
+app/config.py:98:    database_url = env.get("DATABASE_URL")
+app/config.py:101:        k in env for k in ("POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB", "POSTGRES_PORT")
+app/config.py:104:        "user": env.get("POSTGRES_USER", DEFAULT_USER),
+app/config.py:105:        "password": env.get("POSTGRES_PASSWORD", DEFAULT_PASSWORD),
+app/config.py:106:        "dbname": env.get("POSTGRES_DB", DEFAULT_DB),
+app/config.py:107:        "port": env.get("POSTGRES_PORT", DEFAULT_PORT),
+app/config.py:118:            source="DATABASE_URL",
+app/config.py:122:            if env.get("POSTGRES_USER") is not None and parsed["user"] != env["POSTGRES_USER"]:
+app/config.py:123:                warnings.append("[warn] POSTGRES_USER 가 DATABASE_URL 과 다르다")
+app/config.py:125:                env.get("POSTGRES_PASSWORD") is not None
+app/config.py:126:                and parsed["password"] != env["POSTGRES_PASSWORD"]
+app/config.py:128:                warnings.append("[warn] POSTGRES_PASSWORD 가 DATABASE_URL 과 다르다")
+app/config.py:129:            if env.get("POSTGRES_DB") is not None and parsed["dbname"] != env["POSTGRES_DB"]:
+app/config.py:130:                warnings.append("[warn] POSTGRES_DB 가 DATABASE_URL 과 다르다")
+app/config.py:131:            if env.get("POSTGRES_PORT") is not None and parsed["port"] != env["POSTGRES_PORT"]:
+app/config.py:132:                warnings.append("[warn] POSTGRES_PORT 가 DATABASE_URL 과 다르다")
+app/config.py:135:    # DATABASE_URL 이 없으면 POSTGRES_* (없으면 기본값)로 조립한다.
+app/config.py:139:        host=env.get("POSTGRES_HOST", DEFAULT_HOST),
+app/config.py:142:        source="POSTGRES_*",
+
+=== grep POSTGRES_HOST in .env.example scripts/db_check.py app/config.py ===
+.env.example:20:POSTGRES_HOST=localhost
+app/config.py:11:     `POSTGRES_HOST`(선택, 기본값 `localhost` -- 컨테이너 밖에서 접속할 때만 바꾼다)로
+app/config.py:139:        host=env.get("POSTGRES_HOST", DEFAULT_HOST),

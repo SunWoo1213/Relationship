@@ -1,4 +1,4 @@
-"""Refs: P0-compose D4 D5 S3.1 -- 로컬 pgvector 접속 검사.
+"""Refs: P0-compose D4 D5 S3.1 · P1-schema(F-ace4dd 접속 조립을 app.config 로 단일화) -- 로컬 pgvector 접속 검사.
 
 설치(필요 시): pip install "psycopg[binary]"
 사용:
@@ -29,112 +29,38 @@ from __future__ import annotations
 
 import os
 import sys
-from dataclasses import dataclass
-from urllib.parse import urlsplit
+from pathlib import Path
 
-DEFAULT_USER = "app"
-DEFAULT_PASSWORD = "pass"
-DEFAULT_DB = "relationship"
-DEFAULT_PORT = "5432"
-DEFAULT_HOST = "localhost"
+# 스크립트로 직접 실행될 때(`python scripts/db_check.py`) `app` 패키지를
+# 찾을 수 있도록 저장소 루트를 sys.path 에 넣는다.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+# 접속 설정 해석 규칙의 단일 구현은 app.config 다(F-ace4dd). 여기서는
+# re-export 만 해서 기존 호출부(main 아래)와 tests/test_db_check.py 가
+# `db_check.resolve_connection` 등을 그대로 쓸 수 있게 한다.
+from app.config import (  # noqa: E402
+    DEFAULT_DB,
+    DEFAULT_HOST,
+    DEFAULT_PASSWORD,
+    DEFAULT_PORT,
+    DEFAULT_USER,
+    ConnInfo,
+    parse_database_url,
+    resolve_connection,
+)
 
-@dataclass
-class ConnInfo:
-    """접속 정보. 이 값을 출력할 때는 password 필드를 절대 포함하지 않는다."""
-
-    user: str
-    password: str
-    host: str
-    port: str
-    dbname: str
-    source: str  # "DATABASE_URL" | "POSTGRES_*"
-
-    def as_keywords(self) -> dict[str, str]:
-        """psycopg.connect(**kwargs) 에 넘길 키워드. 반환값을 로그에 찍지 않는다."""
-        return {
-            "user": self.user,
-            "password": self.password,
-            "host": self.host,
-            "port": self.port,
-            "dbname": self.dbname,
-        }
-
-    def safe_summary(self) -> str:
-        """비밀번호를 뺀 요약. 출력용."""
-        return (
-            f"user={self.user} host={self.host} port={self.port} "
-            f"dbname={self.dbname} (source={self.source})"
-        )
-
-
-def parse_database_url(url: str) -> dict[str, str]:
-    """DATABASE_URL 을 user/password/host/port/dbname 으로 분해한다."""
-    parts = urlsplit(url)
-    dbname = parts.path.lstrip("/")
-    return {
-        "user": parts.username or "",
-        "password": parts.password or "",
-        "host": parts.hostname or DEFAULT_HOST,
-        "port": str(parts.port) if parts.port else DEFAULT_PORT,
-        "dbname": dbname or DEFAULT_DB,
-    }
-
-
-def resolve_connection(env: dict[str, str]) -> tuple[ConnInfo, list[str]]:
-    """환경변수 dict 에서 접속 정보와 불일치 경고 목록을 만든다.
-
-    env 는 os.environ 대신 넘길 수 있는 평범한 dict -- 테스트에서 os.environ 을
-    건드리지 않고 이 함수를 검증하기 위함.
-    """
-    warnings: list[str] = []
-    database_url = env.get("DATABASE_URL")
-
-    postgres_present = any(
-        k in env for k in ("POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB", "POSTGRES_PORT")
-    )
-    postgres = {
-        "user": env.get("POSTGRES_USER", DEFAULT_USER),
-        "password": env.get("POSTGRES_PASSWORD", DEFAULT_PASSWORD),
-        "dbname": env.get("POSTGRES_DB", DEFAULT_DB),
-        "port": env.get("POSTGRES_PORT", DEFAULT_PORT),
-    }
-
-    if database_url:
-        parsed = parse_database_url(database_url)
-        conn = ConnInfo(
-            user=parsed["user"] or postgres["user"],
-            password=parsed["password"] or postgres["password"],
-            host=parsed["host"],
-            port=parsed["port"],
-            dbname=parsed["dbname"],
-            source="DATABASE_URL",
-        )
-        if postgres_present:
-            # 어긋난 변수 이름만 경고 -- 값은 출력하지 않는다.
-            if env.get("POSTGRES_USER") is not None and parsed["user"] != env["POSTGRES_USER"]:
-                warnings.append("[warn] POSTGRES_USER 가 DATABASE_URL 과 다르다")
-            if (
-                env.get("POSTGRES_PASSWORD") is not None
-                and parsed["password"] != env["POSTGRES_PASSWORD"]
-            ):
-                warnings.append("[warn] POSTGRES_PASSWORD 가 DATABASE_URL 과 다르다")
-            if env.get("POSTGRES_DB") is not None and parsed["dbname"] != env["POSTGRES_DB"]:
-                warnings.append("[warn] POSTGRES_DB 가 DATABASE_URL 과 다르다")
-            if env.get("POSTGRES_PORT") is not None and parsed["port"] != env["POSTGRES_PORT"]:
-                warnings.append("[warn] POSTGRES_PORT 가 DATABASE_URL 과 다르다")
-        return conn, warnings
-
-    # DATABASE_URL 이 없으면 POSTGRES_* (없으면 기본값)로 조립한다.
-    conn = ConnInfo(
-        user=postgres["user"],
-        password=postgres["password"],
-        host=env.get("POSTGRES_HOST", DEFAULT_HOST),
-        port=postgres["port"],
-        dbname=postgres["dbname"],
-        source="POSTGRES_*",
-    )
-    return conn, warnings
+__all__ = [
+    "DEFAULT_DB",
+    "DEFAULT_HOST",
+    "DEFAULT_PASSWORD",
+    "DEFAULT_PORT",
+    "DEFAULT_USER",
+    "ConnInfo",
+    "parse_database_url",
+    "resolve_connection",
+    "run_checks",
+    "main",
+]
 
 
 def run_checks(conn: ConnInfo) -> int:

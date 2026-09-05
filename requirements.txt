@@ -1,0 +1,5 @@
+# Refs: P1-schema S3.1 -- 런타임 의존성. 설치된 버전을 == 로 고정.
+SQLAlchemy==2.0.50
+alembic==1.19.2
+psycopg[binary]==3.3.5
+pgvector==0.5.0

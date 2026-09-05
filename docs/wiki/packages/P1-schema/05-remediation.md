@@ -203,11 +203,13 @@ WARN  접속 해석 규칙 이중 구현 위험: app/config.py 와 scripts/db_ch
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | `app/config.py` 신설 — `ConnInfo`/`parse_database_url`/`resolve_connection`/`ConnInfo.sqlalchemy_url()`/`sqlalchemy_url()` 을 여기로 옮김(우선순위·변수 이름·경고 문구는 기존 `scripts/db_check.py` 와 동일하게 이동) | `python -c "import app.config"` | 예외 없음 | 완료 |
+| 2 | `scripts/db_check.py` 에서 자체 정의(`ConnInfo`·`parse_database_url`·`resolve_connection` 등) 삭제, `from app.config import (...)` 로 대체 + re-export(`__all__`), 스크립트 단독 실행 시 저장소 루트를 `sys.path` 에 넣는 줄 추가 | `grep -n "DATABASE_URL\|POSTGRES_" scripts/db_check.py app/config.py` | `scripts/db_check.py` 는 docstring 설명 줄만 남고 실제 조립 로직(`env.get("POSTGRES_...")` 등)은 `app/config.py` 에만 존재 | 완료 |
+| 3 | 회귀 확인 — 기존 `tests/test_db_check.py`(6건, 지금 이름 `db_check.resolve_connection` 등 그대로) 계속 통과 | `python -m pytest tests/test_config.py tests/test_db_check.py -q` | `11 passed` | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P1-schema` (계획 단계면 `verify-plan.sh P1-schema`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): 20260905-1243-remediation-f-ace4dd-f-75c1c1.txt(grep 출력), 20260905-1242-pytest-u1.txt(11 passed)
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
@@ -281,11 +283,11 @@ WARN  POSTGRES_HOST(P0-compose O5) 처리 미결정 — app/config.py 가 읽으
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 |  |  |  | 대기 |
+| 1 | `.env.example` POSTGRES_* 절에 `POSTGRES_HOST=localhost` 한 줄 + "선택. 컨테이너 밖에서 접속할 때만 바꾼다" 주석 추가(이름·기본값만, 비밀 아님). `app/config.py`(단일 구현)가 `env.get("POSTGRES_HOST", DEFAULT_HOST)` 로 계속 읽음 — `scripts/db_check.py` 쪽 자체 구현은 F-ace4dd 해결로 이미 삭제됨(재구현 없음) | `grep -n "POSTGRES_HOST" .env.example app/config.py` | `.env.example:20:POSTGRES_HOST=localhost`, `app/config.py` 에 `env.get("POSTGRES_HOST", DEFAULT_HOST)` 1건 | 완료 |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P1-schema` (계획 단계면 `verify-plan.sh P1-schema`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): 20260905-1243-remediation-f-ace4dd-f-75c1c1.txt
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드

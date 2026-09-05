@@ -9,3 +9,10 @@
 - 정합성 확인: 원칙7(A–B 테이블 없음)·8·9 / D2 D4 D5 D8 D9 / S3.1 55컬럼 1:1 / 보안 §1(.env 미접촉, alembic url 공란) §4(downgrade 는 Alembic 경로) — 위반 없음. WARN 4 는 README·db_check 기존 registry 행(비고만 갱신, 의도)
 - 남은 것 · 다음 단위: U1 백엔드 골격 최소 + DB 접속 설정(requirements.txt/-dev, app/config.py — db_check 의 접속 조립과 단일 구현 여부 F-ace4dd 결정, app/db/base.py, tests). 사용자 승인 → `--stage backend-agent`.
 - Refs: P1-schema R8 R9 D4 D5 S3.1
+
+## 2026-09-05 12:42 · feat(P1-schema): U1 백엔드 골격·requirements·app.config 접속 설정 단일화 · pending
+- 변경: requirements.txt(SQLAlchemy 2.0.50/alembic 1.19.2/psycopg[binary] 3.3.5/pgvector 0.5.0 == 고정), requirements-dev.txt(+pytest 9.0.3), app/__init__.py, app/db/__init__.py, app/config.py(신설 — `ConnInfo`/`parse_database_url`/`resolve_connection`/`sqlalchemy_url()` 단일 구현), app/db/base.py(`Base` + `MetaData(naming_convention=...)`), scripts/db_check.py(자체 정의 제거 → `app.config` import·re-export, 저장소 루트 sys.path 추가), .env.example(`POSTGRES_HOST=localhost` + 주석), tests/conftest.py(sys.path 등록), tests/test_config.py(신규 5건), evidence/20260905-1239-pip-freeze*.txt·20260905-1242-pytest-u1.txt·20260905-1242-db-check-after-refactor.txt
+- 이유(기획서·카드 연결): 01-plan U1(R8 R9 D4 D5 S3.1) — 마이그레이션을 돌리는 데 필요한 최소 골격과 DB 접속 설정. F-ace4dd(접속 조립 이중 구현 위험)를 `app/config.py` 단일 구현 + `scripts/db_check.py` re-export 로 해소. F-75c1c1(POSTGRES_HOST 미문서화)를 `.env.example` 에 이름·기본값·주석 추가로 해소.
+- 정합성 확인: 원칙9(판정 근거) 해당 없음(이 단위는 접속 설정) / 보안 §1(.env 읽기·쓰기 없음, `os.environ` 에서만 읽음, 비밀번호 값 미출력 — `safe_summary()`/경고문에서 검증) — 위반 없음. `resolve_connection` 우선순위·변수 이름·경고 문구는 기존 db_check.py 와 동일(byte 단위로 옮김).
+- 남은 것 · 다음 단위: U2 모델 9개 + 제약·인덱스(`app/db/models.py`, `tests/test_schema_models.py`). `app/db/base.py` 는 모델 없이 `Base`만 존재 — U2 에서 import 해 쓴다.
+- Refs: P1-schema R8 R9 D4 D5 S3.1 F-ace4dd F-75c1c1

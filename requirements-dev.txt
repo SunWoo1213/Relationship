@@ -1,0 +1,3 @@
+# Refs: P1-schema S3.1 -- 개발/테스트 의존성.
+-r requirements.txt
+pytest==9.0.3
