@@ -92,3 +92,6 @@
 - 2026-09-06 14:11 | COMMIT | a807364 fix(P3-er): 승진 회귀 테스트 evidence 기록을 ER_EVIDENCE_STAMP 로 게이트 — 실행마다 파일 남발 중단
 - 2026-09-06 14:35 | COMMIT | b3bcc2d docs(P3-er): U9 registry 20행·README ER 실행법·수용 기준 기계 검증 evidence, verify-impl FAIL 0
 - 2026-09-06 19:20 | DONE | P3-er 완료: U1~U9 + FIX(2b82882 2c63c60 02e6f14 593c254 b1f2782 d6e5949 cc5d24f 107ace3 a807364 b3bcc2d), verifier(fable) 04-review `완료`(필수 0·권고 6, verify-impl FAIL 0/WARN 0, pytest 398/skip 0, 변이 4종 검출, 재계산 오차 0), 사용자 승인. 회귀 3종 통과(승진 0.863 merge·relaxed_retry / 이모 배제 new_person / 동명이인 0.575 identity), 판정기 공급자 중립(결정 3 개정 2). R4·R9 구현완료(실호출 미검증 표기). 남은 권고: F-87c597 스모크 사용자 실행, F-46f1eb·F-036185 사소 FIX, F-251dc2·F-bdd6c5 P4 결정 | P3-er R4 R9 D3 D5 D10 S3.3 S3.7
+- 2026-09-06 15:02 | COMMIT | 0527ab8 docs(P3-er): 완료 — verifier 04-review 완료 판정·사용자 승인, R4 R9 구현완료(실호출 미검증), 패키지 닫음
+- 2026-09-06 15:02 | PUSH | origin dev 0527ab8 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-06 15:03 | RELEASE | origin main ← dev 0527ab8

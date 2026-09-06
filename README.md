@@ -257,5 +257,6 @@ python scripts/er_smoke.py --provider openai      # OPENAI_API_KEY·OPENAI_MODEL
 | 왜 이렇게 설계했나 | `docs/wiki/decisions/D01~D10` |
 | 스키마·툴·해석 파이프라인·평가 명세 | `docs/wiki/specs/S3.1~S3.7` |
 | 기획서에서 무엇이 바뀌었나 | `docs/proposal.md` 상단 안내문, `docs/wiki/review-index.md` |
+| 실서버에 올린 뒤 무엇을 점검하나 | `SERVER-CHECKLIST.md` (dev → 실서버 검증 → main 승격의 "검증" 기준·증거 규약·되돌리기) |
 | 지금 어디까지 왔나 | `docs/wiki/HANDOFF.md`, `docs/wiki/journal.md` |
 | 무엇이 이미 만들어져 있나 | `docs/wiki/registry.md` |
