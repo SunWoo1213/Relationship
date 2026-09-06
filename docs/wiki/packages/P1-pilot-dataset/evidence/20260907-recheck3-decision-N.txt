@@ -1,0 +1,12 @@
+# 결정 N 대조 — verifier 3차 재검수, 대상 커밋 6906af4 (git show 40c36f8:data/scenarios/promotion.json 과 비교)
+40c36f8 sc-005 t4: '9월 20일에 축하 겸 밥 먹기로 했어' 39ec9b94203230ec9dbcec979020ecb695ed959820eab2b820ebb0a520eba8b9eab8b0eba19c20ed9688ec96b4
+6906af4 sc-005 t4: '9월 20일에 축하 겸 밥 먹기로 했어' 39ec9b94203230ec9dbcec979020ecb695ed959820eab2b820ebb0a520eba8b9eab8b0eba19c20ed9688ec96b4
+bytes identical: True
+all 5 utterances identical to 40c36f8: True
+40c36f8 events: [{'turn': 1, 'type': 'personal_share', 'occurred_at_kind': 'relative'}, {'turn': 3, 'type': 'meeting', 'occurred_at_kind': 'relative'}, {'turn': 4, 'type': 'meal', 'occurred_at_kind': 'absolute'}]
+6906af4 events: [{'turn': 1, 'type': 'personal_share', 'occurred_at_kind': 'relative'}, {'turn': 3, 'type': 'personal_share', 'occurred_at_kind': 'relative'}]
+t4 event present in 6906af4: False
+absolute count all files: 0
+sc-036 mentions: [{'turn': 0, 'surface': '이대리', 'gold_person_id': 'p1'}, {'turn': 1, 'surface': '그 친구', 'gold_person_id': 'p2'}, {'turn': 1, 'surface': '임대리', 'gold_person_id': 'p2'}, {'turn': 2, 'surface': '임대리', 'gold_person_id': 'p2'}, {'turn': 2, 'surface': '이대리', 'gold_person_id': 'p1'}, {'turn': 3, 'surface': '임대리', 'gold_person_id': 'p2'}]
+t1 utterance contains '그 친구': True
+manifest distribution event_types: {'conflict': 6, 'favor': 9, 'meal': 17, 'meeting': 12, 'other': 5, 'personal_share': 26, 'praise': 1} kind: {'none': 28, 'relative': 48}

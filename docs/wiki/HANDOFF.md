@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-07 03:10 (U6-2 커밋 — verifier 3차 재검수 위임 예정)
-active: **P1-pilot-dataset** | frozen: none | 브랜치: dev (origin/dev 09875aa, main bdf9f70 승격 보류; 로컬 U3~U6-2 미푸시). **U6-2 커밋**(해시 journal). **다음: verifier 3차 재검수**(L-004 승인됨 → --stage verifier) — #18~#20 닫기, U6-5 일관성, 반전 가능 판단 4건. 열림 0 → 사용자 검수(함정 12·지나가는 언급 3, review-packet-3) → U7(registry·README·evidence: --strict rc=0·건수 40·pytest·label-review 열림 0 grep) → /devlog done(verifier 04-review).
+갱신: 2026-09-07 04:10 (U6-3 커밋 — verifier 4차 재검수 위임 예정)
+active: **P1-pilot-dataset** | frozen: none | 브랜치: dev (origin/dev 09875aa, main bdf9f70 승격 보류; 로컬 U3~U6-3 미푸시). **U6-3 커밋**(해시 journal). **다음: verifier 4차 재검수**(L-004 승인됨) — #21·#22 닫기, sc-034 t0/t1 별개 사건 판정. 열림 0 → 사용자 검수(3차 절 최종 목록: 함정 sc-002/004/006/008/010/012/013/015/036 + 지나가는 언급 sc-038/039/040) → U7(eval-agent: registry·README·수용 기준 evidence) → /devlog done(verifier 04-review). P10 인계: absolute 0, praise 1·other 5, personal_share 편중, 사용자→인물 favor 1.
 
 ## 지금 어디까지
 - **P3-er 완료(2026-09-06)** — U1 @traced 세이브포인트(2b82882) → U2 임베딩 런타임 공급자·check_dimension(2c63c60) → U3 호칭 사전·규칙 필터(02e6f14) → U4 확신도·두 임계치·허용오차 1e-9(593c254) → U5 후보 어댑터·**공급자 중립 Judge(Claude·OpenAI, judge_from_env, gemini 예약 — 사용자 결정, 결정 3 개정 2)**(b1f2782) → U6 resolve() 4단계·trace 1행·부수효과 0(d6e5949) → U7 apply_resolution·회귀 3종(cc5d24f) → U8 백필·스모크 스크립트(107ace3) → FIX evidence 게이트 ER_EVIDENCE_STAMP(a807364) → U9 registry 20행·README ER 실행법·기계 검증(b3bcc2d) → verifier(fable) 04-review **완료**(필수 0·권고 6, verify-impl FAIL 0/WARN 0, pytest 398/skip 0, 변이 4종 검출, trace 재계산 오차 0) → 사용자 승인. backlog P3 ER 행 [x], review-index R4·R9 구현완료(**실호출 미검증** 두 줄 표기), README P3 행, CURRENT none.

@@ -197,11 +197,11 @@
     ],
     "event_types": {
       "conflict": 6,
-      "favor": 9,
+      "favor": 10,
       "meal": 17,
       "meeting": 12,
       "other": 5,
-      "personal_share": 26,
+      "personal_share": 25,
       "praise": 1
     },
     "occurred_at_kind": {

@@ -1,0 +1,235 @@
+# U6-5 전건 턴 스윕 — verifier 3차 재검수, 대상 커밋 6906af4. 160턴 전부: 발화 / 이벤트 / verifier 판정(규칙 근거)
+# 판정 어휘: EV=이벤트 있음(동의) · X-부작위 · X-세부(같은 사건 두 번째 턴) · X-미래(J(b)) · X-상태(U6-3) · X-인용(U6-1) · X-amb(U6-4) · X-본인(사용자 혼자) · X-무인물(persons 밖 인물만의 일) · X-A–B→ps(J(d)) · !!=새 지적
+
+== sc-001
+  t0 오늘 김팀장이랑 회의 또 길어졌음ㅋㅋ  | E=['meeting/relative'] | EV meeting
+  t1 근데 김팀장 이번에 부장 달았대  | E=['personal_share/relative'] | EV ps J(c)
+  t2 이제 김부장님이라고 불러야 되나ㅋㅋ  | E=[] | X-인용
+  t3 부장님이 다음주에 밥 사준다고 함  | E=[] | X-미래
+
+== sc-002
+  t0 이대리 이번에 과장으로 승진했더라 ㅊㅋㅊㅋ  | E=['personal_share/relative'] | EV ps
+  t1 원래 우리 팀 과장님은 박과장님인데  | E=[] | X-상태
+  t2 박과장님이 어제 회식비 다 내주심  | E=['meal/relative'] | EV meal 인물→사용자
+  t3 이제 막 승진한 과장님은 호칭 어색하대  | E=[] | X-상태(전언 감상)
+  t4 이서연 과장님이라고 부르니 좀 웃김ㅋㅋ  | E=[] | X-인용
+
+== sc-003
+  t0 최주임 요즘 일 잘한다고 소문났어  | E=[] | X-상태(평판, U6-3)
+  t1 명함 새로 팠다고 자랑하더라ㅋㅋ  | E=['personal_share/none'] | EV ps J(c) 승진 소식 턴
+  t2 이제 명함에 최대리라고 적혀 있음  | E=[] | X-인용
+  t3 유진씨한테 축하한다고 커피 사줬어  | E=['meal/none'] | EV meal 사용자→인물
+
+== sc-004
+  t0 강팀장님 이번 인사에 실장 되셨대  | E=['personal_share/relative'] | EV ps
+  t1 옆 팀 윤팀장님은 그대로시고  | E=[] | X-상태
+  t2 습관대로 팀장님이라 불렀다가 혼남ㅋㅋ  | E=['conflict/none'] | EV conflict 인물→사용자
+  t3 실장님이 저녁에 술 사주셨어  | E=['meal/relative'] | EV meal
+
+== sc-005
+  t0 하윤이 동아리 부회장이었잖아  | E=[] | X-상태
+  t1 이번에 회장 됐다고 연락 왔어ㅋㅋ  | E=['personal_share/relative'] | EV ps
+  t2 이제 회장님이라고 놀리는 중임  | E=[] | X-인용(놀리는 중 — 호칭 진술)
+  t3 첫 회의 때 엄청 긴장했다더라  | E=['personal_share/relative'] | EV ps J(d) 전언
+  t4 9월 20일에 축하 겸 밥 먹기로 했어  | E=[] | X-미래 (결정 N: 이벤트 제거 확인)
+
+== sc-006
+  t0 채원씨 이번에 주임 달았어  | E=['personal_share/relative'] | EV ps
+  t1 원래 그 업무는 조주임이 하던 건데  | E=[] | X-상태
+  t2 주임님한테 인수인계 받으라고 했음  | E=['other/none'] | EV other U6-5 지시(주체가 사용자든 상사든 사용자가 한쪽) — 동의
+  t3 채원씨가 고맙다고 커피 사줬어  | E=['meal/none'] | EV meal 인물→사용자
+
+== sc-007
+  t0 오늘 문쌤한테 피티 받았는데 빡셌음  | E=['other/relative'] | EV other 수업(인물→사용자)
+  t1 명찰이 실장으로 바뀌어 있더라  | E=['personal_share/none'] | EV ps 승진 소식 턴
+  t2 문실장님 됐다고 커피 쏘심ㅋㅋ  | E=['meal/none'] | EV meal
+  t3 담주에도 같은 시간에 하기로 함  | E=[] | X-미래
+
+== sc-008
+  t0 아빠 이번에 부장으로 승진하셨대  | E=['personal_share/relative'] | EV ps
+  t1 근데 우리 회사 부장님은 오늘도 잔소리ㅋ  | E=['conflict/relative'] | EV conflict 잔소리 J(e)
+  t2 저녁에 아빠랑 축하 삼겹살 먹었음  | E=['meal/relative'] | EV meal
+  t3 한부장님한테는 굳이 말 안 했어  | E=[] | X-부작위(사용자 측 — sc-012 t1·sc-033 t2 와 대칭)
+
+== sc-009
+  t0 배대리랑 점심 같이 먹었어  | E=['meal/relative'] | EV meal
+  t1 준호가 요즘 야근 많다고 힘들대  | E=['personal_share/relative'] | EV ps 근황
+  t2 배준호 원래 저런 스타일 아닌데  | E=[] | X-상태
+  t3 준호형이라 부르니까 좋아하더라ㅋㅋ  | E=[] | X-인용(U6-3 제거 확인)
+
+== sc-010
+  t0 회사 김팀장이랑 오늘 또 부딪혔어ㅠ  | E=['conflict/relative'] | EV conflict
+  t1 저녁엔 동창 민준이 만나서 술 마심  | E=['meal/relative'] | EV meal
+  t2 민준이가 회사 얘기 실컷 들어줬어  | E=['favor/none'] | EV favor 인물→사용자(별도 type — sc-037 t2 와 다른 점)
+  t3 내일 또 팀장님 보고 들어가야 됨  | E=[] | X-미래
+
+== sc-011
+  t0 언니가 오늘 반찬 잔뜩 갖다줬어  | E=['favor/relative'] | EV favor 인물→사용자
+  t1 최유진 여사님 손맛 여전하더라ㅋㅋ  | E=[] | X-상태(감상, t0 사건의 세부)
+  t2 유진언니한테 용돈 조금 드렸음  | E=['favor/none'] | EV favor **사용자→인물** (U6-5 favor 문구 '사용자에게 이득이 되는' 의 글자 밖 — !! #22 문구)
+  t3 주말에 같이 영화 보기로 했어  | E=[] | X-미래
+
+== sc-012
+  t0 수학쌤이 오늘 숙제 진짜 많이 냄  | E=['other/relative'] | EV other 과제 부과 — 동의
+  t1 영어쌤은 그냥 넘어가주셨는데  | E=[] | X-부작위 — 동의(§3-1)
+  t2 안쌤한테 질문하러 갔다가 혼났어  | E=['conflict/none'] | EV conflict
+  t3 알고 보니 영어쌤이 권쌤이더라ㅋㅋ  | E=[] | X-인용/사실
+  t4 권쌤은 그럴 때 웃어주시더라  | E=[] | X-상태
+
+== sc-013
+  t0 채원씨가 보고서 대신 봐줘서 살았음  | E=['favor/none'] | EV favor
+  t1 저녁엔 채영이랑 약속 있어서 나감  | E=['meeting/relative'] | EV meeting 사용자–채영 만남 — 동의(#20(1))
+  t2 채원이랑 채영이 이름 맨날 헷갈림ㅋㅋ  | E=[] | X-본인(헷갈림)
+  t3 아까 걔가 카톡 보냈는데 누군지 모르겠음  | E=[] | X-amb
+
+== sc-014
+  t0 다인이랑 오늘 전시회 갔다왔어  | E=['meeting/relative'] | EV meeting
+  t1 서다인 사진 진짜 잘 찍음ㅋㅋ  | E=[] | X-상태(감상, U6-3 제거 확인)
+  t2 다음달 다인이 생일이라 케이크 예약함  | E=[] | X-미래(준비)
+  t3 자기라고 부르면 부끄러워 하더라  | E=[] | X-인용
+
+== sc-015
+  t0 은우 별명이 부장님이야 잔소리 대마왕ㅋ  | E=[] | X-인용
+  t1 오늘 진짜 한부장님한테 제대로 깨졌어  | E=['conflict/relative'] | EV conflict
+  t2 그 얘기 했더니 은우가 또 잔소리함  | E=['conflict/none'] | EV conflict 잔소리
+  t3 우리 부장님은 언제 퇴사하시려나ㅋㅋ  | E=[] | X-상태
+
+== sc-016
+  t0 예린이랑 카페에서 세 시간 수다떰  | E=['meeting/none'] | EV meeting(기간만 → none)
+  t1 예리니 요즘 이직 준비한다고 바쁘대  | E=['personal_share/relative'] | EV ps
+  t2 린이라고 부르는 건 나뿐이야ㅋㅋ  | E=[] | X-인용
+
+== sc-017
+  t0 어제 규진이랑 서윤이 만나서 밥 먹었어  | E=['meal/relative'] | EV meal
+  t1 규진이는 요즘 이직 준비한대ㅋㅋ  | E=['personal_share/relative'] | EV ps
+  t2 걔 진짜 열심히 하더라  | E=[] | X-상태
+  t3 서윤이는 그냥 다니는 거 같고  | E=[] | X-상태
+
+== sc-018
+  t0 민서 누나가 오늘 반찬 갖다줬어  | E=['favor/relative'] | EV favor
+  t1 보라는 이사 도와준다고 연락 왔고  | E=[] | X-미래(제안 — 연락 자체는 J(b) 제안의 전달)
+  t2 그 사람 진짜 오지랖 넓어ㅋㅋ  | E=[] | X-상태
+  t3 누나한테는 나중에 밥 산다 했어  | E=[] | X-미래
+
+== sc-019
+  t0 아름이랑 세호랑 같이 영화 봤는데  | E=['meeting/none'] | EV meeting
+  t1 세호가 팝콘 다 먹어버림ㅋㅋ  | E=[] | X-세부(팝콘 — 사용자에게 한 행위 아님)
+  t2 쟤는 진짜 먹는 거 좋아해  | E=[] | X-상태
+  t3 아름이는 그거 보고 웃기다고  | E=[] | X-세부
+
+== sc-020
+  t0 오늘 심팀장이랑 가은이랑 같이 외근 갔어  | E=['meeting/relative'] | EV meeting
+  t1 그분이 점심 사주셔서 잘 먹었어  | E=['meal/relative'] | EV meal(같은 외근이지만 type 이 다른 사건 — sc-031 t2 와 같은 처리)
+  t2 걔는 계속 딴짓하고ㅋㅋ  | E=[] | X-세부(딴짓)
+  t3 다음엔 나도 사드려야지  | E=[] | X-미래
+
+== sc-021
+  t0 동혁이가 주말에 등산 가자고 하네  | E=[] | X-미래(제안)
+  t1 서윤이랑 보라는 못 간다고 하고  | E=[] | X-상태
+  t2 아까 걔가 장비도 빌려준대ㅋㅋ  | E=[] | X-미래
+  t3 보라는 저번에 도시락 싸줬었는데  | E=['favor/relative'] | EV favor
+
+== sc-022
+  t0 규진이랑 세호랑 어제 같이 술 마셨대  | E=['personal_share/relative'] | EV ps A–B
+  t1 걔 요즘 힘든가 봐  | E=[] | X-amb
+  t2 다음에 한번 물어봐야겠다  | E=[] | X-미래
+
+== sc-023
+  t0 심팀장이 이번에 본사로 옮기신대  | E=['personal_share/relative'] | EV ps
+  t1 그 분 밑에서 3년 있었는데  | E=[] | X-상태(기간)
+  t2 밥이라도 한번 사드려야지 싶어  | E=[] | X-미래
+
+== sc-024
+  t0 동혁이랑 보라랑 카페에서 두 시간 떠들었어  | E=['meeting/none'] | EV meeting(기간만 → none)
+  t1 동혁이가 커피 사줘서 잘 마셨어  | E=['meal/none'] | EV meal
+  t2 얘가 원래 잘 챙겨주는 스타일ㅋㅋ  | E=[] | X-상태
+  t3 둘 다 요즘 힘들다고 하더라  | E=['personal_share/relative'] | EV ps 근황
+  t4 걔 조만간 따로 만나야겠다  | E=[] | X-amb
+
+== sc-025
+  t0 엄마가 어제 김치 담가서 보내주셨어  | E=['favor/relative'] | EV favor
+  t1 택배 오늘 도착했는데 양이 어마어마ㅋㅋ  | E=[] | X-세부(같은 김치 택배의 도착 — 동의)
+  t2 담주 일요일에 엄마 뵈러 내려가기로 했어  | E=[] | X-미래
+
+== sc-026
+  t0 아름이랑 오늘 저녁에 파스타 먹었어  | E=['meal/relative'] | EV meal
+  t1 요즘 회사 일 많다고 좀 지쳐 보였어  | E=['personal_share/relative'] | EV ps 근황
+  t2 주말에는 아름이랑 그냥 집에서 쉬려고  | E=[] | X-미래
+
+== sc-027
+  t0 규진이가 어제 이사한다고 연락 왔더라  | E=['personal_share/relative'] | EV ps 이사 소식
+  t1 짐 옮기는 거 도와주기로 했어ㅋㅋ  | E=[] | X-미래(약속)
+  t2 담주 토요일 아침에 규진이네 가기로  | E=[] | X-미래
+
+== sc-028
+  t0 심팀장이 오늘 보고서 칭찬해줬어  | E=['praise/relative'] | EV praise
+  t1 괜히 기분 좋아서 커피 사 마심ㅋㅋ  | E=[] | X-본인(커피)
+  t2 다음 주 회의도 심팀장이 주관한대  | E=[] | X-미래
+
+== sc-029
+  t0 보라쌤한테 오늘 자세 교정 받았어  | E=['other/relative'] | EV other 수업
+  t1 어깨 아픈 거 많이 나아진 듯  | E=[] | X-본인(상태)
+  t2 보라쌤이 스트레칭 영상도 보내줬어  | E=['favor/none'] | EV favor 인물→사용자
+  t3 다음 수업은 목요일 저녁 일곱시  | E=[] | X-미래
+
+== sc-030
+  t0 하윤이가 시험 끝났다고 좋아하더라  | E=['personal_share/none'] | EV ps 근황
+  t1 축하한다고 치킨 사줬어ㅋㅋ  | E=['meal/none'] | EV meal 사용자→인물
+  t2 엄마도 용돈 챙겨줬대ㅋㅋ  | E=['personal_share/none'] | EV ps A–B(엄마→하윤)
+  t3 하윤이 요즘 부쩍 컸다 싶어  | E=[] | X-상태
+
+== sc-031
+  t0 서윤이랑 어제 한강에서 자전거 탔어  | E=['meeting/relative'] | EV meeting
+  t1 날씨 좋아서 두 시간이나 돌아다님  | E=[] | X-세부(두 시간 돌아다님)
+  t2 서윤이가 사진 잘 찍어줘서 고마웟어  | E=['favor/none'] | EV favor(같은 자리지만 type 이 다른 사건)
+
+== sc-032
+  t0 지호형이 어제 이직 축하한다고 밥 샀어  | E=['meal/relative'] | EV meal
+  t1 동네 형이라 그런지 편하더라ㅋㅋ  | E=[] | X-상태
+  t2 다음엔 내가 산다고 했어  | E=[] | X-미래
+
+== sc-033
+  t0 가은이랑 점심에 새로 생긴 국밥집 갔어  | E=['meal/relative'] | EV meal
+  t1 줄 오래 서서 좀 늦게 들어감ㅋㅋ  | E=[] | X-본인(늦게 들어감)
+  t2 심팀장은 별말 안 하고 넘어갔어  | E=[] | X-부작위 — 동의(§3-1)
+  t3 다음 주 수요일에 같이 야근하기로 했어  | E=[] | X-미래
+  t4 가은이 요즘 프로젝트 때문에 정신없대  | E=['personal_share/relative'] | EV ps
+
+== sc-034
+  t0 아빠가 지난주에 낚시 다녀오셨대  | E=['personal_share/relative'] | EV ps 근황(지난주 낚시)
+  t1 월척 잡았다고 사진 계속 보내심ㅋㅋ  | E=['personal_share/none'] | !! #21 — ps/none: 같은 낚시 근황의 두 번째 턴이면 (ii) 세부로 이벤트 없음, '사진 보내심' 을 인물→사용자 행위로 보면 U6-5 활동 type(sc-029 t2 '영상도 보내줬어' = favor 와 비교). 어느 쪽이든 ps 두 번은 규칙 밖
+  t2 이번 주말에 같이 가자고 하시네  | E=[] | X-미래(제안)
+  t3 아빠랑 오랜만에 바람 쐬고 오려고  | E=[] | X-미래
+
+== sc-035
+  t0 오늘 팀에 신입 들어왔는데 이름이 장하람이래  | E=['personal_share/relative'] | EV ps 입사 소식
+  t1 박과장님이 나보고 하람씨 사수 하라고 함ㅋㅋ  | E=['other/none'] | EV other 업무 지시 — 동의(#20(3))
+  t2 하람씨 첫날부터 야근하던데 좀 안쓰럽더라  | E=['personal_share/relative'] | EV ps 근황 — 동의(#20(2)), 첫 → relative
+
+== sc-036
+  t0 이대리가 어제 동호회에 친구 데려왔더라  | E=['meeting/relative'] | EV meeting
+  t1 그 친구도 대리라서 임대리라고 부르래ㅋㅋ  | E=[] | X-인용(mention '그 친구' 추가 확인 #19)
+  t2 임대리랑 이대리랑 헷갈려서 계속 실수함ㅋ  | E=[] | X-본인(실수)
+  t3 담주 모임 때 임대리도 또 온다고 함  | E=[] | X-미래
+
+== sc-037
+  t0 주말에 큰집 갔다가 사촌형 시우 만났어  | E=['meeting/relative'] | EV meeting
+  t1 시우형이 취업했다고 고기 사줬음ㅋㅋ  | E=['personal_share/none', 'meal/none'] | EV ps + meal(두 줄)
+  t2 형이랑 술 마시면서 얘기 마니 했다  | E=[] | X-세부 — 동의(§3-4): 술=meal(t1)·얘기=meeting(t0) 과 type 중복, sc-010 t2 처럼 별도 type 이 아님
+
+== sc-038
+  t0 어제 다인이랑 드라마 정주행했는데 재밌더라  | E=['meeting/relative'] | EV meeting
+  t1 거기 남주 배우 진짜 잘생겼음ㅋㅋ  | E=[] | X-무인물(passing)
+  t2 다인이는 그 아이돌이 더 좋다고 우김  | E=[] | X-세부/passing
+
+== sc-039
+  t0 야근하다가 한부장님이 치킨 시켜줬어  | E=['meal/none'] | EV meal
+  t1 배달 기사님이 엘베 안 와서 계단으로 왔대ㅋㅋ  | E=[] | X-무인물 — 결과 동의(§3-3), 근거는 '세부' 보다 '기사님이 persons 에 없어 붙일 인물이 없다' 가 강함
+  t2 한부장님이 기사님한테 음료수까지 챙겨주심  | E=['personal_share/none'] | EV ps A–B(한부장→기사님, 2차 (b) 확인 유지)
+
+== sc-040
+  t0 예린이랑 한강 걷는데 앞에 웬 아저씨가 소리침  | E=['meeting/none'] | EV meeting
+  t1 무서워서 그냥 빨리 지나갔음ㅠ  | E=[] | X-본인
+  t2 예린이는 뉴스에 나온 그 정치인 닮았다고 함ㅋㅋ  | E=[] | X-세부/감상(passing)
+
+# 요약: 160턴 중 이벤트 76. U6-5 위반(사용자가 한쪽인 행위인데 type 없음 / 부작위·세부 제외 불일치): sc-034 t1 1건(#21). 규칙 문구 불일치: favor 방향(#22, sc-011 t2 라벨은 유지 가능). 기존 conflict 6·other 5 전부 사용자–인물 사건으로 U6-5 와 충돌 0.
