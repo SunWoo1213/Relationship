@@ -1,0 +1,4 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k "applied"
+..                                                                       [100%]
+2 passed, 16 deselected in 0.58s
+exit=0

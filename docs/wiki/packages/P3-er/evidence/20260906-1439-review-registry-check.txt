@@ -1,0 +1,42 @@
+== registry 커밋 열 표본 대조: git log --oneline -- <path> (최신 커밋이 registry 커밋 열과 일치해야 함) ==
+app/er/__init__.py                   registry=cc5d24f  git-latest=cc5d24f  → 일치
+app/er/types.py                      registry=cc5d24f  git-latest=cc5d24f  → 일치
+app/er/confidence.py                 registry=593c254  git-latest=593c254  → 일치
+app/er/judge.py                      registry=b1f2782  git-latest=b1f2782  → 일치
+app/er/pipeline.py                   registry=cc5d24f  git-latest=cc5d24f  → 일치
+app/er/rules.py                      registry=02e6f14  git-latest=02e6f14  → 일치
+app/er/candidates.py                 registry=b1f2782  git-latest=b1f2782  → 일치
+scripts/er_smoke.py                  registry=107ace3  git-latest=107ace3  → 일치
+tests/test_er_pipeline.py            registry=a807364  git-latest=a807364  → 일치
+tests/test_er_types.py               registry=d6e5949  git-latest=d6e5949  → 일치
+tests/test_embedding_provider.py     registry=2c63c60  git-latest=2c63c60  → 일치
+tests/conftest.py                    registry=cc5d24f  git-latest=cc5d24f  → 일치
+.env.example                         registry=e062986  git-latest=b1f2782  → 이력에 있음(최신 아님: 최신=b1f2782)
+app/tools/persons.py                 registry=2c63c60  git-latest=2c63c60  → 일치
+app/embedding.py                     registry=2c63c60  git-latest=2c63c60  → 일치
+
+== .env.example 이력 ==
+b1f2782 feat(P3-er): U5 후보 어댑터·공급자 중립 LLM 판정 — Claude/OpenAI Judge·judge_from_env
+f217190 feat(P2-tools): U1 기반 — fastapi·uvicorn·httpx 핀, ConnInfo repr 비밀 제거, 세션·설정, DB 롤백 픽스처
+d7113e9 feat(P1-schema): U1 백엔드 골격·requirements·app.config 접속 설정 단일화
+749bb8e feat(P0-compose): U1 로컬 pgvector compose — .env.example 이름 4개·compose·initdb
+e062986 harness(wiki): 개발 프로세스 하네스 구축 — 위키·승인 커밋·보안·핸드오프·검증 루프
+
+== app/tools/persons.py 이력(최근 4) ==
+2c63c60 feat(P3-er): U2 임베딩 런타임 공급자 — dimension·check_dimension·openai/anthropic 핀
+9cb35b6 feat(P2-tools): U5 add_event·add_schedule — EVENT_TYPES 검사·raw_utterance 원문 보존·aware 시각만·패턴 감지 없음
+f318d58 feat(P2-tools): U4 create_person·update_person — D1 확인 강제(긍정 답 규약)·D6 별칭 누적·facts upsert
+a9cb254 feat(P2-tools): U3 search_person — 별칭 일치·cosine top-K 인물별 max·rule_flags(신호만, 판정은 P3-er)
+
+== registry 행 수(중복 행 금지) ==
+app/settings.py              1
+app/embedding.py             1
+app/tools/context.py         1
+app/tools/persons.py         1
+requirements.txt             0
+tests/conftest.py            1
+tests/test_tools_context.py  1
+README.md                    1
+scripts/embed_pilot.py       1
+.env.example                 1
+P3-er 행 수: 20

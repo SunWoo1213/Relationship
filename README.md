@@ -71,7 +71,7 @@
 | P1 | 스키마 v2 마이그레이션 (Alembic) | **완료** — 9테이블·CHECK 4·FK CASCADE 6·`vector(1536)`·인덱스 10, upgrade/downgrade 왕복·`alembic check` 통과, verifier 04-review 완료 |
 | P1 | 파일럿 데이터셋 | 대기 |
 | P2 | 툴 7종 v2 + FastAPI 골격 | **완료** — 시그니처 = CLAUDE.md(tools_check 7/7), ask_user→pending_questions, D1 확인 강제, GET /health·POST /answers, pytest 206, verifier 04-review 완료 |
-| P3 | 엔티티 해석 4단계 · 베이스라인 | **구현 완료 · 검증 대기** — ER 4단계(app/er) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity), 판정기 공급자 중립(Claude·OpenAI, `LLM_PROVIDER`), pytest 398 |
+| P3 | 엔티티 해석 4단계 · 베이스라인 | **ER 완료(verifier 04-review 완료) · 베이스라인 3종은 eval-agent 대기** — ER 4단계(app/er) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity), 판정기 공급자 중립(Claude·OpenAI, `LLM_PROVIDER`), pytest 398 |
 | P4 | **파일럿 평가(게이트)** — 여기서 임계치·보정표 확정 | 대기 |
 | P5~P9 | 에이전트 루프 · 메모리 · 브리핑 · 푸시 · 프론트 · 인프라 | P4 통과 후 |
 

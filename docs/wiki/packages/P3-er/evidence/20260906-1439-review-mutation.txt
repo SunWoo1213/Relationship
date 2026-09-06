@@ -1,0 +1,102 @@
+== 변이 검사 (verifier) — 원본은 scratchpad 에 복사해 두고 각 변이 후 cp 로 원복, sha256 으로 원복 확인 ==
+원본 sha256: 77f7d08ff125444b… confidence.py / 0479901a8ad9785c… rules.py
+
+---- 변이 A: band_for 의 T_merge 비교 ge_with_tolerance(confidence, t_merge) → confidence > t_merge (경계·허용오차 제거) ----
+86:    if confidence > config.t_merge:
+170:        "T_merge": config.t_merge,
+3 failed, 52 passed in 3.02s
+exit=1
+원복 sha256: 77f7d08ff125444b…
+
+---- 변이 B: _forced_decision 의 band = "identity" if passed → "merge" if passed (llm_failed/null/out_of_range 경로에서 자동 병합) ----
+191:    band = "merge" if passed else "new_person"
+            n_passed = rng.randint(0, 3)
+            passed = [
+                for pid in range(n_passed)
+            result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+>           assert result.band != "merge", (t_merge, t_new, n_passed, result.band)
+________________ test_threshold_sweep_llm_failed_never_merges _________________
+    def test_threshold_sweep_llm_failed_never_merges() -> None:
+            n_passed = rng.randint(0, 3)
+            passed = [
+                for pid in range(n_passed)
+            result = decide(judgement=None, passed=passed, llm_failed=True, config=config)
+>           assert result.band != "merge", (t_merge, t_new, n_passed, result.band)
+____ test_decide_null_matched_person_id_with_passed_candidates_is_identity ____
+    def test_decide_null_matched_person_id_with_passed_candidates_is_identity() -> None:
+        passed = [_candidate(1, s_emb=0.9, s_rule=0.8)]
+        result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+__________ test_decide_llm_failed_with_passed_candidates_is_identity __________
+    def test_decide_llm_failed_with_passed_candidates_is_identity() -> None:
+        passed = [_candidate(1, s_emb=0.9, s_rule=0.8)]
+        result = decide(judgement=None, passed=passed, llm_failed=True, config=config)
+__ test_decide_out_of_range_matched_person_id_is_llm_failed_with_error_kind ___
+    def test_decide_out_of_range_matched_person_id_is_llm_failed_with_error_kind() -> None:
+        passed = [_candidate(1, s_emb=0.9, s_rule=0.8)]
+        result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+        assert result.forced_reason == "llm_failed"
+___________ test_resolve_llm_failed_forces_identity_band_llm_failed ___________
+    def test_resolve_llm_failed_forces_identity_band_llm_failed(db_session, fake_embedder):
+        session_id = "er-pipeline-llm-failed"
+        assert result.forced_reason == "llm_failed"
+7 failed, 48 passed in 2.93s
+exit=1
+원복 sha256: 77f7d08ff125444b…
+
+---- 변이 C: rules._evaluate 엄격 단계에서도 인접 위계를 통과로(if relaxed and adjacent → if adjacent) — 승진 회귀가 완화 경로 없이도 통과하는지 ----
+105:            if adjacent:
+        passed, all_scored, relaxed_retry = rules.run_rule_stage([candidate], hints)
+3 failed, 21 passed in 2.88s
+exit=1
+원복 sha256: 0479901a8ad9785c…
+
+---- 변이 D: decide 의 null 분기 제거(matched_person_id is None 이면 강제 대신 산식으로 진행하도록 우회) ----
+mutated: null → 첫 통과 후보로 귀속
+            n_passed = rng.randint(0, 3)
+            passed = [
+                for pid in range(n_passed)
+            result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+>           assert result.band != "merge", (t_merge, t_new, n_passed, result.band)
+____ test_decide_null_matched_person_id_with_passed_candidates_is_identity ____
+    def test_decide_null_matched_person_id_with_passed_candidates_is_identity() -> None:
+        passed = [_candidate(1, s_emb=0.9, s_rule=0.8)]
+        result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+E        +  where None = Resolution(trace_id=7508, mention='팀장', candidates=[ScoredCandidate(person_id=4062, display_name='김민수', aliases=['팀장']...'confidence': 0.5, 'rule_checked': 3, 'rule_passed': 3}, 'affirmative_options': ['김민수']}}, suggested_display_name=None).forced_reason
+3 failed, 52 passed in 2.97s
+exit=1
+원복 sha256: 77f7d08ff125444b…
+
+== 원복 확인: git status --short app/er/ ==
+(빈 출력 = 변경 없음)
+
+== 보충: 변이 A·C·D 에서 실패한 테스트 이름(-rf) ==
+---- 변이 A 재실행 ----
+FAILED tests/test_er_confidence.py::test_boundary_exactly_t_merge_is_merge - ...
+FAILED tests/test_er_confidence.py::test_boundary_t_merge_minus_5e10_is_merge_within_tolerance
+FAILED tests/test_er_confidence.py::test_threshold_sweep_uses_same_comparison_function_as_boundary
+3 failed, 52 passed in 2.96s
+---- 변이 C 재실행 ----
+        passed, all_scored, relaxed_retry = rules.run_rule_stage([candidate], hints)
+FAILED tests/test_er_rules.py::test_promotion_fixture_relaxes_and_merges_with_conservative_scoring
+FAILED tests/test_er_rules.py::test_relaxation_attempts_at_most_once - assert...
+FAILED tests/test_er_pipeline.py::test_apply_resolution_promotion_connects_via_relaxed_retry_promotion
+3 failed, 21 passed in 2.81s
+---- 변이 D 재실행 ----
+            n_passed = rng.randint(0, 3)
+            passed = [
+                for pid in range(n_passed)
+            result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+>           assert result.band != "merge", (t_merge, t_new, n_passed, result.band)
+____ test_decide_null_matched_person_id_with_passed_candidates_is_identity ____
+    def test_decide_null_matched_person_id_with_passed_candidates_is_identity() -> None:
+        passed = [_candidate(1, s_emb=0.9, s_rule=0.8)]
+        result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+E        +  where None = Resolution(trace_id=7627, mention='팀장', candidates=[ScoredCandidate(person_id=4125, display_name='김민수', aliases=['팀장']...'confidence': 0.5, 'rule_checked': 3, 'rule_passed': 3}, 'affirmative_options': ['김민수']}}, suggested_display_name=None).forced_reason
+FAILED tests/test_er_confidence.py::test_threshold_sweep_null_matched_person_id_never_merges
+FAILED tests/test_er_confidence.py::test_decide_null_matched_person_id_with_passed_candidates_is_identity
+FAILED tests/test_er_pipeline.py::test_resolve_null_matched_person_id_forces_identity_not_new_person_null_path
+3 failed, 52 passed in 2.97s
+== 최종 원복 확인 ==
+77f7d08ff125444b
+0479901a8ad9785c
+(빈 출력 = 변경 없음)

@@ -3,7 +3,7 @@
 > `findings.py` 가 검증 출력에서 만든다. 소견 본문(원인·해결 단계·재검증·영향)은 에이전트가 채우고, 해결 단계의 완료 판정 명령을 실제로 실행한 출력이 증거다. 소견은 지우지 않는다(해소만 한다).
 > 루프: 검증 → 소견 → 단계별 조치 → 재검증(같은 명령) → 해소. 같은 소견이 3회 재검증 후에도 열려 있으면 사용자에게 보고한다.
 
-갱신: 2026-09-05 22:19 | 출처: verify-plan | 열림: 14 (필수 0) | 해소: 12
+갱신: 2026-09-06 14:50 | 출처: review-impl(verifier 04-review) | 열림: 6 (필수 0) | 해소: 26
 
 ## F-3cf08f · [필수] 없음: docs/wiki/packages/P3-er/02-plan-verify.md
 상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-05
@@ -32,7 +32,7 @@ FAIL  없음: docs/wiki/packages/P3-er/02-plan-verify.md
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-fdb56f · [권고] registry 에 다른 패키지로 이미 있음: app/settings.py → | 모듈 | 런타임 설정값 | app/settings.py | P2-tools | f217190 | `app_use
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-06 (04-review, verifier 판정 — b3bcc2d 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -57,8 +57,12 @@ WARN  registry 에 다른 패키지로 이미 있음: app/settings.py → | 모�
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. U9(b3bcc2d)가 `app/settings.py` 의 기존 행 **비고만** 갱신했고 새 행은 없다 — 행 수 1 유지(`requirements.txt` 는 `requirements.txt, requirements-dev.txt` 합행 1개), 커밋 열 표본 대조 일치(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-registry-check.txt`). `scripts/embed_pilot.py` 행은 "결정 6-a 예외로 옮기지 않음" 확정 문구로 교체됨(registry.md 26행).
+- 재검증: `bash .claude/scripts/verify-impl.sh P3-er` → `PASS registry 에 P3-er 행 있음`, FAIL 0(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-verify-impl.txt`).
+
 ## F-b3d90e · [권고] registry 에 다른 패키지로 이미 있음: app/embedding.py → | 스크립트 | 임베딩 파일럿(결정용 코드): EmbeddingProvider·OpenA
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-06 (04-review, verifier 판정 — b3bcc2d 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -83,8 +87,12 @@ WARN  registry 에 다른 패키지로 이미 있음: app/embedding.py → | 스
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. U9(b3bcc2d)가 `app/embedding.py` 의 기존 행 **비고만** 갱신했고 새 행은 없다 — 행 수 1 유지(`requirements.txt` 는 `requirements.txt, requirements-dev.txt` 합행 1개), 커밋 열 표본 대조 일치(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-registry-check.txt`). `scripts/embed_pilot.py` 행은 "결정 6-a 예외로 옮기지 않음" 확정 문구로 교체됨(registry.md 26행).
+- 재검증: `bash .claude/scripts/verify-impl.sh P3-er` → `PASS registry 에 P3-er 행 있음`, FAIL 0(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-verify-impl.txt`).
+
 ## F-149891 · [권고] registry 에 다른 패키지로 이미 있음: app/tools/context.py → | 모듈 | ToolContext·@traced | app/tools/context.py | P2-tools | 4eca3e9 | �
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-06 (04-review, verifier 판정 — b3bcc2d 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -109,8 +117,12 @@ WARN  registry 에 다른 패키지로 이미 있음: app/tools/context.py → |
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. U9(b3bcc2d)가 `app/tools/context.py` 의 기존 행 **비고만** 갱신했고 새 행은 없다 — 행 수 1 유지(`requirements.txt` 는 `requirements.txt, requirements-dev.txt` 합행 1개), 커밋 열 표본 대조 일치(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-registry-check.txt`). `scripts/embed_pilot.py` 행은 "결정 6-a 예외로 옮기지 않음" 확정 문구로 교체됨(registry.md 26행).
+- 재검증: `bash .claude/scripts/verify-impl.sh P3-er` → `PASS registry 에 P3-er 행 있음`, FAIL 0(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-verify-impl.txt`).
+
 ## F-ef1fb8 · [권고] registry 에 다른 패키지로 이미 있음: scripts/embed_pilot.py → | 스크립트 | 임베딩 파일럿(결정용 코드): EmbeddingProvider·OpenA
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-06 (04-review, verifier 판정 — b3bcc2d 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -135,8 +147,12 @@ WARN  registry 에 다른 패키지로 이미 있음: scripts/embed_pilot.py →
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. U9(b3bcc2d)가 `scripts/embed_pilot.py` 의 기존 행 **비고만** 갱신했고 새 행은 없다 — 행 수 1 유지(`requirements.txt` 는 `requirements.txt, requirements-dev.txt` 합행 1개), 커밋 열 표본 대조 일치(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-registry-check.txt`). `scripts/embed_pilot.py` 행은 "결정 6-a 예외로 옮기지 않음" 확정 문구로 교체됨(registry.md 26행).
+- 재검증: `bash .claude/scripts/verify-impl.sh P3-er` → `PASS registry 에 P3-er 행 있음`, FAIL 0(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-verify-impl.txt`).
+
 ## F-2c37bd · [권고] registry 에 다른 패키지로 이미 있음: requirements.txt → | 문서/설정 | 런타임·개발 의존성 선언(첫 도입, `==` 고정) |
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-06 (04-review, verifier 판정 — b3bcc2d 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -161,8 +177,12 @@ WARN  registry 에 다른 패키지로 이미 있음: requirements.txt → | 문
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. U9(b3bcc2d)가 `requirements.txt` 의 기존 행 **비고만** 갱신했고 새 행은 없다 — 행 수 1 유지(`requirements.txt` 는 `requirements.txt, requirements-dev.txt` 합행 1개), 커밋 열 표본 대조 일치(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-registry-check.txt`). `scripts/embed_pilot.py` 행은 "결정 6-a 예외로 옮기지 않음" 확정 문구로 교체됨(registry.md 26행).
+- 재검증: `bash .claude/scripts/verify-impl.sh P3-er` → `PASS registry 에 P3-er 행 있음`, FAIL 0(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-verify-impl.txt`).
+
 ## F-127d01 · [권고] registry 에 다른 패키지로 이미 있음: tests/conftest.py → | 테스트 | 저장소 루트 `sys.path` 등록(공용 fixture) | tests/conftes
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-06 (04-review, verifier 판정 — b3bcc2d 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -187,8 +207,12 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/conftest.py → | �
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. U9(b3bcc2d)가 `tests/conftest.py` 의 기존 행 **비고만** 갱신했고 새 행은 없다 — 행 수 1 유지(`requirements.txt` 는 `requirements.txt, requirements-dev.txt` 합행 1개), 커밋 열 표본 대조 일치(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-registry-check.txt`). `scripts/embed_pilot.py` 행은 "결정 6-a 예외로 옮기지 않음" 확정 문구로 교체됨(registry.md 26행).
+- 재검증: `bash .claude/scripts/verify-impl.sh P3-er` → `PASS registry 에 P3-er 행 있음`, FAIL 0(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-verify-impl.txt`).
+
 ## F-b266cb · [권고] registry 에 다른 패키지로 이미 있음: tests/test_tools_context.py → | 테스트 | trace 행 기록·예외 시 tool_error·문자열 절단 | tests/
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-06 (04-review, verifier 판정 — b3bcc2d 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -213,8 +237,12 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/test_tools_context.p
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. U9(b3bcc2d)가 `tests/test_tools_context.py` 의 기존 행 **비고만** 갱신했고 새 행은 없다 — 행 수 1 유지(`requirements.txt` 는 `requirements.txt, requirements-dev.txt` 합행 1개), 커밋 열 표본 대조 일치(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-registry-check.txt`). `scripts/embed_pilot.py` 행은 "결정 6-a 예외로 옮기지 않음" 확정 문구로 교체됨(registry.md 26행).
+- 재검증: `bash .claude/scripts/verify-impl.sh P3-er` → `PASS registry 에 P3-er 행 있음`, FAIL 0(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-verify-impl.txt`).
+
 ## F-0ffff5 · [권고] registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-06 (04-review, verifier 판정 — b3bcc2d 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -238,6 +266,10 @@ WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | �
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. U9(b3bcc2d)가 `README.md` 의 기존 행 **비고만** 갱신했고 새 행은 없다 — 행 수 1 유지(`requirements.txt` 는 `requirements.txt, requirements-dev.txt` 합행 1개), 커밋 열 표본 대조 일치(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-registry-check.txt`). `scripts/embed_pilot.py` 행은 "결정 6-a 예외로 옮기지 않음" 확정 문구로 교체됨(registry.md 26행).
+- 재검증: `bash .claude/scripts/verify-impl.sh P3-er` → `PASS registry 에 P3-er 행 있음`, FAIL 0(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-verify-impl.txt`).
 
 ## F-138665 · [필수] 계획 미정: confidence 의 s_emb·s_rule 이 어느 후보의 값인지(matched_person_id 귀속)와 matched_person_id=null 일 때의 구간(merge 금지)이 01-plan 에 없다 — U5 "s_emb = 최고 후보의 인물별 max 유사도" 는 LLM 이 고른 후보와 다를 수 있다(원칙1·D3)
 상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-05
@@ -526,7 +558,7 @@ WARN  보류 1 건 — 결과는 통과가 될 수 없다
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-7fe239 · [권고] 임계치 비교 허용오차가 두 갈래다(round(·,6) 또는 isclose(1e-9)) — round(·,6) 은 T_merge-5e-7 을 merge 로 판정해 스윕 테스트 "원값 confidence < T_merge 이면 band != merge" 와 모순될 수 있다(원칙1 방향 반대). 1e-9 급 하나로 고정하고 스윕·경계 테스트가 같은 비교 함수를 쓰게 할 것(evidence plan-review-arith)
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-06 (04-review, verifier 판정 — b3bcc2d 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -553,8 +585,13 @@ WARN  임계치 비교 허용오차가 두 갈래다(round(·,6) 또는 isclose(
 - 관련 카드(D/S/원칙)와 충돌: 있음 → 원칙1·S3.3 "T_merge 미만 자동 병합 금지"(5e-7 폭이지만 방향이 반대) — 1e-9 로 고정하면 없음
 - FIX/CR 로 올려야 하는가: 아니오 (구현 규약, 카드 무변경)
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. `app/er/confidence.py::ge_with_tolerance`(별칭 `_ge`) 단일 비교, `ER_TOLERANCE=1e-9`(app/settings.py) 단일 출처. `round(` 호출 코드 0건(매치는 docstring/주석뿐) — `docs/wiki/packages/P3-er/evidence/20260906-1439-review-grep-principles.txt`.
+- 재현: `python -m pytest tests/test_er_confidence.py -q -k boundary` → 7 passed(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-pytest-k-boundary.txt`), `-k threshold` → 4 passed(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-pytest-k-threshold.txt`).
+- 변이 A(`band_for` 의 비교를 `confidence > t_merge` 로 교체) → `test_boundary_exactly_t_merge_is_merge`·`test_boundary_t_merge_minus_5e10_is_merge_within_tolerance`·`test_threshold_sweep_uses_same_comparison_function_as_boundary` 3건 실패 = 테스트가 규약을 실제로 검사한다(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-mutation.txt`).
+
 ## F-93f063 · [권고] apply_resolution 의 JSONB 부분 갱신을 검증하는 U7 테스트가 같은 세션 identity map 으로 읽으면 in-place dict 변경이 flush 되지 않아도 통과한다 — 원시 SQL 또는 expire 후 재조회로 읽고, 구현은 jsonb_set/|| 또는 flag_modified 를 쓴다고 명시할 것(원칙8·원칙9)
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-06 (04-review, verifier 판정 — cc5d24f 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -579,8 +616,12 @@ WARN  apply_resolution 의 JSONB 부분 갱신을 검증하는 U7 테스트가 �
 - 관련 카드(D/S/원칙)와 충돌: 없음 (원칙8·9 검증 방법 문제)
 - FIX/CR 로 올려야 하는가: 아니오
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. 구현은 dict 제자리 수정 + `flag_modified(trace_row, "output")` + `flush()`(`app/er/pipeline.py apply_resolution`). 테스트 `test_apply_resolution_updates_only_three_decision_fields_via_raw_sql_applied` 는 `SELECT output FROM agent_traces WHERE id=:id` **원시 SQL** 로 전/후 재조회하고 `expire_all()` 뒤 비교한다(tests/test_er_pipeline.py 580~622행 직접 확인) — identity map 오탐 경로 아님.
+- 재현: `POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k applied` → 2 passed(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-pytest-k-applied.txt`). verifier 자체 probe 도 원시 SQL 로 `applied=true`·`applied_at` 갱신과 `confidence_breakdown` 불변을 확인(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-trace-full-recompute.txt`).
+
 ## F-8809f2 · [권고] apply_resolution 을 같은 Resolution 으로 두 번 부를 때의 동작이 없다 — identity/new_person 경로는 pending_questions 2행과 pending_question_id 덮어쓰기가 생긴다. applied=true 면 거부(예외) 또는 기존 AppliedResolution 반환 중 하나를 정하고 테스트할 것
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-06 (04-review, verifier 판정 — cc5d24f 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -605,8 +646,13 @@ WARN  apply_resolution 을 같은 Resolution 으로 두 번 부를 때의 동작
 - 관련 카드(D/S/원칙)와 충돌: 없음 (S3.4 질문 프로토콜의 중복 질문 방지 — P5 인계 사항과 맞닿음)
 - FIX/CR 로 올려야 하는가: 아니오
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. `AlreadyApplied(InvalidValue)`(app/er/types.py) — `apply_resolution` 이 `decision["applied"] is True` 를 확인하는 즉시 던지고 `update_person`/`ask_user`/trace 갱신 어느 것도 실행하지 않는다(app/er/pipeline.py 362~366행).
+- 재현: `POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k double_apply` → 1 passed(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-pytest-k-double_apply.txt`). 해결 단계의 `-k "applied and twice"` 는 테스트 이름과 매치되지 않으므로 판정 명령은 `-k double_apply` 로 읽는다(03-log U7 기록과 일치).
+- P5 인계: 재시도·재개 경로에서 같은 `Resolution` 을 두 번 적용하면 예외이므로 P5 루프는 `AlreadyApplied` 를 잡아 기존 `pending_question_id`(trace `decision.pending_question_id`)를 재사용해야 한다.
+
 ## F-f3b245 · [권고] llm_failed 경로의 s_emb·s_rule 귀속이 없다 — 결정 3-c 는 null 경로만 0 으로 정했고 JudgeUnavailable 경로는 matched_person_id 가 없는데 confidence_breakdown 값이 미정(S3.7 재계산 일관성). null 과 같은 규약(s_emb=s_rule=0, matched_person_id=null, band_by_threshold=new_person)으로 명시할 것
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-06 (04-review, verifier 판정 — 593c254·d6e5949 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -635,8 +681,12 @@ WARN  llm_failed 경로의 s_emb·s_rule 귀속이 없다 — 결정 3-c 는 nul
 - 관련 카드(D/S/원칙)와 충돌: 없음 (D3 trace `confidence_breakdown` 필수 5키는 유지, 값 규약만)
 - FIX/CR 로 올려야 하는가: 아니오
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. `_forced_decision()` 하나가 null·llm_failed·out_of_range 세 경로의 귀속(`matched_person_id=None`, 세 신호 0, `confidence=0`, `band_by_threshold=band_for(0)`)을 만든다(app/er/confidence.py 176~223행) — 값이 갈릴 수 없는 구조.
+- 재현: `POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k llm_failed` → 1 passed(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-pytest-k-llm_failed.txt`). 변이 B(`_forced_decision` 의 identity 강제를 merge 로) → 확신도 5건 + 파이프라인 `llm_failed` 1건 등 7건 실패(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-mutation.txt`).
+
 ## F-5a97ef · [권고] matched_person_id 범위 검증 집합이 결정 3(a) "후보 id 집합" 과 34행 "통과 후보 id 집합" 으로 표기가 갈린다 — 통과 후보 집합으로 통일하고, 배제 후보 id 를 답한 경우 JudgeUnavailable(llm_failed) 로 가되 llm.error 유형으로 API 장애와 구분되게 할 것(P4 실패 케이스 분석)
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-06 (04-review, verifier 판정 — 593c254·b1f2782 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -664,8 +714,13 @@ WARN  matched_person_id 범위 검증 집합이 결정 3(a) "후보 id 집합" �
 - 관련 카드(D/S/원칙)와 충돌: 없음 — 통과 후보 집합으로 통일하면 원칙1·4(2단계 필터 유효) 유지
 - FIX/CR 로 올려야 하는가: 아니오
 
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**(Judge 조기 차단 U5 까지 확인). 계층 1: `decide()` 가 `passed_ids`(2단계 통과 후보) 밖 id 를 `llm_failed`+`llm_error_kind="out_of_range_id"` 로 강등(app/er/confidence.py 267~273행). 계층 2: `validate_judgement(raw, allowed_ids)` 가 `ClaudeJudge`·`OpenAIJudge`·`FakeJudge` 셋 모두에서 공유되어 `JudgeUnavailable("out_of_range_id")` 를 API 장애 유형(`timeout`/`rate_limit`/`api_error`/`connection`/`schema`)과 구분해 던진다(app/er/judge.py 149~183행, 호출부 3곳 직접 확인).
+- 재현: `python -m pytest tests/test_er_judge.py -q -k out_of_range` → 5건 통과는 전체 실행 398 passed 에 포함(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-pytest-all.txt`); `test_both_providers_call_shared_validate_judgement` 가 공유를 단언. 파이프라인은 `llm_failed=True`+`llm.error=str(exc)` 로 흡수(app/er/pipeline.py 172~178행) → trace `llm.error="out_of_range_id"` 가 남는다.
+- 잔여(신규 소견 F-036185 로 분리): `validate_judgement` 가 bool 형 id 를 int 로 통과시키는 사소한 구멍.
+
 ## F-1d65ac · [권고] 결정 3-c(b) null 경로의 파이프라인 테스트가 U6 목록·판정 방법 표에 없다(FakeJudge → null, 통과 후보 있음 → band=identity·band_by_threshold=new_person·forced_reason=no_matched). 후보 0건이면 LLM 을 부르지 않으므로 null 은 항상 통과 후보 ≥1 에서만 생긴다 — "없으면 new_person" 가지는 도달 불가이며 테스트한 것으로 세지 말 것
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-06 (04-review, verifier 판정 — d6e5949 기준)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -690,5 +745,165 @@ WARN  결정 3-c(b) null 경로의 파이프라인 테스트가 U6 목록·판�
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 (원칙8 커버리지 표기)
+- FIX/CR 로 올려야 하는가: 아니오
+
+### verifier 04-review 판정 (2026-09-06)
+- 판정: **닫힘**. `test_resolve_null_matched_person_id_forces_identity_not_new_person_null_path`(`-k null_path`) — `FakeJudge(table={})` 로 `matched_person_id=None` 을 만들고 `band=identity`·`band_by_threshold=new_person`·`forced_reason=no_matched`·세 신호 0 을 단언. "통과 후보 0 + null" 가지는 docstring 에 도달 불가로 명시하고 테스트로 세지 않았다(원칙8).
+- 재현: `POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k null_path` → 1 passed(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-pytest-k-null_path.txt`). 해결 단계의 `-k no_matched` 는 이름과 매치되지 않으므로 `-k null_path` 로 읽는다. 변이 D(null 분기를 첫 통과 후보 귀속으로 우회) → 스윕·decide·파이프라인 3건 실패(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-mutation.txt`).
+
+## F-87c597 · [권고] R4 실호출 미검증 — er_smoke 실 API evidence 파일이 없다(evidence/ 에 *er-smoke-real* 0건). claude-sonnet-5 모델 id·Anthropic 도구 정의의 strict=True·usage 필드명은 스텁(test_er_judge.py 36건)으로만 확인됐다. review-index R4 는 "구현완료(스텁 검증)·실호출 미검증" 으로 표기하고, 사용자가 키를 넣어 1회 실행한 출력을 evidence/<ts>-er-smoke-real.txt 로 남긴 뒤에만 "실호출 확인" 으로 바꿀 것
+상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  R4 실호출 미검증 — er_smoke 실 API evidence 파일이 없다(evidence/ 에 *er-smoke-real* 0건). claude-sonnet-5 모델 id·Anthropic 도구 정의의 strict=True·usage 필드명은 스텁(test_er_judge.py 36건)으로만 확인됐다. review-index R4 는 "구현완료(스텁 검증)·실호출 미검증" 으로 표기하고, 사용자가 키를 넣어 1회 실행한 출력을 evidence/<ts>-er-smoke-real.txt 로 남긴 뒤에만 "실호출 확인" 으로 바꿀 것
+```
+
+### 원인 분석
+- 가설: 01-plan 결정 9·판정 방법 표(120~121행)가 실 LLM 호출을 "사용자 실행" 으로 두었고(security.md §6), 구현 단위(U5·U8·U9)와 이 검토 어디에서도 키를 넣은 실행이 없었다. 따라서 R4 의 (ii) 실 API 구조화 출력 수락 여부(모델 id `claude-sonnet-5`, Anthropic 도구 정의 `strict: True`, `usage.input_tokens/output_tokens`, OpenAI `gpt-4o-mini`·`strict`)는 코드 형태로만 존재한다. 설치본 SDK 타입에 `strict` 키가 있는 것까지는 정적으로 확인했다.
+- 확인 방법(명령): `ls docs/wiki/packages/P3-er/evidence/ | grep -i real`; `python scripts/er_smoke.py`(키 없음)
+- 확인 결과: 실 호출 evidence 0건. 키 없이 실행 → rc=2 안내(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-tools-alembic-scripts.txt`). SDK 타입 정적 확인: anthropic 1.4.0 `ToolParam` 에 `strict` 있음, openai 2.33.0 `FunctionDefinition` 에 `strict` 있음(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-sdk-shape.txt`) — 실제 API 수락은 미확인.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | 사용자가 셸에서 `ANTHROPIC_API_KEY=… python scripts/er_smoke.py > docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt`(또는 `--provider openai`)를 1회 실행. 실패(rc 3, `{"error": ...}`)도 결과다 — 그 출력을 그대로 evidence 로 남기고 04-review §4 R4 (ii) 줄을 갱신. 이 패키지 닫기의 전제 조건은 아니다(01-plan 121행 규약) | `test -s docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt && python -c "import json,sys; d=json.load(open(sys.argv[1],encoding='utf-8')); print(sorted(d))" <그 파일>` | 9키(`provider model tokens_in tokens_out s_llm matched_person_id reason confidence band`) 또는 `error` 1키 — 어느 쪽이든 review-index R4 표기를 그에 맞게 갱신 | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
+- 결과 파일(evidence/): docs/wiki/packages/P3-er/evidence/20260906-1439-review-sdk-shape.txt, docs/wiki/packages/P3-er/evidence/20260906-1439-review-tools-alembic-scripts.txt
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음(D3·R4 — 코드 구조는 검증 완료, 실호출 증거만 부재)
+- FIX/CR 로 올려야 하는가: 아니오
+
+## F-46f1eb · [권고] tests/test_er_judge.py 505·526행이 더미 키를 "sk-test-dummy" 문자열로 setenv 한다 — U2·U8 이 secret-guard 때문에 채택한 _FAKE_KEY_MARKER 규약(sk- 접두 금지)과 불일치, 비밀 스캐너 오탐 원인. 같은 마커로 통일할 것(동작 변화 없음)
+상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  tests/test_er_judge.py 505·526행이 더미 키를 "sk-test-dummy" 문자열로 setenv 한다 — U2·U8 이 secret-guard 때문에 채택한 _FAKE_KEY_MARKER 규약(sk- 접두 금지)과 불일치, 비밀 스캐너 오탐 원인. 같은 마커로 통일할 것(동작 변화 없음)
+```
+
+### 원인 분석
+- 가설: U5 가 `OpenAI()` 생성 시점 키 존재 확인을 우회하려고 더미 값을 넣으며 `sk-` 접두 문자열을 썼다. U2·U8 은 같은 상황에서 secret-guard 훅에 막혀 `_FAKE_KEY_MARKER = "FAKE-TEST-ONLY-NOT-A-REAL-KEY-4f21"` 로 바꿨는데 U5 파일에는 훅이 반응하지 않아 규약이 갈렸다. 실제 키는 아니지만(길이·형식 불충족) 비밀 스캐너·훅의 오탐 원인이 되고 규약 이중 출처다.
+- 확인 방법(명령): `grep -rnE "sk-[A-Za-z0-9_-]{5,}" tests/ app/ scripts/`
+- 확인 결과: `tests/test_er_judge.py:505`·`:526` 2건(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-grep-principles.txt`). 다른 파일은 `_FAKE_KEY_MARKER` 사용.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | `tests/test_er_judge.py` 두 곳을 `_FAKE_KEY_MARKER`(같은 문자열 상수, 파일 상단 정의)로 교체 — 동작 변화 없음(값은 검사되지 않고 존재만 확인됨) | `grep -rnE "sk-[A-Za-z0-9_-]{5,}" tests/ app/ scripts/ | wc -l` 및 `python -m pytest tests/test_er_judge.py -q -k judge_from_env` | 0 / 5 passed | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
+- 결과 파일(evidence/): docs/wiki/packages/P3-er/evidence/20260906-1439-review-grep-principles.txt
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음(security.md §1 규약 통일)
+- FIX/CR 로 올려야 하는가: 아니오
+
+## F-251dc2 · [권고] trace candidates[].similarity 와 aliases_matched 가 s_emb(클램프 후)·전체 별칭 목록의 복제다(candidates.py._to_scored 가 P2 Candidate.similarity 원시값·aliases_matched 부분집합을 보존하지 않음, 03-log U6 명시). P4 가 "실제 일치 별칭" 을 trace 만으로 알 수 없다 — P4 착수 전 _to_scored 가 두 필드를 그대로 보존하도록 확장하거나 P4 01-plan 이 불필요를 명시할 것
+상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  trace candidates[].similarity 와 aliases_matched 가 s_emb(클램프 후)·전체 별칭 목록의 복제다(candidates.py._to_scored 가 P2 Candidate.similarity 원시값·aliases_matched 부분집합을 보존하지 않음, 03-log U6 명시). P4 가 "실제 일치 별칭" 을 trace 만으로 알 수 없다 — P4 착수 전 _to_scored 가 두 필드를 그대로 보존하도록 확장하거나 P4 01-plan 이 불필요를 명시할 것
+```
+
+### 원인 분석
+- 가설: U5 `_to_scored()` 가 P2 `Candidate` 의 `similarity`(클램프 전 원시 유사도)와 `aliases_matched`(질의와 실제 일치한 별칭 부분집합)를 `ScoredCandidate` 에 보존하지 않고 각각 `s_emb`(클램프 후)·`aliases`(전체)로만 옮겼다. U6 `_candidate_trace_dict()` 는 결정 5 스키마 키 이름을 채우려고 두 키에 같은 값을 넣었다(03-log U6 "계획과 다르게 한 것" (1) 에 명시). 구조는 스키마를 만족하지만 의미는 근사다.
+- 확인 방법(명령): verifier probe 의 trace `candidates[]` 출력 비교
+- 확인 결과: 승진 픽스처에서 `similarity == s_emb == 0.8493583888197921`, `aliases_matched == ["김팀장","팀장"]`(전체 별칭 — mention "부장님" 과 문자열 일치한 별칭은 없으므로 실제 부분집합은 빈 목록이어야 한다)(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-trace-full-recompute.txt`). `s_emb` 는 이미 `[0,1]` 안이라 재계산 정확성(S3.7)에는 영향 없음.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | P4-pilot-eval 01-plan 이 (a) `_to_scored()` 에 `similarity_raw`·`aliases_matched` 보존을 추가하는 사소 FIX 를 선행 단위로 넣거나, (b) 두 키가 P4 재계산·실패 케이스 분석에 불필요함을 명시한다 — 둘 중 하나를 architect 가 결정 | (a) 채택 시 `POSTGRES_PORT=5433 python -m pytest tests/test_er_candidates.py tests/test_er_pipeline.py -q -rs -k "aliases_matched or similarity"` | (a) 신규 테스트 통과 — `aliases_matched` 가 전체 별칭의 부분집합이고 exact/partial 일치만 담김 / (b) P4 01-plan 문장 | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
+- 결과 파일(evidence/): docs/wiki/packages/P3-er/evidence/20260906-1439-review-trace-full-recompute.txt
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음(결정 5 trace 스키마 키는 그대로, 값 의미만)
+- FIX/CR 로 올려야 하는가: 아니오(P4 01-plan 결정)
+
+## F-bdd6c5 · [권고] search_candidates(top_k=…) 인자가 search_person 에 전달되지 않아 ERConfig.top_k 를 바꿔도 실제 K 는 SEARCH_TOP_K 고정인데 trace input.config.top_k 에는 ERConfig 값이 기록된다 — P4 가 top_k 를 스윕하면 trace 가 실제와 어긋난다. P4 01-plan 에 "top_k 스윕 금지(또는 search_person 확장 필요)" 를 명시할 것
+상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  search_candidates(top_k=…) 인자가 search_person 에 전달되지 않아 ERConfig.top_k 를 바꿔도 실제 K 는 SEARCH_TOP_K 고정인데 trace input.config.top_k 에는 ERConfig 값이 기록된다 — P4 가 top_k 를 스윕하면 trace 가 실제와 어긋난다. P4 01-plan 에 "top_k 스윕 금지(또는 search_person 확장 필요)" 를 명시할 것
+```
+
+### 원인 분석
+- 가설: `search_person` 시그니처(S3.2, 변경 금지)에 `top_k` 가 없어 U5 가 인자를 받아 두기만 하고 전달하지 않았다(app/er/candidates.py docstring 에 명시). 반면 `ERConfig.to_dict()` 가 trace `input.config.top_k` 를 기록하므로 `resolve(config=ERConfig(top_k=5))` 처럼 스윕하면 trace 는 5, 실제 검색은 `SEARCH_TOP_K=10` 이 된다.
+- 확인 방법(명령): `grep -n "top_k" app/er/candidates.py app/tools/persons.py`
+- 확인 결과: `candidates.py` 는 인자 수신만, `search_person` 내부는 `SEARCH_TOP_K` 상수 사용 — 전달 경로 없음(코드 직접 확인).
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | P4 01-plan 에 "`ERConfig.top_k` 는 스윕하지 않는다(현재 무효)" 를 명시하거나, P5 이전 사소 FIX 로 `search_person` 이 `settings.SEARCH_TOP_K` 를 모듈 로드 시 고정하지 않고 주입 가능하게 바꾼다(시그니처 v2 는 유지 — 내부 helper 인자). 결정은 architect | FIX 채택 시 `POSTGRES_PORT=5433 python -m pytest tests/test_er_candidates.py -q -rs -k top_k` | `top_k=1` 로 호출 시 후보 수 ≤ 1 단언 통과 | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
+- 결과 파일(evidence/): docs/wiki/packages/P3-er/evidence/20260906-1439-review-grep-principles.txt
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음(S3.2 시그니처 무변경 전제)
+- FIX/CR 로 올려야 하는가: 아니오(P4/P5 01-plan 결정)
+
+## F-036185 · [권고] judge.validate_judgement 가 bool 형 matched_person_id 를 int 로 통과시킨다(isinstance(True,int) — True in {1} 이 참이라 1번 후보로 귀속). strict 스키마가 실호출에서는 막지만 FakeJudge·비strict 응답 경로에 방어가 없다 — isinstance(x, bool) 선차단 한 줄과 테스트 1건을 P5 이전 사소 수정으로
+상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  judge.validate_judgement 가 bool 형 matched_person_id 를 int 로 통과시킨다(isinstance(True,int) — True in {1} 이 참이라 1번 후보로 귀속). strict 스키마가 실호출에서는 막지만 FakeJudge·비strict 응답 경로에 방어가 없다 — isinstance(x, bool) 선차단 한 줄과 테스트 1건을 P5 이전 사소 수정으로
+```
+
+### 원인 분석
+- 가설: `validate_judgement` 는 `isinstance(matched_person_id, int)` 로 타입을 검사하는데 파이썬에서 `bool` 은 `int` 의 서브클래스라 `True`/`False` 가 통과하고, `True in {1}`·`False in {0}` 이 참이라 후보 id 1(또는 0)로 귀속될 수 있다. `s_llm` 검사는 `isinstance(s_llm, bool)` 을 먼저 배제하지만 id 쪽은 빠졌다. 실호출은 strict 스키마(`["integer","null"]`)가 막고 `FakeJudge` 는 테스트가 int 만 주므로 현재 도달 경로는 없다 — 방어 일관성 문제.
+- 확인 방법(명령): `python -c "from app.er.judge import validate_judgement as v; print(v({'matched_person_id': True, 's_llm': 0.9, 'reason': 'r'}, {1}).matched_person_id)"`
+- 확인 결과: `True` 가 그대로 반환된다(예외 없음) — verifier 가 직접 실행해 확인.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | `validate_judgement` 에 `if isinstance(matched_person_id, bool): raise JudgeUnavailable("schema")` 한 줄 + `tests/test_er_judge.py` 에 케이스 1건. P5 이전 사소 수정(별도 커밋) | `python -m pytest tests/test_er_judge.py -q -k bool` | 1 passed | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
+- 결과 파일(evidence/): 위 확인 명령 출력(04-review §3 (viii) 표)
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음(S3.3 스키마 그대로)
+- FIX/CR 로 올려야 하는가: 아니오
+
+## F-d5c11e · [권고] 03-log U9 항목(pending)은 ".env.example registry 새 행을 만들지 않았다" 고 적었으나 커밋 b3bcc2d 는 그 행을 신설했다(registry.md 35행) — 03-log 와 커밋 내용 불일치, U9 항목 헤더가 여전히 pending. /devlog done 에서 03-log 에 후속 한 줄(고쳐 쓰지 않고 추가)로 해시·행 신설 사실을 남길 것
+상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+
+### 증상 (검증 출력 인용)
+```
+WARN  03-log U9 항목(pending)은 ".env.example registry 새 행을 만들지 않았다" 고 적었으나 커밋 b3bcc2d 는 그 행을 신설했다(registry.md 35행) — 03-log 와 커밋 내용 불일치, U9 항목 헤더가 여전히 pending. /devlog done 에서 03-log 에 후속 한 줄(고쳐 쓰지 않고 추가)로 해시·행 신설 사실을 남길 것
+```
+
+### 원인 분석
+- 가설: U9 03-log 항목은 커밋 전에 `pending` 으로 쓰였고 그 시점에는 `.env.example` 행이 없었다. 이후 커밋 b3bcc2d 가(커밋 메시지 "`.env.example` 행 신설(하네스 e062986, 이름만 추적)") 행을 추가했지만 03-log 는 형식상 고쳐 쓰지 않으므로 그대로 남았다. 03-log U9 헤더의 해시도 아직 `pending`.
+- 확인 방법(명령): `git show b3bcc2d -- docs/wiki/registry.md | grep -n "환경변수 이름 목록"`; `grep -n "pending" docs/wiki/packages/P3-er/03-log.md`
+- 확인 결과: b3bcc2d diff 에 `+| 문서 | 환경변수 이름 목록(값 비움, 추적 유지) | .env.example | 하네스 | e062986 |` 행 추가 확인(registry.md 35행). 03-log 122행 헤더 `· pending`.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | /devlog done 에서 메인 세션이 03-log 에 후속 한 줄 추가(고쳐 쓰지 않음): "U9 커밋 b3bcc2d — `.env.example` registry 행은 이 커밋에서 신설됨(위 U9 본문의 '만들지 않았다' 는 커밋 전 상태)", U9 헤더 해시 반영 | `grep -n "b3bcc2d" docs/wiki/packages/P3-er/03-log.md | wc -l` | ≥ 1 | 대기 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
+- 결과 파일(evidence/): docs/wiki/packages/P3-er/evidence/20260906-1439-review-registry-check.txt
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음(문서 정합성)
 - FIX/CR 로 올려야 하는가: 아니오
 

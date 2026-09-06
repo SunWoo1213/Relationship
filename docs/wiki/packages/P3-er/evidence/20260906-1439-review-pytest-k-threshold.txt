@@ -1,0 +1,4 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_er_confidence.py -q -rs -k "threshold"
+....                                                                     [100%]
+4 passed, 33 deselected in 0.21s
+exit=0

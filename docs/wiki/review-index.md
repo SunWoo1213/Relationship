@@ -9,12 +9,12 @@
 | R1 | H | ER 파이프라인이 스키마에 의존 (일정 충돌) | 폐기 | 의존성 순서 P1→P3 |
 | R2 | H | 기획서 일정 ↔ 하네스 마일스톤 불일치 | 폐기 | 일정 전면 삭제 |
 | R3 | H | 임계치 방향 문장이 반대 | 해소(문서) | D10 |
-| R4 | H | "LLM 출력 확률"은 Claude API에 없음 | 해소(문서) | D3 |
+| R4 | H | "LLM 출력 확률"은 Claude API에 없음 | 구현완료(b1f2782 — 구조화 출력 자기보고 s_llm, judge.py·test_er_judge.py 36건 스텁 검증; **실호출 미검증** — er_smoke 사용자 실행 후 evidence 경로 추가) | D3 → S3.3 → P3-er |
 | R5 | H | 임베딩 공급자 미정, 차원 1536은 가정 | 구현완료(876a450, reports/embed_pilot.md: OpenAI text-embedding-3-small, N=1536) | D4 → P0-embed-pilot |
 | R6 | M | 신규 인물 자동등록 vs 확인형 불일치 | 구현완료(f318d58, 8162e09 — create_person 은 answered new_person 질문+긍정 답 없이는 ConfirmationRequired; P5-loop 가 1회 소비·대상 바인딩 결정) | D1 → S3.4 → P2-tools, P5-loop |
 | R7 | M | ask_user 동기 반환 불가 | 구현완료(8162e09, 4d5817e — pending_questions 저장 후 {question_id,status:pending} 반환, POST /answers 답 저장; 재개 흐름은 P5-loop) | D2 → S3.4 → P2-tools, P5-loop |
 | R8 | M | 시맨틱→원문 링크 없음 | 구현완료(4dfaf33, 09c2bd1 — fact_sources(fact_id, event_id) 복합 PK·FK CASCADE 2; P6-memory 가 승격 시 채움) | S3.1 `fact_sources` → P1-schema, P6-memory |
-| R9 | M | 인물당 임베딩 1개 | 구현완료(4dfaf33, 09c2bd1 — person_aliases.embedding vector(1536) nullable, person_embeddings 없음; P3-er 가 후보 검색에 사용) | D5 → S3.1 → P1-schema, P3-er |
+| R9 | M | 인물당 임베딩 1개 | 구현완료(4dfaf33, 09c2bd1, a9cb254, 2c63c60 — 별칭 단위 임베딩·top-K 인물별 max·OpenAIEmbeddingProvider 런타임; **실 공급자 호출 미검증**, P4 에서 실측) | D5 → S3.1 → P1-schema, P2-tools, P3-er |
 | R10 | M | 툴 시그니처 ↔ 스키마 불일치 | 구현완료(f2e9e05 — tools_check 7/7, CLAUDE.md 표 = 실제 시그니처) | S3.2 |
 | R11 | M | 반복 패턴 감지 메커니즘 없음 | 결정완료 | D9 → S3.5 → P6-memory |
 | R12 | M | 브리핑 트리거·푸시 구독 저장소 없음 | 결정완료 | S3.6 → P6-briefing, P7-push |

@@ -152,3 +152,10 @@
   - `.env.example` registry 행 부재(위 "변경" 절 참고) — 새 행 생성 여부는 architect/메인 세션 판단 필요.
 - 사용자가 해야 할 것: `scripts/er_smoke.py` 실 호출(키가 있는 1회, 위 U8 항목의 두 명령 중 하나) — 이 단위도 대신 실행하지 않았다(security.md §6). 실행하면 `docs/wiki/packages/P3-er/evidence/<ts>-u9-er-smoke-real.txt` 로 남기고 04-review 의 R4 "실호출" 닫힘 표기에 쓸 수 있다.
 - Refs: P3-er R4 R9 D3 D10 S3.3 S3.7 원칙8 원칙9
+
+## 2026-09-06 19:10 · docs(P3-er): 04-review 완료 판정 · pending
+- 후속 정정(F-d5c11e): U9 항목 본문은 `.env.example` registry 행을 "만들지 않음" 으로 적었으나, 메인 세션이 U9 커밋 b3bcc2d 에 그 행을 신설했다(하네스 e062986 소유, 이름만 추적). U9 헤더 해시 = b3bcc2d.
+- verifier(fable) 04-review: **결과 완료**, 필수 소견 0, 권고 신규 6(F-87c597 R4 실호출 미검증 / F-46f1eb 더미 키 규약 / F-251dc2 candidates[] 근사 / F-bdd6c5 ERConfig.top_k 무효 / F-036185 bool id 방어 / F-d5c11e 본 정정). verify-impl 최종 FAIL 0/WARN 0(`evidence/20260906-1452-review-verify-impl-final.txt`), 직접 pytest 398/skip 0, 변이 4종 전부 검출(A `>=`→`>` 3 failed / B 강제 identity→merge 7 failed / C 엄격 단계 인접 통과 3 failed / D null 분기 제거 3 failed), trace 재계산 abs diff 0. 권고 6건(F-7fe239 F-93f063 F-8809f2 F-f3b245 F-5a97ef F-1d65ac)·registry WARN 8 → 닫힘. R4·R9 는 review-index 에 두 줄 표기(구조화 출력·별칭 top-K 검증 완료 / 실호출 미검증).
+- 메인 세션 처리: review-index R4·R9 갱신, backlog P3 ER 행 [x], CURRENT none, journal DONE, README P3 행 "검증 완료".
+- 남은 것: 사용자 스모크 1회(`ANTHROPIC_API_KEY`=… `python scripts/er_smoke.py` → evidence) 후 F-87c597 닫고 R4 표기 갱신; F-46f1eb·F-036185 는 P5 전 사소 FIX 커밋 후보; F-251dc2·F-bdd6c5 는 P4 01-plan 결정.
+- Refs: P3-er R4 R9 D3 D5 D10 S3.3 S3.7 원칙8 원칙9

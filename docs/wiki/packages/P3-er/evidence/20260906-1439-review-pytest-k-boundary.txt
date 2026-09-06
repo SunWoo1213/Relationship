@@ -1,0 +1,4 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_er_confidence.py -q -rs -k "boundary"
+.......                                                                  [100%]
+7 passed, 30 deselected in 0.16s
+exit=0

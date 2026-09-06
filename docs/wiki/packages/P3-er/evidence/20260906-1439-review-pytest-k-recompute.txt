@@ -1,0 +1,4 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k "recompute"
+.                                                                        [100%]
+1 passed, 17 deselected in 0.42s
+exit=0

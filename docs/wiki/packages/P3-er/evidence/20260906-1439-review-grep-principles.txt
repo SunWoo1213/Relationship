@@ -1,0 +1,96 @@
+$ grep -rn "dotenv" app/ scripts/backfill_embeddings.py scripts/er_smoke.py
+count=0
+
+$ grep -rnE "os\.environ(\[|\.get\()[\"'][A-Z_]*API_KEY" app/ scripts/backfill_embeddings.py scripts/er_smoke.py  (키 값 읽기)
+app/embedding.py:131:    키는 `os.environ["OPENAI_API_KEY"]` 로만 읽는다 -- `.env` 는 읽지
+app/embedding.py:153:            if not os.environ.get("OPENAI_API_KEY"):
+scripts/backfill_embeddings.py:124:    if args.apply and not os.environ.get("OPENAI_API_KEY"):
+count=3
+
+$ grep -rnE "API_KEY" app/ scripts/backfill_embeddings.py scripts/er_smoke.py (모든 언급, 문맥 확인용)
+app/embedding.py:131:    키는 `os.environ["OPENAI_API_KEY"]` 로만 읽는다 -- `.env` 는 읽지
+app/embedding.py:153:            if not os.environ.get("OPENAI_API_KEY"):
+app/embedding.py:155:                    "OPENAI_API_KEY 환경변수가 설정되지 않았다. os.environ 에 "
+app/er/judge.py:29:키(`ANTHROPIC_API_KEY`/`OPENAI_API_KEY`)는 각 SDK 클라이언트가 **내부에서**
+app/er/judge.py:208:    만든다 -- 키는 인자로 넘기지 않고 SDK 가 `ANTHROPIC_API_KEY` 를
+app/er/judge.py:295:    키는 SDK 가 `OPENAI_API_KEY` 를 환경변수에서 읽는다(security.md §1).
+scripts/backfill_embeddings.py:10:`OPENAI_API_KEY` 는 `os.environ` 에서만 읽는다(실제로 읽는 것은
+scripts/backfill_embeddings.py:17:    OPENAI_API_KEY=... POSTGRES_PORT=5433 python scripts/backfill_embeddings.py --apply
+scripts/backfill_embeddings.py:21:    2 = `--apply` 인데 `OPENAI_API_KEY` 가 없음
+scripts/backfill_embeddings.py:97:        help="실제로 임베딩을 계산해 쓴다. OPENAI_API_KEY 필요",
+scripts/backfill_embeddings.py:124:    if args.apply and not os.environ.get("OPENAI_API_KEY"):
+scripts/backfill_embeddings.py:126:            "[error] OPENAI_API_KEY 환경변수가 설정되지 않았다. --apply 는 "
+scripts/er_smoke.py:11:(`anthropic` → `ANTHROPIC_API_KEY`, `openai` → `OPENAI_API_KEY`)가
+scripts/er_smoke.py:19:    ANTHROPIC_API_KEY=... python scripts/er_smoke.py
+scripts/er_smoke.py:20:    LLM_PROVIDER=openai OPENAI_API_KEY=... python scripts/er_smoke.py --provider openai
+scripts/er_smoke.py:43:    "anthropic": "ANTHROPIC_API_KEY",
+scripts/er_smoke.py:44:    "openai": "OPENAI_API_KEY",
+
+$ grep -rnE "sk-(ant-)?[A-Za-z0-9_-]{10,}|AKIA[0-9A-Z]{12,}" docs/wiki/packages/P3-er/evidence README.md app scripts tests  (키 문자열)
+tests/test_er_judge.py:505:    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-dummy")
+tests/test_er_judge.py:526:    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-dummy")
+Binary file tests/__pycache__/test_er_judge.cpython-313-pytest-9.0.3.pyc matches
+Binary file tests/__pycache__/test_er_judge.cpython-313.pyc matches
+count=6
+
+$ grep -n "round(" app/er/*.py app/settings.py  (임계치 비교 round 사용 여부)
+app/er/confidence.py:8:01-plan 은 `round(confidence, 6) >= round(T, 6)` 과 `math.isclose(abs_tol=1e-9)`
+app/er/confidence.py:9:두 갈래를 적었다(28·43·111·201행). `round(·, 6)` 은 오차 폭이 최대 5e-7 이라
+app/er/confidence.py:12:반대 방향이다. 그래서 이 모듈은 `round()` 를 어디에도 쓰지 않고, 부동소수
+app/er/confidence.py:50:    (F-7fe239). `round()` 를 쓰지 않는다 -- 이유는 모듈 docstring 참조.
+app/settings.py:26:(F-7fe239 -- `round()` 기반 비교는 `T_merge` 미만 confidence 를 merge 로
+app/settings.py:93:#: `ge_with_tolerance()` 하나만 이 상수를 쓴다 -- `round()` 기반 비교는
+
+$ grep -nE "^\s*[a-z_]+\s*=\s*round\(|if round\(|>= round\(|round\(confidence" app/er/*.py  (round 호출 코드)
+app/er/confidence.py:8:01-plan 은 `round(confidence, 6) >= round(T, 6)` 과 `math.isclose(abs_tol=1e-9)`
+count=1
+
+$ grep -nE "t_merge|t_new|>=|isclose" app/er/confidence.py  (임계치 비교 지점)
+8:01-plan 은 `round(confidence, 6) >= round(T, 6)` 과 `math.isclose(abs_tol=1e-9)`
+49:    """`a >= b` 를 부동소수 표현 오차만 흡수해 판정하는 단일 비교 함수
+55:    return a >= b or math.isclose(a, b, abs_tol=tolerance)
+83:    """확신도 → 구간(D10 원칙1·2). `>= T_merge` 는 `"merge"`, `>= T_new` 는
+86:    if ge_with_tolerance(confidence, config.t_merge):
+88:    if ge_with_tolerance(confidence, config.t_new):
+170:        "T_merge": config.t_merge,
+171:        "T_new": config.t_new,
+186:    (`= "new_person"`, `t_new > 0` 인 통상 설정에서). 최종 `band` 는 통과
+
+$ grep -rn "t_merge\|t_new\|T_MERGE\|T_NEW" app/er/pipeline.py app/er/rules.py app/er/candidates.py app/er/judge.py  (confidence.py 밖 임계치 비교 = 이중 출처 여부)
+count=0
+
+$ grep -nE "\"merge\"" app/er/*.py  (merge 를 만드는 지점)
+app/er/confidence.py:38:    "merge": "merge",
+app/er/confidence.py:83:    """확신도 → 구간(D10 원칙1·2). `>= T_merge` 는 `"merge"`, `>= T_new` 는
+app/er/confidence.py:87:        return "merge"
+app/er/confidence.py:102:    불변식: `matched_person_id is None` 이면 어떤 경로든 `band != "merge"`).
+app/er/confidence.py:247:    불변식: `matched_person_id is None` 이면 어떤 경로든 `band != "merge"`.
+app/er/pipeline.py:97:    - `band == "merge"`: `ask_payload=None`, `suggested_display_name` 은
+app/er/pipeline.py:109:    if band == "merge":
+app/er/pipeline.py:304:    - `band == "merge"`: `update_person(ctx, person_id=resolution.
+app/er/pipeline.py:373:    if resolution.band == "merge":
+app/er/types.py:260:    않는다(이중 출처 금지). `alias_added` 는 `band == "merge"` 경로에서만
+app/er/types.py:268:    action: str  # "merge" | "ask_identity" | "ask_new_person"
+
+$ grep -nE "ask_user\(|update_person\(|create_person\(|session\.add\(|\.delete\(|\.commit\(" app/er/pipeline.py app/er/candidates.py app/er/rules.py app/er/confidence.py app/er/judge.py  (DB 쓰기 지점)
+app/er/pipeline.py:304:    - `band == "merge"`: `update_person(ctx, person_id=resolution.
+app/er/pipeline.py:310:    - `band in {"identity", "new_person"}`: `ask_user(ctx, kind=..., question=
+app/er/pipeline.py:313:      `pending_question_id`. **계획과 다르게 한 것**: 01-plan 은 `ask_user(ctx,
+app/er/pipeline.py:378:        update_person(
+app/er/pipeline.py:391:        question = ask_user(
+
+$ grep -n "display_name" app/er/pipeline.py  (merge 경로 display_name 갱신 여부)
+96:    반환값 `(ask_payload, suggested_display_name)`:
+97:    - `band == "merge"`: `ask_payload=None`, `suggested_display_name` 은
+98:      귀속된 후보의 `display_name`(결정3-b -- merge 는 별칭만 누적하고
+112:        suggested_display_name = matched.display_name if matched is not None else None
+113:        return None, suggested_display_name
+117:        names = [c.display_name for c in top]
+118:        candidate_ids = {c.display_name: c.person_id for c in top}
+212:    ask_payload, suggested_display_name = _build_ask_payload(
+234:        suggested_display_name=suggested_display_name,
+306:      누적**한다 -- `display_name` 은 바꾸지 않는다(결정3-b, D6). 이미
+
+$ grep -nE "def (decide|combine|band_for|apply_rules|run_rule_stage|validate_judgement)" app/er/pipeline.py  (재구현 0 확인)
+count=0
+bool id passes as: True

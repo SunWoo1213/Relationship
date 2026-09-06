@@ -1,0 +1,8 @@
+anthropic 1.4.0 | openai 2.33.0
+anthropic ToolParam keys: ['allowed_callers', 'cache_control', 'defer_loading', 'description', 'eager_input_streaming', 'input_examples', 'input_schema', 'name', 'strict', 'type']
+anthropic ToolChoiceToolParam keys: ['disable_parallel_tool_use', 'name', 'type']
+openai FunctionDefinition keys: ['description', 'name', 'parameters', 'strict']
+Traceback (most recent call last):
+  File "<stdin>", line 20, in <module>
+UnicodeEncodeError: 'cp949' codec can't encode character '\u2014' in position 60: illegal multibyte sequence
+NOTE: static type check only; actual API acceptance (model id, strict support) can only be confirmed by a real call - real call NOT verified in this review

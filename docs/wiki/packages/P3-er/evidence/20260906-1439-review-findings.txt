@@ -1,0 +1,7 @@
+== verifier 04-review 신규 소견 (P3-er, 2026-09-06 14:39) — 전부 권고, 수용 기준·원칙 침범 없음 ==
+WARN  R4 실호출 미검증 — er_smoke 실 API evidence 파일이 없다(evidence/ 에 *er-smoke-real* 0건). claude-sonnet-5 모델 id·Anthropic 도구 정의의 strict=True·usage 필드명은 스텁(test_er_judge.py 36건)으로만 확인됐다. review-index R4 는 "구현완료(스텁 검증)·실호출 미검증" 으로 표기하고, 사용자가 키를 넣어 1회 실행한 출력을 evidence/<ts>-er-smoke-real.txt 로 남긴 뒤에만 "실호출 확인" 으로 바꿀 것
+WARN  tests/test_er_judge.py 505·526행이 더미 키를 "sk-test-dummy" 문자열로 setenv 한다 — U2·U8 이 secret-guard 때문에 채택한 _FAKE_KEY_MARKER 규약(sk- 접두 금지)과 불일치, 비밀 스캐너 오탐 원인. 같은 마커로 통일할 것(동작 변화 없음)
+WARN  trace candidates[].similarity 와 aliases_matched 가 s_emb(클램프 후)·전체 별칭 목록의 복제다(candidates.py._to_scored 가 P2 Candidate.similarity 원시값·aliases_matched 부분집합을 보존하지 않음, 03-log U6 명시). P4 가 "실제 일치 별칭" 을 trace 만으로 알 수 없다 — P4 착수 전 _to_scored 가 두 필드를 그대로 보존하도록 확장하거나 P4 01-plan 이 불필요를 명시할 것
+WARN  search_candidates(top_k=…) 인자가 search_person 에 전달되지 않아 ERConfig.top_k 를 바꿔도 실제 K 는 SEARCH_TOP_K 고정인데 trace input.config.top_k 에는 ERConfig 값이 기록된다 — P4 가 top_k 를 스윕하면 trace 가 실제와 어긋난다. P4 01-plan 에 "top_k 스윕 금지(또는 search_person 확장 필요)" 를 명시할 것
+WARN  judge.validate_judgement 가 bool 형 matched_person_id 를 int 로 통과시킨다(isinstance(True,int) — True in {1} 이 참이라 1번 후보로 귀속). strict 스키마가 실호출에서는 막지만 FakeJudge·비strict 응답 경로에 방어가 없다 — isinstance(x, bool) 선차단 한 줄과 테스트 1건을 P5 이전 사소 수정으로
+WARN  03-log U9 항목(pending)은 ".env.example registry 새 행을 만들지 않았다" 고 적었으나 커밋 b3bcc2d 는 그 행을 신설했다(registry.md 35행) — 03-log 와 커밋 내용 불일치, U9 항목 헤더가 여전히 pending. /devlog done 에서 03-log 에 후속 한 줄(고쳐 쓰지 않고 추가)로 해시·행 신설 사실을 남길 것

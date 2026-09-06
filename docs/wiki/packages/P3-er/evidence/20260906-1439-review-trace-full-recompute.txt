@@ -1,0 +1,26 @@
+$ POSTGRES_PORT=5433 python <scratchpad>/review_trace_probe.py  (승진 픽스처 재현 → trace 원시 SQL 전체 output 조회 → 재계산 → rollback)
+derived hints = {'relation_tag': '직장', 'hierarchy': '상'}
+strict-stage passed_rules = [(3993, False, 'hierarchy_conflict', '동')]
+
+SQL: SELECT id, step, tool_name, tokens_in, tokens_out, output FROM agent_traces WHERE step='er_resolve' AND session_id=:sid
+er_resolve rows = 1
+{"id": 7376, "step": "er_resolve", "tool_name": "er", "tokens_in": 0, "tokens_out": 0}
+output.keys = ['candidates', 'confidence_breakdown', 'decision', 'er_version', 'llm', 'mention', 'relaxed_retry']
+confidence_breakdown = {"s_emb": 0.8493583888197921, "s_llm": 0.95, "s_rule": 0.6666666666666666, "weights": {"emb": 0.3, "llm": 0.5, "rule": 0.2}, "confidence": 0.8631408499792709, "rule_passed": 2, "rule_checked": 3, "matched_person_id": 3993}
+decision = {"band": "merge", "T_new": 0.3, "action": "merge", "T_merge": 0.8, "applied": true, "applied_at": "2026-09-06T05:42:38.821282+00:00", "forced_reason": null, "relaxed_retry": true, "band_by_threshold": "merge", "matched_person_id": 3993, "pending_question_id": null, "hierarchy_relaxed_retry": true}
+llm = {"error": null, "model": null, "s_llm": 0.95, "reason": "fake", "skipped": false, "attempts": 1, "provider": "fake", "tokens_in": 0, "tokens_out": 0, "self_reported": true}
+candidates[0] keys = ['aliases_matched', 'display_name', 'excluded_by', 'passed_rules', 'person_id', 'relaxed_pass', 'rule_checked', 'rule_flags', 'rule_passed', 's_emb', 's_rule', 'similarity']
+candidates = [{"s_emb": 0.8493583888197921, "s_rule": 0.6666666666666666, "person_id": 3993, "rule_flags": {"exact_alias": false, "partial_alias": false, "hierarchy_match": false, "embedding_skipped": false, "hierarchy_adjacent": true, "relation_tag_match": true}, "similarity": 0.8493583888197921, "excluded_by": null, "rule_passed": 2, "display_name": "김민수", "passed_rules": true, "relaxed_pass": true, "rule_checked": 3, "aliases_matched": ["김팀장", "팀장"]}]
+
+recomputed = 0.5*0.95 + 0.3*0.8493583888197921 + 0.2*0.6666666666666666 = 0.8631408499792709
+trace confidence = 0.8631408499792709
+abs diff = 0.000e+00  (<1e-9: True)
+weights sum = 1.0
+breakdown has required keys: True []
+decision has band/band_by_threshold/forced_reason: True
+llm has provider/model/self_reported: True {'provider': 'fake', 'self_reported': True, 'model': None}
+
+display_name after merge = 김민수 | aliases = ['팀장', '김팀장', '부장님']
+
+[rolled back — DB unchanged]
+exit=0

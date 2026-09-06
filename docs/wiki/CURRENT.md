@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: P3-er
+active: none
 frozen: none
 
 <!--

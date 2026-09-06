@@ -1,0 +1,40 @@
+$ python scripts/tools_check.py
+[ok] search_person: CLAUDE.md (query, hints?) == actual (ctx, query, hints=None)
+[ok] create_person: CLAUDE.md (display_name, aliases, relation_tag, hierarchy) == actual (ctx, display_name, aliases, relation_tag, hierarchy)
+[ok] update_person: CLAUDE.md (person_id, facts?, new_alias?, display_name?) == actual (ctx, person_id, facts=None, new_alias=None, display_name=None)
+[ok] add_event: CLAUDE.md (person_id, type, content, occurred_at, raw_utterance) == actual (ctx, person_id, type, content, occurred_at, raw_utterance)
+[ok] add_schedule: CLAUDE.md (person_id, title, scheduled_at) == actual (ctx, person_id, title, scheduled_at)
+[ok] get_briefing: CLAUDE.md (person_id, schedule_id?) == actual (ctx, person_id, schedule_id=None)
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+exit=0
+
+$ POSTGRES_PORT=5433 python -m alembic check
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+No new upgrade operations detected.
+exit=0
+
+$ POSTGRES_PORT=5433 python scripts/backfill_embeddings.py --dry-run
+[info] 대상 별칭 0건, 인물 0명 (batch_size=64)
+[dry-run] 쓰기 0건 (--apply 로 실제 반영)
+exit=0
+
+$ python scripts/er_smoke.py  (키 없음)
+[error] ANTHROPIC_API_KEY 환경변수가 설정되지 않았다. 실 LLM 호출은 os.environ 에 그 변수를 직접 넣어야 한다(.env 는 읽지 않는다, security.md §1 -- .env.example 참조).
+exit=2
+
+$ python scripts/er_smoke.py --provider openai  (키 없음)
+[error] OPENAI_API_KEY 환경변수가 설정되지 않았다. 실 LLM 호출은 os.environ 에 그 변수를 직접 넣어야 한다(.env 는 읽지 않는다, security.md §1 -- .env.example 참조).
+exit=2
+
+$ git log --oneline -3 -- alembic/versions
+09c2bd1 feat(P1-schema): U3 Alembic 도입·0001 스키마 v2 마이그레이션 — 로컬 upgrade head 9테이블
+$ git diff --stat bb1abfe..b3bcc2d -- alembic/ app/db/models.py
+(빈 출력 = 스키마 파일 무변경)

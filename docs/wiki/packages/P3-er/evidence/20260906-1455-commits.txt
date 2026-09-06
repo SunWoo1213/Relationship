@@ -1,0 +1,16 @@
+b3bcc2d docs(P3-er): U9 registry 20행·README ER 실행법·수용 기준 기계 검증 evidence, verify-impl FAIL 0
+a807364 fix(P3-er): 승진 회귀 테스트 evidence 기록을 ER_EVIDENCE_STAMP 로 게이트 — 실행마다 파일 남발 중단
+107ace3 feat(P3-er): U8 백필·스모크 스크립트 — backfill_embeddings(dry-run 기본)·er_smoke(공급자 선택)
+cc5d24f feat(P3-er): U7 apply_resolution·회귀 3종 — 승진 연결/이모 배제/동명이인, trace 부분 갱신
+d6e5949 feat(P3-er): U6 resolve() 파이프라인·trace 1행 — 4단계 조립, 부수효과 0, Resolution.trace_id
+b1f2782 feat(P3-er): U5 후보 어댑터·공급자 중립 LLM 판정 — Claude/OpenAI Judge·judge_from_env
+593c254 feat(P3-er): U4 확신도·두 임계치(4단계) — confidence.py·ER_* settings·허용오차 단일 비교
+02e6f14 feat(P3-er): U3 호칭 사전·규칙 필터(2단계) — app/er types·dictionary·rules
+2c63c60 feat(P3-er): U2 임베딩 런타임 공급자 — dimension·check_dimension·openai/anthropic 핀
+2b82882 feat(P3-er): U1 @traced 세이브포인트로 F-ca12ad 수정, step 인자·trace_tokens 확장
+bb1abfe docs(P3-er): 계획·계획검증 승인, 패키지 착수 — ER 4단계·확신도 3신호·두 임계치·trace
+b676799 docs(P2-tools): 완료 — verifier 04-review 완료 판정·사용자 승인, R6 R7 R10 R18 구현완료, 패키지 닫음
+f2e9e05 docs(P2-tools): U9 tools_check 시그니처 기계 검증·registry·README 실행 절·S3.1 alias source, verify-impl 사전 실행
+a9cb254 feat(P2-tools): U3 search_person — 별칭 일치·cosine top-K 인물별 max·rule_flags(신호만, 판정은 P3-er)
+7b793ba docs(P2-tools): 계획·계획검증 승인, 패키지 착수 — 툴 7종 v2 + FastAPI 골격
+5dc95bb docs(P1-schema): 완료 — verifier 04-review 완료 판정·사용자 승인, R8 R9 구현완료, 패키지 닫음

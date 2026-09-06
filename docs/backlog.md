@@ -28,7 +28,7 @@
 
 ### P3
 
-- [ ] [backend-agent] ER 4단계 + 확신도 + trace / 의존: P2 / 수용기준: 승진 회귀 테스트 통과, trace에 `confidence_breakdown` 존재
+- [x] [backend-agent] ER 4단계 + 확신도 + trace / 의존: P2 / 수용기준: 승진 회귀 테스트 통과, trace에 `confidence_breakdown` 존재 — **완료(2026-09-06, P3-er, verifier 04-review `완료`; R4 실호출은 스모크 사용자 실행 후 보강)**
 - [ ] [eval-agent] 베이스라인 3종 (문자열 완전일치·임베딩 단독·LLM 단일 프롬프트) / 의존: P1 데이터셋 / 수용기준: 제안 방식과 동일 인터페이스로 호출 가능
 
 ### P4 — 게이트
