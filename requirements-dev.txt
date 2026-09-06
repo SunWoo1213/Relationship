@@ -1,3 +1,7 @@
 # Refs: P1-schema S3.1 -- 개발/테스트 의존성.
 -r requirements.txt
 pytest==9.0.3
+# Refs: P1-pilot-dataset S3.7 -- data/scenarios/*.json 골드 라벨 검증
+# (scripts/validate_scenarios.py). 런타임(requirements.txt)에는 넣지 않는다 --
+# 제품 코드는 평가 데이터셋을 읽지 않는다(사용자 결정).
+jsonschema==4.26.0

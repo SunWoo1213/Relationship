@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "files": [
+    "promotion.json",
+    "pronoun.json",
+    "alias.json",
+    "normal.json",
+    "new_person.json"
+  ],
+  "counts": {
+    "promotion": 0,
+    "pronoun": 0,
+    "alias": 0,
+    "normal": 0,
+    "new_person": 0
+  },
+  "total": 0,
+  "ambiguous_mention_count": 0,
+  "trap_count": 0,
+  "virtual_names": [],
+  "generator": {
+    "model_id": null,
+    "prompt_ref": null,
+    "seed": null,
+    "seed_reason": null,
+    "same_family_as_judge": null
+  }
+}

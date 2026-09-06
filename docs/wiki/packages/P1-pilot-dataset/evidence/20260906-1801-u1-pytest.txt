@@ -1,0 +1,6 @@
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m pytest tests/test_validate_scenarios.py -q -rs
+# 커밋(평가 대상 코드 기준): 4c80c31 / 브랜치 dev
+
+...................................                                      [100%]
+35 passed in 0.78s
+pytest rc=0

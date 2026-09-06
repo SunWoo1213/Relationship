@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SunWoo1213/Relationship/data/scenarios/manifest.schema.json",
+  "schema_version": 1,
+  "title": "평가 시나리오 매니페스트 (P1-pilot-dataset)",
+  "description": "data/scenarios/manifest.json 의 스키마. **schema.json 의 $defs 에 넣지 않고 파일을 나눈 이유**: JSON Schema 문서 하나는 $id 하나·루트 하나를 갖는 것이 소비자(P3-baselines·P4-pilot-eval)에게 가장 단순하다. schema.json 의 루트는 이미 '시나리오 객체' 이므로 매니페스트를 $defs 에 넣으면 소비자가 '어떤 $ref 를 써야 하는가' 를 매번 알아야 하고, 두 스키마의 schema_version 을 따로 올릴 수도 없다. 파일을 나누면 각각 루트에서 바로 검증된다(scripts/validate_scenarios.py 모듈 docstring 의 '남긴 결정' 참조).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "files",
+    "counts",
+    "total",
+    "ambiguous_mention_count",
+    "trap_count",
+    "virtual_names",
+    "generator"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "description": "schema.json 의 schema_version 과 같아야 한다. 스키마가 바뀌면 FIX 가 아니라 이 값을 올린다."
+    },
+    "files": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "uniqueItems": true,
+      "description": "카테고리별 5파일(01-plan 미결 1 계획값). 검증기는 이 목록으로 파일을 읽는다. U1 시점에는 5파일이 아직 없고, 없는 파일은 기본 모드에서 '0건' 으로 다룬다(--strict 면 FAIL).",
+      "items": {
+        "enum": [
+          "promotion.json",
+          "pronoun.json",
+          "alias.json",
+          "normal.json",
+          "new_person.json"
+        ]
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["promotion", "pronoun", "alias", "normal", "new_person"],
+      "description": "카테고리별 **시나리오** 건수. 실제 건수와 일치해야 한다(검사 (6)). 수용 기준 '30~50건' 을 기계가 세는 근거.",
+      "properties": {
+        "promotion": { "type": "integer", "minimum": 0 },
+        "pronoun": { "type": "integer", "minimum": 0 },
+        "alias": { "type": "integer", "minimum": 0 },
+        "normal": { "type": "integer", "minimum": 0 },
+        "new_person": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "counts 의 합이자 실제 시나리오 총수(검사 (6))."
+    },
+    "ambiguous_mention_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "H-1 (3) — ambiguous: true 인 **mention** 의 총수(시나리오 총수와 다른 단위다). P4 가 오병합률·미검출률·F1 의 분모에서 뺄 개수이므로 실제와 어긋나면 지표가 틀린다(검사 (8))."
+    },
+    "trap_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "trap 필드를 가진 시나리오 수(검사 (10)). 01-plan 리스크 '함정 난이도의 자의성' — 함정 건수를 숨기지 않는다."
+    },
+    "virtual_names": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "이 데이터셋이 쓰는 **가상** 인물 지칭 문자열의 화이트리스트(01-plan 리스크 '개인정보', R-2). 목록 밖 이름이 persons 에 나오면 검증기가 FAIL 한다(검사 (7)). 판정 규칙이 일부러 넓어서 직급 호칭('김팀장')도 이 목록에 들어간다 — scripts/validate_scenarios.py 의 '이름 판정 규칙' 참조.",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "prompt_ref", "seed", "seed_reason", "same_family_as_judge"],
+      "description": "H-2 — 생성 경로 기록(결정 F (ii) LLM 초안 + 사람/verifier 검수). U1 에서는 값이 전부 null 이고 U2~U4 가 채운다. 재현 불가능한 부분(대화형 생성이라 시드가 없다)을 숨기지 않고 그대로 적는 것이 원칙8 의 정직한 형태다.",
+      "properties": {
+        "model_id": {
+          "type": ["string", "null"],
+          "description": "초안을 쓴 eval-agent 모델 id."
+        },
+        "prompt_ref": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "minLength": 1 },
+            { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true }
+          ],
+          "description": "위임 프롬프트를 저장한 evidence/<ts>-gen-prompt.md 경로. R-8 — U2·U3·U4 가 서로 다른 위임 호출이면 배열로 두어 호출마다 파일 하나씩 가리킨다."
+        },
+        "seed": {
+          "type": ["integer", "null"],
+          "description": "샘플링 시드. 대화형 생성에는 없으므로 null."
+        },
+        "seed_reason": {
+          "type": ["string", "null"],
+          "description": "seed 가 null 인 이유(예: '대화형 생성')."
+        },
+        "same_family_as_judge": {
+          "type": ["boolean", "null"],
+          "description": "초안 생성 모델이 평가 대상 판정 모델과 같은 공급자 계열인가. 같다면 그 사실을 숨기지 않고 명시한다(결정 F (b)). P4 가 다른 공급자 판정기로도 돌리면 P4 가 판정 모델별로 다시 적는다 — 여기 값은 **생성 시점** 기록이다."
+        }
+      }
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "선택 — 관계 태그·위계 배분표(01-plan 산출물 32행). **U5 가 채운다.** U1 에서 선택 키로 열어 두는 이유: 나중에 키를 추가하려면 additionalProperties: false 때문에 schema_version 을 올려야 하는데, 배분표는 스키마 계약이 아니라 집계 결과라서 판을 올릴 사유가 못 된다. 하위 유형·trap 열 추가(R-5)도 이 안에서 한다."
+    }
+  }
+}

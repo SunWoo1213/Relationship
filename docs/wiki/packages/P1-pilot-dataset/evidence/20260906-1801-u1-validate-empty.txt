@@ -1,0 +1,73 @@
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/validate_scenarios.py --json
+# 커밋: 4c80c31 / 브랜치 dev
+
+{
+  "ambiguous_mention_count": 0,
+  "counts": {
+    "alias": 0,
+    "new_person": 0,
+    "normal": 0,
+    "promotion": 0,
+    "pronoun": 0
+  },
+  "dir": "data/scenarios",
+  "files": [
+    {
+      "count": 0,
+      "exists": false,
+      "file": "promotion.json"
+    },
+    {
+      "count": 0,
+      "exists": false,
+      "file": "pronoun.json"
+    },
+    {
+      "count": 0,
+      "exists": false,
+      "file": "alias.json"
+    },
+    {
+      "count": 0,
+      "exists": false,
+      "file": "normal.json"
+    },
+    {
+      "count": 0,
+      "exists": false,
+      "file": "new_person.json"
+    }
+  ],
+  "issue_count": 0,
+  "issues": [],
+  "ok": true,
+  "scenario_count": 0,
+  "schema_version": 1,
+  "strict": false,
+  "total": 0,
+  "trap_count": 0
+}
+rc=0
+
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/validate_scenarios.py
+== validate_scenarios data/scenarios ==
+[info] strict=False schema_version=1
+[info] promotion.json: 파일 없음(0건으로 취급)
+[info] pronoun.json: 파일 없음(0건으로 취급)
+[info] alias.json: 파일 없음(0건으로 취급)
+[info] normal.json: 파일 없음(0건으로 취급)
+[info] new_person.json: 파일 없음(0건으로 취급)
+[PASS] (0) 적재(manifest·시나리오 파일 읽기)
+[PASS] (1) 스키마 위반
+[PASS] (2) gold_person_id 교차(H-1 ambiguous 예외 포함)
+[PASS] (3) turn 범위
+[PASS] (4) id 전역 유일
+[PASS] (5) events.type enum
+[PASS] (6) manifest counts·total 일치
+[PASS] (7) virtual_names 화이트리스트
+[PASS] (8) manifest ambiguous_mention_count 일치
+[PASS] (9) seed_persons ⊆ persons
+[PASS] (10) manifest trap_count 일치
+[info] 카테고리별: promotion=0 pronoun=0 alias=0 normal=0 new_person=0
+== 결과: 시나리오 0건 / 오류 0 ==
+rc=0

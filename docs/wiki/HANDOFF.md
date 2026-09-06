@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-06 21:05 (P1-pilot-dataset 계획 승인·활성화 — 계획 문서 커밋 대기)
-active: **P1-pilot-dataset** | frozen: none | 브랜치: dev (dev = origin/dev = main = bdf9f70). **미커밋: 계획 문서 일괄**(packages/P1-pilot-dataset/01~03·05·evidence 6파일, backlog P1 하위 불릿, CURRENT, journal START) — 커밋 초안 승인 대기.
+갱신: 2026-09-06 21:45 (P1-pilot-dataset U1 완료·커밋 — U2 위임 대기)
+active: **P1-pilot-dataset** | frozen: none | 브랜치: dev (origin/dev = main = bdf9f70, dev 는 계획 4c80c31 + U1 커밋 — 미푸시 2). **미커밋: journal 훅 줄만.** U1 완료: schema.json·manifest.schema.json·manifest.json·validate_scenarios.py(검사 10)·test 35건·jsonschema 4.26.0(dev). 남긴 결정 3(docstring). U5 에서 파일명↔category 검사 추가.
 
 ## 지금 어디까지
 - **P3-er 완료(2026-09-06)** — U1 @traced 세이브포인트(2b82882) → U2 임베딩 런타임 공급자·check_dimension(2c63c60) → U3 호칭 사전·규칙 필터(02e6f14) → U4 확신도·두 임계치·허용오차 1e-9(593c254) → U5 후보 어댑터·**공급자 중립 Judge(Claude·OpenAI, judge_from_env, gemini 예약 — 사용자 결정, 결정 3 개정 2)**(b1f2782) → U6 resolve() 4단계·trace 1행·부수효과 0(d6e5949) → U7 apply_resolution·회귀 3종(cc5d24f) → U8 백필·스모크 스크립트(107ace3) → FIX evidence 게이트 ER_EVIDENCE_STAMP(a807364) → U9 registry 20행·README ER 실행법·기계 검증(b3bcc2d) → verifier(fable) 04-review **완료**(필수 0·권고 6, verify-impl FAIL 0/WARN 0, pytest 398/skip 0, 변이 4종 검출, trace 재계산 오차 0) → 사용자 승인. backlog P3 ER 행 [x], review-index R4·R9 구현완료(**실호출 미검증** 두 줄 표기), README P3 행, CURRENT none.
@@ -16,7 +16,7 @@ active: **P1-pilot-dataset** | frozen: none | 브랜치: dev (dev = origin/dev =
 - 로컬 DB: capstone2-postgres-1 호스트 5433, 스키마 0001(head), 명령 앞 `POSTGRES_PORT=5433`, pytest `-rs`, 한글 출력 `PYTHONIOENCODING=utf-8` + 리다이렉트. verify-impl.sh 내부 pytest 는 포트 없이 돌아 skip 표시(하네스 한계 — 직접 실행이 증거, 개선 후보). 설치: anthropic 1.4.0·openai 2.33.0.
 
 ## 바로 다음에 할 것 (순서대로)
-0. (완료) P1-pilot-dataset 계획 승인(2026-09-06, verifier 2차 통과 FAIL 0/WARN 0). **다음: 계획 문서 `/commit` → U1(eval-agent: schema.json·validate_scenarios.py·tests, 위반 표본 8종) L-004 승인 후 위임.** U2 위임 시 위임 프롬프트를 `evidence/<ts>-gen-prompt.md` 로 저장(R-8, manifest.generator.prompt_ref). 검수(U6 전)는 verifier **새 컨텍스트**, 기록 `evidence/<ts>-label-review.md`. 결정 A~G·H-1~H-3 은 01-plan "결정 확정" 블록이 권위.
+0. **다음: U2**(eval-agent, promotion 8 + alias 8, 함정 각 3건 이상). 위임 전 L-004 승인 → 위임 프롬프트 전문을 `evidence/<ts>-gen-prompt.md` 로 저장(R-8, manifest.generator.prompt_ref) → **프롬프트에 ER 판정 프롬프트·호칭 사전·임계치 값 금지(H-2)**. 이름은 manifest.virtual_names 에 먼저 등록. 완료 판정: `validate_scenarios.py --strict` 는 U5 전엔 파일 부재로 FAIL 이므로 U2~U4 는 기본 모드 rc=0 + 해당 파일 건수. 검수(U6 전)는 verifier 새 컨텍스트, 기록 `evidence/<ts>-label-review.md`.
 1. (완료) 완료 커밋 0527ab8 → dev 푸시 → **main 승격(2026-09-06 19:35, 12커밋 b676799..0527ab8, 로컬 검증 근거로 사용자 승인)**.
 1-b. (완료) `SERVER-CHECKLIST.md` 루트 커밋 bdf9f70 → dev 푸시 → **main 승격(2026-09-06 20:15, 문서 전용이라 실서버 검증 없이 사용자 승인)**. 다음 승격부터는 이 가이드 §1~§4 증거를 근거로 한다.
 2. 사용자 스모크(값은 셸에만): `ANTHROPIC_API_KEY=… python scripts/er_smoke.py > docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt` 또는 `LLM_PROVIDER=openai OPENAI_API_KEY=… python scripts/er_smoke.py --provider openai` → F-87c597 닫고 review-index R4 갱신(작은 docs 커밋).

@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/SunWoo1213/Relationship/data/scenarios/schema.json",
+  "schema_version": 1,
+  "title": "평가 시나리오 (P1-pilot-dataset)",
+  "description": "한국어 대화 시나리오 1건의 골드 라벨. Refs: P1-pilot-dataset S3.7 S3.1 원칙8, .claude/skills/eval-harness/SKILL.md §1. 이 문서의 루트는 **시나리오 객체 하나**다. 카테고리 파일(promotion.json 등)은 이 객체의 배열이며, scripts/validate_scenarios.py 가 원소마다 이 스키마를 적용한다(원소 단위 검증이라 오류 위치가 시나리오 id 로 나온다). schema_version 은 이 스키마 문서의 판이며 manifest.json 의 schema_version 과 같아야 한다 — 소비자(P3-baselines·P4-pilot-eval)가 필드를 더 요구하면 FIX 가 아니라 schema_version 을 올린다(01-plan '소비자와의 계약 미확정').",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "category",
+    "persons",
+    "seed_persons",
+    "utterances",
+    "mentions",
+    "events",
+    "expected_ask_user"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^sc-\\d{3}$",
+      "description": "전역 연번(sc-001 …). 카테고리 접두(promo-001)를 쓰지 않는다 — eval-harness §1 예시와 같은 규칙(01-plan 미결 2, R-7). 전역 유일성은 검사 (4)."
+    },
+    "category": {
+      "enum": ["promotion", "pronoun", "alias", "normal", "new_person"],
+      "description": "S3.7 이 요구하는 5범주. new_person 포함(eval-harness §1)."
+    },
+    "persons": {
+      "type": "array",
+      "minItems": 1,
+      "description": "결정 A — 이 시나리오에 등장하는 인물의 메타. 베이스라인(문자열 완전일치·임베딩 단독)이 후보 집합으로 쓰고, 제안 방식의 s_rule(위계·관계 태그)이 이 값으로 계산된다(D3). 사용자–인물 관계만 담는다(원칙7 — 인물 간 A–B 관계 필드 없음).",
+      "items": { "$ref": "#/$defs/person" }
+    },
+    "seed_persons": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "결정 E — 대화 전 이미 메모리에 등록돼 있는 인물의 person_id 목록. persons[].person_id 의 부분집합이어야 한다(검사 (9)). new_person 카테고리는 비거나 무관한 인물만 갖는다. 이 값이 없으면 P4 러너가 시나리오마다 임의로 DB 를 채워 베이스라인 비교의 동일 조건이 깨진다.",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "utterances": {
+      "type": "array",
+      "minItems": 1,
+      "description": "사용자 발화열. 인덱스가 곧 turn 이다(검사 (3)).",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "mentions": {
+      "type": "array",
+      "description": "지칭 표현 → 골드 인물 매핑. 지표(오병합률·미검출률·F1)의 분모가 되는 단위다.",
+      "items": { "$ref": "#/$defs/mention" }
+    },
+    "events": {
+      "type": "array",
+      "description": "결정 B — 이벤트 추출 F1 의 골드. 일정(schedule) 골드 라벨 필드는 **의도적으로 없다**: 결정 C 로 P10 에 미뤘고(파일럿 목표 지표는 오병합률·미검출률·보정표), 일정 추출 파이프라인은 P5-loop 이후에야 존재한다. normal 일부에 일정 발화만 섞어 두어 P10 이 라벨만 덧붙일 수 있게 한다.",
+      "items": { "$ref": "#/$defs/event" }
+    },
+    "expected_ask_user": { "$ref": "#/$defs/expected_ask_user" },
+    "trap": { "$ref": "#/$defs/trap" }
+  },
+  "$defs": {
+    "person": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["person_id", "display_name", "relation_tag", "hierarchy", "aliases"],
+      "properties": {
+        "person_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "시나리오 안에서만 유일하면 된다(p1, p2 …). DB 의 persons.id 와 무관하다."
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "가상 성명. manifest.json 의 virtual_names 안에 있어야 한다(검사 (7), 개인정보 리스크)."
+        },
+        "relation_tag": {
+          "enum": ["가족", "연인", "친구", "직장", "지인"],
+          "description": "S3.1 relation_tag CHECK 값 집합의 복제. app.db.models.RELATION_TAGS 와 글자 그대로 같아야 하며 tests/test_validate_scenarios.py 가 대조한다(코드 import 없음 — 데이터셋은 app/ 에 런타임 의존하지 않는다)."
+        },
+        "hierarchy": {
+          "enum": ["상", "동", "하"],
+          "description": "S3.1 hierarchy CHECK 값 집합의 복제. app.db.models.HIERARCHIES 와 대조."
+        },
+        "aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "description": "호칭 변이(직급·별명·줄임말). D6 별칭 누적 정책과 같은 방향 — 승진해도 옛 호칭을 지우지 않는다. 한글 2~4자 원소는 virtual_names 검사 (7) 의 대상이다.",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "mention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn", "surface", "gold_person_id"],
+      "description": "H-1 규칙(ambiguous 가 true 일 때만 gold_person_id: null 허용)은 **스키마가 아니라 검사 (2)** 가 강제한다. 스키마의 if/then 으로도 쓸 수 있지만 그러면 같은 위반이 (1) 과 (2) 양쪽에서 보고돼 원인을 찾기 어려워진다.",
+      "properties": {
+        "turn": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "utterances 의 인덱스. 범위는 검사 (3)."
+        },
+        "surface": {
+          "type": "string",
+          "minLength": 1,
+          "description": "발화에 실제로 나타난 지칭 표면형(김팀장 / 걔 / 부장님 …)."
+        },
+        "gold_person_id": {
+          "type": ["string", "null"],
+          "description": "정답 인물. persons[].person_id 안에 있어야 한다(검사 (2)). null 은 ambiguous: true 인 mention 에만 허용한다(H-1)."
+        },
+        "ambiguous": {
+          "type": "boolean",
+          "description": "H-1 — 사람도 선행사를 정할 수 없는 mention. 시나리오 자체는 건수·배분표에 포함하되 이 mention 은 오병합률·미검출률·F1 분모에서 제외한다(P4 가 manifest.ambiguous_mention_count 로 분모를 맞춘다). 생략하면 false 로 본다."
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn", "type", "occurred_at_kind"],
+      "properties": {
+        "turn": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "이벤트가 나온 발화의 인덱스. 범위는 검사 (3)."
+        },
+        "type": {
+          "enum": [
+            "conflict",
+            "praise",
+            "meal",
+            "meeting",
+            "personal_share",
+            "favor",
+            "other"
+          ],
+          "description": "S3.1 events.type CHECK 고정 7종의 복제. app.db.models.EVENT_TYPES 와 글자 그대로 같아야 하며 테스트가 대조한다. 검사 (5) 가 스키마와 별개의 메시지로 다시 본다(위반 표본 5번)."
+        },
+        "occurred_at_kind": {
+          "enum": ["relative", "absolute", "none"],
+          "description": "결정 B — 절대 시각을 라벨하지 않는다. '오늘' 의 기준일에 묶이면 같은 입력이 날짜에 따라 다른 정답을 갖게 돼 재현성이 깨진다(원칙8). 정밀 occurred_at 정규화 평가는 P10."
+        }
+      }
+    },
+    "expected_ask_user": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed"],
+      "description": "결정 D — 단일 정답이 아니라 **허용 집합**이다. 같은 발화도 T_merge 를 0.5→0.95 로 스윕하면 구간이 달라지므로(D10) 단일 정답으로 고정하면 곡선 자체가 라벨을 위반한다.",
+      "properties": {
+        "allowed": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "R-1 — 이 enum 은 ask_user.kind(S3.1 pending_questions.kind = identity/new_person/schedule)와 **별도**다. (a) 'none'(질문하지 않는 것이 허용됨)은 kind 값이 아니며, (b) 'schedule' 은 제외한다 — 일정 골드 라벨을 P1 에서 만들지 않기로 했고(결정 C) 일정 추출 파이프라인은 P5-loop 이후라, 일정 확인 질문은 이 파일럿에서 기대값이 될 수 없다.",
+          "items": { "enum": ["identity", "new_person", "none"] }
+        }
+      }
+    },
+    "trap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reason"],
+      "description": "선택 — 오병합 유도 함정 건임을 표시한다(01-plan 리스크 '함정 난이도의 자의성'). 검수자가 난이도를 판정할 수 있게 이유를 남긴다. 개수는 manifest.trap_count 와 일치해야 한다(검사 (10)).",
+      "properties": {
+        "kind": { "type": "string", "minLength": 1, "description": "함정 유형(예: 유사 호칭 동료 / 동명이인 / 지나가는 언급)." },
+        "reason": { "type": "string", "minLength": 1, "description": "왜 오병합을 유도하는지 한 줄." }
+      }
+    }
+  }
+}
