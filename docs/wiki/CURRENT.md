@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: none
+active: P1-pilot-dataset
 frozen: none
 
 <!--
@@ -12,4 +12,5 @@ frozen: none
 -->
 
 ## 메모
+- P1-pilot-dataset 계획 승인(2026-09-06, architect 초안 → 사용자 결정 A~G → verifier 보류 3(H-1~H-3, F-033bb1) → 사용자 결정 → 반영 → 재검증 통과 FAIL 0/WARN 0, 권고 R-4~R-12). U1 부터 eval-agent(L-004 매번). 검수는 verifier 새 컨텍스트(U6 전).
 - P3-er 계획 승인(2026-09-06, architect 초안 → verifier 보류 3 → 사용자 결정 → 개정 1 → 재검증 통과 FAIL 0/WARN 8 의도, 권고 6). U1 부터 backend-agent. 미착수: P1-pilot-dataset·P0-cost(eval-agent). 열림: F-4d2507(architect). 팀 밑작업 보류.

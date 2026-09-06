@@ -1,0 +1,44 @@
+== verify-plan P1-pilot-dataset  (2026-09-06 17:28) ==
+PASS  존재: docs/wiki/packages/P1-pilot-dataset/01-plan.md
+PASS  존재: docs/wiki/packages/P1-pilot-dataset/02-plan-verify.md
+PASS  카드 존재: D1
+PASS  카드 존재: D10
+PASS  카드 존재: D6
+PASS  패키지 id 등록됨: P0-cost
+PASS  패키지 id 등록됨: P1-pilot-dataset
+PASS  패키지 id 등록됨: P1-schema
+PASS  패키지 id 등록됨: P10-final-eval
+PASS  패키지 id 등록됨: P3-baselines
+PASS  패키지 id 등록됨: P3-er
+PASS  패키지 id 등록됨: P4-pilot-eval
+PASS  패키지 id 등록됨: P5-loop
+PASS  검증 항목 존재: R13
+PASS  Refs 있음: - [ ] U1 시나리오 스키마 확정 + JSON Schema + 검�
+PASS  Refs 있음: - [ ] U2 `promotion` 8건 + `alias` 8건 작성. 승진 후 
+PASS  Refs 있음: - [ ] U3 `pronoun` 8건 + `normal` 10건 작성. `pronoun` �
+PASS  Refs 있음: - [ ] U4 `new_person` 6건 작성. 처음 등장하는 인�
+PASS  Refs 있음: - [ ] U5 전건 무결성 점검 + 검수 패킷 생성. `va
+PASS  Refs 있음: - [ ] U6 라벨 검수 지적 반영. verifier 또는 사용
+PASS  Refs 있음: - [ ] U7 registry 행 추가 · README "평가 데이터셋"
+PASS  backlog 일치: 파일럿 데이터셋 30~50건 (승진·대명사·별칭·
+PASS  의존 완료: P1-schema
+PASS  의존 완료: P3-er
+PASS  검증자 = verifier (L-002)
+PASS  점검표 8행 존재
+PASS  점검표 모든 행에 판정(통과/보류) 있음
+WARN  보류 3 건 — 결과는 통과가 될 수 없다
+PASS  결과: 줄 존재
+PASS  점검표 모든 행에 근거 있음
+PASS  registry 중복 없음: data/scenarios/schema.json
+PASS  registry 중복 없음: events.type
+PASS  registry 중복 없음: ask_user.kind
+PASS  registry 중복 없음: data/scenarios/promotion.json
+PASS  registry 중복 없음: data/scenarios/pronoun.json
+PASS  registry 중복 없음: data/scenarios/alias.json
+PASS  registry 중복 없음: data/scenarios/normal.json
+PASS  registry 중복 없음: data/scenarios/new_person.json
+PASS  registry 중복 없음: data/scenarios/manifest.json
+PASS  registry 중복 없음: scripts/validate_scenarios.py
+PASS  registry 중복 없음: tests/test_validate_scenarios.py
+PASS  registry 중복 없음: -label-review.md
+== 결과: FAIL=0 WARN=1 ==
