@@ -47,6 +47,15 @@ class JudgeUnavailable(Exception):
     "묻는 것"으로 흡수한다)."""
 
 
+class AlreadyApplied(InvalidValue):
+    """`apply_resolution()`(U7, F-8809f2)이 같은 `Resolution`(같은
+    `trace_id`)으로 두 번 불렸을 때 거부한다 -- trace 행의
+    `output.decision.applied` 가 이미 `true` 면 이 예외를 던지고 **아무것도
+    쓰지 않는다**(별칭·`pending_questions` 중복 생성 방지, 03-log U7 항목
+    "거부(예외)" 채택 근거). `InvalidValue` 를 상속해 기존 `ToolError`
+    계층에 편입시킨다 -- 새 예외 계층을 따로 만들지 않는다."""
+
+
 @dataclass(frozen=True)
 class ScoredCandidate:
     """2단계(규칙 필터, `app/er/rules.py`) 산출물을 담은 후보 하나.
@@ -242,23 +251,35 @@ class AppliedResolution:
     결과 -- `Resolution` 이 정한 행동(`band`)을 실제로 실행한 뒤의 사실만
     담는다(판정 필드는 `Resolution` 쪽에 그대로 있다, 결정4).
 
-    이 dataclass 의 필드는 U3 시점에는 **자리만 잡는다** -- 실제로 채우는
-    로직(`update_person`/`ask_user` 호출, trace 부분 갱신)은 U7 이 만든다.
+    `trace_id`/`band` 는 실행한 `Resolution` 을 가리키는 최소 참조다(U3
+    초안은 `Resolution` 전체를 품었으나, U7 이 필드를 좁혔다 -- 판정
+    dataclass 를 통째로 다시 담으면 trace `output` 과 이중 출처가 되고,
+    호출자는 이미 `Resolution` 객체를 들고 있어 참조로 충분하다). `action`
+    은 `app.er.confidence._ACTION_BY_BAND` 가 이미 계산한 값
+    (`Resolution.decision["action"]`)을 그대로 옮긴 것이지 새로 판단하지
+    않는다(이중 출처 금지). `alias_added` 는 `band == "merge"` 경로에서만
+    `True` -- `update_person(new_alias=...)` 가 항상 upsert(신규 또는
+    격상)로 끝나므로(`app/tools/persons.py._add_alias`) 예외 없이 `True`
+    로 둔다.
     """
 
-    resolution: Resolution
+    trace_id: int
+    band: str
     action: str  # "merge" | "ask_identity" | "ask_new_person"
     person_id: int | None = None
     pending_question_id: int | None = None
     applied_at: datetime | None = None
+    alias_added: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "resolution": self.resolution.to_dict(),
+            "trace_id": self.trace_id,
+            "band": self.band,
             "action": self.action,
             "person_id": self.person_id,
             "pending_question_id": self.pending_question_id,
             "applied_at": self.applied_at.isoformat() if self.applied_at else None,
+            "alias_added": self.alias_added,
         }
 
 

@@ -1,28 +1,39 @@
 """Refs: P3-er S3.3 D3 D10 R4 R9 결정1 결정3-c 결정4 결정5 원칙1 원칙4 원칙9
-F-1d65ac -- U6 `resolve()` 오케스트레이션 + trace 통합 테스트.
+F-1d65ac -- U6 `resolve()` 오케스트레이션 + trace 통합 테스트, U7
+`apply_resolution()` + 회귀 3종(승진·이모 배제·동명이인).
 
 실 PostgreSQL(로컬, `POSTGRES_PORT` 기본 5433) + 롤백 픽스처(`db_session`) +
-`FakeJudge`(결정9 -- 실 LLM 은 스모크 1회로 분리) + `fake_embedder`. 승진
-회귀·이모 배제·동명이인 3종의 **완전한** 규약(정확한 수치·`apply_resolution`
-연동)은 U7 이 `grouped_embedder` 로 채운다(01-plan U7 체크리스트) -- 이
-파일의 목적은 `resolve()` 자체(4단계 오케스트레이션·trace 스키마·부수효과
-0·강제 강등 경로)를 확인하는 것이다.
+`FakeJudge`(결정9 -- 실 LLM 은 스모크 1회로 분리) + `fake_embedder`/
+`grouped_embedder`(회귀 3종, 결정9 -- 통제된 유사도가 필요한 케이스).
 """
 
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
 import pytest
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 
 from app.db.models import ALIAS_SOURCES, AgentTrace, PendingQuestion, Person, PersonAlias
 from app.er.confidence import band_for
 from app.er.judge import FakeJudge
-from app.er.pipeline import resolve
-from app.er.types import ER_TRACE_STEP, ER_TRACE_TOOL_NAME, ERConfig
+from app.er.pipeline import apply_resolution, resolve
+from app.er.types import ER_TRACE_STEP, ER_TRACE_TOOL_NAME, AlreadyApplied, ERConfig
 from app.tools.context import ToolContext
 from app.tools.types import AFFIRMATIVE_KEY
 
 pytestmark = pytest.mark.dbtest
+
+_EVIDENCE_DIR = (
+    Path(__file__).resolve().parent.parent
+    / "docs"
+    / "wiki"
+    / "packages"
+    / "P3-er"
+    / "evidence"
+)
 
 
 def _make_person(
@@ -338,3 +349,342 @@ def test_resolve_sets_applied_fields_false_and_null_before_apply_applied_fields(
     assert result.decision["applied"] is False
     assert result.decision["pending_question_id"] is None
     assert result.decision["applied_at"] is None
+
+
+# ---------------------------------------------------------------------------
+# U7 -- grouped_embedder 자기 검증
+# ---------------------------------------------------------------------------
+
+
+def test_grouped_embedder_similarity_self_check(grouped_embedder):
+    """`grouped_embedder` 픽스처 자체의 계약 검증(위임 프롬프트 "짧은 자기
+    검증 테스트 1건") -- 같은 그룹 문자열끼리 코사인 유사도 ≥ 0.8, 다른
+    그룹·미등재 문자열은 ≤ 0.2, 단위벡터, 차원 `EMBEDDING_DIM`."""
+
+    from app.embedding import EMBEDDING_DIM
+
+    embedder = grouped_embedder({"kim": ["팀장", "김팀장", "부장님"], "park": ["과장"]})
+    vectors = embedder(["팀장", "김팀장", "부장님", "과장", "이모"])
+    names = ["팀장", "김팀장", "부장님", "과장", "이모"]
+
+    for v in vectors:
+        assert len(v) == EMBEDDING_DIM
+        norm = sum(x * x for x in v) ** 0.5
+        assert abs(norm - 1.0) < 1e-6
+
+    def cos(a: list[float], b: list[float]) -> float:
+        return sum(x * y for x, y in zip(a, b))
+
+    by_name = dict(zip(names, vectors))
+    # 같은 그룹("kim"): 팀장/김팀장/부장님 서로 ≥ 0.8.
+    for a, b in (("팀장", "김팀장"), ("팀장", "부장님"), ("김팀장", "부장님")):
+        assert cos(by_name[a], by_name[b]) >= 0.8
+
+    # 다른 그룹("kim" vs "park")·미등재("이모")는 ≤ 0.2.
+    for a, b in (("팀장", "과장"), ("팀장", "이모"), ("과장", "이모")):
+        assert abs(cos(by_name[a], by_name[b])) <= 0.2
+
+
+# ---------------------------------------------------------------------------
+# U7 -- apply_resolution() + 회귀 3종
+# ---------------------------------------------------------------------------
+
+
+def _write_evidence(name: str, content: str) -> Path:
+    _EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
+    path = _EVIDENCE_DIR / f"{stamp}-u7-{name}.txt"
+    path.write_text(content, encoding="utf-8")
+    return path
+
+
+def test_apply_resolution_promotion_connects_via_relaxed_retry_promotion(
+    db_session, grouped_embedder
+):
+    """01-plan 결정9 "승진 회귀(a) 픽스처 확정" 그대로 -- 저장 위계(동) ↔
+    유도 위계(상) 불일치 -> 엄격 필터 탈락 -> 인접(1칸) -> 완화 1회 재평가
+    통과 -> `grouped_embedder` 로 높은 `s_emb` -> `confidence ≈ 0.863
+    ≥ T_merge` -> `band="merge"` -> `apply_resolution` 이 별칭만 누적
+    (`display_name` 무변경)."""
+
+    session_id = "er-apply-promotion"
+    embedder = grouped_embedder({"kim": ["팀장", "김팀장", "부장님"]})
+    person = _make_person(db_session, display_name="김민수", relation_tag="직장", hierarchy="동")
+    _add_alias(db_session, person, "팀장", embedding=embedder(["팀장"])[0])
+    _add_alias(db_session, person, "김팀장", embedding=embedder(["김팀장"])[0])
+
+    ctx = _ctx(db_session, session_id=session_id, embedder=embedder)
+    judge = FakeJudge(table={person.id: 0.95})
+
+    result = resolve(
+        ctx, "부장님", "요즘 부장님이 회식을 자주 잡으셔", judge=judge, config=ERConfig()
+    )
+
+    assert result.decision["relaxed_retry"] is True
+    candidate = next(c for c in result.candidates if c.person_id == person.id)
+    assert candidate.relaxed_pass is True
+    assert candidate.rule_checked == 3
+    assert candidate.rule_passed == 2
+    assert abs(candidate.s_rule - (2 / 3)) < 1e-9
+    assert candidate.s_emb >= 0.8
+
+    breakdown = result.confidence_breakdown
+    assert breakdown["s_llm"] == 0.95
+    assert breakdown["confidence"] >= 0.8
+    assert abs(breakdown["confidence"] - 0.863) < 0.01
+    assert result.band == "merge"
+    assert result.forced_reason is None
+
+    applied = apply_resolution(ctx, result)
+    assert applied.trace_id == result.trace_id
+    assert applied.band == "merge"
+    assert applied.action == "merge"
+    assert applied.person_id == person.id
+    assert applied.alias_added is True
+    assert applied.pending_question_id is None
+    assert applied.applied_at is not None
+
+    aliases = (
+        db_session.execute(select(PersonAlias.alias).where(PersonAlias.person_id == person.id))
+        .scalars()
+        .all()
+    )
+    assert "부장님" in aliases
+
+    db_session.expire_all()
+    refreshed = db_session.get(Person, person.id)
+    assert refreshed.display_name == "김민수"
+
+    # 판정 방법 표의 SQL 그대로 -- evidence 로 1행을 남긴다.
+    sql = (
+        "SELECT step, tool_name, output->'confidence_breakdown' AS confidence_breakdown, "
+        "output->'decision' AS decision, tokens_in, tokens_out FROM agent_traces "
+        "WHERE step='er_resolve' AND session_id=:sid"
+    )
+    row = db_session.execute(text(sql), {"sid": session_id}).mappings().one()
+    _write_evidence(
+        "promotion-trace-sql",
+        f"SQL:\n{sql}\n\nsession_id={session_id}\n\nrow=\n"
+        f"{json.dumps(dict(row), indent=2, ensure_ascii=False, default=str)}\n",
+    )
+
+
+def test_apply_resolution_aunt_excluded_creates_new_person_question_aunt(
+    db_session, grouped_embedder
+):
+    """01-plan 리스크 41행 "팀장 vs 이모 배제" -- 관계 태그 그룹 불일치로
+    규칙 필터 탈락(모순, 인접 완화 부적격) -> 규칙 통과 후보 0 -> LLM 생략
+    -> `new_person` -> `apply_resolution` 이 `ask_user(kind="new_person")`
+    를 저장한다."""
+
+    session_id = "er-apply-aunt"
+    embedder = grouped_embedder({"kim": ["팀장"]})
+    person = _make_person(db_session, display_name="김민수", relation_tag="직장", hierarchy="동")
+    _add_alias(db_session, person, "팀장", embedding=embedder(["팀장"])[0])
+
+    ctx = _ctx(db_session, session_id=session_id, embedder=embedder)
+    judge = FakeJudge(table={person.id: 0.9})
+
+    result = resolve(ctx, "이모", "이모가 또 전화하셨어", judge=judge, config=ERConfig())
+
+    excluded = next(c for c in result.candidates if c.person_id == person.id)
+    assert excluded.passed_rules is False
+    assert excluded.excluded_by == "relation_tag_conflict"
+    assert result.llm["skipped"] is True
+    assert result.forced_reason == "no_candidates"
+    assert result.band == "new_person"
+
+    applied = apply_resolution(ctx, result)
+    assert applied.band == "new_person"
+    assert applied.action == "ask_new_person"
+    assert applied.person_id is None
+    assert applied.pending_question_id is not None
+
+    rows = (
+        db_session.execute(
+            select(PendingQuestion).where(PendingQuestion.session_id == session_id)
+        )
+        .scalars()
+        .all()
+    )
+    assert len(rows) == 1
+    assert rows[0].kind == "new_person"
+    assert rows[0].id == applied.pending_question_id
+
+
+def test_apply_resolution_homonym_splits_into_identity_question_homonym(
+    db_session, grouped_embedder
+):
+    """01-plan 리스크 42행 "동명이인 분리" -- 같은 별칭("민수")을 가진
+    두 인물(둘 다 친구·동) 모두 규칙 통과 -> `FakeJudge` 가 중간 `s_llm`
+    으로 하나에 귀속 -> `confidence ∈ [T_new, T_merge)` -> `identity` ->
+    `apply_resolution` 이 `ask_user(kind="identity")` 를 저장하고, 두
+    후보의 `s_emb`/`s_rule` 은 `candidates[]` 에 그대로 남는다."""
+
+    session_id = "er-apply-homonym"
+    embedder = grouped_embedder({"minsu": ["민수"]})
+    person1 = _make_person(db_session, display_name="김민수", relation_tag="친구", hierarchy="동")
+    _add_alias(db_session, person1, "민수", embedding=embedder(["민수"])[0])
+    person2 = _make_person(db_session, display_name="이민수", relation_tag="친구", hierarchy="동")
+    _add_alias(db_session, person2, "민수", embedding=embedder(["민수"])[0])
+
+    ctx = _ctx(db_session, session_id=session_id, embedder=embedder)
+    judge = FakeJudge(table={person1.id: 0.55}, pick=person1.id)
+
+    result = resolve(ctx, "민수", "민수가 그러던데", judge=judge, config=ERConfig())
+
+    for candidate in result.candidates:
+        assert candidate.passed_rules is True
+
+    config = ERConfig()
+    assert config.t_new <= result.confidence < config.t_merge
+    assert result.band == "identity"
+
+    by_person = {c.person_id: c for c in result.candidates}
+    assert by_person[person1.id].s_rule == 0.0
+    assert by_person[person2.id].s_rule == 0.0
+    assert by_person[person1.id].s_emb is not None
+    assert by_person[person2.id].s_emb is not None
+
+    ask_payload = result.ask_payload
+    assert ask_payload is not None
+    assert ask_payload["kind"] == "identity"
+    assert set(ask_payload["context"]["candidate_ids"].values()) == {person1.id, person2.id}
+
+    applied = apply_resolution(ctx, result)
+    assert applied.band == "identity"
+    assert applied.action == "ask_identity"
+    assert applied.person_id is None
+    assert applied.pending_question_id is not None
+
+    rows = (
+        db_session.execute(
+            select(PendingQuestion).where(PendingQuestion.session_id == session_id)
+        )
+        .scalars()
+        .all()
+    )
+    assert len(rows) == 1
+    assert rows[0].kind == "identity"
+
+
+def test_apply_resolution_updates_only_three_decision_fields_via_raw_sql_applied(
+    db_session, fake_embedder
+):
+    """F-93f063 -- 부분 갱신을 **원시 SQL 재조회**로 검증한다(같은 세션
+    identity map 이 in-place dict 변경을 오탐하지 않도록). `applied`/
+    `pending_question_id`/`applied_at` 세 필드만 바뀌고 나머지 판정
+    필드(`confidence_breakdown`/`candidates`/`llm`/`band`)는 JSON 문자열
+    비교로 완전히 동일해야 한다. `er_resolve` 행 수는 여전히 1."""
+
+    session_id = "er-apply-fields"
+    person = _make_person(db_session, display_name="김민수", relation_tag="직장", hierarchy="동")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+    judge = FakeJudge(table={person.id: 0.95})
+    result = resolve(ctx, "팀장", "발화", judge=judge, config=ERConfig())
+    assert result.band == "merge"
+
+    sql = "SELECT output FROM agent_traces WHERE id = :id"
+    before = db_session.execute(text(sql), {"id": result.trace_id}).scalar_one()
+    assert before["decision"]["applied"] is False
+    assert before["decision"]["pending_question_id"] is None
+    assert before["decision"]["applied_at"] is None
+    before_band = before["decision"]["band"]
+    before_breakdown = json.dumps(before["confidence_breakdown"], sort_keys=True)
+    before_candidates = json.dumps(before["candidates"], sort_keys=True)
+    before_llm = json.dumps(before["llm"], sort_keys=True)
+
+    apply_resolution(ctx, result)
+    db_session.flush()
+    db_session.expire_all()
+
+    after = db_session.execute(text(sql), {"id": result.trace_id}).scalar_one()
+    assert after["decision"]["applied"] is True
+    assert after["decision"]["pending_question_id"] is None
+    assert after["decision"]["applied_at"] is not None
+    assert after["decision"]["band"] == before_band
+    assert json.dumps(after["confidence_breakdown"], sort_keys=True) == before_breakdown
+    assert json.dumps(after["candidates"], sort_keys=True) == before_candidates
+    assert json.dumps(after["llm"], sort_keys=True) == before_llm
+
+    rows = [r for r in _trace_rows(db_session, session_id) if r.step == ER_TRACE_STEP]
+    assert len(rows) == 1
+
+
+def test_resolve_without_apply_creates_no_pending_question_no_apply_no_question(
+    db_session, fake_embedder
+):
+    """`resolve()` 만 부르면(결정4 -- 부수효과 없음) `pending_questions`
+    행이 생기지 않는다 -- `apply_resolution` 을 불러야만 저장된다."""
+
+    session_id = "er-no-apply"
+    person1 = _make_person(db_session, display_name="김민수", relation_tag="친구", hierarchy="동")
+    _add_alias(db_session, person1, "민수", embedding=fake_embedder(["민수"])[0])
+    person2 = _make_person(db_session, display_name="이민수", relation_tag="친구", hierarchy="동")
+    _add_alias(db_session, person2, "민수", embedding=fake_embedder(["민수"])[0])
+
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+    judge = FakeJudge(table={person1.id: 0.55}, pick=person1.id)
+    result = resolve(ctx, "민수", "발화", judge=judge, config=ERConfig())
+    assert result.band == "identity"
+
+    _, _, questions = _row_counts(db_session)
+    assert questions == 0
+
+
+def test_apply_resolution_twice_raises_and_leaves_state_unchanged_double_apply(
+    db_session, fake_embedder
+):
+    """F-8809f2 -- 같은 `Resolution` 으로 `apply_resolution` 을 두 번
+    부르면 두 번째는 `AlreadyApplied` 로 거부되고 `pending_questions`/
+    `person_aliases` 행 수가 늘지 않는다."""
+
+    session_id = "er-apply-double"
+    person1 = _make_person(db_session, display_name="김민수", relation_tag="친구", hierarchy="동")
+    _add_alias(db_session, person1, "민수", embedding=fake_embedder(["민수"])[0])
+    person2 = _make_person(db_session, display_name="이민수", relation_tag="친구", hierarchy="동")
+    _add_alias(db_session, person2, "민수", embedding=fake_embedder(["민수"])[0])
+
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+    judge = FakeJudge(table={person1.id: 0.55}, pick=person1.id)
+    result = resolve(ctx, "민수", "발화", judge=judge, config=ERConfig())
+    assert result.band == "identity"
+
+    first = apply_resolution(ctx, result)
+    assert first.pending_question_id is not None
+
+    before_counts = _row_counts(db_session)
+
+    with pytest.raises(AlreadyApplied):
+        apply_resolution(ctx, result)
+
+    after_counts = _row_counts(db_session)
+    assert before_counts == after_counts
+
+    trace_rows = [r for r in _trace_rows(db_session, session_id) if r.step == ER_TRACE_STEP]
+    assert len(trace_rows) == 1
+
+
+def test_apply_resolution_merge_does_not_change_display_name_display_name_unchanged(
+    db_session, fake_embedder
+):
+    """결정3-b/D6 -- merge 구간은 별칭만 누적하고 `display_name` 은
+    확인 없이 바꾸지 않는다."""
+
+    session_id = "er-apply-display-name"
+    person = _make_person(db_session, display_name="김민수", relation_tag="직장", hierarchy="동")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+    judge = FakeJudge(table={person.id: 0.95})
+    result = resolve(ctx, "팀장", "발화", judge=judge, config=ERConfig())
+    assert result.band == "merge"
+    assert result.suggested_display_name == "김민수"
+
+    apply_resolution(ctx, result)
+
+    db_session.expire_all()
+    refreshed = db_session.get(Person, person.id)
+    assert refreshed.display_name == "김민수"

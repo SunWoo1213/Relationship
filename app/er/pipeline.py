@@ -1,6 +1,6 @@
 """Refs: P3-er S3.3 D3 D10 R4 R9 결정1 결정3-b 결정3-c 결정4 결정5 결정8
-원칙1 원칙4 원칙9 -- 오케스트레이션(`resolve()`, U6). `apply_resolution()`
-은 아직 없다(U7 몫, 01-plan U7 체크리스트).
+원칙1 원칙4 원칙9 -- 오케스트레이션(`resolve()`, U6) + 실행(`apply_resolution()`,
+U7).
 
 ## `resolve()` 가 하는 일 (4단계 그대로, 하드코딩된 파이프라인이 아니다)
 
@@ -50,6 +50,9 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Any
 
+from sqlalchemy.orm.attributes import flag_modified
+
+from app.db.models import AgentTrace
 from app.er.candidates import search_candidates
 from app.er.confidence import decide
 from app.er.judge import Judge, JudgeUnavailable, judge_from_env
@@ -57,13 +60,17 @@ from app.er.rules import run_rule_stage
 from app.er.types import (
     ER_TRACE_STEP,
     ER_TRACE_TOOL_NAME,
+    AlreadyApplied,
+    AppliedResolution,
     ERConfig,
     Resolution,
     ScoredCandidate,
 )
 from app.settings import er_config
 from app.tools.context import ToolContext, traced
-from app.tools.types import AFFIRMATIVE_KEY
+from app.tools.persons import update_person
+from app.tools.questions import ask_user
+from app.tools.types import AFFIRMATIVE_KEY, InvalidValue
 
 #: identity 질문 옵션에 담을 후보 표시 이름 최대 개수(결정4).
 _MAX_IDENTITY_OPTIONS = 3
@@ -265,3 +272,145 @@ def resolve(
 
     result = _traced_pipeline(ctx, mention, utterance, hints, resolved_config)
     return replace(result, trace_id=ctx.last_trace_id)
+
+
+def _load_trace_row(ctx: ToolContext, trace_id: int) -> AgentTrace:
+    """`resolution.trace_id` 가 가리키는 `er_resolve` 행을 조회한다.
+    없으면(잘못된 `trace_id`, 롤백된 트랜잭션 등) `InvalidValue` -- 존재를
+    가정하고 조용히 `None` 필드로 진행하지 않는다(원칙8)."""
+
+    row = ctx.session.get(AgentTrace, trace_id)
+    if row is None:
+        raise InvalidValue(
+            f"apply_resolution: agent_traces row {trace_id!r} not found"
+        )
+    output = row.output
+    decision = output.get("decision") if isinstance(output, dict) else None
+    if not isinstance(decision, dict):
+        raise InvalidValue(
+            "apply_resolution: agent_traces row output.decision missing or malformed"
+        )
+    return row
+
+
+def apply_resolution(ctx: ToolContext, resolution: Resolution) -> AppliedResolution:
+    """`Resolution`(U6 `resolve()`) 이 정한 행동을 **실제로 실행**한다
+    (결정4 -- 판정과 실행 분리). `resolve()` 는 부수효과가 없었으므로,
+    `persons`/`person_aliases`/`pending_questions` 를 실제로 바꾸는 것은
+    이 함수뿐이다.
+
+    ## 경로별 동작
+
+    - `band == "merge"`: `update_person(ctx, person_id=resolution.
+      matched_person_id, new_alias=resolution.mention)` 로 **별칭만
+      누적**한다 -- `display_name` 은 바꾸지 않는다(결정3-b, D6). 이미
+      같은 별칭 문자열이 있으면 `app/tools/persons.py._add_alias` 의
+      기존 upsert(격상) 규약을 그대로 따르며 예외를 던지지 않는다.
+      `pending_question_id=None`.
+    - `band in {"identity", "new_person"}`: `ask_user(ctx, kind=..., question=
+      ..., options=..., context=...)` 로 U6 이 만든 `ask_payload` 의 `kind`/
+      `question`/`options`/`context` 를 **그대로** 저장한다(재구성 없음) ->
+      `pending_question_id`. **계획과 다르게 한 것**: 01-plan 은 `ask_user(ctx,
+      **resolution.ask_payload)` 로 페이로드 전체를 그대로 splat 하라고
+      적었으나, U6 이 만든 `ask_payload` 에는 `ask_user` 의 시그니처
+      (`kind, question, options, context`)에 없는 `affirmative_options`
+      키가 최상위에도 함께 있다(`app.tools.questions.ask_user` 가 요구하는
+      값은 `context[AFFIRMATIVE_KEY]` 뿐 -- U6 테스트(`-k identity_payload`)
+      가 이미 이 최상위 키를 단언하므로 U6 쪽 스키마를 바꾸지 않는다,
+      "재계산 금지 — 읽기만 한다"). 그래서 여기서는 `ask_user` 가 실제로
+      받는 4개 키만 뽑아 넘긴다 -- `kind`/`question`/`options`/`context`
+      값 자체는 전혀 가공하지 않는다(03-log U7 항목에 기록).
+
+    ## trace 부분 갱신 (결정4 "trace 행의 갱신 주체", F-93f063)
+
+    실행 뒤 `resolution.trace_id` 가 가리키는 **같은** `er_resolve` 행의
+    `output["decision"]` 안 `applied`/`pending_question_id`/`applied_at`
+    **세 키만** 바꾼다. 갱신 수단은 (a) 조회한 ORM 객체의 `output` dict 를
+    제자리에서 수정한 뒤 `sqlalchemy.orm.attributes.flag_modified(row,
+    "output")` 로 변경 추적을 강제하는 것 -- (b) 원시 `UPDATE ... SET
+    output = jsonb_set(...)` 대안도 있었으나, ORM 이 이미 같은 행을 들고
+    있는 이 경로(같은 세션, 같은 요청 트랜잭션)에서는 (a) 가 SQL 문자열을
+    새로 조립하지 않고 기존 `to_jsonable`/`AgentTrace` 계약을 그대로 쓸 수
+    있어 더 단순하다(원시 SQL 은 JSONB 안의 임의 depth 를 다시 손으로
+    지정해야 한다). `MutableDict`(모델 컬럼 정의 변경)는 스키마/모델 변경
+    없이 이 단위를 끝내기 위해 채택하지 않았다(01-plan "스키마 변경 없음").
+    `flag_modified` 없이 dict 를 제자리에서 바꾸기만 하면 SQLAlchemy 의
+    변경 추적이 JSONB 컬럼의 in-place mutation 을 감지하지 못해 `flush()`
+    가 아무것도 UPDATE 하지 않는다(F-93f063 증상 그대로) -- 그래서 이
+    호출이 반드시 필요하다. `candidates[]`/`confidence_breakdown`/`llm`/
+    `band`/`band_by_threshold`/`forced_reason` 은 건드리지 않는다(판정
+    필드 불변, 전체 재기록 금지).
+
+    ## 중복 호출 거부 (F-8809f2)
+
+    같은 `Resolution`(같은 `trace_id`)으로 두 번째 호출하면, 첫 번째
+    호출이 이미 `decision["applied"] = True` 로 갱신해 두었으므로
+    `AlreadyApplied` 를 던지고 **아무것도 쓰지 않는다** -- `ask_user`/
+    `update_person` 을 다시 부르지 않는다(identity/new_person 경로가
+    `pending_questions` 행을 하나 더 만들거나 `person_aliases` 를 다시
+    upsert 하는 것을 막는다, 03-log U7 "거부(예외)" 채택).
+
+    커밋하지 않는다 -- `flush()` 까지만(호출자 트랜잭션, 01-plan 결정2와
+    같은 툴 규약).
+    """
+
+    if resolution.trace_id is None:
+        raise InvalidValue("apply_resolution: resolution.trace_id is required")
+
+    trace_row = _load_trace_row(ctx, resolution.trace_id)
+    decision_json = trace_row.output["decision"]
+
+    if decision_json.get("applied") is True:
+        raise AlreadyApplied(
+            f"apply_resolution: trace {resolution.trace_id!r} was already applied"
+        )
+
+    action = resolution.decision.get("action")
+    person_id: int | None = None
+    pending_question_id: int | None = None
+    alias_added = False
+
+    if resolution.band == "merge":
+        if resolution.matched_person_id is None:
+            raise InvalidValue(
+                "apply_resolution: band='merge' requires matched_person_id"
+            )
+        update_person(
+            ctx,
+            person_id=resolution.matched_person_id,
+            new_alias=resolution.mention,
+        )
+        person_id = resolution.matched_person_id
+        alias_added = True
+    else:
+        if not resolution.ask_payload:
+            raise InvalidValue(
+                f"apply_resolution: band={resolution.band!r} requires ask_payload"
+            )
+        payload = resolution.ask_payload
+        question = ask_user(
+            ctx,
+            kind=payload["kind"],
+            question=payload["question"],
+            options=payload["options"],
+            context=payload["context"],
+        )
+        pending_question_id = question.question_id
+
+    applied_at = ctx.now()
+
+    decision_json["applied"] = True
+    decision_json["pending_question_id"] = pending_question_id
+    decision_json["applied_at"] = applied_at.isoformat()
+    flag_modified(trace_row, "output")
+    ctx.session.flush()
+
+    return AppliedResolution(
+        trace_id=resolution.trace_id,
+        band=resolution.band,
+        action=action,
+        person_id=person_id,
+        pending_question_id=pending_question_id,
+        applied_at=applied_at,
+        alias_added=alias_added,
+    )

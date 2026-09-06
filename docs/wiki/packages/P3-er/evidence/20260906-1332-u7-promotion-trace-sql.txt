@@ -1,0 +1,40 @@
+SQL:
+SELECT step, tool_name, output->'confidence_breakdown' AS confidence_breakdown, output->'decision' AS decision, tokens_in, tokens_out FROM agent_traces WHERE step='er_resolve' AND session_id=:sid
+
+session_id=er-apply-promotion
+
+row=
+{
+  "step": "er_resolve",
+  "tool_name": "er",
+  "confidence_breakdown": {
+    "s_emb": 0.8493583888197921,
+    "s_llm": 0.95,
+    "s_rule": 0.6666666666666666,
+    "weights": {
+      "emb": 0.3,
+      "llm": 0.5,
+      "rule": 0.2
+    },
+    "confidence": 0.8631408499792709,
+    "rule_passed": 2,
+    "rule_checked": 3,
+    "matched_person_id": 3395
+  },
+  "decision": {
+    "band": "merge",
+    "T_new": 0.3,
+    "action": "merge",
+    "T_merge": 0.8,
+    "applied": true,
+    "applied_at": "2026-09-06T04:33:18.976853+00:00",
+    "forced_reason": null,
+    "relaxed_retry": true,
+    "band_by_threshold": "merge",
+    "matched_person_id": 3395,
+    "pending_question_id": null,
+    "hierarchy_relaxed_retry": true
+  },
+  "tokens_in": 0,
+  "tokens_out": 0
+}

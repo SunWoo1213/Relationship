@@ -86,3 +86,4 @@
 - 2026-09-06 11:47 | COMMIT | 593c254 feat(P3-er): U4 확신도·두 임계치(4단계) — confidence.py·ER_* settings·허용오차 단일 비교
 - 2026-09-06 14:20 | DECISION | P3-er 결정 3 개정 2(사용자): LLM 판정기를 Claude 에 한정하지 않고 공급자 중립으로 — Judge 핵심(프롬프트·스키마·검증·오류 어휘) 분리, ClaudeJudge + OpenAIJudge 구현, Gemini 는 의존성 추가 전까지 예약, judge_from_env(LLM_PROVIDER·*_MODEL) 팩토리, trace llm.provider·model, .env.example 이름 추가. 카드 D3·S3.3 문장 변경 없음 | P3-er D3 S3.3 원칙3
 - 2026-09-06 12:13 | COMMIT | b1f2782 feat(P3-er): U5 후보 어댑터·공급자 중립 LLM 판정 — Claude/OpenAI Judge·judge_from_env
+- 2026-09-06 13:19 | COMMIT | d6e5949 feat(P3-er): U6 resolve() 파이프라인·trace 1행 — 4단계 조립, 부수효과 0, Resolution.trace_id

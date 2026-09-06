@@ -38,6 +38,7 @@ from sqlalchemy.orm import Session
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.db.session import get_engine  # noqa: E402
+from app.embedding import EMBEDDING_DIM  # noqa: E402
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -94,9 +95,102 @@ def _deterministic_vector(value: str, dimension: int = 1536) -> list[float]:
 def fake_embedder() -> Callable[[list[str]], list[list[float]]]:
     """결정적 가짜 임베딩 콜러블. `EmbeddingProvider.embed(texts)` 와 같은 형태
     (`list[str] -> list[list[float]]`) -- U3 가 `app.embedding.EmbeddingProvider`
-    를 정의하면 이 픽스처를 그 자리에 주입한다. U1 은 픽스처만 둔다."""
+    를 정의하면 이 픽스처를 그 자리에 주입한다. U1 은 픽스처만 둔다.
+
+    이 픽스처는 문자열마다 **독립적인** 무작위 단위벡터를 만들므로 서로
+    다른 문자열은 항상 거의 직교한다("팀장"과 "부장님"이 직교해 승진
+    케이스를 만들 수 없다) -- 그룹 안에서 목표 유사도를 갖는 벡터가
+    필요하면 `grouped_embedder` 를 쓴다(결정9, P3-er U7).
+    """
 
     def _embed(texts: list[str]) -> list[list[float]]:
         return [_deterministic_vector(t) for t in texts]
 
     return _embed
+
+
+def _grouped_vector_for_seed(key: str, *, dimension: int, seed: int) -> list[float]:
+    """`key`(그룹 베이스/잡음/미등재 문자열을 구분하는 합성 문자열)로부터
+    결정적 단위벡터를 만든다. `_deterministic_vector` 와 같은 방식(sha256
+    → `random.Random` 시드)이지만 `seed` 를 문자열에 섞어 팩토리 호출마다
+    (기본값이 아닌 `seed` 를 주면) 다른 벡터 공간을 쓸 수 있게 한다."""
+
+    return _deterministic_vector(f"{seed}:{key}", dimension)
+
+
+@pytest.fixture()
+def grouped_embedder() -> Callable[..., Callable[[list[str]], list[list[float]]]]:
+    """그룹 기반 결정적 가짜 임베딩 **팩토리**(결정9, P3-er U7 -- 승진
+    회귀 "팀장 → 부장님"처럼 서로 다른 문자열이 같은 인물을 가리켜야
+    유사도가 높아야 하는 케이스를 `fake_embedder`(문자열마다 독립 벡터)로는
+    만들 수 없다).
+
+    `grouped_embedder(groups, *, within=0.85, dim=EMBEDDING_DIM, seed=0)`
+    을 호출하면 `EmbeddingProvider.embed(texts)` 와 같은 콜러블을 돌려준다:
+
+    - `groups` = `{그룹이름: [문자열, ...]}`. 같은 그룹에 속한 문자열끼리는
+      코사인 유사도가 `within` 근처(±0.05)가 되도록 만든다 -- 그룹마다
+      결정적 "베이스" 단위벡터를 하나 뽑고, 각 문자열은
+      `sqrt(within)*베이스 + sqrt(1-within)*문자열별 잡음벡터` 를 다시
+      정규화해 만든다. 고차원(`EMBEDDING_DIM=1536`)에서 서로 다른 잡음
+      벡터끼리, 그리고 잡음과 베이스끼리는 거의 직교하므로, 두 벡터의
+      내적은 `within` 근처로 수렴하고 베이스·잡음 성분이 상쇄돼 노름도
+      거의 1로 유지된다(단위벡터에 가깝다).
+    - `groups` 에 없는 문자열("미등재")은 그 문자열만으로 시드를 뽑은
+      독립 단위벡터가 된다 -- 등재된 벡터들과 거의 직교(코사인 ≈0)한다.
+    - 결정적이다: 같은 `groups`/`within`/`dim`/`seed` 로 다시 호출하면
+      (그리고 프로세스가 달라져도) 항상 같은 벡터가 나온다(`hashlib.sha256`
+      기반 시드, 원칙8 재현성) -- `random`/시각 등 비결정 요소를 쓰지
+      않는다.
+    - 반환 벡터는 항상 단위벡터(노름 ≈1)이고 차원은 `dim`.
+
+    승진 회귀(01-plan 결정9 "승진 회귀(a) 픽스처 확정")가 이 픽스처로
+    `"팀장"`·`"김팀장"`·`"부장님"` 을 한 그룹에 묶어 `s_emb ≈ 0.85` 를
+    만든다.
+    """
+
+    def _factory(
+        groups: dict[str, list[str]],
+        *,
+        within: float = 0.85,
+        dim: int = EMBEDDING_DIM,
+        seed: int = 0,
+    ) -> Callable[[list[str]], list[list[float]]]:
+        string_to_group: dict[str, str] = {}
+        for group_name, members in groups.items():
+            for member in members:
+                string_to_group[member] = group_name
+
+        base_weight = within**0.5
+        noise_weight = max(0.0, 1.0 - within) ** 0.5
+
+        def _base_vector(group_name: str) -> list[float]:
+            return _grouped_vector_for_seed(
+                f"__group_base__:{group_name}", dimension=dim, seed=seed
+            )
+
+        def _embed(texts: list[str]) -> list[list[float]]:
+            vectors: list[list[float]] = []
+            for text in texts:
+                group_name = string_to_group.get(text)
+                if group_name is None:
+                    vectors.append(
+                        _grouped_vector_for_seed(
+                            f"__unregistered__:{text}", dimension=dim, seed=seed
+                        )
+                    )
+                    continue
+                base = _base_vector(group_name)
+                noise = _grouped_vector_for_seed(
+                    f"__noise__:{group_name}:{text}", dimension=dim, seed=seed
+                )
+                combined = [
+                    base_weight * b + noise_weight * n for b, n in zip(base, noise)
+                ]
+                norm = sum(v * v for v in combined) ** 0.5 or 1.0
+                vectors.append([v / norm for v in combined])
+            return vectors
+
+        return _embed
+
+    return _factory
