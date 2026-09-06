@@ -1,0 +1,302 @@
+[
+  {
+    "id": "sc-017",
+    "category": "pronoun",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "남규진",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["규진이", "규진"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "백서윤",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["서윤이", "서윤"]
+      }
+    ],
+    "seed_persons": ["p1", "p2"],
+    "utterances": [
+      "어제 규진이랑 서윤이 만나서 밥 먹었어",
+      "규진이는 요즘 이직 준비한대ㅋㅋ",
+      "걔 진짜 열심히 하더라",
+      "서윤이는 그냥 다니는 거 같고"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "규진이", "gold_person_id": "p1" },
+      { "turn": 0, "surface": "서윤이", "gold_person_id": "p2" },
+      { "turn": 1, "surface": "규진이", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "걔", "gold_person_id": "p1" },
+      { "turn": 3, "surface": "서윤이", "gold_person_id": "p2" }
+    ],
+    "events": [
+      { "turn": 0, "type": "meal", "occurred_at_kind": "relative" },
+      { "turn": 1, "type": "personal_share", "occurred_at_kind": "none" }
+    ],
+    "expected_ask_user": { "allowed": ["identity", "none"] }
+  },
+  {
+    "id": "sc-018",
+    "category": "pronoun",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "구민서",
+        "relation_tag": "가족",
+        "hierarchy": "상",
+        "aliases": ["민서 누나", "민서"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "양보라",
+        "relation_tag": "지인",
+        "hierarchy": "동",
+        "aliases": ["보라"]
+      }
+    ],
+    "seed_persons": ["p1", "p2"],
+    "utterances": [
+      "민서 누나가 오늘 반찬 갖다줬어",
+      "보라는 이사 도와준다고 연락 왔고",
+      "그 사람 진짜 오지랖 넓어ㅋㅋ",
+      "누나한테는 나중에 밥 산다 했어"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "민서 누나", "gold_person_id": "p1" },
+      { "turn": 1, "surface": "보라", "gold_person_id": "p2" },
+      { "turn": 2, "surface": "그 사람", "gold_person_id": "p2" },
+      { "turn": 3, "surface": "누나", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "favor", "occurred_at_kind": "relative" },
+      { "turn": 1, "type": "favor", "occurred_at_kind": "none" }
+    ],
+    "expected_ask_user": { "allowed": ["identity", "none"] }
+  },
+  {
+    "id": "sc-019",
+    "category": "pronoun",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "노아름",
+        "relation_tag": "연인",
+        "hierarchy": "동",
+        "aliases": ["아름이", "아름"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "장세호",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["세호"]
+      }
+    ],
+    "seed_persons": ["p1", "p2"],
+    "utterances": [
+      "아름이랑 세호랑 같이 영화 봤는데",
+      "세호가 팝콘 다 먹어버림ㅋㅋ",
+      "쟤는 진짜 먹는 거 좋아해",
+      "아름이는 그거 보고 웃기다고"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "아름이", "gold_person_id": "p1" },
+      { "turn": 0, "surface": "세호", "gold_person_id": "p2" },
+      { "turn": 1, "surface": "세호", "gold_person_id": "p2" },
+      { "turn": 2, "surface": "쟤", "gold_person_id": "p2" },
+      { "turn": 3, "surface": "아름이", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "meeting", "occurred_at_kind": "none" }
+    ],
+    "expected_ask_user": { "allowed": ["identity", "none"] }
+  },
+  {
+    "id": "sc-020",
+    "category": "pronoun",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "심우재",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": ["심팀장", "팀장님"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "홍가은",
+        "relation_tag": "직장",
+        "hierarchy": "동",
+        "aliases": ["가은이", "가은"]
+      }
+    ],
+    "seed_persons": ["p1", "p2"],
+    "utterances": [
+      "오늘 심팀장이랑 가은이랑 같이 외근 갔어",
+      "그분이 점심 사주셔서 잘 먹었어",
+      "걔는 계속 딴짓하고ㅋㅋ",
+      "다음엔 나도 사드려야지"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "심팀장", "gold_person_id": "p1" },
+      { "turn": 0, "surface": "가은이", "gold_person_id": "p2" },
+      { "turn": 1, "surface": "그분", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "걔", "gold_person_id": "p2" }
+    ],
+    "events": [
+      { "turn": 0, "type": "meeting", "occurred_at_kind": "relative" },
+      { "turn": 1, "type": "meal", "occurred_at_kind": "relative" }
+    ],
+    "expected_ask_user": { "allowed": ["identity", "none"] }
+  },
+  {
+    "id": "sc-021",
+    "category": "pronoun",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "표동혁",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["동혁이", "동혁"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "백서윤",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["서윤이", "서윤"]
+      },
+      {
+        "person_id": "p3",
+        "display_name": "양보라",
+        "relation_tag": "지인",
+        "hierarchy": "동",
+        "aliases": ["보라"]
+      }
+    ],
+    "seed_persons": ["p1", "p2", "p3"],
+    "utterances": [
+      "동혁이가 주말에 등산 가자고 하네",
+      "서윤이랑 보라는 못 간다고 하고",
+      "아까 걔가 장비도 빌려준대ㅋㅋ",
+      "보라는 저번에 도시락 싸줬었는데"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "동혁이", "gold_person_id": "p1" },
+      { "turn": 1, "surface": "서윤이", "gold_person_id": "p2" },
+      { "turn": 1, "surface": "보라", "gold_person_id": "p3" },
+      { "turn": 2, "surface": "아까 걔", "gold_person_id": "p1" },
+      { "turn": 3, "surface": "보라", "gold_person_id": "p3" }
+    ],
+    "events": [
+      { "turn": 3, "type": "favor", "occurred_at_kind": "relative" }
+    ],
+    "expected_ask_user": { "allowed": ["identity", "none"] }
+  },
+  {
+    "id": "sc-022",
+    "category": "pronoun",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "남규진",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["규진이", "규진"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "장세호",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["세호"]
+      }
+    ],
+    "seed_persons": ["p1", "p2"],
+    "utterances": [
+      "규진이랑 세호랑 어제 같이 술 마셨대",
+      "걔 요즘 힘든가 봐",
+      "다음에 한번 물어봐야겠다"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "규진이", "gold_person_id": "p1" },
+      { "turn": 0, "surface": "세호", "gold_person_id": "p2" },
+      { "turn": 1, "surface": "걔", "gold_person_id": null, "ambiguous": true }
+    ],
+    "events": [
+      { "turn": 0, "type": "meal", "occurred_at_kind": "relative" }
+    ],
+    "expected_ask_user": { "allowed": ["identity", "none"] }
+  },
+  {
+    "id": "sc-023",
+    "category": "pronoun",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "심우재",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": ["심팀장", "팀장님"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "심팀장이 이번에 본사로 옮기신대",
+      "그 분 밑에서 3년 있었는데",
+      "밥이라도 한번 사드려야지 싶어"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "심팀장", "gold_person_id": "p1" },
+      { "turn": 1, "surface": "그 분", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "personal_share", "occurred_at_kind": "relative" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  },
+  {
+    "id": "sc-024",
+    "category": "pronoun",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "표동혁",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["동혁이", "동혁"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "양보라",
+        "relation_tag": "지인",
+        "hierarchy": "동",
+        "aliases": ["보라"]
+      }
+    ],
+    "seed_persons": ["p1", "p2"],
+    "utterances": [
+      "동혁이랑 보라랑 카페에서 두 시간 떠들었어",
+      "동혁이가 커피 사줘서 잘 마셨어",
+      "얘가 원래 잘 챙겨주는 스타일ㅋㅋ",
+      "둘 다 요즘 힘들다고 하더라",
+      "걔 조만간 따로 만나야겠다"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "동혁이", "gold_person_id": "p1" },
+      { "turn": 0, "surface": "보라", "gold_person_id": "p2" },
+      { "turn": 1, "surface": "동혁이", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "얘", "gold_person_id": "p1" },
+      { "turn": 4, "surface": "걔", "gold_person_id": null, "ambiguous": true }
+    ],
+    "events": [
+      { "turn": 0, "type": "meeting", "occurred_at_kind": "none" },
+      { "turn": 1, "type": "meal", "occurred_at_kind": "none" }
+    ],
+    "expected_ask_user": { "allowed": ["identity", "none"] }
+  }
+]

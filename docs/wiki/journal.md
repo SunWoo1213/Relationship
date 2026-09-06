@@ -102,3 +102,5 @@
 - 2026-09-06 17:47 | COMMIT | 4c80c31 docs(P1-pilot-dataset): 계획·계획검증 승인, 패키지 착수 — 파일럿 데이터셋 40건·검증기·verifier 라벨 검수
 - 2026-09-06 18:07 | COMMIT | 1e1320c feat(P1-pilot-dataset): U1 시나리오 스키마·검증기·테스트 — JSON Schema 2020-12, 교차 검사 10항목, 위반 표본 8종
 - 2026-09-06 18:44 | COMMIT | baee71e fix(P1-pilot-dataset): 검증기 테스트 시점 고정 해소·검사 12 surface∈utterance·13 발화 길이/턴 수 — F-7bea05 F-1ba055
+- 2026-09-06 18:44 | COMMIT | 09875aa feat(P1-pilot-dataset): U2 promotion 8·alias 8 시나리오 — 오병합 유도 함정 8건, manifest generator 기록
+- 2026-09-06 18:44 | PUSH | origin dev 09875aa — 사용자 결정 대기(승격/수정) L-003

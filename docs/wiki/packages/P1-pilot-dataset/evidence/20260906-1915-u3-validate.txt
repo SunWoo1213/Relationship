@@ -1,0 +1,47 @@
+{
+  "ambiguous_mention_count": 3,
+  "counts": {
+    "alias": 8,
+    "new_person": 0,
+    "normal": 10,
+    "promotion": 8,
+    "pronoun": 8
+  },
+  "dir": "data/scenarios",
+  "files": [
+    {
+      "count": 8,
+      "exists": true,
+      "file": "promotion.json"
+    },
+    {
+      "count": 8,
+      "exists": true,
+      "file": "pronoun.json"
+    },
+    {
+      "count": 8,
+      "exists": true,
+      "file": "alias.json"
+    },
+    {
+      "count": 10,
+      "exists": true,
+      "file": "normal.json"
+    },
+    {
+      "count": 0,
+      "exists": false,
+      "file": "new_person.json"
+    }
+  ],
+  "issue_count": 0,
+  "issues": [],
+  "ok": true,
+  "scenario_count": 34,
+  "schema_version": 1,
+  "strict": false,
+  "total": 34,
+  "trap_count": 8
+}
+rc=0

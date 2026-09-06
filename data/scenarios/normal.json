@@ -1,0 +1,300 @@
+[
+  {
+    "id": "sc-025",
+    "category": "normal",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "엄마",
+        "relation_tag": "가족",
+        "hierarchy": "상",
+        "aliases": ["엄마", "울엄마"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "엄마가 어제 김치 담가서 보내주셨어",
+      "택배 오늘 도착했는데 양이 어마어마ㅋㅋ",
+      "담주 일요일에 엄마 뵈러 내려가기로 했어"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "엄마", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "엄마", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "favor", "occurred_at_kind": "relative" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  },
+  {
+    "id": "sc-026",
+    "category": "normal",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "노아름",
+        "relation_tag": "연인",
+        "hierarchy": "동",
+        "aliases": ["아름이", "자기"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "아름이랑 오늘 저녁에 파스타 먹었어",
+      "요즘 회사 일 많다고 좀 지쳐 보였어",
+      "주말에는 아름이랑 그냥 집에서 쉬려고"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "아름이", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "아름이", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "meal", "occurred_at_kind": "relative" },
+      { "turn": 1, "type": "personal_share", "occurred_at_kind": "none" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  },
+  {
+    "id": "sc-027",
+    "category": "normal",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "남규진",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["규진이", "규진"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "규진이가 어제 이사한다고 연락 왔더라",
+      "짐 옮기는 거 도와주기로 했어ㅋㅋ",
+      "담주 토요일 아침에 규진이네 가기로"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "규진이", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "규진이", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "personal_share", "occurred_at_kind": "relative" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  },
+  {
+    "id": "sc-028",
+    "category": "normal",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "심우재",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": ["심팀장", "팀장님"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "심팀장이 오늘 보고서 칭찬해줬어",
+      "괜히 기분 좋아서 커피 사 마심ㅋㅋ",
+      "다음 주 회의도 심팀장이 주관한대"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "심팀장", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "심팀장", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "praise", "occurred_at_kind": "relative" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  },
+  {
+    "id": "sc-029",
+    "category": "normal",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "양보라",
+        "relation_tag": "지인",
+        "hierarchy": "동",
+        "aliases": ["보라쌤", "보라"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "보라쌤한테 오늘 자세 교정 받았어",
+      "어깨 아픈 거 많이 나아진 듯",
+      "보라쌤이 스트레칭 영상도 보내줬어",
+      "다음 수업은 목요일 저녁 일곱시"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "보라쌤", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "보라쌤", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "other", "occurred_at_kind": "relative" },
+      { "turn": 2, "type": "favor", "occurred_at_kind": "none" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  },
+  {
+    "id": "sc-030",
+    "category": "normal",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "정하윤",
+        "relation_tag": "가족",
+        "hierarchy": "하",
+        "aliases": ["하윤이", "하윤"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "엄마",
+        "relation_tag": "가족",
+        "hierarchy": "상",
+        "aliases": ["엄마", "울엄마"]
+      }
+    ],
+    "seed_persons": ["p1", "p2"],
+    "utterances": [
+      "하윤이가 시험 끝났다고 좋아하더라",
+      "축하한다고 치킨 사줬어ㅋㅋ",
+      "엄마도 용돈 챙겨줬대ㅋㅋ",
+      "하윤이 요즘 부쩍 컸다 싶어"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "하윤이", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "엄마", "gold_person_id": "p2" },
+      { "turn": 3, "surface": "하윤이", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "personal_share", "occurred_at_kind": "none" },
+      { "turn": 1, "type": "meal", "occurred_at_kind": "none" },
+      { "turn": 2, "type": "favor", "occurred_at_kind": "none" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  },
+  {
+    "id": "sc-031",
+    "category": "normal",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "백서윤",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["서윤이", "서윤"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "서윤이랑 어제 한강에서 자전거 탔어",
+      "날씨 좋아서 두 시간이나 돌아다님",
+      "서윤이가 사진 잘 찍어줘서 고마웟어"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "서윤이", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "서윤이", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "meeting", "occurred_at_kind": "relative" },
+      { "turn": 2, "type": "favor", "occurred_at_kind": "none" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  },
+  {
+    "id": "sc-032",
+    "category": "normal",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "오지호",
+        "relation_tag": "지인",
+        "hierarchy": "상",
+        "aliases": ["지호형", "지호"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "지호형이 어제 이직 축하한다고 밥 샀어",
+      "동네 형이라 그런지 편하더라ㅋㅋ",
+      "다음엔 내가 산다고 했어"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "지호형", "gold_person_id": "p1" },
+      { "turn": 1, "surface": "형", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "meal", "occurred_at_kind": "relative" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  },
+  {
+    "id": "sc-033",
+    "category": "normal",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "홍가은",
+        "relation_tag": "직장",
+        "hierarchy": "동",
+        "aliases": ["가은이", "가은"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "심우재",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": ["심팀장", "팀장님"]
+      }
+    ],
+    "seed_persons": ["p1", "p2"],
+    "utterances": [
+      "가은이랑 점심에 새로 생긴 국밥집 갔어",
+      "줄 오래 서서 좀 늦게 들어감ㅋㅋ",
+      "심팀장은 별말 안 하고 넘어갔어",
+      "다음 주 수요일에 같이 야근하기로 했어",
+      "가은이 요즘 프로젝트 때문에 정신없대"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "가은이", "gold_person_id": "p1" },
+      { "turn": 2, "surface": "심팀장", "gold_person_id": "p2" },
+      { "turn": 4, "surface": "가은이", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "meal", "occurred_at_kind": "relative" },
+      { "turn": 4, "type": "personal_share", "occurred_at_kind": "none" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  },
+  {
+    "id": "sc-034",
+    "category": "normal",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "아빠",
+        "relation_tag": "가족",
+        "hierarchy": "상",
+        "aliases": ["아빠", "울아빠"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "아빠가 지난주에 낚시 다녀오셨대",
+      "월척 잡았다고 사진 계속 보내심ㅋㅋ",
+      "이번 주말에 같이 가자고 하시네",
+      "아빠랑 오랜만에 바람 쐬고 오려고"
+    ],
+    "mentions": [
+      { "turn": 0, "surface": "아빠", "gold_person_id": "p1" },
+      { "turn": 3, "surface": "아빠", "gold_person_id": "p1" }
+    ],
+    "events": [
+      { "turn": 0, "type": "other", "occurred_at_kind": "relative" },
+      { "turn": 1, "type": "personal_share", "occurred_at_kind": "none" }
+    ],
+    "expected_ask_user": { "allowed": ["none"] }
+  }
+]
