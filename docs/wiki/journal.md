@@ -83,3 +83,5 @@
 - 2026-09-06 10:41 | COMMIT | 2b82882 feat(P3-er): U1 @traced 세이브포인트로 F-ca12ad 수정, step 인자·trace_tokens 확장
 - 2026-09-06 11:04 | COMMIT | 2c63c60 feat(P3-er): U2 임베딩 런타임 공급자 — dimension·check_dimension·openai/anthropic 핀
 - 2026-09-06 11:26 | COMMIT | 02e6f14 feat(P3-er): U3 호칭 사전·규칙 필터(2단계) — app/er types·dictionary·rules
+- 2026-09-06 11:47 | COMMIT | 593c254 feat(P3-er): U4 확신도·두 임계치(4단계) — confidence.py·ER_* settings·허용오차 단일 비교
+- 2026-09-06 14:20 | DECISION | P3-er 결정 3 개정 2(사용자): LLM 판정기를 Claude 에 한정하지 않고 공급자 중립으로 — Judge 핵심(프롬프트·스키마·검증·오류 어휘) 분리, ClaudeJudge + OpenAIJudge 구현, Gemini 는 의존성 추가 전까지 예약, judge_from_env(LLM_PROVIDER·*_MODEL) 팩토리, trace llm.provider·model, .env.example 이름 추가. 카드 D3·S3.3 문장 변경 없음 | P3-er D3 S3.3 원칙3

@@ -102,11 +102,18 @@ class Judgement:
     """3단계(LLM 판정, `app/er/judge.py`) 산출물 -- 단일 판정(후보별 점수
     배열이 아니다, 결정3-c(a)).
 
-    `s_llm` 은 **LLM 이 구조화 출력(tool_use)으로 자기보고한 0~1 점수이며,
-    로그 확률이 아니다**(R4 -- Claude API 는 토큰 로그 확률을 제공하지
-    않는다). 이 사실은 `judge.py` 모듈 docstring 과 trace
+    `s_llm` 은 **LLM 이 구조화 출력(도구/함수 호출)으로 자기보고한 0~1
+    점수이며, 로그 확률이 아니다**(R4 -- 어떤 공급자의 API 도 토큰 로그
+    확률을 제공하지 않는다). 이 사실은 `judge.py` 모듈 docstring 과 trace
     `llm.self_reported=true` 에도 반복해서 남긴다(R4 를 코드로 닫는 세
     지점 중 하나, 결정3(a)).
+
+    `provider`(사용자 결정 2026-09-06, 공급자 중립 설계)는 실제 판정을
+    수행한 공급자 이름(`"anthropic"`/`"openai"`/`"fake"`)이다 -- U5 의
+    `judge.py` 가 `Judge` 를 공급자별로 구현하면서 trace `llm.provider`
+    에 이 값을 그대로 남긴다. 기본값 `"fake"` 는 `FakeJudge` 가 흔히
+    쓰이는 테스트 맥락과 맞춘 것일 뿐, 실제 공급자 구현은 언제나 이
+    필드를 명시적으로 채운다.
     """
 
     matched_person_id: int | None
@@ -115,6 +122,7 @@ class Judgement:
     tokens_in: int = 0
     tokens_out: int = 0
     model: str | None = None
+    provider: str = "fake"
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -124,6 +132,7 @@ class Judgement:
             "tokens_in": self.tokens_in,
             "tokens_out": self.tokens_out,
             "model": self.model,
+            "provider": self.provider,
         }
 
 

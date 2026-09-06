@@ -84,6 +84,11 @@ ER_TOP_K = SEARCH_TOP_K
 ER_JUDGE_TIMEOUT = 20.0
 ER_JUDGE_MAX_RETRIES = 1
 
+#: 3단계 LLM 판정 공급자 기본값(사용자 결정 2026-09-06 -- 공급자 중립).
+#: `app/er/judge.py` 의 `judge_from_env()` 가 `LLM_PROVIDER` 환경변수를
+#: 읽을 때 이 값이 기본이다. `.env.example` 에 이름만 추가한다(값은 비움).
+LLM_PROVIDER = "anthropic"
+
 #: 임계치 비교 허용오차의 단일 출처(F-7fe239). `app/er/confidence.py` 의
 #: `ge_with_tolerance()` 하나만 이 상수를 쓴다 -- `round()` 기반 비교는
 #: 쓰지 않는다(경계 폭이 넓어 `T_merge` 미만 confidence 를 merge 로
