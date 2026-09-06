@@ -10,7 +10,7 @@ F-1d65ac -- U6 `resolve()` 오케스트레이션 + trace 통합 테스트, U7
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+import os
 from pathlib import Path
 
 import pytest
@@ -390,10 +390,19 @@ def test_grouped_embedder_similarity_self_check(grouped_embedder):
 # ---------------------------------------------------------------------------
 
 
-def _write_evidence(name: str, content: str) -> Path:
+#: evidence 파일 기록 게이트. 이 환경변수가 설정된 pytest 실행에서만
+#: 승진 테스트가 판정 방법 표 SQL 결과를 evidence 로 남긴다. 게이트 없이
+#: 실행마다 타임스탬프 새 파일을 쓰면 미추적 파일이 쌓인다(U8 실행에서
+#: 발견, FIX 2026-09-06). 값은 파일 이름 접두(예: `20260906-1332-u7`).
+EVIDENCE_STAMP_ENV = "ER_EVIDENCE_STAMP"
+
+
+def _write_evidence(name: str, content: str) -> Path | None:
+    stamp = os.environ.get(EVIDENCE_STAMP_ENV)
+    if not stamp:
+        return None
     _EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
-    path = _EVIDENCE_DIR / f"{stamp}-u7-{name}.txt"
+    path = _EVIDENCE_DIR / f"{stamp}-{name}.txt"
     path.write_text(content, encoding="utf-8")
     return path
 

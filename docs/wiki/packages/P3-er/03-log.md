@@ -110,3 +110,11 @@
   출력 예상 형태: `{"provider": "...", "model": "...", "tokens_in": N, "tokens_out": N, "s_llm": 0.0~1.0, "matched_person_id": 1|2|null, "reason": "...", "confidence": 0.0~1.0, "band": "merge"|"identity"|"new_person"}` 한 줄. 출력을 evidence 로 남기려면 `... > docs/wiki/packages/P3-er/evidence/<타임스탬프>-u8-er-smoke-real.txt`(키 값 자체는 그 파일에도 남지 않는다 — 스크립트가 출력하지 않는다).
 - 남은 것 · 다음 단위: U9(수용 기준 기계 검증 + 문서 — 전체 pytest·회귀 3종 단독·`agent_traces` SQL 조회·`alembic check`·`tools_check` 증거 정리, `docs/wiki/registry.md` 신규 행 6개(`scripts/backfill_embeddings.py`·`scripts/er_smoke.py`·`tests/test_backfill_embeddings.py`·`tests/test_er_smoke.py` 및 U1~U7 이 이미 만들었지만 아직 registry 에 없는 `app/er/*` 8모듈·기타 테스트 파일 — 05-remediation WARN 8건이 "대기(U8)"로 적어 둔 것은 실제로는 U9 몫), `README.md` 진행 표 P3 행("구현 완료 · 검증 대기")과 **ER 실행법 절**(스모크 실행 명령·환경변수 이름·`LLM_PROVIDER` 선택지·키 없을 때 rc=2, 백필 dry-run/--apply 명령과 rc=2 조건 — 값은 절대 적지 않는다)). U9 인계: 이 단위가 만든 registry 행 후보 문구와 README 실행법 절에 넣을 명령 두 가지(백필 dry-run/apply, 스모크 anthropic/openai)는 위임 보고의 "보고 형식"에 그대로 있다.
 - Refs: P3-er D4 D5 D6 R9 S3.3 원칙8 원칙9 security.md§1 security.md§6
+
+## 2026-09-06 17:30 · fix(P3-er): 승진 회귀 테스트 evidence 기록을 환경변수로 게이트 · pending
+- 변경: `tests/test_er_pipeline.py` — `_write_evidence()` 가 `ER_EVIDENCE_STAMP` 환경변수가 설정된 실행에서만 `<stamp>-promotion-trace-sql.txt` 를 쓰고, 없으면 아무 파일도 만들지 않는다(`None` 반환). 타임스탬프를 테스트가 직접 찍던 코드(`datetime.now().strftime`)를 제거하고 접두는 호출자가 준다. `os` import 추가·`datetime` import 제거. 미추적 잡파일 `evidence/20260906-0451-u7-promotion-trace-sql.txt`(U8 전체 실행 중 생성) 삭제.
+- 이유: U7 이 넣은 evidence 덤프가 **pytest 실행마다** 새 타임스탬프 파일을 만들어 미추적 파일이 쌓였다(U8 의 전체 실행에서 발견). 증거는 "재현 명령 출력"이어야 하고(verification.md) 실행 부산물이 저장소를 어지럽히면 안 된다. 게이트를 켠 실행 1회의 산출물이 곧 증거다.
+- 정합성 확인: 원칙8(재현 가능 — 명령에 `ER_EVIDENCE_STAMP=<접두>` 를 붙이면 같은 SQL 결과가 같은 이름으로 재생성됨)·원칙9(판정 근거는 trace 에 있고 evidence 는 그 조회 결과일 뿐 — 게이트가 근거를 줄이지 않음). 판정 방법 표 "trace 에 confidence_breakdown 존재" 행의 재현 명령은 `ER_EVIDENCE_STAMP=<접두> POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k promotion` 으로 읽는다(U9 README 실행법 절에 반영).
+- 검증: 게이트 없이 `-k promotion` → 1 passed, 새 미추적 파일 0 / `ER_EVIDENCE_STAMP=20260906-1730-fix-u7` 로 → 1 passed, `evidence/20260906-1730-fix-u7-promotion-trace-sql.txt` 생성(이 커밋에 포함) / 전체 `POSTGRES_PORT=5433 pytest tests/ -q -rs` → 398 passed, skip 0.
+- 남은 것: U9 에서 README 실행법 절에 게이트 변수 이름을 적는다.
+- Refs: P3-er 원칙8 원칙9
