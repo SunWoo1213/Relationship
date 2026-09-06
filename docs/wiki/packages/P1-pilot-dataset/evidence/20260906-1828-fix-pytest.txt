@@ -1,0 +1,7 @@
+# 재검증 (F-7bea05·F-1ba055 + 검사 (12)(13))
+커밋(평가 시점 HEAD): 1e1320c feat(P1-pilot-dataset): U1 시나리오 스키마·검증기·테스트 — JSON Schema 2020-12, 교차 검사 10항목, 위반 표본 8종
+명령: PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m pytest tests/test_validate_scenarios.py -q -rs
+
+...................................................                      [100%]
+51 passed in 1.15s
+pytest rc=0

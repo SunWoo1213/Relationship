@@ -5,6 +5,11 @@
 H-1(ambiguous) 예외, 결정 E(seed_persons), 함정 수(trap_count)를 각각 독립
 테스트로 둔다.
 
+검사 (12) surface-발화 대조·(13) 구어체 규칙(길이·턴 수)도 같은 방식으로 위반
+표본과 경계값(8/60자, 2/6턴)을 함께 둔다. 저장소 실물 데이터셋에 대한 단정은
+**건수에 의존하지 않는 불변식만** 쓴다(F-7bea05·F-1ba055) — U2~U4 가 데이터를
+채우는 동안 깨지는 단정은 검증기가 아니라 달력을 시험한다.
+
 네트워크·DB 를 쓰지 않는다. `tests/conftest.py` 의 `db_engine`/`db_session`
 픽스처를 **의존하지 않으므로** PostgreSQL 없이도 전부 돈다(`dbtest` 마커 없음).
 `app.db.models` 는 값 집합 튜플을 대조하기 위해서만 import 하며(검증기 본체는
@@ -397,6 +402,118 @@ def test_main_returns_2_for_missing_dir(tmp_path: Path):
 
 
 # --------------------------------------------------------------------------
+# 검사 (12) surface 가 그 turn 의 발화 안에 있는가
+# --------------------------------------------------------------------------
+
+
+def test_violation_12_surface_not_in_utterance(tmp_path: Path):
+    """(12) 발화에 없는 지칭을 라벨하면 FAIL -- 아무 모델도 맞힐 수 없는 라벨이다."""
+    bad = scenario()
+    bad["mentions"][0]["surface"] = "박팀장"
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [bad]}))
+    assert "SURFACE_NOT_IN_UTTERANCE" in codes(report)
+    assert "12" in checks(report)
+
+
+def test_check_12_does_not_normalize_whitespace(tmp_path: Path):
+    """(12) 공백을 정규화하지 않는다 -- "김 팀장" != "김팀장"."""
+    bad = scenario()
+    bad["mentions"][0]["surface"] = "김 팀장"
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [bad]}))
+    assert "SURFACE_NOT_IN_UTTERANCE" in codes(report)
+
+
+def test_check_12_surface_in_wrong_turn_fails(tmp_path: Path):
+    """(12) 발화 어딘가가 아니라 **그 turn** 의 발화에 있어야 한다."""
+    bad = scenario()
+    bad["mentions"][0]["surface"] = "부장님"  # 0턴이 아니라 1턴에 있는 말
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [bad]}))
+    assert any(
+        i.code == "SURFACE_NOT_IN_UTTERANCE" and "mentions[0]" in i.where
+        for i in report.issues
+    )
+
+
+def test_check_12_accepts_partial_substring(tmp_path: Path):
+    """(12) 부분 문자열이면 통과한다("김팀장" 안의 "팀장")."""
+    ok = scenario()
+    ok["mentions"][0]["surface"] = "팀장"
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [ok]}))
+    assert report.issues == [], [i.line() for i in report.issues]
+
+
+def test_check_12_skips_out_of_range_turn(tmp_path: Path):
+    """(12) turn 이 범위 밖이면 검사 (3) 만 보고한다(한 결함에 두 번 FAIL 금지)."""
+    bad = scenario()
+    bad["mentions"][0]["turn"] = 5
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [bad]}))
+    assert "TURN_OUT_OF_RANGE" in codes(report)
+    assert "SURFACE_NOT_IN_UTTERANCE" not in codes(report)
+
+
+# --------------------------------------------------------------------------
+# 검사 (13) 발화 길이·턴 수 (구어체 규칙)
+# --------------------------------------------------------------------------
+
+
+def shaped(lengths: list[int]) -> dict:
+    """길이가 정확히 `lengths` 인 발화들로 시나리오를 만든다(전부 "김팀장" 포함)."""
+    return scenario(
+        utterances=["김팀장" + "가" * (n - 3) for n in lengths],
+        mentions=[{"turn": 0, "surface": "김팀장", "gold_person_id": "p1"}],
+        events=[{"turn": 0, "type": "conflict", "occurred_at_kind": "relative"}],
+    )
+
+
+def test_shape_constants_match_plan():
+    """경계값은 01-plan 리스크 줄·U2 생성 프롬프트와 같은 숫자여야 한다."""
+    assert (vs.UTTERANCE_MIN_CHARS, vs.UTTERANCE_MAX_CHARS) == (8, 60)
+    assert (vs.MIN_TURNS, vs.MAX_TURNS) == (2, 6)
+
+
+@pytest.mark.parametrize("length", [7, 61])
+def test_violation_13_utterance_length_out_of_range(tmp_path: Path, length: int):
+    """(13) 7자·61자는 FAIL -- 너무 짧으면 지칭이 못 들어가고, 길면 문어체다."""
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [shaped([length, 12])]}))
+    assert "UTTERANCE_LENGTH" in codes(report)
+    assert "13" in checks(report)
+
+
+@pytest.mark.parametrize("length", [8, 60])
+def test_check_13_accepts_boundary_lengths(tmp_path: Path, length: int):
+    """(13) 8자·60자는 통과 -- 경계는 양끝을 **포함**한다."""
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [shaped([length, 12])]}))
+    assert report.issues == [], [i.line() for i in report.issues]
+
+
+@pytest.mark.parametrize("turns", [1, 7])
+def test_violation_13_turn_count_out_of_range(tmp_path: Path, turns: int):
+    """(13) 1턴·7턴은 FAIL."""
+    report = vs.run(
+        write_dataset(tmp_path, {"promotion.json": [shaped([12] * turns)]})
+    )
+    assert "TURN_COUNT" in codes(report)
+    assert "13" in checks(report)
+
+
+@pytest.mark.parametrize("turns", [2, 6])
+def test_check_13_accepts_boundary_turn_counts(tmp_path: Path, turns: int):
+    """(13) 2턴·6턴은 통과."""
+    report = vs.run(
+        write_dataset(tmp_path, {"promotion.json": [shaped([12] * turns)]})
+    )
+    assert report.issues == [], [i.line() for i in report.issues]
+
+
+def test_check_names_cover_registered_checks():
+    """사람이 읽는 출력·`--json` 요약이 새 검사도 다른 검사와 같은 형식으로 낸다."""
+    assert set(vs.CHECK_NAMES) == {
+        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "13"
+    }
+    assert "11" not in vs.CHECK_NAMES  # U5 예정 -- 하지 않는 검사에 PASS 를 찍지 않는다
+
+
+# --------------------------------------------------------------------------
 # 값 집합이 app.db.models 와 글자 그대로 같은가
 # --------------------------------------------------------------------------
 
@@ -461,23 +578,53 @@ def test_schema_versions_match(scenario_schema: dict, manifest_schema: dict):
 
 
 # --------------------------------------------------------------------------
-# 현재 저장소 상태(시나리오 0건)
+# 빈 데이터셋 · 저장소 실물 (시점 무관 단정만)
 # --------------------------------------------------------------------------
 
 
-def test_repository_dataset_passes_with_zero_scenarios(capsys):
-    """U1 시점: 시나리오 파일이 아직 없어도 검증기는 rc=0 · 총 0건."""
-    assert vs.main(["--dir", str(REPO_SCENARIOS), "--json"]) == 0
+def test_empty_dataset_passes_with_zero_scenarios(tmp_path: Path, capsys):
+    """시나리오 **파일이 하나도 없어도** 검증기는 rc=0 · 총 0건이다.
+
+    U1 의 검사 의도(F-7bea05 해결 1단계)를 저장소 대신 빈 fixture 로 옮겼다.
+    저장소를 대상으로 `total == 0` 을 단정하면 U2 가 데이터를 넣는 순간 깨지는
+    **시점 의존 단정**이 된다 — 검증기의 성질이 아니라 달력을 시험하게 된다.
+    """
+    write_dataset(tmp_path, files={})
+    assert vs.main(["--dir", str(tmp_path), "--json"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["ok"] is True
     assert payload["total"] == 0
     assert payload["scenario_count"] == 0
     assert payload["counts"] == {c: 0 for c in vs.CATEGORIES}
     assert [f["file"] for f in payload["files"]] == list(CATEGORY_FILES)
+    assert [f["exists"] for f in payload["files"]] == [False] * len(CATEGORY_FILES)
+
+
+def test_repository_dataset_satisfies_time_invariant_properties(capsys):
+    """저장소 데이터셋: 건수에 의존하지 않는 불변식만 본다(F-7bea05 2단계).
+
+    U2~U4 가 시나리오를 채우는 동안에도 참이어야 하는 것 — rc=0, manifest 와
+    실제 건수 일치, 카테고리 키 집합, 파일 순서.
+    """
+    real_manifest = json.loads(
+        (REPO_SCENARIOS / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert vs.main(["--dir", str(REPO_SCENARIOS), "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["ok"] is True
+    assert payload["total"] == real_manifest["total"]
+    assert payload["scenario_count"] == real_manifest["total"]
+    assert set(payload["counts"]) == set(vs.CATEGORIES)
+    assert payload["counts"] == real_manifest["counts"]
+    assert [f["file"] for f in payload["files"]] == list(CATEGORY_FILES)
 
 
 def test_repository_manifest_generator_keys_exist():
-    """H-2 -- U1 에서는 값이 비어 있어도 generator 키는 존재해야 한다."""
+    """H-2 -- generator 키 5종은 값이 비어 있든 채워졌든 **항상** 존재해야 한다.
+
+    값이 채워졌는지(`model_id`·`prompt_ref` != null)는 U5/U7 수용 기준이 본다.
+    테스트에 넣으면 U2~U4 진행 중 다시 시점 의존이 된다(F-1ba055 2단계).
+    """
     real_manifest = json.loads(
         (REPO_SCENARIOS / "manifest.json").read_text(encoding="utf-8")
     )
@@ -488,7 +635,13 @@ def test_repository_manifest_generator_keys_exist():
         "seed_reason",
         "same_family_as_judge",
     }
-    assert real_manifest["virtual_names"] == []
+    names = real_manifest["virtual_names"]
+    # F-1ba055 -- `== []` 는 U1 시점에서만 참이다. 시점 무관 성질만 본다:
+    # 문자열 목록이고, 비어 있지 않은 값이며, 중복이 없다(중복은 검사 (7) 의
+    # 화이트리스트를 부풀리기만 하고 아무 것도 더 허용하지 않는다).
+    assert isinstance(names, list)
+    assert all(isinstance(n, str) and n.strip() for n in names)
+    assert len(set(names)) == len(names), "virtual_names 에 중복이 있다"
 
 
 def test_repository_manifest_validates_against_manifest_schema(manifest_schema: dict):

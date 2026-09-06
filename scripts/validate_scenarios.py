@@ -36,6 +36,25 @@
 (8)  manifest `ambiguous_mention_count` 불일치              `check_ambiguous_count`
 (9)  `seed_persons` 가 `persons` 의 부분집합이 아님          `check_seed_persons`
 (10) manifest `trap_count` 불일치                              `check_trap_count`
+(11) — **비워 둔다.** 파일명 <-> `category` 일치 검사는 U5 예정.
+(12) `mentions[].surface` 가 그 turn 의 발화에 없음     `check_surface_in_utterance`
+(13) 발화 길이·턴 수가 구어체 규칙 밖                     `check_utterance_shape`
+
+교차 검사는 12항목((1)~(10)·(12)·(13))이고, 여기에 적재 (0) 을 더한 13행이
+사람이 읽는 출력·`--json` 요약의 검사 줄이다. (11) 은 번호만 예약해 둔다 —
+비워 둔 번호에 PASS 를 찍으면 하지 않은 검사가 통과로 보인다.
+
+구어체 규칙 (검사 (13), 01-plan 리스크 "한국어 구어체 부족")
+--------------------------------------------------------
+01-plan 85행: "LLM 초안은 문어체·완결 문장으로 기울고 ... 완화: ... (d) **발화
+길이 8~60자** 규칙을 두고 검수 항목에 넣는다. 이 리스크가 현실화되면 P4 수치가
+실사용보다 좋게 나온다 — 즉 **과대평가 방향의 편향**이므로 반드시 검수에서
+잡는다." 턴 수 2~6 은 같은 규칙을 U2 생성 프롬프트가 옮겨 적은 값이다
+(`evidence/20260906-1850-gen-prompt-u2.md` 28행 "발화 길이 8~60자, 턴 수 2~6").
+
+경계값은 모듈 상수 `UTTERANCE_MIN_CHARS`/`UTTERANCE_MAX_CHARS`/`MIN_TURNS`/
+`MAX_TURNS` 에 둔다. 길이는 **공백을 포함한 문자 수**(`len(str)`)다 — 형태소·
+어절이 아니라 사람이 눈으로 셀 수 있는 값이어야 검수에서 다툼이 없다.
 
 이름 판정 규칙 (검사 (7), 01-plan 리스크 "개인정보")
 ----------------------------------------------------
@@ -116,6 +135,15 @@ CATEGORIES: tuple[str, ...] = (
 #: 검사 (7) 의 "한글 2~4자 성명 패턴". 위 docstring "이름 판정 규칙" 참조.
 KOREAN_NAME_PATTERN = re.compile("^[가-힣]{2,4}$")
 
+#: 검사 (13) 발화 길이 경계(문자 수, 공백 포함). 근거는 위 docstring "구어체 규칙"
+#: 절 — 01-plan 리스크 "한국어 구어체 부족" 의 완화책 (d).
+UTTERANCE_MIN_CHARS = 8
+UTTERANCE_MAX_CHARS = 60
+
+#: 검사 (13) 시나리오당 턴 수 경계. 같은 절 참조(U2 생성 프롬프트 28행).
+MIN_TURNS = 2
+MAX_TURNS = 6
+
 #: 검사 번호 -> 사람이 읽는 이름(출력·JSON 요약에서 같은 문자열을 쓴다).
 CHECK_NAMES: dict[str, str] = {
     "0": "적재(manifest·시나리오 파일 읽기)",
@@ -129,6 +157,9 @@ CHECK_NAMES: dict[str, str] = {
     "8": "manifest ambiguous_mention_count 일치",
     "9": "seed_persons ⊆ persons",
     "10": "manifest trap_count 일치",
+    # (11) 파일명<->category 일치는 U5 예정 — 하지 않는 검사에 PASS 를 찍지 않는다.
+    "12": "mentions.surface 가 그 turn 발화 안",
+    "13": "발화 길이·턴 수(구어체 규칙)",
 }
 
 
@@ -683,6 +714,105 @@ def check_trap_count(dataset: Dataset) -> list[Issue]:
 
 
 # --------------------------------------------------------------------------
+# 검사 (12)~(13) 발화 본문 대조
+# --------------------------------------------------------------------------
+
+
+def check_surface_in_utterance(dataset: Dataset) -> list[Issue]:
+    """(12) `mentions[].surface` 는 `utterances[turn]` 안에 그대로 들어 있어야 한다.
+
+    라벨의 `surface` 가 발화에 없으면 그 mention 은 **어떤 모델도 맞힐 수 없는
+    라벨**이다(지칭 표현이 원문과 다르다). P4 의 분모에 들어가는 순간 모든 방식의
+    Recall 을 똑같이 깎아 베이스라인 비교를 흐린다.
+
+    부분 문자열 **정확 일치**로 본다 — 공백을 정규화하지 않는다. "김 팀장" 과
+    "김팀장" 을 검증기가 같다고 봐 주면, 실행기(P3-baselines·P4)가 원문에서
+    지칭을 잘라낼 때 쓰는 오프셋과 라벨이 어긋난 채 통과한다.
+
+    `turn` 이 범위 밖이거나 타입이 틀린 경우는 검사 (3)/(1) 의 몫이라 건너뛴다
+    (한 결함에 두 번 FAIL 을 내면 소견 수가 부풀어 원인 추적이 어려워진다).
+    """
+    issues: list[Issue] = []
+    for file_name, scenario in dataset.scenarios:
+        if not isinstance(scenario, dict):
+            continue
+        utterances = scenario.get("utterances")
+        if not isinstance(utterances, list):
+            continue
+        for index, mention in enumerate(_dict_items(scenario.get("mentions"))):
+            surface = mention.get("surface")
+            turn = mention.get("turn")
+            if not isinstance(surface, str):
+                continue  # 타입 위반은 스키마 검사 (1)
+            if not isinstance(turn, int) or isinstance(turn, bool):
+                continue
+            if not 0 <= turn < len(utterances):
+                continue  # 범위 위반은 검사 (3)
+            utterance = utterances[turn]
+            if not isinstance(utterance, str):
+                continue
+            if surface not in utterance:
+                issues.append(
+                    Issue(
+                        "12",
+                        "SURFACE_NOT_IN_UTTERANCE",
+                        _where(file_name, scenario, f"mentions[{index}]({surface})"),
+                        f"surface={surface!r} 가 utterances[{turn}]={utterance!r} 안에 없다"
+                        " (공백 정규화 없이 부분 문자열 정확 일치)",
+                    )
+                )
+    return issues
+
+
+def check_utterance_shape(dataset: Dataset) -> list[Issue]:
+    """(13) 발화 길이 8~60자·시나리오당 턴 수 2~6 (구어체 규칙).
+
+    근거는 모듈 docstring "구어체 규칙" 절(01-plan 리스크 "한국어 구어체 부족",
+    U2 생성 프롬프트 28행). 경계는 `UTTERANCE_MIN_CHARS`/`UTTERANCE_MAX_CHARS`/
+    `MIN_TURNS`/`MAX_TURNS` 상수이고 **양끝을 포함**한다(8자·60자·2턴·6턴은 통과).
+
+    길이 규칙이 잡는 것은 두 방향의 편향이다. 너무 짧으면("응", "ㅇㅇ") 지칭이
+    들어갈 자리가 없어 라벨이 붙지 않고, 너무 길면 LLM 이 쓴 문어체 서술이라
+    실사용보다 쉬운 입력이 된다 — 둘 다 P4 수치를 실제보다 좋게 만든다.
+
+    이 검사는 **문체**를 판정하지 않는다(ㅋㅋ·오타·조사 생략은 사람 검수 U6 의
+    항목이다). 기계가 셀 수 있는 것만 센다.
+    """
+    issues: list[Issue] = []
+    for file_name, scenario in dataset.scenarios:
+        if not isinstance(scenario, dict):
+            continue
+        utterances = scenario.get("utterances")
+        if not isinstance(utterances, list):
+            continue  # 타입 위반은 스키마 검사 (1)
+        turns = len(utterances)
+        if not MIN_TURNS <= turns <= MAX_TURNS:
+            issues.append(
+                Issue(
+                    "13",
+                    "TURN_COUNT",
+                    _where(file_name, scenario, "utterances"),
+                    f"턴 수 {turns} 가 규칙({MIN_TURNS}~{MAX_TURNS}턴) 밖이다",
+                )
+            )
+        for index, utterance in enumerate(utterances):
+            if not isinstance(utterance, str):
+                continue
+            length = len(utterance)
+            if not UTTERANCE_MIN_CHARS <= length <= UTTERANCE_MAX_CHARS:
+                issues.append(
+                    Issue(
+                        "13",
+                        "UTTERANCE_LENGTH",
+                        _where(file_name, scenario, f"utterances[{index}]"),
+                        f"길이 {length}자 가 규칙"
+                        f"({UTTERANCE_MIN_CHARS}~{UTTERANCE_MAX_CHARS}자, 공백 포함) 밖이다",
+                    )
+                )
+    return issues
+
+
+# --------------------------------------------------------------------------
 # 실행
 # --------------------------------------------------------------------------
 
@@ -704,6 +834,8 @@ def run(directory: Path, *, strict: bool = False) -> Report:
     issues.extend(check_ambiguous_count(dataset))
     issues.extend(check_seed_persons(dataset))
     issues.extend(check_trap_count(dataset))
+    issues.extend(check_surface_in_utterance(dataset))
+    issues.extend(check_utterance_shape(dataset))
 
     return Report(
         directory=directory,

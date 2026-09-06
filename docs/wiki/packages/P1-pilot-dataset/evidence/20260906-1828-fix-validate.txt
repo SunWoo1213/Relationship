@@ -1,0 +1,84 @@
+# 저장소 실물 데이터셋 재검증 (검사 12항목)
+커밋(평가 시점 HEAD): 1e1320c
+명령: PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/validate_scenarios.py
+
+== validate_scenarios data/scenarios ==
+[info] strict=False schema_version=1
+[info] promotion.json: 8건
+[info] pronoun.json: 파일 없음(0건으로 취급)
+[info] alias.json: 8건
+[info] normal.json: 파일 없음(0건으로 취급)
+[info] new_person.json: 파일 없음(0건으로 취급)
+[PASS] (0) 적재(manifest·시나리오 파일 읽기)
+[PASS] (1) 스키마 위반
+[PASS] (2) gold_person_id 교차(H-1 ambiguous 예외 포함)
+[PASS] (3) turn 범위
+[PASS] (4) id 전역 유일
+[PASS] (5) events.type enum
+[PASS] (6) manifest counts·total 일치
+[PASS] (7) virtual_names 화이트리스트
+[PASS] (8) manifest ambiguous_mention_count 일치
+[PASS] (9) seed_persons ⊆ persons
+[PASS] (10) manifest trap_count 일치
+[PASS] (12) mentions.surface 가 그 turn 발화 안
+[PASS] (13) 발화 길이·턴 수(구어체 규칙)
+[info] 카테고리별: promotion=8 pronoun=0 alias=8 normal=0 new_person=0
+== 결과: 시나리오 16건 / 오류 0 ==
+rc=0
+--- json ---
+{
+  "ambiguous_mention_count": 1,
+  "counts": {
+    "alias": 8,
+    "new_person": 0,
+    "normal": 0,
+    "promotion": 8,
+    "pronoun": 0
+  },
+  "dir": "data/scenarios",
+  "files": [
+    {
+      "count": 8,
+      "exists": true,
+      "file": "promotion.json"
+    },
+    {
+      "count": 0,
+      "exists": false,
+      "file": "pronoun.json"
+    },
+    {
+      "count": 8,
+      "exists": true,
+      "file": "alias.json"
+    },
+    {
+      "count": 0,
+      "exists": false,
+      "file": "normal.json"
+    },
+    {
+      "count": 0,
+      "exists": false,
+      "file": "new_person.json"
+    }
+  ],
+  "issue_count": 0,
+  "issues": [],
+  "ok": true,
+  "scenario_count": 16,
+  "schema_version": 1,
+  "strict": false,
+  "total": 16,
+  "trap_count": 8
+}
+json rc=0
+
+--- 변이 검출 (저장소 데이터 사본을 scratchpad 에서 일부러 깨뜨림 — 저장소 데이터는 수정하지 않음) ---
+변이: sc-001 mentions[0].surface="없는지칭" / sc-002 utterances[0]="ㅇㅇ" / sc-003 턴 1개로 절단
+[FAIL] (12) SURFACE_NOT_IN_UTTERANCE promotion.json:sc-001:mentions[0](없는지칭): surface='없는지칭' 가 utterances[0]='오늘 김팀장이랑 회의 또 길어졌음ㅋㅋ' 안에 없다 (공백 정규화 없이 부분 문자열 정확 일치)
+[FAIL] (12) SURFACE_NOT_IN_UTTERANCE promotion.json:sc-002:mentions[0](이대리): surface='이대리' 가 utterances[0]='ㅇㅇ' 안에 없다 (공백 정규화 없이 부분 문자열 정확 일치)
+[FAIL] (13) TURN_COUNT promotion.json:sc-003:utterances: 턴 수 1 가 규칙(2~6턴) 밖이다
+[FAIL] (13) UTTERANCE_LENGTH promotion.json:sc-002:utterances[0]: 길이 2자 가 규칙(8~60자, 공백 포함) 밖이다
+== 결과: 시나리오 16건 / 오류 4 ==
+rc=1
