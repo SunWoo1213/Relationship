@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-06 17:35 (L-003 결정: 수정 계속. evidence 게이트 FIX 커밋 대기, 다음 U9)
-active: **P3-er** | frozen: none | 브랜치: dev (**dev = origin/dev = 107ace3**, main = b676799 — 9커밋 뒤). L-003 결정(17:25): **수정 계속**(`--decision fix`), 승격은 04-review 뒤. **U1~U8 커밋(2b82882·2c63c60·02e6f14·593c254·b1f2782·d6e5949·cc5d24f·107ace3), dev 푸시 완료**. FIX(승진 테스트 evidence 를 `ER_EVIDENCE_STAMP` 로 게이트, 잡파일 삭제) 완료·커밋 대기 → **다음 U9 시작 승인(L-004)** → verifier 04-review
+갱신: 2026-09-06 18:40 (U9 완료·커밋 대기 → 다음은 verifier 04-review 승인)
+active: **P3-er** | frozen: none | 브랜치: dev (**dev = origin/dev = 107ace3**, main = b676799 — 9커밋 뒤). L-003 결정(17:25): **수정 계속**(`--decision fix`), 승격은 04-review 뒤. **U1~U8 커밋(2b82882·2c63c60·02e6f14·593c254·b1f2782·d6e5949·cc5d24f·107ace3), dev 푸시 완료**. FIX a807364 · **U9 완료(커밋은 journal COMMIT 줄 참조) — U1~U9 전부 완료**. 다음: **verifier(fable) 04-review 시작 승인(L-004)** → 소견 처리 → /devlog done → 푸시·승격
 
 ## 지금 어디까지
 - **P3-er 착수 진행 중(2026-09-05)**: 사용자 "P3-er 시작해줘" → 선행 확인(P2-tools 완료 b676799, 닫는 R4 R9, 카드 S3.3 D3 D10 D5, .env.example 에 ANTHROPIC_API_KEY·ANTHROPIC_MODEL·OPENAI_API_KEY 이름 있음, anthropic·openai 미설치) → `--stage architect` → architect(opus) 01-plan 초안 U1~U8(app/er/{types,dictionary,candidates,rules,judge,confidence,pipeline}, Anthropic tool_use 강제 구조화 출력·실패 시 안전 강등 s_llm=0→identity, resolve() 부수효과 0 + apply_resolution(), trace 1행 step=er_resolve tool_name="er", FakeJudge+grouped_embedder 회귀 3종, 벡터 인덱스 연기, U1 F-ca12ad begin_nested) → verify-plan FAIL 1(02-plan-verify 부재)/WARN 8(기존 행) → **사용자 확인 3건(23:45 DECISION)**: 별칭만 누적·이름은 확인 후 / tool_name="er" / 인덱스 연기·공급자 이동·의존성 추가 → verifier 02-plan-verify **보류**(FAIL 0/WARN 9: 점검표 #2 원칙 보류 1 + 기존 행 8; 필수 3: F-138665 confidence 후보 귀속·null 구간 / F-f43a9d resolve 부수효과 0 vs trace applied 필드 / F-8c6354 승진 픽스처 위계; 권고 7) → **사용자 결정(00:10 DECISION)**: LLM 이 고른 인물의 값·null 은 병합 금지 / apply 가 같은 행 갱신 / 픽스처 hierarchy=동 → `--stage architect` 2회차 → 개정 1(결정 3-c 신설·결정 4 apply 부분 갱신·결정 9·10 승진 픽스처 hierarchy=동·직급→위계 표(USER_RANK_ANCHOR=2)·결정 2 배제 규칙 수정, 권고 7 반영, U6 분할 → U1~U9, 신규 리스크: 부동소수 round·힌트 없는 상한 0.8=T_merge→P4 인계) → verify-plan FAIL 0/WARN 9(옛 보류 표기 1 + 기존 행 8) → `--stage verifier` 2회차 → 재검증 **통과**(FAIL 0/WARN 8 의도, 보류 3 닫힘·권고 7 해소, 새 권고 6: F-7fe239 허용오차 1e-9 / F-93f063 JSONB 갱신 원시 SQL 재조회 / F-8809f2 apply 중복 거부 / F-f3b245 llm_failed 귀속 / F-5a97ef 범위 집합 통일 / F-1d65ac null 경로 테스트) → **사용자 계획 승인(2026-09-06 01:00)** → active: P3-er.
@@ -30,7 +30,8 @@ active: **P3-er** | frozen: none | 브랜치: dev (**dev = origin/dev = 107ace3*
 9. (완료) **U7** — apply_resolution(merge→update_person 별칭만·display_name 무변경 / identity·new_person→ask_user 저장(ask_payload 에서 kind·question·options·context 4키만 — affirmative_options 는 context 안, 03-log 기록) / trace 행 decision.applied·pending_question_id·applied_at 세 필드만 flag_modified 부분 갱신 / 중복 apply → AlreadyApplied(InvalidValue)), grouped_embedder 픽스처, **회귀 3종 통과 — 승진 s_llm 0.95·s_emb 0.849·s_rule 0.667(2/3)·confidence 0.863·merge·relaxed_retry True·별칭 "부장님" 추가·display_name 무변경 / 이모 relation_tag_conflict·LLM 생략·new_person 질문 1행 / 동명이인 0.575·identity 질문 1행·options 2 이름**, applied 원시 SQL 검증(판정 필드 바이트 동일), pytest 375/skip 0(evidence `20260906-1332-u7-*.txt`, 승진 trace SQL 덤프 포함). 03-log U7 pending 해시는 다음 커밋에서 교체.
 10. (완료) **U8** — scripts/backfill_embeddings.py(dry-run 기본·--apply·--batch-size·--limit, --apply 에 OPENAI_API_KEY 없으면 exit 2, session_scope 로 배치 flush·끝에 commit, .env 미독), scripts/er_smoke.py(judge_from_env·--provider, 키 없으면 exit 2, JudgeUnavailable exit 3, JSON 한 줄, 프롬프트·키 미출력, er_config 실제 설정 사용), 테스트 14+9. dry-run 실측 대상 0건(U2 이후 별칭 저장 시 임베딩 항상 채움), pytest 398/skip 0(evidence `20260906-1350-u8-*.txt`). **실 LLM 스모크는 사용자 실행 대기**: `ANTHROPIC_API_KEY=… python scripts/er_smoke.py` 또는 `LLM_PROVIDER=openai OPENAI_API_KEY=… python scripts/er_smoke.py --provider openai` → evidence 로 리다이렉트. **발견: tests/test_er_pipeline.py 승진 테스트가 실행마다 타임스탬프 새 evidence 파일을 씀(미추적 파일 남발) → 환경변수로 게이트하는 FIX 필요.**
 11. (완료) FIX — `_write_evidence` 를 `ER_EVIDENCE_STAMP` 게이트(없으면 미기록), 잡파일 삭제, 게이트 on/off 검증·398 passed. README 실행법에 변수 이름 반영은 U9.
-12. **다음: U9 registry·README·수용 기준 기계 검증** — 시작 전 AskUserQuestion → `--stage backend-agent`. registry 신규 행(app/er 8모듈·scripts 2·tests 9)+기존 행 비고, README P3 행·ER 실행법 절(변수 이름만, `ER_EVIDENCE_STAMP` 포함), 회귀 3종 단독·SQL 조회·alembic·tools_check 증거 재수집, verify-impl.sh 사전 실행.
+12. (완료) **U9** — registry 신규 20행(app/er 8·scripts 2·tests 10)+기존 9행 비고(WARN 8 해소)+`.env.example` 행 신설(메인 세션), README P3 행 "구현 완료·검증 대기"·"엔티티 해석(ER) 실행법" 절, 판정 방법 표 전 행 재실행(evidence `20260906-1418-u9-*.txt`: pytest 398/skip 0, 회귀 3종 3 passed, 승진 SQL 덤프, threshold 4·boundary 7, applied·stages·no_side_effect, flush_failure·dimension, alembic 무변경, tools_check 7/7, backfill dry-run 0건, smoke rc 2, dotenv 0, 키 값 접근 0), **verify-impl FAIL 0 / WARN 2**(04-review 부재·U9 미체크 — 둘 다 이 커밋에서 해소되거나 04-review 후 해소). verify-impl 내부 pytest 는 POSTGRES_PORT 없이 돌아 150 skip 표시(하네스 한계, P2 관찰과 동일 — 직접 실행 398 이 증거). 03-log U8·FIX 해시 반영.
+13. **다음: verifier 04-review** — AskUserQuestion → `--stage verifier` → Agent(verifier) 1회: 수용 기준(01-plan 121행~)·판정 방법 표·회귀 3종·trace breakdown·원칙 1~4 침범 grep·권고 6건 닫힘 판정·R4 실호출 미검증 표기(F-5aaf28)·F-5a97ef 완결 여부. 결과 `완료`면 /devlog done(backlog·CURRENT none·review-index R4 R9) → 푸시 → 승격 결정.
 
 ## 재개 시 읽을 카드 (이것만)
 - `docs/wiki/CURRENT.md`, `docs/wiki/INDEX.md`, `.claude/gitlog.md`
@@ -38,7 +39,7 @@ active: **P3-er** | frozen: none | 브랜치: dev (**dev = origin/dev = 107ace3*
 - `lessons/L-001`~`L-004`
 
 ## 열린 질문 · 사용자 결정 대기
-- **U9 시작 승인(L-004)**. 스모크 실 호출 시점(키 필요, 사용자 실행). 승격은 04-review 완료 뒤. P1-pilot-dataset·P0-cost 착수 시점.
+- **verifier 04-review 시작 승인(L-004)**. 스모크 실 호출 시점(키 필요, 사용자 실행 — 04-review 는 없으면 "실호출 미검증" 으로 표기). 승격은 04-review 완료 뒤. P1-pilot-dataset·P0-cost 착수 시점.
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)
 - 재개 시 커밋 안 된 변경·진행 중 항목이 있으면 **먼저 사용자에게 목록을 보이고 우선순위를 묻는다**(`/devlog resume`).

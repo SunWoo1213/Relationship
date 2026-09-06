@@ -1,0 +1,3 @@
+grep -rn dotenv app/ scripts/backfill_embeddings.py scripts/er_smoke.py
+MATCH_COUNT=0
+exit=0

@@ -1,0 +1,23 @@
+== verify-impl P3-er  (20260906-1420) ==
+ss...ssssssssssssssssssssssssssssssssssssssssssssssssssssssss.ssssssssss [ 90%]
+ssssssssssssssssssssssssss............                                   [100%]
+248 passed, 150 skipped in 6.26s
+PASS  pytest 통과 → evidence/20260906-1420-pytest.txt
+PASS  compileall 통과 → evidence/20260906-1420-lint.txt
+PASS  태그 P3-er 커밋 15 건 → evidence/20260906-1420-commits.txt
+PASS  커밋에 태그 존재: D1
+PASS  커밋에 태그 존재: D10
+PASS  커밋에 태그 존재: D2
+PASS  커밋에 태그 존재: D3
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: D5
+PASS  커밋에 태그 존재: D6
+PASS  커밋에 태그 존재: R4
+PASS  커밋에 태그 존재: R9
+PASS  커밋에 태그 존재: S3.3
+PASS  커밋에 태그 존재: S3.4
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P3-er 행 있음
+WARN  미완료 작업 단위 1 개
+== 결과: FAIL=0 WARN=2 → evidence/20260906-1420-summary.txt ==
+exit=0

@@ -71,7 +71,7 @@
 | P1 | 스키마 v2 마이그레이션 (Alembic) | **완료** — 9테이블·CHECK 4·FK CASCADE 6·`vector(1536)`·인덱스 10, upgrade/downgrade 왕복·`alembic check` 통과, verifier 04-review 완료 |
 | P1 | 파일럿 데이터셋 | 대기 |
 | P2 | 툴 7종 v2 + FastAPI 골격 | **완료** — 시그니처 = CLAUDE.md(tools_check 7/7), ask_user→pending_questions, D1 확인 강제, GET /health·POST /answers, pytest 206, verifier 04-review 완료 |
-| P3 | 엔티티 해석 4단계 · 베이스라인 | 대기 |
+| P3 | 엔티티 해석 4단계 · 베이스라인 | **구현 완료 · 검증 대기** — ER 4단계(app/er) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity), 판정기 공급자 중립(Claude·OpenAI, `LLM_PROVIDER`), pytest 398 |
 | P4 | **파일럿 평가(게이트)** — 여기서 임계치·보정표 확정 | 대기 |
 | P5~P9 | 에이전트 루프 · 메모리 · 브리핑 · 푸시 · 프론트 · 인프라 | P4 통과 후 |
 
@@ -213,6 +213,42 @@ curl -X POST http://localhost:8000/answers/1 \
 | 422 | 저장된 `options` 밖의 답, 요청 본문 형식 오류 |
 
 이 두 엔드포인트(`GET /health`, `POST /answers/{question_id}`)는 답 저장까지만 한다 — 채팅·에이전트 루프(발화 → 툴 선택 → 응답, 저장된 context로 루프 재개)는 P5 에서 붙는다.
+
+### 엔티티 해석(ER) 실행법
+
+`app/er/`가 4단계(후보 검색 → 규칙 필터 → LLM 판정 → 확신도 분기)를 구현한다. 아래 명령은 실 PostgreSQL(로컬 포트가 5432가 아니면 `POSTGRES_PORT`를 앞에 붙인다)과 `.env`를 읽지 않는 `os.environ` 기반 설정을 전제로 한다 — **값·키 문자열은 이 문서에 적지 않는다.**
+
+```bash
+# 회귀 3종(승진 연결·이모 배제·동명이인 분리) 단독
+POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k "promotion or aunt or homonym"
+
+# 전체 테스트
+POSTGRES_PORT=5433 python -m pytest tests/ -q -rs
+```
+
+- 승진 회귀의 `agent_traces` 증거(SQL 조회 결과)를 다시 만들려면 `ER_EVIDENCE_STAMP`로 접두를 준다 — 접두가 없으면 파일을 만들지 않는다(반복 실행이 저장소를 어지럽히지 않도록):
+
+```bash
+ER_EVIDENCE_STAMP=<접두> POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k promotion
+```
+
+- **NULL 임베딩 백필** (`person_aliases.embedding IS NULL`인 별칭을 채운다, 기본은 쓰기 없는 조회):
+
+```bash
+POSTGRES_PORT=5433 python scripts/backfill_embeddings.py --dry-run
+POSTGRES_PORT=5433 python scripts/backfill_embeddings.py --apply   # OPENAI_API_KEY 필요 — 없으면 종료 코드 2
+```
+
+- **실 LLM 판정 스모크** (후보 2개짜리 판정 1회, 자동 테스트에는 포함하지 않는다 — 재현 불가능한 지표를 만들지 않기 위해):
+
+```bash
+python scripts/er_smoke.py                       # LLM_PROVIDER=anthropic(기본), ANTHROPIC_API_KEY·ANTHROPIC_MODEL 필요
+python scripts/er_smoke.py --provider openai      # OPENAI_API_KEY·OPENAI_MODEL 필요
+```
+
+  키가 없으면 종료 코드 2로 안내만 하고 끝난다(키·프롬프트 원문은 어떤 경우에도 출력하지 않는다). 출력은 `{provider, model, tokens_in, tokens_out, s_llm, matched_person_id, reason, confidence, band}` 키를 가진 JSON 한 줄이다. `gemini`는 예약값일 뿐 아직 구현되지 않았다(팩토리가 사람이 읽는 오류를 낸다).
+
+- **임계치·가중치 조정**: 환경변수 이름 `T_MERGE`·`T_NEW`·`W_LLM`·`W_EMB`·`W_RULE`(값은 `.env.example`에 이름만 있다 — 이 문서와 에이전트는 `.env`를 읽지 않는다). 조정은 P4-pilot-eval의 트레이드오프 곡선 결과로만 한다.
 
 ## 문서 안내
 

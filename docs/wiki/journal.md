@@ -89,3 +89,4 @@
 - 2026-09-06 13:19 | COMMIT | d6e5949 feat(P3-er): U6 resolve() 파이프라인·trace 1행 — 4단계 조립, 부수효과 0, Resolution.trace_id
 - 2026-09-06 13:42 | COMMIT | cc5d24f feat(P3-er): U7 apply_resolution·회귀 3종 — 승진 연결/이모 배제/동명이인, trace 부분 갱신
 - 2026-09-06 13:56 | COMMIT | 107ace3 feat(P3-er): U8 백필·스모크 스크립트 — backfill_embeddings(dry-run 기본)·er_smoke(공급자 선택)
+- 2026-09-06 14:11 | COMMIT | a807364 fix(P3-er): 승진 회귀 테스트 evidence 기록을 ER_EVIDENCE_STAMP 로 게이트 — 실행마다 파일 남발 중단

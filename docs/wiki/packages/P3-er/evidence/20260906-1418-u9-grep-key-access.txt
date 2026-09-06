@@ -1,0 +1,21 @@
+grep -rn 'ANTHROPIC_API_KEY|OPENAI_API_KEY|GEMINI_API_KEY|sk-' app/er/
+app/er/judge.py:29:키(`ANTHROPIC_API_KEY`/`OPENAI_API_KEY`)는 각 SDK 클라이언트가 **내부에서**
+app/er/judge.py:208:    만든다 -- 키는 인자로 넘기지 않고 SDK 가 `ANTHROPIC_API_KEY` 를
+app/er/judge.py:295:    키는 SDK 가 `OPENAI_API_KEY` 를 환경변수에서 읽는다(security.md §1).
+Binary file app/er/__pycache__/judge.cpython-313.pyc matches
+---
+grep -rn 'ANTHROPIC_API_KEY|OPENAI_API_KEY|GEMINI_API_KEY|sk-|api_key' scripts/backfill_embeddings.py scripts/er_smoke.py
+scripts/backfill_embeddings.py:10:`OPENAI_API_KEY` 는 `os.environ` 에서만 읽는다(실제로 읽는 것은
+scripts/backfill_embeddings.py:17:    OPENAI_API_KEY=... POSTGRES_PORT=5433 python scripts/backfill_embeddings.py --apply
+scripts/backfill_embeddings.py:21:    2 = `--apply` 인데 `OPENAI_API_KEY` 가 없음
+scripts/backfill_embeddings.py:97:        help="실제로 임베딩을 계산해 쓴다. OPENAI_API_KEY 필요",
+scripts/backfill_embeddings.py:124:    if args.apply and not os.environ.get("OPENAI_API_KEY"):
+scripts/backfill_embeddings.py:126:            "[error] OPENAI_API_KEY 환경변수가 설정되지 않았다. --apply 는 "
+scripts/er_smoke.py:11:(`anthropic` → `ANTHROPIC_API_KEY`, `openai` → `OPENAI_API_KEY`)가
+scripts/er_smoke.py:19:    ANTHROPIC_API_KEY=... python scripts/er_smoke.py
+scripts/er_smoke.py:20:    LLM_PROVIDER=openai OPENAI_API_KEY=... python scripts/er_smoke.py --provider openai
+scripts/er_smoke.py:43:    "anthropic": "ANTHROPIC_API_KEY",
+scripts/er_smoke.py:44:    "openai": "OPENAI_API_KEY",
+---
+판정: 모든 일치는 docstring 설명·os.environ.get() 변수명 참조·오류 안내 문구뿐이다. 실제 키 값을 변수에 담아 출력/로그하는 코드 0건(값 접근 0건).
+exit=0
