@@ -1,0 +1,30 @@
+=== -k stages ===
+.                                                                        [100%]
+1 passed, 9 deselected in 0.51s
+=== -k no_side_effect ===
+.                                                                        [100%]
+1 passed, 9 deselected in 0.42s
+=== -k recompute ===
+.                                                                        [100%]
+1 passed, 9 deselected in 0.41s
+=== -k llm_failed ===
+.                                                                        [100%]
+1 passed, 9 deselected in 0.46s
+=== -k no_candidates ===
+.                                                                        [100%]
+1 passed, 9 deselected in 0.42s
+=== -k null_path ===
+.                                                                        [100%]
+1 passed, 9 deselected in 0.41s
+=== -k merge_payload ===
+.                                                                        [100%]
+1 passed, 9 deselected in 0.43s
+=== -k identity_payload ===
+.                                                                        [100%]
+1 passed, 9 deselected in 0.49s
+=== -k provider_in_trace ===
+.                                                                        [100%]
+1 passed, 9 deselected in 0.41s
+=== -k applied_fields ===
+.                                                                        [100%]
+1 passed, 9 deselected in 0.41s

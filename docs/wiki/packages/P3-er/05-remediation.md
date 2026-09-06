@@ -627,7 +627,9 @@ WARN  llm_failed 경로의 s_emb·s_rule 귀속이 없다 — 결정 3-c 는 nul
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
-- 결과 파일(evidence/): evidence/20260905-2206-plan-review-findings-2.txt (발견, verifier 계획 재검증) → 구현 후 04-review 에서 완료 판정 명령 출력으로 닫는다. U4 구현 증거(`decide()` 레벨): `python -m pytest tests/test_er_confidence.py -q -k llm_failed` — 통과 6건(evidence 위 `20260906-1330-u4-pytest-confidence.txt` 전체 실행에 포함). U6 이 파이프라인 통합 테스트를 추가해야 완전히 닫힌다.
+- 결과 파일(evidence/): evidence/20260905-2206-plan-review-findings-2.txt (발견, verifier 계획 재검증) → 구현 후 04-review 에서 완료 판정 명령 출력으로 닫는다. U4 구현 증거(`decide()` 레벨): `python -m pytest tests/test_er_confidence.py -q -k llm_failed` — 통과 6건(evidence 위 `20260906-1330-u4-pytest-confidence.txt` 전체 실행에 포함).
+
+**U6 파이프라인 테스트 통과**: `tests/test_er_pipeline.py::test_resolve_llm_failed_forces_identity_band_llm_failed`(`-k llm_failed`) — `FakeJudge(fail="timeout")` 로 실제 `JudgeUnavailable` 예외를 흡수해 `forced_reason="llm_failed"`·`band="identity"`(통과 후보 ≥1)·`confidence_breakdown` 세 신호 0·`matched_person_id is None`·`llm.error=="timeout"`·`llm.skipped is False` 단언. 명령: `POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k llm_failed` → 1 passed(evidence `docs/wiki/packages/P3-er/evidence/20260906-1301-u6-pytest-pipeline.txt` 전체 실행 10건에 포함). `decide()` 순수 함수 레벨(U4)과 파이프라인 통합 레벨(U6) 모두 닫혔다.
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 (D3 trace `confidence_breakdown` 필수 5키는 유지, 값 규약만)
@@ -679,6 +681,8 @@ WARN  결정 3-c(b) null 경로의 파이프라인 테스트가 U6 목록·판�
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
 | 1 | U6 테스트에 케이스 추가: `FakeJudge` 가 `matched_person_id=None` 을 돌려주고 통과 후보 1개 이상 → `band=identity`·`band_by_threshold=new_person`·`forced_reason=no_matched`·`confidence_breakdown.matched_person_id is None`·세 신호 0, `apply` 뒤 `ask_user(kind=identity)` 의 `options` 에 통과 후보 이름. 도달 불가 가지는 docstring 에 명시. 03-log 기록 | `POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k no_matched` | 통과 1건 이상 | 대기(backend-agent U6) |
+
+**U6 파이프라인 테스트 통과**: `tests/test_er_pipeline.py::test_resolve_null_matched_person_id_forces_identity_not_new_person_null_path`(`-k null_path`, 테스트 이름에 `no_matched` 대신 결정3-c(b) 사유 코드 `null_path` 를 붙였다 — 위 명령의 `-k no_matched` 대신 `-k null_path` 로 실행) — `FakeJudge(table={})` 로 통과 후보와 교집합이 없어 `matched_person_id=None` 자동 생성, `band="identity"`·`band_by_threshold="new_person"`·`forced_reason="no_matched"`·`confidence_breakdown` 세 신호 0·`matched_person_id is None`·`ask_payload.kind=="identity"` 단언. 명령: `POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k null_path` → 1 passed(evidence `docs/wiki/packages/P3-er/evidence/20260906-1301-u6-pytest-pipeline.txt` 전체 실행 10건에 포함, 단독 실행은 evidence `20260906-1301-u6-pytest-pipeline-kwise.txt` 로 확인). "통과 후보 0 + null" 가지는 테스트 docstring 에 도달 불가로 명시하고 테스트하지 않음(원칙8).
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)

@@ -30,6 +30,22 @@
 우회(예: 별도 커넥션 즉시 커밋)로 고치지 않는다. **이번 단위(P3-er U1)에서도
 이 한계는 그대로 유지한다 -- 별도 커넥션 여부는 여전히 P5-loop 의 결정이다.**
 
+## trace 행 id 회수 (P3-er U6, 결정4 "trace 행의 갱신 주체")
+`app/er/pipeline.py` 의 `resolve()` 는 `agent_traces` 행 하나를 쓰고 그 행의
+id 를 `Resolution.trace_id` 로 돌려줘야 한다(`apply_resolution` 이 나중에
+같은 행을 부분 갱신하는 열쇠). `@traced` 는 성공 행을 flush 한 **뒤에만**
+자동증가 PK 를 알 수 있고, 그 시점은 감싸인 함수(`fn`)가 이미 반환값을
+만들어 돌려준 다음이다 -- 반환값 생성 시점에는 아직 행 id 가 없다. 이를
+위해 `ToolContext` 에 `last_trace_id` 필드(기본 `None`)를 추가하고, `traced()`
+의 성공 경로가 flush 직후 `ctx.last_trace_id = trace_row.id` 를 채운다. 이
+필드는 **모든** `@traced` 호출(6개 기존 툴 포함)에서 갱신되지만, ER 이외의
+호출자는 이 값을 읽지 않으므로 동작에 영향이 없다(하위 호환, `traced()` 의
+인자·시그니처는 그대로). `resolve()` 는 감싸인 내부 함수 호출 직후
+`ctx.last_trace_id` 를 읽어 `dataclasses.replace(result, trace_id=...)` 로
+최종 `Resolution` 을 만든다(U6, `app/er/pipeline.py`) -- `Resolution` 자체는
+여전히 불변(frozen) dataclass이며 이 필드에 직접 `object.__setattr__` 하지
+않는다.
+
 ## F-ca12ad -- flush 실패 뒤 tool_error 기록 실패를 조용히 포기한다 (결정7)
 P2 시점 코드는 except 경로에서 실패한 flush 뒤 **같은 세션에** tool_error 를
 `add()` + `flush()` 했다. flush 가 DB 오류(예: `person_aliases.embedding` 차원
@@ -87,6 +103,7 @@ class ToolContext:
     embedder: EmbeddingProvider | EmbedderCallable | None = None
     now: Callable[[], datetime] = lambda: datetime.now(timezone.utc)
     confirmed_question_id: int | None = None
+    last_trace_id: int | None = None
 
 
 def _truncate_string(value: str) -> str:
@@ -140,6 +157,10 @@ def traced(tool_name: str, step: str = "tool_call") -> Callable[[F], F]:
     `tokens_out`: 반환값이 `trace_tokens() -> tuple[int, int]` 메서드를
     제공하면 그 결과를 그대로 쓰고(예: ER 판정 결과가 LLM 사용량을 실어
     돌려줄 때), 없으면 `(0, 0)`(P2 툴처럼 LLM 호출이 없는 경우).
+
+    성공 행 flush 직후 `ctx.last_trace_id` 에 그 행의 PK 를 남긴다(P3-er U6
+    확장, 모듈 docstring "trace 행 id 회수" 절) -- `resolve()` 가 이 값으로
+    `Resolution.trace_id` 를 채운다. 반환값 자체는 바꾸지 않는다.
 
     예외: `step="tool_error"`(고정 -- 성공 행의 `step` 인자와 무관하다),
     `output={"error": 예외 클래스명, "message": str(e)[:TRACE_MAX_STRING]}`.
@@ -199,18 +220,18 @@ def traced(tool_name: str, step: str = "tool_call") -> Callable[[F], F]:
             if callable(trace_tokens):
                 tokens_in, tokens_out = trace_tokens()
 
-            ctx.session.add(
-                AgentTrace(
-                    session_id=ctx.session_id,
-                    step=step,
-                    tool_name=tool_name,
-                    input=input_payload,
-                    output=to_jsonable(result),
-                    tokens_in=tokens_in,
-                    tokens_out=tokens_out,
-                )
+            trace_row = AgentTrace(
+                session_id=ctx.session_id,
+                step=step,
+                tool_name=tool_name,
+                input=input_payload,
+                output=to_jsonable(result),
+                tokens_in=tokens_in,
+                tokens_out=tokens_out,
             )
+            ctx.session.add(trace_row)
             ctx.session.flush()
+            ctx.last_trace_id = trace_row.id
             return result
 
         wrapper.__signature__ = signature  # type: ignore[attr-defined]

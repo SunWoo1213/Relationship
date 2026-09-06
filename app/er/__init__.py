@@ -4,11 +4,33 @@
 판정 → 확신도 분기)를 모듈 4개로 그대로 옮긴다 -- 한 파일에서 LLM 을
 한 번만 부르고 끝내는 지름길을 구조로 막는다(원칙4).
 
-이 파일은 재export 지점이다. U3(이 단위)는 `types`·`dictionary`·`rules`
-까지만 만든다 -- `candidates`(1단계)·`judge`(3단계)·`confidence`(4단계)·
-`pipeline`(오케스트레이션)은 U4~U6 이 추가하며, 그때 이 파일에
-`resolve`·`apply_resolution`·`Judge`·`FakeJudge` 재export 가 채워진다
-(01-plan 산출물 목록 24행).
+U6(`app/er/pipeline.py`)이 `resolve()` 를 재export 한다. `apply_resolution`
+은 아직 없다(U7 몫) -- 이 파일도, `pipeline.py` 도 U7 전까지는 그 이름을
+갖지 않는다.
 """
 
 from __future__ import annotations
+
+from app.er.judge import FakeJudge, Judge, judge_from_env
+from app.er.pipeline import resolve
+from app.er.types import (
+    ER_TRACE_STEP,
+    ER_TRACE_TOOL_NAME,
+    ER_VERSION,
+    ERConfig,
+    JudgeUnavailable,
+    Resolution,
+)
+
+__all__ = [
+    "resolve",
+    "Judge",
+    "FakeJudge",
+    "judge_from_env",
+    "Resolution",
+    "ERConfig",
+    "JudgeUnavailable",
+    "ER_TRACE_STEP",
+    "ER_TRACE_TOOL_NAME",
+    "ER_VERSION",
+]

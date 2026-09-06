@@ -84,9 +84,49 @@ def test_judge_unavailable_is_a_plain_exception() -> None:
 
 
 def test_resolution_to_dict_serializes_candidates() -> None:
-    candidate = ScoredCandidate(person_id=1, display_name="팀장", aliases=["팀장"])
-    resolution = Resolution(trace_id=42, mention="부장님", candidates=[candidate])
+    # U6(app/er/pipeline.py)이 `to_dict()` 를 결정5 trace `output` 스키마
+    # 그대로 내도록 바꿨다 -- `trace_id`/`band` 는 더 이상 최상위 키가
+    # 아니다(편의 접근자는 dataclass 필드로만 남고, decision5 스키마 값은
+    # `confidence_breakdown`/`decision` dict 가 단일 출처다).
+    candidate = ScoredCandidate(
+        person_id=1, display_name="팀장", aliases=["팀장"], s_emb=0.5
+    )
+    resolution = Resolution(
+        trace_id=42,
+        mention="부장님",
+        candidates=[candidate],
+        decision={"band": "new_person"},
+    )
     as_dict = resolution.to_dict()
-    assert as_dict["trace_id"] == 42
-    assert as_dict["candidates"][0]["person_id"] == 1
-    assert as_dict["band"] == "new_person"
+    assert as_dict["mention"] == "부장님"
+    assert as_dict["er_version"] == ER_VERSION
+    candidate_dict = as_dict["candidates"][0]
+    assert candidate_dict["person_id"] == 1
+    assert candidate_dict["similarity"] == 0.5
+    assert candidate_dict["aliases_matched"] == ["팀장"]
+    assert as_dict["decision"]["band"] == "new_person"
+    assert resolution.trace_id == 42
+    assert resolution.band == "new_person"
+
+
+def test_resolution_trace_tokens_reads_llm_dict() -> None:
+    resolution = Resolution(
+        trace_id=1, mention="팀장", llm={"tokens_in": 12, "tokens_out": 34}
+    )
+    assert resolution.trace_tokens() == (12, 34)
+
+
+def test_resolution_trace_tokens_defaults_to_zero_when_llm_empty() -> None:
+    resolution = Resolution(trace_id=1, mention="팀장")
+    assert resolution.trace_tokens() == (0, 0)
+
+
+def test_er_config_to_dict_matches_trace_input_schema() -> None:
+    config = ERConfig()
+    as_dict = config.to_dict()
+    assert as_dict == {
+        "t_merge": 0.8,
+        "t_new": 0.3,
+        "weights": {"llm": 0.5, "emb": 0.3, "rule": 0.2},
+        "top_k": config.top_k,
+    }

@@ -136,6 +136,32 @@ class Judgement:
         }
 
 
+def _candidate_trace_dict(candidate: ScoredCandidate) -> dict[str, Any]:
+    """`candidates[]` 의 trace 형태(결정5 output 스키마, U6). `similarity`
+    는 `ScoredCandidate.s_emb`(이미 정규화·클램프된 값)를 그대로 옮긴 것이다
+    -- U5(`app/er/candidates.py`)가 P2 `Candidate.similarity` 를 `s_emb` 로
+    옮겨 담을 때 원래(클램프 전) 값을 별도로 보존하지 않으므로 두 키는 같은
+    값이다(U6 인터페이스 한계, 03-log 명시). `aliases_matched` 도 같은
+    이유로 `ScoredCandidate.aliases`(그 인물의 전체 별칭 목록, U5 가 채운
+    것)를 그대로 쓴다 -- P2 `Candidate.aliases_matched`(질의와 실제로 일치한
+    부분집합)는 U5 변환 과정에서 보존되지 않는다."""
+
+    return {
+        "person_id": candidate.person_id,
+        "display_name": candidate.display_name,
+        "similarity": candidate.s_emb,
+        "aliases_matched": list(candidate.aliases),
+        "rule_flags": dict(candidate.rule_flags),
+        "passed_rules": candidate.passed_rules,
+        "excluded_by": candidate.excluded_by,
+        "rule_checked": candidate.rule_checked,
+        "rule_passed": candidate.rule_passed,
+        "relaxed_pass": candidate.relaxed_pass,
+        "s_emb": candidate.s_emb,
+        "s_rule": candidate.s_rule,
+    }
+
+
 @dataclass(frozen=True)
 class Resolution:
     """4단계(확신도 분기, `app/er/confidence.py`) + 오케스트레이션
@@ -143,17 +169,31 @@ class Resolution:
     는 `agent_traces` 행 1개만 쓰고 `persons`/`person_aliases`/
     `pending_questions` 는 건드리지 않는다.
 
-    `trace_id` 는 `resolve()` 가 쓴 `er_resolve` 행의 id 다 -- `apply_resolution`
-    (U7)이 같은 행을 다시 찾아 `decision.applied`/`pending_question_id`/
-    `applied_at` 세 필드만 부분 갱신하는 열쇠다(결정4 "trace 행의 갱신
-    주체").
+    `trace_id` 는 `resolve()` 가 쓴 `er_resolve` 행의 id 다(U6, `app.tools.
+    context.ToolContext.last_trace_id` 를 통해 채워진다) -- `apply_resolution`
+    (U7)이 같은 행을 다시 찾아 `decision["applied"]`/`decision["pending_question_id"]`/
+    `decision["applied_at"]` 세 값만 부분 갱신하는 열쇠다(결정4 "trace 행의
+    갱신 주체").
 
-    `band`/`band_by_threshold` 를 나누는 이유(결정5, F-4d1e21): 강등
-    (`forced_reason="llm_failed"`)·`matched_person_id=null`
-    (`forced_reason="no_matched"`)·규칙 통과 후보 0
-    (`forced_reason="no_candidates"`) 경로에서는 최종 `band` 가 산식이 준
-    구간과 달라진다. `forced_reason` 이 `None` 인 행만 순수 산식 구간이며
-    P4 의 트레이드오프 곡선은 그 행들로만 재계산한다.
+    `to_dict()` 는 **결정5 trace `output` 스키마를 그대로** 낸다 --
+    `{er_version, mention, relaxed_retry, candidates[], confidence_breakdown{},
+    decision{}, llm{}}`. 이 dataclass 의 나머지 필드(`band`·`band_by_threshold`
+    ·`forced_reason`·`matched_person_id`·`confidence`)는 `confidence_breakdown`/
+    `decision` 과 같은 값의 **편의 접근자**일 뿐이며 `to_dict()` 출력에는
+    중복해서 담지 않는다(이중 출처 방지 -- `confidence_breakdown`/`decision`
+    dict 가 단일 출처).
+
+    `candidates`(U6 시점부터 의미가 바뀐다 -- 이전 초안은 필드명만 정의):
+    2단계(`run_rule_stage`)가 돌려준 **전체**(배제 후보 포함, `all_scored`)
+    목록이다(원칙9 "배제도 근거다").
+
+    `decision`(dict): `app.er.confidence.Decision.decision` 을 `resolve()`
+    가 `relaxed_retry`/`hierarchy_relaxed_retry`/`applied`/`pending_question_id`
+    /`applied_at` 다섯 키로 확장한 것(U4 03-log "U6/U7 인계" 그대로).
+
+    `llm`(dict): `{provider, model, self_reported, s_llm, reason, tokens_in,
+    tokens_out, attempts, skipped, error}` -- `Judgement` 를 그대로 옮기되
+    스킵/실패 시 안전 기본값을 쓴다(U5 03-log "U6 인계" (3)).
 
     `suggested_display_name`(결정3-b): merge 구간은 별칭만 누적하고
     `display_name` 은 바꾸지 않는다 -- 확인을 거친 갱신에 쓰라고 후보
@@ -166,27 +206,33 @@ class Resolution:
     relaxed_retry: bool = False
     matched_person_id: int | None = None
     confidence: float = 0.0
-    breakdown: dict[str, Any] = field(default_factory=dict)
+    confidence_breakdown: dict[str, Any] = field(default_factory=dict)
     band: str = "new_person"
     band_by_threshold: str = "new_person"
     forced_reason: str | None = None
+    decision: dict[str, Any] = field(default_factory=dict)
+    llm: dict[str, Any] = field(default_factory=dict)
     ask_payload: dict[str, Any] | None = None
     suggested_display_name: str | None = None
 
+    def trace_tokens(self) -> tuple[int, int]:
+        """`app.tools.context.traced()` 가 `tokens_in`/`tokens_out` 을
+        채울 때 쓰는 규약(U1) -- ER 판정의 실제 LLM 사용량(`llm.tokens_in`/
+        `tokens_out`)을 그대로 옮긴다. 스킵·실패 시 `llm` 이 이미 `0` 을
+        담고 있으므로 별도 분기가 필요 없다."""
+        tokens_in = self.llm.get("tokens_in", 0) or 0
+        tokens_out = self.llm.get("tokens_out", 0) or 0
+        return int(tokens_in), int(tokens_out)
+
     def to_dict(self) -> dict[str, Any]:
         return {
-            "trace_id": self.trace_id,
+            "er_version": ER_VERSION,
             "mention": self.mention,
-            "candidates": [c.to_dict() for c in self.candidates],
             "relaxed_retry": self.relaxed_retry,
-            "matched_person_id": self.matched_person_id,
-            "confidence": self.confidence,
-            "breakdown": dict(self.breakdown),
-            "band": self.band,
-            "band_by_threshold": self.band_by_threshold,
-            "forced_reason": self.forced_reason,
-            "ask_payload": dict(self.ask_payload) if self.ask_payload is not None else None,
-            "suggested_display_name": self.suggested_display_name,
+            "candidates": [_candidate_trace_dict(c) for c in self.candidates],
+            "confidence_breakdown": dict(self.confidence_breakdown),
+            "decision": dict(self.decision),
+            "llm": dict(self.llm),
         }
 
 
@@ -250,3 +296,17 @@ class ERConfig:
                 "ERConfig: thresholds must satisfy 0 <= t_new <= t_merge <= 1 "
                 f"(got t_new={self.t_new!r}, t_merge={self.t_merge!r})"
             )
+
+    def to_dict(self) -> dict[str, Any]:
+        """U6 trace `input.config` 형태(위임 프롬프트 "input={mention, utterance,
+        hints, config{t_merge,t_new,weights,top_k}}") -- `judge_timeout`/
+        `judge_max_retries` 는 이 trace 입력 스키마에 없으므로 담지 않는다.
+        `app.tools.context.to_jsonable` 이 `to_dict` 를 우선하므로,
+        `resolve()` 가 `ERConfig` 인스턴스를 `@traced` 대상 함수에 그대로
+        넘기면 이 메서드가 자동으로 쓰인다(이중 출처 없음)."""
+        return {
+            "t_merge": self.t_merge,
+            "t_new": self.t_new,
+            "weights": {"llm": self.w_llm, "emb": self.w_emb, "rule": self.w_rule},
+            "top_k": self.top_k,
+        }
