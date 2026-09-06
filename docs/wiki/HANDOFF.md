@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-06 10:50 (U1 완료·커밋, 다음 U2 는 사용자 승인 후)
-active: **P3-er** | frozen: none | 브랜치: dev (dev = origin/dev = **main = b676799**). 미푸시 2커밋: 착수 bb1abfe + U1 커밋(journal COMMIT 줄 참조). **U1 완료(2026-09-06)** — 다음은 U2, 시작 전 AskUserQuestion(L-004)
+갱신: 2026-09-06 11:40 (U2 완료·커밋 대기, 다음 U3 는 사용자 승인 후)
+active: **P3-er** | frozen: none | 브랜치: dev (dev = origin/dev = **main = b676799**). 미푸시 2커밋: 착수 bb1abfe + U1 커밋(journal COMMIT 줄 참조). **U1 완료 2b82882 · U2 완료(커밋은 journal COMMIT 줄 참조)**. 다음 U3, 시작 전 AskUserQuestion(L-004)
 
 ## 지금 어디까지
 - **P3-er 착수 진행 중(2026-09-05)**: 사용자 "P3-er 시작해줘" → 선행 확인(P2-tools 완료 b676799, 닫는 R4 R9, 카드 S3.3 D3 D10 D5, .env.example 에 ANTHROPIC_API_KEY·ANTHROPIC_MODEL·OPENAI_API_KEY 이름 있음, anthropic·openai 미설치) → `--stage architect` → architect(opus) 01-plan 초안 U1~U8(app/er/{types,dictionary,candidates,rules,judge,confidence,pipeline}, Anthropic tool_use 강제 구조화 출력·실패 시 안전 강등 s_llm=0→identity, resolve() 부수효과 0 + apply_resolution(), trace 1행 step=er_resolve tool_name="er", FakeJudge+grouped_embedder 회귀 3종, 벡터 인덱스 연기, U1 F-ca12ad begin_nested) → verify-plan FAIL 1(02-plan-verify 부재)/WARN 8(기존 행) → **사용자 확인 3건(23:45 DECISION)**: 별칭만 누적·이름은 확인 후 / tool_name="er" / 인덱스 연기·공급자 이동·의존성 추가 → verifier 02-plan-verify **보류**(FAIL 0/WARN 9: 점검표 #2 원칙 보류 1 + 기존 행 8; 필수 3: F-138665 confidence 후보 귀속·null 구간 / F-f43a9d resolve 부수효과 0 vs trace applied 필드 / F-8c6354 승진 픽스처 위계; 권고 7) → **사용자 결정(00:10 DECISION)**: LLM 이 고른 인물의 값·null 은 병합 금지 / apply 가 같은 행 갱신 / 픽스처 hierarchy=동 → `--stage architect` 2회차 → 개정 1(결정 3-c 신설·결정 4 apply 부분 갱신·결정 9·10 승진 픽스처 hierarchy=동·직급→위계 표(USER_RANK_ANCHOR=2)·결정 2 배제 규칙 수정, 권고 7 반영, U6 분할 → U1~U9, 신규 리스크: 부동소수 round·힌트 없는 상한 0.8=T_merge→P4 인계) → verify-plan FAIL 0/WARN 9(옛 보류 표기 1 + 기존 행 8) → `--stage verifier` 2회차 → 재검증 **통과**(FAIL 0/WARN 8 의도, 보류 3 닫힘·권고 7 해소, 새 권고 6: F-7fe239 허용오차 1e-9 / F-93f063 JSONB 갱신 원시 SQL 재조회 / F-8809f2 apply 중복 거부 / F-f3b245 llm_failed 귀속 / F-5a97ef 범위 집합 통일 / F-1d65ac null 경로 테스트) → **사용자 계획 승인(2026-09-06 01:00)** → active: P3-er.
@@ -22,7 +22,8 @@ active: **P3-er** | frozen: none | 브랜치: dev (dev = origin/dev = **main = b
 1. (완료) 완료 커밋 b676799 → dev 푸시(11커밋) → main 승격(사용자 승인, 2026-09-05).
 2. (완료) 착수 커밋 bb1abfe.
 3. (완료) **U1** — backend-agent(sonnet) 구현, pytest 208 passed/skip 0·tools_check 7/7(evidence `20260906-1030-u1-*.txt`), 03-log 항목 pending 해시는 다음 커밋에서 교체. 내용: app/tools/context.py `@traced` except 경로 — `begin_nested()` 세이브포인트로 tool_error 기록, 기록 실패 시 원래 예외 보존(`raise from`), step 인자·`trace_tokens`(tokens_in/out 주입) 확장; 재현 테스트: 1535차원 임베딩 flush 실패 → 원래 DataError 가 보존되고 tool_error 행이 남는지(F-ca12ad). 이후 U2 임베딩 공급자 이동(dimension·check_dimension·NOT NULL 위반으로 flush 실패 테스트 전환·openai/anthropic 핀·dotenv 는 embed_pilot 에만) → U3 호칭 사전·규칙 필터 → U4 확신도·두 임계치(권고 F-7fe239 F-f3b245 F-5a97ef) → U5 후보 어댑터·Judge → U6 resolve·trace(F-1d65ac) → U7 apply·회귀 3종(F-93f063 F-8809f2) → U8 백필·스모크 → U9 검증·문서.
-4. **다음: U2 임베딩 런타임 공급자** — 시작 전 AskUserQuestion → `--stage backend-agent`. U1 인계: flush 실패 테스트 재현 수단을 NOT NULL 위반으로 전환(F-3ca6b5), `check_dimension()` 을 `_add_alias` 저장 직전에.
+4. (완료) **U2** — app/embedding.py 에 OpenAIEmbeddingProvider·dimension·check_dimension·as_provider(embed 속성 확인), _add_alias 저장 직전 check_dimension, flush 실패 테스트 NOT NULL 위반으로 전환(F-3ca6b5), tests/test_embedding_provider.py 14건, openai==2.33.0·anthropic==1.4.0 핀. pytest 223/skip 0, alembic check 무변경, app/ dotenv 0(evidence `20260906-1130-u2-*.txt`). **계획과 다른 점: scripts/embed_pilot.py 는 옮기지 않음(결정 6-a 예외 — 파일럿은 모델별 실제 차원·usage·name 이 필요해 런타임 계약과 충돌, app/embedding.py 를 런타임 단일 출처로 선언, 03-log 기록)**. 03-log U2 항목 pending 해시는 다음 커밋에서 교체.
+5. **다음: U3 호칭 사전·규칙 필터** — 시작 전 AskUserQuestion → `--stage backend-agent`.
 
 ## 재개 시 읽을 카드 (이것만)
 - `docs/wiki/CURRENT.md`, `docs/wiki/INDEX.md`, `.claude/gitlog.md`
@@ -30,7 +31,7 @@ active: **P3-er** | frozen: none | 브랜치: dev (dev = origin/dev = **main = b
 - `lessons/L-001`~`L-004`
 
 ## 열린 질문 · 사용자 결정 대기
-- **U2 시작 승인(L-004)**. 미푸시 2커밋(bb1abfe·U1) 푸시 시점. P1-pilot-dataset·P0-cost 착수 시점.
+- **U3 시작 승인(L-004)**. 미푸시 3커밋(bb1abfe·2b82882·U2) 푸시 시점. P1-pilot-dataset·P0-cost 착수 시점.
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)
 - 재개 시 커밋 안 된 변경·진행 중 항목이 있으면 **먼저 사용자에게 목록을 보이고 우선순위를 묻는다**(`/devlog resume`).

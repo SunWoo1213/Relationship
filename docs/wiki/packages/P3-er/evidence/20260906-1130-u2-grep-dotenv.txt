@@ -1,0 +1,4 @@
+scripts/embed_pilot.py:197:def _load_dotenv_quietly() -> None:
+scripts/embed_pilot.py:200:        from dotenv import load_dotenv
+scripts/embed_pilot.py:202:        load_dotenv(ROOT / ".env", override=False)
+scripts/embed_pilot.py:223:    _load_dotenv_quietly()

@@ -83,7 +83,7 @@ from app.db.models import (
     PersonFact,
     RELATION_TAGS,
 )
-from app.embedding import EmbedderCallable, EmbeddingProvider, as_provider
+from app.embedding import EmbedderCallable, EmbeddingProvider, as_provider, check_dimension
 from app.settings import DEFAULT_FACT_CONFIDENCE, SEARCH_TOP_K
 from app.tools.context import ToolContext, traced
 from app.tools.types import (
@@ -354,6 +354,7 @@ def _add_alias(
     provider = as_provider(embedder)
     if provider is not None:
         embedding = provider.embed([alias])[0]
+        check_dimension(embedding)
 
     row = PersonAlias(
         person_id=person.id,

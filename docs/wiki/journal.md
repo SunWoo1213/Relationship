@@ -80,3 +80,4 @@
 - 2026-09-06 00:10 | DECISION | P3-er 계획 보류 3건 결정(사용자): F-138665 confidence 는 LLM 이 고른 인물의 s_emb·s_rule, null 이면 s_llm=0·병합 금지(후보 있으면 identity, 없으면 new_person); F-f43a9d apply_resolution 이 er_resolve 같은 행에 applied·pending_question_id·applied_at 갱신; F-8c6354 승진 픽스처 인물 hierarchy=동, 호칭 사전이 부장님→상 유도 → 1칸 차이 완화 경로 | P3-er D3 D10 S3.3
 - 2026-09-06 01:00 | START | P3-er 착수: architect(opus) 계획 → 사용자 확인 3 → verifier(fable) 보류 3(F-138665 귀속·F-f43a9d trace 갱신·F-8c6354 승진 픽스처) → 사용자 결정 → 개정 1(권고 7 반영, U1~U9) → 재검증 통과(FAIL 0/WARN 8 의도, 권고 6) → 사용자 승인 | P3-er R4 R9 D3 D5 D10 S3.3
 - 2026-09-05 22:27 | COMMIT | bb1abfe docs(P3-er): 계획·계획검증 승인, 패키지 착수 — ER 4단계·확신도 3신호·두 임계치·trace
+- 2026-09-06 10:41 | COMMIT | 2b82882 feat(P3-er): U1 @traced 세이브포인트로 F-ca12ad 수정, step 인자·trace_tokens 확장

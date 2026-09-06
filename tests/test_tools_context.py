@@ -14,7 +14,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import PendingRollbackError
 
-from app.db.models import AgentTrace, PendingQuestion
+from app.db.models import AgentTrace, PendingQuestion, Person, PersonAlias
 from app.tools.context import TRACE_MAX_STRING, ToolContext, to_jsonable, traced
 from app.tools.persons import create_person
 from app.tools.types import AFFIRMATIVE_KEY, InvalidValue, PersonOut
@@ -35,6 +35,22 @@ def _dummy_error(ctx: ToolContext, value: str) -> None:
 @traced("dummy_long")
 def _dummy_long(ctx: ToolContext, text_value: str) -> str:
     return "ok"
+
+
+@traced("dummy_flush_failure")
+def _dummy_flush_failure(ctx: ToolContext) -> None:
+    """F-ca12ad 재현 수단(U2 전환, F-3ca6b5): flush 시점에만 드러나는 DB
+    오류(`person_aliases.alias` NOT NULL 위반)를 강제로 일으킨다. 첫 번째
+    `flush()`(person 행)는 성공하고, 두 번째 `flush()`(alias=None)만 실패한다
+    -- U1 시점의 1535차원 가짜 공급자 재현은 이제 `check_dimension()`(U2)이
+    flush 전에 가로채므로 더 이상 flush 실패를 만들지 못한다."""
+    person = Person(
+        user_id=ctx.user_id, display_name="flush-fail", relation_tag="지인", hierarchy="동"
+    )
+    ctx.session.add(person)
+    ctx.session.flush()
+    ctx.session.add(PersonAlias(person_id=person.id, alias=None, source="system"))
+    ctx.session.flush()
 
 
 class _FakeTokenResult:
@@ -129,40 +145,36 @@ def test_traced_exception_writes_tool_error_row_and_reraises(db_session):
     assert row.tokens_out == 0
 
 
-# U2 에서 `app.embedding.check_dimension()` 이 flush 전에 차원 불일치를
-# 잡게 되면, 이 테스트의 재현 수단(1535차원 가짜 공급자)은 더 이상 flush
-# 실패를 만들지 못한다 -- 그때는 강제 flush 실패(예: `person_aliases.alias`
-# NOT NULL 위반)로 수단을 바꿔 F-ca12ad 회귀를 유지한다(F-3ca6b5, U2 인계).
+# U2 에서 전환 완료(F-3ca6b5): `app.embedding.check_dimension()` 이 flush
+# 전에 차원 불일치를 잡게 되어, U1 시점 재현 수단(1535차원 가짜 공급자)은
+# 더 이상 flush 실패를 만들지 못한다. 재현 수단을 강제 flush 실패
+# (`person_aliases.alias` NOT NULL 위반, `_dummy_flush_failure`)로 바꿔
+# F-ca12ad 회귀를 유지한다. 차원 불일치의 "flush 전 사전 검출" 경로는 아래
+# `test_add_alias_rejects_dimension_mismatch_before_flush` 가 대신 검증한다.
 def test_traced_flush_failure_preserves_original_error(db_session):
-    """F-ca12ad: `_add_alias` 의 flush 가 차원 불일치로 실패했을 때, 호출자가
+    """F-ca12ad: 두 번째 `flush()`(NOT NULL 위반)가 실패했을 때, 호출자가
     받는 예외는 `PendingRollbackError` 가 아니라 원래 DB 오류(`DataError`/
     `StatementError`/`IntegrityError` 계열)여야 한다. `__context__` 도
     `PendingRollbackError` 로 덮이지 않아야 한다(결정7)."""
     session_id = "trace-flush-fail-1"
-    question = _make_pending_question(db_session, session_id=session_id)
-    ctx = ToolContext(
-        session=db_session,
-        session_id=session_id,
-        confirmed_question_id=question.id,
-        embedder=lambda texts: [[0.1] * 1535 for _ in texts],
-    )
+    ctx = ToolContext(session=db_session, session_id=session_id)
 
     with pytest.raises(Exception) as exc_info:
-        create_person(ctx, "김철수", [], "직장", "상")
+        _dummy_flush_failure(ctx)
 
     exc = exc_info.value
     assert not isinstance(exc, PendingRollbackError)
     assert type(exc).__name__ in {"DataError", "StatementError", "IntegrityError"}
     assert not isinstance(exc.__context__, PendingRollbackError)
 
-    # `create_person`(정상 flush 로 이미 person 행까지 쓴 뒤 별칭 flush 에서
-    # 실패)의 세션은 이 시점에 SQLAlchemy 상 DEACTIVE 상태다 -- 실제 호출자
-    # (예: `get_session()`)가 그렇듯, 여기서도 회복을 위해 명시적으로
-    # `rollback()` 한다. 이것은 테스트가 세션을 계속 쓰기 위한 정리이지
-    # `traced()` 구현이 부르는 것이 아니다(구현은 절대 `session.rollback()`
-    # 을 부르지 않는다 -- 결정7. 위에서 이미 `begin_nested()` 가 세션 무효
-    # 상태를 감지해 조용히 포기했다는 것을 exc 가 원래 DataError 그대로임이
-    # 보여 준다).
+    # `_dummy_flush_failure`(정상 flush 로 이미 person 행까지 쓴 뒤 두 번째
+    # flush 에서 실패)의 세션은 이 시점에 SQLAlchemy 상 DEACTIVE 상태다 --
+    # 실제 호출자(예: `get_session()`)가 그렇듯, 여기서도 회복을 위해
+    # 명시적으로 `rollback()` 한다. 이것은 테스트가 세션을 계속 쓰기 위한
+    # 정리이지 `traced()` 구현이 부르는 것이 아니다(구현은 절대
+    # `session.rollback()` 을 부르지 않는다 -- 결정7. 위에서 이미
+    # `begin_nested()` 가 세션 무효 상태를 감지해 조용히 포기했다는 것을
+    # exc 가 원래 DB 오류 그대로임이 보여 준다).
     db_session.rollback()
 
     # 세이브포인트 안에서 tool_error 기록을 시도했지만 세션이 이미 무효라
@@ -173,6 +185,31 @@ def test_traced_flush_failure_preserves_original_error(db_session):
     for row in rows:
         assert row.step == "tool_error"
         assert row.output["error"] == type(exc).__name__
+
+
+def test_add_alias_rejects_dimension_mismatch_before_flush(db_session):
+    """F-3ca6b5: 차원 불일치는 flush 전에 `check_dimension()` 이 사람이 읽는
+    오류(`InvalidValue`)로 막는다 -- `DataError`/`PendingRollbackError` 가
+    아니다. 이 예외는 평범한 파이썬 예외이므로 세션을 무효로 만들지 않고,
+    `@traced` 의 `tool_error` 기록이 정상적으로 남는다(F-ca12ad 경로와
+    다르다)."""
+    session_id = "trace-dimension-1"
+    question = _make_pending_question(db_session, session_id=session_id, kind="new_person")
+    ctx = ToolContext(
+        session=db_session,
+        session_id=session_id,
+        confirmed_question_id=question.id,
+        embedder=lambda texts: [[0.1] * 1535 for _ in texts],
+    )
+
+    with pytest.raises(InvalidValue):
+        create_person(ctx, "김철수", [], "직장", "상")
+
+    rows = _rows_for(db_session, session_id)
+    error_rows = [row for row in rows if row.step == "tool_error"]
+    assert len(error_rows) == 1
+    assert error_rows[0].output["error"] == "InvalidValue"
+    assert error_rows[0].tool_name == "create_person"
 
 
 def test_traced_step_argument_and_trace_tokens_are_recorded(db_session):

@@ -7,3 +7,8 @@ pgvector==0.5.0
 fastapi==0.135.1
 uvicorn[standard]==0.41.0
 httpx==0.28.1  # TestClient 용 (런타임에는 쓰지 않음, Starlette TestClient 의 필수 의존성)
+# Refs: P3-er 결정6 결정3 -- 임베딩(app/embedding.py)·LLM 판정(app/er/judge.py)
+# 런타임 호출자가 생겨 핀 추가(P2 결정10 이 "P3 몫"으로 미룬 것). 둘 다 지연
+# import(app/embedding.py·app/er/judge.py 본문 참고) -- 키·SDK 없이도 임포트 가능.
+openai==2.33.0
+anthropic==1.4.0
