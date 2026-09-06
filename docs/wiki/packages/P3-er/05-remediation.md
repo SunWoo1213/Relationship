@@ -541,11 +541,13 @@ WARN  임계치 비교 허용오차가 두 갈래다(round(·,6) 또는 isclose(
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | U4 구현 시 비교 함수 하나(`_ge(a, b) = a > b or math.isclose(a, b, abs_tol=1e-9)` 또는 `round(·,9)`)를 `app/er/confidence.py` 단일 출처로 두고, 경계 테스트·스윕 테스트가 같은 함수를 import 해 쓴다. 03-log 에 규약 확정을 적는다(01-plan 문구는 개정하지 않아도 되나 두 갈래 중 1e-9 를 택했다는 기록은 남긴다) | `python -m pytest tests/test_er_confidence.py -q -k "boundary or threshold"` | 통과 — 0.7999999999999999 는 merge, 0.7999996 은 identity | 대기(backend-agent U4) |
+| 1 | U4 구현 시 비교 함수 하나(`_ge(a, b) = a > b or math.isclose(a, b, abs_tol=1e-9)` 또는 `round(·,9)`)를 `app/er/confidence.py` 단일 출처로 두고, 경계 테스트·스윕 테스트가 같은 함수를 import 해 쓴다. 03-log 에 규약 확정을 적는다(01-plan 문구는 개정하지 않아도 되나 두 갈래 중 1e-9 를 택했다는 기록은 남긴다) | `python -m pytest tests/test_er_confidence.py -q -k "boundary or threshold"` | 통과 — 0.7999999999999999 는 merge, 0.7999996 은 identity | 완료(backend-agent U4, 커밋 대기) |
+
+**구현 요약(U4)**: `app/er/confidence.py::ge_with_tolerance(a, b, tolerance=ER_TOLERANCE)`(별칭 `_ge`, 같은 객체 — `_ge is ge_with_tolerance`)를 유일한 비교 함수로 두었다. `round()` **함수 호출** 0건 -- `grep -n "round(" app/er/confidence.py app/settings.py` 의 매치는 전부 `round(·,6)` 을 쓰지 않는 이유를 설명하는 docstring/주석 문장뿐이고 실제 호출 코드는 없다(evidence 로 grep 원문 자체를 남긴다). `ER_TOLERANCE = 1e-9`(`app/settings.py`)가 허용오차 단일 출처다. `band_for()`·`decide()` 내부 판정이 모두 이 함수를 거친다. 경계 테스트 `test_boundary_t_merge_minus_5e7_is_not_merge_round_regression`(`T_merge-5e-7` → `band != "merge"`, F-7fe239 가 지적한 정확한 회귀 케이스)와 `test_boundary_t_merge_minus_5e10_is_merge_within_tolerance`(`T_merge-5e-10` → merge)가 두 방향을 모두 단언한다. 스윕 테스트(`test_threshold_sweep_uses_same_comparison_function_as_boundary`)가 `ge_with_tolerance` 를 직접 import 해 `band_for()` 결과와 교차검증한다.
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
-- 결과 파일(evidence/): evidence/20260905-2206-plan-review-findings-2.txt (발견, verifier 계획 재검증) → 구현 후 04-review 에서 완료 판정 명령 출력으로 닫는다
+- 결과 파일(evidence/): evidence/20260905-2206-plan-review-findings-2.txt (발견, verifier 계획 재검증) → 구현 후 04-review 에서 완료 판정 명령 출력으로 닫는다. U4 구현 증거: `docs/wiki/packages/P3-er/evidence/20260906-1330-u4-pytest-boundary.txt`(7 passed)·`20260906-1330-u4-pytest-threshold.txt`(4 passed)·`20260906-1330-u4-grep-round.txt`(round() 매치는 전부 docstring/주석) — verifier 가 04-review 에서 이 세 파일을 재현하면 닫을 수 있다.
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 있음 → 원칙1·S3.3 "T_merge 미만 자동 병합 금지"(5e-7 폭이지만 방향이 반대) — 1e-9 로 고정하면 없음
@@ -619,11 +621,13 @@ WARN  llm_failed 경로의 s_emb·s_rule 귀속이 없다 — 결정 3-c 는 nul
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | U4/U6 구현: `JudgeUnavailable` 경로는 null 경로와 같은 분해(`matched_person_id=null`, `s_llm=s_emb=s_rule=0`, `confidence=0`, `band_by_threshold=new_person`, `band=identity`(통과 후보 ≥1), `forced_reason=llm_failed`). U6 테스트 "LLM 실패 시 identity 강등" 에 `confidence_breakdown` 값 단언 추가. 03-log 기록 | `POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k llm_failed` | 통과 — breakdown `matched_person_id` null·세 신호 0 | 대기(backend-agent U6) |
+| 1 | U4/U6 구현: `JudgeUnavailable` 경로는 null 경로와 같은 분해(`matched_person_id=null`, `s_llm=s_emb=s_rule=0`, `confidence=0`, `band_by_threshold=new_person`, `band=identity`(통과 후보 ≥1), `forced_reason=llm_failed`). U6 테스트 "LLM 실패 시 identity 강등" 에 `confidence_breakdown` 값 단언 추가. 03-log 기록 | `POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k llm_failed` | 통과 — breakdown `matched_person_id` null·세 신호 0 | 완료(backend-agent U4, `app/er/confidence.py::decide()` 레벨 — U6 파이프라인 통합 테스트는 대기) |
+
+**구현 요약(U4)**: `app/er/confidence.py::decide(*, judgement, passed, llm_failed=True, config)` 가 `_forced_decision(forced_reason="llm_failed", passed=passed, config=config)` 를 호출한다 — 이 helper 가 null 경로(`forced_reason="no_matched"`)와 **완전히 같은 귀속**(`matched_person_id=None`, `s_llm=s_emb=s_rule=0`, `confidence=0.0`, `band_by_threshold=band_for(0.0, config)`)을 만들고 `band` 만 통과 후보 유무(`identity`/`new_person`)로 갈린다. 두 경로가 같은 함수를 공유하므로 값이 갈릴 수 없다(코드 구조 자체가 일관성을 강제, F-f3b245 가 우려한 "구현자가 최고 유사도 후보로 되돌릴 여지"가 원천 차단됨). `tests/test_er_confidence.py::test_decide_llm_failed_with_passed_candidates_is_identity` 가 `confidence_breakdown` 의 `s_llm`/`s_emb`/`s_rule`=0, `band_by_threshold="new_person"`, `band="identity"`, `matched_person_id is None` 을 단언하고, `test_decide_llm_failed_without_passed_candidates_is_new_person` 이 통과 후보 0 인 경우(`no_candidates` 가 우선하는 방어적 분기)를 확인한다. U6 파이프라인 통합 테스트(`tests/test_er_pipeline.py -k llm_failed`, `JudgeUnavailable` 실제 예외 처리·trace 기록)는 아직 없다 — `decide()` 순수 함수 레벨은 이 단위에서 완전히 닫혔다.
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
-- 결과 파일(evidence/): evidence/20260905-2206-plan-review-findings-2.txt (발견, verifier 계획 재검증) → 구현 후 04-review 에서 완료 판정 명령 출력으로 닫는다
+- 결과 파일(evidence/): evidence/20260905-2206-plan-review-findings-2.txt (발견, verifier 계획 재검증) → 구현 후 04-review 에서 완료 판정 명령 출력으로 닫는다. U4 구현 증거(`decide()` 레벨): `python -m pytest tests/test_er_confidence.py -q -k llm_failed` — 통과 6건(evidence 위 `20260906-1330-u4-pytest-confidence.txt` 전체 실행에 포함). U6 이 파이프라인 통합 테스트를 추가해야 완전히 닫힌다.
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 (D3 trace `confidence_breakdown` 필수 5키는 유지, 값 규약만)
@@ -645,11 +649,13 @@ WARN  matched_person_id 범위 검증 집합이 결정 3(a) "후보 id 집합" �
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | U5 구현: `ClaudeJudge`·`FakeJudge` 공통 후처리에서 `matched_person_id` 가 통과 후보 id 집합 밖이면 구분되는 예외 유형(예: `JudgeUnavailable` 의 `error="out_of_range_id"`)을 쓰고 `llm.error` 에 그 이름을 남긴다. `tests/test_er_judge.py` 에 배제 후보 id·존재하지 않는 id 두 케이스 추가. 03-log 기록(계획 표기 통일은 03-log 한 줄로 충분) | `python -m pytest tests/test_er_judge.py -q -k out_of_range` | 통과 — 두 케이스 모두 `JudgeUnavailable`, 오류 유형이 타임아웃과 다름 | 대기(backend-agent U5) |
+| 1 | U5 구현: `ClaudeJudge`·`FakeJudge` 공통 후처리에서 `matched_person_id` 가 통과 후보 id 집합 밖이면 구분되는 예외 유형(예: `JudgeUnavailable` 의 `error="out_of_range_id"`)을 쓰고 `llm.error` 에 그 이름을 남긴다. `tests/test_er_judge.py` 에 배제 후보 id·존재하지 않는 id 두 케이스 추가. 03-log 기록(계획 표기 통일은 03-log 한 줄로 충분) | `python -m pytest tests/test_er_judge.py -q -k out_of_range` | 통과 — 두 케이스 모두 `JudgeUnavailable`, 오류 유형이 타임아웃과 다름 | 부분 완료(backend-agent U4 가 `decide()` 레벨 방어를 먼저 닫음 — U5 의 `Judge` 레벨 조기 차단은 대기) |
+
+**구현 요약(U4, 표기 통일 + 방어 계층 1)**: 표기는 34행("통과 후보 id 집합") 쪽으로 통일했다 — `app/er/confidence.py::decide()` 가 `passed_ids = {c.person_id for c in passed}`(2단계 규칙 통과 후보만)를 검증 집합으로 명시적으로 쓴다. 위임 프롬프트가 "범위는 규칙 통과 후보 id 집합 ∪ {null} 로 통일"(01-plan 34행)이라고 U4 자체에도 이 검증을 요구했으므로, `Judge` 구현(U5)보다 먼저 **`decide()` 자체에 이중 방어**를 넣었다: `judgement.matched_person_id` 가 `passed_ids ∪ {None}` 밖(배제된 후보 id·존재하지 않는 id 둘 다)이면 llm_failed 와 같은 귀속에 `Decision.llm_error_kind="out_of_range_id"` 를 얹어 반환한다(F-f3b245 의 귀속 규약을 그대로 재사용). `tests/test_er_confidence.py::test_decide_out_of_range_matched_person_id_is_llm_failed_with_error_kind`(존재하지 않는 id 999)·`test_decide_out_of_range_excluded_candidate_id_is_llm_failed`(배제된 후보 id)가 두 케이스 모두 `forced_reason="llm_failed"`·`llm_error_kind="out_of_range_id"`·`band != "merge"` 를 단언한다. **U5 몫은 남아 있다**: `ClaudeJudge`/`FakeJudge` 가 API 응답을 파싱하는 시점에 더 일찍 `JudgeUnavailable(error="out_of_range_id")` 를 던져 `llm.error` 에 API 장애(`timeout`/`api_error`/`schema`)와 구분되는 이름을 남기는 것 — `decide()` 의 방어는 U5 가 놓치더라도 오병합(원칙1)은 막지만, trace `llm.error` 필드 자체는 U5 가 채워야 한다(`decide()` 는 `llm` 객체를 만들지 않는다, 결정5 스키마 — 그건 U6/U5 몫).
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
-- 결과 파일(evidence/): evidence/20260905-2206-plan-review-findings-2.txt (발견, verifier 계획 재검증) → 구현 후 04-review 에서 완료 판정 명령 출력으로 닫는다
+- 결과 파일(evidence/): evidence/20260905-2206-plan-review-findings-2.txt (발견, verifier 계획 재검증) → 구현 후 04-review 에서 완료 판정 명령 출력으로 닫는다. U4 방어 계층 증거: `python -m pytest tests/test_er_confidence.py -q -k out_of_range` — 통과 6건("out_of_range" 이름 매치, 그중 `matched_person_id` 범위 밖 케이스는 `test_decide_out_of_range_matched_person_id_is_llm_failed_with_error_kind`·`test_decide_out_of_range_excluded_candidate_id_is_llm_failed` 2건, 나머지 4건은 `combine()` 의 `s_llm`/`s_rule` `[0,1]` 범위 검증(`test_combine_s_llm_out_of_range_rejected`·`test_combine_s_rule_out_of_range_rejected`, 각 파라미터화 2건) — evidence 위 `20260906-1330-u4-pytest-confidence.txt` 전체 실행에 포함. U5 가 `tests/test_er_judge.py -k out_of_range` 를 추가해야 완전히 닫힌다.
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 — 통과 후보 집합으로 통일하면 원칙1·4(2단계 필터 유효) 유지

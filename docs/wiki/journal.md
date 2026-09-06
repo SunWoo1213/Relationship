@@ -82,3 +82,4 @@
 - 2026-09-05 22:27 | COMMIT | bb1abfe docs(P3-er): 계획·계획검증 승인, 패키지 착수 — ER 4단계·확신도 3신호·두 임계치·trace
 - 2026-09-06 10:41 | COMMIT | 2b82882 feat(P3-er): U1 @traced 세이브포인트로 F-ca12ad 수정, step 인자·trace_tokens 확장
 - 2026-09-06 11:04 | COMMIT | 2c63c60 feat(P3-er): U2 임베딩 런타임 공급자 — dimension·check_dimension·openai/anthropic 핀
+- 2026-09-06 11:26 | COMMIT | 02e6f14 feat(P3-er): U3 호칭 사전·규칙 필터(2단계) — app/er types·dictionary·rules

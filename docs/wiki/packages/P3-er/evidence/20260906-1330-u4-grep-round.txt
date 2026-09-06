@@ -1,0 +1,6 @@
+app/er/confidence.py:8:01-plan 은 `round(confidence, 6) >= round(T, 6)` 과 `math.isclose(abs_tol=1e-9)`
+app/er/confidence.py:9:두 갈래를 적었다(28·43·111·201행). `round(·, 6)` 은 오차 폭이 최대 5e-7 이라
+app/er/confidence.py:12:반대 방향이다. 그래서 이 모듈은 `round()` 를 어디에도 쓰지 않고, 부동소수
+app/er/confidence.py:50:    (F-7fe239). `round()` 를 쓰지 않는다 -- 이유는 모듈 docstring 참조.
+app/settings.py:26:(F-7fe239 -- `round()` 기반 비교는 `T_merge` 미만 confidence 를 merge 로
+app/settings.py:88:#: `ge_with_tolerance()` 하나만 이 상수를 쓴다 -- `round()` 기반 비교는
