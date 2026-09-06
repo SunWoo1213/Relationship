@@ -1,0 +1,200 @@
+[
+  {
+    "id": "sc-035",
+    "category": "new_person",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "장하람",
+        "relation_tag": "직장",
+        "hierarchy": "하",
+        "aliases": ["하람", "하람씨"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "박지훈",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": ["박과장", "과장님"]
+      }
+    ],
+    "seed_persons": ["p2"],
+    "utterances": [
+      "오늘 팀에 신입 들어왔는데 이름이 장하람이래",
+      "박과장님이 나보고 하람씨 사수 하라고 함ㅋㅋ",
+      "하람씨 첫날부터 야근하던데 좀 안쓰럽더라"
+    ],
+    "mentions": [
+      {"turn": 0, "surface": "장하람", "gold_person_id": "p1"},
+      {"turn": 1, "surface": "박과장님", "gold_person_id": "p2"},
+      {"turn": 1, "surface": "하람씨", "gold_person_id": "p1"},
+      {"turn": 2, "surface": "하람씨", "gold_person_id": "p1"}
+    ],
+    "events": [
+      {"turn": 0, "type": "other", "occurred_at_kind": "relative"}
+    ],
+    "expected_ask_user": {"allowed": ["new_person"]}
+  },
+  {
+    "id": "sc-036",
+    "category": "new_person",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "이민준",
+        "relation_tag": "직장",
+        "hierarchy": "동",
+        "aliases": ["이대리", "민준"]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "임세아",
+        "relation_tag": "지인",
+        "hierarchy": "동",
+        "aliases": ["임대리", "세아"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "이대리가 어제 동호회에 친구 데려왔더라",
+      "그 친구도 대리라서 임대리라고 부르래ㅋㅋ",
+      "임대리랑 이대리랑 헷갈려서 계속 실수함ㅋ",
+      "담주 모임 때 임대리도 또 온다고 함"
+    ],
+    "mentions": [
+      {"turn": 0, "surface": "이대리", "gold_person_id": "p1"},
+      {"turn": 1, "surface": "임대리", "gold_person_id": "p2"},
+      {"turn": 2, "surface": "임대리", "gold_person_id": "p2"},
+      {"turn": 2, "surface": "이대리", "gold_person_id": "p1"},
+      {"turn": 3, "surface": "임대리", "gold_person_id": "p2"}
+    ],
+    "events": [
+      {"turn": 0, "type": "meeting", "occurred_at_kind": "relative"}
+    ],
+    "expected_ask_user": {"allowed": ["identity", "new_person"]},
+    "trap": {
+      "kind": "new_person_resembles_existing",
+      "reason": "seed 인물 '이대리'(이민준)와 처음 등장하는 '임대리'(임세아)가 성씨 한 글자만 다르고 직급까지 같다 — 새 인물을 기존 이대리로 오병합하거나, 반대로 이대리를 새 인물로 잘못 나눌 수 있다"
+    }
+  },
+  {
+    "id": "sc-037",
+    "category": "new_person",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "홍시우",
+        "relation_tag": "가족",
+        "hierarchy": "상",
+        "aliases": ["시우", "시우형"]
+      }
+    ],
+    "seed_persons": [],
+    "utterances": [
+      "주말에 큰집 갔다가 사촌형 시우 만났어",
+      "시우형이 취업했다고 고기 사줬음ㅋㅋ",
+      "형이랑 술 마시면서 얘기 마니 했다"
+    ],
+    "mentions": [
+      {"turn": 0, "surface": "시우", "gold_person_id": "p1"},
+      {"turn": 1, "surface": "시우형", "gold_person_id": "p1"}
+    ],
+    "events": [
+      {"turn": 1, "type": "meal", "occurred_at_kind": "relative"}
+    ],
+    "expected_ask_user": {"allowed": ["new_person"]}
+  },
+  {
+    "id": "sc-038",
+    "category": "new_person",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "서다인",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": ["다인", "다인이"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "어제 다인이랑 드라마 정주행했는데 재밌더라",
+      "거기 남주 배우 진짜 잘생겼음ㅋㅋ",
+      "다인이는 그 아이돌이 더 좋다고 우김"
+    ],
+    "mentions": [
+      {"turn": 0, "surface": "다인이", "gold_person_id": "p1"},
+      {"turn": 2, "surface": "다인이", "gold_person_id": "p1"}
+    ],
+    "events": [
+      {"turn": 0, "type": "meeting", "occurred_at_kind": "relative"}
+    ],
+    "expected_ask_user": {"allowed": ["none"]},
+    "trap": {
+      "kind": "passing_mention",
+      "reason": "'남주 배우'(t1)·'그 아이돌'(t2)은 대화 소재로 스쳐 가는 연예인 언급이라 사용자와 관계를 갖지 않는다 — persons·mentions 에 라벨하지 않았고, 인물 생성이나 new_person 질문이 일어나면 오탐이다(D1 확인형 등록의 반대 방향)"
+    }
+  },
+  {
+    "id": "sc-039",
+    "category": "new_person",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "한지원",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": ["한부장", "부장님"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "야근하다가 한부장님이 치킨 시켜줬어",
+      "배달 기사님이 엘베 안 와서 계단으로 왔대ㅋㅋ",
+      "한부장님이 기사님한테 음료수까지 챙겨주심"
+    ],
+    "mentions": [
+      {"turn": 0, "surface": "한부장님", "gold_person_id": "p1"},
+      {"turn": 2, "surface": "한부장님", "gold_person_id": "p1"}
+    ],
+    "events": [
+      {"turn": 0, "type": "favor", "occurred_at_kind": "relative"}
+    ],
+    "expected_ask_user": {"allowed": ["none"]},
+    "trap": {
+      "kind": "passing_mention",
+      "reason": "'배달 기사님'(t1)·'기사님'(t2)은 일회성 직업 언급으로 사용자와 지속 관계가 없다 — 이름도 없고 다시 등장하지 않는다. 인물 카드가 생기거나 new_person 질문이 나오면 오탐이다"
+    }
+  },
+  {
+    "id": "sc-040",
+    "category": "new_person",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "신예린",
+        "relation_tag": "연인",
+        "hierarchy": "동",
+        "aliases": ["예린", "자기"]
+      }
+    ],
+    "seed_persons": ["p1"],
+    "utterances": [
+      "예린이랑 한강 걷는데 앞에 웬 아저씨가 소리침",
+      "무서워서 그냥 빨리 지나갔음ㅠ",
+      "예린이는 뉴스에 나온 그 정치인 닮았다고 함ㅋㅋ"
+    ],
+    "mentions": [
+      {"turn": 0, "surface": "예린이", "gold_person_id": "p1"},
+      {"turn": 2, "surface": "예린이", "gold_person_id": "p1"}
+    ],
+    "events": [
+      {"turn": 0, "type": "meeting", "occurred_at_kind": "relative"}
+    ],
+    "expected_ask_user": {"allowed": ["none"]},
+    "trap": {
+      "kind": "passing_mention",
+      "reason": "'웬 아저씨'(t0)는 길에서 스친 모르는 사람, '그 정치인'(t2)은 뉴스 속 인물이다 — 둘 다 사용자와 관계가 없고 실명도 쓰지 않았다. 둘 중 하나라도 인물로 등록되면 오탐이다"
+    }
+  }
+]
