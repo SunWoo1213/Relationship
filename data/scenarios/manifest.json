@@ -198,16 +198,15 @@
     "event_types": {
       "conflict": 6,
       "favor": 9,
-      "meal": 18,
-      "meeting": 11,
-      "other": 2,
-      "personal_share": 25,
+      "meal": 17,
+      "meeting": 12,
+      "other": 5,
+      "personal_share": 26,
       "praise": 1
     },
     "occurred_at_kind": {
-      "absolute": 1,
       "none": 28,
-      "relative": 43
+      "relative": 48
     },
     "utterance_stats": {
       "turns_min": 3,

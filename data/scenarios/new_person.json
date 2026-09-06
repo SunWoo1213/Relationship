@@ -31,7 +31,9 @@
       {"turn": 2, "surface": "하람씨", "gold_person_id": "p1"}
     ],
     "events": [
-      {"turn": 0, "type": "personal_share", "occurred_at_kind": "relative"}
+      {"turn": 0, "type": "personal_share", "occurred_at_kind": "relative"},
+      {"turn": 1, "type": "other", "occurred_at_kind": "none"},
+      {"turn": 2, "type": "personal_share", "occurred_at_kind": "relative"}
     ],
     "expected_ask_user": {"allowed": ["new_person"]}
   },
@@ -63,6 +65,7 @@
     ],
     "mentions": [
       {"turn": 0, "surface": "이대리", "gold_person_id": "p1"},
+      {"turn": 1, "surface": "그 친구", "gold_person_id": "p2"},
       {"turn": 1, "surface": "임대리", "gold_person_id": "p2"},
       {"turn": 2, "surface": "임대리", "gold_person_id": "p2"},
       {"turn": 2, "surface": "이대리", "gold_person_id": "p1"},

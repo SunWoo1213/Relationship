@@ -1,0 +1,120 @@
+# 재검수 전건 일관성 스캔 (verifier, 대상 76add8a) — 읽기 전용 스크립트 출력
+
+## A. 결정 I — seed 인물 aliases 가 발화에서 '처음 생기는 호칭' 인지 (인용/승진 턴에 등장하는 alias)
+  sc-001 p1 alias='김팀장' turns=[1] -> ['근데 김팀장 이번에 부장 달았대']
+  sc-002 p1 alias='이대리' turns=[0] -> ['이대리 이번에 과장으로 승진했더라 ㅊㅋㅊㅋ']
+  sc-002 p1 alias='이서연' turns=[4] -> ['이서연 과장님이라고 부르니 좀 웃김ㅋㅋ']
+  sc-004 p1 alias='강팀장' turns=[0] -> ['강팀장님 이번 인사에 실장 되셨대']
+  sc-006 p1 alias='채원씨' turns=[0] -> ['채원씨 이번에 주임 달았어']
+  sc-008 p1 alias='아빠' turns=[0] -> ['아빠 이번에 부장으로 승진하셨대']
+  sc-014 p1 alias='자기' turns=[3] -> ['자기라고 부르면 부끄러워 하더라']
+  sc-015 p1 alias='은우' turns=[0] -> ['은우 별명이 부장님이야 잔소리 대마왕ㅋ']
+  sc-015 p1 alias='부장님' turns=[0] -> ['은우 별명이 부장님이야 잔소리 대마왕ㅋ']
+  sc-015 p2 alias='부장님' turns=[0] -> ['은우 별명이 부장님이야 잔소리 대마왕ㅋ']
+  sc-016 p1 alias='린이' turns=[2] -> ['린이라고 부르는 건 나뿐이야ㅋㅋ']
+
+## B. 결정 I — 두 seed 인물 이상 시나리오의 alias 교집합·직급형 호칭 비대칭
+  sc-002 공유=[] 직급형=[('p1', ['이대리']), ('p2', ['박과장'])]
+  sc-004 공유=[] 직급형=[('p1', ['강팀장']), ('p2', ['윤팀장'])]
+  sc-006 공유=[] 직급형=[('p1', []), ('p2', ['조주임'])]
+  sc-008 공유=[] 직급형=[('p1', ['김차장']), ('p2', ['한부장'])]
+  sc-010 공유=['민준'] 직급형=[('p1', ['김팀장', '팀장님']), ('p2', [])]
+  sc-013 공유=[] 직급형=[('p1', []), ('p2', [])]
+  sc-015 공유=['부장님'] 직급형=[('p1', ['부장님']), ('p2', ['한부장', '부장님'])]
+  sc-017 공유=[] 직급형=[('p1', []), ('p2', [])]
+  sc-018 공유=[] 직급형=[('p1', []), ('p2', [])]
+  sc-019 공유=[] 직급형=[('p1', []), ('p2', [])]
+  sc-020 공유=[] 직급형=[('p1', ['심팀장', '팀장님']), ('p2', [])]
+  sc-021 공유=[] 직급형=[('p1', []), ('p2', []), ('p3', [])]
+  sc-022 공유=[] 직급형=[('p1', []), ('p2', [])]
+  sc-024 공유=[] 직급형=[('p1', []), ('p2', [])]
+  sc-030 공유=[] 직급형=[('p1', []), ('p2', [])]
+  sc-033 공유=[] 직급형=[('p1', []), ('p2', ['심팀장', '팀장님'])]
+
+## C. 결정 J(a) — 시간 낱말 포함 턴과 occurred_at_kind
+  sc-001 t0 kind=['relative'] found=['오늘'] :: 오늘 김팀장이랑 회의 또 길어졌음ㅋㅋ
+  sc-001 t1 kind=['relative'] found=['이번'] :: 근데 김팀장 이번에 부장 달았대
+  sc-002 t0 kind=['relative'] found=['이번'] :: 이대리 이번에 과장으로 승진했더라 ㅊㅋㅊㅋ
+  sc-002 t2 kind=['relative'] found=['어제'] :: 박과장님이 어제 회식비 다 내주심
+  sc-003 t1 kind=['none'] found=[] :: 명함 새로 팠다고 자랑하더라ㅋㅋ
+  sc-003 t3 kind=['none'] found=[] :: 유진씨한테 축하한다고 커피 사줬어
+  sc-004 t0 kind=['none'] found=['이번'] :: 강팀장님 이번 인사에 실장 되셨대
+  sc-004 t2 kind=['none'] found=[] :: 습관대로 팀장님이라 불렀다가 혼남ㅋㅋ
+  sc-004 t3 kind=['relative'] found=['저녁'] :: 실장님이 저녁에 술 사주셨어
+  sc-005 t1 kind=['relative'] found=['이번'] :: 이번에 회장 됐다고 연락 왔어ㅋㅋ
+  sc-005 t3 kind=['none'] found=['첫', '때'] :: 첫 회의 때 엄청 긴장했다더라
+  sc-005 t4 kind=['absolute'] found=['월'] :: 9월 3일에 축하 겸 밥 먹었어ㅋㅋ
+  sc-006 t0 kind=['relative'] found=['이번'] :: 채원씨 이번에 주임 달았어
+  sc-006 t3 kind=['none'] found=[] :: 채원씨가 고맙다고 커피 사줬어
+  sc-007 t0 kind=['relative'] found=['오늘'] :: 오늘 문쌤한테 피티 받았는데 빡셌음
+  sc-007 t1 kind=['none'] found=[] :: 명찰이 실장으로 바뀌어 있더라
+  sc-007 t2 kind=['none'] found=[] :: 문실장님 됐다고 커피 쏘심ㅋㅋ
+  sc-008 t0 kind=['relative'] found=['이번'] :: 아빠 이번에 부장으로 승진하셨대
+  sc-008 t1 kind=['relative'] found=['오늘'] :: 근데 우리 회사 부장님은 오늘도 잔소리ㅋ
+  sc-008 t2 kind=['relative'] found=['저녁'] :: 저녁에 아빠랑 축하 삼겹살 먹었음
+  sc-009 t0 kind=['relative'] found=['점심'] :: 배대리랑 점심 같이 먹었어
+  sc-009 t1 kind=['relative'] found=['요즘'] :: 준호가 요즘 야근 많다고 힘들대
+  sc-010 t0 kind=['relative'] found=['오늘'] :: 회사 김팀장이랑 오늘 또 부딪혔어ㅠ
+  sc-010 t1 kind=['relative'] found=['저녁'] :: 저녁엔 동창 민준이 만나서 술 마심
+  sc-010 t2 kind=['none'] found=[] :: 민준이가 회사 얘기 실컷 들어줬어
+  sc-011 t0 kind=['relative'] found=['오늘'] :: 언니가 오늘 반찬 잔뜩 갖다줬어
+  sc-011 t2 kind=['none'] found=[] :: 유진언니한테 용돈 조금 드렸음
+  sc-012 t2 kind=['none'] found=[] :: 안쌤한테 질문하러 갔다가 혼났어
+  sc-013 t0 kind=['none'] found=[] :: 채원씨가 보고서 대신 봐줘서 살았음
+  sc-014 t0 kind=['relative'] found=['오늘', '시'] :: 다인이랑 오늘 전시회 갔다왔어
+  sc-015 t1 kind=['relative'] found=['오늘'] :: 오늘 진짜 한부장님한테 제대로 깨졌어
+  sc-015 t2 kind=['none'] found=[] :: 그 얘기 했더니 은우가 또 잔소리함
+  sc-016 t0 kind=['none'] found=['시간'] :: 예린이랑 카페에서 세 시간 수다떰
+  sc-016 t1 kind=['relative'] found=['요즘'] :: 예리니 요즘 이직 준비한다고 바쁘대
+  sc-017 t0 kind=['relative'] found=['어제'] :: 어제 규진이랑 서윤이 만나서 밥 먹었어
+  sc-017 t1 kind=['relative'] found=['요즘'] :: 규진이는 요즘 이직 준비한대ㅋㅋ
+  sc-018 t0 kind=['relative'] found=['오늘'] :: 민서 누나가 오늘 반찬 갖다줬어
+  sc-019 t0 kind=['none'] found=[] :: 아름이랑 세호랑 같이 영화 봤는데
+  sc-020 t0 kind=['relative'] found=['오늘'] :: 오늘 심팀장이랑 가은이랑 같이 외근 갔어
+  sc-020 t1 kind=['relative'] found=['점심'] :: 그분이 점심 사주셔서 잘 먹었어
+  sc-021 t3 kind=['relative'] found=['저번', '시'] :: 보라는 저번에 도시락 싸줬었는데
+  sc-022 t0 kind=['relative'] found=['어제'] :: 규진이랑 세호랑 어제 같이 술 마셨대
+  sc-023 t0 kind=['relative'] found=['이번'] :: 심팀장이 이번에 본사로 옮기신대
+  sc-024 t0 kind=['none'] found=['시간'] :: 동혁이랑 보라랑 카페에서 두 시간 떠들었어
+  sc-024 t1 kind=['none'] found=[] :: 동혁이가 커피 사줘서 잘 마셨어
+  sc-024 t3 kind=['relative'] found=['요즘'] :: 둘 다 요즘 힘들다고 하더라
+  sc-025 t0 kind=['relative'] found=['어제'] :: 엄마가 어제 김치 담가서 보내주셨어
+  sc-026 t0 kind=['relative'] found=['오늘', '저녁'] :: 아름이랑 오늘 저녁에 파스타 먹었어
+  sc-026 t1 kind=['relative'] found=['요즘'] :: 요즘 회사 일 많다고 좀 지쳐 보였어
+  sc-027 t0 kind=['relative'] found=['어제'] :: 규진이가 어제 이사한다고 연락 왔더라
+  sc-028 t0 kind=['relative'] found=['오늘'] :: 심팀장이 오늘 보고서 칭찬해줬어
+  sc-029 t0 kind=['relative'] found=['오늘'] :: 보라쌤한테 오늘 자세 교정 받았어
+  sc-029 t2 kind=['none'] found=[] :: 보라쌤이 스트레칭 영상도 보내줬어
+  sc-030 t0 kind=['none'] found=['시'] :: 하윤이가 시험 끝났다고 좋아하더라
+  sc-030 t1 kind=['none'] found=[] :: 축하한다고 치킨 사줬어ㅋㅋ
+  sc-030 t2 kind=['none'] found=[] :: 엄마도 용돈 챙겨줬대ㅋㅋ
+  sc-031 t0 kind=['relative'] found=['어제'] :: 서윤이랑 어제 한강에서 자전거 탔어
+  sc-031 t2 kind=['none'] found=[] :: 서윤이가 사진 잘 찍어줘서 고마웟어
+  sc-032 t0 kind=['relative'] found=['어제'] :: 지호형이 어제 이직 축하한다고 밥 샀어
+  sc-033 t0 kind=['relative'] found=['점심'] :: 가은이랑 점심에 새로 생긴 국밥집 갔어
+  sc-033 t4 kind=['relative'] found=['요즘', '때'] :: 가은이 요즘 프로젝트 때문에 정신없대
+  sc-034 t0 kind=['relative'] found=['지난', '시'] :: 아빠가 지난주에 낚시 다녀오셨대
+  sc-034 t1 kind=['none'] found=['월'] :: 월척 잡았다고 사진 계속 보내심ㅋㅋ
+  sc-035 t0 kind=['relative'] found=['오늘'] :: 오늘 팀에 신입 들어왔는데 이름이 장하람이래
+  sc-036 t0 kind=['relative'] found=['어제'] :: 이대리가 어제 동호회에 친구 데려왔더라
+  sc-037 t0 kind=['relative'] found=['주말', '시'] :: 주말에 큰집 갔다가 사촌형 시우 만났어
+  sc-037 t1 kind=['none', 'none'] found=['시'] :: 시우형이 취업했다고 고기 사줬음ㅋㅋ
+  sc-038 t0 kind=['relative'] found=['어제'] :: 어제 다인이랑 드라마 정주행했는데 재밌더라
+  sc-039 t0 kind=['none'] found=['시'] :: 야근하다가 한부장님이 치킨 시켜줬어
+  sc-039 t2 kind=['none'] found=[] :: 한부장님이 기사님한테 음료수까지 챙겨주심
+  sc-040 t0 kind=['none'] found=[] :: 예린이랑 한강 걷는데 앞에 웬 아저씨가 소리침
+
+## D. '이번' 전건
+  sc-001 t1 E=[('personal_share', 'relative')] :: 근데 김팀장 이번에 부장 달았대
+  sc-002 t0 E=[('personal_share', 'relative')] :: 이대리 이번에 과장으로 승진했더라 ㅊㅋㅊㅋ
+  sc-004 t0 E=[('personal_share', 'none')] :: 강팀장님 이번 인사에 실장 되셨대
+  sc-005 t1 E=[('personal_share', 'relative')] :: 이번에 회장 됐다고 연락 왔어ㅋㅋ
+  sc-006 t0 E=[('personal_share', 'relative')] :: 채원씨 이번에 주임 달았어
+  sc-008 t0 E=[('personal_share', 'relative')] :: 아빠 이번에 부장으로 승진하셨대
+  sc-023 t0 E=[('personal_share', 'relative')] :: 심팀장이 이번에 본사로 옮기신대
+  sc-034 t2 E=[] :: 이번 주말에 같이 가자고 하시네
+
+## E. U6-4 ambiguous 턴 이벤트
+  sc-013 t3 events=[]
+  sc-022 t1 events=[]
+  sc-024 t4 events=[]

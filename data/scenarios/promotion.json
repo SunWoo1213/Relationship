@@ -268,7 +268,7 @@
       {
         "turn": 0,
         "type": "personal_share",
-        "occurred_at_kind": "none"
+        "occurred_at_kind": "relative"
       },
       {
         "turn": 2,
@@ -315,7 +315,7 @@
       "이번에 회장 됐다고 연락 왔어ㅋㅋ",
       "이제 회장님이라고 놀리는 중임",
       "첫 회의 때 엄청 긴장했다더라",
-      "9월 3일에 축하 겸 밥 먹었어ㅋㅋ"
+      "9월 20일에 축하 겸 밥 먹기로 했어"
     ],
     "mentions": [
       {
@@ -338,12 +338,7 @@
       {
         "turn": 3,
         "type": "personal_share",
-        "occurred_at_kind": "none"
-      },
-      {
-        "turn": 4,
-        "type": "meal",
-        "occurred_at_kind": "absolute"
+        "occurred_at_kind": "relative"
       }
     ],
     "expected_ask_user": {
@@ -412,6 +407,11 @@
         "turn": 0,
         "type": "personal_share",
         "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 2,
+        "type": "other",
+        "occurred_at_kind": "none"
       },
       {
         "turn": 3,

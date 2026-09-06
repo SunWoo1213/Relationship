@@ -281,6 +281,11 @@
     ],
     "events": [
       {
+        "turn": 0,
+        "type": "other",
+        "occurred_at_kind": "relative"
+      },
+      {
         "turn": 2,
         "type": "conflict",
         "occurred_at_kind": "none"
@@ -366,6 +371,11 @@
         "turn": 0,
         "type": "favor",
         "occurred_at_kind": "none"
+      },
+      {
+        "turn": 1,
+        "type": "meeting",
+        "occurred_at_kind": "relative"
       }
     ],
     "expected_ask_user": {

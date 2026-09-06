@@ -107,3 +107,4 @@
 - 2026-09-06 18:59 | COMMIT | aa6ecfc feat(P1-pilot-dataset): U3 pronoun 8·normal 10 시나리오 — 선행사 2인 이상 7/8, ambiguous 누적 3, 일정 발화 4건
 - 2026-09-06 19:10 | COMMIT | 6775463 feat(P1-pilot-dataset): U4 new_person 6 시나리오 — 등록 대상 3·지나가는 언급 3, 40건 완성·--strict rc=0
 - 2026-09-06 19:32 | COMMIT | 40c36f8 feat(P1-pilot-dataset): U5 schema_version 2·검사 11/14/15·manifest 배분표·검수 패킷 — 40건 --strict rc=0, 69 passed
+- 2026-09-06 20:12 | COMMIT | 76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17건 반영 — aliases 사전 상태 규칙(I)·events 규칙(J) 전건 재라벨·sc-002/012 재작성
