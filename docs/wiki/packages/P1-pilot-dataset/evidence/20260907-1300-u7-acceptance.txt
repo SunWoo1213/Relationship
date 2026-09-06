@@ -1,0 +1,77 @@
+# P1-pilot-dataset U7 — 수용 기준 기계 검증 (01-plan 50~58행)
+평가한 커밋: aeed0bd4a15a18c4e6efa963034cc24e66c128f9 (dev, aeed0bd fix(P1-pilot-dataset): U6-3 3차 재검수 #21·#22 반영 — sc-034 t1 favor(결정 O)·U6-5 favor 문구 방향 무관(결정 P), label-review 3차 절)
+작업 트리: data/ scripts/ tests/ 미커밋 변경 없음 (git status --porcelain 빈 출력)
+생성 시각(시스템 시계): 2026-09-06 21:43
+실행 환경: Windows / Git Bash, PYTHONIOENCODING=utf-8, 네트워크·DB·LLM 미사용
+
+== 기준 1 "30~50건" + 기준 2 "(승진·대명사·별칭·정상·신규)" — 5범주 각 1건 이상
+$ python scripts/validate_scenarios.py --strict --json | python -c "import json,sys;d=json.load(sys.stdin);print('total',d['total'],'ok',d['ok'],'counts',d['counts'])"
+total 40 ok True counts {'alias': 8, 'new_person': 6, 'normal': 10, 'promotion': 8, 'pronoun': 8}
+
+== 기준 3 "data/scenarios/ JSON" — 검증기 rc=0
+$ python scripts/validate_scenarios.py --strict; echo rc=$?
+== validate_scenarios data/scenarios ==
+[info] strict=True schema_version=2
+[info] promotion.json: 8건
+[info] pronoun.json: 8건
+[info] alias.json: 8건
+[info] normal.json: 10건
+[info] new_person.json: 6건
+[PASS] (0) 적재(manifest·시나리오 파일 읽기)
+[PASS] (1) 스키마 위반
+[PASS] (2) gold_person_id 교차(H-1 ambiguous 예외 포함)
+[PASS] (3) turn 범위
+[PASS] (4) id 전역 유일
+[PASS] (5) events.type enum
+[PASS] (6) manifest counts·total 일치
+[PASS] (7) virtual_names 화이트리스트
+[PASS] (8) manifest ambiguous_mention_count 일치
+[PASS] (9) seed_persons ⊆ persons
+[PASS] (10) manifest trap_count 일치
+[PASS] (11) 파일명 <-> category 일치
+[PASS] (12) mentions.surface 가 그 turn 발화 안
+[PASS] (13) 발화 길이·턴 수(구어체 규칙)
+[PASS] (14) passing_mentions.surface 가 그 turn 발화 안
+[PASS] (15) 같은 turn 의 mentions <-> passing_mentions 비겹침
+[info] 카테고리별: promotion=8 pronoun=8 alias=8 normal=10 new_person=6
+== 결과: 시나리오 40건 / 오류 0 ==
+rc=0
+
+== 검증기 자체 테스트
+$ python -m pytest tests/test_validate_scenarios.py -q
+.....................................................................    [100%]
+69 passed in 1.75s
+
+== 기준 4 "라벨 검수 완료" — 반영 건수 / 열림 0 / 검수자 줄
+$ grep -c "반영 " docs/wiki/packages/P1-pilot-dataset/evidence/20260906-1938-label-review.md
+29
+$ grep -cE '\| *열림 *\|' docs/wiki/packages/P1-pilot-dataset/evidence/20260906-1938-label-review.md
+0
+$ head -1 docs/wiki/packages/P1-pilot-dataset/evidence/20260906-1938-label-review.md
+# P1-pilot-dataset 라벨 검수 기록 (20260906-1938)
+$ sed -n '3p' docs/wiki/packages/P1-pilot-dataset/evidence/20260906-1938-label-review.md
+검수자: verifier (fable, 새 컨텍스트) | 표본: 40/40 | 사용자 검수: 함정 12건·new_person 지나가는 언급 3건
+
+== 산출물 목록
+$ ls data/scenarios
+alias.json
+manifest.json
+manifest.schema.json
+new_person.json
+normal.json
+promotion.json
+pronoun.json
+schema.json
+
+== 보충: grep -c 는 '일치한 행 수'라 표 밖 산문 행(집계·인용)까지 센다(29).
+   지적 표의 상태 셀만 세면 반영 21 · 기각 1 · 열림 0 (총 22) — 검수 기록의 최종 집계와 같다.
+$ grep -cE '^\| *[0-9]+ \|.*\| *반영 ' docs/wiki/packages/P1-pilot-dataset/evidence/20260906-1938-label-review.md
+21
+$ grep -cE '^\| *[0-9]+ \|.*\| *기각 ' docs/wiki/packages/P1-pilot-dataset/evidence/20260906-1938-label-review.md
+1
+$ grep -n '^\*\*반영 21' docs/wiki/packages/P1-pilot-dataset/evidence/20260906-1938-label-review.md
+259:**반영 21**(#1~#16 76add8a · #18~#20 6906af4 · #21~#22 aeed0bd) · **기각 1**(#17, 결정 L) · **열림 0**. 총 22.
+
+== 사용자 검수(결정 G) 기록 줄
+$ grep -n '12/12 동의' docs/wiki/packages/P1-pilot-dataset/evidence/20260906-1938-label-review.md
+271:대상: 3차 재검수 절 최종 목록 12건(함정 sc-002·004·006·008·010·012·013·015·036 + 지나가는 언급 sc-038·039·040). 메인 세션이 각 건의 발화·지칭→골드·이벤트·확인 포인트를 대화에 제시했고, 사용자가 **12/12 동의**(이의 0). 데이터 변경 없음. 검수 기록의 열림 0 유지.

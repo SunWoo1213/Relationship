@@ -109,3 +109,4 @@
 - 2026-09-06 19:32 | COMMIT | 40c36f8 feat(P1-pilot-dataset): U5 schema_version 2·검사 11/14/15·manifest 배분표·검수 패킷 — 40건 --strict rc=0, 69 passed
 - 2026-09-06 20:12 | COMMIT | 76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17건 반영 — aliases 사전 상태 규칙(I)·events 규칙(J) 전건 재라벨·sc-002/012 재작성
 - 2026-09-06 20:47 | COMMIT | 6906af4 fix(P1-pilot-dataset): U6-2 재검수 #18~#20 반영 — 시점 낱말 기준(결정 M)·sc-005 원복(결정 N)·U6-5 사용자–인물 행위 규칙, label-review 재검수 절
+- 2026-09-06 21:09 | COMMIT | aeed0bd fix(P1-pilot-dataset): U6-3 3차 재검수 #21·#22 반영 — sc-034 t1 favor(결정 O)·U6-5 favor 문구 방향 무관(결정 P), label-review 3차 절

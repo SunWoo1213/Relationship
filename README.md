@@ -250,6 +250,46 @@ python scripts/er_smoke.py --provider openai      # OPENAI_API_KEY·OPENAI_MODEL
 
 - **임계치·가중치 조정**: 환경변수 이름 `T_MERGE`·`T_NEW`·`W_LLM`·`W_EMB`·`W_RULE`(값은 `.env.example`에 이름만 있다 — 이 문서와 에이전트는 `.env`를 읽지 않는다). 조정은 P4-pilot-eval의 트레이드오프 곡선 결과로만 한다.
 
+### 평가 데이터셋(파일럿 40건)
+
+`data/scenarios/`는 엔티티 해석·이벤트 추출을 채점하기 위한 **한국어 대화 시나리오 40건**과 그 골드 라벨이다. 지표 계산(오병합률·미검출률·트레이드오프 곡선)은 여기서 하지 않는다 — P4-pilot-eval이 이 데이터를 읽어서 한다. 실명·연락처는 들어 있지 않다(가상 성명 목록 밖 이름은 검증기가 FAIL 한다).
+
+- 5 카테고리: `promotion` 8(sc-001~008, 승진 호칭 변경) · `alias` 8(sc-009~016, 별칭 혼용) · `pronoun` 8(sc-017~024, 지시대명사) · `normal` 10(sc-025~034, 함정 없는 기준선) · `new_person` 6(sc-035~040, 신규 등록 판정).
+- `schema_version` 2. 시나리오 1건 = 발화열 + 골드 라벨: `persons[]`(가상 성명·관계 태그·위계·별칭) · `seed_persons`(대화 전 이미 등록돼 있는 인물) · `mentions[]`(지칭 표면형 → 골드 인물) · `passing_mentions[]`(등록하면 안 되는 지나가는 언급) · `events[]`(`turn`·`type` 7종·`occurred_at_kind`) · `expected_ask_user.allowed`(허용 집합) · `trap`(오병합 유도 함정).
+- 오병합 유도 함정 12건, `ambiguous` mention 3건, 일정 발화 4건. 일정(schedule) 골드 라벨은 없다 — P10에서 덧붙인다.
+
+실행법(네트워크·DB·LLM을 쓰지 않는다):
+
+```bash
+python scripts/validate_scenarios.py --strict              # 검사 (0)~(15), rc 0/1
+python scripts/validate_scenarios.py --strict --json       # 기계 판독 요약(ok·total·counts·issue_count)
+python scripts/validate_scenarios.py --write-distribution  # manifest.json 배분표 재계산(멱등, 항상 LF)
+python scripts/dump_scenarios.py --out <경로>.md            # 사람이 읽는 검수 패킷
+python -m pytest tests/test_validate_scenarios.py -q       # 검증기 자체 테스트 69건
+```
+
+라벨 규칙 요약(권위는 `data/scenarios/schema.json`의 각 필드 description):
+
+- `persons[].aliases`는 **대화 시작 전에 이미 알려진 별칭만** 적는다. 승진 후 호칭처럼 시스템이 대화에서 배워야 할 호칭은 넣지 않고, 두 인물이 나눠 쓸 수 있는 호칭(팀장님·부장님 …)은 양쪽 다 넣거나 양쪽 다 뺀다 — 비대칭이면 별칭 완전일치만으로 정답이 새어 나가 함정이 함정이 아니게 된다.
+- `events` 규칙: (a) `occurred_at_kind`는 **그 턴 안의 시점 낱말만** 본다(앞 턴에서 상속하지 않고 문장 성분을 가리지 않는다. 시점 낱말이 있으면 `relative`, 날짜·시각이면 `absolute`, 없으면 `none`. 기간 표현은 시점이 아니다) (b) 미래 약속·계획은 이벤트가 아니다 (c) 승진·이직·취업 같은 신상 소식은 `personal_share` (d) 사용자가 참여하지 않은 사건(전해 들은 근황·인물끼리 한 일)도 `personal_share` — `meal`/`meeting`/`favor`/`conflict`/`praise`/`other`는 **사용자–인물 사이 사건**에만 쓴다 (e) 잔소리는 `conflict`. 행위의 한쪽이 사용자이면 어느 방향이든 호의는 `favor`, 업무 지시·과제 부과는 `other`이고, 부작위("그냥 넘어가주셨는데")는 사건이 아니다.
+- `mentions[].ambiguous: true`인 지칭만 `gold_person_id: null`을 허용하며, 그 지칭은 오병합률·미검출률·F1 분모에서 뺀다(개수는 `manifest.json`의 `ambiguous_mention_count`).
+- `passing_mentions[]`는 정답 인물이 **없는** 지칭이다. 여기서 인물 생성이나 `ask_user(kind=new_person)`이 나오면 오탐으로 센다.
+
+검수 절차(데이터를 만든 쪽이 검수하지 않는다):
+
+1. eval-agent가 시나리오를 쓰고 `dump_scenarios.py`로 검수 패킷을 만든다 — 패킷은 판정하지 않고 판정할 것을 나열한다.
+2. verifier가 **새 컨텍스트**에서 전건 40/40을 검수해 지적을 남기고, 반영본을 재검수해 상태를 닫는다(반영한 사람이 자기 지적을 닫지 않는다).
+3. 사용자가 함정 건과 지나가는 언급 건을 검수한다.
+4. 기록은 한 파일: `docs/wiki/packages/P1-pilot-dataset/evidence/20260906-1938-label-review.md`(지적 22건 → 반영 21·기각 1·**열림 0**, 사용자 12/12 동의). 수용 기준 기계 검증 출력은 같은 폴더의 `20260907-1300-u7-acceptance.txt`.
+
+알려진 한계(P4·P10으로 넘긴다 — 성능에 유리하게 감추지 않는다):
+
+- `occurred_at_kind: absolute` **0건** — 미래 약속 발화를 원문대로 되돌리면서 유일한 사례가 사라졌다. P10에서 과거 절대 날짜 발화를 보충해야 absolute 분모가 생긴다.
+- 이벤트 type 편중: 전체 76건 중 `personal_share` 25 · `meal` 17 · `meeting` 12 · `favor` 10 · `conflict` 6 · `other` 5 · `praise` 1. `favor` 10건 중 사용자→인물 방향은 1건뿐이다.
+- 위계 `하` 6/60, 발화 길이 10~26자, 턴 수 3~5로 폭이 좁다 — 실사용보다 쉬운 방향, 즉 **과대평가 편향**이다.
+- 같은 가상 성명이 시나리오마다 다른 관계로 다시 등장한다. **P4 러너는 시나리오 사이에 DB를 비워야 한다** — 비우지 않으면 사전 상태가 오염돼 베이스라인 비교의 동일 조건이 깨진다.
+- 소비자(P3-baselines·P4-pilot-eval)가 mention 단위 정보(함정 대상, 지칭별 기대 질문, 발화 안 위치, 선행사 턴 등)를 더 요구하면 FIX가 아니라 `schema_version`을 올린다.
+
 ## 문서 안내
 
 | 알고 싶은 것 | 보는 곳 |
@@ -260,3 +300,4 @@ python scripts/er_smoke.py --provider openai      # OPENAI_API_KEY·OPENAI_MODEL
 | 실서버에 올린 뒤 무엇을 점검하나 | `SERVER-CHECKLIST.md` (dev → 실서버 검증 → main 승격의 "검증" 기준·증거 규약·되돌리기) |
 | 지금 어디까지 왔나 | `docs/wiki/HANDOFF.md`, `docs/wiki/journal.md` |
 | 무엇이 이미 만들어져 있나 | `docs/wiki/registry.md` |
+| 평가 데이터셋은 어디에 | `data/scenarios/` (검증기 `scripts/validate_scenarios.py`, 라벨 규칙은 `data/scenarios/schema.json`의 description) |
