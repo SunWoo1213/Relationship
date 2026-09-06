@@ -1,0 +1,2 @@
+[info] 대상 별칭 0건, 인물 0명 (batch_size=64)
+[dry-run] 쓰기 0건 (--apply 로 실제 반영)

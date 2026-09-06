@@ -1,0 +1,1 @@
+[error] ANTHROPIC_API_KEY 환경변수가 설정되지 않았다. 실 LLM 호출은 os.environ 에 그 변수를 직접 넣어야 한다(.env 는 읽지 않는다, security.md §1 -- .env.example 참조).
