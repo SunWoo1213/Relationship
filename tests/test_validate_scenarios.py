@@ -98,7 +98,7 @@ def manifest_for(files: dict[str, list[dict]], **overrides) -> dict:
         if category in counts:
             counts[category] += 1
     data = {
-        "schema_version": 1,
+        "schema_version": 2,
         "files": list(CATEGORY_FILES),
         "counts": counts,
         "total": len(scenarios),
@@ -507,10 +507,11 @@ def test_check_13_accepts_boundary_turn_counts(tmp_path: Path, turns: int):
 
 def test_check_names_cover_registered_checks():
     """사람이 읽는 출력·`--json` 요약이 새 검사도 다른 검사와 같은 형식으로 낸다."""
-    assert set(vs.CHECK_NAMES) == {
-        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "13"
-    }
-    assert "11" not in vs.CHECK_NAMES  # U5 예정 -- 하지 않는 검사에 PASS 를 찍지 않는다
+    assert set(vs.CHECK_NAMES) == {str(n) for n in range(16)}
+    # U5 에서 (11) 을 채웠다 -- U1~fix 시점에는 비어 있었고("하지 않는 검사에
+    # PASS 를 찍지 않는다") 이제 예약 번호가 없다. 번호에 빈칸이 생기면 사람이
+    # 읽는 출력에서 "없는 검사" 를 통과로 오해한다.
+    assert list(vs.CHECK_NAMES) == [str(n) for n in range(16)]
 
 
 # --------------------------------------------------------------------------
@@ -567,14 +568,18 @@ def test_validator_reads_event_types_from_schema_not_hardcoded(scenario_schema: 
 
 
 def test_schema_versions_match(scenario_schema: dict, manifest_schema: dict):
-    """schema.json·manifest.schema.json·manifest.json 의 판이 1 로 일치한다."""
+    """schema.json·manifest.schema.json·manifest.json 의 판이 2 로 일치한다.
+
+    판 2(U5) = 선택 필드 `passing_mentions` 추가. 세 파일이 같은 값을 들고 있지
+    않으면 소비자(P3-baselines·P4-pilot-eval)가 어느 판의 데이터인지 알 수 없다.
+    """
     real_manifest = json.loads(
         (REPO_SCENARIOS / "manifest.json").read_text(encoding="utf-8")
     )
-    assert scenario_schema["schema_version"] == 1
-    assert manifest_schema["schema_version"] == 1
-    assert manifest_schema["properties"]["schema_version"]["const"] == 1
-    assert real_manifest["schema_version"] == 1
+    assert scenario_schema["schema_version"] == 2
+    assert manifest_schema["schema_version"] == 2
+    assert manifest_schema["properties"]["schema_version"]["const"] == 2
+    assert real_manifest["schema_version"] == 2
 
 
 # --------------------------------------------------------------------------
@@ -665,3 +670,239 @@ def test_prompt_ref_accepts_string_and_list(manifest_schema: dict):
         candidate = copy.deepcopy(base)
         candidate["generator"]["prompt_ref"] = value
         assert list(validator.iter_errors(candidate)) == []
+
+
+# --------------------------------------------------------------------------
+# 검사 (11) 파일명 <-> category  (schema_version 2 / U5)
+# --------------------------------------------------------------------------
+
+
+def test_violation_11_file_category_mismatch(tmp_path: Path):
+    """(11) normal 시나리오가 promotion.json 안에 있으면 FAIL.
+
+    manifest.counts 는 category 값으로 세므로 **검사 (6) 은 통과한다** — 파일
+    배치가 어긋나도 배분표는 맞아 보인다. 검수 패킷·배분표를 파일 단위로 읽는
+    사람만 어긋남을 보게 되는 조용한 실패라 검사로 막는다.
+    """
+    files = {"promotion.json": [scenario(category="normal")]}
+    report = vs.run(write_dataset(tmp_path, files))
+    assert "FILE_CATEGORY_MISMATCH" in codes(report)
+    assert "11" in checks(report)
+    assert "6" not in checks(report), "배분표는 맞아 보인다는 것이 이 검사의 이유다"
+
+
+def test_check_11_passes_when_file_matches(tmp_path: Path):
+    """(11) 파일명과 category 가 같으면 통과(카테고리 5종 모두)."""
+    files = {
+        "promotion.json": [scenario(id="sc-001", category="promotion")],
+        "pronoun.json": [scenario(id="sc-002", category="pronoun")],
+        "alias.json": [scenario(id="sc-003", category="alias")],
+        "normal.json": [scenario(id="sc-004", category="normal")],
+        "new_person.json": [scenario(id="sc-005", category="new_person")],
+    }
+    report = vs.run(write_dataset(tmp_path, files))
+    assert report.issues == [], [i.line() for i in report.issues]
+
+
+def test_check_11_names_map_covers_all_categories():
+    """파일명 규칙 <category>.json 을 두 곳에 적지 않는다(FILE_CATEGORY 는 파생)."""
+    assert vs.FILE_CATEGORY == {f"{c}.json": c for c in vs.CATEGORIES}
+    assert set(vs.FILE_CATEGORY) == set(CATEGORY_FILES)
+
+
+# --------------------------------------------------------------------------
+# 검사 (14)(15) 지나가는 언급 (passing_mentions)
+# --------------------------------------------------------------------------
+
+
+def with_passing(*passing, **overrides) -> dict:
+    """정상 시나리오에 passing_mentions 를 붙인다."""
+    item = scenario(**overrides)
+    item["passing_mentions"] = list(passing)
+    return item
+
+
+def test_valid_passing_mentions_pass(tmp_path: Path):
+    """정상 표본: 발화에 있고 같은 턴 mention 과 겹치지 않는다."""
+    ok = with_passing(
+        {"turn": 0, "surface": "또", "why": "지칭이 아닌 부사지만 발화 안에는 있다"},
+    )
+    ok["mentions"] = [{"turn": 1, "surface": "부장님", "gold_person_id": "p1"}]
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [ok]}))
+    assert report.issues == [], [i.line() for i in report.issues]
+
+
+def test_violation_14_passing_surface_not_in_utterance(tmp_path: Path):
+    """(14) 발화에 없는 표면형을 지나가는 언급으로 라벨하면 FAIL.
+
+    일어날 수 없는 오탐을 기다리게 되어 그 시나리오의 오탐률이 항상 0 이 된다.
+    """
+    bad = with_passing({"turn": 0, "surface": "그 아이돌", "why": "연예인"})
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [bad]}))
+    assert "PASSING_SURFACE_NOT_IN_UTTERANCE" in codes(report)
+    assert "14" in checks(report)
+
+
+def test_check_14_skips_out_of_range_turn_but_3_reports_it(tmp_path: Path):
+    """(3) 이 passing_mentions 의 범위 밖 turn 을 잡고 (14) 는 중복 보고하지 않는다."""
+    bad = with_passing({"turn": 7, "surface": "김팀장", "why": "범위 밖"})
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [bad]}))
+    assert any(
+        i.code == "TURN_OUT_OF_RANGE" and "passing_mentions[0]" in i.where
+        for i in report.issues
+    )
+    assert "PASSING_SURFACE_NOT_IN_UTTERANCE" not in codes(report)
+
+
+def test_violation_15_overlap_substring(tmp_path: Path):
+    """(15) 같은 턴에서 mention 안에 든 "팀장" 을 지나가는 언급으로 라벨."""
+    bad = with_passing({"turn": 0, "surface": "팀장", "why": "겹치는 라벨"})
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [bad]}))
+    assert "PASSING_MENTION_OVERLAP" in codes(report)
+    assert "15" in checks(report)
+
+
+def test_violation_15_overlap_reverse_direction(tmp_path: Path):
+    """(15) 반대 방향(지나가는 언급이 mention 을 포함)도 잡는다."""
+    bad = with_passing({"turn": 0, "surface": "김팀장이랑", "why": "더 긴 쪽"})
+    bad["mentions"] = [{"turn": 0, "surface": "김팀장", "gold_person_id": "p1"}]
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [bad]}))
+    assert "PASSING_MENTION_OVERLAP" in codes(report)
+
+
+def test_check_15_ignores_other_turns(tmp_path: Path):
+    """(15) 는 **같은 턴**만 본다 — 같은 표면형이 턴마다 다른 뜻일 수 있다."""
+    ok = scenario(
+        utterances=["오늘 김팀장이랑 또 부딪혔어", "김팀장 얘기 계속 나옴ㅋㅋ"],
+        mentions=[{"turn": 0, "surface": "김팀장", "gold_person_id": "p1"}],
+        events=[],
+    )
+    ok["passing_mentions"] = [
+        {"turn": 1, "surface": "김팀장", "why": "다른 턴이라 겹침 판정 대상이 아니다"}
+    ]
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [ok]}))
+    assert report.issues == [], [i.line() for i in report.issues]
+
+
+def test_passing_mention_requires_why(tmp_path: Path):
+    """(1) 스키마 -- why 는 필수다(검수자가 판정할 근거가 없으면 라벨이 아니다)."""
+    bad = with_passing({"turn": 0, "surface": "또"})
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [bad]}))
+    assert "1" in checks(report)
+
+
+def test_passing_mention_rejects_gold_person_id(tmp_path: Path):
+    """(1) 스키마 -- 정답 인물 자리를 두지 않는다(H-1 의 null 과 뜻이 섞인다)."""
+    bad = with_passing(
+        {"turn": 0, "surface": "또", "why": "x", "gold_person_id": None}
+    )
+    report = vs.run(write_dataset(tmp_path, {"promotion.json": [bad]}))
+    assert "1" in checks(report)
+
+
+def test_repository_passing_mention_traps_have_structured_labels():
+    """저장소 불변식: trap.kind == passing_mention 이면 passing_mentions 가 있다.
+
+    판 1 은 지나가는 언급을 trap.reason 의 자연어에만 적어 P4 가 오탐을 세려면
+    문자열을 파싱해야 했다(U4 03-log 인계 (1)). 건수를 단정하지 않고 **연결**만
+    본다 — 건수 단정은 다시 시점 의존이 된다(F-1ba055).
+    """
+    dataset, _ = vs.load_dataset(REPO_SCENARIOS)
+    checked = 0
+    for _, sc in dataset.scenarios:
+        trap = sc.get("trap")
+        if isinstance(trap, dict) and trap.get("kind") == "passing_mention":
+            checked += 1
+            passing = sc.get("passing_mentions")
+            assert isinstance(passing, list) and passing, sc.get("id")
+    assert checked > 0, "passing_mention 함정이 하나도 없다면 이 불변식이 무의미하다"
+
+
+# --------------------------------------------------------------------------
+# 배분표(--write-distribution) — 검사가 아니라 산출물
+# --------------------------------------------------------------------------
+
+
+def test_build_distribution_counts_from_data(tmp_path: Path):
+    """배분표는 실제 데이터에서 계산된다(manifest 값을 되읊지 않는다)."""
+    path = write_dataset(tmp_path)
+    dataset, _ = vs.load_dataset(path)
+    dist = vs.build_distribution(dataset)
+    assert dist["by_category"]["promotion"] == 1
+    assert dist["by_relation_tag"] == {"직장": 1}
+    assert dist["by_hierarchy"] == {"상": 1}
+    assert dist["event_types"] == {"conflict": 1}
+    assert dist["occurred_at_kind"] == {"relative": 1}
+    assert dist["utterance_stats"]["turns_min"] == 2
+    assert dist["utterance_stats"]["turns_max"] == 2
+    assert dist["ambiguous_mentions"] == []
+    assert dist["new_person_subtypes"] == {"register_target": [], "passing_mention": []}
+
+
+def test_build_distribution_new_person_subtypes(tmp_path: Path):
+    """new_person 하위 유형은 trap.kind 로 기계 판정한다(R-5, 라벨 두 벌 금지)."""
+    register = scenario(id="sc-010", category="new_person")
+    passing = scenario(id="sc-011", category="new_person")
+    passing["trap"] = {"kind": "passing_mention", "reason": "연예인"}
+    path = write_dataset(tmp_path, {"new_person.json": [register, passing]})
+    dataset, _ = vs.load_dataset(path)
+    dist = vs.build_distribution(dataset)
+    assert dist["new_person_subtypes"] == {
+        "register_target": ["sc-010"],
+        "passing_mention": ["sc-011"],
+    }
+    assert dist["by_trap_kind"] == {"passing_mention": 1}
+
+
+def test_write_distribution_is_idempotent(tmp_path: Path):
+    """같은 데이터에 두 번 쓰면 **바이트가 같다**(멱등, 원칙8)."""
+    path = write_dataset(tmp_path)
+    dataset, _ = vs.load_dataset(path)
+    dist = vs.build_distribution(dataset)
+
+    changed_first, _ = vs.write_distribution(path, dist)
+    first_bytes = (path / vs.MANIFEST_FILE).read_bytes()
+    changed_second, message = vs.write_distribution(path, vs.build_distribution(dataset))
+    second_bytes = (path / vs.MANIFEST_FILE).read_bytes()
+
+    assert changed_first is True
+    assert changed_second is False
+    assert first_bytes == second_bytes
+    assert "멱등" in message
+
+
+def test_write_distribution_preserves_other_keys(tmp_path: Path):
+    """distribution 만 갈아 끼우고 나머지 키·순서는 그대로 둔다."""
+    path = write_dataset(tmp_path)
+    before = json.loads((path / vs.MANIFEST_FILE).read_text(encoding="utf-8"))
+    dataset, _ = vs.load_dataset(path)
+    vs.write_distribution(path, vs.build_distribution(dataset))
+    after = json.loads((path / vs.MANIFEST_FILE).read_text(encoding="utf-8"))
+    assert list(after) == list(before) + ["distribution"]
+    for key in before:
+        assert after[key] == before[key]
+
+
+def test_write_distribution_refuses_when_dataset_is_broken(tmp_path: Path, capsys):
+    """깨진 데이터셋의 집계를 manifest 에 남기지 않는다(배분표 뒤에 라벨 오류가 숨는다)."""
+    bad = scenario()
+    bad["mentions"][0]["gold_person_id"] = "p9"
+    path = write_dataset(tmp_path, {"promotion.json": [bad]})
+    assert vs.main(["--dir", str(path), "--write-distribution"]) == 1
+    manifest = json.loads((path / vs.MANIFEST_FILE).read_text(encoding="utf-8"))
+    assert "distribution" not in manifest
+    assert "배분표를 쓰지 않았다" in capsys.readouterr().err
+
+
+def test_repository_distribution_matches_recomputed():
+    """저장소 manifest.distribution 이 지금 데이터로 다시 계산한 값과 같다.
+
+    검증기 **기본 실행은 이것을 검사하지 않는다**(집계 결과이지 계약이 아니다,
+    U5 결정). 대신 이 테스트가 --write-distribution 재실행을 잊은 채 데이터만
+    바뀐 상태를 잡는다 — 리포트 재현성(원칙8)의 최소 방어선이다.
+    """
+    dataset, _ = vs.load_dataset(REPO_SCENARIOS)
+    real_manifest = json.loads(
+        (REPO_SCENARIOS / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert real_manifest.get("distribution") == vs.build_distribution(dataset)

@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "files": [
     "promotion.json",
     "pronoun.json",
@@ -137,5 +137,91 @@
     "seed": null,
     "seed_reason": "대화형 생성",
     "same_family_as_judge": true
+  },
+  "distribution": {
+    "generated_by": "scripts/validate_scenarios.py --write-distribution",
+    "by_category": {
+      "promotion": 8,
+      "pronoun": 8,
+      "alias": 8,
+      "normal": 10,
+      "new_person": 6
+    },
+    "by_relation_tag": {
+      "가족": 8,
+      "연인": 4,
+      "지인": 9,
+      "직장": 23,
+      "친구": 16
+    },
+    "by_hierarchy": {
+      "동": 31,
+      "상": 23,
+      "하": 6
+    },
+    "by_trap_kind": {
+      "new_person_resembles_existing": 1,
+      "nickname_shared": 1,
+      "nickname_shared_with_title": 1,
+      "passing_mention": 3,
+      "promotion_collides_with_existing_title": 2,
+      "same_title_two_persons": 3,
+      "similar_name_two_persons": 1
+    },
+    "new_person_subtypes": {
+      "register_target": [
+        "sc-035",
+        "sc-036",
+        "sc-037"
+      ],
+      "passing_mention": [
+        "sc-038",
+        "sc-039",
+        "sc-040"
+      ]
+    },
+    "schedule_utterance_scenarios": [
+      "sc-025",
+      "sc-027",
+      "sc-029",
+      "sc-033"
+    ],
+    "ambiguous_mentions": [
+      {
+        "id": "sc-022",
+        "turn": 1,
+        "surface": "걔"
+      },
+      {
+        "id": "sc-024",
+        "turn": 4,
+        "surface": "걔"
+      },
+      {
+        "id": "sc-013",
+        "turn": 3,
+        "surface": "걔"
+      }
+    ],
+    "event_types": {
+      "conflict": 5,
+      "favor": 12,
+      "meal": 19,
+      "meeting": 11,
+      "other": 6,
+      "personal_share": 10,
+      "praise": 3
+    },
+    "occurred_at_kind": {
+      "absolute": 1,
+      "none": 14,
+      "relative": 51
+    },
+    "utterance_stats": {
+      "turns_min": 3,
+      "turns_max": 5,
+      "chars_min": 10,
+      "chars_max": 26
+    }
   }
 }

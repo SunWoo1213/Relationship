@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/SunWoo1213/Relationship/data/scenarios/schema.json",
-  "schema_version": 1,
+  "schema_version": 2,
   "title": "평가 시나리오 (P1-pilot-dataset)",
-  "description": "한국어 대화 시나리오 1건의 골드 라벨. Refs: P1-pilot-dataset S3.7 S3.1 원칙8, .claude/skills/eval-harness/SKILL.md §1. 이 문서의 루트는 **시나리오 객체 하나**다. 카테고리 파일(promotion.json 등)은 이 객체의 배열이며, scripts/validate_scenarios.py 가 원소마다 이 스키마를 적용한다(원소 단위 검증이라 오류 위치가 시나리오 id 로 나온다). schema_version 은 이 스키마 문서의 판이며 manifest.json 의 schema_version 과 같아야 한다 — 소비자(P3-baselines·P4-pilot-eval)가 필드를 더 요구하면 FIX 가 아니라 schema_version 을 올린다(01-plan '소비자와의 계약 미확정').",
+  "description": "한국어 대화 시나리오 1건의 골드 라벨. Refs: P1-pilot-dataset S3.7 S3.1 원칙8, .claude/skills/eval-harness/SKILL.md §1. 이 문서의 루트는 **시나리오 객체 하나**다. 카테고리 파일(promotion.json 등)은 이 객체의 배열이며, scripts/validate_scenarios.py 가 원소마다 이 스키마를 적용한다(원소 단위 검증이라 오류 위치가 시나리오 id 로 나온다). schema_version 은 이 스키마 문서의 판이며 manifest.json 의 schema_version 과 같아야 한다 — 소비자(P3-baselines·P4-pilot-eval)가 필드를 더 요구하면 FIX 가 아니라 schema_version 을 올린다(01-plan '소비자와의 계약 미확정'). **판 2(U5)**: 선택 필드 passing_mentions 를 추가했다 — 판 1 은 '지나가는 언급'을 trap.reason 의 자연어에만 적어 두어 P4 가 오탐을 세려면 문자열을 파싱해야 했다. 판 1 데이터는 그대로 유효하다(추가만 했고 기존 필드 의미를 바꾸지 않았다).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -48,6 +48,11 @@
       "type": "array",
       "description": "지칭 표현 → 골드 인물 매핑. 지표(오병합률·미검출률·F1)의 분모가 되는 단위다.",
       "items": { "$ref": "#/$defs/mention" }
+    },
+    "passing_mentions": {
+      "type": "array",
+      "description": "판 2(U5) 선택 필드 — **등록하면 안 되는 지나가는 언급**(연예인·배달 기사·길에서 스친 사람 등). mentions 와 달리 골드 인물이 없다: 사용자와 관계가 없어 인물 카드를 만들면 안 되는 지칭이다(D1 확인형 등록의 반대 방향). P4 는 여기서 인물 생성이나 ask_user(kind=new_person) 이 나오면 **오탐**으로 센다. 판 1 은 이 정보를 trap.reason 의 자연어에만 적어 기계가 셀 수 없었다.",
+      "items": { "$ref": "#/$defs/passing_mention" }
     },
     "events": {
       "type": "array",
@@ -112,6 +117,29 @@
         "ambiguous": {
           "type": "boolean",
           "description": "H-1 — 사람도 선행사를 정할 수 없는 mention. 시나리오 자체는 건수·배분표에 포함하되 이 mention 은 오병합률·미검출률·F1 분모에서 제외한다(P4 가 manifest.ambiguous_mention_count 로 분모를 맞춘다). 생략하면 false 로 본다."
+        }
+      }
+    },
+    "passing_mention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn", "surface", "why"],
+      "description": "지나가는 언급 하나. gold_person_id 필드가 **없다** — 정답 인물이 없는 것이 이 필드의 요점이라, null 을 담을 자리를 두면 H-1(ambiguous) 의 null 과 뜻이 섞인다.",
+      "properties": {
+        "turn": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "utterances 의 인덱스. 범위는 검사 (3)(판 2 에서 passing_mentions 까지 확장), 발화 본문 대조는 검사 (14)."
+        },
+        "surface": {
+          "type": "string",
+          "minLength": 1,
+          "description": "발화에 실제로 나타난 지칭 표면형(그 아이돌 / 배달 기사님 …). utterances[turn] 안에 그대로 있어야 한다(검사 (14)). 같은 턴의 mentions[].surface 와 부분 문자열 관계면 안 된다(검사 (15)) — 겹치면 P4 가 한 지칭을 정답과 오탐 양쪽으로 세게 된다."
+        },
+        "why": {
+          "type": "string",
+          "minLength": 1,
+          "description": "왜 등록 대상이 아닌지 한 줄(검수자가 판정할 근거). trap.reason 의 자연어를 구조화한 것이다."
         }
       }
     },

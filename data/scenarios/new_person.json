@@ -126,6 +126,10 @@
       {"turn": 0, "surface": "다인이", "gold_person_id": "p1"},
       {"turn": 2, "surface": "다인이", "gold_person_id": "p1"}
     ],
+    "passing_mentions": [
+      {"turn": 1, "surface": "남주 배우", "why": "드라마 속 연예인 — 대화 소재로만 스쳐 가고 사용자와 관계가 없다. 실명도 쓰지 않았다"},
+      {"turn": 2, "surface": "그 아이돌", "why": "좋아하는 연예인 얘기일 뿐 사용자와 관계가 없다 — 인물 카드가 생기면 오탐"}
+    ],
     "events": [
       {"turn": 0, "type": "meeting", "occurred_at_kind": "relative"}
     ],
@@ -157,6 +161,10 @@
       {"turn": 0, "surface": "한부장님", "gold_person_id": "p1"},
       {"turn": 2, "surface": "한부장님", "gold_person_id": "p1"}
     ],
+    "passing_mentions": [
+      {"turn": 1, "surface": "배달 기사님", "why": "일회성 직업 언급 — 이름이 없고 지속 관계도 없다"},
+      {"turn": 2, "surface": "기사님", "why": "같은 배달 기사를 다시 부른 것뿐 — 두 번 나왔다고 등록 대상이 되지 않는다"}
+    ],
     "events": [
       {"turn": 0, "type": "favor", "occurred_at_kind": "relative"}
     ],
@@ -187,6 +195,10 @@
     "mentions": [
       {"turn": 0, "surface": "예린이", "gold_person_id": "p1"},
       {"turn": 2, "surface": "예린이", "gold_person_id": "p1"}
+    ],
+    "passing_mentions": [
+      {"turn": 0, "surface": "웬 아저씨", "why": "길에서 스친 모르는 사람 — 이름도 관계도 없다"},
+      {"turn": 2, "surface": "그 정치인", "why": "뉴스 속 인물이며 닮은꼴 비유로만 등장 — 사용자와 관계가 없고 실명도 쓰지 않았다"}
     ],
     "events": [
       {"turn": 0, "type": "meeting", "occurred_at_kind": "relative"}

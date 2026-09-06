@@ -1,0 +1,23 @@
+# --write-distribution 멱등성 확인 (U5) — 같은 데이터에 두 번 써도 바이트가 같다
+# 평가한 코드 커밋: dev 6775463 (U4) + 이 작업 단위의 미커밋 변경
+
+$ md5sum data/scenarios/manifest.json  # 1회차 쓰기 직후
+4eb573231193db62d98ad7a5ccffd935 *data/scenarios/manifest.json
+
+$ python scripts/validate_scenarios.py --strict --write-distribution  # 2회차
+[write] data/scenarios/manifest.json: distribution 변경 없음(멱등)
+rc=0
+
+$ md5sum data/scenarios/manifest.json  # 2회차 쓰기 직후
+4eb573231193db62d98ad7a5ccffd935 *data/scenarios/manifest.json
+
+$ git diff --numstat -- data/scenarios/manifest.json  # HEAD(6775463) 대비 이 단위의 변경량 = schema_version 1행 + distribution 87행. 재실행 사이의 차이는 위/아래 md5 로 본다
+warning: in the working copy of 'data/scenarios/manifest.json', LF will be replaced by CRLF the next time Git touches it
+87	1	data/scenarios/manifest.json
+
+$ python scripts/validate_scenarios.py --strict --write-distribution  # 3회차
+[write] data/scenarios/manifest.json: distribution 변경 없음(멱등)
+rc=0
+4eb573231193db62d98ad7a5ccffd935 *data/scenarios/manifest.json
+
+# 판정: 2회차·3회차 md5 가 1회차와 같고 [write] 메시지가 '변경 없음(멱등)' 이면 멱등.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/SunWoo1213/Relationship/data/scenarios/manifest.schema.json",
-  "schema_version": 1,
+  "schema_version": 2,
   "title": "평가 시나리오 매니페스트 (P1-pilot-dataset)",
   "description": "data/scenarios/manifest.json 의 스키마. **schema.json 의 $defs 에 넣지 않고 파일을 나눈 이유**: JSON Schema 문서 하나는 $id 하나·루트 하나를 갖는 것이 소비자(P3-baselines·P4-pilot-eval)에게 가장 단순하다. schema.json 의 루트는 이미 '시나리오 객체' 이므로 매니페스트를 $defs 에 넣으면 소비자가 '어떤 $ref 를 써야 하는가' 를 매번 알아야 하고, 두 스키마의 schema_version 을 따로 올릴 수도 없다. 파일을 나누면 각각 루트에서 바로 검증된다(scripts/validate_scenarios.py 모듈 docstring 의 '남긴 결정' 참조).",
   "type": "object",
@@ -18,8 +18,8 @@
   ],
   "properties": {
     "schema_version": {
-      "const": 1,
-      "description": "schema.json 의 schema_version 과 같아야 한다. 스키마가 바뀌면 FIX 가 아니라 이 값을 올린다."
+      "const": 2,
+      "description": "schema.json 의 schema_version 과 같아야 한다. 스키마가 바뀌면 FIX 가 아니라 이 값을 올린다. 판 2(U5) — 시나리오 스키마에 선택 필드 passing_mentions 가 추가됐다(추가만, 기존 필드 의미 불변)."
     },
     "files": {
       "type": "array",
@@ -106,7 +106,7 @@
     "distribution": {
       "type": "object",
       "additionalProperties": true,
-      "description": "선택 — 관계 태그·위계 배분표(01-plan 산출물 32행). **U5 가 채운다.** U1 에서 선택 키로 열어 두는 이유: 나중에 키를 추가하려면 additionalProperties: false 때문에 schema_version 을 올려야 하는데, 배분표는 스키마 계약이 아니라 집계 결과라서 판을 올릴 사유가 못 된다. 하위 유형·trap 열 추가(R-5)도 이 안에서 한다."
+      "description": "선택 — 관계 태그·위계 배분표(01-plan 산출물 32행). **U5 가 채운다.** U1 에서 선택 키로 열어 두는 이유: 나중에 키를 추가하려면 additionalProperties: false 때문에 schema_version 을 올려야 하는데, 배분표는 스키마 계약이 아니라 집계 결과라서 판을 올릴 사유가 못 된다. 하위 유형·trap 열 추가(R-5)도 이 안에서 한다. **U5 결정**: 값은 `python scripts/validate_scenarios.py --write-distribution` 이 실제 데이터에서 계산해 쓰고(손으로 세지 않는다), 검증기 기본 실행은 이 값과 실제 집계의 일치를 **검사하지 않는다** — 집계 결과이지 소비자와의 계약이 아니기 때문이다(U1 결정과 같은 이유). 값이 낡았는지는 `--write-distribution` 재실행 후 diff 가 비는지로 본다."
     }
   }
 }

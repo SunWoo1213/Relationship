@@ -28,7 +28,8 @@
 (2)  `gold_person_id` 가 그 시나리오 `persons[].person_id` 밖    `check_gold_person_id`
      — H-1: `ambiguous: true` 인 mention 만 `null` 을 허용한다. `ambiguous` 가
        없거나 false 인데 `null` 이면 FAIL.
-(3)  `turn` 이 `utterances` 범위 밖 (mentions·events 둘 다)      `check_turn_range`
+(3)  `turn` 이 `utterances` 범위 밖
+     (mentions·events·passing_mentions 셋 다)                     `check_turn_range`
 (4)  `id` 전역 중복                                              `check_unique_ids`
 (5)  `events[].type` 이 enum 밖 (스키마와 중복이지만 별도 메시지) `check_event_types`
 (6)  manifest `counts`·`total` 과 실제 건수 불일치           `check_manifest_counts`
@@ -36,13 +37,31 @@
 (8)  manifest `ambiguous_mention_count` 불일치              `check_ambiguous_count`
 (9)  `seed_persons` 가 `persons` 의 부분집합이 아님          `check_seed_persons`
 (10) manifest `trap_count` 불일치                              `check_trap_count`
-(11) — **비워 둔다.** 파일명 <-> `category` 일치 검사는 U5 예정.
+(11) 파일 `<category>.json` 안의 `category` 가 파일명과 다름  `check_file_category`
 (12) `mentions[].surface` 가 그 turn 의 발화에 없음     `check_surface_in_utterance`
 (13) 발화 길이·턴 수가 구어체 규칙 밖                     `check_utterance_shape`
+(14) `passing_mentions[].surface` 가 그 turn 의 발화에 없음
+                                          `check_passing_mentions_in_utterance`
+(15) 같은 turn 의 `mentions[].surface` 와 `passing_mentions[].surface` 가
+     서로 부분 문자열                     `check_passing_mentions_disjoint`
 
-교차 검사는 12항목((1)~(10)·(12)·(13))이고, 여기에 적재 (0) 을 더한 13행이
-사람이 읽는 출력·`--json` 요약의 검사 줄이다. (11) 은 번호만 예약해 둔다 —
-비워 둔 번호에 PASS 를 찍으면 하지 않은 검사가 통과로 보인다.
+교차 검사는 15항목((1)~(15), **예약 번호 없음**)이고, 여기에 적재 (0) 을 더한
+16행이 사람이 읽는 출력·`--json` 요약의 검사 줄이다. (11) 은 U1~fix 시점에
+번호만 비워 두었고(하지 않는 검사에 PASS 를 찍지 않기 위해서였다) U5 에서
+채웠다.
+
+지나가는 언급 (검사 (14)·(15), schema_version 2)
+-----------------------------------------------
+판 2 의 선택 필드 `passing_mentions` 는 **등록하면 안 되는 지칭**이다(연예인·
+배달 기사·길에서 스친 사람). P4 는 여기서 인물 생성이나
+`ask_user(kind="new_person")` 이 나오면 **오탐**으로 센다 — D1 확인형 등록의
+반대 방향 표본이다. 판 1 은 같은 정보를 `trap.reason` 의 자연어에만 적어 두어
+기계가 세려면 문자열을 파싱해야 했다(U4 03-log 의 인계 (1)).
+
+(15) 가 필요한 이유: 같은 턴에서 `mentions[].surface` 와
+`passing_mentions[].surface` 가 부분 문자열 관계면(예: "기사님" 과 "박기사님")
+한 지칭이 정답 분자와 오탐 분자에 **동시에** 들어가 P4 의 정밀도가 라벨 때문에
+흔들린다. 그래서 두 목록은 같은 턴 안에서 서로 겹치지 않아야 한다.
 
 구어체 규칙 (검사 (13), 01-plan 리스크 "한국어 구어체 부족")
 --------------------------------------------------------
@@ -89,6 +108,17 @@
   `--strict` 를 주면 없는 파일이 FAIL 이다 — U5·U7 의 수용 기준 검증은
   `--strict` 로 돌려 "파일이 없어서 0건" 과 "정말 0건" 을 구분한다.
 * **`id` 규칙** — 전역 연번 `sc-001`(카테고리 접두 아님, R-7).
+* **배분표를 별도 스크립트가 아니라 이 파일의 `--write-distribution` 으로 쓴다**
+  (U5). 이유 둘. (a) 배분표를 계산하려면 manifest·5파일 적재와 집계 도우미
+  (`_actual_counts`·`_actual_ambiguous_mentions`·`_actual_traps`)가 그대로
+  필요한데, 별도 스크립트를 두면 적재·집계 코드가 두 벌이 되고 두 벌은 반드시
+  어긋난다. (b) 이 파일에 두면 **검증을 통과한 데이터셋에서만** 배분표를 쓰게
+  강제할 수 있다 — 깨진 데이터의 집계를 `manifest.json` 에 남기지 않는다.
+* **배분표 일치는 검사하지 않는다**(U5). `distribution` 은 소비자와의 계약이
+  아니라 집계 결과라서, 값이 낡았다고 데이터셋이 틀린 것이 아니다. 대신
+  `--write-distribution` 을 다시 돌려 `git diff` 가 비는지로 최신 여부를 본다
+  (멱등). `counts`·`ambiguous_mention_count`·`trap_count` 는 P4 가 분모로 읽는
+  **계약**이라 검사 (6)·(8)·(10) 이 그대로 본다.
 """
 
 from __future__ import annotations
@@ -157,10 +187,16 @@ CHECK_NAMES: dict[str, str] = {
     "8": "manifest ambiguous_mention_count 일치",
     "9": "seed_persons ⊆ persons",
     "10": "manifest trap_count 일치",
-    # (11) 파일명<->category 일치는 U5 예정 — 하지 않는 검사에 PASS 를 찍지 않는다.
+    "11": "파일명 <-> category 일치",
     "12": "mentions.surface 가 그 turn 발화 안",
     "13": "발화 길이·턴 수(구어체 규칙)",
+    "14": "passing_mentions.surface 가 그 turn 발화 안",
+    "15": "같은 turn 의 mentions <-> passing_mentions 비겹침",
 }
+
+#: 검사 (11) 파일명 -> 기대 category. `CATEGORIES` 에서 기계적으로 만든다
+#: (파일명 규칙 `<category>.json` 을 두 곳에 적으면 어긋난다).
+FILE_CATEGORY: dict[str, str] = {f"{c}.json": c for c in CATEGORIES}
 
 
 # --------------------------------------------------------------------------
@@ -492,7 +528,13 @@ def check_gold_person_id(dataset: Dataset) -> list[Issue]:
 
 
 def check_turn_range(dataset: Dataset) -> list[Issue]:
-    """(3) mentions·events 의 turn 이 utterances 인덱스 범위 안이어야 한다."""
+    """(3) mentions·events·passing_mentions 의 turn 이 utterances 범위 안이어야.
+
+    판 2 에서 `passing_mentions` 를 추가할 때 이 검사도 같이 넓혔다. (14) 는
+    범위 밖 turn 을 건너뛰므로(한 결함에 두 번 FAIL 을 내지 않기 위해서다),
+    (3) 이 보지 않으면 범위 밖 `passing_mentions[].turn` 이 **아무 검사에도
+    걸리지 않는 구멍**이 된다.
+    """
     issues: list[Issue] = []
     for file_name, scenario in dataset.scenarios:
         if not isinstance(scenario, dict):
@@ -501,7 +543,7 @@ def check_turn_range(dataset: Dataset) -> list[Issue]:
         if not isinstance(utterances, list):
             continue
         limit = len(utterances)
-        for key in ("mentions", "events"):
+        for key in ("mentions", "events", "passing_mentions"):
             for index, item in enumerate(_dict_items(scenario.get(key))):
                 turn = item.get("turn")
                 if not isinstance(turn, int) or isinstance(turn, bool):
@@ -714,7 +756,47 @@ def check_trap_count(dataset: Dataset) -> list[Issue]:
 
 
 # --------------------------------------------------------------------------
-# 검사 (12)~(13) 발화 본문 대조
+# 검사 (11) 파일 배치
+# --------------------------------------------------------------------------
+
+
+def check_file_category(dataset: Dataset) -> list[Issue]:
+    """(11) `<category>.json` 안의 시나리오 `category` 가 파일명과 같아야 한다.
+
+    파일명과 내용이 어긋나면 `manifest.counts` 는 **맞는데**(검사 (6) 은
+    category 값으로 세므로 통과한다) 사람이 파일을 열어 보고 세는 배분과
+    달라진다. 검수 패킷·배분표가 파일 단위로 읽히므로 조용한 어긋남을 막는다
+    (U1 03-log "U5 에서 추가(사용자 결정): 파일명 <-> category 대응 검사").
+
+    `manifest.files` 밖의 이름이나 `<category>.json` 규칙에 없는 파일명은
+    건너뛴다 — 파일 목록 자체의 위반은 매니페스트 스키마 검사 (1) 의 몫이다.
+    """
+    issues: list[Issue] = []
+    for entry in dataset.files:
+        expected = FILE_CATEGORY.get(entry.name)
+        if expected is None:
+            continue
+        for scenario in entry.scenarios:
+            if not isinstance(scenario, dict):
+                continue
+            category = scenario.get("category")
+            if not isinstance(category, str):
+                continue  # 타입·enum 위반은 스키마 검사 (1)
+            if category != expected:
+                issues.append(
+                    Issue(
+                        "11",
+                        "FILE_CATEGORY_MISMATCH",
+                        _where(entry.name, scenario),
+                        f"category={category!r} 인데 파일은 {entry.name}"
+                        f"(기대 {expected!r})",
+                    )
+                )
+    return issues
+
+
+# --------------------------------------------------------------------------
+# 검사 (12)~(15) 발화 본문 대조 · 지나가는 언급
 # --------------------------------------------------------------------------
 
 
@@ -812,6 +894,226 @@ def check_utterance_shape(dataset: Dataset) -> list[Issue]:
     return issues
 
 
+def check_passing_mentions_in_utterance(dataset: Dataset) -> list[Issue]:
+    """(14) `passing_mentions[].surface` 도 `utterances[turn]` 안에 있어야 한다.
+
+    검사 (12) 와 같은 이유·같은 규칙(공백 정규화 없는 부분 문자열 정확 일치)
+    이다. 발화에 없는 표면형을 "등록하면 안 되는 지칭" 으로 라벨하면 P4 는
+    일어날 수 없는 오탐을 기다리게 되고, 그 시나리오의 오탐률은 **항상 0** 이
+    되어 D1(확인형 등록)이 실제로 지켜지는지를 못 본다.
+
+    `turn` 범위·타입 위반은 검사 (3)/(1) 이 본다(한 결함에 두 번 FAIL 금지).
+    """
+    issues: list[Issue] = []
+    for file_name, scenario in dataset.scenarios:
+        if not isinstance(scenario, dict):
+            continue
+        utterances = scenario.get("utterances")
+        if not isinstance(utterances, list):
+            continue
+        for index, passing in enumerate(_dict_items(scenario.get("passing_mentions"))):
+            surface = passing.get("surface")
+            turn = passing.get("turn")
+            if not isinstance(surface, str):
+                continue
+            if not isinstance(turn, int) or isinstance(turn, bool):
+                continue
+            if not 0 <= turn < len(utterances):
+                continue
+            utterance = utterances[turn]
+            if not isinstance(utterance, str):
+                continue
+            if surface not in utterance:
+                issues.append(
+                    Issue(
+                        "14",
+                        "PASSING_SURFACE_NOT_IN_UTTERANCE",
+                        _where(file_name, scenario, f"passing_mentions[{index}]({surface})"),
+                        f"surface={surface!r} 가 utterances[{turn}]={utterance!r} 안에 없다"
+                        " (공백 정규화 없이 부분 문자열 정확 일치)",
+                    )
+                )
+    return issues
+
+
+def check_passing_mentions_disjoint(dataset: Dataset) -> list[Issue]:
+    """(15) 같은 turn 의 mention 과 passing_mention 은 서로 부분 문자열이 아니어야.
+
+    근거는 모듈 docstring "지나가는 언급" 절이다. 겹치면 한 지칭이 정답 분자와
+    오탐 분자에 동시에 들어가 P4 의 정밀도가 모델이 아니라 라벨 때문에 흔들린다.
+
+    **부분 문자열 양방향**으로 본다(완전 일치만 보면 "기사님" 과 "박기사님" 을
+    놓친다). 다른 turn 끼리는 보지 않는다 — 같은 표면형이 어떤 턴에서는 등록
+    대상이고 다른 턴에서는 지나가는 언급인 경우가 실제로 있을 수 있고, 그 판정은
+    문맥이 하는 일이지 라벨 무결성의 문제가 아니다.
+    """
+    issues: list[Issue] = []
+    for file_name, scenario in dataset.scenarios:
+        if not isinstance(scenario, dict):
+            continue
+        mentions = _dict_items(scenario.get("mentions"))
+        passings = _dict_items(scenario.get("passing_mentions"))
+        if not passings:
+            continue
+        for p_index, passing in enumerate(passings):
+            p_surface = passing.get("surface")
+            p_turn = passing.get("turn")
+            if not isinstance(p_surface, str):
+                continue
+            for m_index, mention in enumerate(mentions):
+                m_surface = mention.get("surface")
+                if not isinstance(m_surface, str):
+                    continue
+                if mention.get("turn") != p_turn:
+                    continue
+                if p_surface in m_surface or m_surface in p_surface:
+                    issues.append(
+                        Issue(
+                            "15",
+                            "PASSING_MENTION_OVERLAP",
+                            _where(
+                                file_name,
+                                scenario,
+                                f"passing_mentions[{p_index}]({p_surface})",
+                            ),
+                            f"turn={p_turn} 의 mentions[{m_index}]"
+                            f"({m_surface!r}) 와 부분 문자열 관계다"
+                            " — 한 지칭이 정답과 오탐에 동시에 셈해진다",
+                        )
+                    )
+    return issues
+
+
+# --------------------------------------------------------------------------
+# 배분표 쓰기 (--write-distribution, 검사가 아니다)
+# --------------------------------------------------------------------------
+
+
+#: `--write-distribution` 이 배분표에 그대로 옮겨 적는 **수동 지정** 목록.
+#: 결정 C 로 일정(schedule) 골드 라벨을 P10 으로 미뤘기 때문에 시나리오 안에
+#: 일정 필드가 없다 — 즉 기계가 셀 근거가 데이터에 없다. U3 03-log 가 기록한
+#: "normal 의 일정 발화 4건"(sc-025 담주 일요일 / sc-027 담주 토요일 /
+#: sc-029 목요일 저녁 / sc-033 다음 주 수요일)을 P10 이 다시 찾지 않아도 되게
+#: 여기 적어 둔다. 데이터가 바뀌면 이 상수도 사람이 고쳐야 한다(추정하지 않는다).
+SCHEDULE_UTTERANCE_SCENARIOS: tuple[str, ...] = (
+    "sc-025",
+    "sc-027",
+    "sc-029",
+    "sc-033",
+)
+
+#: 배분표에 적는 생성 명령(사람이 재현할 수 있게). 고정 문자열이라 멱등이다.
+DISTRIBUTION_GENERATED_BY = "scripts/validate_scenarios.py --write-distribution"
+
+#: 배분표를 쓸 때 쓰는 줄바꿈. 플랫폼(Windows)에 따라 CRLF 로 바뀌면 같은
+#: 데이터가 다른 바이트를 내어 멱등성 확인(git diff)이 깨진다.
+NEWLINE = "\n"
+
+
+def build_distribution(dataset: Dataset) -> dict[str, Any]:
+    """실제 데이터에서 배분표를 계산한다(손으로 세지 않는다, 원칙8).
+
+    모든 집계는 **정렬된 키**로 담는다 — dict 순서가 삽입 순서라, 파일을 읽는
+    순서에 따라 같은 데이터가 다른 JSON 을 만들면 멱등성이 깨진다.
+
+    단위가 서로 다르다는 것을 키 이름으로 드러낸다: `by_category` 는 시나리오,
+    `by_relation_tag`·`by_hierarchy` 는 **persons 항목**(같은 인물이 여러
+    시나리오에 나오면 그만큼 세어진다), `ambiguous_mentions` 는 mention 이다.
+    """
+    scenarios = [sc for _, sc in dataset.scenarios if isinstance(sc, dict)]
+
+    relation: Counter[str] = Counter()
+    hierarchy: Counter[str] = Counter()
+    trap_kind: Counter[str] = Counter()
+    event_types: Counter[str] = Counter()
+    occurred: Counter[str] = Counter()
+    ambiguous: list[dict[str, Any]] = []
+    register_target: list[str] = []
+    passing_mention: list[str] = []
+    turn_counts: list[int] = []
+    char_counts: list[int] = []
+
+    for scenario in scenarios:
+        for person in _dict_items(scenario.get("persons")):
+            if isinstance(person.get("relation_tag"), str):
+                relation[person["relation_tag"]] += 1
+            if isinstance(person.get("hierarchy"), str):
+                hierarchy[person["hierarchy"]] += 1
+        trap = scenario.get("trap")
+        trap_is_passing = False
+        if isinstance(trap, dict) and isinstance(trap.get("kind"), str):
+            trap_kind[trap["kind"]] += 1
+            trap_is_passing = trap["kind"] == "passing_mention"
+        for event in _dict_items(scenario.get("events")):
+            if isinstance(event.get("type"), str):
+                event_types[event["type"]] += 1
+            if isinstance(event.get("occurred_at_kind"), str):
+                occurred[event["occurred_at_kind"]] += 1
+        for mention in _dict_items(scenario.get("mentions")):
+            if mention.get("ambiguous") is True:
+                ambiguous.append(
+                    {
+                        "id": _scenario_id(scenario),
+                        "turn": mention.get("turn"),
+                        "surface": mention.get("surface"),
+                    }
+                )
+        if scenario.get("category") == "new_person":
+            # 하위 유형(R-5)은 trap.kind 로 기계 판정한다: 지나가는 언급 건은
+            # U4 가 trap.kind="passing_mention" 으로 라벨했고, 나머지가 등록
+            # 대상이다. 별도 필드를 새로 만들면 라벨이 두 벌이 된다.
+            (passing_mention if trap_is_passing else register_target).append(
+                _scenario_id(scenario)
+            )
+        utterances = scenario.get("utterances")
+        if isinstance(utterances, list):
+            turn_counts.append(len(utterances))
+            char_counts.extend(len(u) for u in utterances if isinstance(u, str))
+
+    actual = _actual_counts(dataset)
+    return {
+        "generated_by": DISTRIBUTION_GENERATED_BY,
+        "by_category": {c: actual.get(c, 0) for c in CATEGORIES},
+        "by_relation_tag": dict(sorted(relation.items())),
+        "by_hierarchy": dict(sorted(hierarchy.items())),
+        "by_trap_kind": dict(sorted(trap_kind.items())),
+        "new_person_subtypes": {
+            "register_target": sorted(register_target),
+            "passing_mention": sorted(passing_mention),
+        },
+        "schedule_utterance_scenarios": list(SCHEDULE_UTTERANCE_SCENARIOS),
+        "ambiguous_mentions": ambiguous,
+        "event_types": dict(sorted(event_types.items())),
+        "occurred_at_kind": dict(sorted(occurred.items())),
+        "utterance_stats": {
+            "turns_min": min(turn_counts) if turn_counts else 0,
+            "turns_max": max(turn_counts) if turn_counts else 0,
+            "chars_min": min(char_counts) if char_counts else 0,
+            "chars_max": max(char_counts) if char_counts else 0,
+        },
+    }
+
+
+def write_distribution(directory: Path, distribution: dict[str, Any]) -> tuple[bool, str]:
+    """`manifest.json` 의 `distribution` 키만 갈아 끼운다. `(변경됨, 메시지)`.
+
+    다른 키는 읽은 그대로 다시 쓴다(`json.load` 가 순서를 보존하므로 키 순서도
+    유지된다). 같은 데이터에 두 번 돌리면 바이트가 같다 — 멱등성은 evidence 로
+    남긴다(`git diff` 가 비는지).
+    """
+    path = directory / MANIFEST_FILE
+    manifest, err = load_json_file(path)
+    if err or not isinstance(manifest, dict):
+        return False, f"manifest 를 읽지 못했다: {err or '객체가 아니다'}"
+    before = manifest.get("distribution")
+    manifest["distribution"] = distribution
+    text = json.dumps(manifest, ensure_ascii=False, indent=2) + NEWLINE
+    path.write_text(text, encoding="utf-8", newline=NEWLINE)
+    if before == distribution:
+        return False, f"{path.as_posix()}: distribution 변경 없음(멱등)"
+    return True, f"{path.as_posix()}: distribution 갱신"
+
+
 # --------------------------------------------------------------------------
 # 실행
 # --------------------------------------------------------------------------
@@ -834,8 +1136,11 @@ def run(directory: Path, *, strict: bool = False) -> Report:
     issues.extend(check_ambiguous_count(dataset))
     issues.extend(check_seed_persons(dataset))
     issues.extend(check_trap_count(dataset))
+    issues.extend(check_file_category(dataset))
     issues.extend(check_surface_in_utterance(dataset))
     issues.extend(check_utterance_shape(dataset))
+    issues.extend(check_passing_mentions_in_utterance(dataset))
+    issues.extend(check_passing_mentions_disjoint(dataset))
 
     return Report(
         directory=directory,
@@ -898,6 +1203,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="manifest.files 에 있으나 없는 파일을 FAIL 로 다룬다",
     )
+    parser.add_argument(
+        "--write-distribution",
+        action="store_true",
+        help=(
+            "실제 데이터에서 배분표를 계산해 manifest.json 의 distribution 에 쓴다"
+            "(검증을 통과했을 때만. 결과 메시지는 stderr)"
+        ),
+    )
     return parser
 
 
@@ -913,6 +1226,19 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(report.summary(), ensure_ascii=False, indent=2, sort_keys=True))
     else:
         print(format_text(report))
+
+    if args.write_distribution:
+        # 깨진 데이터셋의 집계를 manifest 에 남기지 않는다 — 배분표가 맞아
+        # 보이면 라벨 오류가 통계 뒤로 숨는다.
+        if not report.ok:
+            print(
+                "오류가 있어 배분표를 쓰지 않았다(먼저 검사 FAIL 을 해소한다)",
+                file=sys.stderr,
+            )
+            return 1
+        _, message = write_distribution(directory, build_distribution(report.dataset))
+        print(f"[write] {message}", file=sys.stderr)
+
     return 0 if report.ok else 1
 
 

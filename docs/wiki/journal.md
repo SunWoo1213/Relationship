@@ -105,3 +105,4 @@
 - 2026-09-06 18:44 | COMMIT | 09875aa feat(P1-pilot-dataset): U2 promotion 8·alias 8 시나리오 — 오병합 유도 함정 8건, manifest generator 기록
 - 2026-09-06 18:44 | PUSH | origin dev 09875aa — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-06 18:59 | COMMIT | aa6ecfc feat(P1-pilot-dataset): U3 pronoun 8·normal 10 시나리오 — 선행사 2인 이상 7/8, ambiguous 누적 3, 일정 발화 4건
+- 2026-09-06 19:10 | COMMIT | 6775463 feat(P1-pilot-dataset): U4 new_person 6 시나리오 — 등록 대상 3·지나가는 언급 3, 40건 완성·--strict rc=0
