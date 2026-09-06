@@ -51,7 +51,15 @@ REVIEW_ITEMS: tuple[tuple[str, str], ...] = (
         "라벨 정확성",
         "mentions 의 gold_person_id 가 문맥상 맞는가. ambiguous 표시가 정말 "
         "사람도 못 정하는 건인가. expected_ask_user.allowed 집합이 타당한가(D10 — "
-        "임계치에 따라 달라지므로 단일 정답이 아니다).",
+        "임계치에 따라 달라지므로 단일 정답이 아니다). "
+        "**결정 I(U6) — persons[].aliases 는 '대화 시작 전에 이미 알려진 별칭' 만이다**: "
+        "승진 후 호칭·대화 중 처음 생기는 호칭이 seed 인물의 aliases 에 들어 있으면 "
+        "별칭 완전일치만으로 정답이 풀려 호칭 변경 추적을 측정하지 못한다. 두 인물이 "
+        "나눠 쓸 수 있는 호칭(팀장님·주임님·부장님·과장님)은 **비대칭 금지** — 양쪽 다 "
+        "없거나 양쪽 다 있어야 한다. seed 밖 인물(new_person 등록 대상)은 대화에서 "
+        "처음 등장하는 호칭이라도 식별 표기로 적는다. mention 을 세는 규칙(U6): 호칭 "
+        "인용형('X 라고 부른다', '별명이 X')의 X 는 세고, 인물을 범주로 서술하는 "
+        "명사('동네 형이라')는 세지 않는다.",
     ),
     (
         "함정 난이도",
@@ -80,7 +88,16 @@ REVIEW_ITEMS: tuple[tuple[str, str], ...] = (
     (
         "events 라벨 타당",
         "events[].type 고정 7종 선택이 발화와 맞는가. occurred_at_kind "
-        "(relative/absolute/none)가 맞는가(결정 B — 절대 시각은 라벨하지 않는다).",
+        "(relative/absolute/none)가 맞는가(결정 B — 절대 시각은 라벨하지 않는다). "
+        "**결정 J(U6) 규칙으로 본다**: (a) occurred_at_kind 는 그 턴 안의 시간 표현만 "
+        "본다(앞 턴 상속 없음. 오늘·어제·주말에·요즘·이번에 = relative, 날짜·시각 = "
+        "absolute, 없으면 none. 기간 '세 시간'·'이번 인사' 는 시간 표현이 아니다) "
+        "(b) 미래 약속·계획은 이벤트가 아니다 (c) 승진·이직·취업 등 인물 소식 = "
+        "personal_share, 소식이 전달되는 턴 하나에만 (d) 사용자가 참여하지 않은 사건·"
+        "전해 들은 근황도 personal_share — meal/meeting/favor/conflict/praise/other 는 "
+        "사용자–인물 사이 사건에만(원칙7) (e) 잔소리 = conflict (f) 성향·평판·감상·호칭 "
+        "사실 같은 상태 서술은 이벤트가 아니다 (g) ambiguous mention 이 있는 턴에는 "
+        "이벤트를 붙이지 않는다.",
     ),
     (
         "new_person 하위 유형 (R-5)",

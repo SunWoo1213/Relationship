@@ -1,0 +1,20 @@
+# U6 --write-distribution 멱등성 확인 — 같은 데이터에 두 번 써도 바이트가 같다
+# 평가한 코드 커밋: dev 40c36f8 (U5) + 이 작업 단위(U6)의 미커밋 데이터 변경
+
+$ md5sum data/scenarios/manifest.json  # U6 데이터 반영 후 1회차 쓰기 직후
+fa83fcc623c1a71354038f0cdcb5d3a7 *data/scenarios/manifest.json
+
+$ python scripts/validate_scenarios.py --strict --write-distribution  # 2회차
+[write] data/scenarios/manifest.json: distribution 변경 없음(멱등)
+== 결과: 시나리오 40건 / 오류 0 ==
+rc=0
+
+$ md5sum data/scenarios/manifest.json  # 2회차
+fa83fcc623c1a71354038f0cdcb5d3a7 *data/scenarios/manifest.json
+
+$ python scripts/validate_scenarios.py --strict --write-distribution  # 3회차
+[write] data/scenarios/manifest.json: distribution 변경 없음(멱등)
+== 결과: 시나리오 40건 / 오류 0 ==
+fa83fcc623c1a71354038f0cdcb5d3a7 *data/scenarios/manifest.json
+
+# 판정: 2·3회차 md5 가 1회차와 같고 [write] 가 '변경 없음(멱등)' 이면 멱등.

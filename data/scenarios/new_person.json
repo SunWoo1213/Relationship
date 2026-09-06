@@ -31,7 +31,7 @@
       {"turn": 2, "surface": "하람씨", "gold_person_id": "p1"}
     ],
     "events": [
-      {"turn": 0, "type": "other", "occurred_at_kind": "relative"}
+      {"turn": 0, "type": "personal_share", "occurred_at_kind": "relative"}
     ],
     "expected_ask_user": {"allowed": ["new_person"]}
   },
@@ -97,10 +97,13 @@
     ],
     "mentions": [
       {"turn": 0, "surface": "시우", "gold_person_id": "p1"},
-      {"turn": 1, "surface": "시우형", "gold_person_id": "p1"}
+      {"turn": 1, "surface": "시우형", "gold_person_id": "p1"},
+      {"turn": 2, "surface": "형", "gold_person_id": "p1"}
     ],
     "events": [
-      {"turn": 1, "type": "meal", "occurred_at_kind": "relative"}
+      {"turn": 0, "type": "meeting", "occurred_at_kind": "relative"},
+      {"turn": 1, "type": "personal_share", "occurred_at_kind": "none"},
+      {"turn": 1, "type": "meal", "occurred_at_kind": "none"}
     ],
     "expected_ask_user": {"allowed": ["new_person"]}
   },
@@ -166,7 +169,8 @@
       {"turn": 2, "surface": "기사님", "why": "같은 배달 기사를 다시 부른 것뿐 — 두 번 나왔다고 등록 대상이 되지 않는다"}
     ],
     "events": [
-      {"turn": 0, "type": "favor", "occurred_at_kind": "relative"}
+      {"turn": 0, "type": "meal", "occurred_at_kind": "none"},
+      {"turn": 2, "type": "personal_share", "occurred_at_kind": "none"}
     ],
     "expected_ask_user": {"allowed": ["none"]},
     "trap": {
@@ -201,7 +205,7 @@
       {"turn": 2, "surface": "그 정치인", "why": "뉴스 속 인물이며 닮은꼴 비유로만 등장 — 사용자와 관계가 없고 실명도 쓰지 않았다"}
     ],
     "events": [
-      {"turn": 0, "type": "meeting", "occurred_at_kind": "relative"}
+      {"turn": 0, "type": "meeting", "occurred_at_kind": "none"}
     ],
     "expected_ask_user": {"allowed": ["none"]},
     "trap": {

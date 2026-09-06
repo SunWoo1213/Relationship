@@ -50,7 +50,7 @@
     ],
     "events": [
       { "turn": 0, "type": "meal", "occurred_at_kind": "relative" },
-      { "turn": 1, "type": "personal_share", "occurred_at_kind": "none" }
+      { "turn": 1, "type": "personal_share", "occurred_at_kind": "relative" }
     ],
     "expected_ask_user": { "allowed": ["none"] }
   },
@@ -171,7 +171,7 @@
     "events": [
       { "turn": 0, "type": "personal_share", "occurred_at_kind": "none" },
       { "turn": 1, "type": "meal", "occurred_at_kind": "none" },
-      { "turn": 2, "type": "favor", "occurred_at_kind": "none" }
+      { "turn": 2, "type": "personal_share", "occurred_at_kind": "none" }
     ],
     "expected_ask_user": { "allowed": ["none"] }
   },
@@ -222,8 +222,7 @@
       "다음엔 내가 산다고 했어"
     ],
     "mentions": [
-      { "turn": 0, "surface": "지호형", "gold_person_id": "p1" },
-      { "turn": 1, "surface": "형", "gold_person_id": "p1" }
+      { "turn": 0, "surface": "지호형", "gold_person_id": "p1" }
     ],
     "events": [
       { "turn": 0, "type": "meal", "occurred_at_kind": "relative" }
@@ -264,7 +263,7 @@
     ],
     "events": [
       { "turn": 0, "type": "meal", "occurred_at_kind": "relative" },
-      { "turn": 4, "type": "personal_share", "occurred_at_kind": "none" }
+      { "turn": 4, "type": "personal_share", "occurred_at_kind": "relative" }
     ],
     "expected_ask_user": { "allowed": ["none"] }
   },
@@ -292,7 +291,7 @@
       { "turn": 3, "surface": "아빠", "gold_person_id": "p1" }
     ],
     "events": [
-      { "turn": 0, "type": "other", "occurred_at_kind": "relative" },
+      { "turn": 0, "type": "personal_share", "occurred_at_kind": "relative" },
       { "turn": 1, "type": "personal_share", "occurred_at_kind": "none" }
     ],
     "expected_ask_user": { "allowed": ["none"] }

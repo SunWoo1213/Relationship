@@ -57,11 +57,6 @@
         "turn": 1,
         "type": "personal_share",
         "occurred_at_kind": "relative"
-      },
-      {
-        "turn": 3,
-        "type": "other",
-        "occurred_at_kind": "none"
       }
     ],
     "expected_ask_user": {
@@ -142,7 +137,7 @@
       {
         "turn": 2,
         "type": "favor",
-        "occurred_at_kind": "relative"
+        "occurred_at_kind": "none"
       }
     ],
     "expected_ask_user": {
@@ -207,7 +202,7 @@
       {
         "turn": 2,
         "type": "favor",
-        "occurred_at_kind": "relative"
+        "occurred_at_kind": "none"
       }
     ],
     "expected_ask_user": {
@@ -249,6 +244,7 @@
       "수학쌤이 오늘 숙제 진짜 많이 냄",
       "영어쌤은 그냥 넘어가주셨는데",
       "안쌤한테 질문하러 갔다가 혼났어",
+      "알고 보니 영어쌤이 권쌤이더라ㅋㅋ",
       "권쌤은 그럴 때 웃어주시더라"
     ],
     "mentions": [
@@ -269,6 +265,16 @@
       },
       {
         "turn": 3,
+        "surface": "영어쌤",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 3,
+        "surface": "권쌤",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 4,
         "surface": "권쌤",
         "gold_person_id": "p2"
       }
@@ -277,19 +283,18 @@
       {
         "turn": 2,
         "type": "conflict",
-        "occurred_at_kind": "relative"
+        "occurred_at_kind": "none"
       }
     ],
     "expected_ask_user": {
       "allowed": [
         "identity",
-        "new_person",
-        "none"
+        "new_person"
       ]
     },
     "trap": {
       "kind": "same_title_two_persons",
-      "reason": "'쌤' 접미 호칭을 두 사람이 나눠 쓴다. 과목 수식(수학/영어)과 성씨(안/권)를 교차해야 같은 사람인지 갈린다. 권나연은 seed 에 없어 신규 등록 판정까지 얽힌다."
+      "reason": "'쌤' 접미 호칭을 두 사람이 나눠 쓴다. 과목 수식(수학/영어)과 성씨(안/권)를 교차해야 갈린다. 3턴이 '영어쌤 = 권쌤' 을 사람이 읽을 수 있게 이어 준다 — 단서가 없으면 저자만 아는 연결이 된다. 권나연은 seed 에 없어 신규 등록 판정까지 얽힌다."
     }
   },
   {
@@ -360,7 +365,7 @@
       {
         "turn": 0,
         "type": "favor",
-        "occurred_at_kind": "relative"
+        "occurred_at_kind": "none"
       }
     ],
     "expected_ask_user": {
@@ -426,11 +431,6 @@
         "turn": 0,
         "type": "meeting",
         "occurred_at_kind": "relative"
-      },
-      {
-        "turn": 1,
-        "type": "praise",
-        "occurred_at_kind": "relative"
       }
     ],
     "expected_ask_user": {
@@ -482,6 +482,11 @@
         "gold_person_id": "p1"
       },
       {
+        "turn": 0,
+        "surface": "부장님",
+        "gold_person_id": "p1"
+      },
+      {
         "turn": 1,
         "surface": "한부장님",
         "gold_person_id": "p2"
@@ -505,8 +510,8 @@
       },
       {
         "turn": 2,
-        "type": "other",
-        "occurred_at_kind": "relative"
+        "type": "conflict",
+        "occurred_at_kind": "none"
       }
     ],
     "expected_ask_user": {
@@ -565,7 +570,7 @@
       {
         "turn": 0,
         "type": "meeting",
-        "occurred_at_kind": "relative"
+        "occurred_at_kind": "none"
       },
       {
         "turn": 1,

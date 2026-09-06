@@ -34,7 +34,7 @@
     ],
     "events": [
       { "turn": 0, "type": "meal", "occurred_at_kind": "relative" },
-      { "turn": 1, "type": "personal_share", "occurred_at_kind": "none" }
+      { "turn": 1, "type": "personal_share", "occurred_at_kind": "relative" }
     ],
     "expected_ask_user": { "allowed": ["identity", "none"] }
   },
@@ -71,8 +71,7 @@
       { "turn": 3, "surface": "누나", "gold_person_id": "p1" }
     ],
     "events": [
-      { "turn": 0, "type": "favor", "occurred_at_kind": "relative" },
-      { "turn": 1, "type": "favor", "occurred_at_kind": "none" }
+      { "turn": 0, "type": "favor", "occurred_at_kind": "relative" }
     ],
     "expected_ask_user": { "allowed": ["identity", "none"] }
   },
@@ -228,7 +227,7 @@
       { "turn": 1, "surface": "걔", "gold_person_id": null, "ambiguous": true }
     ],
     "events": [
-      { "turn": 0, "type": "meal", "occurred_at_kind": "relative" }
+      { "turn": 0, "type": "personal_share", "occurred_at_kind": "relative" }
     ],
     "expected_ask_user": { "allowed": ["identity", "none"] }
   },
@@ -295,7 +294,8 @@
     ],
     "events": [
       { "turn": 0, "type": "meeting", "occurred_at_kind": "none" },
-      { "turn": 1, "type": "meal", "occurred_at_kind": "none" }
+      { "turn": 1, "type": "meal", "occurred_at_kind": "none" },
+      { "turn": 3, "type": "personal_share", "occurred_at_kind": "relative" }
     ],
     "expected_ask_user": { "allowed": ["identity", "none"] }
   }

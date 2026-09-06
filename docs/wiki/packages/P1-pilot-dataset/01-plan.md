@@ -79,6 +79,14 @@
 - F 채택: (ii) LLM 초안 + 사람/verifier 검수. **H-2 확정(사용자)**: 생성 경로는 **eval-agent(opus) 가 자기 컨텍스트에서 JSON 을 직접 작성**한다(스크립트 API 호출 없음 — "하지 않는 것"의 네트워크 미사용 문장 유지). `manifest.json` 필수 키: `generator.model_id`(eval-agent 모델 id), `generator.prompt_ref`(위임 프롬프트를 저장한 `evidence/<ts>-gen-prompt.md` 경로), `generator.seed: null` + `seed_reason: "대화형 생성"`, `generator.same_family_as_judge: true`(P3-er 판정 모델과 같은 공급자 계열). **금지: 초안 위임 프롬프트에 ER 판정 프롬프트·호칭 사전(`app/er/dictionary`)·임계치 값을 넣지 않는다** — "판정하기 쉬운 데이터만 만드는" 편향 차단. 검수 거친 라벨만 유효, (iii) 전량 LLM 생성(검수 없음) 금지.
 - G 채택: verifier 전건(40건) 라벨 검수 + 사용자는 함정 건·`new_person` 지나가는 언급 건 검수. **H-3 확정(사용자)**: 기록은 `evidence/<ts>-label-review.md` 한 파일(산출물 절의 고정 형식). 검수는 **새 verifier 컨텍스트**에서 하고 P4 04-review 에서 라벨을 재해석하지 않는다(R-3, P4 01-plan 인계).
 
+**검수 후 결정 — 사용자 (2026-09-07, verifier 라벨 검수 evidence/20260906-1938-label-review.md 지적 17건에 대해)**
+
+- 결정 I (#1~#4) **`persons[].aliases` = 대화 시작 전에 이미 알려진 별칭만.** 승진 후 호칭·대화 중 처음 등장하는 호칭은 aliases 에 넣지 않는다(시스템이 대화에서 배워야 할 것). 두 인물이 공유할 수 있는 호칭(팀장님·주임님·부장님)은 **비대칭 금지** — 양쪽 다 없거나(문맥으로만 결정) 양쪽 다 있게 한다. P4 는 aliases 를 그대로 사전 상태로 적재한다. 구조 불변이라 schema_version 2 유지, `schema.json` description 과 검수 항목에 명문화. 기계 검사는 두지 않음(사람 검수 항목).
+- 결정 J (#10~#16) **events 라벨 규칙**: (a) `occurred_at_kind` 는 그 턴 안의 시간 표현만 본다 — 오늘/어제/주말에/요즘 = relative, 날짜·시각 = absolute, 없으면 none, 앞 턴 상속 없음 (b) 미래 약속·계획은 events 가 아니다(결정 C) (c) 승진·이직·취업 등 인물 소식 = personal_share (d) 사용자 부재 전언 사건(인물끼리 한 일)도 personal_share — 사용자–인물 사이 사건만 meal/meeting/favor/conflict/praise (원칙 7) (e) 잔소리 = conflict.
+- 결정 K (#5·#6·#7) sc-002 재작성(성씨 없는 '과장님' 이 이서연을 가리키되 문맥으로 결정 가능한 턴 추가), sc-012 재작성(영어쌤=권쌤 단서 턴 추가, allowed → identity/new_person).
+- 결정 L (#17) 실존 공인과 동명인 가상 성명 4건은 **동명 허용으로 기각**(흔한 이름, 문맥이 공인을 가리키지 않음, 01-plan 리스크 절의 허용 예시). 데이터 무변경.
+- 나머지 지적(#8 sc-003/007 allowed → none, #9·#10 sc-037 mention·event 누락)은 지적대로 U6 에서 반영. 검수자 의견(인용형 지칭 규칙 등)은 U6 이 필요 시 규칙으로 올려 03-log 에 남긴다.
+
 **리스크**
 
 - **개인정보.** 실제 지인·실존 인물의 이름·직장·연락처를 넣지 않는다. 가상 성명 목록을 `manifest.json` 에 두고 그 목록 밖 이름이 나오면 검증기가 FAIL 하게 한다(U1 위반 표본 7종째로 확정, R-2 — 결정 A 와 함께 확정). 연예인 언급이 필요한 `new_person` 건은 실명 대신 "○○ 아이돌" 같은 일반 명사로 쓴다.
