@@ -27,7 +27,26 @@
 `InvalidValue`/`PersonNotFound`/`ConfirmationRequired` 같은 검증 오류라
 원칙9 "판정 근거" 손실에는 해당하지 않는다). 별도 커넥션으로 오류를 영구
 기록할지는 **P5-loop 01-plan** 이 결정한다 -- 이 한계를 지금 여기서
-우회(예: 별도 커넥션 즉시 커밋)로 고치지 않는다.
+우회(예: 별도 커넥션 즉시 커밋)로 고치지 않는다. **이번 단위(P3-er U1)에서도
+이 한계는 그대로 유지한다 -- 별도 커넥션 여부는 여전히 P5-loop 의 결정이다.**
+
+## F-ca12ad -- flush 실패 뒤 tool_error 기록 실패를 조용히 포기한다 (결정7)
+P2 시점 코드는 except 경로에서 실패한 flush 뒤 **같은 세션에** tool_error 를
+`add()` + `flush()` 했다. flush 가 DB 오류(예: `person_aliases.embedding` 차원
+불일치)로 실패하면 그 세션은 SQLAlchemy 가 "이 트랜잭션은 이미 롤백이
+필요하다"고 표시한 상태가 되고, 같은 세션에 다시 `flush()` 하면
+`sqlalchemy.exc.PendingRollbackError` 가 새로 발생해 **원래 예외를 가리고
+호출자에게 그 대신 올라간다**(evidence
+`docs/wiki/packages/P2-tools/evidence/20260905-1942-review-tool-error-probe.txt`).
+이를 고치기 위해 tool_error 기록 시도를 `ctx.session.begin_nested()`
+세이브포인트 **안에서만** 한다 -- 세이브포인트 자체를 열지 못하거나(세션이
+이미 무효) 그 안의 `flush()` 가 다시 실패하면 **조용히 포기하고 원래 예외를
+`raise`(인자 없는 bare raise)로 그대로 올린다** -- `exc.__context__`/
+`__traceback__` 을 새로 바꾸지 않는다. `session.rollback()` 은 호출하지
+않는다 -- 호출자가 아직 커밋하지 않은 정상 작업(같은 트랜잭션의 다른 변경)
+까지 지워 버리기 때문이다. 이 경로에서는 tool_error 행이 아예 생기지 않을
+수 있다(세이브포인트도 못 여는 경우) -- "원래 예외를 절대 가리지 않는다"가
+"오류 trace 를 항상 남긴다"보다 우선이다(원칙1 의 비대칭 비용과 같은 방향).
 """
 
 from __future__ import annotations
@@ -106,18 +125,29 @@ def to_jsonable(obj: Any) -> Any:
     return _truncate_string(str(obj))
 
 
-def traced(tool_name: str) -> Callable[[F], F]:
+def traced(tool_name: str, step: str = "tool_call") -> Callable[[F], F]:
     """`agent_traces` 기록 데코레이터(원칙9). 대상 함수 시그니처는
     `(ctx, *args, **kwargs)`.
 
-    성공: `step="tool_call"`, `input`=ctx 를 뺀 인자의 이름→값 매핑을
-    `to_jsonable` 로 변환한 것, `output`=반환값을 `to_jsonable` 로 변환한
-    것(반환값이 `*Out` 이면 사실상 `to_dict()`), `tokens_in=tokens_out=0`
-    (P2 에는 LLM 호출이 없다).
+    `step`(P3-er U1 확장): 성공 행의 `step` 값. 기존 툴 호출(`@traced("search_person")`
+    처럼 인자 하나만 준 호출)은 기본값 `"tool_call"` 그대로 동작한다 -- 이
+    확장은 하위 호환을 깨지 않는다. `app/er/pipeline.py`(U6)는
+    `@traced("er", step="er_resolve")` 처럼 두 번째 인자로 ER 단계 이름을 쓴다.
 
-    예외: `step="tool_error"`, `output={"error": 예외 클래스명,
-    "message": str(e)[:TRACE_MAX_STRING]}` 를 남기고 **예외를 다시 올린다**
-    (F-4d8d96 한계는 모듈 docstring 참고).
+    성공: `step`(인자, 기본 `"tool_call"`), `input`=ctx 를 뺀 인자의 이름→값
+    매핑을 `to_jsonable` 로 변환한 것, `output`=반환값을 `to_jsonable` 로
+    변환한 것(반환값이 `*Out` 이면 사실상 `to_dict()`). `tokens_in`/
+    `tokens_out`: 반환값이 `trace_tokens() -> tuple[int, int]` 메서드를
+    제공하면 그 결과를 그대로 쓰고(예: ER 판정 결과가 LLM 사용량을 실어
+    돌려줄 때), 없으면 `(0, 0)`(P2 툴처럼 LLM 호출이 없는 경우).
+
+    예외: `step="tool_error"`(고정 -- 성공 행의 `step` 인자와 무관하다),
+    `output={"error": 예외 클래스명, "message": str(e)[:TRACE_MAX_STRING]}`.
+    이 기록은 `ctx.session.begin_nested()` 세이브포인트 **안에서만** 시도한다
+    -- 세이브포인트를 열지 못하거나 그 안의 flush 가 다시 실패하면(세션이
+    이미 무효, F-ca12ad) **조용히 포기**하고 `session.rollback()` 을 부르지
+    않은 채 원래 예외를 **bare `raise`** 로 그대로 올린다(`__context__`·
+    `__traceback__` 불변, 모듈 docstring "F-ca12ad" 절·결정7 참고).
 
     `functools.wraps` 로 `__name__`·`__doc__`·`__wrapped__` 를 보존하되,
     `wrapper.__signature__` 를 원함수의 시그니처로 명시해 `inspect.signature`
@@ -140,32 +170,44 @@ def traced(tool_name: str) -> Callable[[F], F]:
             try:
                 result = fn(ctx, *args, **kwargs)
             except Exception as exc:
-                ctx.session.add(
-                    AgentTrace(
-                        session_id=ctx.session_id,
-                        step="tool_error",
-                        tool_name=tool_name,
-                        input=input_payload,
-                        output={
-                            "error": type(exc).__name__,
-                            "message": str(exc)[:TRACE_MAX_STRING],
-                        },
-                        tokens_in=0,
-                        tokens_out=0,
-                    )
-                )
-                ctx.session.flush()
+                try:
+                    with ctx.session.begin_nested():
+                        ctx.session.add(
+                            AgentTrace(
+                                session_id=ctx.session_id,
+                                step="tool_error",
+                                tool_name=tool_name,
+                                input=input_payload,
+                                output={
+                                    "error": type(exc).__name__,
+                                    "message": str(exc)[:TRACE_MAX_STRING],
+                                },
+                                tokens_in=0,
+                                tokens_out=0,
+                            )
+                        )
+                        ctx.session.flush()
+                except Exception:
+                    # 세션이 이미 무효(F-ca12ad) -- tool_error 기록을 조용히
+                    # 포기한다. 원래 예외(exc)를 덮지 않는 것이 우선이다.
+                    # session.rollback() 은 호출하지 않는다(결정7).
+                    pass
                 raise
+
+            tokens_in, tokens_out = 0, 0
+            trace_tokens = getattr(result, "trace_tokens", None)
+            if callable(trace_tokens):
+                tokens_in, tokens_out = trace_tokens()
 
             ctx.session.add(
                 AgentTrace(
                     session_id=ctx.session_id,
-                    step="tool_call",
+                    step=step,
                     tool_name=tool_name,
                     input=input_payload,
                     output=to_jsonable(result),
-                    tokens_in=0,
-                    tokens_out=0,
+                    tokens_in=tokens_in,
+                    tokens_out=tokens_out,
                 )
             )
             ctx.session.flush()
