@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-06 22:40 (FIX 커밋 진행 — 이어서 U2 커밋·dev 푸시 예정)
-active: **P1-pilot-dataset** | frozen: none | 브랜치: dev. 커밋 순서(승인됨): fix(F-7bea05·F-1ba055, 검사 12·13, 51 passed) → feat U2(promotion 8·alias 8, manifest generator) → `git push origin dev` → L-003 결정. U2 표본 sc-002·008·013 메인 세션 확인 완료.
+갱신: 2026-09-06 22:50 (FIX baee71e 커밋, U2 커밋·dev 푸시 진행 — 이후 L-003 결정 대기)
+active: **P1-pilot-dataset** | frozen: none | 브랜치: dev (main = origin/main = bdf9f70; dev = 계획 4c80c31 → U1 1e1320c → FIX baee71e → U2 커밋). **푸시 뒤 L-003 결정(승격/수정/보류) 대기.** 다음 단위 U3(pronoun 8 + normal 10) 는 결정 뒤 L-004 승인 → gen-prompt evidence 저장 → eval-agent 위임. U5 에서 (11) 파일명↔category 검사 + 01-plan 에 턴 수 2~6 규칙 한 줄 추가.
 
 ## 지금 어디까지
 - **P3-er 완료(2026-09-06)** — U1 @traced 세이브포인트(2b82882) → U2 임베딩 런타임 공급자·check_dimension(2c63c60) → U3 호칭 사전·규칙 필터(02e6f14) → U4 확신도·두 임계치·허용오차 1e-9(593c254) → U5 후보 어댑터·**공급자 중립 Judge(Claude·OpenAI, judge_from_env, gemini 예약 — 사용자 결정, 결정 3 개정 2)**(b1f2782) → U6 resolve() 4단계·trace 1행·부수효과 0(d6e5949) → U7 apply_resolution·회귀 3종(cc5d24f) → U8 백필·스모크 스크립트(107ace3) → FIX evidence 게이트 ER_EVIDENCE_STAMP(a807364) → U9 registry 20행·README ER 실행법·기계 검증(b3bcc2d) → verifier(fable) 04-review **완료**(필수 0·권고 6, verify-impl FAIL 0/WARN 0, pytest 398/skip 0, 변이 4종 검출, trace 재계산 오차 0) → 사용자 승인. backlog P3 ER 행 [x], review-index R4·R9 구현완료(**실호출 미검증** 두 줄 표기), README P3 행, CURRENT none.

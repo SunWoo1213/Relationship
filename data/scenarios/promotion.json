@@ -1,0 +1,560 @@
+[
+  {
+    "id": "sc-001",
+    "category": "promotion",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "김민준",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": [
+          "김팀장",
+          "팀장님",
+          "김부장",
+          "부장님"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1"
+    ],
+    "utterances": [
+      "오늘 김팀장이랑 회의 또 길어졌음ㅋㅋ",
+      "근데 김팀장 이번에 부장 달았대",
+      "이제 김부장님이라고 불러야 되나ㅋㅋ",
+      "부장님이 다음주에 밥 사준다고 함"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "김팀장",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "김팀장",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 2,
+        "surface": "김부장님",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 3,
+        "surface": "부장님",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 0,
+        "type": "meeting",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 3,
+        "type": "meal",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "none"
+      ]
+    }
+  },
+  {
+    "id": "sc-002",
+    "category": "promotion",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "이서연",
+        "relation_tag": "직장",
+        "hierarchy": "동",
+        "aliases": [
+          "이대리",
+          "이서연",
+          "이과장"
+        ]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "박지훈",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": [
+          "박과장",
+          "과장님",
+          "박지훈"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1",
+      "p2"
+    ],
+    "utterances": [
+      "이대리 이번에 과장으로 승진했더라 ㅊㅋㅊㅋ",
+      "원래 우리 팀 과장님은 박과장님인데",
+      "박과장님이 어제 회식비 다 내주심",
+      "이서연 과장님은 아직 호칭 어색하대"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "이대리",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "박과장님",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 2,
+        "surface": "박과장님",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 3,
+        "surface": "이서연 과장님",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 2,
+        "type": "meal",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "identity",
+        "none"
+      ]
+    },
+    "trap": {
+      "kind": "promotion_collides_with_existing_title",
+      "reason": "승진으로 새로 생긴 '이 과장' 과 원래부터 그 직급이던 '박 과장' 이 같은 '과장님' 호칭을 쓴다. 성씨를 떼고 부르는 순간 두 사람이 겹친다."
+    }
+  },
+  {
+    "id": "sc-003",
+    "category": "promotion",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "최유진",
+        "relation_tag": "직장",
+        "hierarchy": "하",
+        "aliases": [
+          "최주임",
+          "유진씨",
+          "최대리"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1"
+    ],
+    "utterances": [
+      "최주임 요즘 일 잘한다고 소문났어",
+      "명함 새로 팠다고 자랑하더라ㅋㅋ",
+      "이제 명함에 최대리라고 적혀 있음",
+      "유진씨한테 축하한다고 커피 사줬어"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "최주임",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 2,
+        "surface": "최대리",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 3,
+        "surface": "유진씨",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 0,
+        "type": "praise",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 3,
+        "type": "meal",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "identity",
+        "none"
+      ]
+    }
+  },
+  {
+    "id": "sc-004",
+    "category": "promotion",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "강도윤",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": [
+          "강팀장",
+          "팀장님",
+          "강실장"
+        ]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "윤서준",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": [
+          "윤팀장",
+          "윤서준"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1",
+      "p2"
+    ],
+    "utterances": [
+      "강팀장님 이번 인사에 실장 되셨대",
+      "옆 팀 윤팀장님은 그대로시고",
+      "습관대로 팀장님이라 불렀다가 혼남ㅋㅋ",
+      "실장님이 저녁에 술 사주셨어"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "강팀장님",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "윤팀장님",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 2,
+        "surface": "팀장님",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 3,
+        "surface": "실장님",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 2,
+        "type": "conflict",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 3,
+        "type": "meal",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "identity",
+        "none"
+      ]
+    },
+    "trap": {
+      "kind": "same_title_two_persons",
+      "reason": "승진한 강 실장의 옛 호칭 '팀장님' 이 현직 윤 팀장과 겹친다. 2턴의 '팀장님' 은 '습관대로 불렀다가 혼남' 이라는 문맥으로만 강 실장으로 정해진다."
+    }
+  },
+  {
+    "id": "sc-005",
+    "category": "promotion",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "정하윤",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": [
+          "하윤이",
+          "부회장",
+          "회장님"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1"
+    ],
+    "utterances": [
+      "하윤이 동아리 부회장이었잖아",
+      "이번에 회장 됐다고 연락 왔어ㅋㅋ",
+      "이제 회장님이라고 놀리는 중임",
+      "첫 회의 때 엄청 긴장했다더라",
+      "9월 20일에 축하 겸 밥 먹기로 했어"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "하윤이",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 2,
+        "surface": "회장님",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 1,
+        "type": "personal_share",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 3,
+        "type": "meeting",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 4,
+        "type": "meal",
+        "occurred_at_kind": "absolute"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "none"
+      ]
+    }
+  },
+  {
+    "id": "sc-006",
+    "category": "promotion",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "임채원",
+        "relation_tag": "직장",
+        "hierarchy": "하",
+        "aliases": [
+          "채원씨",
+          "임주임"
+        ]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "조은우",
+        "relation_tag": "직장",
+        "hierarchy": "하",
+        "aliases": [
+          "조주임",
+          "주임님"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1",
+      "p2"
+    ],
+    "utterances": [
+      "채원씨 이번에 주임 달았어",
+      "원래 그 업무는 조주임이 하던 건데",
+      "주임님한테 인수인계 받으라고 했음",
+      "채원씨가 고맙다고 커피 사줬어"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "채원씨",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "조주임",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 2,
+        "surface": "주임님",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 3,
+        "surface": "채원씨",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 3,
+        "type": "meal",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "identity",
+        "none"
+      ]
+    },
+    "trap": {
+      "kind": "promotion_collides_with_existing_title",
+      "reason": "막 주임이 된 임채원과 원래 주임이던 조은우가 같은 '주임님' 을 쓴다. 2턴의 '주임님' 은 '인수인계를 해 주는 쪽' 이라는 문맥으로만 조은우로 정해진다."
+    }
+  },
+  {
+    "id": "sc-007",
+    "category": "promotion",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "문태현",
+        "relation_tag": "지인",
+        "hierarchy": "동",
+        "aliases": [
+          "문쌤",
+          "태현쌤",
+          "문실장"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1"
+    ],
+    "utterances": [
+      "오늘 문쌤한테 피티 받았는데 빡셌음",
+      "명찰이 실장으로 바뀌어 있더라",
+      "문실장님 됐다고 커피 쏘심ㅋㅋ",
+      "담주에도 같은 시간에 하기로 함"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "문쌤",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 2,
+        "surface": "문실장님",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 0,
+        "type": "other",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 2,
+        "type": "meal",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "identity",
+        "none"
+      ]
+    }
+  },
+  {
+    "id": "sc-008",
+    "category": "promotion",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "김태윤",
+        "relation_tag": "가족",
+        "hierarchy": "상",
+        "aliases": [
+          "아빠",
+          "김차장",
+          "김부장"
+        ]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "한지원",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": [
+          "한부장",
+          "부장님"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1",
+      "p2"
+    ],
+    "utterances": [
+      "아빠 이번에 부장으로 승진하셨대",
+      "근데 우리 회사 부장님은 오늘도 잔소리ㅋ",
+      "저녁에 아빠랑 축하 삼겹살 먹었음",
+      "한부장님한테는 굳이 말 안 했어"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "아빠",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "부장님",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 2,
+        "surface": "아빠",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 3,
+        "surface": "한부장님",
+        "gold_person_id": "p2"
+      }
+    ],
+    "events": [
+      {
+        "turn": 1,
+        "type": "conflict",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 2,
+        "type": "meal",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "identity",
+        "none"
+      ]
+    },
+    "trap": {
+      "kind": "same_title_two_persons",
+      "reason": "아버지가 부장으로 승진해 '부장님' 이 가족·직장 양쪽에 생긴다. 1턴의 '우리 회사 부장님' 은 수식어로만 직장 쪽으로 갈린다."
+    }
+  }
+]

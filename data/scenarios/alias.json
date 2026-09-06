@@ -1,0 +1,582 @@
+[
+  {
+    "id": "sc-009",
+    "category": "alias",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "배준호",
+        "relation_tag": "직장",
+        "hierarchy": "동",
+        "aliases": [
+          "배대리",
+          "배준호",
+          "준호",
+          "준호형"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1"
+    ],
+    "utterances": [
+      "배대리랑 점심 같이 먹었어",
+      "준호가 요즘 야근 많다고 힘들대",
+      "배준호 원래 저런 스타일 아닌데",
+      "준호형이라 부르니까 좋아하더라ㅋㅋ"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "배대리",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "준호",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 2,
+        "surface": "배준호",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 3,
+        "surface": "준호형",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 0,
+        "type": "meal",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 1,
+        "type": "personal_share",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 3,
+        "type": "other",
+        "occurred_at_kind": "none"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "none"
+      ]
+    }
+  },
+  {
+    "id": "sc-010",
+    "category": "alias",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "김민준",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": [
+          "김팀장",
+          "팀장님",
+          "민준"
+        ]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "이민준",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": [
+          "민준",
+          "민준이"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1",
+      "p2"
+    ],
+    "utterances": [
+      "회사 김팀장이랑 오늘 또 부딪혔어ㅠ",
+      "저녁엔 동창 민준이 만나서 술 마심",
+      "민준이가 회사 얘기 실컷 들어줬어",
+      "내일 또 팀장님 보고 들어가야 됨"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "김팀장",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "민준이",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 2,
+        "surface": "민준이",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 3,
+        "surface": "팀장님",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 0,
+        "type": "conflict",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 1,
+        "type": "meal",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 2,
+        "type": "favor",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "identity",
+        "none"
+      ]
+    },
+    "trap": {
+      "kind": "nickname_shared",
+      "reason": "직장 상사 김민준과 동창 이민준이 같은 이름을 쓴다. '민준이' 는 '동창' 수식과 저녁이라는 시간대로만 친구 쪽으로 갈린다."
+    }
+  },
+  {
+    "id": "sc-011",
+    "category": "alias",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "최유진",
+        "relation_tag": "가족",
+        "hierarchy": "상",
+        "aliases": [
+          "언니",
+          "유진언니",
+          "최유진"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1"
+    ],
+    "utterances": [
+      "언니가 오늘 반찬 잔뜩 갖다줬어",
+      "최유진 여사님 손맛 여전하더라ㅋㅋ",
+      "유진언니한테 용돈 조금 드렸음",
+      "주말에 같이 영화 보기로 했어"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "언니",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "최유진",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 2,
+        "surface": "유진언니",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 0,
+        "type": "favor",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 2,
+        "type": "favor",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "none"
+      ]
+    }
+  },
+  {
+    "id": "sc-012",
+    "category": "alias",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "안소미",
+        "relation_tag": "지인",
+        "hierarchy": "상",
+        "aliases": [
+          "안쌤",
+          "수학쌤",
+          "소미쌤"
+        ]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "권나연",
+        "relation_tag": "지인",
+        "hierarchy": "상",
+        "aliases": [
+          "권쌤",
+          "영어쌤"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1"
+    ],
+    "utterances": [
+      "수학쌤이 오늘 숙제 진짜 많이 냄",
+      "영어쌤은 그냥 넘어가주셨는데",
+      "안쌤한테 질문하러 갔다가 혼났어",
+      "권쌤은 그럴 때 웃어주시더라"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "수학쌤",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "영어쌤",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 2,
+        "surface": "안쌤",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 3,
+        "surface": "권쌤",
+        "gold_person_id": "p2"
+      }
+    ],
+    "events": [
+      {
+        "turn": 2,
+        "type": "conflict",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "identity",
+        "new_person",
+        "none"
+      ]
+    },
+    "trap": {
+      "kind": "same_title_two_persons",
+      "reason": "'쌤' 접미 호칭을 두 사람이 나눠 쓴다. 과목 수식(수학/영어)과 성씨(안/권)를 교차해야 같은 사람인지 갈린다. 권나연은 seed 에 없어 신규 등록 판정까지 얽힌다."
+    }
+  },
+  {
+    "id": "sc-013",
+    "category": "alias",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "임채원",
+        "relation_tag": "직장",
+        "hierarchy": "하",
+        "aliases": [
+          "채원",
+          "채원씨",
+          "임채원"
+        ]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "서채영",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": [
+          "채영",
+          "채영이"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1",
+      "p2"
+    ],
+    "utterances": [
+      "채원씨가 보고서 대신 봐줘서 살았음",
+      "저녁엔 채영이랑 약속 있어서 나감",
+      "채원이랑 채영이 이름 맨날 헷갈림ㅋㅋ",
+      "아까 걔가 카톡 보냈는데 누군지 모르겠음"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "채원씨",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "채영이",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 2,
+        "surface": "채원이",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 2,
+        "surface": "채영이",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 3,
+        "surface": "걔",
+        "gold_person_id": null,
+        "ambiguous": true
+      }
+    ],
+    "events": [
+      {
+        "turn": 0,
+        "type": "favor",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "identity",
+        "none"
+      ]
+    },
+    "trap": {
+      "kind": "similar_name_two_persons",
+      "reason": "'채원' 과 '채영' 은 한 글자만 다르다. 임베딩·편집거리 모두 가깝게 나와 오병합을 유도한다. 3턴의 '걔' 는 사람도 정할 수 없어 ambiguous 로 둔다."
+    }
+  },
+  {
+    "id": "sc-014",
+    "category": "alias",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "서다인",
+        "relation_tag": "연인",
+        "hierarchy": "동",
+        "aliases": [
+          "다인",
+          "다인이",
+          "자기"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1"
+    ],
+    "utterances": [
+      "다인이랑 오늘 전시회 갔다왔어",
+      "서다인 사진 진짜 잘 찍음ㅋㅋ",
+      "다음달 다인이 생일이라 케이크 예약함",
+      "자기라고 부르면 부끄러워 하더라"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "다인이",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "서다인",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 2,
+        "surface": "다인이",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 3,
+        "surface": "자기",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 0,
+        "type": "meeting",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 1,
+        "type": "praise",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "none"
+      ]
+    }
+  },
+  {
+    "id": "sc-015",
+    "category": "alias",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "조은우",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": [
+          "은우",
+          "부장님",
+          "조은우"
+        ]
+      },
+      {
+        "person_id": "p2",
+        "display_name": "한지원",
+        "relation_tag": "직장",
+        "hierarchy": "상",
+        "aliases": [
+          "한부장",
+          "부장님"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1",
+      "p2"
+    ],
+    "utterances": [
+      "은우 별명이 부장님이야 잔소리 대마왕ㅋ",
+      "오늘 진짜 한부장님한테 제대로 깨졌어",
+      "그 얘기 했더니 은우가 또 잔소리함",
+      "우리 부장님은 언제 퇴사하시려나ㅋㅋ"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "은우",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "한부장님",
+        "gold_person_id": "p2"
+      },
+      {
+        "turn": 2,
+        "surface": "은우",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 3,
+        "surface": "부장님",
+        "gold_person_id": "p2"
+      }
+    ],
+    "events": [
+      {
+        "turn": 1,
+        "type": "conflict",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 2,
+        "type": "other",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "identity",
+        "none"
+      ]
+    },
+    "trap": {
+      "kind": "nickname_shared_with_title",
+      "reason": "친구의 별명이 하필 직장 상사의 직급 호칭과 같다. 3턴의 '우리 부장님' 은 '퇴사' 라는 회사 문맥으로만 상사 쪽으로 갈린다."
+    }
+  },
+  {
+    "id": "sc-016",
+    "category": "alias",
+    "persons": [
+      {
+        "person_id": "p1",
+        "display_name": "신예린",
+        "relation_tag": "친구",
+        "hierarchy": "동",
+        "aliases": [
+          "예린",
+          "예리니",
+          "린이"
+        ]
+      }
+    ],
+    "seed_persons": [
+      "p1"
+    ],
+    "utterances": [
+      "예린이랑 카페에서 세 시간 수다떰",
+      "예리니 요즘 이직 준비한다고 바쁘대",
+      "린이라고 부르는 건 나뿐이야ㅋㅋ"
+    ],
+    "mentions": [
+      {
+        "turn": 0,
+        "surface": "예린이",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 1,
+        "surface": "예리니",
+        "gold_person_id": "p1"
+      },
+      {
+        "turn": 2,
+        "surface": "린이",
+        "gold_person_id": "p1"
+      }
+    ],
+    "events": [
+      {
+        "turn": 0,
+        "type": "meeting",
+        "occurred_at_kind": "relative"
+      },
+      {
+        "turn": 1,
+        "type": "personal_share",
+        "occurred_at_kind": "relative"
+      }
+    ],
+    "expected_ask_user": {
+      "allowed": [
+        "none"
+      ]
+    }
+  }
+]

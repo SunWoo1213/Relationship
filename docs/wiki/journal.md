@@ -101,3 +101,4 @@
 - 2026-09-06 21:05 | START | P1-pilot-dataset 착수: architect(opus) 초안 → 사용자 결정 A~G(전부 권장안) → verifier(fable) 보류 3(H-1 ambiguous 규칙·H-2 생성 경로/manifest·H-3 검수 파일 형식, F-033bb1) → 사용자 결정 → 반영 → 재검증 통과(FAIL 0/WARN 0, 권고 R-4~R-12) → 사용자 승인. 담당 eval-agent, 40건(promotion 8/pronoun 8/alias 8/normal 10/new_person 6), 검수 verifier 새 컨텍스트 | P1-pilot-dataset S3.7 D1 D3 D10
 - 2026-09-06 17:47 | COMMIT | 4c80c31 docs(P1-pilot-dataset): 계획·계획검증 승인, 패키지 착수 — 파일럿 데이터셋 40건·검증기·verifier 라벨 검수
 - 2026-09-06 18:07 | COMMIT | 1e1320c feat(P1-pilot-dataset): U1 시나리오 스키마·검증기·테스트 — JSON Schema 2020-12, 교차 검사 10항목, 위반 표본 8종
+- 2026-09-06 18:44 | COMMIT | baee71e fix(P1-pilot-dataset): 검증기 테스트 시점 고정 해소·검사 12 surface∈utterance·13 발화 길이/턴 수 — F-7bea05 F-1ba055

@@ -1,0 +1,41 @@
+...............................FF..                                      [100%]
+================================== FAILURES ===================================
+_____________ test_repository_dataset_passes_with_zero_scenarios ______________
+
+capsys = <_pytest.capture.CaptureFixture object at 0x0000025FA5DFF610>
+
+    def test_repository_dataset_passes_with_zero_scenarios(capsys):
+        """U1 시점: 시나리오 파일이 아직 없어도 검증기는 rc=0 · 총 0건."""
+        assert vs.main(["--dir", str(REPO_SCENARIOS), "--json"]) == 0
+        payload = json.loads(capsys.readouterr().out)
+        assert payload["ok"] is True
+>       assert payload["total"] == 0
+E       assert 16 == 0
+
+tests\test_validate_scenarios.py:473: AssertionError
+________________ test_repository_manifest_generator_keys_exist ________________
+
+    def test_repository_manifest_generator_keys_exist():
+        """H-2 -- U1 에서는 값이 비어 있어도 generator 키는 존재해야 한다."""
+        real_manifest = json.loads(
+            (REPO_SCENARIOS / "manifest.json").read_text(encoding="utf-8")
+        )
+        assert set(real_manifest["generator"]) == {
+            "model_id",
+            "prompt_ref",
+            "seed",
+            "seed_reason",
+            "same_family_as_judge",
+        }
+>       assert real_manifest["virtual_names"] == []
+E       AssertionError: assert ['강도윤', '강실장'...연', '권쌤', ...] == []
+E         
+E         Left contains 68 more items, first extra item: '강도윤'
+E         Use -v to get more diff
+
+tests\test_validate_scenarios.py:491: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_validate_scenarios.py::test_repository_dataset_passes_with_zero_scenarios
+FAILED tests/test_validate_scenarios.py::test_repository_manifest_generator_keys_exist
+2 failed, 33 passed in 1.18s
+rc=1
