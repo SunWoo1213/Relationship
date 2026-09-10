@@ -5,31 +5,28 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-07 05:20 (U7 커밋 — /devlog done: verifier 04-review 위임 예정)
-active: **P1-pilot-dataset** | frozen: none | 브랜치: dev (origin/dev 09875aa, main bdf9f70 승격 보류; 로컬 U3~U7 미푸시). **U1~U7 전부 완료·커밋**(U7 해시 journal). **다음: /devlog done** — verifier(L-004 승인됨) verify-impl.sh + 04-review(수용 기준 증거·부정 케이스·registry·P4 인계) → 사용자 완료 승인 → backlog [x]·CURRENT none·journal DONE → `/commit` → dev 푸시 → L-003 승격(묶음).
+갱신: 2026-09-10 (P1-pilot-dataset 완료 승인 — 닫는 docs 커밋 준비 중)
+active: **none** | frozen: none | 브랜치: dev = f78e9dc(U7), origin/dev 09875aa(로컬 7커밋 미푸시), main bdf9f70 승격 보류. **진행 중: P1-pilot-dataset 닫는 커밋(`/commit` 초안 → 사용자 승인)** — 04-review `승인: 사용자 (2026-09-10)`·backlog P1 [x]·registry 105/106행 정정·03-log U7 해시·CURRENT none·journal DONE·05-remediation F-14f3ef 해소·evidence 22(2152-* 16 + 20260910-*) 전부 미커밋. `.gitignore`(졸업작품신청서.md 제외)도 같은 커밋에 넣는다(사용자 결정 2026-09-10). 03-log 09:40 항목의 `pending` 은 이 커밋 해시로 다음 커밋에서 채운다.
 
 ## 지금 어디까지
-- **P3-er 완료(2026-09-06)** — U1 @traced 세이브포인트(2b82882) → U2 임베딩 런타임 공급자·check_dimension(2c63c60) → U3 호칭 사전·규칙 필터(02e6f14) → U4 확신도·두 임계치·허용오차 1e-9(593c254) → U5 후보 어댑터·**공급자 중립 Judge(Claude·OpenAI, judge_from_env, gemini 예약 — 사용자 결정, 결정 3 개정 2)**(b1f2782) → U6 resolve() 4단계·trace 1행·부수효과 0(d6e5949) → U7 apply_resolution·회귀 3종(cc5d24f) → U8 백필·스모크 스크립트(107ace3) → FIX evidence 게이트 ER_EVIDENCE_STAMP(a807364) → U9 registry 20행·README ER 실행법·기계 검증(b3bcc2d) → verifier(fable) 04-review **완료**(필수 0·권고 6, verify-impl FAIL 0/WARN 0, pytest 398/skip 0, 변이 4종 검출, trace 재계산 오차 0) → 사용자 승인. backlog P3 ER 행 [x], review-index R4·R9 구현완료(**실호출 미검증** 두 줄 표기), README P3 행, CURRENT none.
-- 회귀 3종 실측: 승진 s_llm 0.95·s_emb 0.849·s_rule 0.667·confidence 0.863 → merge·relaxed_retry·별칭 "부장님"·display_name 무변경 / 이모 relation_tag_conflict → LLM 생략 → new_person 질문 / 동명이인 0.575 → identity 질문·options 2 이름.
-- **열린 권고(P3-er 05-remediation)**: F-87c597 R4 실호출 미검증 — 사용자 스모크 1회 → evidence → R4 표기 갱신. F-46f1eb 테스트 더미 키 `"sk-test-dummy"` → `_FAKE_KEY_MARKER` 규약. F-036185 `validate_judgement` bool id 방어. F-251dc2 trace candidates[].similarity/aliases_matched 가 s_emb·전체 별칭 복제(P4 결정). F-bdd6c5 `ERConfig.top_k` 가 실제 검색 K 에 무효(P4 스윕 금지 명시 또는 FIX). F-d5c11e 03-log 정정(완료).
-- 이전 패키지 열린 소견: P2 F-4d2507 `DELETE /persons/{id}` backlog 항목(P5/P8 계획 때 architect), F-4d8d96 tool_error rollback 소실(P5 별도 커넥션 결정), F-c7078e mako Refs(revision 만들 때).
-- 로컬 DB: capstone2-postgres-1 호스트 5433, 스키마 0001(head), 명령 앞 `POSTGRES_PORT=5433`, pytest `-rs`, 한글 출력 `PYTHONIOENCODING=utf-8` + 리다이렉트. verify-impl.sh 내부 pytest 는 포트 없이 돌아 skip 표시(하네스 한계 — 직접 실행이 증거, 개선 후보). 설치: anthropic 1.4.0·openai 2.33.0.
+- **P1-pilot-dataset 완료(2026-09-10)** — U1 스키마·검증기(1e1320c) → U2 promotion·alias(09875aa) → FIX 시점 무관 테스트(baee71e) → U3 pronoun·normal(aa6ecfc) → U4 new_person(6775463) → U5 schema_version 2·검사 11/14/15·manifest(40c36f8) → U6 라벨 검수 반영 3라운드(76add8a·6906af4·aeed0bd) → U7 registry 12행·README(f78e9dc) → verifier(fable) 04-review **완료**(필수 0, 권고 R-4~R-12 반영 8·R-6 P4 이관, verify-impl FAIL 0/WARN 0, 수용 기준 4/4, 부정 케이스 8/8·대조군 0) → 사용자 승인. 40건·5범주(8/8/8/10/6), 라벨 검수 verifier 40/40·사용자 12/12. 닫는 R 없음(R3·R4 는 P4). **P4 인계 13항·P10 인계 5항 = `packages/P1-pilot-dataset/04-review.md` §7** — P4 01-plan 이 옮겨 적었는지 P4 02-plan-verify 에서 본다.
+- **P3-er 완료(2026-09-06)** — U1~U9 + FIX(2b82882..b3bcc2d), verifier 04-review 완료(필수 0·권고 6). R4·R9 구현완료(**실호출 미검증** 표기). 열린 권고: F-87c597 R4 실호출(사용자 스모크), F-46f1eb 더미 키 규약, F-036185 bool id 방어, F-251dc2 trace 복제·F-bdd6c5 top_k 무효(P4 결정).
+- 이전 패키지 열린 소견: P2 F-4d2507 `DELETE /persons/{id}` backlog(P5/P8 계획 때 architect), F-4d8d96 tool_error rollback(P5), F-c7078e mako Refs(revision 만들 때).
+- 로컬 DB: capstone2-postgres-1 호스트 5433, 스키마 0001(head), 명령 앞 `POSTGRES_PORT=5433`, pytest `-rs`, 한글 출력 `PYTHONIOENCODING=utf-8` + 리다이렉트. verify-impl.sh 내부 pytest 는 포트 없이 돌아 skip 표시(하네스 한계). 설치: anthropic 1.4.0·openai 2.33.0.
 
 ## 바로 다음에 할 것 (순서대로)
-0. **(완료) F-7bea05·F-1ba055 해소** — 빈 fixture(`test_empty_dataset_passes_with_zero_scenarios`) + 시점 무관 불변식(`test_repository_dataset_satisfies_time_invariant_properties`), `virtual_names` 단정 완화. 함께 **검사 (12) SURFACE_NOT_IN_UTTERANCE·(13) UTTERANCE_LENGTH/TURN_COUNT** 추가(경계 상수 8~60자·2~6턴, (11)은 U5 예정으로 비워 둠). 저장소 16건 위반 0. → 다음: fix 커밋 → U2 커밋 → U3(pronoun 8 + normal 10, 같은 방식: L-004 승인 → gen-prompt evidence 저장 → 위임) → U4(new_person 6, 하위 유형 각 3건 이상 R-5) → U5(무결성·manifest 배분표·검사 11 파일명↔category 추가·검수 패킷) → 검수(verifier 새 컨텍스트, evidence/<ts>-label-review.md, 사용자는 함정·new_person 건) → U6 → U7.
-1. (완료) 완료 커밋 0527ab8 → dev 푸시 → **main 승격(2026-09-06 19:35, 12커밋 b676799..0527ab8, 로컬 검증 근거로 사용자 승인)**.
-1-b. (완료) `SERVER-CHECKLIST.md` 루트 커밋 bdf9f70 → dev 푸시 → **main 승격(2026-09-06 20:15, 문서 전용이라 실서버 검증 없이 사용자 승인)**. 다음 승격부터는 이 가이드 §1~§4 증거를 근거로 한다.
-2. 사용자 스모크(값은 셸에만): `ANTHROPIC_API_KEY=… python scripts/er_smoke.py > docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt` 또는 `LLM_PROVIDER=openai OPENAI_API_KEY=… python scripts/er_smoke.py --provider openai` → F-87c597 닫고 review-index R4 갱신(작은 docs 커밋).
-3. 다음 패키지 후보(architect 에게 backlog 분해 요청, L-004 승인 후): **P1-pilot-dataset**(eval-agent, 한국어 대화 150건 — P4 게이트 선행) / **P3 베이스라인 3종**(eval-agent) / **P0-cost**(AWS Budgets) / P4-pilot-eval(P3 완료로 착수 가능, P1 데이터셋 필요). **P4 통과 전 P5 이후 시작 금지.** P4 01-plan 에 F-251dc2·F-bdd6c5 결정 포함.
-4. 사소 FIX 후보(별도 작은 커밋, 승인 후): F-46f1eb·F-036185.
+0. **닫는 커밋** `/commit`(docs: 04-review·05·03-log·backlog·registry·CURRENT·journal·HANDOFF·evidence 22·.gitignore) → dev 푸시(7+1 커밋, 승인) → L-003 승격 판단 대기(`SERVER-CHECKLIST.md` §1~§4 근거; 데이터·문서 위주라 로컬 검증 근거 승격도 가능 — 사용자 결정).
+1. 사용자 스모크(값은 셸에만): `ANTHROPIC_API_KEY=… python scripts/er_smoke.py > docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt` 또는 `LLM_PROVIDER=openai OPENAI_API_KEY=… python scripts/er_smoke.py --provider openai` → F-87c597 닫고 review-index R4 갱신(작은 docs 커밋).
+2. 다음 패키지(architect 에게 backlog 분해, L-004 승인 후): **P3 베이스라인 3종**(eval-agent) / **P4-pilot-eval**(P1·P3 완료로 착수 가능 — 01-plan 에 F-251dc2·F-bdd6c5 결정 + P1 04-review §7 인계 13항 포함) / **P0-cost**(AWS Budgets). **P4 통과 전 P5 이후 시작 금지.**
+3. 사소 FIX 후보(별도 작은 커밋, 승인 후): F-46f1eb·F-036185.
 
 ## 재개 시 읽을 카드 (이것만)
-- `docs/wiki/CURRENT.md`, `.claude/gitlog.md`, `packages/P1-pilot-dataset/01-plan.md`(작업 단위·결정 확정 블록), `02-plan-verify.md` §3 권고 R-4~R-12, `docs/backlog.md` P1 절
+- `docs/wiki/CURRENT.md`, `.claude/gitlog.md`, `packages/P1-pilot-dataset/04-review.md` §6~§7(권고 처리·P4/P10 인계), `docs/backlog.md` P3·P4 절
 - `packages/P3-er/04-review.md` §6~§7(열린 권고·P4/P5 인계), `05-remediation.md` 신규 권고 6, `README.md` "엔티티 해석(ER) 실행법"
 - `lessons/L-001`~`L-004`
 
 ## 열린 질문 · 사용자 결정 대기
-- 스모크 실행 시점(사용자 키 필요, 순서 2). 다음 패키지 선택(P1-pilot-dataset 권장, 순서 3) — L-004 승인 뒤 architect 위임.
+- dev 푸시 뒤 main 승격 여부(순서 0). 스모크 실행 시점(사용자 키 필요, 순서 1). 다음 패키지 선택(P3 베이스라인 또는 P4-pilot-eval, 순서 2) — L-004 승인 뒤 architect 위임.
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)
 - 재개 시 커밋 안 된 변경·진행 중 항목이 있으면 **먼저 사용자에게 목록을 보이고 우선순위를 묻는다**(`/devlog resume`).

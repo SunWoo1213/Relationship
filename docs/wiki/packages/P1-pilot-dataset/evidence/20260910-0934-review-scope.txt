@@ -1,0 +1,49 @@
+# verifier 04-review §6 — 범위 대조 (01-plan '하지 않는 것': app/·alembic/·reports/ 무변경, 네트워크 미사용) HEAD f78e9dc44c627c45950e53b9a58146d4d489665c
+
+$ git diff --stat 4c80c31..f78e9dc -- app/ alembic/ reports/
+(끝 — 빈 출력이면 무변경)
+
+$ git diff --stat 4c80c31..f78e9dc --stat | tail -1
+ 66 files changed, 10933 insertions(+), 13 deletions(-)
+
+$ git diff --name-only 4c80c31..f78e9dc | grep -vE "^docs/wiki/" 
+README.md
+data/scenarios/alias.json
+data/scenarios/manifest.json
+data/scenarios/manifest.schema.json
+data/scenarios/new_person.json
+data/scenarios/normal.json
+data/scenarios/promotion.json
+data/scenarios/pronoun.json
+data/scenarios/schema.json
+requirements-dev.txt
+scripts/dump_scenarios.py
+scripts/validate_scenarios.py
+tests/test_validate_scenarios.py
+
+$ grep -nE "import (requests|httpx|urllib|socket|openai|anthropic|psycopg|sqlalchemy)" scripts/validate_scenarios.py scripts/dump_scenarios.py tests/test_validate_scenarios.py
+tests/test_validate_scenarios.py:33:from app.db.models import (  # noqa: E402
+rc=0 (1 = 일치 없음 = 네트워크·DB·app import 없음)
+
+$ grep -cE "^def test_" tests/test_validate_scenarios.py
+65
+$ grep -oE "assert \"[A-Z_]+\" in codes" tests/test_validate_scenarios.py | sort -u
+assert "AMBIGUOUS_COUNT_MISMATCH" in codes
+assert "DUPLICATE_ID" in codes
+assert "EVENT_TYPE_UNKNOWN" in codes
+assert "FILE_CATEGORY_MISMATCH" in codes
+assert "FILE_MISSING" in codes
+assert "FILE_NOT_ARRAY" in codes
+assert "GOLD_ID_ORPHAN" in codes
+assert "GOLD_NULL_NOT_AMBIGUOUS" in codes
+assert "MANIFEST_LOAD" in codes
+assert "NAME_NOT_IN_VIRTUAL_NAMES" in codes
+assert "PASSING_MENTION_OVERLAP" in codes
+assert "PASSING_SURFACE_NOT_IN_UTTERANCE" in codes
+assert "SCHEMA" in codes
+assert "SEED_PERSON_UNKNOWN" in codes
+assert "SURFACE_NOT_IN_UTTERANCE" in codes
+assert "TRAP_COUNT_MISMATCH" in codes
+assert "TURN_COUNT" in codes
+assert "TURN_OUT_OF_RANGE" in codes
+assert "UTTERANCE_LENGTH" in codes

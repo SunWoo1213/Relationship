@@ -20,15 +20,15 @@
 ### P1
 
 - [x] [backend-agent] 스키마 v2 마이그레이션 (Alembic) / 의존: 착수 준비(D4 차원 확정, docker-compose) / 수용기준: 9개 테이블 생성, `events.type` 제약 존재 — 완료(2026-09-05, 04-review 완료, verify-impl FAIL 0, R8 R9 구현완료)
-- [ ] [eval-agent] 파일럿 데이터셋 30~50건 (승진·대명사·별칭·정상·신규) / 의존: 평가 명세(resolution-plan 3.7) / 수용기준: `data/scenarios/` JSON, 라벨 검수 완료
+- [x] [eval-agent] 파일럿 데이터셋 30~50건 (승진·대명사·별칭·정상·신규) / 의존: 평가 명세(resolution-plan 3.7) / 수용기준: `data/scenarios/` JSON, 라벨 검수 완료 — **완료(2026-09-10, P1-pilot-dataset, verifier 04-review `완료`, verify-impl FAIL 0/WARN 0; 40건·5범주, 라벨 검수 열림 0; 닫는 R 없음 — R3·R4 는 P4 가 닫는다)**
   - 세분화는 `docs/wiki/packages/P1-pilot-dataset/01-plan.md` (U1~U7). 위 행의 문장·수용기준은 권위이며 바꾸지 않는다.
-  - [ ] U1 스키마 확정 + `data/scenarios/schema.json` + `scripts/validate_scenarios.py` + 검증기 테스트 / 수용: 위반 표본 8종을 전부 FAIL 로 잡는다
-  - [ ] U2 `promotion` 8건 + `alias` 8건 (오병합 유도 함정 각 3건 이상, 호칭 변이 의도적 포함)
-  - [ ] U3 `pronoun` 8건 + `normal` 10건 (선행사 명확한 대명사만, 모호 건은 `ambiguous` 플래그 후보)
-  - [ ] U4 `new_person` 6건 (등록 대상 vs 지나가는 언급, 기대 `ask_user` 는 허용 집합으로 라벨 — D1 D10)
-  - [ ] U5 전건 무결성 점검 + `manifest.json` 배분표 + 검수 패킷 생성(검수는 하지 않는다)
-  - [ ] U6 라벨 검수 지적 반영 / 검수자: **verifier 또는 사용자**(eval-agent 자기검수 금지, L-002) / 기록: `packages/P1-pilot-dataset/evidence/<ts>-label-review.md`(열림 0 이 완료 조건)
-  - [ ] U7 registry 행 · README 데이터셋 절 · 수용 기준 기계 검증 evidence
+  - [x] U1 스키마 확정 + `data/scenarios/schema.json` + `scripts/validate_scenarios.py` + 검증기 테스트 / 수용: 위반 표본 8종을 전부 FAIL 로 잡는다
+  - [x] U2 `promotion` 8건 + `alias` 8건 (오병합 유도 함정 각 3건 이상, 호칭 변이 의도적 포함)
+  - [x] U3 `pronoun` 8건 + `normal` 10건 (선행사 명확한 대명사만, 모호 건은 `ambiguous` 플래그 후보)
+  - [x] U4 `new_person` 6건 (등록 대상 vs 지나가는 언급, 기대 `ask_user` 는 허용 집합으로 라벨 — D1 D10)
+  - [x] U5 전건 무결성 점검 + `manifest.json` 배분표 + 검수 패킷 생성(검수는 하지 않는다)
+  - [x] U6 라벨 검수 지적 반영 / 검수자: **verifier 또는 사용자**(eval-agent 자기검수 금지, L-002) / 기록: `packages/P1-pilot-dataset/evidence/<ts>-label-review.md`(열림 0 이 완료 조건)
+  - [x] U7 registry 행 · README 데이터셋 절 · 수용 기준 기계 검증 evidence
   - **U1 착수 전 사용자 결정 7건**(01-plan "리스크·미결" A~G): 인물 메타 포함 여부 / 이벤트 골드 라벨 범위 / 일정 골드 라벨 연기 / `ask_user` 라벨 형태 / seed 인물 표현 / 생성 방식(LLM 초안+검수) / 검수 범위·검수자
 
 ### P2

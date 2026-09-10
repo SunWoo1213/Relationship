@@ -1,0 +1,33 @@
+# 부정 케이스 b-orphan — sc-001 mentions[0].gold_person_id p1→p9(persons 에 없음)
+변이 디렉터리: C:\Users\swsj1\AppData\Local\Temp\claude\C--Capstone2\37ff739a-d82e-4361-9c42-61789c7785bc\scratchpad\neg-b-orphan  (저장소 원본 data/scenarios 무수정 — 복사본만 변이)
+명령: python scripts/validate_scenarios.py --strict --dir <복사본>
+rc=1  기대 rc=1  → OK
+기대 검사 (2) FAIL 포함 → True
+--- stdout ---
+== validate_scenarios C:/Users/swsj1/AppData/Local/Temp/claude/C--Capstone2/37ff739a-d82e-4361-9c42-61789c7785bc/scratchpad/neg-b-orphan ==
+[info] strict=True schema_version=2
+[info] promotion.json: 8건
+[info] pronoun.json: 8건
+[info] alias.json: 8건
+[info] normal.json: 10건
+[info] new_person.json: 6건
+[PASS] (0) 적재(manifest·시나리오 파일 읽기)
+[PASS] (1) 스키마 위반
+[FAIL] (2) GOLD_ID_ORPHAN promotion.json:sc-001:mentions[0](김팀장): gold_person_id='p9' 가 persons[].person_id ['p1'] 안에 없다
+[PASS] (3) turn 범위
+[PASS] (4) id 전역 유일
+[PASS] (5) events.type enum
+[PASS] (6) manifest counts·total 일치
+[PASS] (7) virtual_names 화이트리스트
+[PASS] (8) manifest ambiguous_mention_count 일치
+[PASS] (9) seed_persons ⊆ persons
+[PASS] (10) manifest trap_count 일치
+[PASS] (11) 파일명 <-> category 일치
+[PASS] (12) mentions.surface 가 그 turn 발화 안
+[PASS] (13) 발화 길이·턴 수(구어체 규칙)
+[PASS] (14) passing_mentions.surface 가 그 turn 발화 안
+[PASS] (15) 같은 turn 의 mentions <-> passing_mentions 비겹침
+[info] 카테고리별: promotion=8 pronoun=8 alias=8 normal=10 new_person=6
+== 결과: 시나리오 40건 / 오류 1 ==
+
+--- stderr ---

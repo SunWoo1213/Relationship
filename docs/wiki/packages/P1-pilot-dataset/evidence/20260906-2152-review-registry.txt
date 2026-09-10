@@ -1,0 +1,96 @@
+# verifier 04-review §5 — registry 12행 커밋 열 대조 (git log --oneline -- <경로>)
+
+$ git log --oneline -- data/scenarios/schema.json
+aeed0bd fix(P1-pilot-dataset): U6-3 3차 재검수 #21·#22 
+6906af4 fix(P1-pilot-dataset): U6-2 재검수 #18~#20 반영
+76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17
+40c36f8 feat(P1-pilot-dataset): U5 schema_version 2·검사 
+1e1320c feat(P1-pilot-dataset): U1 시나리오 스키마·�
+registry 열:  1e1320c 40c36f8 76add8a 6906af4 aeed0bd 
+존재: yes
+
+$ git log --oneline -- data/scenarios/manifest.schema.json
+40c36f8 feat(P1-pilot-dataset): U5 schema_version 2·검사 
+1e1320c feat(P1-pilot-dataset): U1 시나리오 스키마·�
+registry 열:  1e1320c 40c36f8 
+존재: yes
+
+$ git log --oneline -- data/scenarios/manifest.json
+aeed0bd fix(P1-pilot-dataset): U6-3 3차 재검수 #21·#22 
+6906af4 fix(P1-pilot-dataset): U6-2 재검수 #18~#20 반영
+76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17
+40c36f8 feat(P1-pilot-dataset): U5 schema_version 2·검사 
+6775463 feat(P1-pilot-dataset): U4 new_person 6 시나리오
+aa6ecfc feat(P1-pilot-dataset): U3 pronoun 8·normal 10 시�
+09875aa feat(P1-pilot-dataset): U2 promotion 8·alias 8 시�
+1e1320c feat(P1-pilot-dataset): U1 시나리오 스키마·�
+registry 열:  1e1320c 09875aa aa6ecfc 6775463 40c36f8 76add8a 6906af4 aeed0bd 
+존재: yes
+
+$ git log --oneline -- data/scenarios/promotion.json
+6906af4 fix(P1-pilot-dataset): U6-2 재검수 #18~#20 반영
+76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17
+09875aa feat(P1-pilot-dataset): U2 promotion 8·alias 8 시�
+registry 열:  09875aa 76add8a 6906af4 
+존재: yes
+
+$ git log --oneline -- data/scenarios/alias.json
+6906af4 fix(P1-pilot-dataset): U6-2 재검수 #18~#20 반영
+76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17
+09875aa feat(P1-pilot-dataset): U2 promotion 8·alias 8 시�
+registry 열:  09875aa 76add8a 6906af4 
+존재: yes
+
+$ git log --oneline -- data/scenarios/pronoun.json
+76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17
+aa6ecfc feat(P1-pilot-dataset): U3 pronoun 8·normal 10 시�
+registry 열:  aa6ecfc 76add8a 
+존재: yes
+
+$ git log --oneline -- data/scenarios/normal.json
+aeed0bd fix(P1-pilot-dataset): U6-3 3차 재검수 #21·#22 
+76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17
+aa6ecfc feat(P1-pilot-dataset): U3 pronoun 8·normal 10 시�
+registry 열:  aa6ecfc 76add8a aeed0bd 
+존재: yes
+
+$ git log --oneline -- data/scenarios/new_person.json
+6906af4 fix(P1-pilot-dataset): U6-2 재검수 #18~#20 반영
+76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17
+40c36f8 feat(P1-pilot-dataset): U5 schema_version 2·검사 
+6775463 feat(P1-pilot-dataset): U4 new_person 6 시나리오
+registry 열:  6775463 40c36f8 76add8a 6906af4 
+존재: yes
+
+$ git log --oneline -- scripts/validate_scenarios.py
+40c36f8 feat(P1-pilot-dataset): U5 schema_version 2·검사 
+baee71e fix(P1-pilot-dataset): 검증기 테스트 시점 �
+1e1320c feat(P1-pilot-dataset): U1 시나리오 스키마·�
+registry 열:  1e1320c baee71e 40c36f8 
+존재: yes
+
+$ git log --oneline -- scripts/dump_scenarios.py
+aeed0bd fix(P1-pilot-dataset): U6-3 3차 재검수 #21·#22 
+6906af4 fix(P1-pilot-dataset): U6-2 재검수 #18~#20 반영
+76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17
+40c36f8 feat(P1-pilot-dataset): U5 schema_version 2·검사 
+registry 열:  40c36f8 76add8a 6906af4 aeed0bd 
+존재: yes
+
+$ git log --oneline -- tests/test_validate_scenarios.py
+40c36f8 feat(P1-pilot-dataset): U5 schema_version 2·검사 
+baee71e fix(P1-pilot-dataset): 검증기 테스트 시점 �
+1e1320c feat(P1-pilot-dataset): U1 시나리오 스키마·�
+registry 열:  1e1320c baee71e 40c36f8 
+존재: yes
+
+$ git log --oneline -- docs/wiki/packages/P1-pilot-dataset/evidence/20260906-1938-label-review.md
+f78e9dc docs(P1-pilot-dataset): U7 registry 12행·README �
+aeed0bd fix(P1-pilot-dataset): U6-3 3차 재검수 #21·#22 
+6906af4 fix(P1-pilot-dataset): U6-2 재검수 #18~#20 반영
+76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17
+registry 열:  76add8a 6906af4 aeed0bd 
+존재: yes
+
+$ grep -c 'P1-pilot-dataset' docs/wiki/registry.md
+12

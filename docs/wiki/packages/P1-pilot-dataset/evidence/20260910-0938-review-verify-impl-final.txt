@@ -1,0 +1,22 @@
+== verify-impl P1-pilot-dataset  (20260910-0938) ==
+ssssssssssssssssssssssssss.............................................. [ 92%]
+...................................                                      [100%]
+317 passed, 150 skipped in 27.01s
+PASS  pytest 통과 → evidence/20260910-0938-pytest.txt
+PASS  compileall 통과 → evidence/20260910-0938-lint.txt
+PASS  태그 P1-pilot-dataset 커밋 13 건 → evidence/20260910-0938-commits.txt
+PASS  커밋에 태그 존재: D1
+PASS  커밋에 태그 존재: D10
+PASS  커밋에 태그 존재: D3
+PASS  커밋에 태그 존재: D6
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.7
+PASS  검토자 = verifier (L-002)
+PASS  증거 확인:  파일럿 데이터셋 30~50건 — `scripts/vali ← evidence/20260906-2152-review-acceptance
+PASS  증거 확인:  (승진·대명사·별칭·정상·신규) — ` ← evidence/20260906-2152-review-acceptance
+PASS  증거 확인:  `data/scenarios/` JSON — 해당 디렉터리에 ← evidence/20260906-2152-review-acceptance
+PASS  증거 확인:  라벨 검수 완료 — `evidence/<ts>-label-rev ← evidence/20260906-2152-review-acceptance
+PASS  registry 에 P1-pilot-dataset 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=0 → evidence/20260910-0938-summary.txt ==

@@ -3,7 +3,7 @@
 > `findings.py` 가 검증 출력에서 만든다. 소견 본문(원인·해결 단계·재검증·영향)은 에이전트가 채우고, 해결 단계의 완료 판정 명령을 실제로 실행한 출력이 증거다. 소견은 지우지 않는다(해소만 한다).
 > 루프: 검증 → 소견 → 단계별 조치 → 재검증(같은 명령) → 해소. 같은 소견이 3회 재검증 후에도 열려 있으면 사용자에게 보고한다.
 
-갱신: 2026-09-06 18:28 | 출처: pytest | 열림: 0 | 해소: 3
+갱신: 2026-09-10 09:39 | 출처: verify-impl | 열림: 0 (필수 0) | 해소: 4
 
 ## F-033bb1 · [권고] 보류 3 건 — 결과는 통과가 될 수 없다
 상태: 해소 | 발견: 2026-09-06 (verify-plan) | 해소: 2026-09-06
@@ -103,3 +103,30 @@ pytest rc=0
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음. `virtual_names` 의 권위는 매니페스트 스키마와 검사 (7) 이고 테스트는 그 위에 시점 무관 성질만 얹는다.
 - FIX/CR 로 올려야 하는가: 아니오.
+## F-14f3ef · [권고] 04-review.md 없음 (완료 검토 전이면 정상)
+상태: 해소 | 발견: 2026-09-06 (verify-impl) | 해소: 2026-09-10
+
+### 증상 (검증 출력 인용)
+```
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+```
+
+### 원인 분석
+- 가설: verify-impl 5번 검사는 04-review.md 부재를 WARN 으로 낸다. 이 실행(`evidence/20260906-2152-verify-impl.txt`)은 verifier 가 04-review 를 쓰기 전의 사전 실행이라 절차상 정상(P1-schema F-14f3ef·P3-er 04-review §1 과 같은 유형). 04-review.md 작성 후 같은 명령을 재실행하면 사라진다.
+- 확인 방법(명령): `ls docs/wiki/packages/P1-pilot-dataset/04-review.md`
+- 확인 결과: 2026-09-06 21:52 시점 부재(01·02·03·05 만 존재). verifier 가 04-review.md 를 쓴 뒤 재실행 — 결과 파일은 04-review §1 최종 출력(`evidence/<ts>-review-verify-impl-final.txt`).
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | `docs/wiki/packages/P1-pilot-dataset/04-review.md` 작성 — verifier(fable, 새 컨텍스트). `검토자: verifier (fable)` 줄, §1 사전·최종 기계 검증 출력, §2 수용 기준 4행(증거 열 = `evidence/20260906-2152-review-acceptance.txt` + 경로 + 해시), §3 부정 케이스 8종 + 대조군, §4~§7 | `bash .claude/scripts/verify-impl.sh P1-pilot-dataset` | `WARN  04-review.md 없음` 이 사라지고 `PASS  검토자 = verifier (L-002)` + `PASS  증거 확인:` 4행, `FAIL=0 WARN=0` | 완료 — `evidence/20260910-0938-review-verify-impl-final.txt` 마지막 줄 `== 결과: FAIL=0 WARN=0 → evidence/20260910-0938-summary.txt ==` |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P1-pilot-dataset | tee docs/wiki/packages/P1-pilot-dataset/evidence/20260910-0938-review-verify-impl-final.txt`
+- 결과 파일(evidence/): `20260910-0938-review-verify-impl-final.txt`(전문은 04-review §1b) · `20260910-0938-summary.txt`(`FAIL=0 WARN=0`) · `20260910-0938-pytest.txt`(`317 passed, 150 skipped`) · `20260910-0938-lint.txt`(`compileall: ok`) · `20260910-0938-commits.txt`(13건)
+- 해소 명령: `PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python .claude/scripts/findings.py P1-pilot-dataset docs/wiki/packages/P1-pilot-dataset/evidence/20260910-0938-review-verify-impl-final.txt --source verify-impl` → `05-remediation.md 갱신: 새 소견 0, 해소 1, 열림 0 (필수 0)` / `✓ F-14f3ef  해소` (2026-09-10 09:39, verifier)
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 — 절차상 WARN(L-002 검토 순서), 데이터·코드·카드 무관
+- FIX/CR 로 올려야 하는가: 아니오
+

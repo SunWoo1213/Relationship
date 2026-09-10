@@ -1,0 +1,13 @@
+f78e9dc docs(P1-pilot-dataset): U7 registry 12행·README 평가 데이터셋 절·수용 기준 evidence — 라벨 검수 완료(verifier 4차 열림 0·사용자 12/12)
+aeed0bd fix(P1-pilot-dataset): U6-3 3차 재검수 #21·#22 반영 — sc-034 t1 favor(결정 O)·U6-5 favor 문구 방향 무관(결정 P), label-review 3차 절
+6906af4 fix(P1-pilot-dataset): U6-2 재검수 #18~#20 반영 — 시점 낱말 기준(결정 M)·sc-005 원복(결정 N)·U6-5 사용자–인물 행위 규칙, label-review 재검수 절
+76add8a feat(P1-pilot-dataset): U6 verifier 라벨 검수 17건 반영 — aliases 사전 상태 규칙(I)·events 규칙(J) 전건 재라벨·sc-002/012 재작성
+40c36f8 feat(P1-pilot-dataset): U5 schema_version 2·검사 11/14/15·manifest 배분표·검수 패킷 — 40건 --strict rc=0, 69 passed
+6775463 feat(P1-pilot-dataset): U4 new_person 6 시나리오 — 등록 대상 3·지나가는 언급 3, 40건 완성·--strict rc=0
+aa6ecfc feat(P1-pilot-dataset): U3 pronoun 8·normal 10 시나리오 — 선행사 2인 이상 7/8, ambiguous 누적 3, 일정 발화 4건
+09875aa feat(P1-pilot-dataset): U2 promotion 8·alias 8 시나리오 — 오병합 유도 함정 8건, manifest generator 기록
+baee71e fix(P1-pilot-dataset): 검증기 테스트 시점 고정 해소·검사 12 surface∈utterance·13 발화 길이/턴 수 — F-7bea05 F-1ba055
+1e1320c feat(P1-pilot-dataset): U1 시나리오 스키마·검증기·테스트 — JSON Schema 2020-12, 교차 검사 10항목, 위반 표본 8종
+4c80c31 docs(P1-pilot-dataset): 계획·계획검증 승인, 패키지 착수 — 파일럿 데이터셋 40건·검증기·verifier 라벨 검수
+b676799 docs(P2-tools): 완료 — verifier 04-review 완료 판정·사용자 승인, R6 R7 R10 R18 구현완료, 패키지 닫음
+5dc95bb docs(P1-schema): 완료 — verifier 04-review 완료 판정·사용자 승인, R8 R9 구현완료, 패키지 닫음
