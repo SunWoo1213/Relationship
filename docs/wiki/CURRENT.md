@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: none
+active: P3-baselines
 frozen: none
 
 <!--
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- P3-baselines 계획 승인(2026-09-10, architect 초안 → 사용자 결정 A~H 전부 권장안 → verifier 통과 FAIL 0/WARN 1 의도, 권고 R-1~R-9 → 사용자 결정 I(R-3 candidate_person_ids)·J(R-5 judge.py 공개 승격 1건 예외)). U1 부터 eval-agent(L-004 매번). 코드는 `evaluation/` 최상위.
 - P1-pilot-dataset 완료(2026-09-10, verifier 04-review `완료`, verify-impl FAIL 0/WARN 0, 사용자 승인). 다음 후보: P3 베이스라인 3종 / P4-pilot-eval(04-review §7 인계 13+5항) / P0-cost. P4 통과 전 P5 이후 시작 금지.
 - P1-pilot-dataset 계획 승인(2026-09-06, architect 초안 → 사용자 결정 A~G → verifier 보류 3(H-1~H-3, F-033bb1) → 사용자 결정 → 반영 → 재검증 통과 FAIL 0/WARN 0, 권고 R-4~R-12). U1 부터 eval-agent(L-004 매번). 검수는 verifier 새 컨텍스트(U6 전).
 - P3-er 계획 승인(2026-09-06, architect 초안 → verifier 보류 3 → 사용자 결정 → 개정 1 → 재검증 통과 FAIL 0/WARN 8 의도, 권고 6). U1 부터 backend-agent. 미착수: P1-pilot-dataset·P0-cost(eval-agent). 열림: F-4d2507(architect). 팀 밑작업 보류.

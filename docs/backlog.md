@@ -39,6 +39,15 @@
 
 - [x] [backend-agent] ER 4단계 + 확신도 + trace / 의존: P2 / 수용기준: 승진 회귀 테스트 통과, trace에 `confidence_breakdown` 존재 — **완료(2026-09-06, P3-er, verifier 04-review `완료`; R4 실호출은 스모크 사용자 실행 후 보강)**
 - [ ] [eval-agent] 베이스라인 3종 (문자열 완전일치·임베딩 단독·LLM 단일 프롬프트) / 의존: P1 데이터셋 / 수용기준: 제안 방식과 동일 인터페이스로 호출 가능
+  - 세분화는 `docs/wiki/packages/P3-baselines/01-plan.md` (U1~U8). 위 행의 문장·수용기준은 권위이며 바꾸지 않는다. 코드 위치 `evaluation/`(결정 A).
+  - [ ] U1 공통 인터페이스 `Resolver`·`MentionDecision`·방식 표 `RESOLVERS` + 계약 테스트
+  - [ ] U2 제안 방식 어댑터 (`app.er.resolve` 감싸기, `app/` 무수정)
+  - [ ] U3 베이스라인 1 문자열 완전일치 (raw·norm 두 변형, 동명이인 → identity)
+  - [ ] U4 베이스라인 2 임베딩 단독 (`search_candidates`·`band_for` 재사용)
+  - [ ] U5 베이스라인 3 LLM 단일 프롬프트 (결정까지 LLM, `candidate_person_ids`, 오류 매핑 공개 승격 1건) + 스모크 스크립트
+  - [ ] U6 시나리오 사전 상태 적재기 (`seed_persons`+`aliases` 그대로, P4 재사용)
+  - [ ] U7 동일 인터페이스 계약 테스트 `tests/test_baseline_parity.py` (수용 기준 증명)
+  - [ ] U8 수용 기준 기계 검증 evidence + registry + README 실행법
 
 ### P4 — 게이트
 

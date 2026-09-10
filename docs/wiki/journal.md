@@ -117,3 +117,5 @@
 - 2026-09-10 09:53 | PUSH | origin dev 4f73b07 — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-10 09:55 | RELEASE | origin main ← dev 4f73b07
 - 2026-09-10 10:10 | COMMIT | 5b93dce docs(wiki): P1 닫는 커밋 뒤 정리 — 03-log 해시 5cac9bf, journal 4f73b07 COMMIT 줄, HANDOFF main 승격 반영
+- 2026-09-10 10:23 | COMMIT | 8fdc5b5 docs(user-setup): 사용자가 직접 하는 설정·결정 카드 7개 + 색인 신설 — 키·AWS Budgets·스모크·로컬 DB·배포 비밀·승인·데모
+- 2026-09-10 10:45 | START | P3-baselines 착수: architect(opus) 초안 → 사용자 결정 A~H(전부 권장안: evaluation/ 최상위·3밴드+supported_decisions·완전일치 2변형·s_emb 에 T_merge/T_new·LLM 단일 새 프롬프트·적재기 이 패키지·실 PostgreSQL 공유·테스트 가짜 임베딩) → verifier(fable) 통과(보류 0, FAIL 0/WARN 1 의도, 권고 R-1~R-9) → 사용자 결정 I(R-3 candidate_person_ids)·J(R-5 judge.py 공개 승격 1건 예외) → 승인. U1 부터 eval-agent | P3-baselines S3.7 S3.3 D3 D4 D5 D10 L-002 L-004
