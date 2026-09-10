@@ -5,6 +5,10 @@
 그리고 앞으로 올 러너·지표 계산기(P4-pilot-eval). 제품 런타임은 `app/` 이고
 둘의 의존 방향은 **한쪽뿐**이다.
 
+`evaluation/scenario_state.py`(U6) 는 시나리오의 `seed_persons`+`aliases` 를
+있는 그대로 DB 에 적재하고 `gold_person_id` → `persons.id` 매핑을 돌려준다
+-- 네 방식이 **같은 사전 상태**를 보게 하는 단일 출처다(결정 F·G).
+
 ## 의존 방향 (R-2, 02-plan-verify §3)
 
     evaluation/  --import->  app/          (허용: 어댑터가 `app.er.resolve` 를 부른다)

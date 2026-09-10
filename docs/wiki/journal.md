@@ -126,3 +126,4 @@
 - 2026-09-10 14:16 | COMMIT | f212ad6 feat(P3-baselines): U2 제안 방식 어댑터 — app.er.resolve → MentionDecision 변환, "proposed" 등록, 테스트 20건
 - 2026-09-10 14:28 | COMMIT | bcb2fad feat(P3-baselines): U3 문자열 완전일치 베이스라인 2변형 — exact_raw·exact_norm 등록, 순수 함수 분리, 테스트 61건
 - 2026-09-10 14:41 | COMMIT | 8bfd880 feat(P3-baselines): U4 임베딩 단독 베이스라인 — search_candidates·band_for 재사용, embedding_only 등록, 테스트 53건
+- 2026-09-10 15:06 | COMMIT | 0d98e47 feat(P3-baselines): U5 LLM 단일 프롬프트 베이스라인 — llm_single 등록, 결정 I·J 반영, 스모크 스크립트, 테스트 69건

@@ -1,0 +1,20 @@
+# U6 분리 증거 — app/ 무변경 + 역방향 import 0 (원칙4, 권고 R-2)
+# 명령1: git status --short app/
+# 명령2: grep -rn "evaluation" app/ --include=*.py
+# 실행: 2026-09-10T15:15:40+09:00
+
+--- git status --short app/ (0줄이어야 한다) ---
+(위가 비어 있으면 U6 은 app/ 을 한 줄도 고치지 않았다)
+
+--- grep -rn evaluation app/ --include=*.py (0줄이어야 한다) ---
+rc=1 (1 = 일치 없음)
+
+--- git status --short (U6 작업 트리 전체) ---
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M evaluation/__init__.py
+?? docs/wiki/packages/P3-baselines/evidence/20260910-1515-u6-data-unchanged.txt
+?? docs/wiki/packages/P3-baselines/evidence/20260910-1515-u6-isolation.txt
+?? docs/wiki/packages/P3-baselines/evidence/20260910-1515-u6-pytest.txt
+?? evaluation/scenario_state.py
+?? tests/test_scenario_state.py
