@@ -122,3 +122,4 @@
 - 2026-09-10 10:51 | COMMIT | 0e3447a docs(P3-baselines): 계획·계획검증 승인, 패키지 착수 — 베이스라인 3종 + 공통 Resolver 인터페이스, 결정 A~J
 - 2026-09-10 10:51 | PUSH | origin dev 0e3447a — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-10 10:58 | RELEASE | origin main ← dev 0e3447a
+- 2026-09-10 14:03 | COMMIT | 05d90f0 feat(P3-baselines): U1 공통 Resolver 인터페이스·방식 표 — evaluation/ 패키지 신설, 불변 규약 4개, 계약 테스트 39건

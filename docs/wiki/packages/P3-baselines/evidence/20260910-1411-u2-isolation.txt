@@ -1,0 +1,13 @@
+# U2 격리 증거 — 2026-09-10 14:11 · 평가한 커밋: 05d90f0 (U1 05d90f0 이후 작업 트리)
+
+$ git status --short app/
+(끝 — 0줄이면 app/ 무수정)
+
+$ git diff --name-only 05d90f0..HEAD -- app/
+(끝)
+
+$ grep -rn "evaluation" app/ --include=*.py
+(끝 — 0줄이면 역방향 import·언급 0, R-2)
+
+$ python -c "import evaluation.resolvers as r; print(r.ALL_METHODS)"
+('proposed',)
