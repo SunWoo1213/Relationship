@@ -116,3 +116,4 @@
 - 2026-09-10 09:53 | COMMIT | 4f73b07 chore(repo): .gitignore 에 졸업작품신청서.md 제외 — 로컬 문서, 커밋 대상 아님
 - 2026-09-10 09:53 | PUSH | origin dev 4f73b07 — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-10 09:55 | RELEASE | origin main ← dev 4f73b07
+- 2026-09-10 10:10 | COMMIT | 5b93dce docs(wiki): P1 닫는 커밋 뒤 정리 — 03-log 해시 5cac9bf, journal 4f73b07 COMMIT 줄, HANDOFF main 승격 반영

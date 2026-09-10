@@ -299,5 +299,6 @@ python -m pytest tests/test_validate_scenarios.py -q       # 검증기 자체 �
 | 기획서에서 무엇이 바뀌었나 | `docs/proposal.md` 상단 안내문, `docs/wiki/review-index.md` |
 | 실서버에 올린 뒤 무엇을 점검하나 | `SERVER-CHECKLIST.md` (dev → 실서버 검증 → main 승격의 "검증" 기준·증거 규약·되돌리기) |
 | 지금 어디까지 왔나 | `docs/wiki/HANDOFF.md`, `docs/wiki/journal.md` |
+| **사용자가 직접 해야 하는 것**(API 키·AWS Budgets·실호출 스모크·로컬 DB·배포 비밀·승인 결정) | `docs/user-setup/README.md` 색인 → 카드 01~07 |
 | 무엇이 이미 만들어져 있나 | `docs/wiki/registry.md` |
 | 평가 데이터셋은 어디에 | `data/scenarios/` (검증기 `scripts/validate_scenarios.py`, 라벨 규칙은 `data/scenarios/schema.json`의 description) |
