@@ -1,0 +1,9 @@
+$ git diff --name-only 0e3447a..HEAD -- app/  (working tree 포함: git status --short app/)
+== 출력 줄 수: 0 (기대 0) ==
+
+$ grep -rn "evaluation" app/ --include=*.py  (R-2 역방향 import)
+== 출력 줄 수: 0 (기대 0) ==
+
+$ python -c 'import evaluation.resolvers as r; print(r.ALL_METHODS)'
+()
+[]

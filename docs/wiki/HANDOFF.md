@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-10 10:48 (P3-baselines 계획 승인·활성 — 계획 문서 커밋 준비)
-active: **P3-baselines** | frozen: none | 브랜치: dev = 8fdc5b5(origin/dev 4f73b07 보다 3 앞, 미푸시), main 4f73b07. **진행 중: 계획 문서 /commit**(01·02·03·05·evidence 3·CURRENT·backlog·journal·HANDOFF) → 푸시 여부 → **U1 공통 인터페이스** eval-agent 위임(L-004). 결정 A~H + I(R-3 `candidate_person_ids`)·J(R-5 `judge.py` 오류 매핑 공개 승격 — `app/` 변경 유일 예외)는 01-plan "결정 확정" 두 블록이 권위. 권고 R-1~R-9 는 02-plan-verify §3 — 각 단위 위임 프롬프트에 해당 R 을 넣는다.
+갱신: 2026-09-10 14:00 (U1 공통 인터페이스 코드 완성·evidence 저장·registry 5행·03-log 항목 — /commit 승인 대기)
+active: **P3-baselines** | frozen: none | 브랜치: dev = main = origin = **0e3447a**. L-003 해제(RELEASE). **진행 중: U1 커밋 대기** — eval-agent 가 만든 `evaluation/{__init__,resolvers/{__init__,base,registry}}.py`·`tests/test_baseline_base.py`(39 passed) 를 세션 재개 후 메인 세션이 마무리: evidence `20260910-1358-u1-pytest.txt`·`-u1-isolation.txt`(app/ 0줄·역방향 import 0줄), registry 5행, 03-log 13:58 항목. **다음**: /commit(사용자 승인) → U2 제안 방식 어댑터 eval-agent(L-004). U1 `ALL_METHODS` 는 빈 튜플(설계, U2 가 첫 등록). 결정 A~J = 01-plan "결정 확정" 2블록, 권고 R-1~R-9 = 02-plan-verify §3.
 
 ## 지금 어디까지
 - **P1-pilot-dataset 완료(2026-09-10)** — U1 스키마·검증기(1e1320c) → U2 promotion·alias(09875aa) → FIX 시점 무관 테스트(baee71e) → U3 pronoun·normal(aa6ecfc) → U4 new_person(6775463) → U5 schema_version 2·검사 11/14/15·manifest(40c36f8) → U6 라벨 검수 반영 3라운드(76add8a·6906af4·aeed0bd) → U7 registry 12행·README(f78e9dc) → verifier(fable) 04-review **완료**(필수 0, 권고 R-4~R-12 반영 8·R-6 P4 이관, verify-impl FAIL 0/WARN 0, 수용 기준 4/4, 부정 케이스 8/8·대조군 0) → 사용자 승인. 40건·5범주(8/8/8/10/6), 라벨 검수 verifier 40/40·사용자 12/12. 닫는 R 없음(R3·R4 는 P4). **P4 인계 13항·P10 인계 5항 = `packages/P1-pilot-dataset/04-review.md` §7** — P4 01-plan 이 옮겨 적었는지 P4 02-plan-verify 에서 본다.
