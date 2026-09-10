@@ -112,3 +112,7 @@
 - 2026-09-06 21:09 | COMMIT | aeed0bd fix(P1-pilot-dataset): U6-3 3차 재검수 #21·#22 반영 — sc-034 t1 favor(결정 O)·U6-5 favor 문구 방향 무관(결정 P), label-review 3차 절
 - 2026-09-06 21:50 | COMMIT | f78e9dc docs(P1-pilot-dataset): U7 registry 12행·README 평가 데이터셋 절·수용 기준 evidence — 라벨 검수 완료(verifier 4차 열림 0·사용자 12/12)
 - 2026-09-10 09:50 | DONE | P1-pilot-dataset 완료 승인(사용자). U1~U7(1e1320c 09875aa baee71e aa6ecfc 6775463 40c36f8 76add8a 6906af4 aeed0bd f78e9dc), verifier(fable) 04-review `완료`(필수 0, 권고 R-4~R-12 반영 8·R-6 P4 이관, verify-impl FAIL 0/WARN 0, 수용 기준 4/4, 부정 케이스 8/8 검출·대조군 0, F-14f3ef 해소·열림 0). 40건·5범주(8/8/8/10/6), 라벨 검수 verifier 40/40·사용자 12/12. 닫는 R 없음(R3·R4 는 P4). P4 인계 13항·P10 인계 5항은 04-review §7 | P1-pilot-dataset S3.7 S3.1 D1 D10 원칙8 L-002
+- 2026-09-10 09:53 | COMMIT | 5cac9bf docs(P1-pilot-dataset): 완료 검토 04-review 승인·패키지 닫음 — verifier 완료 판정, verify-impl FAIL 0/WARN 0
+- 2026-09-10 09:53 | COMMIT | 4f73b07 chore(repo): .gitignore 에 졸업작품신청서.md 제외 — 로컬 문서, 커밋 대상 아님
+- 2026-09-10 09:53 | PUSH | origin dev 4f73b07 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-10 09:55 | RELEASE | origin main ← dev 4f73b07
