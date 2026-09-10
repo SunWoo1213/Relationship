@@ -1,0 +1,8 @@
+# U3 베이스라인 1(문자열 완전일치, exact_raw·exact_norm) — pytest
+# 커밋: HEAD=f212ad6 (U1=05d90f0, U2=f212ad6), 브랜치=dev
+# 명령: POSTGRES_PORT=5433 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m pytest tests/test_baseline_exact_match.py tests/test_baseline_base.py tests/test_baseline_proposed.py -q -rs
+# 실행: 2026-09-10 14:23:45 +0900
+
+........................................................................ [ 60%]
+................................................                         [100%]
+120 passed in 2.91s

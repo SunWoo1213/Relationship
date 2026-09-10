@@ -1,0 +1,12 @@
+# U3 격리 증거 — app/ 무수정(원칙4) · 역방향 import 0(R-2) · 방식 목록
+# 커밋: HEAD=f212ad6, 브랜치=dev
+# 실행: 2026-09-10 14:24:03 +0900
+
+$ git status --short app/    # 기대: 0줄
+(rc=0, 줄수=0)
+
+$ grep -rn "evaluation" app/ --include=*.py    # 기대: 0줄 (제품 코드가 평가 패키지를 import 하지 않는다)
+(줄수=0)
+
+$ python -c "import evaluation.resolvers as r; print(r.ALL_METHODS)"
+('proposed', 'exact_raw', 'exact_norm')

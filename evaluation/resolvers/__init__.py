@@ -39,7 +39,7 @@ from evaluation.resolvers.registry import (
 
 # --- 방식 모듈 import (등록 순서 = ALL_METHODS 순서) ---------------------
 from evaluation.resolvers import proposed  # noqa: F401  -- register("proposed")
-# U3: from evaluation.resolvers import exact_match     # noqa: F401
+from evaluation.resolvers import exact_match  # noqa: F401  -- register("exact_raw"/"exact_norm")
 # U4: from evaluation.resolvers import embedding_only  # noqa: F401
 # U5: from evaluation.resolvers import llm_single      # noqa: F401
 
