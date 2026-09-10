@@ -1,0 +1,11 @@
+# U4 격리 확인 — app/ 무변경 · 역방향 import 0 · 방식 표
+# 실행: 2026-09-10 14:37:30
+
+$ git status --short app/
+(위 0줄 = app/ 수정 없음)
+
+$ grep -rn "evaluation" app/ --include=*.py
+(위 0줄 = app/ 은 evaluation/ 을 import 하지 않는다, R-2)
+
+$ python -c "import evaluation.resolvers as r; print(r.ALL_METHODS)"
+('proposed', 'exact_raw', 'exact_norm', 'embedding_only')

@@ -532,8 +532,13 @@ def test_both_variants_are_registered() -> None:
 
 def test_all_methods_order_after_u3() -> None:
     """등록 순서 = `evaluation/resolvers/__init__.py` 의 import 순서.
-    이름은 `metrics.json` 의 키다(P4 인계 4)."""
-    assert resolver_registry.ALL_METHODS == ("proposed", RAW_METHOD_NAME, NORM_METHOD_NAME)
+    이름은 `metrics.json` 의 키다(P4 인계 4).
+
+    이 테스트가 보는 것은 **두 변형이 `proposed` 다음에 이 순서로 온다**는
+    것뿐이다 -- 뒤에 붙는 방식(U4 `embedding_only`·U5 `llm_single`)까지
+    여기서 단언하면 단위가 추가될 때마다 U3 테스트가 깨진다. 전체 목록은
+    그 단위의 테스트가 소유한다(U4: `test_all_methods_order_after_u4`)."""
+    assert resolver_registry.ALL_METHODS[:3] == ("proposed", RAW_METHOD_NAME, NORM_METHOD_NAME)
 
 
 @pytest.mark.parametrize(
