@@ -135,6 +135,13 @@ class KnownPerson:
     person_id: int
     display_name: str
     names: tuple[str, ...] = ()
+    #: 관계 태그·위계. **이 방식은 쓰지 않는다**(문자열 비교에 필요 없다) --
+    #: 같은 사전 상태 조회를 베이스라인 3(`llm_single`, U5)이 재사용하는데
+    #: 그 프롬프트가 두 값을 요구하기 때문에 조회 결과에 함께 담는다
+    #: (중복 구현 금지 -- 사전 상태 조회의 단일 출처는 `load_known_persons`).
+    #: 기본값 `None` 이라 순수 층 테스트는 두 값을 몰라도 된다.
+    relation_tag: str | None = None
+    hierarchy: str | None = None
 
     def all_names(self) -> tuple[str, ...]:
         """표시 이름 + 별칭(중복 제거, 등장 순서 유지)."""
@@ -206,20 +213,32 @@ def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
     """
 
     rows = ctx.session.execute(
-        select(Person.id, Person.display_name, PersonAlias.alias)
+        select(
+            Person.id,
+            Person.display_name,
+            Person.relation_tag,
+            Person.hierarchy,
+            PersonAlias.alias,
+        )
         .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
         .where(Person.user_id == ctx.user_id)
         .order_by(Person.id, PersonAlias.id)
     ).all()
 
-    by_id: OrderedDict[int, tuple[str, list[str]]] = OrderedDict()
-    for person_id, display_name, alias in rows:
-        entry = by_id.setdefault(person_id, (display_name, []))
+    by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+    for person_id, display_name, relation_tag, hierarchy, alias in rows:
+        entry = by_id.setdefault(person_id, (display_name, relation_tag, hierarchy, []))
         if alias is not None:
-            entry[1].append(alias)
+            entry[3].append(alias)
     return [
-        KnownPerson(person_id=pid, display_name=display_name, names=tuple(aliases))
-        for pid, (display_name, aliases) in by_id.items()
+        KnownPerson(
+            person_id=pid,
+            display_name=display_name,
+            names=tuple(aliases),
+            relation_tag=relation_tag,
+            hierarchy=hierarchy,
+        )
+        for pid, (display_name, relation_tag, hierarchy, aliases) in by_id.items()
     ]
 
 

@@ -195,8 +195,13 @@ def test_honorific_only_mention_is_not_empty_after_normalize() -> None:
 
 class _FakeSession:
     """`load_known_persons()` 를 대신하지 않는다 -- DB 없이 resolver 를
-    돌리기 위해 `execute()` 만 흉내 내는 최소 스텁. 반환 행은
-    `(person_id, display_name, alias)` 튜플 목록이다."""
+    돌리기 위해 `execute()` 만 흉내 내는 최소 스텁.
+
+    이 테스트가 쓰는 행은 이 방식이 실제로 보는 세 값
+    `(person_id, display_name, alias)` 이고, `load_known_persons()` 의
+    SELECT 열(U5 부터 `relation_tag`·`hierarchy` 가 추가되어 다섯 열 --
+    베이스라인 3 프롬프트가 두 값을 요구한다)에 맞추는 일은 스텁이 한다.
+    완전일치 판정은 두 값을 쓰지 않으므로 `None` 으로 채운다."""
 
     def __init__(self, rows: list[tuple[int, str, str | None]]) -> None:
         self.rows = rows
@@ -204,10 +209,13 @@ class _FakeSession:
 
     def execute(self, statement: Any) -> Any:  # noqa: ARG002 -- 문장은 보지 않는다
         self.executed += 1
-        rows = self.rows
+        rows = [
+            (person_id, display_name, None, None, alias)
+            for person_id, display_name, alias in self.rows
+        ]
 
         class _Result:
-            def all(self_inner) -> list[tuple[int, str, str | None]]:  # noqa: N805
+            def all(self_inner) -> list[tuple[int, str, None, None, str | None]]:  # noqa: N805
                 return rows
 
         return _Result()

@@ -18,7 +18,7 @@ LLM 판정기를 Anthropic 하나에 묶지 않는다 -- **공급자 중립 핵�
   `out_of_range_id`), `FakeJudge`. 어느 공급자든 이 핵심을 그대로 쓰고
   "구조화 출력을 받아 dict 로 만드는 부분"만 구현한다.
 - **공급자 구현**: `ClaudeJudge`(Anthropic, 강제 `tool_use`)·
-  `OpenAIJudge`(OpenAI, function calling). 둘 다 `_call_with_error_mapping()`
+  `OpenAIJudge`(OpenAI, function calling). 둘 다 `call_with_error_mapping()`
   (예외 매핑 표 공유)과 `validate_judgement()`(응답 검증 공유)를 거친다 --
   요청 조립만 SDK 마다 다르다(도구 스키마를 감싸는 바깥 모양이 다를 뿐
   `JUDGEMENT_SCHEMA` 자체는 같다).
@@ -175,7 +175,7 @@ def validate_judgement(raw: dict[str, Any], allowed_ids: set[int]) -> Judgement:
     )
 
 
-def _call_with_error_mapping(errors_module: Any, fn: Callable[[], Any]) -> Any:
+def call_with_error_mapping(errors_module: Any, fn: Callable[[], Any]) -> Any:
     """공급자 SDK 예외를 `JudgeUnavailable` 로 통일 매핑하는 **공유 표**
     (사용자 결정 2026-09-06 "예외 매핑 표"). `errors_module` 은 `anthropic`
     또는 `openai` 모듈이다 -- 두 SDK 모두 같은 이름의 예외 클래스
@@ -193,6 +193,11 @@ def _call_with_error_mapping(errors_module: Any, fn: Callable[[], Any]) -> Any:
         raise JudgeUnavailable("api_error") from exc
     except errors_module.APIConnectionError as exc:
         raise JudgeUnavailable("connection") from exc
+
+
+#: 옛 이름(밑줄) 호환 별칭 -- 승격 전 이름을 참조하는 코드가 있어도
+#: 깨지지 않게 남긴다(결정 J: 동작 무변경).
+_call_with_error_mapping = call_with_error_mapping
 
 
 @dataclass
@@ -244,7 +249,7 @@ class ClaudeJudge:
             "input_schema": JUDGEMENT_SCHEMA,
         }
 
-        response = _call_with_error_mapping(
+        response = call_with_error_mapping(
             anthropic,
             lambda: self.client.messages.create(
                 model=self.model,
@@ -326,7 +331,7 @@ class OpenAIJudge:
             },
         }
 
-        response = _call_with_error_mapping(
+        response = call_with_error_mapping(
             openai,
             lambda: self.client.chat.completions.create(
                 model=self.model,

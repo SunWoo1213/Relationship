@@ -1,0 +1,8 @@
+# 키 없이 baseline_smoke.py 실행 — 종료 코드 2 (실 키·네트워크 미사용)
+$ unset ANTHROPIC_API_KEY OPENAI_API_KEY; python scripts/baseline_smoke.py; echo rc=$?
+[error] ANTHROPIC_API_KEY 환경변수가 설정되지 않았다. 실 LLM 호출은 os.environ 에 그 변수를 직접 넣어야 한다(.env 는 읽지 않는다, security.md §1 -- .env.example 참조).
+rc=2
+
+$ unset ANTHROPIC_API_KEY OPENAI_API_KEY; python scripts/baseline_smoke.py --provider openai; echo rc=$?
+[error] OPENAI_API_KEY 환경변수가 설정되지 않았다. 실 LLM 호출은 os.environ 에 그 변수를 직접 넣어야 한다(.env 는 읽지 않는다, security.md §1 -- .env.example 참조).
+rc=2

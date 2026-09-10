@@ -1,0 +1,74 @@
+# U5 격리 증거 — app/ 변경은 결정 J 1건뿐, 역방향 의존 0
+# 기준 커밋(U4) = 8bfd880 · HEAD = 8bfd880 · 브랜치 = dev
+
+$ git diff --name-only 8bfd880..HEAD -- app/
+(끝 — 커밋된 변경 없음, U5 는 아직 미커밋)
+
+$ git status --short app/
+ M app/er/judge.py
+
+$ git diff --stat -- app/er/judge.py
+warning: in the working copy of 'app/er/judge.py', LF will be replaced by CRLF the next time Git touches it
+ app/er/judge.py | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+$ git diff -- app/er/judge.py
+warning: in the working copy of 'app/er/judge.py', LF will be replaced by CRLF the next time Git touches it
+diff --git a/app/er/judge.py b/app/er/judge.py
+index 7c81575..398603d 100644
+--- a/app/er/judge.py
++++ b/app/er/judge.py
+@@ -18,7 +18,7 @@ LLM 판정기를 Anthropic 하나에 묶지 않는다 -- **공급자 중립 핵
+   `out_of_range_id`), `FakeJudge`. 어느 공급자든 이 핵심을 그대로 쓰고
+   "구조화 출력을 받아 dict 로 만드는 부분"만 구현한다.
+ - **공급자 구현**: `ClaudeJudge`(Anthropic, 강제 `tool_use`)·
+-  `OpenAIJudge`(OpenAI, function calling). 둘 다 `_call_with_error_mapping()`
++  `OpenAIJudge`(OpenAI, function calling). 둘 다 `call_with_error_mapping()`
+   (예외 매핑 표 공유)과 `validate_judgement()`(응답 검증 공유)를 거친다 --
+   요청 조립만 SDK 마다 다르다(도구 스키마를 감싸는 바깥 모양이 다를 뿐
+   `JUDGEMENT_SCHEMA` 자체는 같다).
+@@ -175,7 +175,7 @@ def validate_judgement(raw: dict[str, Any], allowed_ids: set[int]) -> Judgement:
+     )
+ 
+ 
+-def _call_with_error_mapping(errors_module: Any, fn: Callable[[], Any]) -> Any:
++def call_with_error_mapping(errors_module: Any, fn: Callable[[], Any]) -> Any:
+     """공급자 SDK 예외를 `JudgeUnavailable` 로 통일 매핑하는 **공유 표**
+     (사용자 결정 2026-09-06 "예외 매핑 표"). `errors_module` 은 `anthropic`
+     또는 `openai` 모듈이다 -- 두 SDK 모두 같은 이름의 예외 클래스
+@@ -195,6 +195,11 @@ def _call_with_error_mapping(errors_module: Any, fn: Callable[[], Any]) -> Any:
+         raise JudgeUnavailable("connection") from exc
+ 
+ 
++#: 옛 이름(밑줄) 호환 별칭 -- 승격 전 이름을 참조하는 코드가 있어도
++#: 깨지지 않게 남긴다(결정 J: 동작 무변경).
++_call_with_error_mapping = call_with_error_mapping
++
++
+ @dataclass
+ class ClaudeJudge:
+     """Anthropic SDK 로 3단계 LLM 판정을 수행한다(결정3, 강제 `tool_use`).
+@@ -244,7 +249,7 @@ class ClaudeJudge:
+             "input_schema": JUDGEMENT_SCHEMA,
+         }
+ 
+-        response = _call_with_error_mapping(
++        response = call_with_error_mapping(
+             anthropic,
+             lambda: self.client.messages.create(
+                 model=self.model,
+@@ -326,7 +331,7 @@ class OpenAIJudge:
+             },
+         }
+ 
+-        response = _call_with_error_mapping(
++        response = call_with_error_mapping(
+             openai,
+             lambda: self.client.chat.completions.create(
+                 model=self.model,
+
+$ grep -rn "evaluation" app/ --include=*.py
+(끝 — 0줄: 제품 코드는 평가 패키지를 import 하지 않는다, R-2)
+
+$ python -c "import evaluation.resolvers as r; print(r.ALL_METHODS)"
+('proposed', 'exact_raw', 'exact_norm', 'embedding_only', 'llm_single')

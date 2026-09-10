@@ -1,0 +1,659 @@
+........................................................................ [ 29%]
+........................................................................ [ 59%]
+................FFFFFFFFFFFFF........................................... [ 89%]
+..........................                                               [100%]
+================================== FAILURES ===================================
+__ test_single_match_is_merge_with_person_id_and_score_one[ExactRawResolver] __
+
+resolver_cls = <class 'evaluation.resolvers.exact_match.ExactRawResolver'>
+
+    @pytest.mark.parametrize("resolver_cls", [ExactRawResolver, ExactNormResolver])
+    def test_single_match_is_merge_with_person_id_and_score_one(resolver_cls) -> None:
+>       decision = resolver_cls().resolve_mention(_stub_ctx(_STUB_ROWS), "팀장", "발화")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:230: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+_ test_single_match_is_merge_with_person_id_and_score_one[ExactNormResolver] __
+
+resolver_cls = <class 'evaluation.resolvers.exact_match.ExactNormResolver'>
+
+    @pytest.mark.parametrize("resolver_cls", [ExactRawResolver, ExactNormResolver])
+    def test_single_match_is_merge_with_person_id_and_score_one(resolver_cls) -> None:
+>       decision = resolver_cls().resolve_mention(_stub_ctx(_STUB_ROWS), "팀장", "발화")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:230: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+______ test_two_matches_are_identity_without_person_id[ExactRawResolver] ______
+
+resolver_cls = <class 'evaluation.resolvers.exact_match.ExactRawResolver'>
+
+    @pytest.mark.parametrize("resolver_cls", [ExactRawResolver, ExactNormResolver])
+    def test_two_matches_are_identity_without_person_id(resolver_cls) -> None:
+        """동명이인 2건 -- 임의로 고르지 않는다(원칙1). 후보 **전부**가 답이다."""
+        rows = [(10, "김민수", "민수"), (11, "이민수", "민수")]
+    
+>       decision = resolver_cls().resolve_mention(_stub_ctx(rows), "민수", "발화")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:250: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+_____ test_two_matches_are_identity_without_person_id[ExactNormResolver] ______
+
+resolver_cls = <class 'evaluation.resolvers.exact_match.ExactNormResolver'>
+
+    @pytest.mark.parametrize("resolver_cls", [ExactRawResolver, ExactNormResolver])
+    def test_two_matches_are_identity_without_person_id(resolver_cls) -> None:
+        """동명이인 2건 -- 임의로 고르지 않는다(원칙1). 후보 **전부**가 답이다."""
+        rows = [(10, "김민수", "민수"), (11, "이민수", "민수")]
+    
+>       decision = resolver_cls().resolve_mention(_stub_ctx(rows), "민수", "발화")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:250: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+________ test_no_match_is_new_person_with_score_zero[ExactRawResolver] ________
+
+resolver_cls = <class 'evaluation.resolvers.exact_match.ExactRawResolver'>
+
+    @pytest.mark.parametrize("resolver_cls", [ExactRawResolver, ExactNormResolver])
+    def test_no_match_is_new_person_with_score_zero(resolver_cls) -> None:
+>       decision = resolver_cls().resolve_mention(_stub_ctx(_STUB_ROWS), "부장님", "발화")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:261: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+_______ test_no_match_is_new_person_with_score_zero[ExactNormResolver] ________
+
+resolver_cls = <class 'evaluation.resolvers.exact_match.ExactNormResolver'>
+
+    @pytest.mark.parametrize("resolver_cls", [ExactRawResolver, ExactNormResolver])
+    def test_no_match_is_new_person_with_score_zero(resolver_cls) -> None:
+>       decision = resolver_cls().resolve_mention(_stub_ctx(_STUB_ROWS), "부장님", "발화")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:261: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+____ test_blank_mention_is_new_person_with_forced_reason[ExactRawResolver] ____
+
+resolver_cls = <class 'evaluation.resolvers.exact_match.ExactRawResolver'>
+
+    @pytest.mark.parametrize("resolver_cls", [ExactRawResolver, ExactNormResolver])
+    def test_blank_mention_is_new_person_with_forced_reason(resolver_cls) -> None:
+        """**R-8** -- 정규화 결과가 빈 문자열이면 `new_person` +
+        `forced_reason="empty_after_normalize"`. 예외로 죽지 않는다(불변 규약 2)."""
+>       decision = resolver_cls().resolve_mention(_stub_ctx(_STUB_ROWS), "   ", "발화")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+___ test_blank_mention_is_new_person_with_forced_reason[ExactNormResolver] ____
+
+resolver_cls = <class 'evaluation.resolvers.exact_match.ExactNormResolver'>
+
+    @pytest.mark.parametrize("resolver_cls", [ExactRawResolver, ExactNormResolver])
+    def test_blank_mention_is_new_person_with_forced_reason(resolver_cls) -> None:
+        """**R-8** -- 정규화 결과가 빈 문자열이면 `new_person` +
+        `forced_reason="empty_after_normalize"`. 예외로 죽지 않는다(불변 규약 2)."""
+>       decision = resolver_cls().resolve_mention(_stub_ctx(_STUB_ROWS), "   ", "발화")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+____________ test_variants_differ_only_by_dictionary_normalization ____________
+
+    def test_variants_differ_only_by_dictionary_normalization() -> None:
+        """같은 사전 상태·같은 mention 에서 두 변형의 결정이 갈리는 지점이
+        "김팀장" 이다 -- P4 표의 두 행이 무엇을 뜻하는지의 근거."""
+>       raw = ExactRawResolver().resolve_mention(_stub_ctx(_STUB_ROWS), "김팀장", "발화")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:288: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+_______________ test_config_and_hints_are_accepted_and_ignored ________________
+
+    def test_config_and_hints_are_accepted_and_ignored() -> None:
+        """`config`(`ERConfig`)·`hints`·`utterance` 를 받되 쓰지 않는다 --
+        임계치를 바꿔도 결정이 같다(불변 규약 4: 이 방식은 두 임계치를 쓰지 않는다).
+        P4 의 `T_merge` 스윕에서 이 방식의 선이 수평인 근거다."""
+        low = ERConfig(t_merge=0.5, t_new=0.1)
+        high = ERConfig(t_merge=0.95, t_new=0.9)
+    
+>       a = ExactRawResolver().resolve_mention(_stub_ctx(_STUB_ROWS), "팀장", "발화1", config=low)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:306: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+_________________ test_decision_to_dict_is_json_serializable __________________
+
+    def test_decision_to_dict_is_json_serializable() -> None:
+        """P4 가 `metrics.json`/캐시로 보존한다(재현성, 원칙8)."""
+>       decision = ExactNormResolver().resolve_mention(_stub_ctx(_STUB_ROWS), "팀장님", "발화")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+______ test_same_input_twice_gives_identical_decision[ExactRawResolver] _______
+
+resolver_cls = <class 'evaluation.resolvers.exact_match.ExactRawResolver'>
+
+    @pytest.mark.parametrize("resolver_cls", [ExactRawResolver, ExactNormResolver])
+    def test_same_input_twice_gives_identical_decision(resolver_cls) -> None:
+        ctx = _stub_ctx(_STUB_ROWS)
+        resolver = resolver_cls()
+    
+>       first = resolver.resolve_mention(ctx, "팀장", "발화").to_dict()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:333: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+______ test_same_input_twice_gives_identical_decision[ExactNormResolver] ______
+
+resolver_cls = <class 'evaluation.resolvers.exact_match.ExactNormResolver'>
+
+    @pytest.mark.parametrize("resolver_cls", [ExactRawResolver, ExactNormResolver])
+    def test_same_input_twice_gives_identical_decision(resolver_cls) -> None:
+        ctx = _stub_ctx(_STUB_ROWS)
+        resolver = resolver_cls()
+    
+>       first = resolver.resolve_mention(ctx, "팀장", "발화").to_dict()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_baseline_exact_match.py:333: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+evaluation\resolvers\exact_match.py:355: in resolve_mention
+    persons = load_known_persons(ctx)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ctx = ToolContext(session_id='exact-stub', user_id='exact-match-user', embedder=None, now=<function ToolContext.<lambda> at 0x00000140BE4A4720>, confirmed_question_id=None, last_trace_id=None)
+
+    def load_known_persons(ctx: ToolContext) -> list[KnownPerson]:
+        """사전 상태 조회(**`SELECT` 만** -- 불변 규약 1).
+    
+        `Person.user_id == ctx.user_id` 범위의 인물 전부를 `persons.id` 오름차순
+        으로, 각 인물의 별칭은 `person_aliases.id` 오름차순으로 담는다(결정적
+        순서 = 재현성, 원칙8). 별칭이 하나도 없는 인물도 표시 이름으로 비교
+        대상이 되어야 하므로 `outerjoin` 이다.
+    
+        `embedding IS NULL` 인 별칭도 포함한다 -- 문자열 비교에는 벡터가 필요
+        없다(모듈 docstring "사전 상태를 읽는 범위").
+        """
+    
+        rows = ctx.session.execute(
+            select(
+                Person.id,
+                Person.display_name,
+                Person.relation_tag,
+                Person.hierarchy,
+                PersonAlias.alias,
+            )
+            .outerjoin(PersonAlias, PersonAlias.person_id == Person.id)
+            .where(Person.user_id == ctx.user_id)
+            .order_by(Person.id, PersonAlias.id)
+        ).all()
+    
+        by_id: OrderedDict[int, tuple[str, str | None, str | None, list[str]]] = OrderedDict()
+>       for person_id, display_name, relation_tag, hierarchy, alias in rows:
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 5, got 3)
+
+evaluation\resolvers\exact_match.py:229: ValueError
+13 failed, 229 passed in 13.43s

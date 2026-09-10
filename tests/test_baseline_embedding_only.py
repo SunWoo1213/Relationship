@@ -621,9 +621,14 @@ def test_get_resolver_returns_the_embedding_only_resolver() -> None:
 
 def test_all_methods_order_after_u4() -> None:
     """등록 순서 = `evaluation/resolvers/__init__.py` 의 import 순서.
-    이름은 `metrics.json` 의 키다(P4 인계 4)."""
+    이름은 `metrics.json` 의 키다(P4 인계 4).
 
-    assert resolver_registry.ALL_METHODS == (
+    U3 와 같은 이유로 **앞 네 자리만** 본다 -- 뒤에 붙는 방식(U5
+    `llm_single`)까지 여기서 단언하면 단위가 추가될 때마다 U4 테스트가
+    깨진다. 전체 목록은 그 단위의 테스트가 소유한다(U5:
+    `test_all_methods_order_after_u5`)."""
+
+    assert resolver_registry.ALL_METHODS[:4] == (
         "proposed",
         "exact_raw",
         "exact_norm",

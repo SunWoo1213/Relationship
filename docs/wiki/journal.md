@@ -125,3 +125,4 @@
 - 2026-09-10 14:03 | COMMIT | 05d90f0 feat(P3-baselines): U1 공통 Resolver 인터페이스·방식 표 — evaluation/ 패키지 신설, 불변 규약 4개, 계약 테스트 39건
 - 2026-09-10 14:16 | COMMIT | f212ad6 feat(P3-baselines): U2 제안 방식 어댑터 — app.er.resolve → MentionDecision 변환, "proposed" 등록, 테스트 20건
 - 2026-09-10 14:28 | COMMIT | bcb2fad feat(P3-baselines): U3 문자열 완전일치 베이스라인 2변형 — exact_raw·exact_norm 등록, 순수 함수 분리, 테스트 61건
+- 2026-09-10 14:41 | COMMIT | 8bfd880 feat(P3-baselines): U4 임베딩 단독 베이스라인 — search_candidates·band_for 재사용, embedding_only 등록, 테스트 53건
