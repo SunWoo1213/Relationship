@@ -1,0 +1,71 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_baseline_parity.py -q -rs -v
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Capstone2
+plugins: anyio-4.12.1, langsmith-0.8.8, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 46 items
+
+tests\test_baseline_parity.py .......................................... [ 91%]
+....                                                                     [100%]
+
+============================= 46 passed in 6.38s ==============================
+rc=0
+$ POSTGRES_PORT=5433 python -m pytest tests/test_baseline_parity.py -rs -v   # -q 를 빼야 parametrize id 가 보인다
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.0.3, pluggy-1.6.0 -- C:\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Capstone2
+plugins: anyio-4.12.1, langsmith-0.8.8, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 46 items
+
+tests/test_baseline_parity.py::test_all_methods_are_the_five_expected_names PASSED [  2%]
+tests/test_baseline_parity.py::test_expectation_tables_cover_every_method[ALLOWED_TRACE_DELTA-table0] PASSED [  4%]
+tests/test_baseline_parity.py::test_expectation_tables_cover_every_method[ALLOWED_EMBED_CALLS-table1] PASSED [  6%]
+tests/test_baseline_parity.py::test_expectation_tables_cover_every_method[ALLOWED_LLM_CALLS-table2] PASSED [  8%]
+tests/test_baseline_parity.py::test_factory_creates_a_resolver_without_keys_or_network[proposed] PASSED [ 10%]
+tests/test_baseline_parity.py::test_factory_creates_a_resolver_without_keys_or_network[exact_raw] PASSED [ 13%]
+tests/test_baseline_parity.py::test_factory_creates_a_resolver_without_keys_or_network[exact_norm] PASSED [ 15%]
+tests/test_baseline_parity.py::test_factory_creates_a_resolver_without_keys_or_network[embedding_only] PASSED [ 17%]
+tests/test_baseline_parity.py::test_factory_creates_a_resolver_without_keys_or_network[llm_single] PASSED [ 19%]
+tests/test_baseline_parity.py::test_resolve_mention_signature_is_identical[proposed] PASSED [ 21%]
+tests/test_baseline_parity.py::test_resolve_mention_signature_is_identical[exact_raw] PASSED [ 23%]
+tests/test_baseline_parity.py::test_resolve_mention_signature_is_identical[exact_norm] PASSED [ 26%]
+tests/test_baseline_parity.py::test_resolve_mention_signature_is_identical[embedding_only] PASSED [ 28%]
+tests/test_baseline_parity.py::test_resolve_mention_signature_is_identical[llm_single] PASSED [ 30%]
+tests/test_baseline_parity.py::test_contract_holds_for_every_method[proposed-sc-025] PASSED [ 32%]
+tests/test_baseline_parity.py::test_contract_holds_for_every_method[proposed-sc-001] PASSED [ 34%]
+tests/test_baseline_parity.py::test_contract_holds_for_every_method[exact_raw-sc-025] PASSED [ 36%]
+tests/test_baseline_parity.py::test_contract_holds_for_every_method[exact_raw-sc-001] PASSED [ 39%]
+tests/test_baseline_parity.py::test_contract_holds_for_every_method[exact_norm-sc-025] PASSED [ 41%]
+tests/test_baseline_parity.py::test_contract_holds_for_every_method[exact_norm-sc-001] PASSED [ 43%]
+tests/test_baseline_parity.py::test_contract_holds_for_every_method[embedding_only-sc-025] PASSED [ 45%]
+tests/test_baseline_parity.py::test_contract_holds_for_every_method[embedding_only-sc-001] PASSED [ 47%]
+tests/test_baseline_parity.py::test_contract_holds_for_every_method[llm_single-sc-025] PASSED [ 50%]
+tests/test_baseline_parity.py::test_contract_holds_for_every_method[llm_single-sc-001] PASSED [ 52%]
+tests/test_baseline_parity.py::test_same_input_twice_gives_the_same_decision[proposed-sc-025] PASSED [ 54%]
+tests/test_baseline_parity.py::test_same_input_twice_gives_the_same_decision[proposed-sc-001] PASSED [ 56%]
+tests/test_baseline_parity.py::test_same_input_twice_gives_the_same_decision[exact_raw-sc-025] PASSED [ 58%]
+tests/test_baseline_parity.py::test_same_input_twice_gives_the_same_decision[exact_raw-sc-001] PASSED [ 60%]
+tests/test_baseline_parity.py::test_same_input_twice_gives_the_same_decision[exact_norm-sc-025] PASSED [ 63%]
+tests/test_baseline_parity.py::test_same_input_twice_gives_the_same_decision[exact_norm-sc-001] PASSED [ 65%]
+tests/test_baseline_parity.py::test_same_input_twice_gives_the_same_decision[embedding_only-sc-025] PASSED [ 67%]
+tests/test_baseline_parity.py::test_same_input_twice_gives_the_same_decision[embedding_only-sc-001] PASSED [ 69%]
+tests/test_baseline_parity.py::test_same_input_twice_gives_the_same_decision[llm_single-sc-025] PASSED [ 71%]
+tests/test_baseline_parity.py::test_same_input_twice_gives_the_same_decision[llm_single-sc-001] PASSED [ 73%]
+tests/test_baseline_parity.py::test_method_definition_call_counters[proposed-sc-025] PASSED [ 76%]
+tests/test_baseline_parity.py::test_method_definition_call_counters[proposed-sc-001] PASSED [ 78%]
+tests/test_baseline_parity.py::test_method_definition_call_counters[exact_raw-sc-025] PASSED [ 80%]
+tests/test_baseline_parity.py::test_method_definition_call_counters[exact_raw-sc-001] PASSED [ 82%]
+tests/test_baseline_parity.py::test_method_definition_call_counters[exact_norm-sc-025] PASSED [ 84%]
+tests/test_baseline_parity.py::test_method_definition_call_counters[exact_norm-sc-001] PASSED [ 86%]
+tests/test_baseline_parity.py::test_method_definition_call_counters[embedding_only-sc-025] PASSED [ 89%]
+tests/test_baseline_parity.py::test_method_definition_call_counters[embedding_only-sc-001] PASSED [ 91%]
+tests/test_baseline_parity.py::test_method_definition_call_counters[llm_single-sc-025] PASSED [ 93%]
+tests/test_baseline_parity.py::test_method_definition_call_counters[llm_single-sc-001] PASSED [ 95%]
+tests/test_baseline_parity.py::test_every_method_runs_on_one_shared_ctx[sc-025] PASSED [ 97%]
+tests/test_baseline_parity.py::test_every_method_runs_on_one_shared_ctx[sc-001] PASSED [100%]
+
+============================= 46 passed in 6.89s ==============================
+rc=0

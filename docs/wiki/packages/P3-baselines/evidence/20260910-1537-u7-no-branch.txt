@@ -1,0 +1,4 @@
+$ grep -nE "if name ==|if name in|match name|name !=" tests/test_baseline_parity.py; echo rc=$?
+rc=1
+-- 기대: 출력 0줄, rc=1(일치 없음) — 02-plan-verify §3 R-1 "테스트 함수 본문의 단언·호출 분기" 없음
+-- 이름별로 달라지는 값은 모듈 상수 표(ALLOWED_*)와 픽스처의 kwargs 표에만 있다(R-1 허용 범위)

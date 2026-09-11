@@ -1,0 +1,11 @@
+$ git status --short app/
+rc=0 (출력 0줄 = U7 은 app/ 를 건드리지 않았다)
+
+$ grep -rn "evaluation" app/ --include=*.py
+rc=1 (출력 0줄 = 제품 코드가 평가 패키지를 import 하지 않는다, R-2·원칙4)
+
+$ git status --short tests/ evaluation/ data/
+?? tests/test_baseline_parity.py
+
+$ python -c "from evaluation.resolvers import registry; print(registry.ALL_METHODS)"
+('proposed', 'exact_raw', 'exact_norm', 'embedding_only', 'llm_single')
