@@ -69,9 +69,9 @@
 | P0 | 로컬 docker-compose (pgvector) | **완료** — `SELECT '[1,2,3]'::vector` 통과, pgvector 0.8.6 (pg16) |
 | P0 | LLM 비용 실측 | 대기 |
 | P1 | 스키마 v2 마이그레이션 (Alembic) | **완료** — 9테이블·CHECK 4·FK CASCADE 6·`vector(1536)`·인덱스 10, upgrade/downgrade 왕복·`alembic check` 통과, verifier 04-review 완료 |
-| P1 | 파일럿 데이터셋 | 대기 |
+| P1 | 파일럿 데이터셋 | **완료** — 40건·5범주(승진 8/별칭 8/대명사 8/일반 10/신규 6), `schema_version` 2, `validate_scenarios --strict` rc=0, 라벨 검수 verifier 40/40·사용자 12/12, verifier 04-review 완료(5cac9bf) |
 | P2 | 툴 7종 v2 + FastAPI 골격 | **완료** — 시그니처 = CLAUDE.md(tools_check 7/7), ask_user→pending_questions, D1 확인 강제, GET /health·POST /answers, pytest 206, verifier 04-review 완료 |
-| P3 | 엔티티 해석 4단계 · 베이스라인 | **ER 완료(verifier 04-review 완료) · 베이스라인 3종은 eval-agent 대기** — ER 4단계(app/er) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity), 판정기 공급자 중립(Claude·OpenAI, `LLM_PROVIDER`), pytest 398 |
+| P3 | 엔티티 해석 4단계 · 베이스라인 | **ER 완료(verifier 04-review 완료) · 베이스라인 3종 구현 완료(04-review 대기)** — ER 4단계(app/er) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity), 판정기 공급자 중립(Claude·OpenAI, `LLM_PROVIDER`). 베이스라인은 `evaluation/` 다섯 방식(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`)이 같은 함수·같은 인자로 호출 가능(parity 46건, 부수효과 0), pytest 859 |
 | P4 | **파일럿 평가(게이트)** — 여기서 임계치·보정표 확정 | 대기 |
 | P5~P9 | 에이전트 루프 · 메모리 · 브리핑 · 푸시 · 프론트 · 인프라 | P4 통과 후 |
 
@@ -289,6 +289,41 @@ python -m pytest tests/test_validate_scenarios.py -q       # 검증기 자체 �
 - 위계 `하` 6/60, 발화 길이 10~26자, 턴 수 3~5로 폭이 좁다 — 실사용보다 쉬운 방향, 즉 **과대평가 편향**이다.
 - 같은 가상 성명이 시나리오마다 다른 관계로 다시 등장한다. **P4 러너는 시나리오 사이에 DB를 비워야 한다** — 비우지 않으면 사전 상태가 오염돼 베이스라인 비교의 동일 조건이 깨진다.
 - 소비자(P3-baselines·P4-pilot-eval)가 mention 단위 정보(함정 대상, 지칭별 기대 질문, 발화 안 위치, 선행사 턴 등)를 더 요구하면 FIX가 아니라 `schema_version`을 올린다.
+
+### 베이스라인 3종 실행법
+
+`evaluation/`은 **평가 장치**다 — 제품 런타임(`app/`)이 아니고, 의존 방향은 `evaluation → app` 한쪽뿐이다(제품 코드는 이 패키지를 import 하지 않는다). 여기 있는 것은 "엔티티 해석을 LLM 한 번으로 하지 않는다"(불변 원칙 4)를 **숫자로 반박당할 수 있게** 만드는 대비군이다: 같은 사전 상태·같은 지칭·같은 `ERConfig`로 네(등록 이름으로는 다섯) 방식을 돌려 S3.7이 요구하는 동일 데이터·동일 지표 비교를 성립시킨다.
+
+| 등록 이름 | 정의 | 임베딩 / LLM 호출 | 모듈 |
+|---|---|---|---|
+| `proposed` | 제안 4단계 하이브리드(후보 검색 → 규칙 필터 → LLM 판정 → 두 임계치) 어댑터 | 1 / 0~1 | `evaluation/resolvers/proposed.py` |
+| `exact_raw` | 문자열 완전일치(앞뒤 공백·대소문자만 정리) | 0 / 0 | `evaluation/resolvers/exact_match.py` |
+| `exact_norm` | 완전일치 + 호칭 정규화(`app.er.dictionary.normalize()`를 지칭·별칭 양쪽에) | 0 / 0 | `evaluation/resolvers/exact_match.py` |
+| `embedding_only` | 별칭 임베딩 top-K → 인물별 max 유사도에 두 임계치만 적용(규칙·LLM 없음) | 1 / 0 | `evaluation/resolvers/embedding_only.py` |
+| `llm_single` | 사전 상태 **전체 인물 목록** + 발화를 구조화 출력 **한 번**에 보내 결정까지 받는다 | 0 / 1 | `evaluation/resolvers/llm_single.py` |
+
+다섯 방식의 호출 형태는 글자 그대로 같다 — `get_resolver(name, **kwargs).resolve_mention(ctx, mention, utterance, hints=None, *, config=ERConfig())` → `MentionDecision{method, decision, person_id, score, candidates, signals, detail, tokens_in, tokens_out}`. `decision`은 `merge`/`identity`/`new_person`(D10과 같은 어휘)이고 `person_id`는 `merge`일 때만 채워진다. 어떤 방식도 인물·별칭·질문을 **쓰지 않는다**(부수효과 0 — 무엇을 할지만 답하고 실행은 P4 러너 몫이다). 시나리오의 사전 상태(`seed_persons` + `aliases`)를 DB에 적재하는 단일 출처는 `evaluation/scenario_state.py`의 `load_scenario_state(ctx, scenario, embedder=…)`이다(`embedder`를 주지 않으면 별칭 임베딩이 비어 임베딩 기반 두 방식이 `embedding_skipped`로 떨어진다).
+
+```bash
+# 방식 목록(= metrics.json 키)
+python -c "from evaluation.resolvers import ALL_METHODS; print(ALL_METHODS)"
+
+# 동일 인터페이스 계약 — 다섯 방식을 같은 함수·같은 인자로 호출(실물 시나리오 2건 적재)
+POSTGRES_PORT=5433 python -m pytest tests/test_baseline_parity.py -q -rs
+
+# 방식별 정의(완전일치 임베딩·LLM 0회 / 임베딩 단독 LLM 0회 / 단일 프롬프트 LLM 정확히 1회)
+POSTGRES_PORT=5433 python -m pytest tests/test_baseline_exact_match.py tests/test_baseline_embedding_only.py tests/test_baseline_llm_single.py -q -rs
+```
+
+위 테스트는 전부 스텁(가짜 임베딩·`FakeJudge`·스텁 클라이언트)으로 돌아 **네트워크 호출 0**이다. 실제 공급자로 한 번 확인하려면:
+
+```bash
+python scripts/baseline_smoke.py     # 사전 상태 3명 · 지칭 1건 · 실 LLM 1회, DB 미사용
+```
+
+  환경변수 이름은 제안 방식과 같다 — `LLM_PROVIDER`·`ANTHROPIC_MODEL`·`OPENAI_MODEL`과 키 이름 `ANTHROPIC_API_KEY`·`OPENAI_API_KEY`(값은 이 문서에도 `.env`에도 의존하지 않는다. 셸 환경에만 둔다). 종료 코드는 **2 = 키 없음**(이름만 안내), **3 = LLM 호출·응답 오류**이며, 출력 JSON 한 줄에는 프롬프트 **길이와 인물 수**만 들어간다(프롬프트 원문·키는 어떤 경우에도 출력하지 않는다).
+
+이 절은 **인터페이스까지**다. 밴드 분포·정답률·오병합률·트레이드오프 곡선은 P4-pilot-eval이 이 다섯 이름으로 측정해 `reports/metrics.json`에 남긴다 — 여기서 수치를 말하지 않는 이유는 재현 가능한 수치만 리포트에 넣기 위해서다(불변 원칙 8).
 
 ## 문서 안내
 

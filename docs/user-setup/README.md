@@ -15,6 +15,7 @@
 | 05 | [실서버·배포 비밀(SSM·VAPID·GitHub)](05-server-secrets.md) | P7(웹푸시)·P9(Terraform/Actions) 착수 시 | 해당 없음(P9 전) | `SERVER-CHECKLIST.md` §0·§4, `docs/wiki/decisions/D07-tls-caddy.md` |
 | 06 | [하네스 승인 결정(무엇을 물어보는가)](06-approval-decisions.md) | 매 세션 | 상시 | `docs/wiki/lessons/`, `.claude/skills/commit` |
 | 07 | [데모 리허설(P11)](07-demo-rehearsal.md) | P9 배포 후 | 해당 없음 | `docs/backlog.md` 74행, `README.md` "데모 시나리오" |
+| 08 | [베이스라인 3 실 LLM 스모크](08-baseline-smoke.md) | 키를 넣은 뒤. **P4 파일럿 평가 전에 한 번**(03 카드와 같은 시점) | **미실행** | `scripts/baseline_smoke.py`, `README.md` "베이스라인 3종 실행법" |
 
 ## 규칙 (전 카드 공통)
 

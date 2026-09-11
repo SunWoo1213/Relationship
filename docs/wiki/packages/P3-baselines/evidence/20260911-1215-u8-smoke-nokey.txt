@@ -1,0 +1,8 @@
+# 환경에 ANTHROPIC_API_KEY·OPENAI_API_KEY 가 모두 없음(이름 존재 여부만 확인, 값 미출력)
+$ python -c "import os; print(\x27ANTHROPIC_API_KEY set:\x27, \x27ANTHROPIC_API_KEY\x27 in os.environ); print(\x27OPENAI_API_KEY set:\x27, \x27OPENAI_API_KEY\x27 in os.environ)"
+ANTHROPIC_API_KEY set: False
+OPENAI_API_KEY set: False
+
+$ python scripts/baseline_smoke.py; echo rc=$?
+[error] ANTHROPIC_API_KEY 환경변수가 설정되지 않았다. 실 LLM 호출은 os.environ 에 그 변수를 직접 넣어야 한다(.env 는 읽지 않는다, security.md §1 -- .env.example 참조).
+rc=2

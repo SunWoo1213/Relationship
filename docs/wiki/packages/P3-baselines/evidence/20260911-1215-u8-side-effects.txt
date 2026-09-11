@@ -1,0 +1,143 @@
+$ POSTGRES_PORT=5433 python <scratchpad>/side_effects_probe.py
+# scratchpad = C:\Users\swsj1\AppData\Local\Temp\claude\C--Capstone2\d9c26ff4-8eba-457b-95ba-9acc3a6bdc22\scratchpad (저장소 밖 일회용 조회 스크립트, 원문은 이 파일 끝)
+방식 목록(ALL_METHODS) = ('proposed', 'exact_raw', 'exact_norm', 'embedding_only', 'llm_single')
+config = ERConfig(t_merge=0.8, t_new=0.3), hints = None
+
+== 시나리오 sc-025 ==
+   mention = '엄마' / utterance = '엄마가 어제 김치 담가서 보내주셨어'
+   U6 load_scenario_state 적재 직후 = {'persons': 1, 'person_aliases': 2, 'pending_questions': 0, 'agent_traces': 0}
+   method         |            persons            |        person_aliases         |       pending_questions       |         agent_traces          | decision
+   ---------------------------------------------------------------------------------------------------------------------------------------------------------
+   (전/후/증분)     |    before / after / delta     |    before / after / delta     |    before / after / delta     |    before / after / delta     |
+   proposed       |         1 /        1 /      0 |         2 /        2 /      0 |         0 /        0 /      0 |         0 /        2 /      2 | merge
+   exact_raw      |         1 /        1 /      0 |         2 /        2 /      0 |         0 /        0 /      0 |         2 /        2 /      0 | merge
+   exact_norm     |         1 /        1 /      0 |         2 /        2 /      0 |         0 /        0 /      0 |         2 /        2 /      0 | merge
+   embedding_only |         1 /        1 /      0 |         2 /        2 /      0 |         0 /        0 /      0 |         2 /        3 /      1 | merge
+   llm_single     |         1 /        1 /      0 |         2 /        2 /      0 |         0 /        0 /      0 |         3 /        3 /      0 | merge
+
+== 시나리오 sc-001 ==
+   mention = '김팀장' / utterance = '오늘 김팀장이랑 회의 또 길어졌음ㅋㅋ'
+   U6 load_scenario_state 적재 직후 = {'persons': 2, 'person_aliases': 4, 'pending_questions': 0, 'agent_traces': 3}
+   method         |            persons            |        person_aliases         |       pending_questions       |         agent_traces          | decision
+   ---------------------------------------------------------------------------------------------------------------------------------------------------------
+   (전/후/증분)     |    before / after / delta     |    before / after / delta     |    before / after / delta     |    before / after / delta     |
+   proposed       |         2 /        2 /      0 |         4 /        4 /      0 |         0 /        0 /      0 |         3 /        5 /      2 | merge
+   exact_raw      |         2 /        2 /      0 |         4 /        4 /      0 |         0 /        0 /      0 |         5 /        5 /      0 | merge
+   exact_norm     |         2 /        2 /      0 |         4 /        4 /      0 |         0 /        0 /      0 |         5 /        5 /      0 | merge
+   embedding_only |         2 /        2 /      0 |         4 /        4 /      0 |         0 /        0 /      0 |         5 /        6 /      1 | merge
+   llm_single     |         2 /        2 /      0 |         4 /        4 /      0 |         0 /        0 /      0 |         6 /        6 /      0 | merge
+
+모든 조회 완료 -- 트랜잭션 rollback(DB 에 아무 행도 남기지 않는다).
+rc=0
+
+$ POSTGRES_PORT=5433 python -c "<새 커넥션으로 롤백 후 행 수 재조회>"
+{'persons': 0, 'person_aliases': 0, 'pending_questions': 0, 'agent_traces': 0}
+rc=0
+
+----- 스크립트 원문(재현용) -----
+"""U8 부수효과 0 SQL 조회 출력(01-plan 131행 · 판정 표 127행).
+
+저장소 밖(scratchpad)의 일회용 조회 스크립트다 -- 제품 코드도 테스트도
+아니다(registry 대상 아님). tests/test_baseline_parity.py 의 픽스처를
+**그대로** 재사용해(중복 구현 금지) 실물 시나리오를 U6 적재기로 적재한 뒤,
+다섯 방식을 각각 1회 호출하기 전·후의 네 테이블 행 수를 SELECT count(*) 로
+찍는다. 트랜잭션은 마지막에 rollback 한다(DB 에 남기지 않는다).
+네트워크 0(FakeJudge · 스텁 Claude 클라이언트 · grouped_embedder).
+"""
+
+from __future__ import annotations
+
+import sys
+
+REPO = r"C:\Capstone2"
+sys.path.insert(0, REPO)
+
+from sqlalchemy import func, select  # noqa: E402
+from sqlalchemy.orm import Session  # noqa: E402
+
+from app.db.models import AgentTrace, PendingQuestion, Person, PersonAlias  # noqa: E402
+from app.db.session import get_engine  # noqa: E402
+
+import tests.conftest as conftest  # noqa: E402
+import tests.test_baseline_parity as P  # noqa: E402
+
+TABLES = (
+    ("persons", Person),
+    ("person_aliases", PersonAlias),
+    ("pending_questions", PendingQuestion),
+    ("agent_traces", AgentTrace),
+)
+
+
+def unwrap(fixture):
+    """pytest 픽스처 객체에서 원래 함수를 꺼낸다(직접 호출 금지 우회가
+    아니라, 같은 구성 코드를 복제하지 않기 위해서다 -- 중복 구현 금지)."""
+    getter = getattr(fixture, "_get_wrapped_function", None)
+    if getter is not None:
+        return getter()
+    return getattr(fixture, "__pytest_wrapped__", fixture).obj if hasattr(
+        fixture, "__pytest_wrapped__"
+    ) else fixture
+
+
+def counts(session: Session) -> dict[str, int]:
+    return {
+        name: session.execute(select(func.count()).select_from(model)).scalar_one()
+        for name, model in TABLES
+    }
+
+
+def main() -> int:
+    engine = get_engine()
+    connection = engine.connect()
+    outer = connection.begin()
+    session = Session(bind=connection, join_transaction_mode="create_savepoint")
+    try:
+        factory = unwrap(conftest.grouped_embedder)()
+        make = unwrap(P.parity_harness)(session, factory)
+
+        print(f"방식 목록(ALL_METHODS) = {P.ALL_METHODS}")
+        print(f"config = ERConfig(t_merge={P.CONFIG.t_merge}, t_new={P.CONFIG.t_new}), hints = {P.HINTS}")
+        print()
+
+        for scenario_id in P.SCENARIO_IDS:
+            harness = make(scenario_id)
+            after_seed = counts(session)
+            print(f"== 시나리오 {scenario_id} ==")
+            print(f"   mention = {harness.mention!r} / utterance = {harness.utterance!r}")
+            print(f"   U6 load_scenario_state 적재 직후 = {after_seed}")
+            header = (
+                f"   {'method':<14} | "
+                + " | ".join(f"{n:^29}" for n, _ in TABLES)
+                + " | decision"
+            )
+            print(header)
+            print("   " + "-" * (len(header) - 3))
+            print(
+                f"   {'(전/후/증분)':<12} | "
+                + " | ".join(f"{'before / after / delta':^29}" for _ in TABLES)
+                + " |"
+            )
+            for name in P.ALL_METHODS:
+                before = counts(session)
+                harness.reset_counters()
+                decision = harness.call(name)
+                session.flush()
+                after = counts(session)
+                cells = " | ".join(
+                    f"{before[t]:>9} /{after[t]:>9} /{after[t] - before[t]:>7}"
+                    for t, _ in TABLES
+                )
+                print(f"   {name:<14} | {cells} | {decision.decision}")
+            print()
+
+        print("모든 조회 완료 -- 트랜잭션 rollback(DB 에 아무 행도 남기지 않는다).")
+        return 0
+    finally:
+        session.close()
+        outer.rollback()
+        connection.close()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

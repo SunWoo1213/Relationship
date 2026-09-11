@@ -1,0 +1,3 @@
+$ python -c "from evaluation.resolvers import ALL_METHODS; print(ALL_METHODS)"
+('proposed', 'exact_raw', 'exact_norm', 'embedding_only', 'llm_single')
+rc=0

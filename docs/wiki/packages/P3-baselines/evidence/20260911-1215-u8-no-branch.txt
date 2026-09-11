@@ -1,0 +1,2 @@
+$ grep -nE "if name ==|if name in|match name|name !=" tests/test_baseline_parity.py; echo rc=$?
+rc=1

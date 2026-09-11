@@ -1,0 +1,21 @@
+$ grep -n "candidate" evaluation/resolvers/base.py | head
+24:   이므로 후보 목록(`candidates`)이 답이고 단일 인물을 고르지 않는다.
+114:    candidates: list[ResolverCandidate]
+154:            "candidates": [c.to_dict() for c in self.candidates],
+rc=0
+
+$ grep -n "identity" evaluation/resolvers/base.py
+19:   던지지 않는다. `decision="new_person"` 또는 `"identity"` 로 표현하고
+23:3. **`person_id` 는 `merge` 에서만** -- `identity` 는 "사람에게 묻는다"
+37:(`merge` / `identity` / `new_person`, D10). 베이스라인도 이 어휘를 쓰되
+40:`identity` 가 자연스럽고, 임의로 하나를 고르게 하면 오병합률이 인위적으로
+57:DECISIONS: tuple[str, ...] = ("merge", "identity", "new_person")
+rc=0
+
+$ grep -n "identity" evaluation/resolvers/llm_single.py | head -5
+17:    {decision: "merge"|"identity"|"new_person",
+45:`detail["forced_reason"]` 이 말한다. **`identity` 로 강등한다**(오병합이
+50:| LLM 호출·응답 실패 | `identity` | `timeout`/`rate_limit`/`api_error`/`connection`/`schema`(P3-er `llm.error` 어휘 그대로) |
+51:| `decision` 이 어휘 밖 | `identity` | `unknown_decision:<원문>` |
+52:| `matched_person_id` 가 사전 상태 밖 | `identity` | `out_of_range_id` |
+rc=0

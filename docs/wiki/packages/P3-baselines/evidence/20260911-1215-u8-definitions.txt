@@ -1,0 +1,6 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_baseline_exact_match.py tests/test_baseline_embedding_only.py tests/test_baseline_llm_single.py -q -rs
+........................................................................ [ 39%]
+........................................................................ [ 78%]
+.......................................                                  [100%]
+183 passed in 7.77s
+rc=0

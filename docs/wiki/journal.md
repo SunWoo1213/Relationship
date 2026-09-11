@@ -129,3 +129,4 @@
 - 2026-09-10 15:06 | COMMIT | 0d98e47 feat(P3-baselines): U5 LLM 단일 프롬프트 베이스라인 — llm_single 등록, 결정 I·J 반영, 스모크 스크립트, 테스트 69건
 - 2026-09-10 15:24 | COMMIT | e0812f7 feat(P3-baselines): U6 시나리오 사전 상태 적재기 — seed_persons·aliases 그대로 적재, validate_scenarios 적재 함수 재사용, 테스트 104건
 - 2026-09-10 16:00 | STOP | 사용자 요청 중단. P3-baselines U1~U6 커밋 완료(05d90f0..e0812f7, 미푸시 6), U7 parity 구현·evidence·03-log·커밋 초안 완료·**커밋 미승인**. 재개는 HANDOFF 재개 절차 (1)~(3) | P3-baselines L-004
+- 2026-09-11 12:09 | COMMIT | 7289a63 test(P3-baselines): U7 동일 인터페이스 parity 계약 테스트 — 5방식 같은 함수·같은 인자, 본문 분기 0(R-1), 46건

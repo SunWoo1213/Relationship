@@ -1,0 +1,54 @@
+$ python scripts/validate_scenarios.py --strict --json
+{
+  "ambiguous_mention_count": 3,
+  "counts": {
+    "alias": 8,
+    "new_person": 6,
+    "normal": 10,
+    "promotion": 8,
+    "pronoun": 8
+  },
+  "dir": "data/scenarios",
+  "files": [
+    {
+      "count": 8,
+      "exists": true,
+      "file": "promotion.json"
+    },
+    {
+      "count": 8,
+      "exists": true,
+      "file": "pronoun.json"
+    },
+    {
+      "count": 8,
+      "exists": true,
+      "file": "alias.json"
+    },
+    {
+      "count": 10,
+      "exists": true,
+      "file": "normal.json"
+    },
+    {
+      "count": 6,
+      "exists": true,
+      "file": "new_person.json"
+    }
+  ],
+  "issue_count": 0,
+  "issues": [],
+  "ok": true,
+  "scenario_count": 40,
+  "schema_version": 2,
+  "strict": true,
+  "total": 40,
+  "trap_count": 12
+}
+rc=0
+
+$ git diff --name-only 0e3447a..HEAD -- data/
+rc=0
+
+$ git diff --name-only 0e3447a..HEAD -- data/ | wc -l
+0
