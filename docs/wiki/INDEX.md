@@ -66,6 +66,7 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | `P2-tools` | 툴 7종 v2 | backend-agent | R6 R7 R10 R18 |
 | `P3-er` | ER 4단계 + 확신도 + trace | backend-agent | R4 R9 |
 | `P3-baselines` | 베이스라인 3종 | eval-agent | — |
+| `P3-llm-providers` | LLM 판정기 공급자 등록표·활성 스위치 + Gemini 구현 | backend-agent | — (R4 는 P4 가 닫는다 — 이 패키지는 공급자를 늘릴 뿐 실호출 미검증 꼬리표를 풀지 않는다) |
 | `P4-pilot-eval` | **게이트** 파일럿 평가 · 보정표 · 곡선 | eval-agent | R3 R4 |
 | `P5-loop` | 에이전트 루프 + ask_user 재개 | backend-agent | R6 R7 |
 | `P6-memory` | 승격 + 패턴 + fact_sources | backend-agent | R8 R11 |

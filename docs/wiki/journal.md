@@ -133,3 +133,5 @@
 - 2026-09-11 12:29 | COMMIT | ad394ba docs(P3-baselines): U8 수용 기준 기계 검증 evidence 13·registry 해시 확정·README 베이스라인 실행법·user-setup 08 스모크 카드
 - 2026-09-11 12:51 | COMMIT | 0e47d19 docs(P3-baselines): 04-review 권고 1·2·4·5 반영 — trace 증분 실측 문언(base.py·01-plan 각주), llm_single s_llm clamp 비대칭 명시, 스모크 카드 경로 정정
 - 2026-09-11 13:05 | DONE | P3-baselines 완료 승인(사용자). U1~U8(05d90f0 f212ad6 bcb2fad 8bfd880 0d98e47 e0812f7 7289a63 ad394ba) + 권고 정정 0e47d19, verifier(fable) 04-review `완료`(필수 0·권고 8, verify-impl FAIL 0/WARN 0, pytest 859/skip 0, 수용 기준 4/4, 판정 표 8/8 실측, 부정 케이스 33/33, F-445cda·F-0ffff5 해소·열림 0). 다섯 방식(proposed·exact_raw·exact_norm·embedding_only·llm_single) 동일 인터페이스·부수효과 0, app/ 변경 judge.py 1건(결정 J). 권고 1·2·3·4·5·7 처리, 6 사용자 스모크(user-setup 08), 8 하네스 L-nnn 후보. 닫는 R 없음. P4 인계 15항은 04-review §7 | P3-baselines S3.7 S3.3 D4 D5 D10 원칙1 원칙2 원칙4 원칙8 원칙9 L-002
+- 2026-09-11 12:57 | COMMIT | 5a1bcbe docs(P3-baselines): 완료 검토 04-review 승인·패키지 닫음 — verifier 완료 판정(필수 0·권고 8), F-0ffff5 해소, registry 커밋 열 규칙·README 비고
+- 2026-09-11 12:57 | PUSH | origin dev 5a1bcbe — 사용자 결정 대기(승격/수정) L-003
