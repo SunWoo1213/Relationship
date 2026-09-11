@@ -12,9 +12,12 @@ P4 러너는 `for name in ALL_METHODS:` 한 줄로 네 방식을 돌린다.
    `pending_questions` 에 쓰지 않는다. 어떤 방식도 `ask_user`·
    `create_person`·`update_person`·`apply_resolution` 을 부르지 않는다.
    "무엇을 할지"만 답하고 실행은 P4 러너/P5 몫이다(제안 방식
-   `app.er.resolve()` 가 이미 그런 계약이다 -- P3-er 결정4). 제안 방식
-   어댑터만 `agent_traces` 행 1개를 남기는데, 그것은 감싼 `resolve()` 의
-   성질이며 인물·별칭·질문 상태를 바꾸지 않는다.
+   `app.er.resolve()` 가 이미 그런 계약이다 -- P3-er 결정4). `agent_traces`
+   는 이 규약의 대상이 아니다 -- 실측(P3-baselines 04-review §2b) 제안 방식
+   어댑터 +2(`er_resolve` 1 + 읽기 툴 `search_person` 의 `@traced` 1),
+   임베딩 단독 +1(`search_person`), 완전일치·LLM 단일 0. 전부 감싼 제품
+   코드의 성질이며 어떤 방식도 trace 를 직접 쓰지 않고 인물·별칭·질문
+   상태를 바꾸지 않는다.
 2. **예외 비대칭 금지** -- 후보 0건·판정 실패·응답 스키마 위반은 예외로
    던지지 않는다. `decision="new_person"` 또는 `"identity"` 로 표현하고
    이유를 `detail["forced_reason"]` 에 남긴다. 한 방식만 예외로 죽으면

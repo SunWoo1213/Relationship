@@ -9,7 +9,7 @@
 
 자동 테스트가 아니다(`tests/test_baseline_llm_single.py` 는 전부 스텁
 클라이언트로 네트워크 0 이다) -- 실 호출은 **사용자가 직접** 키를 넣어
-실행한다(`docs/wiki/user-setup/` 스모크 카드, 원칙8: LLM 출력은 재현
+실행한다(`docs/user-setup/08-baseline-smoke.md` 스모크 카드, 원칙8: LLM 출력은 재현
 불가능하므로 자동 테스트에 넣지 않는다).
 
 `.env` 는 읽지 않는다(security.md §1) -- 공급자별로 필요한 키

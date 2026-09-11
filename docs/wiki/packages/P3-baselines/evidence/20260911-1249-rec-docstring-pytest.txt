@@ -1,0 +1,10 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_baseline_base.py tests/test_baseline_llm_single.py tests/test_baseline_parity.py tests/test_baseline_proposed.py -q -rs
+........................................................................ [ 41%]
+........................................................................ [ 82%]
+..............................                                           [100%]
+174 passed in 9.57s
+$ python scripts/baseline_smoke.py; echo rc=$?
+[error] ANTHROPIC_API_KEY 환경변수가 설정되지 않았다. 실 LLM 호출은 os.environ 에 그 변수를 직접 넣어야 한다(.env 는 읽지 않는다, security.md §1 -- .env.example 참조).
+rc=2
+$ python -c "import evaluation.resolvers.base, evaluation.resolvers.llm_single, ast; ast.parse(open(\"scripts/baseline_smoke.py\",encoding=\"utf-8\").read()); print(\"import ok\")"
+import ok

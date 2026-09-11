@@ -237,8 +237,11 @@ class RawResolution:
 def validate_resolution(raw: dict[str, Any]) -> RawResolution:
     """구조화 출력(이미 dict)의 **자료형**을 검증한다. 위반은
     `JudgeUnavailable("schema")` -- `app/er/judge.py` `validate_judgement()`
-    와 같은 어휘·같은 엄격함이다(두 방식이 같은 이유로 실패해야 비교가
-    공정하다, 원칙8).
+    와 같은 어휘다. 엄격함은 한 지점에서 다르다: `validate_judgement()` 는
+    `s_llm` 범위 밖(0~1)을 `schema` 로 **거부**하지만 여기서는 접고(clamp)
+    결정을 유지한다(아래 `score_clamped`). 베이스라인을 약하게 만드는 방향이
+    아니므로 원칙8 위반은 아니나 비대칭이다 -- P4 는 `score_clamped=True`
+    건을 보정표에서 제외하거나 별도 표시한다(04-review §6 권고 2·§7 인계 11).
 
     - `decision` 이 문자열이 아니면 `schema`. **어휘 밖 문자열은 여기서
       막지 않는다** -- 그건 실패가 아니라 강등 대상이다(`unknown_decision:`).

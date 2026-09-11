@@ -124,7 +124,7 @@
 |------|------|-----------|
 | **동일 인터페이스로 호출 가능** | `POSTGRES_PORT=5433 python -m pytest tests/test_baseline_parity.py -q -rs` | 전 방식 parametrize 통과, skip 0. 방식 수 = 4(결정 C 채택 시 5) |
 | 방식 목록 | `python -c "from evaluation.resolvers import ALL_METHODS; print(ALL_METHODS)"` | `proposed`·`exact_match`·`embedding_only`·`llm_single` 포함 |
-| 부수효과 0 | parity 테스트 안에서 `SELECT count(*) FROM persons/person_aliases/pending_questions` 호출 전후 비교 | 세 테이블 모두 증분 0(제안 방식만 `agent_traces` +1) |
+| 부수효과 0 | parity 테스트 안에서 `SELECT count(*) FROM persons/person_aliases/pending_questions` 호출 전후 비교 | 세 테이블 모두 증분 0(제안 방식만 `agent_traces` +1) — **정정 각주(04-review §2b, 판정 (a) 계획 문언 오차)**: 실측 `agent_traces` 증분은 `proposed` +2(`er_resolve`+`search_person`)·`embedding_only` +1(`search_person`)·나머지 0, evidence `20260911-1215-u8-side-effects.txt` |
 | 베이스라인 정의 준수 | `python -m pytest tests/test_baseline_exact_match.py tests/test_baseline_embedding_only.py tests/test_baseline_llm_single.py -q` | 완전일치: 임베딩·LLM 호출 0 / 임베딩 단독: LLM 호출 0 / 단일 프롬프트: LLM 호출 1 |
 | 제안 방식 무변경 | `git diff --name-only <U1 직전 해시>..HEAD -- app/` | 출력 0줄 — **예외(결정 J)**: `app/er/judge.py` 1건, diff 는 오류 매핑 함수의 공개 승격(이름)뿐 |
 | 데이터셋 무변경 | `python scripts/validate_scenarios.py --strict --json` | rc=0, `total` 40·`counts` 5범주 그대로(원칙8 — 라벨을 고치지 않았다) |
