@@ -1,0 +1,23 @@
+== verify-impl P3-baselines  (20260911-1242) ==
+sssssssssssssssssssss.ssssssssssssssssssssssssssssssssssss.............. [ 92%]
+...................................................................      [100%]
+627 passed, 232 skipped in 10.35s
+PASS  pytest 통과 → evidence/20260911-1242-pytest.txt
+PASS  compileall 통과 → evidence/20260911-1242-lint.txt
+PASS  태그 P3-baselines 커밋 9 건 → evidence/20260911-1242-commits.txt
+PASS  커밋에 태그 존재: D10
+PASS  커밋에 태그 존재: D3
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: D5
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.3
+PASS  커밋에 태그 존재: S3.7
+PASS  검토자 = verifier (L-002)
+PASS  증거 확인:  베이스라인 3종 (문자열 완전일치·임 ← evidence/20260911-1215-u8-parity.txt, ev
+PASS  증거 확인:  해석 1 "베이스라인 3종" → `ALL_METHODS` ← evidence/20260911-1215-u8-methods.txt (`
+PASS  증거 확인:  해석 2 "(문자열 완전일치·임베딩 단� ← evidence/20260911-1215-u8-definitions.tx
+PASS  증거 확인:  해석 3 "의존: P1 데이터셋" → `tests/tes ← tests/test_baseline_parity.py (103·159~
+PASS  증거 확인:  해석 4 "제안 방식과 동일 인터페이스 ← evidence/20260911-1215-u8-parity.txt (46
+PASS  registry 에 P3-baselines 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=0 → evidence/20260911-1242-summary.txt ==

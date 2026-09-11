@@ -1,0 +1,9 @@
+ad394ba docs(P3-baselines): U8 수용 기준 기계 검증 evidence 13·registry 해시 확정·README 베이스라인 실행법·user-setup 08 스모크 카드
+7289a63 test(P3-baselines): U7 동일 인터페이스 parity 계약 테스트 — 5방식 같은 함수·같은 인자, 본문 분기 0(R-1), 46건
+e0812f7 feat(P3-baselines): U6 시나리오 사전 상태 적재기 — seed_persons·aliases 그대로 적재, validate_scenarios 적재 함수 재사용, 테스트 104건
+0d98e47 feat(P3-baselines): U5 LLM 단일 프롬프트 베이스라인 — llm_single 등록, 결정 I·J 반영, 스모크 스크립트, 테스트 69건
+8bfd880 feat(P3-baselines): U4 임베딩 단독 베이스라인 — search_candidates·band_for 재사용, embedding_only 등록, 테스트 53건
+bcb2fad feat(P3-baselines): U3 문자열 완전일치 베이스라인 2변형 — exact_raw·exact_norm 등록, 순수 함수 분리, 테스트 61건
+f212ad6 feat(P3-baselines): U2 제안 방식 어댑터 — app.er.resolve → MentionDecision 변환, "proposed" 등록, 테스트 20건
+05d90f0 feat(P3-baselines): U1 공통 Resolver 인터페이스·방식 표 — evaluation/ 패키지 신설, 불변 규약 4개, 계약 테스트 39건
+0e3447a docs(P3-baselines): 계획·계획검증 승인, 패키지 착수 — 베이스라인 3종 + 공통 Resolver 인터페이스, 결정 A~J

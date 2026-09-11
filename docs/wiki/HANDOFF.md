@@ -5,34 +5,37 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-11 12:55 (**verifier 04-review 완료 판정**(필수 0·권고 8), 사용자 완료 승인·권고 처리 A+B 결정. **B(docstring·계획 각주) 커밋 초안 승인 대기** → 그 다음 닫는 커밋)
-active: **P3-baselines** | frozen: none | 브랜치: dev = **ad394ba**(U8), origin dev = main = 0e3447a(미푸시 8). **진행 중: (B) 권고 1·2·4·5 정정 커밋**(`.claude/commit-draft.txt` 초안, 파일: evaluation/resolvers/base.py·llm_single.py docstring, scripts/baseline_smoke.py 12행, 01-plan 127행 각주, 03-log(U8 해시 ad394ba + 새 항목), evidence 20260911-1249-rec-docstring-pytest.txt(174 passed·rc=2), HANDOFF, journal). 재개 시 초안 AskUserQuestion 승인 → `approve-commit.sh` → 명시 경로 add → `git commit -F`. **그 다음: 닫는 docs 커밋** — `04-review.md`(verifier 작성, 미커밋) `승인: 사용자 (2026-09-11)` 줄 → `docs/backlog.md` 41행 `- [x]` → `CURRENT.md active: none` + 메모 1줄 → registry 32행 README 비고에 `P3-baselines U8: "베이스라인 3종 실행법" 절 추가`(권고 3, F-0ffff5 해결 단계 1 판정 `grep -c "| README.md |"` = 1) + 머리 규칙 "커밋 열 = 파일을 만든 커밋, 후속 수정은 비고"(권고 7) → `05-remediation.md` F-0ffff5 `상태: 닫힘` → 03-log 이 항목 해시 확정 → journal `DONE` → HANDOFF → verifier evidence 12파일(20260911-12{35,36,37,42,45}-*)·04-review·05 를 명시 경로 add → 커밋 → 사용자 승인 시 `git push origin dev` → `.claude/.awaiting-decision`(L-003 멈춤). 04-review 요지: verify-impl FAIL 0/WARN 0, 수용 기준 4/4, 판정 표 8/8, 부정 33/33, 131행(현재 127행) 판정 (a), R-1~R-9 반영, P4 인계 15항(§7). 권고 6 사용자 스모크(user-setup 08)·권고 8 verify-impl 포트 L-nnn 후보는 HANDOFF 열린 질문에. **그 다음 후보**(사용자 결정): P4-pilot-eval(architect backlog 분해, L-004; 04-review §7 15항 + P1 §7 13항 옮겨 적기) / 사용자 스모크 03·08 / P0-cost. P4 통과 전 P5 이후 금지.
+갱신: 2026-09-11 13:10 (**P3-baselines 완료 승인(사용자)** — 닫는 docs 커밋 초안 작성, **커밋 승인 대기**. 커밋 뒤 푸시 여부를 묻는다)
+active: **none** | frozen: none | 브랜치: dev = **0e47d19**(권고 정정), origin dev = main = 0e3447a(미푸시 9: 05d90f0 U1·f212ad6 U2·bcb2fad U3·8bfd880 U4·0d98e47 U5·e0812f7 U6·7289a63 U7·ad394ba U8·0e47d19 권고 1·2·4·5). **진행 중: 닫는 커밋**(`.claude/commit-draft.txt` 제목 `docs(P3-baselines): 완료 검토 04-review 승인·패키지 닫음 …`). 재개 시 초안 AskUserQuestion 승인 → `approve-commit.sh` → 명시 경로 add(04-review.md, 05-remediation.md, evidence 20260911-12{35,36,37,42,45}-* 12파일 + 20260911-1305-close-f0ffff5.txt, docs/backlog.md, CURRENT.md, registry.md, README.md, 03-log.md, journal.md, HANDOFF.md) → `git commit -F`. 그 다음 AskUserQuestion 으로 `git push origin dev`(미푸시 10) 승인 → 푸시 → `.claude/.awaiting-decision`(L-003: 승격/수정/보류를 묻고 멈춘다).
 
 ## 지금 어디까지
-- **P1-pilot-dataset 완료(2026-09-10)** — U1 스키마·검증기(1e1320c) → U2 promotion·alias(09875aa) → FIX 시점 무관 테스트(baee71e) → U3 pronoun·normal(aa6ecfc) → U4 new_person(6775463) → U5 schema_version 2·검사 11/14/15·manifest(40c36f8) → U6 라벨 검수 반영 3라운드(76add8a·6906af4·aeed0bd) → U7 registry 12행·README(f78e9dc) → verifier(fable) 04-review **완료**(필수 0, 권고 R-4~R-12 반영 8·R-6 P4 이관, verify-impl FAIL 0/WARN 0, 수용 기준 4/4, 부정 케이스 8/8·대조군 0) → 사용자 승인. 40건·5범주(8/8/8/10/6), 라벨 검수 verifier 40/40·사용자 12/12. 닫는 R 없음(R3·R4 는 P4). **P4 인계 13항·P10 인계 5항 = `packages/P1-pilot-dataset/04-review.md` §7** — P4 01-plan 이 옮겨 적었는지 P4 02-plan-verify 에서 본다.
-- **P3-er 완료(2026-09-06)** — U1~U9 + FIX(2b82882..b3bcc2d), verifier 04-review 완료(필수 0·권고 6). R4·R9 구현완료(**실호출 미검증** 표기). 열린 권고: F-87c597 R4 실호출(사용자 스모크), F-46f1eb 더미 키 규약, F-036185 bool id 방어, F-251dc2 trace 복제·F-bdd6c5 top_k 무효(P4 결정).
+- **P3-baselines 완료(2026-09-11)** — U1~U8(05d90f0..ad394ba) + 권고 정정 0e47d19, verifier(fable) 04-review **완료**(필수 0·권고 8, verify-impl FAIL 0/WARN 0, pytest 859/skip 0, 수용 기준 4/4, 판정 표 8/8 실측, 부정 케이스 33/33, F-445cda·F-0ffff5 해소·열림 0) → 사용자 승인. 다섯 방식(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`, `evaluation/resolvers/`) 동일 인터페이스·부수효과 0, 적재기 `evaluation/scenario_state.py`. `app/` 변경은 `judge.py` 1건(결정 J). 닫는 R 없음(R3·R4 는 P4 곡선). **P4 인계 15항 = `packages/P3-baselines/04-review.md` §7**(01-plan 178~183행 6항 + 신규 9항) — P4 01-plan 이 옮겨 적었는지 P4 02-plan-verify 에서 본다. 권고 6 사용자 스모크(`docs/user-setup/08-baseline-smoke.md`), 권고 8 `verify-impl.sh` 포트 미전달(L-nnn 후보, 아래 열린 질문).
+- **P1-pilot-dataset 완료(2026-09-10)** — 40건·5범주(8/8/8/10/6), verifier 04-review 완료(5cac9bf). **P4 인계 13항·P10 인계 5항 = `packages/P1-pilot-dataset/04-review.md` §7**.
+- **P3-er 완료(2026-09-06)** — U1~U9 + FIX(2b82882..b3bcc2d), verifier 04-review 완료(필수 0·권고 6). 열린 권고: F-87c597 R4 실호출(사용자 스모크 03 카드), F-46f1eb 더미 키 규약, F-036185 bool id 방어, F-251dc2 trace 복제·F-bdd6c5 top_k 무효(P4 결정).
 - 이전 패키지 열린 소견: P2 F-4d2507 `DELETE /persons/{id}` backlog(P5/P8 계획 때 architect), F-4d8d96 tool_error rollback(P5), F-c7078e mako Refs(revision 만들 때).
-- 로컬 DB: capstone2-postgres-1 호스트 5433, 스키마 0001(head), 명령 앞 `POSTGRES_PORT=5433`, pytest `-rs`, 한글 출력 `PYTHONIOENCODING=utf-8` + 리다이렉트. verify-impl.sh 내부 pytest 는 포트 없이 돌아 skip 표시(하네스 한계). 설치: anthropic 1.4.0·openai 2.33.0.
+- 로컬 DB: capstone2-postgres-1 호스트 5433(Docker Desktop 필요), 스키마 0001(head), 명령 앞 `POSTGRES_PORT=5433`, pytest `-rs`, 한글 출력 `PYTHONIOENCODING=utf-8` + 리다이렉트. verify-impl.sh 내부 pytest 는 포트 없이 돌아 skip 표시(하네스 한계). 설치: anthropic 1.4.0·openai 2.33.0.
 
 ## 바로 다음에 할 것 (순서대로)
-0. **P3-baselines 구현**: 계획 커밋 → U1(인터페이스, R-1 분기 금지 명령 명시) → U2(어댑터) → U3(완전일치, R-8) → U4(임베딩 단독) → U5(LLM 단일, 결정 I·J, R-4 OPENAI_MODEL) → U6(적재기, R-6·R-7 validate_scenarios 적재 함수 재사용) → U7(parity) → U8(evidence·registry·README, R-2 역방향 import 0) → verifier 04-review. 단위마다 L-004 승인 → eval-agent → /commit. DB 5433 필요(Docker Desktop).
-1. 사용자 스모크(값은 셸에만): `ANTHROPIC_API_KEY=… python scripts/er_smoke.py > docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt` 또는 `LLM_PROVIDER=openai OPENAI_API_KEY=… python scripts/er_smoke.py --provider openai` → F-87c597 닫고 review-index R4 갱신(작은 docs 커밋).
-2. 다음 패키지(architect 에게 backlog 분해, L-004 승인 후): **P3 베이스라인 3종**(eval-agent) / **P4-pilot-eval**(P1·P3 완료로 착수 가능 — 01-plan 에 F-251dc2·F-bdd6c5 결정 + P1 04-review §7 인계 13항 포함) / **P0-cost**(AWS Budgets). **P4 통과 전 P5 이후 시작 금지.**
-3. 사소 FIX 후보(별도 작은 커밋, 승인 후): F-46f1eb·F-036185.
+0. **닫는 커밋**(위 진행 중) → **`git push origin dev` 승인 질문** → 푸시 후 L-003 멈춤. 푸시·커밋은 서로 다른 Bash 호출.
+1. 사용자 스모크(값은 셸에만, 사용자 몫): 03 카드 `ANTHROPIC_API_KEY=… python scripts/er_smoke.py > docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt`(F-87c597 닫기), 08 카드 `python scripts/baseline_smoke.py > docs/wiki/packages/P3-baselines/evidence/<ts>-baseline-smoke-real.txt`. 결과 오면 작은 docs 커밋(review-index R4·user-setup 상태 열).
+2. 다음 패키지(사용자 결정 → L-004 승인 → architect 에게 backlog 분해): **P4-pilot-eval**(P1·P3-er·P3-baselines 완료로 착수 가능 — 01-plan 에 P3-baselines §7 15항 + P1 §7 13항 + F-251dc2·F-bdd6c5 결정 포함. 러너·DB 초기화·지표·곡선·보정표·`score_clamped` 처리·`embedder=` 명시·`hints=None`) / **P0-cost**(AWS Budgets). **P4 통과 전 P5 이후 시작 금지.**
+3. 사소 FIX 후보(별도 작은 커밋, 승인 후): F-46f1eb·F-036185. 하네스: 권고 8 `verify-impl.sh` 가 `POSTGRES_PORT` 를 넘기도록(L-nnn), registry 커밋 열 규칙은 반영됨(머리 6행).
 
 ## 재개 시 읽을 카드 (이것만)
-- 사용자가 직접 할 일(키·Budgets·스모크·배포 비밀): `docs/user-setup/README.md` — 사용자 요청(2026-09-10)으로 신설. 사용자 몫 항목은 여기에만 추가한다.
-- `docs/wiki/CURRENT.md`, `.claude/gitlog.md`, `packages/P3-baselines/01-plan.md`(범위·작업 단위·결정 확정 2블록), `02-plan-verify.md` §3 권고 R-1~R-9, `03-log.md` 마지막 항목, `docs/backlog.md` P3 절
-- `packages/P3-er/04-review.md` §6~§7(열린 권고·P4/P5 인계), `05-remediation.md` 신규 권고 6, `README.md` "엔티티 해석(ER) 실행법"
+- 사용자가 직접 할 일(키·Budgets·스모크·배포 비밀): `docs/user-setup/README.md`(01~08). 사용자 몫 항목은 여기에만 추가한다.
+- `docs/wiki/CURRENT.md`, `.claude/gitlog.md`, `packages/P3-baselines/04-review.md` §6~§7(권고·P4 인계 15항), `packages/P1-pilot-dataset/04-review.md` §7, `docs/backlog.md` P4 절
+- `packages/P3-er/04-review.md` §6~§7, `README.md` "엔티티 해석(ER) 실행법"·"베이스라인 3종 실행법"
 - `lessons/L-001`~`L-004`
 
 ## 열린 질문 · 사용자 결정 대기
-- 스모크 실행 시점(사용자 키 필요, 순서 1). 다음 패키지 선택(P3 베이스라인 또는 P4-pilot-eval, 순서 2) — L-004 승인 뒤 architect 위임.
+- 닫는 커밋 승인 → 푸시 승인 → L-003(승격 `/commit release` / 수정 / 보류). 다음 패키지 선택(P4-pilot-eval 권장 / P0-cost). 스모크 실행 시점(03·08 카드, 키 필요).
+- 하네스 L-nnn 후보: `verify-impl.sh` 포트 전달(권고 8, P1·P3-baselines 두 번 반복된 한계).
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)
 - 재개 시 커밋 안 된 변경·진행 중 항목이 있으면 **먼저 사용자에게 목록을 보이고 우선순위를 묻는다**(`/devlog resume`).
-- **점검표·완료 검토는 verifier 에게 위임**(L-002). **위임은 묻고 시작**(L-004): AskUserQuestion → `approve-commit.sh --stage <이름>` → Agent 1회. 재검증·개정도 매번.
+- **점검표·완료 검토는 verifier 에게 위임**(L-002). **위임은 묻고 시작**(L-004): AskUserQuestion → `approve-commit.sh --stage <이름>` → Agent 1회. 재검증·개정도 매번. Docker Desktop 이 꺼져 있으면 우회하지 않고 사용자에게 켜 달라고 한다(security §6).
 - **푸시는 `git push origin dev` 만**. 푸시 뒤 `.claude/.awaiting-decision` → 승격/수정/보류를 묻고 멈춘다(L-003). "계속 작업"은 `--decision fix`. 승격은 `--release` → `git push origin dev:main` → `git fetch origin main:main`.
-- 승인 마커는 커밋 명령과 **다른 Bash 호출**에서 먼저. **`git commit` 과 `git push` 를 한 Bash 호출에 묶지 않는다** — cleanup 훅이 push 분기에서 끝나 commit 마커·COMMIT journal 줄이 남는다(2026-09-10 실측: journal 은 손으로 보정, 마커는 safety-guard 가 삭제를 막아 그대로 둠). Bash 문자열에 마커 파일명을 쓰는 것도 막힌다. Bash 문자열에 훅 금지 문구(볼륨 삭제, 강제 푸시, DROP, 환경변수 전체 출력 단어) 금지 — 문서 수정은 스크립트 파일(scratchpad) + python 실행 또는 Write 도구. `.env` 존재 확인도 금지. 변이 검사 원복에 `git checkout --` 는 safety-guard 가 막는다(복사본으로 원복).
-- `findings.py` 는 `PYTHONUTF8=1 PYTHONIOENCODING=utf-8` 앞에. `## 수용 기준` 절엔 backlog 문장 불릿만. registry 커밋 열은 파일을 실제로 바꾼 커밋만, 기존 파일 행은 비고만.
-- 서브에이전트가 만든 pending 해시·상태 줄은 다음 커밋에서 메인 세션이 정리한다. evidence 를 쓰는 테스트는 반드시 환경변수 게이트(`ER_EVIDENCE_STAMP` 규약).
+- 승인 마커는 커밋 명령과 **다른 Bash 호출**에서 먼저. **`git commit` 과 `git push` 를 한 Bash 호출에 묶지 않는다**. Bash 문자열에 마커 파일명·훅 금지 문구(볼륨 삭제, 강제 푸시, DROP, 환경변수 전체 출력 단어) 금지 — 문서 수정은 scratchpad 스크립트 + python 실행 또는 Write 도구. `.env` 존재 확인도 금지. 변이 검사 원복에 `git checkout --` 는 safety-guard 가 막는다(복사본으로 원복).
+- `findings.py` 는 `PYTHONUTF8=1 PYTHONIOENCODING=utf-8` 앞에. `## 수용 기준` 절엔 backlog 문장 불릿만. registry 커밋 열은 파일을 만든 커밋 하나, 후속 수정은 비고(머리 6행 규칙).
+- 서브에이전트가 만든 pending 해시·상태 줄은 다음 커밋에서 메인 세션이 정리한다. 서브에이전트에게 HANDOFF·journal 은 건드리지 말라고 명시한다(훅이 journal 에 COMMIT 줄을 자동 추가). evidence 를 쓰는 테스트는 반드시 환경변수 게이트(`ER_EVIDENCE_STAMP` 규약).
+- 계획서 행 번호는 "결정 확정" 블록 삽입으로 밀릴 수 있다(02-plan-verify 가 적은 171~178행 → 실제 178~183행). 카드 인용은 문장으로도 대조한다.

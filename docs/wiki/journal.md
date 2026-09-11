@@ -131,3 +131,5 @@
 - 2026-09-10 16:00 | STOP | 사용자 요청 중단. P3-baselines U1~U6 커밋 완료(05d90f0..e0812f7, 미푸시 6), U7 parity 구현·evidence·03-log·커밋 초안 완료·**커밋 미승인**. 재개는 HANDOFF 재개 절차 (1)~(3) | P3-baselines L-004
 - 2026-09-11 12:09 | COMMIT | 7289a63 test(P3-baselines): U7 동일 인터페이스 parity 계약 테스트 — 5방식 같은 함수·같은 인자, 본문 분기 0(R-1), 46건
 - 2026-09-11 12:29 | COMMIT | ad394ba docs(P3-baselines): U8 수용 기준 기계 검증 evidence 13·registry 해시 확정·README 베이스라인 실행법·user-setup 08 스모크 카드
+- 2026-09-11 12:51 | COMMIT | 0e47d19 docs(P3-baselines): 04-review 권고 1·2·4·5 반영 — trace 증분 실측 문언(base.py·01-plan 각주), llm_single s_llm clamp 비대칭 명시, 스모크 카드 경로 정정
+- 2026-09-11 13:05 | DONE | P3-baselines 완료 승인(사용자). U1~U8(05d90f0 f212ad6 bcb2fad 8bfd880 0d98e47 e0812f7 7289a63 ad394ba) + 권고 정정 0e47d19, verifier(fable) 04-review `완료`(필수 0·권고 8, verify-impl FAIL 0/WARN 0, pytest 859/skip 0, 수용 기준 4/4, 판정 표 8/8 실측, 부정 케이스 33/33, F-445cda·F-0ffff5 해소·열림 0). 다섯 방식(proposed·exact_raw·exact_norm·embedding_only·llm_single) 동일 인터페이스·부수효과 0, app/ 변경 judge.py 1건(결정 J). 권고 1·2·3·4·5·7 처리, 6 사용자 스모크(user-setup 08), 8 하네스 L-nnn 후보. 닫는 R 없음. P4 인계 15항은 04-review §7 | P3-baselines S3.7 S3.3 D4 D5 D10 원칙1 원칙2 원칙4 원칙8 원칙9 L-002

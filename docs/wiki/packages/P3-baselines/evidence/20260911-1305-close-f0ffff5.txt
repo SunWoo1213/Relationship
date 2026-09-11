@@ -1,0 +1,6 @@
+$ grep -c "| README.md |" docs/wiki/registry.md
+1
+$ grep -n "| README.md |" docs/wiki/registry.md | grep -o "P3-baselines U8:[^|]*"
+P3-baselines U8: "베이스라인 3종 실행법" 절 추가(ad394ba, 방식 표 5종·동일 시그니처·환경변수 이름만·스모크 종료 코드), 진행 표 P3 행·P1 행 정정; 닫는 커밋에서 P3 행 04-review 완료 표기(F-0ffff5 닫힘, 행 수 1 유지) 
+$ grep -n "^> 커밋 열" docs/wiki/registry.md
+6:> 커밋 열: **파일을 만든 커밋 하나**. 후속 수정 커밋은 비고에 적는다(P3-baselines 04-review 권고 7, 2026-09-11). 하네스 소유 행의 `pending` 은 그대로 둔다.

@@ -38,7 +38,7 @@
 ### P3
 
 - [x] [backend-agent] ER 4단계 + 확신도 + trace / 의존: P2 / 수용기준: 승진 회귀 테스트 통과, trace에 `confidence_breakdown` 존재 — **완료(2026-09-06, P3-er, verifier 04-review `완료`; R4 실호출은 스모크 사용자 실행 후 보강)**
-- [ ] [eval-agent] 베이스라인 3종 (문자열 완전일치·임베딩 단독·LLM 단일 프롬프트) / 의존: P1 데이터셋 / 수용기준: 제안 방식과 동일 인터페이스로 호출 가능
+- [x] [eval-agent] 베이스라인 3종 (문자열 완전일치·임베딩 단독·LLM 단일 프롬프트) / 의존: P1 데이터셋 / 수용기준: 제안 방식과 동일 인터페이스로 호출 가능
   - 세분화는 `docs/wiki/packages/P3-baselines/01-plan.md` (U1~U8). 위 행의 문장·수용기준은 권위이며 바꾸지 않는다. 코드 위치 `evaluation/`(결정 A).
   - [ ] U1 공통 인터페이스 `Resolver`·`MentionDecision`·방식 표 `RESOLVERS` + 계약 테스트
   - [ ] U2 제안 방식 어댑터 (`app.er.resolve` 감싸기, `app/` 무수정)

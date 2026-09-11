@@ -1,0 +1,360 @@
+$ POSTGRES_PORT=5433 python <scratchpad>/review_negative.py   (verifier 부정 케이스, HEAD ad394ba, 스크립트 원문은 파일 끝)
+ALL_METHODS = ('proposed', 'exact_raw', 'exact_norm', 'embedding_only', 'llm_single')
+
+[N1 get_resolver('없는이름')] ok  | 기대 'KeyError' | 관측: KeyError: "get_resolver: unknown resolver name '없는이름'. 등록된 방식: [proposed, exact_raw, exact_norm, embedding_only, llm_single]"
+[N1b register 중복 이름 'proposed'] ok  | 기대 'ValueError' | 관측: ValueError: register: 'proposed' is already registered (<class 'evaluation.resolve
+[N2 merge + person_id=None] ok  | 기대 'ValueError' | 관측: ValueError: MentionDecision: decision="merge" requires person_id (불변 규약 3)
+[N3 identity + person_id=1] ok  | 기대 'ValueError' | 관측: ValueError: MentionDecision: person_id is only allowed when decision == "merge" (got decisio
+[N3b new_person + person_id=1] ok  | 기대 'ValueError' | 관측: ValueError: MentionDecision: person_id is only allowed when decision == "merge" (got decisio
+[N3c decision='foo' (어휘 밖)] ok  | 기대 'ValueError' | 관측: ValueError: MentionDecision: decision must be one of ('merge', 'identity', 'new_person') (go
+[N3d score=1.5] ok  | 기대 'ValueError' | 관측: ValueError: MentionDecision: score must be in [0, 1] (got 1.5)
+[N3e score=NaN] ok  | 기대 'ValueError' | 관측: ValueError: MentionDecision: score must be in [0, 1] (got nan)
+[N3f identity + person_id=None (허용)] ok  | 기대 'NO ERROR' | 관측: NO ERROR
+[N6a normalize_dictionary('님') 은 비지 않는다(구현 사실)] ok  | 기대 ''님'' | 관측: '님'
+[N6b match_exact('님', norm) 일치 0] ok  | 기대 '()' | 관측: ()
+[N6c match_exact('', norm) 일치 0] ok  | 기대 '()' | 관측: ()
+[N7a decision='maybe' (어휘 밖) → identity + unknown_decision] ok  | 기대 'forced=unknown_decision:maybe' | 관측: decision=identity person_id=None score=0.9 forced=unknown_decision:maybe dropped=[] cands=[1] clamped=None calls=1
+[N7a' 위 케이스 person_id=None] ok  | 기대 'person_id=None' | 관측: decision=identity person_id=None score=0.9 forced=unknown_decision:maybe dropped=[] cands=[1] clamped=None calls=1
+[N7b matched_person_id=9999 (사전 밖) → identity + out_of_range_id] ok  | 기대 'forced=out_of_range_id' | 관측: decision=identity person_id=None score=0.9 forced=out_of_range_id dropped=[] cands=[1] clamped=None calls=1
+[N7c merge + matched_person_id=None → identity + merge_without_person_id] ok  | 기대 'forced=merge_without_person_id' | 관측: decision=identity person_id=None score=0.9 forced=merge_without_person_id dropped=[] cands=[1] clamped=None calls=1
+[N7d identity + candidate_person_ids=[] → identity_without_candidates] ok  | 기대 'forced=identity_without_candidates' | 관측: decision=identity person_id=None score=0.9 forced=identity_without_candidates dropped=[] cands=[] clamped=None calls=1
+[N7e s_llm=1.7 → clamp 1.0 + score_clamped] ok  | 기대 'score=1.0' | 관측: decision=merge person_id=1 score=1.0 forced=None dropped=[] cands=[1] clamped=True calls=1
+[N7e' 위 케이스 clamped=True] ok  | 기대 'clamped=True' | 관측: decision=merge person_id=1 score=1.0 forced=None dropped=[] cands=[1] clamped=True calls=1
+[N7f identity + candidate_person_ids=[1, 9999, 'x'] → kept [1], dropped [9999,'x']] ok  | 기대 'dropped=[9999, 'x']' | 관측: decision=identity person_id=None score=0.9 forced=None dropped=[9999, 'x'] cands=[1] clamped=None calls=1
+[N7g caller 가 JudgeUnavailable('timeout') → identity + forced=timeout] ok  | 기대 'forced=timeout' | 관측: decision=identity person_id=None score=0.0 forced=timeout dropped=[] cands=[] clamped=None calls=1
+[N7h 빈 mention → LLM 미호출 new_person + empty_mention] ok  | 기대 'calls=0' | 관측: decision=new_person forced=empty_mention calls=0
+[N7i 정상 merge 는 LLM 정확히 1회] ok  | 기대 'calls=1' | 관측: decision=merge person_id=1 score=0.9 forced=None dropped=[] cands=[1] clamped=None calls=1
+[N8a seed_persons 밖 id 'p9' → ScenarioStateError] ok  | 기대 'ScenarioStateError' | 관측: ScenarioStateError: sc-x: seed_persons 의 'p9' 가 persons[] 에 없다(라벨 계약 위반)
+[N8b schema_version 3 → ScenarioStateError] ok  | 기대 'ScenarioStateError' | 관측: ScenarioStateError: schema_version 이 2 이 아니다(실제: 3) -- 적재기가 읽는 계약이 바뀌었다(P1 04-re
+[N9a baseline_smoke.py (anthropic, 키 없음) → rc=2] ok  | 기대 'rc=2' | 관측: rc=2 stdout='[error] ANTHROPIC_API_KEY 환경변수가 설정되지 않았다. 실 LLM 호출은 os.environ 에 그 변수를 직접 넣어야 한다(.env 는 읽지'
+[N9b baseline_smoke.py --provider openai (키 없음) → rc=2] ok  | 기대 'rc=2' | 관측: rc=2 stdout='[error] OPENAI_API_KEY 환경변수가 설정되지 않았다. 실 LLM 호출은 os.environ 에 그 변수를 직접 넣어야 한다(.env 는 읽지 않는'
+
+== DB 케이스 (POSTGRES_PORT=5433, 롤백 세션) ==
+적재: persons [6420, 6421] display_name='김민수' x2, alias '민수' x2, embedding NULL
+[N10a exact_raw 동명이인 2건 → identity] ok  | 기대 'decision=identity' | 관측: decision=identity
+[N10a' person_id=None (하나를 고르지 않음, 원칙1)] ok  | 기대 'person_id=None' | 관측: person_id=None
+[N10a'' 후보 2건 = 두 인물] ok  | 기대 'cands=[6420, 6421]' | 관측: cands=[6420, 6421]
+[N10b exact_norm '김민수님'(접미 제거) → identity 2건] ok  | 기대 'decision=identity' | 관측: decision=identity norm='김민수' match_count=2
+[N10c exact_norm '님' 단독 → new_person (빈 문자열 아님, forced None)] ok  | 기대 'decision=new_person forced=None' | 관측: decision=new_person forced=None
+[N10d exact_norm '   ' → new_person + empty_after_normalize] ok  | 기대 'forced=empty_after_normalize' | 관측: decision=new_person forced=empty_after_normalize
+[N10d' exact_raw '' → new_person + empty_after_normalize] ok  | 기대 'forced=empty_after_normalize' | 관측: decision=new_person forced=empty_after_normalize
+[N10e embedding_only, embedder=None·별칭 embedding NULL → new_person + embedding_skipped] ok  | 기대 'decision=new_person forced=embedding_skipped' | 관측: decision=new_person forced=embedding_skipped skipped=True top_s_emb=0.0 band_by_threshold=new_person
+[N10e' embedding_only agent_traces 증분 = 1 (search_person @traced)] ok  | 기대 'delta=1' | 관측: delta=1
+[N10f proposed, embedder=None → merge 아님(자동 병합 없음)] ok  | 기대 'no_merge' | 관측: no_merge decision=identity forced=None band_by_threshold=identity score=0.45
+[N10f' proposed agent_traces 증분 = 2 (er_resolve + search_person)] ok  | 기대 'delta=2' | 관측: delta=2
+[N10g 다른 user_id 에서 exact_raw '김민수' → new_person (사용자 범위 격리)] ok  | 기대 'decision=new_person' | 관측: decision=new_person cands=[]
+[N10h 위 7회 호출 후 persons/person_aliases/pending_questions 증분 0] ok  | 기대 'delta={'persons': 0, 'person_aliases': 0, 'pending_questions': 0}' | 관측: delta={'persons': 0, 'person_aliases': 0, 'pending_questions': 0}
+   agent_traces 총 증분(7회 호출) = 3 (embedding_only 1 + proposed 2 = 3 기대)
+[N11 롤백 뒤 새 커넥션에서 review-neg-user 인물 수 0] ok  | 기대 'n=0' | 관측: n=0
+
+MISMATCH=0
+rc=0
+
+----- 스크립트 원문(재현용) -----
+"""P3-baselines 04-review §3 부정 케이스 -- verifier 일회용 스크립트(저장소 밖).
+
+되지 말아야 할 것이 안 되는지를 실제로 실행해 본다. DB 케이스는 롤백 세션
+(create_savepoint) 안에서만 돌고 마지막에 outer.rollback() 한다. 네트워크 0,
+키 값 출력 0. 각 줄은 `[케이스] 관측값` 형태이며 기대와 다르면 `!!MISMATCH`.
+"""
+from __future__ import annotations
+
+import math
+import os
+import subprocess
+import sys
+from types import SimpleNamespace
+
+REPO = r"C:\Capstone2"
+sys.path.insert(0, REPO)
+os.chdir(REPO)
+
+from sqlalchemy import func, select  # noqa: E402
+from sqlalchemy.orm import Session  # noqa: E402
+
+from app.db.models import AgentTrace, PendingQuestion, Person, PersonAlias  # noqa: E402
+from app.db.session import get_engine  # noqa: E402
+from app.er.judge import FakeJudge  # noqa: E402
+from app.er.types import ERConfig, JudgeUnavailable  # noqa: E402
+from app.tools.context import ToolContext  # noqa: E402
+from evaluation.resolvers import (  # noqa: E402
+    DECISIONS,
+    MentionDecision,
+    get_resolver,
+    register,
+)
+from evaluation.resolvers import registry as R  # noqa: E402
+from evaluation.resolvers.exact_match import (  # noqa: E402
+    KnownPerson,
+    match_exact,
+    normalize_dictionary,
+)
+from evaluation.resolvers.llm_single import SingleCallResult, resolve_from_state  # noqa: E402
+from evaluation.scenario_state import (  # noqa: E402
+    ScenarioStateError,
+    check_schema_version,
+    seed_person_specs,
+)
+
+MISMATCH = 0
+
+
+def case(name: str, expect: str, fn):
+    global MISMATCH
+    try:
+        got = fn()
+    except Exception as exc:  # noqa: BLE001
+        got = f"UNEXPECTED {type(exc).__name__}: {exc}"
+    ok = expect in got
+    if not ok:
+        MISMATCH += 1
+    print(f"[{name}] {'ok ' if ok else '!!MISMATCH'} | 기대 '{expect}' | 관측: {got}")
+
+
+print(f"ALL_METHODS = {R.ALL_METHODS}")
+print()
+
+# ---- N1 registry ---------------------------------------------------------
+def n1():
+    try:
+        get_resolver("없는이름")
+        return "NO ERROR"
+    except KeyError as exc:
+        return f"KeyError: {exc}"
+
+
+case("N1 get_resolver('없는이름')", "KeyError", n1)
+
+
+def n1b():
+    try:
+        register("proposed", lambda: None)
+        return "NO ERROR"
+    except ValueError as exc:
+        return f"ValueError: {str(exc)[:70]}"
+
+
+case("N1b register 중복 이름 'proposed'", "ValueError", n1b)
+
+# ---- N2/N3 MentionDecision 규약 3 ----------------------------------------
+def md(**kw):
+    base = dict(method="x", mention="m", decision="merge", person_id=1, score=0.5, candidates=[])
+    base.update(kw)
+    try:
+        MentionDecision(**base)
+        return "NO ERROR"
+    except ValueError as exc:
+        return f"ValueError: {str(exc)[:80]}"
+
+
+case("N2 merge + person_id=None", "ValueError", lambda: md(decision="merge", person_id=None))
+case("N3 identity + person_id=1", "ValueError", lambda: md(decision="identity", person_id=1))
+case("N3b new_person + person_id=1", "ValueError", lambda: md(decision="new_person", person_id=1))
+case("N3c decision='foo' (어휘 밖)", "ValueError", lambda: md(decision="foo", person_id=None))
+case("N3d score=1.5", "ValueError", lambda: md(score=1.5))
+case("N3e score=NaN", "ValueError", lambda: md(score=math.nan))
+case("N3f identity + person_id=None (허용)", "NO ERROR", lambda: md(decision="identity", person_id=None))
+
+# ---- N6 exact_norm 순수 층 (R-8) -----------------------------------------
+PURE = [
+    KnownPerson(1, "김민수", ("팀장", "김팀장"), "직장", "상"),
+    KnownPerson(2, "박민수", ("민수",), "친구", "동"),
+]
+case(
+    "N6a normalize_dictionary('님') 은 비지 않는다(구현 사실)",
+    "'님'",
+    lambda: repr(normalize_dictionary("님")),
+)
+case(
+    "N6b match_exact('님', norm) 일치 0",
+    "()",
+    lambda: repr(match_exact("님", PURE, normalizer=normalize_dictionary).person_ids),
+)
+case(
+    "N6c match_exact('', norm) 일치 0",
+    "()",
+    lambda: repr(match_exact("", PURE, normalizer=normalize_dictionary).person_ids),
+)
+
+# ---- N7 llm_single 강등 (순수, DB·네트워크 없음) -------------------------
+class StubCaller:
+    provider = "stub"
+    model = "stub-model"
+
+    def __init__(self, raw=None, raise_exc=None):
+        self.raw = raw
+        self.raise_exc = raise_exc
+        self.calls = 0
+
+    def complete(self, system, user_text):
+        self.calls += 1
+        if self.raise_exc is not None:
+            raise self.raise_exc
+        return SingleCallResult(raw=self.raw, tokens_in=1, tokens_out=1, model=self.model, provider=self.provider)
+
+
+def llm(raw=None, raise_exc=None):
+    caller = StubCaller(raw, raise_exc)
+    d = resolve_from_state(PURE, "부장님", "부장님이 회식 잡으래", caller=caller)
+    return (
+        f"decision={d.decision} person_id={d.person_id} score={d.score} "
+        f"forced={d.detail['forced_reason']} dropped={d.detail['dropped_ids']} "
+        f"cands={[c.person_id for c in d.candidates]} clamped={d.detail.get('score_clamped')} "
+        f"calls={caller.calls}"
+    )
+
+
+ok_raw = dict(decision="merge", matched_person_id=1, s_llm=0.9, reason="r", candidate_person_ids=[1])
+case("N7a decision='maybe' (어휘 밖) → identity + unknown_decision", "forced=unknown_decision:maybe",
+     lambda: llm({**ok_raw, "decision": "maybe"}))
+case("N7a' 위 케이스 person_id=None", "person_id=None", lambda: llm({**ok_raw, "decision": "maybe"}))
+case("N7b matched_person_id=9999 (사전 밖) → identity + out_of_range_id", "forced=out_of_range_id",
+     lambda: llm({**ok_raw, "matched_person_id": 9999}))
+case("N7c merge + matched_person_id=None → identity + merge_without_person_id", "forced=merge_without_person_id",
+     lambda: llm({**ok_raw, "matched_person_id": None}))
+case("N7d identity + candidate_person_ids=[] → identity_without_candidates", "forced=identity_without_candidates",
+     lambda: llm({**ok_raw, "decision": "identity", "matched_person_id": None, "candidate_person_ids": []}))
+case("N7e s_llm=1.7 → clamp 1.0 + score_clamped", "score=1.0",
+     lambda: llm({**ok_raw, "s_llm": 1.7}))
+case("N7e' 위 케이스 clamped=True", "clamped=True", lambda: llm({**ok_raw, "s_llm": 1.7}))
+case("N7f identity + candidate_person_ids=[1, 9999, 'x'] → kept [1], dropped [9999,'x']", "dropped=[9999, 'x']",
+     lambda: llm({**ok_raw, "decision": "identity", "matched_person_id": None, "candidate_person_ids": [1, 9999, "x"]}))
+case("N7g caller 가 JudgeUnavailable('timeout') → identity + forced=timeout", "forced=timeout",
+     lambda: llm(raise_exc=JudgeUnavailable("timeout")))
+case("N7h 빈 mention → LLM 미호출 new_person + empty_mention", "calls=0",
+     lambda: (lambda c: (lambda d: f"decision={d.decision} forced={d.detail['forced_reason']} calls={c.calls}")(
+         resolve_from_state(PURE, "   ", "발화", caller=c)))(StubCaller(ok_raw)))
+case("N7i 정상 merge 는 LLM 정확히 1회", "calls=1", lambda: llm(ok_raw))
+
+# ---- N8 scenario_state ----------------------------------------------------
+def n8():
+    sc = {"id": "sc-x", "seed_persons": ["p9"],
+          "persons": [{"person_id": "p1", "display_name": "a", "relation_tag": "친구", "hierarchy": "동", "aliases": ["a"]}]}
+    try:
+        seed_person_specs(sc)
+        return "NO ERROR"
+    except ScenarioStateError as exc:
+        return f"ScenarioStateError: {exc}"
+
+
+case("N8a seed_persons 밖 id 'p9' → ScenarioStateError", "ScenarioStateError", n8)
+
+
+def n8b():
+    try:
+        check_schema_version(SimpleNamespace(manifest_dict={"schema_version": 3}))
+        return "NO ERROR"
+    except ScenarioStateError as exc:
+        return f"ScenarioStateError: {str(exc)[:60]}"
+
+
+case("N8b schema_version 3 → ScenarioStateError", "ScenarioStateError", n8b)
+
+# ---- N9 smoke 키 없음 rc=2 (키 이름을 환경에서 제거하고 실행, 값 미출력) ----
+def smoke(extra_args):
+    env = {k: v for k, v in os.environ.items() if k not in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY")}
+    env["PYTHONIOENCODING"] = "utf-8"
+    p = subprocess.run([sys.executable, "scripts/baseline_smoke.py", *extra_args], cwd=REPO, env=env,
+                       capture_output=True, text=True, encoding="utf-8")
+    return f"rc={p.returncode} stdout={p.stdout.strip()[:90]!r}"
+
+
+case("N9a baseline_smoke.py (anthropic, 키 없음) → rc=2", "rc=2", lambda: smoke([]))
+case("N9b baseline_smoke.py --provider openai (키 없음) → rc=2", "rc=2", lambda: smoke(["--provider", "openai"]))
+
+# ---- N10 DB 케이스 (롤백 세션) --------------------------------------------
+print()
+print("== DB 케이스 (POSTGRES_PORT=%s, 롤백 세션) ==" % os.environ.get("POSTGRES_PORT"))
+engine = get_engine()
+conn = engine.connect()
+outer = conn.begin()
+session = Session(bind=conn, join_transaction_mode="create_savepoint")
+USER = "review-neg-user"
+CFG = ERConfig()
+
+
+def counts(s):
+    return {
+        "persons": s.execute(select(func.count()).select_from(Person)).scalar_one(),
+        "person_aliases": s.execute(select(func.count()).select_from(PersonAlias)).scalar_one(),
+        "pending_questions": s.execute(select(func.count()).select_from(PendingQuestion)).scalar_one(),
+        "agent_traces": s.execute(select(func.count()).select_from(AgentTrace)).scalar_one(),
+    }
+
+
+try:
+    ctx = ToolContext(session=session, session_id="review-neg", user_id=USER, embedder=None)
+    ids = []
+    for _ in range(2):  # 동명이인 2건 '김민수', 별칭 '민수' -- embedding 은 전부 NULL
+        p = Person(user_id=USER, display_name="김민수", relation_tag="직장", hierarchy="상")
+        session.add(p)
+        session.flush()
+        session.add(PersonAlias(person_id=p.id, alias="민수", source="confirmed", confirmed_at=ctx.now()))
+        ids.append(p.id)
+    session.flush()
+    print(f"적재: persons {ids} display_name='김민수' x2, alias '민수' x2, embedding NULL")
+    before = counts(session)
+
+    def run(name, mention, **kw):
+        d = get_resolver(name, **kw).resolve_mention(ctx, mention, "발화", None, config=CFG)
+        session.flush()
+        return d
+
+    d = run("exact_raw", "김민수")
+    case("N10a exact_raw 동명이인 2건 → identity", "decision=identity", lambda: f"decision={d.decision}")
+    case("N10a' person_id=None (하나를 고르지 않음, 원칙1)", "person_id=None", lambda: f"person_id={d.person_id}")
+    case("N10a'' 후보 2건 = 두 인물", f"cands={sorted(ids)}",
+         lambda: f"cands={sorted(c.person_id for c in d.candidates)}")
+
+    d2 = run("exact_norm", "김민수님")
+    case("N10b exact_norm '김민수님'(접미 제거) → identity 2건", "decision=identity",
+         lambda: f"decision={d2.decision} norm={d2.detail['normalized_mention']!r} match_count={d2.detail['match_count']}")
+
+    d3 = run("exact_norm", "님")
+    case("N10c exact_norm '님' 단독 → new_person (빈 문자열 아님, forced None)", "decision=new_person forced=None",
+         lambda: f"decision={d3.decision} forced={d3.detail['forced_reason']}")
+    d4 = run("exact_norm", "   ")
+    case("N10d exact_norm '   ' → new_person + empty_after_normalize", "forced=empty_after_normalize",
+         lambda: f"decision={d4.decision} forced={d4.detail['forced_reason']}")
+    d4r = run("exact_raw", "")
+    case("N10d' exact_raw '' → new_person + empty_after_normalize", "forced=empty_after_normalize",
+         lambda: f"decision={d4r.decision} forced={d4r.detail['forced_reason']}")
+
+    t0 = counts(session)["agent_traces"]
+    d5 = run("embedding_only", "민수")
+    t1 = counts(session)["agent_traces"]
+    case("N10e embedding_only, embedder=None·별칭 embedding NULL → new_person + embedding_skipped",
+         "decision=new_person forced=embedding_skipped",
+         lambda: f"decision={d5.decision} forced={d5.detail['forced_reason']} skipped={d5.detail['embedding_skipped']} "
+                 f"top_s_emb={d5.detail['top_s_emb']} band_by_threshold={d5.detail['band_by_threshold']}")
+    case("N10e' embedding_only agent_traces 증분 = 1 (search_person @traced)", "delta=1", lambda: f"delta={t1 - t0}")
+
+    t0 = counts(session)["agent_traces"]
+    d6 = run("proposed", "민수", judge=FakeJudge(table={pid: 0.9 for pid in ids}))
+    t1 = counts(session)["agent_traces"]
+    case("N10f proposed, embedder=None → merge 아님(자동 병합 없음)", "no_merge",
+         lambda: f"{'no_merge' if d6.decision != 'merge' else 'MERGE'} decision={d6.decision} forced={d6.detail['forced_reason']} "
+                 f"band_by_threshold={d6.detail['band_by_threshold']} score={d6.score}")
+    case("N10f' proposed agent_traces 증분 = 2 (er_resolve + search_person)", "delta=2", lambda: f"delta={t1 - t0}")
+
+    ctx_other = ToolContext(session=session, session_id="review-neg-other", user_id="other-user", embedder=None)
+    d7 = get_resolver("exact_raw").resolve_mention(ctx_other, "김민수", "발화", None, config=CFG)
+    case("N10g 다른 user_id 에서 exact_raw '김민수' → new_person (사용자 범위 격리)", "decision=new_person",
+         lambda: f"decision={d7.decision} cands={[c.person_id for c in d7.candidates]}")
+
+    after = counts(session)
+    case("N10h 위 7회 호출 후 persons/person_aliases/pending_questions 증분 0", "delta={'persons': 0, 'person_aliases': 0, 'pending_questions': 0}",
+         lambda: "delta=" + str({k: after[k] - before[k] for k in ("persons", "person_aliases", "pending_questions")}))
+    print(f"   agent_traces 총 증분(7회 호출) = {after['agent_traces'] - before['agent_traces']} (embedding_only 1 + proposed 2 = 3 기대)")
+finally:
+    session.close()
+    outer.rollback()
+    conn.close()
+
+with engine.connect() as c2:
+    n = c2.execute(select(func.count()).select_from(Person).where(Person.user_id == USER)).scalar_one()
+    case("N11 롤백 뒤 새 커넥션에서 review-neg-user 인물 수 0", "n=0", lambda: f"n={n}")
+
+print()
+print(f"MISMATCH={MISMATCH}")
+sys.exit(1 if MISMATCH else 0)

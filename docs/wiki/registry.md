@@ -3,6 +3,7 @@
 > 목적: **이미 만든 것을 다시 만들거나, 만들었다고 착각하는 것**을 막는다.
 > 규칙: 작업 단위를 시작하기 전에 이 표를 `grep` 한다. `/commit` 마다 새 산출물을 한 줄씩 추가하고, `/devlog done` 에서 패키지 행을 확정한다. `verify-plan.sh`(중복 경고)·`verify-impl.sh`(등록 확인)가 이 파일을 읽는다.
 > 종류: 모듈 · 엔드포인트 · 툴 · 테이블 · 마이그레이션 · 테스트 · 스크립트 · 데이터셋 · 리포트 · 문서 · 훅 · 스킬
+> 커밋 열: **파일을 만든 커밋 하나**. 후속 수정 커밋은 비고에 적는다(P3-baselines 04-review 권고 7, 2026-09-11). 하네스 소유 행의 `pending` 은 그대로 둔다.
 
 | 종류 | 이름 | 경로 | 패키지 | 커밋 | 비고 |
 |------|------|------|--------|------|------|
@@ -29,7 +30,7 @@
 | 에이전트 | verifier — 계획 검증·완료 검토·코드 리뷰 전담(fable, 구현자와 다른 모델) | .claude/agents/verifier.md | 하네스 | pending | L-002 |
 | 문서 | 교훈 L-002 역할별 모델 분리(계획 opus · 구현 sonnet · 검증 fable) | docs/wiki/lessons/L-002-role-model-separation.md | 하네스 | pending | verify-plan/impl 이 검증자=verifier 강제 |
 | 문서 | 교훈 L-003 dev 푸시 뒤 사용자 결정까지 멈춤 | docs/wiki/lessons/L-003-stop-after-dev-push.md | 하네스 | pending | .awaiting-decision 마커 |
-| 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·실행법) | README.md | 하네스 | pending | 패키지 완료마다 진행 상태 표 갱신. P0-compose: 로컬 DB 절 추가(2026-09-04), pg16 태그는 P9-infra 에서 재확인. P1-schema: 진행 표 P1 행·마이그레이션 절 추가(U5 커밋은 pending). P2-tools U9: 진행 표 P2 행(구현 완료·검증 대기)·"백엔드 실행(FastAPI)" 절 추가(uvicorn·curl /health·POST /answers 예). P3-er U9: 진행 표 P3 행(구현 완료·검증 대기)·"엔티티 해석(ER) 실행법" 절 추가(회귀 3종·trace 재생성·백필·스모크·임계치 조정 변수 이름, 값·키 금지) |
+| 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·실행법) | README.md | 하네스 | pending | 패키지 완료마다 진행 상태 표 갱신. P0-compose: 로컬 DB 절 추가(2026-09-04), pg16 태그는 P9-infra 에서 재확인. P1-schema: 진행 표 P1 행·마이그레이션 절 추가(U5 커밋은 pending). P2-tools U9: 진행 표 P2 행(구현 완료·검증 대기)·"백엔드 실행(FastAPI)" 절 추가(uvicorn·curl /health·POST /answers 예). P3-er U9: 진행 표 P3 행(구현 완료·검증 대기)·"엔티티 해석(ER) 실행법" 절 추가(회귀 3종·trace 재생성·백필·스모크·임계치 조정 변수 이름, 값·키 금지). P3-baselines U8: "베이스라인 3종 실행법" 절 추가(ad394ba, 방식 표 5종·동일 시그니처·환경변수 이름만·스모크 종료 코드), 진행 표 P3 행·P1 행 정정; 닫는 커밋에서 P3 행 04-review 완료 표기(F-0ffff5 닫힘, 행 수 1 유지) |
 | 훅 | 단계 위임 게이트(Agent 호출 전 사용자 승인 마커) | .claude/hooks/delegate-guard.sh | 하네스 | pending | L-004 |
 | 문서 | 교훈 L-004 단계는 묻고 시작 | docs/wiki/lessons/L-004-ask-before-stage.md | 하네스 | pending | |
 | 문서 | 환경변수 이름 목록(값 비움, 추적 유지) | .env.example | 하네스 | e062986 | 값·키는 절대 넣지 않는다(security.md §1). P0-compose 749bb8e: DB 이름 4개 / P2-tools f217190: 앱 설정 / P3-er b1f2782: LLM_PROVIDER·OPENAI_MODEL·GEMINI_API_KEY·GEMINI_MODEL 이름 추가(결정 3 개정 2). U9 에서 registry 행 부재 발견 → 신설 |

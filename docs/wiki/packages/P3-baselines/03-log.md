@@ -73,10 +73,18 @@
 - 남은 것 · 다음 단위: **verifier 04-review**(L-004 — 새 컨텍스트·구현자와 다른 모델). 확인 대상: 판정 표 8행 대조(131행은 실측 기준), 수용 기준 4문장, U1~U8 판단 누적 48건, R-1·R-2·R-3·R-4·R-9, `verify-impl.sh`. 그 뒤 **P4-pilot-eval**(01-plan 176~183행 인계 6항 — DB 초기화·분모 규칙·지표/곡선/보정표·`metrics.json` 키·공급자 기록·실 임베딩/실 LLM 첫 대면). 사용자 몫: `docs/user-setup/08` 스모크 1회
 - Refs: P3-baselines S3.7 원칙4 원칙8 원칙9 R-1 R-2 R-3 R-4 R-9 L-002 L-004
 
-## 2026-09-11 12:50 · docs(P3-baselines): 04-review 권고 1·2·4 반영 — trace 증분 실측 문언(base.py·01-plan 각주), llm_single s_llm clamp 비대칭 명시, 스모크 카드 경로 정정 · pending
+## 2026-09-11 12:50 · docs(P3-baselines): 04-review 권고 1·2·4 반영 — trace 증분 실측 문언(base.py·01-plan 각주), llm_single s_llm clamp 비대칭 명시, 스모크 카드 경로 정정 · 0e47d19
 - 변경: `evaluation/resolvers/base.py` 불변 규약 1 docstring(16~17행 "제안 방식 어댑터만 `agent_traces` 행 1개" → 실측 proposed +2·embedding_only +1·나머지 0, trace 는 규약 대상 아님), `docs/wiki/packages/P3-baselines/01-plan.md` 127행 판정 표 "부수효과 0" 기대 출력에 **정정 각주**(원문 보존, 04-review §2b 판정 (a)), `evaluation/resolvers/llm_single.py` `validate_resolution` docstring("같은 엄격함" → `s_llm` 범위 밖 처리가 `validate_judgement()` 의 `schema` 거부와 달리 clamp 유지임을 명시, P4 는 `score_clamped` 제외/표시), `scripts/baseline_smoke.py` 12행 경로 `docs/wiki/user-setup/` → `docs/user-setup/08-baseline-smoke.md`. 동작 변경 0(docstring·주석·계획 각주만). evidence `20260911-1249-rec-docstring-pytest.txt`(base·llm_single·parity·proposed 174 passed, 스모크 rc=2, import ok). 이 로그(U8 항목 해시 ad394ba = 04-review 권고 5)
 - 이유(기획서·카드 연결): verifier 04-review §6 [권고] 1·2·4·5 — 문서가 실측과 다르면 P4 가 잘못된 기대값으로 지표를 짠다(원칙9 근거 정확성). 권고 2 는 원칙8 위반이 아니나(베이스라인에 유리한 방향) 비대칭을 숨기지 않는다
 - 정합성 확인: 원칙4(`app/` 무수정) / 원칙8(구현 동작 무변경 — clamp 를 거부로 바꾸지 않았다, 결정은 P4 지표 정의 몫) / 계획 원문 보존(각주만) — 위반 없음
 - 메인 세션 판단 2건: (1) 권고 2 의 구현 변경(clamp→거부)은 하지 않는다 — 두 방식의 분모를 같게 하려면 P4 가 `score_clamped` 를 지표에서 다루는 편이 원칙8 에 맞고, 코드 변경은 04-review 재검증을 부른다 (2) 01-plan 은 본문을 고치지 않고 같은 셀에 각주를 붙였다(02-plan-verify 가 인용한 행 번호 보존)
 - 남은 것 · 다음 단위: 닫는 docs 커밋(04-review `승인:` 줄, backlog 41행 체크, CURRENT active none, journal DONE, registry README 비고(F-0ffff5 닫기 = 권고 3)·머리 규칙 한 문장(권고 7), 05-remediation F-0ffff5 닫힘, HANDOFF) → 사용자 승인 시 `git push origin dev`(L-003)
 - Refs: P3-baselines S3.7 원칙8 원칙9 R-3 F-0ffff5 L-002
+
+## 2026-09-11 13:05 · docs(P3-baselines): 완료 검토 04-review 승인·패키지 닫음 — verifier 완료 판정(필수 0·권고 8), F-0ffff5 해소, 권고 3·7 반영 · pending
+- 변경: `04-review.md`(verifier 작성 그대로 + `승인: 사용자 (2026-09-11)`), verifier evidence 12파일(`20260911-1235-review-verify-impl-draft`·`-1236-review-pytest-all`(859 passed skip 0)·`-1237-review-negative`(33/33)·`-1245-review-verify-impl-final`(FAIL 0/WARN 0) + 스크립트 부산물 `-1235/-1242-{pytest,lint,commits,summary}`), `05-remediation.md`(F-445cda 해소 기록(verifier), F-0ffff5 해소 — 열림 0), `docs/backlog.md` 41행 `[x]`, `CURRENT.md` active none + 메모, `registry.md` 머리 규칙 "커밋 열 = 파일을 만든 커밋"(권고 7) + 32행 README 비고 `P3-baselines U8:`(권고 3), `README.md` 진행 표 P3 행 "04-review 완료", evidence `20260911-1305-close-f0ffff5.txt`, 이 로그(권고 정정 항목 해시 0e47d19), journal `DONE`, HANDOFF
+- 이유(기획서·카드 연결): `/devlog done` 3~4단계. 닫는 R 없음(04-review §4 — R3·R4 는 P4 곡선으로). backlog 41행 수용 기준 = 04-review §2 4/4 evidence
+- 정합성 확인: 원칙8(수치는 evidence 파일만, 실 LLM 특성은 P4 가 처음 봄) / L-002(검증자 verifier fable, 구현자 eval-agent opus, 조율 메인) / 원칙4·security(닫는 커밋은 docs 만) — 위반 없음
+- 메인 세션 판단: 권고 2 구현 변경 안 함(0e47d19 항목), 권고 6 사용자 몫(user-setup 08), 권고 8 하네스 L-nnn 후보(HANDOFF 열린 질문)
+- 남은 것 · 다음 단위: 사용자 승인 시 `git push origin dev`(미푸시 10) → L-003 멈춤(승격/수정/보류). 다음 패키지 후보 P4-pilot-eval(architect, L-004; 04-review §7 15항·P1 §7 13항 옮겨 적기), 사용자 스모크 03·08, P0-cost
+- Refs: P3-baselines S3.7 원칙4 원칙8 원칙9 F-0ffff5 F-445cda L-002 L-004

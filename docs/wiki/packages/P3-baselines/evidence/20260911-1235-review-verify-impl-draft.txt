@@ -1,0 +1,19 @@
+== verify-impl P3-baselines  (20260911-1235) ==
+sssssssssssssssssssss.ssssssssssssssssssssssssssssssssssss.............. [ 92%]
+...................................................................      [100%]
+627 passed, 232 skipped in 10.63s
+PASS  pytest 통과 → evidence/20260911-1235-pytest.txt
+PASS  compileall 통과 → evidence/20260911-1235-lint.txt
+PASS  태그 P3-baselines 커밋 9 건 → evidence/20260911-1235-commits.txt
+PASS  커밋에 태그 존재: D10
+PASS  커밋에 태그 존재: D3
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: D5
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.3
+PASS  커밋에 태그 존재: S3.7
+PASS  검토자 = verifier (L-002)
+FAIL  04-review 수용 기준 표에 행이 없다
+PASS  registry 에 P3-baselines 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=1 WARN=0 → evidence/20260911-1235-summary.txt ==
