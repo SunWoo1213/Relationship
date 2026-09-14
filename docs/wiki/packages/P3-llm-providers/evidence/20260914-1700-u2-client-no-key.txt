@@ -1,0 +1,3 @@
+$ python (GEMINI_API_KEY, GOOGLE_API_KEY popped in-process) -c "from google import genai; genai.Client()"
+builtins.ValueError
+ValueError('No API key was provided. Please pass a valid API key. Learn how to create an API key at https://ai.google.dev/gemini-api/docs/api-key.')

@@ -1,0 +1,2 @@
+$ python -c "from google.genai import types; print(sorted(types.Schema.model_fields))"
+['additional_properties', 'any_of', 'default', 'defs', 'description', 'enum', 'example', 'format', 'items', 'max_items', 'max_length', 'max_properties', 'maximum', 'min_items', 'min_length', 'min_properties', 'minimum', 'nullable', 'pattern', 'properties', 'property_ordering', 'ref', 'required', 'title', 'type']

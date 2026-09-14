@@ -1,0 +1,4 @@
+$ grep -n "safety\|blocked" app/er/judge.py
+(exit code: 1, empty match expected)
+$ grep -c "^JUDGES" app/er/judge.py
+1

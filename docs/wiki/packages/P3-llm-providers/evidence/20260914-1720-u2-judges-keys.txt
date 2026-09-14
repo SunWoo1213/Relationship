@@ -1,0 +1,2 @@
+$ python -c "from app.er.judge import JUDGES; print(sorted(JUDGES), JUDGES[\"gemini\"].__name__)"
+['anthropic', 'gemini', 'openai'] GeminiJudge

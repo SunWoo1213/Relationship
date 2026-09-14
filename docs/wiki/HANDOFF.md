@@ -5,20 +5,21 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-14 16:58 (**P3-llm-providers U1 구현 완료·커밋 승인됨 — 커밋 실행 중.** 전건 DB 재실행 873 passed/skip 0. 다음 U2 위임 승인됨(L-004))
-active: **P3-llm-providers** | frozen: none | 브랜치: dev = 025a7c4(origin/dev = 5a1bcbe, 미푸시 2), main = 0e3447a. **진행 중**: U1 커밋(`.claude/commit-draft.txt` 초안 있음 — 승인 → `approve-commit.sh` → `git add` 명시 경로: `app/er/judge.py app/settings.py .env.example tests/test_er_judge.py tests/test_er_smoke.py scripts/er_smoke.py scripts/baseline_smoke.py` + evidence `20260914-1620-u1-*.txt` 11개 + `20260914-1655-u1-pytest-full-db.txt` + `03-log.md` `05-remediation.md` HANDOFF journal → `git commit -F`). 커밋 뒤 03-log U1 항목 `pending` 은 다음 커밋에서 해시로.
+갱신: 2026-09-14 17:55 (**사용자 요청으로 여기서 중단.** U2 GeminiJudge 커밋 완료(해시는 journal 마지막 COMMIT 줄). **U3 는 시작하지 않았다** — 다음 세션이 L-004 승인부터)
+active: **P3-llm-providers** | frozen: none | 브랜치: dev = c01381d(origin/dev = 5a1bcbe, 미푸시 3), main = 0e3447a. **진행 중: 없음**(U1 c01381d·U2 커밋됨, 미푸시 4). **재개 절차(새 세션)**: `/devlog resume` → 미커밋(HANDOFF·journal 뿐이어야 함) 확인 → (1) AskUserQuestion 으로 **U3 위임 승인**(L-004) → `bash .claude/hooks/approve-commit.sh --stage backend-agent` → backend-agent 1회(아래 'U3 위임 프롬프트' 항목 그대로) → (2) 결과 검토(`git diff --name-only -- app/` 0줄, evidence, R-1(c) 삭제 함수) → 03-log U3 항목(+U2 항목 `pending`→해시) → HANDOFF → 커밋 초안 → 승인 → `/commit` → (3) U4 위임(L-004) → `/devlog done`(verifier 04-review).
 
 ## 지금 어디까지
-- **U1 완료(미커밋)** — `JUDGES` 단일 표(anthropic·openai·gemini 자리표시 `_gemini_reserved`)·`enabled_providers(env)`(R-4)·`select_provider(env)`(유일한 거부 자리, U3 가 import)·`judge_from_env` 2단계, `LLM_PROVIDER="openai"`·`LLM_PROVIDERS_ENABLED_DEFAULT` 단일 출처, `.env.example` 이름만, 테스트 신규 11 + R-1(a)(d) 개명 2. **계획 밖**: `tests/test_er_smoke.py` 기존 2건 setenv 키 이름(같은 원인) → 소견 F-7afd7f(해소, 04-review 대조 목록 포함). evidence 11개: `app/` diff 2줄, tools_check 7/7, 전체 DB 미연결 641/232 skip → 사용자 Docker 기동 후 재실행 **873 passed / 0 failed / 0 skipped**(`20260914-1655-u1-pytest-full-db.txt`).
+- **U2 완료(커밋됨)** — `GeminiJudge`(google-genai 2.23.0 핀, `GEMINI_MODEL` 미설정 `InvalidValue`, 키 인자 미전달, 지연 import), `_to_gemini_schema`(`JUDGEMENT_SCHEMA` 불변, 배열도 변환 — U3 재사용), `call_with_gemini_error_mapping`(어휘 6종, timeout·connection 만 1회 재시도 — `HttpOptions.retry_options` 는 429/5xx 도 재시도해 미채택, 판단 근거 evidence). 실측 evidence 6(errors 클래스 `APIError`/`ClientError`/`ServerError`, Schema 필드 nullable·min·max·items 존재 → 멈추지 않음, `Client()` 키 없음 `ValueError`). 전체 896 passed/0 skip, `app/` diff 1줄, 삭제 테스트 1개(R-1(b)).
+- **U1 완료(c01381d)** — `JUDGES` 단일 표(anthropic·openai·gemini 자리표시 `_gemini_reserved`)·`enabled_providers(env)`(R-4)·`select_provider(env)`(유일한 거부 자리, U3 가 import)·`judge_from_env` 2단계, `LLM_PROVIDER="openai"`·`LLM_PROVIDERS_ENABLED_DEFAULT` 단일 출처, `.env.example` 이름만, 테스트 신규 11 + R-1(a)(d) 개명 2. **계획 밖**: `tests/test_er_smoke.py` 기존 2건 setenv 키 이름(같은 원인) → 소견 F-7afd7f(해소, 04-review 대조 목록 포함). evidence 11개: `app/` diff 2줄, tools_check 7/7, 전체 DB 미연결 641/232 skip → 사용자 Docker 기동 후 재실행 **873 passed / 0 failed / 0 skipped**(`20260914-1655-u1-pytest-full-db.txt`).
 - **계획 승인(2026-09-14)** — verifier 02-plan-verify 통과(FAIL 0/WARN 11 의도), 권고 R-1~R-9. D11 카드(등록표·스위치·기본 openai). 05-remediation 열림 9(registry 의도된 WARN, 04-review §5), 해소 3(F-81e3e5·F-11fbee·F-7afd7f).
-- **U2 위임 프롬프트에 넣을 것**: 01-plan U2(49행)·82~96행(오류 매핑 표)·124행(변환 불가 시 멈춤)·결정 3(`GEMINI_MODEL` 기본 없음→`InvalidValue`)·4(어휘 6종 재사용)·5(`requirements.txt` 핀 `google-genai==<pip show 실측>`), D11 (d)(e), **R-6 실측 evidence 3건 먼저**(`pip show google-genai`, `google.genai.errors` 대문자 이름, `types.Schema.model_fields`; nullable integer·`s_llm` 0~1 표현 불가면 멈추고 보고), R-2(`GEMINI_API_KEY` 미설정 `genai.Client()` 예외 클래스명 evidence, 더미 키 규약), R-1(b) `test_judge_from_env_gemini_is_reserved_not_implemented` 삭제·대체(gemini 양성 + `GEMINI_MODEL` 미설정 `InvalidValue`), `_gemini_reserved` → `GeminiJudge`, 스텁으로 호출 횟수·재시도 단언, `RESOLUTION_SCHEMA` 도 같은 변환기(U3 가 재사용). `app/` 수정은 `judge.py`(+`requirements.txt`)뿐. HANDOFF·journal·registry 손대지 말 것.
+- **U3 위임 프롬프트에 넣을 것**: 01-plan U3(50행)·판정 표 '두 진입점이 같은 표'(`llm_single.CALLERS.keys() == judge.JUDGES.keys()`), D11 (b) `caller_from_env()` 는 표·스위치를 `judge.py` 에서 import(자체 표 금지), R-5(`grep -c 'InvalidValue(' evaluation/resolvers/llm_single.py` 의 `caller_from_env` 본문 0, `CALLERS` 키 리터럴 재기입 금지 — `JUDGES` 키 순회 또는 동일성 테스트), R-1(c) `tests/test_baseline_llm_single.py:334` parametrize `['gemini','llama']` → gemini 양성 이동·llama 만, R-6 `RESOLUTION_SCHEMA` 도 `_to_gemini_schema` 재사용(두 번째 변환기 금지), `call_with_gemini_error_mapping` 재사용(`llm.error` 어휘 5방식 동일, 결정 J), `app/` 무수정(`git diff --name-only -- app/` 0줄), `evaluation/__init__.py` 의존 방향(evaluation→app 만), evidence `<ts>-u3-*.txt`, parity 46 통과. HANDOFF·journal·registry 금지.
+- (U2 위임 항목 — 완료, 참고만): 01-plan U2(49행)·82~96행(오류 매핑 표)·124행(변환 불가 시 멈춤)·결정 3(`GEMINI_MODEL` 기본 없음→`InvalidValue`)·4(어휘 6종 재사용)·5(`requirements.txt` 핀 `google-genai==<pip show 실측>`), D11 (d)(e), **R-6 실측 evidence 3건 먼저**(`pip show google-genai`, `google.genai.errors` 대문자 이름, `types.Schema.model_fields`; nullable integer·`s_llm` 0~1 표현 불가면 멈추고 보고), R-2(`GEMINI_API_KEY` 미설정 `genai.Client()` 예외 클래스명 evidence, 더미 키 규약), R-1(b) `test_judge_from_env_gemini_is_reserved_not_implemented` 삭제·대체(gemini 양성 + `GEMINI_MODEL` 미설정 `InvalidValue`), `_gemini_reserved` → `GeminiJudge`, 스텁으로 호출 횟수·재시도 단언, `RESOLUTION_SCHEMA` 도 같은 변환기(U3 가 재사용). `app/` 수정은 `judge.py`(+`requirements.txt`)뿐. HANDOFF·journal·registry 손대지 말 것.
 - **P3-baselines·P1-pilot-dataset·P3-er 완료** — P4 인계: `packages/P3-baselines/04-review.md` §7 15항, `packages/P1-pilot-dataset/04-review.md` §7 13항. P4 01-plan 초안 701fb8d — P3-llm-providers 04-review 완료 해시를 P4 01-plan 5행에 채운 뒤 P4 02-plan-verify.
 - 이전 패키지 열린 소견: P3-er F-87c597 R4 실호출(스모크 03), F-46f1eb, F-036185, F-251dc2·F-bdd6c5(P4). P2 F-4d2507·F-4d8d96(P5), F-c7078e.
-- 로컬 DB: capstone2-postgres-1 호스트 5433(Docker Desktop 필요 — 2026-09-14 16:55 켜짐), 명령 앞 `POSTGRES_PORT=5433`, pytest `-rs`, 한글 출력 `PYTHONIOENCODING=utf-8`. 설치: anthropic 1.4.0·openai 2.33.0, `google-genai` 미설치(U2 R-6).
+- 로컬 DB: capstone2-postgres-1 호스트 5433(Docker Desktop 필요 — 2026-09-14 16:55 켜짐), 명령 앞 `POSTGRES_PORT=5433`, pytest `-rs`, 한글 출력 `PYTHONIOENCODING=utf-8`. 설치: anthropic 1.4.0·openai 2.33.0, google-genai 2.23.0(U2 핀).
 
 ## 바로 다음에 할 것 (순서대로)
-1. **U1 커밋**(승인됨) → 마커 → 명시 경로 add → `git commit -F`.
-2. **U2 위임**(L-004 승인됨 2026-09-14) → `approve-commit.sh --stage backend-agent` → backend-agent 1회(위 항목) → 검토 → `/commit`(Refs D11).
+1. **U3 위임**(L-004 AskUserQuestion) → `approve-commit.sh --stage backend-agent` → 1회(위 'U3 위임 프롬프트' 항목) → 검토 → `/commit`(03-log U2 항목 `pending`→해시 포함).
 3. U3(`GeminiSingleCaller`, `select_provider`·`JUDGES` import, `CALLERS` 키 = `JUDGES` 키 단언, R-1(c) parametrize) → U4(문서·R-7 gemini 키 행·R-8 registry 비고·R-9(e) user-setup 01·전건 evidence) → `/devlog done`(verifier 04-review, R-9(b) "실호출 검증 공급자 0/3"). 그 다음 `git push origin dev` → L-003 → P4 02-plan-verify.
 4. 보류: 사용자 스모크 03·08(gemini 포함) 카드, P0-cost, F-46f1eb·F-036185, 하네스 L-nnn(`verify-impl.sh` 포트).
 
@@ -28,7 +29,7 @@ active: **P3-llm-providers** | frozen: none | 브랜치: dev = 025a7c4(origin/de
 - `lessons/L-001`~`L-004`
 
 ## 열린 질문 · 사용자 결정 대기
-- 없음(U1 커밋·U2 위임 승인됨). Docker Desktop 현재 켜짐.
+- U3 위임 승인(L-004) — 다음 세션 첫 질문. Docker Desktop 은 2026-09-14 켜져 있었음(재개 시 `docker ps` 로 확인, 꺼져 있으면 사용자에게 요청). google-genai 2.23.0 설치됨.
 - 하네스 L-nnn 후보: `verify-impl.sh` 포트 전달.
 
 ## 주의 (다음 세션이 실수하기 쉬운 것)

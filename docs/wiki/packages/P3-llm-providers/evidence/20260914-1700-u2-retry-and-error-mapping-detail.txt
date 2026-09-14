@@ -1,0 +1,52 @@
+$ python -c "import google.genai.errors as e; import inspect; print(inspect.getsource(e.APIError.raise_error))"
+  @classmethod
+  def raise_error(cls, status_code, response_json, response):
+    """Raises an appropriate APIError subclass based on the status code.
+    Raises:
+      ClientError: If the status code is in the 4xx range.
+      ServerError: If the status code is in the 5xx range.
+      APIError: For other error status codes.
+    """
+    if 400 <= status_code < 500:
+      raise ClientError(status_code, response_json, response)
+    elif 500 <= status_code < 600:
+      raise ServerError(status_code, response_json, response)
+    else:
+      raise cls(status_code, response_json, response)
+
+-- APIError.code:int is the HTTP status code (ClientError/ServerError subclass APIError, no
+   separate RateLimitError class exists in this SDK version 2.23.0). 429 surfaces as
+   ClientError(code=429, ...).
+
+$ python -c "import google.genai._api_client as ac; import inspect; print(inspect.getsource(ac.retry_args))"
+def retry_args(options):
+  if options is None:
+    return {'stop': tenacity.stop_after_attempt(1), 'reraise': True}   # <-- default Client(): NO retry at all
+  if options.attempts == 0:
+    options.attempts = 1
+  stop = tenacity.stop_after_attempt(options.attempts or _RETRY_ATTEMPTS)  # _RETRY_ATTEMPTS=5 if attempts unset
+  retriable_codes = options.http_status_codes or _RETRY_HTTP_STATUS_CODES  # default (408,429,500,502,503,504)
+  retry = tenacity.retry_if_exception(
+      lambda e: (isinstance(e, errors.APIError) and e.code in retriable_codes)
+      or isinstance(e, _HTTPX_TRANSIENT_EXC))
+  ...
+
+-- _HTTPX_TRANSIENT_EXC = (httpx.TimeoutException, httpx.ConnectError[, httpx2 equivalents])
+-- Conclusion (judgement, not guess): HttpOptions.retry_options EXISTS as a field, but its
+   granularity does not match this project's error vocabulary: passing retry_options=HttpRetryOptions(attempts=2)
+   would ALSO retry ClientError(429)=rate_limit and ServerError(5xx)=api_error (both are in the
+   default retriable_codes list, and http_status_codes=() is falsy so it cannot be narrowed to
+   "timeout/connection only" via this field -- an empty tuple falls back to the default list).
+   The task's literal test requirement ("timeout -> 2 calls, api_error -> 1 call, no retry") is
+   therefore NOT expressible with the SDK's built-in retry_options. Per 01-plan 96 line ("google-genai
+   에 동등한 설정이 없으면 판정기 안에 1회만 재시도하는 최소 루프"), this counts as "no equivalent
+   setting" for our timeout/connection-only policy, so U2 implements the manual 1-retry loop
+   (call_with_gemini_error_mapping), matching ClaudeJudge/OpenAIJudge's semantics of "1 retry only",
+   restricted to timeout/connection per the oru vocabulary table (01-plan 82-96행).
+-- Without retry_options set (our judge does not pass retry_options to HttpOptions), a network
+   timeout/connect failure propagates as the raw httpx.TimeoutException/httpx.ConnectError (or the
+   httpx2 equivalents already vendored alongside anthropic in this repo) -- NOT wrapped into APIError.
+   This confirms the manual mapping helper must catch (TimeoutError, httpx.TimeoutException,
+   httpx2.TimeoutException) for "timeout" and (ConnectionError, httpx.ConnectError, httpx2.ConnectError)
+   for "connection", in addition to errors.ClientError/errors.ServerError/errors.APIError for
+   rate_limit/api_error.

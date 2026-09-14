@@ -1,0 +1,4 @@
+$ python -c "from google.genai import types; import inspect; print([n for n in dir(types.HttpOptions) if not n.startswith(\"_\")])"
+['construct', 'copy', 'dict', 'from_orm', 'json', 'model_computed_fields', 'model_config', 'model_construct', 'model_copy', 'model_dump', 'model_dump_json', 'model_extra', 'model_fields', 'model_fields_set', 'model_json_schema', 'model_parametrized_name', 'model_post_init', 'model_rebuild', 'model_validate', 'model_validate_json', 'model_validate_strings', 'parse_file', 'parse_obj', 'parse_raw', 'schema', 'schema_json', 'to_json_dict', 'update_forward_refs', 'validate']
+---model_fields---
+['aiohttp_client', 'api_version', 'async_client_args', 'base_url', 'base_url_resource_scope', 'client_args', 'extra_body', 'headers', 'httpx_async_client', 'httpx_client', 'retry_options', 'timeout']

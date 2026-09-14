@@ -23,9 +23,10 @@ LLM 판정기를 Anthropic 하나에 묶지 않는다 -- **공급자 중립 핵�
   요청 조립만 SDK 마다 다르다(도구 스키마를 감싸는 바깥 모양이 다를 뿐
   `JUDGEMENT_SCHEMA` 자체는 같다).
 - **팩토리** `judge_from_env(env=None)`: `LLM_PROVIDER`(기본 `openai`,
-  D11 결정 2)로 등록표 `JUDGES` 에서 고른다. `gemini` 는 새 의존성
-  (`google-genai`)이 필요해 이번에 구현하지 않고, 사람이 읽는
-  `InvalidValue` 로 예약만 한다(U2 에서 `GeminiJudge` 로 교체).
+  D11 결정 2)로 등록표 `JUDGES` 에서 고른다. `gemini` 는 `GeminiJudge`
+  (P3-llm-providers U2, `google-genai` SDK)로 구현되어 있다 --
+  `GEMINI_MODEL` 기본값은 두지 않는다(D11 결정 3, 미설정 시
+  `InvalidValue`).
 
 ## 등록표·활성 스위치 (P3-llm-providers U1, D11)
 
@@ -60,6 +61,29 @@ trace·예외 메시지에 넣지 않는다(security.md §1). `.env` 는 읽지 
 `JudgeUnavailable(error="out_of_range_id")` 로 바꿔, `llm.error` 에
 API 장애와 구분되는 이름이 남게 한다. 모든 구현이 이 **같은 함수**를
 공유해 검증 로직의 이중 출처를 막는다.
+
+## Gemini 전용 (P3-llm-providers U2, D11, R-6 실측)
+
+`google-genai`(2.23.0, R-6 evidence)는 Anthropic·OpenAI 와 예외 계층이
+다르다 -- `errors.ClientError`/`errors.ServerError`(둘 다
+`errors.APIError` 의 서브클래스, `.code` 가 HTTP 상태 코드)만 있고 별도
+`RateLimitError`/`APITimeoutError` 클래스가 없다. 그래서 기존
+`call_with_error_mapping`(모듈 덕타이핑 -- anthropic·openai 가 우연히
+같은 이름을 쓴다)은 **고치지 않고**, 같은 어휘 6종을 내는
+`call_with_gemini_error_mapping()` 을 따로 둔다. timeout·connection 은
+SDK 가 감싸지 않고 `httpx`/`httpx2` 의 `TimeoutException`/`ConnectError`
+를 그대로 던지며(R-6 evidence), `HttpOptions.retry_options` 는 기본으로
+재시도가 없고 켜더라도 429/5xx 까지 함께 재시도하게 되어 "timeout·
+connection 에만" 이라는 이 프로젝트의 어휘별 재시도 정책과 맞지 않는다
+-- 그래서 이 헬퍼 안에 **1회만** 재시도하는 최소 루프를 둔다(재시도
+횟수를 늘리지 않는다, 01-plan 96행).
+
+`_to_gemini_schema(schema)` 는 `JUDGEMENT_SCHEMA`(및 U3 의
+`RESOLUTION_SCHEMA`)의 JSON Schema 부분집합을 `response_schema` 가 받는
+딕셔너리로 변환한다 -- `"type": [..., "null"]` 을 `nullable=True` + 단일
+타입으로, JSON Schema 타입 이름을 Gemini `Type` 대문자 이름으로 바꾼다.
+`JUDGEMENT_SCHEMA` 객체 자체는 절대 바꾸지 않는다(항상 새 딕셔너리를
+만든다) -- R-6 이 요구하는 "원 스키마 불변" 을 이 함수 하나가 담당한다.
 """
 
 from __future__ import annotations
@@ -455,31 +479,262 @@ class FakeJudge:
         )
 
 
-def _gemini_reserved() -> Judge:
-    """`JUDGES["gemini"]` 의 U1 자리표시 팩토리(D11 결정 6, U2 에서
-    `GeminiJudge` 로 교체된다). 키 값·프롬프트를 넣지 않는 사람이 읽는
-    `InvalidValue` 로 예약만 한다(우회 구현 금지, 원칙8) -- 이 함수는
-    `select_provider()` 가 `gemini` 를 허용(표에 있고 활성)한 **뒤에만**
-    호출되므로, 여기 도달했다는 것은 이름·활성 여부가 아니라 구현 자체가
-    없다는 뜻이다."""
+# ---------------------------------------------------------------------------
+# Gemini 전용 절 (P3-llm-providers U2, D11) -- 이 절 밖의 공유 자산
+# (JUDGEMENT_SCHEMA·build_prompt·validate_judgement·call_with_error_mapping)
+# 은 이 절에서 읽기만 한다. `_to_gemini_schema`/`call_with_gemini_error_mapping`
+# 은 U3(`llm_single.py` 의 Gemini caller)가 그대로 import 해 재사용한다
+# (두 번째 변환기·두 번째 매핑 헬퍼를 만들지 않는다, R-6).
+# ---------------------------------------------------------------------------
 
-    from app.tools.types import InvalidValue
+#: JSON Schema 타입 이름 -> Gemini `types.Schema.type` 이 받는 대문자
+#: 이름(R-6 실측, `types.Type` enum 값과 동일한 문자열). 실측하지 않은
+#: 이름을 추측으로 늘리지 않는다(원칙8) -- 이 프로젝트의 스키마(
+#: `JUDGEMENT_SCHEMA`·U3 `RESOLUTION_SCHEMA`)가 실제로 쓰는 6개뿐이다.
+_JSON_TYPE_TO_GEMINI: dict[str, str] = {
+    "object": "OBJECT",
+    "array": "ARRAY",
+    "string": "STRING",
+    "number": "NUMBER",
+    "integer": "INTEGER",
+    "boolean": "BOOLEAN",
+    "null": "NULL",
+}
 
-    raise InvalidValue(
-        "gemini 판정기는 아직 구현되지 않았다 — U2 에서 GeminiJudge 로 구현 "
-        "예정(google-genai 의존성 필요, 현재는 예약된 이름)"
+
+def _to_gemini_schema(schema: dict[str, Any]) -> dict[str, Any]:
+    """`JUDGEMENT_SCHEMA` 부분집합(및 U3 `RESOLUTION_SCHEMA`)을 Gemini
+    `response_schema` 가 받는 딕셔너리로 변환한다(R-6). **입력을 제자리
+    수정하지 않고 항상 새 딕셔너리를 만든다** -- `JUDGEMENT_SCHEMA` 객체는
+    세 공급자 공유 자산이라 이 함수가 절대 바꾸지 않는다.
+
+    - `"type": [..., "null"]`(nullable 유니온, 예 `matched_person_id`) ->
+      남은 단일 타입을 `type`(대문자)으로, `nullable=True` 를 덧붙인다
+      (01-plan 124행 "nullable integer" 표현 -- R-6 실측으로
+      `types.Schema` 에 `nullable` 필드가 있어 표현 가능함을 확인했다).
+    - `"type": "integer"|"string"|"number"|"boolean"|"array"|"object"` ->
+      `_JSON_TYPE_TO_GEMINI` 로 대문자 이름 하나.
+    - `properties` -> 각 값을 재귀 변환. `items` -> 재귀 변환(U3 의
+      `candidate_person_ids: {"type":"array","items":{"type":"integer"}}`
+      대비 -- 두 번째 변환기를 만들지 않는다).
+    - `required`/`minimum`/`maximum`/`enum`/`description` -> 그대로
+      옮긴다(`s_llm` 의 `minimum`/`maximum` 0~1 이 이 경로로 유지된다).
+    - `additionalProperties` -> 같은 camelCase 키로 그대로 전달한다
+      (`google.genai.types.Schema` 가 pydantic alias 로 받는다).
+    """
+
+    if not isinstance(schema, dict):
+        return schema
+
+    result: dict[str, Any] = {}
+
+    json_type = schema.get("type")
+    nullable = False
+    if isinstance(json_type, list):
+        remaining = [t for t in json_type if t != "null"]
+        nullable = "null" in json_type
+        json_type = remaining[0] if remaining else None
+
+    if json_type is not None:
+        result["type"] = _JSON_TYPE_TO_GEMINI[json_type]
+    if nullable:
+        result["nullable"] = True
+
+    if "properties" in schema:
+        result["properties"] = {
+            key: _to_gemini_schema(value) for key, value in schema["properties"].items()
+        }
+    if "items" in schema:
+        result["items"] = _to_gemini_schema(schema["items"])
+    if "required" in schema:
+        result["required"] = list(schema["required"])
+    if "minimum" in schema:
+        result["minimum"] = schema["minimum"]
+    if "maximum" in schema:
+        result["maximum"] = schema["maximum"]
+    if "enum" in schema:
+        result["enum"] = list(schema["enum"])
+    if "description" in schema:
+        result["description"] = schema["description"]
+    if "additionalProperties" in schema:
+        result["additionalProperties"] = schema["additionalProperties"]
+
+    return result
+
+
+def call_with_gemini_error_mapping(fn: Callable[[], Any]) -> Any:
+    """Gemini 전용 오류 매핑 + **1회만** 재시도(모듈 docstring "Gemini
+    전용" 절, R-6). 기존 `call_with_error_mapping`(anthropic·openai
+    덕타이핑)은 고치지 않는다(원칙4 -- 두 공급자의 회귀 위험).
+
+    - `errors.ClientError`(4xx, `.code`) 중 429 -> `rate_limit`. 그 밖
+      `ClientError`/`ServerError`(5xx)/`APIError`(그 밖 코드) -> `api_error`.
+      **재시도하지 않는다**(호출 1회) -- Claude/OpenAI 의 `max_retries` 는
+      429/5xx 도 재시도하지만, 이 프로젝트의 6종 어휘 계약은 재시도
+      여부를 어휘가 아니라 두 공급자 SDK 설정에 위임했을 뿐이므로 이
+      비대칭은 Gemini 쪽 설계 선택이다 -- **timeout·connection 에만**
+      재시도한다(01-plan 96행, 아래).
+    - `httpx.TimeoutException`/`httpx2.TimeoutException`(+ 표준
+      `TimeoutError`, 방어적)-> **1회 재시도 후에도 실패하면** `timeout`
+      (호출 2회 한도).
+    - `httpx.ConnectError`/`httpx2.ConnectError`(+ 표준 `ConnectionError`,
+      방어적) -> **1회 재시도 후에도 실패하면** `connection`(호출 2회
+      한도).
+
+    google-genai 의 `HttpOptions.retry_options` 는 기본으로 재시도가
+    없고(R-6 실측 `_api_client.retry_args` -- `options is None` 이면
+    `stop_after_attempt(1)`), 켜더라도 429/5xx 를 포함한 상태 코드
+    기준으로 재시도해 "timeout·connection 에만" 이라는 이 어휘의 재시도
+    정책을 표현할 수 없다(빈 `http_status_codes=()` 는 falsy 라 기본
+    목록으로 되돌아간다) -- 그래서 이 함수 안에 최소 재시도 루프를 둔다.
+    """
+
+    from google.genai import errors as genai_errors
+    import httpx
+    import httpx2
+
+    timeout_exc: tuple[type[BaseException], ...] = (
+        httpx.TimeoutException,
+        httpx2.TimeoutException,
+        TimeoutError,
     )
+    connection_exc: tuple[type[BaseException], ...] = (
+        httpx.ConnectError,
+        httpx2.ConnectError,
+        ConnectionError,
+    )
+
+    for attempt in (1, 2):
+        try:
+            return fn()
+        except genai_errors.ClientError as exc:
+            if exc.code == 429:
+                raise JudgeUnavailable("rate_limit") from exc
+            raise JudgeUnavailable("api_error") from exc
+        except genai_errors.ServerError as exc:
+            raise JudgeUnavailable("api_error") from exc
+        except genai_errors.APIError as exc:
+            raise JudgeUnavailable("api_error") from exc
+        except timeout_exc as exc:
+            if attempt == 2:
+                raise JudgeUnavailable("timeout") from exc
+        except connection_exc as exc:
+            if attempt == 2:
+                raise JudgeUnavailable("connection") from exc
+
+    raise AssertionError("unreachable -- loop always returns or raises")
+
+
+@dataclass
+class GeminiJudge:
+    """`google-genai` SDK 로 3단계 LLM 판정을 수행한다(D11, P3-llm-providers
+    U2).
+
+    `model` 기본값은 **두지 않는다**(D11 결정 3) -- **생성 시점**에
+    `os.environ.get("GEMINI_MODEL")` 을 읽고, 없으면
+    `app.tools.types.InvalidValue` 로 거부한다(`ClaudeJudge`/`OpenAIJudge`
+    와 같은 "생성 시점에 읽는다" 규약이나, 이름을 추측으로 박지 않는다는
+    점이 다르다 -- 콘솔에서 확인한 모델 이름을 `.env` 의 `GEMINI_MODEL` 에
+    넣게 한다).
+
+    `client` 가 `None` 이면 `google.genai` 를 지연 import 해
+    `genai.Client(http_options=types.HttpOptions(timeout=...))` 를
+    만든다 -- 키는 인자로 넘기지 않고 SDK 가 `GEMINI_API_KEY`(또는
+    `GOOGLE_API_KEY`)를 환경변수에서 읽는다(security.md §1). R-2 실측 --
+    키가 없으면 `genai.Client()` 자체가 `ValueError`("No API key was
+    provided...", 키 값 없음)를 낸다. 테스트는 `client` 자리에 스텁을
+    주입해 네트워크 없이 돈다.
+
+    이 SDK 에는 `max_retries` 같은 "이 어휘에만 재시도" 설정이 없다(R-6) --
+    재시도는 `call_with_gemini_error_mapping()` 안에서 한다.
+    """
+
+    model: str | None = None
+    client: Any = None
+    timeout: float = 20.0
+
+    def __post_init__(self) -> None:
+        if self.model is None:
+            model = os.environ.get("GEMINI_MODEL")
+            if not model:
+                from app.tools.types import InvalidValue
+
+                raise InvalidValue(
+                    "GeminiJudge: GEMINI_MODEL 환경변수가 필요하다(기본값 "
+                    "없음 -- D11 결정 3). Google AI 콘솔에서 확인한 모델 "
+                    "이름을 .env 의 GEMINI_MODEL 에 넣는다"
+                )
+            self.model = model
+        if self.client is None:
+            from google import genai  # 지연 import -- 키·SDK 없이도 app 임포트가 깨지지 않게.
+            from google.genai import types as genai_types
+
+            self.client = genai.Client(
+                http_options=genai_types.HttpOptions(timeout=int(self.timeout * 1000))
+            )
+
+    def judge(
+        self, mention: str, utterance: str, candidates: list[ScoredCandidate]
+    ) -> Judgement:
+        from google.genai import types as genai_types  # 요청 조립용 지연 import.
+
+        system, user_text = build_prompt(mention, utterance, candidates)
+        allowed_ids = {c.person_id for c in candidates}
+
+        config = genai_types.GenerateContentConfig(
+            system_instruction=system,
+            temperature=0,
+            response_mime_type="application/json",
+            response_schema=_to_gemini_schema(JUDGEMENT_SCHEMA),
+        )
+
+        response = call_with_gemini_error_mapping(
+            lambda: self.client.models.generate_content(
+                model=self.model,
+                contents=user_text,
+                config=config,
+            )
+        )
+
+        text = getattr(response, "text", None)
+        if not text:
+            # 후보 블록 없음 · 안전 필터로 본문 없음 -- 둘 다 "스키마대로
+            # 된 판정을 못 받았다" 는 점에서 같다(D11 결정 4, 어휘를
+            # 늘리지 않는다).
+            raise JudgeUnavailable("schema")
+
+        try:
+            raw = json.loads(text)
+        except (TypeError, ValueError) as exc:
+            raise JudgeUnavailable("schema") from exc
+
+        judgement = validate_judgement(raw, allowed_ids)
+
+        usage = getattr(response, "usage_metadata", None)
+        tokens_in = getattr(usage, "prompt_token_count", 0) if usage is not None else 0
+        tokens_out = getattr(usage, "candidates_token_count", 0) if usage is not None else 0
+        model_used = getattr(response, "model_version", None) or self.model
+
+        return Judgement(
+            matched_person_id=judgement.matched_person_id,
+            s_llm=judgement.s_llm,
+            reason=judgement.reason,
+            tokens_in=tokens_in or 0,
+            tokens_out=tokens_out or 0,
+            model=model_used,
+            provider="gemini",
+        )
 
 
 #: 이름 -> 무인자 팩토리의 **유일한** 등록표(D11 "코드에서 지켜야 할 것",
 #: R-5 -- `grep -c "^JUDGES" app/er/judge.py` = 1). `ClaudeJudge`/
-#: `OpenAIJudge` 는 dataclass 라 클래스 자체가 무인자 호출 가능한 팩토리다.
-#: `FakeJudge` 는 여기 없다(테스트 전용 -- 환경변수로 실제 판정기를 가짜로
-#: 바꿀 수 있으면 원칙8·원칙9 의 근거가 무의미해진다).
+#: `OpenAIJudge`/`GeminiJudge` 는 dataclass 라 클래스 자체가 무인자 호출
+#: 가능한 팩토리다. `FakeJudge` 는 여기 없다(테스트 전용 -- 환경변수로
+#: 실제 판정기를 가짜로 바꿀 수 있으면 원칙8·원칙9 의 근거가 무의미해진다).
 JUDGES: dict[str, Callable[[], Judge]] = {
     "anthropic": ClaudeJudge,
     "openai": OpenAIJudge,
-    "gemini": _gemini_reserved,
+    "gemini": GeminiJudge,
 }
 
 

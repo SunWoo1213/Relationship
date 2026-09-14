@@ -1,0 +1,2 @@
+$ python -c "import google.genai.errors as e; print([n for n in dir(e) if n[0].isupper()])"
+['APIError', 'Any', 'Callable', 'ClientError', 'ExperimentalWarning', 'FunctionInvocationError', 'Optional', 'ServerError', 'TYPE_CHECKING', 'Union', 'UnknownApiResponseError', 'UnknownFunctionCallArgumentError', 'UnsupportedFunctionError']

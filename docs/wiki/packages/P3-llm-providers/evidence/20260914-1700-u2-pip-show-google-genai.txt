@@ -1,0 +1,11 @@
+$ python -m pip show google-genai
+Name: google-genai
+Version: 2.23.0
+Summary: GenAI Python SDK
+Home-page: https://github.com/googleapis/python-genai
+Author: 
+Author-email: Google LLC <googleapis-packages@google.com>
+License-Expression: Apache-2.0
+Location: C:\Users\swsj1\AppData\Roaming\Python\Python313\site-packages
+Requires: anyio, distro, google-auth, httpx, pydantic, requests, sniffio, tenacity, typing-extensions, websockets
+Required-by: 

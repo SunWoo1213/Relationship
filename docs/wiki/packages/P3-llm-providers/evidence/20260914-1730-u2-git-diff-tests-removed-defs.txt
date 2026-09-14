@@ -1,0 +1,2 @@
+$ git diff -- tests/test_er_judge.py | grep "^-def\|^-    def"
+-def test_judge_from_env_gemini_is_reserved_not_implemented():

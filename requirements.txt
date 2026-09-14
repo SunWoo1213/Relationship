@@ -12,3 +12,7 @@ httpx==0.28.1  # TestClient 용 (런타임에는 쓰지 않음, Starlette TestCl
 # import(app/embedding.py·app/er/judge.py 본문 참고) -- 키·SDK 없이도 임포트 가능.
 openai==2.33.0
 anthropic==1.4.0
+# Refs: P3-llm-providers D11 U2 -- Gemini 판정기(app/er/judge.py
+# GeminiJudge) 런타임 의존성. 지연 import(GeminiJudge.__post_init__/judge
+# 본문 참고) -- 키·SDK 없이도 임포트 가능.
+google-genai==2.23.0

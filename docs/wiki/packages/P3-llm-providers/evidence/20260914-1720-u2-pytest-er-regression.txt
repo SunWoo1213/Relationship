@@ -1,0 +1,4 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_er_judge.py tests/test_er_pipeline.py tests/test_er_smoke.py -q -rs
+........................................................................ [ 72%]
+............................                                             [100%]
+100 passed in 16.43s

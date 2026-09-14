@@ -1,8 +1,10 @@
-"""Refs: P3-er P3-llm-providers S3.3 D3 D4 D5 D11 R4 결정3 결정3-c F-5a97ef
--- U5 3단계(LLM 판정) 테스트 + U1 등록표·활성 스위치 테스트.
+"""Refs: P3-er P3-llm-providers S3.3 D3 D4 D5 D11 R4 R-6 결정3 결정3-c
+F-5a97ef -- U5 3단계(LLM 판정) 테스트 + U1 등록표·활성 스위치 테스트 + U2
+`GeminiJudge` 테스트.
 
-네트워크 호출 없음(원칙8) -- `ClaudeJudge`/`OpenAIJudge` 는 스텁 클라이언트를
-주입해 검증하고, 실 API 스모크는 `scripts/er_smoke.py`(U8)가 따로 한다.
+네트워크 호출 없음(원칙8) -- `ClaudeJudge`/`OpenAIJudge`/`GeminiJudge` 는
+스텁 클라이언트를 주입해 검증하고, 실 API 스모크는 `scripts/er_smoke.py`
+(U8)가 따로 한다.
 """
 
 from __future__ import annotations
@@ -17,14 +19,17 @@ import pytest
 
 import anthropic
 import openai
+from google.genai import errors as genai_errors
 
 from app.er.judge import (
     JUDGEMENT_SCHEMA,
     JUDGES,
     ClaudeJudge,
     FakeJudge,
+    GeminiJudge,
     OpenAIJudge,
     TOOL_NAME,
+    _to_gemini_schema,
     build_prompt,
     enabled_providers,
     judge_from_env,
@@ -152,6 +157,44 @@ def _openai_response(matched_person_id, s_llm, reason="확실", *, tokens=(12, 3
         choices=[choice],
         usage=SimpleNamespace(prompt_tokens=tokens[0], completion_tokens=tokens[1]),
         model=model,
+    )
+
+
+class _StubGeminiModels:
+    """`genai.Client().models` 를 흉내 내는 스텁 -- `generate_content()` 만.
+    `queue` 가 주어지면 호출마다 하나씩 소비한다(재시도 횟수 확인용,
+    비면 `response` 를 계속 돌려준다)."""
+
+    def __init__(self, outer: "StubGeminiClient") -> None:
+        self._outer = outer
+
+    def generate_content(self, **kwargs):
+        self._outer.calls.append(kwargs)
+        item = self._outer.queue.pop(0) if self._outer.queue else self._outer.response
+        if isinstance(item, BaseException):
+            raise item
+        return item
+
+
+class StubGeminiClient:
+    """`genai.Client` 를 흉내 내는 스텁 -- `models.generate_content()` 만."""
+
+    def __init__(self, response=None, queue=None) -> None:
+        self.response = response
+        self.queue: list = list(queue) if queue else []
+        self.calls: list[dict] = []
+        self.models = _StubGeminiModels(self)
+
+
+def _gemini_response(matched_person_id, s_llm, reason="확실", *, tokens=(12, 34), model="gemini-test-model"):
+    return SimpleNamespace(
+        text=json.dumps(
+            {"matched_person_id": matched_person_id, "s_llm": s_llm, "reason": reason}
+        ),
+        usage_metadata=SimpleNamespace(
+            prompt_token_count=tokens[0], candidates_token_count=tokens[1]
+        ),
+        model_version=model,
     )
 
 
@@ -418,6 +461,270 @@ def test_openai_judge_maps_connection_error():
 
 
 # ---------------------------------------------------------------------------
+# (f-2) GeminiJudge (P3-llm-providers U2, D11, R-6) -- 네트워크 0, 스텁만
+# ---------------------------------------------------------------------------
+
+
+def test_gemini_judge_request_body_has_schema_temperature_zero_and_mime(monkeypatch):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    client = StubGeminiClient(response=_gemini_response(1, 0.9))
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+
+    judge.judge("부장님", "부장님이 회의를 잡으셨다", CANDIDATES)
+
+    assert len(client.calls) == 1
+    kwargs = client.calls[0]
+    assert kwargs["model"] == "gemini-test-model"
+    assert "김민수" in kwargs["contents"]
+    assert "부장님" in kwargs["contents"]
+
+    config = kwargs["config"]
+    assert config.temperature == 0
+    assert config.response_mime_type == "application/json"
+    assert config.response_schema == _to_gemini_schema(JUDGEMENT_SCHEMA)
+    assert "직장" in config.system_instruction or "직장" in kwargs["contents"]
+
+    body_str = json.dumps(
+        {"contents": kwargs["contents"], "system_instruction": config.system_instruction},
+        default=str,
+        ensure_ascii=False,
+    )
+    assert "GEMINI_API_KEY" not in body_str
+    assert "os.environ" not in body_str
+    assert "api_key" not in body_str.lower()
+
+
+def test_gemini_judge_parses_text_into_judgement():
+    client = StubGeminiClient(response=_gemini_response(2, 0.7, reason="과장 별칭"))
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+
+    result = judge.judge("과장님", "과장님이 오셨다", CANDIDATES)
+
+    assert result.matched_person_id == 2
+    assert result.s_llm == 0.7
+    assert result.reason == "과장 별칭"
+    assert result.tokens_in == 12
+    assert result.tokens_out == 34
+    assert result.model == "gemini-test-model"
+    assert result.provider == "gemini"
+
+
+def test_gemini_judge_s_llm_out_of_range_is_schema_error():
+    client = StubGeminiClient(response=_gemini_response(1, 1.5))
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "schema"
+
+
+def test_gemini_judge_out_of_range_matched_id_is_out_of_range_id():
+    client = StubGeminiClient(response=_gemini_response(999, 0.9))
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "out_of_range_id"
+
+
+def test_gemini_judge_excluded_candidate_id_is_out_of_range_id():
+    client = StubGeminiClient(response=_gemini_response(3, 0.9))
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "out_of_range_id"
+
+
+def test_gemini_judge_text_not_json_is_schema_error():
+    response = SimpleNamespace(text="모르겠다", usage_metadata=None, model_version="gemini-test-model")
+    client = StubGeminiClient(response=response)
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "schema"
+
+
+def test_gemini_judge_no_text_is_schema_error():
+    # 후보 블록 없음 · 안전 필터로 본문 없음 -- 둘 다 response.text 가 None.
+    response = SimpleNamespace(text=None, usage_metadata=None, model_version="gemini-test-model")
+    client = StubGeminiClient(response=response)
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "schema"
+
+
+def test_gemini_judge_empty_text_is_schema_error():
+    response = SimpleNamespace(text="", usage_metadata=None, model_version="gemini-test-model")
+    client = StubGeminiClient(response=response)
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "schema"
+
+
+def test_gemini_judge_maps_rate_limit_error_no_retry():
+    exc = genai_errors.ClientError(429, {"error": {"message": "rate limited"}}, None)
+    client = StubGeminiClient(response=exc)
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "rate_limit"
+    assert len(client.calls) == 1
+
+
+def test_gemini_judge_maps_client_4xx_to_api_error_no_retry():
+    exc = genai_errors.ClientError(400, {"error": {"message": "bad request"}}, None)
+    client = StubGeminiClient(response=exc)
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "api_error"
+    assert len(client.calls) == 1
+
+
+def test_gemini_judge_maps_server_5xx_to_api_error_no_retry():
+    exc = genai_errors.ServerError(500, {"error": {"message": "server error"}}, None)
+    client = StubGeminiClient(response=exc)
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "api_error"
+    assert len(client.calls) == 1
+
+
+def test_gemini_judge_maps_timeout_retries_once_then_raises():
+    client = StubGeminiClient(queue=[httpx.TimeoutException("t1"), httpx.TimeoutException("t2")])
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "timeout"
+    assert len(client.calls) == 2
+
+
+def test_gemini_judge_maps_connection_retries_once_then_raises():
+    client = StubGeminiClient(queue=[httpx.ConnectError("c1"), httpx.ConnectError("c2")])
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        judge.judge("부장님", "u", CANDIDATES)
+    assert str(excinfo.value) == "connection"
+    assert len(client.calls) == 2
+
+
+def test_gemini_judge_timeout_succeeds_on_retry():
+    client = StubGeminiClient(queue=[httpx.TimeoutException("t1"), _gemini_response(1, 0.9)])
+    judge = GeminiJudge(model="gemini-test-model", client=client)
+    result = judge.judge("부장님", "u", CANDIDATES)
+    assert result.matched_person_id == 1
+    assert len(client.calls) == 2
+
+
+def test_gemini_judge_default_model_follows_env(monkeypatch):
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-custom-1")
+    judge = GeminiJudge(client=StubGeminiClient(response=_gemini_response(1, 0.9)))
+    assert judge.model == "gemini-custom-1"
+
+
+def test_gemini_judge_missing_model_env_raises_invalid_value(monkeypatch):
+    from app.tools.types import InvalidValue
+
+    monkeypatch.delenv("GEMINI_MODEL", raising=False)
+    with pytest.raises(InvalidValue):
+        GeminiJudge(client=StubGeminiClient(response=_gemini_response(1, 0.9)))
+
+
+def test_gemini_judge_key_marker_not_in_request_or_output(monkeypatch, capsys):
+    monkeypatch.setenv("GEMINI_API_KEY", _FAKE_KEY_MARKER)
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-test-model")
+
+    client = StubGeminiClient(response=_gemini_response(1, 0.9))
+    # client 를 주입하므로 GEMINI_API_KEY 를 실제로 읽지는 않지만(SDK 가
+    # 감춘 값), 이 테스트는 요청 본문·출력에 마커가 어디에도 없음을
+    # 단언한다(SDK 로 흘러들어가는 경로가 생겨도 잡힌다).
+    judge = GeminiJudge(client=client)
+    judge.judge("부장님", "부장님이 회의를 잡으셨다", CANDIDATES)
+
+    body_str = json.dumps(
+        {"contents": client.calls[0]["contents"]}, default=str, ensure_ascii=False
+    )
+    assert _FAKE_KEY_MARKER not in body_str
+
+    captured = capsys.readouterr()
+    assert _FAKE_KEY_MARKER not in captured.out
+    assert _FAKE_KEY_MARKER not in captured.err
+
+
+def test_module_importable_without_google_genai_installed():
+    # SDK 없이도 `app.er.judge` 임포트 자체는 깨지지 않는다(지연 import
+    # 유지, 판정 표 72행). `sys.modules["google"] = None` 은 import 기계가
+    # 즉시 ImportError 를 내게 만드는 표준 기법이다.
+    #
+    # `importlib.reload()` 는 이 파일이 수집 시점에 `from app.er.judge
+    # import ...` 로 미리 들고 있는 클래스 객체(`OpenAIJudge` 등)를 새
+    # 객체로 바꿔치기해 다른 테스트의 `isinstance` 단언을 깨뜨린다 --
+    # 그래서 원본 모듈 `__dict__` 를 통째로 스냅샷했다가 그대로 복원해,
+    # 이 테스트가 끝나면 다른 테스트가 보는 객체 정체성이 그대로다.
+    import sys
+    import importlib
+
+    import app.er.judge as judge_module
+
+    original_dict = dict(judge_module.__dict__)
+    saved: dict[str, object] = {}
+    for name in list(sys.modules):
+        if name == "google" or name.startswith("google."):
+            saved[name] = sys.modules.pop(name)
+    sys.modules["google"] = None  # type: ignore[assignment]
+
+    try:
+        reloaded = importlib.reload(judge_module)
+        assert "gemini" in reloaded.JUDGES
+        assert reloaded.JUDGES["gemini"] is reloaded.GeminiJudge
+    finally:
+        del sys.modules["google"]
+        sys.modules.update(saved)
+        judge_module.__dict__.clear()
+        judge_module.__dict__.update(original_dict)
+
+
+# ---------------------------------------------------------------------------
+# (f-3) `_to_gemini_schema` 변환 함수 (R-6)
+# ---------------------------------------------------------------------------
+
+
+def test_to_gemini_schema_leaves_judgement_schema_object_unchanged():
+    import copy
+
+    before = copy.deepcopy(JUDGEMENT_SCHEMA)
+    _to_gemini_schema(JUDGEMENT_SCHEMA)
+    assert JUDGEMENT_SCHEMA == before
+
+
+def test_to_gemini_schema_converts_nullable_integer_and_bounded_number():
+    converted = _to_gemini_schema(JUDGEMENT_SCHEMA)
+
+    assert converted["required"] == ["matched_person_id", "s_llm", "reason"]
+    assert converted["additionalProperties"] is False
+
+    matched = converted["properties"]["matched_person_id"]
+    assert matched["type"] == "INTEGER"
+    assert matched["nullable"] is True
+
+    s_llm = converted["properties"]["s_llm"]
+    assert s_llm["type"] == "NUMBER"
+    assert s_llm["minimum"] == 0
+    assert s_llm["maximum"] == 1
+
+    reason = converted["properties"]["reason"]
+    assert reason["type"] == "STRING"
+    assert "nullable" not in reason
+
+
+def test_to_gemini_schema_converts_array_field():
+    # U3 RESOLUTION_SCHEMA 의 candidate_person_ids 꼴 대비.
+    schema = {"type": "array", "items": {"type": "integer"}}
+    assert _to_gemini_schema(schema) == {"type": "ARRAY", "items": {"type": "INTEGER"}}
+
+
+# ---------------------------------------------------------------------------
 # (g) 기본 모델 -- env 를 따른다
 # ---------------------------------------------------------------------------
 
@@ -516,9 +823,25 @@ def test_judge_from_env_openai(monkeypatch):
     assert isinstance(judge, OpenAIJudge)
 
 
-def test_judge_from_env_gemini_is_reserved_not_implemented():
+def test_judge_from_env_gemini_builds_with_model_and_key(monkeypatch):
+    # R-1(b) 대체 -- U2 이후 `gemini` 는 실제 `GeminiJudge` 를 만든다
+    # (생성은 네트워크를 타지 않는다, R-2 -- 더미 키로 `genai.Client()`
+    # 생성까지는 성공하고 `judge()` 호출 시점에만 네트워크를 탄다).
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-test-model")
+    monkeypatch.setenv("GEMINI_API_KEY", _FAKE_KEY_MARKER)
+    judge = judge_from_env(env={"LLM_PROVIDER": "gemini"})
+    assert isinstance(judge, GeminiJudge)
+    assert judge.model == "gemini-test-model"
+
+
+def test_judge_from_env_gemini_missing_model_is_invalid_value(monkeypatch):
+    # D11 결정 3 -- GEMINI_MODEL 기본값 없음, 미설정이면 InvalidValue
+    # (틀린 이유로 통과하던 옛 테스트를 대체 -- 이름·활성 여부가 아니라
+    # 모델 미설정이 원인임을 명시적으로 검증한다).
     from app.tools.types import InvalidValue
 
+    monkeypatch.delenv("GEMINI_MODEL", raising=False)
+    monkeypatch.setenv("GEMINI_API_KEY", _FAKE_KEY_MARKER)
     with pytest.raises(InvalidValue):
         judge_from_env(env={"LLM_PROVIDER": "gemini"})
 
@@ -548,16 +871,19 @@ def test_judges_table_has_exactly_three_keys_no_fake():
 
 
 @pytest.mark.parametrize(
-    "provider, key_name, judge_cls",
+    "provider, key_name, judge_cls, extra_env",
     [
-        ("anthropic", "ANTHROPIC_API_KEY", ClaudeJudge),
-        ("openai", "OPENAI_API_KEY", OpenAIJudge),
+        ("anthropic", "ANTHROPIC_API_KEY", ClaudeJudge, {}),
+        ("openai", "OPENAI_API_KEY", OpenAIJudge, {}),
+        ("gemini", "GEMINI_API_KEY", GeminiJudge, {"GEMINI_MODEL": "gemini-test-model"}),
     ],
 )
 def test_judge_from_env_builds_each_active_provider(
-    monkeypatch, provider, key_name, judge_cls
+    monkeypatch, provider, key_name, judge_cls, extra_env
 ):
     monkeypatch.setenv(key_name, _FAKE_KEY_MARKER)
+    for env_name, env_value in extra_env.items():
+        monkeypatch.setenv(env_name, env_value)
     judge = judge_from_env(env={"LLM_PROVIDER": provider})
     assert isinstance(judge, judge_cls)
 

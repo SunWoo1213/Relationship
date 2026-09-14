@@ -1,0 +1,3 @@
+$ git diff --name-only -- app/
+warning: in the working copy of 'app/er/judge.py', LF will be replaced by CRLF the next time Git touches it
+app/er/judge.py
