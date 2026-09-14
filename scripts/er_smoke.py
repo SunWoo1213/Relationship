@@ -1,7 +1,7 @@
 """Refs: P3-er 01-plan 44행·94행(U8)·결정9 -- 실 LLM 1회 호출 ER 판정 스모크.
 
 `judge_from_env()`(`app/er/judge.py`)로 공급자를 고른다(`LLM_PROVIDER`,
-기본 `anthropic`). **DB 를 쓰지 않는다** -- 후보 2개를 이 스크립트 안에서
+기본 `openai`, D11 결정 2). **DB 를 쓰지 않는다** -- 후보 2개를 이 스크립트 안에서
 직접 `ScoredCandidate` 로 만들고, mention "부장님" · 짧은 발화 하나로
 `judge.judge(...)` 를 1회 호출한다. 자동 테스트(`tests/test_er_smoke.py`)는
 `FakeJudge` 로 `run_smoke()` 만 검증하고 **실제 API 호출은 하지 않는다**

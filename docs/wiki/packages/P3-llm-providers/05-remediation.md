@@ -48,7 +48,7 @@ FAIL  카드 없음: D11 (decisions/D11-*.md)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
 | 1 | `docs/wiki/decisions/D11-llm-provider-registry.md` 신설 + `D03-confidence-formula.md` 파급 상호참조 1줄(메인 세션, 결정 6 (i)) | `ls docs/wiki/decisions/D11-*.md && grep -c "D11" docs/wiki/decisions/D03-confidence-formula.md` | 파일 경로 1줄 + `1` 이상 | 완료(2026-09-11 14:14, `evidence/20260911-1414-verify-plan-2.txt` 4행 PASS) |
-| 2 | 계획 승인 커밋에 D11·D03 diff 를 포함한다(현재 미커밋 — 메인 세션 `/commit`, `git add` 명시 경로) | `git log --oneline --grep D11 -- docs/wiki/decisions/` | 승인 커밋 해시 1줄 | 대기(메인 세션) |
+| 2 | 계획 승인 커밋에 D11·D03 diff 를 포함한다(현재 미커밋 — 메인 세션 `/commit`, `git add` 명시 경로) | `git log --oneline --grep D11 -- docs/wiki/decisions/` | 승인 커밋 해시 1줄 | 완료(025a7c4, 2026-09-14) |
 
 ### 재검증
 - 명령: `PYTHONIOENCODING=utf-8 bash .claude/scripts/verify-plan.sh P3-llm-providers | tee docs/wiki/packages/P3-llm-providers/evidence/20260911-1421-verify-plan-final.txt`
@@ -290,4 +290,34 @@ WARN  registry 에 다른 패키지로 이미 있음: llm_single.py → | 모듈
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
+
+## F-7afd7f · [권고] U1 기존 테스트 변경이 R-1 목록 밖 2건: tests/test_er_smoke.py test_main_success_path_prints_expected_json · test_main_judge_unavailable_returns_3 의 setenv 키 이름
+상태: 해소 | 발견: 2026-09-14 (review) | 해소: 2026-09-14
+
+### 증상 (검증 출력 인용)
+```
+git diff -- tests/test_er_smoke.py | grep "^[-+]" | grep -v "^[-+][-+]"
+-    monkeypatch.setenv("ANTHROPIC_API_KEY", _FAKE_KEY_MARKER)
++    monkeypatch.setenv("OPENAI_API_KEY", _FAKE_KEY_MARKER)   (2곳 — success_path · judge_unavailable)
+(01-plan 127행 "테스트를 고쳐서 통과시키는 일이 있으면 그 자체를 findings 로 올린다"; 02-plan-verify R-1 은 바뀌는 기존 테스트를 4건으로 고정)
+```
+
+### 원인 분석
+- 가설: 두 테스트는 `LLM_PROVIDER` 를 지정하지 않고 기본 공급자의 키(`ANTHROPIC_API_KEY`)만 설정해 `scripts/er_smoke.py` 의 키 사전 확인을 통과시키고 있었다. 결정 2 로 기본이 `openai` 가 되자 필요한 키가 `OPENAI_API_KEY` 로 바뀌어 rc=2 로 깨졌다 — R-1(d) 와 **같은 원인**이며 verifier 가 R-1 작성 시 이 두 함수를 빠뜨렸다(기본 키 이름을 단언하지 않고 setenv 로만 쓰므로 grep 에 안 잡힘).
+- 확인 방법(명령): `git stash`-없이 확인 — `git diff 025a7c4 -- tests/test_er_smoke.py | grep "^[-+]    def\|^[-+]def\|setenv\|delenv"` · `git show 025a7c4:tests/test_er_smoke.py | grep -n "ANTHROPIC_API_KEY"`
+- 확인 결과: U1 직전 파일에서 `ANTHROPIC_API_KEY` 는 세 함수(missing_key·success_path·judge_unavailable)에만 있고, 셋 다 `LLM_PROVIDER` 미지정 = 기본 공급자 의존. 변경은 키 이름 3곳 + 함수 개명 1곳뿐, 단언·검증 로직 무변경(evidence `20260914-1620-u1-git-diff-tests-removed-defs.txt` — 삭제·개명 함수는 R-1(a)(d) 2개뿐).
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | `tests/test_er_smoke.py` 두 함수의 `setenv` 키 이름을 `OPENAI_API_KEY` 로(backend-agent U1, 검증 로직 무변경) | `python -m pytest tests/test_er_smoke.py -q` | 전건 통과 | 완료(evidence `20260914-1620-u1-pytest-er-regression.txt`) |
+| 2 | R-1 의 "네 건" 을 "네 건 + 이 두 건(키 이름만)" 으로 읽는다 — 04-review 의 `git diff <U1 직전>..HEAD -- tests/` 대조 목록에 이 소견을 포함(verifier 몫) | `git diff 025a7c4..HEAD -- tests/test_er_smoke.py \| grep -c "OPENAI_API_KEY"` | `4`(delenv 1 + assert 1 + setenv 2) | 대기(04-review) |
+
+### 재검증
+- 명령: `POSTGRES_PORT=5433 python -m pytest tests/test_er_smoke.py tests/test_er_judge.py -q -rs`
+- 결과 파일(evidence/): `20260914-1620-u1-pytest-er-regression.txt`(실패 0)
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 — D11 결정 2 의 직접 결과. 원칙8(테스트를 고쳐 통과시킨 사실을 숨기지 않음)
 - FIX/CR 로 올려야 하는가: 아니오

@@ -1,0 +1,2 @@
+$ PYTHONIOENCODING=utf-8 python -c "import app.er.judge, evaluation.resolvers.llm_single; print('ok')"
+ok

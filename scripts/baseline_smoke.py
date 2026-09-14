@@ -1,7 +1,7 @@
 """Refs: P3-baselines 01-plan 61행·104행(U5) 원칙8 -- 베이스라인 3 실 LLM 1회 스모크.
 
 `evaluation/resolvers/llm_single.py` 의 `caller_from_env()`로 공급자를
-고른다(`LLM_PROVIDER`, 기본 `anthropic`). **DB 를 쓰지 않는다** -- 사전
+고른다(`LLM_PROVIDER`, 기본 `openai`, D11 결정 2). **DB 를 쓰지 않는다** -- 사전
 상태 인물 3명을 이 스크립트 안에서 `KnownPerson` 으로 직접 만들고, mention
 "부장님" · 짧은 발화 하나로 `resolve_from_state()` 를 1회 호출한다. 평가에서
 실제로 도는 것과 **같은 함수**를 부르므로(프롬프트 조립·강등 규칙의 이중

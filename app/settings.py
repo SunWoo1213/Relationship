@@ -84,10 +84,21 @@ ER_TOP_K = SEARCH_TOP_K
 ER_JUDGE_TIMEOUT = 20.0
 ER_JUDGE_MAX_RETRIES = 1
 
-#: 3단계 LLM 판정 공급자 기본값(사용자 결정 2026-09-06 -- 공급자 중립).
-#: `app/er/judge.py` 의 `judge_from_env()` 가 `LLM_PROVIDER` 환경변수를
-#: 읽을 때 이 값이 기본이다. `.env.example` 에 이름만 추가한다(값은 비움).
-LLM_PROVIDER = "anthropic"
+#: 3단계 LLM 판정 공급자 기본값(D11 결정 2, 2026-09-11 -- 사용자 결정
+#: "현재는 OpenAI 로만 실행"). `app/er/judge.py` 의 `select_provider()`/
+#: `judge_from_env()` 와 베이스라인 단일 프롬프트 caller 모듈
+#: (`llm_single.py`)의 `caller_from_env()` 가 `LLM_PROVIDER` 환경변수를 읽을 때 이 값이
+#: 기본이다. 기획서 전제(Claude)와 다른 **운영 기본값**의 변경이며 확신도
+#: 공식(D3)·판정 프롬프트를 바꾸지 않는다(D11 참조). `.env.example` 에
+#: 값을 그대로 적는다.
+LLM_PROVIDER = "openai"
+
+#: `LLM_PROVIDERS_ENABLED`(D11 결정 1) 미설정·공백만일 때의 기본값 --
+#: 표(`app.er.judge.JUDGES`) 전체를 켠 상태다. 끄는 것은 명시적 행위여야
+#: 재현성이 유지된다(원칙8) -- "키가 있는 것만 켬" 같은 조용한 기본값은
+#: 쓰지 않는다. `app/er/judge.py` 는 이 상수를 **import 해서만** 쓰고
+#: 같은 목록 리터럴을 다시 쓰지 않는다(R-4 단일 출처).
+LLM_PROVIDERS_ENABLED_DEFAULT = "anthropic,openai,gemini"
 
 #: 임계치 비교 허용오차의 단일 출처(F-7fe239). `app/er/confidence.py` 의
 #: `ge_with_tolerance()` 하나만 이 상수를 쓴다 -- `round()` 기반 비교는

@@ -1,0 +1,23 @@
+..............ssssssssssssssssssssssssssssssss                           [100%]
+=========================== short test summary info ===========================
+SKIPPED [10] tests\test_baseline_parity.py:408: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [10] tests\test_baseline_parity.py:451: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [10] tests\test_baseline_parity.py:480: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [2] tests\test_baseline_parity.py:507: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+14 passed, 32 skipped in 11.04s

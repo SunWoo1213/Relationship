@@ -1,0 +1,2 @@
+-def test_judge_from_env_defaults_to_anthropic(monkeypatch):
+-def test_main_missing_anthropic_key_returns_2(monkeypatch, capsys):

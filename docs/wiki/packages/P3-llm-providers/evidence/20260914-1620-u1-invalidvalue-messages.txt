@@ -1,0 +1,27 @@
+$ PYTHONIOENCODING=utf-8 python -c "from app.er.judge import judge_from_env; judge_from_env({'LLM_PROVIDER':'gemini','LLM_PROVIDERS_ENABLED':'anthropic'})"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from app.er.judge import judge_from_env; judge_from_env({'LLM_PROVIDER':'gemini','LLM_PROVIDERS_ENABLED':'anthropic'})
+                                             ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Capstone2\app\er\judge.py", line 579, in judge_from_env
+    return JUDGES[select_provider(env)]()
+                  ~~~~~~~~~~~~~~~^^^^^
+  File "C:\Capstone2\app\er\judge.py", line 561, in select_provider
+    raise InvalidValue(
+    ...<2 lines>...
+    )
+app.tools.types.InvalidValue: select_provider: LLM_PROVIDER 'gemini' is not in LLM_PROVIDERS_ENABLED (active: ['anthropic'])
+
+$ PYTHONIOENCODING=utf-8 python -c "from app.er.judge import judge_from_env; judge_from_env({'LLM_PROVIDER':'llama'})"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from app.er.judge import judge_from_env; judge_from_env({'LLM_PROVIDER':'llama'})
+                                             ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Capstone2\app\er\judge.py", line 579, in judge_from_env
+    return JUDGES[select_provider(env)]()
+                  ~~~~~~~~~~~~~~~^^^^^
+  File "C:\Capstone2\app\er\judge.py", line 554, in select_provider
+    raise InvalidValue(
+    ...<2 lines>...
+    )
+app.tools.types.InvalidValue: select_provider: unknown LLM_PROVIDER 'llama' (expected one of ['anthropic', 'gemini', 'openai'])

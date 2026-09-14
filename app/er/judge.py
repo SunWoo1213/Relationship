@@ -1,4 +1,4 @@
-"""Refs: P3-er S3.3 D3 D4 D5 R4 결정3 결정3-c F-5a97ef -- 3단계(LLM 판정).
+"""Refs: P3-llm-providers D11 S3.3 D3 D4 D5 R4 결정3 결정3-c F-5a97ef -- 3단계(LLM 판정).
 
 `s_llm` 은 **LLM 이 구조화 출력(도구/함수 호출)으로 자기보고한 0~1 점수이며,
 어떤 공급자의 API 도 제공하지 않는 토큰 로그 확률이 아니다**(R4, D3). 이
@@ -22,9 +22,23 @@ LLM 판정기를 Anthropic 하나에 묶지 않는다 -- **공급자 중립 핵�
   (예외 매핑 표 공유)과 `validate_judgement()`(응답 검증 공유)를 거친다 --
   요청 조립만 SDK 마다 다르다(도구 스키마를 감싸는 바깥 모양이 다를 뿐
   `JUDGEMENT_SCHEMA` 자체는 같다).
-- **팩토리** `judge_from_env(env=None)`: `LLM_PROVIDER`(기본 `anthropic`)
-  로 고른다. `gemini` 는 새 의존성(`google-genai`)이 필요해 이번에
-  구현하지 않고, 사람이 읽는 `InvalidValue` 로 예약만 한다.
+- **팩토리** `judge_from_env(env=None)`: `LLM_PROVIDER`(기본 `openai`,
+  D11 결정 2)로 등록표 `JUDGES` 에서 고른다. `gemini` 는 새 의존성
+  (`google-genai`)이 필요해 이번에 구현하지 않고, 사람이 읽는
+  `InvalidValue` 로 예약만 한다(U2 에서 `GeminiJudge` 로 교체).
+
+## 등록표·활성 스위치 (P3-llm-providers U1, D11)
+
+`JUDGES: dict[str, Callable[[], Judge]]` 하나가 이름 -> 무인자 팩토리의
+**유일한** 등록표다(`FakeJudge` 는 여기 없다 -- 환경변수로 진짜 판정기를
+가짜로 바꿀 수 없다, D11 "코드에서 지켜야 할 것"). `select_provider(env)`
+가 `LLM_PROVIDER`/`LLM_PROVIDERS_ENABLED` 를 **같은 `env` 매핑**에서 읽어
+거부(미지 이름 -- 표 키 목록 / 비활성 -- 활성 목록)를 판정하는 **유일한**
+자리다 -- 베이스라인 단일 프롬프트 caller 모듈(`llm_single.py`)의
+`caller_from_env()` 가 이 함수를 import 해 재사용한다(자체 표·자체 거부
+로직 금지). `env` 를
+생략하면 `os.environ` 을 읽고, `env` 가 주어지면 `os.environ` 을 보지
+않는다(R-3 단일 출처).
 
 키(`ANTHROPIC_API_KEY`/`OPENAI_API_KEY`)는 각 SDK 클라이언트가 **내부에서**
 환경변수로 읽는다 -- 이 모듈의 코드는 그 값을 변수로 옮기거나 프롬프트·
@@ -441,26 +455,90 @@ class FakeJudge:
         )
 
 
-#: `judge_from_env()` 가 고르는 공급자 이름 -- `app.settings.LLM_PROVIDER`
-#: 기본값과 같은 어휘. `gemini` 는 예약만(아래 함수 docstring).
-_KNOWN_PROVIDERS = ("anthropic", "openai", "gemini")
+def _gemini_reserved() -> Judge:
+    """`JUDGES["gemini"]` 의 U1 자리표시 팩토리(D11 결정 6, U2 에서
+    `GeminiJudge` 로 교체된다). 키 값·프롬프트를 넣지 않는 사람이 읽는
+    `InvalidValue` 로 예약만 한다(우회 구현 금지, 원칙8) -- 이 함수는
+    `select_provider()` 가 `gemini` 를 허용(표에 있고 활성)한 **뒤에만**
+    호출되므로, 여기 도달했다는 것은 이름·활성 여부가 아니라 구현 자체가
+    없다는 뜻이다."""
+
+    from app.tools.types import InvalidValue
+
+    raise InvalidValue(
+        "gemini 판정기는 아직 구현되지 않았다 — U2 에서 GeminiJudge 로 구현 "
+        "예정(google-genai 의존성 필요, 현재는 예약된 이름)"
+    )
 
 
-def judge_from_env(env: dict[str, str] | None = None) -> Judge:
-    """`LLM_PROVIDER`(기본 `anthropic`, `app.settings.LLM_PROVIDER`)로
-    판정기를 고른다. 모델은 공급자별 env(`ANTHROPIC_MODEL`/`OPENAI_MODEL`/
-    `GEMINI_MODEL`)를 각 판정기 생성자가 그대로 읽는다(이 함수는 모델
-    문자열을 여기서 다시 읽지 않는다 -- 단일 출처는 각 Judge 클래스).
+#: 이름 -> 무인자 팩토리의 **유일한** 등록표(D11 "코드에서 지켜야 할 것",
+#: R-5 -- `grep -c "^JUDGES" app/er/judge.py` = 1). `ClaudeJudge`/
+#: `OpenAIJudge` 는 dataclass 라 클래스 자체가 무인자 호출 가능한 팩토리다.
+#: `FakeJudge` 는 여기 없다(테스트 전용 -- 환경변수로 실제 판정기를 가짜로
+#: 바꿀 수 있으면 원칙8·원칙9 의 근거가 무의미해진다).
+JUDGES: dict[str, Callable[[], Judge]] = {
+    "anthropic": ClaudeJudge,
+    "openai": OpenAIJudge,
+    "gemini": _gemini_reserved,
+}
 
-    `env` 를 생략하면 `os.environ` 을 읽는다(`app.settings` 의 다른 로더와
-    같은 규약). `.env` 는 읽지 않는다.
 
-    - `"anthropic"` -> `ClaudeJudge()`
-    - `"openai"` -> `OpenAIJudge()`
-    - `"gemini"` -> 아직 구현하지 않는다(`google-genai` 의존성이 없다) --
-      `InvalidValue("gemini 판정기는 아직 구현되지 않았다 — google-genai "
-      "의존성 추가 필요")` 를 던진다(우회 구현하지 않는다, 원칙8).
-    - 그 밖의 값 -> `InvalidValue`.
+def enabled_providers(env: dict[str, str] | None = None) -> frozenset[str]:
+    """`LLM_PROVIDERS_ENABLED`(D11 결정 1, R-4 파싱 규칙)를 파싱해 활성
+    공급자 집합을 돌려준다.
+
+    규칙: 쉼표로 분리 -> 각 항목 `strip().lower()` -> 빈 항목 제거.
+    **미설정 또는 공백만 남으면** `app.settings.LLM_PROVIDERS_ENABLED_DEFAULT`
+    (표 전체 켬) -- 이 상수가 단일 출처이고, 이 함수는 기본 목록 리터럴을
+    다시 쓰지 않는다(R-4). 파싱 결과에 `JUDGES` 표에 없는 이름이 섞여
+    있으면 오타를 조용히 무시하지 않고 `InvalidValue`(표 키 목록 포함)를
+    던진다(원칙8 재현성).
+
+    `env` 를 생략하면 `os.environ` 을 읽는다. `env` 가 주어지면
+    `os.environ` 을 보지 않는다(R-3 단일 출처, `select_provider()` 와
+    같은 규약).
+    """
+
+    from app.settings import LLM_PROVIDERS_ENABLED_DEFAULT
+    from app.tools.types import InvalidValue
+
+    if env is None:
+        env = dict(os.environ)
+
+    raw = env.get("LLM_PROVIDERS_ENABLED")
+    if raw is None or raw.strip() == "":
+        raw = LLM_PROVIDERS_ENABLED_DEFAULT
+
+    names = [item.strip().lower() for item in raw.split(",")]
+    names = [name for name in names if name]
+
+    unknown = sorted(set(names) - set(JUDGES))
+    if unknown:
+        raise InvalidValue(
+            f"enabled_providers: LLM_PROVIDERS_ENABLED has unknown name(s) "
+            f"{unknown} (expected subset of {sorted(JUDGES)})"
+        )
+
+    return frozenset(names)
+
+
+def select_provider(env: dict[str, str] | None = None) -> str:
+    """`LLM_PROVIDER`/`LLM_PROVIDERS_ENABLED` 를 **같은 `env` 매핑**에서
+    읽어 이번 호출에서 쓸 공급자 이름을 고르는 **유일한** 거부 판정
+    자리다(D11, R-5) -- `judge_from_env()` 와 베이스라인 단일 프롬프트
+    caller 모듈(`llm_single.py`)의 `caller_from_env()` 가 이 함수 하나를
+    import 해 재사용한다(두 진입점이 같은 환경변수·같은 거부 규칙을
+    쓴다는 R-4 를 유지, 자체 표 금지).
+
+    - `LLM_PROVIDER` 값을 `strip().lower()` 한 뒤 `JUDGES` 에서 조회한다.
+      표에 없으면 `InvalidValue`(메시지에 `JUDGES` 키 목록).
+    - 표에 있어도 `enabled_providers(env)` 의 활성 집합 밖이면
+      `InvalidValue`(메시지에 활성 목록).
+    - 오류 메시지에 키 값·프롬프트는 넣지 않는다.
+
+    `env` 를 생략하면 `os.environ` 을 읽는다(`app.settings` 의 다른
+    로더와 같은 규약). `env` 가 주어지면 `os.environ` 을 보지 않는다
+    (R-3).
     """
 
     from app.settings import LLM_PROVIDER
@@ -469,17 +547,33 @@ def judge_from_env(env: dict[str, str] | None = None) -> Judge:
     if env is None:
         env = dict(os.environ)
 
-    provider = env.get("LLM_PROVIDER", LLM_PROVIDER)
+    raw_name = env.get("LLM_PROVIDER", LLM_PROVIDER)
+    name = raw_name.strip().lower()
 
-    if provider == "anthropic":
-        return ClaudeJudge()
-    if provider == "openai":
-        return OpenAIJudge()
-    if provider == "gemini":
+    if name not in JUDGES:
         raise InvalidValue(
-            "gemini 판정기는 아직 구현되지 않았다 — google-genai 의존성 추가 필요"
+            f"select_provider: unknown LLM_PROVIDER {raw_name!r} "
+            f"(expected one of {sorted(JUDGES)})"
         )
-    raise InvalidValue(
-        f"judge_from_env: unknown LLM_PROVIDER {provider!r} "
-        f"(expected one of {_KNOWN_PROVIDERS})"
-    )
+
+    active = enabled_providers(env)
+    if name not in active:
+        raise InvalidValue(
+            f"select_provider: LLM_PROVIDER {raw_name!r} is not in "
+            f"LLM_PROVIDERS_ENABLED (active: {sorted(active)})"
+        )
+
+    return name
+
+
+def judge_from_env(env: dict[str, str] | None = None) -> Judge:
+    """`select_provider(env)` -> `JUDGES[name]()` 2단계로 판정기를
+    고른다(D11, U1 -- `if provider == "anthropic"` 사다리를 등록표
+    조회로 대체). 모델은 공급자별 env(`ANTHROPIC_MODEL`/`OPENAI_MODEL`/
+    `GEMINI_MODEL`)를 각 판정기 생성자가 그대로 읽는다(이 함수는 모델
+    문자열을 여기서 다시 읽지 않는다 -- 단일 출처는 각 Judge 클래스).
+
+    `env` 를 생략하면 `os.environ` 을 읽는다. `.env` 는 읽지 않는다.
+    """
+
+    return JUDGES[select_provider(env)]()

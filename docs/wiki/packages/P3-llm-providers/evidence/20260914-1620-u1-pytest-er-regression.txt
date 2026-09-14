@@ -1,0 +1,89 @@
+..................................................ssssssssss.sssssss.... [ 93%]
+.....                                                                    [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_er_pipeline.py:90: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:149: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:169: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:191: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:210: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:238: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:269: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:290: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:320: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:337: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:410: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:481: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:524: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:580: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:625: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:646: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+SKIPPED [1] tests\test_er_pipeline.py:679: local PostgreSQL not reachable — set POSTGRES_PORT=5433 (OperationalError: (psycopg.errors.ConnectionTimeout) connection timeout expired
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5433, hostaddr: '::1': connection timeout expired
+- host: 'localhost', port: 5433, hostaddr: '127.0.0.1': connection timeout expired
+(Background on this error at: https://sqlalche.me/e/20/e3q8))
+60 passed, 17 skipped in 20.06s

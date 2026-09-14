@@ -1,4 +1,5 @@
-"""Refs: P3-er S3.3 D3 D4 D5 R4 결정3 결정3-c F-5a97ef -- U5 3단계(LLM 판정) 테스트.
+"""Refs: P3-er P3-llm-providers S3.3 D3 D4 D5 D11 R4 결정3 결정3-c F-5a97ef
+-- U5 3단계(LLM 판정) 테스트 + U1 등록표·활성 스위치 테스트.
 
 네트워크 호출 없음(원칙8) -- `ClaudeJudge`/`OpenAIJudge` 는 스텁 클라이언트를
 주입해 검증하고, 실 API 스모크는 `scripts/er_smoke.py`(U8)가 따로 한다.
@@ -19,15 +20,22 @@ import openai
 
 from app.er.judge import (
     JUDGEMENT_SCHEMA,
+    JUDGES,
     ClaudeJudge,
     FakeJudge,
     OpenAIJudge,
     TOOL_NAME,
     build_prompt,
+    enabled_providers,
     judge_from_env,
+    select_provider,
     validate_judgement,
 )
 from app.er.types import JudgeUnavailable, ScoredCandidate
+
+#: P3-er F-46f1eb 규약 -- 더미 키는 실제 키 형식(`sk-…`/`AKIA…`)이 아닌
+#: 이 마커를 쓴다(secret-guard 오탐 방지, `tests/test_er_smoke.py` 와 동일).
+_FAKE_KEY_MARKER = "FAKE-TEST-ONLY-NOT-A-REAL-KEY-4f21"
 
 CANDIDATES = [
     ScoredCandidate(
@@ -492,11 +500,12 @@ def test_fake_judge_is_deterministic_across_calls():
 # ---------------------------------------------------------------------------
 
 
-def test_judge_from_env_defaults_to_anthropic(monkeypatch):
+def test_judge_from_env_defaults_to_openai(monkeypatch):
+    # R-1(a) -- D11 결정 2(기본 LLM_PROVIDER=openai)로 기본값이 바뀐다.
     monkeypatch.delenv("LLM_PROVIDER", raising=False)
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setenv("OPENAI_API_KEY", _FAKE_KEY_MARKER)
     judge = judge_from_env(env={})
-    assert isinstance(judge, ClaudeJudge)
+    assert isinstance(judge, OpenAIJudge)
 
 
 def test_judge_from_env_openai(monkeypatch):
@@ -526,6 +535,107 @@ def test_judge_from_env_uses_os_environ_when_env_omitted(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test-dummy")
     judge = judge_from_env()
     assert isinstance(judge, OpenAIJudge)
+
+
+# ---------------------------------------------------------------------------
+# JUDGES 등록표·활성 스위치 (P3-llm-providers U1, D11) -- 네트워크 0, 더미 키만
+# ---------------------------------------------------------------------------
+
+
+def test_judges_table_has_exactly_three_keys_no_fake():
+    assert sorted(JUDGES) == ["anthropic", "gemini", "openai"]
+    assert "fake" not in JUDGES
+
+
+@pytest.mark.parametrize(
+    "provider, key_name, judge_cls",
+    [
+        ("anthropic", "ANTHROPIC_API_KEY", ClaudeJudge),
+        ("openai", "OPENAI_API_KEY", OpenAIJudge),
+    ],
+)
+def test_judge_from_env_builds_each_active_provider(
+    monkeypatch, provider, key_name, judge_cls
+):
+    monkeypatch.setenv(key_name, _FAKE_KEY_MARKER)
+    judge = judge_from_env(env={"LLM_PROVIDER": provider})
+    assert isinstance(judge, judge_cls)
+
+
+def test_select_provider_rejects_disabled_provider_with_active_list_message():
+    from app.tools.types import InvalidValue
+
+    with pytest.raises(InvalidValue) as excinfo:
+        judge_from_env(
+            env={"LLM_PROVIDER": "gemini", "LLM_PROVIDERS_ENABLED": "anthropic"}
+        )
+    assert "anthropic" in str(excinfo.value)
+
+
+def test_select_provider_rejects_unknown_provider_with_table_keys_message():
+    from app.tools.types import InvalidValue
+
+    with pytest.raises(InvalidValue) as excinfo:
+        judge_from_env(env={"LLM_PROVIDER": "llama"})
+    message = str(excinfo.value)
+    for name in ("anthropic", "openai", "gemini"):
+        assert name in message
+
+
+def test_select_provider_env_is_single_source_os_environ_does_not_leak(monkeypatch):
+    # R-3 -- os.environ 의 LLM_PROVIDERS_ENABLED="gemini" 가 있어도 env 인자로
+    # 넘긴 LLM_PROVIDERS_ENABLED="anthropic" 만 쓰인다(openai 는 거부된다).
+    from app.tools.types import InvalidValue
+
+    monkeypatch.setenv("LLM_PROVIDERS_ENABLED", "gemini")
+    with pytest.raises(InvalidValue):
+        judge_from_env(
+            env={"LLM_PROVIDER": "openai", "LLM_PROVIDERS_ENABLED": "anthropic"}
+        )
+
+
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        (" anthropic , OPENAI ", frozenset({"anthropic", "openai"})),
+        ("", frozenset({"anthropic", "openai", "gemini"})),
+        ("anthropic,,gemini", frozenset({"anthropic", "gemini"})),
+        ("Gemini", frozenset({"gemini"})),
+    ],
+)
+def test_enabled_providers_parsing_rules(raw, expected):
+    assert enabled_providers({"LLM_PROVIDERS_ENABLED": raw}) == expected
+
+
+def test_enabled_providers_missing_key_defaults_to_full_table():
+    assert enabled_providers({}) == frozenset({"anthropic", "openai", "gemini"})
+
+
+def test_enabled_providers_rejects_unknown_name_in_list():
+    from app.tools.types import InvalidValue
+
+    with pytest.raises(InvalidValue):
+        enabled_providers({"LLM_PROVIDERS_ENABLED": "anthropic,llama"})
+
+
+def test_select_provider_returns_name_string():
+    assert select_provider({"LLM_PROVIDER": "openai"}) == "openai"
+
+
+def test_dummy_key_marker_does_not_leak_into_exceptions_or_output(monkeypatch, capsys):
+    from app.tools.types import InvalidValue
+
+    monkeypatch.setenv("OPENAI_API_KEY", _FAKE_KEY_MARKER)
+    judge = judge_from_env(env={"LLM_PROVIDER": "openai"})
+    assert isinstance(judge, OpenAIJudge)
+
+    with pytest.raises(InvalidValue) as excinfo:
+        judge_from_env(env={"LLM_PROVIDER": "llama"})
+    assert _FAKE_KEY_MARKER not in str(excinfo.value)
+
+    captured = capsys.readouterr()
+    assert _FAKE_KEY_MARKER not in captured.out
+    assert _FAKE_KEY_MARKER not in captured.err
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,12 @@
+$ grep -n 'LLM_PROVIDERS_ENABLED' app/er/judge.py
+35:가 `LLM_PROVIDER`/`LLM_PROVIDERS_ENABLED` 를 **같은 `env` 매핑**에서 읽어
+487:    """`LLM_PROVIDERS_ENABLED`(D11 결정 1, R-4 파싱 규칙)를 파싱해 활성
+491:    **미설정 또는 공백만 남으면** `app.settings.LLM_PROVIDERS_ENABLED_DEFAULT`
+502:    from app.settings import LLM_PROVIDERS_ENABLED_DEFAULT
+508:    raw = env.get("LLM_PROVIDERS_ENABLED")
+510:        raw = LLM_PROVIDERS_ENABLED_DEFAULT
+518:            f"enabled_providers: LLM_PROVIDERS_ENABLED has unknown name(s) "
+526:    """`LLM_PROVIDER`/`LLM_PROVIDERS_ENABLED` 를 **같은 `env` 매핑**에서
+563:            f"LLM_PROVIDERS_ENABLED (active: {sorted(active)})"
+
+확인: 상수 정의(`LLM_PROVIDERS_ENABLED_DEFAULT = ...`)는 app/settings.py 에만 있고 app/er/judge.py 는 import 해서만 쓴다(위 목록에 '= "anthropic,openai,gemini"' 리터럴 대입 없음).

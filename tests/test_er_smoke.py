@@ -83,15 +83,16 @@ def test_run_smoke_does_not_leak_prompt_or_candidate_dump():
 # ---------- main(): 키 없음 -> 2, 키 미노출 ----------
 
 
-def test_main_missing_anthropic_key_returns_2(monkeypatch, capsys):
+def test_main_missing_openai_key_returns_2(monkeypatch, capsys):
+    # R-1(d) -- D11 결정 2(기본 LLM_PROVIDER=openai)로 기본 필요 키가 바뀐다.
     monkeypatch.delenv("LLM_PROVIDER", raising=False)
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
     rc = er_smoke.main([])
 
     assert rc == 2
     captured = capsys.readouterr()
-    assert "ANTHROPIC_API_KEY" in captured.out
+    assert "OPENAI_API_KEY" in captured.out
     assert _FAKE_KEY_MARKER not in captured.out
 
 
@@ -109,7 +110,8 @@ def test_main_missing_openai_key_returns_2_with_provider_flag(monkeypatch, capsy
 
 
 def test_main_success_path_prints_expected_json(monkeypatch, capsys):
-    monkeypatch.setenv("ANTHROPIC_API_KEY", _FAKE_KEY_MARKER)
+    # 기본 LLM_PROVIDER=openai(D11 결정 2) -- 필요 키도 OPENAI_API_KEY 로 바뀐다.
+    monkeypatch.setenv("OPENAI_API_KEY", _FAKE_KEY_MARKER)
     monkeypatch.setattr(
         er_smoke, "judge_from_env", lambda env=None: FakeJudge(table={1: 0.9}, pick=1)
     )
@@ -128,7 +130,8 @@ def test_main_success_path_prints_expected_json(monkeypatch, capsys):
 
 
 def test_main_judge_unavailable_returns_3(monkeypatch, capsys):
-    monkeypatch.setenv("ANTHROPIC_API_KEY", _FAKE_KEY_MARKER)
+    # 기본 LLM_PROVIDER=openai(D11 결정 2) -- 필요 키도 OPENAI_API_KEY 로 바뀐다.
+    monkeypatch.setenv("OPENAI_API_KEY", _FAKE_KEY_MARKER)
 
     def _raise(env=None):
         raise JudgeUnavailable("timeout")

@@ -1,0 +1,9 @@
+$ grep -c '^JUDGES' app/er/judge.py
+1
+
+$ grep -c '_KNOWN_PROVIDERS' app/er/judge.py
+0
+
+$ grep -n '^from app.er.judge import\|^from app.er import judge\|judge\.JUDGES\|enabled_providers' evaluation/resolvers/llm_single.py
+87:from app.er.judge import call_with_error_mapping
+(U1 범위 -- llm_single.py 는 U3 대상. 아직 표·스위치 import 없음, 기존 call_with_error_mapping import 만 있음. U3 에서 select_provider/JUDGES import 로 확장)
