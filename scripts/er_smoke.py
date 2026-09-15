@@ -37,11 +37,12 @@ from app.er.judge import Judge, judge_from_env  # noqa: E402
 from app.er.types import ERConfig, JudgeUnavailable, ScoredCandidate  # noqa: E402
 
 #: 공급자 -> 필요한 키 환경변수 이름(위임 프롬프트 그대로). 여기 없는
-#: 공급자(예: `gemini`)는 키 사전 확인을 건너뛰고 `judge_from_env()` 의
-#: 오류 메시지에 맡긴다(이름을 지어내지 않는다).
+#: 공급자는 키 사전 확인을 건너뛰고 `judge_from_env()` 의 오류 메시지에
+#: 맡긴다(이름을 지어내지 않는다).
 _REQUIRED_KEY_BY_PROVIDER = {
     "anthropic": "ANTHROPIC_API_KEY",
     "openai": "OPENAI_API_KEY",
+    "gemini": "GEMINI_API_KEY",
 }
 
 _MENTION = "부장님"
@@ -83,7 +84,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--provider",
         default=None,
-        help="LLM_PROVIDER 를 오버라이드한다(anthropic|openai). 기본은 환경변수/설정값",
+        help="LLM_PROVIDER 를 오버라이드한다(anthropic|openai|gemini). 기본은 환경변수/설정값",
     )
     return parser
 

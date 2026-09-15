@@ -17,10 +17,11 @@ P3-er 의 판정기(`app/er/judge.py`)는 스텁 테스트 36건으로만 검증
    $ts = Get-Date -Format yyyyMMdd-HHmm
    python scripts/er_smoke.py > docs/wiki/packages/P3-er/evidence/$ts-er-smoke-real.txt
    ```
-2. (선택) OpenAI 판정기 비교: `python scripts/er_smoke.py --provider openai > ...-er-smoke-real-openai.txt` (`OPENAI_MODEL` 필요).
-3. 저장한 파일을 **한 번 읽는다**. 키·프롬프트 원문이 나오지 않게 되어 있지만 저장 전 확인은 사용자 몫이다.
-4. 종료 코드 해석: 0 = 성공(JSON 한 줄, 9키 `provider model tokens_in tokens_out s_llm matched_person_id reason confidence band`). 2 = 환경에 키 이름이 없음(01 카드). 3 = 공급자 호출 실패(`{"error": "<유형>"}`) — 모델 이름·할당량·공급자 상태를 먼저 본다. **실패도 결과다** — 그 출력도 evidence 로 둔다.
-5. DB 가 떠 있으면 trace 확인(선택): `SELECT step, tool_name, output->'confidence_breakdown', output->'decision' FROM agent_traces ORDER BY id DESC LIMIT 1;`
+2. (선택) Anthropic 판정기 비교(기획서 원 전제, D11 이후 기본은 아니다): `python scripts/er_smoke.py --provider anthropic > ...-er-smoke-real-anthropic.txt` (`ANTHROPIC_API_KEY`·`ANTHROPIC_MODEL` 필요).
+3. (선택) Gemini 판정기 비교: `python scripts/er_smoke.py --provider gemini > docs/wiki/packages/P3-er/evidence/$(date +%Y%m%d-%H%M)-er-smoke-real-gemini.txt` (`GEMINI_API_KEY`·`GEMINI_MODEL` 필요 — `GEMINI_MODEL` 기본값 없음, 미설정이면 `InvalidValue`).
+4. 저장한 파일을 **한 번 읽는다**. 키·프롬프트 원문이 나오지 않게 되어 있지만 저장 전 확인은 사용자 몫이다.
+5. 종료 코드 해석: 0 = 성공(JSON 한 줄, 9키 `provider model tokens_in tokens_out s_llm matched_person_id reason confidence band`). 2 = 환경에 키 이름이 없음(01 카드). 3 = 공급자 호출 실패(`{"error": "<유형>"}`) — 모델 이름·할당량·공급자 상태를 먼저 본다. **실패도 결과다** — 그 출력도 evidence 로 둔다.
+6. DB 가 떠 있으면 trace 확인(선택): `SELECT step, tool_name, output->'confidence_breakdown', output->'decision' FROM agent_traces ORDER BY id DESC LIMIT 1;`
 
 ## 끝났다는 증거
 - `docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt` 가 존재하고 비어 있지 않다.

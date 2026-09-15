@@ -30,3 +30,4 @@
 
 **갱신 이력**
 - 2026-09-11 신설 — 사용자 결정(P4 결정 A, P3-llm-providers 결정 1·2·6). 카드는 메인 세션이 기록, 구현은 P3-llm-providers U1~U4.
+- 2026-09-15 — U1(c01381d)·U2(cf01e9f)·U3(7b94a69) 구현 완료(등록표 `JUDGES`·활성 스위치·`GeminiJudge`·`GeminiSingleCaller`), U4(pending)에서 문서(.env.example·README·user-setup 01/03/08·registry) 반영.

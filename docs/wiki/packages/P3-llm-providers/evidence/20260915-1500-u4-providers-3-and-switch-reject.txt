@@ -1,0 +1,4 @@
+anthropic -> ClaudeJudge
+openai -> OpenAIJudge
+gemini -> GeminiJudge
+reject: InvalidValue -> select_provider: LLM_PROVIDER 'gemini' is not in LLM_PROVIDERS_ENABLED (active: ['openai'])

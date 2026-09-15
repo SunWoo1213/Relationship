@@ -4,12 +4,13 @@
 | 변수 이름 | 필요한 시점 | 없으면 |
 |-----------|-----------|--------|
 | `POSTGRES_USER` `POSTGRES_PASSWORD` `POSTGRES_DB` `POSTGRES_PORT` `POSTGRES_HOST` `DATABASE_URL` | 로컬 DB 기동·모든 DB 테스트 | 테스트가 skip 된다(`-rs` 로 이유 표시) |
-| `ANTHROPIC_API_KEY` `ANTHROPIC_MODEL` (`LLM_PROVIDER=anthropic`) | ER 실호출 스모크(03), P4 파일럿 평가, P5 이후 제품 에이전트 | 스모크 종료 코드 2(안내만) |
+| `OPENAI_API_KEY` `OPENAI_MODEL` (`LLM_PROVIDER=openai`, D11 기본값) | ER 실호출 스모크(03), 베이스라인 3 스모크(08), P4 파일럿 평가, P5 이후 제품 에이전트 | 스모크 종료 코드 2(안내만) |
 | `OPENAI_API_KEY` `EMBEDDING_MODEL` (`EMBEDDING_PROVIDER=openai`) | 임베딩 백필(`scripts/backfill_embeddings.py --apply`), 후보 검색 실사용, P4 | 백필 종료 코드 2 |
-| `OPENAI_MODEL` (`LLM_PROVIDER=openai` 일 때) | 판정기를 OpenAI 로 비교할 때(스모크 `--provider openai`) | 스모크 종료 코드 2 |
+| `ANTHROPIC_API_KEY` `ANTHROPIC_MODEL` | 판정기를 Claude 로 비교할 때(스모크 `--provider anthropic`, 기획서 원 전제) — 기본은 아니다(D11) | 스모크 종료 코드 2 |
 | `T_MERGE` `T_NEW` `W_LLM` `W_EMB` `W_RULE` | 기본값(0.8 / 0.3 / 0.5 / 0.3 / 0.2)으로 충분. **P4 곡선 결과로만 바꾼다** | 기본값 사용 |
 | `VAPID_*` | P7 웹푸시 | 05 카드 |
-| `GEMINI_*` | 예약값. 미구현 | — |
+| `GEMINI_API_KEY` `GEMINI_MODEL` | 판정기를 Gemini 로 비교할 때(스모크 `--provider gemini`). `GEMINI_MODEL` 은 기본값이 없다 — 미설정이면 `InvalidValue` | 스모크 종료 코드 2(키 없음) / `InvalidValue`(`GEMINI_MODEL` 없음) |
+| `LLM_PROVIDERS_ENABLED` | 개발자가 판정기 공급자를 켜고 끌 때(쉼표 구분 `anthropic,openai,gemini`). 비우거나 미설정이면 전체 켬(D11) | 전체 켬(기본값) |
 
 ## 왜 사용자 몫인가
 비밀은 에이전트가 읽지도 쓰지도 않는다(`docs/wiki/security.md` §1, 훅 `safety-guard.sh`). 코드는 `os.environ` 으로만 읽는다.

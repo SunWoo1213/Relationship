@@ -17,10 +17,11 @@ P3-baselines 의 베이스라인 3(`evaluation/resolvers/llm_single.py`)은 스�
    $ts = Get-Date -Format yyyyMMdd-HHmm
    python scripts/baseline_smoke.py > docs/wiki/packages/P3-baselines/evidence/$ts-baseline-smoke-real.txt
    ```
-2. (선택) OpenAI 경로 비교: `python scripts/baseline_smoke.py --provider openai > ...-baseline-smoke-real-openai.txt` (`OPENAI_API_KEY`·`OPENAI_MODEL` 필요).
-3. 저장한 파일을 **한 번 읽는다**. 프롬프트는 길이(`prompt_chars`)와 인물 수(`person_count`)만 나가게 되어 있지만 저장 전 확인은 사용자 몫이다.
-4. 종료 코드 해석: 0 = 성공(JSON 한 줄 — `method decision person_id score tokens_in tokens_out provider model forced_reason llm_error candidate_person_ids dropped_ids prompt_chars person_count mention`). 2 = 환경에 키 이름이 없음(01 카드). 3 = 공급자 호출·응답 오류(`llm_error` 가 `timeout`/`rate_limit`/`api_error`/`connection`/`schema` 중 하나, 결정은 `identity` 로 강등돼 나온다). **실패도 결과다** — 그 출력도 그대로 evidence 로 둔다.
-5. DB 는 쓰지 않는다(이 스모크는 사전 상태 3명을 메모리에서 만든다). 즉 컨테이너가 꺼져 있어도 된다.
+2. (선택) Anthropic 경로 비교(기획서 원 전제, D11 이후 기본은 아니다): `python scripts/baseline_smoke.py --provider anthropic > ...-baseline-smoke-real-anthropic.txt` (`ANTHROPIC_API_KEY`·`ANTHROPIC_MODEL` 필요).
+3. (선택) Gemini 경로 비교: `python scripts/baseline_smoke.py --provider gemini > docs/wiki/packages/P3-baselines/evidence/$(date +%Y%m%d-%H%M)-baseline-smoke-real-gemini.txt` (`GEMINI_API_KEY`·`GEMINI_MODEL` 필요 — `GEMINI_MODEL` 기본값 없음, 미설정이면 `InvalidValue`).
+4. 저장한 파일을 **한 번 읽는다**. 프롬프트는 길이(`prompt_chars`)와 인물 수(`person_count`)만 나가게 되어 있지만 저장 전 확인은 사용자 몫이다.
+5. 종료 코드 해석: 0 = 성공(JSON 한 줄 — `method decision person_id score tokens_in tokens_out provider model forced_reason llm_error candidate_person_ids dropped_ids prompt_chars person_count mention`). 2 = 환경에 키 이름이 없음(01 카드). 3 = 공급자 호출·응답 오류(`llm_error` 가 `timeout`/`rate_limit`/`api_error`/`connection`/`schema` 중 하나, 결정은 `identity` 로 강등돼 나온다). **실패도 결과다** — 그 출력도 그대로 evidence 로 둔다.
+6. DB 는 쓰지 않는다(이 스모크는 사전 상태 3명을 메모리에서 만든다). 즉 컨테이너가 꺼져 있어도 된다.
 
 ## 끝났다는 증거
 - `docs/wiki/packages/P3-baselines/evidence/<ts>-baseline-smoke-real.txt` 가 존재하고 비어 있지 않다.

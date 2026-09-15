@@ -49,6 +49,7 @@ from evaluation.resolvers.llm_single import (  # noqa: E402
 _REQUIRED_KEY_BY_PROVIDER = {
     "anthropic": "ANTHROPIC_API_KEY",
     "openai": "OPENAI_API_KEY",
+    "gemini": "GEMINI_API_KEY",
 }
 
 _MENTION = "부장님"
@@ -92,7 +93,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--provider",
         default=None,
-        help="LLM_PROVIDER 를 오버라이드한다(anthropic|openai). 기본은 환경변수/설정값",
+        help="LLM_PROVIDER 를 오버라이드한다(anthropic|openai|gemini). 기본은 환경변수/설정값",
     )
     return parser
 

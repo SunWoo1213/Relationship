@@ -1,0 +1,30 @@
+=== git diff --name-only 025a7c4..HEAD -- app/ ===
+app/er/judge.py
+app/settings.py
+
+=== git diff --name-only 025a7c4..HEAD -- scripts/ tests/ requirements.txt ===
+requirements.txt
+scripts/baseline_smoke.py
+scripts/er_smoke.py
+tests/test_baseline_llm_single.py
+tests/test_er_judge.py
+tests/test_er_smoke.py
+
+=== git status --short (working tree, this U4 session) ===
+ M README.md
+ M docs/user-setup/01-env-keys.md
+ M docs/user-setup/03-er-smoke.md
+ M docs/user-setup/08-baseline-smoke.md
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/decisions/D11-llm-provider-registry.md
+ M docs/wiki/journal.md
+ M docs/wiki/registry.md
+ M scripts/baseline_smoke.py
+ M scripts/er_smoke.py
+ M tests/test_er_smoke.py
+?? docs/wiki/packages/P3-llm-providers/evidence/20260915-1500-u4-app-diff.txt
+?? docs/wiki/packages/P3-llm-providers/evidence/20260915-1500-u4-pytest-all.txt
+?? docs/wiki/packages/P3-llm-providers/evidence/20260915-1500-u4-pytest-er-regression.txt
+?? docs/wiki/packages/P3-llm-providers/evidence/20260915-1500-u4-pytest-parity.txt
+?? docs/wiki/packages/P3-llm-providers/evidence/20260915-1500-u4-registry-r8.txt
+?? docs/wiki/packages/P3-llm-providers/evidence/20260915-1500-u4-tools-check.txt

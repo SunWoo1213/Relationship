@@ -142,3 +142,4 @@
 - 2026-09-14 16:33 | COMMIT | c01381d feat(P3-llm-providers): U1 공급자 등록표·활성 스위치 — JUDGES 단일 표·select_provider 거부 판정·LLM_PROVIDERS_ENABLED 파싱·기본 openai, 테스트 11건
 - 2026-09-14 17:04 | COMMIT | cf01e9f feat(P3-llm-providers): U2 GeminiJudge — google-genai 2.23.0 실측 기반 오류 매핑·스키마 변환·1회 재시도, 테스트 29건
 - 2026-09-14 17:58 | STOP | 사용자 요청 중단. 재개→계획 승인·커밋 025a7c4, U1 등록표·스위치 c01381d(873 passed), U2 GeminiJudge cf01e9f(896 passed, google-genai 2.23.0 실측 6건, 멈춤 규칙 미발동). **U3 미착수** — 다음 세션 L-004 U3 위임 승인부터(HANDOFF 재개 절차 (1)~(3)). 미푸시 4. evidence u2-import-module.txt 1개 미커밋 | P3-llm-providers D11 L-004
+- 2026-09-15 13:52 | COMMIT | 7b94a69 feat(P3-llm-providers): U3 GeminiSingleCaller — D11 등록표·select_provider 재사용, Gemini 스키마 변환·오류 매핑 공유, R-1(c) 테스트 이동, 테스트 22건

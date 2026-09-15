@@ -106,6 +106,18 @@ def test_main_missing_openai_key_returns_2_with_provider_flag(monkeypatch, capsy
     assert "OPENAI_API_KEY" in captured.out
 
 
+def test_main_missing_gemini_key_returns_2_with_provider_flag(monkeypatch, capsys):
+    # R-7 -- `_REQUIRED_KEY_BY_PROVIDER["gemini"]` 행 추가(U4).
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+
+    rc = er_smoke.main(["--provider", "gemini"])
+
+    assert rc == 2
+    captured = capsys.readouterr()
+    assert "GEMINI_API_KEY" in captured.out
+    assert _FAKE_KEY_MARKER not in captured.out
+
+
 # ---------- main(): 정상 경로(judge_from_env monkeypatch, 실 호출 없음) ----------
 
 

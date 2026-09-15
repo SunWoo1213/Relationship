@@ -71,7 +71,7 @@
 | P1 | 스키마 v2 마이그레이션 (Alembic) | **완료** — 9테이블·CHECK 4·FK CASCADE 6·`vector(1536)`·인덱스 10, upgrade/downgrade 왕복·`alembic check` 통과, verifier 04-review 완료 |
 | P1 | 파일럿 데이터셋 | **완료** — 40건·5범주(승진 8/별칭 8/대명사 8/일반 10/신규 6), `schema_version` 2, `validate_scenarios --strict` rc=0, 라벨 검수 verifier 40/40·사용자 12/12, verifier 04-review 완료(5cac9bf) |
 | P2 | 툴 7종 v2 + FastAPI 골격 | **완료** — 시그니처 = CLAUDE.md(tools_check 7/7), ask_user→pending_questions, D1 확인 강제, GET /health·POST /answers, pytest 206, verifier 04-review 완료 |
-| P3 | 엔티티 해석 4단계 · 베이스라인 | **ER 완료(verifier 04-review 완료) · 베이스라인 3종 완료(verifier 04-review 완료)** — ER 4단계(app/er) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity), 판정기 공급자 중립(Claude·OpenAI, `LLM_PROVIDER`). 베이스라인은 `evaluation/` 다섯 방식(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`)이 같은 함수·같은 인자로 호출 가능(parity 46건, 부수효과 0), pytest 859 |
+| P3 | 엔티티 해석 4단계 · 베이스라인 | **ER 완료(verifier 04-review 완료) · 베이스라인 3종 완료(verifier 04-review 완료)** — ER 4단계(app/er) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity), 판정기 공급자 중립(Claude·OpenAI·Gemini, `LLM_PROVIDER`·등록표 `JUDGES`·활성 스위치 `LLM_PROVIDERS_ENABLED`, D11). 베이스라인은 `evaluation/` 다섯 방식(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`)이 같은 함수·같은 인자로 호출 가능(parity 46건, 부수효과 0), pytest 917 |
 | P4 | **파일럿 평가(게이트)** — 여기서 임계치·보정표 확정 | 대기 |
 | P5~P9 | 에이전트 루프 · 메모리 · 브리핑 · 푸시 · 프론트 · 인프라 | P4 통과 후 |
 
@@ -242,11 +242,12 @@ POSTGRES_PORT=5433 python scripts/backfill_embeddings.py --apply   # OPENAI_API_
 - **실 LLM 판정 스모크** (후보 2개짜리 판정 1회, 자동 테스트에는 포함하지 않는다 — 재현 불가능한 지표를 만들지 않기 위해):
 
 ```bash
-python scripts/er_smoke.py                       # LLM_PROVIDER=anthropic(기본), ANTHROPIC_API_KEY·ANTHROPIC_MODEL 필요
-python scripts/er_smoke.py --provider openai      # OPENAI_API_KEY·OPENAI_MODEL 필요
+python scripts/er_smoke.py                       # LLM_PROVIDER=openai(기본), OPENAI_API_KEY·OPENAI_MODEL 필요
+python scripts/er_smoke.py --provider anthropic   # ANTHROPIC_API_KEY·ANTHROPIC_MODEL 필요
+python scripts/er_smoke.py --provider gemini      # GEMINI_API_KEY·GEMINI_MODEL 필요(기본 모델 없음 — 미설정 시 InvalidValue)
 ```
 
-  키가 없으면 종료 코드 2로 안내만 하고 끝난다(키·프롬프트 원문은 어떤 경우에도 출력하지 않는다). 출력은 `{provider, model, tokens_in, tokens_out, s_llm, matched_person_id, reason, confidence, band}` 키를 가진 JSON 한 줄이다. `gemini`는 예약값일 뿐 아직 구현되지 않았다(팩토리가 사람이 읽는 오류를 낸다).
+  키가 없으면 종료 코드 2로 안내만 하고 끝난다(키·프롬프트 원문은 어떤 경우에도 출력하지 않는다). 출력은 `{provider, model, tokens_in, tokens_out, s_llm, matched_person_id, reason, confidence, band}` 키를 가진 JSON 한 줄이다. 지원 공급자는 `anthropic`·`openai`·`gemini` 세 가지이며(D11 등록표 `JUDGES`), `LLM_PROVIDERS_ENABLED`(쉼표 구분, 비우면 전체 켬)로 개발자가 원하는 공급자만 켤 수 있다 — 꺼진 공급자나 표에 없는 이름을 `LLM_PROVIDER`/`--provider`로 고르면 즉시 `InvalidValue`(메시지에 활성 목록)로 거부된다.
 
 - **임계치·가중치 조정**: 환경변수 이름 `T_MERGE`·`T_NEW`·`W_LLM`·`W_EMB`·`W_RULE`(값은 `.env.example`에 이름만 있다 — 이 문서와 에이전트는 `.env`를 읽지 않는다). 조정은 P4-pilot-eval의 트레이드오프 곡선 결과로만 한다.
 
@@ -318,10 +319,11 @@ POSTGRES_PORT=5433 python -m pytest tests/test_baseline_exact_match.py tests/tes
 위 테스트는 전부 스텁(가짜 임베딩·`FakeJudge`·스텁 클라이언트)으로 돌아 **네트워크 호출 0**이다. 실제 공급자로 한 번 확인하려면:
 
 ```bash
-python scripts/baseline_smoke.py     # 사전 상태 3명 · 지칭 1건 · 실 LLM 1회, DB 미사용
+python scripts/baseline_smoke.py                    # LLM_PROVIDER=openai(기본) · 사전 상태 3명 · 지칭 1건 · 실 LLM 1회, DB 미사용
+python scripts/baseline_smoke.py --provider gemini   # GEMINI_API_KEY·GEMINI_MODEL 필요(기본 모델 없음 — 미설정 시 InvalidValue)
 ```
 
-  환경변수 이름은 제안 방식과 같다 — `LLM_PROVIDER`·`ANTHROPIC_MODEL`·`OPENAI_MODEL`과 키 이름 `ANTHROPIC_API_KEY`·`OPENAI_API_KEY`(값은 이 문서에도 `.env`에도 의존하지 않는다. 셸 환경에만 둔다). 종료 코드는 **2 = 키 없음**(이름만 안내), **3 = LLM 호출·응답 오류**이며, 출력 JSON 한 줄에는 프롬프트 **길이와 인물 수**만 들어간다(프롬프트 원문·키는 어떤 경우에도 출력하지 않는다).
+  환경변수 이름은 제안 방식과 같다 — `LLM_PROVIDER`·`ANTHROPIC_MODEL`·`OPENAI_MODEL`·`GEMINI_MODEL`과 키 이름 `ANTHROPIC_API_KEY`·`OPENAI_API_KEY`·`GEMINI_API_KEY`(값은 이 문서에도 `.env`에도 의존하지 않는다. 셸 환경에만 둔다). 세 공급자는 같은 등록표(D11 `JUDGES`)와 활성 스위치 `LLM_PROVIDERS_ENABLED`를 `judge.py`에서 재사용한다(표를 두 벌 두지 않는다). 종료 코드는 **2 = 키 없음**(이름만 안내), **3 = LLM 호출·응답 오류**이며, 출력 JSON 한 줄에는 프롬프트 **길이와 인물 수**만 들어간다(프롬프트 원문·키는 어떤 경우에도 출력하지 않는다).
 
 이 절은 **인터페이스까지**다. 밴드 분포·정답률·오병합률·트레이드오프 곡선은 P4-pilot-eval이 이 다섯 이름으로 측정해 `reports/metrics.json`에 남긴다 — 여기서 수치를 말하지 않는 이유는 재현 가능한 수치만 리포트에 넣기 위해서다(불변 원칙 8).
 
