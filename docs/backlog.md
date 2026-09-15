@@ -48,12 +48,12 @@
   - [ ] U6 시나리오 사전 상태 적재기 (`seed_persons`+`aliases` 그대로, P4 재사용)
   - [ ] U7 동일 인터페이스 계약 테스트 `tests/test_baseline_parity.py` (수용 기준 증명)
   - [ ] U8 수용 기준 기계 검증 evidence + registry + README 실행법
-- [ ] [backend-agent] LLM 판정기 공급자 확장 — Gemini 구현 + 공급자 등록표·활성 스위치 / 의존: P3-er, P3-baselines / 수용기준: `LLM_PROVIDER` ∈ {anthropic, openai, gemini} 각각으로 `judge_from_env()`·`caller_from_env()` 가 해당 공급자의 판정기를 만들고, 비활성·미지 공급자는 `InvalidValue` 로 거부하며, 신규 테스트는 네트워크 0(스텁)이고 기존 pytest 전건이 통과한다
+- [x] [backend-agent] LLM 판정기 공급자 확장 — Gemini 구현 + 공급자 등록표·활성 스위치 / 의존: P3-er, P3-baselines / 수용기준: `LLM_PROVIDER` ∈ {anthropic, openai, gemini} 각각으로 `judge_from_env()`·`caller_from_env()` 가 해당 공급자의 판정기를 만들고, 비활성·미지 공급자는 `InvalidValue` 로 거부하며, 신규 테스트는 네트워크 0(스텁)이고 기존 pytest 전건이 통과한다
   - 세분화는 `docs/wiki/packages/P3-llm-providers/01-plan.md` (U1~U4). 위 행의 문장·수용기준은 권위이며 바꾸지 않는다. 수정 대상 `app/` 파일은 `app/er/judge.py`·`app/settings.py` 뿐(결정 J 이후 두 번째 예외).
-  - [ ] U1 공급자 등록표·활성 스위치 (이름→팩토리 표, `LLM_PROVIDER` 선택, 활성 목록 환경변수, 꺼진 공급자 거부) + 테스트
-  - [ ] U2 `GeminiJudge` (`google-genai`, `response_schema` 로 `JUDGEMENT_SCHEMA` 강제, 오류 어휘 동일) + 의존성 핀 + 스텁 테스트
-  - [ ] U3 `GeminiSingleCaller` (`evaluation/resolvers/llm_single.py`, 같은 등록표·같은 스위치 재사용) + 스텁 테스트
-  - [ ] U4 문서·evidence (`.env.example`·README 두 절·user-setup 01/03/08·D 카드·registry·회귀 전건 evidence)
+  - [x] U1 공급자 등록표·활성 스위치 (이름→팩토리 표, `LLM_PROVIDER` 선택, 활성 목록 환경변수, 꺼진 공급자 거부) + 테스트
+  - [x] U2 `GeminiJudge` (`google-genai`, `response_schema` 로 `JUDGEMENT_SCHEMA` 강제, 오류 어휘 동일) + 의존성 핀 + 스텁 테스트
+  - [x] U3 `GeminiSingleCaller` (`evaluation/resolvers/llm_single.py`, 같은 등록표·같은 스위치 재사용) + 스텁 테스트
+  - [x] U4 문서·evidence (`.env.example`·README 두 절·user-setup 01/03/08·D 카드·registry·회귀 전건 evidence)
   - **U1 착수 전 사용자 결정 7건**(01-plan "리스크·미결" 1~7): 활성 스위치 이름·기본값 / 기본 `LLM_PROVIDER` / Gemini 기본 모델명 / 구조화 출력 실패 어휘 / 의존성 핀 위치 / D 카드 신설 여부 / 실 Gemini 스모크 카드 위치
 
 ### P4 — 게이트

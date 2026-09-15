@@ -1,0 +1,2 @@
+verify-impl P3-llm-providers 20260915-1527
+FAIL=1 WARN=1

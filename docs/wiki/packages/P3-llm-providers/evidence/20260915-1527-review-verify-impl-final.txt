@@ -1,0 +1,29 @@
+== verify-impl P3-llm-providers  (20260915-1527) ==
+........................................................................ [ 94%]
+......................................................                   [100%]
+918 passed in 36.26s
+PASS  pytest 통과 → evidence/20260915-1527-pytest.txt
+PASS  compileall 통과 → evidence/20260915-1527-lint.txt
+PASS  태그 P3-llm-providers 커밋 6 건 → evidence/20260915-1527-commits.txt
+PASS  커밋에 태그 존재: D11
+PASS  커밋에 태그 존재: D3
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: R4
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.3
+PASS  커밋에 태그 존재: S3.7
+PASS  검토자 = verifier (L-002)
+PASS  증거 확인:  `LLM_PROVIDER` ∈ {anthropic, openai, gemini} � ← evidence/20260915-1514-review-verify-imp
+PASS  증거 확인:  항목 1a `anthropic` → `judge_from_env()` 가  ← evidence/20260915-1500-u4-providers-3-an
+PASS  증거 확인:  항목 1b `openai` → `judge_from_env()` 가 `Op ← evidence/20260915-1500-u4-providers-3-an
+PASS  증거 확인:  항목 1c `gemini` → `judge_from_env()` 가 `Ge ← evidence/20260915-1500-u4-providers-3-an
+PASS  증거 확인:  항목 2a `anthropic` → `caller_from_env()` 가 ← evidence/20260915-1517-review-pytest-nok
+PASS  증거 확인:  항목 2b `openai` → `caller_from_env()` 가 `O ← evidence/20260915-1517-review-pytest-nok
+PASS  증거 확인:  항목 2c `gemini` → `caller_from_env()` 가 `G ← evidence/20260915-1517-review-pytest-nok
+PASS  증거 확인:  항목 3 비활성 공급자 `InvalidValue`(팩� ← evidence/20260915-1516-review-negative-p
+PASS  증거 확인:  항목 4 미지 공급자 `InvalidValue`(메시� ← evidence/20260915-1516-review-negative-p
+PASS  증거 확인:  항목 5 신규 테스트는 네트워크 0(스� ← evidence/20260915-1517-review-pytest-nok
+PASS  증거 확인:  항목 6 기존 pytest 전건 통과 — 918 pass ← evidence/20260915-1514-pytest.txt, evide
+FAIL  registry.md 에 P3-llm-providers 의 산출물이 등록되지 않았다 (중복·누락 방지용)
+WARN  미완료 작업 단위 3 개
+== 결과: FAIL=1 WARN=1 → evidence/20260915-1527-summary.txt ==

@@ -1,0 +1,6 @@
+10a66c3 docs(P3-llm-providers): U4 문서·evidence — README·user-setup 01/03/08 Gemini·활성 스위치 반영, R-7 스모크 gemini 키 행, registry 비고 8행, D11 이력
+7b94a69 feat(P3-llm-providers): U3 GeminiSingleCaller — D11 등록표·select_provider 재사용, Gemini 스키마 변환·오류 매핑 공유, R-1(c) 테스트 이동, 테스트 22건
+cf01e9f feat(P3-llm-providers): U2 GeminiJudge — google-genai 2.23.0 실측 기반 오류 매핑·스키마 변환·1회 재시도, 테스트 29건
+c01381d feat(P3-llm-providers): U1 공급자 등록표·활성 스위치 — JUDGES 단일 표·select_provider 거부 판정·LLM_PROVIDERS_ENABLED 파싱·기본 openai, 테스트 11건
+025a7c4 docs(P3-llm-providers): 계획검증 통과·계획 승인·D11 카드 신설 — 공급자 등록표·활성 스위치·기본 openai, 패키지 착수
+701fb8d docs(P3-llm-providers,P4-pilot-eval): 계획 초안 2건 — P4 U1~U9 + 결정 A~K 확정(실행 OpenAI 1벌), 선행 소패키지 P3-llm-providers(U1~U4, 기본 LLM_PROVIDER openai) backlog·INDEX 등록

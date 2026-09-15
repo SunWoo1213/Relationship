@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: P3-llm-providers
+active: none
 frozen: none
 
 <!--
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- P3-llm-providers 완료(2026-09-15, verifier 04-review `완료`, verify-impl FAIL 0/WARN 0, 수용 기준 11/11, 부정 43/43, 열린 소견 0, 사용자 승인). U1 c01381d·U2 cf01e9f·U3 7b94a69·U4 10a66c3. 실호출 검증 공급자 0/3(F-87c597, 사용자 스모크 03·08). 다음 후보: P4-pilot-eval(04-review §7 인계 7항 + P3-baselines 15항 + P1 13항 — 01-plan 5행에 done 해시) / 사용자 스모크 03·08 / P0-cost. P4 통과 전 P5 이후 시작 금지.
 - P3-llm-providers 계획 승인(2026-09-14, architect 초안 + 결정 1~7 확정(2026-09-11) → verifier 통과 FAIL 0/WARN 11 의도(registry 기존 행), 점검표 8/8, 보류 0, 권고 R-1~R-9 실행 시 반영). U1 부터 backend-agent(L-004 매번). `app/` 수정은 `judge.py`·`settings.py` 2파일뿐. D11 카드 신설.
 - P3-baselines 완료(2026-09-11, verifier 04-review `완료`, verify-impl FAIL 0/WARN 0, 수용 기준 4/4, 부정 33/33, 필수 0·권고 8 중 1·2·3·4·5·7 처리, 사용자 승인). 다음 후보: P4-pilot-eval(04-review §7 인계 15항 + P1 §7 13항) / 사용자 스모크 03·08 / P0-cost. P4 통과 전 P5 이후 시작 금지.
 - P3-baselines 계획 승인(2026-09-10, architect 초안 → 사용자 결정 A~H 전부 권장안 → verifier 통과 FAIL 0/WARN 1 의도, 권고 R-1~R-9 → 사용자 결정 I(R-3 candidate_person_ids)·J(R-5 judge.py 공개 승격 1건 예외)). U1 부터 eval-agent(L-004 매번). 코드는 `evaluation/` 최상위.

@@ -1,0 +1,52 @@
+== GenerateContentResponse._get_text 소스(오프라인) ==
+  def _get_text(self) -> Optional[str]:
+    """Returns the concatenation of all text parts in the response.
+
+    This is an internal method that allows customizing or disabling the warning
+    message.
+
+    Returns:
+      The concatenation of all text parts in the response.
+    """
+    if (
+        not self.candidates
+        or not self.candidates[0].content
+        or not self.candidates[0].content.parts
+    ):
+      return None
+    global _response_text_warning_logged
+    if len(self.candidates) > 1 and not _response_text_warning_logged:
+      logger.warning(
+          f'there are {len(self.candidates)} candidates, returning text result'
+          ' from the first candidate. Access response.candidates directly to'
+          ' get the result from other candidates.'
+      )
+      _response_text_warning_logged = True
+    text = ''
+    any_text_part_text = False
+    non_text_parts = []
+    for part in self.candidates[0].content.parts:
+      for field_name, field_value in part.model_dump(
+          exclude={'text', 'thought', 'thought_signature'}
+      ).items():
+        if field_value is not None:
+          non_text_parts.append(field_name)
+      if isinstance(part.text, str):
+        if isinstance(part.thought, bool) and part.thought:
+          continue
+        any_text_part_text = True
+        text += part.text
+    global _response_text_non_text_warning_logged
+    if non_text_parts and not _response_text_non_text_warning_logged:
+      logger.warning(
+          'Warning: there are non-text parts in the response:'
+          f' {non_text_parts}, returning concatenated text result'
+          ' from text parts. Check the full candidates.content.parts accessor'
+          ' to get the full model response.'
+      )
+      _response_text_non_text_warning_logged = True
+    # part.text == '' is different from part.text is None
+    return text if any_text_part_text else None
+
+raise 문: []
+return None 경로: True

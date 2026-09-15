@@ -1,0 +1,19 @@
+== verify-impl P3-llm-providers  (20260915-1514) ==
+........................................................................ [ 94%]
+......................................................                   [100%]
+918 passed in 37.00s
+PASS  pytest 통과 → evidence/20260915-1514-pytest.txt
+PASS  compileall 통과 → evidence/20260915-1514-lint.txt
+PASS  태그 P3-llm-providers 커밋 6 건 → evidence/20260915-1514-commits.txt
+PASS  커밋에 태그 존재: D11
+PASS  커밋에 태그 존재: D3
+PASS  커밋에 태그 존재: D4
+PASS  커밋에 태그 존재: R4
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.3
+PASS  커밋에 태그 존재: S3.7
+PASS  검토자 = verifier (L-002)
+FAIL  04-review 수용 기준 표에 행이 없다
+FAIL  registry.md 에 P3-llm-providers 의 산출물이 등록되지 않았다 (중복·누락 방지용)
+WARN  미완료 작업 단위 3 개
+== 결과: FAIL=2 WARN=1 → evidence/20260915-1514-summary.txt ==

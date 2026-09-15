@@ -3,7 +3,7 @@
 > `findings.py` 가 검증 출력에서 만든다. 소견 본문(원인·해결 단계·재검증·영향)은 에이전트가 채우고, 해결 단계의 완료 판정 명령을 실제로 실행한 출력이 증거다. 소견은 지우지 않는다(해소만 한다).
 > 루프: 검증 → 소견 → 단계별 조치 → 재검증(같은 명령) → 해소. 같은 소견이 3회 재검증 후에도 열려 있으면 사용자에게 보고한다.
 
-갱신: 2026-09-11 14:28 | 출처: verify-plan | 열림: 9 (필수 0) | 해소: 2
+갱신: 2026-09-15 15:38 | 출처: verify-impl | 열림: 0 (필수 0) | 해소: 15
 
 ## F-81e3e5 · [필수] 없음: docs/wiki/packages/P3-llm-providers/02-plan-verify.md
 상태: 해소 | 발견: 2026-09-11 (verify-plan) | 해소: 2026-09-11
@@ -59,7 +59,7 @@ FAIL  카드 없음: D11 (decisions/D11-*.md)
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-e93529 · [권고] registry 에 다른 패키지로 이미 있음: app/er/judge.py → | 모듈 | LLM 판정(3단계, 공급자 중립) | app/er/judge.py | P3-er | b1f
-상태: 열림 | 발견: 2026-09-11 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-11 (verify-plan) | 해소: 2026-09-15
 
 ### 증상 (검증 출력 인용)
 ```
@@ -74,18 +74,18 @@ WARN  registry 에 다른 패키지로 이미 있음: app/er/judge.py → | 모�
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 82행 **비고만** 갱신(`P3-llm-providers U1/U2: JUDGES 등록표·enabled_providers·GeminiJudge`), 새 행 금지. 04-review §5 에서 verifier 가 행 수를 확인해 닫는다 | `grep -c "\| app/er/judge.py \|" docs/wiki/registry.md` | `1` (행 수 불변) — 그리고 82행 비고에 `P3-llm-providers U` 문구 존재 | 대기(U4) |
+| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 82행 **비고만** 갱신(`P3-llm-providers U1/U2: JUDGES 등록표·enabled_providers·GeminiJudge`), 새 행 금지. 04-review §5 에서 verifier 가 행 수를 확인해 닫는다 | `grep -c "\| app/er/judge.py \|" docs/wiki/registry.md` | `1` (행 수 불변) — 그리고 82행 비고에 `P3-llm-providers U` 문구 존재 | 완료(2026-09-15 verifier 04-review §5, `evidence/20260915-1517-review-registry-r8.txt` — `grep -c "| app/er/judge.py |"` = 1, 비고 `P3-llm-providers U1(c01381d)`+`U2(cf01e9f)`(GeminiJudge·`_to_gemini_schema`)) |
 
 ### 재검증
-- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계)
-- 결과 파일(evidence/): 계획 단계 재검증 `20260911-1421-verify-plan-final.txt` 26행에서 WARN 유지 — 예상된 상태. 닫는 evidence 는 04-review 에서.
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계) + R-8 닫는 명령(04-review §5, 02-plan-verify R-8 그대로) — verifier 재실행 2026-09-15
+- 결과 파일(evidence/): 계획 단계 재검증 `20260911-1421-verify-plan-final.txt` 26행에서 WARN 유지 — 예상된 상태. 닫는 evidence 는 04-review 에서. → **닫음(2026-09-15)**: `evidence/20260915-1517-review-registry-r8.txt`(verifier) · `evidence/20260915-1500-u4-registry-r8.txt`(U4 자체 실행, 같은 값) — `grep -c "| app/er/judge.py |"` = 1, 비고 `P3-llm-providers U1(c01381d)`+`U2(cf01e9f)`(GeminiJudge·`_to_gemini_schema`). 04-review §5 판정: 해소
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-fdb56f · [권고] registry 에 다른 패키지로 이미 있음: app/settings.py → | 모듈 | 런타임 설정값 | app/settings.py | P2-tools | f217190 | `app_use
-상태: 열림 | 발견: 2026-09-11 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-11 (verify-plan) | 해소: 2026-09-15
 
 ### 증상 (검증 출력 인용)
 ```
@@ -100,18 +100,18 @@ WARN  registry 에 다른 패키지로 이미 있음: app/settings.py → | 모�
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 51행 **비고만** 갱신(`P3-llm-providers U1: LLM_PROVIDER 기본 openai(D11)·LLM_PROVIDERS_ENABLED 기본 전체`), 새 행 금지 | `grep -c "\| app/settings.py \|" docs/wiki/registry.md` | `1` (행 수 불변) + 51행 비고에 `P3-llm-providers U1` 문구 | 대기(U4) |
+| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 51행 **비고만** 갱신(`P3-llm-providers U1: LLM_PROVIDER 기본 openai(D11)·LLM_PROVIDERS_ENABLED 기본 전체`), 새 행 금지 | `grep -c "\| app/settings.py \|" docs/wiki/registry.md` | `1` (행 수 불변) + 51행 비고에 `P3-llm-providers U1` 문구 | 완료(2026-09-15 verifier 04-review §5, `evidence/20260915-1517-review-registry-r8.txt` — `grep -c "| app/settings.py |"` = 1, 비고 `P3-llm-providers U1(c01381d)`(`LLM_PROVIDER` 기본 openai·`LLM_PROVIDERS_ENABLED_DEFAULT`)) |
 
 ### 재검증
-- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계)
-- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 27행 WARN 유지 — 예상된 상태.
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계) + R-8 닫는 명령(04-review §5, 02-plan-verify R-8 그대로) — verifier 재실행 2026-09-15
+- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 27행 WARN 유지 — 예상된 상태. → **닫음(2026-09-15)**: `evidence/20260915-1517-review-registry-r8.txt`(verifier) · `evidence/20260915-1500-u4-registry-r8.txt`(U4 자체 실행, 같은 값) — `grep -c "| app/settings.py |"` = 1, 비고 `P3-llm-providers U1(c01381d)`(`LLM_PROVIDER` 기본 openai·`LLM_PROVIDERS_ENABLED_DEFAULT`). 04-review §5 판정: 해소
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음(D11 이 기본값 변경을 결정으로 기록)
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-07a652 · [권고] registry 에 다른 패키지로 이미 있음: evaluation/resolvers/llm_single.py → | 모듈 | 베이스라인 3 LLM 단일 프롬프트(`llm_single`) | evaluation/
-상태: 열림 | 발견: 2026-09-11 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-11 (verify-plan) | 해소: 2026-09-15
 
 ### 증상 (검증 출력 인용)
 ```
@@ -126,18 +126,18 @@ WARN  registry 에 다른 패키지로 이미 있음: evaluation/resolvers/llm_s
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 119행 **비고만** 갱신(`P3-llm-providers U3: GeminiSingleCaller·caller_from_env 가 judge.JUDGES/스위치 import`), 새 행 금지 | `grep -c "\| evaluation/resolvers/llm_single.py \|" docs/wiki/registry.md` | `1` (행 수 불변) + 119행 비고에 `P3-llm-providers U3` 문구 | 대기(U4) |
+| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 119행 **비고만** 갱신(`P3-llm-providers U3: GeminiSingleCaller·caller_from_env 가 judge.JUDGES/스위치 import`), 새 행 금지 | `grep -c "\| evaluation/resolvers/llm_single.py \|" docs/wiki/registry.md` | `1` (행 수 불변) + 119행 비고에 `P3-llm-providers U3` 문구 | 완료(2026-09-15 verifier 04-review §5, `evidence/20260915-1517-review-registry-r8.txt` — `grep -c "| evaluation/resolvers/llm_single.py |"` = 1, 비고 `P3-llm-providers U3(7b94a69)`(GeminiSingleCaller·CALLERS 파생·select_provider)) |
 
 ### 재검증
-- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계)
-- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 28행 WARN 유지 — 예상된 상태.
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계) + R-8 닫는 명령(04-review §5, 02-plan-verify R-8 그대로) — verifier 재실행 2026-09-15
+- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 28행 WARN 유지 — 예상된 상태. → **닫음(2026-09-15)**: `evidence/20260915-1517-review-registry-r8.txt`(verifier) · `evidence/20260915-1500-u4-registry-r8.txt`(U4 자체 실행, 같은 값) — `grep -c "| evaluation/resolvers/llm_single.py |"` = 1, 비고 `P3-llm-providers U3(7b94a69)`(GeminiSingleCaller·CALLERS 파생·select_provider). 04-review §5 판정: 해소
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-2c37bd · [권고] registry 에 다른 패키지로 이미 있음: requirements.txt → | 문서/설정 | 런타임·개발 의존성 선언(첫 도입, `==` 고정) |
-상태: 열림 | 발견: 2026-09-11 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-11 (verify-plan) | 해소: 2026-09-15
 
 ### 증상 (검증 출력 인용)
 ```
@@ -152,18 +152,18 @@ WARN  registry 에 다른 패키지로 이미 있음: requirements.txt → | 문
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 45행 **비고만** 갱신(`P3-llm-providers U2: google-genai==<버전>`), 새 행 금지 | `grep -c "requirements.txt" docs/wiki/registry.md` | `1` (행 수 불변) + 45행 비고에 `google-genai==` 와 `pip show` 실측 버전 | 대기(U4) |
+| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 45행 **비고만** 갱신(`P3-llm-providers U2: google-genai==<버전>`), 새 행 금지 | `grep -c "requirements.txt" docs/wiki/registry.md` | `1` (행 수 불변) + 45행 비고에 `google-genai==` 와 `pip show` 실측 버전 | 완료(2026-09-15 verifier 04-review §5, `evidence/20260915-1517-review-registry-r8.txt` — `grep -c "requirements.txt"` = 1, 비고 `P3-llm-providers U2(cf01e9f)`+`google-genai==2.23.0`(`pip show` 2.23.0 일치)) |
 
 ### 재검증
-- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계)
-- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 29행 WARN 유지 — 예상된 상태.
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계) + R-8 닫는 명령(04-review §5, 02-plan-verify R-8 그대로) — verifier 재실행 2026-09-15
+- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 29행 WARN 유지 — 예상된 상태. → **닫음(2026-09-15)**: `evidence/20260915-1517-review-registry-r8.txt`(verifier) · `evidence/20260915-1500-u4-registry-r8.txt`(U4 자체 실행, 같은 값) — `grep -c "requirements.txt"` = 1, 비고 `P3-llm-providers U2(cf01e9f)`+`google-genai==2.23.0`(`pip show` 2.23.0 일치). 04-review §5 판정: 해소
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-6ff7bc · [권고] registry 에 다른 패키지로 이미 있음: tests/test_er_judge.py → | 테스트 | LLM 판정 요청/파싱/실패 분기(공급자 중립, 네트워
-상태: 열림 | 발견: 2026-09-11 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-11 (verify-plan) | 해소: 2026-09-15
 
 ### 증상 (검증 출력 인용)
 ```
@@ -178,18 +178,18 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/test_er_judge.py →
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 90행 **비고만** 갱신(`P3-llm-providers U1/U2: +N건, 기본값 단언 2건 R-1 갱신`), 새 행 금지 | `grep -c "\| tests/test_er_judge.py \|" docs/wiki/registry.md` | `1` (행 수 불변) + 90행 비고에 새 건수 | 대기(U4) |
+| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 90행 **비고만** 갱신(`P3-llm-providers U1/U2: +N건, 기본값 단언 2건 R-1 갱신`), 새 행 금지 | `grep -c "\| tests/test_er_judge.py \|" docs/wiki/registry.md` | `1` (행 수 불변) + 90행 비고에 새 건수 | 완료(2026-09-15 verifier 04-review §5, `evidence/20260915-1517-review-registry-r8.txt` — `grep -c "| tests/test_er_judge.py |"` = 1, 비고 `P3-llm-providers U1(c01381d)·U2(cf01e9f)` 73건 수집/`def test_` 68(verifier 실측 68 일치)) |
 
 ### 재검증
-- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계)
-- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 30행 WARN 유지 — 예상된 상태.
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계) + R-8 닫는 명령(04-review §5, 02-plan-verify R-8 그대로) — verifier 재실행 2026-09-15
+- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 30행 WARN 유지 — 예상된 상태. → **닫음(2026-09-15)**: `evidence/20260915-1517-review-registry-r8.txt`(verifier) · `evidence/20260915-1500-u4-registry-r8.txt`(U4 자체 실행, 같은 값) — `grep -c "| tests/test_er_judge.py |"` = 1, 비고 `P3-llm-providers U1(c01381d)·U2(cf01e9f)` 73건 수집/`def test_` 68(verifier 실측 68 일치). 04-review §5 판정: 해소
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음(원칙8 — 기존 테스트 수정은 R-1 목록 4건으로 한정, 그 밖은 findings)
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-c6bd9b · [권고] registry 에 다른 패키지로 이미 있음: tests/test_baseline_llm_single.py → | 테스트 | LLM 단일 프롬프트 요청/파싱/강등/오류/키 미노출(
-상태: 열림 | 발견: 2026-09-11 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-11 (verify-plan) | 해소: 2026-09-15
 
 ### 증상 (검증 출력 인용)
 ```
@@ -204,18 +204,18 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/test_baseline_llm_si
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 120행 **비고만** 갱신(`P3-llm-providers U3: +N건, gemini 거부 케이스 → 양성 케이스`), 새 행 금지 | `grep -c "\| tests/test_baseline_llm_single.py \|" docs/wiki/registry.md` | `1` (행 수 불변) + 120행 비고에 새 건수 | 대기(U4) |
+| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 120행 **비고만** 갱신(`P3-llm-providers U3: +N건, gemini 거부 케이스 → 양성 케이스`), 새 행 금지 | `grep -c "\| tests/test_baseline_llm_single.py \|" docs/wiki/registry.md` | `1` (행 수 불변) + 120행 비고에 새 건수 | 완료(2026-09-15 verifier 04-review §5, `evidence/20260915-1517-review-registry-r8.txt` — `grep -c "| tests/test_baseline_llm_single.py |"` = 1, 비고 `P3-llm-providers U3(7b94a69)` 90건 수집/`def test_` 69(실측 69 일치)) |
 
 ### 재검증
-- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계)
-- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 31행 WARN 유지 — 예상된 상태.
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계) + R-8 닫는 명령(04-review §5, 02-plan-verify R-8 그대로) — verifier 재실행 2026-09-15
+- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 31행 WARN 유지 — 예상된 상태. → **닫음(2026-09-15)**: `evidence/20260915-1517-review-registry-r8.txt`(verifier) · `evidence/20260915-1500-u4-registry-r8.txt`(U4 자체 실행, 같은 값) — `grep -c "| tests/test_baseline_llm_single.py |"` = 1, 비고 `P3-llm-providers U3(7b94a69)` 90건 수집/`def test_` 69(실측 69 일치). 04-review §5 판정: 해소
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-cfdfa4 · [권고] registry 에 다른 패키지로 이미 있음: .env.examp → | 문서 | 환경변수 이름 목록(값 비움, 추적 유지) | .env.example
-상태: 열림 | 발견: 2026-09-11 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-11 (verify-plan) | 해소: 2026-09-15
 
 ### 증상 (검증 출력 인용)
 ```
@@ -230,18 +230,18 @@ WARN  registry 에 다른 패키지로 이미 있음: .env.examp → | 문서 | 
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 36행 **비고만** 갱신(`P3-llm-providers U4: LLM_PROVIDER 기본 openai, LLM_PROVIDERS_ENABLED 이름 추가(값 비움)`), 새 행 금지. `.env.example` 에는 이름만 | `grep -c "환경변수 이름 목록" docs/wiki/registry.md && grep -c "^LLM_PROVIDERS_ENABLED=$" .env.example` | `1` (행 수 불변) 그리고 `1`(값 비움) | 대기(U4) |
+| 1 | 조치 없음(계획 단계) — U4 에서 `registry.md` 36행 **비고만** 갱신(`P3-llm-providers U4: LLM_PROVIDER 기본 openai, LLM_PROVIDERS_ENABLED 이름 추가(값 비움)`), 새 행 금지. `.env.example` 에는 이름만 | `grep -c "환경변수 이름 목록" docs/wiki/registry.md && grep -c "^LLM_PROVIDERS_ENABLED=$" .env.example` | `1` (행 수 불변) 그리고 `1`(값 비움) | 완료(2026-09-15 verifier 04-review §5, `evidence/20260915-1517-review-registry-r8.txt` — `grep -c "환경변수 이름 목록"` = 1 그리고 `grep -c "^LLM_PROVIDERS_ENABLED=$" .env.example` = 1(값 비움), 비고 `P3-llm-providers U1(c01381d)`) |
 
 ### 재검증
-- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계)
-- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 32행 WARN 유지 — 예상된 상태.
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계) + R-8 닫는 명령(04-review §5, 02-plan-verify R-8 그대로) — verifier 재실행 2026-09-15
+- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 32행 WARN 유지 — 예상된 상태. → **닫음(2026-09-15)**: `evidence/20260915-1517-review-registry-r8.txt`(verifier) · `evidence/20260915-1500-u4-registry-r8.txt`(U4 자체 실행, 같은 값) — `grep -c "환경변수 이름 목록"` = 1 그리고 `grep -c "^LLM_PROVIDERS_ENABLED=$" .env.example` = 1(값 비움), 비고 `P3-llm-providers U1(c01381d)`. 04-review §5 판정: 해소
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음(security §1 이름만)
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-0ffff5 · [권고] registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
-상태: 열림 | 발견: 2026-09-11 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-11 (verify-plan) | 해소: 2026-09-15
 
 ### 증상 (검증 출력 인용)
 ```
@@ -256,18 +256,18 @@ WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | �
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음(계획 단계) — U4 에서 README 두 절의 환경변수 문단을 고치되 `registry.md` 는 33행 **비고만**(`P3-llm-providers U4: ER·베이스라인 실행법 절 공급자 3종·스위치 문단`), 새 행 금지. 04-review §5 에서 닫는다 | `grep -c "\| README.md \|" docs/wiki/registry.md` | `1` (행 수 불변) + 33행 비고에 `P3-llm-providers U4:` 문구 | 대기(U4) |
+| 1 | 조치 없음(계획 단계) — U4 에서 README 두 절의 환경변수 문단을 고치되 `registry.md` 는 33행 **비고만**(`P3-llm-providers U4: ER·베이스라인 실행법 절 공급자 3종·스위치 문단`), 새 행 금지. 04-review §5 에서 닫는다 | `grep -c "\| README.md \|" docs/wiki/registry.md` | `1` (행 수 불변) + 33행 비고에 `P3-llm-providers U4:` 문구 | 완료(2026-09-15 verifier 04-review §5, `evidence/20260915-1517-review-registry-r8.txt` — `grep -c "| README.md |"` = 1, 비고 `P3-llm-providers U4(pending)` 문구 존재(해시 `pending` → `10a66c3` 은 닫는 docs 커밋 몫, 04-review §6 3)) |
 
 ### 재검증
-- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계)
-- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 34행 WARN 유지 — 예상된 상태.
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계) + R-8 닫는 명령(04-review §5, 02-plan-verify R-8 그대로) — verifier 재실행 2026-09-15
+- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 34행 WARN 유지 — 예상된 상태. → **닫음(2026-09-15)**: `evidence/20260915-1517-review-registry-r8.txt`(verifier) · `evidence/20260915-1500-u4-registry-r8.txt`(U4 자체 실행, 같은 값) — `grep -c "| README.md |"` = 1, 비고 `P3-llm-providers U4(pending)` 문구 존재(해시 `pending` → `10a66c3` 은 닫는 docs 커밋 몫, 04-review §6 3). 04-review §5 판정: 해소
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-22010b · [권고] registry 에 다른 패키지로 이미 있음: llm_single.py → | 모듈 | 베이스라인 3 LLM 단일 프롬프트(`llm_single`) | evaluation/
-상태: 열림 | 발견: 2026-09-11 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-11 (verify-plan) | 해소: 2026-09-15
 
 ### 증상 (검증 출력 인용)
 ```
@@ -282,11 +282,11 @@ WARN  registry 에 다른 패키지로 이미 있음: llm_single.py → | 모듈
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 조치 없음(계획 단계) — F-07a652 와 동일(U4 에서 119행 비고만). 04-review 에서 F-07a652 와 함께 닫는다 | `grep -c "\| evaluation/resolvers/llm_single.py \|" docs/wiki/registry.md` | `1` (행 수 불변) | 대기(U4) |
+| 1 | 조치 없음(계획 단계) — F-07a652 와 동일(U4 에서 119행 비고만). 04-review 에서 F-07a652 와 함께 닫는다 | `grep -c "\| evaluation/resolvers/llm_single.py \|" docs/wiki/registry.md` | `1` (행 수 불변) | 완료(2026-09-15 verifier 04-review §5, `evidence/20260915-1517-review-registry-r8.txt` — `grep -c "| evaluation/resolvers/llm_single.py |"` = 1 — F-07a652 와 함께 닫음) |
 
 ### 재검증
-- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계)
-- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 43행 WARN 유지 — 예상된 상태.
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (U4 후, 04-review 단계) + R-8 닫는 명령(04-review §5, 02-plan-verify R-8 그대로) — verifier 재실행 2026-09-15
+- 결과 파일(evidence/): 계획 단계 `20260911-1421-verify-plan-final.txt` 43행 WARN 유지 — 예상된 상태. → **닫음(2026-09-15)**: `evidence/20260915-1517-review-registry-r8.txt`(verifier) · `evidence/20260915-1500-u4-registry-r8.txt`(U4 자체 실행, 같은 값) — `grep -c "| evaluation/resolvers/llm_single.py |"` = 1 — F-07a652 와 함께 닫음. 04-review §5 판정: 해소
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음
@@ -321,3 +321,82 @@ git diff -- tests/test_er_smoke.py | grep "^[-+]" | grep -v "^[-+][-+]"
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 — D11 결정 2 의 직접 결과. 원칙8(테스트를 고쳐 통과시킨 사실을 숨기지 않음)
 - FIX/CR 로 올려야 하는가: 아니오
+## F-445cda · [필수] 04-review 수용 기준 표에 행이 없다
+상태: 해소 | 발견: 2026-09-15 (verify-impl) | 해소: 2026-09-15
+
+### 증상 (검증 출력 인용)
+```
+FAIL  04-review 수용 기준 표에 행이 없다
+```
+
+### 원인 분석
+- 가설: 검증 순서상 정상(P3-baselines F-445cda 와 같은 F-id·같은 원인) — 1a 초안 실행(15:14)은 verifier 가 `검토자: verifier (fable)` 줄만 있는 04-review 골격으로 돌린 것이고, §2 수용 기준 표는 본문 작성 후에 생긴다. `verify-impl.sh` 71~72행은 `## 2. 수용 기준 대조` 아래 `|` 행(머리·구분선 제외)이 0개면 FAIL.
+- 확인 방법(명령): `awk '/^## ([0-9]+[.] )?수용 기준 대조/{f=1;next} /^## /{f=0} f && /^\|/ && !/^\| *기준|^\|-/ {print}' docs/wiki/packages/P3-llm-providers/04-review.md | wc -l` (1a 시점 0 → 본문 작성 후 12) · 1b `PYTHONUTF8=1 PYTHONIOENCODING=utf-8 POSTGRES_PORT=5433 bash .claude/scripts/verify-impl.sh P3-llm-providers`
+- 확인 결과: 1a `evidence/20260915-1514-review-verify-impl-draft.txt` 12행 FAIL. 본문 작성 후 §2 표 12행(전체 1 + 항목 1a~2c 6 + 항목 3~6 4) — 증거 열은 evidence 파일·해시·경로만. 1b 결과는 아래 재검증 칸.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | `04-review.md` §2 수용 기준 표 12행 작성(verifier, 증거 열 = evidence/·해시·경로) | `PYTHONUTF8=1 PYTHONIOENCODING=utf-8 POSTGRES_PORT=5433 bash .claude/scripts/verify-impl.sh P3-llm-providers \| grep -c "수용 기준 표에 행이 없다"` | `0` (그리고 `증거 확인:` PASS 12줄) | 완료(2026-09-15, 1b — 아래) |
+
+### 재검증
+- 명령: `PYTHONUTF8=1 PYTHONIOENCODING=utf-8 POSTGRES_PORT=5433 bash .claude/scripts/verify-impl.sh P3-llm-providers | tee docs/wiki/packages/P3-llm-providers/evidence/<ts>-review-verify-impl-final.txt`
+- 결과 파일(evidence/): `20260915-1527-review-verify-impl-final.txt` — `증거 확인:` PASS 12줄, "수용 기준 표에 행이 없다" 0, FAIL 1(F-4ef1a3 만)·WARN 1(F-2f0840). `findings.py … 20260915-1527-review-verify-impl-final.txt --source verify-impl` 출력 `✓ F-445cda  해소`(2026-09-15 15:28).
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+
+## F-4ef1a3 · [필수] registry.md 에 P3-llm-providers 의 산출물이 등록되지 않았다 (중복·누락 방지용)
+상태: 해소 | 발견: 2026-09-15 (verify-impl) | 해소: 2026-09-15
+
+### 증상 (검증 출력 인용)
+```
+FAIL  registry.md 에 P3-llm-providers 의 산출물이 등록되지 않았다 (중복·누락 방지용)
+```
+
+### 원인 분석
+- 가설: **코드 결함이 아니라 R-8 과 스크립트 6번의 충돌.** `verify-impl.sh` 94행은 `grep -Fq "| P3-llm-providers |"` — **패키지 열**이 이 id 인 행을 요구한다. 02-plan-verify R-8 은 "registry 는 여덟 경로 모두 기존 행 비고만(새 행 금지) … 새 행 0 이 기대값" 으로 고정했고 U4 가 그대로 따랐다(비고 8곳에 `P3-llm-providers U<n>(<해시>)`, 새 행 0). 두 규칙이 동시에 만족될 수 없다 — 기존 파일만 확장한 패키지는 스크립트 6번을 통과할 수 없다(P3-baselines 는 새 모듈 17행이 있어 드러나지 않았다). 단, 이 패키지가 실제로 **새로 만든 파일**이 하나 있다: `docs/wiki/decisions/D11-llm-provider-registry.md`(025a7c4, 메인 세션) — R-8 이 이것을 새 파일로 세지 않은 것은 verifier 의 누락이다. 해소 후보(사용자·메인 세션 결정, verifier 는 고르지도 고치지도 않는다): (i) D11 카드를 `| 문서 | 결정 카드 D11 … | docs/wiki/decisions/D11-llm-provider-registry.md | P3-llm-providers | 025a7c4 | … |` 1행으로 추가(R-8 "새 행은 새 파일에만" 과 정합; 결정 카드 행 선례는 없음 — `grep "decisions/" registry.md` 0건) / (ii) 스크립트 6번을 "패키지 열 또는 비고에 `<id>`" 로 완화(하네스 변경 = L-nnn + 사용자 결정, 이 패키지 조치 아님).
+- 확인 방법(명령): `grep -c "| P3-llm-providers |" docs/wiki/registry.md` · `grep -c "P3-llm-providers U" docs/wiki/registry.md` · `grep -n "decisions/" docs/wiki/registry.md` · `sed -n 94p .claude/scripts/verify-impl.sh` · `git log --oneline --diff-filter=A 025a7c4^..HEAD --name-only -- docs/ app/ evaluation/ scripts/ tests/ | grep -v evidence`
+- 확인 결과: `| P3-llm-providers |` = **0**, 비고 `P3-llm-providers U` = 9곳(`evidence/20260915-1517-review-registry-r8.txt`), `decisions/` 행 0건, 스크립트 94행 `grep -Fq -- "| $id |"`. 이 패키지 커밋에서 새로 추가(A)된 비-evidence 파일은 `docs/wiki/decisions/D11-llm-provider-registry.md`·`docs/wiki/packages/P3-llm-providers/02-plan-verify.md`·`05-remediation.md` 뿐(코드 새 파일 0). 04-review §5·§6 1 참조. 1b 최종 실행에서도 이 FAIL 은 남는다(verifier 가 registry 를 고치지 않으므로) → 결과 `부분완료`.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | `docs/wiki/registry.md` · 사용자 결정 (i): 이 패키지가 만든 새 파일 `decisions/D11-llm-provider-registry.md` 행 1줄 추가(패키지 열 `P3-llm-providers`, 커밋 025a7c4). 하네스 스크립트 무수정 | `grep -c "| P3-llm-providers |" docs/wiki/registry.md` | `1` | 완료 |
+| 2 | `docs/wiki/registry.md` · `U4(pending)` 2곳(README.md·tests/test_er_smoke.py 비고) → `U4(10a66c3)` | `grep -c "U4(pending)" docs/wiki/registry.md; grep -c "U4(10a66c3)" docs/wiki/registry.md` | `0` / `2` | 완료 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (계획 단계면 `verify-plan.sh P3-llm-providers`)
+- 결과 파일(evidence/): `20260915-1537-close-verify-impl.txt` — `== 결과: FAIL=0 WARN=0 ==`, `PASS  registry 에 P3-llm-providers 행 있음`, `PASS  작업 단위 모두 완료 표시`, 918 passed. `findings.py … 20260915-1537-close-verify-impl.txt --source verify-impl` 출력 `✓ F-4ef1a3 해소` `✓ F-2f0840 해소`(새 소견 0, 열림 0)
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+
+## F-2f0840 · [권고] 미완료 작업 단위 3 개
+상태: 해소 | 발견: 2026-09-15 (verify-impl) | 해소: 2026-09-15
+
+### 증상 (검증 출력 인용)
+```
+WARN  미완료 작업 단위 3 개
+```
+
+### 원인 분석
+- 가설: 01-plan 48~50행 U1·U2·U3 의 체크박스가 `[ ]` 로 남아 있다(U4 만 `[x]`). U1~U3 는 03-log 항목·커밋(c01381d·cf01e9f·7b94a69)·evidence 로 완료가 증명되므로 **문서 표기 누락**이다 — 각 단위의 `/commit` 이 01-plan 체크박스를 갱신하지 않았고 U4 커밋(10a66c3)이 U4 줄만 `[x]` 로 바꿨다(`git show 10a66c3 -- docs/wiki/packages/P3-llm-providers/01-plan.md` 1줄 변경). `verify-impl.sh` 99~100행은 `^- \[ \] U[0-9]+` 행 수를 센다.
+- 확인 방법(명령): `grep -nE '^- \[.\] U[0-9]+' docs/wiki/packages/P3-llm-providers/01-plan.md | cut -c1-30` · `git log --oneline 025a7c4..HEAD -- docs/wiki/packages/P3-llm-providers/01-plan.md`
+- 확인 결과: 48행 `- [ ] U1`, 49행 `- [ ] U2`, 50행 `- [ ] U3`, 51행 `- [x] U4`. 01-plan 을 건드린 커밋은 10a66c3 하나(U4 줄). 해소는 닫는 docs 커밋에서 세 줄을 `[x]` 로(메인 세션·backend-agent 몫 — verifier 는 01-plan 을 고치지 않는다). 04-review §6 2.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | `01-plan.md` 48~50행 · U1·U2·U3 체크박스 `[ ]` → `[x]`(커밋 c01381d·cf01e9f·7b94a69 로 완료 증명, 03-log 항목 존재) | `grep -cE '^- \[ \] U[0-9]+' docs/wiki/packages/P3-llm-providers/01-plan.md` | `0` | 완료 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P3-llm-providers` (계획 단계면 `verify-plan.sh P3-llm-providers`)
+- 결과 파일(evidence/): `20260915-1537-close-verify-impl.txt` — `== 결과: FAIL=0 WARN=0 ==`, `PASS  registry 에 P3-llm-providers 행 있음`, `PASS  작업 단위 모두 완료 표시`, 918 passed. `findings.py … 20260915-1537-close-verify-impl.txt --source verify-impl` 출력 `✓ F-4ef1a3 해소` `✓ F-2f0840 해소`(새 소견 0, 열림 0)
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
+- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+

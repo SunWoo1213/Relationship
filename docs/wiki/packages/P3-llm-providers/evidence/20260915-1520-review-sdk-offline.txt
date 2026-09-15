@@ -1,0 +1,24 @@
+== JUDGEMENT_SCHEMA 변환 dict ==
+{"type": "OBJECT", "properties": {"matched_person_id": {"type": "INTEGER", "nullable": true}, "s_llm": {"type": "NUMBER", "minimum": 0, "maximum": 1}, "reason": {"type": "STRING"}}, "required": ["matched_person_id", "s_llm", "reason"], "additionalProperties": false}
+Schema.model_validate ok: Type.OBJECT nullable(matched_person_id)= True additional_properties= False extra= None
+GenerateContentConfig ok; response_schema type at config: dict
+== RESOLUTION_SCHEMA 변환 dict ==
+{"type": "OBJECT", "properties": {"decision": {"type": "STRING", "enum": ["merge", "identity", "new_person"]}, "matched_person_id": {"type": "INTEGER", "nullable": true}, "s_llm": {"type": "NUMBER", "minimum": 0, "maximum": 1}, "reason": {"type": "STRING"}, "candidate_person_ids": {"type": "ARRAY", "items": {"type": "INTEGER"}}}, "required": ["decision", "matched_person_id", "s_llm", "reason", "candidate_person_ids"], "additionalProperties": false}
+Schema.model_validate ok: Type.OBJECT nullable(matched_person_id)= True additional_properties= False extra= None
+GenerateContentConfig ok; response_schema type at config: dict
+Client() ok with GEMINI_API_KEY set (no network); vertexai= False
+t_schema -> Schema | dump: {"additional_properties": false, "properties": {"matched_person_id": {"nullable": true, "type": "INTEGER"}, "s_llm": {"maximum": 1.0, "minimum": 0.0, "type": "NUMBER"}, "reason": {"type": "STRING"}}, "property_ordering": ["matched_person_id", "s_llm", "reason"], "required": ["matched_person_id", "s_llm", "reason"], "type": "OBJECT"}
+_GenerateContentConfig_to_mldev signature: (api_client: google.genai._api_client.BaseApiClient, from_object: Union[dict[str, Any], object], parent_object: Optional[dict[str, Any]] = None, root_object: Union[dict[str, Any], object, NoneType] = None) -> dict[str, typing.Any]
+mldev request config -> {"temperature": 0.0, "responseMimeType": "application/json", "responseSchema": "additional_properties=False defs=None ref=None any_of=None default=None description=None enum=None example=None format=None items=None max_items=None max_length=None max_properties=None maximum=None min_items=None min_length=None min_properties=None minimum=None nullable=None pattern=None properties={'matched_person_id': Schema(\n  nullable=True,\n  type=<Type.INTEGER: 'INTEGER'>\n), 's_llm': Schema(\n  maximum=1.0,\n  minimum=0.0,\n  type=<Type.NUMBER: 'NUMBER'>\n), 'reason': Schema(\n  type=<Type.STRING: 'STRING'>\n)} property_ordering=['matched_person_id', 's_llm', 'reason'] required=['matched_person_id', 's_llm', 'reason'] title=None type=<Type.OBJECT: 'OBJECT'>"}
+== GenerateContentResponse.text 접근자 소스 ==
+  @property
+  def text(self) -> Optional[str]:
+    """Returns the concatenation of all text parts in the response.
+
+    If there are multiple candidates, returns the text from only the first one.
+    If there are non-text parts in the response, this returns only the text
+    parts.
+    """
+    return self._get_text()
+
+raises ValueError?: False | returns None when no candidates?: False

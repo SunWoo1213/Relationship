@@ -1,0 +1,287 @@
+== verifier 부정 케이스(python, 스텁·네트워크 0·더미 키 'x') · 재실행(1차는 PYTHONPATH 누락으로 ModuleNotFoundError) ==
+OK   a1 env 주입: ENABLED=openai + PROVIDER=gemini: InvalidValue: select_provider: LLM_PROVIDER 'gemini' is not in LLM_PROVIDERS_ENABLED (active: ['openai'])
+OK   a2 os.environ: ENABLED=openai + PROVIDER=gemini (env 생략): InvalidValue: select_provider: LLM_PROVIDER 'gemini' is not in LLM_PROVIDERS_ENABLED (active: ['openai'])
+OK   a3 caller_from_env 도 같은 거부: InvalidValue: select_provider: LLM_PROVIDER 'gemini' is not in LLM_PROVIDERS_ENABLED (active: ['openai'])
+OK   b LLM_PROVIDER='fake': InvalidValue: select_provider: unknown LLM_PROVIDER 'fake' (expected one of ['anthropic', 'gemini', 'openai'])
+OK   b LLM_PROVIDER='FAKE ': InvalidValue: select_provider: unknown LLM_PROVIDER 'FAKE ' (expected one of ['anthropic', 'gemini', 'openai'])
+OK   b LLM_PROVIDER=' Fake': InvalidValue: select_provider: unknown LLM_PROVIDER ' Fake' (expected one of ['anthropic', 'gemini', 'openai'])
+OK   b LLM_PROVIDER='llama': InvalidValue: select_provider: unknown LLM_PROVIDER 'llama' (expected one of ['anthropic', 'gemini', 'openai'])
+OK   b LLM_PROVIDER='': InvalidValue: select_provider: unknown LLM_PROVIDER '' (expected one of ['anthropic', 'gemini', 'openai'])
+OK   b enabled 목록 안 오타 'anthropic,llama': InvalidValue: enabled_providers: LLM_PROVIDERS_ENABLED has unknown name(s) ['llama'] (expected subset of ['anthropic', 'gemini', 'openai'])
+OK   b 대소문자·공백 'GEMINI ' 는 표에 있으나 비활성이면 거부: InvalidValue: select_provider: LLM_PROVIDER ' GEMINI ' is not in LLM_PROVIDERS_ENABLED (active: ['anthropic'])
+OK   b' 정규화 양성: ' Gemini ' + ' GEMINI ,openai' → GeminiJudge: GeminiJudge
+OK   c1 FakeJudge not in JUDGES.values(): ['anthropic', 'gemini', 'openai']
+OK   c2 'fake' not in JUDGES: 
+OK   c3 CALLERS.keys() == JUDGES.keys(): ['anthropic', 'gemini', 'openai']
+OK   c4 JUDGES 값이 세 클래스: 
+OK   c5 llm_single 가 judge 의 헬퍼 같은 객체: 
+OK   d1 judge_from_env gemini, GEMINI_MODEL 미설정: InvalidValue: GeminiJudge: GEMINI_MODEL 환경변수가 필요하다(기본값 없음 -- D11 결정 3). Google AI 콘솔에서 확인한 모델 이름을 .env 의 GEMINI_MODEL 에 넣는다
+OK   d2 caller_from_env gemini, GEMINI_MODEL 미설정: InvalidValue: GeminiSingleCaller: GEMINI_MODEL 환경변수가 필요하다(기본값 없음 -- D11 결정 3). Google AI 콘솔에서 확인한 모델 이름을 .env 의 GEMINI_MODEL 에 넣는다
+OK   d3 GEMINI_MODEL='' 도 미설정 취급: InvalidValue: GeminiJudge: GEMINI_MODEL 환경변수가 필요하다(기본값 없음 -- D11 결정 3). Google AI 콘솔에서 확인한 모델 이름을 .env 의 GEMINI_MODEL 에 넣는다
+OK   e GeminiJudge timeout x2: err 'timeout' calls=2 (want 'timeout' calls=2)
+OK   e GeminiJudge connection x2: err 'connection' calls=2 (want 'connection' calls=2)
+OK   e GeminiJudge 429 then success (재시도 없음): err 'rate_limit' calls=1 (want 'rate_limit' calls=1)
+OK   e GeminiJudge 500 then success (재시도 없음): err 'api_error' calls=1 (want 'api_error' calls=1)
+OK   e GeminiJudge 400: err 'api_error' calls=1 (want 'api_error' calls=1)
+OK   e GeminiJudge 503: err 'api_error' calls=1 (want 'api_error' calls=1)
+OK   e GeminiJudge timeout then 429 (재시도 뒤 429 는 즉시): err 'rate_limit' calls=2 (want 'rate_limit' calls=2)
+OK   e GeminiJudge text 없음: err 'schema' calls=1 (want 'schema' calls=1)
+OK   e GeminiJudge text 비JSON: err 'schema' calls=1 (want 'schema' calls=1)
+OK   e GeminiJudge 후보 밖 id 9: err 'out_of_range_id' calls=1 (want 'out_of_range_id' calls=1)
+OK   e GeminiJudge s_llm 1.5: err 'schema' calls=1 (want 'schema' calls=1)
+OK   e GeminiJudge timeout 1회 뒤 성공: ok calls=2 provider=gemini model=gemini-x-model
+OK   e 관측된 오류 어휘 ⊆ 6종: ['api_error', 'connection', 'out_of_range_id', 'rate_limit', 'schema', 'timeout']
+OK   e GeminiSingleCaller timeout x2: err 'timeout' calls=2
+OK   e GeminiSingleCaller 429 then success: err 'rate_limit' calls=1
+OK   e GeminiSingleCaller 500: err 'api_error' calls=1
+OK   s1 JUDGEMENT_SCHEMA 불변: 
+OK   s2 변환: matched_person_id nullable INTEGER · s_llm NUMBER 0~1 · required 3: {"type": "OBJECT", "properties": {"matched_person_id": {"type": "INTEGER", "nullable": true}, "s_llm": {"type": "NUMBER", "minimum": 0, "maximum": 1}, "reason": {"type": "STRING"}}, "required": ["matched_person_id", "s_llm", "reason"], "additionalProperties": false}
+OK   s3 요청 config temperature=0 · application/json · response_schema: temp=0.0 mime=application/json
+OK   s4 요청 본문에 GEMINI_API_KEY 이름·환경변수 덤프 없음: 
+OK   r3 os.environ ENABLED=gemini 인데 env 주입 ENABLED=anthropic → openai 거부: InvalidValue: select_provider: LLM_PROVIDER 'openai' is not in LLM_PROVIDERS_ENABLED (active: ['anthropic'])
+OK   def1 enabled_providers({}) = 전체: 
+OK   def2 enabled_providers('   ') = 전체: 
+OK   def3 select_provider({}) = 'openai' (D11 결정 2): openai
+
+TOTAL=43 MISMATCH=0
+rc=0
+
+== 스크립트 원문 ==
+"""verifier 부정 케이스 (P3-llm-providers 04-review §3). 네트워크 0 · 더미 키 값은 "x" 만 ·
+환경변수 전체 출력 없음 · .env 미열람. 스텁은 tests/test_er_judge.py 의 StubGeminiClient 와 같은 방식."""
+from __future__ import annotations
+
+import copy
+import json
+import os
+import sys
+from types import SimpleNamespace
+
+import httpx
+from google.genai import errors as genai_errors
+
+from app.er.judge import (
+    JUDGES,
+    JUDGEMENT_SCHEMA,
+    FakeJudge,
+    GeminiJudge,
+    ClaudeJudge,
+    OpenAIJudge,
+    _to_gemini_schema,
+    enabled_providers,
+    judge_from_env,
+    select_provider,
+)
+from app.er.types import JudgeUnavailable, ScoredCandidate
+from app.tools.types import InvalidValue
+from evaluation.resolvers import llm_single
+from evaluation.resolvers.llm_single import CALLERS, GeminiSingleCaller, caller_from_env
+
+VOCAB = {"timeout", "rate_limit", "api_error", "connection", "schema", "out_of_range_id"}
+results: list[tuple[str, bool, str]] = []
+
+
+def case(name: str, ok: bool, detail: str) -> None:
+    results.append((name, ok, detail))
+    print(f"{'OK  ' if ok else 'MISS'} {name}: {detail}")
+
+
+def expect_invalid(name: str, fn, must_contain=(), must_not_contain=()):
+    try:
+        fn()
+    except InvalidValue as exc:
+        msg = str(exc)
+        ok = all(s in msg for s in must_contain) and not any(s in msg for s in must_not_contain)
+        case(name, ok, f"InvalidValue: {msg}")
+    except Exception as exc:  # noqa: BLE001
+        case(name, False, f"wrong exception {type(exc).__name__}: {exc}")
+    else:
+        case(name, False, "no exception")
+
+
+# --- 스텁 (tests/test_er_judge.py 163~190행과 같은 형태) -----------------------
+class _Models:
+    def __init__(self, outer):
+        self._outer = outer
+
+    def generate_content(self, **kwargs):
+        self._outer.calls.append(kwargs)
+        item = self._outer.queue.pop(0) if self._outer.queue else self._outer.response
+        if isinstance(item, BaseException):
+            raise item
+        return item
+
+
+class StubGeminiClient:
+    def __init__(self, response=None, queue=None):
+        self.response = response
+        self.queue = list(queue) if queue else []
+        self.calls = []
+        self.models = _Models(self)
+
+
+def gem_resp(pid, s, reason="r"):
+    return SimpleNamespace(
+        text=json.dumps({"matched_person_id": pid, "s_llm": s, "reason": reason}),
+        usage_metadata=SimpleNamespace(prompt_token_count=7, candidates_token_count=3),
+        model_version="gemini-x-model",
+    )
+
+
+CANDS = [
+    ScoredCandidate(person_id=1, display_name="김팀장", aliases=("팀장",), relation_tag="직장", hierarchy="상", s_emb=0.9, rule_flags={})
+]
+
+# --- (a) 비활성 거부 ------------------------------------------------------------
+os.environ["GEMINI_API_KEY"] = "x"
+os.environ["GEMINI_MODEL"] = "gemini-x-model"
+expect_invalid(
+    "a1 env 주입: ENABLED=openai + PROVIDER=gemini",
+    lambda: judge_from_env({"LLM_PROVIDER": "gemini", "LLM_PROVIDERS_ENABLED": "openai"}),
+    must_contain=("openai", "LLM_PROVIDERS_ENABLED"),
+    must_not_contain=("API_KEY", "gemini-x-model"),
+)
+os.environ["LLM_PROVIDERS_ENABLED"] = "openai"
+os.environ["LLM_PROVIDER"] = "gemini"
+expect_invalid(
+    "a2 os.environ: ENABLED=openai + PROVIDER=gemini (env 생략)",
+    lambda: judge_from_env(),
+    must_contain=("active", "openai"),
+    must_not_contain=("API_KEY",),
+)
+expect_invalid(
+    "a3 caller_from_env 도 같은 거부",
+    lambda: caller_from_env(client=object()),
+    must_contain=("active", "openai"),
+    must_not_contain=("API_KEY",),
+)
+del os.environ["LLM_PROVIDERS_ENABLED"]
+del os.environ["LLM_PROVIDER"]
+
+# --- (b) 미지 이름 --------------------------------------------------------------
+for raw in ("fake", "FAKE ", " Fake", "llama", ""):
+    expect_invalid(
+        f"b LLM_PROVIDER={raw!r}",
+        lambda raw=raw: judge_from_env({"LLM_PROVIDER": raw}),
+        must_contain=("anthropic", "openai", "gemini"),
+        must_not_contain=("API_KEY",),
+    )
+expect_invalid(
+    "b enabled 목록 안 오타 'anthropic,llama'",
+    lambda: enabled_providers({"LLM_PROVIDERS_ENABLED": "anthropic,llama"}),
+    must_contain=("llama", "anthropic", "openai", "gemini"),
+)
+expect_invalid(
+    "b 대소문자·공백 'GEMINI ' 는 표에 있으나 비활성이면 거부",
+    lambda: judge_from_env({"LLM_PROVIDER": " GEMINI ", "LLM_PROVIDERS_ENABLED": "anthropic"}),
+    must_contain=("anthropic",),
+)
+# 정규화 양성 대조군
+try:
+    j = judge_from_env({"LLM_PROVIDER": " Gemini ", "LLM_PROVIDERS_ENABLED": " GEMINI ,openai"})
+    case("b' 정규화 양성: ' Gemini ' + ' GEMINI ,openai' → GeminiJudge", isinstance(j, GeminiJudge), type(j).__name__)
+except Exception as exc:  # noqa: BLE001
+    case("b' 정규화 양성", False, f"{type(exc).__name__}: {exc}")
+
+# --- (c) FakeJudge 표 밖 · CALLERS == JUDGES ------------------------------------
+case("c1 FakeJudge not in JUDGES.values()", FakeJudge not in JUDGES.values(), str(sorted(JUDGES)))
+case("c2 'fake' not in JUDGES", "fake" not in JUDGES, "")
+case("c3 CALLERS.keys() == JUDGES.keys()", CALLERS.keys() == JUDGES.keys(), str(sorted(CALLERS)))
+case("c4 JUDGES 값이 세 클래스", set(JUDGES.values()) == {ClaudeJudge, OpenAIJudge, GeminiJudge}, "")
+case("c5 llm_single 가 judge 의 헬퍼 같은 객체", llm_single._to_gemini_schema is _to_gemini_schema and llm_single.select_provider is select_provider, "")
+
+# --- (d) GEMINI_MODEL 미설정 ----------------------------------------------------
+del os.environ["GEMINI_MODEL"]
+expect_invalid("d1 judge_from_env gemini, GEMINI_MODEL 미설정", lambda: judge_from_env({"LLM_PROVIDER": "gemini"}), must_contain=("GEMINI_MODEL",), must_not_contain=("API_KEY",))
+expect_invalid("d2 caller_from_env gemini, GEMINI_MODEL 미설정", lambda: caller_from_env({"LLM_PROVIDER": "gemini"}, client=object()), must_contain=("GEMINI_MODEL",))
+os.environ["GEMINI_MODEL"] = ""
+expect_invalid("d3 GEMINI_MODEL='' 도 미설정 취급", lambda: judge_from_env({"LLM_PROVIDER": "gemini"}), must_contain=("GEMINI_MODEL",))
+os.environ["GEMINI_MODEL"] = "gemini-x-model"
+
+# --- (e) GeminiJudge 오류 매핑 --------------------------------------------------
+def run_judge(queue=None, response=None):
+    client = StubGeminiClient(response=response, queue=queue)
+    judge = GeminiJudge(model="gemini-x-model", client=client)
+    try:
+        out = judge.judge("팀장", "팀장이 회의를 잡았다", CANDS)
+        return ("ok", out, len(client.calls))
+    except JudgeUnavailable as exc:
+        return ("err", str(exc), len(client.calls))
+
+
+seen_errors = set()
+for label, queue, want_err, want_calls in [
+    ("timeout x2", [httpx.TimeoutException("t1"), httpx.TimeoutException("t2")], "timeout", 2),
+    ("connection x2", [httpx.ConnectError("c1"), httpx.ConnectError("c2")], "connection", 2),
+    ("429 then success (재시도 없음)", [genai_errors.ClientError(429, {"error": {"message": "rl"}}, None), gem_resp(1, 0.9)], "rate_limit", 1),
+    ("500 then success (재시도 없음)", [genai_errors.ServerError(500, {"error": {"message": "se"}}, None), gem_resp(1, 0.9)], "api_error", 1),
+    ("400", [genai_errors.ClientError(400, {"error": {"message": "br"}}, None)], "api_error", 1),
+    ("503", [genai_errors.ServerError(503, {"error": {"message": "un"}}, None)], "api_error", 1),
+    ("timeout then 429 (재시도 뒤 429 는 즉시)", [httpx.TimeoutException("t1"), genai_errors.ClientError(429, {"error": {"message": "rl"}}, None)], "rate_limit", 2),
+    ("text 없음", [SimpleNamespace(text=None, usage_metadata=None)], "schema", 1),
+    ("text 비JSON", [SimpleNamespace(text="not json", usage_metadata=None)], "schema", 1),
+    ("후보 밖 id 9", [gem_resp(9, 0.9)], "out_of_range_id", 1),
+    ("s_llm 1.5", [gem_resp(1, 1.5)], "schema", 1),
+]:
+    kind, val, calls = run_judge(queue=queue)
+    ok = kind == "err" and val == want_err and calls == want_calls
+    if kind == "err":
+        seen_errors.add(val)
+    case(f"e GeminiJudge {label}", ok, f"{kind} {val!r} calls={calls} (want {want_err!r} calls={want_calls})")
+
+kind, val, calls = run_judge(queue=[httpx.TimeoutException("t1"), gem_resp(1, 0.9)])
+case("e GeminiJudge timeout 1회 뒤 성공", kind == "ok" and val.matched_person_id == 1 and calls == 2 and val.provider == "gemini" and val.model == "gemini-x-model" and (val.tokens_in, val.tokens_out) == (7, 3), f"{kind} calls={calls} provider={getattr(val,'provider',None)} model={getattr(val,'model',None)}")
+case("e 관측된 오류 어휘 ⊆ 6종", seen_errors <= VOCAB, str(sorted(seen_errors)))
+
+# GeminiSingleCaller 도 같은 매핑
+def run_caller(queue):
+    client = StubGeminiClient(queue=queue)
+    caller = GeminiSingleCaller(model="gemini-x-model", client=client)
+    try:
+        caller.complete("s", "u")
+        return ("ok", None, len(client.calls))
+    except JudgeUnavailable as exc:
+        return ("err", str(exc), len(client.calls))
+
+
+for label, queue, want_err, want_calls in [
+    ("timeout x2", [httpx.TimeoutException("t1"), httpx.TimeoutException("t2")], "timeout", 2),
+    ("429 then success", [genai_errors.ClientError(429, {"error": {"message": "rl"}}, None), gem_resp(1, 0.9)], "rate_limit", 1),
+    ("500", [genai_errors.ServerError(500, {"error": {"message": "se"}}, None)], "api_error", 1),
+]:
+    kind, val, calls = run_caller(queue)
+    case(f"e GeminiSingleCaller {label}", kind == "err" and val == want_err and calls == want_calls, f"{kind} {val!r} calls={calls}")
+
+# --- 스키마 불변·변환 -----------------------------------------------------------
+before = copy.deepcopy(JUDGEMENT_SCHEMA)
+conv = _to_gemini_schema(JUDGEMENT_SCHEMA)
+case("s1 JUDGEMENT_SCHEMA 불변", JUDGEMENT_SCHEMA == before, "")
+p = conv["properties"]
+case(
+    "s2 변환: matched_person_id nullable INTEGER · s_llm NUMBER 0~1 · required 3",
+    p["matched_person_id"] == {"type": "INTEGER", "nullable": True}
+    and p["s_llm"]["type"] == "NUMBER" and p["s_llm"]["minimum"] == 0 and p["s_llm"]["maximum"] == 1
+    and conv["required"] == ["matched_person_id", "s_llm", "reason"],
+    json.dumps(conv, ensure_ascii=False),
+)
+# 요청 본문에 temperature 0·mime·schema
+client = StubGeminiClient(response=gem_resp(None, 0.1))
+GeminiJudge(model="gemini-x-model", client=client).judge("팀장", "u", CANDS)
+cfg = client.calls[0]["config"]
+case("s3 요청 config temperature=0 · application/json · response_schema", cfg.temperature == 0 and cfg.response_mime_type == "application/json" and cfg.response_schema is not None and client.calls[0]["model"] == "gemini-x-model", f"temp={cfg.temperature} mime={cfg.response_mime_type}")
+body = json.dumps({"contents": client.calls[0]["contents"], "system": cfg.system_instruction}, default=str, ensure_ascii=False)
+case("s4 요청 본문에 GEMINI_API_KEY 이름·환경변수 덤프 없음", "GEMINI_API_KEY" not in body and "LLM_PROVIDER" not in body, "")
+
+# --- os.environ 누설 없음(R-3) --------------------------------------------------
+os.environ["LLM_PROVIDERS_ENABLED"] = "gemini"
+expect_invalid("r3 os.environ ENABLED=gemini 인데 env 주입 ENABLED=anthropic → openai 거부", lambda: judge_from_env({"LLM_PROVIDER": "openai", "LLM_PROVIDERS_ENABLED": "anthropic"}), must_contain=("anthropic",))
+del os.environ["LLM_PROVIDERS_ENABLED"]
+
+# --- 기본값 ------------------------------------------------------------------------
+case("def1 enabled_providers({}) = 전체", enabled_providers({}) == frozenset({"anthropic", "openai", "gemini"}), "")
+case("def2 enabled_providers('   ') = 전체", enabled_providers({"LLM_PROVIDERS_ENABLED": "   "}) == frozenset({"anthropic", "openai", "gemini"}), "")
+case("def3 select_provider({}) = 'openai' (D11 결정 2)", select_provider({}) == "openai", select_provider({}))
+
+miss = [r for r in results if not r[1]]
+print(f"\nTOTAL={len(results)} MISMATCH={len(miss)}")
+sys.exit(1 if miss else 0)

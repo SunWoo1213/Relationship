@@ -1,0 +1,158 @@
+== (f) grep -rn evaluation app/ --include=*.py ==
+rc=1 (1 = 0건)
+== (f) grep -rln google app/ --include=*.py ==
+app/er/judge.py
+== judge.py 밖 ==
+rc=1 (1 = 0건)
+== (g) git diff --name-only 025a7c4..HEAD -- app/ ==
+app/er/judge.py
+app/settings.py
+== (g) git diff --name-only 025a7c4..HEAD -- scripts/ tests/ requirements.txt evaluation/ ==
+evaluation/resolvers/llm_single.py
+requirements.txt
+scripts/baseline_smoke.py
+scripts/er_smoke.py
+tests/test_baseline_llm_single.py
+tests/test_er_judge.py
+tests/test_er_smoke.py
+== (g) 03-log 선언 파일(코드) 대조: U1 app/er/judge.py app/settings.py .env.example tests/test_er_judge.py tests/test_er_smoke.py scripts/er_smoke.py scripts/baseline_smoke.py · U2 app/er/judge.py requirements.txt tests/test_er_judge.py · U3 evaluation/resolvers/llm_single.py tests/test_baseline_llm_single.py · U4 README.md docs/user-setup/01,03,08 D11 registry scripts/er_smoke.py scripts/baseline_smoke.py tests/test_er_smoke.py ==
+== (g) 전체 변경 파일(evidence 제외) ==
+.env.example
+README.md
+app/er/judge.py
+app/settings.py
+docs/user-setup/01-env-keys.md
+docs/user-setup/03-er-smoke.md
+docs/user-setup/08-baseline-smoke.md
+docs/wiki/HANDOFF.md
+docs/wiki/decisions/D11-llm-provider-registry.md
+docs/wiki/journal.md
+docs/wiki/packages/P3-llm-providers/01-plan.md
+docs/wiki/packages/P3-llm-providers/03-log.md
+docs/wiki/packages/P3-llm-providers/05-remediation.md
+docs/wiki/registry.md
+evaluation/resolvers/llm_single.py
+requirements.txt
+scripts/baseline_smoke.py
+scripts/er_smoke.py
+tests/test_baseline_llm_single.py
+tests/test_er_judge.py
+tests/test_er_smoke.py
+== (h) git diff 025a7c4..HEAD --stat -- tests/ ==
+ tests/test_baseline_llm_single.py | 329 +++++++++++++++++++++++++++-
+ tests/test_er_judge.py            | 450 +++++++++++++++++++++++++++++++++++++-
+ tests/test_er_smoke.py            |  25 ++-
+ 3 files changed, 788 insertions(+), 16 deletions(-)
+== (h) 삭제·개명된 def test_ / parametrize ==
+-@pytest.mark.parametrize("provider", ["gemini", "llama"])
+-def test_caller_from_env_rejects_unimplemented_provider(provider: str) -> None:
+-def test_judge_from_env_defaults_to_anthropic(monkeypatch):
+-def test_judge_from_env_gemini_is_reserved_not_implemented():
+-def test_main_missing_anthropic_key_returns_2(monkeypatch, capsys):
+== (h) tests/test_er_smoke.py 코드 변경 줄(주석 제외) ==
+-def test_main_missing_anthropic_key_returns_2(monkeypatch, capsys):
++def test_main_missing_openai_key_returns_2(monkeypatch, capsys):
+-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
++    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+-    assert "ANTHROPIC_API_KEY" in captured.out
++    assert "OPENAI_API_KEY" in captured.out
++def test_main_missing_gemini_key_returns_2_with_provider_flag(monkeypatch, capsys):
++    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
++
++    rc = er_smoke.main(["--provider", "gemini"])
++
++    assert rc == 2
++    captured = capsys.readouterr()
++    assert "GEMINI_API_KEY" in captured.out
++    assert _FAKE_KEY_MARKER not in captured.out
++
++
+-    monkeypatch.setenv("ANTHROPIC_API_KEY", _FAKE_KEY_MARKER)
++    monkeypatch.setenv("OPENAI_API_KEY", _FAKE_KEY_MARKER)
+-    monkeypatch.setenv("ANTHROPIC_API_KEY", _FAKE_KEY_MARKER)
++    monkeypatch.setenv("OPENAI_API_KEY", _FAKE_KEY_MARKER)
+== (h) tests/ 의 다른 파일 변경 0 ==
+rc=1 (1 = 0건)
+== (i) app/ 판정 로직 공유 자산 무변경: git diff 025a7c4..HEAD -- app/er/judge.py 에서 JUDGEMENT_SCHEMA·build_prompt·validate_judgement·call_with_error_mapping 정의 줄 변경 ==
+rc=1 (1 = 0건)
+== (i) app/er/confidence.py·app/embedding.py·app/er/rules.py 무변경 ==
+rc=0
+== (i) 삭제된 줄 수(app/er/judge.py) ==
+380	31	app/er/judge.py
+15	4	app/settings.py
+== (i) app/er/judge.py 에서 삭제된 줄 전부 ==
+-"""Refs: P3-er S3.3 D3 D4 D5 R4 결정3 결정3-c F-5a97ef -- 3단계(LLM 판정).
+-- **팩토리** `judge_from_env(env=None)`: `LLM_PROVIDER`(기본 `anthropic`)
+-  로 고른다. `gemini` 는 새 의존성(`google-genai`)이 필요해 이번에
+-  구현하지 않고, 사람이 읽는 `InvalidValue` 로 예약만 한다.
+-#: `judge_from_env()` 가 고르는 공급자 이름 -- `app.settings.LLM_PROVIDER`
+-#: 기본값과 같은 어휘. `gemini` 는 예약만(아래 함수 docstring).
+-_KNOWN_PROVIDERS = ("anthropic", "openai", "gemini")
+-def judge_from_env(env: dict[str, str] | None = None) -> Judge:
+-    """`LLM_PROVIDER`(기본 `anthropic`, `app.settings.LLM_PROVIDER`)로
+-    판정기를 고른다. 모델은 공급자별 env(`ANTHROPIC_MODEL`/`OPENAI_MODEL`/
+-    `GEMINI_MODEL`)를 각 판정기 생성자가 그대로 읽는다(이 함수는 모델
+-    문자열을 여기서 다시 읽지 않는다 -- 단일 출처는 각 Judge 클래스).
+-    `env` 를 생략하면 `os.environ` 을 읽는다(`app.settings` 의 다른 로더와
+-    같은 규약). `.env` 는 읽지 않는다.
+-    - `"anthropic"` -> `ClaudeJudge()`
+-    - `"openai"` -> `OpenAIJudge()`
+-    - `"gemini"` -> 아직 구현하지 않는다(`google-genai` 의존성이 없다) --
+-      `InvalidValue("gemini 판정기는 아직 구현되지 않았다 — google-genai "
+-      "의존성 추가 필요")` 를 던진다(우회 구현하지 않는다, 원칙8).
+-    - 그 밖의 값 -> `InvalidValue`.
+-    provider = env.get("LLM_PROVIDER", LLM_PROVIDER)
+-    if provider == "anthropic":
+-        return ClaudeJudge()
+-    if provider == "openai":
+-        return OpenAIJudge()
+-    if provider == "gemini":
+-            "gemini 판정기는 아직 구현되지 않았다 — google-genai 의존성 추가 필요"
+-    raise InvalidValue(
+-        f"judge_from_env: unknown LLM_PROVIDER {provider!r} "
+-        f"(expected one of {_KNOWN_PROVIDERS})"
+-    )
+== (j) settings.py diff ==
+-#: 3단계 LLM 판정 공급자 기본값(사용자 결정 2026-09-06 -- 공급자 중립).
+-#: `app/er/judge.py` 의 `judge_from_env()` 가 `LLM_PROVIDER` 환경변수를
+-#: 읽을 때 이 값이 기본이다. `.env.example` 에 이름만 추가한다(값은 비움).
+-LLM_PROVIDER = "anthropic"
++#: 3단계 LLM 판정 공급자 기본값(D11 결정 2, 2026-09-11 -- 사용자 결정
++#: "현재는 OpenAI 로만 실행"). `app/er/judge.py` 의 `select_provider()`/
++#: `judge_from_env()` 와 베이스라인 단일 프롬프트 caller 모듈
++#: (`llm_single.py`)의 `caller_from_env()` 가 `LLM_PROVIDER` 환경변수를 읽을 때 이 값이
++#: 기본이다. 기획서 전제(Claude)와 다른 **운영 기본값**의 변경이며 확신도
++#: 공식(D3)·판정 프롬프트를 바꾸지 않는다(D11 참조). `.env.example` 에
++#: 값을 그대로 적는다.
++LLM_PROVIDER = "openai"
++
++#: `LLM_PROVIDERS_ENABLED`(D11 결정 1) 미설정·공백만일 때의 기본값 --
++#: 표(`app.er.judge.JUDGES`) 전체를 켠 상태다. 끄는 것은 명시적 행위여야
++#: 재현성이 유지된다(원칙8) -- "키가 있는 것만 켬" 같은 조용한 기본값은
++#: 쓰지 않는다. `app/er/judge.py` 는 이 상수를 **import 해서만** 쓰고
++#: 같은 목록 리터럴을 다시 쓰지 않는다(R-4 단일 출처).
++LLM_PROVIDERS_ENABLED_DEFAULT = "anthropic,openai,gemini"
+== (k) D4·proposal·reports·app/embedding 무변경 ==
+rc=0 (출력 0줄 기대)
+== (l) 오류 어휘: judge.py 의 JudgeUnavailable("…") 리터럴 집합 ==
+      4 "api_error")
+      2 "connection")
+      1 "out_of_range_id")
+      2 "rate_limit")
+     22 "schema")
+      2 "timeout")
+== (l) safety|blocked ==
+rc=1 (1 = 0건)
+== (m) 등록표 단일성 ==
+^JUDGES: 1
+_KNOWN_PROVIDERS: 0
+llm_single InvalidValue( 호출 줄: 527:                raise InvalidValue(
+llm_single 재정의 0: 0
+== (n) HttpOptions.timeout 단위 실측 ==
+Timeout for the request in milliseconds. typing.Optional[int]
+GeminiJudge: int(self.timeout * 1000) -> app/er/judge.py:673 / llm_single.py:540
+== (o) pip show google-genai 버전 == requirements 핀 ==
+Version: 2.23.0
+18:google-genai==2.23.0
+== (p) import without keys ==
+ok

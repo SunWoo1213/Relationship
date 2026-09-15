@@ -11,6 +11,7 @@
 > - **부록 A의 "F1 0.87, 오병합률 3%, 베이스라인 대비 +0.19" 등 수치는 예시이며 측정 결과가 아니다.**
 > - **제목의 "관계 그래프"는 "관계 메모리"로 변경 확정(D8).** 확정 제목: "대화형 관계 메모리 에이전트 — 자연어 대화에서 자동 구축되는 개인 관계 메모리 기반 브리핑 시스템".
 > - 설계 확정(스키마 v2·툴 시그니처 v2·확신도·임계치·ask_user 프로토콜)은 `docs/resolution-plan.md` 3장이 권위를 갖는다.
+> - **LLM 판정기 기본 공급자는 OpenAI 로 확정(D11, 2026-09-15).** 기획서 전제(Claude API)와 달리 운영 기본값 `LLM_PROVIDER=openai`, 등록표 anthropic|openai|gemini 에서 선택·활성 스위치. 확신도 공식(D3)·판정 프롬프트·구조화 출력 스키마는 바꾸지 않았다. 카드: `docs/wiki/decisions/D11-llm-provider-registry.md`.
 > - 검증 항목별 처리 상태는 `docs/proposal-review.md` 참조.
 
 ---
