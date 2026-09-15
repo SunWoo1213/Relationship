@@ -145,3 +145,6 @@
 - 2026-09-15 13:52 | COMMIT | 7b94a69 feat(P3-llm-providers): U3 GeminiSingleCaller — D11 등록표·select_provider 재사용, Gemini 스키마 변환·오류 매핑 공유, R-1(c) 테스트 이동, 테스트 22건
 - 2026-09-15 15:10 | COMMIT | 10a66c3 docs(P3-llm-providers): U4 문서·evidence — README·user-setup 01/03/08 Gemini·활성 스위치 반영, R-7 스모크 gemini 키 행, registry 비고 8행, D11 이력
 - 2026-09-15 15:45 | DONE | P3-llm-providers 완료 승인(사용자). U1~U4(c01381d cf01e9f 7b94a69 10a66c3), verifier(fable) 04-review `완료`(수용 기준 11/11, 부정 python 43/43, D11 (a)~(e) 1:1, 03-log 판단 8건 채택, registry 소견 9건 해소; 유일한 필수 F-4ef1a3 = R-8 vs verify-impl 6번 충돌 → 사용자 결정 (i) D11 카드 registry 행 1줄, H-1 (a) proposal 상단 안내문 1줄 → 재실행 FAIL 0/WARN 0 evidence 20260915-1537-close-verify-impl.txt, pytest 918). 실호출 검증 공급자 0/3(F-87c597 열림, R4 는 P4). P4 인계 7항(04-review §7). 하네스 L-nnn 후보: verify-impl 6번 '확장 전용 패키지' 표현 | P3-llm-providers D11 L-002 L-004
+- 2026-09-15 15:44 | COMMIT | 59c67cc docs(P3-llm-providers): 완료 검토·패키지 종료 — verifier 04-review 완료(수용 11/11·부정 43/43·소견 0), registry D11 행, proposal 안내문 1줄(D11), CURRENT none
+- 2026-09-15 15:44 | PUSH | origin dev 59c67cc — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-15 15:47 | RELEASE | origin main ← dev 59c67cc

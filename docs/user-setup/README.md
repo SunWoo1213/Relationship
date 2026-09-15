@@ -16,6 +16,7 @@
 | 06 | [하네스 승인 결정(무엇을 물어보는가)](06-approval-decisions.md) | 매 세션 | 상시 | `docs/wiki/lessons/`, `.claude/skills/commit` |
 | 07 | [데모 리허설(P11)](07-demo-rehearsal.md) | P9 배포 후 | 해당 없음 | `docs/backlog.md` 74행, `README.md` "데모 시나리오" |
 | 08 | [베이스라인 3 실 LLM 스모크](08-baseline-smoke.md) | 키를 넣은 뒤. **P4 파일럿 평가 전에 한 번**(03 카드와 같은 시점) | **미실행** | `scripts/baseline_smoke.py`, `README.md` "베이스라인 3종 실행법" |
+| 09 | [AWS 배포 가이드라인(몇 명 규모)](09-aws-deploy.md) | P9 착수 전 §2 결정 10개 확정, 4.0 은 지금(Budgets·도메인·SSO 프로필·GitHub prod 환경) | **미착수**(P9 전) | `SERVER-CHECKLIST.md`, `05-server-secrets.md`, `docs/wiki/decisions/D07-tls-caddy.md` |
 
 ## 규칙 (전 카드 공통)
 
