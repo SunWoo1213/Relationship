@@ -1,0 +1,3 @@
+$ PYTHONIOENCODING=utf-8 POSTGRES_PORT=5433 python -m pytest tests/test_baseline_parity.py -q -rs
+..............................................                           [100%]
+46 passed in 7.38s

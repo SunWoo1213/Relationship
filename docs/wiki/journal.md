@@ -140,3 +140,5 @@
 - 2026-09-14 16:01 | START | P3-llm-providers 착수 — 사용자 재개 결정(이어서 완료)·계획 승인·U1 backend-agent 위임 승인(L-004). verifier 02-plan-verify 통과(FAIL 0/WARN 11 의도, 점검표 8/8, 보류 0, 권고 R-1~R-9 실행 시 반영), D11 카드 신설·D03 상호참조. U1 등록표·스위치 → U2 GeminiJudge → U3 GeminiSingleCaller → U4 문서·evidence → verifier 04-review | P3-llm-providers D11 D3 D4 S3.3 S3.7 원칙4 원칙8 L-002 L-004
 - 2026-09-14 16:05 | COMMIT | 025a7c4 docs(P3-llm-providers): 계획검증 통과·계획 승인·D11 카드 신설 — 공급자 등록표·활성 스위치·기본 openai, 패키지 착수
 - 2026-09-14 16:33 | COMMIT | c01381d feat(P3-llm-providers): U1 공급자 등록표·활성 스위치 — JUDGES 단일 표·select_provider 거부 판정·LLM_PROVIDERS_ENABLED 파싱·기본 openai, 테스트 11건
+- 2026-09-14 17:04 | COMMIT | cf01e9f feat(P3-llm-providers): U2 GeminiJudge — google-genai 2.23.0 실측 기반 오류 매핑·스키마 변환·1회 재시도, 테스트 29건
+- 2026-09-14 17:58 | STOP | 사용자 요청 중단. 재개→계획 승인·커밋 025a7c4, U1 등록표·스위치 c01381d(873 passed), U2 GeminiJudge cf01e9f(896 passed, google-genai 2.23.0 실측 6건, 멈춤 규칙 미발동). **U3 미착수** — 다음 세션 L-004 U3 위임 승인부터(HANDOFF 재개 절차 (1)~(3)). 미푸시 4. evidence u2-import-module.txt 1개 미커밋 | P3-llm-providers D11 L-004

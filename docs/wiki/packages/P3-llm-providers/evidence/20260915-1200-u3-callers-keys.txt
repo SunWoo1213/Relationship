@@ -1,0 +1,2 @@
+$ python -c "from app.er import judge; from evaluation.resolvers import llm_single; print(sorted(llm_single.CALLERS), sorted(judge.JUDGES), sorted(llm_single.CALLERS)==sorted(judge.JUDGES))"
+['anthropic', 'gemini', 'openai'] ['anthropic', 'gemini', 'openai'] True

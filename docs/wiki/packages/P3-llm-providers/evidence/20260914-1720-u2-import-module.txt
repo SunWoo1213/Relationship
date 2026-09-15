@@ -1,0 +1,2 @@
+$ python -c "import app.er.judge; print(\"ok\")"
+ok

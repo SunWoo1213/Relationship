@@ -1,0 +1,3 @@
+$ git diff HEAD -- tests/ | grep "^-def\|^-    def\|^-@pytest.mark.parametrize"
+-@pytest.mark.parametrize("provider", ["gemini", "llama"])
+-def test_caller_from_env_rejects_unimplemented_provider(provider: str) -> None:

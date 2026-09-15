@@ -1,4 +1,6 @@
-"""Refs: P3-baselines S3.7 D3 원칙4 원칙8 -- 베이스라인 3 LLM 단일 프롬프트.
+"""Refs: P3-llm-providers S3.7 D3 D11 원칙8 -- 베이스라인 3 LLM 단일 프롬프트
+(P3-baselines 원작(원칙4, `ClaudeSingleCaller`/`OpenAISingleCaller`) +
+P3-llm-providers U3 가 `GeminiSingleCaller` 를 더한다, D11 등록표 재사용).
 
 **두 임계치**(base.py 불변 규약 4): 이 방식은 `T_merge`/`T_new` 를 **쓰지
 않는다** -- 결정 어휘까지 LLM 이 한 번에 내므로 바깥에 임계치 분기가
@@ -70,6 +72,29 @@
 (`person_count`)뿐이고 프롬프트 원문은 어디에도 저장하지 않는다. 그래서 P4
 비용 추정(01-plan 리스크 "비용")에 필요한 값은 남되 원문은 새지 않는다.
 
+## GeminiSingleCaller (P3-llm-providers U3, D11)
+
+`app/er/judge.py` 의 `GeminiJudge`(U2)와 같은 규약이다 -- `google-genai`
+지연 import, 키 인자 미전달(SDK 가 `GEMINI_API_KEY` 를 읽는다), `model`
+기본값을 두지 않고 **생성 시점**에 `GEMINI_MODEL` 을 읽어 미설정이면
+`InvalidValue`(D11 결정 3). `response_schema` 는 **두 번째 변환기를 만들지
+않고** `app.er.judge._to_gemini_schema(RESOLUTION_SCHEMA)` 를 그대로
+재사용한다(R-6 -- `RESOLUTION_SCHEMA` 의 `candidate_person_ids` 배열도 같은
+함수가 변환한다). 오류 매핑·1회 재시도도 `app.er.judge.call_with_gemini_error_mapping`
+을 재사용한다(결정 J -- `llm.error` 어휘가 다섯 방식에 동일). 이 caller 는
+`max_retries` 를 받지 않는다 -- 재시도는 그 헬퍼 안의 고정 1회 루프가
+담당하고(01-plan 96행, 횟수를 늘리지 않는다), `caller_from_env()` 는 그
+사실을 알 필요 없이 공통 인자를 넘기고 남는 인자는 무시한다.
+
+## 등록표 재사용 (P3-llm-providers U3, R-5)
+
+`caller_from_env()` 는 **자체 공급자 이름 목록·거부 로직을 갖지 않는다**
+-- `app.er.judge.select_provider(env)` 하나를 import 해 미지·비활성
+공급자 거부를 그 함수에 맡긴다(두 진입점이 같은 `env`·같은 표를 본다는
+R-4 를 유지). `CALLERS`(이름 -> caller 팩토리)는 `app.er.judge.JUDGES` 의
+키를 순회해 만들어 **키 목록을 문자열로 다시 쓰지 않는다**(`set(CALLERS)
+== set(judge.JUDGES)`).
+
 ## 부수효과 0 (불변 규약 1)
 
 DB 는 사전 상태 조회(`load_known_persons`, `SELECT` 만)에만 쓴다 --
@@ -82,9 +107,15 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Any, Callable, Protocol
 
-from app.er.judge import call_with_error_mapping
+from app.er.judge import (
+    JUDGES,
+    _to_gemini_schema,
+    call_with_error_mapping,
+    call_with_gemini_error_mapping,
+    select_provider,
+)
 from app.er.types import JudgeUnavailable
 from evaluation.resolvers.base import DECISIONS, MentionDecision, ResolverCandidate
 from evaluation.resolvers.exact_match import KnownPerson, load_known_persons
@@ -465,6 +496,131 @@ class OpenAISingleCaller:
         )
 
 
+@dataclass
+class GeminiSingleCaller:
+    """`google-genai` SDK, 강제 구조화 출력 1회(P3-llm-providers U3, D11).
+    `app/er/judge.py` 의 `GeminiJudge`(U2)와 **같은 규약**이다 -- 지연
+    import, 키 인자 미전달(SDK 가 `GEMINI_API_KEY` 를 환경변수에서 읽음),
+    `model` 기본값을 두지 않고 **생성 시점**에 `GEMINI_MODEL` 을 읽어
+    미설정이면 `app.tools.types.InvalidValue`(D11 결정 3). `response_schema`
+    는 `app.er.judge._to_gemini_schema(RESOLUTION_SCHEMA)` 를 재사용한다
+    (R-6, 두 번째 변환기를 만들지 않는다).
+
+    `max_retries` 필드가 **없다** -- `GeminiJudge` 와 같은 이유로 재시도는
+    `call_with_gemini_error_mapping()` 안의 고정 1회 루프가 담당한다
+    (01-plan 96행, 재시도 횟수를 늘리지 않는다). `caller_from_env()` 가
+    공통 인자를 넘길 때 이 caller 로 전달되는 `max_retries` 는 팩토리
+    래퍼가 버린다.
+    """
+
+    provider: str = "gemini"
+    model: str | None = None
+    client: Any = None
+    timeout: float = DEFAULT_TIMEOUT
+
+    def __post_init__(self) -> None:
+        if self.model is None:
+            model = os.environ.get("GEMINI_MODEL")
+            if not model:
+                from app.tools.types import InvalidValue
+
+                raise InvalidValue(
+                    "GeminiSingleCaller: GEMINI_MODEL 환경변수가 필요하다"
+                    "(기본값 없음 -- D11 결정 3). Google AI 콘솔에서 확인한 "
+                    "모델 이름을 .env 의 GEMINI_MODEL 에 넣는다"
+                )
+            self.model = model
+        if self.client is None:
+            from google import genai  # 지연 import -- 키·SDK 없이도 import 가 깨지지 않게.
+            from google.genai import types as genai_types
+
+            self.client = genai.Client(
+                http_options=genai_types.HttpOptions(timeout=int(self.timeout * 1000))
+            )
+
+    def complete(self, system: str, user_text: str) -> SingleCallResult:
+        from google.genai import types as genai_types  # 요청 조립용 지연 import.
+
+        config = genai_types.GenerateContentConfig(
+            system_instruction=system,
+            temperature=0,
+            response_mime_type="application/json",
+            response_schema=_to_gemini_schema(RESOLUTION_SCHEMA),
+        )
+
+        response = call_with_gemini_error_mapping(
+            lambda: self.client.models.generate_content(
+                model=self.model,
+                contents=user_text,
+                config=config,
+            )
+        )
+
+        text = getattr(response, "text", None)
+        if not text:
+            # 후보 블록 없음 · 안전 필터로 본문 없음 -- 둘 다 "스키마대로
+            # 된 결정을 못 받았다" 는 점에서 같다(D11 결정 4, 어휘를
+            # 늘리지 않는다, `GeminiJudge` 와 같은 판단).
+            raise JudgeUnavailable("schema")
+
+        try:
+            raw = json.loads(text)
+        except (TypeError, ValueError) as exc:
+            raise JudgeUnavailable("schema") from exc
+
+        usage = getattr(response, "usage_metadata", None)
+        tokens_in = getattr(usage, "prompt_token_count", 0) if usage is not None else 0
+        tokens_out = getattr(usage, "candidates_token_count", 0) if usage is not None else 0
+        model_used = getattr(response, "model_version", None) or self.model
+
+        return SingleCallResult(
+            raw=raw,
+            tokens_in=tokens_in or 0,
+            tokens_out=tokens_out or 0,
+            model=model_used,
+            provider=self.provider,
+        )
+
+
+def _claude_single_caller(
+    *, model: str | None, client: Any, timeout: float, max_retries: int
+) -> SingleCaller:
+    return ClaudeSingleCaller(
+        model=model, client=client, timeout=timeout, max_retries=max_retries
+    )
+
+
+def _openai_single_caller(
+    *, model: str | None, client: Any, timeout: float, max_retries: int
+) -> SingleCaller:
+    return OpenAISingleCaller(
+        model=model, client=client, timeout=timeout, max_retries=max_retries
+    )
+
+
+def _gemini_single_caller(
+    *, model: str | None, client: Any, timeout: float, max_retries: int
+) -> SingleCaller:
+    del max_retries  # GeminiSingleCaller 는 재시도 횟수 인자를 받지 않는다(위 docstring).
+    return GeminiSingleCaller(model=model, client=client, timeout=timeout)
+
+
+#: 이름 -> caller 팩토리. **`JUDGES`(`app.er.judge`) 의 키를 순회해 만든다**
+#: -- 공급자 이름 목록을 문자열로 다시 쓰지 않는다(R-5, D11 "자체 표
+#: 금지"). caller 클래스는 Judge 와 다른 타입이므로 별도 표를 두지만, 키
+#: 집합은 항상 `JUDGES` 와 같다(`set(CALLERS) == set(JUDGES)`, 테스트로
+#: 고정).
+_CALLER_FACTORY_BY_NAME: dict[str, Callable[..., SingleCaller]] = {
+    "anthropic": _claude_single_caller,
+    "openai": _openai_single_caller,
+    "gemini": _gemini_single_caller,
+}
+
+CALLERS: dict[str, Callable[..., SingleCaller]] = {
+    name: _CALLER_FACTORY_BY_NAME[name] for name in JUDGES
+}
+
+
 def caller_from_env(
     env: dict[str, str] | None = None,
     *,
@@ -473,41 +629,21 @@ def caller_from_env(
     timeout: float = DEFAULT_TIMEOUT,
     max_retries: int = DEFAULT_MAX_RETRIES,
 ) -> SingleCaller:
-    """`LLM_PROVIDER`(기본은 `app.settings.LLM_PROVIDER`)로 공급자를 고른다
-    -- **제안 방식(`judge_from_env`)과 같은 환경변수**를 읽는다(R-4). 모델은
-    각 caller 생성자가 공급자별 env(`ANTHROPIC_MODEL`/`OPENAI_MODEL`)를
-    읽으므로 여기서 다시 읽지 않는다(단일 출처).
+    """`select_provider(env)`(`app.er.judge`, D11)로 공급자 이름을 고르고
+    `CALLERS` 에서 팩토리를 찾아 caller 를 만든다.
 
-    `client` 는 테스트용 스텁 주입 자리다(네트워크 0). `gemini` 는
-    `judge_from_env()` 와 같은 이유로 구현하지 않고 사람이 읽는
-    `InvalidValue` 를 던진다(우회 구현하지 않는다, 원칙8).
+    이 함수는 **자체 공급자 이름 목록·거부 로직을 갖지 않는다**(R-5) --
+    미지 이름(표 밖)·비활성 공급자 거부는 `select_provider()` 하나가
+    담당하고, 제안 방식(`judge_from_env`)과 이 함수가 같은 환경변수·같은
+    표(`JUDGES`)를 본다(R-4 유지). 모델은 각 caller 생성자가 공급자별
+    env(`ANTHROPIC_MODEL`/`OPENAI_MODEL`/`GEMINI_MODEL`)를 읽으므로 여기서
+    다시 읽지 않는다(단일 출처).
+
+    `client` 는 테스트용 스텁 주입 자리다(네트워크 0).
     """
 
-    from app.settings import LLM_PROVIDER
-    from app.tools.types import InvalidValue
-
-    if env is None:
-        env = dict(os.environ)
-
-    provider = env.get("LLM_PROVIDER", LLM_PROVIDER)
-
-    if provider == "anthropic":
-        return ClaudeSingleCaller(
-            model=model, client=client, timeout=timeout, max_retries=max_retries
-        )
-    if provider == "openai":
-        return OpenAISingleCaller(
-            model=model, client=client, timeout=timeout, max_retries=max_retries
-        )
-    if provider == "gemini":
-        raise InvalidValue(
-            "gemini 단일 프롬프트 베이스라인은 아직 구현되지 않았다 — "
-            "google-genai 의존성 추가 필요"
-        )
-    raise InvalidValue(
-        f"caller_from_env: unknown LLM_PROVIDER {provider!r} "
-        "(expected one of ('anthropic', 'openai', 'gemini'))"
-    )
+    name = select_provider(env)
+    return CALLERS[name](model=model, client=client, timeout=timeout, max_retries=max_retries)
 
 
 # ---------------------------------------------------------------------------

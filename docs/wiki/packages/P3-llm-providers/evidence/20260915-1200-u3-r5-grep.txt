@@ -1,0 +1,13 @@
+$ grep -n "^from app.er.judge import\|^from app.er import judge\|judge\.JUDGES\|select_provider\|enabled_providers\|InvalidValue(" evaluation/resolvers/llm_single.py
+92:-- `app.er.judge.select_provider(env)` 하나를 import 해 미지·비활성
+94:R-4 를 유지). `CALLERS`(이름 -> caller 팩토리)는 `app.er.judge.JUDGES` 의
+96:== set(judge.JUDGES)`).
+112:from app.er.judge import (
+117:    select_provider,
+527:                raise InvalidValue(
+632:    """`select_provider(env)`(`app.er.judge`, D11)로 공급자 이름을 고르고
+636:    미지 이름(표 밖)·비활성 공급자 거부는 `select_provider()` 하나가
+645:    name = select_provider(env)
+
+$ grep -c "def _to_gemini_schema\|def call_with_gemini_error_mapping" evaluation/resolvers/llm_single.py
+0

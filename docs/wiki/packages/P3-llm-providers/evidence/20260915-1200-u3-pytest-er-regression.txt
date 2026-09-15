@@ -1,0 +1,4 @@
+$ PYTHONIOENCODING=utf-8 POSTGRES_PORT=5433 python -m pytest tests/test_er_judge.py tests/test_er_pipeline.py -q -rs
+........................................................................ [ 79%]
+...................                                                      [100%]
+91 passed in 15.94s

@@ -1,0 +1,4 @@
+$ PYTHONIOENCODING=utf-8 POSTGRES_PORT=5433 python -m pytest tests/test_baseline_llm_single.py -q -rs
+........................................................................ [ 80%]
+..................                                                       [100%]
+90 passed in 5.87s

@@ -34,16 +34,19 @@ import httpx
 import httpx2
 import openai
 import pytest
+from google.genai import errors as genai_errors
 from sqlalchemy import func, select
 
 from app.db.models import ALIAS_SOURCES, AgentTrace, PendingQuestion, Person, PersonAlias
-from app.er.judge import call_with_error_mapping
+from app.er.judge import JUDGES, _to_gemini_schema, call_with_error_mapping
+from app.er.judge import call_with_gemini_error_mapping as judge_call_with_gemini_error_mapping
 from app.er.types import ERConfig, JudgeUnavailable
 from app.tools.context import ToolContext
 from evaluation.resolvers import DECISIONS, RESOLVERS, get_resolver
 from evaluation.resolvers import registry as resolver_registry
 from evaluation.resolvers.exact_match import KnownPerson
 from evaluation.resolvers.llm_single import (
+    CALLERS,
     EMPTY_MENTION,
     IDENTITY_WITHOUT_CANDIDATES,
     MERGE_WITHOUT_PERSON_ID,
@@ -53,6 +56,7 @@ from evaluation.resolvers.llm_single import (
     TOOL_NAME,
     UNKNOWN_DECISION_PREFIX,
     ClaudeSingleCaller,
+    GeminiSingleCaller,
     LLMSingleResolver,
     OpenAISingleCaller,
     build_decision,
@@ -61,6 +65,7 @@ from evaluation.resolvers.llm_single import (
     resolve_from_state,
     validate_resolution,
 )
+from evaluation.resolvers import llm_single as llm_single_module
 
 CONFIG = ERConfig()
 USER_ID = "llm-single-user"
@@ -175,6 +180,53 @@ def _openai_response(payload: dict, *, tokens=(120, 30), model="gpt-4o-mini"):
         usage=SimpleNamespace(prompt_tokens=tokens[0], completion_tokens=tokens[1]),
         model=model,
     )
+
+
+class _StubGeminiModels:
+    """`genai.Client().models` 를 흉내 내는 스텁 -- `generate_content()` 만.
+    `queue` 가 주어지면 호출마다 하나씩 소비한다(재시도 횟수 확인용,
+    `tests/test_er_judge.py` 의 `StubGeminiClient` 와 같은 형태)."""
+
+    def __init__(self, outer: "StubGeminiClient") -> None:
+        self._outer = outer
+
+    def generate_content(self, **kwargs):
+        self._outer.calls.append(kwargs)
+        item = self._outer.queue.pop(0) if self._outer.queue else self._outer.response
+        if isinstance(item, BaseException):
+            raise item
+        return item
+
+
+class StubGeminiClient:
+    """`genai.Client` 를 흉내 내는 스텁 -- `models.generate_content()` 만."""
+
+    def __init__(self, response=None, queue=None) -> None:
+        self.response = response
+        self.queue: list = list(queue) if queue else []
+        self.calls: list[dict] = []
+        self.models = _StubGeminiModels(self)
+
+
+def _gemini_response(payload: dict, *, tokens=(12, 34), model="gemini-test-model"):
+    return SimpleNamespace(
+        text=json.dumps(payload, ensure_ascii=False),
+        usage_metadata=SimpleNamespace(
+            prompt_token_count=tokens[0], candidates_token_count=tokens[1]
+        ),
+        model_version=model,
+    )
+
+
+def _gemini_caller(payload_or_exc, **kw) -> tuple[GeminiSingleCaller, StubGeminiClient]:
+    response = (
+        payload_or_exc
+        if isinstance(payload_or_exc, BaseException)
+        else _gemini_response(payload_or_exc)
+    )
+    client = StubGeminiClient(response=response)
+    kw.setdefault("model", "gemini-test-model")
+    return GeminiSingleCaller(client=client, **kw), client
 
 
 def _anthropic_request(url: str = "https://api.anthropic.com/v1/messages") -> httpx2.Request:
@@ -329,12 +381,47 @@ def test_caller_from_env_selects_provider(monkeypatch) -> None:
     assert isinstance(caller_from_env(client=object()), OpenAISingleCaller)
 
 
-@pytest.mark.parametrize("provider", ["gemini", "llama"])
-def test_caller_from_env_rejects_unimplemented_provider(provider: str) -> None:
+def test_caller_from_env_rejects_unknown_provider() -> None:
+    """R-1(c) -- `gemini` 는 U3 로 구현되어 양성 케이스로 이동했다(아래).
+    표에 없는 이름만 이 자리에 남는다."""
     from app.tools.types import InvalidValue
 
     with pytest.raises(InvalidValue):
-        caller_from_env({"LLM_PROVIDER": provider})
+        caller_from_env({"LLM_PROVIDER": "llama"})
+
+
+def test_caller_from_env_selects_gemini_provider(monkeypatch) -> None:
+    """R-1(c) 양성 케이스 -- `GeminiSingleCaller` 가 등록표를 통해 만들어진다."""
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-test-model")
+    caller = caller_from_env({"LLM_PROVIDER": "gemini"}, client=object())
+    assert isinstance(caller, GeminiSingleCaller)
+    assert caller.model == "gemini-test-model"
+
+
+def test_caller_from_env_gemini_without_model_env_is_invalid_value(monkeypatch) -> None:
+    """D11 결정 3 -- `GEMINI_MODEL` 기본값 없음, 미설정이면 `InvalidValue`."""
+    from app.tools.types import InvalidValue
+
+    monkeypatch.delenv("GEMINI_MODEL", raising=False)
+    with pytest.raises(InvalidValue):
+        caller_from_env({"LLM_PROVIDER": "gemini"}, client=object())
+
+
+def test_caller_from_env_rejects_disabled_gemini(monkeypatch) -> None:
+    """R-5 -- 거부는 `select_provider()` 한 곳에서만 일어난다(꺼진 공급자)."""
+    from app.tools.types import InvalidValue
+
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-test-model")
+    with pytest.raises(InvalidValue):
+        caller_from_env(
+            {"LLM_PROVIDER": "gemini", "LLM_PROVIDERS_ENABLED": "openai"}, client=object()
+        )
+
+
+def test_callers_keys_match_judges_keys() -> None:
+    """R-5 -- `CALLERS` 는 `JUDGES` 의 키를 순회해 만든 것이라 키 집합이
+    항상 같다(문자열 리터럴로 다시 쓰지 않는다)."""
+    assert set(CALLERS) == set(JUDGES)
 
 
 def test_error_mapping_helper_is_reused_not_reimplemented() -> None:
@@ -343,6 +430,24 @@ def test_error_mapping_helper_is_reused_not_reimplemented() -> None:
     from evaluation.resolvers import llm_single
 
     assert llm_single.call_with_error_mapping is call_with_error_mapping
+
+
+def test_gemini_helpers_are_reused_not_reimplemented() -> None:
+    """R-6 -- `_to_gemini_schema`·`call_with_gemini_error_mapping` 은
+    `app.er.judge` 의 **같은 객체**다(두 번째 변환기·매핑기를 만들지 않는다)."""
+    assert llm_single_module._to_gemini_schema is _to_gemini_schema
+    assert (
+        llm_single_module.call_with_gemini_error_mapping
+        is judge_call_with_gemini_error_mapping
+    )
+
+
+def test_gemini_response_schema_conversion_keeps_array_items() -> None:
+    """R-6 -- `RESOLUTION_SCHEMA` 는 `candidate_person_ids` 배열을 포함하므로
+    변환 결과에 `items` 가 살아 있어야 한다."""
+    converted = _to_gemini_schema(RESOLUTION_SCHEMA)
+    assert converted["properties"]["candidate_person_ids"]["type"] == "ARRAY"
+    assert converted["properties"]["candidate_person_ids"]["items"] == {"type": "INTEGER"}
 
 
 # =========================================================================
@@ -810,6 +915,222 @@ def test_env_secret_never_appears_in_error_paths(monkeypatch) -> None:
     with pytest.raises(JudgeUnavailable) as excinfo:
         validate_resolution({"decision": None})
     assert LEAK_CANARY not in str(excinfo.value)
+
+
+# =========================================================================
+# 4b. GeminiSingleCaller (P3-llm-providers U3, D11) -- 네트워크 0, 스텁만
+# =========================================================================
+
+
+def test_gemini_request_forces_schema_temperature_zero_and_model_from_env(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-test-model")
+    caller, client = _gemini_caller(_payload(matched_person_id=1, s_llm=0.9))
+
+    resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert len(client.calls) == 1  # LLM 호출 정확히 1회.
+    kwargs = client.calls[0]
+    assert kwargs["model"] == "gemini-test-model"
+    config = kwargs["config"]
+    assert config.temperature == 0
+    assert config.response_mime_type == "application/json"
+    assert config.response_schema == _to_gemini_schema(RESOLUTION_SCHEMA)
+    body = kwargs["contents"]
+    for person in PERSONS:
+        assert person.display_name in body
+
+
+def test_gemini_parses_merge_decision_into_result() -> None:
+    caller, _ = _gemini_caller(
+        _payload(decision="merge", matched_person_id=2, s_llm=0.7, reason="과장 별칭")
+    )
+
+    decision = resolve_from_state(PERSONS, "민수", "발화", caller=caller)
+
+    assert decision.decision == "merge"
+    assert decision.person_id == 2
+    assert decision.score == pytest.approx(0.7)
+    assert decision.tokens_in == 12 and decision.tokens_out == 34
+    assert decision.detail["forced_reason"] is None
+    assert decision.detail["provider"] == "gemini"
+    assert decision.detail["model"] == "gemini-test-model"
+
+
+# --- 강등 5경로(호출 실패는 아래 오류 매핑 절에서) --------------------------
+
+
+def test_gemini_downgrade_unknown_decision_word() -> None:
+    caller, _ = _gemini_caller(_payload(decision="link", matched_person_id=1))
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.decision == "identity"
+    assert decision.person_id is None
+    assert decision.detail["forced_reason"] == f"{UNKNOWN_DECISION_PREFIX}link"
+
+
+def test_gemini_downgrade_matched_id_outside_state() -> None:
+    caller, _ = _gemini_caller(_payload(decision="merge", matched_person_id=999))
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.decision == "identity"
+    assert decision.detail["forced_reason"] == OUT_OF_RANGE_ID
+
+
+def test_gemini_downgrade_merge_without_person_id() -> None:
+    caller, _ = _gemini_caller(_payload(decision="merge", matched_person_id=None))
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.decision == "identity"
+    assert decision.detail["forced_reason"] == MERGE_WITHOUT_PERSON_ID
+
+
+def test_gemini_downgrade_identity_without_candidates() -> None:
+    caller, _ = _gemini_caller(
+        _payload(decision="identity", matched_person_id=None, candidate_person_ids=())
+    )
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.decision == "identity"
+    assert decision.detail["forced_reason"] == IDENTITY_WITHOUT_CANDIDATES
+
+
+def test_gemini_downgrade_when_all_candidate_ids_are_hallucinated() -> None:
+    caller, _ = _gemini_caller(
+        _payload(
+            decision="identity", matched_person_id=None, candidate_person_ids=(777, 888)
+        )
+    )
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.detail["forced_reason"] == IDENTITY_WITHOUT_CANDIDATES
+    assert decision.detail["dropped_ids"] == [777, 888]
+
+
+# --- 스키마 위반 -------------------------------------------------------------
+
+
+def test_gemini_response_without_text_is_schema_error() -> None:
+    response = SimpleNamespace(
+        text=None, usage_metadata=None, model_version="gemini-test-model"
+    )
+    caller = GeminiSingleCaller(
+        model="gemini-test-model", client=StubGeminiClient(response=response)
+    )
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.decision == "identity"
+    assert decision.detail["llm_error"] == "schema"
+
+
+def test_gemini_response_text_not_json_is_schema_error() -> None:
+    response = SimpleNamespace(
+        text="설명만 함", usage_metadata=None, model_version="gemini-test-model"
+    )
+    caller = GeminiSingleCaller(
+        model="gemini-test-model", client=StubGeminiClient(response=response)
+    )
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.detail["llm_error"] == "schema"
+
+
+# --- 오류 매핑(결정 J -- `call_with_gemini_error_mapping` 재사용) ----------
+
+
+def test_gemini_maps_rate_limit_error_to_llm_error_vocabulary() -> None:
+    exc = genai_errors.ClientError(429, {"error": {"message": "rate limited"}}, None)
+    caller, client = _gemini_caller(exc)
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.decision == "identity"
+    assert decision.detail["llm_error"] == "rate_limit"
+    assert len(client.calls) == 1
+
+
+def test_gemini_maps_client_4xx_to_api_error() -> None:
+    exc = genai_errors.ClientError(400, {"error": {"message": "bad request"}}, None)
+    caller, client = _gemini_caller(exc)
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.detail["llm_error"] == "api_error"
+    assert len(client.calls) == 1
+
+
+def test_gemini_maps_server_5xx_to_api_error() -> None:
+    exc = genai_errors.ServerError(500, {"error": {"message": "server error"}}, None)
+    caller, client = _gemini_caller(exc)
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.detail["llm_error"] == "api_error"
+    assert len(client.calls) == 1
+
+
+def test_gemini_maps_timeout_after_one_retry() -> None:
+    client = StubGeminiClient(
+        queue=[httpx.TimeoutException("t1"), httpx.TimeoutException("t2")]
+    )
+    caller = GeminiSingleCaller(model="gemini-test-model", client=client)
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.decision == "identity"
+    assert decision.detail["llm_error"] == "timeout"
+    assert len(client.calls) == 2  # 1회 재시도 후 확정(01-plan 96행).
+
+
+def test_gemini_maps_connection_after_one_retry() -> None:
+    client = StubGeminiClient(
+        queue=[httpx.ConnectError("c1"), httpx.ConnectError("c2")]
+    )
+    caller = GeminiSingleCaller(model="gemini-test-model", client=client)
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.detail["llm_error"] == "connection"
+    assert len(client.calls) == 2
+
+
+def test_gemini_downgrade_on_llm_failure_is_identity_not_merge() -> None:
+    """원칙1 -- 실패를 `merge` 로 흡수하지 않는다(비대칭 금지)."""
+    exc = genai_errors.ClientError(429, {"error": {"message": "rate limited"}}, None)
+    caller, _ = _gemini_caller(exc)
+
+    decision = resolve_from_state(PERSONS, "팀장", "발화", caller=caller)
+
+    assert decision.decision == "identity"
+    assert decision.person_id is None
+    assert decision.score == 0.0
+
+
+# --- 키 미노출(security.md §1) ----------------------------------------------
+
+
+def test_gemini_key_marker_never_appears_in_request_or_output(monkeypatch) -> None:
+    monkeypatch.setenv("GEMINI_API_KEY", LEAK_CANARY)
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-test-model")
+    caller, client = _gemini_caller(_payload())
+
+    decision = resolve_from_state(PERSONS, "김팀장", "발화", caller=caller)
+
+    request_body = json.dumps(
+        {"contents": client.calls[0]["contents"]}, ensure_ascii=False, default=str
+    )
+    output = json.dumps(decision.to_dict(), ensure_ascii=False)
+    assert LEAK_CANARY not in request_body
+    assert LEAK_CANARY not in output
+    assert LEAK_CANARY not in json.dumps(decision.detail, ensure_ascii=False, default=str)
 
 
 # =========================================================================
