@@ -1,0 +1,155 @@
+== 01-plan 개정(2026-09-17) 7항 대조 — verifier 2차 (20260917-0950) ==
+$ git diff -U0 docs/wiki/packages/P4-pilot-eval/01-plan.md | grep '^@@'  (미커밋 hunk — 09-15 인계분 + 09-17 개정분)
+warning: in the working copy of 'docs/wiki/packages/P4-pilot-eval/01-plan.md', LF will be replaced by CRLF the next time Git touches it
+@@ -3 +3 @@
+@@ -5,2 +5,2 @@
+@@ -28 +28 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -34 +34 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -51,0 +52 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -57 +58 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -63 +64 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -65,2 +66,2 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -68 +69 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -75 +76 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -93 +94 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -96 +97 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -104 +105,3 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -112,7 +115,7 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -122 +125 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -175,0 +179,12 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -197 +212 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -211 +226 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는
+@@ -246,2 +261,5 @@ P1 04-review §7 "P10-final-eval 로" 1~5 를 그대로 승계한다.
+@@ -249 +267 @@ P1 04-review §7 "P10-final-eval 로" 1~5 를 그대로 승계한다.
+@@ -260 +278,2 @@ P1 04-review §7 "P10-final-eval 로" 1~5 를 그대로 승계한다.
+
+$ wc -l docs/wiki/packages/P4-pilot-eval/01-plan.md
+282 docs/wiki/packages/P4-pilot-eval/01-plan.md
+
+== 항1 헤더 ==
+$ sed -n 3p
+상태: 초안 | 담당: eval-agent | 작성: 2026-09-11 | 개정: 2026-09-17(verifier 02-plan-verify H-1 → 결정 K 지배 기준, R-1~R-4 반영)
+
+== 항2 결정 K ==
+$ grep -n -F '| K 게이트 기준 |'
+226:| K 게이트 기준 | **(i) → 개정 (a) 지배 기준(사용자 2026-09-17, verifier 02-plan-verify H-1)**: `T_merge=0.8` 에서 **어떤 베이스라인도 제안 방식을 지배하지 않는다**(지배 = 그 베이스라인의 오병합률 ≤ 제안 방식 **그리고** 미검출률 ≤ 제안 방식, 둘 중 하나는 엄격히 <) **그리고** 곡선이 D10 방향(`T_merge`↑ → 오병합↓·`ask_user(identity)`↑). 개정 사유: `exact_raw`/`exact_norm` 은 단독 일치 1명일 때만 merge(`evaluation/resolvers/exact_match.py` 264~276행)라 40건에서 오병합 0 이 되기 쉬워, 원안 "제안 방식 오병합률 < 베이스라인 최저" 는 제안 방식이 오병합 0 이어도 `0 < 0` 거짓 → 방식 품질과 무관하게 미달. 지배 기준은 원칙1 의 두 축을 유지하면서 0 동률 함정을 피한다. 미달 시 P5 미착수 + U8 + `/devlog change` | 수용 기준 해석 (ii)·04-review 판정식 = U4 `metrics.json.gate`(판정 표 "게이트" 행) |
+$ 결정 K 원문 문단 보존 (HEAD 대비 diff 0)
+K_ORIGINAL_PRESERVED
+$ grep -n -o -E 'gate\{[^}]*\}[^*]*\*\*' (U4 gate 스키마)
+67:gate{t_merge:0.8, proposed:{false_merge_rate,miss_rate}, baselines:{name:{false_merge_rate,miss_rate}}, dominated_by:[name…], d10_direction:bool, pass:bool}
+$ grep -n -o -E 'dominated_by. 는[^,]*, ' (U4 지배 정의)
+67:dominated_by` 는 `T_merge=0.8` 에서 오병합률 ≤ 제안 방식 **그리고** 미검출률 ≤ 제안 방식이며 둘 중 하나는 엄격히 < 인 베이스라인 목록, `d10_direction` 은 제안 방식 곡선에서 `T_merge` 최저→최고 사�
+$ grep -n -o -E 'd10_direction. 은[^,]*' (U4 D10 방향 정의)
+67:d10_direction` 은 제안 방식 곡선에서 `T_merge` 최저→최고 사이 오병합률이 증가하지 않고 `ask_user(identity)` 발생률이 감소하지 않음, `pass = (dominated_by == []) and d10_direction`. `tests/test_eval_curve.py` — 격자 
+$ grep -n -o -E 'pass = [^`]*' 
+67:pass = (dominated_by == []) and d10_direction
+$ grep -n -o -E 'test_eval_curve.py. — [^/]*' (U4 테스트)
+67:tests/test_eval_curve.py` — 격자 10점·`T_new` 불변·방식 키 5개와 순서·`gate` 판정식(동률 4조합·지배 1건·D10 역방향 1건 손 입력) 
+$ grep -n -o -E 'Refs: P4-pilot-eval R3 D10 S3.7 원칙1 원칙2' (U4 Refs 원칙1)
+67:Refs: P4-pilot-eval R3 D10 S3.7 원칙1 원칙2
+$ grep -n -F '| 게이트(결정 K 지배 기준) |' (판정 표 행)
+107:| 게이트(결정 K 지배 기준) | `python -c "import json;g=json.load(open('reports/metrics.json'))['gate'];print(g['t_merge'],g['dominated_by'],g['d10_direction'],g['pass'])"` | `0.8 [] True True` 면 통과. `dominated_by` 가 비어 있지 않거나 `d10_direction` 이 False 면 미달(→ U8 + `/devlog change`) |
+
+== 항3 R-1 cost_estimate ==
+$ grep -n -F 'cost_estimate.md' (행 번호만)
+52 69 106 125 187 201 217 257 267 
+$ grep -n -F 'reports/cost_estimate.md — 40건 실측' (산출물 목록)
+52:- reports/cost_estimate.md — 40건 실측(시나리오 1건당 토큰·방식별 호출 수·실비용) → 150건 
+$ grep -n -F '| 비용 실측·외삽(P0-cost 흡수, 결정 B) |' (판정 표 행)
+106:| 비용 실측·외삽(P0-cost 흡수, 결정 B) | `grep -nE "1건당|150건" reports/cost_estimate.md` | 시나리오 1건당 토큰 실측 수치와 150건 외삽 총액(USD) 두 수치가 있�
+$ backlog 15행 수용기준 문장 글자 그대로 (grep -F)
+docs/backlog.md:15:- [ ] [eval-agent] LLM 비용 실측 — `reports/cost_estima
+docs/wiki/packages/P4-pilot-eval/01-plan.md:69:- [ ] U6 **실행 CLI·dry-run·�
+$ 신규(registry 행 예정) 에 cost_estimate.md
+125:신규(registry 행 예정): `evaluation/runner.py`·`me
+
+== 항4 R-2 행 번호 ==
+$ grep -n -o -E 'backlog.md. (59~61행|52~54행)'
+5:backlog.md` 59~61행
+267:59~61행 P4 절
+$ grep -n -o -E 'INDEX (69|70|79|80)행|(69|70|79|80)행 .P4-pilot-eval|(79|80)행 "P4 이전'
+6:INDEX 80행
+265:(70행 `P4-pilot-eval
+265:80행 "P4 이전
+$ 재사용 표 registry 행 번호 (01-plan 115~121행 첫 칸)
+ 110~113 `evaluation/__init__.py`·`resolvers/{base,registry
+ 115·117·119·121 `proposed.py`·`exact_match.py`·`embedd
+ 124 `evaluation/scenario_state.py`(e0812f7) 
+ 106 `scripts/validate_scenarios.py`(1e1320c baee71e 40c36f8
+ 107 `scripts/dump_scenarios.py`(40c36f8…) 
+ 87 `scripts/er_smoke.py`(107ace3) · 123 `scripts/baseline_
+ 78~85 `app/er/*`(02e6f14·b1f2782·593c254·d6e5949·cc5d24
+$ registry 실제 행 (sed -n Np | 파일 경로 칸)
+33:  README.md | 하네스 | pending 
+78:  app/er/__init__.py | P3-er | cc5d24f 
+85:  app/er/pipeline.py | P3-er | cc5d24f 
+87:  scripts/er_smoke.py | P3-er | 107ace3 
+106:  scripts/validate_scenarios.py | P1-pilot-dataset | 1e1320c baee71e 40c36f8 
+107:  scripts/dump_scenarios.py | P1-pilot-dataset | 40c36f8 76add8a 6906af4 aeed0bd 
+110:  evaluation/__init__.py | P3-baselines | 05d90f0 
+111:  evaluation/resolvers/base.py | P3-baselines | 05d90f0 
+112:  evaluation/resolvers/registry.py | P3-baselines | 05d90f0 
+113:  evaluation/resolvers/__init__.py | P3-baselines | 05d90f0 
+115:  evaluation/resolvers/proposed.py | P3-baselines | f212ad6 
+117:  evaluation/resolvers/exact_match.py | P3-baselines | bcb2fad 
+119:  evaluation/resolvers/embedding_only.py | P3-baselines | 8bfd880 
+121:  evaluation/resolvers/llm_single.py | P3-baselines | 0d98e47 
+123:  scripts/baseline_smoke.py | P3-baselines | 0d98e47 
+124:  evaluation/scenario_state.py | P3-baselines | e0812f7 
+$ grep -n 'registry 124행' (U1)
+64:registry 124행
+$ backlog 실제: sed -n '59p;61p' docs/backlog.md | cut -c1-60
+### P4 — 게이트
+- [ ] [eval-agent] **파일럿 평가** (오병합률·미�
+$ INDEX 실제: sed -n '70p;80p' docs/wiki/INDEX.md | cut -c1-70
+| `P4-pilot-eval` | **게이트** 파일럿 평가 · 보정표 · 곡
+의존·수용기준은 `docs/backlog.md`가 권위. **P4 이전에 P5
+$ 잔재 확인: 01-plan 267행 'backlog 85~93행 리스크 로그' ↔ grep -n '리스크 로그\|P4 파일럿 평가 시점' docs/backlog.md
+267:85~93행 리스크 로그
+92:## 리스크 로그 (기획서 9장)
+94:- 엔티티 해석 성능 미달 → **P4 파일럿 평�
+97:- `s_llm` 자기보고 점수의 신뢰성 → **P4 파�
+
+== 항5 R-3 실 실행 명령 ==
+97:| 실 실행 | `LLM_PROVIDER=openai OPENAI_API_KEY=… POSTGRES_PORT=5433 python scripts/run_pilot_eval.py --out reports/pilot/` (결정 
+$ ANTHROPIC_API_KEY 잔재 grep -c
+0
+
+== 항6 R-4 trace 실행 중 ==
+64:결정 D(i) 롤백에서는 **실행 중에 한함**: U7 이 표본을 실행 중에 덤프하고 04-review 는 그 evidence 를 실행 로그와 같은 ts 로 요구한다)
+105:| 확신도 재계산(표본) | U7 evidence 의 `agent_traces step='er_resolve'` 재계산 스크립트(결정 D(i) 롤백이므로 **실행 중 덤프**, 실행 로그와 같은 ts) | `0.5·s_llm
+
+== 항7 읽은 카드 ==
+278:- `docs/wiki/packages/P4-pilot-eval/02-plan-verify.md`(verifier, 2026-09-17) — H-1(결정 K 판정식 0 동률)·R
+
+== 수용 기준 글자 대조 (backlog 61 ↔ 01-plan 76) ==
+SAME_AFTER_CHECKBOX_STRIP
+
+== K 행 개정 사유가 인용한 코드 ==
+$ sed -n '264,276p' evaluation/resolvers/exact_match.py
+
+    if len(ids) == 1 and forced_reason is None:
+        decision = "merge"
+        person_id: int | None = ids[0]
+        score = 1.0
+    elif len(ids) >= 2 and forced_reason is None:
+        decision = "identity"
+        person_id = None
+        score = 1.0
+    else:
+        decision = "new_person"
+        person_id = None
+        score = 0.0
+$ grep -n 'def band_for' -A 8 app/er/confidence.py (재밴드 = 같은 confidence 에 >= 비교 → 결정 C(i) 아래 proposed 곡선은 구조적으로 단조)
+82:def band_for(confidence: float, config: Any) -> str:
+83-    """확신도 → 구간(D10 원칙1·2). `>= T_merge` 는 `"merge"`, `>= T_new` 는
+84-    `"identity"`, 그 외 `"new_person"`. 정확히 `T_merge`/`T_new` 인 값은
+85-    `>=` 쪽으로 판정된다(`ge_with_tolerance()` 단일 비교, F-7fe239)."""
+86-    if ge_with_tolerance(confidence, config.t_merge):
+87-        return "merge"
+88-    if ge_with_tolerance(confidence, config.t_new):
+89-        return "identity"
+90-    return "new_person"
+
+== 1차(09:30 작업본) → 현재 행 번호 오프셋 (09-17 개정 삽입: 52행 +1, 106~107행 +2, 278행 +1) ==
+09:30 기준 ≤51행: 0 / 52~104행: +1 / 105~274행: +3 / ≥275행: +4  (예: 96→97, 104→105, 223→226, 264→267, 262→265)

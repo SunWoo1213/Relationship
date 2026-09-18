@@ -1,0 +1,116 @@
+== 01-plan 인용 시그니처 실재 확인 (verifier, 20260917-0922) ==
+$ grep -n "def get_resolver" evaluation/resolvers/registry.py
+92:def get_resolver(name: str, /, **kwargs: Any) -> Resolver:
+$ sed -n 186,194p evaluation/resolvers/base.py  (Resolver.resolve_mention)
+    def resolve_mention(
+        self,
+        ctx: ToolContext,
+        mention: str,
+        utterance: str,
+        hints: dict[str, str] | None = None,
+        *,
+        config: ERConfig | None = None,
+    ) -> MentionDecision: ...
+$ grep -n "class MentionDecision\|def to_dict\|trace_id: \|tokens_in: \|tokens_out: " evaluation/resolvers/base.py
+78:    def to_dict(self) -> dict[str, Any]:
+88:class MentionDecision:
+118:    trace_id: int | None = None
+119:    tokens_in: int = 0
+120:    tokens_out: int = 0
+147:    def to_dict(self) -> dict[str, Any]:
+$ grep -n "def load_scenario_state" -A 6 evaluation/scenario_state.py
+280:def load_scenario_state(
+281-    ctx: ToolContext,
+282-    scenario: dict[str, Any],
+283-    *,
+284-    embedder: EmbeddingProvider | EmbedderCallable | None = None,
+285-) -> ScenarioState:
+286-    """시나리오의 사전 상태를 `ctx.session` 에 적재하고 매핑을 돌려준다.
+$ grep -n "embedded_alias_count\|alias_count: int\|def check_schema_version" evaluation/scenario_state.py
+157:    - `embedded_alias_count` -- 그중 `embedding IS NOT NULL` 인 행 수.
+165:    alias_count: int = 0
+166:    embedded_alias_count: int = 0
+174:            "embedded_alias_count": self.embedded_alias_count,
+210:def check_schema_version(dataset: Dataset) -> int:
+357:        embedded_alias_count=embedded,
+$ grep -n "class ERConfig" -A 3 app/er/types.py; grep -n "t_merge: float\|top_k: int\|t_new: float" app/er/types.py
+287:class ERConfig:
+288-    """임계치·가중치는 설정값이면서 함수 인자다(결정8) -- 모듈 상수(이
+289-    dataclass 의 기본값)가 1층, 환경변수(`.env.example` 의 `T_MERGE`/
+290-    `T_NEW`/`W_LLM`/`W_EMB`/`W_RULE`, `er_config(env)` 로더는 **U4 몫**)가
+300:    t_merge: float = 0.8
+301:    t_new: float = 0.3
+305:    top_k: int = SEARCH_TOP_K
+$ grep -n "^def band_for\|^def select_provider\|^def judge_from_env\|^JUDGES\|^ER_TRACE_STEP" app/er/confidence.py app/er/judge.py app/er/types.py
+app/er/confidence.py:82:def band_for(confidence: float, config: Any) -> str:
+app/er/judge.py:734:JUDGES: dict[str, Callable[[], Judge]] = {
+app/er/judge.py:780:def select_provider(env: dict[str, str] | None = None) -> str:
+app/er/judge.py:824:def judge_from_env(env: dict[str, str] | None = None) -> Judge:
+app/er/types.py:29:ER_TRACE_STEP = "er_resolve"
+$ grep -n "^def caller_from_env" evaluation/resolvers/llm_single.py
+624:def caller_from_env(
+$ grep -n "band_by_threshold\|score_clamped\|raw_decision" evaluation/resolvers/proposed.py evaluation/resolvers/embedding_only.py evaluation/resolvers/llm_single.py | grep -v "^\S*:[0-9]*:\s*#\|docstring" | head -12
+evaluation/resolvers/proposed.py:172:        "band_by_threshold": resolution.band_by_threshold,
+evaluation/resolvers/proposed.py:194:        detail["score_clamped"] = True
+evaluation/resolvers/embedding_only.py:27:끌어올리는 경로는 없다. 강등 여부는 `detail["band_by_threshold"]`(임계치만
+evaluation/resolvers/embedding_only.py:214:        "band_by_threshold": band_by_threshold,
+evaluation/resolvers/llm_single.py:783:        "raw_decision": raw_decision,
+evaluation/resolvers/llm_single.py:805:        detail["score_clamped"] = True
+$ grep -n "config.t_merge\|config.t_new" app/er/confidence.py  (band_for 만 임계치 사용 — 결정 C(i) 근거)
+86:    if ge_with_tolerance(confidence, config.t_merge):
+88:    if ge_with_tolerance(confidence, config.t_new):
+170:        "T_merge": config.t_merge,
+171:        "T_new": config.t_new,
+$ sed -n 264,276p evaluation/resolvers/exact_match.py  (exact_* 판정 규칙: 1건 merge / 2건+ identity / 0건 new_person)
+
+    if len(ids) == 1 and forced_reason is None:
+        decision = "merge"
+        person_id: int | None = ids[0]
+        score = 1.0
+    elif len(ids) >= 2 and forced_reason is None:
+        decision = "identity"
+        person_id = None
+        score = 1.0
+    else:
+        decision = "new_person"
+        person_id = None
+        score = 0.0
+$ ls evaluation/ evaluation/resolvers/ scripts/ | grep -v __pycache__
+evaluation/:
+__init__.py
+resolvers
+scenario_state.py
+
+evaluation/resolvers/:
+__init__.py
+base.py
+embedding_only.py
+exact_match.py
+llm_single.py
+proposed.py
+registry.py
+
+scripts/:
+backfill_embeddings.py
+baseline_smoke.py
+db_check.py
+dump_scenarios.py
+embed_pilot.py
+er_smoke.py
+schema_check.py
+tools_check.py
+validate_scenarios.py
+$ ls docs/user-setup/
+01-env-keys.md
+02-aws-budgets.md
+03-er-smoke.md
+04-local-db.md
+05-server-secrets.md
+06-approval-decisions.md
+07-demo-rehearsal.md
+08-baseline-smoke.md
+09-aws-deploy.md
+README.md
+$ ls .claude/skills/eval-harness/SKILL.md .claude/skills/entity-resolution/SKILL.md
+.claude/skills/entity-resolution/SKILL.md
+.claude/skills/eval-harness/SKILL.md

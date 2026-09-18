@@ -148,3 +148,11 @@
 - 2026-09-15 15:44 | COMMIT | 59c67cc docs(P3-llm-providers): 완료 검토·패키지 종료 — verifier 04-review 완료(수용 11/11·부정 43/43·소견 0), registry D11 행, proposal 안내문 1줄(D11), CURRENT none
 - 2026-09-15 15:44 | PUSH | origin dev 59c67cc — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-15 15:47 | RELEASE | origin main ← dev 59c67cc
+- 2026-09-15 15:52 | COMMIT | 3c6108d docs(user-setup): 09 AWS 배포 가이드라인 — 몇 명 규모(EC2 1대·Caddy·CloudFront·SSM·DB A안 compose/B안 RDS), 비용·순서·운영 규칙·확장 신호
+- 2026-09-15 15:52 | PUSH | origin dev 3c6108d — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-15 16:07 | RELEASE | origin main ← dev 3c6108d
+- 2026-09-15 16:32 | STOP | 사용자 요청 중단. 이번 세션: P3-llm-providers U4 10a66c3 → verifier 04-review → done 59c67cc → dev 푸시·main 승격(검증 없이) → 09 AWS 배포 카드 3c6108d 푸시·승격 → P4-pilot-eval 착수 시작(01-plan 갱신: 의존 59c67cc·수용 기준 backlog 61행 문구·카드 10번·pytest 918·P3-llm-providers §7 7항 대장; verify-plan FAIL 1(02-plan-verify 없음)/WARN 3(registry 의도); 05-remediation 소견 3). **verifier 02-plan-verify 위임은 읽기 단계에서 중단(문서 미작성)** — 새 세션 L-004 재위임부터. 미커밋 6건(01-plan·05·evidence 2·P3-llm-providers 04-review 형식 1줄·HANDOFF·journal). CURRENT active none | P4-pilot-eval L-004
+- 2026-09-17 09:30 | VERIFY | P4-pilot-eval 02-plan-verify 1차 verifier(fable) 보류 H-1(결정 K(i) 판정식 — exact 베이스라인 오병합 0 이면 통과 불가), 권고 R-1~R-7 | P4-pilot-eval S3.7 원칙8 L-002
+- 2026-09-17 09:45 | DECISION | 사용자 결정 K → (a) 지배 기준 + D10 방향, R-1~R-4 반영 → 01-plan 개정, verify-plan FAIL 0/WARN 3 | P4-pilot-eval
+- 2026-09-17 09:50 | VERIFY | P4-pilot-eval 02-plan-verify 2차 verifier 통과(H-1 해소, 점검표 8/8, 보류 0) | P4-pilot-eval L-002 L-004
+- 2026-09-18 | START | P4-pilot-eval 착수: 사용자 재개 결정(이어서 완료)·계획 승인. 담당 eval-agent, U1 러너 → U2 지표 → U3 보정표 → U4 곡선·게이트 → U5 리포트 → U6 CLI·dry-run·비용 → U7 실 공급자 1회 → U8 실패 케이스 → U9 기계 검증 | P4-pilot-eval S3.7 S3.3 D3 D4 D5 D10 R3 R4 L-002 L-004

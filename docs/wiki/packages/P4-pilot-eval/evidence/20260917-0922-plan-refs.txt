@@ -1,0 +1,100 @@
+== 01-plan 인용 커밋 해시·행 번호 실재 확인 (verifier, 20260917-0922) ==
+$ git log -1 --format="%h %ad %s" --date=short <hash>  (01-plan 5·258·112~119행 인용 해시 27건)
+701fb8d 2026-09-11 docs(P3-llm-providers,P4-pilot-eval): 계획 초안 2건 — P4 U1~U9 + 결정 A~
+f78e9dc 2026-09-06 docs(P1-pilot-dataset): U7 registry 12행·README 평가 데이터셋 절·수용
+5cac9bf 2026-09-10 docs(P1-pilot-dataset): 완료 검토 04-review 승인·패키지 닫음 — veri
+b3bcc2d 2026-09-06 docs(P3-er): U9 registry 20행·README ER 실행법·수용 기준 기계 검증 
+0527ab8 2026-09-06 docs(P3-er): 완료 — verifier 04-review 완료 판정·사용자 승인, R4 R9
+ad394ba 2026-09-11 docs(P3-baselines): U8 수용 기준 기계 검증 evidence 13·registry 해시 �
+5a1bcbe 2026-09-11 docs(P3-baselines): 완료 검토 04-review 승인·패키지 닫음 — verifier
+c01381d 2026-09-14 feat(P3-llm-providers): U1 공급자 등록표·활성 스위치 — JUDGES 단�
+cf01e9f 2026-09-14 feat(P3-llm-providers): U2 GeminiJudge — google-genai 2.23.0 실측 기반 오�
+7b94a69 2026-09-15 feat(P3-llm-providers): U3 GeminiSingleCaller — D11 등록표·select_provider 
+10a66c3 2026-09-15 docs(P3-llm-providers): U4 문서·evidence — README·user-setup 01/03/08 Gemin
+59c67cc 2026-09-15 docs(P3-llm-providers): 완료 검토·패키지 종료 — verifier 04-review �
+3c6108d 2026-09-15 docs(user-setup): 09 AWS 배포 가이드라인 — 몇 명 규모(EC2 1대·Cadd
+025a7c4 2026-09-14 docs(P3-llm-providers): 계획검증 통과·계획 승인·D11 카드 신설 —
+05d90f0 2026-09-10 feat(P3-baselines): U1 공통 Resolver 인터페이스·방식 표 — evaluation
+e0812f7 2026-09-10 feat(P3-baselines): U6 시나리오 사전 상태 적재기 — seed_persons·ali
+1e1320c 2026-09-06 feat(P1-pilot-dataset): U1 시나리오 스키마·검증기·테스트 — JSON 
+baee71e 2026-09-06 fix(P1-pilot-dataset): 검증기 테스트 시점 고정 해소·검사 12 surfac
+40c36f8 2026-09-06 feat(P1-pilot-dataset): U5 schema_version 2·검사 11/14/15·manifest 배분표�
+107ace3 2026-09-06 feat(P3-er): U8 백필·스모크 스크립트 — backfill_embeddings(dry-run �
+0d98e47 2026-09-10 feat(P3-baselines): U5 LLM 단일 프롬프트 베이스라인 — llm_single 등
+02e6f14 2026-09-06 feat(P3-er): U3 호칭 사전·규칙 필터(2단계) — app/er types·dictionar
+b1f2782 2026-09-06 feat(P3-er): U5 후보 어댑터·공급자 중립 LLM 판정 — Claude/OpenAI J
+593c254 2026-09-06 feat(P3-er): U4 확신도·두 임계치(4단계) — confidence.py·ER_* setting
+d6e5949 2026-09-06 feat(P3-er): U6 resolve() 파이프라인·trace 1행 — 4단계 조립, 부수�
+cc5d24f 2026-09-06 feat(P3-er): U7 apply_resolution·회귀 3종 — 승진 연결/이모 배제/동
+0e3447a 2026-09-10 docs(P3-baselines): 계획·계획검증 승인, 패키지 착수 — 베이스�
+
+$ git rev-parse --short HEAD dev main origin/main
+fatal: Needed a single revision
+
+$ grep -n "파일럿 평가\|### P4\|P4 U6 로 흡수\|P4 파일럿 평가 이전" docs/backlog.md  (01-plan 은 52~54행이라 적었으나 실제 59~61행)
+7:> **원칙: P4 파일럿 평가 이전에 P5 이후를 시작하지 않는다.** 엔티티 해석이 안 되면 루프·프론트는 의미가 없다.
+59:### P4 — 게이트
+61:- [ ] [eval-agent] **파일럿 평가** (오병합률·미검출률·보정표·곡선 초안) / 의존: P3, P3-llm-providers / 수용기준: `reports/metric
+94:- 엔티티 해석 성능 미달 → **P4 파일럿 평가 시점**에 점검, 실패 케이스 분석을 산출물로
+97:- `s_llm` 자기보고 점수의 신뢰성 → **P4 파일럿 평가 시점**에 보정표(`reports/calibration.json`)로 검증
+
+$ diff <(sed -n 61p docs/backlog.md) <(sed -n 75p docs/wiki/packages/P4-pilot-eval/01-plan.md) && echo SAME  (수용 기준 글자 대조)
+1c1
+< - [ ] [eval-agent] **파일럿 평가** (오병합률·미검출률·보정표·곡선 초안) / 의존: P3, P3-llm-providers / 수용기준: `reports/metrics.json`, `reports/calibration.json` 생성. **미달이면 재시도가 아니라 실패 케이스 분석을 산출물로 남기고 ER 설계(resolution-plan 3.3)를 재설계한다**
+---
+> - [eval-agent] **파일럿 평가** (오병합률·미검출률·보정표·곡선 초안) / 의존: P3, P3-llm-providers / 수용기준: `reports/metrics.json`, `reports/calibration.json` 생성. **미달이면 재시도가 아니라 실패 케이스 분석을 산출물로 남기고 ER 설계(resolution-plan 3.3)를 재설계한다**
+
+$ grep -n "P4-pilot-eval\|P4 이전에 P5" docs/wiki/INDEX.md  (01-plan 은 69·79행이라 적었으나 실제 70·80행)
+70:| `P4-pilot-eval` | **게이트** 파일럿 평가 · 보정표 · 곡선 | eval-agent | R3 R4 |
+80:의존·수용기준은 `docs/backlog.md`가 권위. **P4 이전에 P5 이후를 시작하지 않는다.** 한 번에 활성 패키지는 하나.
+
+$ grep -n -E "^\| (R3|R4|R9) " docs/wiki/review-index.md
+11:| R3 | H | 임계치 방향 문장이 반대 | 해소(문서) | D10 |
+12:| R4 | H | "LLM 출력 확률"은 Claude API에 없음 | 구현완료(b1f2782 — 구조화 출력 자기보고 s_llm, judge.py·test_er_judge.py 36건 스텁 검증; **실호출 미검증** — er
+17:| R9 | M | 인물당 임베딩 1개 | 구현완료(4dfaf33, 09c2bd1, a9cb254, 2c63c60 — 별칭 단위 임베딩·top-K 인물별 max·OpenAIEmbeddingProvider 런타임; **실 공급자 호출 미
+
+$ registry 실제 행 번호 (01-plan "기존 산출물 재사용" 표 인용 행: 108~111·113·115·117·119·122·104·105·85·121·76~82·29)
+29:| reports/embed_pilot.md, reports/embed_pilot/*.json | P0-embed-pilot | pending 
+33:| README.md | 하네스 | pending 
+78:| app/er/__init__.py | P3-er | cc5d24f 
+79:| app/er/types.py | P3-er | cc5d24f 
+80:| app/er/dictionary.py | P3-er | 02e6f14 
+81:| app/er/rules.py | P3-er | 02e6f14 
+82:| app/er/confidence.py | P3-er | 593c254 
+83:| app/er/candidates.py | P3-er | b1f2782 
+84:| app/er/judge.py | P3-er | b1f2782 
+85:| app/er/pipeline.py | P3-er | cc5d24f 
+87:| scripts/er_smoke.py | P3-er | 107ace3 
+106:| scripts/validate_scenarios.py | P1-pilot-dataset | 1e1320c baee71e 40c36f8 
+107:| scripts/dump_scenarios.py | P1-pilot-dataset | 40c36f8 76add8a 6906af4 aeed0bd 
+110:| evaluation/__init__.py | P3-baselines | 05d90f0 
+111:| evaluation/resolvers/base.py | P3-baselines | 05d90f0 
+112:| evaluation/resolvers/registry.py | P3-baselines | 05d90f0 
+113:| evaluation/resolvers/__init__.py | P3-baselines | 05d90f0 
+115:| evaluation/resolvers/proposed.py | P3-baselines | f212ad6 
+117:| evaluation/resolvers/exact_match.py | P3-baselines | bcb2fad 
+119:| evaluation/resolvers/embedding_only.py | P3-baselines | 8bfd880 
+121:| evaluation/resolvers/llm_single.py | P3-baselines | 0d98e47 
+123:| scripts/baseline_smoke.py | P3-baselines | 0d98e47 
+124:| evaluation/scenario_state.py | P3-baselines | e0812f7 
+
+$ grep -n "metrics.json" docs/wiki/registry.md  (WARN 근거: 112행 비고 문구가 basename 일치)
+112:| 모듈 | 이름→팩토리 방식 표(`RESOLVERS`·`register`·`get_resolver`·`ALL_METHODS`) | evaluation/resolvers/registry.py | P3-baselines | 05d90f0 | 예약 이름 5개(`proposed`·`exact
+
+$ sed -n 11p docs/proposal.md
+> - **부록 A의 "F1 0.87, 오병합률 3%, 베이스라인 대비 +0.19" 등 수치는 예시이며 측정 결과가 아니다.**
+$ grep -n "T_merge ∈\|오병합률" docs/resolution-plan.md | head -5  (절대 목표 수치 없음)
+90:- 트레이드오프 곡선의 x축은 **`T_merge`** 하나로 고정하고 `T_new`는 0.3으로 둔다. y축은 오병합률과 ask_user(identity) 발생률
+202:- 곡선: x = T_merge ∈ {0.5, 0.55, …, 0.95}, y = 오병합률·ask_user(identity) 발생률·미검출률. `T_new` 고정.
+230:| P4 | **파일럿 평가** (오병합률·미검출률·보정표·곡선 초안) | eval-agent | P3 | `reports/metrics.json`, `reports/calibration.json`. *
+
+$ git status --short
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P3-llm-providers/04-review.md
+ M docs/wiki/packages/P4-pilot-eval/01-plan.md
+?? docs/wiki/packages/P4-pilot-eval/05-remediation.md
+?? docs/wiki/packages/P4-pilot-eval/evidence/
+
+$ diff <(sed -n 61p docs/backlog.md | sed "s/^- \[ \] //") <(sed -n 75p docs/wiki/packages/P4-pilot-eval/01-plan.md | sed "s/^- //") && echo SAME_AFTER_CHECKBOX_STRIP  (차이는 backlog 체크박스 "[ ] " 뿐 — verify-plan.sh 4번은 grep -F 부분 일치로 PASS)
+SAME_AFTER_CHECKBOX_STRIP

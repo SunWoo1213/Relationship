@@ -1,9 +1,9 @@
 # P4-pilot-eval · 계획 (01-plan)
 
-상태: 초안 | 담당: eval-agent | 작성: 2026-09-11
+상태: 초안 | 담당: eval-agent | 작성: 2026-09-11 | 개정: 2026-09-17(verifier 02-plan-verify H-1 → 결정 K 지배 기준, R-1~R-4 반영)
 태그 — 패키지: P4-pilot-eval · 닫는 검증: R3 R4 · 기대는 결정: D3 D4 D5 D10 · 구현하는 명세: S3.7 S3.3 · 관련 원칙: 원칙1 원칙2 원칙3 원칙8 원칙9
-의존: **P1-pilot-dataset 완료**(`packages/P1-pilot-dataset/04-review.md` `결과: 완료`·승인 2026-09-10, U7 `f78e9dc` / 닫는 커밋 `5cac9bf` — 입력은 `data/scenarios/` 40건·5범주와 `scripts/validate_scenarios.py --strict --json` 의 `counts`·`ambiguous_mention_count`·`trap_count`). **P3-er 완료**(`packages/P3-er/04-review.md` `결과: 완료`·승인 2026-09-06, U9 `b3bcc2d` / 닫는 커밋 `0527ab8` — 평가 대상인 제안 방식 `app.er.resolve()`·`ERConfig`·`agent_traces step='er_resolve'`). **P3-baselines 완료**(`packages/P3-baselines/04-review.md` `결과: 완료`·승인 2026-09-11, U8 `ad394ba` / 닫는 커밋 `5a1bcbe` — 다섯 방식 `RESOLVERS` 와 적재기 `evaluation.scenario_state`). `.claude/gitlog.md`(2026-09-11 12:57) 기준 `dev = 5a1bcbe`, `main(origin) = 0e3447a`, 승격 대기 10, **`P4-pilot-eval` 태그 커밋 0건**(미착수 정상). `docs/backlog.md` 52~54행 P4 행의 의존 문구는 "P3" 이며 충족. **· P3-llm-providers 완료(추가 의존, 사용자 결정 A 2026-09-11 — LLM 공급자 등록표·활성 스위치·Gemini 구현. P4 는 `app/` 을 고치지 않으므로 이 패키지가 먼저 끝나야 한다. 04-review `결과: 완료` 해시를 여기에 적는다)**
-**이 패키지가 P5 이후의 게이트다**(CLAUDE.md·`docs/backlog.md` 7행·INDEX 79행 "P4 이전에 P5 이후를 시작하지 않는다"). 따라서 이 계획의 의존 줄에는 "P4 통과 여부"가 없고, 반대로 P5-loop·P6·P8 의 01-plan 이 이 패키지의 04-review 를 인용하게 된다.
+의존: **P1-pilot-dataset 완료**(`packages/P1-pilot-dataset/04-review.md` `결과: 완료`·승인 2026-09-10, U7 `f78e9dc` / 닫는 커밋 `5cac9bf` — 입력은 `data/scenarios/` 40건·5범주와 `scripts/validate_scenarios.py --strict --json` 의 `counts`·`ambiguous_mention_count`·`trap_count`). **P3-er 완료**(`packages/P3-er/04-review.md` `결과: 완료`·승인 2026-09-06, U9 `b3bcc2d` / 닫는 커밋 `0527ab8` — 평가 대상인 제안 방식 `app.er.resolve()`·`ERConfig`·`agent_traces step='er_resolve'`). **P3-baselines 완료**(`packages/P3-baselines/04-review.md` `결과: 완료`·승인 2026-09-11, U8 `ad394ba` / 닫는 커밋 `5a1bcbe` — 다섯 방식 `RESOLVERS` 와 적재기 `evaluation.scenario_state`). `.claude/gitlog.md`(2026-09-15 16:15) 기준 `dev = main(origin) = 3c6108d`, 승격 대기 0, **`P4-pilot-eval` 태그 커밋 1건**(701fb8d 계획 초안 — 코드 0, 미착수 정상). `docs/backlog.md` 59~61행 P4 행의 의존 문구는 "P3" 이며 충족. **P3-llm-providers 완료**(추가 의존, 사용자 결정 A 2026-09-11 — LLM 공급자 등록표·활성 스위치·Gemini 구현. `packages/P3-llm-providers/04-review.md` `결과: 완료`·승인 2026-09-15, U1 `c01381d`·U2 `cf01e9f`·U3 `7b94a69`·U4 `10a66c3` / 닫는 커밋 `59c67cc` — `JUDGES`·`select_provider`·`judge_from_env`·`caller_from_env` 가 `LLM_PROVIDER=openai` 기본, D11. 실호출 검증 공급자 0/3 은 이 패키지 U6·U7 이 처음 닫는다).
+**이 패키지가 P5 이후의 게이트다**(CLAUDE.md·`docs/backlog.md` 7행·INDEX 80행 "P4 이전에 P5 이후를 시작하지 않는다"). 따라서 이 계획의 의존 줄에는 "P4 통과 여부"가 없고, 반대로 P5-loop·P6·P8 의 01-plan 이 이 패키지의 04-review 를 인용하게 된다.
 
 ## 목표
 
@@ -25,13 +25,13 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는 
   - **실 공급자 1회 실행** — 임베딩 OpenAI `text-embedding-3-small`(D4 확정, N=1536), LLM 은 결정 A. 키는 사용자 셸 환경변수로만 들어가고 저장소·프롬프트·로그·예외에 남지 않는다(security.md §1·§6). 실행 주체는 결정 G.
   - **실패 케이스 분석 `reports/failure_cases.md`** — 오병합·미검출·강제 강등(`forced_reason`)·`llm.error` 건을 유형별로 묶고 각 유형에 원문 mention·후보·`confidence_breakdown` 을 붙인다. **미달이든 아니든 만든다**(원칙8 — 미달일 때만 쓰면 성공 보고서가 된다).
   - **게이트 판정 문단** — 수용 기준 아래 "해석(기계 판정 방법)" 과 결정 K 의 통과 기준으로, 04-review 가 기계적으로 판정할 수 있게 한다.
-  - **문서 반영** — `docs/wiki/registry.md` 신규 행, `README.md` 평가 실행법 절, `docs/user-setup/09-pilot-eval-run.md`(사용자가 키 있는 셸에서 실행하는 카드).
+  - **문서 반영** — `docs/wiki/registry.md` 신규 행, `README.md` 평가 실행법 절, `docs/user-setup/10-pilot-eval-run.md`(사용자가 키 있는 셸에서 실행하는 카드).
 - 이 패키지에서 하지 않는 것:
   - **150건 데이터셋·최종 평가·`eval.md` 확정본** — P10-final-eval. 여기서 만드는 `eval.md` 는 **초안**(backlog 54행 "곡선 초안")이다.
   - **운영 임계치 확정** — 40건은 카테고리당 6~10건이라 "방향과 실패 유형"만 본다(P1 §7 인계 11, P3-baselines §7 인계 15). `T_merge`·`T_new`·가중치의 **운영값 확정은 P10**. 이 패키지는 곡선과 "이 방향으로 움직인다"까지.
   - **`app/` 수정** — `app/er/*`·`app/tools/*`·`app/embedding.py` 를 고치지 않는다(원칙4 경계·P3-baselines 선례). 필요해지면 멈춰 사용자 결정으로 올린다. 유일한 후보는 F-251dc2 이며 이 계획은 **고치지 않는 쪽**을 택한다(아래 "05-remediation 소견 — 이 계획의 결정" 과 결정 G).
   - **골드 라벨 수정·재해석** — 수치가 나쁘게 나와도 `data/` 를 손대지 않는다(P1 §7 인계 9·13, 원칙8). 라벨 의심은 FIX 가 아니라 새 검수 기록 + 사용자 결정.
-  - **이벤트·일정 추출 F1, 툴 호출 정확도** — 발화에서 이벤트를 뽑는 주체는 에이전트 루프(P5)다. P4 는 **mention 단위 인물 해석만** 잰다. P1 §7 인계 7(클래스별 이벤트 F1 보고)은 **범위 밖**으로 명시하고 P10 으로 그대로 넘긴다(아래 대장 P1-7).
+  - **이벤트·일정 추출 F1, 툴 호출 정확도** — 발화에서 이벤트를 뽑는 주체는 에이전트 루프(P5)다. P4 는 **mention 단위 인물 해석만** 잰다. P1 §7 인계 7(클래스별 이벤트 F1 보고)은 **범위 밖**으로 명시하고 P10 으로 그대로 넘긴다(아래 인계 대장 P1 §7 의 7항).
   - **`ERConfig.top_k` 스윕**(F-bdd6c5 — 무효), **가중치(0.5/0.3/0.2) 스윕**(D3 는 설정값이라 했으나 40건으로 튜닝하면 과적합. P10 몫).
   - **프론트·루프·메모리 승격·브리핑**(P5 이후, 게이트 통과 전 금지), **고민 상담·인물 간 관계·감정 대화**(원칙7).
 
@@ -49,30 +49,31 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는 
 - reports/curve.csv — 곡선 좌표(그림 형식은 결정 J)
 - reports/eval.md — 초안(metrics.json 에서 생성)
 - reports/failure_cases.md — 실패 유형·표본·원인 가설(원칙8)
+- reports/cost_estimate.md — 40건 실측(시나리오 1건당 토큰·방식별 호출 수·실비용) → 150건 × 5방식 × 10임계치 총액 외삽(결정 B(i), backlog 15행 P0-cost 흡수. 본문에 "4방식 → 5방식(`exact_raw`/`exact_norm` 분리)" 한 줄)
 - tests/test_eval_runner.py — 격리·적재 단언·`hints=None`·스윕 격자·JSONL 스키마(스텁, 네트워크 0)
 - tests/test_eval_metrics.py — 분모 규칙(ambiguous 제외·`passing_mentions` 오탐·ask_user 제3 범주) 전수
 - tests/test_eval_calibration.py — 구간 경계·공급자 분할·`score_clamped` 제외
 - tests/test_eval_curve.py — x 10점·`T_new` 고정·단조 방향 단언은 하지 않음(데이터가 정한다)
 - tests/test_eval_report.py — 같은 metrics.json → 같은 바이트(재생성 멱등)
-- docs/user-setup/09-pilot-eval-run.md — 사용자 실행 카드(키·비용 상한·명령·증거 저장 위치)
+- docs/user-setup/10-pilot-eval-run.md — 사용자 실행 카드(키·비용 상한·명령·증거 저장 위치)
 - docs/wiki/packages/P4-pilot-eval/evidence/ — pytest·dry-run·실 실행·스키마 검증·무변경 diff 출력
 - docs/wiki/registry.md — 신규 행(기존 행은 비고만), README.md — 평가 실행법 절
 
 ## 작업 단위 (단위 하나 = 커밋 하나 후보. 끝나면 /commit)
 
-- [ ] U1 **러너 골격·격리·적재**: `evaluation/runner.py` — `run_pilot(ctx_factory, scenarios, methods, t_merge_grid, *, embedder, judge=None, out_path) -> RunSummary`. 시나리오마다 (i) 격리 경계 열기(결정 D), (ii) `load_scenario_state(ctx, scenario, embedder=…)` **재사용**(적재기를 다시 만들지 않는다 — registry 122행), (iii) `assert state.embedded_alias_count == state.alias_count`, (iv) mention 순회 × 방식 × `T_merge`, (v) 경계 되돌리기. `hints=None` 고정. 결과는 `MentionDecision.to_dict()` + `scenario_id`·`turn`·`t_merge`·`gold_person_id` 를 더한 JSONL 한 줄. `trace_id` 를 그대로 보존해 제안 방식 판정을 `agent_traces WHERE step='er_resolve'` 로 되짚을 수 있게 한다(P3-er §7 재계산 입력 계약). `tests/test_eval_runner.py` — 같은 시나리오 2회 실행 후 `persons`/`person_aliases` 행 수 증분 0(두 벌 방지, 인계 9), `hints` 인자가 전 방식에서 `None`(호출 스파이), 스윕 격자 길이 = 10, `embedder=None` 이면 **즉시 실패**(경고가 아니라 오류 — 인계 8) / Refs: P4-pilot-eval S3.7 D5 D10 원칙8 원칙9
+- [ ] U1 **러너 골격·격리·적재**: `evaluation/runner.py` — `run_pilot(ctx_factory, scenarios, methods, t_merge_grid, *, embedder, judge=None, out_path) -> RunSummary`. 시나리오마다 (i) 격리 경계 열기(결정 D), (ii) `load_scenario_state(ctx, scenario, embedder=…)` **재사용**(적재기를 다시 만들지 않는다 — registry 124행), (iii) `assert state.embedded_alias_count == state.alias_count`, (iv) mention 순회 × 방식 × `T_merge`, (v) 경계 되돌리기. `hints=None` 고정. 러너가 만드는 env 에 `LLM_PROVIDER=openai` 를 **명시**로 넣고 `LLM_PROVIDERS_ENABLED` 는 넣지 않는다(P3-llm-providers §7 인계 1 — 기본값이 바뀌어도 재현). 결과는 `MentionDecision.to_dict()` + `scenario_id`·`turn`·`t_merge`·`gold_person_id` 를 더한 JSONL 한 줄. `trace_id` 를 그대로 보존해 제안 방식 판정을 `agent_traces WHERE step='er_resolve'` 로 되짚을 수 있게 한다(P3-er §7 재계산 입력 계약 — 결정 D(i) 롤백에서는 **실행 중에 한함**: U7 이 표본을 실행 중에 덤프하고 04-review 는 그 evidence 를 실행 로그와 같은 ts 로 요구한다). `tests/test_eval_runner.py` — 같은 시나리오 2회 실행 후 `persons`/`person_aliases` 행 수 증분 0(두 벌 방지, 인계 9), `hints` 인자가 전 방식에서 `None`(호출 스파이), 스윕 격자 길이 = 10, `embedder=None` 이면 **즉시 실패**(경고가 아니라 오류 — 인계 8) / Refs: P4-pilot-eval S3.7 D5 D10 원칙8 원칙9
 - [ ] U2 **지표 계산기**: `evaluation/metrics.py` — 입력은 U1 의 JSONL 만. 분모 규칙: `ambiguous: true` mention 3개(sc-022 t1·sc-024 t4·sc-013 t3) **제외**, `passing_mentions` 6개(sc-038·039·040)는 `create_person`/`ask_user(kind=new_person)` 이 나오면 **오탐 분자**, `ask_user` 로 간 mention 은 오병합에도 미검출에도 넣지 않는 **제3 범주**로 따로 집계. `expected_ask_user.allowed` 는 **허용 집합**으로 채점(단일 정답 아님). 산출: 방식별 `false_merge_rate`·`miss_rate`·`precision`/`recall`/`f1`·`ask_user_rate_by_kind{identity,new_person,schedule}`·`forced_reason` 분포(한 자리 하나)·`llm_error` 분포·부분집합 지표(`rule_checked==0` 인 merge 의 오병합률, `relaxed_retry==true` 인 merge 의 오병합률, `derive_hints` 가 빈 dict 인 mention 비율 — P3-er §7 리스크 계측). `score` 는 방식마다 의미가 다르므로 **같은 축에 놓지 않는다**(인계 14). `tests/test_eval_metrics.py` — 손으로 만든 소형 입력으로 세 분모 규칙·제3 범주·허용 집합 채점을 전수 단언 / Refs: P4-pilot-eval S3.7 D10 원칙1 원칙2 원칙8
-- [ ] U3 **보정표**: `evaluation/calibration.py` → `reports/calibration.json` — `s_llm` 0.1 구간 10칸 × (`provider`,`model`) 별 `{bin, n, correct, accuracy}`. 대상은 `s_llm` 을 실제로 내는 방식(`proposed`·`llm_single`)뿐이며 방식도 키로 나눈다. `detail["score_clamped"] == True` 는 제외하고 `excluded_clamped` 수를 같은 파일에 적는다([권고] 2). `llm.skipped == true`(통과 후보 0)와 `llm.error`(`timeout/rate_limit/api_error/connection/schema/out_of_range_id`)는 분모에서 빼고 별도 카운트. "정답"의 정의는 그 판정의 `decision`·`person_id` 가 골드와 일치하는가로 한 줄 명시. `tests/test_eval_calibration.py` — 경계값(0.1·0.8·1.0)이 어느 칸인지, 공급자 두 개 섞인 입력이 분리되는지, clamp 제외 / Refs: P4-pilot-eval R4 D3 원칙3 원칙9
-- [ ] U4 **곡선·metrics.json 조립**: `evaluation/curve.py` + `metrics.json` 작성기 — x = `T_merge` {0.5,0.55,…,0.95} 10점, `T_new` = 0.3 고정(스윕하지 않는다), y 3계열(오병합률·`ask_user(identity)` 발생률·미검출률) × 다섯 방식. `metrics.json` 최상위 키는 **`RESOLVERS` 이름 문자열 그대로**(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`, 순서 고정 — 인계 4) + `meta{provider, model, embedding_model, dataset_hash, schema_version, run_id, t_new, grid}`. `band_by_threshold` 만 순수 산식 구간이고 `forced_reason != null` 행은 곡선 계열과 별도 집계(P3-er §7). `reports/curve.csv` 동시 출력. `tests/test_eval_curve.py` — 격자 10점·`T_new` 불변·방식 키 5개와 순서 / Refs: P4-pilot-eval R3 D10 S3.7 원칙2
+- [ ] U3 **보정표**: `evaluation/calibration.py` → `reports/calibration.json` — `s_llm` 0.1 구간 10칸 × (`provider`,`model`) 별 `{bin, n, correct, accuracy}`. 대상은 `s_llm` 을 실제로 내는 방식(`proposed`·`llm_single`)뿐이며 방식도 키로 나눈다. 그룹 키 `model` 은 판정이 돌려준 값(`Judgement.model` / `detail["model"]`)을 그대로 쓰고 설정 문자열(`OPENAI_MODEL`)은 `meta.model_configured` 에 따로 적는다(P3-llm-providers §7 인계 4 — Gemini 는 `model_version` 이 설정과 다를 수 있다). `detail["score_clamped"] == True` 는 제외하고 `excluded_clamped` 수를 같은 파일에 적는다([권고] 2). `llm.skipped == true`(통과 후보 0)와 `llm.error`(`timeout/rate_limit/api_error/connection/schema/out_of_range_id`)는 분모에서 빼고 별도 카운트. "정답"의 정의는 그 판정의 `decision`·`person_id` 가 골드와 일치하는가로 한 줄 명시. `tests/test_eval_calibration.py` — 경계값(0.1·0.8·1.0)이 어느 칸인지, 공급자 두 개 섞인 입력이 분리되는지, clamp 제외 / Refs: P4-pilot-eval R4 D3 원칙3 원칙9
+- [ ] U4 **곡선·metrics.json 조립**: `evaluation/curve.py` + `metrics.json` 작성기 — x = `T_merge` {0.5,0.55,…,0.95} 10점, `T_new` = 0.3 고정(스윕하지 않는다), y 3계열(오병합률·`ask_user(identity)` 발생률·미검출률) × 다섯 방식. `metrics.json` 최상위 키는 **`RESOLVERS` 이름 문자열 그대로**(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`, 순서 고정 — 인계 4) + `meta{provider, model, embedding_model, dataset_hash, schema_version, run_id, t_new, grid}`. `band_by_threshold` 만 순수 산식 구간이고 `forced_reason != null` 행은 곡선 계열과 별도 집계(P3-er §7). `reports/curve.csv` 동시 출력. **`metrics.json` 최상위 `gate{t_merge:0.8, proposed:{false_merge_rate,miss_rate}, baselines:{name:{false_merge_rate,miss_rate}}, dominated_by:[name…], d10_direction:bool, pass:bool}`** 를 결정 K(지배 기준)로 계산해 넣는다 — `dominated_by` 는 `T_merge=0.8` 에서 오병합률 ≤ 제안 방식 **그리고** 미검출률 ≤ 제안 방식이며 둘 중 하나는 엄격히 < 인 베이스라인 목록, `d10_direction` 은 제안 방식 곡선에서 `T_merge` 최저→최고 사이 오병합률이 증가하지 않고 `ask_user(identity)` 발생률이 감소하지 않음, `pass = (dominated_by == []) and d10_direction`. `tests/test_eval_curve.py` — 격자 10점·`T_new` 불변·방식 키 5개와 순서·`gate` 판정식(동률 4조합·지배 1건·D10 역방향 1건 손 입력) / Refs: P4-pilot-eval R3 D10 S3.7 원칙1 원칙2
 - [ ] U5 **리포트 생성기**: `evaluation/report.py` — `python -m evaluation.report --metrics reports/metrics.json --out reports/eval.md`. 입력은 `metrics.json` **하나뿐**(JSONL·DB·네트워크를 읽지 않는다). 표(방식 × 지표), 곡선 표/그림 링크, 운영 최적점 **후보** 한 문단(40건이므로 "방향"이라는 단서를 문장에 박는다), 한계 절. `tests/test_eval_report.py` — 고정 `metrics.json` 픽스처로 두 번 생성해 **바이트 동일**, 입력에 없는 수치를 본문에 쓰지 않는다(템플릿이 키를 참조하지 않으면 실패) / Refs: P4-pilot-eval S3.7 원칙8
-- [ ] U6 **실행 CLI·dry-run·비용 가드**: `scripts/run_pilot_eval.py` — `--dry-run --stub`(스텁 판정기·결정적 가짜 임베딩, **네트워크 0**)으로 전 파이프라인을 한 번 돌려 JSONL→metrics→calibration→curve→eval.md 가 이어지는지 증명한다. 실행 전 **예상 호출 수·토큰·비용 추정을 표준출력에 먼저 찍고**(40 시나리오 × mention × (`proposed` 1 + `llm_single` 1) LLM 호출 + 별칭·mention 임베딩; `detail["prompt_chars"]`·`person_count` 가 실측 입력 — 인계 12), `--max-cost-usd` 상한을 넘으면 실행하지 않고 종료(결정 B). 키 없으면 종료 코드 2(이름만 안내, `.env` 미독 — security §1). 사용자 스모크 03(`docs/user-setup/03-er-smoke.md`)·08(`docs/user-setup/08-baseline-smoke.md`) 결과(공급자·모델·`llm_error`)를 이 패키지 evidence 로 옮겨 적는다(인계 13, [권고] 6). `docs/user-setup/09-pilot-eval-run.md` 작성 / Refs: P4-pilot-eval D4 원칙8 L-004
+- [ ] U6 **실행 CLI·dry-run·비용 가드**: `scripts/run_pilot_eval.py` — `--dry-run --stub`(스텁 판정기·결정적 가짜 임베딩, **네트워크 0**)으로 전 파이프라인을 한 번 돌려 JSONL→metrics→calibration→curve→eval.md 가 이어지는지 증명한다. 실행 전 **예상 호출 수·토큰·비용 추정을 표준출력에 먼저 찍고**(40 시나리오 × mention × (`proposed` 1 + `llm_single` 1) LLM 호출 + 별칭·mention 임베딩; `detail["prompt_chars"]`·`person_count` 가 실측 입력 — 인계 12), `--max-cost-usd` 상한을 넘으면 실행하지 않고 종료(결정 B). 키 없으면 종료 코드 2(이름만 안내, `.env` 미독 — security §1). 사용자 스모크 03(`docs/user-setup/03-er-smoke.md`)·08(`docs/user-setup/08-baseline-smoke.md`) 결과(공급자·모델·`llm_error`)를 이 패키지 evidence 로 옮겨 적는다(인계 13, [권고] 6). **`reports/cost_estimate.md`**(결정 B(i), backlog 15행 "시나리오 1건당 토큰 실측, 150건 × 4방식 × 10임계치 총액 추정" — 문장은 그대로, 본문에 5방식 기준임을 한 줄): dry-run 의 호출 수 추정과 U7 실측 토큰으로 1건당 토큰·150건 외삽 총액(USD) 두 수치를 적는다(실측 수치는 U7 직후 채움). `docs/user-setup/10-pilot-eval-run.md` 작성 / Refs: P4-pilot-eval D4 원칙8 L-004
 - [ ] U7 **실 공급자 1회 실행**: 임베딩 OpenAI `text-embedding-3-small`(N=1536, D4), LLM 결정 A. 산출 `reports/pilot/raw-<ts>.jsonl`·`reports/metrics.json`·`reports/calibration.json`·`reports/curve.csv`·`reports/eval.md`. evidence 에 실행 명령(키 값 없이)·표준출력·소요·실제 토큰 합계·`provider`/`model`/`embedding_model` 을 남긴다(인계 5·13, P1 §7 인계 8 — 판정 모델별 재기록). 제안 방식 표본 일부를 `agent_traces` 로 되짚어 `confidence = 0.5·s_llm + 0.3·s_emb + 0.2·s_rule` 재계산 abs diff 0 을 확인(R4·원칙3·원칙9). 실패·오류도 그대로 남긴다(어느 결과든 evidence, 원칙8) / Refs: P4-pilot-eval R4 R9 D3 D4 D5 원칙3 원칙8 원칙9
 - [ ] U8 **실패 케이스 분석**: `reports/failure_cases.md` — 오병합 전건(있으면 전부), 미검출 상위 유형, `forced_reason`·`llm_error` 유형, 함정 12건(`by_trap_kind` 7종)에서의 거동, 카테고리별(promotion·pronoun·alias·normal·new_person) 실패 분포. 각 건에 시나리오 id·turn·mention·후보·`confidence_breakdown`·왜 그렇게 판정했는지 한 줄. **결론 문장은 "표본 40건이므로 방향과 유형까지"**(인계 15). 수치가 결정 K 기준에 미달이면 재실행·재시도 대신 여기에 S3.3 재설계 후보(어느 단계가 원인인가)를 적고 `/devlog change` 후보로 사용자에게 올린다. 라벨이 틀렸다고 보이면 `data/` 를 고치지 않고 P1 형식의 새 검수 기록 + 사용자 결정으로 분리한다(인계 9) / Refs: P4-pilot-eval S3.3 S3.7 원칙1 원칙8
 - [ ] U9 **수용 기준 기계 검증 + 문서**: 전체 `POSTGRES_PORT=5433 python -m pytest tests/ -q -rs`, dry-run 재실행, `metrics.json`·`calibration.json` 스키마 검증, 곡선 격자 확인, `eval.md` 재생성 멱등 diff 0줄, `git diff --name-only <U1 직전 해시>..HEAD -- app/ data/` **0줄**, `python scripts/validate_scenarios.py --strict --json` rc=0(`total` 40 그대로), `POSTGRES_PORT=5433 python -m alembic check`·`python scripts/tools_check.py` 무변경을 evidence 로 남긴다. `docs/wiki/registry.md` 신규 행(모듈 5·스크립트 1·테스트 5·리포트 산출물), `README.md` "파일럿 평가 실행법" 절(환경변수 **이름**만) / Refs: P4-pilot-eval S3.7 원칙4 원칙8 원칙9
 
 ## 수용 기준 (`docs/backlog.md`의 해당 항목과 글자 그대로 같아야 한다)
 
-- [eval-agent] **파일럿 평가** (오병합률·미검출률·보정표·곡선 초안) / 의존: P3 / 수용기준: `reports/metrics.json`, `reports/calibration.json` 생성. **미달이면 재시도가 아니라 실패 케이스 분석을 산출물로 남기고 ER 설계(resolution-plan 3.3)를 재설계한다**
+- [eval-agent] **파일럿 평가** (오병합률·미검출률·보정표·곡선 초안) / 의존: P3, P3-llm-providers / 수용기준: `reports/metrics.json`, `reports/calibration.json` 생성. **미달이면 재시도가 아니라 실패 케이스 분석을 산출물로 남기고 ER 설계(resolution-plan 3.3)를 재설계한다**
 
   해석(기계 판정 방법, 위 문장을 바꾸지 않는다):
   - "**파일럿 평가**" → `data/scenarios/` **실물 40건 전부**에 대해 다섯 방식이 돌았다. 판정: `python -c "import json,collections;rows=[json.loads(l) for l in open('reports/pilot/raw-<ts>.jsonl',encoding='utf-8')];print(len({r['scenario_id'] for r in rows}), sorted({r['method'] for r in rows}))"` → `40 ['embedding_only','exact_norm','exact_raw','llm_single','proposed']`. 픽스처·부분 표본이 아니다.
@@ -90,10 +91,10 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는 
 
 | 무엇 | 명령 | 기대 출력 |
 |------|------|-----------|
-| 전체 테스트 | `POSTGRES_PORT=5433 python -m pytest tests/ -q -rs` | 기존 859 + 신규 전부 통과, 실패 0·skip 0 |
+| 전체 테스트 | `POSTGRES_PORT=5433 python -m pytest tests/ -q -rs` | 기존 918(P3-llm-providers done 시점) + 신규 전부 통과, 실패 0·skip 0 |
 | dry-run(네트워크 0) | `POSTGRES_PORT=5433 python scripts/run_pilot_eval.py --dry-run --stub --out <tmp>` | rc=0. 5방식 × 10임계치 × mention 행 수 출력, `network_calls=0`·`run_mode=stub` |
 | 적재 임베딩 단언 | dry-run 로그 | 시나리오마다 `embedded_alias_count == alias_count`(인계 8). 불일치면 rc≠0 |
-| 실 실행 | `OPENAI_API_KEY=… ANTHROPIC_API_KEY=… POSTGRES_PORT=5433 python scripts/run_pilot_eval.py --out reports/pilot/` (키 값은 사용자 셸에만) | rc=0, `run_mode=real`, 토큰·비용 합계 출력. 키 없으면 rc=2 |
+| 실 실행 | `LLM_PROVIDER=openai OPENAI_API_KEY=… POSTGRES_PORT=5433 python scripts/run_pilot_eval.py --out reports/pilot/` (결정 A(ii) OpenAI 1벌, 키 값은 사용자 셸에만) | rc=0, `run_mode=real`, 토큰·비용 합계 출력. 키 없으면 rc=2 |
 | `metrics.json` 스키마 | `python -m evaluation.metrics --validate reports/metrics.json` | rc=0. 방식 키 5개·순서 고정·`meta.denominator_rule` 존재 |
 | 보정표 구간 수 | `python -c "import json;d=json.load(open('reports/calibration.json'));print(len({b['bin'] for g in d['groups'] for b in g['bins']}), d['excluded_clamped'])"` | `10 <정수>` |
 | 곡선 파일 | `python -c "import csv;r=list(csv.DictReader(open('reports/curve.csv',encoding='utf-8')));print(sorted({float(x['t_merge']) for x in r}), {x['t_new'] for x in r}, len({x['method'] for x in r}))"` | `[0.5,…,0.95]`(10점) · `{'0.3'}` · `5` |
@@ -101,7 +102,9 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는 
 | 제품 코드·데이터 무변경 | `git diff --name-only <U1 직전 해시>..HEAD -- app/ data/` | **0줄**(원칙4·원칙8. 0줄이 아니면 이 패키지는 미충족) |
 | 라벨 무변경 | `python scripts/validate_scenarios.py --strict --json` | rc=0, `total` 40·5범주 `counts` 그대로 |
 | 스키마·툴 무변경 | `POSTGRES_PORT=5433 python -m alembic check` · `python scripts/tools_check.py` | `No new upgrade operations detected.` · `7/7 ok` |
-| 확신도 재계산(표본) | U7 evidence 의 `agent_traces step='er_resolve'` 재계산 스크립트 | `0.5·s_llm+0.3·s_emb+0.2·s_rule` 과 기록 `confidence` 의 abs diff 0 |
+| 확신도 재계산(표본) | U7 evidence 의 `agent_traces step='er_resolve'` 재계산 스크립트(결정 D(i) 롤백이므로 **실행 중 덤프**, 실행 로그와 같은 ts) | `0.5·s_llm+0.3·s_emb+0.2·s_rule` 과 기록 `confidence` 의 abs diff 0 |
+| 비용 실측·외삽(P0-cost 흡수, 결정 B) | `grep -nE "1건당|150건" reports/cost_estimate.md` | 시나리오 1건당 토큰 실측 수치와 150건 외삽 총액(USD) 두 수치가 있고 5방식 기준이 명시돼 있다 |
+| 게이트(결정 K 지배 기준) | `python -c "import json;g=json.load(open('reports/metrics.json'))['gate'];print(g['t_merge'],g['dominated_by'],g['d10_direction'],g['pass'])"` | `0.8 [] True True` 면 통과. `dominated_by` 가 비어 있지 않거나 `d10_direction` 이 False 면 미달(→ U8 + `/devlog change`) |
 
 - 증거 경로: `docs/wiki/packages/P4-pilot-eval/evidence/`. Docker Desktop 이 꺼져 있거나 키가 없으면 **우회하지 않고** 사용자에게 명령을 보여 주고 멈춘다(security.md §6).
 
@@ -109,17 +112,17 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는 
 
 | registry 행 | 무엇 | 이 패키지가 어떻게 쓰는가 |
 |---|---|---|
-| 108~111 `evaluation/__init__.py`·`resolvers/{base,registry,__init__}.py`(05d90f0) | `MentionDecision`·`Resolver`·`RESOLVERS`·`get_resolver`·`ALL_METHODS` | 러너가 `from evaluation.resolvers import ALL_METHODS, get_resolver` 한 줄로 돈다. 새 방식·새 인터페이스를 만들지 않는다. 다섯 이름 = `metrics.json` 키 |
-| 113·115·117·119 `proposed.py`·`exact_match.py`·`embedding_only.py`·`llm_single.py` | 다섯 방식 구현 | 그대로 호출만 한다. 수정 0(고칠 일이 생기면 멈춘다) |
-| 122 `evaluation/scenario_state.py`(e0812f7) | `load_scenario_state(ctx, scenario, *, embedder=None)` | 사전 상태 적재 **전용 경로**. 새 적재기를 만들지 않는다. `embedder=` 명시 필수 |
-| 104 `scripts/validate_scenarios.py`(1e1320c baee71e 40c36f8) | 적재·`--strict --json` 의 `counts`·`ambiguous_mention_count`·`trap_count` | 분모 계약의 출처이자 "라벨 무변경" 증거 명령. `scenario_state` 가 이미 얇게 감쌌으므로 러너는 그 래퍼를 쓴다 |
-| 105 `scripts/dump_scenarios.py`(40c36f8…) | 검수 패킷 Markdown 덤프 | 실패 케이스 분석(U8)에서 시나리오 원문을 사람이 읽는 형태로 인용할 때 재사용 |
-| 85 `scripts/er_smoke.py`(107ace3) · 121 `scripts/baseline_smoke.py`(0d98e47) | 실 LLM 1회 스모크(사용자 실행) | U6·U7 **전에** 1회 실행해 키·공급자·모델을 확인(결정 I). 결과를 이 패키지 evidence 로 옮긴다 |
-| 76~82 `app/er/*`(02e6f14·b1f2782·593c254·d6e5949·cc5d24f) | `resolve`·`ERConfig`·`band_for`·`combine`·`judge_from_env`·trace 상수 | **읽기 전용 재사용**. `ERConfig(t_merge=…)` 주입으로 스윕, `ER_TRACE_STEP` 으로 trace 조회. `app/` 무수정 |
+| 110~113 `evaluation/__init__.py`·`resolvers/{base,registry,__init__}.py`(05d90f0) | `MentionDecision`·`Resolver`·`RESOLVERS`·`get_resolver`·`ALL_METHODS` | 러너가 `from evaluation.resolvers import ALL_METHODS, get_resolver` 한 줄로 돈다. 새 방식·새 인터페이스를 만들지 않는다. 다섯 이름 = `metrics.json` 키 |
+| 115·117·119·121 `proposed.py`·`exact_match.py`·`embedding_only.py`·`llm_single.py` | 다섯 방식 구현 | 그대로 호출만 한다. 수정 0(고칠 일이 생기면 멈춘다) |
+| 124 `evaluation/scenario_state.py`(e0812f7) | `load_scenario_state(ctx, scenario, *, embedder=None)` | 사전 상태 적재 **전용 경로**. 새 적재기를 만들지 않는다. `embedder=` 명시 필수 |
+| 106 `scripts/validate_scenarios.py`(1e1320c baee71e 40c36f8) | 적재·`--strict --json` 의 `counts`·`ambiguous_mention_count`·`trap_count` | 분모 계약의 출처이자 "라벨 무변경" 증거 명령. `scenario_state` 가 이미 얇게 감쌌으므로 러너는 그 래퍼를 쓴다 |
+| 107 `scripts/dump_scenarios.py`(40c36f8…) | 검수 패킷 Markdown 덤프 | 실패 케이스 분석(U8)에서 시나리오 원문을 사람이 읽는 형태로 인용할 때 재사용 |
+| 87 `scripts/er_smoke.py`(107ace3) · 123 `scripts/baseline_smoke.py`(0d98e47) | 실 LLM 1회 스모크(사용자 실행) | U6·U7 **전에** 1회 실행해 키·공급자·모델을 확인(결정 I). 결과를 이 패키지 evidence 로 옮긴다 |
+| 78~85 `app/er/*`(02e6f14·b1f2782·593c254·d6e5949·cc5d24f) | `resolve`·`ERConfig`·`band_for`·`combine`·`judge_from_env`·trace 상수 | **읽기 전용 재사용**. `ERConfig(t_merge=…)` 주입으로 스윕, `ER_TRACE_STEP` 으로 trace 조회. `app/` 무수정 |
 | 29 `reports/embed_pilot.md`(P0-embed-pilot) | D4 근거·모델·N=1536 | 실 임베딩 공급자·모델을 여기서 인용(새로 고르지 않는다) |
 | README.md "베이스라인 3종 실행법"·"평가 데이터셋(파일럿 40건)" 절 | 실행법 문서 | 새 절을 만들지 않고 **"파일럿 평가 실행법"을 이어 붙인다**(F-0ffff5 선례 — registry 비고에 한 줄) |
 
-신규(registry 행 예정): `evaluation/runner.py`·`metrics.py`·`calibration.py`·`curve.py`·`report.py`, `scripts/run_pilot_eval.py`, `tests/test_eval_{runner,metrics,calibration,curve,report}.py`, `reports/metrics.json`·`calibration.json`·`curve.csv`·`eval.md`·`failure_cases.md`·`pilot/raw-<ts>.jsonl`, `docs/user-setup/09-pilot-eval-run.md`.
+신규(registry 행 예정): `evaluation/runner.py`·`metrics.py`·`calibration.py`·`curve.py`·`report.py`, `scripts/run_pilot_eval.py`, `tests/test_eval_{runner,metrics,calibration,curve,report}.py`, `reports/metrics.json`·`calibration.json`·`curve.csv`·`eval.md`·`failure_cases.md`·`cost_estimate.md`·`pilot/raw-<ts>.jsonl`, `docs/user-setup/10-pilot-eval-run.md`.
 
 ## 인계 항목 대장 (앞 패키지가 넘긴 것 — U 번호·처리 방식. P4 02-plan-verify 점검 대상)
 
@@ -173,6 +176,18 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는 
 | 리스크 계측: `rule_checked==0` merge·`relaxed_retry==true` merge 의 오병합률, `derive_hints` 빈 dict 비율 | **U2**(부분집합 지표) · **U8**(해석) |
 | 실 임베딩·실 LLM 은 P4 가 처음 본다(R4·R9 실호출 미검증) | **U7** — 이 실행이 R4·R9 의 "실호출 미검증" 꼬리표를 닫는 증거다 |
 
+**P3-llm-providers 04-review §7 (7항, 2026-09-15)**
+
+| # | 인계 내용 | 처리 |
+|---|---|---|
+| 1 | 공급자 선택·결정 A 정합 — `LLM_PROVIDER=openai` 명시, `LLM_PROVIDERS_ENABLED` 미설정, `meta.provider`·`meta.model` 은 `select_provider(env)`·`Judgement.model`/`detail["model"]` 출처(단일 출처 `JUDGES`) | **U1**(env 명시)·**U4**(`meta` 조립)·**U7**(evidence) |
+| 2 | Gemini 실호출 미검증 0/3 — P4 는 기본 안 돈다(결정 A (ii)). 돌리려면 스모크 03·08 `--provider gemini` 먼저 | **결정 A 그대로(OpenAI 1벌)**. Gemini 벌은 P10 후보(§P10 9). 사용자가 03·08 gemini 스모크를 실행했으면 결과만 **U6** evidence 로 옮긴다 |
+| 3 | 재시도 비대칭(Gemini timeout·connection 만 1회 / Claude·OpenAI SDK `max_retries=1` 은 429·5xx 도) | **U2** — `llm_error` 분포 표 각주 1줄(이번 실행은 OpenAI 1벌이므로 비교 없음, 각주만) |
+| 4 | `Judgement.model`(Gemini) 은 `response.model_version` 우선 — 설정 문자열과 다를 수 있음 | **U3** — 그룹 키 `model` = 판정이 돌려준 값, 설정값은 `meta.model_configured` |
+| 5 | 토큰 필드(Gemini `usage_metadata`, thinking 토큰 별도) | **U6** — 비용 추정은 `tokens_in`/`tokens_out` 실측 합계로, OpenAI 만 대상. Gemini 주의는 `cost_estimate.md` 각주 |
+| 6 | 스키마 실 API 거부 시 `api_error`(400) 강등 — 모든 mention 에 `api_error` 면 공급자 층 문제 | **U7** — 리스크 절 "오류율 5%" 규칙과 결합: 전 mention `api_error` 면 게이트 판정에 쓰지 않고 evidence + 사용자 보고(재시도 금지) |
+| 7 | 닫는 커밋 해시를 P4 01-plan 5행에 | **완료** — 이 문서 5행 `59c67cc`(2026-09-15) |
+
 **05-remediation 소견 — 이 계획의 결정**
 
 - **F-251dc2**(trace `candidates[].similarity`·`aliases_matched` 가 `s_emb`·전체 별칭의 복제) → **결정 G: (b) 불필요를 명시한다.** 근거: (i) 이 패키지의 지표·보정표·곡선은 전부 `MentionDecision`(JSONL)에서 계산하며 trace 는 재계산 **검증용 보조**다. (ii) 소견 자체가 "`s_emb` 는 이미 `[0,1]` 안이라 재계산 정확성(S3.7)에는 영향 없음"이라고 확인했다. (iii) "실제 일치 별칭"은 U8 실패 케이스 분석에서 알고 싶은 정보지만, `exact_raw`/`exact_norm` 두 방식의 결과가 같은 mention에 대해 문자열 일치 여부를 **이미 알려 준다**(다섯 방식을 같은 입력에 돌리는 설계의 부수 이득). (iv) 반대쪽(a)을 택하면 `app/er/candidates.py` 수정 = 원칙4 경계의 `app/` 변경이고, **게이트 패키지가 평가 대상 코드를 만지는 것**은 원칙8 관점에서 최악의 순서다. → `app/` 수정 요구 **없음**. 사용자 결정 항목으로도 올린다(결정 G).
@@ -194,7 +209,7 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는 
 - **결정 J — 곡선 산출 형식.** (i) **`curve.csv` + `eval.md` 안의 Markdown 표만**(**권장** — 의존성 0, 재현 쉬움, `metrics.json` 만으로 재생성 가능이라는 요구와 정합. 발표용 그림은 P10 에서) / (ii) matplotlib PNG 를 함께 생성(발표 자료에 바로 쓰이지만 새 의존성·바이너리 커밋·재생성 멱등 판정이 까다로워진다) / (iii) PNG 는 P10 에서만.
 - **결정 K — 게이트 통과 기준("미달"의 정의).** 기획서·S3.7 에 절대 수치가 없다(위 수용 기준 절의 grep 근거). (i) **상대 기준: 제안 방식의 오병합률이 `T_merge=0.8`(D10 초기값)에서 베이스라인 3종의 최저 오병합률보다 낮고, 동시에 미검출률이 베이스라인 최고치보다 나쁘지 않다. 곡선이 D10 방향(`T_merge`↑ → 오병합↓·`ask_user(identity)`↑)을 따른다**(**권장** — 40건 표본에서 절대 수치를 게이트로 삼으면 표본 오차로 프로젝트가 좌우된다. 원칙1 의 비대칭 비용을 그대로 판정식으로 옮긴 형태이고, 기획서가 약속한 것도 "베이스라인 대비 우위"다) / (ii) 절대 수치(예: 오병합률 ≤ 5%)를 지금 정한다(명료하지만 근거가 없다 — 부록 A 수치는 예시라고 기획서가 못박았다) / (iii) 게이트를 수치로 걸지 않고 04-review 가 서술로 판정(원칙8 의 "재현 가능"과 어긋난다). **(i) 채택 시에도 미달이면 P5 를 시작하지 않고 U8 산출물 + `/devlog change` 로 간다.**
 
-**결정 확정 (사용자, 2026-09-11 — 메인 세션 기록. 계획 본문의 선택지 문단은 원문 보존)**
+**결정 확정 (사용자, 2026-09-11 — 메인 세션 기록. K 는 2026-09-17 개정. 계획 본문의 선택지 문단은 원문 보존)**
 
 | 결정 | 확정 | 계획에 미치는 것 |
 |------|------|------------------|
@@ -208,7 +223,7 @@ S3.7 카드(`docs/resolution-plan.md` §3.7 원문, §5 P4 행)가 요구하는 
 | H F-bdd6c5 | **(i)** `top_k` 스윕 금지, `meta.top_k_swept:false` | U4 |
 | I 스모크 선행 | **(i)** U6 전 03·08 카드 사용자 1회씩(OpenAI 경로 포함) | U6 evidence 이관 |
 | J 곡선 형식 | **(i)** `curve.csv` + Markdown 표, PNG 는 P10 | U4·U5 |
-| K 게이트 기준 | **(i)** 상대 기준(`T_merge=0.8` 에서 제안 방식 오병합률 < 베이스라인 최저, 미검출률 ≤ 베이스라인 최고, 곡선 D10 방향). 미달 시 P5 미착수 + U8 + `/devlog change` | 수용 기준 해석·04-review 판정식 |
+| K 게이트 기준 | **(i) → 개정 (a) 지배 기준(사용자 2026-09-17, verifier 02-plan-verify H-1)**: `T_merge=0.8` 에서 **어떤 베이스라인도 제안 방식을 지배하지 않는다**(지배 = 그 베이스라인의 오병합률 ≤ 제안 방식 **그리고** 미검출률 ≤ 제안 방식, 둘 중 하나는 엄격히 <) **그리고** 곡선이 D10 방향(`T_merge`↑ → 오병합↓·`ask_user(identity)`↑). 개정 사유: `exact_raw`/`exact_norm` 은 단독 일치 1명일 때만 merge(`evaluation/resolvers/exact_match.py` 264~276행)라 40건에서 오병합 0 이 되기 쉬워, 원안 "제안 방식 오병합률 < 베이스라인 최저" 는 제안 방식이 오병합 0 이어도 `0 < 0` 거짓 → 방식 품질과 무관하게 미달. 지배 기준은 원칙1 의 두 축을 유지하면서 0 동률 함정을 피한다. 미달 시 P5 미착수 + U8 + `/devlog change` | 수용 기준 해석 (ii)·04-review 판정식 = U4 `metrics.json.gate`(판정 표 "게이트" 행) |
 
 **리스크(결정이 아니라 지켜볼 것)**
 
@@ -243,10 +258,13 @@ P1 04-review §7 "P10-final-eval 로" 1~5 를 그대로 승계한다.
 
 ## 읽은 카드
 
-- `.claude/gitlog.md`(2026-09-11 12:57 스냅샷) — 브랜치(dev 5a1bcbe / main 0e3447a / 승격 대기 10), 최근 커밋 20건(5a1bcbe·ad394ba·f78e9dc·5cac9bf 확인), 마지막 커밋 파일 목록, 미커밋 `docs/wiki/journal.md` 1건. **`P4-pilot-eval` 태그 커밋 0건**(L-001)
-- `docs/wiki/INDEX.md` — 패키지 표 59~79행(69행 `P4-pilot-eval | 게이트 파일럿 평가·보정표·곡선 | eval-agent | R3 R4`, 79행 "P4 이전에 P5 이후를 시작하지 않는다")
+- `.claude/gitlog.md`(2026-09-15 16:15 스냅샷, `bash .claude/scripts/gitlog.sh P4-pilot-eval`) — 브랜치(dev = main = 3c6108d / 승격 대기 0), `P4-pilot-eval` 태그 커밋 1건(701fb8d 계획 초안), P3-llm-providers 커밋 6건(025a7c4·c01381d·cf01e9f·7b94a69·10a66c3·59c67cc). 초안 시점(2026-09-11 12:57) 스냅샷은 dev 5a1bcbe / main 0e3447a / 승격 대기 10 이었다(L-001)
+- `docs/wiki/packages/P3-llm-providers/04-review.md` — §6(열린 문제: 실호출 검증 공급자 0/3, H-1 proposal 안내문 → 사용자 (a) 확정)·§7 P4 인계 7항(위 인계 대장에 옮김)
+- `docs/wiki/decisions/D11-llm-provider-registry.md` — 결정(기본 `openai`, 등록표 3종, 활성 스위치)·"코드에서 지켜야 할 것" (a)~(e)·파급(P4 결정 A 정합)
+- `docs/user-setup/09-aws-deploy.md`(3c6108d) — 카드 번호 09 가 이미 쓰여 이 패키지의 사용자 카드는 **10** 번
+- `docs/wiki/INDEX.md` — 패키지 표 60~80행(70행 `P4-pilot-eval | 게이트 파일럿 평가·보정표·곡선 | eval-agent | R3 R4`, 80행 "P4 이전에 P5 이후를 시작하지 않는다")
 - `docs/wiki/CURRENT.md` — `active: none`·`frozen: none`, 메모(P3-baselines 완료·다음 후보 P4)
-- `docs/backlog.md` — 10~17행 착수 준비(15행 `cost_estimate.md` 미완), 52~54행 P4 절(수용 기준 원문), 85~93행 리스크 로그(P4 시점 점검 2건: ER 성능 미달·`s_llm` 신뢰성)
+- `docs/backlog.md` — 10~17행 착수 준비(15행 `cost_estimate.md` 미완), 59~61행 P4 절(수용 기준 원문), 85~93행 리스크 로그(P4 시점 점검 2건: ER 성능 미달·`s_llm` 신뢰성)
 - `docs/wiki/review-index.md` — R3(해소(문서), D10) · R4(구현완료 b1f2782, **실호출 미검증**) · R9(구현완료, **실 공급자 호출 미검증, P4 에서 실측**) 행
 - `docs/wiki/specs/S3.7-eval-spec.md` — 전문(지표·곡선 x축·베이스라인·산출물·미달 시 절차)
 - `docs/wiki/specs/S3.3-er-pipeline.md` — 4단계·확신도·두 임계치 밴드 절(1~18행)
@@ -257,7 +275,8 @@ P1 04-review §7 "P10-final-eval 로" 1~5 를 그대로 승계한다.
 - `docs/wiki/packages/P1-pilot-dataset/04-review.md` — §7(151~177행) P4 인계 13항·P10 인계 5항·공통 주의
 - `docs/wiki/packages/P3-er/04-review.md` — §7(150~163행) P4 절·실 스모크 명령
 - `docs/wiki/packages/P3-er/05-remediation.md` — F-251dc2(806~830행)·F-bdd6c5(832~849행)
-- `docs/wiki/registry.md` — 29·76~85·104~105·108~123행(`evaluation/`·`scripts/`·`app/er/`·`reports/` 행 grep)
+- `docs/wiki/packages/P4-pilot-eval/02-plan-verify.md`(verifier, 2026-09-17) — H-1(결정 K 판정식 0 동률)·R-1~R-4 → 이 개정의 근거. R-5(재밴드 시 `embedding_only` 동점 강등 재적용 테스트)·R-6(`meta.model` 은 응답 모델명)은 U1·U3 구현 시 참고
+- `docs/wiki/registry.md` — 29·78~87·106~107·110~125행(`evaluation/`·`scripts/`·`app/er/`·`reports/` 행 grep)
 - `docs/wiki/packages/P3-baselines/01-plan.md` — 형식 참고(작업 단위 문장·결정 확정 블록·판정 방법 표·P4 인계 절 176~183행), 리스크 절
 - `docs/resolution-plan.md` — §3.7 곡선 문장(90·202행)·§5 P4 행(230행) grep. `docs/proposal.md` 11·170~177·392·400행 grep(**목표 수치는 예시이며 측정 결과가 아님** 확인)
 - `docs/wiki/templates/plan.md` — 이 문서의 형식

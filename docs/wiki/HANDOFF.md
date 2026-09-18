@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-15 16:10 (**59c67cc dev 푸시 → 사용자 결정 '승격(실서버 검증 없이, 문서·평가 코드)' → main 승격 완료(0e3447a..59c67cc). 마커 해제. 새 요청: AWS 배포 가이드 09 카드 작성 — 커밋 승인 대기**)
-active: **none** | frozen: none | 브랜치: dev = origin/dev = **main = origin/main = 59c67cc**. **진행 중: 09 카드 커밋**(`docs/user-setup/09-aws-deploy.md` 신규 + README 색인 09행 + registry 행 1, 코드 0줄). 미커밋: 그 3파일 + journal(COMMIT·PUSH·RELEASE 줄)·HANDOFF. **재개 절차(새 세션)**: `/devlog resume` → 09 카드 커밋 승인부터. 결정 뒤: P4-pilot-eval 01-plan 5행에 done 커밋 해시 채움 → `/devlog start P4-pilot-eval`(verifier 02-plan-verify 위임은 L-004 질문).
+갱신: 2026-09-18 (**P4-pilot-eval 계획 승인·active 등록 — START 커밋 승인 대기. 다음: U1 러너 eval-agent 위임(L-004)**)
+active: **P4-pilot-eval** | frozen: none | 브랜치: dev = origin/dev = main = origin/main = **3c6108d**. 경위: verifier 02-plan-verify 1차(09-17 09:30) 보류 H-1 → 사용자 (a) 지배 기준·R-1~R-4 → 01-plan 개정 → verifier 2차(09:50) **통과**(FAIL 0/WARN 3 의도, 점검표 8/8) → 2026-09-18 사용자 재개 결정·계획 승인 → 02 `승인: 사용자 (2026-09-18)`, CURRENT active, `03-log.md` 생성(pending 항목 1), journal VERIFY×2·DECISION·START. backlog 15행 흡수 표기는 이미 있음. **START 커밋 대상**: P4 01-plan·02·03·05·evidence 10파일, P3-llm-providers 04-review 결과 줄 형식 1줄, CURRENT·journal·HANDOFF. 커밋 뒤 03-log `pending` → 해시.
 
 ## 지금 어디까지
 - **P3-llm-providers 완료(2026-09-15)** — U1 c01381d·U2 cf01e9f·U3 7b94a69·U4 10a66c3. verifier 04-review `완료`: 수용 기준 11/11(backlog 51행 글자 일치), 부정 python 43/43 + bash, D11 (a)~(e) 코드 1:1, 03-log 판단 8건 채택, registry 소견 9건 해소. verifier 판정은 부분완료(F-4ef1a3 [필수] = R-8 "새 행 0" vs `verify-impl.sh` 94행 "패키지 열 행 필수" 충돌) → 사용자 결정 (i) D11 카드 registry 행 1줄·H-1 (a) proposal 상단 안내문 1줄 → 메인 세션 재실행 **FAIL 0 / WARN 0**(`evidence/20260915-1537-close-verify-impl.txt`, 918 passed), 04-review §9·결과 `완료`·승인 줄. CURRENT active none, backlog 51·53~56 `[x]`, journal DONE.
@@ -18,12 +18,12 @@ active: **none** | frozen: none | 브랜치: dev = origin/dev = **main = origin/
 - 로컬 DB: capstone2-postgres-1 호스트 5433(Docker Desktop 켜짐), 명령 앞 `POSTGRES_PORT=5433`(export 하면 스크립트도 상속), pytest `-rs`, 한글 출력 `PYTHONIOENCODING=utf-8`. 설치: anthropic 1.4.0·openai 2.33.0·google-genai 2.23.0.
 
 ## 바로 다음에 할 것 (순서대로)
-1. **09 카드 커밋**(`docs(user-setup): 09 AWS 배포 가이드라인` — 사용자 승인 → 커밋 → 푸시 여부 사용자 결정 → 푸시하면 L-003 다시).
-2. 결정 뒤 **P4-pilot-eval**: 01-plan(701fb8d 초안) 5행에 P3-llm-providers done 해시 → `/devlog start P4-pilot-eval`(verify-plan → L-004 verifier 02-plan-verify 위임 승인 → 사용자 계획 승인). P4 통과 전 P5 이후 시작 금지.
+1. **START `/commit`**(사용자 승인) → **U1 러너 골격·격리·적재** eval-agent 위임: AskUserQuestion → `approve-commit.sh --stage eval-agent` → 1회. 위임 프롬프트: 01-plan 64행 U1·결정 A~K 표·R-5~R-7(278행)·02 §3 O-4~O-6, 금지(HANDOFF·journal·커밋·`.env`·네트워크). 결정 I: U6 전에 사용자 스모크 03·08(OpenAI) 1회씩 — 아직 미실행(F-87c597).
+2. 09 카드 §2 결정 10개·4.0 항목(Budgets·도메인·SSO 프로필·GitHub prod 환경)은 사용자 몫 — P9 전 아무 때나. P4 통과 전 P5 이후 시작 금지.
 3. 보류: 사용자 스모크 03·08 실호출(anthropic·openai·gemini), P0-cost, F-46f1eb·F-036185, 하네스 L-nnn(verify-impl 6번).
 
 ## 재개 시 읽을 카드 (이것만)
-- `packages/P3-llm-providers/04-review.md` §6·§7·§9, `packages/P4-pilot-eval/01-plan.md`(초안, 5행·결정 A~K), `docs/backlog.md` 61행 부근(P4)
+- `packages/P4-pilot-eval/01-plan.md`(U1~U9 64~72행, 결정 표 ~226행, 278행 R-5·R-6), `02-plan-verify.md` §3·§4, `03-log.md` 마지막 항목, `docs/backlog.md` 61행
 - `docs/wiki/CURRENT.md`, `.claude/gitlog.md`, `decisions/D11-llm-provider-registry.md`
 - `lessons/L-001`~`L-004`
 
@@ -36,5 +36,6 @@ active: **none** | frozen: none | 브랜치: dev = origin/dev = **main = origin/
 - **점검표·완료 검토는 verifier 에게 위임**(L-002). **위임은 묻고 시작**(L-004): AskUserQuestion → `approve-commit.sh --stage <이름>` → Agent 1회. Docker 가 꺼져 있으면 우회하지 않고 사용자에게 켜 달라고 한다(security §6).
 - **푸시는 `git push origin dev` 만**. 푸시 뒤 `.claude/.awaiting-decision` → 승격/수정/보류를 묻고 멈춘다(L-003).
 - 승인 마커는 커밋 명령과 **다른 Bash 호출**에서 먼저. `git commit` 과 `git push` 를 한 Bash 호출에 묶지 않는다. Bash 문자열에 마커 파일명·훅 금지 문구·환경변수 전체 출력(`environ` grep·`env -u` 포함) 금지 — 문서 수정은 scratchpad 스크립트 + python 또는 Write. `.env` 존재 확인 금지. `git checkout --` 금지. evidence 파일은 cp949 혼입이 있을 수 있어 python 읽기는 `errors="replace"`.
+- **푸시 명령은 Bash 호출 하나에 단독으로**(뒤에 `grep` 등 실패할 수 있는 명령을 붙이면 종료 코드가 0 이 아니어서 cleanup 훅이 돌지 않는다 — 2026-09-15 실측, 같은 push 재실행으로 복구).
 - `findings.py` 는 `PYTHONUTF8=1 PYTHONIOENCODING=utf-8` 앞에. verify-impl 재실행마다 `<ts>-pytest/lint/commits/summary.txt` 4개가 생기므로 중복 실행분은 지우고 커밋한다.
 - 서브에이전트에게 HANDOFF·journal 금지 명시. `app/` docstring 에 "evaluation" 문자열 금지(`test_app_does_not_mention_evaluation_package_at_all`).
