@@ -157,3 +157,4 @@
 - 2026-09-17 09:50 | VERIFY | P4-pilot-eval 02-plan-verify 2차 verifier 통과(H-1 해소, 점검표 8/8, 보류 0) | P4-pilot-eval L-002 L-004
 - 2026-09-18 | START | P4-pilot-eval 착수: 사용자 재개 결정(이어서 완료)·계획 승인. 담당 eval-agent, U1 러너 → U2 지표 → U3 보정표 → U4 곡선·게이트 → U5 리포트 → U6 CLI·dry-run·비용 → U7 실 공급자 1회 → U8 실패 케이스 → U9 기계 검증 | P4-pilot-eval S3.7 S3.3 D3 D4 D5 D10 R3 R4 L-002 L-004
 - 2026-09-18 12:16 | COMMIT | b164f36 docs(P4-pilot-eval): 계획검증 통과·계획 승인 — 결정 K 지배 기준, 착수
+- 2026-09-18 12:45 | COMMIT | fb81234 feat(P4-pilot-eval): U1 러너 골격·격리·적재 — 세이브포인트 롤백, 테스트 29건

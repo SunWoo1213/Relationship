@@ -1,0 +1,6 @@
+$ PYTHONIOENCODING=utf-8 python -m pytest tests/test_eval_metrics.py -q -rs
+# 2026-09-18T13:05:15+09:00 HEAD=fb81234 branch=dev
+........................................................................ [ 76%]
+......................                                                   [100%]
+94 passed in 0.63s
+rc=0
