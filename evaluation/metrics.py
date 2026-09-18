@@ -78,8 +78,9 @@ mention 당 1회만 받고 나머지 9행은 그 사본이다(결정 C(i)). 그�
 ## 하지 않는 것
 
 보정표(U3)·곡선과 `metrics.json` 조립·`gate`(U4)·리포트(U5)·CLI 비용
-가드(U6). `--validate` 스키마 검증(판정 표 98행)은 `metrics.json` 을 만드는
-U4 가 그 구조를 확정한 뒤에 이 모듈에 붙인다.
+가드(U6). `--validate` 스키마 검증(판정 표 98행)은 U4 가 구조를 확정한 뒤
+CLI 에만 붙었다 -- 규칙 자체는 그 파일을 만드는 `evaluation/curve.py`
+(`validate_metrics_document`)가 단일 출처로 갖고, 여기서는 호출만 한다.
 """
 
 from __future__ import annotations
@@ -788,15 +789,46 @@ def compute_metrics(rows: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+def _validate_file(path: str) -> int:
+    """`metrics.json` 스키마 검증(01-plan 판정 표 98행). 규칙은 그 파일을
+    **만드는** U4(`evaluation/curve.py`)가 단일 출처로 갖고 있고, 여기서는
+    함수 안에서 import 한다(모듈 순환·불필요한 의존을 만들지 않는다)."""
+
+    from evaluation.curve import validate_metrics_document
+
+    document = json.loads(Path(path).read_text(encoding="utf-8"))
+    problems = validate_metrics_document(document)
+    if problems:
+        print(f"FAIL {path}: {len(problems)} problem(s)")
+        for problem in problems:
+            print(f"  - {problem}")
+        return 1
+    print(f"OK {path}")
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="python -m evaluation.metrics",
         description="U1 파일럿 러너 JSONL -> 방식별 지표 JSON (DB·네트워크 없음)",
     )
-    parser.add_argument("--rows", required=True, help="U1 러너가 쓴 JSONL 경로")
+    parser.add_argument("--rows", default=None, help="U1 러너가 쓴 JSONL 경로")
     parser.add_argument("--out", default=None, help="결과 JSON 경로(생략하면 표준출력)")
+    parser.add_argument(
+        "--validate",
+        default=None,
+        metavar="METRICS_JSON",
+        help="metrics.json 스키마 검증(방식 키 5개·순서·meta·gate·격자). 위반이면 rc=1",
+    )
     parser.add_argument("--indent", type=int, default=2)
     args = parser.parse_args(argv)
+
+    if args.validate is not None:
+        if args.rows is not None or args.out is not None:
+            parser.error("--validate 는 --rows/--out 과 함께 쓰지 않는다(검증만 한다)")
+        return _validate_file(args.validate)
+    if args.rows is None:
+        parser.error("--rows 또는 --validate 중 하나가 필요하다")
 
     metrics = compute_metrics(load_rows(args.rows))
     text = json.dumps(metrics, ensure_ascii=False, indent=args.indent, sort_keys=True)
