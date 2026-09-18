@@ -1,0 +1,5 @@
+$ POSTGRES_PORT=5433 PYTHONIOENCODING=utf-8 python -m pytest tests/test_eval_runner.py -q -rs
+# 2026-09-18T12:39:39+09:00 HEAD=b164f36 branch=dev
+.............................                                            [100%]
+29 passed in 42.48s
+rc=0

@@ -5,8 +5,8 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-18 (**P4-pilot-eval 계획 승인·active 등록 — START 커밋 승인 대기. 다음: U1 러너 eval-agent 위임(L-004)**)
-active: **P4-pilot-eval** | frozen: none | 브랜치: dev = origin/dev = main = origin/main = **3c6108d**. 경위: verifier 02-plan-verify 1차(09-17 09:30) 보류 H-1 → 사용자 (a) 지배 기준·R-1~R-4 → 01-plan 개정 → verifier 2차(09:50) **통과**(FAIL 0/WARN 3 의도, 점검표 8/8) → 2026-09-18 사용자 재개 결정·계획 승인 → 02 `승인: 사용자 (2026-09-18)`, CURRENT active, `03-log.md` 생성(pending 항목 1), journal VERIFY×2·DECISION·START. backlog 15행 흡수 표기는 이미 있음. **START 커밋 대상**: P4 01-plan·02·03·05·evidence 10파일, P3-llm-providers 04-review 결과 줄 형식 1줄, CURRENT·journal·HANDOFF. 커밋 뒤 03-log `pending` → 해시.
+갱신: 2026-09-18 (**P4-pilot-eval U1 러너 구현 완료(eval-agent) — runner 29 passed·전체 947 passed, app/·data/ 변경 0. U1 커밋 승인 대기. 다음: U2 지표 계산기(eval-agent, L-004)**)
+active: **P4-pilot-eval** | frozen: none | 브랜치: dev = **b164f36**(origin/dev·main = 3c6108d, 미푸시 1). 경위: verifier 02-plan-verify 1차(09-17 09:30) 보류 H-1 → 사용자 (a) 지배 기준·R-1~R-4 → 01-plan 개정 → verifier 2차(09:50) **통과**(FAIL 0/WARN 3 의도, 점검표 8/8) → 2026-09-18 사용자 재개 결정·계획 승인 → 02 `승인: 사용자 (2026-09-18)`, CURRENT active, `03-log.md` 생성(pending 항목 1), journal VERIFY×2·DECISION·START. backlog 15행 흡수 표기는 이미 있음. START 커밋 **b164f36**(18파일, 미푸시 — dev 가 origin/dev 보다 1 앞). 03-log START 항목 `pending` → b164f36 은 다음 커밋에 포함.
 
 ## 지금 어디까지
 - **P3-llm-providers 완료(2026-09-15)** — U1 c01381d·U2 cf01e9f·U3 7b94a69·U4 10a66c3. verifier 04-review `완료`: 수용 기준 11/11(backlog 51행 글자 일치), 부정 python 43/43 + bash, D11 (a)~(e) 코드 1:1, 03-log 판단 8건 채택, registry 소견 9건 해소. verifier 판정은 부분완료(F-4ef1a3 [필수] = R-8 "새 행 0" vs `verify-impl.sh` 94행 "패키지 열 행 필수" 충돌) → 사용자 결정 (i) D11 카드 registry 행 1줄·H-1 (a) proposal 상단 안내문 1줄 → 메인 세션 재실행 **FAIL 0 / WARN 0**(`evidence/20260915-1537-close-verify-impl.txt`, 918 passed), 04-review §9·결과 `완료`·승인 줄. CURRENT active none, backlog 51·53~56 `[x]`, journal DONE.
@@ -18,7 +18,7 @@ active: **P4-pilot-eval** | frozen: none | 브랜치: dev = origin/dev = main = 
 - 로컬 DB: capstone2-postgres-1 호스트 5433(Docker Desktop 켜짐), 명령 앞 `POSTGRES_PORT=5433`(export 하면 스크립트도 상속), pytest `-rs`, 한글 출력 `PYTHONIOENCODING=utf-8`. 설치: anthropic 1.4.0·openai 2.33.0·google-genai 2.23.0.
 
 ## 바로 다음에 할 것 (순서대로)
-1. **START `/commit`**(사용자 승인) → **U1 러너 골격·격리·적재** eval-agent 위임: AskUserQuestion → `approve-commit.sh --stage eval-agent` → 1회. 위임 프롬프트: 01-plan 64행 U1·결정 A~K 표·R-5~R-7(278행)·02 §3 O-4~O-6, 금지(HANDOFF·journal·커밋·`.env`·네트워크). 결정 I: U6 전에 사용자 스모크 03·08(OpenAI) 1회씩 — 아직 미실행(F-87c597).
+1. U1 `/commit` → **U2 지표 계산기** eval-agent 위임(L-004 질문). U2 입력 주의(U1 03-log): 한 mention 의 10행은 같은 LLM 응답 사본 — 토큰 합산은 `llm_fresh_call=True` 행만; JSONL 추가 10키(category·mention_kind·ambiguous·expected_ask_user_allowed·trap_kind 등)로 분모 규칙 계산. U4 판단 필요: `ERConfig` 모듈 기본 가중치 사용(env W_*/T_* 미사용)을 metrics.json meta 에 기록할지. U7 은 `before_rollback` 콜백으로 trace 표본 덤프. 결정 I: U6 전에 사용자 스모크 03·08(OpenAI) 1회씩 — 미실행(F-87c597).
 2. 09 카드 §2 결정 10개·4.0 항목(Budgets·도메인·SSO 프로필·GitHub prod 환경)은 사용자 몫 — P9 전 아무 때나. P4 통과 전 P5 이후 시작 금지.
 3. 보류: 사용자 스모크 03·08 실호출(anthropic·openai·gemini), P0-cost, F-46f1eb·F-036185, 하네스 L-nnn(verify-impl 6번).
 
