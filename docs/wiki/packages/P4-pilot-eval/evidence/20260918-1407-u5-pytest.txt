@@ -1,0 +1,7 @@
+# 2026-09-18T14:07:25+09:00 HEAD=a59ecb4 branch=dev
+# U5 리포트 생성기 단위 테스트(순수 -- DB·네트워크·LLM·시계 0).
+
+$ PYTHONIOENCODING=utf-8 python -m pytest tests/test_eval_report.py -q -rs
+..........................................                               [100%]
+42 passed in 1.85s
+rc=0

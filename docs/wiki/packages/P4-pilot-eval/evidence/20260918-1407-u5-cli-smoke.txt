@@ -1,0 +1,47 @@
+# 2026-09-18T14:09:26+09:00 HEAD=a59ecb4 branch=dev
+# 01-plan 판정 표 102행(`eval.md` 재생성 멱등 diff 0줄)을 **합성 metrics.json**(tests/test_eval_report.py::make_document
+#  = 5방식 × 격자 10점 × 시나리오 2 × mention 8 = 800 행)으로 미리 돌린 것.
+#  실물 reports/ 는 U7 이 만든다 -- 이 단위는 scratchpad tmp 에만 쓴다(01-plan U5 범위).
+
+$ python -c "<합성 metrics.json 작성: build_metrics_document(make_rows())>"   # <tmp>/metrics.json
+methods: ['proposed', 'exact_raw', 'exact_norm', 'embedding_only', 'llm_single']
+gate: 0.8 [] True True
+rc=0
+
+$ python -m evaluation.metrics --validate <tmp>/metrics.json   # 입력이 U4 계약을 지키는가
+OK <tmp>/metrics.json
+rc=0
+
+$ python -m evaluation.report --metrics <tmp>/metrics.json --out <tmp>/eval.md
+rc=0
+
+$ python -m evaluation.report --metrics <tmp>/metrics.json --out <tmp>/eval2.md   # 두 번째 생성
+rc=0
+
+$ diff <tmp>/eval.md <tmp>/eval2.md   # 판정 표 102행: 출력 0줄
+rc=0 (0줄 = 멱등)
+
+$ cmp <tmp>/eval.md <tmp>/eval2.md && python -c "<CRLF·끝줄 확인>"
+bytes=18411  CRLF=False  endswith_lf=True  lines=229
+rc=0
+
+$ grep -c "^## " <tmp>/eval.md ; grep "^## " <tmp>/eval.md   # 절 목록
+8
+## 실행 메타
+## 방식 × 지표 (`T_merge` = 0.8)
+## 게이트 (결정 K — 지배 기준)
+## 트레이드오프 곡선 (x = `T_merge`, `T_new` = 0.3 고정)
+## 강제 경로·LLM 오류·부분집합 (`T_merge` = 0.8)
+## 카테고리별 (`T_merge` = 0.8)
+## 운영 최적점 **후보** (확정값이 아니다)
+## 한계와 읽는 법
+rc=0
+
+$ python -c "<meta.t_new 를 0.4 로 깨뜨린 사본>" && python -m evaluation.report --metrics <tmp>/broken.json --out <tmp>/never.md   # 거부 확인
+FAIL <tmp>\broken.json: 1 problem(s)
+  - meta.t_new: must be 0.3 (got 0.4)
+rc=1
+never.md 없음 = 깨진 입력으로 리포트를 만들지 않았다
+
+$ git status --porcelain reports/ ; git diff --name-only -- app/ data/ evaluation/runner.py evaluation/metrics.py evaluation/calibration.py evaluation/curve.py reports/
+rc=0 (0줄 = 무변경·reports 실물 미생성)
