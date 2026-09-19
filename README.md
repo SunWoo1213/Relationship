@@ -10,7 +10,7 @@
 |---|---|
 | **무엇** | 대화 속 호칭 변이("팀장 → 김팀장 → 부장님")를 한 인물로 묶는 **엔티티 해석 파이프라인**과 그 **평가 장치** (1인 캡스톤, 진행 중) |
 | **지금 있는 것** | 스키마 v2(9테이블 · pgvector), 툴 7종, 엔티티 해석 4단계, 비교 방식 5종, 평가 데이터 40건, pytest 918 passed |
-| **아직 없는 것** | 성능 수치(파일럿 평가 P4 전), 실제 LLM 호출 검증(테스트는 전부 스텁), 에이전트 대화 루프 · 브리핑 · 프론트 · 배포 |
+| **아직 없는 것** | 성능 수치(파일럿 평가 P4 전), 에이전트 대화 루프 · 브리핑 · 프론트 · 배포. 자동 테스트는 전부 스텁이고, 실제 LLM 호출은 OpenAI 스모크 2건으로만 확인(2026-09-19) |
 | **핵심 결정 ①** | **오병합이 미검출보다 나쁘다** — 확신도가 기준 미만이면 자동으로 합치지 않고 사용자에게 묻는다 |
 | **핵심 결정 ②** | LLM 한 번에 맡기지 않고 **후보 검색 → 규칙 필터 → LLM 판정 → 확신도 분기** 4단계로 나누고, 모든 판정 근거를 trace에 남긴다 |
 | **핵심 결정 ③** | **기능보다 평가 장치를 먼저** — 비교 방식 5종을 같은 인터페이스로 만들어 "LLM 한 번이면 되지 않나?"에 숫자로 답할 준비를 했다 |
@@ -108,7 +108,7 @@ reports/failure_cases.md  오병합·미검출·강제 강등 유형별 분석 �
 | P2 | 툴 7종 v2 + FastAPI 골격 | **완료** — 시그니처 = CLAUDE.md(tools_check 7/7), ask_user→pending_questions, D1 확인 강제, GET /health·POST /answers, pytest 206, verifier 04-review 완료 |
 | P3 | 엔티티 해석 4단계 (P3-er) | **완료**(verifier 04-review 완료) — ER 4단계(`app/er`) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity) |
 | P3 | 베이스라인 3종 (P3-baselines) | **완료**(verifier 04-review 완료) — `evaluation/` 다섯 방식(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`)이 같은 함수·같은 인자로 호출 가능(parity 46건, 부수효과 0) |
-| P3 | LLM 공급자 등록표 (P3-llm-providers) | **완료**(verifier 04-review 완료, 수용 기준 11/11·부정 검사 43/43) — 등록표 `JUDGES`(anthropic·openai·gemini)·활성 스위치 `LLM_PROVIDERS_ENABLED`·기본 `openai`(D11), Gemini 판정기 구현, pytest 918 passed. **실 API 호출로 검증된 공급자는 0/3** — 테스트는 전부 스텁(네트워크 0)이고, 첫 실호출은 사용자 스모크(user-setup 03·08)와 P4에서 한다(소견 F-87c597 열림) |
+| P3 | LLM 공급자 등록표 (P3-llm-providers) | **완료**(verifier 04-review 완료, 수용 기준 11/11·부정 검사 43/43) — 등록표 `JUDGES`(anthropic·openai·gemini)·활성 스위치 `LLM_PROVIDERS_ENABLED`·기본 `openai`(D11), Gemini 판정기 구현, pytest 918 passed. **실 API 호출로 검증된 공급자는 1/3(openai)** — 2026-09-19 `er_smoke.py`("부장님" → 후보 중 부장 인물, 확신도 0.838 · merge)와 `baseline_smoke.py`(llm_single, identity 질문)가 gpt-4o-mini로 통과했다(`docs/wiki/evidence/20260919-openai-live-smoke.txt`). anthropic · gemini 실호출과 소견 F-87c597 종결은 P4에서 한다 |
 | P4 | **파일럿 평가(게이트)** — 곡선·보정표 초안, 임계치 방향 확인 | **계획 초안**(701fb8d, 결정 A~K) — 착수 대기 |
 | P5~P9 | 에이전트 루프 · 메모리·패턴 · 브리핑 · 웹푸시 · 프론트 3화면 · 인프라(Terraform·Actions·Caddy) | P4 통과 후 |
 | P10 | 150건 데이터셋 완성 + 최종 평가 + `reports/eval.md` | P4·P9 후 |
