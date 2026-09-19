@@ -1,6 +1,8 @@
 # 대화형 관계 메모리 에이전트
 
-> 자연어 대화에서 자동 구축되는 개인 관계 메모리 기반 브리핑 시스템 — 1인 개발 캡스톤 프로젝트
+[![tests](https://github.com/SunWoo1213/Relationship/actions/workflows/tests.yml/badge.svg)](https://github.com/SunWoo1213/Relationship/actions/workflows/tests.yml)
+
+> 자연어 대화에서 자동 구축되는 개인 관계 메모리 기반 브리핑 시스템 — 1인 개발 캡스톤디자인 2 프로젝트
 
 사용자가 평소처럼 대화하면, 제품 속 **관계 메모리 에이전트**가 인물·사건·일정을 스스로 추출·해석해 장기 메모리를 쌓고, 만남 직전에 필요한 맥락만 요약(브리핑)해 준다. 입력을 요구하지 않는다는 점에서 수동 기록 도구와 다르고, 세션을 넘어 축적되며 같은 인물의 호칭 변이를 하나로 묶는다는 점에서 범용 LLM 채팅과 다르다.
 
@@ -8,8 +10,8 @@
 
 | | |
 |---|---|
-| **무엇** | 대화 속 호칭 변이("팀장 → 김팀장 → 부장님")를 한 인물로 묶는 **엔티티 해석 파이프라인**과 그 **평가 장치** (1인 캡스톤, 진행 중) |
-| **지금 있는 것** | 스키마 v2(9테이블 · pgvector), 툴 7종, 엔티티 해석 4단계, 비교 방식 5종, 평가 데이터 40건, pytest 918 passed |
+| **무엇** | 대화 속 호칭 변이("팀장 → 김팀장 → 부장님")를 한 인물로 묶는 **엔티티 해석 파이프라인**과 그 **평가 장치** (1인 · 캡스톤디자인 2, 진행 중) |
+| **지금 있는 것** | 스키마 v2(9테이블 · pgvector), 툴 7종, 엔티티 해석 4단계, 비교 방식 5종, 평가 데이터 40건, pytest 918 passed(LLM · 임베딩은 스텁, 실제 PostgreSQL + pgvector에서 CI 실행) |
 | **아직 없는 것** | 성능 수치(파일럿 평가 P4 전), 에이전트 대화 루프 · 브리핑 · 프론트 · 배포. 자동 테스트는 전부 스텁이고, 실제 LLM 호출은 OpenAI 스모크 2건으로만 확인(2026-09-19) |
 | **핵심 결정 ①** | **오병합이 미검출보다 나쁘다** — 확신도가 기준 미만이면 자동으로 합치지 않고 사용자에게 묻는다 |
 | **핵심 결정 ②** | LLM 한 번에 맡기지 않고 **후보 검색 → 규칙 필터 → LLM 판정 → 확신도 분기** 4단계로 나누고, 모든 판정 근거를 trace에 남긴다 |
@@ -503,3 +505,7 @@ python scripts/baseline_smoke.py --provider gemini   # GEMINI_API_KEY·GEMINI_MO
 | **사용자가 직접 해야 하는 것**(API 키·AWS Budgets·실호출 스모크·로컬 DB·배포 비밀·승인 결정·데모·AWS 배포) | `docs/user-setup/README.md` 색인 → 카드 01~09 |
 | 무엇이 이미 만들어져 있나 | `docs/wiki/registry.md` |
 | 평가 데이터셋은 어디에 | `data/scenarios/` (검증기 `scripts/validate_scenarios.py`, 라벨 규칙은 `data/scenarios/schema.json`의 description) |
+
+## License
+
+MIT — [LICENSE](LICENSE)
