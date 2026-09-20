@@ -8,11 +8,11 @@
 
 ## 한눈에 보기
 
-| | |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | |
 |---|---|
 | **무엇** | 대화 속 호칭 변이("팀장 → 김팀장 → 부장님")를 한 인물로 묶는 **엔티티 해석 파이프라인**과 그 **평가 장치** (1인 · 캡스톤디자인 2, 진행 중) |
 | **지금 있는 것** | 스키마 v2(9테이블 · pgvector), 툴 7종, 엔티티 해석 4단계, 비교 방식 5종, 평가 데이터 40건, pytest 918 passed(LLM · 임베딩은 스텁, 실제 PostgreSQL + pgvector에서 CI 실행) |
-| **아직 없는 것** | 성능 수치(파일럿 평가 P4 전), 에이전트 대화 루프 · 브리핑 · 프론트 · 배포. 자동 테스트는 전부 스텁이고, 실제 LLM 호출은 OpenAI 스모크 2건으로만 확인(2026-09-19) |
+| **아직 없는 것** | 성능 수치(파일럿 평가 P4 전), 에이전트 대화 루프 · 브리핑 · 프론트 · 배포. 자동 테스트는 전부 스텁이고, 실제 LLM 호출은 OpenAI 스모크 2건으로만 확인 |
 | **핵심 결정 ①** | **오병합이 미검출보다 나쁘다** — 확신도가 기준 미만이면 자동으로 합치지 않고 사용자에게 묻는다 |
 | **핵심 결정 ②** | LLM 한 번에 맡기지 않고 **후보 검색 → 규칙 필터 → LLM 판정 → 확신도 분기** 4단계로 나누고, 모든 판정 근거를 trace에 남긴다 |
 | **핵심 결정 ③** | **기능보다 평가 장치를 먼저** — 비교 방식 5종을 같은 인터페이스로 만들어 "LLM 한 번이면 되지 않나?"에 숫자로 답할 준비를 했다 |
@@ -36,9 +36,9 @@
 
 ## 무엇을 만드는가
 
-| 화면 (3개 고정) | 툴 7종 (LLM이 선택·호출) |
+| 화면 (3개 고정)| 툴 7종 (LLM이 선택·호출) |
 |---|---|
-| 채팅 | `search_person`, `create_person`, `update_person` |
+| 채팅<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | `search_person`, `create_person`, `update_person` |
 | 인물 카드 (사실 · 타임라인 · 마지막 접촉) | `add_event`, `add_schedule` |
 | 브리핑 | `get_briefing`, `ask_user` |
 
@@ -61,10 +61,10 @@
 
 ## 기술 스택
 
-| 영역 | 선택 |
+| 영역| 선택 |
 |---|---|
 | 백엔드 | FastAPI (Python), Docker |
-| LLM | 공급자 중립 판정기 — `anthropic`·`openai`·`gemini` 등록표(`JUDGES`)에서 `LLM_PROVIDER`로 고른다. **기본값 `openai`**(D11, 사용자 결정 2026-09-11 — 기획서 전제인 Claude API에서 운영 기본값만 바뀌었고 확신도 공식·프롬프트·출력 스키마는 같다) |
+| LLM<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 공급자 중립 판정기 — `anthropic`·`openai`·`gemini` 등록표(`JUDGES`)에서 `LLM_PROVIDER`로 고른다. **기본값 `openai`**(D11, 사용자 결정 — 기획서 전제인 Claude API에서 운영 기본값만 바뀌었고 확신도 공식·프롬프트·출력 스키마는 같다) |
 | 임베딩 | OpenAI `text-embedding-3-small`, **1536차원** (파일럿으로 확정 — `reports/embed_pilot.md`) |
 | DB | PostgreSQL + pgvector (지금은 로컬 Docker, 운영은 P9에서 결정). 별도 벡터 DB 없이 별칭 테이블과 임베딩을 같은 DB에서 조인 |
 | 프론트 | **(계획 · P8)** React + PWA (S3 + CloudFront) — 아직 없음 |
@@ -100,17 +100,17 @@ reports/failure_cases.md  오병합·미검출·강제 강등 유형별 분석 �
 
 ## 진행 상태
 
-| 단계 | 내용 | 상태 |
+| 단계| 내용 | 상태 |
 |---|---|---|
 | P0 | 임베딩 공급자 파일럿 (D4) | **완료** — small/large 모두 기준 통과, `text-embedding-3-small` N=1536 확정 |
 | P0 | 로컬 docker-compose (pgvector) | **완료** — `SELECT '[1,2,3]'::vector` 통과, pgvector 0.8.6 (pg16) |
-| P0 | LLM 비용 실측 | **P4-pilot-eval U6로 흡수**(사용자 결정 2026-09-11 — 40건 실측으로 150건 외삽) |
+| P0 | LLM 비용 실측 | **P4-pilot-eval U6로 흡수**(사용자 결정 — 40건 실측으로 150건 외삽) |
 | P1 | 스키마 v2 마이그레이션 (Alembic) | **완료** — 9테이블·CHECK 4·FK CASCADE 6·`vector(1536)`·인덱스 10, upgrade/downgrade 왕복·`alembic check` 통과, verifier 04-review 완료 |
 | P1 | 파일럿 데이터셋 | **완료** — 40건·5범주(승진 8/별칭 8/대명사 8/일반 10/신규 6), `schema_version` 2, `validate_scenarios --strict` rc=0, 라벨 검수 verifier 40/40·사용자 12/12, verifier 04-review 완료(5cac9bf) |
 | P2 | 툴 7종 v2 + FastAPI 골격 | **완료** — 시그니처 = CLAUDE.md(tools_check 7/7), ask_user→pending_questions, D1 확인 강제, GET /health·POST /answers, pytest 206, verifier 04-review 완료 |
 | P3 | 엔티티 해석 4단계 (P3-er) | **완료**(verifier 04-review 완료) — ER 4단계(`app/er`) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity) |
 | P3 | 베이스라인 3종 (P3-baselines) | **완료**(verifier 04-review 완료) — `evaluation/` 다섯 방식(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`)이 같은 함수·같은 인자로 호출 가능(parity 46건, 부수효과 0) |
-| P3 | LLM 공급자 등록표 (P3-llm-providers) | **완료**(verifier 04-review 완료, 수용 기준 11/11·부정 검사 43/43) — 등록표 `JUDGES`(anthropic·openai·gemini)·활성 스위치 `LLM_PROVIDERS_ENABLED`·기본 `openai`(D11), Gemini 판정기 구현, pytest 918 passed. **실 API 호출로 검증된 공급자는 1/3(openai)** — 2026-09-19 `er_smoke.py`("부장님" → 후보 중 부장 인물, 확신도 0.838 · merge)와 `baseline_smoke.py`(llm_single, identity 질문)가 gpt-4o-mini로 통과했다(`docs/wiki/evidence/20260919-openai-live-smoke.txt`). anthropic · gemini 실호출과 소견 F-87c597 종결은 P4에서 한다 |
+| P3<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | LLM 공급자 등록표 (P3-llm-providers) | **완료**(verifier 04-review 완료, 수용 기준 11/11·부정 검사 43/43) — 등록표 `JUDGES`(anthropic·openai·gemini)·활성 스위치 `LLM_PROVIDERS_ENABLED`·기본 `openai`(D11), Gemini 판정기 구현, pytest 918 passed. **실 API 호출로 검증된 공급자는 1/3(openai)** — `er_smoke.py`("부장님" → 후보 중 부장 인물, 확신도 0.838 · merge)와 `baseline_smoke.py`(llm_single, identity 질문)가 gpt-4o-mini로 통과했다(`docs/wiki/evidence/20260919-openai-live-smoke.txt`). anthropic · gemini 실호출과 소견 F-87c597 종결은 P4에서 한다 |
 | P4 | **파일럿 평가(게이트)** — 곡선·보정표 초안, 임계치 방향 확인 | **계획 초안**(701fb8d, 결정 A~K) — 착수 대기 |
 | P5~P9 | 에이전트 루프 · 메모리·패턴 · 브리핑 · 웹푸시 · 프론트 3화면 · 인프라(Terraform·Actions·Caddy) | P4 통과 후 |
 | P10 | 150건 데이터셋 완성 + 최종 평가 + `reports/eval.md` | P4·P9 후 |
@@ -198,14 +198,14 @@ verify-plan.sh / verify-impl.sh / pytest → findings.py → 05-remediation.md �
 
 ### 교훈 — 사고가 규칙이 되고, 규칙이 훅이 된다
 
-| 교훈 | 무슨 일이 있었나 | 바뀐 규칙 | 집행 |
+| 교훈| 무슨 일이 있었나 | 바뀐 규칙 | 집행 |
 |---|---|---|---|
-| L-001 | 첫 커밋 2건을 `main`에 직접 푸시 | 작업·푸시는 `dev`, `main`은 승격으로만 + 에이전트 git log 연동 | `safety-guard.sh`가 main 직접 푸시 차단(승격은 승인 마커가 있을 때 `dev:main`만), `gitlog.sh` |
+| L-001<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 첫 커밋 2건을 `main`에 직접 푸시 | 작업·푸시는 `dev`, `main`은 승격으로만 + 에이전트 git log 연동 | `safety-guard.sh`가 main 직접 푸시 차단(승격은 승인 마커가 있을 때 `dev:main`만), `gitlog.sh` |
 | L-002 | 한 세션·한 모델이 계획·점검표·완료 검토를 모두 씀 | 계획·구현·검증을 다른 모델·새 컨텍스트로 분리, verifier 신설 | `verify-plan.sh`·`verify-impl.sh`가 검증자 줄 없으면 FAIL |
 | L-003 | dev 푸시 직후 사용자 결정 없이 다음 작업 시작 | 푸시 뒤에는 승격/수정 결정까지 멈춤 | `.awaiting-decision` 마커를 훅이 강제 |
 | L-004 | 계획 승인 직후 에이전트 5회를 스스로 연쇄 위임 | 계획·구현·검증 단계는 매번 묻고 시작 | `delegate-guard.sh`(Agent 도구 PreToolUse) |
 
-네 교훈 모두 첫날(2026-09-03) 하네스 커밋(d6d1afb·64f92e4·4df323f·9d23fd7)으로 반영됐다. 자세한 경위는 `docs/wiki/lessons/`.
+네 교훈 모두 첫날 하네스 커밋(d6d1afb·64f92e4·4df323f·9d23fd7)으로 반영됐다. 자세한 경위는 `docs/wiki/lessons/`.
 
 ### 하네스 구성
 
@@ -342,9 +342,9 @@ curl -X POST http://localhost:8000/answers/1 \
   -d '{"answer": "응, 기억해줘"}'
 ```
 
-| 상태 코드 | 의미 |
+| 상태 코드| 의미 |
 |---|---|
-| 200 | 정상 저장 — `{"question_id": 1, "status": "answered"}` |
+| 200<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 정상 저장 — `{"question_id": 1, "status": "answered"}` |
 | 404 | 그런 `question_id`가 없음 |
 | 409 | 이미 답했거나(already_answered) 24시간이 지나 만료됨(expired) |
 | 422 | 저장된 `options` 밖의 답, 요청 본문 형식 오류 |
@@ -422,9 +422,9 @@ python -m pytest tests/test_validate_scenarios.py -q       # 검증기 자체 �
 
 라벨 결정 이력(검수 4라운드 — 위 규칙 요약은 이 과정에서 생겼다):
 
-| 라운드 | 지적 | 무엇이 드러났고 어떻게 정했나 | 반영 커밋 |
+| 라운드| 지적| 무엇이 드러났고 어떻게 정했나 | 반영 커밋|
 |---|---|---|---|
-| 최초 검수 | #1~#17 | 오병합 유도 함정 8건(promotion 4 + alias 4) 중 **실제로 문맥 판정을 요구하는 것은 3건**뿐이었다 — 별칭 목록이 비대칭이라 완전일치만으로 정답이 새거나, 함정이 발화에 없거나, 사람도 못 푸는 연결을 정답으로 둔 건이 있었다. → 결정 I(aliases는 대화 전 알려진 것만·공유 호칭은 대칭), 결정 J(events 규칙 — 전해 들은 사건은 `personal_share`) 로 전건 재라벨, sc-002·sc-012 재작성. 실존 공인과 동명인 가상 성명 4건은 결정 L로 허용(흔한 이름, 문맥이 공인 아님) | 76add8a |
+| 최초 검수<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | #1~#17<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 오병합 유도 함정 8건(promotion 4 + alias 4) 중 **실제로 문맥 판정을 요구하는 것은 3건**뿐이었다 — 별칭 목록이 비대칭이라 완전일치만으로 정답이 새거나, 함정이 발화에 없거나, 사람도 못 푸는 연결을 정답으로 둔 건이 있었다. → 결정 I(aliases는 대화 전 알려진 것만·공유 호칭은 대칭), 결정 J(events 규칙 — 전해 들은 사건은 `personal_share`) 로 전건 재라벨, sc-002·sc-012 재작성. 실존 공인과 동명인 가상 성명 4건은 결정 L로 허용(흔한 이름, 문맥이 공인 아님) | 76add8a<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | 재검수 | #18~#20 | 시간 표현 판정에 eval-agent가 임의로 세운 통사 하위 규칙이 끼어들었고(→ 결정 M: 그 턴에 시점 낱말이 있으면 문장 성분과 무관하게 `relative`), 지시 표현 mention 누락과 같은 구조인데 이벤트가 빠진 턴이 나왔다(→ 사용자–인물 행위 규칙). 라벨 규칙에 맞추려고 사용자 결정 없이 발화를 바꾼 sc-005 t4는 원문으로 되돌리고 이벤트만 뺐다(결정 N — 라벨을 맞추려고 데이터를 바꾸지 않는다) — 그 결과 `absolute` 표본이 1 → 0이 됐지만 성능에 유리하게 고치지 않고 손실을 그대로 기록했다 | 6906af4 |
 | 3차 재검수 | #21~#22 | 사용자가 한쪽인 행위 규칙을 전건(160턴)에 적용하자 sc-034 t1 1건이 어긋났고(결정 O), `favor` 정의 문구가 한 방향만 적고 있었다(결정 P — 방향 무관) | aeed0bd |
 | 4차 재검수 | — | 열림 0 확인, `--strict` rc=0 → 사용자 12건(함정 9 + 지나가는 언급 3) 검수 12/12 동의 | f78e9dc |
@@ -443,7 +443,7 @@ python -m pytest tests/test_validate_scenarios.py -q       # 검증기 자체 �
 
 `evaluation/`은 **평가 장치**다 — 제품 런타임(`app/`)이 아니고, 의존 방향은 `evaluation → app` 한쪽뿐이다(제품 코드는 이 패키지를 import 하지 않는다). 여기 있는 것은 "엔티티 해석을 LLM 한 번으로 하지 않는다"(불변 원칙 4)를 **숫자로 반박당할 수 있게** 만드는 대비군이다: 같은 사전 상태·같은 지칭·같은 `ERConfig`로 네(등록 이름으로는 다섯) 방식을 돌려 S3.7이 요구하는 동일 데이터·동일 지표 비교를 성립시킨다.
 
-| 등록 이름 | 정의 | 임베딩 / LLM 호출 | 모듈 |
+| 등록 이름| 정의 | 임베딩 / LLM 호출| 모듈 |
 |---|---|---|---|
 | `proposed` | 제안 4단계 하이브리드(후보 검색 → 규칙 필터 → LLM 판정 → 두 임계치) 어댑터 | 1 / 0~1 | `evaluation/resolvers/proposed.py` |
 | `exact_raw` | 문자열 완전일치(앞뒤 공백·대소문자만 정리) | 0 / 0 | `evaluation/resolvers/exact_match.py` |
