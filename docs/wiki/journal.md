@@ -161,3 +161,5 @@
 - 2026-09-18 13:13 | COMMIT | a97521b feat(P4-pilot-eval): U2 지표 계산기 — 분모 규칙 3개·허용 집합 채점, 결정 L, 테스트 94건
 - 2026-09-18 13:35 | COMMIT | ee124b7 feat(P4-pilot-eval): U3 보정표 — s_llm 10칸 × 공급자·모델 × 방식, 제외 6종 계수, 테스트 74건
 - 2026-09-18 13:53 | COMMIT | a59ecb4 feat(P4-pilot-eval): U4 곡선·metrics.json·게이트 — 결정 K 지배 판정, --validate, 테스트 55건
+- 2026-09-18 14:16 | COMMIT | dd6a996 feat(P4-pilot-eval): U5 리포트 생성기 — metrics.json 단일 입력·멱등 eval.md, 테스트 42건
+- 2026-09-21 13:00 | DECISION | 재개(사용자): 미커밋 HANDOFF·journal 은 U6 커밋에 포함 / 스모크 03·08 미실행 — 결정 I 순서 변경(U6 먼저, 스모크는 U7 전) / U6 eval-agent 위임 승인(L-004) | P4-pilot-eval

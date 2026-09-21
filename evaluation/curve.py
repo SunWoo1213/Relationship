@@ -68,15 +68,17 @@ O-5(02-plan-verify) 때문에 `gate.false_merge_ranking` 에 `T_merge=0.8` 의
 방식 블록은 U2 `compute_metrics()["methods"][name]` 을 **그대로** 옮긴 것이다
 (지표를 여기서 다시 계산하지 않는다 -- 두 곳에서 세면 두 수치가 생긴다).
 `meta` 는 U2 `meta`(분모 규칙·격자·제외 수) 위에 실행 정체(`provider`·
-`model`·`embedding_model`·`dataset_hash`·`run_id`)와 결정 H(`top_k_swept:
-false`)·가중치를 얹은 것이다.
+`model`·`embedding_model`·`dataset_hash`·`run_id`·`commit`·`run_mode`)와
+결정 H(`top_k_swept: false`)·가중치를 얹은 것이다.
 
 `meta.model` 의 출처는 U3 보정표와 **같다**(`detail["model"]` = 판정이 돌려준
 모델명). 설정 문자열(`OPENAI_MODEL`)은 `meta.model_configured` 로 따로 적는다
 (P3-llm-providers §7 인계 4 -- Gemini 는 `model_version` 이 설정과 다를 수
-있다). `embedding_model`·`dataset_hash`·`run_id` 는 JSONL 에 없는 값이라
-**호출자가 넘긴다** -- 여기서 환경변수를 읽으면 같은 입력이 같은 출력을 내지
-않는다.
+있다). `embedding_model`·`dataset_hash`·`run_id`·`commit`(L-001, 평가한
+커밋)·`run_mode`(`stub`/`real`, 수용 기준 판정 명령이 읽는다) 는 JSONL 에
+없는 값이라 **호출자가 넘긴다**(U6 `scripts/run_pilot_eval.py`) -- 여기서
+환경변수·git 을 읽으면 같은 입력이 같은 출력을 내지 않는다. 생략하면
+`null` 이고 스키마 검증은 그대로 통과한다(U5 리포트는 `기록 없음`).
 
 ## 하지 않는 것
 
@@ -587,6 +589,8 @@ def build_metrics_document(
     dataset_hash: str | None = None,
     run_id: str | None = None,
     model_configured: Mapping[str, str] | None = None,
+    commit: str | None = None,
+    run_mode: str | None = None,
 ) -> dict[str, Any]:
     """U1 JSONL 행 → `reports/metrics.json` 문서.
 
@@ -631,11 +635,15 @@ def build_metrics_document(
             "embedding_model": embedding_model,
             "dataset_hash": dataset_hash,
             "run_id": run_id,
+            "commit": commit,
+            "run_mode": run_mode,
             "caller_supplied": [
                 "embedding_model",
                 "dataset_hash",
                 "run_id",
                 "model_configured",
+                "commit",
+                "run_mode",
             ],
             "caller_supplied_note": (
                 "JSONL 에 없는 값이라 호출자(U6·U7)가 넘긴다. 이 모듈은 "
@@ -910,6 +918,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--dataset-hash", default=None)
     parser.add_argument("--run-id", default=None)
     parser.add_argument(
+        "--commit",
+        default=None,
+        help="평가한 커밋 해시(L-001). meta.commit 에 그대로 적는다(생략하면 null)",
+    )
+    parser.add_argument(
+        "--run-mode",
+        default=None,
+        choices=("stub", "real"),
+        help="meta.run_mode -- 스텁 실행인지 실 공급자 실행인지(생략하면 null)",
+    )
+    parser.add_argument(
         "--model-configured",
         action="append",
         default=None,
@@ -925,6 +944,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         dataset_hash=args.dataset_hash,
         run_id=args.run_id,
         model_configured=_parse_model_configured(args.model_configured),
+        commit=args.commit,
+        run_mode=args.run_mode,
     )
     text = json.dumps(document, ensure_ascii=False, indent=args.indent)
     if args.out:
