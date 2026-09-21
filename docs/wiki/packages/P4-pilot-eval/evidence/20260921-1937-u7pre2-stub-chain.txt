@@ -1,0 +1,107 @@
+# U7 선행 단위 2 (gzip) — 스텁 전량 사슬 실측
+# 일시: 2026-09-21T10:38:14Z (UTC)
+# HEAD: e7f0a9c5b3f44a24910734bc9e35f8b3b6ef43d5  브랜치: dev
+# 명령: POSTGRES_PORT=5433 PYTHONIOENCODING=utf-8 python scripts/run_pilot_eval.py --dry-run --stub --out <scratch> --commit e7f0a9c
+# out=<scratch>=C:/Users/swsj1/AppData/Local/Temp/claude/C--Portpolio-Project-Relationship/e7d3d49c-fd0f-4260-a0db-ff785530c80e/scratchpad/u7pre2-chain-a (reports/ 는 건드리지 않는다)
+-----
+[estimate] run_mode=stub scenarios=40 mentions=141
+[estimate] llm_calls total=282 proposed=141 llm_single=141 (결정 C(i): 임계치 10점은 같은 응답을 재사용한다)
+[estimate] tokens_in=120100 tokens_out=22560 embed_texts=105 embed_tokens=204
+[estimate] 가정 chars_per_token=1.5 output_tokens_per_call=80 (실측 아님 -- U7 의 tokens_in/out 합계로만 실측이 된다)
+[estimate] price_per_1m in=0.15 out=0.6 embed=0.02
+[estimate] price_source=OpenAI 공개 가격표의 gpt-4o-mini(in $0.15 / out $0.60 per 1M)와 text-embedding-3-small($0.02 per 1M) 기록값 -- 저장소에 적어 둔 오프라인 상수이며 이 실행은 가격표를 조회하지 않았다. 기준일·현재가는 실행자가 확인하고 --price-in/--price-out/--price-embed 로 덮어쓴다
+[estimate] cost_usd total=0.0316 (in=0.0180 out=0.0135 embed=0.0000)
+[estimate] max_cost_usd=5.0
+[run] run_mode=stub run_id=run-3be508f69506
+[run] dataset_hash=sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e
+[run] dataset_hash_method=sorted(data/scenarios/*.json) 의 파일명+내용 sha256
+[run] commit=e7f0a9c
+[run] out=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a
+[stage] runner: run_pilot(scenarios=40, methods=5, grid=10)
+[scenario] sc-001 aliases=2 embedded=2 rows=200 traces=40 ok
+[scenario] sc-002 aliases=4 embedded=4 rows=250 traces=50 ok
+[scenario] sc-003 aliases=2 embedded=2 rows=150 traces=30 ok
+[scenario] sc-004 aliases=3 embedded=3 rows=200 traces=40 ok
+[scenario] sc-005 aliases=2 embedded=2 rows=100 traces=20 ok
+[scenario] sc-006 aliases=2 embedded=2 rows=200 traces=40 ok
+[scenario] sc-007 aliases=2 embedded=2 rows=100 traces=20 ok
+[scenario] sc-008 aliases=3 embedded=3 rows=200 traces=40 ok
+[scenario] sc-017 aliases=4 embedded=4 rows=250 traces=50 ok
+[scenario] sc-018 aliases=3 embedded=3 rows=200 traces=40 ok
+[scenario] sc-019 aliases=3 embedded=3 rows=250 traces=50 ok
+[scenario] sc-020 aliases=4 embedded=4 rows=200 traces=40 ok
+[scenario] sc-021 aliases=5 embedded=5 rows=250 traces=50 ok
+[scenario] sc-022 aliases=3 embedded=3 rows=150 traces=30 ok
+[scenario] sc-023 aliases=2 embedded=2 rows=100 traces=20 ok
+[scenario] sc-024 aliases=3 embedded=3 rows=250 traces=50 ok
+[scenario] sc-009 aliases=4 embedded=4 rows=200 traces=40 ok
+[scenario] sc-010 aliases=5 embedded=5 rows=200 traces=40 ok
+[scenario] sc-011 aliases=3 embedded=3 rows=150 traces=30 ok
+[scenario] sc-012 aliases=3 embedded=3 rows=300 traces=60 ok
+[scenario] sc-013 aliases=5 embedded=5 rows=250 traces=50 ok
+[scenario] sc-014 aliases=3 embedded=3 rows=200 traces=40 ok
+[scenario] sc-015 aliases=5 embedded=5 rows=250 traces=50 ok
+[scenario] sc-016 aliases=3 embedded=3 rows=150 traces=30 ok
+[scenario] sc-025 aliases=2 embedded=2 rows=100 traces=20 ok
+[scenario] sc-026 aliases=2 embedded=2 rows=100 traces=20 ok
+[scenario] sc-027 aliases=2 embedded=2 rows=100 traces=20 ok
+[scenario] sc-028 aliases=2 embedded=2 rows=100 traces=20 ok
+[scenario] sc-029 aliases=2 embedded=2 rows=100 traces=20 ok
+[scenario] sc-030 aliases=4 embedded=4 rows=150 traces=30 ok
+[scenario] sc-031 aliases=2 embedded=2 rows=100 traces=20 ok
+[scenario] sc-032 aliases=2 embedded=2 rows=50 traces=10 ok
+[scenario] sc-033 aliases=4 embedded=4 rows=150 traces=30 ok
+[scenario] sc-034 aliases=2 embedded=2 rows=100 traces=20 ok
+[scenario] sc-035 aliases=2 embedded=2 rows=200 traces=40 ok
+[scenario] sc-036 aliases=2 embedded=2 rows=300 traces=60 ok
+[scenario] sc-037 aliases=0 embedded=0 rows=150 traces=30 ok
+[scenario] sc-038 aliases=2 embedded=2 rows=200 traces=40 ok
+[scenario] sc-039 aliases=2 embedded=2 rows=200 traces=40 ok
+[scenario] sc-040 aliases=2 embedded=2 rows=200 traces=40 ok
+[traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\traces-20260921-103816.jsonl
+[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+[rows] rows=7050 = mentions=141 × methods=5 × t_merge=10 (expected=7050)
+[rows] proposed=1410
+[rows] exact_raw=1410
+[rows] exact_norm=1410
+[rows] embedding_only=1410
+[rows] llm_single=1410
+[rows] raw=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\raw-20260921-103816.jsonl
+[gzip] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\raw-20260921-103816.jsonl.gz 161456 bytes (평문 7404682 bytes, level=9, mtime=0·파일명 미기록)
+[gzip] roundtrip_sha256=469f0226f07077995de7bd984e3e8999a794b48f12a32bdcc41ba6d8d2c44c90 ok plain=보존 -- 이후 단계 입력은 압축본이다
+[run] run_mode=stub network_calls=0 stub_llm_calls=277 stub_embed_calls=62
+[run] tokens_in=0 tokens_out=0 (실행 실측 합계, llm_fresh_call 행만 -- 스텁은 토큰을 세지 않으므로 0 이다)
+[stage] metrics: python -m evaluation.metrics --rows C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\raw-20260921-103816.jsonl.gz --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\metrics-stage.json
+[stage] metrics: rc=0
+[stage] calibration: python -m evaluation.calibration --rows C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\raw-20260921-103816.jsonl.gz --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\calibration.json --t-merge 0.8 --model-configured stub=stub-judge
+[stage] calibration: rc=0
+[stage] curve: python -m evaluation.curve --rows C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\raw-20260921-103816.jsonl.gz --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\metrics.json --curve C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\curve.csv --dataset-hash sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e --run-id run-3be508f69506 --embedding-model stub-embedding --model-configured stub=stub-judge --run-mode stub --commit e7f0a9c
+[stage] curve: rc=0
+[stage] validate: python -m evaluation.metrics --validate C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\metrics.json
+OK C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\metrics.json
+[stage] validate: rc=0
+[stage] report: python -m evaluation.report --metrics C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\metrics.json --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\eval.md
+[stage] report: rc=0
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\raw-20260921-103816.jsonl (7404682 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\raw-20260921-103816.jsonl.gz (161456 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\traces-20260921-103816.jsonl (1739409 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\metrics-stage.json (288453 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\metrics.json (282084 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\calibration.json (8436 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\curve.csv (8621 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\eval.md (19961 bytes)
+[size] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\raw-20260921-103816.jsonl.gz 161456 bytes limit=5242880 ok
+[size] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\traces-20260921-103816.jsonl 1739409 bytes limit=5242880 ok
+[ok] 사슬 완료 -- runner → metrics → calibration → curve → validate → report
+rc=0
+-----
+# ls -l 산출물
+total 9696
+-rw-r--r-- 1 swsj1 197609    8436 Sep 21 19:41 calibration.json
+-rw-r--r-- 1 swsj1 197609    8621 Sep 21 19:41 curve.csv
+-rw-r--r-- 1 swsj1 197609   19961 Sep 21 19:41 eval.md
+-rw-r--r-- 1 swsj1 197609  288453 Sep 21 19:41 metrics-stage.json
+-rw-r--r-- 1 swsj1 197609  282084 Sep 21 19:41 metrics.json
+-rw-r--r-- 1 swsj1 197609 7404682 Sep 21 19:41 raw-20260921-103816.jsonl
+-rw-r--r-- 1 swsj1 197609  161456 Sep 21 19:41 raw-20260921-103816.jsonl.gz
+-rw-r--r-- 1 swsj1 197609 1739409 Sep 21 19:41 traces-20260921-103816.jsonl

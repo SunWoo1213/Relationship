@@ -5,6 +5,12 @@ LLM 을 부르지 않고 `app/` 도 부르지 않는다(방식 이름의 표준 
 `evaluation.resolvers` 를 시도하고, 못 읽으면 등장 순서로 떨어진다). 같은
 JSONL 을 넣으면 언제나 같은 수치가 나온다(원칙8).
 
+`--rows` 는 평문 `.jsonl` 과 **커밋본 `.jsonl.gz`** 를 똑같이 받는다
+(`open_jsonl()`/`iter_jsonl()` 이 여는 로직의 단일 출처다. 원시 JSONL 이
+`.githooks/pre-commit` 의 5MB 한도를 넘어 gzip 으로 커밋하기로 했고 -- 사용자
+결정 2026-09-21, 결정 E 유지 -- 커밋된 그 파일 하나만으로 지표를 다시 계산할
+수 있어야 한다). 두 형식의 결과는 바이트까지 같다.
+
 ## 분모 규칙 세 개 (01-plan 65행 -- `meta.denominator_rule` 로도 나간다)
 
 1. **`ambiguous: true` mention 은 제외한다.** 사람도 선행사를 정할 수 없는
@@ -86,17 +92,20 @@ CLI 에만 붙었다 -- 규칙 자체는 그 파일을 만드는 `evaluation/cur
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
+import zlib
 from collections import Counter
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from pathlib import Path
-from typing import Any
+from typing import IO, Any
 
 __all__ = [
     "ASK_KINDS",
     "ALLOWED_ASK_LABELS",
     "DECISIONS",
     "DENOMINATOR_RULE",
+    "GZIP_SUFFIX",
     "MENTION_KINDS",
     "OUTCOMES",
     "REQUIRED_ROW_KEYS",
@@ -105,8 +114,10 @@ __all__ = [
     "compute_metrics",
     "format_t_merge",
     "group_rates",
+    "iter_jsonl",
     "load_rows",
     "mention_level_rows",
+    "open_jsonl",
     "ratio",
     "validate_rows",
 ]
@@ -305,22 +316,70 @@ def _mention_key(row: Mapping[str, Any]) -> tuple[Any, ...]:
 # ---------------------------------------------------------------------------
 
 
+#: 원시 JSONL 을 압축해 커밋할 때 붙는 확장자. `.githooks/pre-commit` 이 5MB
+#: 초과 파일을 막는데 실측 원시 JSONL 이 그 한도를 넘어 **gzip 으로 커밋**하기로
+#: 했다(사용자 결정 2026-09-21, 결정 E 유지). 그래서 **읽는 쪽이 `.gz` 를
+#: 다뤄야** 커밋된 파일 하나만으로 지표를 다시 계산할 수 있다(원칙8).
+GZIP_SUFFIX = ".gz"
+
+
+def open_jsonl(path: Path | str) -> IO[str]:
+    """JSONL 을 텍스트(utf-8)로 여는 **단일 출처**.
+
+    경로가 `.gz` 로 끝나면 gzip 으로, 아니면 평문으로 연다 -- `--rows` 를
+    받는 모든 진입점(`evaluation.metrics`·`calibration`·`curve`)과
+    `scripts/run_pilot_eval.py` 의 trace 재검이 이 함수만 쓴다(여는 로직을
+    두 번 적지 않는다).
+    """
+
+    target = Path(path)
+    if target.suffix.lower() == GZIP_SUFFIX:
+        return gzip.open(target, mode="rt", encoding="utf-8", newline="")
+    return target.open(encoding="utf-8")
+
+
+def iter_jsonl(path: Path | str) -> Iterator[tuple[int, str]]:
+    """`(줄 번호, 비어 있지 않은 줄)`. gzip 손상은 `MetricsError` 로 바꾼다.
+
+    압축 오류(`BadGzipFile`/`EOFError`/`zlib.error`)를 여기서 한 번만
+    번역해 두면 어느 진입점에서 읽든 같은 문장·같은 rc 가 나온다.
+    """
+
+    target = Path(path)
+    handle = open_jsonl(target)
+    try:
+        lineno = 0
+        while True:
+            try:
+                line = handle.readline()
+            except (gzip.BadGzipFile, EOFError, zlib.error) as exc:
+                raise MetricsError(
+                    f"{target}: gzip 읽기 실패 ({type(exc).__name__}: {exc}) "
+                    "-- 파일이 손상됐거나 gzip 이 아니다"
+                ) from exc
+            if not line:
+                break
+            lineno += 1
+            text = line.strip()
+            if text:
+                yield lineno, text
+    finally:
+        handle.close()
+
+
 def load_rows(path: Path | str) -> list[dict[str, Any]]:
-    """U1 JSONL 을 읽는다. 빈 줄은 건너뛰고, 깨진 줄은 줄 번호와 함께 오류."""
+    """U1 JSONL(`.jsonl` 또는 `.jsonl.gz`)을 읽는다. 빈 줄은 건너뛰고, 깨진
+    줄은 줄 번호와 함께 오류."""
 
     rows: list[dict[str, Any]] = []
-    with Path(path).open(encoding="utf-8") as handle:
-        for lineno, line in enumerate(handle, start=1):
-            text = line.strip()
-            if not text:
-                continue
-            try:
-                row = json.loads(text)
-            except json.JSONDecodeError as exc:
-                raise MetricsError(f"{path}:{lineno}: invalid JSON ({exc.msg})") from exc
-            if not isinstance(row, dict):
-                raise MetricsError(f"{path}:{lineno}: row must be a JSON object")
-            rows.append(row)
+    for lineno, text in iter_jsonl(path):
+        try:
+            row = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise MetricsError(f"{path}:{lineno}: invalid JSON ({exc.msg})") from exc
+        if not isinstance(row, dict):
+            raise MetricsError(f"{path}:{lineno}: row must be a JSON object")
+        rows.append(row)
     if not rows:
         raise MetricsError(f"{path}: no rows")
     return rows
@@ -812,7 +871,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         prog="python -m evaluation.metrics",
         description="U1 파일럿 러너 JSONL -> 방식별 지표 JSON (DB·네트워크 없음)",
     )
-    parser.add_argument("--rows", default=None, help="U1 러너가 쓴 JSONL 경로")
+    parser.add_argument(
+        "--rows",
+        default=None,
+        help="U1 러너가 쓴 JSONL 경로(`.jsonl` 또는 커밋본 `.jsonl.gz`)",
+    )
     parser.add_argument("--out", default=None, help="결과 JSON 경로(생략하면 표준출력)")
     parser.add_argument(
         "--validate",

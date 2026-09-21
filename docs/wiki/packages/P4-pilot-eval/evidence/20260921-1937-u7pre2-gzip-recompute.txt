@@ -1,0 +1,46 @@
+# U7 선행 단위 2 — 커밋본(.gz) 단독 재계산 · gzip 결정성 실측
+# 일시: 2026-09-21T10:42:29Z (UTC)  HEAD: e7f0a9c5b3f44a24910734bc9e35f8b3b6ef43d5
+# 입력: 위 사슬이 만든 7050행 원시 판정 (평문 raw-20260921-103816.jsonl / 압축본 .gz)
+
+## (1) 파일 크기
+7404682 C:/Users/swsj1/AppData/Local/Temp/claude/C--Portpolio-Project-Relationship/e7d3d49c-fd0f-4260-a0db-ff785530c80e/scratchpad/u7pre2-chain-a/raw-20260921-103816.jsonl
+161456 C:/Users/swsj1/AppData/Local/Temp/claude/C--Portpolio-Project-Relationship/e7d3d49c-fd0f-4260-a0db-ff785530c80e/scratchpad/u7pre2-chain-a/raw-20260921-103816.jsonl.gz
+1739409 C:/Users/swsj1/AppData/Local/Temp/claude/C--Portpolio-Project-Relationship/e7d3d49c-fd0f-4260-a0db-ff785530c80e/scratchpad/u7pre2-chain-a/traces-20260921-103816.jsonl
+
+## (2) 커밋본만으로 metrics 재계산 → 평문 결과와 바이트 동일 (원칙8)
+$ python -m evaluation.metrics --rows <raw>.jsonl    --out m-plain.json
+rc=0
+$ python -m evaluation.metrics --rows <raw>.jsonl.gz --out m-gz.json
+rc=0
+$ cmp m-plain.json m-gz.json
+동일 (cmp 출력 없음, rc=0)
+07d0747f071759f2cdffd3c3432c004cf2f7c98ce8ef173b8d8cf4714452e77e *m-plain.json
+07d0747f071759f2cdffd3c3432c004cf2f7c98ce8ef173b8d8cf4714452e77e *m-gz.json
+
+## (3) calibration·curve 도 같은 대조
+calibration plain rc=0
+calibration gz rc=0
+calibration 동일
+curve plain rc=0
+curve gz rc=0
+curve metrics.json 동일
+curve.csv 동일
+
+## (4) gzip 결정성 — 같은 평문을 두 번 압축하면 같은 바이트
+bytes_equal= True size= 161456
+header mtime bytes= 00000000 FNAME flag= 0
+
+## (5) 손상된 .gz 는 조용히 지나가지 않는다
+    ...<2 lines>...
+    ) from exc
+MetricsError: C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\broken.jsonl.gz: gzip 읽기 실패 (EOFError: Compressed file ended before the end-of-stream marker was reached) -- 파일이 손상됐거나 gzip 이 아니다
+rc=1
+$ python scripts/run_pilot_eval.py --recheck-traces broken.jsonl.gz
+[traces] dumped=200 recomputed=0 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre2-chain-a\broken.jsonl.gz
+[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+[fail] traces: line 1 trace_id=54611 sc-001/'김팀장' t_merge=0.5: confidence_breakdown 이 없다
+[fail] traces: line 2 trace_id=54613 sc-001/'김팀장' t_merge=0.55: confidence_breakdown 이 없다
+rc=1
+
+## (6) reports/ 무변경
+(위가 비어 있으면 reports/ 변경 0)

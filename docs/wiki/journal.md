@@ -169,3 +169,6 @@
 - 2026-09-21 19:05 | BLOCKED | U7 선행 보강 코드·테스트(+19) 완료·미커밋. Docker 꺼짐 → DB 의존 7건 skip·스텁 사슬 traces 검증 미실행(47 passed/7 skipped). 신규 쟁점: pre-commit 5MB vs 결정 E(raw 7.4MB). 사용자에게 Docker 기동·결정 요청 | P4-pilot-eval
 - 2026-09-21 19:12 | VERIFY | U7 선행 보강 DB 검증(Docker 기동 후): test_run_pilot_eval 54 passed/skip 0 · 스텁 사슬 rc=0 [traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 (evidence 20260921-1903-u7pre-*) | P4-pilot-eval
 - 2026-09-21 19:12 | DECISION | 사용자: 원시 raw JSONL(스텁 실측 7.4MB) 은 gzip 으로 커밋 — 결정 E 유지, pre-commit 5MB 훅 변경 없음. 도구 .gz 입력 지원은 U7 전 별도 단위 | P4-pilot-eval
+- 2026-09-21 19:22 | COMMIT | e7f0a9c feat(P4-pilot-eval): U7 선행 보강 — er_resolve trace 전량 덤프·확신도 재계산 diff 0, 테스트 19건
+- 2026-09-21 19:35 | DECISION | 사용자: gzip 단위(raw JSONL .gz 읽기·쓰기, 5MB 가드) eval-agent 위임 승인(L-004) | P4-pilot-eval
+- 2026-09-21 20:05 | VERIFY | gzip 단위 메인 세션 재검증: 대상 4파일 296 passed · 스텁 사슬 rc=0 raw 7,404,682 → .gz 161,615 bytes · [size] ok · [traces] diff 0.0 (evidence 20260921-1958-u7pre2-main-stub-chain.txt) | P4-pilot-eval

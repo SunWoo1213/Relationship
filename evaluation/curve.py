@@ -911,7 +911,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         prog="python -m evaluation.curve",
         description="U1 파일럿 러너 JSONL -> metrics.json + curve.csv (DB·네트워크 없음)",
     )
-    parser.add_argument("--rows", required=True, help="U1 러너가 쓴 JSONL 경로")
+    parser.add_argument(
+        "--rows",
+        required=True,
+        help="U1 러너가 쓴 JSONL 경로(`.jsonl` 또는 커밋본 `.jsonl.gz`)",
+    )
     parser.add_argument("--out", default=None, help="metrics.json 경로(생략하면 표준출력)")
     parser.add_argument("--curve", default=None, help="curve.csv 경로(생략하면 쓰지 않는다)")
     parser.add_argument("--embedding-model", default=None)

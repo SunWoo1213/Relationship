@@ -67,6 +67,27 @@ rc=1 이고 어느 trace 인지 찍는다. 재계산은 `app.er.confidence.combi
 `--recheck-traces <path>` 로 언제든 다시 돌릴 수 있다(DB·네트워크 0).
 프롬프트 원문·`llm.reason` 자유 서술·키는 덤프에 넣지 않는다(security §1).
 
+## 원시 JSONL 은 gzip 으로 커밋한다 (결정 E 이행 방식)
+
+`.githooks/pre-commit` 이 5MB 초과 파일을 막는데 전량 실행의
+`raw-<ts>.jsonl` 은 그보다 크다(스텁 실측 7,404,682 bytes). 사용자 결정
+(2026-09-21)은 **gzip 으로 커밋**이다 -- 결정 E(원시 판정을 커밋한다)는
+그대로 두고 훅도 바꾸지 않는다. 그래서 사슬은
+
+1. 러너가 지금처럼 **평문으로 줄 단위로** 쓰고(중단돼도 거기까지 남는다),
+2. 러너가 끝난 뒤 `raw-<ts>.jsonl.gz` 로 압축하고(헤더 `mtime=0`·파일명
+   미기록·`compresslevel` 고정 → 같은 입력이면 **같은 바이트**),
+3. 다시 풀어 sha256 을 대조한 뒤(`[gzip] roundtrip_sha256=… ok`),
+4. **이후 단계(metrics·calibration·curve)에 압축본 경로를 넘긴다** --
+   커밋된 파일 하나만으로 지표가 재계산됨을 실행이 매번 증명한다(원칙8).
+
+평문은 기본 **보존**이고 `--drop-raw-plain` 으로만 지운다(검증 통과 후에만).
+읽는 쪽은 `evaluation.metrics.open_jsonl()`/`iter_jsonl()` 한 곳이라
+`python -m evaluation.metrics --rows …/raw-<ts>.jsonl.gz` 가 그대로 돈다.
+`traces-<ts>.jsonl`(~1.7MB)은 한도 안이라 평문 그대로 둔다. 사슬 끝에서
+커밋 대상(`raw.gz`·`traces`)의 크기를 `[size]` 로 찍고 한도를 넘으면
+`[warn]` 을 낸다(rc 는 바꾸지 않는다 -- `format_commit_sizes` 참조).
+
 ## 하지 않는 것
 
 실 API 호출(U7), `reports/` 실물 작성(U7), 실패 케이스 분석(U8). 지표
@@ -77,13 +98,16 @@ rc=1 이고 어느 trace 인지 찍는다. 재계산은 `app.er.confidence.combi
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import json
 import math
 import os
 import random
 import re
+import shutil
 import sys
+import zlib
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
@@ -114,6 +138,7 @@ from app.tools.types import InvalidValue
 from evaluation import calibration as calibration_mod
 from evaluation import curve as curve_mod
 from evaluation import metrics as metrics_mod
+from evaluation.metrics import GZIP_SUFFIX, MetricsError, iter_jsonl
 from evaluation import report as report_mod
 from evaluation.resolvers import ALL_METHODS
 from evaluation.resolvers.exact_match import KnownPerson
@@ -160,6 +185,12 @@ __all__ = [
     "check_trace_entry",
     "recheck_trace_dump",
     "format_trace_recheck",
+    "COMMIT_SIZE_LIMIT_BYTES",
+    "GZIP_COMPRESSLEVEL",
+    "GzipError",
+    "gzip_jsonl",
+    "sha256_bytes_of",
+    "format_commit_sizes",
     "main",
 ]
 
@@ -948,7 +979,9 @@ def recheck_trace_dump(path: Path | str) -> TraceRecheck:
     """덤프 파일 **하나만** 입력으로 전 줄을 재계산한다(DB·네트워크 0).
 
     실행 중에 불려도(`_run_chain` 끝), 나중에 파일만 들고 다시 불려도
-    (`--recheck-traces`) 같은 결과가 나온다.
+    (`--recheck-traces`) 같은 결과가 나온다. 경로가 `.gz` 면 gzip 으로 읽는다
+    (여는 로직은 `evaluation.metrics.iter_jsonl` 하나뿐 -- traces 는 한도
+    안이라 평문이 기본이지만 압축본을 줘도 같은 판정이 나온다).
     """
 
     target = Path(path)
@@ -956,11 +989,8 @@ def recheck_trace_dump(path: Path | str) -> TraceRecheck:
     recomputed = 0
     max_abs_diff = 0.0
     failures: list[str] = []
-    with target.open(encoding="utf-8") as handle:
-        for lineno, raw_line in enumerate(handle, start=1):
-            line = raw_line.strip()
-            if not line:
-                continue
+    try:
+        for lineno, line in iter_jsonl(target):
             dumped += 1
             try:
                 entry = json.loads(line)
@@ -983,6 +1013,8 @@ def recheck_trace_dump(path: Path | str) -> TraceRecheck:
                     f"{label}: abs diff={diff!r} != 0 "
                     f"(기록 {entry['confidence_breakdown'].get('confidence')!r})"
                 )
+    except MetricsError as exc:  # gzip 손상 -- 조용히 0행으로 넘어가지 않는다
+        failures.append(str(exc))
     if dumped == 0:
         failures.append(f"{target}: 덤프가 비어 있다 -- 재계산할 판정이 없다(원칙9)")
     return TraceRecheck(
@@ -1007,6 +1039,109 @@ def format_trace_recheck(result: TraceRecheck) -> list[str]:
         lines.append(f"[fail] traces: {message}")
     if len(result.failures) > 10:
         lines.append(f"[fail] traces: … 외 {len(result.failures) - 10}건")
+    return lines
+
+
+# ---------------------------------------------------------------------------
+# 커밋용 gzip (결정 E 이행 방식, 사용자 결정 2026-09-21) · 크기 가드
+# ---------------------------------------------------------------------------
+
+#: `.githooks/pre-commit` 27행이 막는 파일 크기(bytes). 훅은 이 단위에서
+#: 바꾸지 않는다 -- 여기서는 **커밋 대상 산출물이 그 한도 안인지 찍어 준다**.
+COMMIT_SIZE_LIMIT_BYTES = 5_242_880
+
+#: gzip 압축 수준. 값이 바뀌면 바이트도 바뀌므로 상수로 고정한다(재현성).
+GZIP_COMPRESSLEVEL = 9
+
+
+class GzipError(RuntimeError):
+    """압축·검증 실패(원본 없음 / 왕복 해시 불일치)."""
+
+
+def sha256_bytes_of(handle: Any, *, chunk: int = 1 << 20) -> str:
+    """열린 **바이너리** 핸들을 끝까지 읽어 sha256(hex)."""
+
+    digest = hashlib.sha256()
+    while True:
+        block = handle.read(chunk)
+        if not block:
+            break
+        digest.update(block)
+    return digest.hexdigest()
+
+
+def gzip_jsonl(
+    src: Path | str,
+    dest: Path | str | None = None,
+    *,
+    compresslevel: int = GZIP_COMPRESSLEVEL,
+    drop_plain: bool = False,
+) -> tuple[Path, str]:
+    """평문 JSONL → **결정적** gzip(`<src>.gz`). `(경로, 평문 sha256)` 반환.
+
+    결정적이어야 하는 이유(원칙8): 같은 입력이면 `metrics.json` 이 바이트까지
+    같다는 기존 성질과 같은 취지로, 커밋되는 원시 파일도 같은 입력이면 같은
+    바이트여야 "이 수치는 이 파일에서 나왔다"를 해시로 말할 수 있다. gzip
+    헤더에는 기본으로 **수정 시각과 원본 파일명**이 들어가 실행마다 달라지므로
+    `mtime=0`·`filename=""` 로 둔다(압축 수준도 상수).
+
+    쓴 뒤에는 **다시 풀어 평문과 sha256 을 대조한다** -- 검증을 통과해야만
+    `drop_plain=True` 가 평문을 지운다(지우고 나서 깨진 것을 발견하면 유료
+    실행 결과가 사라진다).
+    """
+
+    source = Path(src)
+    if not source.is_file():
+        raise GzipError(f"gzip: 원본이 없다 -- {source}")
+    target = Path(dest) if dest is not None else Path(str(source) + GZIP_SUFFIX)
+    with source.open("rb") as raw, target.open("wb") as fileobj:
+        with gzip.GzipFile(
+            filename="", mode="wb", fileobj=fileobj, compresslevel=compresslevel, mtime=0
+        ) as compressed:
+            shutil.copyfileobj(raw, compressed, length=1 << 20)
+
+    with source.open("rb") as raw:
+        plain_digest = sha256_bytes_of(raw)
+    try:
+        with gzip.open(target, "rb") as unpacked:
+            roundtrip_digest = sha256_bytes_of(unpacked)
+    except (gzip.BadGzipFile, EOFError, zlib.error) as exc:  # pragma: no cover -- 방어
+        raise GzipError(f"gzip: {target} 를 다시 풀 수 없다 ({type(exc).__name__}: {exc})") from exc
+    if roundtrip_digest != plain_digest:
+        raise GzipError(
+            f"gzip: 왕복 sha256 불일치 -- 평문 {plain_digest} != 압축본 {roundtrip_digest}"
+        )
+    if drop_plain:
+        source.unlink()
+    return target, plain_digest
+
+
+def format_commit_sizes(paths: Sequence[Path], *, limit: int = COMMIT_SIZE_LIMIT_BYTES) -> list[str]:
+    """커밋 대상 산출물의 크기 줄 + 한도 초과 경고 줄.
+
+    **rc 는 바꾸지 않는다**(0/1/2/3 규약 유지). 한도는 평가의 옳고 그름이
+    아니라 커밋 훅의 규칙이고, 유료 실 실행이 끝난 뒤 크기 때문에 rc≠0 을
+    돌려주면 "지표가 틀렸다"와 "파일이 크다"가 구분되지 않는다. 대신 경고를
+    눈에 띄게 찍어 커밋 전에 사람이 처리하게 한다(03-log 에 근거).
+    """
+
+    lines: list[str] = []
+    over: list[tuple[Path, int]] = []
+    for path in paths:
+        if not path.exists():
+            lines.append(f"[size] {path} (없음)")
+            continue
+        size = path.stat().st_size
+        state = "OVER" if size > limit else "ok"
+        lines.append(f"[size] {path} {size} bytes limit={limit} {state}")
+        if size > limit:
+            over.append((path, size))
+    for path, size in over:
+        lines.append(
+            f"[warn] 커밋 한도 초과: {path} ({size} bytes > {limit}) -- "
+            ".githooks/pre-commit 27행이 이 파일의 커밋을 막는다. "
+            "이 실행은 실패가 아니지만(rc 는 그대로) 커밋 전에 처리해야 한다"
+        )
     return lines
 
 
@@ -1054,6 +1189,11 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
     out_dir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     raw_path = out_dir / f"raw-{stamp}.jsonl"
+    #: 커밋되는 원시 판정(결정 E). 러너는 평문으로 줄 단위로 쓰고(중단돼도
+    #: 거기까지가 남는다), 사슬이 러너가 끝난 뒤 이 이름으로 압축한 다음
+    #: 이후 단계에 **압축본 경로를 넘긴다** -- 커밋된 파일 하나만으로 지표가
+    #: 다시 계산됨을 실행이 매번 증명한다(원칙8).
+    raw_gz_path = Path(str(raw_path) + GZIP_SUFFIX)
     #: 같은 stamp -- 04-review 가 "실행 로그와 같은 ts" 로 대조한다(01-plan 106행).
     traces_path = out_dir / f"traces-{stamp}.jsonl"
     stage_metrics = out_dir / "metrics-stage.json"
@@ -1215,6 +1355,25 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
         return RC_ERROR
     print(f"[rows] raw={raw_path}")
 
+    # --- 커밋용 gzip (결정 E 이행 방식, 사용자 결정 2026-09-21) --------------
+    plain_bytes = raw_path.stat().st_size
+    try:
+        raw_gz_path, plain_digest = gzip_jsonl(
+            raw_path, raw_gz_path, drop_plain=args.drop_raw_plain
+        )
+    except GzipError as exc:
+        print(f"[fail] {exc}")
+        return RC_ERROR
+    print(
+        f"[gzip] {raw_gz_path} {raw_gz_path.stat().st_size} bytes "
+        f"(평문 {plain_bytes} bytes, level={GZIP_COMPRESSLEVEL}, mtime=0·파일명 미기록)"
+    )
+    print(
+        f"[gzip] roundtrip_sha256={plain_digest} ok "
+        f"plain={'삭제' if args.drop_raw_plain else '보존'} -- 이후 단계 입력은 압축본이다"
+    )
+    rows_arg = str(raw_gz_path)
+
     network_calls = 0 if run_mode == "stub" else summary.llm_calls_by_method.get(
         "proposed", 0
     ) + summary.llm_calls_by_method.get("llm_single", 0) + summary.embed_calls
@@ -1236,7 +1395,7 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
     rc = _run_stage(
         "metrics",
         metrics_mod,
-        ["--rows", str(raw_path), "--out", str(stage_metrics)],
+        ["--rows", rows_arg, "--out", str(stage_metrics)],
         stages,
     )
     if rc != 0:
@@ -1246,7 +1405,7 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
         calibration_mod,
         [
             "--rows",
-            str(raw_path),
+            rows_arg,
             "--out",
             str(calibration_path),
             "--t-merge",
@@ -1260,7 +1419,7 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
         return RC_ERROR
     curve_argv = [
         "--rows",
-        str(raw_path),
+        rows_arg,
         "--out",
         str(metrics_path),
         "--curve",
@@ -1295,7 +1454,7 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
 
     missing = [
         p
-        for p in (raw_path, traces_path, metrics_path, calibration_path, curve_path, report_path)
+        for p in (raw_gz_path, traces_path, metrics_path, calibration_path, curve_path, report_path)
         if not p.exists()
     ]
     if missing:
@@ -1303,6 +1462,7 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
         return RC_ERROR
     for path in (
         raw_path,
+        raw_gz_path,
         traces_path,
         stage_metrics,
         metrics_path,
@@ -1310,7 +1470,13 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
         curve_path,
         report_path,
     ):
+        if not path.exists():  # 평문은 --drop-raw-plain 이면 없다
+            continue
         print(f"[out] {path} ({path.stat().st_size} bytes)")
+    # 커밋 대상(결정 E)만 한도와 대조한다 -- 평문 raw 와 중간 산출물
+    # `metrics-stage.json` 은 커밋하지 않는다.
+    for line in format_commit_sizes([raw_gz_path, traces_path]):
+        print(line)
     print("[ok] 사슬 완료 -- runner → metrics → calibration → curve → validate → report")
     return RC_OK
 
@@ -1372,6 +1538,14 @@ def _build_parser() -> argparse.ArgumentParser:
         help=(
             "시나리오당 덤프할 er_resolve trace 줄 수(기본 전량). "
             "표본을 고르는 순간 판정을 유리하게 만들 여지가 생기므로 기본은 전량이다(원칙8)"
+        ),
+    )
+    parser.add_argument(
+        "--drop-raw-plain",
+        action="store_true",
+        help=(
+            "gzip 왕복 검증을 통과한 뒤 평문 raw-<ts>.jsonl 을 지운다"
+            "(기본은 보존 -- 커밋 대상은 .gz 하나다)"
         ),
     )
     parser.add_argument(

@@ -903,6 +903,42 @@ def test_cli_prints_to_stdout_without_out(capsys: Any, tmp_path: Any) -> None:
     assert table["meta"]["scored_at_t_merge"] == ["0.5"]
 
 
+def test_cli_output_is_byte_identical_for_gzip_and_plain(tmp_path: Any) -> None:
+    """커밋본 `.jsonl.gz` 로 돌린 보정표가 평문과 **바이트까지** 같다.
+
+    원시 JSONL 은 5MB 한도 때문에 gzip 으로 커밋한다(사용자 결정 2026-09-21,
+    결정 E 유지) -- 커밋된 그 파일 하나로 보정표가 재생성돼야 한다(원칙8).
+    """
+
+    import gzip
+
+    text = (
+        "\n".join(
+            json.dumps(row, ensure_ascii=False)
+            for row in sweep(make_row()) + sweep(single_row())
+        )
+        + "\n"
+    )
+    plain = tmp_path / "raw.jsonl"
+    plain.write_text(text, encoding="utf-8")
+    packed = tmp_path / "raw.jsonl.gz"
+    with gzip.open(packed, "wt", encoding="utf-8", newline="") as handle:
+        handle.write(text)
+
+    from_plain = tmp_path / "plain.json"
+    from_gz = tmp_path / "gz.json"
+    assert main(["--rows", str(plain), "--out", str(from_plain)]) == 0
+    assert main(["--rows", str(packed), "--out", str(from_gz)]) == 0
+    assert from_gz.read_bytes() == from_plain.read_bytes()
+
+
+def test_cli_rejects_broken_gzip(tmp_path: Any) -> None:
+    broken = tmp_path / "raw.jsonl.gz"
+    broken.write_bytes(b"\x1f\x8b not really compressed")
+    with pytest.raises(MetricsError, match="gzip 읽기 실패"):
+        main(["--rows", str(broken)])
+
+
 @pytest.mark.parametrize("bad", ["gpt-4o-mini", "openai=", "=gpt"])
 def test_cli_rejects_malformed_model_configured(bad: str, tmp_path: Any) -> None:
     rows_path = tmp_path / "raw.jsonl"

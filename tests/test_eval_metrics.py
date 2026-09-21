@@ -15,7 +15,9 @@
 
 from __future__ import annotations
 
+import gzip
 import json
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -25,6 +27,7 @@ from evaluation.metrics import (
     ASK_KINDS,
     DECISIONS,
     DENOMINATOR_RULE,
+    GZIP_SUFFIX,
     OUTCOMES,
     REQUIRED_ROW_KEYS,
     MetricsError,
@@ -32,9 +35,11 @@ from evaluation.metrics import (
     compute_metrics,
     format_t_merge,
     group_rates,
+    iter_jsonl,
     load_rows,
     main,
     mention_level_rows,
+    open_jsonl,
     ratio,
     validate_rows,
 )
@@ -733,3 +738,63 @@ def test_cli_writes_metrics_json(tmp_path: Any, capsys: Any) -> None:
     assert main(["--rows", str(raw)]) == 0
     printed = json.loads(capsys.readouterr().out)
     assert printed == written
+
+
+# ---------------------------------------------------------------------------
+# gzip 입력 (커밋본 `.jsonl.gz` -- 사용자 결정 2026-09-21, 결정 E 이행 방식)
+# ---------------------------------------------------------------------------
+
+
+def _write_pair(tmp_path: Path, rows: list[dict[str, Any]]) -> tuple[Path, Path]:
+    """같은 내용을 평문·gzip 두 벌로 쓴다."""
+
+    text = "\n".join(json.dumps(row, ensure_ascii=False) for row in rows) + "\n"
+    plain = tmp_path / "raw.jsonl"
+    plain.write_text(text, encoding="utf-8")
+    packed = tmp_path / ("raw.jsonl" + GZIP_SUFFIX)
+    with gzip.open(packed, "wt", encoding="utf-8", newline="") as handle:
+        handle.write(text)
+    return plain, packed
+
+
+def test_load_rows_reads_gzip_exactly_like_plain(tmp_path: Path) -> None:
+    plain, packed = _write_pair(tmp_path, _sweep_rows())
+    assert load_rows(packed) == load_rows(plain)
+    # 지표까지 같은 바이트여야 커밋본만으로 재계산이 성립한다(원칙8).
+    assert json.dumps(compute_metrics(load_rows(packed)), sort_keys=True) == json.dumps(
+        compute_metrics(load_rows(plain)), sort_keys=True
+    )
+
+
+def test_open_jsonl_chooses_by_suffix(tmp_path: Path) -> None:
+    plain, packed = _write_pair(tmp_path, [make_row()])
+    with open_jsonl(packed) as handle:
+        from_gz = handle.read()
+    with open_jsonl(plain) as handle:
+        from_plain = handle.read()
+    assert from_gz == from_plain
+    # 평문 경로를 gzip 으로 열지 않는다(확장자만 본다).
+    assert [n for n, _ in iter_jsonl(plain)] == [n for n, _ in iter_jsonl(packed)] == [1]
+
+
+def test_load_rows_rejects_broken_gzip(tmp_path: Path) -> None:
+    broken = tmp_path / "raw.jsonl.gz"
+    broken.write_bytes(b"not a gzip stream at all")
+    with pytest.raises(MetricsError, match="gzip 읽기 실패"):
+        load_rows(broken)
+
+
+def test_load_rows_rejects_truncated_gzip(tmp_path: Path) -> None:
+    _, packed = _write_pair(tmp_path, _sweep_rows())
+    packed.write_bytes(packed.read_bytes()[:-8])  # CRC·길이 꼬리를 자른다
+    with pytest.raises(MetricsError, match="gzip 읽기 실패"):
+        load_rows(packed)
+
+
+def test_cli_output_is_byte_identical_for_gzip_and_plain(tmp_path: Path) -> None:
+    plain, packed = _write_pair(tmp_path, _sweep_rows())
+    from_plain = tmp_path / "plain.json"
+    from_gz = tmp_path / "gz.json"
+    assert main(["--rows", str(plain), "--out", str(from_plain)]) == 0
+    assert main(["--rows", str(packed), "--out", str(from_gz)]) == 0
+    assert from_gz.read_bytes() == from_plain.read_bytes()

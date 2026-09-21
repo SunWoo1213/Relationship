@@ -591,6 +591,35 @@ def test_validate_cli_returns_nonzero_and_prints_reasons(
     assert "meta.t_new" in out
 
 
+def test_curve_cli_gzip_rows_give_identical_bytes(tmp_path) -> None:
+    """커밋본 `.jsonl.gz` 로 만든 `metrics.json`·`curve.csv` 가 평문과 바이트
+    동일(사용자 결정 2026-09-21 -- 원시 JSONL 은 gzip 으로 커밋한다)."""
+
+    import gzip
+
+    from evaluation.curve import main as curve_main
+
+    text = "\n".join(json.dumps(row, ensure_ascii=False) for row in scenario_rows()) + "\n"
+    plain = tmp_path / "raw.jsonl"
+    plain.write_text(text, encoding="utf-8")
+    packed = tmp_path / "raw.jsonl.gz"
+    with gzip.open(packed, "wt", encoding="utf-8", newline="") as handle:
+        handle.write(text)
+
+    made: dict[str, tuple[bytes, bytes]] = {}
+    for label, rows_path in (("plain", plain), ("gz", packed)):
+        out = tmp_path / f"metrics-{label}.json"
+        curve = tmp_path / f"curve-{label}.csv"
+        assert (
+            curve_main(
+                ["--rows", str(rows_path), "--out", str(out), "--curve", str(curve), "--run-id", "r"]
+            )
+            == 0
+        )
+        made[label] = (out.read_bytes(), curve.read_bytes())
+    assert made["gz"] == made["plain"]
+
+
 def test_validate_cli_rejects_rows_and_validate_together(tmp_path) -> None:
     with pytest.raises(SystemExit) as excinfo:
         metrics_main(["--validate", str(tmp_path / "m.json"), "--rows", str(tmp_path / "r.jsonl")])

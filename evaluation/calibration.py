@@ -611,7 +611,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         prog="python -m evaluation.calibration",
         description="U1 파일럿 러너 JSONL -> s_llm 구간별 정답률 보정표 (DB·네트워크 없음)",
     )
-    parser.add_argument("--rows", required=True, help="U1 러너가 쓴 JSONL 경로")
+    parser.add_argument(
+        "--rows",
+        required=True,
+        help="U1 러너가 쓴 JSONL 경로(`.jsonl` 또는 커밋본 `.jsonl.gz`)",
+    )
     parser.add_argument("--out", default=None, help="결과 JSON 경로(생략하면 표준출력)")
     parser.add_argument(
         "--t-merge",

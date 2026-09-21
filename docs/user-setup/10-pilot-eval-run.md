@@ -60,7 +60,26 @@ P4 파일럿 평가는 `data/scenarios/` 40건에 다섯 방식(`proposed`·`exa
 
 4. 저장한 파일을 **한 번 읽는다**. 프롬프트 원문·키는 출력에 나가지 않도록 되어 있지만, 저장 전 확인은 사용자 몫이다.
 
-5. 결과 파일을 `reports/` 자리로 옮긴다(에이전트가 해도 된다): `reports/pilot/metrics.json` → `reports/metrics.json` 등. 원시 `reports/pilot/raw-<ts>.jsonl` 과 **같은 stamp 의 `reports/pilot/traces-<ts>.jsonl`** 은 그대로 둔다(결정 E — 원시 응답이 있어야 지표를 다시 계산할 수 있다).
+5. 결과 파일을 `reports/` 자리로 옮긴다(에이전트가 해도 된다): `reports/pilot/metrics.json` → `reports/metrics.json` 등. 원시 `reports/pilot/raw-<ts>.jsonl.gz` 와 **같은 stamp 의 `reports/pilot/traces-<ts>.jsonl`** 은 그대로 둔다(결정 E — 원시 응답이 있어야 지표를 다시 계산할 수 있다).
+
+## 커밋되는 원시 판정은 `raw-<ts>.jsonl.gz` 다
+
+`.githooks/pre-commit` 이 5MB 초과 파일을 막는데 전량 실행의 원시 JSONL 은 그보다 크다(스텁 실측 7.4MB). **gzip 으로 커밋한다**(사용자 결정 2026-09-21 — 결정 E 유지, 훅은 바꾸지 않는다).
+
+- 실행은 평문 `raw-<ts>.jsonl` 을 먼저 쓰고(중단돼도 거기까지 남는다), 끝난 뒤 `raw-<ts>.jsonl.gz` 로 압축한 다음 **압축본을 metrics·calibration·curve 에 넘긴다**. 출력에 이 두 줄이 찍힌다.
+  ```
+  [gzip] reports/pilot/raw-<ts>.jsonl.gz 1234567 bytes (평문 7404682 bytes, level=9, mtime=0·파일명 미기록)
+  [gzip] roundtrip_sha256=<64자> ok plain=보존 -- 이후 단계 입력은 압축본이다
+  [size] reports/pilot/raw-<ts>.jsonl.gz 1234567 bytes limit=5242880 ok
+  ```
+- 커밋하는 것은 `.gz` 하나다. 평문은 기본 보존이므로 `git add` 에 넣지 않는다(지우고 싶으면 `--drop-raw-plain` — 왕복 sha256 검증을 통과한 뒤에만 지운다).
+- `[size] … OVER` 와 `[warn] 커밋 한도 초과:` 가 나오면 그 파일은 커밋할 수 없다(rc 는 0 그대로다 — 수치가 틀린 게 아니라 파일이 큰 것이다). 그대로 보고한다.
+- **커밋된 파일 하나로 지표를 다시 계산한다**(원칙8) — `--rows` 는 `.jsonl` 과 `.jsonl.gz` 를 똑같이 받고 결과 바이트가 같다.
+  ```bash
+  python -m evaluation.metrics --rows reports/pilot/raw-<ts>.jsonl.gz --out /tmp/metrics-recheck.json
+  python -m evaluation.curve   --rows reports/pilot/raw-<ts>.jsonl.gz --out /tmp/metrics.json --curve /tmp/curve.csv
+  ```
+- `traces-<ts>.jsonl`(~1.7MB)은 한도 안이라 **평문 그대로** 커밋한다.
 
 ## 확신도 재계산 증거 (`traces-<ts>.jsonl`)
 
@@ -99,6 +118,8 @@ P4 파일럿 평가는 `data/scenarios/` 40건에 다섯 방식(`proposed`·`exa
 [scenario] sc-001 aliases=2 embedded=2 rows=200 traces=40 ok   ← 40줄(시나리오마다 1줄)
 [traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=reports/pilot/traces-<ts>.jsonl
 [rows] rows=7050 = mentions=141 × methods=5 × t_merge=10 (expected=7050)
+[gzip] …/raw-<ts>.jsonl.gz … bytes (평문 … bytes, level=9, mtime=0·파일명 미기록)
+[gzip] roundtrip_sha256=… ok plain=보존 -- 이후 단계 입력은 압축본이다
 [run] run_mode=real network_calls=… 
 [run] tokens_in=… tokens_out=… (실행 실측 합계, llm_fresh_call 행만)
 [stage] metrics: rc=0 … [stage] report: rc=0

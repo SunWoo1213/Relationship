@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -679,6 +680,113 @@ def test_traces_per_scenario_zero_is_rejected(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
+# 커밋용 gzip · 크기 가드 (순수 -- DB·네트워크 0)
+# ---------------------------------------------------------------------------
+
+
+def _jsonl(tmp_path: Path, name: str = "raw.jsonl", lines: int = 50) -> Path:
+    path = tmp_path / name
+    path.write_text(
+        "".join(
+            json.dumps({"i": i, "mention": "김팀장"}, ensure_ascii=False) + "\n"
+            for i in range(lines)
+        ),
+        encoding="utf-8",
+    )
+    return path
+
+
+def test_gzip_is_byte_identical_across_runs(tmp_path: Path) -> None:
+    """같은 입력 → 같은 바이트(원칙8). gzip 헤더의 기본 mtime·파일명이
+    실행마다 달라지는 것을 막았는지 본다."""
+
+    import gzip as gzip_mod
+
+    src = _jsonl(tmp_path)
+    first, digest_a = cli.gzip_jsonl(src, tmp_path / "a.jsonl.gz")
+    second, digest_b = cli.gzip_jsonl(src, tmp_path / "b.jsonl.gz")
+    assert first.read_bytes() == second.read_bytes()
+    assert digest_a == digest_b
+    header = first.read_bytes()[:10]
+    assert header[3] & 0x08 == 0  # FNAME 플래그 없음(원본 파일명 미기록)
+    assert header[4:8] == b"\x00\x00\x00\x00"  # mtime=0
+    with gzip_mod.open(first, "rt", encoding="utf-8") as handle:
+        assert handle.read() == src.read_text(encoding="utf-8")
+
+
+def test_gzip_default_name_and_plain_is_kept(tmp_path: Path) -> None:
+    src = _jsonl(tmp_path)
+    packed, digest = cli.gzip_jsonl(src)
+    assert packed == tmp_path / "raw.jsonl.gz"
+    assert src.exists()  # 기본은 평문 보존
+    assert digest == hashlib.sha256(src.read_bytes()).hexdigest()
+
+
+def test_gzip_drop_plain_removes_source_after_verification(tmp_path: Path) -> None:
+    src = _jsonl(tmp_path)
+    packed, _ = cli.gzip_jsonl(src, drop_plain=True)
+    assert packed.exists()
+    assert not src.exists()
+
+
+def test_gzip_missing_source_is_an_error(tmp_path: Path) -> None:
+    with pytest.raises(cli.GzipError, match="원본이 없다"):
+        cli.gzip_jsonl(tmp_path / "nope.jsonl")
+
+
+def test_gzip_output_is_read_by_the_shared_loader(tmp_path: Path) -> None:
+    """압축본을 여는 로직은 `evaluation.metrics` 한 곳뿐이다(중복 구현 금지)."""
+
+    from evaluation.metrics import load_rows
+
+    src = _jsonl(tmp_path, lines=3)
+    packed, _ = cli.gzip_jsonl(src)
+    assert load_rows(packed) == load_rows(src)
+
+
+def test_commit_size_limit_matches_the_hook(tmp_path: Path) -> None:
+    """상수 하나가 `.githooks/pre-commit` 의 한도와 같은 값인가(훅은 안 고친다)."""
+
+    hook = (REPO_ROOT / ".githooks" / "pre-commit").read_text(encoding="utf-8")
+    assert str(cli.COMMIT_SIZE_LIMIT_BYTES) in hook
+    assert cli.COMMIT_SIZE_LIMIT_BYTES == 5 * 1024 * 1024
+
+
+def test_format_commit_sizes_warns_only_over_the_limit(tmp_path: Path) -> None:
+    small = tmp_path / "small.gz"
+    small.write_bytes(b"0" * 10)
+    big = tmp_path / "big.jsonl"
+    big.write_bytes(b"0" * 64)
+    lines = cli.format_commit_sizes([small, big, tmp_path / "gone"], limit=32)
+    joined = "\n".join(lines)
+    assert f"[size] {small} 10 bytes limit=32 ok" in joined
+    assert f"[size] {big} 64 bytes limit=32 OVER" in joined
+    assert f"[size] {tmp_path / 'gone'} (없음)" in joined
+    warns = [line for line in lines if line.startswith("[warn]")]
+    assert len(warns) == 1 and str(big) in warns[0]
+    assert not [line for line in lines if line.startswith("[fail]")]  # rc 규약 불변
+
+
+def test_recheck_traces_accepts_a_gzipped_dump(tmp_path: Path) -> None:
+    path, _, written = _dump(tmp_path, count=3)
+    packed, _ = cli.gzip_jsonl(path, drop_plain=True)
+    result = cli.recheck_trace_dump(packed)
+    assert result.ok and result.dumped == result.recomputed == written
+    assert cli.main(["--recheck-traces", str(packed)]) == cli.RC_OK
+
+
+def test_recheck_traces_rejects_a_broken_gzip(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    broken = tmp_path / "traces.jsonl.gz"
+    broken.write_bytes(b"\x1f\x8b garbage garbage")
+    rc = cli.main(["--recheck-traces", str(broken)])
+    out = capsys.readouterr().out
+    assert rc == cli.RC_ERROR
+    assert "gzip 읽기 실패" in out
+
+
+# ---------------------------------------------------------------------------
 # CLI 인자 조합 · 가드 (실행하지 않는다)
 # ---------------------------------------------------------------------------
 
@@ -897,6 +1005,60 @@ def test_commit_and_run_mode_land_in_meta(tmp_path: Path) -> None:
     # 리포트는 같은 값을 본문에 적는다(U5 메타 표).
     body = (out_dir / "eval.md").read_text(encoding="utf-8")
     assert "0123456789abcdef" in body
+
+
+@pytest.mark.usefixtures("db_engine", "no_provider_factories")
+def test_chain_gzips_raw_and_feeds_the_gz_to_every_stage(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """원시 JSONL 은 gzip 으로 커밋한다(사용자 결정 2026-09-21, 결정 E 유지).
+
+    커밋되는 파일 하나만으로 지표가 나오는지를 실행이 매번 증명해야 하므로
+    metrics·calibration·curve 는 **압축본 경로**를 받는다(원칙8).
+    """
+
+    from evaluation.metrics import load_rows
+
+    out_dir = tmp_path / "out"
+    rc = cli.main(["--dry-run", "--stub", "--limit", "2", "--out", str(out_dir)])
+    out = capsys.readouterr().out
+    assert rc == cli.RC_OK
+
+    raw = _raw_files(out_dir)[0]  # 평문은 기본 보존
+    packed = Path(str(raw) + ".gz")
+    assert packed.exists()
+    assert load_rows(packed) == load_rows(raw)
+
+    assert f"[gzip] {packed}" in out
+    assert "roundtrip_sha256=" in out and "plain=보존" in out
+    for stage in ("metrics", "calibration", "curve"):
+        line = next(l for l in out.splitlines() if l.startswith(f"[stage] {stage}: python -m"))
+        assert f"--rows {packed}" in line
+        assert f"--rows {raw} " not in line
+
+    # 커밋 대상 크기 줄(한도는 훅과 같은 상수)
+    stamp = raw.name[len("raw-") : -len(".jsonl")]
+    traces = out_dir / f"traces-{stamp}.jsonl"
+    for path in (packed, traces):
+        assert f"[size] {path} {path.stat().st_size} bytes limit={cli.COMMIT_SIZE_LIMIT_BYTES}" in out
+    assert "[fail]" not in out
+
+
+@pytest.mark.usefixtures("db_engine", "no_provider_factories")
+def test_chain_drop_raw_plain_leaves_only_the_gz(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    out_dir = tmp_path / "out"
+    rc = cli.main(
+        ["--dry-run", "--stub", "--limit", "1", "--drop-raw-plain", "--out", str(out_dir)]
+    )
+    out = capsys.readouterr().out
+    assert rc == cli.RC_OK
+    assert _raw_files(out_dir) == []  # 평문 없음
+    assert len(sorted(out_dir.glob("raw-*.jsonl.gz"))) == 1
+    assert "plain=삭제" in out
+    for name in OUTPUT_NAMES:
+        assert (out_dir / name).exists(), name
 
 
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")
