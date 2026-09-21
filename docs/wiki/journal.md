@@ -172,3 +172,6 @@
 - 2026-09-21 19:22 | COMMIT | e7f0a9c feat(P4-pilot-eval): U7 선행 보강 — er_resolve trace 전량 덤프·확신도 재계산 diff 0, 테스트 19건
 - 2026-09-21 19:35 | DECISION | 사용자: gzip 단위(raw JSONL .gz 읽기·쓰기, 5MB 가드) eval-agent 위임 승인(L-004) | P4-pilot-eval
 - 2026-09-21 20:05 | VERIFY | gzip 단위 메인 세션 재검증: 대상 4파일 296 passed · 스텁 사슬 rc=0 raw 7,404,682 → .gz 161,615 bytes · [size] ok · [traces] diff 0.0 (evidence 20260921-1958-u7pre2-main-stub-chain.txt) | P4-pilot-eval
+- 2026-09-21 20:03 | COMMIT | 1a5643b feat(P4-pilot-eval): U7 선행 2 — 원시 판정 JSONL gzip 지원·5MB 크기 가드, 테스트 19건
+- 2026-09-21 20:20 | DECISION | 사용자: 01-plan 원시 경로 표기만 .gz 로 개정(46·71·80·126·205행, 80행 gzip.open) — verifier 재검증 생략, verify-plan FAIL 0/WARN 3 | P4-pilot-eval
+- 2026-09-21 20:25 | DECISION | 사용자: 스모크 03·08 + U7 실 실행은 본인 셸에서 직접 실행. 에이전트는 명령 안내만, 결과 파일이 생기면 이어받는다 | P4-pilot-eval
