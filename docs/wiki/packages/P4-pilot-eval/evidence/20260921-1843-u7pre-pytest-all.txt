@@ -1,0 +1,30 @@
+=== 전체 테스트 (Docker 미기동 -- DB 의존 테스트는 전부 skip)
+$ POSTGRES_PORT=5433 python -m pytest tests/ -q
+s.sssssss..........ss..s................................................ [  5%]
+...............................ssssssssss............................... [ 11%]
+...................ssssssssss........................................... [ 17%]
+..........................................ssssss.................sssssss [ 22%]
+ssssssssssssssssssssssssssssssssss...s...................ssss........... [ 28%]
+.............ssssss..................................................... [ 34%]
+........................................................................ [ 39%]
+...................ssssssssss.sssssss................................... [ 45%]
+........................................................................ [ 51%]
+........................................................................ [ 56%]
+........................................................................ [ 62%]
+............................................................ssssssssssss [ 68%]
+ss...............................................sssssss................ [ 73%]
+........................................................................ [ 79%]
+..ssssssssssssss.............................................sssssssssss [ 85%]
+sssssssss...ssssssssssssssssssssssssssssssssssssssssssssssssssssssss.sss [ 90%]
+sssssssssssssssssssssssssssssssss....................................... [ 96%]
+..........................................                               [100%]
+1013 passed, 253 skipped in 32.56s
+
+=== Docker/DB 상태 (우회하지 않는다 -- security §6)
+$ docker ps
+failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+$ python -c 'socket connect 127.0.0.1:5433'
+5433 closed TimeoutError
+
+기준 비교: U6 시점 전체 1247 passed / skip 0 (Docker 기동). 이번 실행은 1013 passed / 253 skipped(전부 DB 미접속).
+1013 + 253 = 1266 = 1247 + 19(신규). 실패 0.

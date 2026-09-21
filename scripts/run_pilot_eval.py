@@ -53,6 +53,20 @@
   같은 입력이면 `metrics.json` 이 바이트까지 같다. 시각은 원시 JSONL 파일
   이름(`raw-<ts>.jsonl`)에만 쓴다.
 
+## 실행 중 trace 표본 덤프 + 확신도 재계산 (원칙3·원칙9)
+
+결정 D(i)(시나리오별 트랜잭션 롤백) 때문에 `agent_traces` 는 **실행 중에만**
+조회된다. 그래서 `run_pilot(before_rollback=…)` 안에서 그 시나리오의
+`step='er_resolve' AND tool_name='er'` 행을 `raw-<ts>.jsonl` 과 **같은
+stamp** 의 `traces-<ts>.jsonl` 로 덤프하고(제안 방식 행 1개 ↔ 판정 1개),
+사슬 끝에서 전 줄의 `confidence` 를 다시 계산해 기록값과 비교한다 --
+`[traces] dumped=… recomputed=… max_abs_diff=… path=…`. 하나라도 어긋나면
+rc=1 이고 어느 trace 인지 찍는다. 재계산은 `app.er.confidence.combine()`
+(제품 코드)을 그대로 부르고 가중치는 trace 에 기록된 값을 쓰되 제품 상수
+`app.settings.ER_WEIGHTS`(0.5/0.3/0.2)와 다르면 거부한다. 덤프 파일만 있으면
+`--recheck-traces <path>` 로 언제든 다시 돌릴 수 있다(DB·네트워크 0).
+프롬프트 원문·`llm.reason` 자유 서술·키는 덤프에 넣지 않는다(security §1).
+
 ## 하지 않는 것
 
 실 API 호출(U7), `reports/` 실물 작성(U7), 실패 케이스 분석(U8). 지표
@@ -64,6 +78,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import math
 import os
 import random
@@ -78,13 +93,24 @@ from typing import Any
 if __package__ in (None, ""):  # pragma: no cover -- `python scripts/...` 직접 실행
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.db.models import AgentTrace
 from app.embedding import EMBEDDING_DIM
+from app.er.confidence import combine
 from app.er.judge import FakeJudge
 from app.er.judge import build_prompt as build_judge_prompt
-from app.er.types import ERConfig, Judgement, ScoredCandidate
+from app.er.types import (
+    ER_TRACE_STEP,
+    ER_TRACE_TOOL_NAME,
+    ERConfig,
+    Judgement,
+    ScoredCandidate,
+)
+from app.settings import ER_WEIGHTS
 from app.tools.context import ToolContext
+from app.tools.types import InvalidValue
 from evaluation import calibration as calibration_mod
 from evaluation import curve as curve_mod
 from evaluation import metrics as metrics_mod
@@ -124,6 +150,16 @@ __all__ = [
     "StubJudge",
     "StubSingleCaller",
     "StubEmbedder",
+    "TRACE_DUMP_SCHEMA_VERSION",
+    "TRACE_DUMP_METHOD",
+    "TraceDumpError",
+    "TraceRecheck",
+    "TraceRecheckError",
+    "dump_er_traces",
+    "recompute_confidence",
+    "check_trace_entry",
+    "recheck_trace_dump",
+    "format_trace_recheck",
     "main",
 ]
 
@@ -617,6 +653,364 @@ class StubEmbedder:
 
 
 # ---------------------------------------------------------------------------
+# trace 표본 덤프 · 확신도 재계산 (원칙3·원칙9, 01-plan 106·174행)
+# ---------------------------------------------------------------------------
+
+
+class TraceDumpError(RuntimeError):
+    """덤프 단계 실패(trace_id 누락·행 없음·mention 불일치·스키마 결손)."""
+
+
+class TraceRecheckError(ValueError):
+    """재계산 단계 실패(필드 결손·비수치·가중치 불일치)."""
+
+
+@dataclass(frozen=True)
+class TraceRecheck:
+    """덤프 파일 하나에 대한 재계산 결과. `failures` 가 비어 있어야 통과."""
+
+    path: str
+    dumped: int
+    recomputed: int
+    max_abs_diff: float
+    failures: list[str] = field(default_factory=list)
+
+    @property
+    def ok(self) -> bool:
+        return not self.failures and self.dumped > 0 and self.recomputed == self.dumped
+
+
+@dataclass(frozen=True)
+class _Weights:
+    """`app.er.confidence.combine()` 이 요구하는 `config` 모양(가중치 3개만).
+
+    가중치는 **이 스크립트가 하드코딩하지 않는다** -- 덤프된 trace 의
+    `confidence_breakdown["weights"]`(판정 당시 `ERConfig` 가 실제로 쓴 값)를
+    그대로 쓰고, 그 값이 제품 상수 `app.settings.ER_WEIGHTS`(원칙3 의
+    0.5/0.3/0.2)와 다르면 재계산을 통과시키지 않는다.
+    """
+
+    w_llm: float
+    w_emb: float
+    w_rule: float
+
+
+#: 덤프 파일 한 줄의 형식 버전(형식이 바뀌면 올린다).
+TRACE_DUMP_SCHEMA_VERSION = 1
+#: 덤프 대상 방식 -- `agent_traces` 에 `er_resolve` 행을 남기는 것은 제안
+#: 방식뿐이다(01-plan 140행 "proposed +2 = er_resolve + search_person").
+TRACE_DUMP_METHOD = "proposed"
+#: 덤프에 옮기는 `decision`/`llm` 키(프롬프트 원문·`llm.reason` 자유 서술은
+#: 옮기지 않는다 -- security §1, 재계산에 필요하지도 않다).
+_TRACE_DECISION_KEYS = (
+    "band",
+    "band_by_threshold",
+    "forced_reason",
+    "action",
+    "T_merge",
+    "T_new",
+    "matched_person_id",
+    "relaxed_retry",
+)
+_TRACE_LLM_KEYS = (
+    "provider",
+    "model",
+    "self_reported",
+    "s_llm",
+    "skipped",
+    "error",
+    "attempts",
+    "tokens_in",
+    "tokens_out",
+)
+#: 귀속된 후보 1개만 옮긴다 -- 후보 전체(`candidates[]`)는 원시 JSONL 의
+#: `MentionDecision.candidates` 에 이미 있고(이중 출처·파일 크기), 재계산에
+#: 필요한 것은 `confidence_breakdown` 과 "그 값이 귀속 후보의 값과 같은가"
+#: 하나뿐이다(원칙9).
+_TRACE_CANDIDATE_KEYS = (
+    "person_id",
+    "s_emb",
+    "s_rule",
+    "passed_rules",
+    "excluded_by",
+    "rule_checked",
+    "rule_passed",
+    "relaxed_pass",
+)
+
+
+def _trace_entry(trace: Any, row: Mapping[str, Any], *, scenario_id: str) -> dict[str, Any]:
+    """`agent_traces` 행 1개 + 그 행을 낳은 JSONL 행 1개 → 덤프 한 줄.
+
+    `agent_traces.output` 은 `app.er.types.Resolution.to_dict()` 스키마
+    (`{er_version, mention, relaxed_retry, candidates[], confidence_breakdown{},
+    decision{}, llm{}}`)다. 여기서 재계산에 필요한 부분과 사람이 되짚을 때
+    필요한 식별자만 옮긴다.
+    """
+
+    output = trace.output if isinstance(trace.output, dict) else {}
+    breakdown = output.get("confidence_breakdown")
+    if not isinstance(breakdown, dict):
+        raise TraceDumpError(
+            f"{scenario_id}: trace {trace.id} 의 output 에 confidence_breakdown 이 없다"
+        )
+    decision = output.get("decision") if isinstance(output.get("decision"), dict) else {}
+    llm = output.get("llm") if isinstance(output.get("llm"), dict) else {}
+    candidates = output.get("candidates") if isinstance(output.get("candidates"), list) else []
+    trace_mention = output.get("mention")
+    if trace_mention != row.get("mention"):
+        raise TraceDumpError(
+            f"{scenario_id}: trace {trace.id} 의 mention({trace_mention!r}) 이 "
+            f"JSONL 행의 mention({row.get('mention')!r}) 과 다르다 -- trace_id 연결이 틀렸다"
+        )
+    return {
+        "schema_version": TRACE_DUMP_SCHEMA_VERSION,
+        "scenario_id": scenario_id,
+        "session_id": trace.session_id,
+        "trace_id": trace.id,
+        "step": trace.step,
+        "tool_name": trace.tool_name,
+        "er_version": output.get("er_version"),
+        "method": row.get("method"),
+        "mention": trace_mention,
+        "mention_index": row.get("mention_index"),
+        "mention_kind": row.get("mention_kind"),
+        "turn": row.get("turn"),
+        "gold_person_id": row.get("gold_person_id"),
+        "t_merge": row.get("t_merge"),
+        "t_new": row.get("t_new"),
+        "sweep_index": row.get("sweep_index"),
+        "llm_fresh_call": row.get("llm_fresh_call"),
+        "row_decision": row.get("decision"),
+        "row_person_id": row.get("person_id"),
+        "row_score": row.get("score"),
+        "confidence_breakdown": dict(breakdown),
+        "decision": {key: decision.get(key) for key in _TRACE_DECISION_KEYS},
+        "llm": {key: llm.get(key) for key in _TRACE_LLM_KEYS},
+        "candidate_count": len(candidates),
+        "matched_candidate": _matched_candidate(candidates, breakdown.get("matched_person_id")),
+    }
+
+
+def _matched_candidate(
+    candidates: Sequence[Any], matched_person_id: Any
+) -> dict[str, Any] | None:
+    """귀속된 후보 1개(없으면 `None`)."""
+
+    if matched_person_id is None:
+        return None
+    for candidate in candidates:
+        if isinstance(candidate, dict) and candidate.get("person_id") == matched_person_id:
+            return {key: candidate.get(key) for key in _TRACE_CANDIDATE_KEYS}
+    return None
+
+
+def dump_er_traces(
+    session: Any,
+    rows: Sequence[Mapping[str, Any]],
+    handle: Any,
+    *,
+    session_id: str,
+    scenario_id: str,
+    method: str = TRACE_DUMP_METHOD,
+    limit_per_scenario: int | None = None,
+) -> int:
+    """시나리오 하나의 `er_resolve` trace 를 **롤백 전에** JSONL 로 덤프한다.
+
+    결정 D(i)(시나리오별 트랜잭션 롤백) 때문에 `agent_traces` 는 실행 중에만
+    조회된다 -- 그래서 `run_pilot(before_rollback=…)` 안에서 불린다.
+
+    조회 조건은 P3-er §7 재계산 입력 계약 그대로
+    `step='er_resolve' AND tool_name='er'` 이고, 대상 id 는 그 시나리오의
+    제안 방식 JSONL 행이 들고 있는 `trace_id` 집합이다(행 1개 ↔ 판정 1개).
+    제안 방식 행이 있는데 `trace_id` 가 없거나 그 id 의 행이 조회되지 않으면
+    `TraceDumpError` 다 -- 01-plan 140행의 "proposed +2" 전제가 깨진
+    것이므로 조용히 0행으로 넘어가지 않는다(원칙9).
+
+    `limit_per_scenario` 는 시나리오당 앞에서부터 N 줄로 줄인다(기본
+    `None` = 전량. 표본 선택으로 판정을 유리하게 만들 여지를 두지 않으려고
+    기본을 전량으로 둔다 -- 원칙8).
+    """
+
+    targets = [row for row in rows if row.get("method") == method]
+    if not targets:
+        return 0
+    without_id = [row for row in targets if not isinstance(row.get("trace_id"), int)]
+    if without_id:
+        raise TraceDumpError(
+            f"{scenario_id}: {method} 행 {len(without_id)}/{len(targets)} 개에 trace_id 가 "
+            "없다 -- 01-plan 140행 'proposed +2(er_resolve+search_person)' 전제가 깨졌다"
+        )
+    if limit_per_scenario is not None:
+        targets = targets[:limit_per_scenario]
+    ids = [int(row["trace_id"]) for row in targets]
+
+    statement = select(AgentTrace).where(
+        AgentTrace.id.in_(sorted(set(ids))),
+        AgentTrace.session_id == session_id,
+        AgentTrace.step == ER_TRACE_STEP,
+        AgentTrace.tool_name == ER_TRACE_TOOL_NAME,
+    )
+    found = {trace.id: trace for trace in session.scalars(statement)}
+    absent = sorted({i for i in ids if i not in found})
+    if absent:
+        raise TraceDumpError(
+            f"{scenario_id}: session_id={session_id} 에서 "
+            f"step={ER_TRACE_STEP}/tool_name={ER_TRACE_TOOL_NAME} 행을 찾지 못했다 "
+            f"(trace_id {absent[:5]}{'…' if len(absent) > 5 else ''}, {len(absent)}개)"
+        )
+
+    written = 0
+    for row in targets:
+        entry = _trace_entry(found[int(row["trace_id"])], row, scenario_id=scenario_id)
+        handle.write(json.dumps(entry, ensure_ascii=False, sort_keys=True))
+        handle.write("\n")
+        written += 1
+    handle.flush()
+    return written
+
+
+def recompute_confidence(breakdown: Mapping[str, Any]) -> float:
+    """`confidence_breakdown` → `w_llm·s_llm + w_emb·s_emb + w_rule·s_rule`.
+
+    산식을 여기에 다시 적지 않고 **제품 코드**
+    `app.er.confidence.combine()` 을 그대로 부른다(두 번째 출처 금지) --
+    `s_emb` 클램프와 덧셈 순서까지 같아야 기록값과 비트가 같다.
+    가중치는 trace 에 기록된 값을 쓰되 제품 상수 `app.settings.ER_WEIGHTS`
+    (원칙3)와 다르면 거부한다.
+    """
+
+    weights = breakdown.get("weights")
+    if not isinstance(weights, Mapping):
+        raise TraceRecheckError("confidence_breakdown.weights 가 없다")
+    try:
+        recorded = {key: float(weights[key]) for key in ("llm", "emb", "rule")}
+    except (KeyError, TypeError, ValueError) as exc:
+        raise TraceRecheckError(f"weights 를 읽을 수 없다: {exc}") from exc
+    if recorded != {key: float(value) for key, value in ER_WEIGHTS.items()}:
+        raise TraceRecheckError(
+            f"weights={recorded} 가 제품 상수 ER_WEIGHTS={dict(ER_WEIGHTS)} 와 다르다(원칙3)"
+        )
+    signals: dict[str, float] = {}
+    for key in ("s_llm", "s_emb", "s_rule"):
+        value = breakdown.get(key)
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise TraceRecheckError(f"{key}={value!r} 가 수치가 아니다")
+        signals[key] = float(value)
+    return combine(
+        signals["s_llm"],
+        signals["s_emb"],
+        signals["s_rule"],
+        _Weights(w_llm=recorded["llm"], w_emb=recorded["emb"], w_rule=recorded["rule"]),
+    )
+
+
+def check_trace_entry(entry: Mapping[str, Any]) -> float:
+    """덤프 한 줄의 `abs(기록 confidence - 재계산 confidence)`.
+
+    **판정 기준은 `diff == 0.0` 이다**(허용오차 없음). 근거:
+    `app/er/confidence.py` 는 `round()` 를 어디에도 쓰지 않고(모듈 docstring
+    6~16행, F-7fe239) 기록값은 `combine()` 이 낸 double 그대로이며, JSONB·
+    `json.dumps` 왕복은 double 을 정확히 복원한다. 같은 함수·같은 연산
+    순서로 다시 계산하면 비트까지 같아야 한다.
+    """
+
+    breakdown = entry.get("confidence_breakdown")
+    if not isinstance(breakdown, Mapping):
+        raise TraceRecheckError("confidence_breakdown 이 없다")
+    recorded = breakdown.get("confidence")
+    if isinstance(recorded, bool) or not isinstance(recorded, (int, float)):
+        raise TraceRecheckError(f"기록 confidence={recorded!r} 가 수치가 아니다")
+    decision = entry.get("decision") if isinstance(entry.get("decision"), Mapping) else {}
+    llm = entry.get("llm") if isinstance(entry.get("llm"), Mapping) else {}
+    if decision.get("forced_reason") is None and llm.get("skipped") is False:
+        # 정상 경로에서 `decide()` 는 `judgement.s_llm` 을 그대로 쓴다
+        # (`app/er/confidence.py` 307행) -- 두 값이 다르면 기록이 깨졌다.
+        if isinstance(llm.get("s_llm"), (int, float)) and not isinstance(llm.get("s_llm"), bool):
+            if breakdown.get("s_llm") != llm.get("s_llm"):
+                raise TraceRecheckError(
+                    f"s_llm={breakdown.get('s_llm')!r} 가 llm.s_llm={llm.get('s_llm')!r} 과 다르다"
+                    " (강제 경로가 아닌데 자기보고 점수가 어긋난다)"
+                )
+    matched = entry.get("matched_candidate")
+    if isinstance(matched, Mapping):
+        # 귀속 후보에서 가져왔다는 값이 정말 그 후보의 값인가(원칙9).
+        for breakdown_key, candidate_key in (("s_emb", "s_emb"), ("s_rule", "s_rule")):
+            if breakdown.get(breakdown_key) != matched.get(candidate_key):
+                raise TraceRecheckError(
+                    f"{breakdown_key}={breakdown.get(breakdown_key)!r} 가 귀속 후보 "
+                    f"{matched.get('person_id')!r} 의 값 {matched.get(candidate_key)!r} 과 다르다"
+                )
+    return abs(float(recorded) - recompute_confidence(breakdown))
+
+
+def recheck_trace_dump(path: Path | str) -> TraceRecheck:
+    """덤프 파일 **하나만** 입력으로 전 줄을 재계산한다(DB·네트워크 0).
+
+    실행 중에 불려도(`_run_chain` 끝), 나중에 파일만 들고 다시 불려도
+    (`--recheck-traces`) 같은 결과가 나온다.
+    """
+
+    target = Path(path)
+    dumped = 0
+    recomputed = 0
+    max_abs_diff = 0.0
+    failures: list[str] = []
+    with target.open(encoding="utf-8") as handle:
+        for lineno, raw_line in enumerate(handle, start=1):
+            line = raw_line.strip()
+            if not line:
+                continue
+            dumped += 1
+            try:
+                entry = json.loads(line)
+            except json.JSONDecodeError as exc:
+                failures.append(f"line {lineno}: JSON 파싱 실패 ({exc})")
+                continue
+            if not isinstance(entry, dict):
+                failures.append(f"line {lineno}: 객체가 아니다")
+                continue
+            label = f"line {lineno} trace_id={entry.get('trace_id')} " f"{entry.get('scenario_id')}/{entry.get('mention')!r} t_merge={entry.get('t_merge')}"
+            try:
+                diff = check_trace_entry(entry)
+            except (TraceRecheckError, InvalidValue) as exc:
+                failures.append(f"{label}: {exc}")
+                continue
+            recomputed += 1
+            max_abs_diff = max(max_abs_diff, diff)
+            if diff != 0.0:
+                failures.append(
+                    f"{label}: abs diff={diff!r} != 0 "
+                    f"(기록 {entry['confidence_breakdown'].get('confidence')!r})"
+                )
+    if dumped == 0:
+        failures.append(f"{target}: 덤프가 비어 있다 -- 재계산할 판정이 없다(원칙9)")
+    return TraceRecheck(
+        path=str(target),
+        dumped=dumped,
+        recomputed=recomputed,
+        max_abs_diff=max_abs_diff,
+        failures=failures,
+    )
+
+
+def format_trace_recheck(result: TraceRecheck) -> list[str]:
+    """`[traces] …` 요약 줄(성공·실패 공통). 실패는 최대 10건까지 보인다."""
+
+    lines = [
+        f"[traces] dumped={result.dumped} recomputed={result.recomputed} "
+        f"max_abs_diff={result.max_abs_diff!r} path={result.path}",
+        f"[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, "
+        f"weights={dict(ER_WEIGHTS)}, 기준 abs diff == 0)",
+    ]
+    for message in result.failures[:10]:
+        lines.append(f"[fail] traces: {message}")
+    if len(result.failures) > 10:
+        lines.append(f"[fail] traces: … 외 {len(result.failures) - 10}건")
+    return lines
+
+
+# ---------------------------------------------------------------------------
 # 사슬
 # ---------------------------------------------------------------------------
 
@@ -660,6 +1054,8 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
     out_dir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     raw_path = out_dir / f"raw-{stamp}.jsonl"
+    #: 같은 stamp -- 04-review 가 "실행 로그와 같은 ts" 로 대조한다(01-plan 106행).
+    traces_path = out_dir / f"traces-{stamp}.jsonl"
     stage_metrics = out_dir / "metrics-stage.json"
     metrics_path = out_dir / "metrics.json"
     calibration_path = out_dir / "calibration.json"
@@ -707,20 +1103,38 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
 
     mismatches: list[str] = []
     seen_scenarios: list[str] = []
+    trace_failures: list[str] = []
+    traces_dumped = 0
 
     def before_rollback(ctx: ToolContext, state: ScenarioState, rows: list[dict[str, Any]]) -> None:
+        nonlocal traces_dumped
         ok = state.embedded_alias_count == state.alias_count
         seen_scenarios.append(state.scenario_id)
+        # 결정 D(i) 롤백 전에 -- 여기서 안 뜨면 trace 는 사라진다(01-plan 236행).
+        dumped = 0
+        try:
+            dumped = dump_er_traces(
+                ctx.session,
+                rows,
+                traces_handle,
+                session_id=ctx.session_id,
+                scenario_id=state.scenario_id,
+                limit_per_scenario=args.traces_per_scenario,
+            )
+        except TraceDumpError as exc:
+            trace_failures.append(str(exc))
+        traces_dumped += dumped
         print(
             f"[scenario] {state.scenario_id} aliases={state.alias_count} "
             f"embedded={state.embedded_alias_count} rows={len(rows)} "
-            f"{'ok' if ok else 'MISMATCH'}"
+            f"traces={dumped} {'ok' if ok else 'MISMATCH'}"
         )
         if not ok:
             mismatches.append(state.scenario_id)
 
     engine = get_engine()
     connection, transaction, session = _session(engine)
+    traces_handle = traces_path.open("w", encoding="utf-8", newline="\n")
     try:
 
         def ctx_factory(scenario_id: str) -> ToolContext:
@@ -750,6 +1164,7 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
         print(f"[fail] runner: {exc}")
         return RC_ERROR
     finally:
+        traces_handle.close()
         session.close()
         transaction.rollback()
         connection.close()
@@ -758,6 +1173,30 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
         print(
             "[fail] embedded_alias_count != alias_count: " + ", ".join(sorted(mismatches))
         )
+        return RC_ERROR
+
+    # --- trace 표본 재계산 (원칙3·원칙9, 01-plan 106행 판정 표) --------------
+    if trace_failures:
+        for message in trace_failures[:10]:
+            print(f"[fail] traces: {message}")
+        return RC_ERROR
+    recheck = recheck_trace_dump(traces_path)
+    for line in format_trace_recheck(recheck):
+        print(line)
+    if recheck.dumped != traces_dumped:
+        print(
+            f"[fail] traces: 덤프 줄 수 {recheck.dumped} != 쓴 줄 수 {traces_dumped}"
+        )
+        return RC_ERROR
+    expected_traces = summary.rows_by_method.get(TRACE_DUMP_METHOD, 0)
+    if args.traces_per_scenario is None and recheck.dumped != expected_traces:
+        print(
+            f"[fail] traces: 덤프 {recheck.dumped} 행 != {TRACE_DUMP_METHOD} 행 "
+            f"{expected_traces} (01-plan 140행 'proposed +2' 전제 -- 판정마다 "
+            "er_resolve 1행)"
+        )
+        return RC_ERROR
+    if not recheck.ok:
         return RC_ERROR
 
     expected_rows = summary.mention_count * len(ALL_METHODS) * len(T_MERGE_GRID)
@@ -854,11 +1293,23 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
     if rc != 0:
         return RC_ERROR
 
-    missing = [p for p in (raw_path, metrics_path, calibration_path, curve_path, report_path) if not p.exists()]
+    missing = [
+        p
+        for p in (raw_path, traces_path, metrics_path, calibration_path, curve_path, report_path)
+        if not p.exists()
+    ]
     if missing:
         print("[fail] 산출물 누락: " + ", ".join(str(p) for p in missing))
         return RC_ERROR
-    for path in (raw_path, stage_metrics, metrics_path, calibration_path, curve_path, report_path):
+    for path in (
+        raw_path,
+        traces_path,
+        stage_metrics,
+        metrics_path,
+        calibration_path,
+        curve_path,
+        report_path,
+    ):
         print(f"[out] {path} ({path.stat().st_size} bytes)")
     print("[ok] 사슬 완료 -- runner → metrics → calibration → curve → validate → report")
     return RC_OK
@@ -914,6 +1365,24 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="추정만 찍고 끝낸다(실행하지 않는다)",
     )
+    parser.add_argument(
+        "--traces-per-scenario",
+        type=int,
+        default=None,
+        help=(
+            "시나리오당 덤프할 er_resolve trace 줄 수(기본 전량). "
+            "표본을 고르는 순간 판정을 유리하게 만들 여지가 생기므로 기본은 전량이다(원칙8)"
+        ),
+    )
+    parser.add_argument(
+        "--recheck-traces",
+        default=None,
+        metavar="PATH",
+        help=(
+            "덤프된 traces-<ts>.jsonl 만 입력으로 확신도를 다시 계산한다"
+            "(DB·네트워크 0). 다른 인자는 무시하고 재계산만 하고 끝낸다"
+        ),
+    )
     return parser
 
 
@@ -921,6 +1390,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
 
+    if args.recheck_traces:
+        target = Path(args.recheck_traces)
+        if not target.exists():
+            print(f"[fail] traces: {target} 가 없다")
+            return RC_ERROR
+        result = recheck_trace_dump(target)
+        for line in format_trace_recheck(result):
+            print(line)
+        return RC_OK if result.ok else RC_ERROR
+
+    if args.traces_per_scenario is not None and args.traces_per_scenario <= 0:
+        parser.error("--traces-per-scenario 는 1 이상이다(0 이면 증거가 없다)")
     if args.stub and not args.dry_run:
         parser.error("--stub 은 --dry-run 과 함께 쓴다(스텁 수치를 실 결과로 두지 않는다)")
     if args.dry_run and not args.stub:

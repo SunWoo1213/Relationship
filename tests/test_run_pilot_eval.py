@@ -275,6 +275,410 @@ def test_stub_embedder_is_deterministic_unit_vectors() -> None:
 
 
 # ---------------------------------------------------------------------------
+# 순수 층 -- trace 표본 덤프 · 확신도 재계산 (U7 선행, DB·네트워크 0)
+# ---------------------------------------------------------------------------
+
+
+class _FakeTrace:
+    """`agent_traces` 행 모양(덤프가 읽는 5개 속성만)."""
+
+    def __init__(self, trace_id: int, session_id: str, output: dict[str, Any]) -> None:
+        from app.er.types import ER_TRACE_STEP, ER_TRACE_TOOL_NAME
+
+        self.id = trace_id
+        self.session_id = session_id
+        self.step = ER_TRACE_STEP
+        self.tool_name = ER_TRACE_TOOL_NAME
+        self.output = output
+
+
+class _FakeSession:
+    """`session.scalars(select(...))` 만 흉내 낸다 -- **조회 조건을 실제로
+    적용해서** 걸러 준다(WHERE 절이 계약대로인지 테스트가 본다)."""
+
+    def __init__(self, traces: list[_FakeTrace]) -> None:
+        self.traces = traces
+        self.statements: list[Any] = []
+
+    def scalars(self, statement: Any) -> list[_FakeTrace]:
+        self.statements.append(statement)
+        params = statement.compile().params
+        wanted = set(params["id_1"])
+        return [
+            trace
+            for trace in self.traces
+            if trace.id in wanted
+            and trace.session_id == params["session_id_1"]
+            and trace.step == params["step_1"]
+            and trace.tool_name == params["tool_name_1"]
+        ]
+
+
+def _resolution_output(
+    *,
+    mention: str = "김팀장",
+    s_llm: float = 0.73,
+    s_emb: float = 0.8123456789,
+    s_rule: float = 0.6666666666666666,
+    t_merge: float = 0.8,
+    matched: int | None = 7,
+) -> dict[str, Any]:
+    """`agent_traces.output` 을 **제품 코드로** 만든다(손으로 적은 숫자가
+    아니라 `decide()` → `Resolution.to_dict()` 가 낸 것)."""
+
+    from app.er.confidence import decide
+    from app.er.types import ERConfig, Judgement, Resolution, ScoredCandidate
+
+    config = ERConfig(t_merge=t_merge, t_new=T_NEW)
+    candidate = ScoredCandidate(
+        person_id=7,
+        display_name="김도윤",
+        aliases=["김팀장"],
+        relation_tag="직장",
+        hierarchy="상",
+        s_emb=s_emb,
+        rule_flags={"exact_alias": True},
+        rule_checked=2,
+        rule_passed=2,
+        s_rule=s_rule,
+        passed_rules=True,
+    )
+    judgement = Judgement(
+        matched_person_id=matched,
+        s_llm=s_llm,
+        reason="비밀이 아니라도 덤프에 넣지 않는 자유 서술",
+        tokens_in=11,
+        tokens_out=7,
+        model="stub-judge",
+        provider="stub",
+    )
+    decision = decide(
+        judgement=judgement, passed=[candidate], llm_failed=False, config=config
+    )
+    resolution = Resolution(
+        trace_id=None,
+        mention=mention,
+        candidates=[candidate],
+        matched_person_id=decision.matched_person_id,
+        confidence=decision.confidence,
+        confidence_breakdown=decision.confidence_breakdown,
+        band=decision.band,
+        band_by_threshold=decision.band_by_threshold,
+        forced_reason=decision.forced_reason,
+        decision=dict(decision.decision),
+        llm={
+            "provider": "stub",
+            "model": "stub-judge",
+            "self_reported": True,
+            "s_llm": s_llm,
+            "reason": judgement.reason,
+            "tokens_in": 11,
+            "tokens_out": 7,
+            "attempts": 1,
+            "skipped": False,
+            "error": None,
+        },
+    )
+    return json.loads(json.dumps(resolution.to_dict(), ensure_ascii=False))
+
+
+def _row(trace_id: int, *, mention: str = "김팀장", t_merge: float = 0.8) -> dict[str, Any]:
+    return {
+        "method": "proposed",
+        "mention": mention,
+        "decision": "merge",
+        "person_id": 7,
+        "score": 0.8,
+        "trace_id": trace_id,
+        "scenario_id": "sc-001",
+        "mention_index": 0,
+        "mention_kind": "gold",
+        "turn": 0,
+        "gold_person_id": "p1",
+        "t_merge": t_merge,
+        "t_new": T_NEW,
+        "sweep_index": 0,
+        "llm_fresh_call": True,
+    }
+
+
+def _dump(tmp_path: Path, count: int = 3) -> tuple[Path, _FakeSession, int]:
+    """제안 방식 행 `count` 개를 덤프해 파일 경로·세션·줄 수를 돌려준다."""
+
+    session_id = "pilot-run-abc-sc-001"
+    traces = [
+        _FakeTrace(100 + i, session_id, _resolution_output(s_llm=0.5 + 0.05 * i))
+        for i in range(count)
+    ]
+    rows: list[dict[str, Any]] = [
+        _row(100 + i, t_merge=T_MERGE_GRID[i]) for i in range(count)
+    ]
+    # 다른 방식 행은 섞여 있어도 덤프 대상이 아니다.
+    rows.append({**_row(999), "method": "embedding_only", "trace_id": None})
+    session = _FakeSession(traces)
+    path = tmp_path / "traces-20260101-000000.jsonl"
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        written = cli.dump_er_traces(
+            session, rows, handle, session_id=session_id, scenario_id="sc-001"
+        )
+    return path, session, written
+
+
+def test_dump_writes_one_line_per_proposed_row(tmp_path: Path) -> None:
+    path, session, written = _dump(tmp_path, count=3)
+    lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line]
+    assert written == 3
+    assert len(lines) == 3
+    entries = [json.loads(line) for line in lines]
+    assert [e["trace_id"] for e in entries] == [100, 101, 102]
+    assert {e["step"] for e in entries} == {"er_resolve"}
+    assert {e["tool_name"] for e in entries} == {"er"}
+    assert {e["method"] for e in entries} == {"proposed"}
+    assert [e["t_merge"] for e in entries] == list(T_MERGE_GRID[:3])
+    # 조회 조건이 P3-er §7 계약 그대로인가
+    params = session.statements[0].compile().params
+    assert params["step_1"] == "er_resolve"
+    assert params["tool_name_1"] == "er"
+    assert params["session_id_1"] == "pilot-run-abc-sc-001"
+
+
+def test_dump_entry_carries_recompute_inputs_and_no_prompt(tmp_path: Path) -> None:
+    path, _, _ = _dump(tmp_path, count=1)
+    entry = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
+    breakdown = entry["confidence_breakdown"]
+    assert set(breakdown) >= {"s_llm", "s_emb", "s_rule", "weights", "confidence"}
+    assert entry["decision"]["T_merge"] == 0.8
+    assert entry["decision"]["T_new"] == T_NEW
+    assert entry["llm"]["provider"] == "stub"
+    # 후보 전체가 아니라 귀속 후보 1개만(원시 JSONL 과 이중 출처 금지)
+    assert entry["candidate_count"] == 1
+    assert entry["matched_candidate"]["person_id"] == breakdown["matched_person_id"]
+    assert entry["matched_candidate"]["s_emb"] == breakdown["s_emb"]
+    # 프롬프트 원문·LLM 자유 서술은 옮기지 않는다(security §1)
+    blob = json.dumps(entry, ensure_ascii=False)
+    assert "reason" not in entry["llm"]
+    assert "자유 서술" not in blob  # Judgement.reason 원문
+    assert "prompt" not in blob
+    assert '"reason"' not in blob  # forced_reason 은 있어도 reason 키는 없다
+
+
+def test_dump_fails_when_proposed_row_has_no_trace_id(tmp_path: Path) -> None:
+    session = _FakeSession([])
+    rows = [{**_row(1), "trace_id": None}]
+    with (tmp_path / "t.jsonl").open("w", encoding="utf-8") as handle:
+        with pytest.raises(cli.TraceDumpError) as exc:
+            cli.dump_er_traces(
+                session, rows, handle, session_id="s", scenario_id="sc-001"
+            )
+    assert "trace_id" in str(exc.value)
+
+
+def test_dump_fails_when_trace_row_is_absent(tmp_path: Path) -> None:
+    session = _FakeSession([])  # 롤백 뒤처럼 조회되지 않는 상태
+    with (tmp_path / "t.jsonl").open("w", encoding="utf-8") as handle:
+        with pytest.raises(cli.TraceDumpError) as exc:
+            cli.dump_er_traces(
+                session, [_row(100)], handle, session_id="s", scenario_id="sc-001"
+            )
+    assert "er_resolve" in str(exc.value)
+
+
+def test_dump_fails_when_trace_mention_differs(tmp_path: Path) -> None:
+    session = _FakeSession([_FakeTrace(100, "s", _resolution_output(mention="박대리"))])
+    with (tmp_path / "t.jsonl").open("w", encoding="utf-8") as handle:
+        with pytest.raises(cli.TraceDumpError) as exc:
+            cli.dump_er_traces(
+                session, [_row(100)], handle, session_id="s", scenario_id="sc-001"
+            )
+    assert "mention" in str(exc.value)
+
+
+def test_recheck_of_untouched_dump_has_zero_diff(tmp_path: Path) -> None:
+    path, _, written = _dump(tmp_path, count=3)
+    result = cli.recheck_trace_dump(path)
+    assert result.dumped == written == 3
+    assert result.recomputed == 3
+    assert result.max_abs_diff == 0.0
+    assert result.failures == []
+    assert result.ok
+
+
+def test_recheck_cli_prints_summary_line(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path, _, _ = _dump(tmp_path, count=2)
+    rc = cli.main(["--recheck-traces", str(path)])
+    out = capsys.readouterr().out
+    assert rc == cli.RC_OK
+    assert "[traces] dumped=2 recomputed=2 max_abs_diff=0.0" in out
+    assert str(path) in out
+
+
+def _rewrite(path: Path, mutate: Any) -> None:
+    entries = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+    mutate(entries)
+    path.write_text(
+        "".join(json.dumps(e, ensure_ascii=False, sort_keys=True) + "\n" for e in entries),
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
+def test_recheck_detects_tampered_confidence(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path, _, _ = _dump(tmp_path, count=3)
+
+    def bump(entries: list[dict[str, Any]]) -> None:
+        entries[1]["confidence_breakdown"]["confidence"] += 1e-12
+
+    _rewrite(path, bump)
+    result = cli.recheck_trace_dump(path)
+    assert result.max_abs_diff > 0.0
+    assert len(result.failures) == 1
+    assert "trace_id=101" in result.failures[0]
+    assert cli.main(["--recheck-traces", str(path)]) == cli.RC_ERROR
+    assert "[fail] traces:" in capsys.readouterr().out
+
+
+def test_recheck_detects_tampered_signal(tmp_path: Path) -> None:
+    path, _, _ = _dump(tmp_path, count=2)
+
+    def bump(entries: list[dict[str, Any]]) -> None:
+        entries[0]["confidence_breakdown"]["s_emb"] = 0.1
+
+    _rewrite(path, bump)
+    result = cli.recheck_trace_dump(path)
+    assert not result.ok
+    assert "trace_id=100" in result.failures[0]
+    # 귀속 후보의 값과 어긋난 것이 먼저 잡힌다(원칙9)
+    assert "귀속 후보" in result.failures[0]
+
+
+def test_recheck_detects_s_llm_out_of_step_with_llm_block(tmp_path: Path) -> None:
+    """강제 경로가 아닌데 `s_llm` 이 `llm.s_llm` 과 다르면 기록이 깨진 것."""
+
+    path, _, _ = _dump(tmp_path, count=1)
+
+    def bump(entries: list[dict[str, Any]]) -> None:
+        entries[0]["confidence_breakdown"]["s_llm"] = 0.99
+
+    _rewrite(path, bump)
+    result = cli.recheck_trace_dump(path)
+    assert not result.ok
+    assert "llm.s_llm" in result.failures[0]
+
+
+def test_recheck_detects_signal_tampered_together_with_candidate(tmp_path: Path) -> None:
+    """후보까지 같이 고쳐도 가중합이 맞지 않으면 잡힌다(부정 케이스)."""
+
+    path, _, _ = _dump(tmp_path, count=1)
+
+    def bump(entries: list[dict[str, Any]]) -> None:
+        entries[0]["confidence_breakdown"]["s_emb"] = 0.1
+        entries[0]["matched_candidate"]["s_emb"] = 0.1
+
+    _rewrite(path, bump)
+    result = cli.recheck_trace_dump(path)
+    assert not result.ok
+    assert result.recomputed == 1
+    assert result.max_abs_diff > 0.0
+    assert "abs diff=" in result.failures[0]
+
+
+def test_recheck_rejects_weights_other_than_product_constant(tmp_path: Path) -> None:
+    path, _, _ = _dump(tmp_path, count=1)
+
+    def swap(entries: list[dict[str, Any]]) -> None:
+        entries[0]["confidence_breakdown"]["weights"] = {
+            "llm": 0.4,
+            "emb": 0.4,
+            "rule": 0.2,
+        }
+
+    _rewrite(path, swap)
+    result = cli.recheck_trace_dump(path)
+    assert not result.ok
+    assert "ER_WEIGHTS" in result.failures[0]
+    assert result.recomputed == 0
+
+
+def test_recheck_rejects_missing_fields_and_empty_file(tmp_path: Path) -> None:
+    path, _, _ = _dump(tmp_path, count=1)
+
+    def drop(entries: list[dict[str, Any]]) -> None:
+        del entries[0]["confidence_breakdown"]["s_llm"]
+
+    _rewrite(path, drop)
+    assert not cli.recheck_trace_dump(path).ok
+
+    empty = tmp_path / "traces-empty.jsonl"
+    empty.write_text("", encoding="utf-8")
+    result = cli.recheck_trace_dump(empty)
+    assert result.dumped == 0
+    assert not result.ok
+    assert cli.main(["--recheck-traces", str(empty)]) == cli.RC_ERROR
+
+
+def test_recheck_missing_path_returns_error(tmp_path: Path) -> None:
+    assert cli.main(["--recheck-traces", str(tmp_path / "없다.jsonl")]) == cli.RC_ERROR
+
+
+def test_recompute_uses_product_combine_not_a_local_formula() -> None:
+    """가중치·산식의 출처가 제품 코드인가(하드코딩 금지)."""
+
+    source = Path(cli.__file__).read_text(encoding="utf-8")
+    assert "from app.er.confidence import combine" in source
+    assert "from app.settings import ER_WEIGHTS" in source
+    assert "0.5 *" not in source and "0.3 *" not in source
+
+    from app.er.confidence import combine
+    from app.er.types import ERConfig
+
+    config = ERConfig(t_merge=0.8, t_new=T_NEW)
+    breakdown = {
+        "s_llm": 0.73,
+        "s_emb": 0.8123456789,
+        "s_rule": 0.6666666666666666,
+        "weights": {"llm": config.w_llm, "emb": config.w_emb, "rule": config.w_rule},
+    }
+    assert cli.recompute_confidence(breakdown) == combine(
+        0.73, 0.8123456789, 0.6666666666666666, config
+    )
+
+
+def test_forced_path_breakdown_recomputes_to_zero(tmp_path: Path) -> None:
+    """강제 강등 경로(세 신호 0·confidence 0)도 같은 기준으로 통과한다."""
+
+    from app.er.confidence import decide
+    from app.er.types import ERConfig, ScoredCandidate
+
+    config = ERConfig(t_merge=0.8, t_new=T_NEW)
+    candidate = ScoredCandidate(person_id=7, display_name="김도윤", passed_rules=True)
+    decision = decide(judgement=None, passed=[candidate], llm_failed=True, config=config)
+    entry = {
+        "confidence_breakdown": decision.confidence_breakdown,
+        "matched_candidate": cli._matched_candidate([], None),
+    }
+    assert entry["matched_candidate"] is None  # 강제 경로는 귀속 후보가 없다
+    assert cli.check_trace_entry(entry) == 0.0
+
+
+def test_traces_per_scenario_zero_is_rejected(tmp_path: Path) -> None:
+    with pytest.raises(SystemExit):
+        cli.main(
+            [
+                "--dry-run",
+                "--stub",
+                "--traces-per-scenario",
+                "0",
+                "--out",
+                str(tmp_path / "o"),
+            ]
+        )
+
+
+# ---------------------------------------------------------------------------
 # CLI 인자 조합 · 가드 (실행하지 않는다)
 # ---------------------------------------------------------------------------
 
@@ -394,6 +798,67 @@ def test_dry_run_logs_embedded_alias_count_per_scenario(
         embedded = int(line.split("embedded=")[1].split()[0])
         assert aliases == embedded
         assert line.endswith("ok")
+
+
+@pytest.mark.usefixtures("db_engine", "no_provider_factories")
+def test_dry_run_dumps_traces_before_rollback_and_rechecks(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """결정 D(i) 롤백 뒤에는 `agent_traces` 가 없으므로, 덤프가 실행 중에
+    떠져 있어야 한다(01-plan 106·236행)."""
+
+    out_dir = tmp_path / "out"
+    rc = cli.main(["--dry-run", "--stub", "--limit", "2", "--out", str(out_dir)])
+    out = capsys.readouterr().out
+    assert rc == cli.RC_OK
+
+    raw = _raw_files(out_dir)[0]
+    stamp = raw.name[len("raw-") : -len(".jsonl")]
+    traces = out_dir / f"traces-{stamp}.jsonl"
+    assert traces.exists()  # raw 와 같은 stamp
+
+    rows = [json.loads(line) for line in raw.read_text(encoding="utf-8").splitlines() if line]
+    proposed = [row for row in rows if row["method"] == cli.TRACE_DUMP_METHOD]
+    entries = [
+        json.loads(line) for line in traces.read_text(encoding="utf-8").splitlines() if line
+    ]
+    assert len(entries) == len(proposed) > 0
+    assert {e["trace_id"] for e in entries} == {row["trace_id"] for row in proposed}
+    assert all(e["session_id"].startswith("pilot-run-") for e in entries)
+    assert all(e["step"] == "er_resolve" and e["tool_name"] == "er" for e in entries)
+
+    assert f"[traces] dumped={len(entries)} recomputed={len(entries)} max_abs_diff=0.0" in out
+    assert f"path={traces}" in out
+    assert "[fail]" not in out
+
+    # 파일만 들고 다시 돌려도 같은 판정
+    assert cli.main(["--recheck-traces", str(traces)]) == cli.RC_OK
+
+
+@pytest.mark.usefixtures("db_engine", "no_provider_factories")
+def test_dry_run_traces_per_scenario_caps_the_dump(tmp_path: Path) -> None:
+    out_dir = tmp_path / "out"
+    rc = cli.main(
+        [
+            "--dry-run",
+            "--stub",
+            "--limit",
+            "2",
+            "--traces-per-scenario",
+            "3",
+            "--out",
+            str(out_dir),
+        ]
+    )
+    assert rc == cli.RC_OK
+    raw = _raw_files(out_dir)[0]
+    stamp = raw.name[len("raw-") : -len(".jsonl")]
+    lines = [
+        line
+        for line in (out_dir / f"traces-{stamp}.jsonl").read_text(encoding="utf-8").splitlines()
+        if line
+    ]
+    assert len(lines) == 6  # 시나리오 2개 × 3줄
 
 
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")

@@ -1,0 +1,102 @@
+=== U7 선행 보강 -- trace 표본 덤프 재계산 CLI (DB·네트워크 0)
+환경: Docker Desktop 미기동(로컬 PostgreSQL 5433 접속 불가) -- 사슬 층(실 DB) 은 이 세션에서 실행하지 못했다.
+      아래 덤프는 tests/test_run_pilot_eval.py 의 픽스처 _dump() 로 만든 것이고,
+      그 안의 판정은 제품 코드 app.er.confidence.decide() 가 낸 실제 Decision 이다(손으로 적은 숫자가 아니다).
+
+$ python <scratch>/make_dump.py <scratch>/dump
+dump=traces-20260101-000000.jsonl lines=5
+tampered=traces-tampered-confidence.jsonl
+tampered=traces-tampered-sllm.jsonl
+
+=== (1) 정상 덤프 재계산 -- abs diff 0
+$ python scripts/run_pilot_eval.py --recheck-traces <scratch>/dump/traces-20260101-000000.jsonl
+[traces] dumped=5 recomputed=5 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre\dump\traces-20260101-000000.jsonl
+[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+rc=0
+
+=== (2) 부정 -- 3번째 줄 confidence 에 1e-12 더함(허용오차 없음)
+[traces] dumped=5 recomputed=5 max_abs_diff=9.999778782798785e-13 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre\dump\traces-tampered-confidence.jsonl
+[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+[fail] traces: line 3 trace_id=102 sc-001/'김팀장' t_merge=0.6: abs diff=9.999778782798785e-13 != 0 (기록 0.6770370370043333)
+rc=1
+
+=== (3) 부정 -- 3번째 줄 s_llm 을 0.99 로 변조(llm.s_llm 과 어긋남)
+[traces] dumped=5 recomputed=4 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre\dump\traces-tampered-sllm.jsonl
+[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+[fail] traces: line 3 trace_id=102 sc-001/'김팀장' t_merge=0.6: s_llm=0.99 가 llm.s_llm=0.6 과 다르다 (강제 경로가 아닌데 자기보고 점수가 어긋난다)
+rc=1
+
+=== (4) 없는 경로
+[fail] traces: C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\e7d3d49c-fd0f-4260-a0db-ff785530c80e\scratchpad\u7pre\dump\none.jsonl 가 없다
+rc=1
+
+=== (5) 덤프 한 줄(형식·크기) -- 프롬프트·llm.reason 없음
+lines= 5 avg_bytes= 1241
+{
+ "candidate_count": 1,
+ "confidence_breakdown": {
+  "confidence": 0.6270370370033334,
+  "matched_person_id": 7,
+  "rule_checked": 2,
+  "rule_passed": 2,
+  "s_emb": 0.8123456789,
+  "s_llm": 0.5,
+  "s_rule": 0.6666666666666666,
+  "weights": {
+   "emb": 0.3,
+   "llm": 0.5,
+   "rule": 0.2
+  }
+ },
+ "decision": {
+  "T_merge": 0.8,
+  "T_new": 0.3,
+  "action": "ask_identity",
+  "band": "identity",
+  "band_by_threshold": "identity",
+  "forced_reason": null,
+  "matched_person_id": 7,
+  "relaxed_retry": null
+ },
+ "er_version": "1",
+ "gold_person_id": "p1",
+ "llm": {
+  "attempts": 1,
+  "error": null,
+  "model": "stub-judge",
+  "provider": "stub",
+  "s_llm": 0.5,
+  "self_reported": true,
+  "skipped": false,
+  "tokens_in": 11,
+  "tokens_out": 7
+ },
+ "llm_fresh_call": true,
+ "matched_candidate": {
+  "excluded_by": null,
+  "passed_rules": true,
+  "person_id": 7,
+  "relaxed_pass": false,
+  "rule_checked": 2,
+  "rule_passed": 2,
+  "s_emb": 0.8123456789,
+  "s_rule": 0.6666666666666666
+ },
+ "mention": "김팀장",
+ "mention_index": 0,
+ "mention_kind": "gold",
+ "method": "proposed",
+ "row_decision": "merge",
+ "row_person_id": 7,
+ "row_score": 0.8,
+ "scenario_id": "sc-001",
+ "schema_version": 1,
+ "session_id": "pilot-run-abc-sc-001",
+ "step": "er_resolve",
+ "sweep_index": 0,
+ "t_merge": 0.5,
+ "t_new": 0.3,
+ "tool_name": "er",
+ "trace_id": 100,
+ "turn": 0
+}

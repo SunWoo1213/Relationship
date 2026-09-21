@@ -60,14 +60,31 @@ P4 파일럿 평가는 `data/scenarios/` 40건에 다섯 방식(`proposed`·`exa
 
 4. 저장한 파일을 **한 번 읽는다**. 프롬프트 원문·키는 출력에 나가지 않도록 되어 있지만, 저장 전 확인은 사용자 몫이다.
 
-5. 결과 파일을 `reports/` 자리로 옮긴다(에이전트가 해도 된다): `reports/pilot/metrics.json` → `reports/metrics.json` 등. 원시 `reports/pilot/raw-<ts>.jsonl` 은 그대로 둔다(결정 E — 원시 응답이 있어야 지표를 다시 계산할 수 있다).
+5. 결과 파일을 `reports/` 자리로 옮긴다(에이전트가 해도 된다): `reports/pilot/metrics.json` → `reports/metrics.json` 등. 원시 `reports/pilot/raw-<ts>.jsonl` 과 **같은 stamp 의 `reports/pilot/traces-<ts>.jsonl`** 은 그대로 둔다(결정 E — 원시 응답이 있어야 지표를 다시 계산할 수 있다).
+
+## 확신도 재계산 증거 (`traces-<ts>.jsonl`)
+
+결정 D(i) 로 시나리오마다 트랜잭션을 되돌리므로 `agent_traces` 는 **실행이 끝나면 사라진다**. 그래서 실행 중에 제안 방식의 `step='er_resolve' AND tool_name='er'` 행을 `raw-<ts>.jsonl` 과 **같은 stamp** 의 `traces-<ts>.jsonl` 로 덤프하고, 사슬 끝에서 전 줄의 `confidence` 를 `0.5·s_llm + 0.3·s_emb + 0.2·s_rule` 로 다시 계산해 기록값과 비교한다(원칙3·원칙9, 01-plan 106행 판정 표).
+
+```
+[traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=reports/pilot/traces-<ts>.jsonl
+[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+```
+
+- `max_abs_diff` 가 `0.0` 이 아니거나 `[fail] traces:` 줄이 있으면 rc=1 이다(어느 trace 인지 함께 찍힌다). 그 출력을 지우지 않고 그대로 보고한다.
+- 덤프에는 프롬프트 원문·`llm.reason` 자유 서술·키가 들어가지 않는다(security §1).
+- 파일만 들고 나중에 다시 확인할 수 있다(DB·네트워크·키 0):
+  ```bash
+  python scripts/run_pilot_eval.py --recheck-traces reports/pilot/traces-<ts>.jsonl
+  ```
+- 파일이 너무 커지면 `--traces-per-scenario N` 으로 시나리오당 N 줄만 덤프한다(기본은 전량 — 표본을 고르면 판정을 유리하게 만들 여지가 생긴다, 원칙8).
 
 ## 종료 코드
 
 | rc | 뜻 | 할 일 |
 |----|----|-------|
 | 0 | 사슬 완료(runner → metrics → calibration → curve → validate → report) | 산출물 5종과 `[ok]` 줄 확인 |
-| 1 | 단계 실패·단언 위반(임베딩 수 불일치, 행 수 불일치, 스키마 검증 실패 등) | 출력의 `[fail]` 줄을 그대로 에이전트에게 보여 준다. **실패도 결과다** — 출력을 지우지 않는다 |
+| 1 | 단계 실패·단언 위반(임베딩 수 불일치, 행 수 불일치, 스키마 검증 실패, **trace 재계산 abs diff ≠ 0** 등) | 출력의 `[fail]` 줄을 그대로 에이전트에게 보여 준다. **실패도 결과다** — 출력을 지우지 않는다 |
 | 2 | 필요한 키 환경변수가 없다 | 안내된 **이름**을 셸에 넣고 다시 돌린다(값은 이 저장소에 쓰지 않는다) |
 | 3 | 예상 비용이 `--max-cost-usd` 를 넘었다 | 단가를 확인하고, 필요하면 상한을 올리거나 `--limit` 로 범위를 줄인다. **이 경우 한 줄도 실행되지 않았다**(과금 0) |
 
@@ -79,7 +96,8 @@ P4 파일럿 평가는 `data/scenarios/` 40건에 다섯 방식(`proposed`·`exa
 [estimate] cost_usd total=0.0316 (in=… out=… embed=…)
 [estimate] max_cost_usd=5.0
 [run] run_mode=real run_id=run-…  / dataset_hash=sha256:… / commit=…
-[scenario] sc-001 aliases=2 embedded=2 rows=200 ok      ← 40줄(시나리오마다 1줄)
+[scenario] sc-001 aliases=2 embedded=2 rows=200 traces=40 ok   ← 40줄(시나리오마다 1줄)
+[traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=reports/pilot/traces-<ts>.jsonl
 [rows] rows=7050 = mentions=141 × methods=5 × t_merge=10 (expected=7050)
 [run] run_mode=real network_calls=… 
 [run] tokens_in=… tokens_out=… (실행 실측 합계, llm_fresh_call 행만)

@@ -163,3 +163,9 @@
 - 2026-09-18 13:53 | COMMIT | a59ecb4 feat(P4-pilot-eval): U4 곡선·metrics.json·게이트 — 결정 K 지배 판정, --validate, 테스트 55건
 - 2026-09-18 14:16 | COMMIT | dd6a996 feat(P4-pilot-eval): U5 리포트 생성기 — metrics.json 단일 입력·멱등 eval.md, 테스트 42건
 - 2026-09-21 13:00 | DECISION | 재개(사용자): 미커밋 HANDOFF·journal 은 U6 커밋에 포함 / 스모크 03·08 미실행 — 결정 I 순서 변경(U6 먼저, 스모크는 U7 전) / U6 eval-agent 위임 승인(L-004) | P4-pilot-eval
+- 2026-09-21 13:33 | COMMIT | 0283ac0 feat(P4-pilot-eval): U6 실행 CLI·dry-run·비용 가드 — 사슬 6단계·네트워크 0, 테스트 35건
+- 2026-09-21 13:48 | STOP | 사용자 요청 중지. U6 0283ac0 완료. 스모크 03 시도 rc=2(세션에 OPENAI_API_KEY 없음, 호출 0). U7 선행 보강(er_resolve trace 표본 덤프) 미착수 — 재개 시 위임 여부부터 묻는다 | P4-pilot-eval
+- 2026-09-21 18:30 | DECISION | 재개(사용자): U7 선행 보강(er_resolve trace 표본 덤프·재계산 diff 0) eval-agent 위임 승인(L-004) / 스모크 03·08·U7 실 실행 방식은 보강 커밋 뒤 결정 / F-95c6a7·F-0ffff5 [권고] 보류(done 때 verifier) | P4-pilot-eval
+- 2026-09-21 19:05 | BLOCKED | U7 선행 보강 코드·테스트(+19) 완료·미커밋. Docker 꺼짐 → DB 의존 7건 skip·스텁 사슬 traces 검증 미실행(47 passed/7 skipped). 신규 쟁점: pre-commit 5MB vs 결정 E(raw 7.4MB). 사용자에게 Docker 기동·결정 요청 | P4-pilot-eval
+- 2026-09-21 19:12 | VERIFY | U7 선행 보강 DB 검증(Docker 기동 후): test_run_pilot_eval 54 passed/skip 0 · 스텁 사슬 rc=0 [traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 (evidence 20260921-1903-u7pre-*) | P4-pilot-eval
+- 2026-09-21 19:12 | DECISION | 사용자: 원시 raw JSONL(스텁 실측 7.4MB) 은 gzip 으로 커밋 — 결정 E 유지, pre-commit 5MB 훅 변경 없음. 도구 .gz 입력 지원은 U7 전 별도 단위 | P4-pilot-eval
