@@ -72,7 +72,7 @@
 | P1 | 파일럿 데이터셋 | **완료** — 40건·5범주(승진 8/별칭 8/대명사 8/일반 10/신규 6), `schema_version` 2, `validate_scenarios --strict` rc=0, 라벨 검수 verifier 40/40·사용자 12/12, verifier 04-review 완료(5cac9bf) |
 | P2 | 툴 7종 v2 + FastAPI 골격 | **완료** — 시그니처 = CLAUDE.md(tools_check 7/7), ask_user→pending_questions, D1 확인 강제, GET /health·POST /answers, pytest 206, verifier 04-review 완료 |
 | P3 | 엔티티 해석 4단계 · 베이스라인 | **ER 완료(verifier 04-review 완료) · 베이스라인 3종 완료(verifier 04-review 완료)** — ER 4단계(app/er) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity), 판정기 공급자 중립(Claude·OpenAI·Gemini, `LLM_PROVIDER`·등록표 `JUDGES`·활성 스위치 `LLM_PROVIDERS_ENABLED`, D11). 베이스라인은 `evaluation/` 다섯 방식(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`)이 같은 함수·같은 인자로 호출 가능(parity 46건, 부수효과 0), pytest 917 |
-| P4 | **파일럿 평가(게이트)** — 여기서 임계치·보정표 확정 | 대기 |
+| P4 | **파일럿 평가(게이트)** — 여기서 임계치·보정표 확정 | **실 실행 완료 · 게이트 미달**(2026-09-22, openai gpt-4o-mini-2024-07-18 + text-embedding-3-small, 40건·7050행, $0.027) — `T_merge` 0.8 에서 제안 방식 오병합 1/132·미검출 1/132·ask_user(identity) 59.8% vs `embedding_only` 0·1·23.5% → 지배됨(D10 방향은 통과). 원칙8 대로 재실행하지 않고 `reports/failure_cases.md`(원인: 2단계 규칙 필터 배제 6건 + 4단계 미측정 `s_rule`=0 합산으로 확신도 상한 0.80)를 남겼다. 다음: verifier 04-review(부분완료) → `/devlog change`(S3.3 재설계 후보 2) |
 | P5~P9 | 에이전트 루프 · 메모리 · 브리핑 · 푸시 · 프론트 · 인프라 | P4 통과 후 |
 
 최신 상태는 `docs/wiki/HANDOFF.md`(지금 어디, 다음 무엇)와 `docs/wiki/journal.md`(시간순)에 있다.
@@ -326,6 +326,29 @@ python scripts/baseline_smoke.py --provider gemini   # GEMINI_API_KEY·GEMINI_MO
   환경변수 이름은 제안 방식과 같다 — `LLM_PROVIDER`·`ANTHROPIC_MODEL`·`OPENAI_MODEL`·`GEMINI_MODEL`과 키 이름 `ANTHROPIC_API_KEY`·`OPENAI_API_KEY`·`GEMINI_API_KEY`(값은 이 문서에도 `.env`에도 의존하지 않는다. 셸 환경에만 둔다). 세 공급자는 같은 등록표(D11 `JUDGES`)와 활성 스위치 `LLM_PROVIDERS_ENABLED`를 `judge.py`에서 재사용한다(표를 두 벌 두지 않는다). 종료 코드는 **2 = 키 없음**(이름만 안내), **3 = LLM 호출·응답 오류**이며, 출력 JSON 한 줄에는 프롬프트 **길이와 인물 수**만 들어간다(프롬프트 원문·키는 어떤 경우에도 출력하지 않는다).
 
 이 절은 **인터페이스까지**다. 밴드 분포·정답률·오병합률·트레이드오프 곡선은 P4-pilot-eval이 이 다섯 이름으로 측정해 `reports/metrics.json`에 남긴다 — 여기서 수치를 말하지 않는 이유는 재현 가능한 수치만 리포트에 넣기 위해서다(불변 원칙 8).
+
+### 파일럿 평가 실행법 (P4)
+
+`scripts/run_pilot_eval.py` 하나가 사슬 전체를 돈다 — runner(40 시나리오 × 5방식 × `T_merge` 10점 → 원시 JSONL) → metrics → calibration → curve → validate → report. 임계치 10점은 같은 LLM 응답을 재사용하므로 LLM 호출은 mention 당 방식별 1회다(`proposed`·`llm_single` 만 LLM 을 부른다).
+
+```bash
+# 1) 비용 추정만 (네트워크·DB 0, 키 불필요)
+PYTHONIOENCODING=utf-8 python scripts/run_pilot_eval.py --dry-run --stub --estimate-only
+
+# 2) 사슬 전체를 스텁으로 (네트워크 0, DB 필요) — 산출물은 임시 디렉터리에
+POSTGRES_PORT=5433 PYTHONIOENCODING=utf-8 python scripts/run_pilot_eval.py --dry-run --stub --out <tmp>
+
+# 3) 실 실행 (키를 실은 셸에서 한 번만 — 절차는 docs/user-setup/10-pilot-eval-run.md)
+POSTGRES_PORT=5433 PYTHONIOENCODING=utf-8 python scripts/run_pilot_eval.py --out reports/pilot --commit "$(git rev-parse HEAD)" --max-cost-usd 5
+
+# 4) 커밋된 원시 파일 하나로 지표 재계산 (원칙8) / trace 확신도 재계산
+PYTHONUTF8=1 python -m evaluation.metrics --rows reports/pilot/raw-<ts>.jsonl.gz --out <tmp>/metrics.json
+python scripts/run_pilot_eval.py --recheck-traces reports/pilot/traces-<ts>.jsonl
+```
+
+환경변수는 **이름**만 적는다: `OPENAI_API_KEY`(필수 — 판정과 임베딩 `text-embedding-3-small` 이 같은 키), `OPENAI_MODEL`(선택, 기본 `gpt-4o-mini`), `POSTGRES_PORT`(로컬 컨테이너 5433). `.env` 는 스크립트가 읽지 않으며 키가 없으면 rc=2 로 이름만 안내한다. `DATABASE_URL` 이 환경에 있으면 `POSTGRES_PORT` 보다 우선하므로 포트가 어긋나면 그쪽을 맞춘다(`app/config.py`). Windows 에서 JSON 을 읽는 한 줄 명령은 `PYTHONUTF8=1` 을 앞에 둔다.
+
+산출물: `reports/pilot/raw-<ts>.jsonl.gz`(원시 판정, 결정적 gzip — 평문은 커밋하지 않는다) · `reports/pilot/traces-<ts>.jsonl`(er_resolve trace 전량) · `reports/metrics.json`(`gate` 포함) · `reports/calibration.json` · `reports/curve.csv` · `reports/eval.md`(멱등) · `reports/cost_estimate.md`(실측 토큰·150건 외삽) · `reports/failure_cases.md`(미달 시 실패 케이스 분석). 게이트 판정은 `metrics.json.gate`(결정 K: `T_merge` 0.8 에서 어떤 베이스라인도 제안 방식을 지배하지 않고 곡선이 D10 방향) 한 곳에서만 내리고, 미달이면 같은 설정으로 다시 돌리지 않는다.
 
 ## 문서 안내
 

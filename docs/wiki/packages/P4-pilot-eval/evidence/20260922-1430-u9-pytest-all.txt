@@ -1,0 +1,17 @@
+# U9 전체 pytest — 2026-09-22 15:05:13 HEAD ea1bbb2
+[stage] validate: rc=0
+[stage] report: python -m evaluation.report --metrics C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\metrics.json --out C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\eval.md
+[stage] report: rc=0
+[out] C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\raw-20260922-060827.jsonl (197879 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\raw-20260922-060827.jsonl.gz (4826 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\traces-20260922-060827.jsonl (50051 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\metrics-stage.json (179753 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\metrics.json (178934 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\calibration.json (7969 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\curve.csv (6693 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\eval.md (18019 bytes)
+[size] C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\raw-20260922-060827.jsonl.gz 4826 bytes limit=5242880 ok
+[size] C:\Users\swsj1\AppData\Local\Temp\pytest-of-swsj1\pytest-230\test_dry_run_leaves_no_rows_an0\o\traces-20260922-060827.jsonl 50051 bytes limit=5242880 ok
+[ok] 사슬 완료 -- runner → metrics → calibration → curve → validate → report
+2 failed, 1283 passed in 199.03s (0:03:19)
+pytest rc=1

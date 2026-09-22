@@ -1,0 +1,51 @@
+# U9 dry-run 재실행(스텁·네트워크 0) — 2026-09-22 15:08:39 HEAD ea1bbb2
+[estimate] run_mode=stub scenarios=40 mentions=141
+[estimate] llm_calls total=282 proposed=141 llm_single=141 (결정 C(i): 임계치 10점은 같은 응답을 재사용한다)
+[estimate] tokens_in=120100 tokens_out=22560 embed_texts=105 embed_tokens=204
+[estimate] 가정 chars_per_token=1.5 output_tokens_per_call=80 (실측 아님 -- U7 의 tokens_in/out 합계로만 실측이 된다)
+[estimate] price_per_1m in=0.15 out=0.6 embed=0.02
+[estimate] price_source=OpenAI 공개 가격표의 gpt-4o-mini(in $0.15 / out $0.60 per 1M)와 text-embedding-3-small($0.02 per 1M) 기록값 -- 저장소에 적어 둔 오프라인 상수이며 이 실행은 가격표를 조회하지 않았다. 기준일·현재가는 실행자가 확인하고 --price-in/--price-out/--price-embed 로 덮어쓴다
+[estimate] cost_usd total=0.0316 (in=0.0180 out=0.0135 embed=0.0000)
+[estimate] max_cost_usd=5.0
+[run] run_mode=stub run_id=run-b30312de33e0
+[run] dataset_hash=sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e
+[run] dataset_hash_method=sorted(data/scenarios/*.json) 의 파일명+내용 sha256
+[run] commit=ea1bbb20d416c69e7a72d550acf16f44407e7868
+[run] out=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9
+[stage] runner: run_pilot(scenarios=40, methods=5, grid=10)
+[traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\traces-20260922-060841.jsonl
+[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+[rows] rows=7050 = mentions=141 × methods=5 × t_merge=10 (expected=7050)
+[rows] proposed=1410
+[rows] exact_raw=1410
+[rows] exact_norm=1410
+[rows] embedding_only=1410
+[rows] llm_single=1410
+[rows] raw=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\raw-20260922-060841.jsonl
+[gzip] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\raw-20260922-060841.jsonl.gz 161630 bytes (평문 7404682 bytes, level=9, mtime=0·파일명 미기록)
+[gzip] roundtrip_sha256=65239451f5ee1b405df8b22d4efb46d6775001a474b50c8356e9910b8d1d0443 ok plain=보존 -- 이후 단계 입력은 압축본이다
+[run] run_mode=stub network_calls=0 stub_llm_calls=277 stub_embed_calls=62
+[run] tokens_in=0 tokens_out=0 (실행 실측 합계, llm_fresh_call 행만 -- 스텁은 토큰을 세지 않으므로 0 이다)
+[stage] metrics: python -m evaluation.metrics --rows C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\raw-20260922-060841.jsonl.gz --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\metrics-stage.json
+[stage] metrics: rc=0
+[stage] calibration: python -m evaluation.calibration --rows C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\raw-20260922-060841.jsonl.gz --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\calibration.json --t-merge 0.8 --model-configured stub=stub-judge
+[stage] calibration: rc=0
+[stage] curve: python -m evaluation.curve --rows C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\raw-20260922-060841.jsonl.gz --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\metrics.json --curve C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\curve.csv --dataset-hash sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e --run-id run-b30312de33e0 --embedding-model stub-embedding --model-configured stub=stub-judge --run-mode stub --commit ea1bbb20d416c69e7a72d550acf16f44407e7868
+[stage] curve: rc=0
+[stage] validate: python -m evaluation.metrics --validate C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\metrics.json
+OK C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\metrics.json
+[stage] validate: rc=0
+[stage] report: python -m evaluation.report --metrics C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\metrics.json --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\eval.md
+[stage] report: rc=0
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\raw-20260922-060841.jsonl (7404682 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\raw-20260922-060841.jsonl.gz (161630 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\traces-20260922-060841.jsonl (1739409 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\metrics-stage.json (288453 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\metrics.json (282117 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\calibration.json (8436 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\curve.csv (8621 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\eval.md (19994 bytes)
+[size] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\raw-20260922-060841.jsonl.gz 161630 bytes limit=5242880 ok
+[size] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\8c63cf5b-1905-457f-b7ae-6a61e0e5cb58\scratchpad\pilot-dry-u9\traces-20260922-060841.jsonl 1739409 bytes limit=5242880 ok
+[ok] 사슬 완료 -- runner → metrics → calibration → curve → validate → report
+dry-run rc=0

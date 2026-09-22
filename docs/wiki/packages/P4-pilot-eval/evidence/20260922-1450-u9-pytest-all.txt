@@ -1,0 +1,3 @@
+# U9 전체 pytest 재실행(테스트 전제 결함 2건 수정 후) — 2026-09-22 15:20:34 HEAD ea1bbb2 + 작업 트리 tests/test_run_pilot_eval.py 수정
+[32m[32m[1m1285 passed[0m[32m in 192.96s (0:03:12)[0m[0m
+pytest rc=0

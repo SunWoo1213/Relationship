@@ -134,8 +134,9 @@ P4 파일럿 평가는 `data/scenarios/` 40건에 다섯 방식(`proposed`·`exa
 - `docs/wiki/packages/P4-pilot-eval/evidence/<ts>-u7-real-run.txt` 가 존재하고 비어 있지 않다.
 - 판정 명령:
   ```bash
-  python -c "import json;m=json.load(open('reports/metrics.json'))['meta'];print(m['provider'],m['model'],m['embedding_model'],m['run_mode'],m['commit'])"
+  PYTHONUTF8=1 python -c "import json;m=json.load(open('reports/metrics.json'))['meta'];print(m['provider'],m['model'],m['embedding_model'],m['run_mode'],m['commit'])"
   ```
+  (`PYTHONUTF8=1` 은 Windows cp949 로케일에서 `open()` 이 UTF-8 JSON 을 읽다 `UnicodeDecodeError` 를 내는 것을 막는다 — 2026-09-22 실측.)
   → `run_mode` 가 `real` 이고 `provider`/`model` 이 `stub`·`fake` 가 아니어야 한다.
 - 같은 설정으로 **두 번 돌리지 않는다**. 수치가 마음에 들지 않아 다시 돌리는 것이 게이트 패키지의 가장 흔한 위반이다(원칙8) — 미달이면 재실행이 아니라 `reports/failure_cases.md`(U8)로 간다.
 

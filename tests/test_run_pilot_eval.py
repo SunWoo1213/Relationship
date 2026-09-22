@@ -847,14 +847,29 @@ def test_real_mode_without_keys_returns_2(
     assert not (tmp_path / "real").exists()
 
 
+def _reports_snapshot() -> dict[str, tuple[int, int]]:
+    """`reports/` 아래 모든 파일의 (크기, mtime_ns). dry-run 전후 비교용 -- U7 이후 `reports/`
+    에는 실 실행 산출물(결정 E)이 커밋되어 있으므로 "존재하지 않는다"가 아니라 "바뀌지 않았다"
+    를 단언한다."""
+    root = REPO_ROOT / "reports"
+    if not root.exists():
+        return {}
+    return {
+        str(path.relative_to(root)): (path.stat().st_size, path.stat().st_mtime_ns)
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }
+
+
 def test_stub_output_cannot_land_in_reports(capsys: pytest.CaptureFixture[str]) -> None:
+    before = _reports_snapshot()
     rc = cli.main(
         ["--dry-run", "--stub", "--limit", "1", "--out", str(REPO_ROOT / "reports" / "pilot")]
     )
     out = capsys.readouterr().out
     assert rc == cli.RC_ERROR
     assert "reports/" in out
-    assert not (REPO_ROOT / "reports" / "pilot").exists()
+    assert _reports_snapshot() == before  # 거부됐으므로 reports/ 에 새 파일도, 변경도 없다
 
 
 # ---------------------------------------------------------------------------
@@ -1071,8 +1086,9 @@ def test_dry_run_leaves_no_rows_and_no_reports_files(tmp_path: Path) -> None:
     engine = get_engine()
     with engine.connect() as connection:
         before = connection.execute(select(func.count()).select_from(Person)).scalar_one()
+    reports_before = _reports_snapshot()
     assert cli.main(["--dry-run", "--stub", "--limit", "1", "--out", str(tmp_path / "o")]) == 0
     with engine.connect() as connection:
         after = connection.execute(select(func.count()).select_from(Person)).scalar_one()
     assert after == before  # 결정 D(i) 롤백 -- 평가는 아무것도 커밋하지 않는다
-    assert not (REPO_ROOT / "reports" / "metrics.json").exists()
+    assert _reports_snapshot() == reports_before  # --out 이 tmp 이므로 reports/ 는 그대로
