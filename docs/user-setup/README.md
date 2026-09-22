@@ -8,14 +8,14 @@
 
 | # | 카드 | 언제 필요한가 | 상태 | 관련 |
 |---|------|-------------|------|------|
-| 01 | [환경변수·API 키(.env)](01-env-keys.md) | 로컬 DB 기동 시(DB 4개), 실 LLM 호출 시(키), P4 파일럿 평가 전 | DB 값 완료(5433) · LLM/임베딩 키 **미입력** | `.env.example`, `docs/wiki/security.md` §1 |
+| 01 | [환경변수·API 키(.env)](01-env-keys.md) | 로컬 DB 기동 시(DB 4개), 실 LLM 호출 시(키), P4 파일럿 평가 전 | DB 값 완료(5433) · OpenAI 키 **입력 완료**(스모크 03·08 rc=0, 사용자 셸 `.env` 로드) · Anthropic/Gemini 키 미입력(선택) | `.env.example`, `docs/wiki/security.md` §1 |
 | 02 | [AWS Budgets 비용 알림](02-aws-budgets.md) | **첫날 필수** — 아직 미완. 실서버 배포(P9) 전에는 반드시 | **미완** | `docs/backlog.md` 13행, `SERVER-CHECKLIST.md` 0-5 |
-| 03 | [ER 실호출 스모크](03-er-smoke.md) | 키를 넣은 뒤 아무 때나. P4 전에 한 번 | **미실행**(F-87c597 열림) | `docs/wiki/packages/P3-er/05-remediation.md` F-87c597 |
+| 03 | [ER 실호출 스모크](03-er-smoke.md) | 키를 넣은 뒤 아무 때나. P4 전에 한 번 | **완료 2026-09-21**(openai gpt-4o-mini, confidence 0.8384 merge — F-87c597 해소; anthropic·gemini 선택 미실행) | `docs/wiki/packages/P3-er/05-remediation.md` F-87c597 |
 | 04 | [로컬 DB(Docker)](04-local-db.md) | 테스트·ER 회귀 실행 전 | 완료(컨테이너 capstone2-postgres-1, 호스트 포트 5433) | `README.md` "로컬 DB" |
 | 05 | [실서버·배포 비밀(SSM·VAPID·GitHub)](05-server-secrets.md) | P7(웹푸시)·P9(Terraform/Actions) 착수 시 | 해당 없음(P9 전) | `SERVER-CHECKLIST.md` §0·§4, `docs/wiki/decisions/D07-tls-caddy.md` |
 | 06 | [하네스 승인 결정(무엇을 물어보는가)](06-approval-decisions.md) | 매 세션 | 상시 | `docs/wiki/lessons/`, `.claude/skills/commit` |
 | 07 | [데모 리허설(P11)](07-demo-rehearsal.md) | P9 배포 후 | 해당 없음 | `docs/backlog.md` 74행, `README.md` "데모 시나리오" |
-| 08 | [베이스라인 3 실 LLM 스모크](08-baseline-smoke.md) | 키를 넣은 뒤. **P4 파일럿 평가 전에 한 번**(03 카드와 같은 시점) | **미실행** | `scripts/baseline_smoke.py`, `README.md` "베이스라인 3종 실행법" |
+| 08 | [베이스라인 3 실 LLM 스모크](08-baseline-smoke.md) | 키를 넣은 뒤. **P4 파일럿 평가 전에 한 번**(03 카드와 같은 시점) | **완료 2026-09-22**(openai gpt-4o-mini, identity·llm_error None — `P3-baselines/evidence/20260922-1309-baseline-smoke-real.txt`) | `scripts/baseline_smoke.py`, `README.md` "베이스라인 3종 실행법" |
 | 09 | [AWS 배포 가이드라인(몇 명 규모)](09-aws-deploy.md) | P9 착수 전 §2 결정 10개 확정, 4.0 은 지금(Budgets·도메인·SSO 프로필·GitHub prod 환경) | **미착수**(P9 전) | `SERVER-CHECKLIST.md`, `05-server-secrets.md`, `docs/wiki/decisions/D07-tls-caddy.md` |
 | 10 | [파일럿 평가 실 실행(P4 U7)](10-pilot-eval-run.md) | 03·08 스모크를 끝낸 뒤 **한 번**. 40건 × 5방식 실 LLM·실 임베딩 | **미실행**(P4 U7) | `scripts/run_pilot_eval.py`, `reports/cost_estimate.md`, `docs/wiki/packages/P4-pilot-eval/01-plan.md` |
 

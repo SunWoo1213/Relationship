@@ -93,9 +93,17 @@
 - 남은 것 · 다음 단위: 스모크 03·08(OpenAI) + U7 실 실행 — 키 필요, 실행 방식 사용자 결정. 커밋 대상 = `raw-<ts>.jsonl.gz` + `traces-<ts>.jsonl`
 - Refs: P4-pilot-eval S3.7 원칙8
 
-## 2026-09-22 · docs(P4-pilot-eval): 스모크 03 실호출 증거 등재 — OpenAI 경로 첫 실호출(F-87c597 1/3) · pending
+## 2026-09-22 · docs(P4-pilot-eval): 스모크 03 실호출 증거 등재 — OpenAI 경로 첫 실호출(F-87c597 1/3) · 2ebf061
 - 변경: `packages/P3-er/evidence/20260921-2011-er-smoke-real.txt`(신규, 319 bytes — 사용자가 2026-09-21 20:11 본인 셸에서 `!` 접두로 스모크 카드 03 `--provider openai` 실행, 출력 그대로), 이 로그(직전 항목 `pending`→`1c84d35`), HANDOFF·journal(VERIFY 줄). 코드·`reports/`·`.claude/` 변경 **0**
 - 이유(카드 연결): F-87c597(P3-er, R4 "실호출로 검증된 공급자 0/3") — 첫 실호출. 스모크 카드 03 이 지정한 명령을 사용자가 직접 돌렸고(사용자 결정 2026-09-21: 에이전트는 실 실행을 돌리지 않는다, `.env` 는 사용자 셸이 로드), 결과 파일을 에이전트가 이관만 했다. 실측: `provider=openai model=gpt-4o-mini-2024-07-18 tokens_in=410 tokens_out=48 s_llm=0.9 matched_person_id=1 confidence=0.8384 band=merge` rc=0 — 0.5·0.9 + (0.3·s_emb + 0.2·s_rule) = 0.8384 로 3신호 결합식(원칙3)이 실 응답에서도 재현됐고 `≥ T_merge 0.8` → merge(원칙2). 키 문자열 미혼입(파일 전문 319 bytes)
 - 한계(원칙8 — 있는 그대로): `reason` 필드는 사용자 셸(cp949 콘솔) 이중 인코딩으로 원문 복구 불가(utf-8·cp949 양쪽 decode 모두 치환문자). 수치 필드는 온전하다. 증거 파일은 고치지 않는다(증거 원문 보존). **스모크 08·U7 은 `PYTHONIOENCODING=utf-8` 을 앞에 붙여 실행**해야 같은 손실이 없다 — 안내 명령에 반영
 - 남은 것 · 다음 단위: (1) 스모크 08(OpenAI 경로, 사용자 셸) → evidence 이관 (2) U7 실 실행(`docs/user-setup/10-pilot-eval-run.md`) → `reports/pilot/raw-<ts>.jsonl.gz`·`traces-<ts>.jsonl`·`metrics.json` 커밋(평문 raw 제외), F-87c597 evidence 이관, `cost_estimate.md` §3·§4 실측, 판정 표 (3) 미달이면 재실행 금지 → U8
 - Refs: P4-pilot-eval P3-er F-87c597 R4 D11 원칙2 원칙3 원칙8 원칙9
+
+## 2026-09-22 · docs(P4-pilot-eval): 스모크 08 실호출 등재·03·08 결과 P4 이관 — F-87c597 해소·R4 실호출 확인(결정 I(i) 완료) · pending
+- 변경: `P3-baselines/evidence/20260922-1309-baseline-smoke-real.txt`(신규 333B — 사용자가 본인 셸에서 `set -a; . ./.env; set +a; PYTHONIOENCODING=utf-8 python scripts/baseline_smoke.py` 실행, rc=0), P4 `evidence/20260921-2011-smoke03-er-real.txt`·`20260922-1309-smoke08-baseline-real.txt`(원본 복사, 인계 13)·`20260922-1320-u6-smoke-handover.txt`(카드 03·08 판정 명령 출력·키 혼입 grep 0), `P3-er/05-remediation.md` F-87c597 `열림`→`해소`(해결 단계 1 완료·재검증 파일·영향 확인), `review-index.md` R4 "실호출 미검증"→"실호출 확인(openai)", `P3-baselines/04-review.md` 행 132 후속·§7 인계 5·13 이관 표기, `docs/user-setup/README.md` 01·03·08 상태 열, 이 로그(직전 항목 `pending`→`2ebf061`), HANDOFF·journal. 코드·`reports/`·`data/` 변경 **0**
+- 이유(카드 연결): 01-plan 결정 I(i) "U6 전에 03·08 카드를 사용자가 1회씩 실행하고 evidence 로 남긴 뒤 U7" — 두 스모크 모두 rc=0 으로 **결정 I(i) 충족, U7 선행 조건 완료**. 카드 03 §"끝난 뒤"(F-87c597 닫기·R4 갱신)와 카드 08 §"끝난 뒤"(04-review·P4 evidence·README 상태)를 그대로 이행. 실측(08): `provider=openai model=gpt-4o-mini-2024-07-18 decision=identity person_id=None score=0.7 candidates=[1,3] forced_reason=None llm_error=None tokens_in=551 tokens_out=57 prompt_chars=873 person_count=3` — 구조화 출력 스키마를 실 API 가 그대로 받았고(`schema` 강등 없음), P4 인계 5 "베이스라인 3 을 어느 모델로" = 제안 방식(03)과 **같은 모델** gpt-4o-mini-2024-07-18
+- 관찰(n=1, 해석하지 않는다 — 원칙8): 같은 mention "부장님"·같은 모델에서 제안 방식(03)은 `s_llm 0.9 → confidence 0.8384 → merge(인물 1)`, 베이스라인 3(08)은 `s_llm 0.7 → identity`(후보 [1,3] 사이에서 물음). 사전 상태가 다르므로(03: DB 시드 / 08: 메모리 3명) 비교가 아니다. 방향·실패 유형은 U7 40건이 말한다
+- 첫 시도(13:08)는 rc=2(`!` 셸에 키 미로드 — 새 셸마다 `.env` 재로드 필요) → 안내문 203B 파일은 실 결과가 아니라 삭제. 스모크 03 evidence 는 유효 UTF-8 이나 `reason` 내용이 사용자 셸 cp949 콘솔 mojibake(U+FFFD 포함) — 08 은 `PYTHONIOENCODING=utf-8` 로 온전. U7 명령(카드 10)에는 이미 그 접두가 있다
+- 남은 것 · 다음 단위: **U7 실 실행**(사용자 셸, 카드 10 — Docker 5433 필요, `--max-cost-usd 5`, `.env` 로드 접두 필요) → `reports/pilot/raw-<ts>.jsonl.gz`·`traces-<ts>.jsonl`·`metrics.json` 커밋, `cost_estimate.md` §3·§4 실측, 판정 표 99·102·104·106·108행 evidence → 미달이면 재실행 금지 → U8. F-87c597 은 해소했으나 anthropic·gemini 실호출은 여전히 0(선택 사항)
+- Refs: P4-pilot-eval P3-er P3-baselines F-87c597 R4 D11 S3.3 원칙2 원칙3 원칙8 L-004

@@ -1,0 +1,1 @@
+{"provider": "openai", "model": "gpt-4o-mini-2024-07-18", "tokens_in": 410, "tokens_out": 48, "s_llm": 0.9, "matched_person_id": 1, "reason": "부장님은 직장에서의 상사를 지칭하는 표현으로, 김민수가 부장직에 해당할 수 있기 때문에 맞는다.", "confidence": 0.8384, "band": "merge"}

@@ -752,7 +752,7 @@ WARN  결정 3-c(b) null 경로의 파이프라인 테스트가 U6 목록·판�
 - 재현: `POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -rs -k null_path` → 1 passed(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-pytest-k-null_path.txt`). 해결 단계의 `-k no_matched` 는 이름과 매치되지 않으므로 `-k null_path` 로 읽는다. 변이 D(null 분기를 첫 통과 후보 귀속으로 우회) → 스윕·decide·파이프라인 3건 실패(`docs/wiki/packages/P3-er/evidence/20260906-1439-review-mutation.txt`).
 
 ## F-87c597 · [권고] R4 실호출 미검증 — er_smoke 실 API evidence 파일이 없다(evidence/ 에 *er-smoke-real* 0건). claude-sonnet-5 모델 id·Anthropic 도구 정의의 strict=True·usage 필드명은 스텁(test_er_judge.py 36건)으로만 확인됐다. review-index R4 는 "구현완료(스텁 검증)·실호출 미검증" 으로 표기하고, 사용자가 키를 넣어 1회 실행한 출력을 evidence/<ts>-er-smoke-real.txt 로 남긴 뒤에만 "실호출 확인" 으로 바꿀 것
-상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+상태: 해소 | 발견: 2026-09-06 (review-impl) | 해소: 2026-09-21 사용자 스모크 03 실행(openai) · 2026-09-22 등재(review-index R4 "실호출 확인", 2ebf061 + 이번 커밋). anthropic·gemini 경로는 여전히 실호출 0 — 이 소견의 요구(1회 실행 evidence)는 충족, 나머지 공급자는 선택 사항(카드 03 2·3번)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -767,14 +767,14 @@ WARN  R4 실호출 미검증 — er_smoke 실 API evidence 파일이 없다(evid
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | 사용자가 셸에서 `ANTHROPIC_API_KEY=… python scripts/er_smoke.py > docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt`(또는 `--provider openai`)를 1회 실행. 실패(rc 3, `{"error": ...}`)도 결과다 — 그 출력을 그대로 evidence 로 남기고 04-review §4 R4 (ii) 줄을 갱신. 이 패키지 닫기의 전제 조건은 아니다(01-plan 121행 규약) | `test -s docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt && python -c "import json,sys; d=json.load(open(sys.argv[1],encoding='utf-8')); print(sorted(d))" <그 파일>` | 9키(`provider model tokens_in tokens_out s_llm matched_person_id reason confidence band`) 또는 `error` 1키 — 어느 쪽이든 review-index R4 표기를 그에 맞게 갱신 | 대기 |
+| 1 | 사용자가 셸에서 `ANTHROPIC_API_KEY=… python scripts/er_smoke.py > docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt`(또는 `--provider openai`)를 1회 실행. 실패(rc 3, `{"error": ...}`)도 결과다 — 그 출력을 그대로 evidence 로 남기고 04-review §4 R4 (ii) 줄을 갱신. 이 패키지 닫기의 전제 조건은 아니다(01-plan 121행 규약) | `test -s docs/wiki/packages/P3-er/evidence/<ts>-er-smoke-real.txt && python -c "import json,sys; d=json.load(open(sys.argv[1],encoding='utf-8')); print(sorted(d))" <그 파일>` | 9키(`provider model tokens_in tokens_out s_llm matched_person_id reason confidence band`) 또는 `error` 1키 — 어느 쪽이든 review-index R4 표기를 그에 맞게 갱신 | 완료(2026-09-21 사용자 `--provider openai` rc=0 → `evidence/20260921-2011-er-smoke-real.txt` 319B, 판정 명령 출력 9키 일치: openai gpt-4o-mini-2024-07-18 · tokens 410/48 · s_llm 0.9 · confidence 0.8384 · merge. `reason` 텍스트는 사용자 셸 cp949 콘솔 mojibake — 수치 온전. 재현: `P4-pilot-eval/evidence/20260922-1320-u6-smoke-handover.txt`) |
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P3-er` (계획 단계면 `verify-plan.sh P3-er`)
-- 결과 파일(evidence/): docs/wiki/packages/P3-er/evidence/20260906-1439-review-sdk-shape.txt, docs/wiki/packages/P3-er/evidence/20260906-1439-review-tools-alembic-scripts.txt
+- 결과 파일(evidence/): docs/wiki/packages/P3-er/evidence/20260906-1439-review-sdk-shape.txt, docs/wiki/packages/P3-er/evidence/20260906-1439-review-tools-alembic-scripts.txt, **docs/wiki/packages/P3-er/evidence/20260921-2011-er-smoke-real.txt**(실호출)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음(D3·R4 — 코드 구조는 검증 완료, 실호출 증거만 부재)
+- 관련 카드(D/S/원칙)와 충돌: 없음(D3·R4 — 코드 구조는 검증 완료, 실호출 증거는 2026-09-21 확보. 실 응답에서 원칙3 결합식 0.5·0.9+… = 0.8384, 원칙2 `≥ T_merge 0.8` → merge 재현)
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-46f1eb · [권고] tests/test_er_judge.py 505·526행이 더미 키를 "sk-test-dummy" 문자열로 setenv 한다 — U2·U8 이 secret-guard 때문에 채택한 _FAKE_KEY_MARKER 규약(sk- 접두 금지)과 불일치, 비밀 스캐너 오탐 원인. 같은 마커로 통일할 것(동작 변화 없음)

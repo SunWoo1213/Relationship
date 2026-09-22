@@ -1,0 +1,20 @@
+# 사용자 스모크 03·08 결과 이관 (P3-baselines 04-review §7 인계 5·13, P4 01-plan U6 70행, 결정 I(i)) — 2026-09-22
+# 실행 주체: 사용자(본인 셸, .env 로드, 에이전트 미독). 에이전트는 파일 복사·판정 명령만 실행.
+
+## 스모크 03 (scripts/er_smoke.py --provider openai, 2026-09-21 20:11) → evidence/20260921-2011-smoke03-er-real.txt (원본 P3-er/evidence/20260921-2011-er-smoke-real.txt)
+$ python -c "import json,sys; d=json.load(open(sys.argv[1],encoding='utf-8')); print(sorted(d))" <파일>   # 카드 03 원문 명령
+['band', 'confidence', 'matched_person_id', 'model', 'provider', 'reason', 's_llm', 'tokens_in', 'tokens_out']
+$ 같은 명령 + errors='replace'   # reason 필드 cp949 이중 인코딩(사용자 셸 콘솔) — 수치 필드 온전
+['band', 'confidence', 'matched_person_id', 'model', 'provider', 'reason', 's_llm', 'tokens_in', 'tokens_out']
+{'provider': 'openai', 'model': 'gpt-4o-mini-2024-07-18', 'tokens_in': 410, 'tokens_out': 48, 's_llm': 0.9, 'matched_person_id': 1, 'confidence': 0.8384, 'band': 'merge'}
+
+## 스모크 08 (scripts/baseline_smoke.py, LLM_PROVIDER 기본 openai, 2026-09-22 13:09, PYTHONIOENCODING=utf-8) → evidence/20260922-1309-smoke08-baseline-real.txt (원본 P3-baselines/evidence/20260922-1309-baseline-smoke-real.txt)
+$ python -c "import json,sys; d=json.load(open(sys.argv[1],encoding='utf-8')); print(d['provider'], d['model'], d['decision'], d['tokens_in'], d['tokens_out'], d['llm_error'])" <파일>   # 카드 08 판정 명령
+openai gpt-4o-mini-2024-07-18 identity 551 57 None
+{"method": "llm_single", "mention": "부장님", "decision": "identity", "person_id": null, "score": 0.7, "tokens_in": 551, "tokens_out": 57, "provider": "openai", "model": "gpt-4o-mini-2024-07-18", "forced_reason": null, "llm_error": null, "candidate_person_ids": [1, 3], "dropped_ids": [], "prompt_chars": 873, "person_count": 3}
+rc=0
+
+## 요약: 공급자 실호출 검증 — openai 1/3 (제안 방식·베이스라인 3 모두 gpt-4o-mini-2024-07-18). anthropic·gemini 경로 실호출 0. 첫 시도(13:08)는 rc=2(키 미로드, 파일 삭제) → .env 로드 후 rc=0.
+## 키 문자열 혼입 검사: grep -c 'sk-' 두 파일 → 0 0
+docs/wiki/packages/P3-er/evidence/20260921-2011-er-smoke-real.txt:0
+docs/wiki/packages/P3-baselines/evidence/20260922-1309-baseline-smoke-real.txt:0
