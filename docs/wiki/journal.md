@@ -199,3 +199,4 @@
 - 2026-09-22 19:00 | START | P4b-er-redesign 계획 승인(사용자) — 02 승인 줄, CURRENT active, 03-log 생성. R-3·R-9 01-plan 반영. U0 부터(메인 세션 SKILL.md 정합), U1 부터 backend-agent(L-004 매번) | P4b-er-redesign
 - 2026-09-22 18:12 | COMMIT | 83d33dd docs(P4b-er-redesign): 계획검증 통과·계획 승인 — CR-001 D12·D13 구현 + 재실행 + 게이트 재판정, 패키지 착수
 - 2026-09-22 18:15 | COMMIT | 28c2de8 harness(P4b-er-redesign): U0 entity-resolution 스킬 카드 D12·D13 정합 — 권위 문구·감점·재정규화 산식
+- 2026-09-22 18:35 | COMMIT | 85ceda7 feat(P4b-er-redesign): U1 D12 관측 신호 재정규화 결합 — combine rule_checked·weights_effective, 테스트 13건

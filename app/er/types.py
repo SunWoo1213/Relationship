@@ -1,5 +1,5 @@
-"""Refs: P3-er S3.3 D3 D10 R4 -- 결정1 결정2 결정3 결정3-b 결정3-c 결정4
-결정5 결정8. ER 4단계가 공유하는 데이터 계약.
+"""Refs: P3-er P4b-er-redesign S3.3 D3 D10 D13 R4 -- 결정1 결정2 결정3
+결정3-b 결정3-c 결정4 결정5 결정8. ER 4단계가 공유하는 데이터 계약.
 
 `ScoredCandidate` 는 P2 `app.tools.types.Candidate`(1단계 `search_person`
 의 출력) 를 감싸 2단계(규칙 필터, `app/er/rules.py`) 산출물을 더한 것이다.
@@ -69,9 +69,17 @@ class ScoredCandidate:
     원칙9).
 
     `rule_checked`/`rule_passed`/`s_rule`/`passed_rules`/`excluded_by`/
-    `relaxed_pass` 는 생성 시 기본값(미평가 상태)이고, `app/er/rules.py`
-    의 `apply_rules()` 가 `dataclasses.replace()` 로 값을 채운 새 인스턴스를
-    돌려준다(불변 dataclass -- 제자리 수정 없음).
+    `relaxed_pass`/`penalized_by` 는 생성 시 기본값(미평가 상태)이고,
+    `app/er/rules.py` 의 `apply_rules()` 가 `dataclasses.replace()` 로 값을
+    채운 새 인스턴스를 돌려준다(불변 dataclass -- 제자리 수정 없음).
+
+    D13(규칙 필터 감점, CR-001) 이후: `excluded_by` 는 `dictionary_conflict`
+    뿐이고 `passed_rules` 는 "배제되지 않았다"를 뜻한다. `penalized_by` 는
+    배제되지 않은 채 남은 충돌(`relation_tag_conflict`·`hierarchy_conflict`)
+    을 `app.er.rules._CONFLICT_PRIORITY` 순서로 정렬한 튜플이다 -- 대표
+    사유 하나가 아니라 **복수 사유를 모두 담는 목록**(원칙9, `rules.py`
+    모듈 docstring "penalized_by" 절과 동일 규약). 빈 튜플은 "감점 없음"
+    이다. `dictionary_conflict` 는 여기 등장하지 않는다.
     """
 
     person_id: int
@@ -87,6 +95,7 @@ class ScoredCandidate:
     passed_rules: bool = False
     excluded_by: str | None = None
     relaxed_pass: bool = False
+    penalized_by: tuple[str, ...] = field(default_factory=tuple)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -103,6 +112,7 @@ class ScoredCandidate:
             "passed_rules": self.passed_rules,
             "excluded_by": self.excluded_by,
             "relaxed_pass": self.relaxed_pass,
+            "penalized_by": list(self.penalized_by),
         }
 
 
@@ -166,6 +176,7 @@ def _candidate_trace_dict(candidate: ScoredCandidate) -> dict[str, Any]:
         "rule_checked": candidate.rule_checked,
         "rule_passed": candidate.rule_passed,
         "relaxed_pass": candidate.relaxed_pass,
+        "penalized_by": list(candidate.penalized_by),
         "s_emb": candidate.s_emb,
         "s_rule": candidate.s_rule,
     }

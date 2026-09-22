@@ -1,0 +1,21 @@
+$ POSTGRES_PORT=5433 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m pytest tests/ -q --tb=no -rf
+........................................................................ [ 44%]
+........................................................................ [ 49%]
+........................................................................ [ 55%]
+........................................................................ [ 60%]
+........................................................................ [ 66%]
+........................................................................ [ 71%]
+............FFF.F.F..................................................... [ 77%]
+........................................................................ [ 82%]
+........................................................................ [ 88%]
+........................................................................ [ 93%]
+........................................................................ [ 99%]
+.......                                                                  [100%]
+=========================== short test summary info ===========================
+FAILED tests/test_baseline_proposed.py::test_new_person_band_carries_excluded_candidates
+FAILED tests/test_run_pilot_eval.py::test_dry_run_chain_produces_all_outputs
+FAILED tests/test_run_pilot_eval.py::test_dry_run_logs_embedded_alias_count_per_scenario
+FAILED tests/test_run_pilot_eval.py::test_dry_run_dumps_traces_before_rollback_and_rechecks
+FAILED tests/test_run_pilot_eval.py::test_dry_run_metrics_json_is_byte_identical
+FAILED tests/test_run_pilot_eval.py::test_chain_gzips_raw_and_feeds_the_gz_to_every_stage
+6 failed, 1297 passed in 145.65s (0:02:25)

@@ -1,0 +1,23 @@
+=== U2 새 실패 1건 — 원인·조치 (메인 세션, 크래시 복구 후 검증에서 발견) ===
+
+발견: 전체 pytest 1차 재실행 6 failed/1297 passed (20260922-1905-u2-pytest-all-failed-list.txt).
+      U1 기준 알려진 5건(test_run_pilot_eval dry-run 사슬, U4 소관) + 새 1건:
+      tests/test_baseline_proposed.py::test_new_person_band_carries_excluded_candidates
+
+단독 실행 출력:
+  E   AssertionError: assert {'14022': 'dictionary_conflict'} == {'14022': 'relation_tag_conflict'}
+  tests/test_baseline_proposed.py:249
+
+원인: 이 테스트의 픽스처(_seed_team_lead + mention '이모')는 01-plan U3 회귀 (b)
+      '팀장<->이모' 와 같은 픽스처다. 별칭 '팀장' 이 호칭 사전 표제어라
+      dictionary_conflict 가 함께 뜨고, D13 이후 excluded_by 는 dictionary_conflict
+      하나만 담는다. 배제 자체와 결과(new_person / no_candidates / tokens (0,0) /
+      ask_kind new_person / score 0.0)는 전부 불변이고 사유 표시만 바뀌었다.
+
+조치: tests/test_baseline_proposed.py 249행 기대값을 dictionary_conflict 로 갱신
+      (+ D13 주석 5줄). evaluation/ 코드는 손대지 않았다 — detail['penalized_by']
+      전달은 U4 소관(01-plan U4 (iv)).
+
+재실행: pytest tests/test_baseline_proposed.py -q -rs -> 20 passed
+        전체 pytest 2차 -> 5 failed / 1298 passed (20260922-1915-u2-pytest-all.txt)
+        = 알려진 5건만 남고 새 실패 0. 통과 수 1293(U1) -> 1298 = 신규 테스트 5건.

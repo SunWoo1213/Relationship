@@ -1,0 +1,39 @@
+=== D13 '코드에서 지켜야 할 것' 1항: excluded_by 에 두 사유가 등장하지 않는다 ===
+$ grep -nE 'excluded_by *=' app/er/rules.py
+196:        excluded_by = _EXCLUSION_ONLY_CONFLICT if _EXCLUSION_ONLY_CONFLICT in conflicts else None
+206:                excluded_by=excluded_by,
+$ grep -n '_EXCLUSION_ONLY_CONFLICT =' app/er/rules.py
+85:_EXCLUSION_ONLY_CONFLICT = "dictionary_conflict"
+
+=== 1항(b): penalized_by 에 두 사유가 들어간다 ===
+$ grep -n 'penalizing_conflicts.add' app/er/rules.py
+139:            penalizing_conflicts.add("relation_tag_conflict")
+151:            penalizing_conflicts.add("hierarchy_conflict")
+$ grep -n 'penalized_by=' app/er/rules.py
+208:                penalized_by=penalized_by,
+
+=== 2항: 3단계 전달 후보 수 == 1단계 − dictionary_conflict (테스트 단언) ===
+$ grep -n 'def test' tests/test_er_rules.py
+41:def test_relation_tag_conflict_excludes_and_no_relaxation() -> None:
+65:def test_relation_tag_conflict_alone_is_penalized_not_excluded() -> None:
+90:def test_promotion_fixture_relaxes_and_merges_with_conservative_scoring() -> None:
+125:def test_two_step_hierarchy_gap_never_relaxes() -> None:
+151:def test_no_hints_means_zero_checked_and_no_exclusion() -> None:
+173:def test_two_candidates_with_same_alias_both_pass() -> None:
+196:def test_relaxation_attempts_at_most_once(monkeypatch) -> None:
+228:def test_candidate_count_forwarded_equals_total_minus_dictionary_excluded() -> None:
+255:def test_excluded_by_domain_is_dictionary_conflict_only() -> None:
+289:def test_relaxation_not_triggered_when_any_candidate_unpenalized() -> None:
+308:def test_relaxation_triggered_when_all_candidates_penalized() -> None:
+
+=== 결정 C: 완화 재평가 트리거 = 감점 없는 후보 0 ===
+$ grep -n 'unpenalized\|감점 없는' app/er/rules.py
+44:`run_rule_stage()` 가 엄격 적용 → (**감점 없는 후보가 하나도 없으면**,
+237:    """엄격 적용 → (**감점 없는 후보가 하나도 없으면**, 위계 불일치만으로
+251:    사실 주장 (b)). 그래서 트리거를 **"감점 없는(=`penalized_by` 가 빈)
+264:    unpenalized = [c for c in strict_passed if not c.penalized_by]
+265:    if unpenalized:
+
+=== 3항(보수 분기 설정값)은 U3 소관 — 현재 미구현이 정상 ===
+$ grep -rn 'ER_PENALIZED_MERGE_POLICY' app/ | wc -l
+0

@@ -232,7 +232,11 @@ def test_resolve_skips_llm_when_no_candidates_pass_rules_no_candidates(db_sessio
 
     excluded = next(c for c in result.candidates if c.person_id == person.id)
     assert excluded.passed_rules is False
-    assert excluded.excluded_by == "relation_tag_conflict"
+    # D13(P4b-er-redesign U2): 별칭 "팀장"이 호칭 사전 표제어라
+    # dictionary_conflict 가 함께 떠서 배제가 유지된다(relation_tag_conflict
+    # 자체는 더 이상 배제 사유가 아니다 -- penalized_by 로 표시된다).
+    assert excluded.excluded_by == "dictionary_conflict"
+    assert excluded.penalized_by == ("relation_tag_conflict", "hierarchy_conflict")
 
 
 def test_resolve_null_matched_person_id_forces_identity_not_new_person_null_path(
@@ -498,7 +502,12 @@ def test_apply_resolution_aunt_excluded_creates_new_person_question_aunt(
 
     excluded = next(c for c in result.candidates if c.person_id == person.id)
     assert excluded.passed_rules is False
-    assert excluded.excluded_by == "relation_tag_conflict"
+    # D13(P4b-er-redesign U2): relation_tag_conflict·hierarchy_conflict 는
+    # 더 이상 배제 사유가 아니다 -- 이 픽스처는 별칭 "팀장"이 호칭 사전
+    # 표제어라 dictionary_conflict 가 함께 떠서 배제가 유지된다(01-plan
+    # U3 픽스처 (b) 그대로). 감점 표시는 penalized_by 로 남는다.
+    assert excluded.excluded_by == "dictionary_conflict"
+    assert excluded.penalized_by == ("relation_tag_conflict", "hierarchy_conflict")
     assert result.llm["skipped"] is True
     assert result.forced_reason == "no_candidates"
     assert result.band == "new_person"

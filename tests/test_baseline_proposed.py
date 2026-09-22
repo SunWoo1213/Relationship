@@ -246,7 +246,12 @@ def test_new_person_band_carries_excluded_candidates(db_session, fake_embedder):
     assert decision.detail["llm_skipped"] is True
     assert decision.detail["forced_reason"] == "no_candidates"
     assert decision.detail["ask_kind"] == "new_person"
-    assert decision.detail["excluded_by"] == {str(person.id): "relation_tag_conflict"}
+    # D13(P4b-er-redesign U2): relation_tag_conflict 는 더 이상 배제 사유가
+    # 아니다 -- 이 픽스처는 별칭 "팀장"이 호칭 사전 표제어라
+    # dictionary_conflict 가 함께 떠서 배제가 유지된다(01-plan U3 픽스처 (b)
+    # 와 같은 픽스처). 결과(new_person·no_candidates·tokens 0)는 불변이고
+    # 사유 표시만 바뀐다. `penalized_by` 의 detail 전달은 U4 소관이다.
+    assert decision.detail["excluded_by"] == {str(person.id): "dictionary_conflict"}
     excluded = next(c for c in decision.candidates if c.person_id == person.id)
     assert excluded.score == 0.0
     assert excluded.signals["passed_rules"] == 0.0

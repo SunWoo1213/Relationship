@@ -1,0 +1,3 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -k "promotion or aunt or homonym" -rs
+...                                                                      [100%]
+3 passed, 15 deselected in 1.06s
