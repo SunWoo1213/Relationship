@@ -1,0 +1,35 @@
+# U5 실행 후 검증 — 산출물 이동·스키마·멱등·재계산 (네트워크 0)
+# 실행 커밋 f96d15b · 산출물 stamp 20260922-150931
+# 2026-09-22T15:21:36Z
+
+$ sha256sum reports/{metrics.json,calibration.json,curve.csv,eval.md}   (이동 후)
+b293ab5099c6da8f341832e10311cf809ad8aa06b440a7901364603c8a150797 *reports/metrics.json
+a653394d04aae5fb7d2fb8d06c21334d66fc0e063afeddee88dbb228a8ffe3da *reports/calibration.json
+d7541a2ffac4ce0a0207c09533b7bc4e3aec705346ab3354e665d5225e4ed130 *reports/curve.csv
+c64784064a4b7cb95b39f593ff1a22534bb57eb54ab31a072e85a4fe786df209 *reports/eval.md
+
+$ python -m evaluation.metrics --validate reports/metrics.json
+OK reports/metrics.json
+rc=0
+
+$ python scripts/run_pilot_eval.py --recheck-traces reports/pilot/traces-20260922-150931.jsonl
+[traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=reports\pilot\traces-20260922-150931.jsonl
+[traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+rc=0
+
+$ python -m evaluation.report --metrics reports/metrics.json --out <tmp>/eval-again.md && diff <tmp>/eval-again.md reports/eval.md   (멱등)
+diff rc=0 (0줄이면 멱등)
+
+$ 게이트 판정 (reports/metrics.json gate 인용)
+meta: schema_version=2 weights_policy=observed_renormalized(D12) penalized_merge_policy=ask
+meta: provider=openai model=gpt-4o-mini-2024-07-18 embedding=text-embedding-3-small run_mode=real commit=f96d15b401a24d31bc49de86a1d2c2e11e593999
+gate: t_merge=0.8 pass=True dominated_by=[] d10_direction=True reason=None
+gate.proposed: false_merge=0/132 | miss=0/132
+  baseline exact_raw       false_merge=0.0 miss=0.25 dominates=False
+  baseline exact_norm      false_merge=0.030303030303030304 miss=0.15151515151515152 dominates=False
+  baseline embedding_only  false_merge=0.0 miss=0.007575757575757576 dominates=False
+  baseline llm_single      false_merge=0.0 miss=0.06818181818181818 dominates=False
+proposed@0.8 outcomes: {"merge_correct": 96, "false_merge": 0, "miss": 0, "deferred": 31, "new_person_correct": 5}
+proposed@0.8 f1=0.897196261682243 precision=1.0 recall=0.8135593220338984 deferred_identity=0.23484848484848486
+proposed@0.8 forced_reason: {"no_candidates": 4, "no_matched": 20, "none": 109, "penalized_candidate": 5}
+proposed@0.8 subsets.penalized_merge: {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}, "relaxed_pass_merges": 14, "relaxed_pass_false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}, "reasons": {"hierarchy_conflict": 14}}

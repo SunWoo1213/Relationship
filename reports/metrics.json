@@ -24,21 +24,21 @@
           "passing_rows": 6
         },
         "outcomes": {
-          "merge_correct": 99,
-          "false_merge": 6,
-          "miss": 1,
+          "merge_correct": 101,
+          "false_merge": 4,
+          "miss": 0,
           "deferred": 22,
-          "new_person_correct": 4
+          "new_person_correct": 5
         },
         "false_merge_rate": {
-          "n": 6,
+          "n": 4,
           "d": 132,
-          "rate": 0.045454545454545456
+          "rate": 0.030303030303030304
         },
         "miss_rate": {
-          "n": 1,
+          "n": 0,
           "d": 132,
-          "rate": 0.007575757575757576
+          "rate": 0.0
         },
         "deferred_identity_rate": {
           "n": 22,
@@ -46,16 +46,16 @@
           "rate": 0.16666666666666666
         },
         "precision": {
-          "n": 99,
+          "n": 101,
           "d": 105,
-          "rate": 0.9428571428571428
+          "rate": 0.9619047619047619
         },
         "recall": {
-          "n": 99,
+          "n": 101,
           "d": 118,
-          "rate": 0.8389830508474576
+          "rate": 0.8559322033898306
         },
-        "f1": 0.8878923766816144,
+        "f1": 0.9058295964125561,
         "ask_user_rate_by_kind": {
           "identity": {
             "n": 22,
@@ -74,9 +74,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 115,
+          "n": 117,
           "d": 132,
-          "rate": 0.8712121212121212
+          "rate": 0.8863636363636364
         },
         "passing": {
           "false_positive": {
@@ -96,9 +96,10 @@
           }
         },
         "forced_reason": {
-          "no_candidates": 5,
-          "no_matched": 25,
-          "none": 108
+          "no_candidates": 4,
+          "no_matched": 20,
+          "none": 107,
+          "penalized_candidate": 7
         },
         "llm_error": {
           "none": 138
@@ -106,32 +107,49 @@
         "excluding_llm_error": {
           "scored": 132,
           "false_merge_rate": {
-            "n": 6,
+            "n": 4,
             "d": 132,
-            "rate": 0.045454545454545456
+            "rate": 0.030303030303030304
           },
           "miss_rate": {
-            "n": 1,
+            "n": 0,
             "d": 132,
-            "rate": 0.007575757575757576
+            "rate": 0.0
           },
           "removed_rows": 0
         },
         "subsets": {
           "merge_rule_unchecked": {
-            "merges": 64,
+            "merges": 67,
             "false_merge_rate": {
               "n": 0,
-              "d": 64,
+              "d": 67,
               "rate": 0.0
             }
           },
           "merge_relaxed_retry": {
-            "merges": 18,
+            "merges": 17,
             "false_merge_rate": {
-              "n": 4,
-              "d": 18,
-              "rate": 0.2222222222222222
+              "n": 3,
+              "d": 17,
+              "rate": 0.17647058823529413
+            }
+          },
+          "penalized_merge": {
+            "merges": 17,
+            "false_merge_rate": {
+              "n": 3,
+              "d": 17,
+              "rate": 0.17647058823529413
+            },
+            "relaxed_pass_merges": 17,
+            "relaxed_pass_false_merge_rate": {
+              "n": 3,
+              "d": 17,
+              "rate": 0.17647058823529413
+            },
+            "reasons": {
+              "hierarchy_conflict": 17
             }
           },
           "merges": 105
@@ -140,9 +158,9 @@
           "alias": {
             "scored": 33,
             "false_merge_rate": {
-              "n": 1,
+              "n": 0,
               "d": 33,
-              "rate": 0.030303030303030304
+              "rate": 0.0
             },
             "miss_rate": {
               "n": 0,
@@ -158,9 +176,9 @@
           "new_person": {
             "scored": 19,
             "false_merge_rate": {
-              "n": 3,
+              "n": 2,
               "d": 19,
-              "rate": 0.15789473684210525
+              "rate": 0.10526315789473684
             },
             "miss_rate": {
               "n": 0,
@@ -168,9 +186,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 3,
+              "n": 4,
               "d": 19,
-              "rate": 0.15789473684210525
+              "rate": 0.21052631578947367
             }
           },
           "normal": {
@@ -199,14 +217,14 @@
               "rate": 0.07142857142857142
             },
             "miss_rate": {
-              "n": 1,
+              "n": 0,
               "d": 28,
-              "rate": 0.03571428571428571
+              "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 5,
+              "n": 7,
               "d": 28,
-              "rate": 0.17857142857142858
+              "rate": 0.25
             }
           },
           "pronoun": {
@@ -222,9 +240,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 9,
+              "n": 6,
               "d": 31,
-              "rate": 0.2903225806451613
+              "rate": 0.1935483870967742
             }
           }
         }
@@ -240,453 +258,21 @@
           "passing_rows": 6
         },
         "outcomes": {
-          "merge_correct": 99,
-          "false_merge": 6,
-          "miss": 1,
-          "deferred": 22,
-          "new_person_correct": 4
-        },
-        "false_merge_rate": {
-          "n": 6,
-          "d": 132,
-          "rate": 0.045454545454545456
-        },
-        "miss_rate": {
-          "n": 1,
-          "d": 132,
-          "rate": 0.007575757575757576
-        },
-        "deferred_identity_rate": {
-          "n": 22,
-          "d": 132,
-          "rate": 0.16666666666666666
-        },
-        "precision": {
-          "n": 99,
-          "d": 105,
-          "rate": 0.9428571428571428
-        },
-        "recall": {
-          "n": 99,
-          "d": 118,
-          "rate": 0.8389830508474576
-        },
-        "f1": 0.8878923766816144,
-        "ask_user_rate_by_kind": {
-          "identity": {
-            "n": 22,
-            "d": 132,
-            "rate": 0.16666666666666666
-          },
-          "new_person": {
-            "n": 5,
-            "d": 132,
-            "rate": 0.03787878787878788
-          },
-          "schedule": {
-            "n": 0,
-            "d": 132,
-            "rate": 0.0
-          }
-        },
-        "expected_ask_user_allowed": {
-          "n": 115,
-          "d": 132,
-          "rate": 0.8712121212121212
-        },
-        "passing": {
-          "false_positive": {
-            "n": 0,
-            "d": 6,
-            "rate": 0.0
-          },
-          "by_decision": {
-            "merge": 1,
-            "identity": 5,
-            "new_person": 0
-          },
-          "expected_ask_user_allowed": {
-            "n": 1,
-            "d": 6,
-            "rate": 0.16666666666666666
-          }
-        },
-        "forced_reason": {
-          "no_candidates": 5,
-          "no_matched": 25,
-          "none": 108
-        },
-        "llm_error": {
-          "none": 138
-        },
-        "excluding_llm_error": {
-          "scored": 132,
-          "false_merge_rate": {
-            "n": 6,
-            "d": 132,
-            "rate": 0.045454545454545456
-          },
-          "miss_rate": {
-            "n": 1,
-            "d": 132,
-            "rate": 0.007575757575757576
-          },
-          "removed_rows": 0
-        },
-        "subsets": {
-          "merge_rule_unchecked": {
-            "merges": 64,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 64,
-              "rate": 0.0
-            }
-          },
-          "merge_relaxed_retry": {
-            "merges": 18,
-            "false_merge_rate": {
-              "n": 4,
-              "d": 18,
-              "rate": 0.2222222222222222
-            }
-          },
-          "merges": 105
-        },
-        "by_category": {
-          "alias": {
-            "scored": 33,
-            "false_merge_rate": {
-              "n": 1,
-              "d": 33,
-              "rate": 0.030303030303030304
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 33,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 4,
-              "d": 33,
-              "rate": 0.12121212121212122
-            }
-          },
-          "new_person": {
-            "scored": 19,
-            "false_merge_rate": {
-              "n": 3,
-              "d": 19,
-              "rate": 0.15789473684210525
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 19,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 3,
-              "d": 19,
-              "rate": 0.15789473684210525
-            }
-          },
-          "normal": {
-            "scored": 21,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 21,
-              "rate": 0.0
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 21,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 1,
-              "d": 21,
-              "rate": 0.047619047619047616
-            }
-          },
-          "promotion": {
-            "scored": 28,
-            "false_merge_rate": {
-              "n": 2,
-              "d": 28,
-              "rate": 0.07142857142857142
-            },
-            "miss_rate": {
-              "n": 1,
-              "d": 28,
-              "rate": 0.03571428571428571
-            },
-            "deferred_identity_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            }
-          },
-          "pronoun": {
-            "scored": 31,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 31,
-              "rate": 0.0
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 31,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 9,
-              "d": 31,
-              "rate": 0.2903225806451613
-            }
-          }
-        }
-      },
-      "0.6": {
-        "method": "proposed",
-        "t_merge": 0.6,
-        "t_new": 0.3,
-        "scored": 132,
-        "rows": 141,
-        "excluded": {
-          "ambiguous_rows": 3,
-          "passing_rows": 6
-        },
-        "outcomes": {
-          "merge_correct": 99,
-          "false_merge": 6,
-          "miss": 1,
-          "deferred": 22,
-          "new_person_correct": 4
-        },
-        "false_merge_rate": {
-          "n": 6,
-          "d": 132,
-          "rate": 0.045454545454545456
-        },
-        "miss_rate": {
-          "n": 1,
-          "d": 132,
-          "rate": 0.007575757575757576
-        },
-        "deferred_identity_rate": {
-          "n": 22,
-          "d": 132,
-          "rate": 0.16666666666666666
-        },
-        "precision": {
-          "n": 99,
-          "d": 105,
-          "rate": 0.9428571428571428
-        },
-        "recall": {
-          "n": 99,
-          "d": 118,
-          "rate": 0.8389830508474576
-        },
-        "f1": 0.8878923766816144,
-        "ask_user_rate_by_kind": {
-          "identity": {
-            "n": 22,
-            "d": 132,
-            "rate": 0.16666666666666666
-          },
-          "new_person": {
-            "n": 5,
-            "d": 132,
-            "rate": 0.03787878787878788
-          },
-          "schedule": {
-            "n": 0,
-            "d": 132,
-            "rate": 0.0
-          }
-        },
-        "expected_ask_user_allowed": {
-          "n": 115,
-          "d": 132,
-          "rate": 0.8712121212121212
-        },
-        "passing": {
-          "false_positive": {
-            "n": 0,
-            "d": 6,
-            "rate": 0.0
-          },
-          "by_decision": {
-            "merge": 0,
-            "identity": 6,
-            "new_person": 0
-          },
-          "expected_ask_user_allowed": {
-            "n": 0,
-            "d": 6,
-            "rate": 0.0
-          }
-        },
-        "forced_reason": {
-          "no_candidates": 5,
-          "no_matched": 25,
-          "none": 108
-        },
-        "llm_error": {
-          "none": 138
-        },
-        "excluding_llm_error": {
-          "scored": 132,
-          "false_merge_rate": {
-            "n": 6,
-            "d": 132,
-            "rate": 0.045454545454545456
-          },
-          "miss_rate": {
-            "n": 1,
-            "d": 132,
-            "rate": 0.007575757575757576
-          },
-          "removed_rows": 0
-        },
-        "subsets": {
-          "merge_rule_unchecked": {
-            "merges": 64,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 64,
-              "rate": 0.0
-            }
-          },
-          "merge_relaxed_retry": {
-            "merges": 18,
-            "false_merge_rate": {
-              "n": 4,
-              "d": 18,
-              "rate": 0.2222222222222222
-            }
-          },
-          "merges": 105
-        },
-        "by_category": {
-          "alias": {
-            "scored": 33,
-            "false_merge_rate": {
-              "n": 1,
-              "d": 33,
-              "rate": 0.030303030303030304
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 33,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 4,
-              "d": 33,
-              "rate": 0.12121212121212122
-            }
-          },
-          "new_person": {
-            "scored": 19,
-            "false_merge_rate": {
-              "n": 3,
-              "d": 19,
-              "rate": 0.15789473684210525
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 19,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 3,
-              "d": 19,
-              "rate": 0.15789473684210525
-            }
-          },
-          "normal": {
-            "scored": 21,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 21,
-              "rate": 0.0
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 21,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 1,
-              "d": 21,
-              "rate": 0.047619047619047616
-            }
-          },
-          "promotion": {
-            "scored": 28,
-            "false_merge_rate": {
-              "n": 2,
-              "d": 28,
-              "rate": 0.07142857142857142
-            },
-            "miss_rate": {
-              "n": 1,
-              "d": 28,
-              "rate": 0.03571428571428571
-            },
-            "deferred_identity_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            }
-          },
-          "pronoun": {
-            "scored": 31,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 31,
-              "rate": 0.0
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 31,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 9,
-              "d": 31,
-              "rate": 0.2903225806451613
-            }
-          }
-        }
-      },
-      "0.65": {
-        "method": "proposed",
-        "t_merge": 0.65,
-        "t_new": 0.3,
-        "scored": 132,
-        "rows": 141,
-        "excluded": {
-          "ambiguous_rows": 3,
-          "passing_rows": 6
-        },
-        "outcomes": {
-          "merge_correct": 98,
-          "false_merge": 6,
-          "miss": 1,
+          "merge_correct": 100,
+          "false_merge": 4,
+          "miss": 0,
           "deferred": 23,
-          "new_person_correct": 4
+          "new_person_correct": 5
         },
         "false_merge_rate": {
-          "n": 6,
+          "n": 4,
           "d": 132,
-          "rate": 0.045454545454545456
+          "rate": 0.030303030303030304
         },
         "miss_rate": {
-          "n": 1,
+          "n": 0,
           "d": 132,
-          "rate": 0.007575757575757576
+          "rate": 0.0
         },
         "deferred_identity_rate": {
           "n": 23,
@@ -694,16 +280,16 @@
           "rate": 0.17424242424242425
         },
         "precision": {
-          "n": 98,
+          "n": 100,
           "d": 104,
-          "rate": 0.9423076923076923
+          "rate": 0.9615384615384616
         },
         "recall": {
-          "n": 98,
+          "n": 100,
           "d": 118,
-          "rate": 0.8305084745762712
+          "rate": 0.847457627118644
         },
-        "f1": 0.8828828828828829,
+        "f1": 0.9009009009009009,
         "ask_user_rate_by_kind": {
           "identity": {
             "n": 23,
@@ -722,9 +308,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 114,
+          "n": 117,
           "d": 132,
-          "rate": 0.8636363636363636
+          "rate": 0.8863636363636364
         },
         "passing": {
           "false_positive": {
@@ -733,20 +319,21 @@
             "rate": 0.0
           },
           "by_decision": {
-            "merge": 0,
-            "identity": 6,
+            "merge": 1,
+            "identity": 5,
             "new_person": 0
           },
           "expected_ask_user_allowed": {
-            "n": 0,
+            "n": 1,
             "d": 6,
-            "rate": 0.0
+            "rate": 0.16666666666666666
           }
         },
         "forced_reason": {
-          "no_candidates": 5,
-          "no_matched": 25,
-          "none": 108
+          "no_candidates": 4,
+          "no_matched": 20,
+          "none": 108,
+          "penalized_candidate": 6
         },
         "llm_error": {
           "none": 138
@@ -754,32 +341,49 @@
         "excluding_llm_error": {
           "scored": 132,
           "false_merge_rate": {
-            "n": 6,
+            "n": 4,
             "d": 132,
-            "rate": 0.045454545454545456
+            "rate": 0.030303030303030304
           },
           "miss_rate": {
-            "n": 1,
+            "n": 0,
             "d": 132,
-            "rate": 0.007575757575757576
+            "rate": 0.0
           },
           "removed_rows": 0
         },
         "subsets": {
           "merge_rule_unchecked": {
-            "merges": 63,
+            "merges": 66,
             "false_merge_rate": {
               "n": 0,
-              "d": 63,
+              "d": 66,
               "rate": 0.0
             }
           },
           "merge_relaxed_retry": {
-            "merges": 18,
+            "merges": 17,
             "false_merge_rate": {
-              "n": 4,
-              "d": 18,
-              "rate": 0.2222222222222222
+              "n": 3,
+              "d": 17,
+              "rate": 0.17647058823529413
+            }
+          },
+          "penalized_merge": {
+            "merges": 17,
+            "false_merge_rate": {
+              "n": 3,
+              "d": 17,
+              "rate": 0.17647058823529413
+            },
+            "relaxed_pass_merges": 17,
+            "relaxed_pass_false_merge_rate": {
+              "n": 3,
+              "d": 17,
+              "rate": 0.17647058823529413
+            },
+            "reasons": {
+              "hierarchy_conflict": 17
             }
           },
           "merges": 104
@@ -788,9 +392,9 @@
           "alias": {
             "scored": 33,
             "false_merge_rate": {
-              "n": 1,
+              "n": 0,
               "d": 33,
-              "rate": 0.030303030303030304
+              "rate": 0.0
             },
             "miss_rate": {
               "n": 0,
@@ -798,17 +402,17 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 5,
+              "n": 4,
               "d": 33,
-              "rate": 0.15151515151515152
+              "rate": 0.12121212121212122
             }
           },
           "new_person": {
             "scored": 19,
             "false_merge_rate": {
-              "n": 3,
+              "n": 2,
               "d": 19,
-              "rate": 0.15789473684210525
+              "rate": 0.10526315789473684
             },
             "miss_rate": {
               "n": 0,
@@ -816,9 +420,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 3,
+              "n": 4,
               "d": 19,
-              "rate": 0.15789473684210525
+              "rate": 0.21052631578947367
             }
           },
           "normal": {
@@ -847,14 +451,14 @@
               "rate": 0.07142857142857142
             },
             "miss_rate": {
-              "n": 1,
+              "n": 0,
               "d": 28,
-              "rate": 0.03571428571428571
+              "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 5,
+              "n": 7,
               "d": 28,
-              "rate": 0.17857142857142858
+              "rate": 0.25
             }
           },
           "pronoun": {
@@ -870,16 +474,16 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 9,
+              "n": 7,
               "d": 31,
-              "rate": 0.2903225806451613
+              "rate": 0.22580645161290322
             }
           }
         }
       },
-      "0.7": {
+      "0.6": {
         "method": "proposed",
-        "t_merge": 0.7,
+        "t_merge": 0.6,
         "t_new": 0.3,
         "scored": 132,
         "rows": 141,
@@ -888,11 +492,11 @@
           "passing_rows": 6
         },
         "outcomes": {
-          "merge_correct": 96,
+          "merge_correct": 100,
           "false_merge": 4,
-          "miss": 1,
-          "deferred": 27,
-          "new_person_correct": 4
+          "miss": 0,
+          "deferred": 23,
+          "new_person_correct": 5
         },
         "false_merge_rate": {
           "n": 4,
@@ -900,31 +504,31 @@
           "rate": 0.030303030303030304
         },
         "miss_rate": {
-          "n": 1,
+          "n": 0,
           "d": 132,
-          "rate": 0.007575757575757576
+          "rate": 0.0
         },
         "deferred_identity_rate": {
-          "n": 27,
+          "n": 23,
           "d": 132,
-          "rate": 0.20454545454545456
+          "rate": 0.17424242424242425
         },
         "precision": {
-          "n": 96,
-          "d": 100,
-          "rate": 0.96
+          "n": 100,
+          "d": 104,
+          "rate": 0.9615384615384616
         },
         "recall": {
-          "n": 96,
+          "n": 100,
           "d": 118,
-          "rate": 0.8135593220338984
+          "rate": 0.847457627118644
         },
-        "f1": 0.8807339449541285,
+        "f1": 0.9009009009009009,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 27,
+            "n": 23,
             "d": 132,
-            "rate": 0.20454545454545456
+            "rate": 0.17424242424242425
           },
           "new_person": {
             "n": 5,
@@ -938,9 +542,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 116,
+          "n": 117,
           "d": 132,
-          "rate": 0.8787878787878788
+          "rate": 0.8863636363636364
         },
         "passing": {
           "false_positive": {
@@ -949,20 +553,21 @@
             "rate": 0.0
           },
           "by_decision": {
-            "merge": 0,
-            "identity": 6,
+            "merge": 1,
+            "identity": 5,
             "new_person": 0
           },
           "expected_ask_user_allowed": {
-            "n": 0,
+            "n": 1,
             "d": 6,
-            "rate": 0.0
+            "rate": 0.16666666666666666
           }
         },
         "forced_reason": {
-          "no_candidates": 5,
-          "no_matched": 25,
-          "none": 108
+          "no_candidates": 4,
+          "no_matched": 20,
+          "none": 108,
+          "penalized_candidate": 6
         },
         "llm_error": {
           "none": 138
@@ -975,18 +580,252 @@
             "rate": 0.030303030303030304
           },
           "miss_rate": {
-            "n": 1,
+            "n": 0,
             "d": 132,
-            "rate": 0.007575757575757576
+            "rate": 0.0
           },
           "removed_rows": 0
         },
         "subsets": {
           "merge_rule_unchecked": {
-            "merges": 62,
+            "merges": 66,
             "false_merge_rate": {
               "n": 0,
-              "d": 62,
+              "d": 66,
+              "rate": 0.0
+            }
+          },
+          "merge_relaxed_retry": {
+            "merges": 17,
+            "false_merge_rate": {
+              "n": 3,
+              "d": 17,
+              "rate": 0.17647058823529413
+            }
+          },
+          "penalized_merge": {
+            "merges": 17,
+            "false_merge_rate": {
+              "n": 3,
+              "d": 17,
+              "rate": 0.17647058823529413
+            },
+            "relaxed_pass_merges": 17,
+            "relaxed_pass_false_merge_rate": {
+              "n": 3,
+              "d": 17,
+              "rate": 0.17647058823529413
+            },
+            "reasons": {
+              "hierarchy_conflict": 17
+            }
+          },
+          "merges": 104
+        },
+        "by_category": {
+          "alias": {
+            "scored": 33,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 33,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 33,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 4,
+              "d": 33,
+              "rate": 0.12121212121212122
+            }
+          },
+          "new_person": {
+            "scored": 19,
+            "false_merge_rate": {
+              "n": 2,
+              "d": 19,
+              "rate": 0.10526315789473684
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 19,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 4,
+              "d": 19,
+              "rate": 0.21052631578947367
+            }
+          },
+          "normal": {
+            "scored": 21,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 21,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 21,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 1,
+              "d": 21,
+              "rate": 0.047619047619047616
+            }
+          },
+          "promotion": {
+            "scored": 28,
+            "false_merge_rate": {
+              "n": 2,
+              "d": 28,
+              "rate": 0.07142857142857142
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 28,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 7,
+              "d": 28,
+              "rate": 0.25
+            }
+          },
+          "pronoun": {
+            "scored": 31,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 31,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 31,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 7,
+              "d": 31,
+              "rate": 0.22580645161290322
+            }
+          }
+        }
+      },
+      "0.65": {
+        "method": "proposed",
+        "t_merge": 0.65,
+        "t_new": 0.3,
+        "scored": 132,
+        "rows": 141,
+        "excluded": {
+          "ambiguous_rows": 3,
+          "passing_rows": 6
+        },
+        "outcomes": {
+          "merge_correct": 99,
+          "false_merge": 3,
+          "miss": 0,
+          "deferred": 25,
+          "new_person_correct": 5
+        },
+        "false_merge_rate": {
+          "n": 3,
+          "d": 132,
+          "rate": 0.022727272727272728
+        },
+        "miss_rate": {
+          "n": 0,
+          "d": 132,
+          "rate": 0.0
+        },
+        "deferred_identity_rate": {
+          "n": 25,
+          "d": 132,
+          "rate": 0.1893939393939394
+        },
+        "precision": {
+          "n": 99,
+          "d": 102,
+          "rate": 0.9705882352941176
+        },
+        "recall": {
+          "n": 99,
+          "d": 118,
+          "rate": 0.8389830508474576
+        },
+        "f1": 0.9,
+        "ask_user_rate_by_kind": {
+          "identity": {
+            "n": 25,
+            "d": 132,
+            "rate": 0.1893939393939394
+          },
+          "new_person": {
+            "n": 5,
+            "d": 132,
+            "rate": 0.03787878787878788
+          },
+          "schedule": {
+            "n": 0,
+            "d": 132,
+            "rate": 0.0
+          }
+        },
+        "expected_ask_user_allowed": {
+          "n": 117,
+          "d": 132,
+          "rate": 0.8863636363636364
+        },
+        "passing": {
+          "false_positive": {
+            "n": 0,
+            "d": 6,
+            "rate": 0.0
+          },
+          "by_decision": {
+            "merge": 1,
+            "identity": 5,
+            "new_person": 0
+          },
+          "expected_ask_user_allowed": {
+            "n": 1,
+            "d": 6,
+            "rate": 0.16666666666666666
+          }
+        },
+        "forced_reason": {
+          "no_candidates": 4,
+          "no_matched": 20,
+          "none": 108,
+          "penalized_candidate": 6
+        },
+        "llm_error": {
+          "none": 138
+        },
+        "excluding_llm_error": {
+          "scored": 132,
+          "false_merge_rate": {
+            "n": 3,
+            "d": 132,
+            "rate": 0.022727272727272728
+          },
+          "miss_rate": {
+            "n": 0,
+            "d": 132,
+            "rate": 0.0
+          },
+          "removed_rows": 0
+        },
+        "subsets": {
+          "merge_rule_unchecked": {
+            "merges": 65,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 65,
               "rate": 0.0
             }
           },
@@ -998,15 +837,32 @@
               "rate": 0.125
             }
           },
-          "merges": 100
+          "penalized_merge": {
+            "merges": 16,
+            "false_merge_rate": {
+              "n": 2,
+              "d": 16,
+              "rate": 0.125
+            },
+            "relaxed_pass_merges": 16,
+            "relaxed_pass_false_merge_rate": {
+              "n": 2,
+              "d": 16,
+              "rate": 0.125
+            },
+            "reasons": {
+              "hierarchy_conflict": 16
+            }
+          },
+          "merges": 102
         },
         "by_category": {
           "alias": {
             "scored": 33,
             "false_merge_rate": {
-              "n": 1,
+              "n": 0,
               "d": 33,
-              "rate": 0.030303030303030304
+              "rate": 0.0
             },
             "miss_rate": {
               "n": 0,
@@ -1014,9 +870,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 5,
+              "n": 4,
               "d": 33,
-              "rate": 0.15151515151515152
+              "rate": 0.12121212121212122
             }
           },
           "new_person": {
@@ -1063,9 +919,243 @@
               "rate": 0.07142857142857142
             },
             "miss_rate": {
-              "n": 1,
+              "n": 0,
               "d": 28,
-              "rate": 0.03571428571428571
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 7,
+              "d": 28,
+              "rate": 0.25
+            }
+          },
+          "pronoun": {
+            "scored": 31,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 31,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 31,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 8,
+              "d": 31,
+              "rate": 0.25806451612903225
+            }
+          }
+        }
+      },
+      "0.7": {
+        "method": "proposed",
+        "t_merge": 0.7,
+        "t_new": 0.3,
+        "scored": 132,
+        "rows": 141,
+        "excluded": {
+          "ambiguous_rows": 3,
+          "passing_rows": 6
+        },
+        "outcomes": {
+          "merge_correct": 98,
+          "false_merge": 3,
+          "miss": 0,
+          "deferred": 26,
+          "new_person_correct": 5
+        },
+        "false_merge_rate": {
+          "n": 3,
+          "d": 132,
+          "rate": 0.022727272727272728
+        },
+        "miss_rate": {
+          "n": 0,
+          "d": 132,
+          "rate": 0.0
+        },
+        "deferred_identity_rate": {
+          "n": 26,
+          "d": 132,
+          "rate": 0.19696969696969696
+        },
+        "precision": {
+          "n": 98,
+          "d": 101,
+          "rate": 0.9702970297029703
+        },
+        "recall": {
+          "n": 98,
+          "d": 118,
+          "rate": 0.8305084745762712
+        },
+        "f1": 0.8949771689497716,
+        "ask_user_rate_by_kind": {
+          "identity": {
+            "n": 26,
+            "d": 132,
+            "rate": 0.19696969696969696
+          },
+          "new_person": {
+            "n": 5,
+            "d": 132,
+            "rate": 0.03787878787878788
+          },
+          "schedule": {
+            "n": 0,
+            "d": 132,
+            "rate": 0.0
+          }
+        },
+        "expected_ask_user_allowed": {
+          "n": 117,
+          "d": 132,
+          "rate": 0.8863636363636364
+        },
+        "passing": {
+          "false_positive": {
+            "n": 0,
+            "d": 6,
+            "rate": 0.0
+          },
+          "by_decision": {
+            "merge": 0,
+            "identity": 6,
+            "new_person": 0
+          },
+          "expected_ask_user_allowed": {
+            "n": 0,
+            "d": 6,
+            "rate": 0.0
+          }
+        },
+        "forced_reason": {
+          "no_candidates": 4,
+          "no_matched": 20,
+          "none": 108,
+          "penalized_candidate": 6
+        },
+        "llm_error": {
+          "none": 138
+        },
+        "excluding_llm_error": {
+          "scored": 132,
+          "false_merge_rate": {
+            "n": 3,
+            "d": 132,
+            "rate": 0.022727272727272728
+          },
+          "miss_rate": {
+            "n": 0,
+            "d": 132,
+            "rate": 0.0
+          },
+          "removed_rows": 0
+        },
+        "subsets": {
+          "merge_rule_unchecked": {
+            "merges": 64,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 64,
+              "rate": 0.0
+            }
+          },
+          "merge_relaxed_retry": {
+            "merges": 16,
+            "false_merge_rate": {
+              "n": 2,
+              "d": 16,
+              "rate": 0.125
+            }
+          },
+          "penalized_merge": {
+            "merges": 16,
+            "false_merge_rate": {
+              "n": 2,
+              "d": 16,
+              "rate": 0.125
+            },
+            "relaxed_pass_merges": 16,
+            "relaxed_pass_false_merge_rate": {
+              "n": 2,
+              "d": 16,
+              "rate": 0.125
+            },
+            "reasons": {
+              "hierarchy_conflict": 16
+            }
+          },
+          "merges": 101
+        },
+        "by_category": {
+          "alias": {
+            "scored": 33,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 33,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 33,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 4,
+              "d": 33,
+              "rate": 0.12121212121212122
+            }
+          },
+          "new_person": {
+            "scored": 19,
+            "false_merge_rate": {
+              "n": 1,
+              "d": 19,
+              "rate": 0.05263157894736842
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 19,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 19,
+              "rate": 0.2631578947368421
+            }
+          },
+          "normal": {
+            "scored": 21,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 21,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 21,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 1,
+              "d": 21,
+              "rate": 0.047619047619047616
+            }
+          },
+          "promotion": {
+            "scored": 28,
+            "false_merge_rate": {
+              "n": 2,
+              "d": 28,
+              "rate": 0.07142857142857142
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 28,
+              "rate": 0.0
             },
             "deferred_identity_rate": {
               "n": 7,
@@ -1104,43 +1194,43 @@
           "passing_rows": 6
         },
         "outcomes": {
-          "merge_correct": 92,
-          "false_merge": 2,
-          "miss": 1,
-          "deferred": 33,
-          "new_person_correct": 4
+          "merge_correct": 97,
+          "false_merge": 1,
+          "miss": 0,
+          "deferred": 29,
+          "new_person_correct": 5
         },
         "false_merge_rate": {
-          "n": 2,
-          "d": 132,
-          "rate": 0.015151515151515152
-        },
-        "miss_rate": {
           "n": 1,
           "d": 132,
           "rate": 0.007575757575757576
         },
-        "deferred_identity_rate": {
-          "n": 33,
+        "miss_rate": {
+          "n": 0,
           "d": 132,
-          "rate": 0.25
+          "rate": 0.0
+        },
+        "deferred_identity_rate": {
+          "n": 29,
+          "d": 132,
+          "rate": 0.2196969696969697
         },
         "precision": {
-          "n": 92,
-          "d": 94,
-          "rate": 0.9787234042553191
+          "n": 97,
+          "d": 98,
+          "rate": 0.9897959183673469
         },
         "recall": {
-          "n": 92,
+          "n": 97,
           "d": 118,
-          "rate": 0.7796610169491526
+          "rate": 0.8220338983050848
         },
-        "f1": 0.8679245283018868,
+        "f1": 0.898148148148148,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 33,
+            "n": 29,
             "d": 132,
-            "rate": 0.25
+            "rate": 0.2196969696969697
           },
           "new_person": {
             "n": 5,
@@ -1154,9 +1244,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 114,
+          "n": 117,
           "d": 132,
-          "rate": 0.8636363636363636
+          "rate": 0.8863636363636364
         },
         "passing": {
           "false_positive": {
@@ -1176,9 +1266,10 @@
           }
         },
         "forced_reason": {
-          "no_candidates": 5,
-          "no_matched": 25,
-          "none": 108
+          "no_candidates": 4,
+          "no_matched": 20,
+          "none": 109,
+          "penalized_candidate": 5
         },
         "llm_error": {
           "none": 138
@@ -1186,43 +1277,60 @@
         "excluding_llm_error": {
           "scored": 132,
           "false_merge_rate": {
-            "n": 2,
-            "d": 132,
-            "rate": 0.015151515151515152
-          },
-          "miss_rate": {
             "n": 1,
             "d": 132,
             "rate": 0.007575757575757576
+          },
+          "miss_rate": {
+            "n": 0,
+            "d": 132,
+            "rate": 0.0
           },
           "removed_rows": 0
         },
         "subsets": {
           "merge_rule_unchecked": {
-            "merges": 58,
+            "merges": 63,
             "false_merge_rate": {
               "n": 0,
-              "d": 58,
+              "d": 63,
               "rate": 0.0
             }
           },
           "merge_relaxed_retry": {
-            "merges": 15,
+            "merges": 14,
             "false_merge_rate": {
-              "n": 1,
-              "d": 15,
-              "rate": 0.06666666666666667
+              "n": 0,
+              "d": 14,
+              "rate": 0.0
             }
           },
-          "merges": 94
+          "penalized_merge": {
+            "merges": 14,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 14,
+              "rate": 0.0
+            },
+            "relaxed_pass_merges": 14,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 14,
+              "rate": 0.0
+            },
+            "reasons": {
+              "hierarchy_conflict": 14
+            }
+          },
+          "merges": 98
         },
         "by_category": {
           "alias": {
             "scored": 33,
             "false_merge_rate": {
-              "n": 1,
+              "n": 0,
               "d": 33,
-              "rate": 0.030303030303030304
+              "rate": 0.0
             },
             "miss_rate": {
               "n": 0,
@@ -1230,9 +1338,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 7,
+              "n": 5,
               "d": 33,
-              "rate": 0.21212121212121213
+              "rate": 0.15151515151515152
             }
           },
           "new_person": {
@@ -1248,9 +1356,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 8,
+              "n": 6,
               "d": 19,
-              "rate": 0.42105263157894735
+              "rate": 0.3157894736842105
             }
           },
           "normal": {
@@ -1279,9 +1387,9 @@
               "rate": 0.03571428571428571
             },
             "miss_rate": {
-              "n": 1,
+              "n": 0,
               "d": 28,
-              "rate": 0.03571428571428571
+              "rate": 0.0
             },
             "deferred_identity_rate": {
               "n": 8,
@@ -1320,43 +1428,43 @@
           "passing_rows": 6
         },
         "outcomes": {
-          "merge_correct": 47,
-          "false_merge": 1,
-          "miss": 1,
-          "deferred": 79,
-          "new_person_correct": 4
+          "merge_correct": 96,
+          "false_merge": 0,
+          "miss": 0,
+          "deferred": 31,
+          "new_person_correct": 5
         },
         "false_merge_rate": {
-          "n": 1,
+          "n": 0,
           "d": 132,
-          "rate": 0.007575757575757576
+          "rate": 0.0
         },
         "miss_rate": {
-          "n": 1,
+          "n": 0,
           "d": 132,
-          "rate": 0.007575757575757576
+          "rate": 0.0
         },
         "deferred_identity_rate": {
-          "n": 79,
+          "n": 31,
           "d": 132,
-          "rate": 0.5984848484848485
+          "rate": 0.23484848484848486
         },
         "precision": {
-          "n": 47,
-          "d": 48,
-          "rate": 0.9791666666666666
+          "n": 96,
+          "d": 96,
+          "rate": 1.0
         },
         "recall": {
-          "n": 47,
+          "n": 96,
           "d": 118,
-          "rate": 0.3983050847457627
+          "rate": 0.8135593220338984
         },
-        "f1": 0.5662650602409639,
+        "f1": 0.897196261682243,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 79,
+            "n": 31,
             "d": 132,
-            "rate": 0.5984848484848485
+            "rate": 0.23484848484848486
           },
           "new_person": {
             "n": 5,
@@ -1370,9 +1478,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 97,
+          "n": 117,
           "d": 132,
-          "rate": 0.7348484848484849
+          "rate": 0.8863636363636364
         },
         "passing": {
           "false_positive": {
@@ -1392,9 +1500,10 @@
           }
         },
         "forced_reason": {
-          "no_candidates": 5,
-          "no_matched": 25,
-          "none": 108
+          "no_candidates": 4,
+          "no_matched": 20,
+          "none": 109,
+          "penalized_candidate": 5
         },
         "llm_error": {
           "none": 138
@@ -1402,23 +1511,23 @@
         "excluding_llm_error": {
           "scored": 132,
           "false_merge_rate": {
-            "n": 1,
+            "n": 0,
             "d": 132,
-            "rate": 0.007575757575757576
+            "rate": 0.0
           },
           "miss_rate": {
-            "n": 1,
+            "n": 0,
             "d": 132,
-            "rate": 0.007575757575757576
+            "rate": 0.0
           },
           "removed_rows": 0
         },
         "subsets": {
           "merge_rule_unchecked": {
-            "merges": 14,
+            "merges": 63,
             "false_merge_rate": {
               "n": 0,
-              "d": 14,
+              "d": 63,
               "rate": 0.0
             }
           },
@@ -1430,15 +1539,32 @@
               "rate": 0.0
             }
           },
-          "merges": 48
+          "penalized_merge": {
+            "merges": 14,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 14,
+              "rate": 0.0
+            },
+            "relaxed_pass_merges": 14,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 14,
+              "rate": 0.0
+            },
+            "reasons": {
+              "hierarchy_conflict": 14
+            }
+          },
+          "merges": 96
         },
         "by_category": {
           "alias": {
             "scored": 33,
             "false_merge_rate": {
-              "n": 1,
+              "n": 0,
               "d": 33,
-              "rate": 0.030303030303030304
+              "rate": 0.0
             },
             "miss_rate": {
               "n": 0,
@@ -1446,9 +1572,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 21,
+              "n": 5,
               "d": 33,
-              "rate": 0.6363636363636364
+              "rate": 0.15151515151515152
             }
           },
           "new_person": {
@@ -1464,9 +1590,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 9,
+              "n": 6,
               "d": 19,
-              "rate": 0.47368421052631576
+              "rate": 0.3157894736842105
             }
           },
           "normal": {
@@ -1482,9 +1608,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 12,
+              "n": 1,
               "d": 21,
-              "rate": 0.5714285714285714
+              "rate": 0.047619047619047616
             }
           },
           "promotion": {
@@ -1495,9 +1621,243 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 1,
+              "n": 0,
               "d": 28,
-              "rate": 0.03571428571428571
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 10,
+              "d": 28,
+              "rate": 0.35714285714285715
+            }
+          },
+          "pronoun": {
+            "scored": 31,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 31,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 31,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 9,
+              "d": 31,
+              "rate": 0.2903225806451613
+            }
+          }
+        }
+      },
+      "0.85": {
+        "method": "proposed",
+        "t_merge": 0.85,
+        "t_new": 0.3,
+        "scored": 132,
+        "rows": 141,
+        "excluded": {
+          "ambiguous_rows": 3,
+          "passing_rows": 6
+        },
+        "outcomes": {
+          "merge_correct": 93,
+          "false_merge": 0,
+          "miss": 0,
+          "deferred": 34,
+          "new_person_correct": 5
+        },
+        "false_merge_rate": {
+          "n": 0,
+          "d": 132,
+          "rate": 0.0
+        },
+        "miss_rate": {
+          "n": 0,
+          "d": 132,
+          "rate": 0.0
+        },
+        "deferred_identity_rate": {
+          "n": 34,
+          "d": 132,
+          "rate": 0.25757575757575757
+        },
+        "precision": {
+          "n": 93,
+          "d": 93,
+          "rate": 1.0
+        },
+        "recall": {
+          "n": 93,
+          "d": 118,
+          "rate": 0.788135593220339
+        },
+        "f1": 0.8815165876777251,
+        "ask_user_rate_by_kind": {
+          "identity": {
+            "n": 34,
+            "d": 132,
+            "rate": 0.25757575757575757
+          },
+          "new_person": {
+            "n": 5,
+            "d": 132,
+            "rate": 0.03787878787878788
+          },
+          "schedule": {
+            "n": 0,
+            "d": 132,
+            "rate": 0.0
+          }
+        },
+        "expected_ask_user_allowed": {
+          "n": 116,
+          "d": 132,
+          "rate": 0.8787878787878788
+        },
+        "passing": {
+          "false_positive": {
+            "n": 0,
+            "d": 6,
+            "rate": 0.0
+          },
+          "by_decision": {
+            "merge": 0,
+            "identity": 6,
+            "new_person": 0
+          },
+          "expected_ask_user_allowed": {
+            "n": 0,
+            "d": 6,
+            "rate": 0.0
+          }
+        },
+        "forced_reason": {
+          "no_candidates": 4,
+          "no_matched": 20,
+          "none": 110,
+          "penalized_candidate": 4
+        },
+        "llm_error": {
+          "none": 138
+        },
+        "excluding_llm_error": {
+          "scored": 132,
+          "false_merge_rate": {
+            "n": 0,
+            "d": 132,
+            "rate": 0.0
+          },
+          "miss_rate": {
+            "n": 0,
+            "d": 132,
+            "rate": 0.0
+          },
+          "removed_rows": 0
+        },
+        "subsets": {
+          "merge_rule_unchecked": {
+            "merges": 63,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 63,
+              "rate": 0.0
+            }
+          },
+          "merge_relaxed_retry": {
+            "merges": 14,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 14,
+              "rate": 0.0
+            }
+          },
+          "penalized_merge": {
+            "merges": 14,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 14,
+              "rate": 0.0
+            },
+            "relaxed_pass_merges": 14,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 14,
+              "rate": 0.0
+            },
+            "reasons": {
+              "hierarchy_conflict": 14
+            }
+          },
+          "merges": 93
+        },
+        "by_category": {
+          "alias": {
+            "scored": 33,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 33,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 33,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 33,
+              "rate": 0.15151515151515152
+            }
+          },
+          "new_person": {
+            "scored": 19,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 19,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 19,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 6,
+              "d": 19,
+              "rate": 0.3157894736842105
+            }
+          },
+          "normal": {
+            "scored": 21,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 21,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 21,
+              "rate": 0.0
+            },
+            "deferred_identity_rate": {
+              "n": 1,
+              "d": 21,
+              "rate": 0.047619047619047616
+            }
+          },
+          "promotion": {
+            "scored": 28,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 28,
+              "rate": 0.0
+            },
+            "miss_rate": {
+              "n": 0,
+              "d": 28,
+              "rate": 0.0
             },
             "deferred_identity_rate": {
               "n": 12,
@@ -1518,225 +1878,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 25,
-              "d": 31,
-              "rate": 0.8064516129032258
-            }
-          }
-        }
-      },
-      "0.85": {
-        "method": "proposed",
-        "t_merge": 0.85,
-        "t_new": 0.3,
-        "scored": 132,
-        "rows": 141,
-        "excluded": {
-          "ambiguous_rows": 3,
-          "passing_rows": 6
-        },
-        "outcomes": {
-          "merge_correct": 30,
-          "false_merge": 1,
-          "miss": 1,
-          "deferred": 96,
-          "new_person_correct": 4
-        },
-        "false_merge_rate": {
-          "n": 1,
-          "d": 132,
-          "rate": 0.007575757575757576
-        },
-        "miss_rate": {
-          "n": 1,
-          "d": 132,
-          "rate": 0.007575757575757576
-        },
-        "deferred_identity_rate": {
-          "n": 96,
-          "d": 132,
-          "rate": 0.7272727272727273
-        },
-        "precision": {
-          "n": 30,
-          "d": 31,
-          "rate": 0.967741935483871
-        },
-        "recall": {
-          "n": 30,
-          "d": 118,
-          "rate": 0.2542372881355932
-        },
-        "f1": 0.40268456375838924,
-        "ask_user_rate_by_kind": {
-          "identity": {
-            "n": 96,
-            "d": 132,
-            "rate": 0.7272727272727273
-          },
-          "new_person": {
-            "n": 5,
-            "d": 132,
-            "rate": 0.03787878787878788
-          },
-          "schedule": {
-            "n": 0,
-            "d": 132,
-            "rate": 0.0
-          }
-        },
-        "expected_ask_user_allowed": {
-          "n": 88,
-          "d": 132,
-          "rate": 0.6666666666666666
-        },
-        "passing": {
-          "false_positive": {
-            "n": 0,
-            "d": 6,
-            "rate": 0.0
-          },
-          "by_decision": {
-            "merge": 0,
-            "identity": 6,
-            "new_person": 0
-          },
-          "expected_ask_user_allowed": {
-            "n": 0,
-            "d": 6,
-            "rate": 0.0
-          }
-        },
-        "forced_reason": {
-          "no_candidates": 5,
-          "no_matched": 25,
-          "none": 108
-        },
-        "llm_error": {
-          "none": 138
-        },
-        "excluding_llm_error": {
-          "scored": 132,
-          "false_merge_rate": {
-            "n": 1,
-            "d": 132,
-            "rate": 0.007575757575757576
-          },
-          "miss_rate": {
-            "n": 1,
-            "d": 132,
-            "rate": 0.007575757575757576
-          },
-          "removed_rows": 0
-        },
-        "subsets": {
-          "merge_rule_unchecked": {
-            "merges": 0,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 0,
-              "rate": null
-            }
-          },
-          "merge_relaxed_retry": {
-            "merges": 14,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 14,
-              "rate": 0.0
-            }
-          },
-          "merges": 31
-        },
-        "by_category": {
-          "alias": {
-            "scored": 33,
-            "false_merge_rate": {
-              "n": 1,
-              "d": 33,
-              "rate": 0.030303030303030304
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 33,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 25,
-              "d": 33,
-              "rate": 0.7575757575757576
-            }
-          },
-          "new_person": {
-            "scored": 19,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 19,
-              "rate": 0.0
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 19,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
               "n": 10,
-              "d": 19,
-              "rate": 0.5263157894736842
-            }
-          },
-          "normal": {
-            "scored": 21,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 21,
-              "rate": 0.0
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 21,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 14,
-              "d": 21,
-              "rate": 0.6666666666666666
-            }
-          },
-          "promotion": {
-            "scored": 28,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 28,
-              "rate": 0.0
-            },
-            "miss_rate": {
-              "n": 1,
-              "d": 28,
-              "rate": 0.03571428571428571
-            },
-            "deferred_identity_rate": {
-              "n": 17,
-              "d": 28,
-              "rate": 0.6071428571428571
-            }
-          },
-          "pronoun": {
-            "scored": 31,
-            "false_merge_rate": {
-              "n": 0,
               "d": 31,
-              "rate": 0.0
-            },
-            "miss_rate": {
-              "n": 0,
-              "d": 31,
-              "rate": 0.0
-            },
-            "deferred_identity_rate": {
-              "n": 30,
-              "d": 31,
-              "rate": 0.967741935483871
+              "rate": 0.3225806451612903
             }
           }
         }
@@ -1752,43 +1896,43 @@
           "passing_rows": 6
         },
         "outcomes": {
-          "merge_correct": 21,
-          "false_merge": 1,
-          "miss": 1,
-          "deferred": 105,
-          "new_person_correct": 4
+          "merge_correct": 81,
+          "false_merge": 0,
+          "miss": 0,
+          "deferred": 46,
+          "new_person_correct": 5
         },
         "false_merge_rate": {
-          "n": 1,
+          "n": 0,
           "d": 132,
-          "rate": 0.007575757575757576
+          "rate": 0.0
         },
         "miss_rate": {
-          "n": 1,
+          "n": 0,
           "d": 132,
-          "rate": 0.007575757575757576
+          "rate": 0.0
         },
         "deferred_identity_rate": {
-          "n": 105,
+          "n": 46,
           "d": 132,
-          "rate": 0.7954545454545454
+          "rate": 0.3484848484848485
         },
         "precision": {
-          "n": 21,
-          "d": 22,
-          "rate": 0.9545454545454546
+          "n": 81,
+          "d": 81,
+          "rate": 1.0
         },
         "recall": {
-          "n": 21,
+          "n": 81,
           "d": 118,
-          "rate": 0.17796610169491525
+          "rate": 0.6864406779661016
         },
-        "f1": 0.3,
+        "f1": 0.8140703517587939,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 105,
+            "n": 46,
             "d": 132,
-            "rate": 0.7954545454545454
+            "rate": 0.3484848484848485
           },
           "new_person": {
             "n": 5,
@@ -1802,9 +1946,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 88,
+          "n": 113,
           "d": 132,
-          "rate": 0.6666666666666666
+          "rate": 0.8560606060606061
         },
         "passing": {
           "false_positive": {
@@ -1824,9 +1968,9 @@
           }
         },
         "forced_reason": {
-          "no_candidates": 5,
-          "no_matched": 25,
-          "none": 108
+          "no_candidates": 4,
+          "no_matched": 20,
+          "none": 114
         },
         "llm_error": {
           "none": 138
@@ -1834,43 +1978,60 @@
         "excluding_llm_error": {
           "scored": 132,
           "false_merge_rate": {
-            "n": 1,
+            "n": 0,
             "d": 132,
-            "rate": 0.007575757575757576
+            "rate": 0.0
           },
           "miss_rate": {
-            "n": 1,
+            "n": 0,
             "d": 132,
-            "rate": 0.007575757575757576
+            "rate": 0.0
           },
           "removed_rows": 0
         },
         "subsets": {
           "merge_rule_unchecked": {
-            "merges": 0,
+            "merges": 59,
             "false_merge_rate": {
               "n": 0,
-              "d": 0,
-              "rate": null
-            }
-          },
-          "merge_relaxed_retry": {
-            "merges": 5,
-            "false_merge_rate": {
-              "n": 0,
-              "d": 5,
+              "d": 59,
               "rate": 0.0
             }
           },
-          "merges": 22
+          "merge_relaxed_retry": {
+            "merges": 6,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 6,
+              "rate": 0.0
+            }
+          },
+          "penalized_merge": {
+            "merges": 6,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 6,
+              "rate": 0.0
+            },
+            "relaxed_pass_merges": 6,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 6,
+              "rate": 0.0
+            },
+            "reasons": {
+              "hierarchy_conflict": 6
+            }
+          },
+          "merges": 81
         },
         "by_category": {
           "alias": {
             "scored": 33,
             "false_merge_rate": {
-              "n": 1,
+              "n": 0,
               "d": 33,
-              "rate": 0.030303030303030304
+              "rate": 0.0
             },
             "miss_rate": {
               "n": 0,
@@ -1878,9 +2039,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 26,
+              "n": 7,
               "d": 33,
-              "rate": 0.7878787878787878
+              "rate": 0.21212121212121213
             }
           },
           "new_person": {
@@ -1896,9 +2057,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 13,
+              "n": 11,
               "d": 19,
-              "rate": 0.6842105263157895
+              "rate": 0.5789473684210527
             }
           },
           "normal": {
@@ -1914,9 +2075,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 14,
+              "n": 3,
               "d": 21,
-              "rate": 0.6666666666666666
+              "rate": 0.14285714285714285
             }
           },
           "promotion": {
@@ -1927,14 +2088,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 1,
+              "n": 0,
               "d": 28,
-              "rate": 0.03571428571428571
+              "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 21,
+              "n": 15,
               "d": 28,
-              "rate": 0.75
+              "rate": 0.5357142857142857
             }
           },
           "pronoun": {
@@ -1950,9 +2111,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 31,
+              "n": 10,
               "d": 31,
-              "rate": 1.0
+              "rate": 0.3225806451612903
             }
           }
         }
@@ -1968,43 +2129,43 @@
           "passing_rows": 6
         },
         "outcomes": {
-          "merge_correct": 12,
-          "false_merge": 1,
-          "miss": 1,
-          "deferred": 114,
-          "new_person_correct": 4
+          "merge_correct": 41,
+          "false_merge": 0,
+          "miss": 0,
+          "deferred": 86,
+          "new_person_correct": 5
         },
         "false_merge_rate": {
-          "n": 1,
+          "n": 0,
           "d": 132,
-          "rate": 0.007575757575757576
+          "rate": 0.0
         },
         "miss_rate": {
-          "n": 1,
+          "n": 0,
           "d": 132,
-          "rate": 0.007575757575757576
+          "rate": 0.0
         },
         "deferred_identity_rate": {
-          "n": 114,
+          "n": 86,
           "d": 132,
-          "rate": 0.8636363636363636
+          "rate": 0.6515151515151515
         },
         "precision": {
-          "n": 12,
-          "d": 13,
-          "rate": 0.9230769230769231
+          "n": 41,
+          "d": 41,
+          "rate": 1.0
         },
         "recall": {
-          "n": 12,
+          "n": 41,
           "d": 118,
-          "rate": 0.1016949152542373
+          "rate": 0.3474576271186441
         },
-        "f1": 0.18320610687022904,
+        "f1": 0.5157232704402516,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 114,
+            "n": 86,
             "d": 132,
-            "rate": 0.8636363636363636
+            "rate": 0.6515151515151515
           },
           "new_person": {
             "n": 5,
@@ -2018,9 +2179,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 82,
+          "n": 96,
           "d": 132,
-          "rate": 0.6212121212121212
+          "rate": 0.7272727272727273
         },
         "passing": {
           "false_positive": {
@@ -2040,9 +2201,9 @@
           }
         },
         "forced_reason": {
-          "no_candidates": 5,
-          "no_matched": 25,
-          "none": 108
+          "no_candidates": 4,
+          "no_matched": 20,
+          "none": 114
         },
         "llm_error": {
           "none": 138
@@ -2050,24 +2211,24 @@
         "excluding_llm_error": {
           "scored": 132,
           "false_merge_rate": {
-            "n": 1,
+            "n": 0,
             "d": 132,
-            "rate": 0.007575757575757576
+            "rate": 0.0
           },
           "miss_rate": {
-            "n": 1,
+            "n": 0,
             "d": 132,
-            "rate": 0.007575757575757576
+            "rate": 0.0
           },
           "removed_rows": 0
         },
         "subsets": {
           "merge_rule_unchecked": {
-            "merges": 0,
+            "merges": 29,
             "false_merge_rate": {
               "n": 0,
-              "d": 0,
-              "rate": null
+              "d": 29,
+              "rate": 0.0
             }
           },
           "merge_relaxed_retry": {
@@ -2078,15 +2239,30 @@
               "rate": null
             }
           },
-          "merges": 13
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
+          "merges": 41
         },
         "by_category": {
           "alias": {
             "scored": 33,
             "false_merge_rate": {
-              "n": 1,
+              "n": 0,
               "d": 33,
-              "rate": 0.030303030303030304
+              "rate": 0.0
             },
             "miss_rate": {
               "n": 0,
@@ -2094,9 +2270,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 29,
+              "n": 20,
               "d": 33,
-              "rate": 0.8787878787878788
+              "rate": 0.6060606060606061
             }
           },
           "new_person": {
@@ -2130,9 +2306,9 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 16,
+              "n": 9,
               "d": 21,
-              "rate": 0.7619047619047619
+              "rate": 0.42857142857142855
             }
           },
           "promotion": {
@@ -2143,14 +2319,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 1,
+              "n": 0,
               "d": 28,
-              "rate": 0.03571428571428571
+              "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 23,
+              "n": 21,
               "d": 28,
-              "rate": 0.8214285714285714
+              "rate": 0.75
             }
           },
           "pronoun": {
@@ -2166,22 +2342,22 @@
               "rate": 0.0
             },
             "deferred_identity_rate": {
-              "n": 31,
+              "n": 21,
               "d": 31,
-              "rate": 1.0
+              "rate": 0.6774193548387096
             }
           }
         }
       }
     },
     "llm": {
-      "calls": 136,
-      "tokens_in": 60266,
-      "tokens_out": 5656,
+      "calls": 137,
+      "tokens_in": 62043,
+      "tokens_out": 5753,
       "errors": {},
       "error_calls": 0,
       "mentions": 141,
-      "skipped_mentions": 5
+      "skipped_mentions": 4
     },
     "rows": 1410
   },
@@ -2318,6 +2494,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 83
         },
         "by_category": {
@@ -2531,6 +2722,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 83
         },
@@ -2746,6 +2952,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 83
         },
         "by_category": {
@@ -2959,6 +3180,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 83
         },
@@ -3174,6 +3410,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 83
         },
         "by_category": {
@@ -3387,6 +3638,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 83
         },
@@ -3602,6 +3868,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 83
         },
         "by_category": {
@@ -3815,6 +4096,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 83
         },
@@ -4030,6 +4326,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 83
         },
         "by_category": {
@@ -4243,6 +4554,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 83
         },
@@ -4484,6 +4810,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 95
         },
         "by_category": {
@@ -4697,6 +5038,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 95
         },
@@ -4912,6 +5268,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 95
         },
         "by_category": {
@@ -5125,6 +5496,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 95
         },
@@ -5340,6 +5726,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 95
         },
         "by_category": {
@@ -5553,6 +5954,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 95
         },
@@ -5768,6 +6184,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 95
         },
         "by_category": {
@@ -5981,6 +6412,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 95
         },
@@ -6196,6 +6642,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 95
         },
         "by_category": {
@@ -6409,6 +6870,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 95
         },
@@ -6652,6 +7128,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 107
         },
         "by_category": {
@@ -6867,6 +7358,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 104
         },
@@ -7084,6 +7590,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 101
         },
         "by_category": {
@@ -7299,6 +7820,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 99
         },
@@ -7516,6 +8052,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 97
         },
         "by_category": {
@@ -7731,6 +8282,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 96
         },
@@ -7948,6 +8514,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 95
         },
         "by_category": {
@@ -8163,6 +8744,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 95
         },
@@ -8380,6 +8976,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 88
         },
         "by_category": {
@@ -8596,6 +9207,21 @@
               "rate": null
             }
           },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
+          },
           "merges": 83
         },
         "by_category": {
@@ -8730,8 +9356,8 @@
         "outcomes": {
           "merge_correct": 90,
           "false_merge": 0,
-          "miss": 10,
-          "deferred": 19,
+          "miss": 9,
+          "deferred": 20,
           "new_person_correct": 13
         },
         "false_merge_rate": {
@@ -8740,14 +9366,14 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "deferred_identity_rate": {
-          "n": 19,
+          "n": 20,
           "d": 132,
-          "rate": 0.14393939393939395
+          "rate": 0.15151515151515152
         },
         "precision": {
           "n": 90,
@@ -8762,14 +9388,14 @@
         "f1": 0.8653846153846153,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 19,
+            "n": 20,
             "d": 132,
-            "rate": 0.14393939393939395
+            "rate": 0.15151515151515152
           },
           "new_person": {
-            "n": 23,
+            "n": 22,
             "d": 132,
-            "rate": 0.17424242424242425
+            "rate": 0.16666666666666666
           },
           "schedule": {
             "n": 0,
@@ -8778,9 +9404,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 117,
+          "n": 118,
           "d": 132,
-          "rate": 0.8863636363636364
+          "rate": 0.8939393939393939
         },
         "passing": {
           "false_positive": {
@@ -8813,9 +9439,9 @@
             "rate": 0.0
           },
           "miss_rate": {
-            "n": 10,
+            "n": 9,
             "d": 132,
-            "rate": 0.07575757575757576
+            "rate": 0.06818181818181818
           },
           "removed_rows": 0
         },
@@ -8835,6 +9461,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 90
         },
@@ -8901,14 +9542,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            },
-            "deferred_identity_rate": {
               "n": 4,
               "d": 28,
               "rate": 0.14285714285714285
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 28,
+              "rate": 0.17857142857142858
             }
           },
           "pronoun": {
@@ -8944,8 +9585,8 @@
         "outcomes": {
           "merge_correct": 90,
           "false_merge": 0,
-          "miss": 10,
-          "deferred": 19,
+          "miss": 9,
+          "deferred": 20,
           "new_person_correct": 13
         },
         "false_merge_rate": {
@@ -8954,14 +9595,14 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "deferred_identity_rate": {
-          "n": 19,
+          "n": 20,
           "d": 132,
-          "rate": 0.14393939393939395
+          "rate": 0.15151515151515152
         },
         "precision": {
           "n": 90,
@@ -8976,14 +9617,14 @@
         "f1": 0.8653846153846153,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 19,
+            "n": 20,
             "d": 132,
-            "rate": 0.14393939393939395
+            "rate": 0.15151515151515152
           },
           "new_person": {
-            "n": 23,
+            "n": 22,
             "d": 132,
-            "rate": 0.17424242424242425
+            "rate": 0.16666666666666666
           },
           "schedule": {
             "n": 0,
@@ -8992,9 +9633,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 117,
+          "n": 118,
           "d": 132,
-          "rate": 0.8863636363636364
+          "rate": 0.8939393939393939
         },
         "passing": {
           "false_positive": {
@@ -9027,9 +9668,9 @@
             "rate": 0.0
           },
           "miss_rate": {
-            "n": 10,
+            "n": 9,
             "d": 132,
-            "rate": 0.07575757575757576
+            "rate": 0.06818181818181818
           },
           "removed_rows": 0
         },
@@ -9049,6 +9690,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 90
         },
@@ -9115,14 +9771,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            },
-            "deferred_identity_rate": {
               "n": 4,
               "d": 28,
               "rate": 0.14285714285714285
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 28,
+              "rate": 0.17857142857142858
             }
           },
           "pronoun": {
@@ -9158,8 +9814,8 @@
         "outcomes": {
           "merge_correct": 90,
           "false_merge": 0,
-          "miss": 10,
-          "deferred": 19,
+          "miss": 9,
+          "deferred": 20,
           "new_person_correct": 13
         },
         "false_merge_rate": {
@@ -9168,14 +9824,14 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "deferred_identity_rate": {
-          "n": 19,
+          "n": 20,
           "d": 132,
-          "rate": 0.14393939393939395
+          "rate": 0.15151515151515152
         },
         "precision": {
           "n": 90,
@@ -9190,14 +9846,14 @@
         "f1": 0.8653846153846153,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 19,
+            "n": 20,
             "d": 132,
-            "rate": 0.14393939393939395
+            "rate": 0.15151515151515152
           },
           "new_person": {
-            "n": 23,
+            "n": 22,
             "d": 132,
-            "rate": 0.17424242424242425
+            "rate": 0.16666666666666666
           },
           "schedule": {
             "n": 0,
@@ -9206,9 +9862,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 117,
+          "n": 118,
           "d": 132,
-          "rate": 0.8863636363636364
+          "rate": 0.8939393939393939
         },
         "passing": {
           "false_positive": {
@@ -9241,9 +9897,9 @@
             "rate": 0.0
           },
           "miss_rate": {
-            "n": 10,
+            "n": 9,
             "d": 132,
-            "rate": 0.07575757575757576
+            "rate": 0.06818181818181818
           },
           "removed_rows": 0
         },
@@ -9263,6 +9919,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 90
         },
@@ -9329,14 +10000,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            },
-            "deferred_identity_rate": {
               "n": 4,
               "d": 28,
               "rate": 0.14285714285714285
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 28,
+              "rate": 0.17857142857142858
             }
           },
           "pronoun": {
@@ -9372,8 +10043,8 @@
         "outcomes": {
           "merge_correct": 90,
           "false_merge": 0,
-          "miss": 10,
-          "deferred": 19,
+          "miss": 9,
+          "deferred": 20,
           "new_person_correct": 13
         },
         "false_merge_rate": {
@@ -9382,14 +10053,14 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "deferred_identity_rate": {
-          "n": 19,
+          "n": 20,
           "d": 132,
-          "rate": 0.14393939393939395
+          "rate": 0.15151515151515152
         },
         "precision": {
           "n": 90,
@@ -9404,14 +10075,14 @@
         "f1": 0.8653846153846153,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 19,
+            "n": 20,
             "d": 132,
-            "rate": 0.14393939393939395
+            "rate": 0.15151515151515152
           },
           "new_person": {
-            "n": 23,
+            "n": 22,
             "d": 132,
-            "rate": 0.17424242424242425
+            "rate": 0.16666666666666666
           },
           "schedule": {
             "n": 0,
@@ -9420,9 +10091,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 117,
+          "n": 118,
           "d": 132,
-          "rate": 0.8863636363636364
+          "rate": 0.8939393939393939
         },
         "passing": {
           "false_positive": {
@@ -9455,9 +10126,9 @@
             "rate": 0.0
           },
           "miss_rate": {
-            "n": 10,
+            "n": 9,
             "d": 132,
-            "rate": 0.07575757575757576
+            "rate": 0.06818181818181818
           },
           "removed_rows": 0
         },
@@ -9477,6 +10148,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 90
         },
@@ -9543,14 +10229,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            },
-            "deferred_identity_rate": {
               "n": 4,
               "d": 28,
               "rate": 0.14285714285714285
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 28,
+              "rate": 0.17857142857142858
             }
           },
           "pronoun": {
@@ -9586,8 +10272,8 @@
         "outcomes": {
           "merge_correct": 90,
           "false_merge": 0,
-          "miss": 10,
-          "deferred": 19,
+          "miss": 9,
+          "deferred": 20,
           "new_person_correct": 13
         },
         "false_merge_rate": {
@@ -9596,14 +10282,14 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "deferred_identity_rate": {
-          "n": 19,
+          "n": 20,
           "d": 132,
-          "rate": 0.14393939393939395
+          "rate": 0.15151515151515152
         },
         "precision": {
           "n": 90,
@@ -9618,14 +10304,14 @@
         "f1": 0.8653846153846153,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 19,
+            "n": 20,
             "d": 132,
-            "rate": 0.14393939393939395
+            "rate": 0.15151515151515152
           },
           "new_person": {
-            "n": 23,
+            "n": 22,
             "d": 132,
-            "rate": 0.17424242424242425
+            "rate": 0.16666666666666666
           },
           "schedule": {
             "n": 0,
@@ -9634,9 +10320,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 117,
+          "n": 118,
           "d": 132,
-          "rate": 0.8863636363636364
+          "rate": 0.8939393939393939
         },
         "passing": {
           "false_positive": {
@@ -9669,9 +10355,9 @@
             "rate": 0.0
           },
           "miss_rate": {
-            "n": 10,
+            "n": 9,
             "d": 132,
-            "rate": 0.07575757575757576
+            "rate": 0.06818181818181818
           },
           "removed_rows": 0
         },
@@ -9691,6 +10377,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 90
         },
@@ -9757,14 +10458,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            },
-            "deferred_identity_rate": {
               "n": 4,
               "d": 28,
               "rate": 0.14285714285714285
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 28,
+              "rate": 0.17857142857142858
             }
           },
           "pronoun": {
@@ -9800,8 +10501,8 @@
         "outcomes": {
           "merge_correct": 90,
           "false_merge": 0,
-          "miss": 10,
-          "deferred": 19,
+          "miss": 9,
+          "deferred": 20,
           "new_person_correct": 13
         },
         "false_merge_rate": {
@@ -9810,14 +10511,14 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "deferred_identity_rate": {
-          "n": 19,
+          "n": 20,
           "d": 132,
-          "rate": 0.14393939393939395
+          "rate": 0.15151515151515152
         },
         "precision": {
           "n": 90,
@@ -9832,14 +10533,14 @@
         "f1": 0.8653846153846153,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 19,
+            "n": 20,
             "d": 132,
-            "rate": 0.14393939393939395
+            "rate": 0.15151515151515152
           },
           "new_person": {
-            "n": 23,
+            "n": 22,
             "d": 132,
-            "rate": 0.17424242424242425
+            "rate": 0.16666666666666666
           },
           "schedule": {
             "n": 0,
@@ -9848,9 +10549,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 117,
+          "n": 118,
           "d": 132,
-          "rate": 0.8863636363636364
+          "rate": 0.8939393939393939
         },
         "passing": {
           "false_positive": {
@@ -9883,9 +10584,9 @@
             "rate": 0.0
           },
           "miss_rate": {
-            "n": 10,
+            "n": 9,
             "d": 132,
-            "rate": 0.07575757575757576
+            "rate": 0.06818181818181818
           },
           "removed_rows": 0
         },
@@ -9905,6 +10606,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 90
         },
@@ -9971,14 +10687,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            },
-            "deferred_identity_rate": {
               "n": 4,
               "d": 28,
               "rate": 0.14285714285714285
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 28,
+              "rate": 0.17857142857142858
             }
           },
           "pronoun": {
@@ -10014,8 +10730,8 @@
         "outcomes": {
           "merge_correct": 90,
           "false_merge": 0,
-          "miss": 10,
-          "deferred": 19,
+          "miss": 9,
+          "deferred": 20,
           "new_person_correct": 13
         },
         "false_merge_rate": {
@@ -10024,14 +10740,14 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "deferred_identity_rate": {
-          "n": 19,
+          "n": 20,
           "d": 132,
-          "rate": 0.14393939393939395
+          "rate": 0.15151515151515152
         },
         "precision": {
           "n": 90,
@@ -10046,14 +10762,14 @@
         "f1": 0.8653846153846153,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 19,
+            "n": 20,
             "d": 132,
-            "rate": 0.14393939393939395
+            "rate": 0.15151515151515152
           },
           "new_person": {
-            "n": 23,
+            "n": 22,
             "d": 132,
-            "rate": 0.17424242424242425
+            "rate": 0.16666666666666666
           },
           "schedule": {
             "n": 0,
@@ -10062,9 +10778,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 117,
+          "n": 118,
           "d": 132,
-          "rate": 0.8863636363636364
+          "rate": 0.8939393939393939
         },
         "passing": {
           "false_positive": {
@@ -10097,9 +10813,9 @@
             "rate": 0.0
           },
           "miss_rate": {
-            "n": 10,
+            "n": 9,
             "d": 132,
-            "rate": 0.07575757575757576
+            "rate": 0.06818181818181818
           },
           "removed_rows": 0
         },
@@ -10119,6 +10835,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 90
         },
@@ -10185,14 +10916,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            },
-            "deferred_identity_rate": {
               "n": 4,
               "d": 28,
               "rate": 0.14285714285714285
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 28,
+              "rate": 0.17857142857142858
             }
           },
           "pronoun": {
@@ -10228,8 +10959,8 @@
         "outcomes": {
           "merge_correct": 90,
           "false_merge": 0,
-          "miss": 10,
-          "deferred": 19,
+          "miss": 9,
+          "deferred": 20,
           "new_person_correct": 13
         },
         "false_merge_rate": {
@@ -10238,14 +10969,14 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "deferred_identity_rate": {
-          "n": 19,
+          "n": 20,
           "d": 132,
-          "rate": 0.14393939393939395
+          "rate": 0.15151515151515152
         },
         "precision": {
           "n": 90,
@@ -10260,14 +10991,14 @@
         "f1": 0.8653846153846153,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 19,
+            "n": 20,
             "d": 132,
-            "rate": 0.14393939393939395
+            "rate": 0.15151515151515152
           },
           "new_person": {
-            "n": 23,
+            "n": 22,
             "d": 132,
-            "rate": 0.17424242424242425
+            "rate": 0.16666666666666666
           },
           "schedule": {
             "n": 0,
@@ -10276,9 +11007,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 117,
+          "n": 118,
           "d": 132,
-          "rate": 0.8863636363636364
+          "rate": 0.8939393939393939
         },
         "passing": {
           "false_positive": {
@@ -10311,9 +11042,9 @@
             "rate": 0.0
           },
           "miss_rate": {
-            "n": 10,
+            "n": 9,
             "d": 132,
-            "rate": 0.07575757575757576
+            "rate": 0.06818181818181818
           },
           "removed_rows": 0
         },
@@ -10333,6 +11064,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 90
         },
@@ -10399,14 +11145,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            },
-            "deferred_identity_rate": {
               "n": 4,
               "d": 28,
               "rate": 0.14285714285714285
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 28,
+              "rate": 0.17857142857142858
             }
           },
           "pronoun": {
@@ -10442,8 +11188,8 @@
         "outcomes": {
           "merge_correct": 90,
           "false_merge": 0,
-          "miss": 10,
-          "deferred": 19,
+          "miss": 9,
+          "deferred": 20,
           "new_person_correct": 13
         },
         "false_merge_rate": {
@@ -10452,14 +11198,14 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "deferred_identity_rate": {
-          "n": 19,
+          "n": 20,
           "d": 132,
-          "rate": 0.14393939393939395
+          "rate": 0.15151515151515152
         },
         "precision": {
           "n": 90,
@@ -10474,14 +11220,14 @@
         "f1": 0.8653846153846153,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 19,
+            "n": 20,
             "d": 132,
-            "rate": 0.14393939393939395
+            "rate": 0.15151515151515152
           },
           "new_person": {
-            "n": 23,
+            "n": 22,
             "d": 132,
-            "rate": 0.17424242424242425
+            "rate": 0.16666666666666666
           },
           "schedule": {
             "n": 0,
@@ -10490,9 +11236,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 117,
+          "n": 118,
           "d": 132,
-          "rate": 0.8863636363636364
+          "rate": 0.8939393939393939
         },
         "passing": {
           "false_positive": {
@@ -10525,9 +11271,9 @@
             "rate": 0.0
           },
           "miss_rate": {
-            "n": 10,
+            "n": 9,
             "d": 132,
-            "rate": 0.07575757575757576
+            "rate": 0.06818181818181818
           },
           "removed_rows": 0
         },
@@ -10547,6 +11293,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 90
         },
@@ -10613,14 +11374,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            },
-            "deferred_identity_rate": {
               "n": 4,
               "d": 28,
               "rate": 0.14285714285714285
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 28,
+              "rate": 0.17857142857142858
             }
           },
           "pronoun": {
@@ -10656,8 +11417,8 @@
         "outcomes": {
           "merge_correct": 90,
           "false_merge": 0,
-          "miss": 10,
-          "deferred": 19,
+          "miss": 9,
+          "deferred": 20,
           "new_person_correct": 13
         },
         "false_merge_rate": {
@@ -10666,14 +11427,14 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "deferred_identity_rate": {
-          "n": 19,
+          "n": 20,
           "d": 132,
-          "rate": 0.14393939393939395
+          "rate": 0.15151515151515152
         },
         "precision": {
           "n": 90,
@@ -10688,14 +11449,14 @@
         "f1": 0.8653846153846153,
         "ask_user_rate_by_kind": {
           "identity": {
-            "n": 19,
+            "n": 20,
             "d": 132,
-            "rate": 0.14393939393939395
+            "rate": 0.15151515151515152
           },
           "new_person": {
-            "n": 23,
+            "n": 22,
             "d": 132,
-            "rate": 0.17424242424242425
+            "rate": 0.16666666666666666
           },
           "schedule": {
             "n": 0,
@@ -10704,9 +11465,9 @@
           }
         },
         "expected_ask_user_allowed": {
-          "n": 117,
+          "n": 118,
           "d": 132,
-          "rate": 0.8863636363636364
+          "rate": 0.8939393939393939
         },
         "passing": {
           "false_positive": {
@@ -10739,9 +11500,9 @@
             "rate": 0.0
           },
           "miss_rate": {
-            "n": 10,
+            "n": 9,
             "d": 132,
-            "rate": 0.07575757575757576
+            "rate": 0.06818181818181818
           },
           "removed_rows": 0
         },
@@ -10761,6 +11522,21 @@
               "d": 0,
               "rate": null
             }
+          },
+          "penalized_merge": {
+            "merges": 0,
+            "false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "relaxed_pass_merges": 0,
+            "relaxed_pass_false_merge_rate": {
+              "n": 0,
+              "d": 0,
+              "rate": null
+            },
+            "reasons": {}
           },
           "merges": 90
         },
@@ -10827,14 +11603,14 @@
               "rate": 0.0
             },
             "miss_rate": {
-              "n": 5,
-              "d": 28,
-              "rate": 0.17857142857142858
-            },
-            "deferred_identity_rate": {
               "n": 4,
               "d": 28,
               "rate": 0.14285714285714285
+            },
+            "deferred_identity_rate": {
+              "n": 5,
+              "d": 28,
+              "rate": 0.17857142857142858
             }
           },
           "pronoun": {
@@ -10861,7 +11637,7 @@
     "llm": {
       "calls": 141,
       "tokens_in": 69974,
-      "tokens_out": 6961,
+      "tokens_out": 6928,
       "errors": {},
       "error_calls": 0,
       "mentions": 141,
@@ -10921,7 +11697,7 @@
       "sweep_copies": "한 mention × 방식은 T_merge 격자만큼의 행을 갖고 LLM 응답은 그중 llm_fresh_call == true 행 하나에서만 나왔다. 토큰·LLM 호출·호출 오류 건수는 그 행만 세고, mention 단위 수치는 sweep_index 최소 행만 본다. 임계치별 분포는 임계치 안에서만 센다(한 자리 하나).",
       "score_axis": "score 의 의미는 방식마다 다르므로(P3-baselines 인계 14) 이 모듈은 어떤 집계에도 score 를 쓰지 않는다 -- 출력 어디에도 score 키가 없다."
     },
-    "schema_version": 1,
+    "schema_version": 2,
     "provider": "openai",
     "model": "gpt-4o-mini-2024-07-18",
     "model_source": "detail['model'] -- 판정이 돌려준 모델명(U3 보정표와 같은 출처). 설정 문자열은 meta.model_configured.",
@@ -10942,7 +11718,7 @@
         "method": "proposed",
         "provider": "openai",
         "model": "gpt-4o-mini-2024-07-18",
-        "mentions": 136
+        "mentions": 137
       }
     ],
     "model_configured": {
@@ -10950,8 +11726,8 @@
     },
     "embedding_model": "text-embedding-3-small",
     "dataset_hash": "sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e",
-    "run_id": "run-29621888da00",
-    "commit": "750f11b02f13c942c6d2ef8155646d5b7bc03ac6",
+    "run_id": "run-35ae97b5e6ed",
+    "commit": "f96d15b401a24d31bc49de86a1d2c2e11e593999",
     "run_mode": "real",
     "caller_supplied": [
       "embedding_model",
@@ -10969,8 +11745,10 @@
       "llm": 0.5,
       "emb": 0.3,
       "rule": 0.2,
-      "source": "app.er.types.ERConfig() 모듈 기본값(0.5·0.3·0.2, D3). W_LLM/W_EMB/W_RULE 환경변수를 읽지 않는다 -- 같은 JSONL 이면 같은 metrics.json."
+      "source": "app.er.types.ERConfig() 모듈 기본값(0.5·0.3·0.2 비율, D12 가 비율을 유지한다). W_LLM/W_EMB/W_RULE 환경변수를 읽지 않는다 -- 같은 JSONL 이면 같은 metrics.json."
     },
+    "weights_policy": "observed_renormalized(D12)",
+    "penalized_merge_policy": "ask",
     "curve": {
       "x_axis": "t_merge",
       "series": [
@@ -10999,19 +11777,21 @@
       "proposed": {
         "0.5": {
           "counts": {
-            "no_candidates": 5,
-            "no_matched": 25
+            "no_candidates": 4,
+            "no_matched": 20,
+            "penalized_candidate": 7
           },
           "rate": {
-            "n": 30,
+            "n": 31,
             "d": 138,
-            "rate": 0.21739130434782608
+            "rate": 0.2246376811594203
           }
         },
         "0.55": {
           "counts": {
-            "no_candidates": 5,
-            "no_matched": 25
+            "no_candidates": 4,
+            "no_matched": 20,
+            "penalized_candidate": 6
           },
           "rate": {
             "n": 30,
@@ -11021,8 +11801,9 @@
         },
         "0.6": {
           "counts": {
-            "no_candidates": 5,
-            "no_matched": 25
+            "no_candidates": 4,
+            "no_matched": 20,
+            "penalized_candidate": 6
           },
           "rate": {
             "n": 30,
@@ -11032,8 +11813,9 @@
         },
         "0.65": {
           "counts": {
-            "no_candidates": 5,
-            "no_matched": 25
+            "no_candidates": 4,
+            "no_matched": 20,
+            "penalized_candidate": 6
           },
           "rate": {
             "n": 30,
@@ -11043,8 +11825,9 @@
         },
         "0.7": {
           "counts": {
-            "no_candidates": 5,
-            "no_matched": 25
+            "no_candidates": 4,
+            "no_matched": 20,
+            "penalized_candidate": 6
           },
           "rate": {
             "n": 30,
@@ -11054,57 +11837,60 @@
         },
         "0.75": {
           "counts": {
-            "no_candidates": 5,
-            "no_matched": 25
+            "no_candidates": 4,
+            "no_matched": 20,
+            "penalized_candidate": 5
           },
           "rate": {
-            "n": 30,
+            "n": 29,
             "d": 138,
-            "rate": 0.21739130434782608
+            "rate": 0.21014492753623187
           }
         },
         "0.8": {
           "counts": {
-            "no_candidates": 5,
-            "no_matched": 25
+            "no_candidates": 4,
+            "no_matched": 20,
+            "penalized_candidate": 5
           },
           "rate": {
-            "n": 30,
+            "n": 29,
             "d": 138,
-            "rate": 0.21739130434782608
+            "rate": 0.21014492753623187
           }
         },
         "0.85": {
           "counts": {
-            "no_candidates": 5,
-            "no_matched": 25
+            "no_candidates": 4,
+            "no_matched": 20,
+            "penalized_candidate": 4
           },
           "rate": {
-            "n": 30,
+            "n": 28,
             "d": 138,
-            "rate": 0.21739130434782608
+            "rate": 0.2028985507246377
           }
         },
         "0.9": {
           "counts": {
-            "no_candidates": 5,
-            "no_matched": 25
+            "no_candidates": 4,
+            "no_matched": 20
           },
           "rate": {
-            "n": 30,
+            "n": 24,
             "d": 138,
-            "rate": 0.21739130434782608
+            "rate": 0.17391304347826086
           }
         },
         "0.95": {
           "counts": {
-            "no_candidates": 5,
-            "no_matched": 25
+            "no_candidates": 4,
+            "no_matched": 20
           },
           "rate": {
-            "n": 30,
+            "n": 24,
             "d": 138,
-            "rate": 0.21739130434782608
+            "rate": 0.17391304347826086
           }
         }
       },
@@ -11476,14 +12262,14 @@
     "d10_rule": "제안 방식 곡선의 연속 격자점 쌍 전부에서 T_merge 가 오르면 false_merge_rate 는 증가하지 않고 ask_user(identity) 발생률은 감소하지 않는다(비엄격 단조, D10). 양 끝점 비교가 아니다 -- 02-plan-verify R-7(1).",
     "proposed": {
       "false_merge_rate": {
-        "n": 1,
+        "n": 0,
         "d": 132,
-        "rate": 0.007575757575757576
+        "rate": 0.0
       },
       "miss_rate": {
-        "n": 1,
+        "n": 0,
         "d": 132,
-        "rate": 0.007575757575757576
+        "rate": 0.0
       }
     },
     "baselines": {
@@ -11524,7 +12310,7 @@
           "d": 132,
           "rate": 0.007575757575757576
         },
-        "dominates_proposed": true
+        "dominates_proposed": false
       },
       "llm_single": {
         "false_merge_rate": {
@@ -11533,21 +12319,19 @@
           "rate": 0.0
         },
         "miss_rate": {
-          "n": 10,
+          "n": 9,
           "d": 132,
-          "rate": 0.07575757575757576
+          "rate": 0.06818181818181818
         },
         "dominates_proposed": false
       }
     },
-    "dominated_by": [
-      "embedding_only"
-    ],
+    "dominated_by": [],
     "undetermined": [],
     "false_merge_ranking": [
       {
         "rank": 1,
-        "method": "exact_raw",
+        "method": "proposed",
         "false_merge_rate": {
           "n": 0,
           "d": 132,
@@ -11556,7 +12340,7 @@
       },
       {
         "rank": 2,
-        "method": "embedding_only",
+        "method": "exact_raw",
         "false_merge_rate": {
           "n": 0,
           "d": 132,
@@ -11565,7 +12349,7 @@
       },
       {
         "rank": 3,
-        "method": "llm_single",
+        "method": "embedding_only",
         "false_merge_rate": {
           "n": 0,
           "d": 132,
@@ -11574,11 +12358,11 @@
       },
       {
         "rank": 4,
-        "method": "proposed",
+        "method": "llm_single",
         "false_merge_rate": {
-          "n": 1,
+          "n": 0,
           "d": 132,
-          "rate": 0.007575757575757576
+          "rate": 0.0
         }
       },
       {
@@ -11596,7 +12380,7 @@
       "pairs": 9,
       "violations": []
     },
-    "pass": false,
+    "pass": true,
     "reason": null
   }
 }
