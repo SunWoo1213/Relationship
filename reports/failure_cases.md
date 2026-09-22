@@ -2,6 +2,7 @@
 
 > 이 문서는 **해석만 한다.** 게이트 판정(pass/fail)은 다시 내리지 않고 `reports/metrics.json` 의 `gate` 를 그대로 옮긴다 — `dominated_by: ["embedding_only"]`, `d10_direction: true`, **`pass: false`**(결정 K 개정 (a), 01-plan 227행).
 > 수치는 전부 아래 입력 파일에서 센 값이고, 절 11 에 세는 명령이 한 줄씩 있다(원칙8). 평가를 다시 돌리지 않았고 `data/`·`app/`·`evaluation/`·`reports/pilot/` 을 고치지 않았다.
+> **§1~12 는 P4 실행(`raw-20260922-042440`) 기준선이고, §13 이 P4b 재실행(`raw-20260922-150931`)이다** — §1~12 의 수치·문장은 P4b 에서 한 글자도 고치지 않았다(P4b-er-redesign 결정 G(i)).
 
 ## 0. 메타 — 무엇을 어디서 읽었나
 
@@ -415,3 +416,347 @@ R1~R23 의 **전체 명령 원문과 실행 출력**은 `docs/wiki/packages/P4-p
 - 제안 방식의 오류 2건은 모두 **2단계 규칙 필터가 정답 후보를 배제**한 데서 나왔고, 마찰 79건 중 52건은 **4단계가 재지 못한 규칙 신호를 0 점으로 합산**해 확신도 상한이 0.80 에 묶인 데서 나왔다. 1단계 후보 검색과 3단계 LLM 판정은 이 실행에서 주된 원인이 아니다.
 - 임계치만 조정해서는 통과할 수 없다(절 5). 설계 변경 후보 2개를 절 8 에 올린다 — **결정은 사용자, 절차는 `/devlog change`.**
 - **표본 40건이므로 이 문서가 말할 수 있는 것은 방향과 실패 유형까지다.** 비율의 정밀도, 변경안의 효과 확인, 신뢰구간은 P10(150건)의 몫이다.
+
+---
+
+## 13. P4 기준선 대비(P4b 재실행)
+
+> 이 절은 **P4b-er-redesign U6** 의 산출물이다. 위 §1~12 는 손대지 않았다(결정 G(i)) — 그것이 비교 기준선이다.
+> 이 절도 §0~12 와 같은 규약을 따른다: **해석만 하고 게이트를 다시 판정하지 않는다.** `pass: true` 는 `reports/metrics.json` 의 `gate` 값을 옮긴 것이고, 최종 판정은 04-review(verifier)가 독립 재계산으로 한다.
+> 평가를 다시 돌리지 않았다(결정 E — 실 실행 1회). 네트워크·LLM·DB 호출 0으로 이미 만들어진 파일만 읽었다. 기준선 파일 6개는 읽기 전용으로 열었다.
+
+### 13.0 메타 — 무엇과 무엇을 비교했나
+
+| 항목 | **P4 기준선** | **P4b 재실행** |
+|---|---|---|
+| 실행 id | `run-29621888da00` | `run-35ae97b5e6ed` |
+| 평가한 커밋 (L-001) | `750f11b02f13c942c6d2ef8155646d5b7bc03ac6` (`750f11b`) | **`f96d15b401a24d31bc49de86a1d2c2e11e593999`** (`f96d15b`) |
+| 원시 판정 | `reports/pilot/raw-20260922-042440.jsonl.gz`<br>sha256 `8d85e4de…` | `reports/pilot/raw-20260922-150931.jsonl.gz`<br>sha256 `7223e1e5…` |
+| trace | `reports/pilot/traces-20260922-042440.jsonl`<br>sha256 `41aa3165…` | `reports/pilot/traces-20260922-150931.jsonl`<br>sha256 `4a8a23ad…` |
+| 지표 | `reports/pilot/metrics-20260922-042440.json`<br>sha256 `25e16dd6…`(결정 I 사본) | `reports/metrics.json`<br>sha256 `b293ab50…` |
+| `meta.schema_version` | 1 | **2** (meta 2키 + `subsets.penalized_merge`) |
+| `meta.weights` | `{llm 0.5, emb 0.3, rule 0.2}` (D3) | `{llm 0.5, emb 0.3, rule 0.2}` (비율 불변, D12) |
+| `meta.weights_policy` | (키 없음) | **`observed_renormalized(D12)`** |
+| `meta.penalized_merge_policy` | (키 없음) | **`ask`** (결정 A(i)·B(i)) |
+| 데이터셋 해시 | `sha256:49cd8c4a…` | `sha256:49cd8c4a…` — **같다**(`data/` 무수정) |
+| 시나리오·행·격자 | 40건 · 7050행 · `T_merge` 10점 · `T_new` 0.3 | 40건 · 7050행 · 같은 격자 · 같은 `T_new` |
+| 공급자·모델 | `openai` · `gpt-4o-mini-2024-07-18` · `text-embedding-3-small` | 같음 |
+| 채점 분모 | 골드 135 − `ambiguous` 3 = **132** | 같음 (`mention_counts` 동일) |
+
+**조인 키.** 04-review §6 이 `mention_index` 의 turn 내 비유일을 지적했으므로 **`(scenario_id, turn, mention, mention_kind)`** 로 조인했다. `proposed`·`T_merge` 0.8 의 141행에서 이 키는 양쪽 모두 **141개 전부 유일**이고 교집합도 141(한쪽에만 있는 키 0)이다. (참고: 이 필터에서는 `(scenario_id, mention_kind, mention_index)` 도 우연히 유일했지만, 계획이 지정한 키를 쓴다.)
+
+**`person_id` 는 실행 간 비교 불가.** 평가 러너가 시나리오마다 DB에 인물을 새로 적재하므로 id 대역이 다르다(기준선 `11894~11949`, 재실행 `16213~16268`). 아래 표의 인물 열은 전부 **`display_name`** 이고, 정오 판정은 `person_id == gold_db_person_id` 로 각 실행 안에서 따로 했다.
+
+### 13.1 (a) mention 단위 diff — `proposed`, `T_merge` = 0.8
+
+**변화 유형별 건수 (141 mention 전체)**
+
+| 변화 유형 | 수 |
+|---|---:|
+| `identity` → `merge` | **49** |
+| 완전 동일(결정·인물·확신도 모두) | 45 |
+| `merge` 유지 · 확신도만 변동 | 28 |
+| `identity` 유지 · 확신도만 변동 | 16 |
+| `new_person` → `identity` | 1 (`sc-007` t2) |
+| `identity` → `new_person` | 1 (`sc-012` t1) |
+| `merge` → `identity` | 1 (`sc-015` t0) |
+| **합계** | **141** |
+
+변화가 있는 행 **96** / 그중 결정이 바뀐 행 **52**. 결정이 같은 44행 중 **귀속 인물이 달라진 행은 0건**이다 — 이 재실행에서 "같은 결정으로 다른 사람에게 붙은" 사례는 없었다.
+
+**채점 분류 전이 (골드·non-`ambiguous` 132건)**
+
+| 기준선 → 재실행 | 수 |
+|---|---:|
+| `deferred` → `merge_correct` | **49** |
+| `merge_correct` → `merge_correct` | 47 |
+| `deferred` → `deferred` | 29 |
+| `new_person_correct` → `new_person_correct` | 4 |
+| `deferred` → `new_person_correct` | 1 |
+| **`miss` → `deferred`** | **1** (`sc-007` t2 "문실장님") |
+| **`false_merge` → `deferred`** | **1** (`sc-015` t0 "부장님") |
+| 합계 | 132 |
+
+**오른쪽 아래가 비어 있다는 것이 이 표의 요점이다** — `merge_correct → false_merge`, `deferred → false_merge`, 어떤 칸에서도 `miss` 로 간 행이 0이다. 이번 표본에서 악화된 mention 은 없었다.
+
+**결정이 바뀐 52행 전체** (변화 없는 89행은 싣지 않는다)
+
+| # | mention | 기준선 decision / 인물 / conf | 재실행 decision / 인물 / conf | 변화 유형 | 채점 |
+|---|---|---|---|---|---|
+| 1 | `sc-002` t4 `"이서연 과장님"` | identity / – / 0.6895 | merge / 이서연 / 0.8619 | identity→merge | deferred → merge_correct |
+| 2 | `sc-003` t3 `"유진씨"` | identity / – / 0.7500 | merge / 최유진 / 1.0000 | identity→merge | deferred → merge_correct |
+| 3 | `sc-005` t0 `"하윤이"` | identity / – / 0.7500 | merge / 정하윤 / 0.9375 | identity→merge | deferred → merge_correct |
+| 4 | `sc-007` t2 `"문실장님"` | new_person / – / 0.0000 | identity / – / 0.5442 | new_person→identity | **miss → deferred** |
+| 5 | `sc-009` t1 `"준호"` | identity / – / 0.7500 | merge / 배준호 / 0.9687 | identity→merge | deferred → merge_correct |
+| 6 | `sc-010` t1 `"민준이"` | identity / – / 0.7500 | merge / 이민준 / 0.9375 | identity→merge | deferred → merge_correct |
+| 7 | `sc-010` t2 `"민준이"` | identity / – / 0.7500 | merge / 이민준 / 0.9375 | identity→merge | deferred → merge_correct |
+| 8 | `sc-011` t1 `"최유진"` | identity / – / 0.7500 | merge / 최유진 / 1.0000 | identity→merge | deferred → merge_correct |
+| 9 | `sc-012` t0 `"수학쌤"` | identity / – / 0.7500 | merge / 안소미 / 0.9375 | identity→merge | deferred → merge_correct |
+| 10 | `sc-012` t1 `"영어쌤"` | identity / – / 0.0000 | new_person / – / 0.2989 | identity→new_person | deferred → new_person_correct |
+| 11 | `sc-012` t2 `"안쌤"` | identity / – / 0.7750 | merge / 안소미 / 0.9687 | identity→merge | deferred → merge_correct |
+| 12 | `sc-013` t0 `"채원씨"` | identity / – / 0.7750 | merge / 임채원 / 0.9687 | identity→merge | deferred → merge_correct |
+| 13 | `sc-013` t1 `"채영이"` | identity / – / 0.7500 | merge / 서채영 / 0.9375 | identity→merge | deferred → merge_correct |
+| 14 | `sc-013` t2 `"채영이"` | identity / – / 0.7500 | merge / 서채영 / 0.9375 | identity→merge | deferred → merge_correct |
+| 15 | `sc-013` t2 `"채원이"` | identity / – / 0.7280 | merge / 임채원 / 0.9100 | identity→merge | deferred → merge_correct |
+| 16 | `sc-014` t2 `"다인이"` | identity / – / 0.7500 | merge / 서다인 / 0.9375 | identity→merge | deferred → merge_correct |
+| 17 | `sc-015` t0 `"부장님"` | merge / 한지원 / 0.9500 | identity / – / 0.8167 | merge→identity | **false_merge → deferred** |
+| 18 | `sc-015` t0 `"은우"` | identity / – / 0.7500 | merge / 조은우 / 0.9375 | identity→merge | deferred → merge_correct |
+| 19 | `sc-015` t2 `"은우"` | identity / – / 0.7500 | merge / 조은우 / 0.9687 | identity→merge | deferred → merge_correct |
+| 20 | `sc-016` t0 `"예린이"` | identity / – / 0.7193 | merge / 신예린 / 0.8991 | identity→merge | deferred → merge_correct |
+| 21 | `sc-016` t1 `"예리니"` | identity / – / 0.7750 | merge / 신예린 / 0.9375 | identity→merge | deferred → merge_correct |
+| 22 | `sc-016` t2 `"린이"` | identity / – / 0.7500 | merge / 신예린 / 0.9687 | identity→merge | deferred → merge_correct |
+| 23 | `sc-017` t0 `"규진이"` | identity / – / 0.7750 | merge / 남규진 / 0.9687 | identity→merge | deferred → merge_correct |
+| 24 | `sc-017` t1 `"규진이"` | identity / – / 0.7750 | merge / 남규진 / 0.9375 | identity→merge | deferred → merge_correct |
+| 25 | `sc-017` t3 `"서윤이"` | identity / – / 0.7500 | merge / 백서윤 / 0.9687 | identity→merge | deferred → merge_correct |
+| 26 | `sc-018` t0 `"민서 누나"` | identity / – / 0.7750 | merge / 구민서 / 0.9687 | identity→merge | deferred → merge_correct |
+| 27 | `sc-018` t1 `"보라"` | identity / – / 0.7750 | merge / 양보라 / 0.9375 | identity→merge | deferred → merge_correct |
+| 28 | `sc-019` t0 `"세호"` | identity / – / 0.7750 | merge / 장세호 / 0.9687 | identity→merge | deferred → merge_correct |
+| 29 | `sc-019` t0 `"아름이"` | identity / – / 0.7500 | merge / 노아름 / 0.9375 | identity→merge | deferred → merge_correct |
+| 30 | `sc-019` t1 `"세호"` | identity / – / 0.7750 | merge / 장세호 / 0.9375 | identity→merge | deferred → merge_correct |
+| 31 | `sc-020` t0 `"가은이"` | identity / – / 0.7500 | merge / 홍가은 / 0.9687 | identity→merge | deferred → merge_correct |
+| 32 | `sc-021` t0 `"동혁이"` | identity / – / 0.7500 | merge / 표동혁 / 0.9687 | identity→merge | deferred → merge_correct |
+| 33 | `sc-021` t1 `"서윤이"` | identity / – / 0.7500 | merge / 백서윤 / 0.9375 | identity→merge | deferred → merge_correct |
+| 34 | `sc-021` t3 `"보라"` | identity / – / 0.7750 | merge / 양보라 / 0.9375 | identity→merge | deferred → merge_correct |
+| 35 | `sc-022` t0 `"규진이"` | identity / – / 0.7750 | merge / 남규진 / 0.9375 | identity→merge | deferred → merge_correct |
+| 36 | `sc-022` t0 `"세호"` | identity / – / 0.7750 | merge / 장세호 / 0.9375 | identity→merge | deferred → merge_correct |
+| 37 | `sc-024` t0 `"동혁이"` | identity / – / 0.7500 | merge / 표동혁 / 0.9687 | identity→merge | deferred → merge_correct |
+| 38 | `sc-024` t0 `"보라"` | identity / – / 0.7500 | merge / 양보라 / 0.9687 | identity→merge | deferred → merge_correct |
+| 39 | `sc-026` t0 `"아름이"` | identity / – / 0.7500 | merge / 노아름 / 0.9375 | identity→merge | deferred → merge_correct |
+| 40 | `sc-026` t2 `"아름이"` | identity / – / 0.7750 | merge / 노아름 / 0.9687 | identity→merge | deferred → merge_correct |
+| 41 | `sc-027` t0 `"규진이"` | identity / – / 0.7500 | merge / 남규진 / 1.0000 | identity→merge | deferred → merge_correct |
+| 42 | `sc-027` t2 `"규진이"` | identity / – / 0.7500 | merge / 남규진 / 0.9375 | identity→merge | deferred → merge_correct |
+| 43 | `sc-029` t0 `"보라쌤"` | identity / – / 0.7750 | merge / 양보라 / 0.9375 | identity→merge | deferred → merge_correct |
+| 44 | `sc-030` t0 `"하윤이"` | identity / – / 0.7750 | merge / 정하윤 / 0.9687 | identity→merge | deferred → merge_correct |
+| 45 | `sc-030` t3 `"하윤이"` | identity / – / 0.7500 | merge / 정하윤 / 0.9687 | identity→merge | deferred → merge_correct |
+| 46 | `sc-031` t0 `"서윤이"` | identity / – / 0.7500 | merge / 백서윤 / 0.9687 | identity→merge | deferred → merge_correct |
+| 47 | `sc-031` t2 `"서윤이"` | identity / – / 0.7500 | merge / 백서윤 / 0.9375 | identity→merge | deferred → merge_correct |
+| 48 | `sc-032` t0 `"지호형"` | identity / – / 0.7500 | merge / 오지호 / 0.9375 | identity→merge | deferred → merge_correct |
+| 49 | `sc-033` t0 `"가은이"` | identity / – / 0.7500 | merge / 홍가은 / 0.9375 | identity→merge | deferred → merge_correct |
+| 50 | `sc-038` t2 `"다인이"` | identity / – / 0.7500 | merge / 서다인 / 0.9375 | identity→merge | deferred → merge_correct |
+| 51 | `sc-040` t0 `"예린이"` | identity / – / 0.7443 | merge / 신예린 / 0.8991 | identity→merge | deferred → merge_correct |
+| 52 | `sc-040` t2 `"예린이"` | identity / – / 0.7193 | merge / 신예린 / 0.8991 | identity→merge | deferred → merge_correct |
+
+49행이 같은 모양이다 — **기준선 확신도가 `0.72~0.78`(§4a 가 "임계치 바로 아래"라고 부른 구간)이던 행이 `0.89~1.00` 으로 올라가 `merge` 가 됐고, 49건 전부 귀속 인물이 골드였다.** 나머지 3행(4·10·17)만 성격이 다르다.
+
+### 13.2 (b) 기준선의 오병합 1건·미검출 1건 — 정답 후보가 3단계에 도달했는가
+
+#### `sc-015` t0 `"부장님"` (기준선의 유일한 오병합)
+
+| 항목 | **P4 기준선** | **P4b 재실행** |
+|---|---|---|
+| 판정 | `merge` → **한지원**(오답) = **`false_merge`** | `identity`(ask_user) = `deferred` |
+| 2단계 | `excluded_by = {조은우: relation_tag_conflict}` — **골드 후보가 여기서 사라짐** | `excluded_by = {}` · `penalized_by = {조은우: ["relation_tag_conflict","hierarchy_conflict"]}` |
+| 3단계 후보 수 | **1**(한지원만) | **2**(조은우 + 한지원) — 골드가 3단계에 **도달했다** |
+| LLM 귀속 | 한지원 (`s_llm` 0.9) | **조은우 = 골드** (`s_llm` 0.9, `llm_attempts` 1) |
+| `rule_checked`/`rule_passed` | 3 / 3 (한지원 기준) | 3 / 1 (조은우 기준) |
+| 확신도 분해 | `0.5·0.9 + 0.3·1.0 + 0.2·1.0 = 0.9500` | `0.5·0.9 + 0.3·1.0 + 0.2·0.3333 = 0.8167` (`weights_effective` = 설정값 그대로, `rule_checked`>0) |
+| 밴드 | `band_by_threshold = merge` → `merge` | `band_by_threshold = merge` → **`forced_reason = "penalized_candidate"`** → `identity` |
+
+후보별 신호(재실행): 조은우 `s_emb` 1.0 · `exact_alias` 1.0 · `rule_checked` 3 / `rule_passed` 1 · `s_rule` 0.3333 · `relaxed_pass` 0 · `passed_rules` **1**(= 배제되지 않음) / 한지원 `s_emb` 1.0 · `rule_checked` 3 / `rule_passed` 3 · `s_rule` 1.0.
+
+**읽는 법.** ② (D13)가 §8 이 예상한 대로 동작했다 — 골드 후보가 목록에 남아 3단계 LLM 이 두 후보를 **비교**했고, LLM 은 이번에 골드를 골랐다. 확신도 0.8167 은 `T_merge` 0.8 을 넘지만(`band_by_threshold = merge`) 귀속 후보가 감점 후보라서 **결정 A(i) 의 보수 강등이 `identity` 로 내렸다.** 즉 이 mention 은 *오병합이 정답 병합으로* 바뀐 것이 아니라 *오병합이 되묻기로* 바뀌었다. 원칙1(오병합 ≫ 미검출) 기준으로는 개선이고, 마찰 축으로는 1건이 남는다. 다섯 방식 전체로 보면 기준선에서 "제안 방식만 확신했다"(§1)는 상황이 사라져 **다섯 방식이 모두 `identity`** 가 됐다.
+
+#### `sc-007` t2 `"문실장님"` (기준선의 유일한 미검출)
+
+| 항목 | **P4 기준선** | **P4b 재실행** |
+|---|---|---|
+| 판정 | `new_person`(단정) = **`miss`** | `identity`(ask_user) = `deferred` |
+| 2단계 | `excluded_by = {문태현: relation_tag_conflict}` → **통과 후보 0** | `excluded_by = {}` · `penalized_by = {문태현: ["relation_tag_conflict","hierarchy_conflict"]}` |
+| 3단계 | `llm_skipped = true`, `llm_attempts = 0` — **LLM 을 부르지 못했다** | `llm_skipped = false`, `llm_attempts = 1` — 골드 후보가 3단계에 **도달했다** |
+| LLM 귀속 | – | **문태현 = 골드** (`s_llm` 0.9) |
+| `rule_checked`/`rule_passed` | 0 / 0 (강제 경로) | 2 / 0 (검사했으나 전부 충돌) |
+| 확신도 분해 | 전 신호 0 → `confidence = 0.0` (`forced_reason = "no_candidates"`) | `0.5·0.9 + 0.3·0.31405 + 0.2·0 = 0.5442`, `forced_reason = null` |
+| 밴드 | `< T_new 0.3` → `new_person` | `T_new 0.3 ≤ 0.5442 < T_merge 0.8` → `identity` |
+
+**읽는 법.** `rule_checked = 2 · rule_passed = 0` 이므로 **D12 의 재정규화는 여기 적용되지 않는다**(카드 D12 "검사했는데 전부 충돌이면 여전히 `s_rule = 0` 으로 합산") — `weights_effective` 도 설정값 그대로다. 미검출이 풀린 원인은 전적으로 **② (D13)** 다: 후보가 살아남아 `no_candidates` 강제 경로를 타지 않았고, 그래서 "새 사람이다"라고 단정하는 대신 "모르겠으니 묻는다"가 됐다. 낮은 `s_emb`(0.314, 승진 호칭 변경)는 그대로이므로 **`merge_correct` 까지 가지는 못했다.** `llm_single` 은 두 실행 모두 이 mention 을 맞혔다(`merge` → 문태현).
+
+### 13.3 (c) 기준선 `deferred` 79건의 행방
+
+| 재실행 결정 | 수 | 그중 귀속 인물 == 골드 | 재실행 채점 |
+|---|---:|---:|---|
+| `merge` | **49** | **49 / 49 (100%)** | `merge_correct` 49 |
+| `identity` 유지 | **29** | 0 (귀속 없음) | `deferred` 29 |
+| `new_person` | **1** | – (골드가 DB 밖) | `new_person_correct` 1 |
+| 합계 | 79 | | |
+
+- **`merge` 49건**은 전부 `rule_checked == 0` 이던 mention 이다(49/49). 기준선 확신도는 `0.6895 ~ 0.7750`(전부 `T_merge` 미만), 재실행 확신도는 `0.8619 ~ 1.0000`. §4d 가 "규칙 신호 미측정이 0.2 를 통째로 깎아 0.8 미만"으로 분류한 52건이 이 49건과 겹친다. **오병합은 0건**이다.
+- **`identity` 유지 29건**의 구성: `forced_reason` = `no_matched` 15 · `penalized_candidate` 4 · `null` 10. 확신도는 `0.0` 15건, `[0.3, 0.8)` 14건. 이 29건 중 `confidence_breakdown.matched_person_id` 가 골드와 같았던 것은 **16건**(기준선 같은 지표는 11건) — §4e 가 말한 "물었지만 사실 맞았을 건"이 비율로는 남아 있다.
+- **`new_person` 1건**은 `sc-012` t1 `"영어쌤"`(확신도 0.2989 < `T_new` 0.3). 골드가 DB 밖 인물이라 `new_person_correct` 다 — 기준선에서는 확신도 0.0 강제로 `identity` 였다.
+- 역방향: **재실행의 `deferred` 31건은 이 29건 + `sc-015` + `sc-007`** 로 정확히 설명된다(`forced_reason`: `no_matched` 15 · `penalized_candidate` 5 · `null` 11).
+
+### 13.4 (d) 감점 후보가 `merge` 된 건수 — D13 위험 계측 (두 경로 교차 확인)
+
+D13 이 명시한 위험은 "**후보가 늘어 오병합 기회도 는다**"이다. 두 경로로 따로 세서 같은 수가 나오는지 확인했다.
+
+| 경로 | 값 |
+|---|---|
+| **경로 1** `reports/metrics.json` → `proposed.by_t_merge["0.8"].subsets.penalized_merge` | `merges` **14** · `false_merge_rate` **0/14** · `relaxed_pass_merges` **14** · `relaxed_pass_false_merge_rate` 0/14 · `reasons` `{hierarchy_conflict: 14}` |
+| **경로 2** 원시 JSONL `detail["penalized_by"]` 직접 집계 | `merge` 이면서 **귀속 인물 자신이 감점 후보**인 행 **14** (채점 분모 안 14) · 그중 `false_merge` **0** · `relaxed_pass = 1.0` **14/14** · 사유 `hierarchy_conflict` **14** |
+| 교차 결과 | **일치(14 = 14, 오병합 0 = 0).** |
+
+**정의 차이 한 가지를 밝혀 둔다.** 원시 JSONL 에서 "`merge` 행 중 `penalized_by` 가 비어 있지 않은 것"을 후보 아무나 기준으로 세면 **22건**이다. 그중 **귀속된 인물 자신이 감점 후보**인 것이 14건이고, `metrics.json` 의 `penalized_merge` 는 후자를 센다. 나머지 8건은 "감점된 다른 후보가 목록에 있었지만 정상 후보로 병합한" 경우로, D13 위험(감점 후보를 자동 연결)과는 성격이 다르다. 두 수가 다른 것은 불일치가 아니라 **정의 차이**이며, 04-review 가 `penalized_merge` 를 읽을 때 이 정의를 함께 읽어야 한다.
+
+**감점 후보 merge 14건 전체** (전부 `merge_correct`, 전부 `relaxed_pass`)
+
+| 시나리오 | mention | 확신도 | 사유 |
+|---|---|---:|---|
+| `sc-001` t0 / t1 | `"김팀장"` | 0.9333 / 0.9333 | `hierarchy_conflict` |
+| `sc-002` t0 | `"이대리"` | 0.9083 | `hierarchy_conflict` |
+| `sc-004` t0 / t1 | `"강팀장님"` / `"윤팀장님"` | 0.8715 / 0.8676 | `hierarchy_conflict` |
+| `sc-009` t0 | `"배대리"` | 0.9333 | `hierarchy_conflict` |
+| `sc-010` t0 / t3 | `"김팀장"` / `"팀장님"` | 0.9083 / 0.8833 | `hierarchy_conflict` |
+| `sc-023` t0 | `"심팀장"` | 0.9083 | `hierarchy_conflict` |
+| `sc-028` t0 / t2 | `"심팀장"` | 0.8833 / 0.8833 | `hierarchy_conflict` |
+| `sc-035` t1 | `"박과장님"` | 0.8617 | `hierarchy_conflict` |
+| `sc-036` t0 / t2 | `"이대리"` | 0.8833 / 0.8833 | `hierarchy_conflict` |
+
+**14건 전부가 `relaxed_pass == True`(인접 위계 1칸 완화 통과, 승진 계열)다.** 즉 결정 A(i)가 자동 연결을 허용한 **예외 경로가 곧 감점 후보 병합 경로 전부**다. 이번 표본에서 그 경로의 오병합은 0이지만, **예외 경로가 위험 경로라는 구조는 그대로 남아 있다**(01-plan 결정 A(i) 의 위험 문장).
+
+**보수 강등(`forced_reason = "penalized_candidate"`) 5건** — 결정 A(i)가 실제로 작동한 자리다.
+
+| 시나리오 | mention | `band_by_threshold` | 확신도 | 귀속 == 골드 | 결과 |
+|---|---|---|---:|---|---|
+| `sc-002` t1 / t2 | `"박과장님"` | `merge` | 0.8617 | **예** | `deferred` |
+| `sc-020` t0 | `"심팀장"` | `merge` | 0.8833 | **예** | `deferred` |
+| `sc-033` t2 | `"심팀장"` | `merge` | 0.8833 | **예** | `deferred` |
+| `sc-015` t0 | `"부장님"` | `merge` | 0.8167 | **예** | `deferred` |
+
+**5건 모두 귀속 인물이 골드였다.** 보수 분기가 이번 표본에서 막은 것은 오병합 0건이고, 대신 **정답 5건을 되묻기로 바꿨다** — 마찰 31건 중 5건(16%)이 이 정책의 비용이다. 원칙1의 비대칭 비용을 받아들인 결과이며, `ER_PENALIZED_MERGE_POLICY=merge` 로 끄면 이 5건이 `merge_correct` 가 되고 `deferred` 는 26건이 된다(다만 그때 `sc-015` 는 자동 연결되므로 안전 마진도 함께 사라진다 — 40건으로는 어느 쪽이 옳은지 정할 수 없다).
+
+**배제 → 감점 전환의 규모** (D13 "코드에서 지켜야 할 것" 1항이 실 데이터에서 확인된 자리)
+
+| 항목 | 기준선 | 재실행 |
+|---|---:|---:|
+| `excluded_by` 가 있는 mention | **19** (`relation_tag_conflict` 12 · `hierarchy_conflict` 7) | **3** (`dictionary_conflict` 3 **만**) |
+| `penalized_by` 가 있는 mention | (키 없음) | **34 / 141** (후보 단위 사유 `hierarchy_conflict` 33 · `relation_tag_conflict` 12) |
+| `forced_reason = no_candidates` | 5 | 4 |
+| `forced_reason = no_matched` | 25 | 20 |
+
+### 13.5 (e) `rule_checked == 0` mention 의 확신도 분포 이동 (D12 재정규화 효과)
+
+**먼저 전제 하나를 정정한다.** "기준선 trace 에는 `rule_checked` 키가 없다"는 전제로 이 항목을 받았으나, 실제로는 **있다** — `traces-20260922-042440.jsonl` 의 `proposed` 141건 전부에 `confidence_breakdown.rule_checked` 가 있고(141/141), 원시 JSONL 의 `detail.confidence_breakdown` 도 같다. 기준선에 **없는 키는 `weights_effective`** 다(0/141, 재실행은 141/141). 따라서 우회(추정·역산)가 필요 없었고, `rule_checked` 는 양쪽에서 **직접 읽어** 비교했다. `weights_effective` 는 재실행에만 있으므로 기준선 쪽은 "설정값 `weights` 가 곧 유효 가중치"로 읽었다(D3 산식이 재정규화를 하지 않았으므로 사실과 같다).
+
+**측정 지점 주의.** §4c 의 `100/141` 은 `sweep_index == 0`(= `T_merge` 0.5)에서 센 값이다. 이 절은 게이트 점 `T_merge` = 0.8 에서 센다(러너가 임계치마다 시나리오 상태를 새로 적재해 돌리므로 sweep 마다 값이 다를 수 있다). 다행히 기준선은 두 지점에서 같은 **100/141** 이다. 재실행은 **96/141**.
+
+| 항목 | 기준선 | 재실행 |
+|---|---:|---:|
+| `rule_checked == 0` 인 mention | **100 / 141** | **96 / 141** |
+| 양쪽 모두 0인 mention | 95 | 95 |
+| 기준선만 0 (재실행에서 규칙이 측정됨) | 5 | – |
+| 재실행만 0 | – | 1 |
+
+기준선에서만 0이던 5건은 전부 **기준선에서 후보가 배제돼 강제 경로(확신도 0)를 타던 mention** 이다 — `sc-002` t1·t2 `"박과장님"`, `sc-007` t2 `"문실장님"`, `sc-020` t0 `"심팀장"`, `sc-033` t2 `"심팀장"`. D13 로 후보가 살아나자 규칙이 실제로 측정됐다. 재실행에서만 0인 1건은 `sc-036` t2 `"임대리"`(양쪽 모두 `deferred`).
+
+**양쪽 모두 `rule_checked == 0` 인 95 mention 의 확신도 구간**
+
+| 구간 | 기준선 | 재실행 |
+|---|---:|---:|
+| `0.000` (강제 경로) | 27 | 25 |
+| `(0, 0.3)` | 0 | 1 |
+| `[0.3, 0.5)` | 2 | 0 |
+| `[0.5, 0.7)` | 4 | 5 |
+| **`[0.7, 0.8)`** | **48** | **1** |
+| `[0.8, 0.9)` | 14 | 4 |
+| **`[0.9, 1.0]`** | **0** | **59** |
+
+- 중앙값 `0.7500 → 0.9375`, 평균 `0.5349 → 0.6756`, **`≥ 0.8` 건수 `14 → 63`**.
+- **`rule_checked == 0` 일 때의 확신도 상한이 `0.800 → 1.000` 으로 풀렸다** (§4c 가 "구조적 상한 0.80"이라고 부른 것). `rule_checked > 0` 의 상한은 양쪽 다 1.0 으로 그대로다.
+- 재실행의 `rule_checked == 0` 96건은 **전부** `weights_effective = {llm 0.625, emb 0.375, rule 0.0}` 이고, 확신도가 0이 아닌 건 전부 `(0.5·s_llm + 0.3·s_emb) / 0.8` 과 **소수점 오차 없이 일치**(불일치 0건)했다.
+- **D12 동치 확인(실 데이터)**: 양쪽 모두 `rule_checked > 0` 인 40 mention 중 세 신호(`s_llm`·`s_emb`·`s_rule`)가 완전히 같은 20건은 **확신도 차이가 정확히 0** 이다. 재정규화는 미측정에만 적용됐다.
+- 부분집합 지표도 같은 말을 한다: `subsets.merge_rule_unchecked` 가 **`merges 14 · 오병합 0` → `merges 63 · 오병합 0`**.
+- **§8 후보 1의 반사실 대비**: 예측은 "`merge` 48 → 97, 골드 일치 96, 오병합 1건 그대로"였다. 실측은 **`merge` 48 → 96, 골드 일치 96, 오병합 0**. 예측 97 대 실측 96 의 1건 차이는 `sc-015`(반사실은 ①만 적용해 오병합이 남는다고 봤고, 실제로는 ②+보수 강등으로 `identity` 가 됐다)로 설명된다. **저장된 신호를 재합산한 반사실이 실 재실행과 거의 같았다**는 것은 ①(D12)의 효과 추정이 견고했다는 뜻이다.
+
+### 13.6 (f) 게이트 4수치 전후
+
+| 수치 | **P4 기준선** | **P4b 재실행** |
+|---|---|---|
+| 제안 방식 **오병합률** (`T_merge` 0.8) | **1 / 132 = 0.76%** | **0 / 132 = 0.00%** |
+| 제안 방식 **미검출률** | **1 / 132 = 0.76%** | **0 / 132 = 0.00%** |
+| `gate.dominated_by` | **`["embedding_only"]`** | **`[]`** |
+| `gate.d10_direction` | `true` | `true` (위반 0/9쌍) |
+| `gate.pass` | **`false`** | **`true`** (`reason: null`) |
+
+**방식별 (`T_merge` = 0.8, 분모 132)** — 베이스라인 열의 변화 없음에 주목.
+
+| 방식 | 오병합 | 미검출 | identity 보류 | f1 |
+|---|---|---|---|---|
+| `proposed` | **1 → 0** | **1 → 0** | 79 → **31** | 0.566 → **0.897** |
+| `exact_raw` | 0 → 0 | 33 → 33 | 2 → 2 | 0.826 → 0.826 |
+| `exact_norm` | 4 → 4 | 20 → 20 | 6 → 6 | 0.854 → 0.854 |
+| `embedding_only` | 0 → 0 | 1 → 1 | 31 → 31 | 0.892 → 0.892 |
+| `llm_single` | 0 → 0 | **10 → 9** | 19 → 20 | 0.865 → 0.865 |
+
+- **지배가 풀린 것은 베이스라인이 나빠져서가 아니다.** `exact_raw`·`exact_norm`·`embedding_only` 는 141 mention 중 **결정이 바뀐 것이 한 건도 없다**(0 / 0 / 0). `embedding_only` 는 여전히 오병합 0 · 미검출 1 이며, 제안 방식이 **두 축 모두에서 그것보다 낮아져**(0 < 1) 지배 조건이 성립하지 않게 됐다. `llm_single` 만 1건 바뀌었고(`sc-002` t3 `"과장님"`, `miss → deferred`) 그것은 LLM 재호출 변동이다.
+- **되묻기**: `ask_user_rate_by_kind.identity` **79/132 (59.8%) → 31/132 (23.5%)** — `embedding_only` 와 정확히 같은 수치가 됐다. `new_person` 은 5/132 (3.8%) 로 양쪽 동일, `schedule` 0. `expected_ask_user.allowed` 준수율 **97/132 (73.5%) → 117/132 (88.6%)**. `passing` 오탐 축은 양쪽 모두 **0/6**.
+- **`T_merge` 격자 단조성(R3)** — 산식이 바뀌어도 방향은 유지된다.
+
+| `T_merge` | 기준선 오병합 / 미검출 / 보류 | 재실행 오병합 / 미검출 / 보류 |
+|---|---|---|
+| 0.50 | 6 / 1 / 22 | 4 / 0 / 22 |
+| 0.55 | 6 / 1 / 22 | 4 / 0 / 23 |
+| 0.60 | 6 / 1 / 22 | 4 / 0 / 23 |
+| 0.65 | 6 / 1 / 23 | 3 / 0 / 25 |
+| 0.70 | 4 / 1 / 27 | 3 / 0 / 26 |
+| 0.75 | 2 / 1 / 33 | 1 / 0 / 29 |
+| **0.80** | **1 / 1 / 79** | **0 / 0 / 31** |
+| 0.85 | 1 / 1 / 96 | 0 / 0 / 34 |
+| 0.90 | 1 / 1 / 105 | 0 / 0 / 46 |
+| 0.95 | 1 / 1 / 114 | 0 / 0 / 86 |
+
+기준선은 0.75 → 0.80 에서 보류가 33 → 79 로 튀었다(구조적 상한 0.80 에 47건이 걸려 있었다). 재실행은 그 절벽이 사라져 보류가 완만하게 오른다(29 → 31 → 34 → 46 → 86). **오병합은 `T_merge` 가 오를수록 단조 감소하고 보류는 단조 증가한다 — R3 방향이 양쪽 실행에서 모두 성립한다.** 운영값 확정은 P10(150건)의 몫이고 이 절은 방향만 확인한다.
+
+- **카테고리별** (분모: promotion 28 · pronoun 31 · alias 33 · normal 21 · new_person 19)
+
+| 카테고리 | 오병합 | 미검출 | identity 보류 |
+|---|---|---|---|
+| `promotion` | 0 → 0 | **1 → 0** | 12 → 10 |
+| `pronoun` | 0 → 0 | 0 → 0 | **25 → 9** |
+| `alias` | **1 → 0** | 0 → 0 | **21 → 5** |
+| `normal` | 0 → 0 | 0 → 0 | **12 → 1** |
+| `new_person` | 0 → 0 | 0 → 0 | 9 → 6 |
+
+마찰이 가장 크게 준 곳은 `pronoun`(지시대명사)·`normal`·`alias` 다 — 힌트가 나오지 않아 `rule_checked = 0` 이 되기 쉬운 범주와 일치한다(§4c).
+
+### 13.7 이 비교가 말하지 않는 것 (한계 — §10 에 이어서)
+
+- **표본 40 시나리오 · 채점 mention 132 다. 이 절이 말할 수 있는 것은 방향과 실패 유형까지다**(P1 인계 15, §10 첫 줄과 같은 한계). 오병합 1건이 0.76%p 를 움직이므로 "0/132" 와 "1/132" 의 차이를 비율로 해석하면 안 된다.
+- **"40건에서 오병합이 안 났다"는 안전의 증명이 아니다.** D13 은 3단계에 가는 후보를 늘렸고(배제 mention 19 → 3, 감점 mention 34), 그만큼 오병합 기회도 늘었다. 이번 표본에서 그 위험을 감싼 것은 보수 강등 5건과 "감점 후보 merge 14건이 전부 `relaxed_pass` 예외 경로"라는 사실인데, **예외 경로가 곧 위험 경로**이므로 P10(150건)에서 이 부분집합을 다시 계측해야 한다(01-plan 리스크 "② 는 40건으로 검증할 수 없다").
+- **두 실행의 차이가 전부 D12·D13 때문은 아니다.** 양쪽에서 LLM 을 실제로 부른 136 mention 중 **60건에서 `s_llm` 자기보고 값이 달랐다**(변화량 대부분 ±0.05·±0.1, 강제 경로가 바뀌며 ±0.7~0.9 로 크게 움직인 6건 포함). `llm_single` 베이스라인도 1건 판정이 바뀌었다 — **같은 모델을 같은 프롬프트로 다시 불러도 자기보고 점수는 흔들린다.** 따라서 mention 단위 diff 는 "D12·D13 효과 + 실행 간 변동"의 합이며, 40건에서 이 둘을 분해할 수 없다. 반사실(§8 후보 1)과 실측이 1건 차이로 맞았다는 것이 D12 기여의 간접 근거일 뿐이다. `s_emb` 이 달라진 5건 중 눈에 띄는 1건(`sc-002` t3 `"과장님"` 0.2849 → 0.4244)은 임베딩 비결정성이 아니라 **앞선 턴의 병합 결과가 달라 별칭 집합이 달라진** 상태 차이다.
+- **`sc-015`·`sc-007` 은 "고쳐졌다"기보다 "안전한 쪽으로 옮겨졌다".** 둘 다 `merge_correct` 가 아니라 `deferred`(되묻기)다. 수용 기준은 "오병합·미검출이 아님"을 요구하고 그 조건은 충족하지만, **정확히 맞힌 것은 아니다**.
+- **보수 강등 5건은 전부 정답이었다.** 이 정책은 이번 표본에서 오병합 0건을 막았고 정답 5건을 되묻기로 바꿨다. 이득과 비용의 균형은 40건으로 판정할 수 없다.
+- **공급자 1벌·`reason` 원문 없음**은 §10 그대로다. 제안 방식 `detail` 에는 여전히 LLM `reason` 이 남지 않으므로(security §1) "LLM 이 왜 `sc-015` 에서 이번에는 조은우를 골랐는가"는 이 산출물로 재현할 수 없다.
+- **이 절은 게이트를 판정하지 않는다.** `pass: true` 는 `reports/metrics.json.gate` 의 값이며, 결정 K (a) 식에 따른 판정과 독립 재계산은 04-review(verifier)의 몫이다(결정 F(i)).
+
+### 13.8 결론
+
+- **게이트 4수치는 `0.8 / [] / true / true` 로 바뀌었다**(기준선 `0.8 / ["embedding_only"] / true / false`). 지배가 풀린 이유는 베이스라인이 나빠져서가 아니라 — 세 베이스라인은 결정이 한 건도 바뀌지 않았다 — 제안 방식의 오병합·미검출이 각각 1 → 0 으로 내려갔기 때문이다.
+- **§8 이 2단계·4단계로 귀속했던 두 가지가 각각 대응된다.** ② D13(감점)이 `sc-015`(오병합)·`sc-007`(미검출) 두 건에서 **정답 후보를 3단계에 도달시켰고**, ① D12(재정규화)가 `rule_checked = 0` 의 구조적 상한 0.80 을 풀어 **마찰 79 → 31** 을 만들었다(기준선 `deferred` 79 중 49건이 골드로 자동 연결, 오병합 0).
+- **그러나 이것은 40건의 결과다.** 방향(오병합↓·마찰↓·미검출↓)과 유형(2단계가 정답을 지우던 실패, 4단계가 임계치 바로 아래에 몰리던 마찰)까지가 말할 수 있는 전부다. 비율의 정밀도·신뢰구간·D13 이 새로 만든 오병합 기회의 크기는 **P10(150건)** 에서 다시 잰다.
+- **실패 케이스는 사라지지 않고 모양이 바뀌었다**: 되묻기 31건(그중 정답을 이미 알고 있던 것 16건 + 보수 강등 5건), 감점 후보 자동 연결 14건(전부 승진 완화 예외 경로). 이 세 덩어리가 P10 이 이어받을 관찰 대상이다.
+
+### 13.9 재현 (§11 과 같은 규약)
+
+전제: 저장소 루트, `PYTHONUTF8=1 PYTHONIOENCODING=utf-8`. 네트워크·DB·LLM 0.
+
+```python
+import gzip,json,sys;sys.path.insert(0,".");from collections import Counter
+from evaluation.metrics import classify_gold_row
+L=lambda p:[json.loads(l) for l in gzip.open(p,"rt",encoding="utf-8")]
+RB,RN=L("reports/pilot/raw-20260922-042440.jsonl.gz"),L("reports/pilot/raw-20260922-150931.jsonl.gz")
+K=lambda r:(r["scenario_id"],r["turn"],r["mention"],r["mention_kind"])        # 결정 G 조인 키
+P=lambda R:{K(r):r for r in R if r["method"]=="proposed" and r["t_merge"]==0.8}
+PB,PN=P(RB),P(RN)
+```
+
+| # | 무엇을 세나 | 기대 출력 |
+|---|---|---|
+| S1 | 게이트 전후 | `0.8 ['embedding_only'] True False` / `0.8 [] True True` |
+| S2 | 변화 유형 | `identity→merge 49`, 완전 동일 45, `merge` 확신도만 28, `identity` 확신도만 16, 나머지 1+1+1 |
+| S3 | 채점 전이 | `deferred→merge_correct 49`, `merge_correct→merge_correct 47`, `deferred→deferred 29`, `false_merge→deferred 1`, `miss→deferred 1`, … 합계 132 |
+| S4 | 두 시나리오 | `sc-015` t0 = `identity`/`penalized_candidate`, `sc-007` t2 = `identity`/`forced_reason None` |
+| S5 | deferred 79 행방 | `{'merge':49,'identity':29,'new_person':1}`, merge 49 전부 귀속==골드 |
+| S6 | 감점 merge 교차 | `subsets.penalized_merge.merges = 14` == 원시 집계 14, 오병합 0 == 0 |
+| S7 | `rule_checked==0` | base 100/141 · new 96/141, 공통 95건 `≥0.8` 14 → 63, 상한 0.800 → 1.000 |
+| S8 | 비결정성 | 양쪽 LLM 호출 136건 중 `s_llm` 상이 60건, 베이스라인 3종 결정 변화 0 |
+
+전체 명령 원문과 실행 출력은 **`docs/wiki/packages/P4b-er-redesign/evidence/20260923-0039-u6-compare.txt`** 에 있다(PART 0 입력 sha256 / PART 1 (a)~(f) / PART 2 세부 / PART 3 게이트 점 재집계·비결정성).

@@ -1,0 +1,507 @@
+# U6 — P4 기준선 대비 P4b 재실행 비교 (eval-agent, 네트워크·LLM·DB 호출 0)
+# 생성: 2026-09-22T15:39:41Z (UTC) / 로컬 20260923-0039
+# 스크립트: scratchpad/u6_compare.py, u6_extra.py, u6_compare2.py (세션 임시 디렉터리)
+# 입력(읽기 전용): reports/pilot/raw-20260922-042440.jsonl.gz, traces-20260922-042440.jsonl, metrics-20260922-042440.json
+#                reports/pilot/raw-20260922-150931.jsonl.gz, traces-20260922-150931.jsonl, reports/metrics.json
+
+## PART 0 — 입력 파일 sha256
+8d85e4de634272872e5800f091285a0beadf24eb5333438226e7c9ec85d87ad4 *reports/pilot/raw-20260922-042440.jsonl.gz
+41aa3165347f1271b58229801e6b6b7fab83dfea453017c594ed495ae7f6b1ee *reports/pilot/traces-20260922-042440.jsonl
+25e16dd67ea74aaf14ac640654af402528f48c873714fa034c1077b8dff98d1f *reports/pilot/metrics-20260922-042440.json
+7223e1e5174e12ff8d0fbfd403ee072ecc103035d91b28f017ed4c0209042dd5 *reports/pilot/raw-20260922-150931.jsonl.gz
+4a8a23ad7c7727e9b5e06e50b34cda5cbb2f666b39481913631039c88fda4d78 *reports/pilot/traces-20260922-150931.jsonl
+b293ab5099c6da8f341832e10311cf809ad8aa06b440a7901364603c8a150797 *reports/metrics.json
+
+## PART 1 — u6_compare.py ((a)(b)(c)(d)(e)(f))
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python u6_compare.py
+
+========================================================================
+0. 파일 / 메타
+========================================================================
+base reports/pilot/raw-20260922-042440.jsonl.gz rows= 7050
+new reports/pilot/raw-20260922-150931.jsonl.gz rows= 7050
+base run_id= run-29621888da00 commit= 750f11b schema_version= None dataset_hash= sha256:49cd8c4a107 run_mode= real model= gpt-4o-mini-2024-07-18 rows= 7050
+    base weights= {'llm': 0.5, 'emb': 0.3, 'rule': 0.2, 'source': 'app.er.types.ERConfig() 모듈 기본값(0.5·0.3·0.2, D3). W_LLM/W_EMB/W_RULE 환경변수를 읽지 않는다 -- 같은 JSONL 이면 같은 metrics.json.'} weights_policy= None penalized_merge_policy= None t_new= 0.3
+new run_id= run-35ae97b5e6ed commit= f96d15b schema_version= None dataset_hash= sha256:49cd8c4a107 run_mode= real model= gpt-4o-mini-2024-07-18 rows= 7050
+    new weights= {'llm': 0.5, 'emb': 0.3, 'rule': 0.2, 'source': 'app.er.types.ERConfig() 모듈 기본값(0.5·0.3·0.2 비율, D12 가 비율을 유지한다). W_LLM/W_EMB/W_RULE 환경변수를 읽지 않는다 -- 같은 JSONL 이면 같은 metrics.json.'} weights_policy= observed_renormalized(D12) penalized_merge_policy= ask t_new= 0.3
+
+========================================================================
+0b. 조인 키 유일성 (proposed, t_merge=0.8)
+========================================================================
+base rows= 141 | unique(scenario,turn,mention,kind)= 141 dup= [] | unique(scenario,kind,mention_index)= 141 dup_rows= 0
+new rows= 141 | unique(scenario,turn,mention,kind)= 141 dup= [] | unique(scenario,kind,mention_index)= 141 dup_rows= 0
+키 교집합= 141 base only= [] new only= []
+
+========================================================================
+0c. person_id 정규화
+========================================================================
+base 후보에 등장한 person_id 수= 56 new= 56
+두 실행의 DB id 대역: base 11894 ~ 11949 | new 16213 ~ 16268
+→ id 는 실행마다 새로 적재되어 비교 불가. 표에는 display_name 을 쓴다.
+
+========================================================================
+(a) mention 단위 diff - 변화 유형별 건수
+========================================================================
+교집합 mention= 141
+  identity->merge                    49
+  완전 동일                              45
+  merge 유지·확신도만 변동                   28
+  identity 유지·확신도만 변동                16
+  new_person->identity               1
+  identity->new_person               1
+  merge->identity                    1
+변화 있는 행= 96 / 그중 결정이 바뀐 행= 52
+
+========================================================================
+(a2) 결정이 바뀐 행 전체
+========================================================================
+sc-002 t4 이서연 과장님[gold]                  identity    -         0.6895 -> merge       이서연       0.8619 | identity->merge        deferred -> merge_correct
+sc-003 t3 유진씨[gold]                      identity    -         0.7500 -> merge       최유진       1.0000 | identity->merge        deferred -> merge_correct
+sc-005 t0 하윤이[gold]                      identity    -         0.7500 -> merge       정하윤       0.9375 | identity->merge        deferred -> merge_correct
+sc-007 t2 문실장님[gold]                     new_person  -         0.0000 -> identity    -         0.5442 | new_person->identity   miss -> deferred
+sc-009 t1 준호[gold]                       identity    -         0.7500 -> merge       배준호       0.9687 | identity->merge        deferred -> merge_correct
+sc-010 t1 민준이[gold]                      identity    -         0.7500 -> merge       이민준       0.9375 | identity->merge        deferred -> merge_correct
+sc-010 t2 민준이[gold]                      identity    -         0.7500 -> merge       이민준       0.9375 | identity->merge        deferred -> merge_correct
+sc-011 t1 최유진[gold]                      identity    -         0.7500 -> merge       최유진       1.0000 | identity->merge        deferred -> merge_correct
+sc-012 t0 수학쌤[gold]                      identity    -         0.7500 -> merge       안소미       0.9375 | identity->merge        deferred -> merge_correct
+sc-012 t1 영어쌤[gold]                      identity    -         0.0000 -> new_person  -         0.2989 | identity->new_person   deferred -> new_person_correct
+sc-012 t2 안쌤[gold]                       identity    -         0.7750 -> merge       안소미       0.9687 | identity->merge        deferred -> merge_correct
+sc-013 t0 채원씨[gold]                      identity    -         0.7750 -> merge       임채원       0.9687 | identity->merge        deferred -> merge_correct
+sc-013 t1 채영이[gold]                      identity    -         0.7500 -> merge       서채영       0.9375 | identity->merge        deferred -> merge_correct
+sc-013 t2 채영이[gold]                      identity    -         0.7500 -> merge       서채영       0.9375 | identity->merge        deferred -> merge_correct
+sc-013 t2 채원이[gold]                      identity    -         0.7280 -> merge       임채원       0.9100 | identity->merge        deferred -> merge_correct
+sc-014 t2 다인이[gold]                      identity    -         0.7500 -> merge       서다인       0.9375 | identity->merge        deferred -> merge_correct
+sc-015 t0 부장님[gold]                      merge       한지원       0.9500 -> identity    -         0.8167 | merge->identity        false_merge -> deferred
+sc-015 t0 은우[gold]                       identity    -         0.7500 -> merge       조은우       0.9375 | identity->merge        deferred -> merge_correct
+sc-015 t2 은우[gold]                       identity    -         0.7500 -> merge       조은우       0.9687 | identity->merge        deferred -> merge_correct
+sc-016 t0 예린이[gold]                      identity    -         0.7193 -> merge       신예린       0.8991 | identity->merge        deferred -> merge_correct
+sc-016 t1 예리니[gold]                      identity    -         0.7750 -> merge       신예린       0.9375 | identity->merge        deferred -> merge_correct
+sc-016 t2 린이[gold]                       identity    -         0.7500 -> merge       신예린       0.9687 | identity->merge        deferred -> merge_correct
+sc-017 t0 규진이[gold]                      identity    -         0.7750 -> merge       남규진       0.9687 | identity->merge        deferred -> merge_correct
+sc-017 t1 규진이[gold]                      identity    -         0.7750 -> merge       남규진       0.9375 | identity->merge        deferred -> merge_correct
+sc-017 t3 서윤이[gold]                      identity    -         0.7500 -> merge       백서윤       0.9687 | identity->merge        deferred -> merge_correct
+sc-018 t0 민서 누나[gold]                    identity    -         0.7750 -> merge       구민서       0.9687 | identity->merge        deferred -> merge_correct
+sc-018 t1 보라[gold]                       identity    -         0.7750 -> merge       양보라       0.9375 | identity->merge        deferred -> merge_correct
+sc-019 t0 세호[gold]                       identity    -         0.7750 -> merge       장세호       0.9687 | identity->merge        deferred -> merge_correct
+sc-019 t0 아름이[gold]                      identity    -         0.7500 -> merge       노아름       0.9375 | identity->merge        deferred -> merge_correct
+sc-019 t1 세호[gold]                       identity    -         0.7750 -> merge       장세호       0.9375 | identity->merge        deferred -> merge_correct
+sc-020 t0 가은이[gold]                      identity    -         0.7500 -> merge       홍가은       0.9687 | identity->merge        deferred -> merge_correct
+sc-021 t0 동혁이[gold]                      identity    -         0.7500 -> merge       표동혁       0.9687 | identity->merge        deferred -> merge_correct
+sc-021 t1 서윤이[gold]                      identity    -         0.7500 -> merge       백서윤       0.9375 | identity->merge        deferred -> merge_correct
+sc-021 t3 보라[gold]                       identity    -         0.7750 -> merge       양보라       0.9375 | identity->merge        deferred -> merge_correct
+sc-022 t0 규진이[gold]                      identity    -         0.7750 -> merge       남규진       0.9375 | identity->merge        deferred -> merge_correct
+sc-022 t0 세호[gold]                       identity    -         0.7750 -> merge       장세호       0.9375 | identity->merge        deferred -> merge_correct
+sc-024 t0 동혁이[gold]                      identity    -         0.7500 -> merge       표동혁       0.9687 | identity->merge        deferred -> merge_correct
+sc-024 t0 보라[gold]                       identity    -         0.7500 -> merge       양보라       0.9687 | identity->merge        deferred -> merge_correct
+sc-026 t0 아름이[gold]                      identity    -         0.7500 -> merge       노아름       0.9375 | identity->merge        deferred -> merge_correct
+sc-026 t2 아름이[gold]                      identity    -         0.7750 -> merge       노아름       0.9687 | identity->merge        deferred -> merge_correct
+sc-027 t0 규진이[gold]                      identity    -         0.7500 -> merge       남규진       1.0000 | identity->merge        deferred -> merge_correct
+sc-027 t2 규진이[gold]                      identity    -         0.7500 -> merge       남규진       0.9375 | identity->merge        deferred -> merge_correct
+sc-029 t0 보라쌤[gold]                      identity    -         0.7750 -> merge       양보라       0.9375 | identity->merge        deferred -> merge_correct
+sc-030 t0 하윤이[gold]                      identity    -         0.7750 -> merge       정하윤       0.9687 | identity->merge        deferred -> merge_correct
+sc-030 t3 하윤이[gold]                      identity    -         0.7500 -> merge       정하윤       0.9687 | identity->merge        deferred -> merge_correct
+sc-031 t0 서윤이[gold]                      identity    -         0.7500 -> merge       백서윤       0.9687 | identity->merge        deferred -> merge_correct
+sc-031 t2 서윤이[gold]                      identity    -         0.7500 -> merge       백서윤       0.9375 | identity->merge        deferred -> merge_correct
+sc-032 t0 지호형[gold]                      identity    -         0.7500 -> merge       오지호       0.9375 | identity->merge        deferred -> merge_correct
+sc-033 t0 가은이[gold]                      identity    -         0.7500 -> merge       홍가은       0.9375 | identity->merge        deferred -> merge_correct
+sc-038 t2 다인이[gold]                      identity    -         0.7500 -> merge       서다인       0.9375 | identity->merge        deferred -> merge_correct
+sc-040 t0 예린이[gold]                      identity    -         0.7443 -> merge       신예린       0.8991 | identity->merge        deferred -> merge_correct
+sc-040 t2 예린이[gold]                      identity    -         0.7193 -> merge       신예린       0.8991 | identity->merge        deferred -> merge_correct
+
+========================================================================
+(a3) 결정은 같고 확신도/귀속만 바뀐 행
+========================================================================
+건수= 44
+그중 귀속 인물이 달라진 행= 0
+
+========================================================================
+(a4) 채점 분류 전이 (gold · non-ambiguous)
+========================================================================
+  deferred               -> merge_correct          49
+  merge_correct          -> merge_correct          47
+  deferred               -> deferred               29
+  new_person_correct     -> new_person_correct     4
+  miss                   -> deferred               1
+  deferred               -> new_person_correct     1
+  false_merge            -> deferred               1
+  합계= 132
+
+========================================================================
+(b) sc-015 t0 '부장님' / sc-007 t2 '문실장님'
+========================================================================
+
+--- ('sc-015', 0, '부장님', 'gold') · P4 기준선 ---
+  decision= merge person_id= 11931 한지원 | gold_db_person_id= 11930 조은우 | classify= false_merge
+  forced_reason= None band_by_threshold= merge ask_kind= None relaxed_retry= False llm_attempts= 1 llm_skipped= False
+  excluded_by= {'11930': 'relation_tag_conflict'} | penalized_by= (키 없음)
+  confidence_breakdown= {"confidence": 0.95, "matched_person_id": 11931, "rule_checked": 3, "rule_passed": 3, "s_emb": 1.0, "s_llm": 0.9, "s_rule": 1.0, "weights": {"emb": 0.3, "llm": 0.5, "rule": 0.2}}
+  후보 목록(2):
+    11930 조은우: score=0.0000 s_emb=1.0 exact_alias=1.0 rule_checked=3.0 rule_passed=1.0 passed_rules=0.0 s_rule=0.3333333333333333 relaxed_pass=0.0 hier_match=0.0 hier_adj=1.0 rel_match=0.0  <== 골드
+    11931 한지원: score=0.9500 s_emb=1.0 exact_alias=1.0 rule_checked=3.0 rule_passed=3.0 passed_rules=1.0 s_rule=1.0 relaxed_pass=0.0 hier_match=1.0 hier_adj=0.0 rel_match=1.0
+
+--- ('sc-015', 0, '부장님', 'gold') · P4b 재실행 ---
+  decision= identity person_id= None - | gold_db_person_id= 16249 조은우 | classify= deferred
+  forced_reason= penalized_candidate band_by_threshold= merge ask_kind= identity relaxed_retry= False llm_attempts= 1 llm_skipped= False
+  excluded_by= {} | penalized_by= {'16249': ['relation_tag_conflict', 'hierarchy_conflict']}
+  confidence_breakdown= {"confidence": 0.8166666666666667, "matched_person_id": 16249, "rule_checked": 3, "rule_passed": 1, "s_emb": 1.0, "s_llm": 0.9, "s_rule": 0.3333333333333333, "weights": {"emb": 0.3, "llm": 0.5, "rule": 0.2}, "weights_effective": {"emb": 0.3, "llm": 0.5, "rule": 0.2}}
+  후보 목록(2):
+    16249 조은우: score=0.8167 s_emb=1.0 exact_alias=1.0 rule_checked=3.0 rule_passed=1.0 passed_rules=1.0 s_rule=0.3333333333333333 relaxed_pass=0.0 hier_match=0.0 hier_adj=1.0 rel_match=0.0  <== 골드
+    16250 한지원: score=0.0000 s_emb=1.0 exact_alias=1.0 rule_checked=3.0 rule_passed=3.0 passed_rules=1.0 s_rule=1.0 relaxed_pass=0.0 hier_match=1.0 hier_adj=0.0 rel_match=1.0
+
+--- ('sc-007', 2, '문실장님', 'gold') · P4 기준선 ---
+  decision= new_person person_id= None - | gold_db_person_id= 11903 문태현 | classify= miss
+  forced_reason= no_candidates band_by_threshold= new_person ask_kind= new_person relaxed_retry= False llm_attempts= 0 llm_skipped= True
+  excluded_by= {'11903': 'relation_tag_conflict'} | penalized_by= (키 없음)
+  confidence_breakdown= {"confidence": 0.0, "matched_person_id": null, "rule_checked": 0, "rule_passed": 0, "s_emb": 0.0, "s_llm": 0.0, "s_rule": 0.0, "weights": {"emb": 0.3, "llm": 0.5, "rule": 0.2}}
+  후보 목록(1):
+    11903 문태현: score=0.0000 s_emb=0.31405469845782474 exact_alias=0.0 rule_checked=2.0 rule_passed=0.0 passed_rules=0.0 s_rule=0.0 relaxed_pass=0.0 hier_match=0.0 hier_adj=1.0 rel_match=0.0  <== 골드
+
+--- ('sc-007', 2, '문실장님', 'gold') · P4b 재실행 ---
+  decision= identity person_id= None - | gold_db_person_id= 16222 문태현 | classify= deferred
+  forced_reason= None band_by_threshold= identity ask_kind= identity relaxed_retry= False llm_attempts= 1 llm_skipped= False
+  excluded_by= {} | penalized_by= {'16222': ['relation_tag_conflict', 'hierarchy_conflict']}
+  confidence_breakdown= {"confidence": 0.5442164095373474, "matched_person_id": 16222, "rule_checked": 2, "rule_passed": 0, "s_emb": 0.31405469845782474, "s_llm": 0.9, "s_rule": 0.0, "weights": {"emb": 0.3, "llm": 0.5, "rule": 0.2}, "weights_effective": {"emb": 0.3, "llm": 0.5, "rule": 0.2}}
+  후보 목록(1):
+    16222 문태현: score=0.5442 s_emb=0.31405469845782474 exact_alias=0.0 rule_checked=2.0 rule_passed=0.0 passed_rules=1.0 s_rule=0.0 relaxed_pass=0.0 hier_match=0.0 hier_adj=1.0 rel_match=0.0  <== 골드
+
+========================================================================
+(b2) 두 mention 의 다섯 방식 판정 (t_merge=0.8)
+========================================================================
+('sc-015', 0, '부장님', 'gold') base proposed=merge/한지원/false_merge | exact_raw=identity/-/deferred | exact_norm=identity/-/deferred | embedding_only=identity/-/deferred | llm_single=identity/-/deferred
+('sc-015', 0, '부장님', 'gold') new proposed=identity/-/deferred | exact_raw=identity/-/deferred | exact_norm=identity/-/deferred | embedding_only=identity/-/deferred | llm_single=identity/-/deferred
+('sc-007', 2, '문실장님', 'gold') base proposed=new_person/-/miss | exact_raw=new_person/-/miss | exact_norm=new_person/-/miss | embedding_only=identity/-/deferred | llm_single=merge/문태현/merge_correct
+('sc-007', 2, '문실장님', 'gold') new proposed=identity/-/deferred | exact_raw=new_person/-/miss | exact_norm=new_person/-/miss | embedding_only=identity/-/deferred | llm_single=merge/문태현/merge_correct
+
+========================================================================
+(c) 기준선 deferred 의 행방
+========================================================================
+기준선 deferred(gold·채점 분모 안)= 79
+재실행 decision 분포= {'identity': 29, 'merge': 49, 'new_person': 1}
+재실행 classify 분포= {'deferred': 29, 'merge_correct': 49, 'new_person_correct': 1}
+  identity     n= 29  귀속==골드 0  classify={'deferred': 29}
+  merge        n= 49  귀속==골드 49  classify={'merge_correct': 49}
+  new_person   n=  1  귀속==골드 0  classify={'new_person_correct': 1}
+  identity 유지 29건 확신도: base med=0.0000 / new med=0.0000
+참고: 기준선 decision=='identity' 전체(분모 밖 포함)= 88 → 재실행 {'identity': 38, 'merge': 49, 'new_person': 1}
+
+========================================================================
+(d) 감점 후보 merge - 두 경로 교차 확인
+========================================================================
+경로1 metrics.json:
+  new proposed.by_t_merge['0.8'].subsets = {"merge_rule_unchecked": {"merges": 63, "false_merge_rate": {"n": 0, "d": 63, "rate": 0.0}}, "merge_relaxed_retry": {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}}, "penalized_merge": {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}, "relaxed_pass_merges": 14, "relaxed_pass_false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}, "reasons": {"hierarchy_conflict": 14}}, "merges": 96}
+  base proposed.by_t_merge['0.8'].subsets = {"merge_rule_unchecked": {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}}, "merge_relaxed_retry": {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}}, "merges": 48}
+  new proposed.by_t_merge['0.8'].forced_reason = {"no_candidates": 4, "no_matched": 20, "none": 109, "penalized_candidate": 5}
+  base proposed.by_t_merge['0.8'].forced_reason = {"no_candidates": 5, "no_matched": 25, "none": 108}
+경로2 원시 JSONL detail['penalized_by'] (proposed, t_merge=0.8, 141행):
+  merge & penalized_by 비어있지 않음 = 22
+  merge & 귀속 인물 자신이 감점 후보 = 14
+  그중 채점 분모 안(gold·non-ambiguous) = 14   <-- metrics subsets.penalized_merge.merges 와 대조
+  그중 오병합 = 0 []
+  사유 분포(채점 분모 안)= {'hierarchy_conflict': 14}
+  relaxed_pass(채점 분모 안)= {1.0: 14}
+  relaxed_pass 분포= {1.0: 14}
+  mention_kind= {'gold': 14} ambiguous= {False: 14}
+  classify= {'merge_correct': 14}
+  목록:
+    sc-001 t0 김팀장      gold   conf=0.9333 relaxed_pass=1.0 merge_correct
+    sc-001 t1 김팀장      gold   conf=0.9333 relaxed_pass=1.0 merge_correct
+    sc-002 t0 이대리      gold   conf=0.9083 relaxed_pass=1.0 merge_correct
+    sc-004 t0 강팀장님     gold   conf=0.8715 relaxed_pass=1.0 merge_correct
+    sc-004 t1 윤팀장님     gold   conf=0.8676 relaxed_pass=1.0 merge_correct
+    sc-023 t0 심팀장      gold   conf=0.9083 relaxed_pass=1.0 merge_correct
+    sc-009 t0 배대리      gold   conf=0.9333 relaxed_pass=1.0 merge_correct
+    sc-010 t0 김팀장      gold   conf=0.9083 relaxed_pass=1.0 merge_correct
+    sc-010 t3 팀장님      gold   conf=0.8833 relaxed_pass=1.0 merge_correct
+    sc-028 t0 심팀장      gold   conf=0.8833 relaxed_pass=1.0 merge_correct
+    sc-028 t2 심팀장      gold   conf=0.8833 relaxed_pass=1.0 merge_correct
+    sc-035 t1 박과장님     gold   conf=0.8617 relaxed_pass=1.0 merge_correct
+    sc-036 t0 이대리      gold   conf=0.8833 relaxed_pass=1.0 merge_correct
+    sc-036 t2 이대리      gold   conf=0.8833 relaxed_pass=1.0 merge_correct
+전체 감점 규모:
+  penalized_by 가 있는 mention = 34 / 141
+  사유 분포(후보 단위)= {'hierarchy_conflict': 33, 'relation_tag_conflict': 12}
+  기준선 excluded_by 가 있던 mention = 19 사유= {'hierarchy_conflict': 7, 'relation_tag_conflict': 12}
+  재실행 excluded_by 가 있던 mention = 3 사유= {'dictionary_conflict': 3}
+보수 강등(forced_reason=penalized_candidate) = 5
+    sc-002 t1 박과장님     gold   band_by_threshold=merge conf=0.8617 deferred
+    sc-002 t2 박과장님     gold   band_by_threshold=merge conf=0.8617 deferred
+    sc-020 t0 심팀장      gold   band_by_threshold=merge conf=0.8833 deferred
+    sc-015 t0 부장님      gold   band_by_threshold=merge conf=0.8167 deferred
+    sc-033 t2 심팀장      gold   band_by_threshold=merge conf=0.8833 deferred
+
+========================================================================
+(e) rule_checked == 0 mention 의 확신도 분포 이동
+========================================================================
+base mention(sweep0)= 141 new= 141
+base raw detail.confidence_breakdown 키 존재 건수: rule_checked 141 | weights 141 | weights_effective 0 / 141
+new raw detail.confidence_breakdown 키 존재 건수: rule_checked 141 | weights 141 | weights_effective 141 / 141
+trace base : proposed sweep0 141 건, confidence_breakdown 키별 건수 = {'confidence': 141, 'matched_person_id': 141, 'rule_checked': 141, 'rule_passed': 141, 's_emb': 141, 's_llm': 141, 's_rule': 141, 'weights': 141}
+trace new : proposed sweep0 141 건, confidence_breakdown 키별 건수 = {'confidence': 141, 'matched_person_id': 141, 'rule_checked': 141, 'rule_passed': 141, 's_emb': 141, 's_llm': 141, 's_rule': 141, 'weights': 141, 'weights_effective': 141}
+
+base rule_checked==0 = 100 | new rule_checked==0 = 96 | 교집합= 95
+base 에서만 0 = [('sc-002', 1, '박과장님', 'gold'), ('sc-002', 2, '박과장님', 'gold'), ('sc-007', 2, '문실장님', 'gold'), ('sc-020', 0, '심팀장', 'gold'), ('sc-033', 2, '심팀장', 'gold')]
+new 에서만 0 = [('sc-036', 2, '임대리', 'gold')]
+[양쪽 모두 rule_checked==0] base: n=95 min=0.0000 q1=0.0000 med=0.7500 q3=0.7750 max=0.8000 mean=0.5349
+[양쪽 모두 rule_checked==0] new : n=95 min=0.0000 q1=0.0000 med=0.9375 q3=0.9687 max=1.0000 mean=0.6756
+base 구간= {'0.0': 27, '[0.5,0.7)': 4, '[0.7,0.8)': 48, '[0.8,0.9)': 14, '[0.3,0.5)': 2}
+new  구간= {'0.0': 25, '[0.8,0.9)': 4, '[0.9,1.0]': 59, '(0,0.3)': 1, '[0.5,0.7)': 5, '[0.7,0.8)': 1}
+>=0.8: base 14 | new 63
+확신도 max(rule_checked==0): base 0.8 | new 1.0
+확신도 max(rule_checked>0) : base 1.0 | new 1.0
+new rule_checked==0 중 (0.5·s_llm+0.3·s_emb)/0.8 과 불일치 = 0
+new rule_checked==0 의 weights_effective 값 분포= {'{"emb": 0.37499999999999994, "llm": 0.625, "rule": 0.0}': 96}
+rule_checked==0 mention 의 decision: new= {'identity': 22, 'merge': 69, 'new_person': 5} | 같은 키 base= {'identity': 25, 'merge': 67, 'new_person': 4}
+반사실 예측(failure_cases §8 후보1: merge 48->97, 골드일치 96, 오병합 1) 대비 실측:
+  base merge= 48 | new merge= 96
+  new merge 중 귀속==골드= 96
+
+========================================================================
+(f) 게이트 4수치 전후
+========================================================================
+P4 기준선 | t_merge= 0.8 | dominated_by= ['embedding_only'] | d10_direction= True | pass= False | reason= None
+P4b 재실행 | t_merge= 0.8 | dominated_by= [] | d10_direction= True | pass= True | reason= None
+
+P4 기준선 mention_counts= {'gold': 135, 'gold_scored': 132, 'ambiguous': 3, 'passing': 6}
+   proposed         outcomes={"merge_correct": 47, "false_merge": 1, "miss": 1, "deferred": 79, "new_person_correct": 4} fm=1/132 miss=1/132 deferred=79/132 f1=0.5663 prec=0.9792 rec=0.3983 ask_identity=0.5985
+   exact_raw        outcomes={"merge_correct": 83, "false_merge": 0, "miss": 33, "deferred": 2, "new_person_correct": 14} fm=0/132 miss=33/132 deferred=2/132 f1=0.8259 prec=1.0000 rec=0.7034 ask_identity=0.0152
+   exact_norm       outcomes={"merge_correct": 91, "false_merge": 4, "miss": 20, "deferred": 6, "new_person_correct": 11} fm=4/132 miss=20/132 deferred=6/132 f1=0.8545 prec=0.9579 rec=0.7712 ask_identity=0.0455
+   embedding_only   outcomes={"merge_correct": 95, "false_merge": 0, "miss": 1, "deferred": 31, "new_person_correct": 5} fm=0/132 miss=1/132 deferred=31/132 f1=0.8920 prec=1.0000 rec=0.8051 ask_identity=0.2348
+   llm_single       outcomes={"merge_correct": 90, "false_merge": 0, "miss": 10, "deferred": 19, "new_person_correct": 13} fm=0/132 miss=10/132 deferred=19/132 f1=0.8654 prec=1.0000 rec=0.7627 ask_identity=0.1439
+   gate.baselines= {"exact_raw": {"false_merge_rate": {"n": 0, "d": 132, "rate": 0.0}, "miss_rate": {"n": 33, "d": 132, "rate": 0.25}, "dominates_proposed": false}, "exact_norm": {"false_merge_rate": {"n": 4, "d": 132, "rate": 0.030303030303030304}, "miss_rate": {"n": 20, "d": 132, "rate": 0.15151515151515152}, "dominates_proposed": false}, "embedding_only": {"false_merge_rate": {"n": 0, "d": 132, "rate": 0.0}, "miss_rate": {"n": 1, "d": 132, "rate": 0.007575757575757576}, "dominates_proposed": true}, "llm_single": {"false_merge_rate": {"n": 0, "d": 132, "rate": 0.0}, "miss_rate": {"n": 10, "d": 132, "rate": 0.07575757575757576}, "dominates_proposed": false}}
+   gate.proposed= {"false_merge_rate": {"n": 1, "d": 132, "rate": 0.007575757575757576}, "miss_rate": {"n": 1, "d": 132, "rate": 0.007575757575757576}}
+   gate.d10_detail= {"pairs": 9, "violations": []}
+
+P4b 재실행 mention_counts= {'gold': 135, 'gold_scored': 132, 'ambiguous': 3, 'passing': 6}
+   proposed         outcomes={"merge_correct": 96, "false_merge": 0, "miss": 0, "deferred": 31, "new_person_correct": 5} fm=0/132 miss=0/132 deferred=31/132 f1=0.8972 prec=1.0000 rec=0.8136 ask_identity=0.2348
+   exact_raw        outcomes={"merge_correct": 83, "false_merge": 0, "miss": 33, "deferred": 2, "new_person_correct": 14} fm=0/132 miss=33/132 deferred=2/132 f1=0.8259 prec=1.0000 rec=0.7034 ask_identity=0.0152
+   exact_norm       outcomes={"merge_correct": 91, "false_merge": 4, "miss": 20, "deferred": 6, "new_person_correct": 11} fm=4/132 miss=20/132 deferred=6/132 f1=0.8545 prec=0.9579 rec=0.7712 ask_identity=0.0455
+   embedding_only   outcomes={"merge_correct": 95, "false_merge": 0, "miss": 1, "deferred": 31, "new_person_correct": 5} fm=0/132 miss=1/132 deferred=31/132 f1=0.8920 prec=1.0000 rec=0.8051 ask_identity=0.2348
+   llm_single       outcomes={"merge_correct": 90, "false_merge": 0, "miss": 9, "deferred": 20, "new_person_correct": 13} fm=0/132 miss=9/132 deferred=20/132 f1=0.8654 prec=1.0000 rec=0.7627 ask_identity=0.1515
+   gate.baselines= {"exact_raw": {"false_merge_rate": {"n": 0, "d": 132, "rate": 0.0}, "miss_rate": {"n": 33, "d": 132, "rate": 0.25}, "dominates_proposed": false}, "exact_norm": {"false_merge_rate": {"n": 4, "d": 132, "rate": 0.030303030303030304}, "miss_rate": {"n": 20, "d": 132, "rate": 0.15151515151515152}, "dominates_proposed": false}, "embedding_only": {"false_merge_rate": {"n": 0, "d": 132, "rate": 0.0}, "miss_rate": {"n": 1, "d": 132, "rate": 0.007575757575757576}, "dominates_proposed": false}, "llm_single": {"false_merge_rate": {"n": 0, "d": 132, "rate": 0.0}, "miss_rate": {"n": 9, "d": 132, "rate": 0.06818181818181818}, "dominates_proposed": false}}
+   gate.proposed= {"false_merge_rate": {"n": 0, "d": 132, "rate": 0.0}, "miss_rate": {"n": 0, "d": 132, "rate": 0.0}}
+   gate.d10_detail= {"pairs": 9, "violations": []}
+
+
+========================================================================
+(f2) T_merge 격자 단조성 (proposed)
+========================================================================
+P4 기준선
+   t_merge=0.5   fm=6 miss=1 deferred=22 ask_identity=0.1667 f1=0.8879
+   t_merge=0.55  fm=6 miss=1 deferred=22 ask_identity=0.1667 f1=0.8879
+   t_merge=0.6   fm=6 miss=1 deferred=22 ask_identity=0.1667 f1=0.8879
+   t_merge=0.65  fm=6 miss=1 deferred=23 ask_identity=0.1742 f1=0.8829
+   t_merge=0.7   fm=4 miss=1 deferred=27 ask_identity=0.2045 f1=0.8807
+   t_merge=0.75  fm=2 miss=1 deferred=33 ask_identity=0.2500 f1=0.8679
+   t_merge=0.8   fm=1 miss=1 deferred=79 ask_identity=0.5985 f1=0.5663
+   t_merge=0.85  fm=1 miss=1 deferred=96 ask_identity=0.7273 f1=0.4027
+   t_merge=0.9   fm=1 miss=1 deferred=105 ask_identity=0.7955 f1=0.3000
+   t_merge=0.95  fm=1 miss=1 deferred=114 ask_identity=0.8636 f1=0.1832
+P4b 재실행
+   t_merge=0.5   fm=4 miss=0 deferred=22 ask_identity=0.1667 f1=0.9058
+   t_merge=0.55  fm=4 miss=0 deferred=23 ask_identity=0.1742 f1=0.9009
+   t_merge=0.6   fm=4 miss=0 deferred=23 ask_identity=0.1742 f1=0.9009
+   t_merge=0.65  fm=3 miss=0 deferred=25 ask_identity=0.1894 f1=0.9000
+   t_merge=0.7   fm=3 miss=0 deferred=26 ask_identity=0.1970 f1=0.8950
+   t_merge=0.75  fm=1 miss=0 deferred=29 ask_identity=0.2197 f1=0.8981
+   t_merge=0.8   fm=0 miss=0 deferred=31 ask_identity=0.2348 f1=0.8972
+   t_merge=0.85  fm=0 miss=0 deferred=34 ask_identity=0.2576 f1=0.8815
+   t_merge=0.9   fm=0 miss=0 deferred=46 ask_identity=0.3485 f1=0.8141
+   t_merge=0.95  fm=0 miss=0 deferred=86 ask_identity=0.6515 f1=0.5157
+rc=0
+
+## PART 2 — u6_extra.py (세부: (c2)(c3)(e2)(e3)(e4)(f3)(f4))
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python u6_extra.py
+
+========================================================================
+(c2) 기준선 deferred 79건 중 재실행 identity 유지 29건의 구성
+========================================================================
+29건 재실행 forced_reason= {'no_matched': 15, 'penalized_candidate': 4, None: 10}
+29건 기준선 forced_reason= {'no_matched': 19, None: 10}
+29건 재실행 확신도 구간= {'0.0': 15, '[0.3,0.8)': 14}
+29건 중 breakdown.matched_person_id == 골드 = 16 / 29   (기준선 같은 지표= 11 )
+49건 merge 의 재실행 확신도 min/max= 0.8619249630683429 1.0
+49건 merge 의 기준선 확신도 min/max= 0.6895490389883483 0.7749999999999999
+49건 중 rule_checked==0 = 49
+new_person 1건= [('sc-012', 1, '영어쌤', 'gold')] conf= [0.2988960193798125]
+
+========================================================================
+(c3) 재실행 deferred 31건의 출처
+========================================================================
+재실행 deferred= 31  출처(기준선 classify)= {'deferred': 29, 'miss': 1, 'false_merge': 1}
+재실행 deferred 의 forced_reason= {'no_matched': 15, 'penalized_candidate': 5, None: 11}
+
+========================================================================
+(e2) rule_checked 가 0 -> >0 으로 바뀐 5건 / >0 -> 0 으로 바뀐 1건
+========================================================================
+  ('sc-002', 1, '박과장님', 'gold')              base rc=0 conf=0.0000 dec=identity -> new rc=3 conf=0.8617 dec=identity | deferred -> deferred
+  ('sc-002', 2, '박과장님', 'gold')              base rc=0 conf=0.0000 dec=identity -> new rc=3 conf=0.8617 dec=identity | deferred -> deferred
+  ('sc-007', 2, '문실장님', 'gold')              base rc=0 conf=0.0000 dec=new_person -> new rc=2 conf=0.5442 dec=identity | miss -> deferred
+  ('sc-020', 0, '심팀장', 'gold')               base rc=0 conf=0.0000 dec=identity -> new rc=3 conf=0.8833 dec=identity | deferred -> deferred
+  ('sc-033', 2, '심팀장', 'gold')               base rc=0 conf=0.0000 dec=identity -> new rc=3 conf=0.8833 dec=identity | deferred -> deferred
+  ('sc-036', 2, '임대리', 'gold')               base rc=3 conf=0.7440 dec=merge -> new rc=0 conf=0.0000 dec=identity | false_merge -> deferred
+
+========================================================================
+(e3) merge_rule_unchecked 부분집합 전후 (metrics.json)
+========================================================================
+P4 기준선 {"merge_rule_unchecked": {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}}, "merge_relaxed_retry": {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}}, "merges": 48}
+P4b 재실행 {"merge_rule_unchecked": {"merges": 63, "false_merge_rate": {"n": 0, "d": 63, "rate": 0.0}}, "merge_relaxed_retry": {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}}, "merges": 96}
+
+========================================================================
+(e4) rule_checked>0 인 mention 의 확신도는 그대로인가 (D12 동치)
+========================================================================
+양쪽 rule_checked>0 = 40  확신도 완전 동일 = 20  (다른 건 s_llm·s_rule 자체가 바뀐 경우 — 아래)
+   ('sc-001', 0, '김팀장', 'gold')               s_llm 0.90->1.00 s_emb 1.0000->1.0000 s_rule 0.6667->0.6667 conf 0.8833->0.9333 rp 2->2
+   ('sc-001', 1, '김팀장', 'gold')               s_llm 0.95->1.00 s_emb 1.0000->1.0000 s_rule 0.6667->0.6667 conf 0.9083->0.9333 rp 2->2
+   ('sc-002', 0, '이대리', 'gold')               s_llm 0.90->0.95 s_emb 1.0000->1.0000 s_rule 0.6667->0.6667 conf 0.8833->0.9083 rp 2->2
+   ('sc-002', 3, '과장님', 'gold')               s_llm 0.80->0.90 s_emb 0.2849->0.4244 s_rule 1.0000->0.6667 conf 0.6855->0.7107 rp 3->2
+   ('sc-004', 2, '팀장님', 'gold')               s_llm 0.90->0.80 s_emb 0.6727->0.6727 s_rule 0.6667->0.6667 conf 0.7852->0.7352 rp 2->2
+   ('sc-004', 3, '실장님', 'gold')               s_llm 0.80->0.90 s_emb 0.4031->0.4031 s_rule 1.0000->1.0000 conf 0.7209->0.7709 rp 3->3
+   ('sc-008', 0, '아빠', 'gold')                s_llm 0.95->0.90 s_emb 1.0000->1.0000 s_rule 1.0000->1.0000 conf 0.9750->0.9500 rp 2->2
+   ('sc-008', 2, '아빠', 'gold')                s_llm 1.00->0.90 s_emb 1.0000->1.0000 s_rule 1.0000->1.0000 conf 1.0000->0.9500 rp 2->2
+   ('sc-023', 0, '심팀장', 'gold')               s_llm 0.90->0.95 s_emb 1.0000->1.0000 s_rule 0.6667->0.6667 conf 0.8833->0.9083 rp 2->2
+   ('sc-009', 0, '배대리', 'gold')               s_llm 0.95->1.00 s_emb 1.0000->1.0000 s_rule 0.6667->0.6667 conf 0.9083->0.9333 rp 2->2
+   ('sc-011', 0, '언니', 'gold')                s_llm 0.95->1.00 s_emb 1.0000->1.0000 s_rule 1.0000->1.0000 conf 0.9750->1.0000 rp 3->3
+   ('sc-014', 3, '자기', 'gold')                s_llm 0.90->0.95 s_emb 1.0000->1.0000 s_rule 1.0000->1.0000 conf 0.9500->0.9750 rp 3->3
+   ('sc-015', 0, '부장님', 'gold')               s_llm 0.90->0.90 s_emb 1.0000->1.0000 s_rule 1.0000->0.3333 conf 0.9500->0.8167 rp 3->1
+   ('sc-028', 0, '심팀장', 'gold')               s_llm 1.00->0.90 s_emb 1.0000->1.0000 s_rule 0.6667->0.6667 conf 0.9333->0.8833 rp 2->2
+   ('sc-028', 2, '심팀장', 'gold')               s_llm 1.00->0.90 s_emb 1.0000->1.0000 s_rule 0.6667->0.6667 conf 0.9333->0.8833 rp 2->2
+   ('sc-030', 2, '엄마', 'gold')                s_llm 1.00->0.95 s_emb 1.0000->1.0000 s_rule 1.0000->1.0000 conf 1.0000->0.9750 rp 3->3
+   ('sc-034', 3, '아빠', 'gold')                s_llm 1.00->0.95 s_emb 1.0000->1.0000 s_rule 1.0000->1.0000 conf 1.0000->0.9750 rp 3->3
+   ('sc-035', 1, '박과장님', 'gold')              s_llm 0.90->0.90 s_emb 0.9281->0.9280 s_rule 0.6667->0.6667 conf 0.8618->0.8617 rp 2->2
+   ('sc-036', 1, '임대리', 'gold')               s_llm 0.80->0.90 s_emb 0.5354->0.5355 s_rule 0.6667->0.6667 conf 0.6940->0.7440 rp 2->2
+   ('sc-036', 3, '임대리', 'gold')               s_llm 0.80->0.70 s_emb 0.5354->0.5355 s_rule 0.6667->0.6667 conf 0.6940->0.6440 rp 2->2
+
+========================================================================
+(f3) ask_user 발생률 kind 별 전후
+========================================================================
+P4 기준선 {"identity": {"n": 79, "d": 132, "rate": 0.5984848484848485}, "new_person": {"n": 5, "d": 132, "rate": 0.03787878787878788}, "schedule": {"n": 0, "d": 132, "rate": 0.0}}
+P4b 재실행 {"identity": {"n": 31, "d": 132, "rate": 0.23484848484848486}, "new_person": {"n": 5, "d": 132, "rate": 0.03787878787878788}, "schedule": {"n": 0, "d": 132, "rate": 0.0}}
+expected_ask_user_allowed 준수율: base {"n": 97, "d": 132, "rate": 0.7348484848484849} | new {"n": 117, "d": 132, "rate": 0.8863636363636364}
+passing(오탐) 축: base {"false_positive": {"n": 0, "d": 6, "rate": 0.0}, "by_decision": {"merge": 0, "identity": 6, "new_person": 0}, "expected_ask_user_allowed": {"n": 0, "d": 6, "rate": 0.0}} | new {"false_positive": {"n": 0, "d": 6, "rate": 0.0}, "by_decision": {"merge": 0, "identity": 6, "new_person": 0}, "expected_ask_user_allowed": {"n": 0, "d": 6, "rate": 0.0}}
+
+========================================================================
+(f4) 카테고리별 전후 (proposed, t_merge=0.8)
+========================================================================
+  promotion   scored 28  fm 0->0  miss 1->0  deferred 12->10
+  pronoun     scored 31  fm 0->0  miss 0->0  deferred 25->9
+  alias       scored 33  fm 1->0  miss 0->0  deferred 21->5
+  normal      scored 21  fm 0->0  miss 0->0  deferred 12->1
+  new_person  scored 19  fm 0->0  miss 0->0  deferred 9->6
+
+========================================================================
+(f5) llm_single 이 base 10 -> new 9 로 바뀐 mention
+========================================================================
+   ('sc-002', 3, '과장님', 'gold') miss -> deferred | base dec new_person -> new dec identity
+Traceback (most recent call last):
+  File "C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\65ee9d48-f330-4081-874a-e63e2bb1c1e4\scratchpad\u6_extra.py", line 116, in <module>
+    if classify_gold_row(LB[k]) != classify_gold_row(LN[k]):
+       ~~~~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Portpolio\Project_Relationship\evaluation\metrics.py", line 471, in classify_gold_row
+    raise MetricsError("classify_gold_row: ambiguous mention is excluded (분모 규칙 1)")
+evaluation.metrics.MetricsError: classify_gold_row: ambiguous mention is excluded (분모 규칙 1)
+rc=1 (마지막 (f5) 는 ambiguous 행에서 MetricsError 로 중단 — u6_compare2.py (f5) 가 대체한다)
+
+## PART 3 — u6_compare2.py ((e) 를 게이트 점 t_merge=0.8 에서 다시 셈 + 비결정성 계량)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python u6_compare2.py
+
+========================================================================
+(e-8) rule_checked == 0 분포 이동 — 게이트 점 t_merge=0.8 기준
+========================================================================
+sweep_index 확인: t_merge=0.8 행의 sweep_index = [6] / sweep_index==0 의 t_merge = [0.5]
+base rule_checked==0 = 100 / 141 | new = 96 / 141 | 교집합 = 95
+base 에서만 0 (재실행에서 규칙이 측정됨) =
+    ('sc-002', 1, '박과장님', 'gold') base conf=0.0000 dec=identity cls=deferred -> new rc=3 conf=0.8617 dec=identity cls=deferred
+    ('sc-002', 2, '박과장님', 'gold') base conf=0.0000 dec=identity cls=deferred -> new rc=3 conf=0.8617 dec=identity cls=deferred
+    ('sc-007', 2, '문실장님', 'gold') base conf=0.0000 dec=new_person cls=miss -> new rc=2 conf=0.5442 dec=identity cls=deferred
+    ('sc-020', 0, '심팀장', 'gold') base conf=0.0000 dec=identity cls=deferred -> new rc=3 conf=0.8833 dec=identity cls=deferred
+    ('sc-033', 2, '심팀장', 'gold') base conf=0.0000 dec=identity cls=deferred -> new rc=3 conf=0.8833 dec=identity cls=deferred
+new 에서만 0 =
+    ('sc-036', 2, '임대리', 'gold') base rc=3 conf=0.7440 dec=identity cls=deferred -> new conf=0.0000 dec=identity cls=deferred
+
+양쪽 모두 rule_checked==0 인 95 mention 의 확신도 구간
+  구간             base    new
+  0.000            27     25
+  (0,0.3)           0      1
+  [0.3,0.5)         2      0
+  [0.5,0.7)         4      5
+  [0.7,0.8)        48      1
+  [0.8,0.9)        14      4
+  [0.9,1.0]         0     59
+  base: n=95 min=0.0000 q1=0.0000 med=0.7500 q3=0.7750 max=0.8000 mean=0.5349
+  new : n=95 min=0.0000 q1=0.0000 med=0.9375 q3=0.9687 max=1.0000 mean=0.6756
+  >=0.8 건수: base 14 | new 63
+  확신도 0 이 아닌 건만: base n=68 min=0.4539 q1=0.7500 med=0.7500 q3=0.7750 max=0.8000 mean=0.7473
+  확신도 0 이 아닌 건만: new  n=70 min=0.2989 q1=0.9375 med=0.9375 q3=0.9687 max=1.0000 mean=0.9169
+  확신도 최댓값(rule_checked==0): base 0.8000 | new 1.0000
+  확신도 최댓값(rule_checked>0) : base 1.0000 | new 1.0000
+  decision: base {'identity': 77, 'merge': 14, 'new_person': 4} | new {'identity': 27, 'merge': 63, 'new_person': 5}
+  classify: base {'deferred': 68, 'merge_correct': 14, '(분모밖)': 9, 'new_person_correct': 4} | new {'deferred': 18, 'merge_correct': 63, 'new_person_correct': 5, '(분모밖)': 9}
+  new rule_checked==0 중 (0.5·s_llm+0.3·s_emb)/0.8 과 불일치 = 0
+  new rule_checked==0 의 weights_effective 분포 = {'{"emb": 0.37499999999999994, "llm": 0.625, "rule": 0.0}': 96}
+  base rule_checked==0 의 weights 분포 = {'{"emb": 0.3, "llm": 0.5, "rule": 0.2}': 100}  weights_effective 키 존재 = 0
+
+========================================================================
+(e-8b) rule_checked > 0 인 mention 은 D12 로 값이 바뀌지 않는다 (동치 확인)
+========================================================================
+양쪽 rule_checked>0 = 40  그중 세 신호가 완전히 같은 건 = 20
+  세 신호가 같은데 확신도가 다른 건 = 0 []
+
+========================================================================
+(x) 두 실행 사이의 비결정성 — D12·D13 이 아닌 원인
+========================================================================
+양쪽에서 LLM 을 실제로 부른 mention = 136  그중 s_llm 이 다른 건 = 60
+  s_llm 변화량 분포 = {0.1: 9, 0.05: 16, 0.9: 4, -0.1: 11, -0.05: 17, 0.2: 1, 0.7: 1, -0.9: 1}
+양쪽 s_emb>0 = 108  그중 s_emb 이 다른 건 = 5  최대 절대차 = 0.1394950302675364
+  s_emb 절대차 >0.01 인 건 = [(('sc-002', 3, '과장님', 'gold'), 0.2849, 0.4244)]
+베이스라인 4종의 결정이 바뀐 mention 수 (D12·D13 과 무관해야 한다):
+   exact_raw       0 []
+   exact_norm      0 []
+   embedding_only  0 []
+   llm_single      1 [('sc-002', 3, '과장님', 'gold')]
+
+========================================================================
+(f5) llm_single 미검출 10 -> 9 의 정체
+========================================================================
+   ('sc-002', 3, '과장님', 'gold') miss -> deferred | dec new_person -> identity
+rc=0
+
+## PART 4 — §13 이어붙이기 후 무결성 확인 (2026-09-22T15:45:29Z UTC)
+$ wc -l reports/failure_cases.md   # 이어붙이기 전 417 -> 후
+762 reports/failure_cases.md
+
+$ head -418 reports/failure_cases.md | sed '5d' | diff <이어붙이기 전 사본> -
+rc=0  (0 = 기존 절 1~12 무수정, 추가된 것은 머리글 1줄뿐)
+
+$ grep -n '^#\{2,3\} 13' reports/failure_cases.md
+422:## 13. P4 기준선 대비(P4b 재실행)
+428:### 13.0 메타 — 무엇과 무엇을 비교했나
+450:### 13.1 (a) mention 단위 diff — `proposed`, `T_merge` = 0.8
+541:### 13.2 (b) 기준선의 오병합 1건·미검출 1건 — 정답 후보가 3단계에 도달했는가
+573:### 13.3 (c) 기준선 `deferred` 79건의 행방
+587:### 13.4 (d) 감점 후보가 `merge` 된 건수 — D13 위험 계측 (두 경로 교차 확인)
+635:### 13.5 (e) `rule_checked == 0` mention 의 확신도 분포 이동 (D12 재정규화 효과)
+669:### 13.6 (f) 게이트 4수치 전후
+720:### 13.7 이 비교가 말하지 않는 것 (한계 — §10 에 이어서)
+730:### 13.8 결론
+737:### 13.9 재현 (§11 과 같은 규약)
+
+$ sed -n '3,5p' reports/failure_cases.md   # 머리글 한 줄 추가 확인
+> 이 문서는 **해석만 한다.** 게이트 판정(pass/fail)은 다시 내리지 않고 `reports/metrics.json` 의 `gate` 를 그대로 옮긴다 — `dominated_by: ["embedding_only"]`, `d10_direction: true`, **`pass: false`**(결정 K 개정 (a), 01-plan 227행).
+> 수치는 전부 아래 입력 파일에서 센 값이고, 절 11 에 세는 명령이 한 줄씩 있다(원칙8). 평가를 다시 돌리지 않았고 `data/`·`app/`·`evaluation/`·`reports/pilot/` 을 고치지 않았다.
+> **§1~12 는 P4 실행(`raw-20260922-042440`) 기준선이고, §13 이 P4b 재실행(`raw-20260922-150931`)이다** — §1~12 의 수치·문장은 P4b 에서 한 글자도 고치지 않았다(P4b-er-redesign 결정 G(i)).
+
+$ git status --porcelain reports/
+ M reports/failure_cases.md
+?? reports/pilot/metrics-stage.json
+?? reports/pilot/raw-20260922-150931.jsonl
+
+$ git diff --name-only -- reports/pilot/raw-20260922-042440.jsonl.gz reports/pilot/traces-20260922-042440.jsonl reports/pilot/metrics-20260922-042440.json   # 기준선 불변
+(0줄이면 기준선 무변경)
+
+$ git diff --name-only -- app/ data/ evaluation/ scripts/   # U6 은 코드·데이터를 고치지 않는다
+(0줄이면 무변경)
+
+$ bash .claude/scripts/gitlog.sh P4b-er-redesign  (L-001 — 평가 대상 커밋 확인)
+dev HEAD = 855a26b042feb4a5054546d7b913ee721d10fd61  / eval(P4b-er-redesign): U5 실 실행 1회 — 게이트를 통과했다
+P4b 재실행 meta.commit = f96d15b401a24d31bc49de86a1d2c2e11e593999 (f96d15b)
+P4  기준선 meta.commit = 750f11b02f13c942c6d2ef8155646d5b7bc03ac6 (750f11b)

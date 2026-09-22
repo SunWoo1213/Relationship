@@ -209,3 +209,4 @@
 - 2026-09-23 00:01 | COMMIT | f96d15b eval(P4b-er-redesign): U5 준비 — 실 실행 전에 사슬과 재계산을 스텁으로 증명한다
 - 2026-09-23 00:01 | PUSH | origin dev f96d15b — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-23 00:12 | DECISION | L-003 푸시 후 결정: 사용자가 **main 승격** 선택 → 실행 불가 확인(origin/main `0dbf2c9`, 갈림점 `3c6108d`, main 전용 6커밋, README.md 충돌 1건, ff 불가) → 그대로 보고 → **사용자 재결정: 승격 보류·U5 실 실행 먼저**. 마커 해제(`--decision fix`) | P4b-er-redesign
+- 2026-09-23 00:29 | COMMIT | 855a26b eval(P4b-er-redesign): U5 실 실행 1회 — 게이트를 통과했다
