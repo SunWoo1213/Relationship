@@ -179,3 +179,5 @@
 - 2026-09-21 20:40 | VERIFY | 스모크 03 실호출 rc=0 (사용자 실행): openai gpt-4o-mini-2024-07-18 · s_llm 0.9 · confidence 0.8384 · merge — 공급자 실호출 검증 1/3 (P3-er/evidence/20260921-2011-er-smoke-real.txt) | P4-pilot-eval
 - 2026-09-22 12:58 | COMMIT | 2ebf061 docs(P4-pilot-eval): 스모크 03 실호출 증거 등재 — OpenAI 첫 실호출(F-87c597 1/3)
 - 2026-09-22 13:09 | VERIFY | 스모크 08 실호출 rc=0 (사용자 실행): openai gpt-4o-mini-2024-07-18 · llm_single decision identity score 0.7 · llm_error None · tokens 551/57 — 결정 I(i) 03·08 완료, U7 선행 조건 충족. F-87c597 해소·R4 실호출 확인 (P3-baselines/evidence/20260922-1309-baseline-smoke-real.txt) | P4-pilot-eval
+- 2026-09-22 13:16 | COMMIT | 750f11b docs(P4-pilot-eval): 스모크 08 실호출 등재·03·08 P4 이관 — F-87c597 해소·R4 실호출 확인
+- 2026-09-22 13:32 | VERIFY | U7 실 실행 rc=0 (사용자, 3차 — 1·2차는 .env DATABASE_URL 5432 로 DB 접속 실패·LLM 0회): openai gpt-4o-mini-2024-07-18 · 40/40 · 7050행 · tokens 130240/12617 · $0.0271 · traces diff 0 · gz 177,043B. **게이트 미달**: proposed 오병합 1/132·미검출 1/132·ask 59.8% vs embedding_only 0·1·23.5% → dominated_by=[embedding_only], D10 방향 ✔ (evidence 20260922-1324-u7-real-run.txt·1340-u7-judgment.txt) → 재실행 금지, U8 + /devlog change 후보 | P4-pilot-eval

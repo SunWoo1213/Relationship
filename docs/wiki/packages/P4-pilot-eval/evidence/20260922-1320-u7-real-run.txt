@@ -1,0 +1,18 @@
+[estimate] run_mode=real scenarios=40 mentions=141
+[estimate] llm_calls total=282 proposed=141 llm_single=141 (결정 C(i): 임계치 10점은 같은 응답을 재사용한다)
+[estimate] tokens_in=120100 tokens_out=22560 embed_texts=105 embed_tokens=204
+[estimate] 가정 chars_per_token=1.5 output_tokens_per_call=80 (실측 아님 -- U7 의 tokens_in/out 합계로만 실측이 된다)
+[estimate] price_per_1m in=0.15 out=0.6 embed=0.02
+[estimate] price_source=OpenAI 공개 가격표의 gpt-4o-mini(in $0.15 / out $0.60 per 1M)와 text-embedding-3-small($0.02 per 1M) 기록값 -- 저장소에 적어 둔 오프라인 상수이며 이 실행은 가격표를 조회하지 않았다. 기준일·현재가는 실행자가 확인하고 --price-in/--price-out/--price-embed 로 덮어쓴다
+[estimate] cost_usd total=0.0316 (in=0.0180 out=0.0135 embed=0.0000)
+[estimate] max_cost_usd=5.0
+[run] run_mode=real run_id=run-29621888da00
+[run] dataset_hash=sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e
+[run] dataset_hash_method=sorted(data/scenarios/*.json) 의 파일명+내용 sha256
+[run] commit=750f11b02f13c942c6d2ef8155646d5b7bc03ac6
+[run] out=reports\pilot
+[fail] OperationalError: (psycopg.OperationalError) connection failed: connection to server at "127.0.0.1", port 5432 failed: FATAL:  password authentication failed for user "app"
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5432, hostaddr: '::1': connection failed: connection to server at "::1", port 5432 failed: FATAL:  password authentication failed for user "app"
+- host: 'localhost', port: 5432, hostaddr: '127.0.0.1': connection failed: connection to server at "127.0.0.1", port 5432 failed: FATAL:  password authentication failed for user "app"
+(Background on this error at: https://sqlalche.me/e/20/e3q8)

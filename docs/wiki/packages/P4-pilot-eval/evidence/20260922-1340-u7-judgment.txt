@@ -1,0 +1,168 @@
+# U7 판정 표 재현 (01-plan 93~108행) — 2026-09-22, HEAD 750f11b, PYTHONUTF8=1 (카드 10 판정 명령은 encoding 미지정이라 cp949 로케일에서 UnicodeDecodeError — 아래는 PYTHONUTF8=1 로 실행)
+# 산출물 이관: cp reports/pilot/{metrics.json,calibration.json,curve.csv,eval.md} reports/ (카드 10 5번). raw-<ts>.jsonl.gz·traces-<ts>.jsonl 은 reports/pilot/ 에 그대로
+
+## 실 실행 판정 명령 (카드 10)
+openai gpt-4o-mini-2024-07-18 text-embedding-3-small real 750f11b02f13c942c6d2ef8155646d5b7bc03ac6
+rc=0
+
+## metrics.json 스키마
+OK reports/metrics.json
+rc=0
+
+## 보정표 구간 수
+10 0
+rc=0
+
+## 곡선 파일
+[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95] {'0.3'} 5
+rc=0
+
+## eval.md 재생성(멱등)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Portpolio\Project_Relationship\evaluation\report.py", line 984, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "C:\Portpolio\Project_Relationship\evaluation\report.py", line 976, in main
+    with out.open("w", encoding="utf-8", newline="\n") as handle:
+         ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Program Files\\Git\\eval-regen.md'
+diff rc=1
+
+## 제품 코드·데이터 무변경 (b164f36 = P4 START 직전 커밋의 자식; U1 직전 = b164f36)
+0
+(위 줄 수)
+0
+(작업 트리 app/ data/ 변경 줄 수)
+
+## 라벨 무변경
+{
+  "ambiguous_mention_count": 3,
+  "counts": {
+    "alias": 8,
+    "new_person": 6,
+    "normal": 10,
+    "promotion": 8,
+    "pronoun": 8
+  },
+  "dir": "data/scenarios",
+  "files": [
+    {
+      "count": 8,
+      "exists": true,
+      "file": "promotion.json"
+    },
+    {
+      "count": 8,
+      "exists": true,
+      "file": "pronoun.json"
+    },
+    {
+      "count": 8,
+      "exists": true,
+      "file": "alias.json"
+    },
+    {
+      "count": 10,
+      "exists": true,
+      "file": "normal.json"
+    },
+    {
+      "count": 6,
+      "exists": true,
+      "file": "new_person.json"
+    }
+  ],
+  "issue_count": 0,
+  "issues": [],
+  "ok": true,
+  "scenario_count": 40,
+  "schema_version": 2,
+  "strict": true,
+  "total": 40,
+  "trap_count": 12
+}
+rc=0
+
+## 스키마·툴 무변경
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+No new upgrade operations detected.
+rc=0
+[ok] search_person: CLAUDE.md (query, hints?) == actual (ctx, query, hints=None)
+[ok] create_person: CLAUDE.md (display_name, aliases, relation_tag, hierarchy) == actual (ctx, display_name, aliases, relation_tag, hierarchy)
+[ok] update_person: CLAUDE.md (person_id, facts?, new_alias?, display_name?) == actual (ctx, person_id, facts=None, new_alias=None, display_name=None)
+[ok] add_event: CLAUDE.md (person_id, type, content, occurred_at, raw_utterance) == actual (ctx, person_id, type, content, occurred_at, raw_utterance)
+[ok] add_schedule: CLAUDE.md (person_id, title, scheduled_at) == actual (ctx, person_id, title, scheduled_at)
+[ok] get_briefing: CLAUDE.md (person_id, schedule_id?) == actual (ctx, person_id, schedule_id=None)
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+rc=0
+
+## 확신도 재계산 (traces)
+[traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=reports\pilot\traces-20260922-042440.jsonl
+[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+rc=0
+
+## 게이트(결정 K)
+0.8 ['embedding_only'] True False
+rc=0
+
+## 커밋본 단독 재계산 (raw .gz → metrics, 사슬 metrics-stage 와 비교)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Portpolio\Project_Relationship\evaluation\metrics.py", line 908, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "C:\Portpolio\Project_Relationship\evaluation\metrics.py", line 901, in main
+    out.write_text(text + "\n", encoding="utf-8")
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 555, in write_text
+    return PathBase.write_text(self, data, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_abc.py", line 651, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Program Files\\Git\\metrics-recheck.json'
+rc=1
+cmp: /metrics-recheck.json: No such file or directory
+
+## 파일 크기·sha256
+8d85e4de634272872e5800f091285a0beadf24eb5333438226e7c9ec85d87ad4 *reports/pilot/raw-20260922-042440.jsonl.gz
+41aa3165347f1271b58229801e6b6b7fab83dfea453017c594ed495ae7f6b1ee *reports/pilot/traces-20260922-042440.jsonl
+25e16dd67ea74aaf14ac640654af402528f48c873714fa034c1077b8dff98d1f *reports/metrics.json
+9512efed8f7901ee98c7e387d929d176be99b1686b682828b48b65829a90bb7f *reports/eval.md
+177043 reports/pilot/raw-20260922-042440.jsonl.gz
+1702234 reports/pilot/traces-20260922-042440.jsonl
+
+## 키 문자열 혼입
+reports/pilot/raw-20260922-042440.jsonl:0
+reports/pilot/traces-20260922-042440.jsonl:0
+reports/metrics.json:0
+reports/eval.md:0
+docs/wiki/packages/P4-pilot-eval/evidence/20260922-1324-u7-real-run.txt:0
+
+## [재실행] 위 '## eval.md 재생성'·'## 커밋본 단독 재계산' 두 항목은 임시 경로 변수 미설정(Program Files 쓰기 거부)으로 실패 — 명시 경로로 재실행
+## eval.md 재생성(멱등) — 재실행
+report rc=0
+diff rc=0 (0 = 출력 0줄)
+
+## 커밋본 단독 재계산 (raw .gz → metrics, 사슬 metrics-stage.json 과 cmp) — 재실행
+metrics rc=0
+cmp: 바이트 동일
+a8a1bda862df5520c16419c043d43f312420f884cca7ee6c09e16685d24121b3 *C:/Users/swsj1/AppData/Local/Temp/claude/C--Portpolio-Project-Relationship/8c63cf5b-1905-457f-b7ae-6a61e0e5cb58/scratchpad/metrics-recheck.json
+a8a1bda862df5520c16419c043d43f312420f884cca7ee6c09e16685d24121b3 *reports/pilot/metrics-stage.json
