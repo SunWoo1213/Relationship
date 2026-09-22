@@ -175,3 +175,5 @@
 - 2026-09-21 20:03 | COMMIT | 1a5643b feat(P4-pilot-eval): U7 선행 2 — 원시 판정 JSONL gzip 지원·5MB 크기 가드, 테스트 19건
 - 2026-09-21 20:20 | DECISION | 사용자: 01-plan 원시 경로 표기만 .gz 로 개정(46·71·80·126·205행, 80행 gzip.open) — verifier 재검증 생략, verify-plan FAIL 0/WARN 3 | P4-pilot-eval
 - 2026-09-21 20:25 | DECISION | 사용자: 스모크 03·08 + U7 실 실행은 본인 셸에서 직접 실행. 에이전트는 명령 안내만, 결과 파일이 생기면 이어받는다 | P4-pilot-eval
+- 2026-09-21 20:07 | COMMIT | 1c84d35 docs(P4-pilot-eval): 01-plan 원시 판정 경로 표기 .gz 개정 — 결정 E 이행 방식 gzip
+- 2026-09-21 20:40 | VERIFY | 스모크 03 실호출 rc=0 (사용자 실행): openai gpt-4o-mini-2024-07-18 · s_llm 0.9 · confidence 0.8384 · merge — 공급자 실호출 검증 1/3 (P3-er/evidence/20260921-2011-er-smoke-real.txt) | P4-pilot-eval

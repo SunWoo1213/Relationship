@@ -85,10 +85,17 @@
 - 남은 것 · 다음 단위: (1) **01-plan 본문은 고치지 않았다**(계획 개정은 메인 세션·사용자 몫) — 평문 경로를 전제한 곳: **46행**(산출물 목록 `reports/pilot/raw-<ts>.jsonl`), **71행**(U7 산출 목록), **80행**(수용 기준 판정 명령 `open('reports/pilot/raw-<ts>.jsonl',encoding='utf-8')` — 그대로 두면 U7 후 판정이 실패한다. `python -c "import json,gzip;rows=[json.loads(l) for l in gzip.open('reports/pilot/raw-<ts>.jsonl.gz','rt',encoding='utf-8')];print(len({r['scenario_id'] for r in rows}), sorted({r['method'] for r in rows}))"` 로 바꾸거나 `python -m evaluation.metrics --rows ….gz` 로 대체해야 한다), **126행**(registry 행 예정 목록), **205행**(결정 E 본문). 결정 E 이행 방식 = gzip(사용자 결정 2026-09-21)은 이 로그에 기록한다. (2) U7 실행 후 커밋 대상은 `raw-<ts>.jsonl.gz` + `traces-<ts>.jsonl` 이고 평문 raw 는 `git add` 하지 않는다. (3) U9 가 registry 의 `pending` 해시와 이 항목 해시를 확정한다
 - Refs: P4-pilot-eval S3.7 D4 D5 원칙8 원칙9 L-001 L-004
 
-## 2026-09-21 · docs(P4-pilot-eval): 01-plan 원시 판정 경로 표기 .gz 개정 — 결정 E 이행 방식(gzip) · pending
+## 2026-09-21 · docs(P4-pilot-eval): 01-plan 원시 판정 경로 표기 .gz 개정 — 결정 E 이행 방식(gzip) · 1c84d35
 - 변경: `01-plan.md` 46·71·80·126·205행 — `raw-<ts>.jsonl` → `raw-<ts>.jsonl.gz`, 80행 판정 명령 `open(…)` → `gzip.open(…,'rt',encoding='utf-8')`, 205행 결정 E 에 개정 주석. 수용 기준 문구·기대 출력(`40 [...]`)·결정 E 의 결론(원시 전부 커밋)은 그대로. 이 로그(직전 항목 `pending`→`1a5643b`), `evidence/20260921-2015-verify-plan-gz.txt`, HANDOFF·journal
 - 이유(기획서·카드 연결): 사용자 결정(2026-09-21) — raw 평문 7,404,682 bytes 가 `.githooks/pre-commit` 5MB 한도 초과 → gzip 으로 커밋(1a5643b). 80행 판정 명령이 평문을 가정한 채면 U7 뒤 커밋본으로 판정이 실패한다(원칙8 재현성). 사용자 선택 '경로 표기만 .gz 로 개정'(verifier 재검증은 생략 — 의미 변경 없음)
 - 정합성 확인: 수용 기준 = backlog 61행 글자 그대로 유지(변경 0) / 원칙8 / 결정 E 결론 불변. 코드 변경 0
 - 검증: `bash .claude/scripts/verify-plan.sh P4-pilot-eval` → FAIL 0 / WARN 3(기존 의도된 3건 그대로, evidence/20260921-2015-verify-plan-gz.txt)
 - 남은 것 · 다음 단위: 스모크 03·08(OpenAI) + U7 실 실행 — 키 필요, 실행 방식 사용자 결정. 커밋 대상 = `raw-<ts>.jsonl.gz` + `traces-<ts>.jsonl`
 - Refs: P4-pilot-eval S3.7 원칙8
+
+## 2026-09-22 · docs(P4-pilot-eval): 스모크 03 실호출 증거 등재 — OpenAI 경로 첫 실호출(F-87c597 1/3) · pending
+- 변경: `packages/P3-er/evidence/20260921-2011-er-smoke-real.txt`(신규, 319 bytes — 사용자가 2026-09-21 20:11 본인 셸에서 `!` 접두로 스모크 카드 03 `--provider openai` 실행, 출력 그대로), 이 로그(직전 항목 `pending`→`1c84d35`), HANDOFF·journal(VERIFY 줄). 코드·`reports/`·`.claude/` 변경 **0**
+- 이유(카드 연결): F-87c597(P3-er, R4 "실호출로 검증된 공급자 0/3") — 첫 실호출. 스모크 카드 03 이 지정한 명령을 사용자가 직접 돌렸고(사용자 결정 2026-09-21: 에이전트는 실 실행을 돌리지 않는다, `.env` 는 사용자 셸이 로드), 결과 파일을 에이전트가 이관만 했다. 실측: `provider=openai model=gpt-4o-mini-2024-07-18 tokens_in=410 tokens_out=48 s_llm=0.9 matched_person_id=1 confidence=0.8384 band=merge` rc=0 — 0.5·0.9 + (0.3·s_emb + 0.2·s_rule) = 0.8384 로 3신호 결합식(원칙3)이 실 응답에서도 재현됐고 `≥ T_merge 0.8` → merge(원칙2). 키 문자열 미혼입(파일 전문 319 bytes)
+- 한계(원칙8 — 있는 그대로): `reason` 필드는 사용자 셸(cp949 콘솔) 이중 인코딩으로 원문 복구 불가(utf-8·cp949 양쪽 decode 모두 치환문자). 수치 필드는 온전하다. 증거 파일은 고치지 않는다(증거 원문 보존). **스모크 08·U7 은 `PYTHONIOENCODING=utf-8` 을 앞에 붙여 실행**해야 같은 손실이 없다 — 안내 명령에 반영
+- 남은 것 · 다음 단위: (1) 스모크 08(OpenAI 경로, 사용자 셸) → evidence 이관 (2) U7 실 실행(`docs/user-setup/10-pilot-eval-run.md`) → `reports/pilot/raw-<ts>.jsonl.gz`·`traces-<ts>.jsonl`·`metrics.json` 커밋(평문 raw 제외), F-87c597 evidence 이관, `cost_estimate.md` §3·§4 실측, 판정 표 (3) 미달이면 재실행 금지 → U8
+- Refs: P4-pilot-eval P3-er F-87c597 R4 D11 원칙2 원칙3 원칙8 원칙9
