@@ -1,0 +1,25 @@
+# 결정 I 이행 — P4 기준선 산출물 stamp 사본 (U5 실 실행 전에 커밋한다)
+# 원본 reports/ 최상위 4파일은 U5 재실행이 덮어쓴다. 사본은 손대지 않는다.
+# 2026-09-22
+
+$ sha256sum reports/{metrics.json,calibration.json,curve.csv,eval.md}   (사본 뜨기 전 원본)
+25e16dd67ea74aaf14ac640654af402528f48c873714fa034c1077b8dff98d1f *reports/metrics.json
+2e4c95447b860bd207439c89bce45deac74f76a5f1f239e697792feb2a47864a *reports/calibration.json
+f6e0ab877581b75bd732c86525ad8226534df3cc5d541ea7648df1b31bc1b55b *reports/curve.csv
+9512efed8f7901ee98c7e387d929d176be99b1686b682828b48b65829a90bb7f *reports/eval.md
+
+$ cp reports/<이름> reports/pilot/<이름>-20260922-042440.<확장자>   (4건)
+$ sha256sum reports/pilot/*-20260922-042440.*
+25e16dd67ea74aaf14ac640654af402528f48c873714fa034c1077b8dff98d1f *reports/pilot/metrics-20260922-042440.json
+2e4c95447b860bd207439c89bce45deac74f76a5f1f239e697792feb2a47864a *reports/pilot/calibration-20260922-042440.json
+f6e0ab877581b75bd732c86525ad8226534df3cc5d541ea7648df1b31bc1b55b *reports/pilot/curve-20260922-042440.csv
+9512efed8f7901ee98c7e387d929d176be99b1686b682828b48b65829a90bb7f *reports/pilot/eval-20260922-042440.md
+
+# 판정 1 — metrics 사본 sha256 이 25e16dd6 로 시작한다(결정 I·CR-001 36행): OK
+# 판정 2 — 네 쌍 모두 원본과 사본의 해시가 같다: OK
+
+$ git status --short reports/   (원본 raw·traces 무변경 = 신규 4건만 보인다)
+?? reports/pilot/calibration-20260922-042440.json
+?? reports/pilot/curve-20260922-042440.csv
+?? reports/pilot/eval-20260922-042440.md
+?? reports/pilot/metrics-20260922-042440.json

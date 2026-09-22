@@ -1,0 +1,306 @@
+{
+  "excluded": {
+    "ambiguous_mention": 6,
+    "llm_error": 0,
+    "llm_error_kinds": {},
+    "llm_skipped": 5,
+    "passing_mention": 12,
+    "placeholder_s_llm": 20,
+    "score_clamped": 0,
+    "total": 43
+  },
+  "excluded_clamped": 0,
+  "groups": [
+    {
+      "accuracy": 0.4392523364485981,
+      "bins": [
+        {
+          "accuracy": null,
+          "bin": "0.0-0.1",
+          "correct": 0,
+          "hi": 0.1,
+          "index": 0,
+          "lo": 0.0,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.1-0.2",
+          "correct": 0,
+          "hi": 0.2,
+          "index": 1,
+          "lo": 0.1,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.2-0.3",
+          "correct": 0,
+          "hi": 0.3,
+          "index": 2,
+          "lo": 0.2,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.3-0.4",
+          "correct": 0,
+          "hi": 0.4,
+          "index": 3,
+          "lo": 0.3,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.4-0.5",
+          "correct": 0,
+          "hi": 0.5,
+          "index": 4,
+          "lo": 0.4,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.5-0.6",
+          "correct": 0,
+          "hi": 0.6,
+          "index": 5,
+          "lo": 0.5,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.6-0.7",
+          "correct": 0,
+          "hi": 0.7,
+          "index": 6,
+          "lo": 0.6,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": 0.0,
+          "bin": "0.7-0.8",
+          "correct": 0,
+          "hi": 0.8,
+          "index": 7,
+          "lo": 0.7,
+          "n": 1,
+          "right_closed": false
+        },
+        {
+          "accuracy": 0.0,
+          "bin": "0.8-0.9",
+          "correct": 0,
+          "hi": 0.9,
+          "index": 8,
+          "lo": 0.8,
+          "n": 5,
+          "right_closed": false
+        },
+        {
+          "accuracy": 0.46534653465346537,
+          "bin": "0.9-1.0",
+          "correct": 47,
+          "hi": 1.0,
+          "index": 9,
+          "lo": 0.9,
+          "n": 101,
+          "right_closed": true
+        }
+      ],
+      "correct": 47,
+      "excluded": {
+        "ambiguous_mention": 3,
+        "llm_error": 0,
+        "llm_error_kinds": {},
+        "llm_skipped": 0,
+        "passing_mention": 6,
+        "placeholder_s_llm": 20,
+        "score_clamped": 0,
+        "total": 29
+      },
+      "method": "proposed",
+      "model": "gpt-4o-mini-2024-07-18",
+      "n": 107,
+      "provider": "openai"
+    },
+    {
+      "accuracy": 0.7803030303030303,
+      "bins": [
+        {
+          "accuracy": null,
+          "bin": "0.0-0.1",
+          "correct": 0,
+          "hi": 0.1,
+          "index": 0,
+          "lo": 0.0,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.1-0.2",
+          "correct": 0,
+          "hi": 0.2,
+          "index": 1,
+          "lo": 0.1,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.2-0.3",
+          "correct": 0,
+          "hi": 0.3,
+          "index": 2,
+          "lo": 0.2,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.3-0.4",
+          "correct": 0,
+          "hi": 0.4,
+          "index": 3,
+          "lo": 0.3,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.4-0.5",
+          "correct": 0,
+          "hi": 0.5,
+          "index": 4,
+          "lo": 0.4,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.5-0.6",
+          "correct": 0,
+          "hi": 0.6,
+          "index": 5,
+          "lo": 0.5,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": null,
+          "bin": "0.6-0.7",
+          "correct": 0,
+          "hi": 0.7,
+          "index": 6,
+          "lo": 0.6,
+          "n": 0,
+          "right_closed": false
+        },
+        {
+          "accuracy": 0.0,
+          "bin": "0.7-0.8",
+          "correct": 0,
+          "hi": 0.8,
+          "index": 7,
+          "lo": 0.7,
+          "n": 11,
+          "right_closed": false
+        },
+        {
+          "accuracy": 0.0,
+          "bin": "0.8-0.9",
+          "correct": 0,
+          "hi": 0.9,
+          "index": 8,
+          "lo": 0.8,
+          "n": 4,
+          "right_closed": false
+        },
+        {
+          "accuracy": 0.8803418803418803,
+          "bin": "0.9-1.0",
+          "correct": 103,
+          "hi": 1.0,
+          "index": 9,
+          "lo": 0.9,
+          "n": 117,
+          "right_closed": true
+        }
+      ],
+      "correct": 103,
+      "excluded": {
+        "ambiguous_mention": 3,
+        "llm_error": 0,
+        "llm_error_kinds": {},
+        "llm_skipped": 0,
+        "passing_mention": 6,
+        "placeholder_s_llm": 0,
+        "score_clamped": 0,
+        "total": 9
+      },
+      "method": "llm_single",
+      "model": "gpt-4o-mini-2024-07-18",
+      "n": 132,
+      "provider": "openai"
+    }
+  ],
+  "meta": {
+    "bin_rule": "폭 0.1 의 10칸. [lo, hi) 왼쪽 닫힘·오른쪽 열림이고 마지막 칸만 [0.9, 1.0] 로 오른쪽도 닫힌다. 경계값은 위쪽 칸 -- 0.1 -> '0.1-0.2', 0.8 -> '0.8-0.9', 1.0 -> '0.9-1.0', 0.0 -> '0.0-0.1'. 비교는 float 그대로(value >= lo)이고 반올림하지 않는다. 분모 0 인 칸은 accuracy: null.",
+    "correct_definition": "결정 F(i) -- 그 판정의 decision 과 person_id 가 골드와 일치하면 정답이다(evaluation.metrics.classify_gold_row(row) in {'merge_correct', 'new_person_correct'}, U2 채점표와 같은 함수).",
+    "counted_units": 239,
+    "exclusion_order": [
+      "passing_mention",
+      "ambiguous_mention",
+      "llm_error",
+      "llm_skipped",
+      "score_clamped",
+      "placeholder_s_llm"
+    ],
+    "ignored_method_rows": 4230,
+    "llm_fresh_calls": {
+      "llm_single": 141,
+      "proposed": 136
+    },
+    "methods": [
+      "proposed",
+      "llm_single"
+    ],
+    "model_configured": {
+      "openai": "gpt-4o-mini"
+    },
+    "model_configured_source": "호출자가 --model-configured 로 넘긴 설정 문자열(OPENAI_MODEL 등). JSONL 에 없는 값이라 여기서 환경변수를 읽지 않는다 -- 넘기지 않으면 빈 객체다(P3-llm-providers §7 인계 4).",
+    "row_count": 7050,
+    "rows_selected": 2820,
+    "s_llm_source": {
+      "llm_single": "MentionDecision.score(= [0,1] 로 접힌 자기보고 s_llm), candidates[].signals['s_llm'] 가 있으면 대조한다. detail['raw_decision'] 가 None 이면 응답을 파싱하기 전 결정이라 score 0.0 이 placeholder 다.",
+      "proposed": "detail['confidence_breakdown']['s_llm'](D3 3신호 분해). 같은 분해의 matched_person_id 가 None 이면 app/er/confidence.py 의 강제 경로 귀속값(placeholder)이라 세지 않는다."
+    },
+    "scored_at_t_merge": [
+      "0.8"
+    ],
+    "t_merge_option": "0.8",
+    "unit_count": 282,
+    "unit_rule": "단위 = (방식, 시나리오, mention) 하나에 한 행. LLM 응답은 mention 당 1회뿐이라(결정 C(i)) T_merge 격자 10행을 10번 세지 않는다. 기본은 sweep_index 최소 행(= llm_fresh_call 행)이고 --t-merge 로 다른 임계치의 행을 고를 수 있다."
+  },
+  "schema_version": 1,
+  "unassigned": {
+    "proposed": {
+      "ambiguous_mention": 0,
+      "llm_error": 0,
+      "llm_error_kinds": {},
+      "llm_skipped": 5,
+      "passing_mention": 0,
+      "placeholder_s_llm": 0,
+      "score_clamped": 0,
+      "total": 5
+    }
+  }
+}

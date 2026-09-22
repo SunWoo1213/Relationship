@@ -204,3 +204,4 @@
 - 2026-09-22 19:36 | COMMIT | dbcfca0 feat(P4b-er-redesign): U3 감점 후보는 바로 연결하지 않고 사용자에게 묻는다
 - 2026-09-22 19:36 | PUSH | origin dev dbcfca0 — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-22 20:40 | PAUSE | P4b-er-redesign U4 구현 완료·미커밋 중단(사용자). 전체 1325 passed/0 failed — 알려진 5건 해소. 재개 시 설계 판단 4건(결정 D 해석·schema_version 2·report 3열·기준선 재검증 불가) 확정 후 커밋 | P4b-er-redesign
+- 2026-09-22 23:00 | COMMIT | b5b412c feat(P4b-er-redesign): U4 평가 도구를 새 확신도 산식과 감점 계측에 맞춘다

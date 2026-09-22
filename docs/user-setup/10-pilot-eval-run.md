@@ -1,4 +1,11 @@
-# 10 · 파일럿 평가 실 실행 (P4-pilot-eval U7)
+# 10 · 파일럿 평가 실 실행 (P4-pilot-eval U7 · P4b-er-redesign U5)
+
+> **두 번째 실행(P4b-er-redesign U5)에서 달라지는 것.** 절차는 같고 네 가지만 다르다.
+> (1) evidence 는 `docs/wiki/packages/P4b-er-redesign/evidence/<ts>-u5-real-run.txt` 로 남긴다.
+> (2) 명령 앞에 `set -a; . ./.env; set +a;` 를 붙여 키를 셸에 올린다 — `!` 로 실행하는 셸은 매번 새로 뜬다.
+> (3) `PYTHONUTF8=1` 을 함께 준다(Windows cp949 로케일에서 UTF-8 JSON 읽기 실패를 막는다).
+> (4) **`reports/` 최상위를 덮어쓰기 전에 P4 기준선 stamp 사본이 커밋돼 있어야 한다**(결정 I).
+> 확신도 재계산 산식도 D12 로 두 분기가 됐다(아래 "확신도 재계산 증거" 절).
 
 ## 언제 필요한가
 P4 파일럿 평가는 `data/scenarios/` 40건에 다섯 방식(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`)을 돌려 `reports/metrics.json`·`calibration.json`·`curve.csv`·`eval.md` 를 만든다. 이 한 번의 실행만 **실 LLM·실 임베딩**을 쓴다(그 밖의 테스트는 전부 네트워크 0). 키는 사용자만 다루므로(`security.md` §6) 이 카드의 명령은 사용자가 직접 돌린다.
@@ -55,12 +62,27 @@ P4 파일럿 평가는 `data/scenarios/` 40건에 다섯 방식(`proposed`·`exa
    python scripts/run_pilot_eval.py --out reports/pilot --commit (git rev-parse HEAD) --max-cost-usd 5 `
      > docs/wiki/packages/P4-pilot-eval/evidence/$ts-u7-real-run.txt 2>&1
    ```
+   P4b U5 재실행(이번 차례)은 같은 명령에 `.env` 로드와 `PYTHONUTF8=1` 을 더하고 evidence 경로만 바꾼다:
+   ```bash
+   # Git Bash — 저장소 루트, Docker Desktop 켜진 상태
+   ts=$(date +%Y%m%d-%H%M)
+   set -a; . ./.env; set +a
+   POSTGRES_PORT=5433 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 \
+     python scripts/run_pilot_eval.py \
+       --out reports/pilot \
+       --commit "$(git rev-parse HEAD)" \
+       --max-cost-usd 5 \
+     > docs/wiki/packages/P4b-er-redesign/evidence/$ts-u5-real-run.txt 2>&1
+   echo "rc=$?"
+   ```
+   - `.env` 의 `DATABASE_URL` 은 `POSTGRES_PORT` 보다 우선한다(`app/config.py` 규칙 1). 로컬 컨테이너가 5433 이면 `.env` 쪽도 5433 이어야 한다 — P4 U7 이 두 번 실패한 원인이 이것이었다.
    - `--commit` 은 **평가한 커밋 해시**다(L-001). `metrics.json` 의 `meta.commit` 과 `eval.md` 메타 표에 그대로 실린다.
    - Docker Desktop 이 켜져 있어야 한다(로컬 PostgreSQL 5433). 평가는 **아무것도 커밋하지 않는다** — 시나리오마다 트랜잭션을 되돌린다(결정 D(i)).
 
 4. 저장한 파일을 **한 번 읽는다**. 프롬프트 원문·키는 출력에 나가지 않도록 되어 있지만, 저장 전 확인은 사용자 몫이다.
 
 5. 결과 파일을 `reports/` 자리로 옮긴다(에이전트가 해도 된다): `reports/pilot/metrics.json` → `reports/metrics.json` 등. 원시 `reports/pilot/raw-<ts>.jsonl.gz` 와 **같은 stamp 의 `reports/pilot/traces-<ts>.jsonl`** 은 그대로 둔다(결정 E — 원시 응답이 있어야 지표를 다시 계산할 수 있다).
+   **P4b U5 에서는 옮기기 전에 P4 기준선 stamp 사본 4개가 커밋돼 있는지 먼저 본다**(결정 I): `reports/pilot/metrics-20260922-042440.json`(sha256 `25e16dd6…`)·`calibration-20260922-042440.json`·`curve-20260922-042440.csv`·`eval-20260922-042440.md`. 사본이 없으면 옮기는 순간 기준선이 사라진다.
 
 ## 커밋되는 원시 판정은 `raw-<ts>.jsonl.gz` 다
 
@@ -83,14 +105,15 @@ P4 파일럿 평가는 `data/scenarios/` 40건에 다섯 방식(`proposed`·`exa
 
 ## 확신도 재계산 증거 (`traces-<ts>.jsonl`)
 
-결정 D(i) 로 시나리오마다 트랜잭션을 되돌리므로 `agent_traces` 는 **실행이 끝나면 사라진다**. 그래서 실행 중에 제안 방식의 `step='er_resolve' AND tool_name='er'` 행을 `raw-<ts>.jsonl` 과 **같은 stamp** 의 `traces-<ts>.jsonl` 로 덤프하고, 사슬 끝에서 전 줄의 `confidence` 를 `0.5·s_llm + 0.3·s_emb + 0.2·s_rule` 로 다시 계산해 기록값과 비교한다(원칙3·원칙9, 01-plan 106행 판정 표).
+결정 D(i) 로 시나리오마다 트랜잭션을 되돌리므로 `agent_traces` 는 **실행이 끝나면 사라진다**. 그래서 실행 중에 제안 방식의 `step='er_resolve' AND tool_name='er'` 행을 `raw-<ts>.jsonl` 과 **같은 stamp** 의 `traces-<ts>.jsonl` 로 덤프하고, 사슬 끝에서 전 줄의 `confidence` 를 **제품 `combine()` 을 그대로 불러** 다시 계산해 기록값과 비교한다(원칙3·원칙9, 01-plan 106행 판정 표). D12 이후 산식은 두 분기다 — 규칙 신호를 **잰** 판정은 `0.5·s_llm+0.3·s_emb+0.2·s_rule`, **재지 않은** 판정은 `s_rule` 을 분모에서 빼고 `(0.5·s_llm+0.3·s_emb)/0.8` 이다. 어느 분기였는지는 trace 의 `confidence_breakdown.rule_checked` 가 말한다.
 
 ```
 [traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=reports/pilot/traces-<ts>.jsonl
-[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+[traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
 ```
 
 - `max_abs_diff` 가 `0.0` 이 아니거나 `[fail] traces:` 줄이 있으면 rc=1 이다(어느 trace 인지 함께 찍힌다). 그 출력을 지우지 않고 그대로 보고한다.
+- **P4 기준선 trace 는 이 재계산을 통과하지 않는다** — `confidence_breakdown.weights_effective` 가 없어 1410줄 전건이 거부된다(rc=1). 옛 산식으로 계산된 값을 새 산식 검사에 조용히 통과시키지 않기 위해서다. 기준선을 다시 검증해야 하면 그 시점 코드로 한다: `git show f01ea35:scripts/run_pilot_eval.py`.
 - 덤프에는 프롬프트 원문·`llm.reason` 자유 서술·키가 들어가지 않는다(security §1).
 - 파일만 들고 나중에 다시 확인할 수 있다(DB·네트워크·키 0):
   ```bash
@@ -131,7 +154,7 @@ P4 파일럿 평가는 `data/scenarios/` 40건에 다섯 방식(`proposed`·`exa
 
 ## 끝났다는 증거
 
-- `docs/wiki/packages/P4-pilot-eval/evidence/<ts>-u7-real-run.txt` 가 존재하고 비어 있지 않다.
+- `docs/wiki/packages/P4-pilot-eval/evidence/<ts>-u7-real-run.txt` 가 존재하고 비어 있지 않다(P4b U5 는 `docs/wiki/packages/P4b-er-redesign/evidence/<ts>-u5-real-run.txt`).
 - 판정 명령:
   ```bash
   PYTHONUTF8=1 python -c "import json;m=json.load(open('reports/metrics.json'))['meta'];print(m['provider'],m['model'],m['embedding_model'],m['run_mode'],m['commit'])"
@@ -142,4 +165,4 @@ P4 파일럿 평가는 `data/scenarios/` 40건에 다섯 방식(`proposed`·`exa
 
 ## 끝난 뒤 에이전트에게
 
-"파일럿 평가 돌렸어, 파일 `<경로>`, rc=`<코드>`" → 에이전트가 산출물을 `reports/` 로 정리하고, `reports/cost_estimate.md` 의 실측 칸을 채우고, 실패 케이스 분석(U8)과 완료 검토(04-review)로 넘어간다.
+"파일럿 평가 돌렸어, 파일 `<경로>`, rc=`<코드>`" → 에이전트가 산출물을 `reports/` 로 정리하고, `reports/cost_estimate.md` 의 실측 칸을 채우고, 실패 케이스 분석(P4 는 U8, P4b 는 U6 의 `reports/failure_cases.md` §13)과 완료 검토(04-review)로 넘어간다.
