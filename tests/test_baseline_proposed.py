@@ -250,8 +250,11 @@ def test_new_person_band_carries_excluded_candidates(db_session, fake_embedder):
     # 아니다 -- 이 픽스처는 별칭 "팀장"이 호칭 사전 표제어라
     # dictionary_conflict 가 함께 떠서 배제가 유지된다(01-plan U3 픽스처 (b)
     # 와 같은 픽스처). 결과(new_person·no_candidates·tokens 0)는 불변이고
-    # 사유 표시만 바뀐다. `penalized_by` 의 detail 전달은 U4 소관이다.
+    # 사유 표시만 바뀐다. `penalized_by` 의 detail 전달은 U4 가 넣었다.
     assert decision.detail["excluded_by"] == {str(person.id): "dictionary_conflict"}
+    assert decision.detail["penalized_by"] == {
+        str(person.id): ["relation_tag_conflict", "hierarchy_conflict"]
+    }
     excluded = next(c for c in decision.candidates if c.person_id == person.id)
     assert excluded.score == 0.0
     assert excluded.signals["passed_rules"] == 0.0
@@ -457,6 +460,39 @@ def test_merge_without_matched_person_id_is_downgraded_not_raised() -> None:
     assert decision.person_id is None
     assert decision.detail["adapter_forced_reason"] == "merge_without_person_id"
     assert decision.detail["band_by_threshold"] == "merge"
+
+
+def test_detail_carries_penalized_by_of_every_candidate() -> None:
+    """D13(P4b U4 (iv)) -- 감점 사유가 `detail["penalized_by"]` 로 나와야
+    `metrics.json` 의 `subsets.penalized_merge`(위험 계측)를 원시 JSONL 만
+    보고 셀 수 있다. 모양은 `excluded_by` 와 같은
+    `{person_id 문자열: [사유, …]}` 이고, 감점 없는 후보는 키가 없다."""
+
+    penalized = ScoredCandidate(
+        person_id=11,
+        display_name="김민수",
+        s_emb=0.9,
+        penalized_by=("relation_tag_conflict", "hierarchy_conflict"),
+        passed_rules=True,
+    )
+    clean = ScoredCandidate(person_id=12, display_name="이서연", passed_rules=True)
+    decision = to_mention_decision(
+        _resolution(
+            candidates=[penalized, clean],
+            band="merge",
+            band_by_threshold="merge",
+            matched_person_id=11,
+        ),
+        "김팀장",
+    )
+
+    assert decision.detail["penalized_by"] == {
+        "11": ["relation_tag_conflict", "hierarchy_conflict"]
+    }
+    # 감점은 배제가 아니다 -- 두 후보 모두 `excluded_by` 에 없다.
+    assert decision.detail["excluded_by"] == {}
+    # 감점 후보도 후보 목록에 그대로 남는다(3단계까지 갔다, 원칙1).
+    assert [c.person_id for c in decision.candidates] == [11, 12]
 
 
 def test_out_of_range_confidence_is_clamped_not_raised() -> None:

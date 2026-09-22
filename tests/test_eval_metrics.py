@@ -553,6 +553,77 @@ def test_subset_denominator_zero_is_none() -> None:
         "d": 0,
         "rate": None,
     }
+    # D13 위험 계측도 같은 규약이다(측정하지 못한 것과 0 은 다르다, 원칙8).
+    assert p["subsets"]["penalized_merge"] == {
+        "merges": 0,
+        "false_merge_rate": {"n": 0, "d": 0, "rate": None},
+        "relaxed_pass_merges": 0,
+        "relaxed_pass_false_merge_rate": {"n": 0, "d": 0, "rate": None},
+        "reasons": {},
+    }
+
+
+def test_subset_penalized_merge_counts_merges_of_penalized_candidates() -> None:
+    """D13 위험 계측 -- 규칙 필터가 감점(배제가 아니라)한 후보가 실제로
+    연결된 건수와 그중 오병합 수. 귀속 후보 기준이다(다른 후보가 감점됐어도
+    연결된 후보가 깨끗하면 세지 않는다)."""
+
+    def merge_with(
+        penalized: dict[str, list[str]],
+        *,
+        relaxed_pass: float = 0.0,
+        **over: Any,
+    ) -> dict[str, Any]:
+        return make_row(
+            candidates=[
+                {
+                    "person_id": 1,
+                    "display_name": "김",
+                    "score": 0.9,
+                    "signals": {"rule_checked": 2.0, "relaxed_pass": relaxed_pass},
+                }
+            ],
+            detail={"penalized_by": penalized},
+            **over,
+        )
+
+    rows = [
+        # 감점 후보 연결 · 골드 일치(정답)
+        merge_with({"1": ["hierarchy_conflict"]}, mention_index=0),
+        # 감점 후보 연결 · 다른 사람(오병합)
+        merge_with(
+            {"1": ["relation_tag_conflict", "hierarchy_conflict"]},
+            mention_index=1,
+            person_id=1,
+            gold_db_person_id=2,
+        ),
+        # 감점 후보 연결 · 완화 통과 예외(결정 A(i)) -- 승진류
+        merge_with({"1": ["hierarchy_conflict"]}, relaxed_pass=1.0, mention_index=2),
+        # 감점은 **다른** 후보에 있고 연결된 후보는 깨끗하다 -> 세지 않는다
+        merge_with({"9": ["hierarchy_conflict"]}, mention_index=3),
+        # 감점 자체가 없다
+        merge_with({}, mention_index=4),
+        # merge 가 아닌 행은 애초에 분모 밖이다
+        merge_with({"1": ["hierarchy_conflict"]}, mention_index=5, decision="identity"),
+    ]
+    p = point(rows)
+    subset = p["subsets"]["penalized_merge"]
+    assert subset["merges"] == 3
+    assert subset["false_merge_rate"] == {"n": 1, "d": 3, "rate": 1 / 3}
+    assert subset["relaxed_pass_merges"] == 1
+    assert subset["relaxed_pass_false_merge_rate"] == {"n": 0, "d": 1, "rate": 0.0}
+    # 한 후보가 두 사유를 함께 가질 수 있어 합이 행 수와 다를 수 있다.
+    assert subset["reasons"] == {"hierarchy_conflict": 3, "relation_tag_conflict": 1}
+
+
+def test_subset_penalized_merge_is_empty_for_methods_without_the_key() -> None:
+    """제안 방식 외에는 `detail["penalized_by"]` 자체가 없다 -- 없는 것을
+    0 으로 세지 않고 분모 0(`rate: null`)으로 둔다."""
+
+    rows = [make_row(method="embedding_only", detail={}, mention_index=0)]
+    subset = point(rows, method="embedding_only")["subsets"]["penalized_merge"]
+    assert subset["merges"] == 0
+    assert subset["false_merge_rate"]["rate"] is None
 
 
 def test_empty_derive_hints_rate_needs_a_method_that_records_hints() -> None:

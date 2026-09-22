@@ -1,0 +1,6 @@
+# U4 목표 5건 (U1 이후 계속 실패하던 dry-run 사슬 테스트)
+# cmd: POSTGRES_PORT=5433 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m pytest tests/test_run_pilot_eval.py -q -rs -k '...'
+# 2026-09-22
+
+.....                                                                    [100%]
+5 passed, 65 deselected in 74.08s (0:01:14)

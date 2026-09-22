@@ -1,0 +1,85 @@
+# U4 dry-run 산출물의 새 키 (판정 표 13·14·20행 예행 — 수치는 stub 이므로 게이트 판정에 쓰지 않는다)
+# 2026-09-22
+
+$ python -m evaluation.metrics --validate <tmp>/metrics.json
+OK C:/Users/swsj1/AppData/Local/Temp/claude/C--Portpolio-Project-Relationship/26295b99-18e0-4dd9-bdf9-03d358046835/scratchpad/u4-dryrun2/metrics.json
+rc=0
+
+meta.weights                = {'llm': 0.5, 'emb': 0.3, 'rule': 0.2}
+meta.weights_policy         = observed_renormalized(D12)
+meta.penalized_merge_policy = ask
+meta.schema_version         = 2 (P4 기준선은 1)
+
+격자별 proposed.subsets.penalized_merge (stub 5 시나리오) — 계수기가 실제로 세는지:
+ t_merge  merges  penalized      그중오병합      완화통과  사유
+     0.5       6          3          0         3  {'hierarchy_conflict': 3}
+    0.55       4          3          0         3  {'hierarchy_conflict': 3}
+     0.6       3          2          0         2  {'hierarchy_conflict': 2}
+    0.65       3          2          0         2  {'hierarchy_conflict': 2}
+     0.7       3          2          0         2  {'hierarchy_conflict': 2}
+    0.75       3          2          0         2  {'hierarchy_conflict': 2}
+     0.8       1          0          0         0  {}
+    0.85       0          0          0         0  {}
+     0.9       0          0          0         0  {}
+    0.95       0          0          0         0  {}
+
+T_merge=0.8 의 proposed.subsets 전문:
+{
+  "merge_rule_unchecked": {
+    "merges": 0,
+    "false_merge_rate": {
+      "n": 0,
+      "d": 0,
+      "rate": null
+    }
+  },
+  "merge_relaxed_retry": {
+    "merges": 0,
+    "false_merge_rate": {
+      "n": 0,
+      "d": 0,
+      "rate": null
+    }
+  },
+  "penalized_merge": {
+    "merges": 0,
+    "false_merge_rate": {
+      "n": 0,
+      "d": 0,
+      "rate": null
+    },
+    "relaxed_pass_merges": 0,
+    "relaxed_pass_false_merge_rate": {
+      "n": 0,
+      "d": 0,
+      "rate": null
+    },
+    "reasons": {}
+  },
+  "merges": 1
+}
+
+$ python -m evaluation.report --metrics <tmp>/metrics.json --out <tmp>/eval-again.md && diff <tmp>/eval-again.md <tmp>/eval.md   (판정 표 14행 멱등)
+diff rc=0 (0줄이면 멱등)
+
+# eval.md 에 실린 두 정책 줄과 부분집합 표(결정 H(i)·D13 위험 계측)
+27:| 가중치 결합 정책 (`meta.weights_policy`) | `observed_renormalized(D12)` |
+28:| 감점 후보 연결 정책 (`meta.penalized_merge_policy`) | `ask` |
+164:**감점 후보 merge**(D13 위험 계측)는 2단계 규칙 필터가 감점만 하고 남긴 후보가 실제로 연결된 건수다 — 배제를 감점으로 바꾸면 후보가 늘어 오병합 기회도 느는데(D13 파급), 이 열이 그 대가를 직접 센다. `그중 완화 통과` 는 위계 1칸 완화로 자동 연결이 허용된 예외(결정 A(i), 승진류)이며 나머지는 `meta.penalized_merge_policy` 정책에 따른다.
+
+164:**감점 후보 merge**(D13 위험 계측)는 2단계 규칙 필터가 감점만 하고 남긴 후보가 실제로 연결된 건수다 — 배제를 감점으로 바꾸면 후보가 늘어 오병합 기회도 느는데(D13 파급), 이 열이 그 대가를 직접 센다. `그중 완화 통과` 는 위계 1칸 완화로 자동 연결이 허용된 예외(결정 A(i), 승진류)이며 나머지는 `meta.penalized_merge_policy` 정책에 따른다.
+166:| 방식 | merge 수 | 규칙 미검사 merge | 그 오병합률 | 완화 재검색 merge | 그 오병합률 | 감점 후보 merge | 그 오병합률 | 그중 완화 통과 |
+
+### 부분집합 (`merge` 행만, P3-er §7 리스크 계측)
+
+**감점 후보 merge**(D13 위험 계측)는 2단계 규칙 필터가 감점만 하고 남긴 후보가 실제로 연결된 건수다 — 배제를 감점으로 바꾸면 후보가 늘어 오병합 기회도 느는데(D13 파급), 이 열이 그 대가를 직접 센다. `그중 완화 통과` 는 위계 1칸 완화로 자동 연결이 허용된 예외(결정 A(i), 승진류)이며 나머지는 `meta.penalized_merge_policy` 정책에 따른다.
+
+| 방식 | merge 수 | 규칙 미검사 merge | 그 오병합률 | 완화 재검색 merge | 그 오병합률 | 감점 후보 merge | 그 오병합률 | 그중 완화 통과 |
+|---|---|---|---|---|---|---|---|---|
+| `proposed` | 1 | 0 | 0/0 (측정 불가(분모 0)) | 0 | 0/0 (측정 불가(분모 0)) | 0 | 0/0 (측정 불가(분모 0)) | 0 |
+| `exact_raw` | 6 | 0 | 0/0 (측정 불가(분모 0)) | 0 | 0/0 (측정 불가(분모 0)) | 0 | 0/0 (측정 불가(분모 0)) | 0 |
+| `exact_norm` | 9 | 0 | 0/0 (측정 불가(분모 0)) | 0 | 0/0 (측정 불가(분모 0)) | 0 | 0/0 (측정 불가(분모 0)) | 0 |
+| `embedding_only` | 6 | 0 | 0/0 (측정 불가(분모 0)) | 0 | 0/0 (측정 불가(분모 0)) | 0 | 0/0 (측정 불가(분모 0)) | 0 |
+| `llm_single` | 18 | 0 | 0/0 (측정 불가(분모 0)) | 0 | 0/0 (측정 불가(분모 0)) | 0 | 0/0 (측정 불가(분모 0)) | 0 |
+
+`derive_hints` 가 빈 dict 인 mention 비율(호칭 사전 누락 계측): 4/18 (22.2%) — 분모는 detail['hints'] 를 남기는 방식의 mention (sweep_index 최소 행).

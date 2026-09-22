@@ -1,4 +1,4 @@
-"""Refs: P4-pilot-eval R4 D3 원칙3 원칙9 -- `s_llm` 구간별 실제 정답률(보정표).
+"""Refs: P4-pilot-eval P4b-er-redesign R4 D12 원칙3 원칙9 -- `s_llm` 구간별 실제 정답률(보정표).
 
 01-plan U3(67행). **입력은 U1 러너가 쓴 JSONL 한 파일뿐이다** -- DB·네트워크·
 LLM 을 부르지 않고 `app/` 도 부르지 않는다. 같은 JSONL 을 넣으면 언제나 같은
@@ -7,7 +7,8 @@ LLM 을 부르지 않고 `app/` 도 부르지 않는다. 같은 JSONL 을 넣으
 
 ## 왜 이 표가 필요한가 (R4)
 
-`confidence = 0.5·s_llm + 0.3·s_emb + 0.2·s_rule`(D3)의 `s_llm` 은 LLM 이
+`confidence = Σ w_i·s_i / Σ w_i`(관측된 신호만, D12 -- 세 신호가 모두 있으면
+`0.5·s_llm + 0.3·s_emb + 0.2·s_rule`)의 `s_llm` 은 LLM 이
 구조화 출력으로 **자기보고한** 0~1 점수다(로그 확률이 아니다 -- 원칙3).
 자기보고 점수를 가중합의 절반으로 쓰려면 "0.9 라고 말했을 때 실제로 몇 %나
 맞았는가"를 보여야 한다. 이 표가 그 근거다(`D03-confidence-formula.md`
@@ -46,7 +47,7 @@ JSON 에 `0.8` 로 적힌 값은 언제나 `0.8-0.9` 칸이다. 분모가 0 인 
 
 | 방식 | 값 | 자기보고가 아닌 경우(placeholder) |
 |------|----|-----------------------------------|
-| `proposed` | `detail["confidence_breakdown"]["s_llm"]`(D3 분해) | 같은 분해의 `matched_person_id` 가 `None` |
+| `proposed` | `detail["confidence_breakdown"]["s_llm"]`(D12 분해) | 같은 분해의 `matched_person_id` 가 `None` |
 | `llm_single` | `MentionDecision.score`(= 접힌 `s_llm`), `candidates[].signals["s_llm"]` 와 대조 | `detail["raw_decision"]` 가 `None`(응답 파싱 전 결정) |
 
 `app/er/confidence.py::_forced_decision` 은 강제 경로(`no_matched`·
@@ -57,6 +58,13 @@ JSON 에 `0.8` 로 적힌 값은 언제나 `0.8-0.9` 칸이다. 분모가 0 인 
 `placeholder_s_llm` 으로 따로 센다**(01-plan 67행이 명시한 세 제외에 더한
 넷째 -- 숨기지 않고 수를 남긴다, 원칙8). `llm_single` 도 같은 이유로
 `raw_decision is None`(호출·파싱 실패로 `score=0.0` 이 놓인 행)을 뺀다.
+
+**판정 규약은 D13 이후에도 그대로다**(`matched_person_id is None`). 다만
+규칙 필터가 배제 대신 감점을 하게 되면서 후보가 0명이 되는
+`forced_reason="no_candidates"` 경로가 줄어, 같은 데이터에서도
+`placeholder_s_llm` **수가 준다**(= 보정표 분모가 는다). 규약을 바꿔서가
+아니라 제품이 강제 경로로 덜 빠져서 생기는 차이이므로 P4 기준선과 비교할
+때 이 수를 함께 읽는다(P4b U6).
 
 > 한계: 강제 경로에서 LLM 이 **실제로 보고한** `s_llm` 은 `app/er` 이
 > 기록하지 않아(pipeline 의 `llm["s_llm"]` 은 `detail` 로 나오지 않는다)
@@ -197,7 +205,7 @@ _COUNTED = "counted"
 #: `s_llm` 을 어디서 읽는지(파일에도 적는다 -- 나중에 사람이 되짚을 근거).
 S_LLM_SOURCE: dict[str, str] = {
     "proposed": (
-        "detail['confidence_breakdown']['s_llm'](D3 3신호 분해). "
+        "detail['confidence_breakdown']['s_llm'](D12 신호 분해). "
         "같은 분해의 matched_person_id 가 None 이면 app/er/confidence.py 의 "
         "강제 경로 귀속값(placeholder)이라 세지 않는다."
     ),
@@ -337,10 +345,10 @@ def s_llm_status(row: Mapping[str, Any]) -> tuple[str, float | None, str | None]
         breakdown = detail.get("confidence_breakdown")
         if not isinstance(breakdown, Mapping):
             raise CalibrationError(
-                "proposed row needs detail['confidence_breakdown'] (D3 3신호 분해, 원칙9)"
+                "proposed row needs detail['confidence_breakdown'] (D12 신호 분해, 원칙9)"
             )
         if "s_llm" not in breakdown:
-            raise CalibrationError("confidence_breakdown has no 's_llm' (D3, 원칙3)")
+            raise CalibrationError("confidence_breakdown has no 's_llm' (D12, 원칙3)")
         value = breakdown["s_llm"]
         placeholder = breakdown.get("matched_person_id") is None
     else:  # llm_single

@@ -1,0 +1,75 @@
+# U4 경계 확인 — app/·data/·reports/ 무변경, 변경 파일 목록
+# 2026-09-22
+
+$ git diff --name-only -- app/
+(끝 — 위가 비어 있으면 app/ 무수정)
+
+$ git status --short -- reports/ data/
+(끝 — 위가 비어 있으면 기준선·데이터 무변경)
+
+$ git status --short
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M evaluation/calibration.py
+ M evaluation/curve.py
+ M evaluation/metrics.py
+ M evaluation/report.py
+ M evaluation/resolvers/proposed.py
+ M scripts/run_pilot_eval.py
+ M tests/test_baseline_proposed.py
+ M tests/test_eval_curve.py
+ M tests/test_eval_metrics.py
+ M tests/test_eval_report.py
+ M tests/test_run_pilot_eval.py
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-1955-u4-recompute-weights-choice.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-boundary-diff.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-dryrun-chain.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-pytest-all.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-recheck-rule-unchecked.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-target5.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-validate-and-subsets.txt
+
+$ git diff --stat
+warning: in the working copy of 'docs/wiki/journal.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_eval_metrics.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_eval_report.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_run_pilot_eval.py', LF will be replaced by CRLF the next time Git touches it
+ docs/wiki/HANDOFF.md             |   2 +-
+ docs/wiki/journal.md             |   2 +
+ evaluation/calibration.py        |  20 +++--
+ evaluation/curve.py              |  63 ++++++++++++++--
+ evaluation/metrics.py            |  70 ++++++++++++++++-
+ evaluation/report.py             |  15 +++-
+ evaluation/resolvers/proposed.py |  26 +++++--
+ scripts/run_pilot_eval.py        | 117 ++++++++++++++++++++++++++---
+ tests/test_baseline_proposed.py  |  38 +++++++++-
+ tests/test_eval_curve.py         |  49 +++++++++++-
+ tests/test_eval_metrics.py       |  71 ++++++++++++++++++
+ tests/test_eval_report.py        |  28 +++++++
+ tests/test_run_pilot_eval.py     | 158 +++++++++++++++++++++++++++++++++++++--
+ 13 files changed, 620 insertions(+), 39 deletions(-)
+
+# (최종) __all__ 정리 뒤 재확인 — 2026-09-22
+$ git status --short
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P4b-er-redesign/03-log.md
+ M evaluation/calibration.py
+ M evaluation/curve.py
+ M evaluation/metrics.py
+ M evaluation/report.py
+ M evaluation/resolvers/proposed.py
+ M scripts/run_pilot_eval.py
+ M tests/test_baseline_proposed.py
+ M tests/test_eval_curve.py
+ M tests/test_eval_metrics.py
+ M tests/test_eval_report.py
+ M tests/test_run_pilot_eval.py
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-1955-u4-recompute-weights-choice.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-boundary-diff.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-dryrun-chain.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-known-baseline-effects.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-pytest-all.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-recheck-rule-unchecked.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-target5.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-validate-and-subsets.txt

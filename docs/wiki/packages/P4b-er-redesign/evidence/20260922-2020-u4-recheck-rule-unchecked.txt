@@ -1,0 +1,29 @@
+# R-5 증명 — rule_checked == 0 인 trace 로 재계산 diff 가 0.0 인가
+# 입력: traces-20260922-112528.jsonl (같은 evidence 폴더의 dry-run 사슬이 만든 덤프, 네트워크 0)
+# 2026-09-22
+
+덤프 줄 수 = 180  (rule_checked==0: 40 / >0: 140)
+
+새 재계산(U4, rule_checked 분기)  max_abs_diff = 0.0
+옛 재계산(D3 원식)               max_abs_diff = 0.08749999999999997  -> 0.0 이 아니므로 rc=1 이었다
+
+표본 1건(rule_checked==0):
+  mention           = '이서연 과장님'  scenario='sc-002'
+  s_llm=0.35 s_emb=0.008057468119708755 s_rule=0.0
+  weights           = {'emb': 0.3, 'llm': 0.5, 'rule': 0.2}
+  weights_effective = {'emb': 0.37499999999999994, 'llm': 0.625, 'rule': 0.0}
+  기록 confidence    = 0.22177155054489076
+  새 재계산          = 0.22177155054489076  (diff 0.0)
+  옛 재계산(D3)      = 0.17741724043591262  (diff 0.04435431010897814)
+
+penalized_by 가 덤프에 실리는가(U4 (i), _TRACE_CANDIDATE_KEYS):
+  _TRACE_CANDIDATE_KEYS = ('person_id', 's_emb', 's_rule', 'passed_rules', 'excluded_by', 'penalized_by', 'rule_checked', 'rule_passed', 'relaxed_pass')
+  matched_candidate 에 키가 있는 줄 = 180/180, 감점 사유가 비어있지 않은 줄 = 70
+    sc-001 t=0.5 mention='김팀장' penalized_by=['hierarchy_conflict'] excluded_by=None
+    sc-001 t=0.55 mention='김팀장' penalized_by=['hierarchy_conflict'] excluded_by=None
+    sc-001 t=0.6 mention='김팀장' penalized_by=['hierarchy_conflict'] excluded_by=None
+
+$ python scripts/run_pilot_eval.py --recheck-traces <위 파일>  (아래 rc 는 다음 줄)
+[traces] dumped=180 recomputed=180 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\traces-20260922-112528.jsonl
+[traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+rc=0

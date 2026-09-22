@@ -323,9 +323,15 @@ def _resolution_output(
     s_rule: float = 0.6666666666666666,
     t_merge: float = 0.8,
     matched: int | None = 7,
+    rule_checked: int = 2,
+    rule_passed: int | None = None,
+    penalized_by: tuple[str, ...] = (),
 ) -> dict[str, Any]:
     """`agent_traces.output` 을 **제품 코드로** 만든다(손으로 적은 숫자가
-    아니라 `decide()` → `Resolution.to_dict()` 가 낸 것)."""
+    아니라 `decide()` → `Resolution.to_dict()` 가 낸 것).
+
+    `rule_checked=0`(힌트가 없어 규칙을 하나도 검사하지 못한 mention)이면
+    제품이 D12 재정규화 분기를 타고, `penalized_by` 는 D13 감점 사유다."""
 
     from app.er.confidence import decide
     from app.er.types import ERConfig, Judgement, Resolution, ScoredCandidate
@@ -339,10 +345,11 @@ def _resolution_output(
         hierarchy="상",
         s_emb=s_emb,
         rule_flags={"exact_alias": True},
-        rule_checked=2,
-        rule_passed=2,
-        s_rule=s_rule,
+        rule_checked=rule_checked,
+        rule_passed=rule_checked if rule_passed is None else rule_passed,
+        s_rule=s_rule if rule_checked else 0.0,
         passed_rules=True,
+        penalized_by=penalized_by,
     )
     judgement = Judgement(
         matched_person_id=matched,
@@ -447,7 +454,17 @@ def test_dump_entry_carries_recompute_inputs_and_no_prompt(tmp_path: Path) -> No
     path, _, _ = _dump(tmp_path, count=1)
     entry = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
     breakdown = entry["confidence_breakdown"]
-    assert set(breakdown) >= {"s_llm", "s_emb", "s_rule", "weights", "confidence"}
+    assert set(breakdown) >= {
+        "s_llm",
+        "s_emb",
+        "s_rule",
+        "weights",
+        # D12 -- 재계산이 판정 때와 같은 분기를 타려면 이 둘이 있어야 한다
+        # (결정 D(i)). 없으면 `--recheck-traces` 가 거부한다.
+        "weights_effective",
+        "rule_checked",
+        "confidence",
+    }
     assert entry["decision"]["T_merge"] == 0.8
     assert entry["decision"]["T_new"] == T_NEW
     assert entry["llm"]["provider"] == "stub"
@@ -461,6 +478,53 @@ def test_dump_entry_carries_recompute_inputs_and_no_prompt(tmp_path: Path) -> No
     assert "자유 서술" not in blob  # Judgement.reason 원문
     assert "prompt" not in blob
     assert '"reason"' not in blob  # forced_reason 은 있어도 reason 키는 없다
+
+
+def test_dump_entry_carries_penalized_by_of_the_matched_candidate(
+    tmp_path: Path,
+) -> None:
+    """D13 -- 감점 사유가 덤프에 남아야 "감점 후보가 귀속됐는가"를 덤프만
+    보고 되짚을 수 있다(01-plan U4 (i), 원칙9)."""
+
+    assert "penalized_by" in cli._TRACE_CANDIDATE_KEYS
+    session_id = "pilot-run-abc-sc-001"
+    output = _resolution_output(penalized_by=("hierarchy_conflict",))
+    session = _FakeSession([_FakeTrace(100, session_id, output)])
+    path = tmp_path / "traces-penalized.jsonl"
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        cli.dump_er_traces(
+            session, [_row(100)], handle, session_id=session_id, scenario_id="sc-001"
+        )
+    entry = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
+    assert entry["matched_candidate"]["penalized_by"] == ["hierarchy_conflict"]
+    # 감점은 배제가 아니다(D13) -- 같은 후보가 `excluded_by` 에는 없다.
+    assert entry["matched_candidate"]["excluded_by"] is None
+    assert cli.recheck_trace_dump(path).ok
+
+
+def test_dump_and_recheck_of_an_unchecked_rule_mention(tmp_path: Path) -> None:
+    """R-5 회귀 -- 힌트가 없어 `rule_checked == 0` 인 mention 이 덤프되면
+    재계산 diff 가 **0.0** 이어야 한다(U1~U3 동안 여기서 rc=1 이 났다)."""
+
+    session_id = "pilot-run-abc-sc-002"
+    output = _resolution_output(mention="이서연 과장님", rule_checked=0)
+    breakdown = output["confidence_breakdown"]
+    assert breakdown["rule_checked"] == 0
+    assert breakdown["weights_effective"]["rule"] == 0.0
+    session = _FakeSession([_FakeTrace(100, session_id, output)])
+    path = tmp_path / "traces-unchecked.jsonl"
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        cli.dump_er_traces(
+            session,
+            [{**_row(100), "mention": "이서연 과장님"}],
+            handle,
+            session_id=session_id,
+            scenario_id="sc-002",
+        )
+    result = cli.recheck_trace_dump(path)
+    assert result.ok
+    assert result.max_abs_diff == 0.0
+    assert cli.main(["--recheck-traces", str(path)]) == cli.RC_OK
 
 
 def test_dump_fails_when_proposed_row_has_no_trace_id(tmp_path: Path) -> None:
@@ -513,6 +577,9 @@ def test_recheck_cli_prints_summary_line(
     assert rc == cli.RC_OK
     assert "[traces] dumped=2 recomputed=2 max_abs_diff=0.0" in out
     assert str(path) in out
+    # 산식 안내는 D12 두 분기를 모두 적는다(결정 D(i) -- 어느 분기로
+    # 재계산했는지 사람이 출력만 보고 알 수 있어야 한다).
+    assert "rule_checked>0" in out and "rule_checked==0" in out
 
 
 def _rewrite(path: Path, mutate: Any) -> None:
@@ -637,15 +704,92 @@ def test_recompute_uses_product_combine_not_a_local_formula() -> None:
     from app.er.types import ERConfig
 
     config = ERConfig(t_merge=0.8, t_new=T_NEW)
+    weights = {"llm": config.w_llm, "emb": config.w_emb, "rule": config.w_rule}
     breakdown = {
         "s_llm": 0.73,
         "s_emb": 0.8123456789,
         "s_rule": 0.6666666666666666,
-        "weights": {"llm": config.w_llm, "emb": config.w_emb, "rule": config.w_rule},
+        "weights": weights,
+        "weights_effective": dict(weights),
+        "rule_checked": 2,
     }
     assert cli.recompute_confidence(breakdown) == combine(
-        0.73, 0.8123456789, 0.6666666666666666, config
+        0.73, 0.8123456789, 0.6666666666666666, config, rule_checked=2
     )
+
+
+def test_recompute_renormalizes_when_rule_was_not_checked() -> None:
+    """D12(결정 D(i), 02-plan-verify R-5) -- `rule_checked == 0` 행은
+    재정규화 산식으로 재계산해야 기록값과 비트가 같다. 옛 D3 재계산으로는
+    `diff != 0` 이 나온다(그것이 U1~U3 동안 dry-run 사슬이 rc=1 이던 이유)."""
+
+    from app.er.confidence import combine
+    from app.er.types import ERConfig
+
+    config = ERConfig(t_merge=0.8, t_new=T_NEW)
+    weights = {"llm": config.w_llm, "emb": config.w_emb, "rule": config.w_rule}
+    denom = config.w_llm + config.w_emb
+    breakdown = {
+        "s_llm": 0.73,
+        "s_emb": 0.8123456789,
+        "s_rule": 0.0,
+        "weights": weights,
+        "weights_effective": {
+            "llm": config.w_llm / denom,
+            "emb": config.w_emb / denom,
+            "rule": 0.0,
+        },
+        "rule_checked": 0,
+    }
+    recomputed = cli.recompute_confidence(breakdown)
+    assert recomputed == combine(0.73, 0.8123456789, 0.0, config, rule_checked=0)
+    # 옛 재계산(= D3 원식)과는 다르다 -- 고치지 않으면 rc=1 이다.
+    assert recomputed != combine(0.73, 0.8123456789, 0.0, config, rule_checked=1)
+
+
+def test_recompute_rejects_missing_rule_checked_or_weights_effective() -> None:
+    """두 키가 없으면 **기본값을 쓰지 않고 거부**한다(원칙8) -- 없는 것을
+    "측정됨"으로 가정하면 D12 판정을 옛 산식으로 조용히 통과시킨다."""
+
+    from app.er.types import ERConfig
+
+    config = ERConfig(t_merge=0.8, t_new=T_NEW)
+    weights = {"llm": config.w_llm, "emb": config.w_emb, "rule": config.w_rule}
+    base = {
+        "s_llm": 0.73,
+        "s_emb": 0.8123456789,
+        "s_rule": 0.6666666666666666,
+        "weights": weights,
+        "weights_effective": dict(weights),
+        "rule_checked": 2,
+    }
+    for missing in ("rule_checked", "weights_effective"):
+        broken = {key: value for key, value in base.items() if key != missing}
+        with pytest.raises(cli.TraceRecheckError) as excinfo:
+            cli.recompute_confidence(broken)
+        assert missing in str(excinfo.value)
+
+
+def test_recompute_rejects_weights_effective_that_is_not_derived() -> None:
+    """`weights_effective` 는 `weights`·`rule_checked` 에서 도출돼야 한다
+    (결정 D(i) 교차 확인) -- 어긋나면 기록이 깨진 것이다."""
+
+    from app.er.types import ERConfig
+
+    config = ERConfig(t_merge=0.8, t_new=T_NEW)
+    weights = {"llm": config.w_llm, "emb": config.w_emb, "rule": config.w_rule}
+    breakdown = {
+        "s_llm": 0.73,
+        "s_emb": 0.8123456789,
+        "s_rule": 0.0,
+        "weights": weights,
+        # `rule_checked == 0` 인데 설정값 그대로 적혀 있다(재정규화 안 됨).
+        "weights_effective": dict(weights),
+        "rule_checked": 0,
+    }
+    with pytest.raises(cli.TraceRecheckError) as excinfo:
+        cli.recompute_confidence(breakdown)
+    assert "weights_effective" in str(excinfo.value)
 
 
 def test_forced_path_breakdown_recomputes_to_zero(tmp_path: Path) -> None:

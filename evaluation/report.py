@@ -386,6 +386,19 @@ def _meta_section(doc: Mapping[str, Any]) -> list[str]:
             + fmt_number(weights.get("rule")),
         ],
         ["가중치 출처", _cell(weights.get("source"))],
+        # 결정 H(i) -- `meta.weights` 는 설정값(비율)이고 실제 적용값은
+        # mention 마다 다르다. 어느 산식·어느 보수 분기로 판정했는지를
+        # 메타 표에서 바로 읽을 수 있어야 한다(D12·D13, 원칙8).
+        [
+            "가중치 결합 정책 (`meta.weights_policy`)",
+            f"`{meta['weights_policy']}`" if meta.get("weights_policy") else MISSING,
+        ],
+        [
+            "감점 후보 연결 정책 (`meta.penalized_merge_policy`)",
+            f"`{meta['penalized_merge_policy']}`"
+            if meta.get("penalized_merge_policy")
+            else MISSING,
+        ],
         ["방식 (`meta.methods`, 순서 고정)", _join(f"`{name}`" for name in _methods(doc))],
     ]
 
@@ -678,6 +691,10 @@ def _diagnostics_section(doc: Mapping[str, Any]) -> list[str]:
             continue
         unchecked = subsets.get("merge_rule_unchecked") or {}
         relaxed = subsets.get("merge_relaxed_retry") or {}
+        # D13 위험 계측 -- 규칙이 감점한 후보가 실제로 연결된 건수. 이 열이
+        # 없으면 "후보가 늘어 오병합 기회가 는다"는 D13 파급을 리포트만
+        # 보고는 확인할 수 없다(`metrics.json` 을 열어야 한다).
+        penalized = subsets.get("penalized_merge") or {}
         subset_rows.append(
             [
                 f"`{method}`",
@@ -686,6 +703,9 @@ def _diagnostics_section(doc: Mapping[str, Any]) -> list[str]:
                 fmt_ratio(unchecked.get("false_merge_rate")),
                 fmt_number(relaxed.get("merges")),
                 fmt_ratio(relaxed.get("false_merge_rate")),
+                fmt_number(penalized.get("merges")),
+                fmt_ratio(penalized.get("false_merge_rate")),
+                fmt_number(penalized.get("relaxed_pass_merges")),
             ]
         )
 
@@ -743,6 +763,13 @@ def _diagnostics_section(doc: Mapping[str, Any]) -> list[str]:
         lines += [
             "### 부분집합 (`merge` 행만, P3-er §7 리스크 계측)",
             "",
+            "**감점 후보 merge**(D13 위험 계측)는 2단계 규칙 필터가 감점만 하고 "
+            "남긴 후보가 실제로 연결된 건수다 — 배제를 감점으로 바꾸면 후보가 "
+            "늘어 오병합 기회도 느는데(D13 파급), 이 열이 그 대가를 직접 센다. "
+            "`그중 완화 통과` 는 위계 1칸 완화로 자동 연결이 허용된 예외"
+            "(결정 A(i), 승진류)이며 나머지는 `meta.penalized_merge_policy` "
+            "정책에 따른다.",
+            "",
             *_table(
                 [
                     "방식",
@@ -751,6 +778,9 @@ def _diagnostics_section(doc: Mapping[str, Any]) -> list[str]:
                     "그 오병합률",
                     "완화 재검색 merge",
                     "그 오병합률",
+                    "감점 후보 merge",
+                    "그 오병합률",
+                    "그중 완화 통과",
                 ],
                 subset_rows,
             ),
@@ -848,7 +878,7 @@ def _optimum_section(doc: Mapping[str, Any]) -> list[str]:
         "",
         f"**{sample}이므로 이것은 방향(direction)이지 확정값이 아니다.** 카테고리당 "
         "표본이 한 자리 수라 오병합 한 건이 비율을 크게 흔든다. 운영 `T_merge`·"
-        "`T_new` 의 확정과 가중치(D3) 조정은 전체 데이터셋을 쓰는 "
+        "`T_new` 의 확정과 가중치(D12 -- 비율 5:3:2) 조정은 전체 데이터셋을 쓰는 "
         "P10-final-eval 에서 하고, 이 문서는 후보 구간과 방향까지만 말한다.",
         "",
     ]

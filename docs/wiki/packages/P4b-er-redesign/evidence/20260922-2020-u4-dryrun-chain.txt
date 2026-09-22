@@ -1,0 +1,59 @@
+# U4 dry-run 사슬 + --recheck-traces (R-5 증명, 네트워크 0, U4 최종 코드 상태)
+# cmd: POSTGRES_PORT=5433 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/run_pilot_eval.py --dry-run --stub --limit 5 --out <tmp>/u4-dryrun2
+# 2026-09-22
+
+[estimate] run_mode=stub scenarios=5 mentions=18
+[estimate] llm_calls total=36 proposed=18 llm_single=18 (결정 C(i): 임계치 10점은 같은 응답을 재사용한다)
+[estimate] tokens_in=15248 tokens_out=2880 embed_texts=23 embed_tokens=52
+[estimate] 가정 chars_per_token=1.5 output_tokens_per_call=80 (실측 아님 -- U7 의 tokens_in/out 합계로만 실측이 된다)
+[estimate] price_per_1m in=0.15 out=0.6 embed=0.02
+[estimate] price_source=OpenAI 공개 가격표의 gpt-4o-mini(in $0.15 / out $0.60 per 1M)와 text-embedding-3-small($0.02 per 1M) 기록값 -- 저장소에 적어 둔 오프라인 상수이며 이 실행은 가격표를 조회하지 않았다. 기준일·현재가는 실행자가 확인하고 --price-in/--price-out/--price-embed 로 덮어쓴다
+[estimate] cost_usd total=0.0040 (in=0.0023 out=0.0017 embed=0.0000)
+[estimate] max_cost_usd=5.0
+[run] run_mode=stub run_id=run-ee543e0ecf8d
+[run] dataset_hash=sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e
+[run] dataset_hash_method=sorted(data/scenarios/*.json) 의 파일명+내용 sha256
+[run] commit=(미지정)
+[run] out=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2
+[stage] runner: run_pilot(scenarios=5, methods=5, grid=10)
+[scenario] sc-001 aliases=2 embedded=2 rows=200 traces=40 ok
+[scenario] sc-002 aliases=4 embedded=4 rows=250 traces=50 ok
+[scenario] sc-003 aliases=2 embedded=2 rows=150 traces=30 ok
+[scenario] sc-004 aliases=3 embedded=3 rows=200 traces=40 ok
+[scenario] sc-005 aliases=2 embedded=2 rows=100 traces=20 ok
+[traces] dumped=180 recomputed=180 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\traces-20260922-112528.jsonl
+[traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+[rows] rows=900 = mentions=18 × methods=5 × t_merge=10 (expected=900)
+[rows] proposed=180
+[rows] exact_raw=180
+[rows] exact_norm=180
+[rows] embedding_only=180
+[rows] llm_single=180
+[rows] raw=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\raw-20260922-112528.jsonl
+[gzip] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\raw-20260922-112528.jsonl.gz 22053 bytes (평문 977201 bytes, level=9, mtime=0·파일명 미기록)
+[gzip] roundtrip_sha256=75fc5bd7c1efb003cc99b19c11c1170280ca7770e571790f899a562570cce454 ok plain=보존 -- 이후 단계 입력은 압축본이다
+[run] run_mode=stub network_calls=0 stub_llm_calls=36 stub_embed_calls=15
+[run] tokens_in=0 tokens_out=0 (실행 실측 합계, llm_fresh_call 행만 -- 스텁은 토큰을 세지 않으므로 0 이다)
+[stage] metrics: python -m evaluation.metrics --rows C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\raw-20260922-112528.jsonl.gz --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\metrics-stage.json
+[stage] metrics: rc=0
+[stage] calibration: python -m evaluation.calibration --rows C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\raw-20260922-112528.jsonl.gz --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\calibration.json --t-merge 0.8 --model-configured stub=stub-judge
+[stage] calibration: rc=0
+[stage] curve: python -m evaluation.curve --rows C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\raw-20260922-112528.jsonl.gz --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\metrics.json --curve C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\curve.csv --dataset-hash sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e --run-id run-ee543e0ecf8d --embedding-model stub-embedding --model-configured stub=stub-judge --run-mode stub
+[stage] curve: rc=0
+[stage] validate: python -m evaluation.metrics --validate C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\metrics.json
+OK C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\metrics.json
+[stage] validate: rc=0
+[stage] report: python -m evaluation.report --metrics C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\metrics.json --out C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\eval.md
+[stage] report: rc=0
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\raw-20260922-112528.jsonl (977201 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\raw-20260922-112528.jsonl.gz (22053 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\traces-20260922-112528.jsonl (243347 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\metrics-stage.json (208564 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\metrics.json (206541 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\calibration.json (8030 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\curve.csv (8096 bytes)
+[out] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\eval.md (19263 bytes)
+[size] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\raw-20260922-112528.jsonl.gz 22053 bytes limit=5242880 ok
+[size] C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\26295b99-18e0-4dd9-bdf9-03d358046835\scratchpad\u4-dryrun2\traces-20260922-112528.jsonl 243347 bytes limit=5242880 ok
+[ok] 사슬 완료 -- runner → metrics → calibration → curve → validate → report
+rc=0

@@ -1,4 +1,4 @@
-"""Refs: P3-baselines S3.3 D3 D10 원칙1 원칙9 -- 제안 4단계 하이브리드 어댑터.
+"""Refs: P3-baselines P4b-er-redesign S3.3 D12 D13 D10 원칙1 원칙9 -- 제안 4단계 하이브리드 어댑터.
 
 **두 임계치**(불변 규약 4): 이 어댑터는 `config`(`ERConfig`)를
 `app.er.resolve()` 에 **그대로 넘기기만** 하고, `T_merge`/`T_new` 는
@@ -28,7 +28,7 @@ judge=…, config=…)` 를 한 번 부르고 그 `Resolution` 을 `MentionDecis
 | `forced_reason`·`relaxed_retry` | `detail`                             |
 | `llm.provider`·`llm.model`      | `detail`                             |
 | `llm.tokens_in/out`             | `tokens_in`/`tokens_out`             |
-| `confidence_breakdown`          | `detail["confidence_breakdown"]`(3신호 분해, D3) |
+| `confidence_breakdown`          | `detail["confidence_breakdown"]`(3신호 분해, D12) |
 
 `trace_id` 는 전용 필드와 `detail["trace_id"]` 두 곳에 같은 값으로 담긴다
 (base.py 는 전용 필드를 두고 01-plan 54·101행은 `detail` 을 요구한다).
@@ -101,13 +101,14 @@ def _clamp_unit(value: float) -> tuple[float, bool]:
 def _candidate_signals(candidate: ScoredCandidate) -> dict[str, float]:
     """후보 하나의 **원자료**(원칙9 -- 배제된 후보도 근거다).
 
-    `s_emb`·`s_rule` 은 확신도 산식의 두 신호(D3)이고, `rule_flags` 6개
+    `s_emb`·`s_rule` 은 확신도 산식의 두 신호(D12)이고, `rule_flags` 6개
     (`exact_alias`·`partial_alias`·`hierarchy_match`·`relation_tag_match`·
     `hierarchy_adjacent`·`embedding_skipped`)는 `search_person` 이 채운
     그대로다. `signals` 는 `dict[str, float]` 이므로 불리언은 `1.0`/`0.0`
     으로 옮긴다(키 이름은 바꾸지 않는다 -- P4 가 이름으로 찾는다).
-    배제 사유(`excluded_by`, 문자열)는 수치가 아니므로
-    `detail["excluded_by"]` 로 간다."""
+    배제 사유(`excluded_by`, 문자열)와 감점 사유(`penalized_by`, 문자열
+    목록 -- D13)는 수치가 아니므로 `detail["excluded_by"]`·
+    `detail["penalized_by"]` 로 간다."""
 
     signals: dict[str, float] = {
         "s_emb": float(candidate.s_emb),
@@ -176,7 +177,8 @@ def to_mention_decision(resolution: Resolution, mention: str) -> MentionDecision
         "llm_skipped": llm.get("skipped"),
         "llm_attempts": llm.get("attempts"),
         "llm_error": llm.get("error"),
-        # 3신호 분해(D3, 원칙3) -- P4 보정표(`s_llm` 구간별 정답률,
+        # 3신호 분해(D12, 원칙3 -- `weights`·`weights_effective`·
+        # `rule_checked` 가 여기 함께 있다) -- P4 보정표(`s_llm` 구간별 정답률,
         # eval-harness §2 `calibration`)의 입력이다.
         "confidence_breakdown": dict(resolution.confidence_breakdown),
         # 실행하지 않으므로(불변 규약 1) 물었을 `kind` 만 남긴다 --
@@ -186,6 +188,18 @@ def to_mention_decision(resolution: Resolution, mention: str) -> MentionDecision
             str(candidate.person_id): candidate.excluded_by
             for candidate in resolution.candidates
             if candidate.excluded_by is not None
+        },
+        # D13 -- `relation_tag_conflict`·`hierarchy_conflict` 는 후보를 빼지
+        # 않고 감점만 한다. 그 사유가 여기 남아야 "감점 후보가 연결됐는가"
+        # (`metrics.json` `subsets.penalized_merge`, D13 위험 계측)를 원시
+        # JSONL 만으로 셀 수 있다. 모양은 `excluded_by` 와 같은
+        # `{person_id 문자열: [사유, …]}` 이고 값이 목록인 것은 한 후보가
+        # 두 사유를 함께 가질 수 있기 때문이다(원칙9 -- 대표 하나로 줄여
+        # 정보를 버리지 않는다).
+        "penalized_by": {
+            str(candidate.person_id): list(candidate.penalized_by)
+            for candidate in resolution.candidates
+            if candidate.penalized_by
         },
     }
     if adapter_forced_reason is not None:

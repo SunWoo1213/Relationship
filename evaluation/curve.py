@@ -1,4 +1,4 @@
-"""Refs: P4-pilot-eval R3 D10 S3.7 원칙1 원칙2 원칙8 -- 곡선·`metrics.json` 조립.
+"""Refs: P4-pilot-eval P4b-er-redesign R3 D10 D12 D13 S3.7 원칙1 원칙2 원칙8 -- 곡선·`metrics.json` 조립.
 
 01-plan U4(68행). **입력은 U1 러너가 쓴 JSONL(또는 그것으로 만든 U2
 `compute_metrics()` 결과)뿐이다** -- DB·네트워크·LLM 을 부르지 않는다. 같은
@@ -110,9 +110,11 @@ __all__ = [
     "EXPECTED_GRID",
     "GATE_T_MERGE",
     "METRICS_SCHEMA_VERSION",
+    "PENALIZED_MERGE_POLICIES",
     "PROPOSED",
     "SERIES",
     "T_NEW",
+    "WEIGHTS_POLICY",
     "CurveError",
     "build_gate",
     "build_metrics_document",
@@ -157,7 +159,11 @@ CURVE_COLUMNS: tuple[str, ...] = (
 )
 
 #: `metrics.json` 자체의 스키마 판(구조가 바뀌면 올린다).
-METRICS_SCHEMA_VERSION = 1
+#: 2 = P4b(D12·D13) -- `meta.weights_policy`·`meta.penalized_merge_policy`
+#: 두 키와 방식별 `subsets.penalized_merge` 가 늘었다. 1 = P4 기준선
+#: (`reports/pilot/metrics-20260922-042440.json`)이며 그 파일은 이 판정기로
+#: 검증되지 않는다(옛 판이다 -- 고치지 않는다, 원칙8).
+METRICS_SCHEMA_VERSION = 2
 
 #: 최상위에서 방식이 아닌 키(O-4 -- 방식 키 5개를 셀 때 이 둘을 뺀다).
 RESERVED_TOP_KEYS: tuple[str, ...] = ("meta", "gate")
@@ -170,6 +176,18 @@ _GATE_REQUIRED_KEYS: tuple[str, ...] = (
     "d10_direction",
     "pass",
 )
+
+#: `meta.weights_policy` -- 가중치를 **어떻게** 결합했는가(결정 H(i)).
+#: `meta.weights` 는 설정값(5:3:2)이고, 실제 적용값은 mention 마다 다르다
+#: (`rule_checked == 0` 이면 `s_rule` 을 분모에서 뺀다, D12). 그래서 실행
+#: 산출물만 보고도 어느 산식이었는지 알 수 있게 정책 이름을 따로 적는다.
+WEIGHTS_POLICY = "observed_renormalized(D12)"
+
+#: `meta.penalized_merge_policy` 의 값 어휘(D13 결정 B). 제품 쪽 단일 출처는
+#: `app.er.types.ERConfig.penalized_merge_policy` 의 허용 어휘이고, 이 모듈은
+#: `app/` 없이도 `--validate` 가 돌아야 해서 같은 어휘를 여기에 적는다 --
+#: 두 어휘가 어긋나면 `tests/test_eval_curve.py` 가 실패한다.
+PENALIZED_MERGE_POLICIES: tuple[str, ...] = ("ask", "merge")
 
 _META_REQUIRED_KEYS: tuple[str, ...] = (
     "provider",
@@ -184,6 +202,8 @@ _META_REQUIRED_KEYS: tuple[str, ...] = (
     "denominator_rule",
     "methods",
     "weights",
+    "weights_policy",
+    "penalized_merge_policy",
     "model_configured",
 )
 
@@ -531,7 +551,12 @@ def _d10_direction(metrics: Mapping[str, Any]) -> dict[str, Any]:
 def _weights_block() -> dict[str, Any]:
     """확신도 가중치(원칙3). `ERConfig` **모듈 기본값**을 읽고 환경변수는
     읽지 않는다 -- 실행 환경이 달라도 같은 JSONL 이면 같은 파일이 나와야
-    한다(원칙8). 실행 시 주입된 값이 달랐다면 그것은 러너 evidence 의 몫이다."""
+    한다(원칙8). 실행 시 주입된 값이 달랐다면 그것은 러너 evidence 의 몫이다.
+
+    D12 이후에도 이 블록은 **설정값**(5:3:2 비율)을 적는다 -- 실제로 적용된
+    가중치(`weights_effective`)는 mention 마다 다르므로 실행 메타에 단일
+    값으로 적을 수 없다. 어느 산식으로 결합했는지는 `meta.weights_policy`
+    가 말한다(결정 H(i))."""
 
     from app.er.types import ERConfig  # 지연 import -- 이 모듈 자체는 app 없이 읽힌다
 
@@ -541,10 +566,25 @@ def _weights_block() -> dict[str, Any]:
         "emb": config.w_emb,
         "rule": config.w_rule,
         "source": (
-            "app.er.types.ERConfig() 모듈 기본값(0.5·0.3·0.2, D3). W_LLM/W_EMB/"
-            "W_RULE 환경변수를 읽지 않는다 -- 같은 JSONL 이면 같은 metrics.json."
+            "app.er.types.ERConfig() 모듈 기본값(0.5·0.3·0.2 비율, D12 가 "
+            "비율을 유지한다). W_LLM/W_EMB/W_RULE 환경변수를 읽지 않는다 -- "
+            "같은 JSONL 이면 같은 metrics.json."
         ),
     }
+
+
+def _penalized_merge_policy() -> str:
+    """`meta.penalized_merge_policy`(결정 A·B, D13) -- 감점 후보가 `T_merge`
+    를 넘겼을 때 자동 연결했는가(`merge`), 되물었는가(`ask`).
+
+    `_weights_block()` 과 같은 규약으로 `ERConfig` **모듈 기본값**을 읽고
+    환경변수(`ER_PENALIZED_MERGE_POLICY`)는 읽지 않는다 -- 같은 JSONL 이면
+    같은 `metrics.json` 이어야 한다(원칙8). 실행 시 다른 값을 주입했다면
+    그것은 러너 evidence 의 몫이다."""
+
+    from app.er.types import ERConfig  # 지연 import -- 위와 같은 이유
+
+    return str(ERConfig().penalized_merge_policy)
 
 
 def _provider_model(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
@@ -657,6 +697,8 @@ def build_metrics_document(
                 "x 축은 T_merge 하나다."
             ),
             "weights": _weights_block(),
+            "weights_policy": WEIGHTS_POLICY,
+            "penalized_merge_policy": _penalized_merge_policy(),
             "curve": {
                 "x_axis": "t_merge",
                 "series": list(SERIES),
@@ -772,6 +814,19 @@ def validate_metrics_document(doc: Any) -> list[str]:
         if methods_meta != method_keys:
             problems.append(
                 f"meta.methods {methods_meta!r} disagrees with method keys {method_keys!r}"
+            )
+        # 결정 H(i) -- 어느 산식·어느 보수 분기로 판정했는지 산출물만 보고
+        # 알 수 있어야 한다(원칙8 재현성). 값 어휘는 D12·D13 이 고정한다.
+        policy = meta.get("weights_policy")
+        if policy != WEIGHTS_POLICY:
+            problems.append(
+                f"meta.weights_policy: must be {WEIGHTS_POLICY!r} (D12, got {policy!r})"
+            )
+        penalized = meta.get("penalized_merge_policy")
+        if penalized not in PENALIZED_MERGE_POLICIES:
+            problems.append(
+                f"meta.penalized_merge_policy: must be one of "
+                f"{list(PENALIZED_MERGE_POLICIES)} (D13 결정 B, got {penalized!r})"
             )
 
     grid_keys: list[str] = []

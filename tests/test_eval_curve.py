@@ -27,6 +27,7 @@ from evaluation.curve import (
     CURVE_COLUMNS,
     EXPECTED_GRID,
     GATE_T_MERGE,
+    PENALIZED_MERGE_POLICIES,
     PROPOSED,
     SERIES,
     T_NEW,
@@ -270,7 +271,7 @@ def test_meta_records_execution_identity(document: dict[str, Any]) -> None:
     assert meta["dataset_hash"] == "sha256:deadbeef"
     assert meta["run_id"] == "run-1"
     assert meta["model_configured"] == {"openai": "gpt-4o-mini"}
-    assert meta["schema_version"] == 1
+    assert meta["schema_version"] == 2  # P4b(D12·D13) 에서 판 2 로 올렸다
     assert meta["weights"]["llm"] == 0.5
     assert meta["weights"]["emb"] == 0.3
     assert meta["weights"]["rule"] == 0.2
@@ -673,6 +674,52 @@ def test_validate_rejects_top_k_swept(document: dict[str, Any]) -> None:
     broken = dict(document)
     broken["meta"] = {**document["meta"], "top_k_swept": True}
     assert any("top_k_swept" in p for p in validate_metrics_document(broken))
+
+
+def test_meta_records_weights_and_penalized_merge_policy(
+    document: dict[str, Any],
+) -> None:
+    """결정 H(i) -- 설정값(`meta.weights`)과 **정책** 두 키를 함께 남긴다.
+    유효 가중치는 mention 마다 다르므로 단일 값으로 적을 수 없다(D12)."""
+
+    meta = document["meta"]
+    # 설정값은 그대로 5:3:2 (비율 불변, D12)
+    assert (meta["weights"]["llm"], meta["weights"]["emb"], meta["weights"]["rule"]) == (
+        0.5,
+        0.3,
+        0.2,
+    )
+    assert meta["weights_policy"] == "observed_renormalized(D12)"
+    assert meta["penalized_merge_policy"] in PENALIZED_MERGE_POLICIES
+    # 환경변수를 읽지 않는다(원칙8) -- `ERConfig` 모듈 기본값이다.
+    from app.er.types import ERConfig
+
+    assert meta["penalized_merge_policy"] == ERConfig().penalized_merge_policy
+
+
+def test_penalized_merge_policy_vocabulary_matches_the_product() -> None:
+    """어휘의 단일 출처는 `app.er.types` 다 -- 두 곳이 갈라지면 여기서 죽는다."""
+
+    from app.er.types import _PENALIZED_MERGE_POLICIES
+
+    assert PENALIZED_MERGE_POLICIES == _PENALIZED_MERGE_POLICIES
+
+
+def test_validate_rejects_missing_or_wrong_policy_keys(document: dict[str, Any]) -> None:
+    for key in ("weights_policy", "penalized_merge_policy"):
+        broken = dict(document)
+        broken["meta"] = {k: v for k, v in document["meta"].items() if k != key}
+        assert any(key in p for p in validate_metrics_document(broken))
+
+    wrong_policy = dict(document)
+    wrong_policy["meta"] = {**document["meta"], "weights_policy": "d3_sum"}
+    assert any("weights_policy" in p for p in validate_metrics_document(wrong_policy))
+
+    wrong_penalized = dict(document)
+    wrong_penalized["meta"] = {**document["meta"], "penalized_merge_policy": "ignore"}
+    assert any(
+        "penalized_merge_policy" in p for p in validate_metrics_document(wrong_penalized)
+    )
 
 
 def test_validate_rejects_missing_gate_keys(document: dict[str, Any]) -> None:

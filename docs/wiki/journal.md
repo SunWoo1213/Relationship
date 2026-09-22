@@ -201,3 +201,6 @@
 - 2026-09-22 18:15 | COMMIT | 28c2de8 harness(P4b-er-redesign): U0 entity-resolution 스킬 카드 D12·D13 정합 — 권위 문구·감점·재정규화 산식
 - 2026-09-22 18:35 | COMMIT | 85ceda7 feat(P4b-er-redesign): U1 D12 관측 신호 재정규화 결합 — combine rule_checked·weights_effective, 테스트 13건
 - 2026-09-22 19:12 | COMMIT | 08bda7c feat(P4b-er-redesign): U2 D13 규칙 필터 감점 — 배제 대신 penalized_by, 완화 트리거 교체
+- 2026-09-22 19:36 | COMMIT | dbcfca0 feat(P4b-er-redesign): U3 감점 후보는 바로 연결하지 않고 사용자에게 묻는다
+- 2026-09-22 19:36 | PUSH | origin dev dbcfca0 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-22 20:40 | PAUSE | P4b-er-redesign U4 구현 완료·미커밋 중단(사용자). 전체 1325 passed/0 failed — 알려진 5건 해소. 재개 시 설계 판단 4건(결정 D 해석·schema_version 2·report 3열·기준선 재검증 불가) 확정 후 커밋 | P4b-er-redesign

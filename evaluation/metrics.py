@@ -1,4 +1,4 @@
-"""Refs: P4-pilot-eval S3.7 D10 원칙1 원칙2 원칙8 -- U1 JSONL -> 방식별 지표.
+"""Refs: P4-pilot-eval P4b-er-redesign S3.7 D10 D13 원칙1 원칙2 원칙8 -- U1 JSONL -> 방식별 지표.
 
 01-plan U2(65행). **입력은 U1 러너가 쓴 JSONL 한 파일뿐이다** -- DB·네트워크·
 LLM 을 부르지 않고 `app/` 도 부르지 않는다(방식 이름의 표준 순서를 읽을 때만
@@ -568,6 +568,16 @@ def _point(method: str, t_merge: str, rows: Sequence[Mapping[str, Any]]) -> dict
     merge_rows = [row for row in gold if row["decision"] == "merge"]
     unchecked = [row for row in merge_rows if _matched_signal(row, "rule_checked") == 0.0]
     relaxed = [row for row in merge_rows if _detail(row).get("relaxed_retry") is True]
+    # D13 위험 계측 -- 규칙 필터가 **감점**한 후보(배제되지 않고 3단계까지
+    # 간 후보)가 실제로 연결된 건수와 그중 오병합 수. "후보가 늘어 오병합
+    # 기회가 는다"는 D13 파급의 유일한 직접 계측이다(01-plan 리스크 1).
+    penalized = [row for row in merge_rows if _matched_penalized_by(row)]
+    # 그중 완화 통과(`relaxed_pass`) 예외로 자동 연결된 것 -- 기본 정책
+    # `ask` 에서는 감점 후보가 여기(승진류)를 빼면 merge 로 남지 않는다
+    # (결정 A(i) 예외, 01-plan 135행 "예외 경로를 함께 센다").
+    penalized_relaxed = [
+        row for row in penalized if _matched_signal(row, "relaxed_pass") == 1.0
+    ]
 
     by_category: dict[str, Any] = {}
     for category in sorted({str(row["category"]) for row in gold}):
@@ -635,10 +645,68 @@ def _point(method: str, t_merge: str, rows: Sequence[Mapping[str, Any]]) -> dict
                     len(relaxed),
                 ),
             },
+            "penalized_merge": {
+                "merges": len(penalized),
+                "false_merge_rate": ratio(
+                    sum(
+                        1
+                        for row in penalized
+                        if classify_gold_row(row) == OUTCOME_FALSE_MERGE
+                    ),
+                    len(penalized),
+                ),
+                "relaxed_pass_merges": len(penalized_relaxed),
+                "relaxed_pass_false_merge_rate": ratio(
+                    sum(
+                        1
+                        for row in penalized_relaxed
+                        if classify_gold_row(row) == OUTCOME_FALSE_MERGE
+                    ),
+                    len(penalized_relaxed),
+                ),
+                "reasons": dict(
+                    sorted(Counter(_penalized_reasons(penalized)).items())
+                ),
+            },
             "merges": len(merge_rows),
         },
         "by_category": by_category,
     }
+
+
+def _matched_penalized_by(row: Mapping[str, Any]) -> list[str]:
+    """`merge` 로 고른 후보의 감점 사유 목록(D13). 없으면 빈 목록.
+
+    출처는 `detail["penalized_by"]` 하나다(`evaluation/resolvers/proposed.py`
+    가 `{person_id 문자열: [사유, …]}` 로 남긴다 -- `detail["excluded_by"]`
+    와 같은 모양). 제안 방식 외에는 이 키 자체가 없으므로 언제나 빈 목록이
+    되고, 없는 것을 0 이 아니라 "없음"으로 센다(원칙8).
+    """
+
+    person_id = row.get("person_id")
+    if person_id is None:
+        return []
+    penalized = _detail(row).get("penalized_by")
+    if penalized is None:
+        return []
+    if not isinstance(penalized, Mapping):
+        raise MetricsError("detail penalized_by must be an object")
+    reasons = penalized.get(str(person_id))
+    if reasons is None:
+        return []
+    if not isinstance(reasons, (list, tuple)):
+        raise MetricsError("detail penalized_by values must be lists")
+    return [str(reason) for reason in reasons]
+
+
+def _penalized_reasons(rows: Sequence[Mapping[str, Any]]) -> list[str]:
+    """감점 merge 행들의 사유를 펼친 목록(한 후보가 두 사유를 함께 가질 수
+    있으므로 행 수와 합이 다를 수 있다 -- 그래서 비율이 아니라 개수로 낸다)."""
+
+    flat: list[str] = []
+    for row in rows:
+        flat.extend(_matched_penalized_by(row))
+    return flat
 
 
 def _matched_signal(row: Mapping[str, Any], name: str) -> float | None:

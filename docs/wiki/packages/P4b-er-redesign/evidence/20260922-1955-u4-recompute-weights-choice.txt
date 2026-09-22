@@ -1,0 +1,15 @@
+# U4 설계 판단 근거 - recompute_confidence 가 combine() 에 무엇을 넘기는가 (결정 D(i))
+# 실행: PYTHONUTF8=1 python (아래 코드 그대로), 2026-09-22
+weights        = (0.5, 0.3, 0.2)
+weights_effective(rule_checked=0) = {'llm': 0.625, 'emb': 0.37499999999999994, 'rule': 0.0}
+
+A안: combine(s_llm, s_emb, s_rule, weights(설정값), rule_checked=0)  <- 제품이 판정 때 실제로 부른 그 호출
+B안: combine(s_llm, s_emb, s_rule, weights_effective,   rule_checked=0)
+B안은 (w_eff_llm*s + w_eff_emb*e)/(w_eff_llm+w_eff_emb) 를 계산한다 - 연산 순서가 달라 비트가 달라질 수 있다.
+
+무작위 20000 표본 중 A != B 인 건수: 7777  (최대 abs diff 2.220446049250313e-16)
+최악 표본: s_llm=0.6309791905321906 s_emb=0.8548700131006799 A=0.714938248995374 B=0.7149382489953742
+
+결론: B안을 쓰면 --recheck-traces 의 판정 기준 max_abs_diff == 0.0 을 만족할 수 없다.
+따라서 재계산은 A안(기록된 weights + rule_checked 를 제품 combine() 에 그대로)으로 하고,
+weights_effective 는 weights·rule_checked 에서 도출되는 값과 같은지 교차 확인하는 데 쓴다(결정 D(i) 둘째 문장).

@@ -459,6 +459,34 @@ def test_missing_optional_meta_key_is_not_invented(document: dict[str, Any], bod
     assert MISSING in body
 
 
+def test_meta_section_prints_the_two_policy_rows(
+    document: dict[str, Any], body: str
+) -> None:
+    """결정 H(i) -- `meta.weights` 는 설정값(비율)이라 그것만으로는 어느
+    산식으로 결합했는지 알 수 없다. 두 정책을 메타 표에 함께 찍는다."""
+
+    assert "meta.weights_policy" in body
+    assert document["meta"]["weights_policy"] in body
+    assert "meta.penalized_merge_policy" in body
+    assert f"`{document['meta']['penalized_merge_policy']}`" in body
+
+
+def test_old_schema_metrics_is_rejected_with_the_missing_policy_keys(
+    document: dict[str, Any],
+) -> None:
+    """옛 판(`schema_version` 1 = P4 기준선) `metrics.json` 으로는 리포트를
+    만들지 않는다 -- 어느 산식으로 결합했는지 모르는 채 수치를 다시 찍으면
+    재현성 주장이 거짓이 된다(원칙8). 무엇이 없는지 이름으로 말한다."""
+
+    old = json.loads(json.dumps(document))
+    old["meta"].pop("weights_policy")
+    old["meta"].pop("penalized_merge_policy")
+    with pytest.raises(ReportError) as excinfo:
+        render_report(old)
+    assert "weights_policy" in str(excinfo.value)
+    assert "penalized_merge_policy" in str(excinfo.value)
+
+
 # ---------------------------------------------------------------------------
 # 5) 필수 절
 # ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-"""Refs: P4-pilot-eval D4 원칙8 L-004 -- 파일럿 평가 실행 CLI(dry-run·비용 가드).
+"""Refs: P4-pilot-eval P4b-er-redesign D4 D12 D13 원칙8 L-004 -- 파일럿 평가 실행 CLI(dry-run·비용 가드).
 
 01-plan U6(70행). 이 스크립트는 **판정도 지표도 만들지 않는다** -- U1~U5 가
 만든 다섯 조각을 순서대로 부르고 각 단계의 종료 코드를 확인할 뿐이다.
@@ -63,7 +63,12 @@ stamp** 의 `traces-<ts>.jsonl` 로 덤프하고(제안 방식 행 1개 ↔ 판�
 `[traces] dumped=… recomputed=… max_abs_diff=… path=…`. 하나라도 어긋나면
 rc=1 이고 어느 trace 인지 찍는다. 재계산은 `app.er.confidence.combine()`
 (제품 코드)을 그대로 부르고 가중치는 trace 에 기록된 값을 쓰되 제품 상수
-`app.settings.ER_WEIGHTS`(0.5/0.3/0.2)와 다르면 거부한다. 덤프 파일만 있으면
+`app.settings.ER_WEIGHTS`(0.5/0.3/0.2)와 다르면 거부한다. D12(관측 신호
+재정규화) 이후에는 `confidence_breakdown["rule_checked"]` 를 함께 넘겨
+판정 때와 같은 분기(`rule_checked == 0` 이면 `s_rule` 을 분모에서 뺀다)를
+타고, 기록된 `weights_effective` 는 `weights`·`rule_checked` 에서 도출되는
+값과 같은지 교차 확인한다(결정 D(i) -- 거부는 `weights`, 재계산 분기는
+`rule_checked`, 교차 확인은 `weights_effective`). 덤프 파일만 있으면
 `--recheck-traces <path>` 로 언제든 다시 돌릴 수 있다(DB·네트워크 0).
 프롬프트 원문·`llm.reason` 자유 서술·키는 덤프에 넣지 않는다(security §1).
 
@@ -716,9 +721,14 @@ class _Weights:
     """`app.er.confidence.combine()` 이 요구하는 `config` 모양(가중치 3개만).
 
     가중치는 **이 스크립트가 하드코딩하지 않는다** -- 덤프된 trace 의
-    `confidence_breakdown["weights"]`(판정 당시 `ERConfig` 가 실제로 쓴 값)를
-    그대로 쓰고, 그 값이 제품 상수 `app.settings.ER_WEIGHTS`(원칙3 의
-    0.5/0.3/0.2)와 다르면 재계산을 통과시키지 않는다.
+    `confidence_breakdown["weights"]`(판정 당시 `ERConfig` 가 실제로 쓴
+    **설정값**)를 그대로 쓰고, 그 값이 제품 상수 `app.settings.ER_WEIGHTS`
+    (원칙3 의 0.5/0.3/0.2)와 다르면 재계산을 통과시키지 않는다.
+
+    D12(관측 신호 재정규화) 이후에도 이 자리에는 **설정값**이 들어간다 --
+    재정규화는 `combine(..., rule_checked=…)` 이 안에서 하고, 기록된
+    `weights_effective` 는 그 도출값과 맞는지 교차 확인하는 데 쓴다
+    (결정 D(i), `recompute_confidence()` docstring).
     """
 
     w_llm: float
@@ -764,6 +774,10 @@ _TRACE_CANDIDATE_KEYS = (
     "s_rule",
     "passed_rules",
     "excluded_by",
+    # D13 이후 `relation_tag_conflict`·`hierarchy_conflict` 는 배제가 아니라
+    # 감점이다 -- 그 사유가 여기 남아야 "감점 후보가 귀속됐는가"를 덤프만
+    # 보고 되짚을 수 있다(U6 위험 계측, 원칙9).
+    "penalized_by",
     "rule_checked",
     "rule_passed",
     "relaxed_pass",
@@ -901,14 +915,89 @@ def dump_er_traces(
     return written
 
 
+def _recorded_rule_checked(breakdown: Mapping[str, Any]) -> int:
+    """`confidence_breakdown.rule_checked` -- 2단계가 실제로 검사한 규칙 수.
+
+    **기본값을 만들지 않는다.** 이 값이 재정규화 여부를 가르므로(D12),
+    없는 것을 "측정됨"으로 가정하면 `rule_checked == 0` 인 판정을 옛 D3
+    산식으로 다시 계산해 조용히 통과시킬 수 있다(원칙8).
+    """
+
+    value = breakdown.get("rule_checked")
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TraceRecheckError(
+            f"confidence_breakdown.rule_checked={value!r} 가 수치가 아니다"
+            " (D12 재정규화 여부를 가르는 값이라 기본값을 쓰지 않는다)"
+        )
+    if float(value) != int(value) or int(value) < 0:
+        raise TraceRecheckError(f"rule_checked={value!r} 가 0 이상 정수가 아니다")
+    return int(value)
+
+
+def _check_weights_effective(
+    breakdown: Mapping[str, Any], recorded: Mapping[str, float], rule_checked: int
+) -> dict[str, float]:
+    """기록된 `weights_effective` 가 `weights`·`rule_checked` 에서 **산술적으로
+    도출되는 값**과 같은지 교차 확인한다(결정 D(i) 둘째 문장).
+
+    도출식은 D12 그대로다 -- `rule_checked > 0` 이면 설정값 그대로,
+    `== 0` 이면 `{llm: w_llm/(w_llm+w_emb), emb: w_emb/(w_llm+w_emb),
+    rule: 0.0}`. 여기서 쓰는 수는 전부 trace 에 기록된 `weights` 에서
+    나오므로 이 함수는 가중치를 하드코딩하지 않는다. 비교는 `== 0` 기준
+    (허용오차 없음) -- `app/er/confidence.py::_effective_weights()` 와 같은
+    입력·같은 연산 순서라 비트까지 같아야 한다.
+    """
+
+    effective = breakdown.get("weights_effective")
+    if not isinstance(effective, Mapping):
+        raise TraceRecheckError(
+            "confidence_breakdown.weights_effective 가 없다"
+            " (D12 이전 trace 는 이 재계산 대상이 아니다)"
+        )
+    try:
+        dumped = {key: float(effective[key]) for key in ("llm", "emb", "rule")}
+    except (KeyError, TypeError, ValueError) as exc:
+        raise TraceRecheckError(f"weights_effective 를 읽을 수 없다: {exc}") from exc
+    if rule_checked > 0:
+        derived = dict(recorded)
+    else:
+        denom = recorded["llm"] + recorded["emb"]
+        derived = {
+            "llm": recorded["llm"] / denom,
+            "emb": recorded["emb"] / denom,
+            "rule": 0.0,
+        }
+    if dumped != derived:
+        raise TraceRecheckError(
+            f"weights_effective={dumped} 가 weights={dict(recorded)}·"
+            f"rule_checked={rule_checked} 에서 도출되는 값 {derived} 과 다르다(D12)"
+        )
+    return dumped
+
+
 def recompute_confidence(breakdown: Mapping[str, Any]) -> float:
-    """`confidence_breakdown` → `w_llm·s_llm + w_emb·s_emb + w_rule·s_rule`.
+    """`confidence_breakdown` → **관측된 신호만** 결합한 확신도(D12).
 
     산식을 여기에 다시 적지 않고 **제품 코드**
     `app.er.confidence.combine()` 을 그대로 부른다(두 번째 출처 금지) --
     `s_emb` 클램프와 덧셈 순서까지 같아야 기록값과 비트가 같다.
-    가중치는 trace 에 기록된 값을 쓰되 제품 상수 `app.settings.ER_WEIGHTS`
-    (원칙3)와 다르면 거부한다.
+
+    두 키의 분업(결정 D(i)):
+
+    - `weights`(설정값) ↔ 제품 상수 `app.settings.ER_WEIGHTS` 비교 -- 다르면
+      **거부**한다(원칙3, 종전 규약 그대로).
+    - `rule_checked` -- `combine(..., rule_checked=…)` 로 넘겨 재정규화
+      분기를 판정 때와 똑같이 태운다. `rule_checked == 0` 이면 제품이
+      `(w_llm·s_llm + w_emb·s_emb) / (w_llm + w_emb)` 를 계산한다.
+    - `weights_effective` -- 위 두 값에서 도출되는지 **교차 확인**한다
+      (`_check_weights_effective()`).
+
+    `weights_effective` 를 `combine()` 의 `config` 로 넘기지 않는 이유:
+    `(0.5·s + 0.3·e)/0.8` 과 `0.625·s + 0.37499999999999994·e` 는 연산
+    순서가 달라 마지막 비트가 어긋난다(무작위 20000 표본 중 7777건,
+    최대 2.22e-16 -- evidence `20260922-1955-u4-recompute-weights-choice.txt`).
+    판정 기준이 `abs diff == 0.0` 이므로 재계산은 **판정 때 제품이 실제로
+    부른 그 호출**(설정 가중치 + `rule_checked`)을 그대로 재현한다.
     """
 
     weights = breakdown.get("weights")
@@ -922,6 +1011,8 @@ def recompute_confidence(breakdown: Mapping[str, Any]) -> float:
         raise TraceRecheckError(
             f"weights={recorded} 가 제품 상수 ER_WEIGHTS={dict(ER_WEIGHTS)} 와 다르다(원칙3)"
         )
+    rule_checked = _recorded_rule_checked(breakdown)
+    _check_weights_effective(breakdown, recorded, rule_checked)
     signals: dict[str, float] = {}
     for key in ("s_llm", "s_emb", "s_rule"):
         value = breakdown.get(key)
@@ -933,6 +1024,7 @@ def recompute_confidence(breakdown: Mapping[str, Any]) -> float:
         signals["s_emb"],
         signals["s_rule"],
         _Weights(w_llm=recorded["llm"], w_emb=recorded["emb"], w_rule=recorded["rule"]),
+        rule_checked=rule_checked,
     )
 
 
@@ -1029,11 +1121,16 @@ def recheck_trace_dump(path: Path | str) -> TraceRecheck:
 def format_trace_recheck(result: TraceRecheck) -> list[str]:
     """`[traces] …` 요약 줄(성공·실패 공통). 실패는 최대 10건까지 보인다."""
 
+    _W = {key: float(value) for key, value in ER_WEIGHTS.items()}
     lines = [
         f"[traces] dumped={result.dumped} recomputed={result.recomputed} "
         f"max_abs_diff={result.max_abs_diff!r} path={result.path}",
-        f"[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, "
-        f"weights={dict(ER_WEIGHTS)}, 기준 abs diff == 0)",
+        # D12 -- 관측된 신호만 결합한다. 가중치 숫자는 제품 상수에서 찍는다
+        # (여기에 다시 적지 않는다, 원칙3).
+        f"[traces] rule=rule_checked>0: {_W['llm']}·s_llm+{_W['emb']}·s_emb+{_W['rule']}·s_rule "
+        f"| rule_checked==0: ({_W['llm']}·s_llm+{_W['emb']}·s_emb)/{_W['llm'] + _W['emb']} "
+        f"(D12 관측 신호 재정규화, app.er.confidence.combine, weights={dict(ER_WEIGHTS)}, "
+        f"기준 abs diff == 0)",
     ]
     for message in result.failures[:10]:
         lines.append(f"[fail] traces: {message}")
