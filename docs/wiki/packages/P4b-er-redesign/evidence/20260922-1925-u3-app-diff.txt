@@ -1,0 +1,6 @@
+warning: in the working copy of 'app/er/pipeline.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/er/types.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/settings.py', LF will be replaced by CRLF the next time Git touches it
+app/er/pipeline.py
+app/er/types.py
+app/settings.py

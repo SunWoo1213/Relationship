@@ -37,6 +37,14 @@ ER_VERSION = "1"
 #: "가중치 합 1.0(오차 1e-9)").
 _WEIGHT_SUM_TOLERANCE = 1e-9
 
+#: `ERConfig.penalized_merge_policy` 허용 어휘(D13 "코드에서 지켜야 할
+#: 것" 3항, P4b-er-redesign 01-plan 결정 B(i)). `"ask"`(기본) -- 감점
+#: 후보(`ScoredCandidate.penalized_by` 비어 있지 않음)가 3단계에서
+#: `band == "merge"` 로 귀속되면 `identity` 로 강등한다(`app/er/pipeline.py`
+#: 소관). `"merge"` -- 강등하지 않고 그대로 자동 연결한다(비권장, 결정
+#: A(ii)).
+_PENALIZED_MERGE_POLICIES = ("ask", "merge")
+
 
 class JudgeUnavailable(Exception):
     """3단계 LLM 판정 실패(타임아웃·API 오류·스키마 위반·범위 밖 `s_llm`,
@@ -306,6 +314,16 @@ class ERConfig:
     생성 시 가중치 합 1.0(오차 1e-9)과 `0 ≤ t_new ≤ t_merge ≤ 1` 을
     검증한다 -- 위반하면 `InvalidValue`(원칙8: 튜닝은 P4 결과로만 하고,
     잘못된 설정으로 조용히 돌아가지 않는다).
+
+    `penalized_merge_policy`(D13·P4b 결정 A·B, U3): 감점 후보(`penalized_by`
+    비어 있지 않음)가 3단계에서 `band == "merge"` 로 귀속됐을 때의 보수
+    분기 정책 -- `"ask"`(기본, 결정 A(i))는 `identity` 로 강등하되
+    `relaxed_pass == True`(인접 위계 완화 통과) 후보는 예외로 자동 연결을
+    유지한다(승진 회귀 성립 조건). `"merge"`(결정 A(ii))는 강등 없이
+    그대로 연결한다. 적용은 `app/er/pipeline.py::_run_pipeline` 이 한다 --
+    이 필드는 설정값만 들고 있다(결정8 1층 모듈 상수 = `app.settings.
+    ER_PENALIZED_MERGE_POLICY`, 2층 환경변수 = `er_config()`, 3층 인자
+    주입은 `resolve(config=ERConfig(...))`).
     """
 
     t_merge: float = 0.8
@@ -316,6 +334,7 @@ class ERConfig:
     top_k: int = SEARCH_TOP_K
     judge_timeout: float = 20.0
     judge_max_retries: int = 1
+    penalized_merge_policy: str = "ask"
 
     def __post_init__(self) -> None:
         weight_sum = self.w_llm + self.w_emb + self.w_rule
@@ -327,6 +346,11 @@ class ERConfig:
             raise InvalidValue(
                 "ERConfig: thresholds must satisfy 0 <= t_new <= t_merge <= 1 "
                 f"(got t_new={self.t_new!r}, t_merge={self.t_merge!r})"
+            )
+        if self.penalized_merge_policy not in _PENALIZED_MERGE_POLICIES:
+            raise InvalidValue(
+                "ERConfig: penalized_merge_policy must be one of "
+                f"{_PENALIZED_MERGE_POLICIES} (got {self.penalized_merge_policy!r})"
             )
 
     def to_dict(self) -> dict[str, Any]:

@@ -268,6 +268,32 @@ def test_er_config_uses_os_environ_when_env_is_none(monkeypatch: pytest.MonkeyPa
 
 
 # ---------------------------------------------------------------------------
+# er_config(env) — ER_PENALIZED_MERGE_POLICY (D13 "코드에서 지켜야 할 것"
+# 3항, P4b-er-redesign 01-plan 결정 B(i))
+# ---------------------------------------------------------------------------
+
+
+def test_er_config_penalized_merge_policy_defaults_to_ask_when_env_missing() -> None:
+    config = er_config({})
+    assert config.penalized_merge_policy == "ask"
+
+
+def test_er_config_penalized_merge_policy_reads_override_from_env() -> None:
+    config = er_config({"ER_PENALIZED_MERGE_POLICY": "merge"})
+    assert config.penalized_merge_policy == "merge"
+
+
+def test_er_config_penalized_merge_policy_empty_string_falls_back_to_default() -> None:
+    config = er_config({"ER_PENALIZED_MERGE_POLICY": ""})
+    assert config.penalized_merge_policy == "ask"
+
+
+def test_er_config_penalized_merge_policy_invalid_value_raises_invalid_value() -> None:
+    with pytest.raises(InvalidValue):
+        er_config({"ER_PENALIZED_MERGE_POLICY": "deny"})
+
+
+# ---------------------------------------------------------------------------
 # decide() — 경로별 귀속 규약
 # ---------------------------------------------------------------------------
 

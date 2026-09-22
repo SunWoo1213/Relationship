@@ -54,6 +54,21 @@ def test_thresholds_may_be_equal() -> None:
     ERConfig(t_new=0.5, t_merge=0.5)
 
 
+def test_default_penalized_merge_policy_is_ask() -> None:
+    # D13 "코드에서 지켜야 할 것" 3항 -- 기본값은 강등(결정 B(i)).
+    assert ERConfig().penalized_merge_policy == "ask"
+
+
+def test_penalized_merge_policy_merge_is_accepted() -> None:
+    config = ERConfig(penalized_merge_policy="merge")
+    assert config.penalized_merge_policy == "merge"
+
+
+def test_invalid_penalized_merge_policy_rejected() -> None:
+    with pytest.raises(InvalidValue):
+        ERConfig(penalized_merge_policy="deny")
+
+
 def test_trace_constants_are_reserved_values() -> None:
     assert ER_TRACE_STEP == "er_resolve"
     assert ER_TRACE_TOOL_NAME == "er"

@@ -1,0 +1,13 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/ -q --tb=no -rf  (메인 세션 재확인)
+........................................................................ [ 82%]
+........................................................................ [ 87%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+................                                                         [100%]
+=========================== short test summary info ===========================
+FAILED tests/test_run_pilot_eval.py::test_dry_run_chain_produces_all_outputs
+FAILED tests/test_run_pilot_eval.py::test_dry_run_logs_embedded_alias_count_per_scenario
+FAILED tests/test_run_pilot_eval.py::test_dry_run_dumps_traces_before_rollback_and_rechecks
+FAILED tests/test_run_pilot_eval.py::test_dry_run_metrics_json_is_byte_identical
+FAILED tests/test_run_pilot_eval.py::test_chain_gzips_raw_and_feeds_the_gz_to_every_stage
+5 failed, 1307 passed in 150.23s (0:02:30)

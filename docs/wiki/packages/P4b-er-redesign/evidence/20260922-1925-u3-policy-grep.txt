@@ -1,0 +1,53 @@
+=== ER_PENALIZED_MERGE_POLICY grep ===
+app/er/pipeline.py:57:(기본 `"ask"`, `app.settings.ER_PENALIZED_MERGE_POLICY`)에 따라 `identity`
+app/er/types.py:325:    ER_PENALIZED_MERGE_POLICY`, 2층 환경변수 = `er_config()`, 3층 인자
+Binary file app/er/__pycache__/pipeline.cpython-313.pyc matches
+Binary file app/er/__pycache__/types.cpython-313.pyc matches
+app/settings.py:91:#: 그대로 연결한다. `.env.example` 의 `ER_PENALIZED_MERGE_POLICY` 환경변수
+app/settings.py:94:ER_PENALIZED_MERGE_POLICY = "ask"
+app/settings.py:121:    `W_RULE`/`ER_PENALIZED_MERGE_POLICY`(D13, U3) 환경변수를 읽어
+app/settings.py:166:        "ER_PENALIZED_MERGE_POLICY", ER_PENALIZED_MERGE_POLICY, ("ask", "merge")
+Binary file app/__pycache__/settings.cpython-313.pyc matches
+
+=== D13/U3 vocab grep (penalized_by, excluded_by) ===
+app/er/rules.py:18:이상 배제 사유가 아니다 -- 후보를 목록에서 빼지 않고 `penalized_by` 로
+app/er/rules.py:26:`penalized_by` 는 `relation_tag_conflict`·`hierarchy_conflict` 충돌을
+app/er/rules.py:29:정보 손실 방지, U2 03-log "penalized_by 형태" 결정). **완화 통과
+app/er/rules.py:30:(`relaxed_pass=True`) 후보도 `penalized_by` 를 엄격 평가 그대로 채운다**
+app/er/rules.py:32:(`relaxed_pass`)로만 판별하고, 감점 표시(`penalized_by`) 자체는 지우지
+app/er/rules.py:33:않는다(정보 손실 없음). `dictionary_conflict` 는 `penalized_by` 에
+app/er/rules.py:37:`penalized_by`/`conflicts` 에 반영**한다. `relaxed=True` 는
+app/er/rules.py:42:(여전히 `hierarchy_conflict` 감점이 `conflicts`/`penalized_by` 에 남는다).
+app/er/rules.py:78:#: `dictionary_conflict` 뿐이다. (2) `penalized_by` -- 배제되지 않은
+app/er/rules.py:83:#: `penalized_by` 에는 절대 등장하지 않는 사유 -- 사전 모순은 감점이 아니라
+app/er/rules.py:120:    (R-4 채택안: `penalized_by` 는 엄격 평가 결과를 그대로 담고, 완화 통과
+app/er/rules.py:178:    `passed_rules`·`excluded_by`·`relaxed_pass`·`penalized_by` 를 채운 새
+app/er/rules.py:183:    `penalized_by` 는 `relation_tag_conflict`·`hierarchy_conflict` 를
+app/er/rules.py:197:        penalized_by = tuple(name for name in _CONFLICT_PRIORITY if name in penalizing_conflicts)
+app/er/rules.py:208:                penalized_by=penalized_by,
+app/er/rules.py:251:    사실 주장 (b)). 그래서 트리거를 **"감점 없는(=`penalized_by` 가 빈)
+app/er/rules.py:264:    unpenalized = [c for c in strict_passed if not c.penalized_by]
+app/er/types.py:42:#: 후보(`ScoredCandidate.penalized_by` 비어 있지 않음)가 3단계에서
+app/er/types.py:80:    `relaxed_pass`/`penalized_by` 는 생성 시 기본값(미평가 상태)이고,
+app/er/types.py:85:    뿐이고 `passed_rules` 는 "배제되지 않았다"를 뜻한다. `penalized_by` 는
+app/er/types.py:89:    모듈 docstring "penalized_by" 절과 동일 규약). 빈 튜플은 "감점 없음"
+app/er/types.py:106:    penalized_by: tuple[str, ...] = field(default_factory=tuple)
+app/er/types.py:123:            "penalized_by": list(self.penalized_by),
+app/er/types.py:187:        "penalized_by": list(candidate.penalized_by),
+app/er/types.py:318:    `penalized_merge_policy`(D13·P4b 결정 A·B, U3): 감점 후보(`penalized_by`
+app/er/pipeline.py:50:포함, `penalized_by` 비어 있지 않은 후보도)를 `passed` 로 돌려주고, 이
+app/er/pipeline.py:55:(`decision.matched_person_id`)가 감점 후보(`penalized_by` 비어 있지 않음)
+app/er/pipeline.py:128:    == "merge"` 이고 귀속된 후보가 감점 후보(`penalized_by` 비어 있지
+app/er/pipeline.py:148:    if matched is None or not matched.penalized_by or matched.relaxed_pass:
+
+21:가 없다)로 바뀐다 -- 감점된 후보도 `passed_rules=True` 다. `excluded_by`
+28:**정렬된 목록** -- `excluded_by` 와 달리 복수 사유를 모두 남긴다, 원칙9
+75:#: `dictionary_conflict`. D13 이전에는 `excluded_by` 대표 사유 하나를
+77:#: `excluded_by` -- 이 셋 중 실제로 배제를 일으키는 것은
+116:    `conflicts` 는 `s_rule` 분자(=`rule_passed`)·`excluded_by`(D13 이후
+178:    `passed_rules`·`excluded_by`·`relaxed_pass`·`penalized_by` 를 채운 새
+181:    D13 이후: `excluded_by` 는 `dictionary_conflict` 뿐이고(`_EXCLUSION_ONLY_CONFLICT`),
+182:    `passed_rules` 는 "배제되지 않았다"(`excluded_by is None`)를 뜻한다.
+196:        excluded_by = _EXCLUSION_ONLY_CONFLICT if _EXCLUSION_ONLY_CONFLICT in conflicts else None
+205:                passed_rules=excluded_by is None,
+206:                excluded_by=excluded_by,

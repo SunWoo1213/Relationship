@@ -84,6 +84,15 @@ ER_TOP_K = SEARCH_TOP_K
 ER_JUDGE_TIMEOUT = 20.0
 ER_JUDGE_MAX_RETRIES = 1
 
+#: 보수 분기 정책 초기값(D13 "코드에서 지켜야 할 것" 3항, P4b-er-redesign
+#: 01-plan 결정 B(i)) -- 감점 후보(`ScoredCandidate.penalized_by` 비어
+#: 있지 않음)가 `app/er/pipeline.py` 3단계에서 `band == "merge"` 로
+#: 귀속되면 `"ask"`(기본)는 `identity` 로 강등하고, `"merge"`는 강등 없이
+#: 그대로 연결한다. `.env.example` 의 `ER_PENALIZED_MERGE_POLICY` 환경변수
+#: (2층)가 이 값을 오버라이드한다(`er_config()`). 값 어휘는
+#: `app.er.types.ERConfig.penalized_merge_policy`(단일 출처)와 같다.
+ER_PENALIZED_MERGE_POLICY = "ask"
+
 #: 3단계 LLM 판정 공급자 기본값(D11 결정 2, 2026-09-11 -- 사용자 결정
 #: "현재는 OpenAI 로만 실행"). `app/er/judge.py` 의 `select_provider()`/
 #: `judge_from_env()` 와 베이스라인 단일 프롬프트 caller 모듈
@@ -109,10 +118,12 @@ ER_TOLERANCE = 1e-9
 
 def er_config(env: dict[str, str] | None = None) -> "ERConfig":
     """`.env.example` 이 이름을 정한 `T_MERGE`/`T_NEW`/`W_LLM`/`W_EMB`/
-    `W_RULE` 환경변수를 읽어 `ERConfig` 를 만든다(결정8 2층). 이름을 새로
-    만들지 않는다 -- `app.tools.types.InvalidValue` 는 `ERConfig` 생성
-    자체(가중치 합·임계치 순서 검증)에서 던져지고, 이 함수는 **문자열
-    파싱 실패**에도 같은 예외를 사람이 읽는 메시지로 던진다.
+    `W_RULE`/`ER_PENALIZED_MERGE_POLICY`(D13, U3) 환경변수를 읽어
+    `ERConfig` 를 만든다(결정8 2층). 이름을 새로 만들지 않는다 --
+    `app.tools.types.InvalidValue` 는 `ERConfig` 생성 자체(가중치 합·
+    임계치 순서·`penalized_merge_policy` 어휘 검증)에서 던져지고, 이
+    함수는 **문자열 파싱 실패**(`float` 변환 실패·허용 어휘 밖 값)에도
+    같은 예외를 사람이 읽는 메시지로 던진다.
 
     `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()` 와 같은 규약).
     `.env` 파일 자체는 읽지 않는다(security.md §1).
@@ -135,11 +146,25 @@ def er_config(env: dict[str, str] | None = None) -> "ERConfig":
                 f"float (got {raw!r})"
             ) from exc
 
+    def _read_choice(name: str, default: str, choices: tuple[str, ...]) -> str:
+        raw = env.get(name)
+        if raw is None or raw == "":
+            return default
+        if raw not in choices:
+            raise InvalidValue(
+                f"er_config: environment variable {name!r} must be one of "
+                f"{choices} (got {raw!r})"
+            )
+        return raw
+
     t_merge = _read_float("T_MERGE", ER_T_MERGE)
     t_new = _read_float("T_NEW", ER_T_NEW)
     w_llm = _read_float("W_LLM", ER_WEIGHTS["llm"])
     w_emb = _read_float("W_EMB", ER_WEIGHTS["emb"])
     w_rule = _read_float("W_RULE", ER_WEIGHTS["rule"])
+    penalized_merge_policy = _read_choice(
+        "ER_PENALIZED_MERGE_POLICY", ER_PENALIZED_MERGE_POLICY, ("ask", "merge")
+    )
 
     return ERConfig(
         t_merge=t_merge,
@@ -150,6 +175,7 @@ def er_config(env: dict[str, str] | None = None) -> "ERConfig":
         top_k=ER_TOP_K,
         judge_timeout=ER_JUDGE_TIMEOUT,
         judge_max_retries=ER_JUDGE_MAX_RETRIES,
+        penalized_merge_policy=penalized_merge_policy,
     )
 
 

@@ -440,12 +440,19 @@ def test_apply_resolution_promotion_connects_via_relaxed_retry_promotion(
     assert candidate.rule_passed == 2
     assert abs(candidate.s_rule - (2 / 3)) < 1e-9
     assert candidate.s_emb >= 0.8
+    # D13(P4b-er-redesign U2/U3): 위계 불일치는 완화 통과 후에도
+    # penalized_by 에 그대로 남는다(R-4) -- 이 후보가 결정 A(i) 의
+    # "relaxed_pass == True 예외"에 걸려 U3 보수 분기가 강등하지 **않고**
+    # merge 를 유지한다는 것을 이 테스트가 증명한다(band_by_threshold 도
+    # merge 로 같아야 한다 -- 강등되지 않았으므로).
+    assert candidate.penalized_by == ("hierarchy_conflict",)
 
     breakdown = result.confidence_breakdown
     assert breakdown["s_llm"] == 0.95
     assert breakdown["confidence"] >= 0.8
     assert abs(breakdown["confidence"] - 0.863) < 0.01
     assert result.band == "merge"
+    assert result.band_by_threshold == "merge"
     assert result.forced_reason is None
 
     applied = apply_resolution(ctx, result)
@@ -584,6 +591,130 @@ def test_apply_resolution_homonym_splits_into_identity_question_homonym(
     )
     assert len(rows) == 1
     assert rows[0].kind == "identity"
+
+
+# ---------------------------------------------------------------------------
+# U3 -- D13 보수 분기(결정 A·B): 감점 후보가 merge 로 귀속되면 강등
+# ---------------------------------------------------------------------------
+
+
+def test_resolve_downgrades_penalized_merge_to_identity_by_default_downgrade(
+    db_session, fake_embedder
+):
+    """결정 A(i)·B(i) -- `relation_tag_conflict` 로 감점된 후보(위계
+    완화와 무관, `relaxed_pass=False`)가 순수 산식으로 `band=="merge"`
+    를 내더라도(`s_llm=1.0`·`s_emb=1.0`·`s_rule=0.5` -> `confidence=0.9`),
+    기본 정책(`ERConfig.penalized_merge_policy == "ask"`)은 `identity` 로
+    강등하고 `forced_reason="penalized_candidate"` 를 남긴다.
+    `band_by_threshold` 는 순수 산식 값("merge")을 그대로 보존한다(원칙9,
+    판정 기록을 덮어쓰지 않는다). R-8: 두 번째(감점되지 않은) 후보와 함께
+    `ask_payload["context"]["candidate_ids"]` 에 **감점 후보도 포함**돼
+    사용자가 칩에서 고를 수 있다(원칙1 "후보를 숨기지 않는다")."""
+
+    session_id = "er-downgrade-penalized-merge-default"
+    embedder = fake_embedder
+    matched = _make_person(
+        db_session, display_name="김철수", relation_tag="친구", hierarchy="동"
+    )
+    _add_alias(db_session, matched, "김철수", embedding=embedder(["김철수"])[0])
+    other = _make_person(
+        db_session, display_name="박영희", relation_tag="가족", hierarchy="동"
+    )
+    _add_alias(db_session, other, "박영희", embedding=embedder(["박영희"])[0])
+
+    ctx = _ctx(db_session, session_id=session_id, embedder=embedder)
+    judge = FakeJudge(table={matched.id: 1.0}, pick=matched.id)
+
+    result = resolve(
+        ctx,
+        "김철수",
+        "김철수가 또 전화했어",
+        {"relation_tag": "가족", "hierarchy": "동"},
+        judge=judge,
+        config=ERConfig(),
+    )
+
+    candidate = next(c for c in result.candidates if c.person_id == matched.id)
+    assert candidate.rule_checked == 2
+    assert candidate.rule_passed == 1
+    assert abs(candidate.s_rule - 0.5) < 1e-9
+    assert candidate.penalized_by == ("relation_tag_conflict",)
+    assert candidate.relaxed_pass is False
+
+    breakdown = result.confidence_breakdown
+    assert abs(breakdown["confidence"] - 0.9) < 1e-9
+    assert breakdown["matched_person_id"] == matched.id  # decide() 원 귀속값 보존
+    assert result.band_by_threshold == "merge"  # 순수 산식 밴드는 보존
+    assert result.band == "identity"  # 보수 분기가 강등
+    assert result.forced_reason == "penalized_candidate"
+    assert result.decision["band"] == "identity"
+    assert result.decision["band_by_threshold"] == "merge"
+    assert result.decision["forced_reason"] == "penalized_candidate"
+    assert result.decision["action"] == "ask_identity"
+    assert result.matched_person_id == matched.id  # 귀속 사실은 지우지 않는다
+
+    ask_payload = result.ask_payload
+    assert ask_payload is not None
+    assert ask_payload["kind"] == "identity"
+    candidate_ids = ask_payload["context"]["candidate_ids"]
+    assert matched.id in candidate_ids.values()  # R-8: 감점 후보도 선택지에
+    assert other.id in candidate_ids.values()
+
+    applied = apply_resolution(ctx, result)
+    assert applied.band == "identity"
+    assert applied.action == "ask_identity"
+    assert applied.person_id is None
+    assert applied.pending_question_id is not None
+
+    rows = (
+        db_session.execute(
+            select(PendingQuestion).where(PendingQuestion.session_id == session_id)
+        )
+        .scalars()
+        .all()
+    )
+    assert len(rows) == 1
+    assert rows[0].kind == "identity"
+
+
+def test_resolve_keeps_penalized_merge_when_policy_is_merge_override(
+    db_session, fake_embedder
+):
+    """결정 A(ii) -- `ERConfig(penalized_merge_policy="merge")` 이면
+    감점 후보라도 강등하지 않고 그대로 `merge` 를 유지한다(권장하지
+    않는 대안이지만, 설정값 하나로 켜고 끌 수 있어야 한다는 D13 "코드에서
+    지켜야 할 것" 3항의 다른 절반)."""
+
+    session_id = "er-penalized-merge-policy-override"
+    embedder = fake_embedder
+    matched = _make_person(
+        db_session, display_name="김철수", relation_tag="친구", hierarchy="동"
+    )
+    _add_alias(db_session, matched, "김철수", embedding=embedder(["김철수"])[0])
+
+    ctx = _ctx(db_session, session_id=session_id, embedder=embedder)
+    judge = FakeJudge(table={matched.id: 1.0}, pick=matched.id)
+
+    result = resolve(
+        ctx,
+        "김철수",
+        "김철수가 또 전화했어",
+        {"relation_tag": "가족", "hierarchy": "동"},
+        judge=judge,
+        config=ERConfig(penalized_merge_policy="merge"),
+    )
+
+    candidate = next(c for c in result.candidates if c.person_id == matched.id)
+    assert candidate.penalized_by == ("relation_tag_conflict",)
+    assert result.band == "merge"
+    assert result.band_by_threshold == "merge"
+    assert result.forced_reason is None
+    assert result.decision["action"] == "merge"
+
+    applied = apply_resolution(ctx, result)
+    assert applied.band == "merge"
+    assert applied.action == "merge"
+    assert applied.person_id == matched.id
 
 
 def test_apply_resolution_updates_only_three_decision_fields_via_raw_sql_applied(

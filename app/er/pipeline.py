@@ -43,6 +43,35 @@ U7).
 절, U6 이 넣은 최소 확장). `Resolution` 은 frozen dataclass 이므로
 `dataclasses.replace()` 로 새 인스턴스를 만든다 -- `object.__setattr__` 로
 제자리 수정하지 않는다.
+
+## 보수 분기 (D13, P4b-er-redesign 결정 A·B, U3)
+
+2단계(`run_rule_stage`)는 D13 이후 배제되지 않은 후보 전체(감점 후보
+포함, `penalized_by` 비어 있지 않은 후보도)를 `passed` 로 돌려주고, 이
+함수는 그 `passed` 를 그대로 3단계 LLM(`judge.judge`)과 4단계
+(`confidence.decide`)에 넘긴다 -- 후보를 숨기지 않는다(원칙1).
+
+`decide()` 가 순수 산식으로 `band == "merge"` 를 내더라도, 귀속된 후보
+(`decision.matched_person_id`)가 감점 후보(`penalized_by` 비어 있지 않음)
+이면 `_downgrade_penalized_merge()` 가 `config.penalized_merge_policy`
+(기본 `"ask"`, `app.settings.ER_PENALIZED_MERGE_POLICY`)에 따라 `identity`
+로 강등한다 -- 확신도가 `T_merge` 를 넘어도 규칙 필터가 이미 경고한
+후보는 자동 연결하지 않고 사용자에게 묻는다(원칙1 "오병합은 미검출보다
+훨씬 나쁘다"). **단 `relaxed_pass == True`(인접 위계 완화 통과) 후보는
+명시적 예외**다 -- 그렇지 않으면 승진 케이스(회귀 1)가 항상 `identity`
+로 묶여 "완화 재검색 후 자동 연결"이 성립하지 않는다(D13 R-4, 결정 A(i)).
+
+강등은 **판정 기록을 덮어쓰지 않는다**(원칙9) -- `Decision.band_by_threshold`
+(순수 산식이 낸 밴드, 이 경우 `"merge"`)는 그대로 두고 `band`/
+`forced_reason`(`"penalized_candidate"`)/`action` 세 필드만 바꾼 새
+`Decision` 을 `dataclasses.replace()` 로 만든다. `confidence`/
+`confidence_breakdown`/`matched_person_id` 도 그대로 -- "누가·얼마나
+귀속됐는가"라는 사실은 강등 여부와 무관하게 보존된다. 강등된 뒤의
+`band == "identity"` 는 `_build_ask_payload()` 를 그대로 타므로,
+`ask_payload["context"]["candidate_ids"]` 에는 `passed`(감점 후보 포함)
+전체 중 `s_emb` 상위 후보가 담긴다 -- 감점 후보도 사용자가 고를 수 있는
+선택지에서 빠지지 않는다(원칙1 "확신이 없으면 묻는 것이지 후보를 숨기는
+것이 아니다").
 """
 
 from __future__ import annotations
@@ -54,7 +83,7 @@ from sqlalchemy.orm.attributes import flag_modified
 
 from app.db.models import AgentTrace
 from app.er.candidates import search_candidates
-from app.er.confidence import decide
+from app.er.confidence import Decision, decide
 from app.er.judge import Judge, JudgeUnavailable, judge_from_env
 from app.er.rules import run_rule_stage
 from app.er.types import (
@@ -78,6 +107,59 @@ _MAX_IDENTITY_OPTIONS = 3
 _IDENTITY_REJECT_OPTION = "아니요, 다른 사람이에요"
 _NEW_PERSON_CONFIRM_OPTION = "네, 기억해둘게요"
 _NEW_PERSON_REJECT_OPTION = "아니요"
+
+#: D13 보수 분기(결정 A·B)의 `forced_reason` 값 -- `app/er/confidence.py`
+#: 의 `no_candidates`/`llm_failed`/`no_matched`/`out_of_range_id` 와 같은
+#: 자리의 다섯 번째 값이지만, 이 값은 `decide()` 안이 아니라 이 모듈의
+#: 후처리(`_downgrade_penalized_merge`)에서만 매겨진다 -- `decide()` 는
+#: 규칙 필터 감점을 모르는 순수 확신도 산식만 담당한다(관심사 분리).
+FORCED_REASON_PENALIZED_CANDIDATE = "penalized_candidate"
+
+#: 강등된 뒤의 action(`app.er.confidence._ACTION_BY_BAND["identity"]` 와
+#: 같은 값) -- 사설 매핑을 다시 만들지 않고 이 한 값만 상수로 둔다(강등은
+#: 항상 `merge -> identity` 한 방향뿐이라 표가 필요 없다).
+_DOWNGRADED_ACTION = "ask_identity"
+
+
+def _downgrade_penalized_merge(
+    decision: Decision, passed: list[ScoredCandidate], config: ERConfig
+) -> Decision:
+    """D13 보수 분기(P4b-er-redesign 01-plan 결정 A·B, U3). `decision.band
+    == "merge"` 이고 귀속된 후보가 감점 후보(`penalized_by` 비어 있지
+    않음)이면, `config.penalized_merge_policy == "ask"`(기본값) 일 때
+    `identity` 로 강등한다. `relaxed_pass == True`(인접 위계 완화 통과)
+    후보는 **명시적 예외**로 강등하지 않는다(결정 A(i), D13 R-4 -- 승진
+    회귀가 이 예외에 걸린다). 강등할 필요가 없으면 `decision` 을 그대로
+    돌려준다(불필요한 복사 없음).
+
+    판정 기록을 덮어쓰지 않는다(원칙9) -- `band_by_threshold`/`confidence`/
+    `confidence_breakdown`/`matched_person_id` 는 그대로 두고 `band`/
+    `forced_reason`/`action`(과 `decision` dict 안의 같은 세 키)만 바꾼다.
+    """
+
+    if decision.band != "merge":
+        return decision
+    if config.penalized_merge_policy != "ask":
+        return decision
+
+    matched = next(
+        (c for c in passed if c.person_id == decision.matched_person_id), None
+    )
+    if matched is None or not matched.penalized_by or matched.relaxed_pass:
+        return decision
+
+    decision_payload = dict(decision.decision)
+    decision_payload["band"] = "identity"
+    decision_payload["forced_reason"] = FORCED_REASON_PENALIZED_CANDIDATE
+    decision_payload["action"] = _DOWNGRADED_ACTION
+
+    return replace(
+        decision,
+        band="identity",
+        forced_reason=FORCED_REASON_PENALIZED_CANDIDATE,
+        action=_DOWNGRADED_ACTION,
+        decision=decision_payload,
+    )
 
 
 def _build_ask_payload(
@@ -188,6 +270,7 @@ def _run_pipeline(
             llm_error = str(exc)
 
     decision = decide(judgement=judgement, passed=passed, llm_failed=llm_failed, config=config)
+    decision = _downgrade_penalized_merge(decision, passed, config)
 
     llm_payload: dict[str, Any] = {
         "provider": judgement.provider if judgement is not None else None,
