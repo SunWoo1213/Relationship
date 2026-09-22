@@ -58,7 +58,7 @@
 
 ### P4 — 게이트
 
-- [ ] [eval-agent] **파일럿 평가** (오병합률·미검출률·보정표·곡선 초안) / 의존: P3, P3-llm-providers / 수용기준: `reports/metrics.json`, `reports/calibration.json` 생성. **미달이면 재시도가 아니라 실패 케이스 분석을 산출물로 남기고 ER 설계(resolution-plan 3.3)를 재설계한다**
+- [x] [eval-agent] **파일럿 평가** (오병합률·미검출률·보정표·곡선 초안) / 의존: P3, P3-llm-providers / 수용기준: `reports/metrics.json`, `reports/calibration.json` 생성. **미달이면 재시도가 아니라 실패 케이스 분석을 산출물로 남기고 ER 설계(resolution-plan 3.3)를 재설계한다** — **부분완료(2026-09-22, verifier 04-review)**: 실 실행 ef18143(openai gpt-4o-mini-2024-07-18, 40건·7050행), 게이트 결정 K 미달(`embedding_only` 지배, D10 방향 ✔), 실패 케이스 분석 ea1bbb2(`reports/failure_cases.md`: 2단계 규칙 필터 배제 6건·4단계 미측정 s_rule=0 합산 상한 0.80). 재설계 = `/devlog change` CR(①4단계 가중치 재정규화 + ②2단계 배제→감점, 사용자 결정). P5 미착수
 
 ### P5
 

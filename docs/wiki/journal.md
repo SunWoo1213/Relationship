@@ -186,3 +186,7 @@
 - 2026-09-22 15:02 | COMMIT | ea1bbb2 eval(P4-pilot-eval): U8 실패 케이스 분석 — 오류 2건은 2단계 규칙 필터, 마찰 52건은 4단계 확신도 상한
 - 2026-09-22 | DECISION | 사용자: /devlog change 후보 = ①4단계 미측정 신호 가중치 재정규화 + ②2단계 규칙 필터 배제→감점 을 한 CR 로(D 카드 2개, 각각 수용/부분/거절). 순서 = P4 done(부분완료 + 실패 케이스 분석) → CR. ③T_merge 단독 재설정·s_llm 보정은 올리지 않음 | P4-pilot-eval
 - 2026-09-22 15:24 | VERIFY | U9 기계 검증: 전체 pytest 1차 2 failed/1283(U6 테스트가 reports/ 부재 단언 — U7 커밋 후 구조적 실패, 사용자 결정으로 메인 세션이 스냅샷 비교로 수정) → 재실행 **1285 passed rc=0**(evidence 20260922-1450-u9-pytest-all.txt), 스텁 dry-run rc=0, verify-plan FAIL 0/WARN 3, registry P4 pending 0 | P4-pilot-eval
+- 2026-09-22 15:26 | COMMIT | f01ea35 test(P4-pilot-eval): U9 수용 기준 기계 검증 — 1285 passed, 테스트 전제 결함 2건 수정, registry 해시 확정
+- 2026-09-22 15:27 | PUSH | origin dev f01ea35 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-22 15:40 | DECISION | 사용자: dev 푸시 f01ea35 L-003 = 보류(승격은 P4 04-review 뒤 한 번에), 마커 해제 후 /devlog done 진행 — verifier 04-review 위임 승인(L-004) | P4-pilot-eval
+- 2026-09-22 16:20 | DONE | P4-pilot-eval 부분완료 — verifier 04-review(FAIL 0, 수용 기준 backlog 61행 SAME, 판정 표 13/14, 부정 20/20, 게이트 결정 K 미달 dominated_by=[embedding_only]·D10 ✔, 열린 [필수] 0), 사용자 승인. F-0ffff5·F-2f0840·F-95c6a7·F-14f3ef 해소, P3-er F-251dc2·F-bdd6c5 해소, review-index R4 보정표 실물·R9 실 공급자 확인. CURRENT active none. 다음 /devlog change(CR ①+②) | P4-pilot-eval

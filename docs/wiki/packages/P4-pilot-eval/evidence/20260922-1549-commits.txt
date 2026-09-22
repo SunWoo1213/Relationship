@@ -1,0 +1,17 @@
+f01ea35 test(P4-pilot-eval): U9 수용 기준 기계 검증 — 1285 passed, 테스트 전제 결함 2건 수정, registry 해시 확정
+ea1bbb2 eval(P4-pilot-eval): U8 실패 케이스 분석 — 오류 2건은 2단계 규칙 필터, 마찰 52건은 4단계 확신도 상한
+ef18143 eval(P4-pilot-eval): U7 실 공급자 1회 실행 — 40건·7050행, 게이트 미달(embedding_only 지배)
+750f11b docs(P4-pilot-eval): 스모크 08 실호출 등재·03·08 P4 이관 — F-87c597 해소·R4 실호출 확인
+2ebf061 docs(P4-pilot-eval): 스모크 03 실호출 증거 등재 — OpenAI 첫 실호출(F-87c597 1/3)
+1c84d35 docs(P4-pilot-eval): 01-plan 원시 판정 경로 표기 .gz 개정 — 결정 E 이행 방식 gzip
+1a5643b feat(P4-pilot-eval): U7 선행 2 — 원시 판정 JSONL gzip 지원·5MB 크기 가드, 테스트 19건
+e7f0a9c feat(P4-pilot-eval): U7 선행 보강 — er_resolve trace 전량 덤프·확신도 재계산 diff 0, 테스트 19건
+0283ac0 feat(P4-pilot-eval): U6 실행 CLI·dry-run·비용 가드 — 사슬 6단계·네트워크 0, 테스트 35건
+dd6a996 feat(P4-pilot-eval): U5 리포트 생성기 — metrics.json 단일 입력·멱등 eval.md, 테스트 42건
+a59ecb4 feat(P4-pilot-eval): U4 곡선·metrics.json·게이트 — 결정 K 지배 판정, --validate, 테스트 55건
+ee124b7 feat(P4-pilot-eval): U3 보정표 — s_llm 10칸 × 공급자·모델 × 방식, 제외 6종 계수, 테스트 74건
+a97521b feat(P4-pilot-eval): U2 지표 계산기 — 분모 규칙 3개·허용 집합 채점, 결정 L, 테스트 94건
+fb81234 feat(P4-pilot-eval): U1 러너 골격·격리·적재 — 세이브포인트 롤백, 테스트 29건
+b164f36 docs(P4-pilot-eval): 계획검증 통과·계획 승인 — 결정 K 지배 기준, 착수
+701fb8d docs(P3-llm-providers,P4-pilot-eval): 계획 초안 2건 — P4 U1~U9 + 결정 A~K 확정(실행 OpenAI 1벌), 선행 소패키지 P3-llm-providers(U1~U4, 기본 LLM_PROVIDER openai) backlog·INDEX 등록
+5cac9bf docs(P1-pilot-dataset): 완료 검토 04-review 승인·패키지 닫음 — verifier 완료 판정, verify-impl FAIL 0/WARN 0

@@ -1,0 +1,433 @@
+# P4-pilot-eval 04-review 부정 케이스 — verifier 직접 실행, HEAD=f01ea35, TMP=/c/Users/swsj1/AppData/Local/Temp/p4review, 2026-09-22 15:37
+
+## N1 실 실행 원시: 시나리오 수·방식 집합·행 수 (01-plan 80행 명령)
+40 ['embedding_only', 'exact_norm', 'exact_raw', 'llm_single', 'proposed'] 7050
+rc=0
+
+## N2 meta provider/model/embedding/run_mode (01-plan 84행 명령 + 부가)
+openai gpt-4o-mini-2024-07-18 text-embedding-3-small real
+commit 750f11b02f13c942c6d2ef8155646d5b7bc03ac6 run_id run-29621888da00 dataset_hash sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e model_configured {'openai': 'gpt-4o-mini'} top_k_swept False
+rc=0
+
+## N3 커밋본 .gz 단독 → metrics(U2) 재계산: metrics-stage.json 과 cmp + reports/metrics.json 5 방식 블록 비교(meta 는 공통 키만, caller_supplied 제외)
+metrics rc=0
+cmp metrics-stage.json: 바이트 동일
+method blocks equal (recheck vs reports/metrics.json): ['proposed', 'exact_raw', 'exact_norm', 'embedding_only', 'llm_single'] count 5 diff []
+meta common keys: ['denominator_rule', 'empty_derive_hints', 'excluded', 'grid', 'mention_counts', 'methods', 'row_count', 'scenario_count', 't_new']
+meta common diff keys: []
+caller_supplied (excluded from comparison): ['embedding_model', 'dataset_hash', 'run_id', 'model_configured', 'commit', 'run_mode']
+
+## N4 커밋본 .gz 단독 → curve(U4) 재계산 — 사슬(1324 evidence)과 같은 인자 → reports/metrics.json·curve.csv cmp
+curve rc=0
+cmp reports/metrics.json: 바이트 동일
+cmp reports/curve.csv: 바이트 동일
+25e16dd67ea74aaf14ac640654af402528f48c873714fa034c1077b8dff98d1f */c/Users/swsj1/AppData/Local/Temp/p4review/metrics.json
+25e16dd67ea74aaf14ac640654af402528f48c873714fa034c1077b8dff98d1f *reports/metrics.json
+25e16dd67ea74aaf14ac640654af402528f48c873714fa034c1077b8dff98d1f *reports/pilot/metrics.json
+
+## N5 커밋본 .gz 단독 → calibration(U3) 재계산 → reports/calibration.json cmp
+calibration rc=0
+cmp reports/calibration.json: 바이트 동일
+
+## N6 traces 재계산 --recheck-traces (DB·네트워크 0)
+[traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=reports\pilot\traces-20260922-042440.jsonl
+[traces] rule=0.5·s_llm+0.3·s_emb+0.2·s_rule (app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+rc=0
+
+## N7 게이트(결정 K) 명령 (01-plan 108행)
+0.8 ['embedding_only'] True False
+rc=0
+
+## N8 게이트 독립 재계산 (02-plan-verify O-4) — verifier 가 metrics.json 의 by_t_merge 수치로 지배·D10 을 직접 계산
+proposed@0.8 fm=0.007575757575757576(1/132) miss=0.007575757575757576(1/132)
+ exact_raw       fm=0.0000(0/132) miss=0.2500(33/132) dominates=False
+ exact_norm      fm=0.0303(4/132) miss=0.1515(20/132) dominates=False
+ embedding_only  fm=0.0000(0/132) miss=0.0076(1/132) dominates=True
+ llm_single      fm=0.0000(0/132) miss=0.0758(10/132) dominates=False
+grid: ['0.5', '0.55', '0.6', '0.65', '0.7', '0.75', '0.8', '0.85', '0.9', '0.95']
+proposed fm curve      : [0.0455, 0.0455, 0.0455, 0.0455, 0.0303, 0.0152, 0.0076, 0.0076, 0.0076, 0.0076]
+proposed ask(identity) : [0.1667, 0.1667, 0.1667, 0.1742, 0.2045, 0.25, 0.5985, 0.7273, 0.7955, 0.8636]
+INDEPENDENT: dominated_by=['embedding_only'] d10=True pass=False
+FILE       : dominated_by=['embedding_only'] d10=True pass=False reason=None
+MATCH: True
+
+## N9 eval.md 재생성 멱등 (01-plan 102행)
+report rc=0
+diff rc=0 (0 = 출력 0줄)
+reports/eval.md == reports/pilot/eval.md (바이트)
+
+## N10 metrics.json --validate (01-plan 99행)
+OK reports/metrics.json
+rc=0
+
+## N11 보정표 구간 수 (01-plan 100행) + 그룹 키
+10 0
+[('proposed', 'openai', 'gpt-4o-mini-2024-07-18', 107), ('llm_single', 'openai', 'gpt-4o-mini-2024-07-18', 132)]
+model_configured {'openai': 'gpt-4o-mini'} scored_at_t_merge ['0.8']
+rc=0
+
+## N12 곡선 파일 (01-plan 101행)
+[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95] {'0.3'} 5 150
+rc=0
+
+## N13 라벨 무변경 validate_scenarios --strict --json (01-plan 104행)
+rc=0
+Traceback (most recent call last):
+  File [35m"<string>"[0m, line [35m1[0m, in [35m<module>[0m
+    import json;d=json.load([31mopen[0m[1;31m('/c/Users/swsj1/AppData/Local/Temp/p4review/validate.json',encoding='utf-8')[0m);print('total',d['total'],'ok',d['ok'],'issue_count',d['issue_count'],d['counts'])
+                            [31m~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[1;35mFileNotFoundError[0m: [35m[Errno 2] No such file or directory: '/c/Users/swsj1/AppData/Local/Temp/p4review/validate.json'[0m
+
+## N14 제품 코드·데이터 무변경 git diff --name-only b164f36..HEAD -- app/ data/ (01-plan 103행)
+lines=0
+작업 트리 app/ data/ 변경: 0 줄
+app/er/ 변경(b164f36..HEAD): 0 줄
+S3.3 카드(docs/wiki 내 S3.3 파일) 변경: 0 줄
+resolution-plan.md 변경: 0 줄
+
+## N15 패키지 전체 변경 파일 목록 b164f36..HEAD 중 packages/P4-pilot-eval/ 밖 (범위 검사)
+README.md
+docs/user-setup/10-pilot-eval-run.md
+docs/user-setup/README.md
+docs/wiki/HANDOFF.md
+docs/wiki/journal.md
+docs/wiki/packages/P3-baselines/04-review.md
+docs/wiki/packages/P3-baselines/evidence/20260922-1309-baseline-smoke-real.txt
+docs/wiki/packages/P3-er/05-remediation.md
+docs/wiki/packages/P3-er/evidence/20260921-2011-er-smoke-real.txt
+docs/wiki/registry.md
+docs/wiki/review-index.md
+evaluation/calibration.py
+evaluation/curve.py
+evaluation/metrics.py
+evaluation/report.py
+evaluation/runner.py
+reports/calibration.json
+reports/cost_estimate.md
+reports/curve.csv
+reports/eval.md
+reports/failure_cases.md
+reports/metrics.json
+reports/pilot/raw-20260922-042440.jsonl.gz
+reports/pilot/traces-20260922-042440.jsonl
+scripts/run_pilot_eval.py
+tests/test_eval_calibration.py
+tests/test_eval_curve.py
+tests/test_eval_metrics.py
+tests/test_eval_report.py
+tests/test_eval_runner.py
+tests/test_run_pilot_eval.py
+
+## N16 키 문자열 혼입 grep -c 'sk-' (산출물·evidence)
+reports/pilot/raw-20260922-042440.jsonl.gz: 0
+reports/pilot/traces-20260922-042440.jsonl: 0
+reports/metrics.json: 0
+reports/calibration.json: 0
+reports/curve.csv: 0
+reports/eval.md: 0
+reports/failure_cases.md: 0
+reports/cost_estimate.md: 0
+docs/wiki/packages/P4-pilot-eval/evidence/20260922-1324-u7-real-run.txt: 0
+docs/wiki/packages/P4-pilot-eval/evidence/20260922-1318-u7-real-run.txt: 0
+docs/wiki/packages/P4-pilot-eval/evidence/20260922-1320-u7-real-run.txt: 0
+docs/wiki/packages/P4-pilot-eval/evidence/20260922-1340-u7-judgment.txt: 0
+docs/wiki/packages/P4-pilot-eval/evidence/20260922-1354-u8-failure-cases.txt: 0
+docs/wiki/packages/P4-pilot-eval/evidence/20260921-2011-smoke03-er-real.txt: 0
+docs/wiki/packages/P4-pilot-eval/evidence/20260922-1309-smoke08-baseline-real.txt: 0
+
+## N17 실 실행 로그에 프롬프트 원문·키 없음
+1324 로그 api_key|Bearer|prompt:|messages 매치 줄: 0
+1324 로그 OPENAI_API_KEY 줄:
+(없음)
+traces 덤프 prompt 키: 0 / reason 키: 0 / 줄 수: 1410
+raw.gz 안 prompt 키: 0
+
+## N18 실 실행 시도 3회: 1318·1320 은 [scenario] 0줄·LLM 0회인가 (수용 기준 해석 (iii))
+20260922-1318: scenario_lines=0 network_calls_line= fail_lines=1 ok_lines=0 last=(Background on this error at: https://sqlalche.me/e/20/e3q8)
+20260922-1320: scenario_lines=0 network_calls_line= fail_lines=1 ok_lines=0 last=(Background on this error at: https://sqlalche.me/e/20/e3q8)
+20260922-1324: scenario_lines=40 network_calls_line=network_calls=339 fail_lines=0 ok_lines=1 last=[ok] 사슬 완료 -- runner → metrics → calibration → curve →
+1318 vs 1320 diff: 0 줄
+커밋된 reports/pilot 파일(설정당 raw 1개): reports/pilot/raw-20260922-042440.jsonl.gz reports/pilot/traces-20260922-042440.jsonl 
+
+## N19 registry P4 행: pending 수·경로 실재·생성 커밋(git log --diff-filter=A)
+pending: 0
+evaluation/runner.py exists=Y registry=fb81234 first_add=fb81234 commit_exists=Y MATCH
+tests/test_eval_runner.py exists=Y registry=fb81234 first_add=fb81234 commit_exists=Y MATCH
+evaluation/metrics.py exists=Y registry=a97521b first_add=a97521b commit_exists=Y MATCH
+tests/test_eval_metrics.py exists=Y registry=a97521b first_add=a97521b commit_exists=Y MATCH
+evaluation/calibration.py exists=Y registry=ee124b7 first_add=ee124b7 commit_exists=Y MATCH
+tests/test_eval_calibration.py exists=Y registry=ee124b7 first_add=ee124b7 commit_exists=Y MATCH
+evaluation/curve.py exists=Y registry=a59ecb4 first_add=a59ecb4 commit_exists=Y MATCH
+tests/test_eval_curve.py exists=Y registry=a59ecb4 first_add=a59ecb4 commit_exists=Y MATCH
+evaluation/report.py exists=Y registry=dd6a996 first_add=dd6a996 commit_exists=Y MATCH
+tests/test_eval_report.py exists=Y registry=dd6a996 first_add=dd6a996 commit_exists=Y MATCH
+scripts/run_pilot_eval.py exists=Y registry=0283ac0 first_add=0283ac0 commit_exists=Y MATCH
+tests/test_run_pilot_eval.py exists=Y registry=0283ac0 first_add=0283ac0 commit_exists=Y MATCH
+reports/cost_estimate.md exists=Y registry=0283ac0 first_add=0283ac0 commit_exists=Y MATCH
+reports/pilot/raw-20260922-042440.jsonl.gz exists=Y registry=ef18143 first_add=ef18143 commit_exists=Y MATCH
+reports/pilot/traces-20260922-042440.jsonl exists=Y registry=ef18143 first_add=ef18143 commit_exists=Y MATCH
+reports/metrics.json exists=Y registry=ef18143 first_add=ef18143 commit_exists=Y MATCH
+reports/calibration.json exists=Y registry=ef18143 first_add=ef18143 commit_exists=Y MATCH
+reports/curve.csv exists=Y registry=ef18143 first_add=ef18143 commit_exists=Y MATCH
+reports/eval.md exists=Y registry=ef18143 first_add=ef18143 commit_exists=Y MATCH
+reports/failure_cases.md exists=Y registry=ea1bbb2 first_add=ea1bbb2 commit_exists=Y MATCH
+docs/user-setup/10-pilot-eval-run.md exists=Y registry=0283ac0 first_add=0283ac0 commit_exists=Y MATCH
+registry P4 행 수: 21
+registry 33행 README 비고 P4 언급: 0
+registry '| reports/metrics.json |' 행 수: 1
+
+## N20 커밋 메시지 Refs (03-log Refs 대조용)
+b164f36: Refs: P4-pilot-eval D3 D4 D5 D10 D11 S3.7 S3.3 R3 R4 F-0e133a L-002 L-004
+fb81234: Refs: P4-pilot-eval S3.7 D5 D10 D11 원칙8 원칙9
+a97521b: Refs: P4-pilot-eval S3.7 D10 원칙1 원칙2 원칙8
+ee124b7: Refs: P4-pilot-eval R4 D3 원칙3 원칙8 원칙9
+a59ecb4: Refs: P4-pilot-eval R3 D10 S3.7 원칙1 원칙2 원칙8
+dd6a996: Refs: P4-pilot-eval S3.7 원칙8
+0283ac0: Refs: P4-pilot-eval D4 S3.7 원칙2 원칙8 L-001 L-004
+e7f0a9c: Refs: P4-pilot-eval S3.7 S3.3 D3 D5 원칙3 원칙8 원칙9 L-004
+1a5643b: Refs: P4-pilot-eval S3.7 D4 D5 원칙8 원칙9 L-004
+1c84d35: Refs: P4-pilot-eval S3.7 원칙8
+2ebf061: Refs: P4-pilot-eval P3-er F-87c597 R4 D11 S3.3
+750f11b: Refs: P4-pilot-eval P3-er P3-baselines F-87c597 R4 D11 S3.3
+ef18143: Refs: P4-pilot-eval R4 R9 D3 D4 D5 D10 S3.3 S3.7
+ea1bbb2: Refs: P4-pilot-eval S3.3 S3.7 R3 R4 D3 D10 원칙1 원칙8 L-004
+f01ea35: Refs: P4-pilot-eval S3.7 원칙4 원칙8 원칙9 L-001 L-004
+
+## N21 f01ea35 tests/test_run_pilot_eval.py diff (테스트 전제 결함 수정이 검사 의도를 유지하는가)
+commit f01ea350c267e11ceb3d1fdadbda5db5d3b16bdf
+Author: LEE SUNWOO <swsj1954@gmail.com>
+Date:   Tue Sep 22 15:26:12 2026 +0900
+
+    test(P4-pilot-eval): U9 수용 기준 기계 검증 — 1285 passed, 테스트 전제 결함 2건 수정, registry 해시 확정
+    
+    변경:
+    - tests/test_run_pilot_eval.py (+18/−2): _reports_snapshot() 추가, 두 테스트의 "reports/pilot·reports/metrics.json 부재" 단언 → "실행 전후 reports/ 스냅샷 동일"(검사 의도 유지)
+    - docs/wiki/registry.md: P4 행 pending 19 → 생성 커밋 해시(git log --diff-filter=A 실측)
+    - README.md: P4 행 상태(실 실행 완료·게이트 미달) + "### 파일럿 평가 실행법 (P4)" 절(명령·환경변수 이름만·산출물·게이트 한 곳)
+    - docs/user-setup/10-pilot-eval-run.md, docs/wiki/packages/P4-pilot-eval/01-plan.md 92행: 판정 명령 PYTHONUTF8=1 각주(Windows cp949 UnicodeDecodeError, 명령 본문 불변)
+    - evidence 4: 1430-u9-pytest-all(1차 2 failed/1283)·1430-u9-dry-run(rc=0 사슬 완료)·1435-u9-verify-plan(FAIL 0/WARN 3)·1450-u9-pytest-all(1285 passed rc=0)
+    - 03-log(U8 pending→ea1bbb2, U9 항목·소견), HANDOFF, journal
+    이유: 01-plan U9(73행). pytest 1차 실패 2건은 U6 테스트가 dry-run 무기록을 경로 부재로 검사한 전제 결함 — U7 이 결정 E 로 reports/ 산출물을 커밋한 뒤 구조적으로 실패. 사용자 결정으로 메인 세션이 수정(승인된 예외). app/·data/·evaluation/·scripts/ 변경 0.
+    정합성: 원칙 4·8·9 · S3.7 대조 — 위반 없음. 코드 변경은 tests/ 1파일. 수치 재실행 없음(U7 판정 표 evidence 재사용).
+    검증: 전체 pytest 1285 passed rc=0 · 스텁 dry-run rc=0 network_calls=0 rows=7050 · verify-plan FAIL 0/WARN 3 · registry P4 pending 0
+    Refs: P4-pilot-eval S3.7 원칙4 원칙8 원칙9 L-001 L-004
+    
+    Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+
+diff --git a/tests/test_run_pilot_eval.py b/tests/test_run_pilot_eval.py
+index 8faffa7..94d33bf 100644
+--- a/tests/test_run_pilot_eval.py
++++ b/tests/test_run_pilot_eval.py
+@@ -847,14 +847,29 @@ def test_real_mode_without_keys_returns_2(
+     assert not (tmp_path / "real").exists()
+ 
+ 
++def _reports_snapshot() -> dict[str, tuple[int, int]]:
++    """`reports/` 아래 모든 파일의 (크기, mtime_ns). dry-run 전후 비교용 -- U7 이후 `reports/`
++    에는 실 실행 산출물(결정 E)이 커밋되어 있으므로 "존재하지 않는다"가 아니라 "바뀌지 않았다"
++    를 단언한다."""
++    root = REPO_ROOT / "reports"
++    if not root.exists():
++        return {}
++    return {
++        str(path.relative_to(root)): (path.stat().st_size, path.stat().st_mtime_ns)
++        for path in sorted(root.rglob("*"))
++        if path.is_file()
++    }
++
++
+ def test_stub_output_cannot_land_in_reports(capsys: pytest.CaptureFixture[str]) -> None:
++    before = _reports_snapshot()
+     rc = cli.main(
+         ["--dry-run", "--stub", "--limit", "1", "--out", str(REPO_ROOT / "reports" / "pilot")]
+     )
+     out = capsys.readouterr().out
+     assert rc == cli.RC_ERROR
+     assert "reports/" in out
+-    assert not (REPO_ROOT / "reports" / "pilot").exists()
++    assert _reports_snapshot() == before  # 거부됐으므로 reports/ 에 새 파일도, 변경도 없다
+ 
+ 
+ # ---------------------------------------------------------------------------
+@@ -1071,8 +1086,9 @@ def test_dry_run_leaves_no_rows_and_no_reports_files(tmp_path: Path) -> None:
+     engine = get_engine()
+     with engine.connect() as connection:
+         before = connection.execute(select(func.count()).select_from(Person)).scalar_one()
++    reports_before = _reports_snapshot()
+     assert cli.main(["--dry-run", "--stub", "--limit", "1", "--out", str(tmp_path / "o")]) == 0
+     with engine.connect() as connection:
+         after = connection.execute(select(func.count()).select_from(Person)).scalar_one()
+     assert after == before  # 결정 D(i) 롤백 -- 평가는 아무것도 커밋하지 않는다
+-    assert not (REPO_ROOT / "reports" / "metrics.json").exists()
++    assert _reports_snapshot() == reports_before  # --out 이 tmp 이므로 reports/ 는 그대로
+
+## N22 reports/ 커밋 목록·평문 raw 미커밋·pilot 잔여(untracked)
+reports/README.md
+reports/calibration.json
+reports/cost_estimate.md
+reports/curve.csv
+reports/embed_pilot.md
+reports/embed_pilot/text-embedding-3-large.json
+reports/embed_pilot/text-embedding-3-small.json
+reports/eval.md
+reports/failure_cases.md
+reports/metrics.json
+reports/pilot/raw-20260922-042440.jsonl.gz
+reports/pilot/traces-20260922-042440.jsonl
+--- untracked/modified:
+?? reports/pilot/calibration.json
+?? reports/pilot/curve.csv
+?? reports/pilot/eval.md
+?? reports/pilot/metrics-stage.json
+?? reports/pilot/metrics.json
+?? reports/pilot/raw-20260922-042440.jsonl
+평문 raw 커밋됨?: 0 (0 이어야)
+
+## N23 metrics.json 방식 키 순서·denominator_rule·LLM 호출/토큰
+method keys (order): ['proposed', 'exact_raw', 'exact_norm', 'embedding_only', 'llm_single']
+denominator_rule keys: ['ambiguous', 'ask_user', 'expected_ask_user_allowed', 'llm_error', 'passing_mentions', 'score_axis', 'scored_base', 'sweep_copies', 'third_category']
+proposed llm: {'calls': 136, 'tokens_in': 60266, 'tokens_out': 5656, 'errors': {}, 'error_calls': 0, 'mentions': 141, 'skipped_mentions': 5}
+llm_single llm: {'calls': 141, 'tokens_in': 69974, 'tokens_out': 6961, 'errors': {}, 'error_calls': 0, 'mentions': 141, 'skipped_mentions': 0}
+embedding_only llm: {'calls': 0, 'tokens_in': 0, 'tokens_out': 0, 'errors': {}, 'error_calls': 0, 'mentions': 141, 'skipped_mentions': 0}
+exact_raw llm: {'calls': 0, 'tokens_in': 0, 'tokens_out': 0, 'errors': {}, 'error_calls': 0, 'mentions': 141, 'skipped_mentions': 0}
+exact_norm llm: {'calls': 0, 'tokens_in': 0, 'tokens_out': 0, 'errors': {}, 'error_calls': 0, 'mentions': 141, 'skipped_mentions': 0}
+scenario_count 40 row_count 7050 mention_counts {'gold': 135, 'gold_scored': 132, 'ambiguous': 3, 'passing': 6}
+excluded {'ambiguous_rows': 150, 'ambiguous_mentions': 3, 'passing_rows': 300, 'passing_mentions': 6}
+proposed@0.8 forced_reason: {'no_candidates': 5, 'no_matched': 25, 'none': 108} llm_error: {'none': 138}
+proposed@0.8 ask_user_rate_by_kind: {'identity': {'n': 79, 'd': 132, 'rate': 0.5984848484848485}, 'new_person': {'n': 5, 'd': 132, 'rate': 0.03787878787878788}, 'schedule': {'n': 0, 'd': 132, 'rate': 0.0}}
+proposed@0.8 outcomes: {'merge_correct': 47, 'false_merge': 1, 'miss': 1, 'deferred': 79, 'new_person_correct': 4}
+
+## N24 U8 evidence 크기·R22(trace 73821 가중합) 인용 존재
+1164 docs/wiki/packages/P4-pilot-eval/evidence/20260922-1354-u8-failure-cases.txt
+6:########## PART 1 — 케이스 전문·분포 ##########
+855:########## PART 2 — 단계 귀속·함정·반사실 ##########
+981:########## PART 3 — 규칙 필터 제외 ##########
+993:########## PART 4 — failure_cases.md 재현 명령(R1~R23) 실행 출력 ##########
+1135:########## PART 5 — R24: no_matched 25 의 정오 분해 (절 3b) ##########
+106:  "trace_id": 73821
+127: "trace_id": 73821,
+136:  traces for trace_id=73821: 1
+
+## N25 실 실행 로그 = raw stamp 대응 (UTC 042440 ↔ 로컬 13:24)
+ef18143 2026-09-22 13:39:06 +0900 eval(P4-pilot-eval): U7 실 공급자 1회 실행 — 40건·7050행, 게이트 미달(embedding_only 지배)
+{"ambiguous": false, "candidates": [{"display_name": "김민준", "person_id": 11894, "score": 0.8833333333333333, "signals": {"embedding_skipped": 0.0, "exact_alias": 1.0, "hierarchy_adjacent": 1.0, "hierarchy_match": 0.0, "partial_alias": 0.0, "passed_rules": 1.0, "relation_tag_match": 1.0, "relaxed_pass": 1.0, "rule_checked": 3.0, "rule_passed": 2.0, "s_emb": 1.0, "s_rule": 0.6666666666666666}}], "category": "promotion", "decision": "merge", "detail": {"ask_kind": null, "band_by_threshold": "merge", "confidence_breakdown": {"confidence": 0.8833333333333333, "matched_person_id": 11894, "rule
+
+## N26 U9 evidence 1450 pytest 요약·1430 1차 실패 2건
+# U9 전체 pytest 재실행(테스트 전제 결함 2건 수정 후) — 2026-09-22 15:20:34 HEAD ea1bbb2 + 작업 트리 tests/test_run_pilot_eval.py 수정
+[32m[32m[1m1285 passed[0m[32m in 192.96s (0:03:12)[0m[0m
+pytest rc=0
+2 failed, 1283 passed in 199.03s (0:03:19)
+
+## N27 P3-er F-251dc2·F-bdd6c5 상태 줄 + 01-plan 결정 G·H 이행 문장 grep
+F-251dc2 상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+F-bdd6c5 상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+32:  - **`app/` 수정** — `app/er/*`·`app/tools/*`·`app/embedding.py` 를 고치지 않는다(원칙4 경계·P3-baselines 선례). 필요해지면 멈춰 사용자 결정으로 올린다. 유일
+35:  - **`ERConfig.top_k` 스윕**(F-bdd6c5 — 무효), **가중치(0.5/0.3/0.2) 스윕**(D3 는 설정값이라 했으나 40건으로 튜닝하면 과적합. P10 몫).
+167:| 12 | F-251dc2·F-bdd6c5 는 P4 01-plan 이 결정 | **결정 G·H**(이 문서가 결정 문장으로 확정) |
+194:- **F-251dc2**(trace `candidates[].similarity`·`aliases_matched` 가 `s_emb`·전체 별칭의 복제) → **결정 G: (b) 불필요를 명시한다.** 근거: (i) 이 패키지의 지표·보정
+195:- **F-bdd6c5**(`ERConfig.top_k` 가 실제로 전달되지 않음) → **결정 H: `top_k` 는 스윕하지 않는다.** 이 계획은 `ERConfig(t_merge=…)` 만 바꾸고 `top_k` 는 기본값 �
+207:- **결정 G — F-251dc2 처리.** (i) **P4 는 두 필드가 불필요함을 명시하고 `app/` 을 고치지 않는다**(**권장** — 위 "05-remediation 소견" 의 (i)~(iv). 이 계획의 
+208:- **결정 H — F-bdd6c5 처리.** (i) **`ERConfig.top_k` 스윕 금지를 명시하고 `meta.top_k_swept: false` 로 기록한다**(**권장** — 인계 3·12 가 이미 같은 방향. `search_
+223:| G F-251dc2 | **(i)** 불필요 명시, `app/` 무수정 | 05-remediation 절 그대로 |
+224:| H F-bdd6c5 | **(i)** `top_k` 스윕 금지, `meta.top_k_swept:false` | U4 |
+258:10. **`ERConfig.top_k` 스윕**(결정 H 로 이번엔 금지) 과 F-bdd6c5 의 사소 FIX 여부.
+279:- `docs/wiki/packages/P3-er/05-remediation.md` — F-251dc2(806~830행)·F-bdd6c5(832~849행)
+2
+failure_cases.md 가 F-251dc2 를 언급: 0
+
+## N13 재실행 (Windows 경로 — 위 N13 의 python 읽기 실패는 POSIX 경로 표기 때문, validate rc=0 은 유효)
+rc=0
+total 40 ok True issue_count 0 {'alias': 8, 'new_person': 6, 'normal': 10, 'promotion': 8, 'pronoun': 8} ambiguous 3 traps 12
+
+## N28 calibration.json 상위 구간 정답률 (failure_cases §8 '97.0%(98/101)' 대조)
+proposed openai gpt-4o-mini-2024-07-18 [('0.0-0.1', 0, 0, None), ('0.1-0.2', 0, 0, None), ('0.2-0.3', 0, 0, None), ('0.3-0.4', 0, 0, None), ('0.4-0.5', 0, 0, None), ('0.5-0.6', 0, 0, None), ('0.6-0.7', 0, 0, None), ('0.7-0.8', 1, 0, 0.0), ('0.8-0.9', 5, 0, 0.0), ('0.9-1.0', 101, 47, 0.46534653465346537)]
+llm_single openai gpt-4o-mini-2024-07-18 [('0.0-0.1', 0, 0, None), ('0.1-0.2', 0, 0, None), ('0.2-0.3', 0, 0, None), ('0.3-0.4', 0, 0, None), ('0.4-0.5', 0, 0, None), ('0.5-0.6', 0, 0, None), ('0.6-0.7', 0, 0, None), ('0.7-0.8', 11, 0, 0.0), ('0.8-0.9', 4, 0, 0.0), ('0.9-1.0', 117, 103, 0.8803418803418803)]
+excluded {'ambiguous_mention': 6, 'llm_error': 0, 'llm_error_kinds': {}, 'llm_skipped': 5, 'passing_mention': 12, 'placeholder_s_llm': 20, 'score_clamped': 0, 'total': 43}
+unassigned {'proposed': {'ambiguous_mention': 0, 'llm_error': 0, 'llm_error_kinds': {}, 'llm_skipped': 5, 'passing_mention': 0, 'placeholder_s_llm': 0, 'score_clamped': 0, 'total': 5}}
+correct_definition 결정 F(i) -- 그 판정의 decision 과 person_id 가 골드와 일치하면 정답이다(evaluation.metrics.classify_gold_row(row) in {'merge_correct', 'ne
+
+## N29 R-5 동점 강등 테스트·O-1 eval.md 한계 절·README 실행법 절·01-plan 체크박스
+12:동점 강등이 모든 임계치에서 유지)·R-7(2)(`0.8` 정확 표현)·인계 1(러너 env)·
+646:# R-5 -- embedding_only 동점 강등은 모든 임계치에서
+651:    "id": "sc-tie-test",
+664:def test_embedding_only_tie_never_merges_at_any_threshold(db_session, fake_embedder, tmp_path) -> None:
+665:    ctx_factory = lambda sid: ToolContext(session=db_session, session_id="tie", user_id=USER_ID)  # noqa: E731
+(eval.md F1/툴 호출 grep 끝)
+330:### 파일럿 평가 실행법 (P4)
+33:| 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네�
+0
+01-plan 미체크 단위: 9 / 체크: 0
+100:  [ "$open_u" -eq 0 ] && ok "작업 단위 모두 완료 표시" || wrn "미완료 작업 단위 $open_u 개"
+
+## N30 커밋 메시지 Refs 전문 확인 (ef18143·0283ac0·f01ea35 — 03-log Refs 와 차이)
+10:이유: 01-plan U7(71행) 실 공급자 1회 실행. 결과는 있는 그대로(원칙8): T_merge=0.8 에서 proposed 오병합 1/132·미검출 1/132·ask(identity) 79/132 vs embedding_only 0·1·31 → gate.dominated_by=[embedding_only], d10_direction=true, pass=false. 결정 K 개정 (a) 대로 재실행 없이 U8 실패 케이스 분석 + /devlog change 후보로 간다. P5 미착수.
+11:정합성: 원칙 1·3·4·8·9 · D3·D4·D5·D10 · S3.3·S3.7 대조 — 위반 없음. app/·data/ 변경 0(git diff b164f36..HEAD 0줄). 코드 미수정(카드 10 판정 명령 encoding·러너 safe_summary 미출력은 결함으로 03-log 기록, U8 뒤 docs/FIX). 키 문자열 혼입 0.
+13:Refs: P4-pilot-eval R4 R9 D3 D4 D5 D10 S3.3 S3.7
+11:Refs: P4-pilot-eval D4 S3.7 원칙2 원칙8 L-001 L-004
+
+## N31 U8 핵심 수치 독립 재계산 (raw.gz 직접, verifier 스크립트 u8_recheck.py)
+proposed gold(non-ambiguous) rows @0.8: 132
+false_merge @0.8: 1 [('sc-015', 0, '부장님', 11931, 11930)]
+miss @0.8: 1 [('sc-007', 2, '문실장님', 11903)]
+deferred(identity) @0.8: 79
+s_llm>=0.9 & matched: n=101 matched==gold=98 rate=0.970
+rule_checked==0 & matched: n=66 max_conf=0.8000
+rule_checked==0 (all fresh gold rows): 91 of 132
+deferred@0.8 with rule_checked==0 and conf in [0.7,0.8): 48
+deferred@0.8 whose matched_person_id == gold: 61
+embedding_only merge_correct on proposed-deferred set: 49
+forced_reason @0.8 (138 rows): Counter({None: 108, 'no_matched': 25, 'no_candidates': 5})
+rc=0
+
+## N32 결정 J: PNG 없음 / raw stamp UTC 대응 / U8 evidence 4g 출처
+0
+0
+137:  trace@0.8: {"candidate_count": 2, "confidence_breakdown": {"confidence": 0.95, "matched_person_id": 11931, "rule_checked": 3, "rule_passed": 3, "s_emb": 1.0, "s_llm": 0.9, "s_rule": 1.0, "weights": {"emb": 0.3, "llm": 0.5, "rule": 0.2}}, "decision": {"T_merge": 0.8, "T_new": 0.3, "action": "merge", "band": "merge", "band_by_threshold": "merge", "forced_reason": null, "matched_person_id": 11931, "relaxed_retry": false}, "er_version": "1", "gold_person_id": "p1", "llm": {"attempts": 1, "error": null, "model": "gpt-4o-mini-2024-07-18", "provider": "openai", "s_llm": 0.9, "self_reported": true, "skipped": false, "tokens_in": 409, "tokens_out": 39}, "llm_fresh_call": false, "matched_candidate": {"excluded_by": null, "passed_rules": true, "person_id": 11931, "relaxed_pass": false, "rule_checked": 3, "rule_passed": 3, "s_emb": 1.0, "s_rule": 1.0}, "mention": "부장님", "mention_index": 1, "mention_kind": "gold", "method": "proposed", "row_decision": "merge", "row_person_id": 11931, "row_score": 0.95, "scenario_id": "sc-015", "schema_version": 1, "session_id": "pilot-run-29621888da00-sc-015", "step": "er_resolve", "sweep_index": 6, "t_merge": 0.8, "t_new": 0.3, "tool_name": "er", "trace_id": 73821, "turn": 0}
+319:   no_matched     sc-001 t2 m2 '김부장님' cat=promotion kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+320:   no_matched     sc-002 t1 m1 '박과장님' cat=promotion kind=gold    cands=2 excluded_by={'11896': 'hierarchy_conflict'} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+321:   no_matched     sc-002 t2 m2 '박과장님' cat=promotion kind=gold    cands=2 excluded_by={'11896': 'hierarchy_conflict'} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+322:   no_matched     sc-003 t2 m1 '최대리' cat=promotion kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+120: "scenario_id": "sc-015",
+137:  trace@0.8: {"candidate_count": 2, "confidence_breakdown": {"confidence": 0.95, "matched_person_id": 11931, "rule_checked": 3, "rule_passed": 3, "s_emb": 1.0, "s_llm": 0.9, "s_rule": 1.0, "weights": {"emb": 0.3, "llm": 0.5, "rule": 0.2}}, "decision": {"T_merge": 0.8, "T_new": 0.3, "action": "merge", "band": "merge", "band_by_threshold": "merge", "forced_reason": null, "matched_person_id": 11931, "relaxed_retry": false}, "er_version": "1", "gold_person_id": "p1", "llm": {"attempts": 1, "error": null, "model": "gpt-4o-mini-2024-07-18", "provider": "openai", "s_llm": 0.9, "self_reported": true, "skipped": false, "tokens_in": 409, "tokens_out": 39}, "llm_fresh_call": false, "matched_candidate": {"excluded_by": null, "passed_rules": true, "person_id": 11931, "relaxed_pass": false, "rule_checked": 3, "rule_passed": 3, "s_emb": 1.0, "s_rule": 1.0}, "mention": "부장님", "mention_index": 1, "mention_kind": "gold", "method": "proposed", "row_decision": "merge", "row_person_id": 11931, "row_score": 0.95, "scenario_id": "sc-015", "schema_version": 1, "session_id": "pilot-run-29621888da00-sc-015", "step": "er_resolve", "sweep_index": 6, "t_merge": 0.8, "t_new": 0.3, "tool_name": "er", "trace_id": 73821, "turn": 0}
+140:   proposed        sc-015 t0 m1 '부장님' gold=p1/11930 -> person_id=11931 score=0.95 cat=alias trap=nickname_shared_with_title matched_names=None
+149:    sc-007 t2 m1 '문실장님' gold=p1/11903 cat=promotion trap=None cands=1 forced=no_candidates score=0.0 cb={'confidence': 0.0, 'matched_person_id': None, 'rule_checked': 0, 'rule_passed': 0, 's_emb': 0.0, 's_llm': 0.0, 's_rule': 0.0, 'weights': {'emb': 0.3, 'llm': 0.5, 'rule': 0.2}}
+
+## N33 U8 §4a·4d·4f 의 '52' 정의별 재계산 (u8_recheck2.py)
+deferred 79
+deferred & rule_checked==0 (any conf): 72
+deferred & rule_checked==0 & conf<0.8: 72
+deferred conf distribution: [(0.0, 20), (0.4539, 1), (0.4945, 1), (0.6344, 1), (0.6855, 1), (0.6895, 1), (0.694, 2), (0.7193, 2), (0.7209, 1), (0.728, 1), (0.744, 1), (0.7443, 1), (0.75, 29), (0.775, 15), (0.7782, 1), (0.7852, 1)]
+deferred rule_checked distribution: Counter({0: 72, 3: 7})
+deferred forced_reason: Counter({None: 59, 'no_matched': 20})
+embedding_only outcomes over deferred-79: Counter({'merge_correct': 49, 'identity': 26, 'miss': 2, 'new_person_correct': 2})
+embedding_only outcomes over deferred&rule_checked==0: Counter({'merge_correct': 49, 'identity': 19, 'miss': 2, 'new_person_correct': 2})
+deferred conf in [0.7,0.8) (any rule_checked): 52 emb outcomes: Counter({'merge_correct': 45, 'identity': 6, 'miss': 1})
+embedding_only outcomes @0.8 (132): Counter({'merge_correct': 95, 'identity': 31, 'new_person_correct': 5, 'miss': 1})
+proposed outcomes @0.8 (132): Counter({'identity': 79, 'merge_correct': 47, 'new_person_correct': 4, 'miss': 1, 'false_merge': 1})
+rc=0
+
+## N34 §4f 조인 키 검증 (u8_recheck3.py)
+embedding_only rows @0.8: 141
+(sid,turn,mention_index) unique keys: 137 collisions: 4
+(sid,turn,mention,mention_index) unique keys: 141 collisions: 0
+  deferred keys missing in emb: 0 []
+  embedding_only outcomes over deferred-79: Counter({'merge_correct': 52, 'identity': 24, 'new_person_correct': 2, 'miss': 1})
+  gold_db_person_id mismatch between methods: 0
+   miss: sc-021 2 아까 걔 gold 11914 emb decision new_person None emb gold 11914 emb kind gold emb amb False
+(sid,turn,mention) unique keys: 141 collisions: 0
+  deferred keys missing in emb: 0 []
+  embedding_only outcomes over deferred-79: Counter({'merge_correct': 52, 'identity': 24, 'new_person_correct': 2, 'miss': 1})
+  gold_db_person_id mismatch between methods: 0
+   miss: sc-021 2 아까 걔 gold 11914 emb decision new_person None emb gold 11914 emb kind gold emb amb False
+dup (sid,turn,mention_index): [(('sc-038', 2, 1), 2), (('sc-039', 2, 1), 2), (('sc-040', 0, 0), 2), (('sc-040', 2, 1), 2)]
+rc=0
+
+## N35 스키마·툴 무변경 (01-plan 105행) — verifier 재실행
+No new upgrade operations detected.
+alembic rc=0
+RESULT: 7/7 ok
+tools rc=0
+
+## N36 pytest skip 수 (1533 verify-impl pytest)
+1285 passed
+0

@@ -804,7 +804,7 @@ WARN  tests/test_er_judge.py 505·526행이 더미 키를 "sk-test-dummy" 문자
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-251dc2 · [권고] trace candidates[].similarity 와 aliases_matched 가 s_emb(클램프 후)·전체 별칭 목록의 복제다(candidates.py._to_scored 가 P2 Candidate.similarity 원시값·aliases_matched 부분집합을 보존하지 않음, 03-log U6 명시). P4 가 "실제 일치 별칭" 을 trace 만으로 알 수 없다 — P4 착수 전 _to_scored 가 두 필드를 그대로 보존하도록 확장하거나 P4 01-plan 이 불필요를 명시할 것
-상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+상태: 해소 | 발견: 2026-09-06 (review-impl) | 해소: 2026-09-22 (P4 01-plan 194행 결정 G (b) "불필요를 명시" 이행, `git diff b164f36..HEAD -- app/` 0줄 — P4 04-review §6(verifier 2026-09-22). `_to_scored` 두 필드 보존은 P5 이전 사소 FIX 후보로 남음)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -830,7 +830,7 @@ WARN  trace candidates[].similarity 와 aliases_matched 가 s_emb(클램프 후)
 - FIX/CR 로 올려야 하는가: 아니오(P4 01-plan 결정)
 
 ## F-bdd6c5 · [권고] search_candidates(top_k=…) 인자가 search_person 에 전달되지 않아 ERConfig.top_k 를 바꿔도 실제 K 는 SEARCH_TOP_K 고정인데 trace input.config.top_k 에는 ERConfig 값이 기록된다 — P4 가 top_k 를 스윕하면 trace 가 실제와 어긋난다. P4 01-plan 에 "top_k 스윕 금지(또는 search_person 확장 필요)" 를 명시할 것
-상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+상태: 해소 | 발견: 2026-09-06 (review-impl) | 해소: 2026-09-22 (P4 01-plan 결정 H(i) "top_k 스윕 금지" 이행, `metrics.json meta.top_k_swept=False`·eval.md 메타 행 — P4 04-review §6(verifier 2026-09-22). `search_person` top_k 주입 FIX 는 P5 이전 후보)
 
 ### 증상 (검증 출력 인용)
 ```
