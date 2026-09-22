@@ -1,0 +1,1164 @@
+# U8 실패 케이스 분석 — 집계 출력 (읽기 전용, 20260922-1354 로컬)
+# 입력: reports/metrics.json · reports/calibration.json · reports/pilot/raw-20260922-042440.jsonl.gz · reports/pilot/traces-20260922-042440.jsonl · data/scenarios/*.json
+# 평가 커밋(meta.commit): 750f11b02f13c942c6d2ef8155646d5b7bc03ac6 / run_id run-29621888da00
+# data/·app/·evaluation/·reports/ 는 수정하지 않았고 평가를 다시 돌리지 않았다(네트워크·LLM 호출 0).
+
+########## PART 1 — 케이스 전문·분포 ##########
+==============================================================================
+[0] META
+  run_id = run-29621888da00
+  commit = 750f11b02f13c942c6d2ef8155646d5b7bc03ac6
+  provider = openai
+  model = gpt-4o-mini-2024-07-18
+  embedding_model = text-embedding-3-small
+  dataset_hash = sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e
+  run_mode = real
+  schema_version = 1
+  row_count = 7050
+  scenario_count = 40
+  t_new = 0.3
+  raw rows loaded = 7050  traces = 1410
+  gate = t_merge 0.8 dominated_by ['embedding_only'] d10 True pass False
+  rows at t_merge=0.8 : 705  (141 per method)
+
+==============================================================================
+[1] 방식별 결과 분포 (t_merge=0.8, 채점 분모)
+  proposed        n=132 {'merge_correct': 47, 'deferred': 79, 'miss': 1, 'false_merge': 1, 'new_person_correct': 4}
+  exact_raw       n=132 {'merge_correct': 83, 'miss': 33, 'new_person_correct': 14, 'deferred': 2}
+  exact_norm      n=132 {'merge_correct': 91, 'miss': 20, 'false_merge': 4, 'deferred': 6, 'new_person_correct': 11}
+  embedding_only  n=132 {'merge_correct': 95, 'deferred': 31, 'miss': 1, 'new_person_correct': 5}
+  llm_single      n=132 {'merge_correct': 90, 'miss': 10, 'deferred': 19, 'new_person_correct': 13}
+
+==============================================================================
+[2] 오병합 전건 (proposed, t_merge=0.8)
+{
+ "ambiguous": false,
+ "candidates": [
+  {
+   "display_name": "조은우",
+   "person_id": 11930,
+   "score": 0.0,
+   "signals": {
+    "embedding_skipped": 0.0,
+    "exact_alias": 1.0,
+    "hierarchy_adjacent": 1.0,
+    "hierarchy_match": 0.0,
+    "partial_alias": 0.0,
+    "passed_rules": 0.0,
+    "relation_tag_match": 0.0,
+    "relaxed_pass": 0.0,
+    "rule_checked": 3.0,
+    "rule_passed": 1.0,
+    "s_emb": 1.0,
+    "s_rule": 0.3333333333333333
+   }
+  },
+  {
+   "display_name": "한지원",
+   "person_id": 11931,
+   "score": 0.95,
+   "signals": {
+    "embedding_skipped": 0.0,
+    "exact_alias": 1.0,
+    "hierarchy_adjacent": 0.0,
+    "hierarchy_match": 1.0,
+    "partial_alias": 0.0,
+    "passed_rules": 1.0,
+    "relation_tag_match": 1.0,
+    "relaxed_pass": 0.0,
+    "rule_checked": 3.0,
+    "rule_passed": 3.0,
+    "s_emb": 1.0,
+    "s_rule": 1.0
+   }
+  }
+ ],
+ "category": "alias",
+ "decision": "merge",
+ "detail": {
+  "ask_kind": null,
+  "band_by_threshold": "merge",
+  "confidence_breakdown": {
+   "confidence": 0.95,
+   "matched_person_id": 11931,
+   "rule_checked": 3,
+   "rule_passed": 3,
+   "s_emb": 1.0,
+   "s_llm": 0.9,
+   "s_rule": 1.0,
+   "weights": {
+    "emb": 0.3,
+    "llm": 0.5,
+    "rule": 0.2
+   }
+  },
+  "excluded_by": {
+   "11930": "relation_tag_conflict"
+  },
+  "forced_reason": null,
+  "llm_attempts": 1,
+  "llm_error": null,
+  "llm_self_reported": true,
+  "llm_skipped": false,
+  "model": "gpt-4o-mini-2024-07-18",
+  "provider": "openai",
+  "relaxed_retry": false,
+  "trace_id": 73821
+ },
+ "expected_ask_user_allowed": [
+  "identity",
+  "none"
+ ],
+ "gold_db_person_id": 11930,
+ "gold_person_id": "p1",
+ "llm_fresh_call": false,
+ "mention": "부장님",
+ "mention_index": 1,
+ "mention_kind": "gold",
+ "method": "proposed",
+ "person_id": 11931,
+ "scenario_id": "sc-015",
+ "score": 0.95,
+ "sweep_index": 6,
+ "t_merge": 0.8,
+ "t_new": 0.3,
+ "tokens_in": 409,
+ "tokens_out": 39,
+ "trace_id": 73821,
+ "trap_kind": "nickname_shared_with_title",
+ "turn": 0
+}
+  -> proposed        decision=merge person_id=11931 score=0.95 forced=None reason=None
+  -> exact_raw       decision=identity person_id=None score=1.0 forced=None reason=None
+  -> exact_norm      decision=identity person_id=None score=1.0 forced=None reason=None
+  -> embedding_only  decision=identity person_id=None score=1.0 forced=tie reason=None
+  -> llm_single      decision=identity person_id=None score=0.8 forced=None reason=부장님이라는 별명이 두 사람에게 모두 사용될 수 있어 헷갈림.
+  traces for trace_id=73821: 1
+  trace@0.8: {"candidate_count": 2, "confidence_breakdown": {"confidence": 0.95, "matched_person_id": 11931, "rule_checked": 3, "rule_passed": 3, "s_emb": 1.0, "s_llm": 0.9, "s_rule": 1.0, "weights": {"emb": 0.3, "llm": 0.5, "rule": 0.2}}, "decision": {"T_merge": 0.8, "T_new": 0.3, "action": "merge", "band": "merge", "band_by_threshold": "merge", "forced_reason": null, "matched_person_id": 11931, "relaxed_retry": false}, "er_version": "1", "gold_person_id": "p1", "llm": {"attempts": 1, "error": null, "model": "gpt-4o-mini-2024-07-18", "provider": "openai", "s_llm": 0.9, "self_reported": true, "skipped": false, "tokens_in": 409, "tokens_out": 39}, "llm_fresh_call": false, "matched_candidate": {"excluded_by": null, "passed_rules": true, "person_id": 11931, "relaxed_pass": false, "rule_checked": 3, "rule_passed": 3, "s_emb": 1.0, "s_rule": 1.0}, "mention": "부장님", "mention_index": 1, "mention_kind": "gold", "method": "proposed", "row_decision": "merge", "row_person_id": 11931, "row_score": 0.95, "scenario_id": "sc-015", "schema_version": 1, "session_id": "pilot-run-29621888da00-sc-015", "step": "er_resolve", "sweep_index": 6, "t_merge": 0.8, "t_new": 0.3, "tool_name": "er", "trace_id": 73821, "turn": 0}
+
+  [2b] 다른 방식의 오병합 (t_merge=0.8)
+   proposed        sc-015 t0 m1 '부장님' gold=p1/11930 -> person_id=11931 score=0.95 cat=alias trap=nickname_shared_with_title matched_names=None
+   exact_norm      sc-002 t3 m3 '과장님' gold=p1/11895 -> person_id=11896 score=1.0 cat=promotion trap=promotion_collides_with_existing_title matched_names={'11896': ['박과장']}
+   exact_norm      sc-036 t1 m2 '임대리' gold=p2/None -> person_id=11946 score=1.0 cat=new_person trap=new_person_resembles_existing matched_names={'11946': ['이대리']}
+   exact_norm      sc-036 t2 m3 '임대리' gold=p2/None -> person_id=11946 score=1.0 cat=new_person trap=new_person_resembles_existing matched_names={'11946': ['이대리']}
+   exact_norm      sc-036 t3 m5 '임대리' gold=p2/None -> person_id=11946 score=1.0 cat=new_person trap=new_person_resembles_existing matched_names={'11946': ['이대리']}
+
+==============================================================================
+[3] 미검출 전건 (전 방식, t_merge=0.8)
+  proposed : 1
+    sc-007 t2 m1 '문실장님' gold=p1/11903 cat=promotion trap=None cands=1 forced=no_candidates score=0.0 cb={'confidence': 0.0, 'matched_person_id': None, 'rule_checked': 0, 'rule_passed': 0, 's_emb': 0.0, 's_llm': 0.0, 's_rule': 0.0, 'weights': {'emb': 0.3, 'llm': 0.5, 'rule': 0.2}}
+  exact_raw : 33
+    sc-001 t2 m2 '김부장님' gold=p1/11894 cat=promotion trap=None cands=0 forced=None score=0.0 cb=None
+    sc-001 t3 m3 '부장님' gold=p1/11894 cat=promotion trap=None cands=0 forced=None score=0.0 cb=None
+    sc-002 t1 m1 '박과장님' gold=p2/11896 cat=promotion trap=promotion_collides_with_existing_title cands=0 forced=None score=0.0 cb=None
+    sc-002 t2 m2 '박과장님' gold=p2/11896 cat=promotion trap=promotion_collides_with_existing_title cands=0 forced=None score=0.0 cb=None
+    sc-002 t3 m3 '과장님' gold=p1/11895 cat=promotion trap=promotion_collides_with_existing_title cands=0 forced=None score=0.0 cb=None
+    sc-002 t4 m4 '이서연 과장님' gold=p1/11895 cat=promotion trap=promotion_collides_with_existing_title cands=0 forced=None score=0.0 cb=None
+    sc-003 t2 m1 '최대리' gold=p1/11897 cat=promotion trap=None cands=0 forced=None score=0.0 cb=None
+    sc-004 t0 m0 '강팀장님' gold=p1/11898 cat=promotion trap=same_title_two_persons cands=0 forced=None score=0.0 cb=None
+    sc-004 t1 m1 '윤팀장님' gold=p2/11899 cat=promotion trap=same_title_two_persons cands=0 forced=None score=0.0 cb=None
+    sc-004 t2 m2 '팀장님' gold=p1/11898 cat=promotion trap=same_title_two_persons cands=0 forced=None score=0.0 cb=None
+    sc-004 t3 m3 '실장님' gold=p1/11898 cat=promotion trap=same_title_two_persons cands=0 forced=None score=0.0 cb=None
+    sc-005 t2 m1 '회장님' gold=p1/11900 cat=promotion trap=None cands=0 forced=None score=0.0 cb=None
+    sc-006 t2 m2 '주임님' gold=p2/11902 cat=promotion trap=promotion_collides_with_existing_title cands=0 forced=None score=0.0 cb=None
+    sc-007 t2 m1 '문실장님' gold=p1/11903 cat=promotion trap=None cands=0 forced=None score=0.0 cb=None
+    sc-008 t1 m1 '부장님' gold=p2/11905 cat=promotion trap=same_title_two_persons cands=0 forced=None score=0.0 cb=None
+    sc-008 t3 m3 '한부장님' gold=p2/11905 cat=promotion trap=same_title_two_persons cands=0 forced=None score=0.0 cb=None
+    sc-017 t2 m3 '걔' gold=p1/11906 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-018 t2 m2 '그 사람' gold=p2/11909 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-018 t3 m3 '누나' gold=p1/11908 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-019 t2 m3 '쟤' gold=p2/11911 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-020 t1 m2 '그분' gold=p1/11912 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-020 t2 m3 '걔' gold=p2/11913 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-021 t2 m3 '아까 걔' gold=p1/11914 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-023 t1 m1 '그 분' gold=p1/11919 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-024 t2 m3 '얘' gold=p1/11920 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-013 t2 m2 '채원이' gold=p1/11927 cat=alias trap=similar_name_two_persons cands=0 forced=None score=0.0 cb=None
+    sc-015 t1 m2 '한부장님' gold=p2/11931 cat=alias trap=nickname_shared_with_title cands=0 forced=None score=0.0 cb=None
+    sc-016 t0 m0 '예린이' gold=p1/11932 cat=alias trap=None cands=0 forced=None score=0.0 cb=None
+    sc-035 t1 m1 '박과장님' gold=p2/11945 cat=new_person trap=None cands=0 forced=None score=0.0 cb=None
+    sc-039 t0 m0 '한부장님' gold=p1/11948 cat=new_person trap=passing_mention cands=0 forced=None score=0.0 cb=None
+    sc-039 t2 m1 '한부장님' gold=p1/11948 cat=new_person trap=passing_mention cands=0 forced=None score=0.0 cb=None
+    sc-040 t0 m0 '예린이' gold=p1/11949 cat=new_person trap=passing_mention cands=0 forced=None score=0.0 cb=None
+    sc-040 t2 m1 '예린이' gold=p1/11949 cat=new_person trap=passing_mention cands=0 forced=None score=0.0 cb=None
+  exact_norm : 20
+    sc-001 t2 m2 '김부장님' gold=p1/11894 cat=promotion trap=None cands=0 forced=None score=0.0 cb=None
+    sc-001 t3 m3 '부장님' gold=p1/11894 cat=promotion trap=None cands=0 forced=None score=0.0 cb=None
+    sc-002 t4 m4 '이서연 과장님' gold=p1/11895 cat=promotion trap=promotion_collides_with_existing_title cands=0 forced=None score=0.0 cb=None
+    sc-003 t2 m1 '최대리' gold=p1/11897 cat=promotion trap=None cands=0 forced=None score=0.0 cb=None
+    sc-004 t3 m3 '실장님' gold=p1/11898 cat=promotion trap=same_title_two_persons cands=0 forced=None score=0.0 cb=None
+    sc-005 t2 m1 '회장님' gold=p1/11900 cat=promotion trap=None cands=0 forced=None score=0.0 cb=None
+    sc-007 t2 m1 '문실장님' gold=p1/11903 cat=promotion trap=None cands=0 forced=None score=0.0 cb=None
+    sc-017 t2 m3 '걔' gold=p1/11906 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-018 t2 m2 '그 사람' gold=p2/11909 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-018 t3 m3 '누나' gold=p1/11908 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-019 t2 m3 '쟤' gold=p2/11911 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-020 t1 m2 '그분' gold=p1/11912 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-020 t2 m3 '걔' gold=p2/11913 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-021 t2 m3 '아까 걔' gold=p1/11914 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-023 t1 m1 '그 분' gold=p1/11919 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-024 t2 m3 '얘' gold=p1/11920 cat=pronoun trap=None cands=0 forced=None score=0.0 cb=None
+    sc-013 t2 m2 '채원이' gold=p1/11927 cat=alias trap=similar_name_two_persons cands=0 forced=None score=0.0 cb=None
+    sc-016 t0 m0 '예린이' gold=p1/11932 cat=alias trap=None cands=0 forced=None score=0.0 cb=None
+    sc-040 t0 m0 '예린이' gold=p1/11949 cat=new_person trap=passing_mention cands=0 forced=None score=0.0 cb=None
+    sc-040 t2 m1 '예린이' gold=p1/11949 cat=new_person trap=passing_mention cands=0 forced=None score=0.0 cb=None
+  embedding_only : 1
+    sc-021 t2 m3 '아까 걔' gold=p1/11914 cat=pronoun trap=None cands=3 forced=None score=0.29886044999736383 cb=None
+  llm_single : 10
+    sc-001 t2 m2 '김부장님' gold=p1/11894 cat=promotion trap=None cands=0 forced=None score=0.9 cb=None
+    sc-001 t3 m3 '부장님' gold=p1/11894 cat=promotion trap=None cands=0 forced=None score=0.9 cb=None
+    sc-002 t3 m3 '과장님' gold=p1/11895 cat=promotion trap=promotion_collides_with_existing_title cands=0 forced=None score=0.9 cb=None
+    sc-003 t2 m1 '최대리' gold=p1/11897 cat=promotion trap=None cands=0 forced=None score=0.9 cb=None
+    sc-005 t2 m1 '회장님' gold=p1/11900 cat=promotion trap=None cands=0 forced=None score=0.9 cb=None
+    sc-017 t2 m3 '걔' gold=p1/11906 cat=pronoun trap=None cands=0 forced=None score=0.9 cb=None
+    sc-018 t2 m2 '그 사람' gold=p2/11909 cat=pronoun trap=None cands=0 forced=None score=0.9 cb=None
+    sc-019 t2 m3 '쟤' gold=p2/11911 cat=pronoun trap=None cands=0 forced=None score=0.9 cb=None
+    sc-020 t2 m3 '걔' gold=p2/11913 cat=pronoun trap=None cands=0 forced=None score=0.9 cb=None
+    sc-024 t2 m3 '얘' gold=p1/11920 cat=pronoun trap=None cands=0 forced=None score=0.9 cb=None
+
+  [3b] proposed 미검출 1건 전문
+{
+ "ambiguous": false,
+ "candidates": [
+  {
+   "display_name": "문태현",
+   "person_id": 11903,
+   "score": 0.0,
+   "signals": {
+    "embedding_skipped": 0.0,
+    "exact_alias": 0.0,
+    "hierarchy_adjacent": 1.0,
+    "hierarchy_match": 0.0,
+    "partial_alias": 0.0,
+    "passed_rules": 0.0,
+    "relation_tag_match": 0.0,
+    "relaxed_pass": 0.0,
+    "rule_checked": 2.0,
+    "rule_passed": 0.0,
+    "s_emb": 0.31405469845782474,
+    "s_rule": 0.0
+   }
+  }
+ ],
+ "category": "promotion",
+ "decision": "new_person",
+ "detail": {
+  "ask_kind": "new_person",
+  "band_by_threshold": "new_person",
+  "confidence_breakdown": {
+   "confidence": 0.0,
+   "matched_person_id": null,
+   "rule_checked": 0,
+   "rule_passed": 0,
+   "s_emb": 0.0,
+   "s_llm": 0.0,
+   "s_rule": 0.0,
+   "weights": {
+    "emb": 0.3,
+    "llm": 0.5,
+    "rule": 0.2
+   }
+  },
+  "excluded_by": {
+   "11903": "relation_tag_conflict"
+  },
+  "forced_reason": "no_candidates",
+  "llm_attempts": 0,
+  "llm_error": null,
+  "llm_self_reported": true,
+  "llm_skipped": true,
+  "model": null,
+  "provider": null,
+  "relaxed_retry": false,
+  "trace_id": 71871
+ },
+ "expected_ask_user_allowed": [
+  "none"
+ ],
+ "gold_db_person_id": 11903,
+ "gold_person_id": "p1",
+ "llm_fresh_call": false,
+ "mention": "문실장님",
+ "mention_index": 1,
+ "mention_kind": "gold",
+ "method": "proposed",
+ "person_id": null,
+ "scenario_id": "sc-007",
+ "score": 0.0,
+ "sweep_index": 6,
+ "t_merge": 0.8,
+ "t_new": 0.3,
+ "tokens_in": 0,
+ "tokens_out": 0,
+ "trace_id": 71871,
+ "trap_kind": null,
+ "turn": 2
+}
+  -> proposed        decision=new_person person_id=None score=0.0 reason=None
+  -> exact_raw       decision=new_person person_id=None score=0.0 reason=None
+  -> exact_norm      decision=new_person person_id=None score=0.0 reason=None
+  -> embedding_only  decision=identity person_id=None score=0.31405469845782474 reason=None
+  -> llm_single      decision=merge person_id=11903 score=0.9 reason=문실장님은 문태현과 같은 인물로 보입니다.
+
+==============================================================================
+[4] 강제 경로 forced_reason (proposed, t_merge=0.8, 전 mention 141)
+  분포: {None: 109, 'no_matched': 27, 'no_candidates': 5}
+  llm_skipped: Counter({False: 136, True: 5})
+  llm_error  : Counter({None: 141})
+
+  [4a] forced_reason 별 × 카테고리 × 후보수 × 결정 × 채점결과
+   no_candidates: {'promotion': 1, 'new_person': 4} (합 5)
+   no_matched: {'promotion': 5, 'pronoun': 9, 'alias': 4, 'normal': 1, 'new_person': 8} (합 27)
+
+  [4b] forced 행 전량 목록
+   no_candidates  sc-007 t2 m1 '문실장님' cat=promotion kind=gold    cands=1 excluded_by={'11903': 'relation_tag_conflict'} decision=new_person s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=miss
+   no_candidates  sc-036 t1 m1 '그 친구' cat=new_person kind=gold    cands=1 excluded_by={'11946': 'relation_tag_conflict'} decision=new_person s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=new_person_correct
+   no_candidates  sc-037 t0 m0 '시우' cat=new_person kind=gold    cands=0 excluded_by={} decision=new_person s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=new_person_correct
+   no_candidates  sc-037 t1 m1 '시우형' cat=new_person kind=gold    cands=0 excluded_by={} decision=new_person s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=new_person_correct
+   no_candidates  sc-037 t2 m2 '형' cat=new_person kind=gold    cands=0 excluded_by={} decision=new_person s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=new_person_correct
+   no_matched     sc-001 t2 m2 '김부장님' cat=promotion kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-002 t1 m1 '박과장님' cat=promotion kind=gold    cands=2 excluded_by={'11896': 'hierarchy_conflict'} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-002 t2 m2 '박과장님' cat=promotion kind=gold    cands=2 excluded_by={'11896': 'hierarchy_conflict'} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-003 t2 m1 '최대리' cat=promotion kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-005 t2 m1 '회장님' cat=promotion kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-012 t1 m1 '영어쌤' cat=alias     kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-012 t3 m3 '영어쌤' cat=alias     kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-012 t3 m4 '권쌤' cat=alias     kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-012 t4 m5 '권쌤' cat=alias     kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-017 t2 m3 '걔' cat=pronoun   kind=gold    cands=2 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-018 t2 m2 '그 사람' cat=pronoun   kind=gold    cands=2 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-019 t2 m3 '쟤' cat=pronoun   kind=gold    cands=2 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-020 t0 m0 '심팀장' cat=pronoun   kind=gold    cands=2 excluded_by={'11912': 'hierarchy_conflict'} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-020 t2 m3 '걔' cat=pronoun   kind=gold    cands=2 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-021 t2 m3 '아까 걔' cat=pronoun   kind=gold    cands=3 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-022 t1 m2 '걔' cat=pronoun   kind=gold    cands=2 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=-
+   no_matched     sc-024 t2 m3 '얘' cat=pronoun   kind=gold    cands=2 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-024 t4 m4 '걔' cat=pronoun   kind=gold    cands=2 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=-
+   no_matched     sc-033 t2 m1 '심팀장' cat=normal    kind=gold    cands=2 excluded_by={'11943': 'hierarchy_conflict'} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-035 t0 m0 '장하람' cat=new_person kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-035 t1 m2 '하람씨' cat=new_person kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-035 t2 m3 '하람씨' cat=new_person kind=gold    cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=deferred
+   no_matched     sc-038 t1 m0 '남주 배우' cat=new_person kind=passing cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=-
+   no_matched     sc-039 t1 m0 '배달 기사님' cat=new_person kind=passing cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=-
+   no_matched     sc-039 t2 m1 '기사님' cat=new_person kind=passing cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=-
+   no_matched     sc-040 t0 m0 '웬 아저씨' cat=new_person kind=passing cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=-
+   no_matched     sc-040 t2 m1 '그 정치인' cat=new_person kind=passing cands=1 excluded_by={} decision=identity s_llm=0.0 s_emb=0.0 s_rule=0.0 conf=0.0 outcome=-
+
+  [4c] no_matched 25건: 후보는 있었는가 / 규칙 통과 후보 수
+   sc-001 t2 '김부장님' cands=1 passed_rules=1 top_s_emb=None cand_names=['김민준'] excluded_by={}
+   sc-002 t1 '박과장님' cands=2 passed_rules=1 top_s_emb=None cand_names=['박지훈', '이서연'] excluded_by={'11896': 'hierarchy_conflict'}
+   sc-002 t2 '박과장님' cands=2 passed_rules=1 top_s_emb=None cand_names=['박지훈', '이서연'] excluded_by={'11896': 'hierarchy_conflict'}
+   sc-003 t2 '최대리' cands=1 passed_rules=1 top_s_emb=None cand_names=['최유진'] excluded_by={}
+   sc-005 t2 '회장님' cands=1 passed_rules=1 top_s_emb=None cand_names=['정하윤'] excluded_by={}
+   sc-017 t2 '걔' cands=2 passed_rules=2 top_s_emb=None cand_names=['남규진', '백서윤'] excluded_by={}
+   sc-018 t2 '그 사람' cands=2 passed_rules=2 top_s_emb=None cand_names=['양보라', '구민서'] excluded_by={}
+   sc-019 t2 '쟤' cands=2 passed_rules=2 top_s_emb=None cand_names=['장세호', '노아름'] excluded_by={}
+   sc-020 t0 '심팀장' cands=2 passed_rules=1 top_s_emb=None cand_names=['심우재', '홍가은'] excluded_by={'11912': 'hierarchy_conflict'}
+   sc-020 t2 '걔' cands=2 passed_rules=2 top_s_emb=None cand_names=['홍가은', '심우재'] excluded_by={}
+   sc-021 t2 '아까 걔' cands=3 passed_rules=3 top_s_emb=None cand_names=['표동혁', '백서윤', '양보라'] excluded_by={}
+   sc-022 t1 '걔' cands=2 passed_rules=2 top_s_emb=None cand_names=['남규진', '장세호'] excluded_by={}
+   sc-024 t2 '얘' cands=2 passed_rules=2 top_s_emb=None cand_names=['표동혁', '양보라'] excluded_by={}
+   sc-024 t4 '걔' cands=2 passed_rules=2 top_s_emb=None cand_names=['표동혁', '양보라'] excluded_by={}
+   sc-012 t1 '영어쌤' cands=1 passed_rules=1 top_s_emb=None cand_names=['안소미'] excluded_by={}
+   sc-012 t3 '영어쌤' cands=1 passed_rules=1 top_s_emb=None cand_names=['안소미'] excluded_by={}
+   sc-012 t3 '권쌤' cands=1 passed_rules=1 top_s_emb=None cand_names=['안소미'] excluded_by={}
+   sc-012 t4 '권쌤' cands=1 passed_rules=1 top_s_emb=None cand_names=['안소미'] excluded_by={}
+   sc-033 t2 '심팀장' cands=2 passed_rules=1 top_s_emb=None cand_names=['심우재', '홍가은'] excluded_by={'11943': 'hierarchy_conflict'}
+   sc-035 t0 '장하람' cands=1 passed_rules=1 top_s_emb=None cand_names=['박지훈'] excluded_by={}
+   sc-035 t1 '하람씨' cands=1 passed_rules=1 top_s_emb=None cand_names=['박지훈'] excluded_by={}
+   sc-035 t2 '하람씨' cands=1 passed_rules=1 top_s_emb=None cand_names=['박지훈'] excluded_by={}
+   sc-038 t1 '남주 배우' cands=1 passed_rules=1 top_s_emb=None cand_names=['서다인'] excluded_by={}
+   sc-039 t1 '배달 기사님' cands=1 passed_rules=1 top_s_emb=None cand_names=['한지원'] excluded_by={}
+   sc-039 t2 '기사님' cands=1 passed_rules=1 top_s_emb=None cand_names=['한지원'] excluded_by={}
+   sc-040 t0 '웬 아저씨' cands=1 passed_rules=1 top_s_emb=None cand_names=['신예린'] excluded_by={}
+   sc-040 t2 '그 정치인' cands=1 passed_rules=1 top_s_emb=None cand_names=['신예린'] excluded_by={}
+
+==============================================================================
+[5] ask_user(identity) 79건 구성 (proposed, t_merge=0.8, deferred)
+  n = 79
+  확신도 구간: {'[0,0.3)': 20, '[0.6,0.7)': 5, '[0.7,0.8)': 52, '[0.3,0.5)': 2} (confidence 없는 행 0)
+  confidence: n=79 min=0.000 q1=0.000 med=0.750 q3=0.750 max=0.785 mean=0.553
+  s_llm     : n=79 min=0.000 q1=0.000 med=0.900 q3=0.900 max=1.000 mean=0.675
+  s_emb     : n=79 min=0.000 q1=0.000 med=1.000 q3=1.000 max=1.000 mean=0.670
+  s_rule    : n=79 min=0.000 q1=0.000 med=0.000 q3=0.000 max=1.000 mean=0.072
+  s_llm 분포: {0.0: 20, 0.7: 1, 0.8: 5, 0.9: 36, 0.95: 16, 1.0: 1}
+  s_rule 분포: {0.0: 72, 0.6666666666666666: 4, 1.0: 3}
+
+  [5a] '물었지만 사실 맞았을 건' — matched_person_id 가 골드와 같은가
+   matched_person_id == gold_db : 61/79
+   골드가 DB 안 인물인 건       : 69/79
+   후보 목록에 골드가 들어 있던 건: 69/69
+
+  [5b] 같은 mention 에서 다른 방식은?
+   exact_raw       {'miss': 22, 'merge_correct': 47, 'new_person_correct': 10}
+   exact_norm      {'miss': 17, 'merge_correct': 50, 'false_merge': 4, 'deferred': 1, 'new_person_correct': 7}
+   embedding_only  {'deferred': 24, 'merge_correct': 52, 'miss': 1, 'new_person_correct': 2}
+   llm_single      {'miss': 9, 'merge_correct': 47, 'deferred': 13, 'new_person_correct': 10}
+
+  [5c] 반사실: confidence >= 0.8 였다면? (merge 로 갔을 때 정오)
+   matched_person_id 있는 deferred: 59 → 골드일치 54 / 불일치 5
+
+  [5d] deferred 중 matched_person_id 있는 건의 신호별 '0.8 미달 기여도'
+   n=79  평균 부족분=0.2473
+   평균 손실 기여: llm=0.1627 emb=0.0990 rule=0.1857
+   최대 손실 신호 분포: {'llm': 20, 'emb': 8, 'rule': 51}
+
+==============================================================================
+[6] T_merge 격자 전체 — 지배 여부
+  t_merge  |     proposed |    exact_raw |   exact_norm | embedding_on |   llm_single | dominated_by
+  0.5      |     6/1 /22  |     0/33/2   |     4/20/6   |     6/1 /19  |     0/10/19  | []
+  0.55     |     6/1 /22  |     0/33/2   |     4/20/6   |     3/1 /22  |     0/10/19  | ['embedding_only']
+  0.6      |     6/1 /22  |     0/33/2   |     4/20/6   |     1/1 /25  |     0/10/19  | ['embedding_only']
+  0.65     |     6/1 /23  |     0/33/2   |     4/20/6   |     1/1 /27  |     0/10/19  | ['embedding_only']
+  0.7      |     4/1 /27  |     0/33/2   |     4/20/6   |     0/1 /29  |     0/10/19  | ['embedding_only']
+  0.75     |     2/1 /33  |     0/33/2   |     4/20/6   |     0/1 /30  |     0/10/19  | ['embedding_only']
+  0.8      |     1/1 /79  |     0/33/2   |     4/20/6   |     0/1 /31  |     0/10/19  | ['embedding_only']
+  0.85     |     1/1 /96  |     0/33/2   |     4/20/6   |     0/1 /31  |     0/10/19  | ['embedding_only']
+  0.9      |     1/1 /105 |     0/33/2   |     4/20/6   |     0/1 /38  |     0/10/19  | ['embedding_only']
+  0.95     |     1/1 /114 |     0/33/2   |     4/20/6   |     0/1 /43  |     0/10/19  | ['embedding_only']
+  (셀 = 오병합n/미검출n/ask_identity_n, 분모 132)
+
+==============================================================================
+[7] 함정 mention (trap_kind) 거동 — t_merge=0.8
+  함정 mention 수 = 55
+  by_trap_kind = {'promotion_collides_with_existing_title': 9, 'same_title_two_persons': 14, 'nickname_shared': 4, 'similar_name_two_persons': 5, 'nickname_shared_with_title': 5, 'new_person_resembles_existing': 6, 'passing_mention': 12}
+  promotion_collides_with_existing_title sc-002 t0 '이대리' cat=promotion kind=gold    gold=p1
+      proposed        merge       pid= 11895 → merge_correct
+      exact_raw       merge       pid= 11895 → merge_correct
+      exact_norm      merge       pid= 11895 → merge_correct
+      embedding_only  merge       pid= 11895 → merge_correct
+      llm_single      merge       pid= 11895 → merge_correct
+  promotion_collides_with_existing_title sc-002 t1 '박과장님' cat=promotion kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      merge       pid= 11896 → merge_correct
+      embedding_only  merge       pid= 11896 → merge_correct
+      llm_single      merge       pid= 11896 → merge_correct
+  promotion_collides_with_existing_title sc-002 t2 '박과장님' cat=promotion kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      merge       pid= 11896 → merge_correct
+      embedding_only  merge       pid= 11896 → merge_correct
+      llm_single      merge       pid= 11896 → merge_correct
+  promotion_collides_with_existing_title sc-002 t3 '과장님' cat=promotion kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      merge       pid= 11896 → false_merge
+      embedding_only  identity    pid=  None → deferred
+      llm_single      new_person  pid=  None → miss
+  promotion_collides_with_existing_title sc-002 t4 '이서연 과장님' cat=promotion kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      new_person  pid=  None → miss
+      embedding_only  identity    pid=  None → deferred
+      llm_single      merge       pid= 11895 → merge_correct
+  same_title_two_persons sc-004 t0 '강팀장님' cat=promotion kind=gold    gold=p1
+      proposed        merge       pid= 11898 → merge_correct
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      identity    pid=  None → deferred
+      embedding_only  merge       pid= 11898 → merge_correct
+      llm_single      merge       pid= 11898 → merge_correct
+  same_title_two_persons sc-004 t1 '윤팀장님' cat=promotion kind=gold    gold=p2
+      proposed        merge       pid= 11899 → merge_correct
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      identity    pid=  None → deferred
+      embedding_only  merge       pid= 11899 → merge_correct
+      llm_single      merge       pid= 11899 → merge_correct
+  same_title_two_persons sc-004 t2 '팀장님' cat=promotion kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      identity    pid=  None → deferred
+      embedding_only  identity    pid=  None → deferred
+      llm_single      identity    pid=  None → deferred
+  same_title_two_persons sc-004 t3 '실장님' cat=promotion kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      new_person  pid=  None → miss
+      embedding_only  identity    pid=  None → deferred
+      llm_single      identity    pid=  None → deferred
+  promotion_collides_with_existing_title sc-006 t0 '채원씨' cat=promotion kind=gold    gold=p1
+      proposed        merge       pid= 11901 → merge_correct
+      exact_raw       merge       pid= 11901 → merge_correct
+      exact_norm      merge       pid= 11901 → merge_correct
+      embedding_only  merge       pid= 11901 → merge_correct
+      llm_single      merge       pid= 11901 → merge_correct
+  promotion_collides_with_existing_title sc-006 t1 '조주임' cat=promotion kind=gold    gold=p2
+      proposed        merge       pid= 11902 → merge_correct
+      exact_raw       merge       pid= 11902 → merge_correct
+      exact_norm      merge       pid= 11902 → merge_correct
+      embedding_only  merge       pid= 11902 → merge_correct
+      llm_single      merge       pid= 11902 → merge_correct
+  promotion_collides_with_existing_title sc-006 t2 '주임님' cat=promotion kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      merge       pid= 11902 → merge_correct
+      embedding_only  identity    pid=  None → deferred
+      llm_single      identity    pid=  None → deferred
+  promotion_collides_with_existing_title sc-006 t3 '채원씨' cat=promotion kind=gold    gold=p1
+      proposed        merge       pid= 11901 → merge_correct
+      exact_raw       merge       pid= 11901 → merge_correct
+      exact_norm      merge       pid= 11901 → merge_correct
+      embedding_only  merge       pid= 11901 → merge_correct
+      llm_single      merge       pid= 11901 → merge_correct
+  same_title_two_persons sc-008 t0 '아빠' cat=promotion kind=gold    gold=p1
+      proposed        merge       pid= 11904 → merge_correct
+      exact_raw       merge       pid= 11904 → merge_correct
+      exact_norm      merge       pid= 11904 → merge_correct
+      embedding_only  merge       pid= 11904 → merge_correct
+      llm_single      merge       pid= 11904 → merge_correct
+  same_title_two_persons sc-008 t1 '부장님' cat=promotion kind=gold    gold=p2
+      proposed        merge       pid= 11905 → merge_correct
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      merge       pid= 11905 → merge_correct
+      embedding_only  identity    pid=  None → deferred
+      llm_single      identity    pid=  None → deferred
+  same_title_two_persons sc-008 t2 '아빠' cat=promotion kind=gold    gold=p1
+      proposed        merge       pid= 11904 → merge_correct
+      exact_raw       merge       pid= 11904 → merge_correct
+      exact_norm      merge       pid= 11904 → merge_correct
+      embedding_only  merge       pid= 11904 → merge_correct
+      llm_single      merge       pid= 11904 → merge_correct
+  same_title_two_persons sc-008 t3 '한부장님' cat=promotion kind=gold    gold=p2
+      proposed        merge       pid= 11905 → merge_correct
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      merge       pid= 11905 → merge_correct
+      embedding_only  merge       pid= 11905 → merge_correct
+      llm_single      merge       pid= 11905 → merge_correct
+  nickname_shared        sc-010 t0 '김팀장' cat=alias     kind=gold    gold=p1
+      proposed        merge       pid= 11923 → merge_correct
+      exact_raw       merge       pid= 11923 → merge_correct
+      exact_norm      merge       pid= 11923 → merge_correct
+      embedding_only  merge       pid= 11923 → merge_correct
+      llm_single      merge       pid= 11923 → merge_correct
+  nickname_shared        sc-010 t1 '민준이' cat=alias     kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       merge       pid= 11924 → merge_correct
+      exact_norm      merge       pid= 11924 → merge_correct
+      embedding_only  merge       pid= 11924 → merge_correct
+      llm_single      identity    pid=  None → deferred
+  nickname_shared        sc-010 t2 '민준이' cat=alias     kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       merge       pid= 11924 → merge_correct
+      exact_norm      merge       pid= 11924 → merge_correct
+      embedding_only  merge       pid= 11924 → merge_correct
+      llm_single      identity    pid=  None → deferred
+  nickname_shared        sc-010 t3 '팀장님' cat=alias     kind=gold    gold=p1
+      proposed        merge       pid= 11923 → merge_correct
+      exact_raw       merge       pid= 11923 → merge_correct
+      exact_norm      merge       pid= 11923 → merge_correct
+      embedding_only  merge       pid= 11923 → merge_correct
+      llm_single      merge       pid= 11923 → merge_correct
+  same_title_two_persons sc-012 t0 '수학쌤' cat=alias     kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       merge       pid= 11926 → merge_correct
+      exact_norm      merge       pid= 11926 → merge_correct
+      embedding_only  merge       pid= 11926 → merge_correct
+      llm_single      merge       pid= 11926 → merge_correct
+  same_title_two_persons sc-012 t1 '영어쌤' cat=alias     kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → new_person_correct
+      exact_norm      new_person  pid=  None → new_person_correct
+      embedding_only  identity    pid=  None → deferred
+      llm_single      new_person  pid=  None → new_person_correct
+  same_title_two_persons sc-012 t2 '안쌤' cat=alias     kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       merge       pid= 11926 → merge_correct
+      exact_norm      merge       pid= 11926 → merge_correct
+      embedding_only  merge       pid= 11926 → merge_correct
+      llm_single      merge       pid= 11926 → merge_correct
+  same_title_two_persons sc-012 t3 '영어쌤' cat=alias     kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → new_person_correct
+      exact_norm      new_person  pid=  None → new_person_correct
+      embedding_only  identity    pid=  None → deferred
+      llm_single      new_person  pid=  None → new_person_correct
+  same_title_two_persons sc-012 t3 '권쌤' cat=alias     kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → new_person_correct
+      exact_norm      new_person  pid=  None → new_person_correct
+      embedding_only  identity    pid=  None → deferred
+      llm_single      new_person  pid=  None → new_person_correct
+  same_title_two_persons sc-012 t4 '권쌤' cat=alias     kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → new_person_correct
+      exact_norm      new_person  pid=  None → new_person_correct
+      embedding_only  identity    pid=  None → deferred
+      llm_single      new_person  pid=  None → new_person_correct
+  similar_name_two_persons sc-013 t0 '채원씨' cat=alias     kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       merge       pid= 11927 → merge_correct
+      exact_norm      merge       pid= 11927 → merge_correct
+      embedding_only  merge       pid= 11927 → merge_correct
+      llm_single      merge       pid= 11927 → merge_correct
+  similar_name_two_persons sc-013 t1 '채영이' cat=alias     kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       merge       pid= 11928 → merge_correct
+      exact_norm      merge       pid= 11928 → merge_correct
+      embedding_only  merge       pid= 11928 → merge_correct
+      llm_single      merge       pid= 11928 → merge_correct
+  similar_name_two_persons sc-013 t2 '채원이' cat=alias     kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      new_person  pid=  None → miss
+      embedding_only  merge       pid= 11927 → merge_correct
+      llm_single      identity    pid=  None → deferred
+  similar_name_two_persons sc-013 t2 '채영이' cat=alias     kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       merge       pid= 11928 → merge_correct
+      exact_norm      merge       pid= 11928 → merge_correct
+      embedding_only  merge       pid= 11928 → merge_correct
+      llm_single      identity    pid=  None → deferred
+  similar_name_two_persons sc-013 t3 '걔' cat=alias     kind=gold    gold=None
+      proposed        identity    pid=  None → -
+      exact_raw       new_person  pid=  None → -
+      exact_norm      new_person  pid=  None → -
+      embedding_only  identity    pid=  None → -
+      llm_single      new_person  pid=  None → -
+  nickname_shared_with_title sc-015 t0 '은우' cat=alias     kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       merge       pid= 11930 → merge_correct
+      exact_norm      merge       pid= 11930 → merge_correct
+      embedding_only  merge       pid= 11930 → merge_correct
+      llm_single      identity    pid=  None → deferred
+  nickname_shared_with_title sc-015 t0 '부장님' cat=alias     kind=gold    gold=p1
+      proposed        merge       pid= 11931 → false_merge
+      exact_raw       identity    pid=  None → deferred
+      exact_norm      identity    pid=  None → deferred
+      embedding_only  identity    pid=  None → deferred
+      llm_single      identity    pid=  None → deferred
+  nickname_shared_with_title sc-015 t1 '한부장님' cat=alias     kind=gold    gold=p2
+      proposed        merge       pid= 11931 → merge_correct
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      identity    pid=  None → deferred
+      embedding_only  merge       pid= 11931 → merge_correct
+      llm_single      merge       pid= 11931 → merge_correct
+  nickname_shared_with_title sc-015 t2 '은우' cat=alias     kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       merge       pid= 11930 → merge_correct
+      exact_norm      merge       pid= 11930 → merge_correct
+      embedding_only  merge       pid= 11930 → merge_correct
+      llm_single      merge       pid= 11930 → merge_correct
+  nickname_shared_with_title sc-015 t3 '부장님' cat=alias     kind=gold    gold=p2
+      proposed        merge       pid= 11931 → merge_correct
+      exact_raw       identity    pid=  None → deferred
+      exact_norm      identity    pid=  None → deferred
+      embedding_only  identity    pid=  None → deferred
+      llm_single      identity    pid=  None → deferred
+  new_person_resembles_existing sc-036 t0 '이대리' cat=new_person kind=gold    gold=p1
+      proposed        merge       pid= 11946 → merge_correct
+      exact_raw       merge       pid= 11946 → merge_correct
+      exact_norm      merge       pid= 11946 → merge_correct
+      embedding_only  merge       pid= 11946 → merge_correct
+      llm_single      merge       pid= 11946 → merge_correct
+  new_person_resembles_existing sc-036 t1 '그 친구' cat=new_person kind=gold    gold=p2
+      proposed        new_person  pid=  None → new_person_correct
+      exact_raw       new_person  pid=  None → new_person_correct
+      exact_norm      new_person  pid=  None → new_person_correct
+      embedding_only  identity    pid=  None → deferred
+      llm_single      identity    pid=  None → deferred
+  new_person_resembles_existing sc-036 t1 '임대리' cat=new_person kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → new_person_correct
+      exact_norm      merge       pid= 11946 → false_merge
+      embedding_only  identity    pid=  None → deferred
+      llm_single      new_person  pid=  None → new_person_correct
+  new_person_resembles_existing sc-036 t2 '임대리' cat=new_person kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → new_person_correct
+      exact_norm      merge       pid= 11946 → false_merge
+      embedding_only  identity    pid=  None → deferred
+      llm_single      new_person  pid=  None → new_person_correct
+  new_person_resembles_existing sc-036 t2 '이대리' cat=new_person kind=gold    gold=p1
+      proposed        merge       pid= 11946 → merge_correct
+      exact_raw       merge       pid= 11946 → merge_correct
+      exact_norm      merge       pid= 11946 → merge_correct
+      embedding_only  merge       pid= 11946 → merge_correct
+      llm_single      identity    pid=  None → deferred
+  new_person_resembles_existing sc-036 t3 '임대리' cat=new_person kind=gold    gold=p2
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → new_person_correct
+      exact_norm      merge       pid= 11946 → false_merge
+      embedding_only  identity    pid=  None → deferred
+      llm_single      new_person  pid=  None → new_person_correct
+  passing_mention        sc-038 t0 '다인이' cat=new_person kind=gold    gold=p1
+      proposed        merge       pid= 11947 → merge_correct
+      exact_raw       merge       pid= 11947 → merge_correct
+      exact_norm      merge       pid= 11947 → merge_correct
+      embedding_only  merge       pid= 11947 → merge_correct
+      llm_single      merge       pid= 11947 → merge_correct
+  passing_mention        sc-038 t2 '다인이' cat=new_person kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       merge       pid= 11947 → merge_correct
+      exact_norm      merge       pid= 11947 → merge_correct
+      embedding_only  merge       pid= 11947 → merge_correct
+      llm_single      merge       pid= 11947 → merge_correct
+  passing_mention        sc-038 t1 '남주 배우' cat=new_person kind=passing gold=None
+      proposed        identity    pid=  None → -
+      exact_raw       new_person  pid=  None → -
+      exact_norm      new_person  pid=  None → -
+      embedding_only  new_person  pid=  None → -
+      llm_single      new_person  pid=  None → -
+  passing_mention        sc-038 t2 '그 아이돌' cat=new_person kind=passing gold=None
+      proposed        identity    pid=  None → -
+      exact_raw       new_person  pid=  None → -
+      exact_norm      new_person  pid=  None → -
+      embedding_only  identity    pid=  None → -
+      llm_single      new_person  pid=  None → -
+  passing_mention        sc-039 t0 '한부장님' cat=new_person kind=gold    gold=p1
+      proposed        merge       pid= 11948 → merge_correct
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      merge       pid= 11948 → merge_correct
+      embedding_only  merge       pid= 11948 → merge_correct
+      llm_single      merge       pid= 11948 → merge_correct
+  passing_mention        sc-039 t2 '한부장님' cat=new_person kind=gold    gold=p1
+      proposed        merge       pid= 11948 → merge_correct
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      merge       pid= 11948 → merge_correct
+      embedding_only  merge       pid= 11948 → merge_correct
+      llm_single      merge       pid= 11948 → merge_correct
+  passing_mention        sc-039 t1 '배달 기사님' cat=new_person kind=passing gold=None
+      proposed        identity    pid=  None → -
+      exact_raw       new_person  pid=  None → -
+      exact_norm      new_person  pid=  None → -
+      embedding_only  identity    pid=  None → -
+      llm_single      new_person  pid=  None → -
+  passing_mention        sc-039 t2 '기사님' cat=new_person kind=passing gold=None
+      proposed        identity    pid=  None → -
+      exact_raw       new_person  pid=  None → -
+      exact_norm      new_person  pid=  None → -
+      embedding_only  identity    pid=  None → -
+      llm_single      new_person  pid=  None → -
+  passing_mention        sc-040 t0 '예린이' cat=new_person kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      new_person  pid=  None → miss
+      embedding_only  merge       pid= 11949 → merge_correct
+      llm_single      merge       pid= 11949 → merge_correct
+  passing_mention        sc-040 t2 '예린이' cat=new_person kind=gold    gold=p1
+      proposed        identity    pid=  None → deferred
+      exact_raw       new_person  pid=  None → miss
+      exact_norm      new_person  pid=  None → miss
+      embedding_only  merge       pid= 11949 → merge_correct
+      llm_single      merge       pid= 11949 → merge_correct
+  passing_mention        sc-040 t0 '웬 아저씨' cat=new_person kind=passing gold=None
+      proposed        identity    pid=  None → -
+      exact_raw       new_person  pid=  None → -
+      exact_norm      new_person  pid=  None → -
+      embedding_only  new_person  pid=  None → -
+      llm_single      new_person  pid=  None → -
+  passing_mention        sc-040 t2 '그 정치인' cat=new_person kind=passing gold=None
+      proposed        identity    pid=  None → -
+      exact_raw       new_person  pid=  None → -
+      exact_norm      new_person  pid=  None → -
+      embedding_only  identity    pid=  None → -
+      llm_single      new_person  pid=  None → -
+
+==============================================================================
+[8] 카테고리 × 방식 × 결과 (t_merge=0.8)
+  --- proposed
+    alias      n= 33 merge_ok= 11 false_merge= 1 miss= 0 deferred= 21 new_ok= 0
+    new_person n= 19 merge_ok=  6 false_merge= 0 miss= 0 deferred=  9 new_ok= 4
+    normal     n= 21 merge_ok=  9 false_merge= 0 miss= 0 deferred= 12 new_ok= 0
+    promotion  n= 28 merge_ok= 15 false_merge= 0 miss= 1 deferred= 12 new_ok= 0
+    pronoun    n= 31 merge_ok=  6 false_merge= 0 miss= 0 deferred= 25 new_ok= 0
+  --- exact_raw
+    alias      n= 33 merge_ok= 24 false_merge= 0 miss= 3 deferred=  2 new_ok= 4
+    new_person n= 19 merge_ok=  4 false_merge= 0 miss= 5 deferred=  0 new_ok=10
+    normal     n= 21 merge_ok= 21 false_merge= 0 miss= 0 deferred=  0 new_ok= 0
+    promotion  n= 28 merge_ok= 12 false_merge= 0 miss=16 deferred=  0 new_ok= 0
+    pronoun    n= 31 merge_ok= 22 false_merge= 0 miss= 9 deferred=  0 new_ok= 0
+  --- exact_norm
+    alias      n= 33 merge_ok= 24 false_merge= 0 miss= 2 deferred=  3 new_ok= 4
+    new_person n= 19 merge_ok=  7 false_merge= 3 miss= 2 deferred=  0 new_ok= 7
+    normal     n= 21 merge_ok= 21 false_merge= 0 miss= 0 deferred=  0 new_ok= 0
+    promotion  n= 28 merge_ok= 17 false_merge= 1 miss= 7 deferred=  3 new_ok= 0
+    pronoun    n= 31 merge_ok= 22 false_merge= 0 miss= 9 deferred=  0 new_ok= 0
+  --- embedding_only
+    alias      n= 33 merge_ok= 26 false_merge= 0 miss= 0 deferred=  7 new_ok= 0
+    new_person n= 19 merge_ok=  9 false_merge= 0 miss= 0 deferred=  5 new_ok= 5
+    normal     n= 21 merge_ok= 21 false_merge= 0 miss= 0 deferred=  0 new_ok= 0
+    promotion  n= 28 merge_ok= 17 false_merge= 0 miss= 0 deferred= 11 new_ok= 0
+    pronoun    n= 31 merge_ok= 22 false_merge= 0 miss= 1 deferred=  8 new_ok= 0
+  --- llm_single
+    alias      n= 33 merge_ok= 22 false_merge= 0 miss= 0 deferred=  7 new_ok= 4
+    new_person n= 19 merge_ok=  8 false_merge= 0 miss= 0 deferred=  2 new_ok= 9
+    normal     n= 21 merge_ok= 21 false_merge= 0 miss= 0 deferred=  0 new_ok= 0
+    promotion  n= 28 merge_ok= 19 false_merge= 0 miss= 5 deferred=  4 new_ok= 0
+    pronoun    n= 31 merge_ok= 20 false_merge= 0 miss= 5 deferred=  6 new_ok= 0
+
+==============================================================================
+[9] 신호 분포 전체 (proposed, mention 141, t_merge 무관 — sweep 최소 행)
+  mention=141 confidence 있는 행=141
+  confidence: n=141 min=0.000 q1=0.530 med=0.750 q3=0.800 max=1.000 mean=0.619
+  s_llm     : n=141 min=0.000 q1=0.800 med=0.900 q3=0.950 max=1.000 mean=0.714
+  s_emb     : n=141 min=0.000 q1=0.341 med=1.000 q3=1.000 max=1.000 mean=0.708
+  s_rule    : n=141 min=0.000 q1=0.000 med=0.000 q3=0.667 max=1.000 mean=0.248
+  s_llm 히스토그램: {0.0: 32, 0.7: 1, 0.8: 6, 0.9: 58, 0.95: 21, 1.0: 23}
+  s_rule 히스토그램: {0.0: 100, 0.667: 18, 1.0: 23}
+  s_emb 구간: {0.0: 32, 0.2: 1, 0.3: 4, 0.4: 3, 0.5: 4, 0.6: 3, 0.7: 1, 0.8: 7, 0.9: 4, 1.0: 82}
+  confidence >= 0.8 : 48
+  rule_checked==0   : 100
+  empty_derive_hints: {'n': 91, 'd': 141, 'rate': 0.6453900709219859, 'basis': "detail['hints'] 를 남기는 방식의 mention (sweep_index 최소 행)"}
+
+  [9a] 반사실 가중치: llm 0.5/emb 0.3/rule 0.2 대신 다른 조합이면 merge 수·오병합은?
+   w(llm,emb,rule)=(0.5, 0.3, 0.2) → merge 48 (골드일치 47 / 불일치 1)
+   w(llm,emb,rule)=(0.4, 0.4, 0.2) → merge 47 (골드일치 46 / 불일치 1)
+   w(llm,emb,rule)=(0.3, 0.5, 0.2) → merge 45 (골드일치 44 / 불일치 1)
+   w(llm,emb,rule)=(0.34, 0.33, 0.33) → merge 34 (골드일치 33 / 불일치 1)
+   w(llm,emb,rule)=(0.2, 0.6, 0.2) → merge 45 (골드일치 44 / 불일치 1)
+
+  [9b] 반사실 T_merge 낮추기 (가중치 고정) — 골드 mention 기준
+   T_merge=0.5 → merge 105 (골드일치 99 / 불일치 6)
+   T_merge=0.55 → merge 105 (골드일치 99 / 불일치 6)
+   T_merge=0.6 → merge 105 (골드일치 99 / 불일치 6)
+   T_merge=0.65 → merge 104 (골드일치 98 / 불일치 6)
+   T_merge=0.7 → merge 100 (골드일치 96 / 불일치 4)
+   T_merge=0.75 → merge 94 (골드일치 92 / 불일치 2)
+   T_merge=0.8 → merge 48 (골드일치 47 / 불일치 1)
+
+==============================================================================
+[10] LLM 사용 현황 (proposed)
+  llm_skipped: Counter({False: 136, True: 5})
+  llm_error  : Counter({None: 141})
+  llm_self_reported: Counter({True: 141})
+  relaxed_retry: Counter({False: 123, True: 18})
+  candidate_count 분포: {None: 141}
+  proposed detail 에 'reason' 키: 0
+  llm_single detail 에 'reason' 키: 141
+
+==============================================================================
+[11] embedding_only 가 merge 로 맞힌 건의 s_emb (지배 원인 대조)
+  merge_correct = 95  score: n=95 min=0.897 q1=1.000 med=1.000 q3=1.000 max=1.000 mean=0.988
+  (proposed, embedding_only) 결과 교차표:
+    ('deferred', 'deferred') : 24
+    ('deferred', 'merge_correct') : 52
+    ('deferred', 'miss') : 1
+    ('deferred', 'new_person_correct') : 2
+    ('false_merge', 'deferred') : 1
+    ('merge_correct', 'deferred') : 4
+    ('merge_correct', 'merge_correct') : 43
+    ('miss', 'deferred') : 1
+    ('new_person_correct', 'deferred') : 1
+    ('new_person_correct', 'new_person_correct') : 3
+
+  [11a] embedding_only 판정 임계 확인 — detail 키
+   {"ask_kind": null, "band_by_threshold": "merge", "candidate_count": 1, "embedding_skipped": false, "forced_reason": null, "hints": {"hierarchy": "동", "relation_tag": "직장"}, "thresholds": {"t_merge": 0.8, "t_new": 0.3}, "tied_person_ids": [], "top_s_emb": 1.0, "uses_embedding": true, "uses_llm": false, "uses_rules": false, "uses_thresholds": true}
+
+==============================================================================
+[12] 라벨 점검 — 전 방식이 틀린 mention (검수 후보)
+  (전 방식 오답인 mention 이 없으면 위 목록은 비어 있다)
+
+[12b] proposed 가 틀린 2건의 골드·후보 재확인은 [2]·[3] 참조
+==============================================================================
+DONE
+
+########## PART 2 — 단계 귀속·함정·반사실 ##########
+==============================================================================
+[A] forced_reason 을 metrics 분모(138 = 141 - ambiguous 3)로 맞춘 재현
+  141행 기준: {None: 109, 'no_matched': 27, 'no_candidates': 5}
+  138행 기준(ambiguous 3 제외): {None: 108, 'no_matched': 25, 'no_candidates': 5}
+  metrics.json: {'no_candidates': 5, 'no_matched': 25, 'none': 108}
+  ambiguous 3건의 forced_reason: [('sc-022', 1, '걔', 'no_matched'), ('sc-024', 4, '걔', 'no_matched'), ('sc-013', 3, '걔', None)]
+
+==============================================================================
+[B] 단계 귀속 — rule_checked / derive_hints / s_rule 연쇄 (proposed, mention 141)
+  derive_hints 가 빈 dict 인 mention : 141/141
+  rule_checked == 0                 : 100/141
+  (hints 있음?, rule_checked==0?) 교차: {(False, False): 41, (False, True): 100}
+  s_rule == 0.0                     : 100/141
+  s_rule==0 중 rule_checked==0 인 것 : 100
+
+  [B1] 확신도 상한 구조: s_rule=0 이면 conf = 0.5*s_llm + 0.3*s_emb <= 0.8 (동시 만점일 때만 0.8)
+  rule_checked==0 mention 의 confidence 값 분포: {0.0: 32, 0.454: 1, 0.494: 1, 0.5: 1, 0.56: 1, 0.634: 1, 0.69: 1, 0.719: 2, 0.728: 1, 0.744: 1, 0.75: 29, 0.775: 15, 0.8: 14}
+  rule_checked>0  mention 의 confidence 값 분포: {0.685: 1, 0.694: 2, 0.721: 1, 0.744: 1, 0.778: 1, 0.785: 1, 0.83: 1, 0.836: 1, 0.839: 1, 0.862: 1, 0.868: 1, 0.871: 1, 0.883: 6, 0.908: 3, 0.919: 4, 0.933: 2, 0.95: 5, 0.975: 2, 1.0: 6}
+
+  [B2] deferred 79 의 rule_checked / s_llm / s_emb 조합
+    rule_checked0=True  s_llm=0.9   s_emb≈1.0  : 29
+    rule_checked0=True  s_llm=0.0   s_emb≈0.0  : 20
+    rule_checked0=True  s_llm=0.95  s_emb≈1.0  : 15
+    rule_checked0=True  s_llm=0.9   s_emb≈0.9  : 3
+    rule_checked0=False s_llm=0.8   s_emb≈0.5  : 2
+    rule_checked0=False s_llm=0.8   s_emb≈0.3  : 1
+    rule_checked0=True  s_llm=0.9   s_emb≈0.8  : 1
+    rule_checked0=False s_llm=0.9   s_emb≈0.7  : 1
+    rule_checked0=False s_llm=0.8   s_emb≈0.4  : 1
+    rule_checked0=False s_llm=0.9   s_emb≈0.4  : 1
+    rule_checked0=True  s_llm=0.8   s_emb≈0.3  : 1
+    rule_checked0=True  s_llm=0.7   s_emb≈0.3  : 1
+    rule_checked0=True  s_llm=1.0   s_emb≈0.4  : 1
+    rule_checked0=False s_llm=0.9   s_emb≈0.5  : 1
+    rule_checked0=True  s_llm=0.95  s_emb≈0.9  : 1
+
+  [B3] deferred 79 를 '왜 0.8 미만인가'로 분류
+     52  규칙 신호 미측정(rule_checked=0) → s_rule=0 이 0.2 를 통째로 깎음
+     20  강제(no_matched) — 확신도 계산 자체가 0
+      7  규칙은 쟀지만 합산이 0.8 미만
+
+  [B4] 반사실: s_rule 을 '미측정이면 가중치 재정규화'(llm 0.625/emb 0.375)로 바꾸면
+    merge 97 → 골드일치 96 / 불일치 1  (현행 47/1)
+    새로 생기는 오병합: [('sc-015', 0, '부장님')]
+
+  [B5] 반사실: T_merge 만 0.75 로 내리면 (metrics 격자에서 직접)
+    T_merge=0.75: 오병합 2/132 미검출 1/132 ask_identity 33/132 merge_correct 92
+      embedding_only: 오병합 0 미검출 1 ask 30
+    T_merge=0.8: 오병합 1/132 미검출 1/132 ask_identity 79/132 merge_correct 47
+      embedding_only: 오병합 0 미검출 1 ask 31
+
+==============================================================================
+[C] 함정 유형별 집계 (t_merge=0.8) — 시나리오 수·mention 수·방식별 결과
+  함정 시나리오: ['sc-002', 'sc-004', 'sc-006', 'sc-008', 'sc-010', 'sc-012', 'sc-013', 'sc-015', 'sc-036', 'sc-038', 'sc-039', 'sc-040'] (12건)
+  함정 mention: 55
+
+  trap_kind                              sc  men                    proposed                  exact_raw                 exact_norm                embedding_o                 llm_single
+  new_person_resembles_existing          1   6           ok2/fm0/ms0/df3/np1        ok2/fm0/ms0/df0/np4        ok2/fm3/ms0/df0/np1        ok2/fm0/ms0/df4/np0        ok1/fm0/ms0/df2/np3
+  nickname_shared                        1   4           ok2/fm0/ms0/df2/np0        ok4/fm0/ms0/df0/np0        ok4/fm0/ms0/df0/np0        ok4/fm0/ms0/df0/np0        ok2/fm0/ms0/df2/np0
+  nickname_shared_with_title             1   5           ok2/fm1/ms0/df2/np0        ok2/fm0/ms1/df2/np0        ok2/fm0/ms0/df3/np0        ok3/fm0/ms0/df2/np0        ok2/fm0/ms0/df3/np0
+  passing_mention                        3   12          ok3/fm0/ms0/df3/np0        ok2/fm0/ms4/df0/np0        ok4/fm0/ms2/df0/np0        ok6/fm0/ms0/df0/np0        ok6/fm0/ms0/df0/np0
+  promotion_collides_with_existing_title 2   9           ok4/fm0/ms0/df5/np0        ok4/fm0/ms5/df0/np0        ok7/fm1/ms1/df0/np0        ok6/fm0/ms0/df3/np0        ok7/fm0/ms1/df1/np0
+  same_title_two_persons                 3   14          ok6/fm0/ms0/df8/np0        ok4/fm0/ms6/df0/np4        ok6/fm0/ms1/df3/np4        ok7/fm0/ms0/df7/np0        ok7/fm0/ms0/df3/np4
+  similar_name_two_persons               1   5           ok0/fm0/ms0/df4/np0        ok3/fm0/ms1/df0/np0        ok3/fm0/ms1/df0/np0        ok4/fm0/ms0/df0/np0        ok2/fm0/ms0/df2/np0
+  (ok=merge_correct fm=false_merge ms=miss df=deferred np=new_person_correct; 골드 mention 만, ambiguous·passing 제외)
+
+  [C1] 함정 mention 중 골드 채점 대상 수
+    new_person_resembles_existing          gold_scored= 6 passing= 0 ambiguous= 0
+    nickname_shared                        gold_scored= 4 passing= 0 ambiguous= 0
+    nickname_shared_with_title             gold_scored= 5 passing= 0 ambiguous= 0
+    passing_mention                        gold_scored= 6 passing= 6 ambiguous= 0
+    promotion_collides_with_existing_title gold_scored= 9 passing= 0 ambiguous= 0
+    same_title_two_persons                 gold_scored=14 passing= 0 ambiguous= 0
+    similar_name_two_persons               gold_scored= 4 passing= 0 ambiguous= 1
+
+==============================================================================
+[D] passing mention 6건 — 방식별 결정 (오탐 축)
+  proposed        {'identity': 6}  metrics.passing={'false_positive': {'n': 0, 'd': 6, 'rate': 0.0}, 'by_decision': {'merge': 0, 'identity': 6, 'new_person': 0}, 'expected_ask_user_allowed': {'n': 0, 'd': 6, 'rate': 0.0}}
+  exact_raw       {'new_person': 6}  metrics.passing={'false_positive': {'n': 6, 'd': 6, 'rate': 1.0}, 'by_decision': {'merge': 0, 'identity': 0, 'new_person': 6}, 'expected_ask_user_allowed': {'n': 0, 'd': 6, 'rate': 0.0}}
+  exact_norm      {'new_person': 6}  metrics.passing={'false_positive': {'n': 6, 'd': 6, 'rate': 1.0}, 'by_decision': {'merge': 0, 'identity': 0, 'new_person': 6}, 'expected_ask_user_allowed': {'n': 0, 'd': 6, 'rate': 0.0}}
+  embedding_only  {'new_person': 2, 'identity': 4}  metrics.passing={'false_positive': {'n': 2, 'd': 6, 'rate': 0.3333333333333333}, 'by_decision': {'merge': 0, 'identity': 4, 'new_person': 2}, 'expected_ask_user_allowed': {'n': 0, 'd': 6, 'rate': 0.0}}
+  llm_single      {'new_person': 6}  metrics.passing={'false_positive': {'n': 6, 'd': 6, 'rate': 1.0}, 'by_decision': {'merge': 0, 'identity': 0, 'new_person': 6}, 'expected_ask_user_allowed': {'n': 0, 'd': 6, 'rate': 0.0}}
+
+==============================================================================
+[E] ask_user(new_person) 5건 (proposed, t_merge=0.8)
+  sc-007 t2 '문실장님' cat=promotion gold=p1/11903 forced=no_candidates → miss
+  sc-036 t1 '그 친구' cat=new_person gold=p2/None forced=no_candidates → new_person_correct
+  sc-037 t0 '시우' cat=new_person gold=p1/None forced=no_candidates → new_person_correct
+  sc-037 t1 '시우형' cat=new_person gold=p1/None forced=no_candidates → new_person_correct
+  sc-037 t2 '형' cat=new_person gold=p1/None forced=no_candidates → new_person_correct
+
+==============================================================================
+[F] embedding_only 미검출 1건 vs proposed 미검출 1건 — 같은 mention 인가
+  proposed      : [('sc-007', 2, '문실장님')]
+  embedding_only: [('sc-021', 2, '아까 걔')]
+  같은 mention 인가: False
+  embedding_only miss 행: {"ambiguous": false, "category": "pronoun", "decision": "new_person", "detail": {"ask_kind": "new_person", "band_by_threshold": "new_person", "candidate_count": 3, "embedding_skipped": false, "forced_reason": null, "hints": {}, "thresholds": {"t_merge": 0.8, "t_new": 0.3}, "tied_person_ids": [], "top_s_emb": 0.29886044999736383, "uses_embedding": true, "uses_llm": false, "uses_rules": false, "uses_thresholds": true}, "expected_ask_user_allowed": ["identity", "none"], "gold_db_person_id": 11914, "gold_person_id": "p1", "llm_fresh_call": false, "mention": "아까 걔", "mention_index": 3, "mention_kind": "gold", "method": "embedding_only", "person_id": null, "scenario_id": "sc-021", "score": 0.29886044999736383, "sweep_index": 6, "t_merge": 0.8, "t_new": 0.3, "tokens_in": 0, "tokens_out": 0, "trace_id": null, "trap_kind": null, "turn": 2}
+   후보: [{"display_name": "표동혁", "person_id": 11914, "score": 0.29886044999736383, "signals": {"embedding_skipped": 0.0, "s_emb": 0.29886044999736383}}, {"display_name": "백서윤", "person_id": 11915, "score": 0.2876328046403598, "signals": {"embedding_skipped": 0.0, "s_emb": 0.2876328046403598}}, {"display_name": "양보라", "person_id": 11916, "score": 0.24798942306839677, "signals": {"embedding_skipped": 0.0, "s_emb": 0.24798942306839677}}]
+
+==============================================================================
+[G] 토큰·비용 실측 (재현용)
+  llm_fresh_call 행: 277 Counter({'llm_single': 141, 'proposed': 136})
+  tokens_in 합: 130240  tokens_out 합: 12617
+   proposed: n=136 in=60266 out=5656
+   llm_single: n=141 in=69974 out=6961
+
+==============================================================================
+[H] 보정표 (calibration.json) 요약 — s_llm 자기보고의 신뢰성
+  keys: ['excluded', 'excluded_clamped', 'groups', 'meta', 'schema_version', 'unassigned']
+  group: method=proposed provider=openai model=gpt-4o-mini-2024-07-18 n=107
+    bin 0.7-0.8: n=1 correct=0 acc=0.0
+    bin 0.8-0.9: n=5 correct=0 acc=0.0
+    bin 0.9-1.0: n=101 correct=47 acc=0.46534653465346537
+  group: method=llm_single provider=openai model=gpt-4o-mini-2024-07-18 n=132
+    bin 0.7-0.8: n=11 correct=0 acc=0.0
+    bin 0.8-0.9: n=4 correct=0 acc=0.0
+    bin 0.9-1.0: n=117 correct=103 acc=0.8803418803418803
+  excluded: {'excluded': {'ambiguous_mention': 6, 'llm_error': 0, 'llm_error_kinds': {}, 'llm_skipped': 5, 'passing_mention': 12, 'placeholder_s_llm': 20, 'score_clamped': 0, 'total': 43}, 'excluded_clamped': 0}
+
+==============================================================================
+[I] 전 방식이 deferred 인 mention (데이터가 원래 어려운 건)
+  합: 0
+==============================================================================
+DONE2
+
+########## PART 3 — 규칙 필터 제외 ##########
+[M] 규칙 필터 제외(excluded_by) — 단계 2 귀속 증거
+excluded_by 가 비지 않은 mention: 19 / 141
+제외 사유 분포: {'hierarchy_conflict': 7, 'relation_tag_conflict': 12}
+그중 골드 인물이 제외된 건:
+   sc-002 t1 '박과장님' hierarchy_conflict decision= identity -> deferred
+   sc-002 t2 '박과장님' hierarchy_conflict decision= identity -> deferred
+   sc-007 t2 '문실장님' relation_tag_conflict decision= new_person -> miss
+   sc-020 t0 '심팀장' hierarchy_conflict decision= identity -> deferred
+   sc-015 t0 '부장님' relation_tag_conflict decision= merge -> false_merge
+   sc-033 t2 '심팀장' hierarchy_conflict decision= identity -> deferred
+
+########## PART 4 — failure_cases.md 재현 명령(R1~R23) 실행 출력 ##########
+
+### R1 게이트(판정은 metrics.json 을 옮긴다)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import json;g=json.load(open("reports/metrics.json",encoding="utf-8"))["gate"];print(g["t_merge"],g["dominated_by"],g["d10_direction"],g["pass"])'
+0.8 ['embedding_only'] True False
+
+### R2 방식별 결과 분포 (T_merge=0.8)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];[print(m,dict(Counter(classify_gold_row(r) for r in G(m,0.8)))) for m in ["proposed","exact_raw","exact_norm","embedding_only","llm_single"]]'
+proposed {'merge_correct': 47, 'deferred': 79, 'miss': 1, 'false_merge': 1, 'new_person_correct': 4}
+exact_raw {'merge_correct': 83, 'miss': 33, 'new_person_correct': 14, 'deferred': 2}
+exact_norm {'merge_correct': 91, 'miss': 20, 'false_merge': 4, 'deferred': 6, 'new_person_correct': 11}
+embedding_only {'merge_correct': 95, 'deferred': 31, 'miss': 1, 'new_person_correct': 5}
+llm_single {'merge_correct': 90, 'miss': 10, 'deferred': 19, 'new_person_correct': 13}
+
+### R3 오병합 전건 (방식별, T_merge=0.8)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];[print(m,r["scenario_id"],r["turn"],r["mention"],r["gold_db_person_id"],"->",r["person_id"]) for m in ["proposed","exact_raw","exact_norm","embedding_only","llm_single"] for r in G(m,0.8) if classify_gold_row(r)=="false_merge"]'
+proposed sc-015 0 부장님 11930 -> 11931
+exact_norm sc-002 3 과장님 11895 -> 11896
+exact_norm sc-036 1 임대리 None -> 11946
+exact_norm sc-036 2 임대리 None -> 11946
+exact_norm sc-036 3 임대리 None -> 11946
+
+### R4 미검출 전건 (proposed·embedding_only, T_merge=0.8)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];[print(m,r["scenario_id"],r["turn"],r["mention"],r["detail"].get("forced_reason")) for m in ["proposed","embedding_only"] for r in G(m,0.8) if classify_gold_row(r)=="miss"]'
+proposed sc-007 2 문실장님 no_candidates
+embedding_only sc-021 2 아까 걔 None
+
+### R5 강제 경로 분포 (분모 138 = 141 - ambiguous 3)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];print(dict(Counter(r["detail"]["forced_reason"] for r in R if r["method"]=="proposed" and r["t_merge"]==0.8 and not r["ambiguous"])))'
+{None: 108, 'no_matched': 25, 'no_candidates': 5}
+
+### R6 no_matched 25건은 LLM 을 불렀는가
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];F=[r for r in R if r["method"]=="proposed" and r["t_merge"]==0.8 and not r["ambiguous"] and r["detail"]["forced_reason"]=="no_matched"];print(len(F),dict(Counter(r["detail"]["llm_attempts"] for r in F)),dict(Counter(r["detail"]["llm_skipped"] for r in F)),dict(Counter(bool(r["candidates"]) for r in F)))'
+25 {1: 25} {False: 25} {True: 25}
+
+### R7 no_candidates 5건: 후보 검색 0 인가 규칙이 떨어뜨렸는가
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];[print(r["scenario_id"],r["turn"],r["mention"],"cands=",len(r["candidates"]),"excluded_by=",r["detail"]["excluded_by"]) for r in R if r["method"]=="proposed" and r["t_merge"]==0.8 and r["detail"]["forced_reason"]=="no_candidates"]'
+sc-007 2 문실장님 cands= 1 excluded_by= {'11903': 'relation_tag_conflict'}
+sc-036 1 그 친구 cands= 1 excluded_by= {'11946': 'relation_tag_conflict'}
+sc-037 0 시우 cands= 0 excluded_by= {}
+sc-037 1 시우형 cands= 0 excluded_by= {}
+sc-037 2 형 cands= 0 excluded_by= {}
+
+### R8 ask_user(identity) 79건의 확신도 구간
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];D=[r for r in G("proposed",0.8) if classify_gold_row(r)=="deferred"];print(len(D));print(dict(Counter(("0.0" if c==0 else "[0.3,0.5)" if c<0.5 else "[0.5,0.7)" if c<0.7 else "[0.7,0.8)") for c in [r["detail"]["confidence_breakdown"]["confidence"] for r in D])))'
+79
+{'0.0': 20, '[0.5,0.7)': 5, '[0.7,0.8)': 52, '[0.3,0.5)': 2}
+
+### R9 deferred 79 의 신호값 분포
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];import statistics as st;D=[r["detail"]["confidence_breakdown"] for r in G("proposed",0.8) if classify_gold_row(r)=="deferred"];[print(k,"med=%.3f"%st.median([c[k] for c in D]),"mean=%.3f"%st.mean([c[k] for c in D]),dict(sorted(Counter(round(c[k],3) for c in D).items()))) for k in ("s_llm","s_emb","s_rule","confidence")]'
+s_llm med=0.900 mean=0.675 {0.0: 20, 0.7: 1, 0.8: 5, 0.9: 36, 0.95: 16, 1.0: 1}
+s_emb med=1.000 mean=0.670 {0.0: 20, 0.285: 1, 0.315: 1, 0.346: 1, 0.403: 1, 0.427: 1, 0.448: 1, 0.535: 3, 0.673: 1, 0.798: 1, 0.898: 3, 0.927: 1, 1.0: 44}
+s_rule med=0.000 mean=0.072 {0.0: 72, 0.667: 4, 1.0: 3}
+confidence med=0.750 mean=0.553 {0.0: 20, 0.454: 1, 0.494: 1, 0.634: 1, 0.685: 1, 0.69: 1, 0.694: 2, 0.719: 2, 0.721: 1, 0.728: 1, 0.744: 2, 0.75: 29, 0.775: 15, 0.778: 1, 0.785: 1}
+
+### R10 deferred 중 귀속 인물이 실제로 골드였던 비율
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];D=[r for r in G("proposed",0.8) if classify_gold_row(r)=="deferred"];print(sum(1 for r in D if r["detail"]["confidence_breakdown"]["matched_person_id"]==r["gold_db_person_id"]),"/",len(D))'
+61 / 79
+
+### R11 같은 79 mention 에서 embedding_only 의 결과
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];E={K(r):r for r in G("embedding_only",0.8)};D=[r for r in G("proposed",0.8) if classify_gold_row(r)=="deferred"];print(dict(Counter(classify_gold_row(E[K(r)]) for r in D)))'
+{'deferred': 24, 'merge_correct': 52, 'miss': 1, 'new_person_correct': 2}
+
+### R12 rule_checked==0 연쇄 (derive_hints 는 embedding_only detail 에만 남는다)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];P={K(r):r for r in S0("proposed")};E={K(r):r for r in S0("embedding_only")};print("hints 빈 dict",sum(1 for r in E.values() if not (r["detail"].get("hints") or {})),"/",len(E));print("rule_checked==0",sum(1 for r in P.values() if r["detail"]["confidence_breakdown"]["rule_checked"]==0),"/",len(P));print("교차",dict(Counter((not (E[k]["detail"].get("hints") or {}), P[k]["detail"]["confidence_breakdown"]["rule_checked"]==0) for k in P)))'
+hints 빈 dict 91 / 141
+rule_checked==0 100 / 141
+교차 {(False, False): 41, (False, True): 9, (True, True): 91}
+
+### R13 rule_checked==0 mention 의 확신도 상한
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];C=[r["detail"]["confidence_breakdown"] for r in S0("proposed")];print("rc=0:",dict(sorted(Counter(round(c["confidence"],3) for c in C if c["rule_checked"]==0).items())));print("rc>0 최대:",max(c["confidence"] for c in C if c["rule_checked"]>0),"rc=0 최대:",max(c["confidence"] for c in C if c["rule_checked"]==0))'
+rc=0: {0.0: 32, 0.454: 1, 0.494: 1, 0.5: 1, 0.56: 1, 0.634: 1, 0.69: 1, 0.719: 2, 0.728: 1, 0.744: 1, 0.75: 29, 0.775: 15, 0.8: 14}
+rc>0 최대: 1.0 rc=0 최대: 0.8
+
+### R14 LLM 귀속 인물 자체의 정확도 (임계치 무관, s_llm 구간별)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];B=lambda s:"0.9-1.0" if s>=0.9 else ("0.8-0.9" if s>=0.8 else ("0.7-0.8" if s>=0.7 else "<0.7"));X=[(B(r["detail"]["confidence_breakdown"]["s_llm"]), r["detail"]["confidence_breakdown"]["matched_person_id"]==r["gold_db_person_id"]) for r in S0("proposed") if r["mention_kind"]=="gold" and not r["ambiguous"] and r["detail"]["confidence_breakdown"]["matched_person_id"] is not None];print(dict(Counter(X)))'
+{('0.9-1.0', True): 98, ('0.8-0.9', True): 2, ('0.9-1.0', False): 3, ('0.8-0.9', False): 3, ('0.7-0.8', True): 1}
+
+### R15 T_merge 격자별 지배
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import json;d=json.load(open("reports/metrics.json",encoding="utf-8"));M=d["meta"]["methods"];[print(t, [(m,d[m]["by_t_merge"]["%g"%t]["false_merge_rate"]["n"],d[m]["by_t_merge"]["%g"%t]["miss_rate"]["n"],d[m]["by_t_merge"]["%g"%t]["ask_user_rate_by_kind"]["identity"]["n"]) for m in M]) for t in d["meta"]["grid"]]'
+0.5 [('proposed', 6, 1, 22), ('exact_raw', 0, 33, 2), ('exact_norm', 4, 20, 6), ('embedding_only', 6, 1, 19), ('llm_single', 0, 10, 19)]
+0.55 [('proposed', 6, 1, 22), ('exact_raw', 0, 33, 2), ('exact_norm', 4, 20, 6), ('embedding_only', 3, 1, 22), ('llm_single', 0, 10, 19)]
+0.6 [('proposed', 6, 1, 22), ('exact_raw', 0, 33, 2), ('exact_norm', 4, 20, 6), ('embedding_only', 1, 1, 25), ('llm_single', 0, 10, 19)]
+0.65 [('proposed', 6, 1, 23), ('exact_raw', 0, 33, 2), ('exact_norm', 4, 20, 6), ('embedding_only', 1, 1, 27), ('llm_single', 0, 10, 19)]
+0.7 [('proposed', 4, 1, 27), ('exact_raw', 0, 33, 2), ('exact_norm', 4, 20, 6), ('embedding_only', 0, 1, 29), ('llm_single', 0, 10, 19)]
+0.75 [('proposed', 2, 1, 33), ('exact_raw', 0, 33, 2), ('exact_norm', 4, 20, 6), ('embedding_only', 0, 1, 30), ('llm_single', 0, 10, 19)]
+0.8 [('proposed', 1, 1, 79), ('exact_raw', 0, 33, 2), ('exact_norm', 4, 20, 6), ('embedding_only', 0, 1, 31), ('llm_single', 0, 10, 19)]
+0.85 [('proposed', 1, 1, 96), ('exact_raw', 0, 33, 2), ('exact_norm', 4, 20, 6), ('embedding_only', 0, 1, 31), ('llm_single', 0, 10, 19)]
+0.9 [('proposed', 1, 1, 105), ('exact_raw', 0, 33, 2), ('exact_norm', 4, 20, 6), ('embedding_only', 0, 1, 38), ('llm_single', 0, 10, 19)]
+0.95 [('proposed', 1, 1, 114), ('exact_raw', 0, 33, 2), ('exact_norm', 4, 20, 6), ('embedding_only', 0, 1, 43), ('llm_single', 0, 10, 19)]
+
+### R16 함정 유형별 mention 수·시나리오 수
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];T=[r for r in R if r["method"]=="proposed" and r["t_merge"]==0.8 and r["trap_kind"]];print(len(T), len({r["scenario_id"] for r in T}), dict(Counter(r["trap_kind"] for r in T)))'
+55 12 {'promotion_collides_with_existing_title': 9, 'same_title_two_persons': 14, 'nickname_shared': 4, 'similar_name_two_persons': 5, 'nickname_shared_with_title': 5, 'new_person_resembles_existing': 6, 'passing_mention': 12}
+
+### R17 카테고리 × 방식 (metrics.json by_category)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import json;d=json.load(open("reports/metrics.json",encoding="utf-8"));[print(m,{c:(v["false_merge_rate"]["n"],v["miss_rate"]["n"],v["deferred_identity_rate"]["n"],v["scored"]) for c,v in d[m]["by_t_merge"]["0.8"]["by_category"].items()}) for m in d["meta"]["methods"]]'
+proposed {'alias': (1, 0, 21, 33), 'new_person': (0, 0, 9, 19), 'normal': (0, 0, 12, 21), 'promotion': (0, 1, 12, 28), 'pronoun': (0, 0, 25, 31)}
+exact_raw {'alias': (0, 3, 2, 33), 'new_person': (0, 5, 0, 19), 'normal': (0, 0, 0, 21), 'promotion': (0, 16, 0, 28), 'pronoun': (0, 9, 0, 31)}
+exact_norm {'alias': (0, 2, 3, 33), 'new_person': (3, 2, 0, 19), 'normal': (0, 0, 0, 21), 'promotion': (1, 7, 3, 28), 'pronoun': (0, 9, 0, 31)}
+embedding_only {'alias': (0, 0, 7, 33), 'new_person': (0, 0, 5, 19), 'normal': (0, 0, 0, 21), 'promotion': (0, 0, 11, 28), 'pronoun': (0, 1, 8, 31)}
+llm_single {'alias': (0, 0, 7, 33), 'new_person': (0, 0, 2, 19), 'normal': (0, 0, 0, 21), 'promotion': (0, 5, 4, 28), 'pronoun': (0, 5, 6, 31)}
+
+### R18 passing mention 6건 오탐
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import json;d=json.load(open("reports/metrics.json",encoding="utf-8"));[print(m,d[m]["by_t_merge"]["0.8"]["passing"]["by_decision"],d[m]["by_t_merge"]["0.8"]["passing"]["false_positive"]) for m in d["meta"]["methods"]]'
+proposed {'merge': 0, 'identity': 6, 'new_person': 0} {'n': 0, 'd': 6, 'rate': 0.0}
+exact_raw {'merge': 0, 'identity': 0, 'new_person': 6} {'n': 6, 'd': 6, 'rate': 1.0}
+exact_norm {'merge': 0, 'identity': 0, 'new_person': 6} {'n': 6, 'd': 6, 'rate': 1.0}
+embedding_only {'merge': 0, 'identity': 4, 'new_person': 2} {'n': 2, 'd': 6, 'rate': 0.3333333333333333}
+llm_single {'merge': 0, 'identity': 0, 'new_person': 6} {'n': 6, 'd': 6, 'rate': 1.0}
+
+### R19 보정표
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import json;c=json.load(open("reports/calibration.json",encoding="utf-8"));[print(g["method"],[(b["bin"],b["n"],b["correct"],b["accuracy"]) for b in g["bins"] if b["n"]]) for g in c["groups"]];print(c["excluded"])'
+proposed [('0.7-0.8', 1, 0, 0.0), ('0.8-0.9', 5, 0, 0.0), ('0.9-1.0', 101, 47, 0.46534653465346537)]
+llm_single [('0.7-0.8', 11, 0, 0.0), ('0.8-0.9', 4, 0, 0.0), ('0.9-1.0', 117, 103, 0.8803418803418803)]
+{'ambiguous_mention': 6, 'llm_error': 0, 'llm_error_kinds': {}, 'llm_skipped': 5, 'passing_mention': 12, 'placeholder_s_llm': 20, 'score_clamped': 0, 'total': 43}
+
+### R20 반사실: 규칙 미측정 시 가중치 재정규화(0.625/0.375)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];ok=bad=0;
+for r in G("proposed",0.8):
+    c=r["detail"]["confidence_breakdown"]
+    if c["matched_person_id"] is None: continue
+    v=0.625*c["s_llm"]+0.375*c["s_emb"] if c["rule_checked"]==0 else c["confidence"]
+    if v>=0.8:
+        ok,bad=(ok+1,bad) if c["matched_person_id"]==r["gold_db_person_id"] else (ok,bad+1)
+print("merge",ok+bad,"골드일치",ok,"불일치",bad)'
+merge 97 골드일치 96 불일치 1
+
+### R21 relaxed_retry 부분집합 (metrics.subsets)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import json;d=json.load(open("reports/metrics.json",encoding="utf-8"));print(d["proposed"]["by_t_merge"]["0.8"]["subsets"])'
+{'merge_rule_unchecked': {'merges': 14, 'false_merge_rate': {'n': 0, 'd': 14, 'rate': 0.0}}, 'merge_relaxed_retry': {'merges': 14, 'false_merge_rate': {'n': 0, 'd': 14, 'rate': 0.0}}, 'merges': 48}
+
+### R22 trace 로 확신도 재계산 (원칙3·9)
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import json;T=[json.loads(l) for l in open("reports/pilot/traces-20260922-042440.jsonl",encoding="utf-8")];t=[x for x in T if x["trace_id"]==73821][0];c=t["confidence_breakdown"];w=c["weights"];print(t["scenario_id"],t["mention"],c["s_llm"],c["s_emb"],c["s_rule"],w["llm"]*c["s_llm"]+w["emb"]*c["s_emb"]+w["rule"]*c["s_rule"],c["confidence"])'
+sc-015 부장님 0.9 1.0 1.0 0.95 0.95
+
+### R23 proposed detail 에 LLM reason 이 남았는가
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c 'import gzip,json,sys;sys.path.insert(0,".");from collections import Counter;from evaluation.metrics import classify_gold_row;R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-042440.jsonl.gz","rt",encoding="utf-8")];K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"]);G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]];S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0];print("proposed",sum(1 for r in S0("proposed") if "reason" in r["detail"]),"llm_single",sum(1 for r in S0("llm_single") if "reason" in r["detail"]))'
+proposed 0 llm_single 141
+
+### 끝
+
+########## PART 5 — R24: no_matched 25 의 정오 분해 (절 3b) ##########
+n = 25
+mention_kind: {'gold': 20, 'passing': 5}
+gold_db 있음: 13
+gold_db 있고 후보에 골드 포함: 13
+  sc-001 t2 김부장님 gold gold_db= 11894 cand_ids= [11894]
+  sc-002 t1 박과장님 gold gold_db= 11896 cand_ids= [11896, 11895]
+  sc-002 t2 박과장님 gold gold_db= 11896 cand_ids= [11896, 11895]
+  sc-003 t2 최대리 gold gold_db= 11897 cand_ids= [11897]
+  sc-005 t2 회장님 gold gold_db= 11900 cand_ids= [11900]
+  sc-017 t2 걔 gold gold_db= 11906 cand_ids= [11906, 11907]
+  sc-018 t2 그 사람 gold gold_db= 11909 cand_ids= [11909, 11908]
+  sc-019 t2 쟤 gold gold_db= 11911 cand_ids= [11911, 11910]
+  sc-020 t0 심팀장 gold gold_db= 11912 cand_ids= [11912, 11913]
+  sc-020 t2 걔 gold gold_db= 11913 cand_ids= [11913, 11912]
+  sc-021 t2 아까 걔 gold gold_db= 11914 cand_ids= [11914, 11915, 11916]
+  sc-024 t2 얘 gold gold_db= 11920 cand_ids= [11920, 11921]
+  sc-012 t1 영어쌤 gold gold_db= None cand_ids= [11926]
+  sc-012 t3 영어쌤 gold gold_db= None cand_ids= [11926]
+  sc-012 t3 권쌤 gold gold_db= None cand_ids= [11926]
+  sc-012 t4 권쌤 gold gold_db= None cand_ids= [11926]
+  sc-033 t2 심팀장 gold gold_db= 11943 cand_ids= [11943, 11942]
+  sc-035 t0 장하람 gold gold_db= None cand_ids= [11945]
+  sc-035 t1 하람씨 gold gold_db= None cand_ids= [11945]
+  sc-035 t2 하람씨 gold gold_db= None cand_ids= [11945]
+  sc-038 t1 남주 배우 passing gold_db= None cand_ids= [11947]
+  sc-039 t1 배달 기사님 passing gold_db= None cand_ids= [11948]
+  sc-039 t2 기사님 passing gold_db= None cand_ids= [11948]
+  sc-040 t0 웬 아저씨 passing gold_db= None cand_ids= [11949]
+  sc-040 t2 그 정치인 passing gold_db= None cand_ids= [11949]
