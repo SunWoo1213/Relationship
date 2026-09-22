@@ -1,4 +1,5 @@
-"""Refs: P3-er S3.3 D3 D10 R4 결정2 결정3-c 결정5 결정8 -- 4단계(확신도 분기).
+"""Refs: P3-er P4b-er-redesign S3.3 D3 D10 D12 R4 결정2 결정3-c 결정5 결정8
+-- 4단계(확신도 분기).
 
 이 모듈은 **순수 함수만** 담는다 -- DB·LLM·임베딩 호출이 없다. 입력은
 1~3단계(`app/er/candidates.py`·`rules.py`·`judge.py`)가 이미 만든 값이다.
@@ -21,6 +22,37 @@
 점수이며, Claude API 가 제공하지 않는 토큰 로그 확률이 아니다. 이 모듈의
 `combine()` 은 그 값을 다른 두 신호와 가중합할 뿐 로그 확률을 계산하거나
 가정하지 않는다.
+
+## 관측된 신호만 재정규화한다 (D12, D3 대체)
+
+`confidence = Σ_i w_i·s_i / Σ_i w_i` (i ∈ 관측된 신호). `combine()` 은
+`s_rule` 이 **실제로 검사됐는지**를 `rule_checked`(`ScoredCandidate.
+rule_checked`, 2단계가 채운 값)로 받는다 -- `s_rule` 자체의 크기가 아니라
+"검사했는가"가 재정규화 여부를 가른다.
+
+- `rule_checked > 0`(검사함 -- 전부 충돌해 `rule_passed == 0`인 경우도
+  포함, D12 "코드에서 지켜야 할 것" 3항): D3 원식 그대로
+  `w_llm*s_llm + w_emb*s_emb + w_rule*s_rule`. `s_rule` 은 그 값 그대로
+  (충돌이면 보통 0) 합산된다 -- **재정규화하지 않는다**.
+- `rule_checked == 0`(미측정 -- hints 가 비어 규칙을 하나도 검사하지
+  못함): `s_rule` 을 분모에서 빼 `(w_llm*s_llm + w_emb*s_emb) /
+  (w_llm + w_emb)`(기본 가중치에서 `0.625*s_llm + 0.375*s_emb`)를 쓴다.
+  이때 `s_rule` 인자 값은 **완전히 무시된다**(호출부가 실수로 0 이 아닌
+  값을 넘겨도 결과에 반영되지 않는다 -- 테스트가 이를 직접 확인한다).
+
+`rule_checked` 를 생략하면 기본값 `1`(측정됨)로 취급해 D3 원식 그대로
+계산한다 -- 옛 호출부(인자 없이 부르던 기존 테스트)가 그대로 통과하도록
+하는 하위호환 기본값이다(P4b U1).
+
+`confidence_breakdown` 에는 **`weights`(설정값, `ERConfig` 그대로)와
+`weights_effective`(실제 적용된 재정규화 가중치)를 모두** 담는다
+(`_effective_weights()`). 세 신호가 모두 관측되면 `weights_effective ==
+weights`; `rule_checked == 0` 이면 `weights_effective == {llm: w_llm/(w_llm
++w_emb), emb: w_emb/(w_llm+w_emb), rule: 0.0}`. 강제 경로(`_forced_decision`
+·`no_candidates`)도 `rule_checked=0` 으로 `_breakdown()` 을 부르므로
+`weights_effective` 가 재정규화 값으로 채워진다 -- `confidence` 자체는
+세 신호가 모두 0 이라 산식이 무엇이든 0.0 으로 같다(`--recheck-traces`
+가 키 부재로 죽지 않게 하는 목적, D12 "코드에서 지켜야 할 것" 1·2·4항).
 """
 
 from __future__ import annotations
@@ -61,9 +93,23 @@ def ge_with_tolerance(a: float, b: float, tolerance: float = ER_TOLERANCE) -> bo
 _ge = ge_with_tolerance
 
 
-def combine(s_llm: float, s_emb: float, s_rule: float, config: Any) -> float:
-    """세 신호를 `config` 의 가중치로 결합한다(D3 원칙3):
-    `confidence = w_llm*s_llm + w_emb*s_emb + w_rule*s_rule`.
+def combine(
+    s_llm: float,
+    s_emb: float,
+    s_rule: float,
+    config: Any,
+    *,
+    rule_checked: int = 1,
+) -> float:
+    """세 신호를 `config` 의 가중치로 결합한다 -- **관측된 신호만**
+    (D12, D3 대체): `rule_checked > 0` 이면 D3 원식 그대로
+    `confidence = w_llm*s_llm + w_emb*s_emb + w_rule*s_rule`; `rule_checked
+    == 0`(미측정)이면 `s_rule` 을 분모에서 빼 `(w_llm*s_llm + w_emb*s_emb)
+    / (w_llm + w_emb)`. 두 분기의 연산 순서는 각각 D3 원식·재정규화 원식과
+    같은 순서를 유지해 세 신호 관측 시 D3 원식과 **부동소수 오차 없이
+    같은 값**이 되도록 한다(모듈 docstring "관측된 신호만 재정규화한다"
+    참조). `rule_checked` 기본값 `1` 은 이 인자를 생략하는 기존 호출부가
+    "측정됨"(재정규화 없음)으로 해석되게 하는 하위호환 기본값이다.
 
     `s_emb` 가 `[0, 1]` 밖이면 클램프한다(01-plan 43행 -- 코사인 유사도
     구현이나 합성 임베딩이 부동소수 오차로 살짝 벗어날 수 있다). `s_llm`·
@@ -76,7 +122,21 @@ def combine(s_llm: float, s_emb: float, s_rule: float, config: Any) -> float:
     if not (0.0 <= s_rule <= 1.0):
         raise InvalidValue(f"combine: s_rule out of [0,1] range (got {s_rule!r})")
     s_emb_clamped = min(1.0, max(0.0, s_emb))
-    return config.w_llm * s_llm + config.w_emb * s_emb_clamped + config.w_rule * s_rule
+    if rule_checked > 0:
+        return config.w_llm * s_llm + config.w_emb * s_emb_clamped + config.w_rule * s_rule
+    denom = config.w_llm + config.w_emb
+    return (config.w_llm * s_llm + config.w_emb * s_emb_clamped) / denom
+
+
+def _effective_weights(rule_checked: int, config: Any) -> dict[str, float]:
+    """`confidence_breakdown["weights_effective"]` 의 단일 출처(D12) --
+    `combine()` 과 **같은 조건**(`rule_checked > 0`)으로 갈린다. 관측되면
+    설정 가중치 그대로, 미측정이면 `w_llm`·`w_emb` 만 재정규화하고 `rule`
+    은 0.0 이다."""
+    if rule_checked > 0:
+        return {"llm": config.w_llm, "emb": config.w_emb, "rule": config.w_rule}
+    denom = config.w_llm + config.w_emb
+    return {"llm": config.w_llm / denom, "emb": config.w_emb / denom, "rule": 0.0}
 
 
 def band_for(confidence: float, config: Any) -> str:
@@ -147,6 +207,7 @@ def _breakdown(
         "s_emb": s_emb,
         "s_rule": s_rule,
         "weights": {"llm": config.w_llm, "emb": config.w_emb, "rule": config.w_rule},
+        "weights_effective": _effective_weights(rule_checked, config),
         "confidence": confidence,
         "rule_checked": rule_checked,
         "rule_passed": rule_passed,
@@ -307,7 +368,7 @@ def decide(
     s_llm = judgement.s_llm
     s_emb = candidate.s_emb
     s_rule = candidate.s_rule
-    confidence = combine(s_llm, s_emb, s_rule, config)
+    confidence = combine(s_llm, s_emb, s_rule, config, rule_checked=candidate.rule_checked)
     band = band_for(confidence, config)
 
     breakdown = _breakdown(

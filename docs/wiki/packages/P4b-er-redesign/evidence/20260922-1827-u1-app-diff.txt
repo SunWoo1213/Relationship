@@ -1,0 +1,4 @@
+warning: in the working copy of 'app/er/confidence.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/er_smoke.py', LF will be replaced by CRLF the next time Git touches it
+app/er/confidence.py
+scripts/er_smoke.py

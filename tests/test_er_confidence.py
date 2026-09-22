@@ -449,3 +449,191 @@ def test_decision_to_dict_serializes() -> None:
     assert as_dict["band"] == "new_person"
     assert as_dict["decision"]["forced_reason"] == "no_candidates"
     assert isinstance(result, Decision)
+
+
+# ---------------------------------------------------------------------------
+# D12 -- 관측 신호 재정규화 결합 (P4b U1)
+# ---------------------------------------------------------------------------
+
+
+def test_combine_observed_all_three_matches_d3_formula_exactly() -> None:
+    # (i) 세 신호가 모두 관측되면(rule_checked > 0) D3 원식과 abs diff == 0
+    # (무작위 표본 >= 100, seed 고정).
+    rng = random.Random(20260922)
+    config = ERConfig()
+    count = 0
+    for _ in range(200):
+        s_llm = rng.uniform(0.0, 1.0)
+        s_emb = rng.uniform(0.0, 1.0)
+        s_rule = rng.uniform(0.0, 1.0)
+        rule_checked = rng.randint(1, 3)
+        confidence = combine(s_llm, s_emb, s_rule, config, rule_checked=rule_checked)
+        d3_original = config.w_llm * s_llm + config.w_emb * s_emb + config.w_rule * s_rule
+        assert confidence == d3_original, (s_llm, s_emb, s_rule, rule_checked)
+        count += 1
+    assert count >= 100
+
+
+def test_combine_rule_checked_omitted_defaults_to_measured() -> None:
+    # rule_checked 생략 -> 기본값 1(측정됨)로 D3 원식 그대로(하위호환).
+    config = ERConfig()
+    confidence_default = combine(s_llm=0.7, s_emb=0.4, s_rule=0.6, config=config)
+    confidence_explicit = combine(
+        s_llm=0.7, s_emb=0.4, s_rule=0.6, config=config, rule_checked=1
+    )
+    assert confidence_default == confidence_explicit
+    d3_original = config.w_llm * 0.7 + config.w_emb * 0.4 + config.w_rule * 0.6
+    assert confidence_default == d3_original
+
+
+def test_combine_rule_checked_zero_renormalizes_llm_emb_only() -> None:
+    # (ii) rule_checked=0 -> 0.625*s_llm + 0.375*s_emb (기본 가중치),
+    # s_rule 인자 값은 결과에 반영되지 않는다.
+    config = ERConfig()
+    s_llm, s_emb = 0.8, 0.6
+    confidence = combine(s_llm, s_emb, s_rule=0.9, config=config, rule_checked=0)
+    expected = 0.625 * s_llm + 0.375 * s_emb
+    assert math.isclose(confidence, expected, abs_tol=1e-9)
+
+    # s_rule 값을 바꿔도(0.0 vs 0.9) rule_checked=0 인 한 결과가 같다.
+    confidence_zero_rule = combine(s_llm, s_emb, s_rule=0.0, config=config, rule_checked=0)
+    assert confidence == confidence_zero_rule
+
+
+def test_decide_rule_checked_zero_breakdown_weights_effective() -> None:
+    # (ii) decide() 경유 -- confidence_breakdown 의 weights_effective 확인.
+    config = ERConfig()
+    passed = [_candidate(1, s_emb=0.6, s_rule=0.9, rule_checked=0, rule_passed=0)]
+    judgement = Judgement(matched_person_id=1, s_llm=0.8, reason="r")
+    result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+
+    breakdown = result.confidence_breakdown
+    assert breakdown["rule_checked"] == 0
+    weights_effective = breakdown["weights_effective"]
+    assert math.isclose(weights_effective["llm"], 0.625, abs_tol=1e-9)
+    assert math.isclose(weights_effective["emb"], 0.375, abs_tol=1e-9)
+    assert weights_effective["rule"] == 0.0
+    expected = 0.625 * 0.8 + 0.375 * 0.6
+    assert math.isclose(breakdown["confidence"], expected, abs_tol=1e-9)
+
+
+def test_decide_rule_checked_positive_rule_passed_zero_still_sums_zero_s_rule() -> None:
+    # (iii) rule_checked > 0, rule_passed == 0 (검사했는데 전부 충돌) ->
+    # 여전히 s_rule=0 으로 "합산"(재정규화하지 않는다), weights_effective
+    # == weights.
+    config = ERConfig()
+    passed = [_candidate(1, s_emb=0.6, s_rule=0.0, rule_checked=3, rule_passed=0)]
+    judgement = Judgement(matched_person_id=1, s_llm=0.8, reason="r")
+    result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+
+    breakdown = result.confidence_breakdown
+    assert breakdown["rule_checked"] == 3
+    assert breakdown["rule_passed"] == 0
+    assert breakdown["s_rule"] == 0.0
+    expected = config.w_llm * 0.8 + config.w_emb * 0.6 + config.w_rule * 0.0
+    assert math.isclose(breakdown["confidence"], expected, abs_tol=1e-9)
+    assert breakdown["weights_effective"] == breakdown["weights"]
+
+
+def test_breakdown_keys_present_normal_path() -> None:
+    # (iv) 정상 경로 -- weights·weights_effective·rule_checked·rule_passed
+    # 키가 모두 있다.
+    config = ERConfig()
+    passed = [_candidate(1, s_emb=0.9, s_rule=0.8, rule_checked=3, rule_passed=2)]
+    judgement = Judgement(matched_person_id=1, s_llm=0.95, reason="r")
+    result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+    breakdown = result.confidence_breakdown
+    for key in ("weights", "weights_effective", "rule_checked", "rule_passed"):
+        assert key in breakdown
+    assert breakdown["weights_effective"] == breakdown["weights"]
+
+
+def test_breakdown_keys_present_forced_path_llm_failed() -> None:
+    # (iv) 강제 경로(llm_failed) -- 같은 네 키가 있고 weights_effective 는
+    # rule_checked=0 이라 재정규화 값이다.
+    config = ERConfig()
+    passed = [_candidate(1, s_emb=0.9, s_rule=0.8)]
+    result = decide(judgement=None, passed=passed, llm_failed=True, config=config)
+    breakdown = result.confidence_breakdown
+    for key in ("weights", "weights_effective", "rule_checked", "rule_passed"):
+        assert key in breakdown
+    assert breakdown["rule_checked"] == 0
+    weights_effective = breakdown["weights_effective"]
+    assert math.isclose(weights_effective["llm"], 0.625, abs_tol=1e-9)
+    assert math.isclose(weights_effective["emb"], 0.375, abs_tol=1e-9)
+    assert weights_effective["rule"] == 0.0
+    assert breakdown["confidence"] == 0.0
+
+
+def test_breakdown_keys_present_forced_path_no_candidates() -> None:
+    # (iv) 강제 경로(no_candidates) -- 같은 규약.
+    config = ERConfig()
+    result = decide(judgement=None, passed=[], llm_failed=False, config=config)
+    breakdown = result.confidence_breakdown
+    for key in ("weights", "weights_effective", "rule_checked", "rule_passed"):
+        assert key in breakdown
+    assert breakdown["rule_checked"] == 0
+    weights_effective = breakdown["weights_effective"]
+    assert math.isclose(weights_effective["llm"], 0.625, abs_tol=1e-9)
+    assert math.isclose(weights_effective["emb"], 0.375, abs_tol=1e-9)
+    assert weights_effective["rule"] == 0.0
+    assert breakdown["confidence"] == 0.0
+
+
+def test_breakdown_keys_present_forced_path_out_of_range_id() -> None:
+    # (iv) 강제 경로(out_of_range_id) -- 같은 규약.
+    config = ERConfig()
+    passed = [_candidate(1, s_emb=0.9, s_rule=0.8)]
+    judgement = Judgement(matched_person_id=999, s_llm=0.95, reason="존재하지 않는 id")
+    result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+    breakdown = result.confidence_breakdown
+    for key in ("weights", "weights_effective", "rule_checked", "rule_passed"):
+        assert key in breakdown
+    assert breakdown["rule_checked"] == 0
+
+
+def test_original_d3_numeric_expectation_still_holds() -> None:
+    # (v) 293행 원식 수치 테스트(test_decide_normal_path_attributes_to_matched_candidate)
+    # 가 D12 아래서도 그대로 성립하는지 rule_checked > 0 경로로 재확인한다.
+    config = ERConfig()
+    passed = [_candidate(1, s_emb=0.9, s_rule=0.8, rule_checked=3, rule_passed=2)]
+    judgement = Judgement(matched_person_id=1, s_llm=0.95, reason="같은 별칭군")
+    result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+    expected_confidence = 0.5 * 0.95 + 0.3 * 0.9 + 0.2 * 0.8
+    assert math.isclose(result.confidence, expected_confidence, abs_tol=1e-9)
+    assert result.band == "merge"
+
+
+def test_weights_effective_sums_to_one_when_unmeasured() -> None:
+    # (vi) weights_effective 의 합이 1.0 (관측 신호만) -- U4 recheck 테스트와 짝.
+    config = ERConfig()
+    passed = [_candidate(1, s_emb=0.5, s_rule=0.5, rule_checked=0, rule_passed=0)]
+    result = decide(
+        judgement=None, passed=passed, llm_failed=True, config=config
+    )
+    weights_effective = result.confidence_breakdown["weights_effective"]
+    assert math.isclose(sum(weights_effective.values()), 1.0, abs_tol=1e-9)
+
+
+def test_weights_effective_sums_to_one_when_measured() -> None:
+    # (vi) 관측된 경우도 합이 1.0 (기존 가중치 그대로이므로 자명하나 회귀 방지).
+    config = ERConfig()
+    passed = [_candidate(1, s_emb=0.9, s_rule=0.8, rule_checked=3, rule_passed=2)]
+    judgement = Judgement(matched_person_id=1, s_llm=0.95, reason="r")
+    result = decide(judgement=judgement, passed=passed, llm_failed=False, config=config)
+    weights_effective = result.confidence_breakdown["weights_effective"]
+    assert math.isclose(sum(weights_effective.values()), 1.0, abs_tol=1e-9)
+
+
+def test_effective_weights_helper_matches_combine_branch_condition() -> None:
+    # combine() 과 _effective_weights() 가 같은 조건(rule_checked > 0)으로
+    # 갈리는지 직접 import 해 교차 확인한다(이중 출처 금지, 원칙9).
+    from app.er.confidence import _effective_weights
+
+    config = ERConfig()
+    unmeasured = _effective_weights(0, config)
+    assert math.isclose(unmeasured["llm"], 0.625, abs_tol=1e-9)
+    assert math.isclose(unmeasured["emb"], 0.375, abs_tol=1e-9)
+    assert unmeasured["rule"] == 0.0
+    assert _effective_weights(1, config) == {"llm": 0.5, "emb": 0.3, "rule": 0.2}
+    assert _effective_weights(5, config) == {"llm": 0.5, "emb": 0.3, "rule": 0.2}

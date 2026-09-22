@@ -1,4 +1,5 @@
-"""Refs: P3-er 01-plan 44행·94행(U8)·결정9 -- 실 LLM 1회 호출 ER 판정 스모크.
+"""Refs: P3-er P4b-er-redesign 01-plan 44행·94행(U8)·결정9·D12 -- 실 LLM 1회
+호출 ER 판정 스모크.
 
 `judge_from_env()`(`app/er/judge.py`)로 공급자를 고른다(`LLM_PROVIDER`,
 기본 `openai`, D11 결정 2). **DB 를 쓰지 않는다** -- 후보 2개를 이 스크립트 안에서
@@ -100,13 +101,20 @@ def run_smoke(
     `matched_person_id` 가 후보 밖(예: `None`)이면 `s_emb`/`s_rule` 을
     0 으로 두고 `combine()`/`band_for()` 를 그대로 적용한다 -- P3 파이프라인
     (`app/er/confidence.decide`)의 null 귀속 규약(결정3-c)과 같은 방향이다.
+
+    이 스모크는 2단계 규칙 필터(`app/er/rules.py`)를 거치지 않고 후보를
+    직접 채워 넣으므로(`_sample_candidates()`) `hints` 가 없는 호출과
+    같다 -- `combine()` 에 `rule_checked=0` 을 넘겨 D12 재정규화
+    (`0.625*s_llm + 0.375*s_emb`, 기본 가중치 기준)를 적용한다(P4b U1,
+    권고 R-3). `s_rule` 값 자체는 그대로 출력에 남기지만 `confidence`
+    계산에는 반영되지 않는다.
     """
     judgement = judge.judge(_MENTION, _UTTERANCE, candidates)
     candidate_by_id = {c.person_id: c for c in candidates}
     matched = candidate_by_id.get(judgement.matched_person_id)
     s_emb = matched.s_emb if matched is not None else 0.0
     s_rule = matched.s_rule if matched is not None else 0.0
-    confidence = combine(judgement.s_llm, s_emb, s_rule, config)
+    confidence = combine(judgement.s_llm, s_emb, s_rule, config, rule_checked=0)
     band = band_for(confidence, config)
     return {
         "provider": judgement.provider,

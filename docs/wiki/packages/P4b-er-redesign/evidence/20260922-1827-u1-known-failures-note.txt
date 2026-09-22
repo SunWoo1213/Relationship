@@ -1,0 +1,40 @@
+P4b-er-redesign U1 -- 전체 pytest 실행 시 남는 5건의 실패(범위 밖, U4 대상)
+
+명령: POSTGRES_PORT=5433 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m pytest tests/ -q -rs
+결과: 5 failed, 1293 passed (20260922-1827-u1-pytest-all.txt)
+
+실패 목록 (전부 tests/test_run_pilot_eval.py, scripts/run_pilot_eval.py 를 통한 dry-run 사슬):
+  - test_dry_run_chain_produces_all_outputs
+  - test_dry_run_logs_embedded_alias_count_per_scenario
+  - test_dry_run_dumps_traces_before_rollback_and_rechecks
+  - test_dry_run_metrics_json_is_byte_identical
+  - test_chain_gzips_raw_and_feeds_the_gz_to_every_stage
+
+원인: scripts/run_pilot_eval.py::recompute_confidence()(904행)가 아직 D3
+원식(weights 키, s_rule 항상 합산)으로 재계산한다. U1 이 app/er/confidence.py
+::decide() 를 rule_checked 기반 D12 재정규화로 바꿨으므로, hints 가 없어
+rule_checked==0 인 mention(예: dry-run stub 시나리오 sc-002 '이서연 과장님')
+의 기록된 confidence 는 이제 재정규화 값(0.625*s_llm+0.375*s_emb)인데
+recompute_confidence() 는 여전히 0.5*s_llm+0.3*s_emb+0.2*s_rule 로 재계산해
+abs diff != 0 이 되어 [traces] recheck 단계가 rc=1 로 실패한다(예: line 81
+trace_id=98841 abs diff=0.04435431010897814 != 0, 기록 0.22177155054489076).
+dry-run 사슬이 내부적으로 이 recheck 단계를 포함하므로 5개 테스트 전부
+같은 원인으로 rc=1 을 받는다.
+
+범위 판정: scripts/run_pilot_eval.py 는 U1(backend-agent, app/er/*·
+scripts/er_smoke.py 만 허용)의 산출물 목록에 없고 위임 프롬프트의
+"금지" 목록에 명시적으로 들어 있다. 이 실패는 01-plan 리스크 절(153행)
+"--recheck-traces 가 새 trace 를 거부할 수 있다"·02-plan-verify 사실
+주장 (e)·권고 R-5 가 이미 예견한 U4/U5 순서 의존성 그대로다 --
+U4(eval-agent) 가 recompute_confidence() 를 weights_effective·
+rule_checked 로 재정규화한 뒤(결정 D(i)) 이 5건이 해소된다.
+
+U1 자체 범위 증거(모두 통과):
+  - tests/test_er_confidence.py: 50 passed (20260922-1827-u1-pytest.txt)
+  - tests/test_er_pipeline.py -k "promotion or aunt or homonym": 3 passed
+    (20260922-1827-u1-regression3.txt, 전후 confidence 수치 포함 -- 동명이인
+    0.575000 -> 0.718750, 승진 0.878333 -> 0.878333 동일)
+  - tests/test_er_smoke.py: 10 passed(별도 실행, evidence 미첨부 -- 전체
+    실행 20260922-1827-u1-pytest-all.txt 안에 포함됨). combine() 시그니처 변경의
+    파급으로 test_run_smoke_merge_band_matches_combine 의 하드코딩 기대값을
+    0.8634(D3) -> 0.9125(D12, rule_checked=0)로 갱신했다(tests/test_er_smoke.py).

@@ -52,12 +52,16 @@ def test_run_smoke_output_keys_match_expected_schema():
 
 
 def test_run_smoke_merge_band_matches_combine():
-    # s_llm=0.95, s_emb=0.85, s_rule=0.667 -> 0.5*0.95+0.3*0.85+0.2*0.667
-    # = 0.8634 >= T_merge(0.8) -> merge (결정9 승진 회귀와 같은 수치대).
+    # 스모크는 2단계 규칙 필터를 거치지 않으므로 hints 가 없는 호출과
+    # 같다 -- `run_smoke()` 가 `combine(..., rule_checked=0)` 을 쓴다
+    # (P4b D12, U1). s_llm=0.95, s_emb=0.85 -> (0.5*0.95+0.3*0.85)/0.8
+    # = 0.9125 >= T_merge(0.8) -> merge. s_rule=0.667 은 재정규화 때문에
+    # 결과에 반영되지 않는다(옛 D3 값 0.8634 는 더 이상 이 스모크의 기대값이
+    # 아니다).
     judge = FakeJudge(table={1: 0.95}, pick=1)
     result = er_smoke.run_smoke(judge, er_smoke._sample_candidates(), er_config())
 
-    assert result["confidence"] == pytest.approx(0.8634, abs=1e-6)
+    assert result["confidence"] == pytest.approx(0.9125, abs=1e-6)
     assert result["band"] == "merge"
 
 

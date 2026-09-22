@@ -1,0 +1,4 @@
+[32m.[0m[32m.[0m[32m.[0m[32m                                                                      [100%][0m
+[32m[32m[1m3 passed[0m, [33m15 deselected[0m[32m in 0.97s[0m[0m
+homonym: D3(old)=0.575000  D12(new, rule_checked=0)=0.718750  band D12=identity
+promotion: D3(old)=0.878333  D12(new, rule_checked=3)=0.878333  same=True

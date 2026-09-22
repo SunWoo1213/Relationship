@@ -198,3 +198,4 @@
 - 2026-09-22 18:55 | VERIFY | P4b-er-redesign 02-plan-verify 통과(verifier): verify-plan FAIL 0/WARN 22 의도(05-remediation [권고] 22·[필수] 0), 점검표 8/8, 사실 주장 (a)~(f) 6/6 코드 확인, 회귀 3종 baseline 3 passed, 권고 R-1~R-9 (evidence 20260922-1710·1718-verify-plan-review·1713-regression3-baseline) | P4b-er-redesign
 - 2026-09-22 19:00 | START | P4b-er-redesign 계획 승인(사용자) — 02 승인 줄, CURRENT active, 03-log 생성. R-3·R-9 01-plan 반영. U0 부터(메인 세션 SKILL.md 정합), U1 부터 backend-agent(L-004 매번) | P4b-er-redesign
 - 2026-09-22 18:12 | COMMIT | 83d33dd docs(P4b-er-redesign): 계획검증 통과·계획 승인 — CR-001 D12·D13 구현 + 재실행 + 게이트 재판정, 패키지 착수
+- 2026-09-22 18:15 | COMMIT | 28c2de8 harness(P4b-er-redesign): U0 entity-resolution 스킬 카드 D12·D13 정합 — 권위 문구·감점·재정규화 산식
