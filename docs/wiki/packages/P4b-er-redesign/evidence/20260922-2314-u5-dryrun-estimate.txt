@@ -1,0 +1,15 @@
+$ POSTGRES_PORT=5433 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/run_pilot_eval.py --dry-run --stub --estimate-only
+# 실행: 2026-09-22T14:15:19Z UTC · 평가 대상 커밋 a8faa81dc51ec2f52a5a1d89c9a7010244b95496 · 네트워크 0 · 키 미사용
+# 목적: P4b-er-redesign U5 준비 1/4 -- 실 실행 전 예상 호출 수·비용 확인(실 실행 아님)
+--- stdout+stderr ---
+[estimate] run_mode=stub scenarios=40 mentions=141
+[estimate] llm_calls total=282 proposed=141 llm_single=141 (결정 C(i): 임계치 10점은 같은 응답을 재사용한다)
+[estimate] tokens_in=120100 tokens_out=22560 embed_texts=105 embed_tokens=204
+[estimate] 가정 chars_per_token=1.5 output_tokens_per_call=80 (실측 아님 -- U7 의 tokens_in/out 합계로만 실측이 된다)
+[estimate] price_per_1m in=0.15 out=0.6 embed=0.02
+[estimate] price_source=OpenAI 공개 가격표의 gpt-4o-mini(in $0.15 / out $0.60 per 1M)와 text-embedding-3-small($0.02 per 1M) 기록값 -- 저장소에 적어 둔 오프라인 상수이며 이 실행은 가격표를 조회하지 않았다. 기준일·현재가는 실행자가 확인하고 --price-in/--price-out/--price-embed 로 덮어쓴다
+[estimate] cost_usd total=0.0316 (in=0.0180 out=0.0135 embed=0.0000)
+[estimate] max_cost_usd=5.0
+[ok] --estimate-only -- 실행하지 않는다
+--- end ---
+rc=0

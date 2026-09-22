@@ -1,0 +1,36 @@
+# P4b-er-redesign U5 준비 3/4 — --recheck-traces 단독 실행 + 덤프 구성 계수 (DB·네트워크·키 0)
+# 입력: 준비 2/4 dry-run 이 만든 traces-20260922-143832.jsonl (<scratchpad>/pilot-dry-chain-20260922-2338/)
+# 실행: 2026-09-22T14:42:36Z UTC · HEAD a8faa81dc51ec2f52a5a1d89c9a7010244b95496
+
+== 1. 단독 재계산 ==
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/run_pilot_eval.py --recheck-traces <scratchpad>/pilot-dry-chain-20260922-2338/traces-20260922-143832.jsonl
+[traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\65ee9d48-f330-4081-874a-e63e2bb1c1e4\scratchpad\pilot-dry-chain-20260922-2338\traces-20260922-143832.jsonl
+[traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+rc=0
+
+== 2. 덤프 구성 계수 (같은 파일을 읽기만 한다 — 재실행 아님) ==
+$ python - <<'PY'  (아래 스크립트 전문)
+  import json, collections
+  rows = [json.loads(l) for l in open(TRACES, encoding='utf-8')]
+  rule0 = sum(1 for r in rows if r['confidence_breakdown']['rule_checked'] == 0)
+  mc    = [r for r in rows if isinstance(r.get('matched_candidate'), dict)]
+  haskey= [r for r in mc if 'penalized_by' in r['matched_candidate']]
+  nonempty = [r for r in haskey if r['matched_candidate']['penalized_by']]
+총 줄수(dumped) = 1410
+method 분포 = {'proposed': 1410}
+rule_checked == 0 줄수 = 930 / 1410   (= D12 재정규화가 걸린 판정)
+  그중 weights_effective = ['{"emb": 0.37499999999999994, "llm": 0.625, "rule": 0.0}']
+rule_checked > 0 줄수 = 480
+  그중 weights_effective = ['{"emb": 0.3, "llm": 0.5, "rule": 0.2}']
+matched_candidate 가 dict 인 줄수 = 1370  / None 인 줄수 = 40
+matched_candidate 에 penalized_by 키가 있는 줄수 = 1370 (dict 인 줄의 1370/1370 )
+  그중 penalized_by 가 비어있지 않은 줄수 = 260
+  사유 분포 = {('hierarchy_conflict',): 210, ('relation_tag_conflict', 'hierarchy_conflict'): 40, ('relation_tag_conflict',): 10}
+  penalized_by 가 비지 않은 줄의 decision.band 분포 = {'merge': 36, 'identity': 194, 'new_person': 30}
+  그중 forced_reason 분포 = {'None': 245, 'penalized_candidate': 15}
+matched_candidate 키 목록(표본1) = ['excluded_by', 'passed_rules', 'penalized_by', 'person_id', 'relaxed_pass', 'rule_checked', 'rule_passed', 's_emb', 's_rule']
+rc=0
+
+판정: rc=0 · dumped == recomputed == 1410 · max_abs_diff=0.0 (판정 표 10행 예행, 허용오차 없음).
+      재계산은 제품 app.er.confidence.combine 을 기록된 weights·rule_checked 로 그대로 부른 결과다(결정 D(i), U4).
+      * 스텁 수치이므로 게이트 판정에 쓰지 않는다 — 여기서 보는 것은 산식·키·경로가 맞물리는지뿐이다(원칙8).
