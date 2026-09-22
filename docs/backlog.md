@@ -60,9 +60,14 @@
 
 - [x] [eval-agent] **파일럿 평가** (오병합률·미검출률·보정표·곡선 초안) / 의존: P3, P3-llm-providers / 수용기준: `reports/metrics.json`, `reports/calibration.json` 생성. **미달이면 재시도가 아니라 실패 케이스 분석을 산출물로 남기고 ER 설계(resolution-plan 3.3)를 재설계한다** — **부분완료(2026-09-22, verifier 04-review)**: 실 실행 ef18143(openai gpt-4o-mini-2024-07-18, 40건·7050행), 게이트 결정 K 미달(`embedding_only` 지배, D10 방향 ✔), 실패 케이스 분석 ea1bbb2(`reports/failure_cases.md`: 2단계 규칙 필터 배제 6건·4단계 미측정 s_rule=0 합산 상한 0.80). 재설계 = `/devlog change` CR(①4단계 가중치 재정규화 + ②2단계 배제→감점, 사용자 결정). P5 미착수
 
+### P4b — 게이트 재도전 (CR-001)
+
+- [ ] [backend-agent + eval-agent] **ER 재설계 후 파일럿 재실행** — D12(관측 신호 재정규화)·D13(규칙 필터 감점) 구현 + 새 stamp 재실행 + 게이트 재판정 / 의존: P4 부분완료(adf9f1b), CR-001 승인 / 수용기준: `app/er/confidence.py`·`rules.py`·`pipeline.py` 가 D12·D13 "코드에서 지켜야 할 것" 전부 충족(회귀 3종 유지), `--recheck-traces` `max_abs_diff=0.0`(weights_effective), 새 stamp `reports/pilot/raw-<ts>.jsonl.gz`·`reports/metrics.json` 로 결정 K 게이트 `0.8 [] True True`, `sc-015` 오병합·`sc-007` 미검출 아님, P4 기준선(`raw-20260922-042440.jsonl.gz`) 미변경. 미달이면 재실행 없이 failure_cases 갱신 + 사용자 결정
+  - 01-plan 결정 항목: 감점 후보의 `≥ T_merge` 보수 분기(권장 강등)·설정값 이름 / 완화 재검색 존치 / `weights` vs `weights_effective` 거부 규약 / 재실행 비용 상한
+
 ### P5
 
-- [ ] [backend-agent] 에이전트 루프(인식→해석→기록→응답) + ask_user 재개 / 의존: P3, P4 통과 / 수용기준: 발화 → 툴 선택 → 저장 → 응답이 API 한 흐름으로 동작, `POST /answers/{question_id}`로 루프 재개
+- [ ] [backend-agent] 에이전트 루프(인식→해석→기록→응답) + ask_user 재개 / 의존: P3, **P4b 게이트 통과**(P4 는 부분완료·미달, CR-001) / 수용기준: 발화 → 툴 선택 → 저장 → 응답이 API 한 흐름으로 동작, `POST /answers/{question_id}`로 루프 재개
 
 ### P6
 

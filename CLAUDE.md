@@ -35,7 +35,7 @@
 
 1. **오병합(False Merge)은 미검출보다 훨씬 나쁘다.** 확신도가 임계치 미만이면 절대 자동 병합하지 말고 `ask_user`를 호출한다. 이 비대칭 비용이 엔티티 해석 설계의 뿌리다.
 2. **임계치는 두 개다(T_merge, T_new).** 확신도 ≥ `T_merge`만 자동 연결한다. 그 미만은 반드시 `ask_user`다 — `[T_new, T_merge)`는 `kind="identity"`, `< T_new`는 `kind="new_person"`. 초기값 `T_merge = 0.8`, `T_new = 0.3` (파일럿 평가로 확정).
-3. **확신도는 3신호 결합이다.** `confidence = 0.5·s_llm + 0.3·s_emb + 0.2·s_rule`. `s_llm`은 LLM이 **구조화 출력으로 자기보고한 0~1 점수**이며, **LLM 로그 확률은 쓰지 않는다**(Claude API가 제공하지 않는다). 자기보고 점수는 보정표(`reports/calibration.json`)로 뒷받침한다.
+3. **확신도는 3신호 결합이다.** `confidence = Σ w_i·s_i / Σ w_i` — **관측된 신호만** 결합하며 가중치는 `w_llm=0.5 · w_emb=0.3 · w_rule=0.2`(D12, CR-001). 세 신호가 모두 있으면 `0.5·s_llm + 0.3·s_emb + 0.2·s_rule` 이고, `s_rule` 이 미측정(`rule_checked=0`)이면 0 으로 넣지 않고 분모에서 뺀다(`0.625·s_llm + 0.375·s_emb`). 2단계 규칙 충돌은 후보 배제가 아니라 `s_rule` 감점이다(D13). `s_llm`은 LLM이 **구조화 출력으로 자기보고한 0~1 점수**이며, **LLM 로그 확률은 쓰지 않는다**(Claude API가 제공하지 않는다). 자기보고 점수는 보정표(`reports/calibration.json`)로 뒷받침한다.
 4. **엔티티 해석은 LLM 단일 호출로 하지 않는다.** 반드시 4단계(후보검색 → 규칙필터 → LLM판정 → 확신도 미달 시 ask_user). 이유는 `.claude/skills/entity-resolution` 참조.
 5. **프론트 화면은 3개로 고정**: 채팅 / 인물 카드 / 브리핑. UI에 시간을 쓰지 않는다.
 6. **포함 범위에 명시**: 반복 패턴 감지(규칙 기반, D9) — 같은 인물의 같은 `events.type`이 90일 내 3회 이상이면 `person_facts(key="pattern:{type}")`를 생성한다. LLM은 패턴 문장화만 한다.

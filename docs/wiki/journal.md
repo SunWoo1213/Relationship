@@ -190,3 +190,6 @@
 - 2026-09-22 15:27 | PUSH | origin dev f01ea35 — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-22 15:40 | DECISION | 사용자: dev 푸시 f01ea35 L-003 = 보류(승격은 P4 04-review 뒤 한 번에), 마커 해제 후 /devlog done 진행 — verifier 04-review 위임 승인(L-004) | P4-pilot-eval
 - 2026-09-22 16:20 | DONE | P4-pilot-eval 부분완료 — verifier 04-review(FAIL 0, 수용 기준 backlog 61행 SAME, 판정 표 13/14, 부정 20/20, 게이트 결정 K 미달 dominated_by=[embedding_only]·D10 ✔, 열린 [필수] 0), 사용자 승인. F-0ffff5·F-2f0840·F-95c6a7·F-14f3ef 해소, P3-er F-251dc2·F-bdd6c5 해소, review-index R4 보정표 실물·R9 실 공급자 확인. CURRENT active none. 다음 /devlog change(CR ①+②) | P4-pilot-eval
+- 2026-09-22 16:09 | COMMIT | adf9f1b docs(P4-pilot-eval): 완료 검토 — verifier 04-review 부분완료(게이트 미달 + 실패 케이스 분석), 패키지 닫기
+- 2026-09-22 17:00 | DECISION | 사용자: CR-001 **A 수용(①4단계 미측정 신호 재정규화 + ②2단계 규칙 필터 배제→감점)**. CURRENT frozen: CR-001 → 카드·문서 이행(D12·D13 신설, D3 대체됨, S3.3, CLAUDE.md 원칙3, backlog P4b-er-redesign, review-index, proposal 상단) → 코드는 P4b 패키지 | CR-001
+- 2026-09-22 17:20 | CR | CR-001 이행완료(문서): D12 관측 신호 재정규화·D13 규칙 필터 감점 신설, D3 대체됨, S3.3 2·4단계, CLAUDE.md 원칙3, resolution-plan §3.3 한 줄, proposal 상단 한 줄, backlog P4b-er-redesign 행(P5 의존 = P4b 게이트), review-index R3·R4, INDEX 태그·패키지 표. frozen CR-001 → none. 코드는 P4b 에서 | CR-001

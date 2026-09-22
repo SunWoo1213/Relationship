@@ -8,8 +8,8 @@
 |---|--------|------|------|-----------|
 | R1 | H | ER 파이프라인이 스키마에 의존 (일정 충돌) | 폐기 | 의존성 순서 P1→P3 |
 | R2 | H | 기획서 일정 ↔ 하네스 마일스톤 불일치 | 폐기 | 일정 전면 삭제 |
-| R3 | H | 임계치 방향 문장이 반대 | 해소(문서) | D10 |
-| R4 | H | "LLM 출력 확률"은 Claude API에 없음 | 구현완료(b1f2782 — 구조화 출력 자기보고 s_llm, judge.py·test_er_judge.py 36건 스텁 검증; **실호출 확인**(2026-09-21 사용자 스모크 03, openai gpt-4o-mini-2024-07-18, confidence 0.8384 merge — `packages/P3-er/evidence/20260921-2011-er-smoke-real.txt`; anthropic·gemini 경로는 미실행) — F-87c597 해소; **보정표 실물**(2026-09-22 P4 U7 ef18143 `reports/calibration.json` — openai gpt-4o-mini-2024-07-18, 10구간, excluded_clamped 0, 정답 정의 결정 F(i); `proposed` 0.9-1.0 칸 47/101(F(i), deferred 오답 처리)·귀속 일치 98/101 = 97.0%(failure_cases §4g) — 두 정의 병기는 P10 결정 F(iii) 후보)) | D3 → S3.3 → P3-er |
+| R3 | H | 임계치 방향 문장이 반대 | 해소(문서); P4 실측 D10 방향 9쌍 위반 0(ef18143). **CR-001 뒤 P4b 재실행 곡선으로 재확인**(산식 D12 로 바뀜) | D10 |
+| R4 | H | "LLM 출력 확률"은 Claude API에 없음 | 구현완료(b1f2782 — 구조화 출력 자기보고 s_llm, judge.py·test_er_judge.py 36건 스텁 검증; **실호출 확인**(2026-09-21 사용자 스모크 03, openai gpt-4o-mini-2024-07-18, confidence 0.8384 merge — `packages/P3-er/evidence/20260921-2011-er-smoke-real.txt`; anthropic·gemini 경로는 미실행) — F-87c597 해소; **보정표 실물**(2026-09-22 P4 U7 ef18143 `reports/calibration.json` — openai gpt-4o-mini-2024-07-18, 10구간, excluded_clamped 0, 정답 정의 결정 F(i); `proposed` 0.9-1.0 칸 47/101(F(i), deferred 오답 처리)·귀속 일치 98/101 = 97.0%(failure_cases §4g) — 두 정의 병기는 P10 결정 F(iii) 후보)). **CR-001(2026-09-22)**: 산식 D3→D12(관측 신호 재정규화) — 자기보고 `s_llm`·보정표 규약은 불변, 결합 분모만 변경. P4b 재실행에서 재검증 | D3→D12 → S3.3 → P3-er, P4b-er-redesign |
 | R5 | H | 임베딩 공급자 미정, 차원 1536은 가정 | 구현완료(876a450, reports/embed_pilot.md: OpenAI text-embedding-3-small, N=1536) | D4 → P0-embed-pilot |
 | R6 | M | 신규 인물 자동등록 vs 확인형 불일치 | 구현완료(f318d58, 8162e09 — create_person 은 answered new_person 질문+긍정 답 없이는 ConfirmationRequired; P5-loop 가 1회 소비·대상 바인딩 결정) | D1 → S3.4 → P2-tools, P5-loop |
 | R7 | M | ask_user 동기 반환 불가 | 구현완료(8162e09, 4d5817e — pending_questions 저장 후 {question_id,status:pending} 반환, POST /answers 답 저장; 재개 흐름은 P5-loop) | D2 → S3.4 → P2-tools, P5-loop |
