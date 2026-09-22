@@ -193,3 +193,7 @@
 - 2026-09-22 16:09 | COMMIT | adf9f1b docs(P4-pilot-eval): 완료 검토 — verifier 04-review 부분완료(게이트 미달 + 실패 케이스 분석), 패키지 닫기
 - 2026-09-22 17:00 | DECISION | 사용자: CR-001 **A 수용(①4단계 미측정 신호 재정규화 + ②2단계 규칙 필터 배제→감점)**. CURRENT frozen: CR-001 → 카드·문서 이행(D12·D13 신설, D3 대체됨, S3.3, CLAUDE.md 원칙3, backlog P4b-er-redesign, review-index, proposal 상단) → 코드는 P4b 패키지 | CR-001
 - 2026-09-22 17:20 | CR | CR-001 이행완료(문서): D12 관측 신호 재정규화·D13 규칙 필터 감점 신설, D3 대체됨, S3.3 2·4단계, CLAUDE.md 원칙3, resolution-plan §3.3 한 줄, proposal 상단 한 줄, backlog P4b-er-redesign 행(P5 의존 = P4b 게이트), review-index R3·R4, INDEX 태그·패키지 표. frozen CR-001 → none. 코드는 P4b 에서 | CR-001
+- 2026-09-22 16:28 | COMMIT | e4109cc cr(CR-001): 확신도 관측 신호 재정규화(D12)·규칙 필터 감점(D13) — D3 대체, S3.3·원칙3·P4b 패키지 신설
+- 2026-09-22 18:20 | DECISION | 사용자: P4b-er-redesign 결정 A~I 권장 조합 확정 — A(i) ask 강등+relaxed_pass 예외·B ER_PENALIZED_MERGE_POLICY·C 완화 존치(트리거 '감점 없는 후보 0')·D recheck weights_effective·E $5/1회·F 결정 K 불변·G failure_cases §13·H meta 키 2·I stamp 사본 보존. backlog 개정 (2) types.py 반영·(1) 거절. CR-001 36행 정정 | P4b-er-redesign
+- 2026-09-22 18:55 | VERIFY | P4b-er-redesign 02-plan-verify 통과(verifier): verify-plan FAIL 0/WARN 22 의도(05-remediation [권고] 22·[필수] 0), 점검표 8/8, 사실 주장 (a)~(f) 6/6 코드 확인, 회귀 3종 baseline 3 passed, 권고 R-1~R-9 (evidence 20260922-1710·1718-verify-plan-review·1713-regression3-baseline) | P4b-er-redesign
+- 2026-09-22 19:00 | START | P4b-er-redesign 계획 승인(사용자) — 02 승인 줄, CURRENT active, 03-log 생성. R-3·R-9 01-plan 반영. U0 부터(메인 세션 SKILL.md 정합), U1 부터 backend-agent(L-004 매번) | P4b-er-redesign

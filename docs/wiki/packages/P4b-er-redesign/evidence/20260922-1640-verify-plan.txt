@@ -1,0 +1,64 @@
+== verify-plan P4b-er-redesign  (2026-09-22 16:40) ==
+PASS  존재: docs/wiki/packages/P4b-er-redesign/01-plan.md
+FAIL  없음: docs/wiki/packages/P4b-er-redesign/02-plan-verify.md
+PASS  카드 존재: D10
+PASS  카드 존재: D12
+PASS  카드 존재: D13
+PASS  카드 존재: D3
+PASS  카드 존재: D4
+PASS  카드 존재: D5
+PASS  패키지 id 등록됨: P3-er
+PASS  검증 항목 존재: R3
+PASS  검증 항목 존재: R4
+FAIL  작업 단위(- [ ] U1 …)가 없다
+PASS  backlog 일치: [ ] [backend-agent + eval-agent] **ER 재설계 후 파일�
+FAIL  backlog 에 같은 문장이 없다: "**D12·D13 "코드에서 지켜야 할 것" 전부 충족**
+FAIL  backlog 에 같은 문장이 없다: "**(회귀 3종 유지)**" → `tests/test_er_pipeline.py` �
+FAIL  backlog 에 같은 문장이 없다: "**`--recheck-traces` `max_abs_diff=0.0`(weights_effective)*
+FAIL  backlog 에 같은 문장이 없다: "**새 stamp … 결정 K 게이트 `0.8 [] True True`**" �
+FAIL  backlog 에 같은 문장이 없다: "**`sc-015` 오병합·`sc-007` 미검출 아님**" → 새 
+FAIL  backlog 에 같은 문장이 없다: "**P4 기준선(`raw-20260922-042440.jsonl.gz`) 미변경**"
+FAIL  backlog 에 같은 문장이 없다: "**미달이면 재실행 없이 failure_cases 갱신 + 사�
+WARN  registry 에 다른 패키지로 이미 있음: app/er/confidence.py → | 모듈 | 확신도·두 임계치(4단계, 순수 함수) | app/er/confidence.
+| 스크립트 | 파일럿 평가 실행 CLI(예상 비용 → 가드 → runner
+WARN  registry 에 다른 패키지로 이미 있음: app/er/rules.py → | 모듈 | 규칙 필터(2단계, 순수 함수) | app/er/rules.py | P3-er | 02e
+WARN  registry 에 다른 패키지로 이미 있음: app/er/pipeline.py → | 모듈 | ER 오케스트레이션(resolve/apply_resolution) | app/er/pipeline.
+WARN  registry 에 다른 패키지로 이미 있음: app/er/types.py → | 모듈 | ER 공용 타입 | app/er/types.py | P3-er | cc5d24f | `ScoredCandida
+PASS  registry 중복 없음: ScoredCandidate.penal
+WARN  registry 에 다른 패키지로 이미 있음: app/settings.py → | 모듈 | 런타임 설정값 | app/settings.py | P2-tools | f217190 | `app_use
+WARN  registry 에 다른 패키지로 이미 있음: scripts/run_pilot_eval.py → | 스크립트 | 파일럿 평가 실행 CLI(예상 비용 → 가드 → runner
+WARN  registry 에 다른 패키지로 이미 있음: evaluation/curve.py → | 모듈 | 파일럿 평가 지표 계산기(U1 JSONL → 방식 × `T_merge` �
+| 모듈 | 곡선(`T_merge` 10점 × 3계열 × 5방식)·`metrics.json` 조립�
+PASS  registry 중복 없음: meta.weigh
+PASS  registry 중복 없음: meta.penal
+WARN  registry 에 다른 패키지로 이미 있음: evaluation/metrics.py → | 모듈 | 파일럿 평가 지표 계산기(U1 JSONL → 방식 × `T_merge` �
+WARN  registry 에 다른 패키지로 이미 있음: evaluation/calibration.py → | 모듈 | 보정표 작성기(U1 JSONL → `s_llm` 구간별 실제 정답률 =
+WARN  registry 에 다른 패키지로 이미 있음: evaluation/resolvers/proposed.py → | 모듈 | 제안 4단계 하이브리드 어댑터(`app.er.resolve` -> `Mention
+WARN  registry 에 다른 패키지로 이미 있음: tests/test_er_confidence.py → | 테스트 | 확신도 가중합·경계값·임계치 스윕 | tests/test_er_c
+WARN  registry 에 다른 패키지로 이미 있음: test_er_rules.py → | 테스트 | 규칙 필터 배제·완화 재평가·s_rule 분모 | tests/test
+WARN  registry 에 다른 패키지로 이미 있음: test_er_pipeline.py → | 테스트 | ER 파이프라인 회귀(승진·이모 배제·동명이인)·tr
+WARN  registry 에 다른 패키지로 이미 있음: test_run_pilot_eval.py → | 테스트 | 실행 CLI 순수 층(지문·run_id·비용 추정·환경변수 
+WARN  registry 에 다른 패키지로 이미 있음: .jsonl.gz → | 모듈 | 파일럿 평가 지표 계산기(U1 JSONL → 방식 × `T_merge` �
+| 스크립트 | 파일럿 평가 실행 CLI(예상 비용 → 가드 → runner
+| 데이터 | 원시 판정 JSONL(gzip, 실 실행 40건·7050행, 결정 E) | r
+| 리포트 | 실패 케이스 분석(오병합·미검출 전건, 강제 경로
+| 문서 | 사용자 카드 10 파일럿 평가 실 실행(환경변수 이름·
+WARN  registry 에 다른 패키지로 이미 있음: reports/metrics.json → | 리포트 | 파일럿 지표(5방식 × 10임계치 · 게이트 판정) | rep
+WARN  registry 에 다른 패키지로 이미 있음: calibration.json → | 모듈 | 보정표 작성기(U1 JSONL → `s_llm` 구간별 실제 정답률 =
+| 리포트 | 보정표(`s_llm` 10구간 실제 정답률, 실 실행) | reports
+| 리포트 | 실패 케이스 분석(오병합·미검출 전건, 강제 경로
+WARN  registry 에 다른 패키지로 이미 있음: curve.csv → | 모듈 | 곡선(`T_merge` 10점 × 3계열 × 5방식)·`metrics.json` 조립�
+| 테스트 | 곡선 격자·`T_new` 불변·방식 5키 순서·게이트 판�
+| 모듈 | 리포트 생성기(`metrics.json` → `reports/eval.md` — 표·곡
+| 테스트 | `eval.md` 바이트 재현성·입력에 없는 수치 금지(숫�
+| 리포트 | 트레이드오프 곡선(T_merge 10점 × 3계열 × 5방식) | r
+WARN  registry 에 다른 패키지로 이미 있음: eval.md → | 모듈 | 리포트 생성기(`metrics.json` → `reports/eval.md` — 표·곡
+| 테스트 | `eval.md` 바이트 재현성·입력에 없는 수치 금지(숫�
+| 리포트 | 파일럿 평가 리포트(metrics.json 단일 입력, 멱등) | r
+WARN  registry 에 다른 패키지로 이미 있음: reports/failure_cases.md → | 리포트 | 실패 케이스 분석(오병합·미검출 전건, 강제 경로
+PASS  registry 중복 없음: docs/wiki/registry.md
+WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
+| 문서 | 사용자 카드 10 파일럿 평가 실 실행(환경변수 이름·
+WARN  registry 에 다른 패키지로 이미 있음: docs/user-setup/10-pilot-eval-run.md → | 문서 | 사용자 카드 10 파일럿 평가 실 실행(환경변수 이름·
+PASS  registry 중복 없음: .claude/skills/entity-resolution/SKILL.md
+== 결과: FAIL=9 WARN=22 ==

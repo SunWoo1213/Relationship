@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: none
+active: P4b-er-redesign
 frozen: none
 
 <!--
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- P4b-er-redesign 계획 승인(2026-09-22, architect 초안 → 사용자 결정 A~I 권장 조합 → verifier 02-plan-verify 통과 FAIL 0/WARN 22 의도, 점검표 8/8, 사실 주장 6/6, 보류 0, 권고 R-1~R-9). U0 은 메인 세션(SKILL.md 정합, R-7), U1~U3 backend-agent(app/er 5파일 + er_smoke.py), U4~U7 eval-agent, U5 실 실행은 사용자(새 stamp, 기준선 stamp 사본 선커밋), 04-review verifier. **U4→U5 순서 필수.** 결정 A(i) ask 강등+relaxed_pass 예외·B ER_PENALIZED_MERGE_POLICY·C 완화 트리거 "감점 없는 후보 0"·D recheck weights_effective·E $5/1회·F 결정 K 불변·G §13·H meta 2키·I stamp 사본. P5 는 04-review 게이트 통과 후.
 - **CR-001 이행완료(문서, 2026-09-22, 사용자 A 수용)**: D12(관측 신호 재정규화)·D13(규칙 필터 감점) 신설, D3 대체됨, S3.3·CLAUDE.md 원칙3·resolution-plan §3.3·proposal 상단·backlog P4b 행·review-index R3/R4·INDEX 갱신. frozen 은 문서 커밋으로 해제. **코드는 `P4b-er-redesign`**(backlog "P4b — 게이트 재도전") — `/devlog start P4b-er-redesign` 부터(architect 01-plan → verifier → 승인). P5 는 P4b 게이트 통과 후.
 - P4-pilot-eval **부분완료**(2026-09-22, verifier 04-review, verify-impl FAIL 0/WARN 1→종료 커밋에서 0, 수용 기준 문장 2·해석 6·판정 표 14 중 게이트 2행 미달, 부정 20/20, 열린 [필수] 0, 사용자 승인). 게이트 미달(embedding_only 지배) → 재실행 없음, failure_cases.md. **다음 = /devlog change CR(①4단계 미측정 신호 가중치 재정규화 + ②2단계 규칙 필터 배제→감점, 사용자 결정 2026-09-22)**. P5 이후 시작 금지(결정 K (a)). dev f01ea35 푸시됨·승격 보류(L-003). 남은 [권고]: 러너 safe_summary FIX 후보, stamp UTC, 03-log Refs=커밋 Refs L-nnn, P10 F(iii)·mention_index 조인 키.
 - P4-pilot-eval 계획 승인(2026-09-18, 01-plan 개정 2026-09-17 → verifier 1차 보류 H-1(결정 K 판정식) → 사용자 (a) 지배 기준·R-1~R-4 반영 → verifier 2차 통과(FAIL 0/WARN 3 의도, 점검표 8/8, 보류 0, R-5~R-7·O-4~O-6 은 구현·04-review 확인)). U1 부터 eval-agent(L-004 매번). 이 패키지가 P5 이후 게이트. 권고 F-95c6a7·F-0ffff5(registry 기존 행 확장) 는 04-review §5 에서 닫음.
