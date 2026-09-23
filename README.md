@@ -75,28 +75,8 @@
 ## 평가
 
 - **지금(P4 파일럿)**: 파일럿 데이터셋 **40건**(아래 "평가 데이터셋" 절)으로 인물 해석 지표만 잰다 — P/R/F1, **오병합률**(핵심), 미검출률, `ask_user` 종류별 비율, 보정도.
-- **목표(P10 최종)**: 한국어 대화 **150건**(승진·대명사·별칭·정상·신규 인물)으로 넓히고, 이벤트 추출 F1·툴 호출 정확도를 더한다. 추출 주체인 에이전트 루프(P5)가 생긴 뒤라야 잴 수 있어서 P4 범위에서 뺐다.
 - 베이스라인 3종과 같은 데이터·같은 지표로 비교하고, `T_merge`를 0.5~0.95(0.05 간격 10점, `T_new` 0.3 고정)로 바꾸며 오병합률·질문율·미검출률 트레이드오프 곡선을 그린다.
 - 수치는 재현 가능해야 한다. 성능 미달도 결과이며, 재시도 대신 실패 케이스 분석을 산출물로 남긴다. 산출물은 `reports/`(현재는 `embed_pilot.md`만 있다).
-
-### P4 파일럿 평가 파이프라인 (계획 초안 — `docs/wiki/packages/P4-pilot-eval/01-plan.md`, 701fb8d)
-
-```
-data/scenarios 40건 ─ 시나리오마다 사전 상태 적재·끝나면 되돌림(오염 방지)
-   └ 다섯 방식 × mention × T_merge 10점  ── evaluation/runner.py
-        ▼
-reports/pilot/raw-<ts>.jsonl   원시 판정 (LLM 응답을 다시 사지 않도록 먼저 저장)
-        ▼ 지표는 이 파일에서만 계산
-reports/metrics.json      오병합률·미검출률·P/R/F1·ask_user 종류별 비율   (evaluation/metrics.py)
-reports/calibration.json  s_llm 0.1 구간별 실제 정답률, 공급자·모델별 분리  (evaluation/calibration.py)
-reports/curve.csv         T_merge 스윕 곡선                                (evaluation/curve.py)
-reports/eval.md           metrics.json 한 파일만 읽어 생성(멱등)             (evaluation/report.py)
-reports/failure_cases.md  오병합·미검출·강제 강등 유형별 분석 — 미달이 아니어도 만든다
-```
-
-- 실행은 `LLM_PROVIDER=openai` 1벌(D11)이며 `meta.provider`·`meta.model`에 기록한다. LLM 비용 실측(P0-cost)은 이 패키지의 U6로 흡수했다(40건 실측 → 150건 외삽).
-- 하지 않는 것: `app/` 수정, 골드 라벨 수정(수치가 나빠도 `data/`를 손대지 않는다), `top_k`·가중치 스윕(40건으로 튜닝하면 과적합), 운영 임계치 확정(P10 몫).
-- 게이트: 수치가 나쁘면 재시도가 아니라 `failure_cases.md` + ER 설계(S3.3) 재설계 여부를 사용자 결정으로 올린다. **P4를 통과하기 전에는 P5 이후를 시작하지 않는다.**
 
 ## 진행 상태
 
@@ -110,16 +90,12 @@ reports/failure_cases.md  오병합·미검출·강제 강등 유형별 분석 �
 | P2 | 툴 7종 v2 + FastAPI 골격 | **완료** — 시그니처 = CLAUDE.md(tools_check 7/7), ask_user→pending_questions, D1 확인 강제, GET /health·POST /answers, pytest 206, verifier 04-review 완료 |
 | P3 | 엔티티 해석 4단계 (P3-er) | **완료**(verifier 04-review 완료) — ER 4단계(`app/er`) + 확신도 3신호·두 임계치 + trace 1행, 회귀 3종 통과(승진 0.863 merge / 이모 배제 / 동명이인 0.575 identity) |
 | P3 | 베이스라인 3종 (P3-baselines) | **완료**(verifier 04-review 완료) — `evaluation/` 다섯 방식(`proposed`·`exact_raw`·`exact_norm`·`embedding_only`·`llm_single`)이 같은 함수·같은 인자로 호출 가능(parity 46건, 부수효과 0) |
-| P3<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | LLM 공급자 등록표 (P3-llm-providers) | **완료**(verifier 04-review 완료, 수용 기준 11/11·부정 검사 43/43) — 등록표 `JUDGES`(anthropic·openai·gemini)·활성 스위치 `LLM_PROVIDERS_ENABLED`·기본 `openai`(D11), Gemini 판정기 구현, pytest 918 passed. **실 API 호출로 검증된 공급자는 1/3(openai)** — `er_smoke.py`("부장님" → 후보 중 부장 인물, 확신도 0.838 · merge)와 `baseline_smoke.py`(llm_single, identity 질문)가 gpt-4o-mini로 통과했다(`docs/wiki/evidence/20260919-openai-live-smoke.txt`). anthropic · gemini 실호출과 소견 F-87c597 종결은 P4에서 한다 |
+| P3| LLM 공급자 등록표 (P3-llm-providers) | **완료**(verifier 04-review 완료, 수용 기준 11/11·부정 검사 43/43) — 등록표 `JUDGES`(anthropic·openai·gemini)·활성 스위치 `LLM_PROVIDERS_ENABLED`·기본 `openai`(D11), Gemini 판정기 구현, pytest 918 passed. **실 API 호출로 검증된 공급자는 1/3(openai)** — `er_smoke.py`("부장님" → 후보 중 부장 인물, 확신도 0.838 · merge)와 `baseline_smoke.py`(llm_single, identity 질문)가 gpt-4o-mini로 통과했다(`docs/wiki/evidence/20260919-openai-live-smoke.txt`). anthropic · gemini 실호출과 소견 F-87c597 종결은 P4에서 한다 |
 | P4 | **파일럿 평가(게이트)** — 곡선·보정표 초안, 임계치 방향 확인 | **실 실행 완료 · 게이트 미달**(2026-09-22, openai gpt-4o-mini-2024-07-18 + text-embedding-3-small, 40건·7050행, $0.027) — `T_merge` 0.8에서 제안 방식 오병합 1/132·미검출 1/132·ask_user(identity) 59.8% vs `embedding_only` 0·1·23.5% → 지배됨(D10 방향은 통과). 원칙8대로 재실행하지 않고 `reports/failure_cases.md`(원인: 2단계 규칙 필터 배제 6건 + 4단계 미측정 `s_rule`=0 합산으로 확신도 상한 0.80)를 남겼다. verifier 04-review는 **부분완료**로 닫고 `/devlog change`(CR-001)로 넘어갔다 — 아래 P4b 행이 그 재도전이다 |
-| P4b | **게이트 재도전 (CR-001)** — 확신도 결합·규칙 필터 재설계 후 1회 재실행 | **완료 · 게이트 통과**(2026-09-23, verifier 04-review 완료, 수용 기준 16행 충족, 열린 [필수] 0). D12 관측 신호 재정규화(미측정 `s_rule`은 0으로 합산하지 않고 분모에서 뺀다)와 D13 규칙 필터 감점(관계 태그·위계 충돌은 후보를 빼지 않고 `penalized_by`로 감점, 배제는 호칭 사전 모순일 때만)을 넣고 같은 40건을 **한 번만** 다시 돌렸다. `T_merge` 0.8에서 제안 방식 오병합 **0/132**·미검출 **0/132**, 베이스라인 4종 모두 제안 방식을 지배하지 못한다(`0.8 [] True True`). F1 0.8972(정밀도 1.0·재현율 0.8136), 되묻기 31건 23.5%, $0.0274. 판정식은 고치지 않았다. **한계**: 40건·1회 실행이고 실행 간 `s_llm` 자기보고가 136 mention 중 60건 달라 개선을 D12·D13 단독 효과로 분해할 수 없다. 전후 비교는 `reports/failure_cases.md` §13 |
-| P5~P9 | 에이전트 루프 · 메모리·패턴 · 브리핑 · 웹푸시 · 프론트 3화면 · 인프라(Terraform·Actions·Caddy) | P4b 게이트 통과(2026-09-23) 후 착수 가능 |
-| P10 | 150건 데이터셋 완성 + 최종 평가 + `reports/eval.md` | P4b·P9 후 |
-| P11 | 데모 리허설(사용자) | P9 후 |
+| P4b<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | **게이트 재도전 (CR-001)** — 확신도 결합·규칙 필터 재설계 후 1회 재실행 | **완료 · 게이트 통과**(2026-09-23, verifier 04-review 완료, 수용 기준 16행 충족, 열린 [필수] 0). D12 관측 신호 재정규화(미측정 `s_rule`은 0으로 합산하지 않고 분모에서 뺀다)와 D13 규칙 필터 감점(관계 태그·위계 충돌은 후보를 빼지 않고 `penalized_by`로 감점, 배제는 호칭 사전 모순일 때만)을 넣고 같은 40건을 **한 번만** 다시 돌렸다. `T_merge` 0.8에서 제안 방식 오병합 **0/132**·미검출 **0/132**, 베이스라인 4종 모두 제안 방식을 지배하지 못한다(`0.8 [] True True`). F1 0.8972(정밀도 1.0·재현율 0.8136), 되묻기 31건 23.5%, $0.0274. 판정식은 고치지 않았다. **한계**: 40건·1회 실행이고 실행 간 `s_llm` 자기보고가 136 mention 중 60건 달라 개선을 D12·D13 단독 효과로 분해할 수 없다. 전후 비교는 `reports/failure_cases.md` §13 |
 
 최신 상태는 `docs/wiki/HANDOFF.md`(지금 어디, 다음 무엇)와 `docs/wiki/journal.md`(시간순)에 있다.
 
-**다음 할 일** (`HANDOFF.md` 기준): ① P4-pilot-eval 착수 — 01-plan 초안에 P3-llm-providers 완료 해시를 채우고 `/devlog start` → verifier 계획 검증 → 사용자 계획 승인 ② 사용자 실호출 스모크(user-setup 03·08) ③ P9 전에 AWS 배포 결정 10개 확정(user-setup 09).
 
 ## 설계 과정 — 기획서 검증에서 커밋까지
 
@@ -432,14 +408,6 @@ python -m pytest tests/test_validate_scenarios.py -q       # 검증기 자체 �
 
 원칙: 검수자는 데이터를 고치지 않고 지적만 남기며, 반영은 eval-agent가, 지적을 닫는 것은 다시 검수자가 한다. 기각도 사용자 결정으로만 한다.
 
-알려진 한계(P4·P10으로 넘긴다 — 성능에 유리하게 감추지 않는다):
-
-- `occurred_at_kind: absolute` **0건** — 미래 약속 발화를 원문대로 되돌리면서 유일한 사례가 사라졌다. P10에서 과거 절대 날짜 발화를 보충해야 absolute 분모가 생긴다.
-- 이벤트 type 편중: 전체 76건 중 `personal_share` 25 · `meal` 17 · `meeting` 12 · `favor` 10 · `conflict` 6 · `other` 5 · `praise` 1. `favor` 10건 중 사용자→인물 방향은 1건뿐이다.
-- 위계 `하` 6/60, 발화 길이 10~26자, 턴 수 3~5로 폭이 좁다 — 실사용보다 쉬운 방향, 즉 **과대평가 편향**이다.
-- 같은 가상 성명이 시나리오마다 다른 관계로 다시 등장한다. **P4 러너는 시나리오 사이에 DB를 비워야 한다** — 비우지 않으면 사전 상태가 오염돼 베이스라인 비교의 동일 조건이 깨진다.
-- 소비자(P3-baselines·P4-pilot-eval)가 mention 단위 정보(함정 대상, 지칭별 기대 질문, 발화 안 위치, 선행사 턴 등)를 더 요구하면 FIX가 아니라 `schema_version`을 올린다.
-
 ### 베이스라인 3종 실행법
 
 `evaluation/`은 **평가 장치**다 — 제품 런타임(`app/`)이 아니고, 의존 방향은 `evaluation → app` 한쪽뿐이다(제품 코드는 이 패키지를 import 하지 않는다). 여기 있는 것은 "엔티티 해석을 LLM 한 번으로 하지 않는다"(불변 원칙 4)를 **숫자로 반박당할 수 있게** 만드는 대비군이다: 같은 사전 상태·같은 지칭·같은 `ERConfig`로 네(등록 이름으로는 다섯) 방식을 돌려 S3.7이 요구하는 동일 데이터·동일 지표 비교를 성립시킨다.
@@ -501,22 +469,6 @@ python scripts/run_pilot_eval.py --recheck-traces reports/pilot/traces-<ts>.json
 
 **P4b 재실행(2026-09-22, 같은 명령·같은 40건)** — 위 P4 문단은 첫 실행 기준선이고 고치지 않는다. 그 실행이 게이트에 미달해(`embedding_only` 가 제안 방식을 지배) CR-001 로 확신도 결합과 규칙 필터를 바꾼 뒤 **한 번만** 다시 돌렸다. 바뀐 것은 둘이다 — **D12 관측 신호 재정규화**: `s_rule` 이 미측정(`rule_checked == 0`)이면 0 으로 합산하지 않고 분모에서 빼 `(0.5·s_llm + 0.3·s_emb)/0.8` 로 계산한다(세 신호가 다 있으면 예전 식과 같은 값). **D13 규칙 필터 감점**: 관계 태그·위계 충돌은 후보를 목록에서 빼지 않고 `penalized_by` 로 감점만 하며, 배제는 호칭 사전 모순일 때만 한다. 감점 후보가 자동 연결 구간에 들어오면 `ER_PENALIZED_MERGE_POLICY=ask`(기본) 가 되묻기로 강등한다. 재실행 stamp 는 `reports/pilot/raw-20260922-150931.jsonl.gz`·`traces-20260922-150931.jsonl` 이고, `reports/` 최상위 4파일(`metrics.json`·`calibration.json`·`curve.csv`·`eval.md`)이 그 결과로 갱신됐다 — 첫 실행 결과는 `reports/pilot/<이름>-20260922-042440.*` 사본으로 그대로 남아 있다. 게이트 결과 한 줄: `gate` 의 `t_merge dominated_by d10_direction pass` 가 **`0.8 [] True True`**(첫 실행은 `0.8 ['embedding_only'] True False`). 전후 비교는 `reports/failure_cases.md` §13, 판정식은 그대로다(우리가 미달한 뒤 기준을 고치지 않았다).
 
-
-## 배포 계획 (P9 — 아직 착수 전)
-
-기준 문서는 `docs/user-setup/09-aws-deploy.md`(처음 규모: 사용자 몇 명)와 D7(TLS)이다.
-
-```
-브라우저(PWA) ─HTTPS→ CloudFront ─ /      → S3 (React 정적 빌드, 비공개 버킷)
-                                 └ /api/* → EC2 1대: Caddy(Let's Encrypt) → FastAPI(Docker) → PostgreSQL + pgvector
-비밀: SSM Parameter Store   배포: GitHub Actions(OIDC, 장기 키 없음) → SSM Run Command   비용 알림: AWS Budgets $10/$30/$50
-```
-
-- **D7 그대로**: ALB 없음, NAT 없음. 권장안은 443을 CloudFront 대역에만 열고, 서버 접속은 SSH(22) 대신 SSM Session Manager를 쓰는 것이다.
-- **DB 두 안**: A안 — 같은 EC2의 docker compose(월 약 $22, 매일 `pg_dump` → S3 백업 필수) / B안 — RDS db.t4g.micro(월 약 $38). A안을 고르면 기술 스택(RDS)과 달라지므로 결정 카드(D12)를 남긴다.
-- **배포 트리거 권장안은 수동 dispatch(커밋 해시 입력)** — 승격은 사람이 정한다는 L-001·L-003과 맞추고, 롤백은 이전 해시로 다시 dispatch한다.
-- 리전·DB 안·인스턴스·도메인 등 **결정 10개**를 P9 착수 전에 사용자가 확정한다. 배포 직후 점검·되돌리기 기준·승격 절차는 `SERVER-CHECKLIST.md`(§0~§8)를 따른다.
-- 가장 큰 변동비는 LLM 호출이다 — 비용은 P4 U6 실측으로 잡는다.
 
 ## 문서 안내
 
