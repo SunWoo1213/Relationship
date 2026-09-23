@@ -31,9 +31,11 @@ echo "== verify-impl $id  ($ts) =="
 # 1 테스트
 if [ -d tests ] || ls "$ROOT"/*/tests >/dev/null 2>&1; then
   if python -m pytest --version >/dev/null 2>&1; then
-    python -m pytest -q "$@" > "$E/$ts-pytest.txt" 2>&1; rc=$?
+    # -rs: skip 사유를 증거에 남긴다(DB 미연결로 조용히 skip된 초록불 방지)
+    python -m pytest -q -rs "$@" > "$E/$ts-pytest.txt" 2>&1; rc=$?
     tail -n 3 "$E/$ts-pytest.txt"
     [ $rc -eq 0 ] && ok "pytest 통과 → evidence/$ts-pytest.txt" || bad "pytest 실패(rc=$rc) → evidence/$ts-pytest.txt"
+    grep -qE '[0-9]+ skipped' "$E/$ts-pytest.txt" && wrn "skip 있음 — 사유(SKIPPED 줄) 확인 → evidence/$ts-pytest.txt"
   else
     wrn "pytest 미설치 — 테스트 증거 없음"
   fi

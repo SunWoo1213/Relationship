@@ -216,3 +216,7 @@
 - 2026-09-23 12:08 | COMMIT | 9169a04 docs(P4b-er-redesign): U6 뒤에 남은 기록 — 해시·푸시·보류 결정을 위키로 옮긴다
 - 2026-09-23 12:39 | COMMIT | cf5a171 test(P4b-er-redesign): U7 수용 기준 21행을 모두 돌려 증거로 남기고 문서를 맞춘다
 - 2026-09-23 13:20 | DONE | **P4b-er-redesign 완료** — verifier 04-review `결과: 완료`(게이트 독립 재계산이 `metrics.json.gate` 와 일치, 수용 기준 16행 충족, 부정 18건, 열린 [필수] 0), 사용자 승인. 닫는 작업 뒤 `verify-impl.sh` **FAIL 0 / WARN 0**(`evidence/20260923-1320-close-verify-impl.txt`). 게이트 `0.8 [] True True` — T_merge 0.8 에서 오병합 0/132·미검출 0/132, 베이스라인 4종 미지배, F1 0.8972, 되묻기 31건 23.5%, $0.0274. 단위 해시 U0 83d33dd · U1 85ceda7 · U2 08bda7c · U3 dbcfca0 · U4 b5b412c · U5선행 a8faa81 · U5 855a26b · U6 4338eea · U7 cf5a171. `CURRENT active: none` — **P5 착수 가능** | P4b-er-redesign
+- 2026-09-23 13:19 | COMMIT | 1075dd6 docs(P4b-er-redesign): 패키지를 닫는다 — 게이트를 통과했고 위키를 정리한다
+- 2026-09-23 13:19 | PUSH | origin dev 1075dd6 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-23 13:30 | DECISION | L-003 푸시 후 결정: **main 병합 작업 단위를 연다**(사용자). 마커 해제(`--decision fix`) → `/devlog fix` FIX-001 | FIX-001
+- 2026-09-23 14:00 | FIX | **FIX-001 main 병합** — `origin/main`(6커밋, 갈림점 `3c6108d`)을 dev 로 병합. 충돌 `README.md` 1건을 **양쪽 보존**으로 해소(main 본문 바탕 + dev 의 진행 표 P4·P4b 행과 파일럿 평가 실행법 절). 회귀 1325 passed(skip 0), verify-impl FAIL 0/WARN 0. 승격은 사용자 승인 대기 | FIX-001

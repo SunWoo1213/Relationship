@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: none
+active: FIX-001
 frozen: none
 
 <!--
