@@ -214,3 +214,5 @@
 - 2026-09-23 00:50 | PUSH | origin dev 4338eea — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-23 01:00 | DECISION | L-003 푸시 후 결정: **보류**. main 승격은 origin/main(0dbf2c9)이 dev 와 갈라져 fast-forward 불가이고(README.md 충돌 1건, 병합 작업 단위 필요) 게이트 재판정(04-review)도 남아 있다. 마커 해제(--decision fix). 세션 종료 — 다음은 U7 | P4b-er-redesign
 - 2026-09-23 12:08 | COMMIT | 9169a04 docs(P4b-er-redesign): U6 뒤에 남은 기록 — 해시·푸시·보류 결정을 위키로 옮긴다
+- 2026-09-23 12:39 | COMMIT | cf5a171 test(P4b-er-redesign): U7 수용 기준 21행을 모두 돌려 증거로 남기고 문서를 맞춘다
+- 2026-09-23 13:20 | DONE | **P4b-er-redesign 완료** — verifier 04-review `결과: 완료`(게이트 독립 재계산이 `metrics.json.gate` 와 일치, 수용 기준 16행 충족, 부정 18건, 열린 [필수] 0), 사용자 승인. 닫는 작업 뒤 `verify-impl.sh` **FAIL 0 / WARN 0**(`evidence/20260923-1320-close-verify-impl.txt`). 게이트 `0.8 [] True True` — T_merge 0.8 에서 오병합 0/132·미검출 0/132, 베이스라인 4종 미지배, F1 0.8972, 되묻기 31건 23.5%, $0.0274. 단위 해시 U0 83d33dd · U1 85ceda7 · U2 08bda7c · U3 dbcfca0 · U4 b5b412c · U5선행 a8faa81 · U5 855a26b · U6 4338eea · U7 cf5a171. `CURRENT active: none` — **P5 착수 가능** | P4b-er-redesign

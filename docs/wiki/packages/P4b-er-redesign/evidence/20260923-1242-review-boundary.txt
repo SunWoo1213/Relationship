@@ -1,0 +1,141 @@
+# verifier 04-review · 경계·기준선 불변 (HEAD=cf5a171, 기준점 e4109cc) 2026-09-23T03:43:44Z
+$ git diff --name-only e4109cc..HEAD
+.claude/skills/entity-resolution/SKILL.md
+.env.example
+README.md
+app/er/confidence.py
+app/er/pipeline.py
+app/er/rules.py
+app/er/types.py
+app/settings.py
+docs/backlog.md
+docs/user-setup/10-pilot-eval-run.md
+docs/wiki/CURRENT.md
+docs/wiki/HANDOFF.md
+docs/wiki/changes/CR-001.md
+docs/wiki/journal.md
+docs/wiki/packages/P4b-er-redesign/01-plan.md
+docs/wiki/packages/P4b-er-redesign/02-plan-verify.md
+docs/wiki/packages/P4b-er-redesign/03-log.md
+docs/wiki/packages/P4b-er-redesign/05-remediation.md
+docs/wiki/packages/P4b-er-redesign/evidence/.gitkeep
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1640-verify-plan.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1641-verify-plan-2.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1649-verify-plan-3.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1710-verify-plan-review.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1713-regression3-baseline.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1718-verify-plan-review-2.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1827-u1-app-diff.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1827-u1-known-failures-note.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1827-u1-pytest-all.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1827-u1-pytest.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1827-u1-regression3.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1855-u2-app-diff.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1855-u2-d13-grep.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1855-u2-pytest-rules.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1905-u2-pytest-all-failed-list.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1905-u2-regression3.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1915-u2-new-failure-note.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1915-u2-pytest-all.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1925-u3-app-diff.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1925-u3-policy-grep.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1925-u3-pytest-all.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1925-u3-pytest-pipeline.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1925-u3-regression3.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1950-u3-pytest-all-recheck.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-1955-u4-recompute-weights-choice.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-boundary-diff.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-dryrun-chain.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-known-baseline-effects.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-pytest-all.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-recheck-rule-unchecked.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-target5.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2020-u4-validate-and-subsets.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2035-u4-pytest-all-recheck.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2310-u5pre-baseline-stamp.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2314-u5-dryrun-estimate.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2314-u5-preflight.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2338-u5-dryrun-chain.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260922-2338-u5-recheck-traces.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260923-0009-u5-real-run.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260923-0021-u5-postrun-verify.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260923-0039-u6-compare.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260923-1214-u7-accept-1.txt
+docs/wiki/packages/P4b-er-redesign/evidence/20260923-1214-u7-accept-2.txt
+docs/wiki/registry.md
+evaluation/calibration.py
+evaluation/curve.py
+evaluation/metrics.py
+evaluation/report.py
+evaluation/resolvers/proposed.py
+reports/calibration.json
+reports/cost_estimate.md
+reports/curve.csv
+reports/eval.md
+reports/failure_cases.md
+reports/metrics.json
+reports/pilot/calibration-20260922-042440.json
+reports/pilot/curve-20260922-042440.csv
+reports/pilot/eval-20260922-042440.md
+reports/pilot/metrics-20260922-042440.json
+reports/pilot/raw-20260922-150931.jsonl.gz
+reports/pilot/traces-20260922-150931.jsonl
+scripts/er_smoke.py
+scripts/run_pilot_eval.py
+tests/test_baseline_proposed.py
+tests/test_er_confidence.py
+tests/test_er_pipeline.py
+tests/test_er_rules.py
+tests/test_er_smoke.py
+tests/test_er_types.py
+tests/test_eval_curve.py
+tests/test_eval_metrics.py
+tests/test_eval_report.py
+tests/test_run_pilot_eval.py
+rc=0
+
+$ git diff --name-only e4109cc..HEAD -- app/
+app/er/confidence.py
+app/er/pipeline.py
+app/er/rules.py
+app/er/types.py
+app/settings.py
+rc=0
+
+$ git diff --name-only e4109cc..HEAD -- data/
+(0줄)
+lines=0
+
+$ git diff --name-only e4109cc..HEAD -- reports/pilot/raw-20260922-042440.jsonl.gz reports/pilot/traces-20260922-042440.jsonl
+(0줄)
+lines=0
+
+$ git diff --name-only e4109cc..HEAD -- data/ reports/pilot/raw-20260922-042440.jsonl.gz reports/pilot/traces-20260922-042440.jsonl | wc -l
+0
+
+$ sha256sum reports/pilot/raw-20260922-042440.jsonl.gz reports/pilot/traces-20260922-042440.jsonl reports/pilot/metrics-20260922-042440.json reports/pilot/raw-20260922-150931.jsonl.gz reports/pilot/traces-20260922-150931.jsonl reports/metrics.json
+8d85e4de634272872e5800f091285a0beadf24eb5333438226e7c9ec85d87ad4 *reports/pilot/raw-20260922-042440.jsonl.gz
+41aa3165347f1271b58229801e6b6b7fab83dfea453017c594ed495ae7f6b1ee *reports/pilot/traces-20260922-042440.jsonl
+25e16dd67ea74aaf14ac640654af402528f48c873714fa034c1077b8dff98d1f *reports/pilot/metrics-20260922-042440.json
+7223e1e5174e12ff8d0fbfd403ee072ecc103035d91b28f017ed4c0209042dd5 *reports/pilot/raw-20260922-150931.jsonl.gz
+4a8a23ad7c7727e9b5e06e50b34cda5cbb2f666b39481913631039c88fda4d78 *reports/pilot/traces-20260922-150931.jsonl
+b293ab5099c6da8f341832e10311cf809ad8aa06b440a7901364603c8a150797 *reports/metrics.json
+
+$ git show e4109cc:reports/pilot/raw-20260922-042440.jsonl.gz | sha256sum   (기준점 커밋의 blob 과 작업본 비교)
+8d85e4de634272872e5800f091285a0beadf24eb5333438226e7c9ec85d87ad4 *-
+$ git show e4109cc:reports/metrics.json | sha256sum   (P4 시점 metrics = 사본 25e16dd6 여야 한다)
+498fc057c9ad227b569d24b52636c15cf15a04ea973f632cc4fb7fb3ad6401fe *-
+
+$ git status --short
+ M docs/wiki/journal.md
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260923-1242-pytest.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260923-1242-review-boundary.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260923-1242-review-verify-impl.txt
+?? reports/pilot/metrics-stage.json
+?? reports/pilot/raw-20260922-150931.jsonl
+
+$ ls docs/wiki/packages/P4b-er-redesign/evidence/*real-run* | wc -l
+1
+
+$ grep -cE "^- \[ \] U[0-9]+" docs/wiki/packages/P4b-er-redesign/01-plan.md  (미완료 표시 단위 수)
+8

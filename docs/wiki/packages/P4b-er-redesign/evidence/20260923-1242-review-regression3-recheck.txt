@@ -1,0 +1,57 @@
+# verifier 04-review · 회귀 3종 + --recheck-traces (HEAD=cf5a171) 2026-09-23T03:43:50Z
+$ POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -k "promotion or aunt or homonym" -v -rs
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Portpolio\Project_Relationship
+plugins: anyio-4.12.1, langsmith-0.8.8, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 20 items / 17 deselected / 3 selected
+
+tests\test_er_pipeline.py ...                                            [100%]
+
+====================== 3 passed, 17 deselected in 0.89s =======================
+rc=0
+
+$ POSTGRES_PORT=5433 python -m pytest tests/test_er_pipeline.py -q -k penalized -v
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Portpolio\Project_Relationship
+plugins: anyio-4.12.1, langsmith-0.8.8, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 20 items / 18 deselected / 2 selected
+
+tests\test_er_pipeline.py ..                                             [100%]
+
+====================== 2 passed, 18 deselected in 0.63s =======================
+rc=0
+
+$ POSTGRES_PORT=5433 python -m pytest tests/test_er_rules.py -q -k "forwarded or penal or excluded_by_domain" -v
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Portpolio\Project_Relationship
+plugins: anyio-4.12.1, langsmith-0.8.8, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 11 items / 6 deselected / 5 selected
+
+tests\test_er_rules.py .....                                             [100%]
+
+======================= 5 passed, 6 deselected in 0.17s =======================
+rc=0
+
+$ python -m pytest tests/test_er_confidence.py -q -k "renormalize or observed or rule_passed or effective" -v
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Portpolio\Project_Relationship
+plugins: anyio-4.12.1, langsmith-0.8.8, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 54 items / 47 deselected / 7 selected
+
+tests\test_er_confidence.py .......                                      [100%]
+
+====================== 7 passed, 47 deselected in 0.23s =======================
+rc=0
+
+$ python scripts/run_pilot_eval.py --recheck-traces reports/pilot/traces-20260922-150931.jsonl
+[traces] dumped=1410 recomputed=1410 max_abs_diff=0.0 path=reports\pilot\traces-20260922-150931.jsonl
+[traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+rc=0

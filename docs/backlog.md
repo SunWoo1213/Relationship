@@ -62,7 +62,7 @@
 
 ### P4b — 게이트 재도전 (CR-001)
 
-- [ ] [backend-agent + eval-agent] **ER 재설계 후 파일럿 재실행** — D12(관측 신호 재정규화)·D13(규칙 필터 감점) 구현 + 새 stamp 재실행 + 게이트 재판정 / 의존: P4 부분완료(adf9f1b), CR-001 승인 / 수용기준: `app/er/confidence.py`·`rules.py`·`pipeline.py`·`types.py`(+`settings.py` 설정값) 가 D12·D13 "코드에서 지켜야 할 것" 전부 충족(회귀 3종 유지), `--recheck-traces` `max_abs_diff=0.0`(weights_effective), 새 stamp `reports/pilot/raw-<ts>.jsonl.gz`·`reports/metrics.json` 로 결정 K 게이트 `0.8 [] True True`, `sc-015` 오병합·`sc-007` 미검출 아님, P4 기준선(`raw-20260922-042440.jsonl.gz`) 미변경. 미달이면 재실행 없이 failure_cases 갱신 + 사용자 결정
+- [x] [backend-agent + eval-agent] **ER 재설계 후 파일럿 재실행** — D12(관측 신호 재정규화)·D13(규칙 필터 감점) 구현 + 새 stamp 재실행 + 게이트 재판정 / 의존: P4 부분완료(adf9f1b), CR-001 승인 / 수용기준: `app/er/confidence.py`·`rules.py`·`pipeline.py`·`types.py`(+`settings.py` 설정값) 가 D12·D13 "코드에서 지켜야 할 것" 전부 충족(회귀 3종 유지), `--recheck-traces` `max_abs_diff=0.0`(weights_effective), 새 stamp `reports/pilot/raw-<ts>.jsonl.gz`·`reports/metrics.json` 로 결정 K 게이트 `0.8 [] True True`, `sc-015` 오병합·`sc-007` 미검출 아님, P4 기준선(`raw-20260922-042440.jsonl.gz`) 미변경. 미달이면 재실행 없이 failure_cases 갱신 + 사용자 결정
   - 01-plan 결정 항목: 감점 후보의 `≥ T_merge` 보수 분기(권장 강등)·설정값 이름 / 완화 재검색 존치 / `weights` vs `weights_effective` 거부 규약 / 재실행 비용 상한
 
 ### P5

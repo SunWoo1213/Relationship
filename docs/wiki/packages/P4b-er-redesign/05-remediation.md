@@ -3,10 +3,12 @@
 > `findings.py` 가 검증 출력에서 만든다. 소견 본문(원인·해결 단계·재검증·영향)은 에이전트가 채우고, 해결 단계의 완료 판정 명령을 실제로 실행한 출력이 증거다. 소견은 지우지 않는다(해소만 한다).
 > 루프: 검증 → 소견 → 단계별 조치 → 재검증(같은 명령) → 해소. 같은 소견이 3회 재검증 후에도 열려 있으면 사용자에게 보고한다.
 
-갱신: 2026-09-22 17:19 | 출처: verify-plan | 열림: 22 (필수 0) | 해소: 0
+갱신: 2026-09-23 (패키지 종료) | 출처: verify-plan | 열림: 0 (필수 0) | 해소: 22
+>
+> 22건은 모두 `[권고]` 이고 verify-plan 이 **의도적으로 낸 WARN** 이었다 — 이 패키지는 새 모듈을 만들지 않고 기존 파일을 고치는 확장 패키지라, registry 에 이미 다른 패키지 소속으로 있는 경로가 전부 "중복" 경고로 잡힌 것이다(01-plan 26·67행, F-0ffff5·F-95c6a7 선례). U7(`cf5a171`)이 기존 행의 비고를 확장하고 새 산출물만 행으로 넣어 닫았고, 닫는 커밋이 남은 `pending` 해시 4곳과 P4b 비고가 빠져 있던 테스트 행 9개·`.env.example` 1개를 마저 채웠다. 04-review §5 에 등록 목록이 있다.
 
 ## F-ed9327 · [권고] registry 에 다른 패키지로 이미 있음: app/er/confidence.py → | 모듈 | 확신도·두 임계치(4단계, 순수 함수) | app/er/confidence.
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -32,7 +34,7 @@ WARN  registry 에 다른 패키지로 이미 있음: app/er/confidence.py → |
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-99f745 · [권고] registry 에 다른 패키지로 이미 있음: app/er/rules.py → | 모듈 | 규칙 필터(2단계, 순수 함수) | app/er/rules.py | P3-er | 02e
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -58,7 +60,7 @@ WARN  registry 에 다른 패키지로 이미 있음: app/er/rules.py → | 모�
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-ead503 · [권고] registry 에 다른 패키지로 이미 있음: app/er/pipeline.py → | 모듈 | ER 오케스트레이션(resolve/apply_resolution) | app/er/pipeline.
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -84,7 +86,7 @@ WARN  registry 에 다른 패키지로 이미 있음: app/er/pipeline.py → | �
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-c4dc23 · [권고] registry 에 다른 패키지로 이미 있음: app/er/types.py → | 모듈 | ER 공용 타입 | app/er/types.py | P3-er | cc5d24f | `ScoredCandida
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -110,7 +112,7 @@ WARN  registry 에 다른 패키지로 이미 있음: app/er/types.py → | 모�
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-fdb56f · [권고] registry 에 다른 패키지로 이미 있음: app/settings.py → | 모듈 | 런타임 설정값 | app/settings.py | P2-tools | f217190 | `app_use
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -136,7 +138,7 @@ WARN  registry 에 다른 패키지로 이미 있음: app/settings.py → | 모�
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-3e8c8f · [권고] registry 에 다른 패키지로 이미 있음: scripts/run_pilot_eval.py → | 스크립트 | 파일럿 평가 실행 CLI(예상 비용 → 가드 → runner
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -162,7 +164,7 @@ WARN  registry 에 다른 패키지로 이미 있음: scripts/run_pilot_eval.py 
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-111cde · [권고] registry 에 다른 패키지로 이미 있음: evaluation/curve.py → | 모듈 | 파일럿 평가 지표 계산기(U1 JSONL → 방식 × `T_merge` �
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -188,7 +190,7 @@ WARN  registry 에 다른 패키지로 이미 있음: evaluation/curve.py → | 
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-c9f2fe · [권고] registry 에 다른 패키지로 이미 있음: evaluation/metrics.py → | 모듈 | 파일럿 평가 지표 계산기(U1 JSONL → 방식 × `T_merge` �
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -214,7 +216,7 @@ WARN  registry 에 다른 패키지로 이미 있음: evaluation/metrics.py → 
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-63a805 · [권고] registry 에 다른 패키지로 이미 있음: evaluation/calibration.py → | 모듈 | 보정표 작성기(U1 JSONL → `s_llm` 구간별 실제 정답률 =
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -240,7 +242,7 @@ WARN  registry 에 다른 패키지로 이미 있음: evaluation/calibration.py 
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-a58eb4 · [권고] registry 에 다른 패키지로 이미 있음: evaluation/resolvers/proposed.py → | 모듈 | 제안 4단계 하이브리드 어댑터(`app.er.resolve` -> `Mention
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -266,7 +268,7 @@ WARN  registry 에 다른 패키지로 이미 있음: evaluation/resolvers/propo
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-2e533b · [권고] registry 에 다른 패키지로 이미 있음: tests/test_er_confidence.py → | 테스트 | 확신도 가중합·경계값·임계치 스윕 | tests/test_er_c
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -292,7 +294,7 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/test_er_confidence.p
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-107c92 · [권고] registry 에 다른 패키지로 이미 있음: test_er_rules.py → | 테스트 | 규칙 필터 배제·완화 재평가·s_rule 분모 | tests/test
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -318,7 +320,7 @@ WARN  registry 에 다른 패키지로 이미 있음: test_er_rules.py → | 테
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-8439c7 · [권고] registry 에 다른 패키지로 이미 있음: test_er_pipeline.py → | 테스트 | ER 파이프라인 회귀(승진·이모 배제·동명이인)·tr
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -344,7 +346,7 @@ WARN  registry 에 다른 패키지로 이미 있음: test_er_pipeline.py → | 
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-27a843 · [권고] registry 에 다른 패키지로 이미 있음: test_run_pilot_eval.py → | 테스트 | 실행 CLI 순수 층(지문·run_id·비용 추정·환경변수
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -370,7 +372,7 @@ WARN  registry 에 다른 패키지로 이미 있음: test_run_pilot_eval.py →
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-fcf0a9 · [권고] registry 에 다른 패키지로 이미 있음: .jsonl.gz → | 모듈 | 파일럿 평가 지표 계산기(U1 JSONL → 방식 × `T_merge` �
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -396,7 +398,7 @@ WARN  registry 에 다른 패키지로 이미 있음: .jsonl.gz → | 모듈 | �
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-5d4642 · [권고] registry 에 다른 패키지로 이미 있음: reports/metrics.json → | 리포트 | 파일럿 지표(5방식 × 10임계치 · 게이트 판정) | rep
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -422,7 +424,7 @@ WARN  registry 에 다른 패키지로 이미 있음: reports/metrics.json → |
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-a4bedc · [권고] registry 에 다른 패키지로 이미 있음: calibration.json → | 모듈 | 보정표 작성기(U1 JSONL → `s_llm` 구간별 실제 정답률 =
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -448,7 +450,7 @@ WARN  registry 에 다른 패키지로 이미 있음: calibration.json → | 모
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-09ad74 · [권고] registry 에 다른 패키지로 이미 있음: curve.csv → | 모듈 | 곡선(`T_merge` 10점 × 3계열 × 5방식)·`metrics.json` 조립�
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -474,7 +476,7 @@ WARN  registry 에 다른 패키지로 이미 있음: curve.csv → | 모듈 | �
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-3f9278 · [권고] registry 에 다른 패키지로 이미 있음: eval.md → | 모듈 | 리포트 생성기(`metrics.json` → `reports/eval.md` — 표·곡
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -500,7 +502,7 @@ WARN  registry 에 다른 패키지로 이미 있음: eval.md → | 모듈 | 리
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-00846b · [권고] registry 에 다른 패키지로 이미 있음: reports/failure_cases.md → | 리포트 | 실패 케이스 분석(오병합·미검출 전건, 강제 경로
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -526,7 +528,7 @@ WARN  registry 에 다른 패키지로 이미 있음: reports/failure_cases.md �
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-0ffff5 · [권고] registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -552,7 +554,7 @@ WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | �
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-225938 · [권고] registry 에 다른 패키지로 이미 있음: docs/user-setup/10-pilot-eval-run.md → | 문서 | 사용자 카드 10 파일럿 평가 실 실행(환경변수 이름·
-상태: 열림 | 발견: 2026-09-22 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-22 (verify-plan) | 해소: 2026-09-23 (U7 cf5a171 + 닫는 커밋 — registry 기존 행 비고 확장, 새 행 금지)
 
 ### 증상 (검증 출력 인용)
 ```

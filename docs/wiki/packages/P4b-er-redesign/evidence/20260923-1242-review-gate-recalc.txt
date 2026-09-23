@@ -1,0 +1,63 @@
+# verifier 04-review · 게이트 독립 재계산 (HEAD=cf5a171) 2026-09-23T03:47:37Z — 1회 실행, 네트워크·DB·LLM 0
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python <scratchpad>/gate_recalc.py
+== A. metrics.json by_t_merge['0.8'] 원시 지표(n/d)에서 지배 판정을 다시 계산 ==
+proposed        fm=0/132=0.0  miss=0/132=0.0
+exact_raw       fm=0/132=0.000000  miss=33/132=0.250000  fm<=p:True miss<=p:False strict:False -> dominates_proposed=False  (metrics.json 기록: False)
+exact_norm      fm=4/132=0.030303  miss=20/132=0.151515  fm<=p:False miss<=p:False strict:False -> dominates_proposed=False  (metrics.json 기록: False)
+embedding_only  fm=0/132=0.000000  miss=1/132=0.007576  fm<=p:True miss<=p:False strict:False -> dominates_proposed=False  (metrics.json 기록: False)
+llm_single      fm=0/132=0.000000  miss=9/132=0.068182  fm<=p:True miss<=p:False strict:False -> dominates_proposed=False  (metrics.json 기록: False)
+독립 재계산 dominated_by = [] | undetermined = []
+
+== B. d10_direction 을 reports/curve.csv 에서 직접 확인 (proposed, 연속 격자점 쌍) ==
+grid = [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
+false_merge_rate       = [0.0303, 0.0303, 0.0303, 0.0227, 0.0227, 0.0076, 0.0, 0.0, 0.0, 0.0]
+ask_user_identity_rate = [0.1667, 0.1742, 0.1742, 0.1894, 0.197, 0.2197, 0.2348, 0.2576, 0.3485, 0.6515]
+pairs=9 violations=[] -> d10_direction=True  (metrics.json 기록: True, d10_detail={'pairs': 9, 'violations': []})
+
+== C. 결정 K (a): pass = (dominated_by == []) and d10_direction and (비교 rate 에 null 없음) ==
+독립 재계산     : 0.8 [] True True
+metrics.json.gate: 0.8 [] True True | reason = None
+일치: True
+
+== D. 원시 JSONL 에서 t_merge=0.8 오병합·미검출을 classify_gold_row 로 다시 세어 metrics.json 과 대조 ==
+rows = 7050
+proposed        분모=132 {'merge_correct': 96, 'deferred': 31, 'new_person_correct': 5}  metrics.json fm=0 miss=0 d=132 -> 일치=True
+exact_raw       분모=132 {'merge_correct': 83, 'miss': 33, 'new_person_correct': 14, 'deferred': 2}  metrics.json fm=0 miss=33 d=132 -> 일치=True
+exact_norm      분모=132 {'merge_correct': 91, 'miss': 20, 'false_merge': 4, 'deferred': 6, 'new_person_correct': 11}  metrics.json fm=4 miss=20 d=132 -> 일치=True
+embedding_only  분모=132 {'merge_correct': 95, 'deferred': 31, 'miss': 1, 'new_person_correct': 5}  metrics.json fm=0 miss=1 d=132 -> 일치=True
+llm_single      분모=132 {'merge_correct': 90, 'miss': 9, 'deferred': 20, 'new_person_correct': 13}  metrics.json fm=0 miss=9 d=132 -> 일치=True
+원시 재집계 == metrics.json : True
+
+== E. sc-015 t0 부장님 · sc-007 t2 문실장님 (별도 조항) ==
+sc-007 t2 '문실장님' classify=deferred decision=identity person_id=None gold=16222 forced_reason=None band_by_threshold=identity conf=0.5442164095373474 rule_checked=2 penalized_by={'16222': ['relation_tag_conflict', 'hierarchy_conflict']} matched==gold=True gold_in_candidates=True
+sc-015 t0 '은우' classify=merge_correct decision=merge person_id=16249 gold=16249 forced_reason=None band_by_threshold=merge conf=0.9375 rule_checked=0 penalized_by={} matched==gold=True gold_in_candidates=True
+sc-015 t0 '부장님' classify=deferred decision=identity person_id=None gold=16249 forced_reason=penalized_candidate band_by_threshold=merge conf=0.8166666666666667 rule_checked=3 penalized_by={'16249': ['relation_tag_conflict', 'hierarchy_conflict']} matched==gold=True gold_in_candidates=True
+sc-015 false_merge 행 수: 0 | sc-007 miss 행 수: 0 -> 조항 충족: True
+
+== F. D13 위험 계측 — penalized_merge 두 정의 (proposed, t_merge=0.8) ==
+merge 행 96 | 정의A(귀속 인물 자신이 감점 후보) 14 (채점 분모 안 14) 그중 오병합 0 relaxed_pass 분포 {None: 14} | 정의B(후보 아무나 감점) 22 그중 오병합 0
+metrics.json subsets.penalized_merge = {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}, "relaxed_pass_merges": 14, "relaxed_pass_false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}, "reasons": {"hierarchy_conflict": 14}}
+정의A(채점 분모 안) == metrics.json merges: True
+보수 강등(forced_reason=penalized_candidate) = 5 | 귀속==골드 수 = 5 | decision 분포 = {'identity': 5} | 목록 = [('sc-002', 1, '박과장님'), ('sc-002', 2, '박과장님'), ('sc-020', 0, '심팀장'), ('sc-015', 0, '부장님'), ('sc-033', 2, '심팀장')]
+forced_reason 분포(proposed@0.8) = {None: 110, 'no_matched': 22, 'penalized_candidate': 5, 'no_candidates': 4}
+proposed@0.8 결과 분포 = {'merge_correct': 96, 'deferred': 31, 'new_person_correct': 5}
+
+== G. 해석 (iii) 미달 시 설정 변경 흔적 없음 — meta 대조 (P4 사본 vs P4b) ==
+  t_new: P4=0.3 | P4b=0.3 | same=True
+  grid: P4=[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95] | P4b=[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95] | same=True
+  weights: P4={'llm': 0.5, 'emb': 0.3, 'rule': 0.2, 'source': 'app.er.types.ERConfig() 모듈 기본값(0.5·0.3·0.2, D3). W_LLM/W_EMB/W_RULE 환경변수를 읽지 않는다 -- 같은 JSONL 이면 같은 metrics.json.'} | P4b={'llm': 0.5, 'emb': 0.3, 'rule': 0.2, 'source': 'app.er.types.ERConfig() 모듈 기본값(0.5·0.3·0.2 비율, D12 가 비율을 유지한다). W_LLM/W_EMB/W_RULE 환경변수를 읽지 않는다 -- 같은 JSONL 이면 같은 metrics.json.'} | same=False
+  model_configured: P4={'openai': 'gpt-4o-mini'} | P4b={'openai': 'gpt-4o-mini'} | same=True
+  embedding_model: P4='text-embedding-3-small' | P4b='text-embedding-3-small' | same=True
+  provider: P4='openai' | P4b='openai' | same=True
+  model: P4='gpt-4o-mini-2024-07-18' | P4b='gpt-4o-mini-2024-07-18' | same=True
+  run_mode: P4='real' | P4b='real' | same=True
+  scenario_count: P4=40 | P4b=40 | same=True
+  row_count: P4=7050 | P4b=7050 | same=True
+  dataset_hash: P4='sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e' | P4b='sha256:49cd8c4a1079e36ac1f2a7999a79f5ef36149441f8c5f528024f749a72eb899e' | same=True
+  run_id: P4='run-29621888da00' | P4b='run-35ae97b5e6ed'
+  commit: P4='750f11b02f13c942c6d2ef8155646d5b7bc03ac6' | P4b='f96d15b401a24d31bc49de86a1d2c2e11e593999'
+  schema_version: P4=1 | P4b=2
+  weights_policy: P4=None | P4b='observed_renormalized(D12)'
+  penalized_merge_policy: P4=None | P4b='ask'
+run_id 다름: True | commit 다름: True | run_mode == real: True
+rc=0

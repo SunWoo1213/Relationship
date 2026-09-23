@@ -1,0 +1,92 @@
+# verifier 04-review · 부정 케이스 (HEAD=cf5a171) 2026-09-23T03:48:07Z — 사본은 scratchpad, 저장소 파일 수정 0, 네트워크·DB·LLM 0
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python <scratchpad>/negative_cases.py
+== N1. 어휘 밖 정책값 — 환경변수 ER_PENALIZED_MERGE_POLICY=bogus 를 er_config() 가 거부 ==
+[N1] rc=1 기대=rc!=0 -> PASS
+        raise InvalidValue(
+        ...<2 lines>...
+        )
+    app.tools.types.InvalidValue: er_config: environment variable 'ER_PENALIZED_MERGE_POLICY' must be one of ('ask', 'merge') (got 'bogus')
+== N1b. 같은 어휘 검증을 ERConfig 생성자에서 ==
+[N1b] rc=1 기대=rc!=0 -> PASS
+        raise InvalidValue(
+        ...<2 lines>...
+        )
+    app.tools.types.InvalidValue: ERConfig: penalized_merge_policy must be one of ('ask', 'merge') (got 'bogus')
+== N1c. 허용값 merge 는 통과해야 한다(대조군) ==
+[N1c] rc=0 기대=rc==0 -> PASS
+    policy= merge
+
+== N2. 옛 기준선 trace(D3 산식, weights_effective 없음)를 --recheck-traces 가 거부 (읽기 전용) ==
+[N2] rc=1 기대=rc!=0 -> PASS
+    [fail] traces: line 8 trace_id=71183 sc-001/'김팀장' t_merge=0.85: confidence_breakdown.weights_effective 가 없다 (D12 이전 trace 는 이 재계산 대상이 아니다)
+    [fail] traces: line 9 trace_id=71185 sc-001/'김팀장' t_merge=0.9: confidence_breakdown.weights_effective 가 없다 (D12 이전 trace 는 이 재계산 대상이 아니다)
+    [fail] traces: line 10 trace_id=71187 sc-001/'김팀장' t_merge=0.95: confidence_breakdown.weights_effective 가 없다 (D12 이전 trace 는 이 재계산 대상이 아니다)
+    [fail] traces: … 외 1400건
+
+== N3. 옛 기준선 metrics 사본(판 1, meta 정책 키 없음)을 --validate 가 거부 ==
+[N3] rc=1 기대=rc!=0 -> PASS
+    FAIL reports/pilot/metrics-20260922-042440.json: 3 problem(s)
+      - meta: missing key(s) ['weights_policy', 'penalized_merge_policy']
+      - meta.weights_policy: must be 'observed_renormalized(D12)' (D12, got None)
+      - meta.penalized_merge_policy: must be one of ['ask', 'merge'] (D13 결정 B, got None)
+
+== N4. metrics.json 사본을 변조하면 --validate 가 거부 ==
+[N4a gate.pass 를 false 로 뒤집음] rc=1 기대=rc!=0 -> PASS
+    FAIL C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\daa29867-bcdf-4922-970b-8329671b4032\scratchpad\neg-metrics-pass-flipped.json: 2 problem(s)
+      - gate.pass: False disagrees with (dominated_by == [] and d10_direction and reason is null) = True (결정 K)
+      - gate.pass: false without reason (조용히 미달로 두지 않는다)
+[N4b meta.weights_policy=bogus] rc=1 기대=rc!=0 -> PASS
+    FAIL C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\daa29867-bcdf-4922-970b-8329671b4032\scratchpad\neg-metrics-policy-bogus.json: 1 problem(s)
+      - meta.weights_policy: must be 'observed_renormalized(D12)' (D12, got 'bogus')
+[N4c meta.penalized_merge_policy=downgrade(어휘 밖)] rc=1 기대=rc!=0 -> PASS
+    FAIL C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\daa29867-bcdf-4922-970b-8329671b4032\scratchpad\neg-metrics-policy-merge.json: 1 problem(s)
+      - meta.penalized_merge_policy: must be one of ['ask', 'merge'] (D13 결정 B, got 'downgrade')
+[N4d proposed@0.8 false_merge n=1 로 변조(rate 불일치)] rc=1 기대=rc!=0 -> PASS
+    FAIL C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\daa29867-bcdf-4922-970b-8329671b4032\scratchpad\neg-metrics-rate-tampered.json: 1 problem(s)
+      - proposed.by_t_merge[0.8].false_merge_rate.rate: 0.0 != n/d (1/132)
+[N4e 대조군: 원본 reports/metrics.json 은 통과] rc=0 기대=rc==0 -> PASS
+    OK reports/metrics.json
+
+== N5. 새 trace 덤프 사본을 변조하면 --recheck-traces 가 잡는다 (원본 무수정) ==
+원본 줄 수 = 1410
+변조 줄 index = 20 rule_checked = 0
+[N5a 대조군: 변조 없는 앞 30줄 사본은 통과(max_abs_diff=0.0)] rc=0 기대=rc==0 -> PASS
+    [traces] dumped=30 recomputed=30 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\daa29867-bcdf-4922-970b-8329671b4032\scratchpad\neg-traces-clean.jsonl
+    [traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+[N5b confidence +0.01 변조] rc=1 기대=rc!=0 -> PASS
+    [traces] dumped=30 recomputed=30 max_abs_diff=0.01 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\daa29867-bcdf-4922-970b-8329671b4032\scratchpad\neg-traces-conf.jsonl
+    [traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+    [fail] traces: line 21 trace_id=150528 sc-001/'김부장님' t_merge=0.5: abs diff=0.01 != 0 (기록 0.01)
+[N5c weights_effective 를 도출값과 다르게 변조] rc=1 기대=rc!=0 -> PASS
+    [traces] dumped=30 recomputed=29 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\daa29867-bcdf-4922-970b-8329671b4032\scratchpad\neg-traces-weff.jsonl
+    [traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+    [fail] traces: line 21 trace_id=150528 sc-001/'김부장님' t_merge=0.5: weights_effective={'llm': 0.5, 'emb': 0.3, 'rule': 0.2} 가 weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}·rule_checked=0 에서 도출되는 값 {'llm': 0.625, 'emb': 0.37499999999999994, 'rule': 0.0} 과 다르다(D12)
+[N5d weights 를 ER_WEIGHTS 와 다르게 변조(0.6/0.2/0.2)] rc=1 기대=rc!=0 -> PASS
+    [traces] dumped=30 recomputed=29 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\daa29867-bcdf-4922-970b-8329671b4032\scratchpad\neg-traces-w.jsonl
+    [traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+    [fail] traces: line 21 trace_id=150528 sc-001/'김부장님' t_merge=0.5: weights={'llm': 0.6, 'emb': 0.2, 'rule': 0.2} 가 제품 상수 ER_WEIGHTS={'llm': 0.5, 'emb': 0.3, 'rule': 0.2} 와 다르다(원칙3)
+[N5e weights_effective 키 삭제] rc=1 기대=rc!=0 -> PASS
+    [traces] dumped=30 recomputed=29 max_abs_diff=0.0 path=C:\Users\swsj1\AppData\Local\Temp\claude\C--Portpolio-Project-Relationship\daa29867-bcdf-4922-970b-8329671b4032\scratchpad\neg-traces-drop.jsonl
+    [traces] rule=rule_checked>0: 0.5·s_llm+0.3·s_emb+0.2·s_rule | rule_checked==0: (0.5·s_llm+0.3·s_emb)/0.8 (D12 관측 신호 재정규화, app.er.confidence.combine, weights={'llm': 0.5, 'emb': 0.3, 'rule': 0.2}, 기준 abs diff == 0)
+    [fail] traces: line 21 trace_id=150528 sc-001/'김부장님' t_merge=0.5: confidence_breakdown.weights_effective 가 없다 (D12 이전 trace 는 이 재계산 대상이 아니다)
+
+== N6. combine() — 재정규화가 실제로 값을 바꾸고, 검사했는데 0점은 여전히 0 합산 ==
+D3 원식(s_rule=0)=0.72 | rule_checked=0 -> 0.8999999999999999 (기대 0.9, 다름=True) | rule_checked=2,rule_passed=0 -> 0.72 (기대 0.72, 같음=True)
+N6b s_llm=1.2 -> InvalidValue: combine: s_llm out of [0,1] range (got 1.2)
+
+== N7. rules — 관계 태그·위계 충돌은 후보를 남기고(penalized_by), 사전 모순만 배제한다 ==
+hints(이모) = {'relation_tag': '가족', 'hierarchy': '상'}
+  id=30 passed_rules=False excluded_by=dictionary_conflict penalized_by=('relation_tag_conflict', 'hierarchy_conflict') rule_checked=3 rule_passed=0 s_rule=0.0000
+  id=31 passed_rules=True excluded_by=None penalized_by=('relation_tag_conflict', 'hierarchy_conflict') rule_checked=2 rule_passed=0 s_rule=0.0000
+  id=32 passed_rules=True excluded_by=None penalized_by=() rule_checked=2 rule_passed=2 s_rule=1.0000
+  3단계 전달 = [31, 32] | relaxed_retry = False
+  판정: 사전 모순(30) 배제 · 감점 후보(31) 전달 · 깨끗한 후보(32) 전달 -> PASS
+
+== 요약 ==
+부정 케이스 18건 중 기대대로 = 18 / 기대와 다름 = 0
+rc=0
+
+$ git status --short -- app/ reports/ data/ evaluation/ scripts/ tests/   (부정 케이스 뒤 저장소 무변경 확인)
+?? reports/pilot/metrics-stage.json
+?? reports/pilot/raw-20260922-150931.jsonl
+(끝)

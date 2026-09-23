@@ -1,0 +1,301 @@
+# verifier 04-review · D12·D13 '코드에서 지켜야 할 것' grep (HEAD=cf5a171) 2026-09-23T03:43:47Z
+## D12-1 combine() 이 rule_checked 를 받아 미측정이면 (w_llm·s_llm + w_emb·s_emb)/(w_llm+w_emb)
+$ sed -n "96,141p" app/er/confidence.py
+def combine(
+    s_llm: float,
+    s_emb: float,
+    s_rule: float,
+    config: Any,
+    *,
+    rule_checked: int = 1,
+) -> float:
+    """세 신호를 `config` 의 가중치로 결합한다 -- **관측된 신호만**
+    (D12, D3 대체): `rule_checked > 0` 이면 D3 원식 그대로
+    `confidence = w_llm*s_llm + w_emb*s_emb + w_rule*s_rule`; `rule_checked
+    == 0`(미측정)이면 `s_rule` 을 분모에서 빼 `(w_llm*s_llm + w_emb*s_emb)
+    / (w_llm + w_emb)`. 두 분기의 연산 순서는 각각 D3 원식·재정규화 원식과
+    같은 순서를 유지해 세 신호 관측 시 D3 원식과 **부동소수 오차 없이
+    같은 값**이 되도록 한다(모듈 docstring "관측된 신호만 재정규화한다"
+    참조). `rule_checked` 기본값 `1` 은 이 인자를 생략하는 기존 호출부가
+    "측정됨"(재정규화 없음)으로 해석되게 하는 하위호환 기본값이다.
+
+    `s_emb` 가 `[0, 1]` 밖이면 클램프한다(01-plan 43행 -- 코사인 유사도
+    구현이나 합성 임베딩이 부동소수 오차로 살짝 벗어날 수 있다). `s_llm`·
+    `s_rule` 은 상류(`judge.py`·`rules.py`)가 이미 `[0, 1]` 로 검증하지만,
+    이 함수는 방어적으로 다시 확인해 벗어나면 `InvalidValue` 를 던진다
+    (원칙8 -- 잘못된 입력으로 조용히 계산하지 않는다).
+    """
+    if not (0.0 <= s_llm <= 1.0):
+        raise InvalidValue(f"combine: s_llm out of [0,1] range (got {s_llm!r})")
+    if not (0.0 <= s_rule <= 1.0):
+        raise InvalidValue(f"combine: s_rule out of [0,1] range (got {s_rule!r})")
+    s_emb_clamped = min(1.0, max(0.0, s_emb))
+    if rule_checked > 0:
+        return config.w_llm * s_llm + config.w_emb * s_emb_clamped + config.w_rule * s_rule
+    denom = config.w_llm + config.w_emb
+    return (config.w_llm * s_llm + config.w_emb * s_emb_clamped) / denom
+
+
+def _effective_weights(rule_checked: int, config: Any) -> dict[str, float]:
+    """`confidence_breakdown["weights_effective"]` 의 단일 출처(D12) --
+    `combine()` 과 **같은 조건**(`rule_checked > 0`)으로 갈린다. 관측되면
+    설정 가중치 그대로, 미측정이면 `w_llm`·`w_emb` 만 재정규화하고 `rule`
+    은 0.0 이다."""
+    if rule_checked > 0:
+        return {"llm": config.w_llm, "emb": config.w_emb, "rule": config.w_rule}
+    denom = config.w_llm + config.w_emb
+    return {"llm": config.w_llm / denom, "emb": config.w_emb / denom, "rule": 0.0}
+
+
+
+## D12-2 confidence_breakdown 에 weights·weights_effective·rule_checked 키
+$ grep -n "weights_effective\|\"weights\"\|\"rule_checked\"\|\"rule_passed\"" app/er/confidence.py
+48:`weights_effective`(실제 적용된 재정규화 가중치)를 모두** 담는다
+49:(`_effective_weights()`). 세 신호가 모두 관측되면 `weights_effective ==
+50:weights`; `rule_checked == 0` 이면 `weights_effective == {llm: w_llm/(w_llm
+53:`weights_effective` 가 재정규화 값으로 채워진다 -- `confidence` 자체는
+132:    """`confidence_breakdown["weights_effective"]` 의 단일 출처(D12) --
+209:        "weights": {"llm": config.w_llm, "emb": config.w_emb, "rule": config.w_rule},
+210:        "weights_effective": _effective_weights(rule_checked, config),
+212:        "rule_checked": rule_checked,
+213:        "rule_passed": rule_passed,
+
+## D12-3 rule_checked>0 & rule_passed==0 은 s_rule=0 합산 (테스트 이름)
+$ grep -n "def test_.*rule_passed_zero\|def test_.*all_conflict\|def test_.*not_renormal" tests/test_er_confidence.py
+196:def test_combine_s_rule_zero_input_reflected_directly() -> None:
+202:def test_combine_s_emb_above_one_is_clamped() -> None:
+209:def test_combine_s_emb_below_zero_is_clamped() -> None:
+216:def test_combine_s_llm_out_of_range_rejected(bad: float) -> None:
+223:def test_combine_s_rule_out_of_range_rejected(bad: float) -> None:
+485:def test_combine_observed_all_three_matches_d3_formula_exactly() -> None:
+503:def test_combine_rule_checked_omitted_defaults_to_measured() -> None:
+515:def test_combine_rule_checked_zero_renormalizes_llm_emb_only() -> None:
+546:def test_decide_rule_checked_positive_rule_passed_zero_still_sums_zero_s_rule() -> None:
+
+## D13-1 excluded_by 대입 경로 / penalizing_conflicts
+$ grep -n "excluded_by *=\|excluded_by=\|penalizing_conflicts.add\|conflicts.add\|_EXCLUSION_ONLY_CONFLICT\|_CONFLICT_PRIORITY *=" app/er/rules.py
+81:_CONFLICT_PRIORITY = ("relation_tag_conflict", "hierarchy_conflict", "dictionary_conflict")
+85:_EXCLUSION_ONLY_CONFLICT = "dictionary_conflict"
+138:            conflicts.add("relation_tag_conflict")
+139:            penalizing_conflicts.add("relation_tag_conflict")
+151:            penalizing_conflicts.add("hierarchy_conflict")
+155:                conflicts.add("hierarchy_conflict")
+166:            conflicts.add("dictionary_conflict")
+181:    D13 이후: `excluded_by` 는 `dictionary_conflict` 뿐이고(`_EXCLUSION_ONLY_CONFLICT`),
+196:        excluded_by = _EXCLUSION_ONLY_CONFLICT if _EXCLUSION_ONLY_CONFLICT in conflicts else None
+206:                excluded_by=excluded_by,
+$ sed -n "128,170p" app/er/rules.py
+    penalizing_conflicts: set[str] = set()
+    relaxed_pass = False
+
+    # 관계 태그 일치: hints.relation_tag vs 후보의 저장된 relation_tag.
+    # D13: 불일치는 배제가 아니라 감점(penalizing_conflicts)이다.
+    if hint_relation_tag is not None and candidate.relation_tag is not None:
+        checked += 1
+        if hint_relation_tag == candidate.relation_tag:
+            passed += 1
+        else:
+            conflicts.add("relation_tag_conflict")
+            penalizing_conflicts.add("relation_tag_conflict")
+
+    # 위계 일치: hints.hierarchy vs 후보의 저장된 hierarchy.
+    # D13: 불일치는 배제가 아니라 감점 -- 완화(relaxed and adjacent) 는
+    # 자동 연결 허용 여부(`relaxed_pass`)만 가르고, 감점 표시는 지우지
+    # 않는다(penalizing_conflicts 는 relaxed 값과 무관하게 채운다, R-4).
+    if hint_hierarchy is not None and candidate.hierarchy is not None:
+        checked += 1
+        if hint_hierarchy == candidate.hierarchy:
+            passed += 1
+        else:
+            adjacent = _is_hierarchy_adjacent(candidate.hierarchy, hint_hierarchy)
+            penalizing_conflicts.add("hierarchy_conflict")
+            if relaxed and adjacent:
+                relaxed_pass = True  # rule_passed 에는 미계상(결정2).
+            else:
+                conflicts.add("hierarchy_conflict")
+
+    # 호칭 사전 호환: hints.relation_tag vs 후보 별칭들의 사전 그룹.
+    # D13 이후에도 모순은 배제다(종전 규약 그대로, penalizing_conflicts 에는
+    # 넣지 않는다).
+    dict_group = _dictionary_group_for_aliases(candidate.aliases)
+    if hint_relation_tag is not None and dict_group is not None:
+        checked += 1
+        if dict_group == hint_relation_tag:
+            passed += 1
+        else:
+            conflicts.add("dictionary_conflict")
+
+    return checked, passed, conflicts, relaxed_pass, penalizing_conflicts
+
+
+$ sed -n "186,212p" app/er/rules.py
+
+    hints = hints or {}
+    hint_relation_tag = hints.get("relation_tag")
+    hint_hierarchy = hints.get("hierarchy")
+
+    scored: list[ScoredCandidate] = []
+    for candidate in candidates:
+        checked, passed, conflicts, relaxed_pass, penalizing_conflicts = _evaluate(
+            candidate, hint_relation_tag, hint_hierarchy, relaxed=relaxed
+        )
+        excluded_by = _EXCLUSION_ONLY_CONFLICT if _EXCLUSION_ONLY_CONFLICT in conflicts else None
+        penalized_by = tuple(name for name in _CONFLICT_PRIORITY if name in penalizing_conflicts)
+        s_rule = (passed / checked) if checked else 0.0
+        scored.append(
+            replace(
+                candidate,
+                rule_checked=checked,
+                rule_passed=passed,
+                s_rule=s_rule,
+                passed_rules=excluded_by is None,
+                excluded_by=excluded_by,
+                relaxed_pass=relaxed_pass,
+                penalized_by=penalized_by,
+            )
+        )
+    return scored
+
+
+## D13-2 3단계 후보 수 == 1단계 − dictionary_conflict (테스트)
+$ grep -n "def test_candidate_count_forwarded" -A 40 tests/test_er_rules.py | head -60
+228:def test_candidate_count_forwarded_equals_total_minus_dictionary_excluded() -> None:
+229-    hints = dictionary.derive_hints("이모")  # {"relation_tag": "가족", "hierarchy": "상"}
+230-    dict_excluded = _candidate(30, "팀장", ["팀장"], relation_tag="직장", hierarchy="동")
+231-    penalized_only = _candidate(31, "민수", ["민수"], relation_tag="친구", hierarchy="동")
+232-
+233-    passed, all_scored, _relaxed_retry = rules.run_rule_stage(
+234-        [dict_excluded, penalized_only], hints
+235-    )
+236-
+237-    assert len(all_scored) == 2
+238-    dictionary_excluded_count = sum(
+239-        1 for c in all_scored if c.excluded_by == "dictionary_conflict"
+240-    )
+241-    assert dictionary_excluded_count == 1
+242-    assert len(passed) == len(all_scored) - dictionary_excluded_count
+243-    assert {c.person_id for c in passed} == {31}
+244-    forwarded = passed[0]
+245-    assert forwarded.penalized_by == ("relation_tag_conflict", "hierarchy_conflict")
+246-
+247-
+248-# ---------------------------------------------------------------------------
+249-# (h) D13 "코드에서 지켜야 할 것" 1항 -- excluded_by 값 집합에는
+250-#     dictionary_conflict 만 등장한다. penalized_by 어휘는 _CONFLICT_PRIORITY
+251-#     순서로 정렬된다.
+252-# ---------------------------------------------------------------------------
+253-
+254-
+255-def test_excluded_by_domain_is_dictionary_conflict_only() -> None:
+256-    hints = {"relation_tag": "가족", "hierarchy": "상"}
+257-    # 세 별칭 모두 호칭 사전에 없는 고유명사라 dictionary_conflict 자체가
+258-    # 평가되지 않는다(정보 없음, 분모 제외) -- 순수하게 관계 태그·위계
+259-    # 충돌만 남는다.
+260-    relation_only = _candidate(50, "관계만", ["철수"], relation_tag="친구", hierarchy="상")
+261-    hierarchy_only = _candidate(51, "위계만", ["영희"], relation_tag="가족", hierarchy="하")
+262-    both = _candidate(52, "둘다", ["민지"], relation_tag="친구", hierarchy="하")
+263-
+264-    scored = rules.apply_rules([relation_only, hierarchy_only, both], hints, relaxed=False)
+265-
+266-    excluded_values = {c.excluded_by for c in scored if c.excluded_by is not None}
+267-    assert excluded_values <= {"dictionary_conflict"}
+268-    assert "relation_tag_conflict" not in excluded_values
+
+## D13-3 설정값 하나 ER_PENALIZED_MERGE_POLICY + trace 적용 여부
+$ grep -n "ER_PENALIZED_MERGE_POLICY\|_PENALIZED_MERGE_POLICIES\|penalized_merge_policy" app/settings.py app/er/types.py app/er/pipeline.py
+app/settings.py:91:#: 그대로 연결한다. `.env.example` 의 `ER_PENALIZED_MERGE_POLICY` 환경변수
+app/settings.py:93:#: `app.er.types.ERConfig.penalized_merge_policy`(단일 출처)와 같다.
+app/settings.py:94:ER_PENALIZED_MERGE_POLICY = "ask"
+app/settings.py:121:    `W_RULE`/`ER_PENALIZED_MERGE_POLICY`(D13, U3) 환경변수를 읽어
+app/settings.py:124:    임계치 순서·`penalized_merge_policy` 어휘 검증)에서 던져지고, 이
+app/settings.py:165:    penalized_merge_policy = _read_choice(
+app/settings.py:166:        "ER_PENALIZED_MERGE_POLICY", ER_PENALIZED_MERGE_POLICY, ("ask", "merge")
+app/settings.py:178:        penalized_merge_policy=penalized_merge_policy,
+app/er/types.py:40:#: `ERConfig.penalized_merge_policy` 허용 어휘(D13 "코드에서 지켜야 할
+app/er/types.py:46:_PENALIZED_MERGE_POLICIES = ("ask", "merge")
+app/er/types.py:318:    `penalized_merge_policy`(D13·P4b 결정 A·B, U3): 감점 후보(`penalized_by`
+app/er/types.py:325:    ER_PENALIZED_MERGE_POLICY`, 2층 환경변수 = `er_config()`, 3층 인자
+app/er/types.py:337:    penalized_merge_policy: str = "ask"
+app/er/types.py:350:        if self.penalized_merge_policy not in _PENALIZED_MERGE_POLICIES:
+app/er/types.py:352:                "ERConfig: penalized_merge_policy must be one of "
+app/er/types.py:353:                f"{_PENALIZED_MERGE_POLICIES} (got {self.penalized_merge_policy!r})"
+app/er/pipeline.py:56:이면 `_downgrade_penalized_merge()` 가 `config.penalized_merge_policy`
+app/er/pipeline.py:57:(기본 `"ask"`, `app.settings.ER_PENALIZED_MERGE_POLICY`)에 따라 `identity`
+app/er/pipeline.py:129:    않음)이면, `config.penalized_merge_policy == "ask"`(기본값) 일 때
+app/er/pipeline.py:142:    if config.penalized_merge_policy != "ask":
+$ sed -n "116,165p" app/er/pipeline.py
+FORCED_REASON_PENALIZED_CANDIDATE = "penalized_candidate"
+
+#: 강등된 뒤의 action(`app.er.confidence._ACTION_BY_BAND["identity"]` 와
+#: 같은 값) -- 사설 매핑을 다시 만들지 않고 이 한 값만 상수로 둔다(강등은
+#: 항상 `merge -> identity` 한 방향뿐이라 표가 필요 없다).
+_DOWNGRADED_ACTION = "ask_identity"
+
+
+def _downgrade_penalized_merge(
+    decision: Decision, passed: list[ScoredCandidate], config: ERConfig
+) -> Decision:
+    """D13 보수 분기(P4b-er-redesign 01-plan 결정 A·B, U3). `decision.band
+    == "merge"` 이고 귀속된 후보가 감점 후보(`penalized_by` 비어 있지
+    않음)이면, `config.penalized_merge_policy == "ask"`(기본값) 일 때
+    `identity` 로 강등한다. `relaxed_pass == True`(인접 위계 완화 통과)
+    후보는 **명시적 예외**로 강등하지 않는다(결정 A(i), D13 R-4 -- 승진
+    회귀가 이 예외에 걸린다). 강등할 필요가 없으면 `decision` 을 그대로
+    돌려준다(불필요한 복사 없음).
+
+    판정 기록을 덮어쓰지 않는다(원칙9) -- `band_by_threshold`/`confidence`/
+    `confidence_breakdown`/`matched_person_id` 는 그대로 두고 `band`/
+    `forced_reason`/`action`(과 `decision` dict 안의 같은 세 키)만 바꾼다.
+    """
+
+    if decision.band != "merge":
+        return decision
+    if config.penalized_merge_policy != "ask":
+        return decision
+
+    matched = next(
+        (c for c in passed if c.person_id == decision.matched_person_id), None
+    )
+    if matched is None or not matched.penalized_by or matched.relaxed_pass:
+        return decision
+
+    decision_payload = dict(decision.decision)
+    decision_payload["band"] = "identity"
+    decision_payload["forced_reason"] = FORCED_REASON_PENALIZED_CANDIDATE
+    decision_payload["action"] = _DOWNGRADED_ACTION
+
+    return replace(
+        decision,
+        band="identity",
+        forced_reason=FORCED_REASON_PENALIZED_CANDIDATE,
+        action=_DOWNGRADED_ACTION,
+        decision=decision_payload,
+    )
+
+
+def _build_ask_payload(
+
+## D13-4 / D12-4 회귀 3종 — 별도 evidence(regression3)
+
+## D10 두 임계치 유지
+$ grep -n "t_merge\|t_new" app/er/types.py | head -20
+314:    생성 시 가중치 합 1.0(오차 1e-9)과 `0 ≤ t_new ≤ t_merge ≤ 1` 을
+329:    t_merge: float = 0.8
+330:    t_new: float = 0.3
+345:        if not (0.0 <= self.t_new <= self.t_merge <= 1.0):
+347:                "ERConfig: thresholds must satisfy 0 <= t_new <= t_merge <= 1 "
+348:                f"(got t_new={self.t_new!r}, t_merge={self.t_merge!r})"
+358:        hints, config{t_merge,t_new,weights,top_k}}") -- `judge_timeout`/
+364:            "t_merge": self.t_merge,
+365:            "t_new": self.t_new,
+$ grep -n "band_by_threshold" app/er/confidence.py app/er/pipeline.py | head
+app/er/confidence.py:172:    band_by_threshold: str
+app/er/confidence.py:184:            "band_by_threshold": self.band_by_threshold,
+app/er/confidence.py:220:    band_by_threshold: str,
+app/er/confidence.py:228:        "band_by_threshold": band_by_threshold,
+app/er/confidence.py:246:    `s_llm=s_emb=s_rule=0`, `confidence=0`, `band_by_threshold=band_for(0)`
+app/er/confidence.py:251:    band_by_threshold = band_for(confidence, config)
+app/er/confidence.py:265:        band_by_threshold=band_by_threshold,
+app/er/confidence.py:275:        band_by_threshold=band_by_threshold,
+app/er/confidence.py:294:      -- `s_llm=s_emb=s_rule=0`, `band=band_by_threshold="new_person"`,
+app/er/confidence.py:325:            band_by_threshold=band,

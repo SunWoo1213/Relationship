@@ -1,0 +1,13 @@
+cf5a171 test(P4b-er-redesign): U7 수용 기준 21행을 모두 돌려 증거로 남기고 문서를 맞춘다
+9169a04 docs(P4b-er-redesign): U6 뒤에 남은 기록 — 해시·푸시·보류 결정을 위키로 옮긴다
+4338eea eval(P4b-er-redesign): U6 기준선 대비 — 오병합이 사라진 자리를 mention 단위로 센다
+855a26b eval(P4b-er-redesign): U5 실 실행 1회 — 게이트를 통과했다
+f96d15b eval(P4b-er-redesign): U5 준비 — 실 실행 전에 사슬과 재계산을 스텁으로 증명한다
+a8faa81 docs(P4b-er-redesign): U5 선행 — 기준선 사본을 먼저 남기고 실행 카드를 고친다
+b5b412c feat(P4b-er-redesign): U4 평가 도구를 새 확신도 산식과 감점 계측에 맞춘다
+dbcfca0 feat(P4b-er-redesign): U3 감점 후보는 바로 연결하지 않고 사용자에게 묻는다
+08bda7c feat(P4b-er-redesign): U2 D13 규칙 필터 감점 — 배제 대신 penalized_by, 완화 트리거 교체
+85ceda7 feat(P4b-er-redesign): U1 D12 관측 신호 재정규화 결합 — combine rule_checked·weights_effective, 테스트 13건
+28c2de8 harness(P4b-er-redesign): U0 entity-resolution 스킬 카드 D12·D13 정합 — 권위 문구·감점·재정규화 산식
+83d33dd docs(P4b-er-redesign): 계획검증 통과·계획 승인 — CR-001 D12·D13 구현 + 재실행 + 게이트 재판정, 패키지 착수
+e4109cc cr(CR-001): 확신도 관측 신호 재정규화(D12)·규칙 필터 감점(D13) — D3 대체, S3.3·원칙3·P4b 패키지 신설
