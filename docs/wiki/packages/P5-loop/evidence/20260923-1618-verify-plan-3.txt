@@ -1,0 +1,59 @@
+== verify-plan P5-loop  (2026-09-23 16:18) ==
+PASS  존재: docs/wiki/packages/P5-loop/01-plan.md
+PASS  존재: docs/wiki/packages/P5-loop/02-plan-verify.md
+PASS  카드 존재: D1
+PASS  카드 존재: D11
+PASS  카드 존재: D12
+PASS  카드 존재: D13
+PASS  카드 존재: D2
+PASS  카드 존재: D6
+PASS  패키지 id 등록됨: P2-tools
+PASS  패키지 id 등록됨: P3-er
+PASS  패키지 id 등록됨: P5-loop
+PASS  패키지 id 등록됨: P6-briefing
+PASS  패키지 id 등록됨: P6-memory
+PASS  검증 항목 존재: R10
+PASS  검증 항목 존재: R6
+PASS  검증 항목 존재: R7
+PASS  Refs 있음: - [ ] U1 **[backend-agent] 루프 계약 타입 + trace 어�
+PASS  Refs 있음: - [ ] U2 **[backend-agent] 인식 단계 — 발화 → `too
+PASS  Refs 있음: - [ ] U3 **[backend-agent] 게이트 — 제안을 코드가
+PASS  Refs 있음: - [ ] U4 **[backend-agent] 해석 단계 — ER 연결·되�
+PASS  Refs 있음: - [ ] U5 **[backend-agent] 기록 + 응답 단계**: 게이�
+PASS  Refs 있음: - [ ] U6 **[backend-agent] `POST /chat` — API 한 흐름**
+PASS  Refs 있음: - [ ] U7 **[backend-agent] 재개 — `POST /answers/{questi
+PASS  Refs 있음: - [ ] U8 **[backend-agent] 수용 기준 기계 검증 + 문
+PASS  backlog 일치: [ ] [backend-agent] 에이전트 루프(인식→해석→�
+PASS  P4 게이트 통과 (P4b-er-redesign)
+PASS  검증자 = verifier (L-002)
+PASS  점검표 8행 존재
+PASS  점검표 모든 행에 판정(통과/보류) 있음
+WARN  보류 1 건 — 결과는 통과가 될 수 없다
+PASS  결과: 줄 존재
+PASS  점검표 모든 행에 근거 있음
+PASS  registry 중복 없음: app/agent/__init__.py
+PASS  registry 중복 없음: app/agent/types.py
+PASS  registry 중복 없음: app/agent/propose.py
+PASS  registry 중복 없음: extract.py
+WARN  registry 에 다른 패키지로 이미 있음: app/er/judge.py → | 모듈 | LLM 판정(3단계, 공급자 중립) | app/er/judge.py | P3-er | b1f
+PASS  registry 중복 없음: app/agent/gate.py
+PASS  registry 중복 없음: app.tools
+WARN  registry 에 다른 패키지로 이미 있음: inspect.signa → | 스크립트 | 툴 시그니처 기계 검증 | scripts/tools_check.py | P2-to
+PASS  registry 중복 없음: app/agent/loop.py
+PASS  registry 중복 없음: dataclasses.repla
+PASS  registry 중복 없음: app/agent/respond.py
+PASS  registry 중복 없음: tests/test_agent_propose.py
+PASS  registry 중복 없음: tests/test_agent_gate.py
+PASS  registry 중복 없음: tests/test_agent_loop.py
+PASS  registry 중복 없음: tests/test_agent_resume.py
+PASS  registry 중복 없음: tests/test_api_chat.py
+WARN  registry 에 다른 패키지로 이미 있음: app/api/routes.py → | 엔드포인트 | GET /health · POST /answers/{id} | app/api/routes.py | P2-t
+WARN  registry 에 다른 패키지로 이미 있음: app/api/schemas.py → | 엔드포인트 | API 요청/응답 스키마 | app/api/schemas.py | P2-tools 
+WARN  registry 에 다른 패키지로 이미 있음: app/api/deps.py → | 엔드포인트 | 요청 단위 세션·ToolContext 조립 | app/api/deps.py |
+WARN  registry 에 다른 패키지로 이미 있음: app/settings.py → | 모듈 | 런타임 설정값 | app/settings.py | P2-tools | f217190 | `app_use
+WARN  registry 에 다른 패키지로 이미 있음: tests/test_api.py → | 테스트 | HTTP: /health·/answers 200/404/409/422 | tests/test_api.py | P2-t
+PASS  registry 중복 없음: docs/wiki/registry.md
+WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
+| 문서 | 사용자 카드 10 파일럿 평가 실 실행(환경변수 이름·
+| 문서 | FIX-001 main 병합(갈라진 배포 브랜치를 dev 로 되돌린�
+== 결과: FAIL=0 WARN=9 ==

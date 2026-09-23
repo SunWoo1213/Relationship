@@ -35,6 +35,9 @@
 
 - [x] [backend-agent] 툴 7종 v2 구현 + 단위 테스트 / 의존: P1 스키마 / 수용기준: 시그니처가 CLAUDE.md와 일치, `ask_user`가 `pending_questions`에 저장 — 완료(2026-09-05, 04-review 완료, verify-impl FAIL 0, R6 R7 R10 R18 구현완료; FastAPI 골격 health·answers 포함)
 
+- [ ] [backend-agent] `DELETE /persons/{id}` — 인물 단위 완전 삭제 / 의존: P2 / 수용기준: 인물·별칭·사실·이벤트·일정이 FK CASCADE 로 함께 지워지고, `pending_questions.context`·`agent_traces.input/output` JSONB 안의 `person_id` 참조도 정리된다. 삭제 전 확인을 요구하고, 남의 인물은 지울 수 없다 / Refs: F-4d2507 security§5 (P1 04-review §7)
+  - security.md §5 가 요구하는데 backlog 어느 항목에도 없었다(F-4d2507, P2 04-review 90행이 architect 에게 인계). P5-loop 01-plan 이 다시 지적해 사용자 승인으로 신설(2026-09-23). **P5 에 끼우지 않는다** — 루프의 수용 기준과 성격이 다르다.
+
 ### P3
 
 - [x] [backend-agent] ER 4단계 + 확신도 + trace / 의존: P2 / 수용기준: 승진 회귀 테스트 통과, trace에 `confidence_breakdown` 존재 — **완료(2026-09-06, P3-er, verifier 04-review `완료`; R4 실호출은 스모크 사용자 실행 후 보강)**
@@ -68,6 +71,8 @@
 ### P5
 
 - [ ] [backend-agent] 에이전트 루프(인식→해석→기록→응답) + ask_user 재개 / 의존: P3, **P4b 게이트 통과**(P4 는 부분완료·미달, CR-001) / 수용기준: 발화 → 툴 선택 → 저장 → 응답이 API 한 흐름으로 동작, `POST /answers/{question_id}`로 루프 재개
+  - 세분화는 `docs/wiki/packages/P5-loop/01-plan.md` (U1~U7). 70행의 문장·수용 기준은 바꾸지 않는다.
+  - 01-plan 결정 항목(사용자 확정 2026-09-23, 전부 (i)): 툴 선택은 코드가 한다(LLM 은 구조화 추출만) / 응답은 템플릿 / 재개는 해석 단계부터 / 되묻기로 끝나도 되돌리지 않는다 / 순차 처리·첫 되묻기에서 턴 종료 / 추출 개수 상한 / `loop_` trace 어휘 / 오류는 200 으로 삼켜 같은 트랜잭션에 커밋 / 세션 id 는 서버 발급·격리 부재 명시 / 확인 질문은 409 + `context` 바인딩 / 일정 시각 미확정은 `ask_user(kind="schedule")`
 
 ### P6
 
@@ -89,12 +94,15 @@
 ### P10
 
 - [ ] [eval-agent] 150건 데이터셋 완성 + 최종 평가 + `reports/eval.md` / 의존: P4, P9 / 수용기준: `metrics.json`만으로 `eval.md` 재생성
+  - P5-loop 결정 K 가 만드는 `ask_user(kind="schedule")` 이 `ask_user_rate_by_kind` 의 분모에 들어간다(P4 04-review 214행: "kind=schedule 은 P5 루프가 만든 뒤 P10 이 잰다"). P4b 실측 되묻기는 kind 가 `identity` 뿐이었다.
 
 ### P11
 
 - [ ] [사용자] 데모 리허설 스크립트 (발표일 기준 날짜 재계산) / 의존: P9 / 수용기준: 승진 시나리오·수동 트리거 포함
 
 ## 리스크 로그 (기획서 9장)
+
+- **다중 사용자 격리가 없다(F-fbaaae)** → `pending_questions`·`agent_traces` 에 `user_id` 컬럼이 없어 세션 단위 귀속만 하고 사용자 단위 격리는 하지 못한다. 단일 사용자(`app_user_id()` 고정) 전제에서는 문제가 드러나지 않지만 **P9 배포 전에 다시 꺼내야 하는 부채**다. 스키마 변경(S3.1)이 필요하므로 P5-loop 범위 밖이고, P5 는 이 사실을 모듈 docstring·README 에 명시만 한다(01-plan 결정 I(i), architect 개정 제안 4 · 사용자 승인 2026-09-23).
 
 - 엔티티 해석 성능 미달 → **P4 파일럿 평가 시점**에 점검, 실패 케이스 분석을 산출물로
 - 1인 개발 범위 초과 → 프론트 3화면 고정, 음성·메시지 초안 제외

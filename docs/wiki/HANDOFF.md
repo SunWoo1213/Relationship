@@ -5,36 +5,55 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-23 13:25 (P4b 종료) — **P4b-er-redesign 완료. 게이트를 통과했다. 다음은 P5 다.**
-이번 세션: 재개 → 후행 기록 `9169a04` → **U7** eval-agent `cf5a171`(판정 표 21행 미충족 0·부분 1) → **04-review** verifier `결과: 완료` → 사용자 승인 → 닫는 작업(이 커밋).
-**게이트 `0.8 [] True True`** — T_merge 0.8 에서 제안 방식 오병합 **0/132**·미검출 **0/132**, 베이스라인 4종(`exact_raw` 33/132 · `exact_norm` 4·20/132 · `embedding_only` 1/132 · `llm_single` 9/132) 모두 미지배, 곡선 9쌍 단조 위반 0. F1 0.8972(정밀도 1.0·재현율 0.8136), 되묻기 31건 23.5%, $0.0274. P4 기준선은 `0.8 ['embedding_only'] True False` 로 미달이었다. verifier 가 원시 지표에서 **독립 재계산**해 `metrics.json.gate` 와 일치를 확인했고, 메인 세션도 지배 관계를 따로 다시 계산해 같은 값을 얻었다. 닫는 작업 뒤 `verify-impl.sh` **FAIL 0 / WARN 0**.
-**P5 가 알아야 할 한계·인계**: (1) **40건·1회 실행**이다. 실행 간 `s_llm` 자기보고가 136 mention 중 60건 달라 게이트 개선을 D12·D13 단독 효과로 분해할 수 없다 — 다만 `exact_raw`·`exact_norm`·`embedding_only` 는 결정 변화 0 이라 지배가 풀린 것이 베이스라인 악화 때문은 아니다. (2) **보수 강등 5건은 전부 귀속이 골드였다** — 이 정책(결정 A(i), `ER_PENALIZED_MERGE_POLICY=ask`)이 막은 오병합 0건, 대신 정답 5건을 되물었다(마찰 31건의 16%). 기본값 유지하되 150건에서 재측정. (3) `sc-015` t0 '부장님'·`sc-007` t2 '문실장님' 은 **정답이 된 것이 아니라 `deferred`(되묻기)로 옮겨졌다**. (4) **`penalized_merge` 정의가 둘이다** — `metrics.json` 기준(귀속 인물 자신이 감점 후보) 14건, 원시 기준(후보 아무나 감점) 22건. 둘 다 오병합 0. 보고할 때 어느 정의인지 함께 적는다. (5) P5 가 쓰는 인터페이스: `ERConfig.penalized_merge_policy` · `ScoredCandidate.penalized_by` · `combine(rule_checked=…)` · `weights_effective` · `forced_reason="penalized_candidate"` · `ask_user` 재개 경로는 종전과 같다. (6) T_merge·T_new 운영값 확정은 P10(0.75 에서 오병합 1/132, 절벽 소멸). (7) 다음 실 실행은 `2>&1 | tee` + `echo "rc=$?"` 까지 남긴다 — 이번 실 실행 evidence 에 rc 줄이 없었다.
+갱신: 2026-09-23 17:20 (**세션 중단** — P5-loop 계획이 2차 보류인 상태에서 사용자가 중단을 결정했다. 재개하면 아래 1번부터.)
+
+**이번 세션에 끝난 것**: P4b-er-redesign 종료(게이트 통과, `1075dd6`) → FIX-001 main 병합·승격(`e2f0569`, 네 갈래 동기화) → FIX-001 마무리(`1227026`) → FIX-002 게이트 검사(`cf82868`).
+
+**P5-loop 계획 경과**: architect 01-plan 초안(U1~U7) → **사용자 결정 12건 확정** → backlog 개정 3건 → 기계 검증 `FAIL=12` → 형식 2건 수정 + FIX-002 → `FAIL=1` → **verifier 1차 보류**(H-1·H-2·H-3) → **결정 L 을 (i)→(iii) 하이브리드로 변경** → architect 개정(U1~U8, 판정 표 27행) → **사용자 확정 M-1(d)·M-2(i)** + backlog 리스크 로그 → `FAIL=0` → **verifier 2차 보류**. 상세는 `journal.md` 17:20 줄과 `02-plan-verify.md`.
+
+**확정된 설계(다시 열지 말 것)** — A 추출 개수 상한(언급 5·이벤트 5·일정 3) · B 응답은 템플릿 · C 순차 처리·첫 되묻기에서 턴 종료 · D 되묻기로 끝나도 되돌리지 않는다 · E 재개는 해석 단계부터 · F `tool_name="agent"`+`loop_` 6종(`loop_gate` 포함) · G 한 줄 안내+저장 0 · H 예외를 삼켜 200 으로 같은 트랜잭션 커밋 · I 세션 id 서버 발급·격리는 명시만 · J 소비 1회는 409·대상은 `context["mention"]` · K 이벤트는 `now`·일정은 되묻기 · **L(iii) LLM 이 `tool_calls` 를 제안하고 코드가 게이트를 친다**(화이트리스트·인자 스키마·**`person_id` 직접 지정 금지**·상한, LLM 은 턴당 1회) · M-0 `apply_resolution` 호출 **전에** `dataclasses.replace` 로 `context` 에 `"resume"` 한 키 · M-1(d) 확인 질문 하나로 태그까지 · M-2(i) 후보 시각 2~3개+모르겠어요.
+
+**2차 보류 3건**(원칙·카드 위반 아님. 전부 01-plan 문장 수정으로 닫힌다):
+- **H-1(잔존)** 판정 표 7·22행 기대 출력이 **구조상 거짓**. 메인 세션이 코드로 확인: `search_person`·`update_person`·`ask_user` 가 전부 `@traced` 이고 ER 이 내부에서 부른다(`candidates.py:112`·`pipeline.py:461`·`:474`) → `tool_call` 행에 **게이트가 거부할 툴이 반드시 섞이므로** "`accepted` 집합 = `tool_call` 행 집합" 은 성립 불가. 빈 DB 예시는 되묻기로 끝나 `loop_record` 가 없고, 시드 DB 면 `judge=FakeJudge` 미주입이라 실 공급자를 부른다.
+- **H-4(신규)** 확정 M-1(d)·M-2(i) 가 본문 5곳 미반영 — U1 `PendingResume` 스키마 · U4 `replace` 식 · U7 문장 · **M-0 ③ 이 M-1(d)와 모순**("`AFFIRMATIVE_KEY` 를 고치지 않는다") · 힌트 있을 때도 태그를 묻는지 미정.
+- **H-5(신규)** 판정 표 5행 grep 기대 출력이 U5 의 `update_person(facts/new_alias)` 호출과 모순.
+- 권고 **R-9~R-19**. R-19 는 하네스(P5 밖): `verify-plan.sh` 7절 정규식 `[.][a-z]{1,5}` 가 `inspect.signature` 를 잘라 가짜 경로 토큰을 만든다(메인 세션 확인).
+
+**루프 비용 경고**: 1차 보류 3건 → 개정 → 2차 보류 3건(2건 신규). 계획이 커지며(판정 표 18→27행) 결함이 계속 나온다. 원칙8 "재시도 남발 금지"를 의식할 지점 — 3차는 **범위를 묶어서**.
+
+**메인 세션이 이번에 틀렸던 것(같은 실수 반복 금지)**: ① 결정 L 을 설명할 때 원칙1·4 와 CLAUDE.md 만 보고 **`docs/proposal.md` 72행을 확인하지 않았다** — 권위 문서는 침묵했어도 기획서를 직접 열었어야 했다. ② `FIX-002.md` 에 evidence 파일명을 손으로 적어 틀렸다(1518 → 실제 1526, 정정 완료). ③ stage-gate 훅은 거절할 때도 **exit 0** 이고 판정이 출력 JSON 에 있다 — 종료 코드로 읽어 "가드가 안 막는다"고 잘못 봤다가 정정했다.
+
 **커밋 메시지는 사람이 읽는 문장 형식(사용자 지시) 계속 적용.**
-active: **none** | frozen: none | P4b-er-redesign **완료** · FIX-001 **완료** — **다음은 P5 착수** | 브랜치: dev — **`dev` · `origin/dev` · `main` · `origin/main` 네 갈래가 모두 `e2f0569`** 다(2026-09-23 13:41 승격, fast-forward, 강제 옵션 없음). FIX-001 이 갈라진 main 6커밋을 dev 로 병합해 ff 를 복구했고, 충돌 `README.md` 1건은 **양쪽을 다 남겨** 해소했다. 승격 근거는 실서버가 아니라 `pytest 1325 passed(skip 0)` · `verify-impl FAIL 0/WARN 0` · P4b 게이트 통과다 — **첫 실서버 검증은 P9 배포 뒤 `SERVER-CHECKLIST.md`**. main 에서 들어온 것: `.github/workflows/tests.yml`·`LICENSE`·`docs/wiki/evidence/20260919-openai-live-smoke.txt`·`verify-impl.sh`(`-rs`+skip WARN). Docker `capstone2-postgres-1` 5433. 미추적 2파일(`reports/pilot/raw-20260922-150931.jsonl` 평문 7.7MB·`metrics-stage.json`)은 **의도적으로 커밋하지 않는 것**이니 지우지 않는다.
+active: **none**(P5-loop 은 아직 활성화 전 — 02-plan-verify 통과 + 사용자 승인 뒤에 `active: P5-loop`) | frozen: none | P4b-er-redesign **완료** · FIX-001 **완료** · FIX-002 **완료** | 브랜치: dev — **로컬이 `origin/dev`(e2f0569) 보다 2커밋 앞선다**: `1227026`(FIX-001 마무리) · `cf82868`(FIX-002). `main` = `origin/main` = `e2f0569`. **푸시하지 않았다** — 푸시하면 L-003 마커가 서서 verifier 다음 단계를 바로 못 잇기 때문이고, P5 계획 승인까지 마친 뒤 한 번에 올린다. Docker `capstone2-postgres-1` 5433. 미추적 2파일(`reports/pilot/raw-20260922-150931.jsonl` 평문 7.7MB·`metrics-stage.json`)은 **의도적으로 커밋하지 않는 것**이니 지우지 않는다.
 
 ## 지금 어디까지
-- **P3-llm-providers 완료(2026-09-15)** — U1 c01381d·U2 cf01e9f·U3 7b94a69·U4 10a66c3. verifier 04-review `완료`: 수용 기준 11/11(backlog 51행 글자 일치), 부정 python 43/43 + bash, D11 (a)~(e) 코드 1:1, 03-log 판단 8건 채택, registry 소견 9건 해소. verifier 판정은 부분완료(F-4ef1a3 [필수] = R-8 "새 행 0" vs `verify-impl.sh` 94행 "패키지 열 행 필수" 충돌) → 사용자 결정 (i) D11 카드 registry 행 1줄·H-1 (a) proposal 상단 안내문 1줄 → 메인 세션 재실행 **FAIL 0 / WARN 0**(`evidence/20260915-1537-close-verify-impl.txt`, 918 passed), 04-review §9·결과 `완료`·승인 줄. CURRENT active none, backlog 51·53~56 `[x]`, journal DONE.
-- **실호출로 검증된 공급자 1/3(openai)** — 스모크 03(2ebf061)·08(750f11b) 완료, F-87c597 해소, R4 "실호출 확인". anthropic·gemini 는 선택(미실행). U7 실 실행 750f11b 기준 완료(결과는 위 갱신 줄).
-- **P4 인계(04-review §7, 7항)**: 결정 A 정합(`LLM_PROVIDER=openai` 명시, meta.provider/model 출처 `select_provider`·`Judgement.model`) · Gemini 실호출 0/3 · Gemini 429/5xx 무재시도 비대칭 각주 · Gemini `model` 은 `model_version` 우선 · 토큰 필드·thinking 토큰 · 스키마 실 API 거부 시 `api_error(400)` 강등 · done 커밋 해시를 P4 01-plan 5행에. + P3-baselines 04-review §7 15항, P1-pilot-dataset §7 13항.
-- **하네스 L-nnn 후보 2**: (1) `verify-impl.sh` 6번(94행)이 "기존 파일 확장 전용 패키지"를 표현하지 못함 — 이번엔 D11 새 파일 행으로 해소, 다음 확장 패키지가 나오면 "패키지 열 또는 비고 문구" 완화 결정. (2) `POSTGRES_PORT` 는 `export` 로 상속되므로 스크립트 포트 전달 수정은 불필요(verifier 실측) — 후보에서 내린다.
-- **실서버 검증 없이 승격됨(2026-09-15, 사용자 결정)** — main 59c67cc 는 pytest 918 만 통과. 첫 실서버 검증은 P9 배포 후 `SERVER-CHECKLIST.md`.
-- 이전 패키지 열린 소견: P3-er F-46f1eb, F-036185(F-87c597 은 750f11b 에서 해소), F-251dc2·F-bdd6c5(P4). P2 F-4d2507·F-4d8d96(P5), F-c7078e. P3-llm-providers 열린 소견 0.
-- 로컬 DB: capstone2-postgres-1 호스트 5433(Docker Desktop 켜짐), 명령 앞 `POSTGRES_PORT=5433`(export 하면 스크립트도 상속), pytest `-rs`, 한글 출력 `PYTHONIOENCODING=utf-8`, JSON 읽기 `PYTHONUTF8=1`. 사용자 `!` 실행은 셸이 매번 새로 떠서 `set -a; . ./.env; set +a;` 접두 필요(키). `.env` 의 `DATABASE_URL` 은 사용자가 2026-09-22 에 5433 으로 수정(`app/config.py` 규칙 1: DATABASE_URL 이 POSTGRES_PORT 보다 우선 — U7 1·2차 실패 원인). 설치: anthropic 1.4.0·openai 2.33.0·google-genai 2.23.0.
+- **완료**: P1·P2·P3(er·baselines·llm-providers)·P4(부분완료, 게이트 미달)·**P4b(게이트 통과)**·FIX-001(main 병합·승격)·FIX-002(게이트 검사). 전부 04-review `결과: 완료` 또는 FIX `## 상태: 완료`.
+- **P5-loop 은 계획 단계에서 멈춰 있다** — 01-plan 개정본(U1~U8) + 02-plan-verify `결과: 보류`(2차) + 05-remediation(열림 8 = 필수 1 + 권고 7) + evidence 7개. `CURRENT active: none` 이므로 **제품 코드를 쓸 수 없다**(stage-gate 가 막는다).
+- **실호출로 검증된 LLM 공급자 1/3(openai)**. anthropic·gemini 는 미실행(선택). 첫 실서버 검증은 P9 배포 뒤 `SERVER-CHECKLIST.md` — 지금까지의 승격은 전부 pytest·게이트 근거다.
+- **이전 패키지 열린 소견**: P3-er F-46f1eb·F-036185, P2 F-4d2507(→ backlog `DELETE /persons/{id}` 항목으로 신설됨)·F-4d8d96·F-c7078e, P4 F-251dc2·F-bdd6c5.
+- **로컬 환경**: Docker `capstone2-postgres-1` 호스트 5433. 명령 앞 `POSTGRES_PORT=5433`, 한글 출력 `PYTHONIOENCODING=utf-8`, JSON 한 줄 명령 `PYTHONUTF8=1`. `.env` 의 `DATABASE_URL` 이 `POSTGRES_PORT` 보다 우선한다(`app/config.py`). evidence 를 python 으로 읽을 때 `errors="replace"`(cp949 혼입). 설치: anthropic 1.4.0·openai 2.33.0·google-genai 2.23.0.
 
 ## 바로 다음에 할 것 (순서대로)
-1. ~~FIX-001 병합·승격~~ **완료**(`e2f0569`, 네 갈래 동기화).
-2. **P5 착수** — `/devlog start`(backlog "에이전트 루프"). P4b 게이트를 통과해 결정 K (a) 의 착수 조건이 풀렸다. 순서: backlog 항목·의존 확인 → `registry.md` grep(중복 금지) → `bash .claude/scripts/gitlog.sh` → architect 01-plan(L-004 승인) → `verify-plan.sh` → verifier 02-plan-verify(L-004 승인) → 사용자 승인 → `CURRENT active`.
-3. **L-nnn 후보(사용자 결정)**: main 직접 커밋을 막는 장치가 없다 — 훅은 이 세션의 dev 푸시만 강제하고 웹 UI·다른 클론으로 올라간 커밋은 잡지 못한다. 재발 방지는 **GitHub 브랜치 보호 규칙**이고 저장소 설정이라 사용자 몫이다.
-4. 남은 [권고]: P4b 01-plan 111행 판정 표 20행 경로 오기(계획서는 그대로 두기로 결정, 정정 경로는 03-log·04-review 에 있다) · 03-log `Refs: R8` 어휘 충돌 · registry 133행 `U6(pending)` 은 P4-pilot-eval 소속 · `verify-impl.sh` 6번 완화 여부 · 러너 `safe_summary` FIX · 09 카드 §2 결정 10개 · anthropic·gemini 스모크 · F-46f1eb·F-036185.
-5. **P10 인계**(P4b 04-review §7): 결정 A(i) 비용 재측정(강등 5/5 정답) · 실행 변동성(`s_llm` 60/136) 때문에 2회 실행 여부 결정 · `T_merge`/`T_new` 운영값 확정(0.75 에서 오병합 1/132) · 다음 실 실행은 `2>&1 | tee` + `echo "rc=$?"` 까지 남긴다.
+1. **[재개 첫 질문] 2차 보류를 어떻게 풀지 사용자에게 먼저 묻는다.** 네 안을 그대로 다시 보인다 — (a) **3차 개정, 범위를 묶어서**(architect 에 H-1·H-4·H-5 + R-9~R-17 **만** 고치게 하고 새 단위·새 판정 행 추가 금지) / (b) **판정 표를 줄인다**(27행은 과하다. 수용 기준 직결 행만 남기고 나머지는 구현 중) / (c) **보류를 [권고]로 내리고 승인**(빠르지만 틀린 판정 방법으로 착수하게 된다) / (d) 메인 세션이 직접 고친다(L-002 이탈). **(a) 를 권했다.** 원칙8 "재시도 남발 금지" 를 의식할 지점이다 — 1차 3건 → 2차 3건(2건 신규), 계획이 커지며 결함이 계속 나온다.
+2. 정하면 그 뒤는 **L-004 승인 → `--stage <에이전트>` 마커 → Agent 1회** 순서. 3차도 보류면 멈추고 다시 의논한다.
+3. 통과 뒤: 사용자 계획 승인 → `02-plan-verify.md` `승인: 사용자 (날짜)` → `CURRENT.md active: P5-loop` → `03-log.md` 생성 → `journal.md` START → 계획 문서 커밋 → **U1 착수**(backend-agent, L-004 매번).
+4. **미푸시 3커밋**: `1227026`(FIX-001 마무리) · `cf82868`(FIX-002) · 이번 계획 기록 커밋. `origin/dev` = `e2f0569`. 푸시하면 L-003 마커가 서므로 재개 시 승격/보류를 묻게 된다.
+5. 남은 [권고]: R-19 `verify-plan.sh` 7절 정규식(하네스, P5 밖) · `test-guards.sh` 옛 경로 13곳 · P4b 01-plan 111행 경로 오기 · 03-log `Refs: R8` 어휘 충돌 · registry 133행 `U6(pending)` · `verify-impl.sh` 6번 완화 · 러너 `safe_summary` FIX · 09 카드 §2 결정 10개 · anthropic·gemini 스모크 · F-46f1eb·F-036185.
+6. **P10 인계**(P4b 04-review §7): 결정 A(i) 비용 재측정 · `s_llm` 60/136 변동 때문에 2회 실행 여부 · `T_merge`/`T_new` 운영값 · 다음 실 실행은 `2>&1 | tee` + `echo "rc=$?"` 까지.
+2. **사용자 계획 승인**(AskUserQuestion) → `02-plan-verify.md` 에 `승인: 사용자 (날짜)` → `CURRENT.md` `active: P5-loop` → `03-log.md` 생성 → `journal.md` `START` → **계획 문서 커밋**.
+3. **미커밋 잔여 정리 + dev 푸시** — 계획 승인 커밋까지 묶어 `1227026`·`cf82868` 과 함께 한 번에 올린다. 푸시 뒤 L-003 결정을 묻고 멈춘다.
+4. **U1 착수** — backend-agent 위임(L-004 매번). 단위는 U1~U7, 각 단위 끝에 `/commit`. **U1 은 확정 12건을 전제로 한다.**
+5. 남은 [권고]: `test-guards.sh` 옛 경로 13곳(별도 단위) · P4b 01-plan 111행 판정 표 20행 경로 오기 · 03-log `Refs: R8` 어휘 충돌 · registry 133행 `U6(pending)` 은 P4-pilot-eval 소속 · `verify-impl.sh` 6번 완화 여부 · 러너 `safe_summary` FIX · 09 카드 §2 결정 10개 · anthropic·gemini 스모크 · F-46f1eb·F-036185.
+6. **P10 인계**(P4b 04-review §7): 결정 A(i) 비용 재측정 · 실행 변동성(`s_llm` 60/136) 때문에 2회 실행 여부 · `T_merge`/`T_new` 운영값 확정 · 다음 실 실행은 `2>&1 | tee` + `echo "rc=$?"` 까지 남긴다.
 
 ## 재개 시 읽을 카드 (이것만)
-- `packages/P4b-er-redesign/01-plan.md`(작업 단위 58~69행, 결정 표, 판정 표), `02-plan-verify.md` §2·권고 R-1~R-9, `03-log.md` 마지막 항목, `decisions/D12*.md`·`D13*.md`(코드에서 지켜야 할 것), `changes/CR-001.md` §2, `docs/backlog.md` "P4b" 절
-- `docs/wiki/CURRENT.md`, `.claude/gitlog.md`, `decisions/D11-llm-provider-registry.md`
+- `packages/P5-loop/01-plan.md`(작업 단위 U1~U7, **리스크·미결 절 머리의 확정 12건**, 판정 방법 표), `02-plan-verify.md` §2·권고, `05-remediation.md`(열린 8건 = 필수 1 + 권고 7)
+- `decisions/D01`·`D02`(코드에서 지켜야 할 것), `specs/S3.4`·`S3.2`·`S3.3`, `docs/backlog.md` "P5" 절
+- `docs/wiki/fixes/FIX-002.md`(게이트 검사 수정 근거), `docs/wiki/CURRENT.md`, `.claude/gitlog.md`
 - `lessons/L-001`~`L-004`
 
 ## 열린 질문 · 사용자 결정 대기
-- **main 이 dev 와 갈라졌다 (2026-09-23 00:10 발견, 승격 시도 중).** 갈림점은 `3c6108d`. main 에만 있는 6커밋(`abfb795`·`8714935`·`e29ac75`·`472e85f`·`b6afc2c`·`0dbf2c9`)이 dev 를 거치지 않고 직접 올라갔다(L-001 과 어긋난다). 건드린 파일: `README.md`·`.github/workflows/tests.yml`·`LICENSE`·`.claude/scripts/verify-impl.sh`·`docs/wiki/evidence/20260919-openai-live-smoke.txt`. `git merge-tree --write-tree dev origin/main` 시뮬레이션 결과 **`README.md` 1건 충돌**(갈림점 이후 main 212줄 수정 / dev 는 `f01ea35` 에서 24줄 수정), 나머지 4파일은 dev 에 없어 충돌 없음. `/commit release` 는 fast-forward 만 허용하므로 `git push origin dev:main` 은 거부된다. 강제 푸시·이력 파괴는 하지 않는다. **사용자 결정(00:12): 승격 보류 — U5 실 실행을 먼저 하고, 게이트 재판정 뒤에 `origin/main` 을 dev 로 병합하는 작업 단위를 따로 연다.** 그때 README 두 본을 다 읽고 합친 뒤 사용자 승인 → 병합 커밋 → dev 푸시 → 승격 순서로 간다. 하네스 L-nnn 후보: main 직접 커밋을 막는 장치가 없다(훅은 `dev` 푸시만 강제하고, 다른 경로로 main 에 올라간 것은 잡지 못한다).
+- **[최우선] P5-loop 2차 보류를 어떻게 풀 것인가** — 네 안(3차 개정 범위 묶기 / 판정 표 축소 / 보류를 권고로 내리고 승인 / 메인 세션이 직접 수정). 재개 시 첫 질문이다. ~~main 갈라짐~~ 은 FIX-001 로 해소됐다(네 갈래 모두 `e2f0569`).
 - 09 카드 §2 결정 10개(리전·DB A/B·인스턴스·도메인·443 제한·Session Manager·수동 dispatch·EC2 빌드·프론트·백업) — P9 착수 전 사용자 확정. DB A안(compose) 선택 시 D12 카드 필요.
 - 하네스 L-nnn: `verify-impl.sh` 6번 완화 여부(다음 확장 전용 패키지 때 결정).
 
