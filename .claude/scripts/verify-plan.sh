@@ -67,8 +67,17 @@ for d in $deps; do
 done
 num="$(printf '%s' "$id" | sed -E 's/^P([0-9]+)-.*/\1/')"
 if [ "$num" -ge 5 ] 2>/dev/null; then
-  g="$W/packages/P4-pilot-eval/04-review.md"
-  if [ -f "$g" ] && grep -Eq '^결과:[[:space:]]*완료' "$g"; then ok "P4 게이트 통과"; else bad "P4 게이트 미통과: P5 이후는 P4-pilot-eval 완료 전에 시작할 수 없다"; fi
+  # 게이트 패키지는 하나가 아니다 (CR-001, FIX-002).
+  # P4-pilot-eval 은 미달로 부분완료됐고(원칙8 대로 그 기록을 고치지 않는다),
+  # 재설계 후 실제로 통과한 것은 P4b-er-redesign 이다.
+  # INDEX.md "P4 미달 -> P4b 게이트 통과가 조건, CR-001" 과 같은 뜻으로,
+  # 둘 중 하나라도 04-review 가 '결과: 완료' 면 통과로 본다.
+  gate_pass=""; gate_by=""
+  for gp in P4-pilot-eval P4b-er-redesign; do
+    g="$W/packages/$gp/04-review.md"
+    if [ -f "$g" ] && grep -Eq '^결과:[[:space:]]*완료' "$g"; then gate_pass=1; gate_by="$gp"; break; fi
+  done
+  if [ -n "$gate_pass" ]; then ok "P4 게이트 통과 ($gate_by)"; else bad "P4 게이트 미통과: P5 이후는 P4-pilot-eval 또는 P4b-er-redesign 의 04-review 가 '결과: 완료' 여야 시작할 수 있다"; fi
 fi
 
 # 6 점검표 8행

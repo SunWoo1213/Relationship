@@ -224,3 +224,5 @@
 - 2026-09-23 13:37 | PUSH | origin dev e2f0569 — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-23 13:41 | RELEASE | origin main ← dev e2f0569
 - 2026-09-23 13:45 | FIX | **FIX-001 완료** — 승격까지 끝. `dev`·`origin/dev`·`main`·`origin/main` 네 갈래 모두 `e2f0569`. 승격 근거는 실서버가 아니라 pytest 1325(skip 0)·verify-impl FAIL 0/WARN 0·P4b 게이트 통과(사용자 결정, P9 미착수). `CURRENT active: none` — **다음은 P5** | FIX-001
+- 2026-09-23 13:49 | COMMIT | 1227026 docs(FIX-001): 승격까지 끝났다 — 네 갈래가 한 해시로 맞았다
+- 2026-09-23 15:20 | FIX | **FIX-002** — P5-loop 계획 기계 검증이 낸 [필수] 소견 F-4e4fe4. verify-plan.sh 68~79행이 게이트를 P4-pilot-eval 로 하드코딩해 P5~P11 이 전부 막혔다(P4 는 미달로 부분완료, 통과한 것은 CR-001 의 P4b). 게이트를 두 패키지 목록으로 바꿔 하나라도 04-review 결과: 완료 면 통과. 부정 4경우 유지 확인. verify-plan P5-loop FAIL 12 → 1 | FIX-002
