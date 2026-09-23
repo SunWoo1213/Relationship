@@ -220,3 +220,7 @@
 - 2026-09-23 13:19 | PUSH | origin dev 1075dd6 — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-23 13:30 | DECISION | L-003 푸시 후 결정: **main 병합 작업 단위를 연다**(사용자). 마커 해제(`--decision fix`) → `/devlog fix` FIX-001 | FIX-001
 - 2026-09-23 14:00 | FIX | **FIX-001 main 병합** — `origin/main`(6커밋, 갈림점 `3c6108d`)을 dev 로 병합. 충돌 `README.md` 1건을 **양쪽 보존**으로 해소(main 본문 바탕 + dev 의 진행 표 P4·P4b 행과 파일럿 평가 실행법 절). 회귀 1325 passed(skip 0), verify-impl FAIL 0/WARN 0. 승격은 사용자 승인 대기 | FIX-001
+- 2026-09-23 13:37 | COMMIT | e2f0569 fix(FIX-001): 갈라진 배포 브랜치를 dev 로 되돌린다 — main 6커밋 병합
+- 2026-09-23 13:37 | PUSH | origin dev e2f0569 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-23 13:41 | RELEASE | origin main ← dev e2f0569
+- 2026-09-23 13:45 | FIX | **FIX-001 완료** — 승격까지 끝. `dev`·`origin/dev`·`main`·`origin/main` 네 갈래 모두 `e2f0569`. 승격 근거는 실서버가 아니라 pytest 1325(skip 0)·verify-impl FAIL 0/WARN 0·P4b 게이트 통과(사용자 결정, P9 미착수). `CURRENT active: none` — **다음은 P5** | FIX-001
