@@ -213,3 +213,4 @@
 - 2026-09-23 00:50 | COMMIT | 4338eea eval(P4b-er-redesign): U6 기준선 대비 — 오병합이 사라진 자리를 mention 단위로 센다
 - 2026-09-23 00:50 | PUSH | origin dev 4338eea — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-23 01:00 | DECISION | L-003 푸시 후 결정: **보류**. main 승격은 origin/main(0dbf2c9)이 dev 와 갈라져 fast-forward 불가이고(README.md 충돌 1건, 병합 작업 단위 필요) 게이트 재판정(04-review)도 남아 있다. 마커 해제(--decision fix). 세션 종료 — 다음은 U7 | P4b-er-redesign
+- 2026-09-23 12:08 | COMMIT | 9169a04 docs(P4b-er-redesign): U6 뒤에 남은 기록 — 해시·푸시·보류 결정을 위키로 옮긴다

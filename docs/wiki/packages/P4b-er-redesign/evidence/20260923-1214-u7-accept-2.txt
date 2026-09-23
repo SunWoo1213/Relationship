@@ -1,0 +1,268 @@
+# P4b-er-redesign · U7 수용 기준 기계 검증 — 판정 표 21행 (2/2: 12~21행)
+# 실행: eval-agent / 2026-09-23 12:14 KST / 저장소 루트 / 브랜치 dev / HEAD 9169a04
+# 1/2 는 20260923-1214-u7-accept-1.txt (1~11행)
+# 네트워크·LLM·임베딩 실호출 0. 재실행 0.
+
+================================================================
+# 12행 · 두 시나리오 (sc-015 오병합 아님 · sc-007 미검출 아님)
+# <PRE> = reports/failure_cases.md §11 의 공통 머리글, raw 경로만 새 stamp 로 바꾼 것:
+import gzip,json,sys;sys.path.insert(0,".");from collections import Counter
+from evaluation.metrics import classify_gold_row
+R=[json.loads(l) for l in gzip.open("reports/pilot/raw-20260922-150931.jsonl.gz","rt",encoding="utf-8")]
+K=lambda r:(r["scenario_id"],r["mention_kind"],r["mention_index"])          # metrics._mention_key 와 동일
+G=lambda m,t:[r for r in R if r["method"]==m and r["t_merge"]==t and r["mention_kind"]=="gold" and not r["ambiguous"]]
+S0=lambda m:[r for r in R if r["method"]==m and r["sweep_index"]==0]        # mention 당 한 행
+
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c '<PRE>; print([(r["scenario_id"],r["turn"],r["mention"],classify_gold_row(r)) for r in G("proposed",0.8) if r["scenario_id"] in ("sc-015","sc-007")])'
+[('sc-007', 0, '문쌤', 'merge_correct'), ('sc-007', 2, '문실장님', 'deferred'), ('sc-015', 0, '은우', 'merge_correct'), ('sc-015', 0, '부장님', 'deferred'), ('sc-015', 1, '한부장님', 'merge_correct'), ('sc-015', 2, '은우', 'merge_correct'), ('sc-015', 3, '부장님', 'merge_correct')]
+rc=0
+# (판정 보조) 같은 <PRE> 로 분류 집계 + 두 조항을 불리언으로
+$ … print(dict(Counter(classify_gold_row(r) for r in G("proposed",0.8))), "| sc-015 false_merge:", any(...), "| sc-007 miss:", any(...))
+{'merge_correct': 96, 'deferred': 31, 'new_person_correct': 5}
+sc-015 rows with false_merge: []
+sc-007 rows with miss: []
+전체 proposed@0.8 false_merge 수: 0 | miss 수: 0 | 분모: 132
+rc=0
+기대: sc-015 행에 false_merge 없음, sc-007 행에 miss 없음
+판정: 충족 — sc-015 t0 "부장님" 의 실제 분류값은 **deferred**, sc-007 t2 "문실장님" 의 실제 분류값도 **deferred** 다. 즉 두 건은 '정답이 된 것'이 아니라 **되묻기로 옮겨졌다**(U6 §13.2 와 같은 관찰). 판정 표의 조건은 "false_merge/miss 가 아님"이므로 충족이며, sc-015 의 false_merge 목록과 sc-007 의 miss 목록이 모두 빈 리스트다. 제안 방식 전체도 false_merge 0/132 · miss 0/132
+
+================================================================
+# 13행 · 스키마·격자
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m evaluation.metrics --validate reports/metrics.json
+OK reports/metrics.json
+rc=0
+
+$ PYTHONUTF8=1 python -c "import csv;r=list(csv.DictReader(open('reports/curve.csv',encoding='utf-8')));print(sorted({float(x['t_merge']) for x in r}), {x['t_new'] for x in r}, len({x['method'] for x in r}))"
+[0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95] {'0.3'} 5
+rc=0
+기대: rc=0 · [0.5,…,0.95](10점) · {'0.3'} · 5
+판정: 충족 — --validate rc=0(OK), 격자 10점·t_new 0.3 고정·방식 5종
+
+================================================================
+# 14행 · eval.md 멱등
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m evaluation.report --metrics reports/metrics.json --out <scratchpad>/u7-eval-again.md && diff <scratchpad>/u7-eval-again.md reports/eval.md
+report rc=0 / diff rc=0 (출력 0줄)
+기대: diff 0줄
+판정: 충족 — 재생성본과 커밋본이 바이트 동일(diff 출력 0줄, rc=0)
+
+================================================================
+# 15행 · 허용 파일
+$ git diff --name-only e4109cc..HEAD -- app/
+app/er/confidence.py
+app/er/pipeline.py
+app/er/rules.py
+app/er/types.py
+app/settings.py
+rc=0
+기대: {app/er/confidence.py, app/er/rules.py, app/er/pipeline.py, app/er/types.py, app/settings.py} 의 부분집합
+
+================================================================
+# 16행 · 데이터 무변경
+$ git diff --name-only e4109cc..HEAD -- data/
+rc=0 (출력이 0줄이면 무변경)
+기대: 0줄
+
+================================================================
+# 17행 · 기준선 불변
+$ git diff --name-only e4109cc..HEAD -- reports/pilot/raw-20260922-042440.jsonl.gz reports/pilot/traces-20260922-042440.jsonl
+rc=0 (출력이 0줄이면 무변경)
+
+$ sha256sum reports/pilot/raw-20260922-042440.jsonl.gz reports/pilot/metrics-20260922-042440.json
+8d85e4de634272872e5800f091285a0beadf24eb5333438226e7c9ec85d87ad4 *reports/pilot/raw-20260922-042440.jsonl.gz
+25e16dd67ea74aaf14ac640654af402528f48c873714fa034c1077b8dff98d1f *reports/pilot/metrics-20260922-042440.json
+rc=0
+기대: 0줄 · metrics 사본 해시가 25e16dd6… 로 시작
+판정(15행): 충족 — 5개 전부 허용 목록 안이며 그 밖의 app/ 파일이 없다(=부분집합, 여기서는 목록과 정확히 일치)
+판정(16행): 충족 — 0줄
+판정(17행): 충족 — diff 0줄, metrics 사본 sha256 이 25e16dd6… 로 시작(CR-001 36행 인용값과 같다). raw 기준선 8d85e4de… 는 U5 preflight 기록값과 같다
+
+================================================================
+# 18행 · 라벨 무변경
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/validate_scenarios.py --strict --json
+{
+  "ambiguous_mention_count": 3,
+  "counts": {
+    "alias": 8,
+    "new_person": 6,
+    "normal": 10,
+    "promotion": 8,
+    "pronoun": 8
+  },
+  "dir": "data/scenarios",
+  "files": [
+    {
+      "count": 8,
+      "exists": true,
+      "file": "promotion.json"
+    },
+    {
+      "count": 8,
+      "exists": true,
+      "file": "pronoun.json"
+    },
+    {
+      "count": 8,
+      "exists": true,
+      "file": "alias.json"
+    },
+    {
+      "count": 10,
+      "exists": true,
+      "file": "normal.json"
+    },
+    {
+      "count": 6,
+      "exists": true,
+      "file": "new_person.json"
+    }
+  ],
+  "issue_count": 0,
+  "issues": [],
+  "ok": true,
+  "scenario_count": 40,
+  "schema_version": 2,
+  "strict": true,
+  "total": 40,
+  "trap_count": 12
+}
+rc=0
+기대: rc=0, total 40 · 5범주 counts 그대로
+판정: 충족 — rc=0, total 40, counts {alias 8, new_person 6, normal 10, promotion 8, pronoun 8}, issue_count 0 (U5 preflight 기록과 동일)
+
+================================================================
+# 19행 · 스키마·툴 무변경
+$ POSTGRES_PORT=5433 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -m alembic check
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+No new upgrade operations detected.
+rc=0
+
+$ POSTGRES_PORT=5433 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python scripts/tools_check.py
+[ok] search_person: CLAUDE.md (query, hints?) == actual (ctx, query, hints=None)
+[ok] create_person: CLAUDE.md (display_name, aliases, relation_tag, hierarchy) == actual (ctx, display_name, aliases, relation_tag, hierarchy)
+[ok] update_person: CLAUDE.md (person_id, facts?, new_alias?, display_name?) == actual (ctx, person_id, facts=None, new_alias=None, display_name=None)
+[ok] add_event: CLAUDE.md (person_id, type, content, occurred_at, raw_utterance) == actual (ctx, person_id, type, content, occurred_at, raw_utterance)
+[ok] add_schedule: CLAUDE.md (person_id, title, scheduled_at) == actual (ctx, person_id, title, scheduled_at)
+[ok] get_briefing: CLAUDE.md (person_id, schedule_id?) == actual (ctx, person_id, schedule_id=None)
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+rc=0
+기대: No new upgrade operations detected. · 7/7 ok
+판정: 충족 — alembic check "No new upgrade operations detected." rc=0 · tools_check RESULT: 7/7 ok rc=0
+
+================================================================
+# 20행 · 위험 계측 (subsets 에 penalized_merge 가 있고 분자/분모가 함께 있는가)
+$ PYTHONUTF8=1 python -c "import json;m=json.load(open('reports/metrics.json'));print(m['proposed']['subsets'])"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import json;m=json.load(open('reports/metrics.json'));print(m['proposed']['subsets'])
+                                                                ~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'subsets'
+rc=1
+# ↑ 표에 적힌 명령 원문은 rc=1 로 죽는다 — metrics.json 스키마에서 subsets 는 proposed 바로 아래가 아니라
+#   proposed.by_t_merge["<t_merge>"].subsets 에 있다(failure_cases §11 R21 이 적은 경로와 같다). 실제 구조:
+$ PYTHONUTF8=1 python -c "import json;m=json.load(open('reports/metrics.json'));print(list(m.keys()));print(list(m['proposed'].keys()))"
+['proposed', 'exact_raw', 'exact_norm', 'embedding_only', 'llm_single', 'meta', 'gate']
+['grid', 'by_t_merge', 'llm', 'rows']
+rc=0
+
+# 정정한 명령(같은 값을 본다)
+$ PYTHONUTF8=1 python -c "import json;m=json.load(open('reports/metrics.json'));print(json.dumps(m['proposed']['by_t_merge']['0.8']['subsets'],ensure_ascii=False))"
+{"merge_rule_unchecked": {"merges": 63, "false_merge_rate": {"n": 0, "d": 63, "rate": 0.0}}, "merge_relaxed_retry": {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}}, "penalized_merge": {"merges": 14, "false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}, "relaxed_pass_merges": 14, "relaxed_pass_false_merge_rate": {"n": 0, "d": 14, "rate": 0.0}, "reasons": {"hierarchy_conflict": 14}}, "merges": 96}
+rc=0
+기대: penalized_merge 키가 있고 분자/분모가 함께 적혀 있다
+판정: 충족(조건) · 부분(명령 원문) — 조건은 충족한다: penalized_merge = {merges 14, false_merge_rate {n 0, d 14, rate 0.0}, relaxed_pass_merges 14, relaxed_pass_false_merge_rate {n 0, d 14}, reasons {hierarchy_conflict 14}} 로 분자(n)와 분모(d)가 함께 있다. 다만 **판정 표 20행의 명령 경로가 실제 스키마와 다르다**(m['proposed']['subsets'] → KeyError). 04-review 가 같은 명령을 그대로 쓰면 rc=1 이 난다 — 표 정정이 필요하다(코드·산출물 결함 아님).
+# 정의 명시(U6 §13.4) — 위 penalized_merge=14 는 **귀속 인물 자신이 감점 후보인 merge 행** 기준이다.
+#   원시 JSONL 에서 '후보 아무나 감점' 기준으로 세면 22건이다(둘 다 오병합 0). 아래에 두 정의를 같은 파일로 재계산해 둔다.
+$ PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c '<원시 JSONL 로 두 정의 재계산>'
+proposed@0.8 rows: 141 | merge rows: 96
+정의B 후보 아무나 감점: 22
+정의A 귀속 인물 자신이 감점: 14
+정의A 중 오병합: 0
+정의B 중 오병합: 0
+rc=0
+#   → metrics.json 의 penalized_merge(14)는 **정의 A**(귀속 인물 자신이 감점 후보) 다. 정의 B(후보 아무나)는 22 이고 둘 다 오병합 0.
+
+================================================================
+# 21행 · 재실행 1회
+$ ls docs/wiki/packages/P4b-er-redesign/evidence/*real-run*
+docs/wiki/packages/P4b-er-redesign/evidence/20260923-0009-u5-real-run.txt
+rc=0
+$ ls docs/wiki/packages/P4b-er-redesign/evidence/*real-run* | wc -l
+1
+기대: 실 실행 evidence 가 1개
+판정: 충족 — 1개(20260923-0009-u5-real-run.txt). 설정을 바꿔 다시 돌린 흔적 없음
+
+================================================================
+# 판정 요약 (21행)
+
+| # | 무엇 | 판정 | 핵심 출력 |
+|---|------|------|-----------|
+| 1 | 전체 테스트 | 충족 | 1325 passed (failed 0 · skipped 0), rc=0 |
+| 2 | 회귀 3종 | 충족 | 3 passed, 17 deselected |
+| 3 | D12 grep | 충족 | combine() 102·125행 / _breakdown() 200·210·212행 / _effective_weights() 131행 |
+| 4 | D12 동치 | 충족 | 2 passed (…matches_d3_formula_exactly · …rule_checked_zero_renormalizes_llm_emb_only) |
+| 5 | D13 grep | 충족 | penalized_by 3파일 / excluded_by 대입 2곳, 값 출처 _EXCLUSION_ONLY_CONFLICT 하나 |
+| 6 | 후보 전달 수 | 충족 | 1 passed (test_candidate_count_forwarded_equals_total_minus_dictionary_excluded) |
+| 7 | 보수 분기 스위치 | 충족 | settings.py:94·166 / pipeline.py:116·153 / pytest -k penalized 2 passed |
+| 8 | dry-run | 충족 | rc=0, run_mode=stub network_calls=0, 6단계 rc=0, rows=7050 |
+| 9 | 실 실행 | 충족(인용) | run_mode=real run_id=run-35ae97b5e6ed, rows=7050=141×5×10, tokens_in=132017 out=12681 |
+| 10 | trace 재계산 | 충족 | dumped=1410 recomputed=1410 max_abs_diff=0.0, rc=0 |
+| 11 | 게이트 | 충족 | `0.8 [] True True` |
+| 12 | 두 시나리오 | 충족 | sc-015 t0 deferred · sc-007 t2 deferred (false_merge/miss 목록 모두 빈 리스트) |
+| 13 | 스키마·격자 | 충족 | validate OK rc=0 · 10점 · {'0.3'} · 5 |
+| 14 | eval.md 멱등 | 충족 | diff 0줄 rc=0 |
+| 15 | 허용 파일 | 충족 | 5파일, 허용 목록의 부분집합 |
+| 16 | 데이터 무변경 | 충족 | 0줄 |
+| 17 | 기준선 불변 | 충족 | diff 0줄, metrics 사본 25e16dd6… |
+| 18 | 라벨 무변경 | 충족 | total 40, 5범주 counts 동일, issue_count 0 |
+| 19 | 스키마·툴 무변경 | 충족 | No new upgrade operations detected. · 7/7 ok |
+| 20 | 위험 계측 | 충족(조건) · 부분(명령 원문) | penalized_merge {merges 14, n 0/d 14, relaxed_pass 14, reasons{hierarchy_conflict 14}} — 단 표의 경로 m['proposed']['subsets'] 는 KeyError, 실제는 m['proposed']['by_t_merge']['0.8']['subsets'] |
+| 21 | 재실행 1회 | 충족 | *real-run* 1개 |
+
+미충족: 0행. 부분: 20행(명령 경로 오기 — 산출물·코드 결함 아님, 01-plan 판정 표 정정 필요).
+
+================================================================
+# (d) 카드 10(docs/user-setup/10-pilot-eval-run.md) 확정 점검 — 실제 실행과 어긋나는 곳이 있나
+# 판정 표 21행 밖이지만 U7 (d) 항목이다. 카드의 판정 명령을 그대로 돌린다.
+$ PYTHONUTF8=1 python -c "import json;m=json.load(open('reports/metrics.json'))['meta'];print(m['provider'],m['model'],m['embedding_model'],m['run_mode'],m['commit'])"
+openai gpt-4o-mini-2024-07-18 text-embedding-3-small real f96d15b401a24d31bc49de86a1d2c2e11e593999
+rc=0
+기대(카드): run_mode 가 real 이고 provider/model 이 stub·fake 가 아니다
+판정: 충족
+
+# 카드 ↔ 실제 실행 대조(항목별)
+  (1) evidence 경로 규약 <ts>-u5-real-run.txt      → 실제 20260923-0009-u5-real-run.txt   일치
+  (2) 절차 3 P4b 블록 인자(--out reports/pilot · --commit $(git rev-parse HEAD) · --max-cost-usd 5) → 실제 out=reports\pilot · commit=f96d15b401… · max_cost_usd=5.0   일치
+  (3) 기대 출력 형태 12줄(estimate/run/scenario/traces/rows/gzip/stage/ok) → 실제 출력에 모두 존재   일치
+  (4) [traces] rule=… 예시 문자열 → 위 10행 출력과 글자 그대로 같다   일치
+  (5) 절차 5 산출물 이동(최상위 4파일) + 결정 I 사본 선행 → U5 03-log·20260923-0021-u5-postrun-verify.txt 와 일치
+  (6) 'P4 기준선 trace 는 이 재계산을 통과하지 않는다' → U4 evidence 20260922-2020-u4-known-baseline-effects.txt 와 일치
+  (7) rc 표(0/1/2/3) → 코드 RC_OK/RC_ERROR 경로와 일치(위 9행 판정 보조의 sed 출력)
+확정: 어긋남 없음 — 카드 파일을 고치지 않았다
+
+================================================================
+# U7 이 바꾼 파일 (코드·데이터·reports/ 는 손대지 않았다)
+$ git status --short
+ M README.md
+ M docs/wiki/journal.md
+ M docs/wiki/registry.md
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260923-1214-u7-accept-1.txt
+?? docs/wiki/packages/P4b-er-redesign/evidence/20260923-1214-u7-accept-2.txt
+?? reports/pilot/metrics-stage.json
+?? reports/pilot/raw-20260922-150931.jsonl
+
+$ git diff --stat
+ README.md             |  2 ++
+ docs/wiki/journal.md  |  1 +
+ docs/wiki/registry.md | 44 ++++++++++++++++++++++++--------------------
+ 3 files changed, 27 insertions(+), 20 deletions(-)
+
+$ git diff --name-only -- app/ data/ evaluation/ scripts/ tests/ reports/   (U7 이 이 경로를 고쳤는가)
+→ 0줄이면 U7 은 검증·문서만 했다

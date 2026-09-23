@@ -350,6 +350,8 @@ python scripts/run_pilot_eval.py --recheck-traces reports/pilot/traces-<ts>.json
 
 산출물: `reports/pilot/raw-<ts>.jsonl.gz`(원시 판정, 결정적 gzip — 평문은 커밋하지 않는다) · `reports/pilot/traces-<ts>.jsonl`(er_resolve trace 전량) · `reports/metrics.json`(`gate` 포함) · `reports/calibration.json` · `reports/curve.csv` · `reports/eval.md`(멱등) · `reports/cost_estimate.md`(실측 토큰·150건 외삽) · `reports/failure_cases.md`(미달 시 실패 케이스 분석). 게이트 판정은 `metrics.json.gate`(결정 K: `T_merge` 0.8 에서 어떤 베이스라인도 제안 방식을 지배하지 않고 곡선이 D10 방향) 한 곳에서만 내리고, 미달이면 같은 설정으로 다시 돌리지 않는다.
 
+**P4b 재실행(2026-09-22, 같은 명령·같은 40건)** — 위 P4 문단은 첫 실행 기준선이고 고치지 않는다. 그 실행이 게이트에 미달해(`embedding_only` 가 제안 방식을 지배) CR-001 로 확신도 결합과 규칙 필터를 바꾼 뒤 **한 번만** 다시 돌렸다. 바뀐 것은 둘이다 — **D12 관측 신호 재정규화**: `s_rule` 이 미측정(`rule_checked == 0`)이면 0 으로 합산하지 않고 분모에서 빼 `(0.5·s_llm + 0.3·s_emb)/0.8` 로 계산한다(세 신호가 다 있으면 예전 식과 같은 값). **D13 규칙 필터 감점**: 관계 태그·위계 충돌은 후보를 목록에서 빼지 않고 `penalized_by` 로 감점만 하며, 배제는 호칭 사전 모순일 때만 한다. 감점 후보가 자동 연결 구간에 들어오면 `ER_PENALIZED_MERGE_POLICY=ask`(기본) 가 되묻기로 강등한다. 재실행 stamp 는 `reports/pilot/raw-20260922-150931.jsonl.gz`·`traces-20260922-150931.jsonl` 이고, `reports/` 최상위 4파일(`metrics.json`·`calibration.json`·`curve.csv`·`eval.md`)이 그 결과로 갱신됐다 — 첫 실행 결과는 `reports/pilot/<이름>-20260922-042440.*` 사본으로 그대로 남아 있다. 게이트 결과 한 줄: `gate` 의 `t_merge dominated_by d10_direction pass` 가 **`0.8 [] True True`**(첫 실행은 `0.8 ['embedding_only'] True False`). 전후 비교는 `reports/failure_cases.md` §13, 판정식은 그대로다(우리가 미달한 뒤 기준을 고치지 않았다).
+
 ## 문서 안내
 
 | 알고 싶은 것 | 보는 곳 |
