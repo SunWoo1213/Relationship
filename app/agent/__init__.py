@@ -1,0 +1,75 @@
+"""Refs: P5-loop S3.4 원칙9 -- app/agent 패키지 재export 진입점.
+
+U1 시점에는 `app/agent/types.py` 의 계약 타입·trace 어휘만 있다(01-plan U1
+"코드가 도는 건 아직 없다"). `run_turn`/`resume_turn`(U4 `app/agent/loop.py`)
+은 그 단위가 이 파일에 재export 를 추가한다 -- 아직 존재하지 않는 이름을
+미리 import 하지 않는다(ImportError 방지).
+"""
+
+from __future__ import annotations
+
+from app.agent.types import (
+    BUCKET_EXECUTE,
+    BUCKET_HINT_ONLY,
+    GATE_BUCKETS,
+    LOOP_RESUME_VERSION,
+    LOOP_TRACE_STEPS,
+    LOOP_TRACE_TOOL_NAME,
+    NEW_PERSON_TAG_OPTIONS,
+    STEP_LOOP_ERROR,
+    STEP_LOOP_EXTRACT,
+    STEP_LOOP_GATE,
+    STEP_LOOP_RECORD,
+    STEP_LOOP_RESOLVE_DONE,
+    STEP_LOOP_RESUME,
+    STEP_LOOP_TURN,
+    AcceptedProposal,
+    EventDraft,
+    GateLimits,
+    GateVerdict,
+    LoopError,
+    PendingCall,
+    PendingResume,
+    Proposal,
+    RejectedProposal,
+    ResumeContextError,
+    ResumeInput,
+    ScheduleDraft,
+    ScheduleResumeRef,
+    StoredSummary,
+    ToolCallProposal,
+    TurnResult,
+)
+
+__all__ = [
+    "BUCKET_EXECUTE",
+    "BUCKET_HINT_ONLY",
+    "GATE_BUCKETS",
+    "LOOP_RESUME_VERSION",
+    "LOOP_TRACE_STEPS",
+    "LOOP_TRACE_TOOL_NAME",
+    "NEW_PERSON_TAG_OPTIONS",
+    "STEP_LOOP_ERROR",
+    "STEP_LOOP_EXTRACT",
+    "STEP_LOOP_GATE",
+    "STEP_LOOP_RECORD",
+    "STEP_LOOP_RESOLVE_DONE",
+    "STEP_LOOP_RESUME",
+    "STEP_LOOP_TURN",
+    "AcceptedProposal",
+    "EventDraft",
+    "GateLimits",
+    "GateVerdict",
+    "LoopError",
+    "PendingCall",
+    "PendingResume",
+    "Proposal",
+    "RejectedProposal",
+    "ResumeContextError",
+    "ResumeInput",
+    "ScheduleDraft",
+    "ScheduleResumeRef",
+    "StoredSummary",
+    "ToolCallProposal",
+    "TurnResult",
+]

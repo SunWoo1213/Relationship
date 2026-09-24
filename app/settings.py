@@ -115,6 +115,26 @@ LLM_PROVIDERS_ENABLED_DEFAULT = "anthropic,openai,gemini"
 #: 판정할 위험이 있어 원칙1 의 방향과 반대다).
 ER_TOLERANCE = 1e-9
 
+#: P5-loop 결정 A(i) -- 게이트(U3)가 LLM 제안 목록에 적용하는 상한 4종.
+#: `LOOP_MAX_MENTIONS`/`LOOP_MAX_EVENTS`/`LOOP_MAX_SCHEDULES` 는 초안
+#: 값(언급 5·이벤트 5·일정 3)이고, `LOOP_MAX_PROPOSALS`(R-13, 3차 개정)는
+#: `update_person`/`create_person` 제안까지 포함한 총 제안 수 상한이다 --
+#: 값 13 은 기존 세 상한의 합(5+5+3)에서 파생한 것이고 새 튜닝값이 아니다.
+#: 초과분은 `limit` 사유로 거부되고 `stop_reason="limit"` 가 된다
+#: (`app.agent.types.GateLimits`/`GateVerdict` 가 담는 모양, U1).
+LOOP_MAX_MENTIONS = 5
+LOOP_MAX_EVENTS = 5
+LOOP_MAX_SCHEDULES = 3
+LOOP_MAX_PROPOSALS = LOOP_MAX_MENTIONS + LOOP_MAX_EVENTS + LOOP_MAX_SCHEDULES
+
+#: `pending_questions.context["resume"]`(`app.agent.types.PendingResume`)
+#: 직렬화 바이트 상한 -- 결정 A(i) 의 항목 수 상한이 1차 방어, 이것이
+#: 이중 안전장치다(01-plan M-0 "크기 통제" 절, 판정 표 24행). 초과 시
+#: `held_drafts` 를 버리고 `dropped` 수만 남긴다(`pending_calls` 는
+#: 유지) -- 정확한 채움 규칙은 U4/U5(`app/agent/loop.py`)가 정한다. 이
+#: 값은 초기 추정치이고 P5-loop U8 파일럿 실행에서 다시 확인한다.
+LOOP_MAX_RESUME_BYTES = 8192
+
 
 def er_config(env: dict[str, str] | None = None) -> "ERConfig":
     """`.env.example` 이 이름을 정한 `T_MERGE`/`T_NEW`/`W_LLM`/`W_EMB`/
