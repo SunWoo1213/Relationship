@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: none
+active: P5-loop
 frozen: none
 
 <!--
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- **P5-loop 계획 승인(2026-09-24)** — 01-plan 3차 개정(`7351363`) → verifier 3차 02-plan-verify **통과**(점검표 8/8, [필수] 0, verify-plan FAIL 0/WARN 8, 권고 R-20~R-27). `승인:` 줄은 F 6종·A 게이트 적용·총 제안 상한 `LOOP_MAX_PROPOSALS = 13` 을 포함한다(R-10·R-13). 승인 커밋에서 backlog P5 세분화 줄 개정(R-9)·01-plan M-3 안 B 잔존 문장 정리(R-21)를 했다. 확정 L(iii)·M-0·M-1(d)·M-2(i)·M-3 안 A. U1 부터 backend-agent(L-004 — 매번 승인). R-22·R-23·R-24 는 U2·U3·U5 03-log 에서 정한다.
 - **FIX-001 완료(2026-09-23)** — 갈라진 `main`(6커밋, 갈림점 `3c6108d`)을 dev 로 병합. 충돌은 `README.md` 1건뿐이었고 **양쪽 보존**으로 해소(main 본문 바탕 + dev 의 진행 표 P4·P4b 행과 `### 파일럿 평가 실행법 (P4)` 절). 회귀 1325 passed(skip 0) · verify-impl FAIL 0/WARN 0. 병합 커밋 `e2f0569` → dev 푸시 → 사용자 승인 → `git push origin dev:main`(ff) → **네 갈래 모두 `e2f0569`**. 승격 근거는 실서버가 아니라 pytest·게이트다(P9 미착수, 2026-09-15 과 같은 결정). **L-nnn 후보**: main 직접 커밋을 막는 장치가 없다 — 훅은 이 세션의 dev 푸시만 강제한다. 재발 방지는 GitHub 브랜치 보호 규칙(저장소 설정, 사용자 몫). **다음은 P5.**
 - **P4b-er-redesign 완료(2026-09-23, verifier 04-review `완료`, 사용자 승인)** — verify-impl FAIL 0/WARN 1(01-plan 체크박스 표기), 수용 기준 16행 전부 충족, 부정 케이스 18건, 열린 [필수] 0. **게이트 `0.8 [] True True`**(T_merge 0.8 에서 오병합 0/132·미검출 0/132, 베이스라인 4종 모두 미지배, F1 0.8972, 되묻기 31건 23.5%, $0.0274). verifier 가 원시 지표에서 독립 재계산해 `metrics.json.gate` 와 일치 확인. U0 83d33dd·U1 85ceda7·U2 08bda7c·U3 dbcfca0·U4 b5b412c·U5선행 a8faa81·U5 855a26b·U6 4338eea·U7 cf5a171. **한계(판정에 박음)**: 40건·1회 실행이고 실행 간 `s_llm` 자기보고가 136 mention 중 60건 달라 게이트 개선을 D12·D13 단독 효과로 분해할 수 없다. 보수 강등 5건은 전부 귀속이 골드였다(막은 오병합 0). **P5 착수 가능.** 남은 [권고]: 판정 표 20행 경로 오기(01-plan 111행), 03-log Refs R8 어휘 충돌(L-nnn 후보), main 병합 작업 단위.
 - P4b-er-redesign 계획 승인(2026-09-22, architect 초안 → 사용자 결정 A~I 권장 조합 → verifier 02-plan-verify 통과 FAIL 0/WARN 22 의도, 점검표 8/8, 사실 주장 6/6, 보류 0, 권고 R-1~R-9). U0 은 메인 세션(SKILL.md 정합, R-7), U1~U3 backend-agent(app/er 5파일 + er_smoke.py), U4~U7 eval-agent, U5 실 실행은 사용자(새 stamp, 기준선 stamp 사본 선커밋), 04-review verifier. **U4→U5 순서 필수.** 결정 A(i) ask 강등+relaxed_pass 예외·B ER_PENALIZED_MERGE_POLICY·C 완화 트리거 "감점 없는 후보 0"·D recheck weights_effective·E $5/1회·F 결정 K 불변·G §13·H meta 2키·I stamp 사본. P5 는 04-review 게이트 통과 후.

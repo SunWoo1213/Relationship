@@ -560,9 +560,9 @@ WARN  registry 에 다른 패키지로 이미 있음: inspect.signa → | 스크
 ```
 
 ### 원인 분석
-- 가설:
-- 확인 방법(명령):
-- 확인 결과:
+- 가설: 하네스 결함(02-plan-verify 2차 R-19). `verify-plan.sh` 7절의 토큰 정규식이 01-plan "산출물" 절 문장 속 `inspect.signature` 를 산출물 **경로**로 오인해 5자 확장자 규칙으로 `inspect.signa` 를 만들고, 그 가짜 토큰이 registry 의 `scripts/tools_check.py` 행 비고("`inspect.signature` 대조")에 `grep -F` 부분 일치한다. 계획 결함이 아니다 — `app/agent/gate.py` 가 `inspect.signature` 를 **호출**한다는 문장이지 그 이름의 파일을 만드는 것이 아니다.
+- 확인 방법(명령): ① `sed -n '98p' .claude/scripts/verify-plan.sh` ② `awk '/^## 산출물/{f=1;next} /^## /{f=0} f && /^- /{sub(/^- /,""); print}' docs/wiki/packages/P5-loop/01-plan.md | grep -oE '[A-Za-z0-9_./-]+[.][a-z]{1,5}' | sort -u` ③ `grep -n 'inspect.signa' docs/wiki/registry.md` ④ `grep -n 'inspect.signature' docs/wiki/packages/P5-loop/01-plan.md | head -3`
+- 확인 결과(verifier 3차, 2026-09-24): ① `grep -oE '[A-Za-z0-9_./-]+[.][a-z]{1,5}'` — 확장자 자리를 소문자 1~5자로 잡아 `signature` 가 `signa` 에서 잘린다. ② 22 토큰 중 실재 경로가 아닌 것 4: `app.tools`·`dataclasses.repla`·`extract.py`·`inspect.signa`(뒤 셋은 절단·옛 이름). ③ registry 67행 `| 스크립트 | 툴 시그니처 기계 검증 | scripts/tools_check.py | P2-tools | f2e9e05 | … \`inspect.signature\` 대조` 에만 일치. ④ 01-plan 60행(산출물 절 `app/agent/gate.py` 항목 "`inspect.signature` 인자 대조")이 토큰의 출처. → 산출물 경로 중복 아님. 해결은 이 패키지 밖(하네스 FIX 후보 — 정규식을 실재 파일 확장자 목록 또는 `[ -e "$ROOT/$o" ]` 검사로 좁힌다). 이 패키지에서는 조치 없음, 04-review 가 registry 에 `inspect.signa` 행이 생기지 않았음을 확인하면 닫는다.
 
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |

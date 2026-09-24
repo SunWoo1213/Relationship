@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-24 20:10 — **FIX-003 커밋 `20c2d7e`, verifier 가 에이전트 목록에 다시 나타남(재시작 불필요). 남은 것: P5-loop 3차 개정 문서 커밋 → verifier 3차 위임.** 이전: **사용자 결정: P5-loop 2차 보류는 (a) 범위 묶은 3차 개정으로 푼다.** 남은 [권고]는 P5 끝날 때까지 보류. 이 세션은 새 클론(`main` 7eaf1f6)에서 시작해 `dev`(= `origin/dev` f5fde31)로 전환했다. Docker 꺼짐.
+갱신: 2026-09-24 21:10 — **P5-loop 계획 승인·활성화(active: P5-loop).** verifier 3차 02-plan-verify 통과(점검표 8/8, [필수] 0, evidence `20260924-2051-verify-plan-4.txt` FAIL 0/WARN 8) → 사용자 승인(2026-09-24) — `승인:` 줄에 F 6종·A 게이트 적용·총 제안 상한 `LOOP_MAX_PROPOSALS = 13`(R-10·R-13). 같은 승인 커밋에서 backlog P5 세분화 줄(U1~U8, L(iii)·M-1(d)·M-2(i)·M-3 안 A·상한 13, R-9)과 01-plan M-3 안 B 잔존 문장(R-21) 정리, 03-log 생성, journal START. **다음 = /commit(계획 승인 커밋) → dev 푸시(L-003, 커밋 `20c2d7e`·`7351363` 도 함께 미푸시) → 멈춤. 사용자 결정 뒤 U1(backend-agent, L-004 매번 AskUserQuestion + `approve-commit.sh --stage backend-agent`).** U1 위임 프롬프트: 패키지 P5-loop, 01-plan U1 절, 카드 S3.4·D1·D2·D12·D13, evidence 경로 `docs/wiki/packages/P5-loop/evidence/`. R-22·R-23·R-24 는 U2·U3·U5 03-log 에서 한 줄씩. 루트의 빈 파일 `Usersswsj1.claudesettings.json` 은 사용자 요청으로 삭제했다(커밋 대상 아님). Docker 꺼짐 — U1 테스트 전에 DB(5433) 기동 필요.
 
 **이번 세션에 끝난 것**: P4b-er-redesign 종료(게이트 통과, `1075dd6`) → FIX-001 main 병합·승격(`e2f0569`, 네 갈래 동기화) → FIX-001 마무리(`1227026`) → FIX-002 게이트 검사(`cf82868`).
 

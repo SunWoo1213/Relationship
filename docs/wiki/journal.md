@@ -237,3 +237,6 @@
 - 2026-09-24 19:55 | NOTE | 사용자 요청으로 위키 기록 누락 점검: journal 에 오늘치 없음(HANDOFF 에만 있었다), FIX-003 미작성, 메인 세션 실수 3건이 HANDOFF 에만 있음, L-nnn 후보 흩어짐 → 네 가지 모두 보강(사용자 선택) | L-005 FIX-003
 - 2026-09-24 20:23 | NOTE | FIX-003 확인: 같은 세션에서 에이전트 목록이 갱신되어 verifier 가 다시 나타남(재시작 불필요) | FIX-003
 - 2026-09-24 20:24 | COMMIT | 20c2d7e harness(FIX-003): verifier 가 콜론 하나 때문에 조용히 사라져 있었다
+- 2026-09-24 20:30 | COMMIT | 7351363 docs(P5-loop): 3차 개정 — 2차 보류 세 건만 고치고 범위를 넓히지 않았다
+- 2026-09-24 20:53 | VERIFY | P5-loop 02-plan-verify 3차(verifier, fable) **통과** — H-1·H-4·H-5 해소, 점검표 8/8, [필수] 0, 새 권고 R-20~R-27. verify-plan FAIL 0/WARN 8 | P5-loop evidence/20260924-2051-verify-plan-4.txt
+- 2026-09-24 21:10 | START | P5-loop 계획 승인(사용자) — 02 승인 줄(F 6종·A 게이트 적용·총 제안 상한 13 포함), CURRENT active, 03-log 생성. R-9 backlog P5 세분화 줄·R-21 01-plan M-3 안 B 잔존 문장 반영. U1 부터 backend-agent(L-004 매번) | P5-loop R6 R7 D1 D2 S3.4 L-002 L-004
