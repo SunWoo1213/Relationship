@@ -2,12 +2,26 @@
 
 U1 시점에는 `app/agent/types.py` 의 계약 타입·trace 어휘만 있었다(01-plan
 U1 "코드가 도는 건 아직 없다"). U2 가 인식 단계(`app/agent/propose.py`)를
-더한다 -- `run_turn`/`resume_turn`(U4 `app/agent/loop.py`)은 아직 없으므로
-그 이름은 미리 import 하지 않는다(ImportError 방지).
+더했고, U3 가 게이트(`app/agent/gate.py`)를 더한다 -- `run_turn`/
+`resume_turn`(U4 `app/agent/loop.py`)은 아직 없으므로 그 이름은 미리
+import 하지 않는다(ImportError 방지).
 """
 
 from __future__ import annotations
 
+from app.agent.gate import (
+    GATE_REJECTION_REASONS,
+    INJECTED_ARGS,
+    NOT_CALLABLE_BY_LLM,
+    REASON_BAD_ARGS,
+    REASON_LIMIT,
+    REASON_NEEDS_CONFIRMATION,
+    REASON_NOT_CALLABLE_BY_LLM,
+    REASON_PERSON_ID_FROM_LLM,
+    REASON_UNKNOWN_TOOL,
+    GateConfig,
+    check,
+)
 from app.agent.propose import (
     PROPOSAL_ARG_SCHEMA,
     PROPOSAL_SCHEMA,
@@ -56,6 +70,17 @@ from app.agent.types import (
 )
 
 __all__ = [
+    "GATE_REJECTION_REASONS",
+    "INJECTED_ARGS",
+    "NOT_CALLABLE_BY_LLM",
+    "REASON_BAD_ARGS",
+    "REASON_LIMIT",
+    "REASON_NEEDS_CONFIRMATION",
+    "REASON_NOT_CALLABLE_BY_LLM",
+    "REASON_PERSON_ID_FROM_LLM",
+    "REASON_UNKNOWN_TOOL",
+    "GateConfig",
+    "check",
     "PROPOSAL_ARG_SCHEMA",
     "PROPOSAL_SCHEMA",
     "PROPOSAL_TOOL_NAME",

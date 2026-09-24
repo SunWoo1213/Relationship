@@ -1,0 +1,41 @@
+=== POSTGRES_PORT=5433 python -m pytest tests/test_agent_gate.py -q ===
+................................                                         [100%]
+32 passed in 0.24s
+
+=== grep -rn 'T_merge|t_merge|T_new|t_new|confidence' app/agent/  (기대: 0건) ===
+(0건)
+
+=== grep -rnE -B1 'create_person\(' app/agent/  (기대: U3 시점 0건 -- 재개 경로는 U7 몫) ===
+(0건)
+
+=== grep -rnE 'update_person\(' app/agent/  (기대: U3 시점 0건) ===
+(0건)
+
+=== grep -rnE 'time\.sleep|asyncio\.sleep|while True' app/agent/ app/api/ (기대: 0건) ===
+(0건)
+
+=== python scripts/tools_check.py (기대: 7/7 ok, 툴 시그니처 무변경) ===
+[ok] search_person: CLAUDE.md (query, hints?) == actual (ctx, query, hints=None)
+[ok] create_person: CLAUDE.md (display_name, aliases, relation_tag, hierarchy) == actual (ctx, display_name, aliases, relation_tag, hierarchy)
+[ok] update_person: CLAUDE.md (person_id, facts?, new_alias?, display_name?) == actual (ctx, person_id, facts=None, new_alias=None, display_name=None)
+[ok] add_event: CLAUDE.md (person_id, type, content, occurred_at, raw_utterance) == actual (ctx, person_id, type, content, occurred_at, raw_utterance)
+[ok] add_schedule: CLAUDE.md (person_id, title, scheduled_at) == actual (ctx, person_id, title, scheduled_at)
+[ok] get_briefing: CLAUDE.md (person_id, schedule_id?) == actual (ctx, person_id, schedule_id=None)
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+
+=== POSTGRES_PORT=5433 python -m alembic check (기대: No new upgrade operations detected.) ===
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+No new upgrade operations detected.
+
+=== git status --short app/ tests/ (U3 신규/변경 파일) ===
+ M app/agent/__init__.py
+?? app/agent/gate.py
+?? tests/test_agent_gate.py
