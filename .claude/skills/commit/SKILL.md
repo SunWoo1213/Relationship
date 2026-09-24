@@ -28,7 +28,7 @@ diff를 `docs/wiki` 카드와 대조한다 — devlog 스킬의 점검표 1~4, 8
 형식(고정):
 
 ```
-<type>(<scope>): <제목, 50자 이내, 한국어 가능>
+<type>(<scope>): <제목, 50자 이내, 한국어>
 
 변경:
 - <파일/모듈 단위로 무엇이 바뀌었나>
@@ -41,6 +41,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
 Claude-Session: <이 세션의 URL>
 ```
 
+- **언어: 한국어.** 제목·본문(변경·이유·정합성·검증)과 `03-log.md`·`HANDOFF.md`·`journal.md` 항목은 한국어 문장으로 쓴다. 원문 그대로 두는 것: `type` 접두어, 코드 식별자·파일 경로·명령어·태그(Refs), `Co-Authored-By` 서명 줄.
 - `type`: `feat` `fix` `test` `docs` `eval` `refactor` `chore` `harness`(하네스·훅·스킬·위키) `cr`(기획서 변경 이행)
 - `scope`: 패키지 id(`P3-er`) 또는 영역(`wiki`, `hooks`, `schema`). CURRENT의 active와 다르면 이유를 이유 줄에 쓴다.
 - 제목 줄은 `commit-cleanup.sh`가 HEAD 제목과 비교하므로 초안 첫 줄과 실제 커밋 제목이 같아야 한다(`-F`로 넣으면 자동으로 같다).

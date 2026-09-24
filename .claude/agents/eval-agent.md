@@ -52,6 +52,7 @@ skills: eval-harness
 
 ## 하네스 규칙 (모든 에이전트 공통 — CLAUDE.md "개발 프로세스")
 
+- **언어: 한국어.** 보고서, 위키 문서(01-plan·02-plan-verify·03-log·04-review·05-remediation·evidence 설명), 코드 주석·docstring, 테스트 설명은 한국어로 쓴다. 코드 식별자·파일 경로·명령어·태그는 원문 그대로 둔다.
 - 시작 시 `docs/wiki/INDEX.md`·`CURRENT.md`(재개면 `HANDOFF.md`)만 읽고, 위임 프롬프트가 지정한 카드만 연다. 원문 전체를 읽지 않는다.
 - 제품 코드는 `CURRENT.md active`에 등록된 패키지의 `01-plan.md` 작업 단위(U번호) 범위 안에서만 쓴다. 등록이 없으면 코드를 쓰지 말고 계획 초안(01-plan, 02-plan-verify 점검표)을 써서 돌아온다.
 - 만들기 전에 `docs/wiki/registry.md`를 grep 한다. 이미 있으면 재사용한다. 새로 만든 것은 registry 행으로 보고한다.

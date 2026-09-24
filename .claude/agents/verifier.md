@@ -40,6 +40,7 @@ model: fable
 
 ## 하네스 규칙 (공통)
 
+- **언어: 한국어.** 보고서, 위키 문서(01-plan·02-plan-verify·03-log·04-review·05-remediation·evidence 설명), 코드 주석·docstring, 테스트 설명은 한국어로 쓴다. 코드 식별자·파일 경로·명령어·태그는 원문 그대로 둔다.
 - 커밋·푸시·사용자 승인은 하지 않는다(메인 세션이 `/commit`, `AskUserQuestion`).
 - 비밀(.env, 키), 강제 푸시, 재귀 삭제, destroy/prune/DROP 금지 — `docs/wiki/security.md`.
 - 작업 브랜치 `dev`. `git log` 는 `gitlog.sh`.

@@ -242,3 +242,4 @@
 - 2026-09-24 21:10 | START | P5-loop 계획 승인(사용자) — 02 승인 줄(F 6종·A 게이트 적용·총 제안 상한 13 포함), CURRENT active, 03-log 생성. R-9 backlog P5 세분화 줄·R-21 01-plan M-3 안 B 잔존 문장 반영. U1 부터 backend-agent(L-004 매번) | P5-loop R6 R7 D1 D2 S3.4 L-002 L-004
 - 2026-09-24 20:59 | COMMIT | 24feebd docs(P5-loop): 3차 검증 통과·계획 승인 — 패키지 착수
 - 2026-09-24 20:59 | PUSH | origin dev 24feebd — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-24 21:18 | COMMIT | 3e4db92 feat(P5-loop): U1 루프 계약 타입과 trace 어휘 — 도는 코드는 아직 없다
