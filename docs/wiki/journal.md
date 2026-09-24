@@ -236,3 +236,4 @@
 - 2026-09-24 19:50 | FIX | **FIX-003** — 원인: `.claude/agents/verifier.md` description 의 `L-002: ` 콜론이 YAML frontmatter 파싱을 깨뜨려(`mapping values are not allowed here`) 에이전트가 조용히 로드되지 않았다. `L-002 —` 로 수정. 같은 세션에서는 목록이 다시 읽히지 않아 세션 재시작 필요 | FIX-003 L-002
 - 2026-09-24 19:55 | NOTE | 사용자 요청으로 위키 기록 누락 점검: journal 에 오늘치 없음(HANDOFF 에만 있었다), FIX-003 미작성, 메인 세션 실수 3건이 HANDOFF 에만 있음, L-nnn 후보 흩어짐 → 네 가지 모두 보강(사용자 선택) | L-005 FIX-003
 - 2026-09-24 20:23 | NOTE | FIX-003 확인: 같은 세션에서 에이전트 목록이 갱신되어 verifier 가 다시 나타남(재시작 불필요) | FIX-003
+- 2026-09-24 20:24 | COMMIT | 20c2d7e harness(FIX-003): verifier 가 콜론 하나 때문에 조용히 사라져 있었다

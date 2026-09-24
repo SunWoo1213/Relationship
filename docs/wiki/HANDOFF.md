@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-23 17:20 (**세션 중단** — P5-loop 계획이 2차 보류인 상태에서 사용자가 중단을 결정했다. 재개하면 아래 1번부터.)
+갱신: 2026-09-24 20:10 — **FIX-003 커밋 `20c2d7e`, verifier 가 에이전트 목록에 다시 나타남(재시작 불필요). 남은 것: P5-loop 3차 개정 문서 커밋 → verifier 3차 위임.** 이전: **사용자 결정: P5-loop 2차 보류는 (a) 범위 묶은 3차 개정으로 푼다.** 남은 [권고]는 P5 끝날 때까지 보류. 이 세션은 새 클론(`main` 7eaf1f6)에서 시작해 `dev`(= `origin/dev` f5fde31)로 전환했다. Docker 꺼짐.
 
 **이번 세션에 끝난 것**: P4b-er-redesign 종료(게이트 통과, `1075dd6`) → FIX-001 main 병합·승격(`e2f0569`, 네 갈래 동기화) → FIX-001 마무리(`1227026`) → FIX-002 게이트 검사(`cf82868`).
 
@@ -24,7 +24,7 @@
 **메인 세션이 이번에 틀렸던 것(같은 실수 반복 금지)**: ① 결정 L 을 설명할 때 원칙1·4 와 CLAUDE.md 만 보고 **`docs/proposal.md` 72행을 확인하지 않았다** — 권위 문서는 침묵했어도 기획서를 직접 열었어야 했다. ② `FIX-002.md` 에 evidence 파일명을 손으로 적어 틀렸다(1518 → 실제 1526, 정정 완료). ③ stage-gate 훅은 거절할 때도 **exit 0** 이고 판정이 출력 JSON 에 있다 — 종료 코드로 읽어 "가드가 안 막는다"고 잘못 봤다가 정정했다.
 
 **커밋 메시지는 사람이 읽는 문장 형식(사용자 지시) 계속 적용.**
-active: **none**(P5-loop 은 아직 활성화 전 — 02-plan-verify 통과 + 사용자 승인 뒤에 `active: P5-loop`) | frozen: none | P4b-er-redesign **완료** · FIX-001 **완료** · FIX-002 **완료** | 브랜치: dev — **로컬이 `origin/dev`(e2f0569) 보다 2커밋 앞선다**: `1227026`(FIX-001 마무리) · `cf82868`(FIX-002). `main` = `origin/main` = `e2f0569`. **푸시하지 않았다** — 푸시하면 L-003 마커가 서서 verifier 다음 단계를 바로 못 잇기 때문이고, P5 계획 승인까지 마친 뒤 한 번에 올린다. Docker `capstone2-postgres-1` 5433. 미추적 2파일(`reports/pilot/raw-20260922-150931.jsonl` 평문 7.7MB·`metrics-stage.json`)은 **의도적으로 커밋하지 않는 것**이니 지우지 않는다.
+active: **none**(P5-loop 은 아직 활성화 전 — 02-plan-verify 통과 + 사용자 승인 뒤에 `active: P5-loop`) | frozen: none | P4b-er-redesign **완료** · FIX-001 **완료** · FIX-002 **완료** | 브랜치: dev = `20c2d7e`(+ 3차 개정 문서 커밋 예정), `origin/dev` = `f5fde31` — **미푸시 커밋 있음**. `origin/main` = `7eaf1f6`(GitHub PR #1 로 dev 병합 — 웹 UI 경로). 로컬은 새 클론. Docker `capstone2-postgres-1` 5433 healthy(2026-09-24 사용자가 켬). `.claude/settings.local.json` = 사용자가 적용한 확장 허용 목록(읽기·파일 조작·git add/fetch·pytest·ruff·docker 조회·프로젝트 스크립트, gitignore. rm·push·commit·curl·`python *` 은 제외) — 미추적 평문 raw 는 없다(`reports/pilot/raw-*.jsonl.gz` 는 추적됨).
 
 ## 지금 어디까지
 - **완료**: P1·P2·P3(er·baselines·llm-providers)·P4(부분완료, 게이트 미달)·**P4b(게이트 통과)**·FIX-001(main 병합·승격)·FIX-002(게이트 검사). 전부 04-review `결과: 완료` 또는 FIX `## 상태: 완료`.
@@ -34,23 +34,17 @@ active: **none**(P5-loop 은 아직 활성화 전 — 02-plan-verify 통과 + �
 - **로컬 환경**: Docker `capstone2-postgres-1` 호스트 5433. 명령 앞 `POSTGRES_PORT=5433`, 한글 출력 `PYTHONIOENCODING=utf-8`, JSON 한 줄 명령 `PYTHONUTF8=1`. `.env` 의 `DATABASE_URL` 이 `POSTGRES_PORT` 보다 우선한다(`app/config.py`). evidence 를 python 으로 읽을 때 `errors="replace"`(cp949 혼입). 설치: anthropic 1.4.0·openai 2.33.0·google-genai 2.23.0.
 
 ## 바로 다음에 할 것 (순서대로)
-1. **[재개 첫 질문] 2차 보류를 어떻게 풀지 사용자에게 먼저 묻는다.** 네 안을 그대로 다시 보인다 — (a) **3차 개정, 범위를 묶어서**(architect 에 H-1·H-4·H-5 + R-9~R-17 **만** 고치게 하고 새 단위·새 판정 행 추가 금지) / (b) **판정 표를 줄인다**(27행은 과하다. 수용 기준 직결 행만 남기고 나머지는 구현 중) / (c) **보류를 [권고]로 내리고 승인**(빠르지만 틀린 판정 방법으로 착수하게 된다) / (d) 메인 세션이 직접 고친다(L-002 이탈). **(a) 를 권했다.** 원칙8 "재시도 남발 금지" 를 의식할 지점이다 — 1차 3건 → 2차 3건(2건 신규), 계획이 커지며 결함이 계속 나온다.
-2. 정하면 그 뒤는 **L-004 승인 → `--stage <에이전트>` 마커 → Agent 1회** 순서. 3차도 보류면 멈추고 다시 의논한다.
-3. 통과 뒤: 사용자 계획 승인 → `02-plan-verify.md` `승인: 사용자 (날짜)` → `CURRENT.md active: P5-loop` → `03-log.md` 생성 → `journal.md` START → 계획 문서 커밋 → **U1 착수**(backend-agent, L-004 매번).
-4. **미푸시 3커밋**: `1227026`(FIX-001 마무리) · `cf82868`(FIX-002) · 이번 계획 기록 커밋. `origin/dev` = `e2f0569`. 푸시하면 L-003 마커가 서므로 재개 시 승격/보류를 묻게 된다.
-5. 남은 [권고]: R-19 `verify-plan.sh` 7절 정규식(하네스, P5 밖) · `test-guards.sh` 옛 경로 13곳 · P4b 01-plan 111행 경로 오기 · 03-log `Refs: R8` 어휘 충돌 · registry 133행 `U6(pending)` · `verify-impl.sh` 6번 완화 · 러너 `safe_summary` FIX · 09 카드 §2 결정 10개 · anthropic·gemini 스모크 · F-46f1eb·F-036185.
-6. **P10 인계**(P4b 04-review §7): 결정 A(i) 비용 재측정 · `s_llm` 60/136 변동 때문에 2회 실행 여부 · `T_merge`/`T_new` 운영값 · 다음 실 실행은 `2>&1 | tee` + `echo "rc=$?"` 까지.
-2. **사용자 계획 승인**(AskUserQuestion) → `02-plan-verify.md` 에 `승인: 사용자 (날짜)` → `CURRENT.md` `active: P5-loop` → `03-log.md` 생성 → `journal.md` `START` → **계획 문서 커밋**.
-3. **미커밋 잔여 정리 + dev 푸시** — 계획 승인 커밋까지 묶어 `1227026`·`cf82868` 과 함께 한 번에 올린다. 푸시 뒤 L-003 결정을 묻고 멈춘다.
-4. **U1 착수** — backend-agent 위임(L-004 매번). 단위는 U1~U7, 각 단위 끝에 `/commit`. **U1 은 확정 12건을 전제로 한다.**
-5. 남은 [권고]: `test-guards.sh` 옛 경로 13곳(별도 단위) · P4b 01-plan 111행 판정 표 20행 경로 오기 · 03-log `Refs: R8` 어휘 충돌 · registry 133행 `U6(pending)` 은 P4-pilot-eval 소속 · `verify-impl.sh` 6번 완화 여부 · 러너 `safe_summary` FIX · 09 카드 §2 결정 10개 · anthropic·gemini 스모크 · F-46f1eb·F-036185.
-6. **P10 인계**(P4b 04-review §7): 결정 A(i) 비용 재측정 · 실행 변동성(`s_llm` 60/136) 때문에 2회 실행 여부 · `T_merge`/`T_new` 운영값 확정 · 다음 실 실행은 `2>&1 | tee` + `echo "rc=$?"` 까지 남긴다.
+1. **[진행 중] P5-loop 3차 개정 — 사용자 결정 (a) (2026-09-24).** architect 3차 개정 **끝남**(01-plan 327→약 393행, 판정 표 27→29행: 5a/5b 분할·28행 M-1(d) 부정 신설, 새 미결 **M-3** = 힌트가 있어도 `new_person` 에서 태그를 묻는가, 안 A 권장). 메인 세션: Refs 가 U1·U4 이어지는 줄로 밀려 FAIL 2 → 첫 줄로 옮김(내용 불변) → `evidence/20260924-1940-verify-plan.txt`(FAIL 2) → `…-verify-plan-2.txt` **FAIL 0 / WARN 8**(registry 기존 행 7 의도 + `inspect.signa` = R-19 하네스 버그). findings: F-25b70f(R-18)·F-d61978·F-9c9410 해소, 열림 8·필수 0. **M-3 = 안 A 확정(사용자 2026-09-24, 01-plan 에 기록만 · 안 B 괄호 무효 한 줄) → `verify-plan-3.txt` FAIL 0/WARN 8 → verifier 3차 시작 승인(사용자) + `--stage verifier` 마커 생성 → 그러나 Agent 호출이 `Agent type 'verifier' not found` 로 실패****원인 확정(다음 세션)**: `.claude/agents/verifier.md` description 의 `L-002: ` 콜론이 YAML frontmatter 파싱을 깨뜨려 에이전트가 로드되지 않았다(`yaml.safe_load` → `mapping values are not allowed here`). `L-002 —` 로 고침 → FIX-003 `20c2d7e`. 잠시 뒤 같은 세션에서 목록이 갱신되어 verifier 가 다시 나타났다. 실패한 호출은 마커를 소모한다(CANDIDATES C-5). **다음: 3차 개정 문서 커밋 → 재승인·마커 → verifier 3차 위임.** 위임 프롬프트: 2차 판정을 `2차·` 접두로 보존, 새 §1~§4 = 3차, evidence `20260924-1940/‑2/1943-verify-plan-3`, H-1·H-4(a~e)·H-5·R-9~R-17·범위 준수 판정, 승인 줄 금지. 승인 때 R-10 승인 줄(F 6종·A 게이트·총 상한)·R-13 값 13 도 확인. **3차도 보류면 멈추고 다시 의논**(원칙8).
+2. 통과 뒤: 사용자 계획 승인 → `02-plan-verify.md` `승인: 사용자 (날짜)` → `CURRENT.md active: P5-loop` → `03-log.md` 생성 → `journal.md` START → 계획 문서 `/commit` → dev 푸시(L-003 결정) → **U1 착수**(backend-agent, L-004 매번). U1 전 Docker 켜기 요청.
+2b. **완료**: 위키 기록 보강 + FIX-003 → `20c2d7e`(journal 오늘치 · FIX-003 · L-005 · CANDIDATES C-1~C-7 · test-guards frontmatter 절). Bash 허용 목록은 사용자가 `.claude/settings.local.json` 에 적용했다. 문서 수정은 Edit 도구로 한다(`python -` stdin 방식은 읽기 차단 설정 때문에 매번 확인창이 뜬다).
+3. **보류(사용자 결정 2026-09-24, P5 끝날 때까지)**: R-19(`verify-plan.sh` 7절 정규식, 하네스) · `test-guards.sh` 옛 경로 13곳 · P4b 01-plan 111행 경로 오기 · 03-log `Refs: R8` 어휘 충돌 · registry 133행 `U6(pending)` · `verify-impl.sh` 6번 완화 · 러너 `safe_summary` FIX · 09 카드 §2 결정 10개 · anthropic·gemini 스모크 · F-46f1eb·F-036185 · L-nnn 후보(main 직접 병합 — PR #1 도 웹 경로였다, GitHub 브랜치 보호는 사용자 몫).
+4. **P10 인계**(P4b 04-review §7): 결정 A(i) 비용 재측정 · `s_llm` 60/136 변동 때문에 2회 실행 여부 · `T_merge`/`T_new` 운영값 · 다음 실 실행은 `2>&1 | tee` + `echo "rc=$?"` 까지.
 
 ## 재개 시 읽을 카드 (이것만)
 - `packages/P5-loop/01-plan.md`(작업 단위 U1~U7, **리스크·미결 절 머리의 확정 12건**, 판정 방법 표), `02-plan-verify.md` §2·권고, `05-remediation.md`(열린 8건 = 필수 1 + 권고 7)
 - `decisions/D01`·`D02`(코드에서 지켜야 할 것), `specs/S3.4`·`S3.2`·`S3.3`, `docs/backlog.md` "P5" 절
 - `docs/wiki/fixes/FIX-002.md`(게이트 검사 수정 근거), `docs/wiki/CURRENT.md`, `.claude/gitlog.md`
-- `lessons/L-001`~`L-004`
+- `lessons/L-001`~`L-005`, `lessons/CANDIDATES.md`
 
 ## 열린 질문 · 사용자 결정 대기
 - **[최우선] P5-loop 2차 보류를 어떻게 풀 것인가** — 네 안(3차 개정 범위 묶기 / 판정 표 축소 / 보류를 권고로 내리고 승인 / 메인 세션이 직접 수정). 재개 시 첫 질문이다. ~~main 갈라짐~~ 은 FIX-001 로 해소됐다(네 갈래 모두 `e2f0569`).
