@@ -31,9 +31,16 @@
 - 남은 것 · 다음 단위: U3 에서 정한 것 — **R-23**: `occurred_at`·`scheduled_at` 은 None·누락이면 "미확정"으로 통과(U5 가 결정 K(i) 로 되묻기), 값이 있는데 datetime 이 아니면 `bad_args`. 상한은 ①②④③ 통과 후보에만 적용(이미 거부된 것은 세지 않음), 언급 수는 `args.person` 서로 다른 값(create_person 제외). `GateLimits` 는 그 턴의 실제 개수가 아니라 적용된 설정값. `NOT_CALLABLE_BY_LLM` 은 propose.py 의 안내용 목록과 별도(강제용). **R-25 (ㄱ) 힌트↔언급 매칭 규칙은 U4 로 넘김.** 다음 = U4 해석 단계(backend-agent, L-004). U4 전에 R-25 (ㄴ) `held_drafts` 규칙도 정한다.
 - Refs: P5-loop S3.4 D1 D2 원칙1 원칙4 원칙9
 
-## 2026-09-24 23:10 · feat(P5-loop): U4 해석 단계 — 언급을 인물에 잇고, 애매하면 되묻고 멈춘다 · pending
+## 2026-09-24 23:10 · feat(P5-loop): U4 해석 단계 — 언급을 인물에 잇고, 애매하면 되묻고 멈춘다 · 7a2ec5c
 - 변경: `app/agent/loop.py` 신규(해석 구간 — `resolve_mentions`, 되묻기 전 context 확장 두 갈래, 재개 데이터 크기 상한, `loop_resolve_done` trace). `run_turn`·`resume_turn` 은 U5 자리로 비움. `tests/test_agent_loop.py` 10개. 01-plan U4 [x]. evidence `20260924-2216-U4-pytest.txt`.
 - 이유(기획서·카드 연결): 01-plan U4, 결정 C·D·E·M-0·M-1(d)·M-3 안 A, D2(비동기 대기 질문으로 턴 종료).
 - 정합성 확인: 원칙 1·2·4(ER 의 band 문자열로만 분기, 확신도·임계치 참조 0건) / D1 D2 D12 D13 / S3.3 S3.4 / 보안 — 위반 없음. 루프가 pending_questions 를 직접 쓰지 않음. 전체 1448 passed.
 - 남은 것 · 다음 단위: U4 에서 정한 것 — **R-25 (ㄱ)** `create_person` 힌트는 `display_name`·`aliases` 가 언급 문자열과 완전히 같을 때만 붙는다(아니면 버림 — M-3 안 A 로 태그는 답에서 오므로 저장 결과 불변, 힌트는 hierarchy 에만). **R-25 (ㄴ)** `pending_calls` 는 재개 재실행 근거라 버리지 않고, `held_drafts` 는 사람이 읽는 미리보기(앞 200자)라 `LOOP_MAX_RESUME_BYTES` 초과 시 비운다. 크기 계산은 `app.tools.context.to_jsonable` 적용 후(실제 저장과 같게). `MentionDecision.to_dict()` 는 er_resolve trace_id 만 담는다(중복 저장 방지). `app/agent/__init__.py` 재export 는 U5 에서 run_turn 과 함께. 다음 = U5 기록 + 응답(backend-agent, L-004). R-24 는 U5 에서 정한다.
 - Refs: P5-loop D1 D2 D12 D13 S3.3 S3.4 원칙1 원칙2 원칙4
+
+## 2026-09-25 00:10 · feat(P5-loop): U5 기록·응답 단계 — 확인된 사람의 기록만 저장하고 사실만 답한다 · pending
+- 변경: `app/agent/loop.py` 에 `run_turn()`·기록 구간(`_record_impl`·`_execute_call`·`_ask_schedule`·`_needs_schedule_question`)·trace 래퍼 추가, `app/agent/respond.py` 신규(`build_reply`), `types.py` `SCHEDULE_UNKNOWN_OPTION`, `__init__.py` 재export, `tests/test_agent_loop.py` U5 6개(총 16). 01-plan U5 [x]. evidence `20260924-2245-U5-pytest.txt`(7행 (가)(나)·22행 포함)·`20260924-2312-U5-fix-pytest.txt`.
+- 이유(기획서·카드 연결): 01-plan U5, 결정 B(i)·C(i)·D·E·K(i)·M-2(i). 원칙7 경계 문장.
+- 정합성 확인: 원칙 1·2·4·7·9 / D1 D2 / S3.2 S3.4 / 보안 — 위반 없음. 7행 (가)(나)·22행 기대 일치. 전체 1453 passed / 1 failed(test_er_pipeline 782행 — FIX-004).
+- 남은 것 · 다음 단위: U5 에서 정한 것 — **R-24**: 기록 단계가 제안마다 `ToolError` 를 잡아 `failed[]` 에 담고 계속한다(run_turn 밖 예외 — 공급자·LoopError·SQLAlchemyError — 는 U6 몫). **후보 시각 규칙**: `ctx.now()` 기준 내일·모레 저녁 7시 + "모르겠어요"(발화 속 상대 날짜를 다시 파싱하지 않음). 한 턴에 질문 하나 — schedule 질문이 나면 그 뒤 execute 제안은 전부 pending_calls 로. **사용자 결정(2026-09-24)**: ER 되묻기로 멈춘 턴에서 merge 된 언급의 시각 없는 add_schedule 은 failed 가 아니라 그 질문의 resume.pending_calls 로(재개 때 U7 이 시각을 묻는다). `TurnResult.stop_reason` = 질문 있으면 "ask_user", 아니면 게이트 값("limit"/None). `TurnResult.trace_ids` = loop_extract·loop_gate·loop_resolve_done·loop_record 4행(loop_turn 자신 제외). `PendingQuestionOut` 은 ORM 재조회 없이 ask_payload 에서 재구성. **U6·U7·U8 에서 재확인**: stop_reason·trace_ids 값 집합. **7행 명령은 개발 DB 에 행을 남긴다** — 다시 돌리면 FIX-004 전 테스트가 또 깨진다. 다음 = FIX-004 → U6.
+- Refs: P5-loop D1 D2 S3.2 S3.4 원칙1 원칙7 원칙9 FIX-004

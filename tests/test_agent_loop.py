@@ -1,11 +1,16 @@
-"""Refs: P5-loop D1 D2 D12 D13 S3.3 S3.4 원칙1 원칙2 원칙4 -- U4 해석 단계
-(`app/agent/loop.py::resolve_mentions`) 테스트.
+"""Refs: P5-loop D1 D2 D12 D13 S3.2 S3.3 S3.4 원칙1 원칙2 원칙4 원칙7 원칙9 --
+U4 해석 단계(`app/agent/loop.py::resolve_mentions`) + U5 기록·응답 단계
+(`app/agent/loop.py::run_turn`) 테스트.
 
 실 PostgreSQL(로컬, `POSTGRES_PORT` 기본 5433) + 롤백 픽스처(`db_session`) +
 `FakeJudge`(네트워크 0, `app/er/judge.py` 무수정 import) + `fake_embedder`
 (스텁 임베더). 제안·게이트는 손으로 만들지 않고 실제 `app.agent.gate.check()`
 를 거쳐 `GateVerdict` 를 만든다 -- 게이트·해석 경계가 실제 그대로 맞물리는지
 함께 확인한다(U3 산출물 재사용, 중복 구현 금지).
+
+U5 절은 `run_turn()` 을 `FakeProposer`(U2)로 감싸 인식 단계까지 포함한 한
+턴 전체를 돌린다 -- 손으로 `Proposal`/`GateVerdict` 를 만들지 않는다(U4
+절과 같은 이유, 경계가 실제로 맞물리는지 확인).
 """
 
 from __future__ import annotations
@@ -14,12 +19,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+from sqlalchemy import func, select
 
 import app.agent.loop as loop_module
 from app.agent.gate import check
-from app.agent.loop import resolve_mentions
+from app.agent.loop import resolve_mentions, run_turn
+from app.agent.propose import FakeProposer
 from app.agent.types import NEW_PERSON_TAG_OPTIONS, Proposal, ToolCallProposal
-from app.db.models import ALIAS_SOURCES, PendingQuestion, Person, PersonAlias
+from app.db.models import AgentTrace, ALIAS_SOURCES, Event, PendingQuestion, Person, PersonAlias, Schedule
 from app.er import AlreadyApplied, apply_resolution
 from app.er.judge import FakeJudge
 from app.tools.context import ToolContext
@@ -325,3 +332,331 @@ def test_resume_within_byte_limit_keeps_held_drafts(db_session, fake_embedder):
     resume = row.context["resume"]
     assert resume["dropped"] == 0
     assert resume["held_drafts"] == [{"name": "add_event", "content": "짧은 내용"}]
+
+
+# ---------------------------------------------------------------------------
+# U5 -- run_turn(): 기록 + 응답
+# ---------------------------------------------------------------------------
+
+
+def _trace_rows(db_session, session_id: str) -> list[AgentTrace]:
+    return (
+        db_session.execute(
+            select(AgentTrace).where(AgentTrace.session_id == session_id).order_by(AgentTrace.id)
+        )
+        .scalars()
+        .all()
+    )
+
+
+def _first_output(rows: list[AgentTrace], step: str) -> dict:
+    return next(r.output for r in rows if r.step == step)
+
+
+def _count(db_session, model) -> int:
+    """전체 행 수(로컬 DB 는 다른 테스트·수동 재현 명령이 남긴 행과
+    공유되므로, `select(model).all() == []` 처럼 "테이블이 비어 있다"를
+    직접 단언하지 않고 호출 전후 개수 차이로만 판단한다)."""
+    return db_session.execute(select(func.count()).select_from(model)).scalar_one()
+
+
+def test_run_turn_merge_executes_add_event_and_satisfies_accepted_equation(
+    db_session, fake_embedder
+):
+    """merge 로 끝나는 턴 -- add_event 가 실행되고, 원문이 그대로 저장되고
+    (01-plan U5 "원문 그대로 저장"), `executed[].trace_id` 가 실제
+    `add_event` tool_call 행을 가리키며, U1 등식이 성립한다."""
+
+    session_id = "loop-u5-merge"
+    person = _make_person(db_session, display_name="김민수")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+
+    utterance = "어제 팀장이랑 저녁 먹었어"
+    calls = [
+        {
+            "name": "add_event",
+            "args": {
+                "person": "팀장",
+                "type": "meal",
+                "content": "저녁",
+                "occurred_at": NOW.isoformat(),
+            },
+        }
+    ]
+
+    result = run_turn(
+        ctx,
+        utterance,
+        proposer=FakeProposer(table={utterance: calls}),
+        judge=FakeJudge(table={person.id: 0.95}),
+    )
+
+    assert result.pending_question is None
+    assert result.session_id == session_id
+    assert result.stored.events == 1
+    assert result.stored.schedules == 0
+    assert "이벤트 1건" in result.reply
+
+    event = db_session.execute(select(Event).where(Event.person_id == person.id)).scalar_one()
+    assert event.raw_utterance == utterance
+    assert event.type == "meal"
+
+    rows = _trace_rows(db_session, session_id)
+    gate_out = _first_output(rows, "loop_gate")
+    record_out = _first_output(rows, "loop_record")
+
+    assert record_out["failed"] == []
+    assert len(record_out["executed"]) == 1
+    executed_entry = record_out["executed"][0]
+    assert executed_entry["index"] == 0
+    assert executed_entry["name"] == "add_event"
+
+    trace_id = executed_entry["trace_id"]
+    matched = next(r for r in rows if r.id == trace_id)
+    assert matched.step == "tool_call"
+    assert matched.tool_name == "add_event"
+
+    accepted_idx = {a["index"] for a in gate_out["accepted"]}
+    executed_idx = {e["index"] for e in record_out["executed"]}
+    failed_idx = {f["index"] for f in record_out["failed"]}
+    hint_only_idx = {a["index"] for a in gate_out["accepted"] if a["bucket"] == "hint_only"}
+    assert accepted_idx == executed_idx | failed_idx | hint_only_idx
+
+
+def test_run_turn_new_person_defers_add_event_to_resume_pending_calls(db_session, fake_embedder):
+    """되묻기로 끝나는 턴 -- 확정되지 않은 언급의 `add_event` 는 0회
+    실행되고, `context["resume"]["pending_calls"]` 에 그 제안이 실린다
+    (01-plan U5 "확정되지 않은 언급에는 add_event 0회·보류 제안이
+    resume.pending_calls 에 실림"). U1 등식도 되묻기 턴에서 성립한다."""
+
+    session_id = "loop-u5-new-person"
+    person = _make_person(db_session, display_name="김민수")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+    events_before = _count(db_session, Event)
+
+    utterance = "오늘 이모랑 저녁 먹었어"
+    calls = [
+        {
+            "name": "add_event",
+            "args": {
+                "person": "이모",
+                "type": "meal",
+                "content": "저녁",
+                "occurred_at": NOW.isoformat(),
+            },
+        }
+    ]
+
+    result = run_turn(
+        ctx,
+        utterance,
+        proposer=FakeProposer(table={utterance: calls}),
+        judge=FakeJudge(table={}),
+    )
+
+    assert result.pending_question is not None
+    assert result.pending_question.kind == "new_person"
+    assert result.stored.events == 0
+
+    assert _count(db_session, Event) == events_before
+
+    row = db_session.get(PendingQuestion, result.pending_question.question_id)
+    resume = row.context["resume"]
+    assert [c["index"] for c in resume["pending_calls"]] == [0]
+    assert resume["pending_calls"][0]["name"] == "add_event"
+
+    rows = _trace_rows(db_session, session_id)
+    gate_out = _first_output(rows, "loop_gate")
+    record_out = _first_output(rows, "loop_record")
+    assert record_out["executed"] == []
+    assert record_out["failed"] == []
+
+    accepted_idx = {a["index"] for a in gate_out["accepted"]}
+    executed_idx = {e["index"] for e in record_out["executed"]}
+    failed_idx = {f["index"] for f in record_out["failed"]}
+    pending_idx = {c["index"] for c in resume["pending_calls"]}
+    hint_only_idx = {a["index"] for a in gate_out["accepted"] if a["bucket"] == "hint_only"}
+    assert accepted_idx == executed_idx | failed_idx | pending_idx | hint_only_idx
+
+
+def test_run_turn_schedule_without_time_asks_schedule_question(db_session, fake_embedder):
+    """결정 K(i)·M-2(i) -- `scheduled_at` 이 확정되지 않은 `add_schedule`
+    은 저장되지 않고 `ask_user(kind="schedule")` 로 되묻는다.
+    `resume.schedule.person_id` 는 이번 턴의 merge 로 얻은 id 다."""
+
+    session_id = "loop-u5-schedule"
+    person = _make_person(db_session, display_name="김민수")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+    ctx = ToolContext(
+        session=db_session, session_id=session_id, embedder=fake_embedder, now=lambda: NOW
+    )
+    schedules_before = _count(db_session, Schedule)
+
+    utterance = "팀장이랑 다음에 약속 잡기로 했어"
+    calls = [{"name": "add_schedule", "args": {"person": "팀장", "title": "약속"}}]
+
+    result = run_turn(
+        ctx,
+        utterance,
+        proposer=FakeProposer(table={utterance: calls}),
+        judge=FakeJudge(table={person.id: 0.95}),
+    )
+
+    assert result.pending_question is not None
+    assert result.pending_question.kind == "schedule"
+    assert result.stored.schedules == 0
+
+    assert _count(db_session, Schedule) == schedules_before
+
+    row = db_session.get(PendingQuestion, result.pending_question.question_id)
+    assert row.kind == "schedule"
+    assert "모르겠어요" in row.options
+
+    resume = row.context["resume"]
+    assert resume["schedule"]["person_id"] == person.id
+    assert resume["schedule"]["title"] == "약속"
+    assert resume["schedule"]["call_index"] == 0
+    assert set(resume["schedule_options"]) == set(row.options) - {"모르겠어요"}
+    assert [c["name"] for c in resume["pending_calls"]] == ["add_schedule"]
+
+
+def test_run_turn_stopped_turn_defers_merged_mention_unconfirmed_schedule_to_pending_calls(
+    db_session, fake_embedder
+):
+    """사용자 수정 요청(2026-09-24) -- 다른 언급("이모")이 되묻기로 턴을
+    끝내도, 이미 merge 된 언급("팀장")의 시각 미확정 `add_schedule` 은
+    `InvalidValue` 로 잃지 않고 그 되묻기 질문의
+    `context["resume"]["pending_calls"]` 로 넘어간다(U4
+    `_pending_calls_from` 의 예외). `schedules` 행 0·`failed` 에 없음·
+    등식 성립을 함께 확인한다."""
+
+    session_id = "loop-u5-schedule-deferred"
+    person = _make_person(db_session, display_name="김민수")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+    schedules_before = _count(db_session, Schedule)
+
+    utterance = "팀장이랑 저녁 먹고 이모랑도 저녁 먹었는데 팀장이랑 다음에 약속도 잡기로 했어"
+    calls = [
+        {
+            "name": "add_event",
+            "args": {
+                "person": "팀장",
+                "type": "meal",
+                "content": "저녁1",
+                "occurred_at": NOW.isoformat(),
+            },
+        },
+        {
+            "name": "add_event",
+            "args": {
+                "person": "이모",
+                "type": "meal",
+                "content": "저녁2",
+                "occurred_at": NOW.isoformat(),
+            },
+        },
+        {"name": "add_schedule", "args": {"person": "팀장", "title": "약속"}},
+    ]
+
+    result = run_turn(
+        ctx,
+        utterance,
+        proposer=FakeProposer(table={utterance: calls}),
+        judge=FakeJudge(table={person.id: 0.95}),
+    )
+
+    assert result.pending_question is not None
+    assert result.pending_question.kind == "new_person"
+    assert result.stored.events == 1
+    assert result.stored.schedules == 0
+    assert _count(db_session, Schedule) == schedules_before
+
+    rows = _trace_rows(db_session, session_id)
+    gate_out = _first_output(rows, "loop_gate")
+    record_out = _first_output(rows, "loop_record")
+    assert record_out["failed"] == []
+    assert [e["name"] for e in record_out["executed"]] == ["add_event"]
+    assert record_out["executed"][0]["index"] == 0
+
+    row = db_session.get(PendingQuestion, result.pending_question.question_id)
+    resume = row.context["resume"]
+    pending_by_index = {c["index"]: c["name"] for c in resume["pending_calls"]}
+    assert pending_by_index == {1: "add_event", 2: "add_schedule"}
+
+    accepted_idx = {a["index"] for a in gate_out["accepted"]}
+    executed_idx = {e["index"] for e in record_out["executed"]}
+    failed_idx = {f["index"] for f in record_out["failed"]}
+    pending_idx = {c["index"] for c in resume["pending_calls"]}
+    hint_only_idx = {a["index"] for a in gate_out["accepted"] if a["bucket"] == "hint_only"}
+    assert accepted_idx == executed_idx | failed_idx | pending_idx | hint_only_idx
+
+
+def test_run_turn_add_event_naive_datetime_is_caught_as_failed(db_session, fake_embedder):
+    """R-24 -- 기록 단계가 게이트를 지난 제안 하나를 실행하다 `ToolError`
+    로 실패하면(여기서는 tz 정보 없는 ISO 문자열이 `datetime` 으로는
+    바뀌었지만 naive 라 `add_event` 가 거절한다) `loop_record.output.
+    failed[]` 에 담기고 다음 제안으로 넘어간다 -- 턴 전체가 죽지 않는다."""
+
+    session_id = "loop-u5-failed"
+    person = _make_person(db_session, display_name="김민수")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+
+    utterance = "어제 팀장이랑 저녁 먹었어"
+    calls = [
+        {
+            "name": "add_event",
+            "args": {
+                "person": "팀장",
+                "type": "meal",
+                "content": "저녁",
+                # tz 오프셋이 없는 ISO 문자열 -- U2 가 datetime 으로는
+                # 바꾸지만(파싱 자체는 성공) naive 라 add_event 가 거절한다.
+                "occurred_at": "2026-09-23T19:00:00",
+            },
+        }
+    ]
+
+    result = run_turn(
+        ctx,
+        utterance,
+        proposer=FakeProposer(table={utterance: calls}),
+        judge=FakeJudge(table={person.id: 0.95}),
+    )
+
+    assert result.stored.events == 0
+    assert (
+        db_session.execute(select(Event).where(Event.person_id == person.id)).scalars().all()
+        == []
+    )
+
+    rows = _trace_rows(db_session, session_id)
+    record_out = _first_output(rows, "loop_record")
+    assert record_out["executed"] == []
+    assert record_out["failed"] == [{"index": 0, "name": "add_event", "error": "InvalidValue"}]
+    assert "1건은 저장하지 못했어요" in result.reply
+
+
+def test_run_turn_no_counseling_reply_for_emotional_utterance(db_session, fake_embedder):
+    """원칙7 부정 테스트 -- 감정 발화에 아무 툴도 제안되지 않으면(LLM 이
+    빈 `tool_calls` 를 냈다고 가정, `FakeProposer` 표에 없는 발화) 응답은
+    고정 문장 하나뿐이고 공감·위로·조언 어휘가 들어갈 자리가 없다."""
+
+    session_id = "loop-u5-no-counseling"
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+
+    utterance = "오늘 너무 힘들고 속상했어"
+    result = run_turn(
+        ctx,
+        utterance,
+        proposer=FakeProposer(table={}),
+        judge=FakeJudge(table={}),
+    )
+
+    assert result.pending_question is None
+    assert result.reply == "이번 발화에서는 새로 기억한 것이 없어요."
+    for banned in ("힘드셨", "위로", "괜찮", "공감", "힘내", "그랬구나"):
+        assert banned not in result.reply

@@ -2,9 +2,10 @@
 
 U1 시점에는 `app/agent/types.py` 의 계약 타입·trace 어휘만 있었다(01-plan
 U1 "코드가 도는 건 아직 없다"). U2 가 인식 단계(`app/agent/propose.py`)를
-더했고, U3 가 게이트(`app/agent/gate.py`)를 더한다 -- `run_turn`/
-`resume_turn`(U4 `app/agent/loop.py`)은 아직 없으므로 그 이름은 미리
-import 하지 않는다(ImportError 방지).
+더했고, U3 가 게이트(`app/agent/gate.py`)를 더했다. U5 가 기록·응답
+단계와 함께 `run_turn()`(`app/agent/loop.py`)을 더한다 -- `resume_turn`
+은 아직 없으므로(U7 몫) 그 이름은 미리 import 하지 않는다(ImportError
+방지, U4/U5 `loop.py` 모듈 docstring "이 단위가 채우는 자리" 참고).
 """
 
 from __future__ import annotations
@@ -22,6 +23,13 @@ from app.agent.gate import (
     GateConfig,
     check,
 )
+from app.agent.loop import (
+    MentionDecision,
+    RecordOutcome,
+    ResolveOutcome,
+    resolve_mentions,
+    run_turn,
+)
 from app.agent.propose import (
     PROPOSAL_ARG_SCHEMA,
     PROPOSAL_SCHEMA,
@@ -36,6 +44,7 @@ from app.agent.propose import (
     proposer_from_env,
     validate_proposal,
 )
+from app.agent.respond import build_reply
 from app.agent.types import (
     BUCKET_EXECUTE,
     BUCKET_HINT_ONLY,
@@ -44,6 +53,7 @@ from app.agent.types import (
     LOOP_TRACE_STEPS,
     LOOP_TRACE_TOOL_NAME,
     NEW_PERSON_TAG_OPTIONS,
+    SCHEDULE_UNKNOWN_OPTION,
     STEP_LOOP_ERROR,
     STEP_LOOP_EXTRACT,
     STEP_LOOP_GATE,
@@ -81,6 +91,11 @@ __all__ = [
     "REASON_UNKNOWN_TOOL",
     "GateConfig",
     "check",
+    "MentionDecision",
+    "RecordOutcome",
+    "ResolveOutcome",
+    "resolve_mentions",
+    "run_turn",
     "PROPOSAL_ARG_SCHEMA",
     "PROPOSAL_SCHEMA",
     "PROPOSAL_TOOL_NAME",
@@ -93,6 +108,7 @@ __all__ = [
     "build_propose_prompt",
     "proposer_from_env",
     "validate_proposal",
+    "build_reply",
     "BUCKET_EXECUTE",
     "BUCKET_HINT_ONLY",
     "GATE_BUCKETS",
@@ -100,6 +116,7 @@ __all__ = [
     "LOOP_TRACE_STEPS",
     "LOOP_TRACE_TOOL_NAME",
     "NEW_PERSON_TAG_OPTIONS",
+    "SCHEDULE_UNKNOWN_OPTION",
     "STEP_LOOP_ERROR",
     "STEP_LOOP_EXTRACT",
     "STEP_LOOP_GATE",
