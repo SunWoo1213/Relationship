@@ -38,9 +38,16 @@
 - 남은 것 · 다음 단위: U4 에서 정한 것 — **R-25 (ㄱ)** `create_person` 힌트는 `display_name`·`aliases` 가 언급 문자열과 완전히 같을 때만 붙는다(아니면 버림 — M-3 안 A 로 태그는 답에서 오므로 저장 결과 불변, 힌트는 hierarchy 에만). **R-25 (ㄴ)** `pending_calls` 는 재개 재실행 근거라 버리지 않고, `held_drafts` 는 사람이 읽는 미리보기(앞 200자)라 `LOOP_MAX_RESUME_BYTES` 초과 시 비운다. 크기 계산은 `app.tools.context.to_jsonable` 적용 후(실제 저장과 같게). `MentionDecision.to_dict()` 는 er_resolve trace_id 만 담는다(중복 저장 방지). `app/agent/__init__.py` 재export 는 U5 에서 run_turn 과 함께. 다음 = U5 기록 + 응답(backend-agent, L-004). R-24 는 U5 에서 정한다.
 - Refs: P5-loop D1 D2 D12 D13 S3.3 S3.4 원칙1 원칙2 원칙4
 
-## 2026-09-25 00:10 · feat(P5-loop): U5 기록·응답 단계 — 확인된 사람의 기록만 저장하고 사실만 답한다 · pending
+## 2026-09-25 00:10 · feat(P5-loop): U5 기록·응답 단계 — 확인된 사람의 기록만 저장하고 사실만 답한다 · 1835355
 - 변경: `app/agent/loop.py` 에 `run_turn()`·기록 구간(`_record_impl`·`_execute_call`·`_ask_schedule`·`_needs_schedule_question`)·trace 래퍼 추가, `app/agent/respond.py` 신규(`build_reply`), `types.py` `SCHEDULE_UNKNOWN_OPTION`, `__init__.py` 재export, `tests/test_agent_loop.py` U5 6개(총 16). 01-plan U5 [x]. evidence `20260924-2245-U5-pytest.txt`(7행 (가)(나)·22행 포함)·`20260924-2312-U5-fix-pytest.txt`.
 - 이유(기획서·카드 연결): 01-plan U5, 결정 B(i)·C(i)·D·E·K(i)·M-2(i). 원칙7 경계 문장.
 - 정합성 확인: 원칙 1·2·4·7·9 / D1 D2 / S3.2 S3.4 / 보안 — 위반 없음. 7행 (가)(나)·22행 기대 일치. 전체 1453 passed / 1 failed(test_er_pipeline 782행 — FIX-004).
 - 남은 것 · 다음 단위: U5 에서 정한 것 — **R-24**: 기록 단계가 제안마다 `ToolError` 를 잡아 `failed[]` 에 담고 계속한다(run_turn 밖 예외 — 공급자·LoopError·SQLAlchemyError — 는 U6 몫). **후보 시각 규칙**: `ctx.now()` 기준 내일·모레 저녁 7시 + "모르겠어요"(발화 속 상대 날짜를 다시 파싱하지 않음). 한 턴에 질문 하나 — schedule 질문이 나면 그 뒤 execute 제안은 전부 pending_calls 로. **사용자 결정(2026-09-24)**: ER 되묻기로 멈춘 턴에서 merge 된 언급의 시각 없는 add_schedule 은 failed 가 아니라 그 질문의 resume.pending_calls 로(재개 때 U7 이 시각을 묻는다). `TurnResult.stop_reason` = 질문 있으면 "ask_user", 아니면 게이트 값("limit"/None). `TurnResult.trace_ids` = loop_extract·loop_gate·loop_resolve_done·loop_record 4행(loop_turn 자신 제외). `PendingQuestionOut` 은 ORM 재조회 없이 ask_payload 에서 재구성. **U6·U7·U8 에서 재확인**: stop_reason·trace_ids 값 집합. **7행 명령은 개발 DB 에 행을 남긴다** — 다시 돌리면 FIX-004 전 테스트가 또 깨진다. 다음 = FIX-004 → U6.
 - Refs: P5-loop D1 D2 S3.2 S3.4 원칙1 원칙7 원칙9 FIX-004
+
+## 2026-09-25 00:50 · fix(FIX-004): 인물 해석 테스트가 DB 전체 질문 수 대신 해석 전후를 비교한다 · pending
+- 변경: `tests/test_er_pipeline.py` 한 테스트의 단언을 전후 비교로. `docs/wiki/fixes/FIX-004.md` 신규. evidence `20260924-2325-FIX-004-er-pipeline-pytest.txt`·`20260924-2319-FIX-004-full-suite-pytest.txt`. HANDOFF 재작성(세션 마무리).
+- 이유(기획서·카드 연결): 판정 표 7행 명령이 개발 DB 에 남긴 확인 행 때문에 DB 전체 개수 0 단언이 깨졌다. 검사 대상(결정4 — resolve() 는 부수효과 없음)에 단언을 맞춘다.
+- 정합성 확인: 원칙·D·S 변경 없음, 원칙8(남은 행 삭제 안 함), 제품 코드 무변경 — 위반 없음. 전체 1454 passed, 실패 0 · 스킵 0.
+- 남은 것 · 다음 단위: 다음 세션 = 푸시 여부 확인 → U6 `POST /chat`(backend-agent, L-004). 판정 표 7행 명령은 U8 전까지 다시 돌리지 않는다.
+- Refs: FIX-004 P5-loop P3-er D2 원칙8

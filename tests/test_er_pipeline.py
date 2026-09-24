@@ -776,11 +776,13 @@ def test_resolve_without_apply_creates_no_pending_question_no_apply_no_question(
 
     ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
     judge = FakeJudge(table={person1.id: 0.55}, pick=person1.id)
+
+    _, _, questions_before = _row_counts(db_session)
     result = resolve(ctx, "민수", "발화", judge=judge, config=ERConfig())
     assert result.band == "identity"
 
-    _, _, questions = _row_counts(db_session)
-    assert questions == 0
+    _, _, questions_after = _row_counts(db_session)
+    assert questions_after == questions_before
 
 
 def test_apply_resolution_twice_raises_and_leaves_state_unchanged_double_apply(
