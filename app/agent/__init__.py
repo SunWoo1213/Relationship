@@ -1,13 +1,27 @@
 """Refs: P5-loop S3.4 원칙9 -- app/agent 패키지 재export 진입점.
 
-U1 시점에는 `app/agent/types.py` 의 계약 타입·trace 어휘만 있다(01-plan U1
-"코드가 도는 건 아직 없다"). `run_turn`/`resume_turn`(U4 `app/agent/loop.py`)
-은 그 단위가 이 파일에 재export 를 추가한다 -- 아직 존재하지 않는 이름을
-미리 import 하지 않는다(ImportError 방지).
+U1 시점에는 `app/agent/types.py` 의 계약 타입·trace 어휘만 있었다(01-plan
+U1 "코드가 도는 건 아직 없다"). U2 가 인식 단계(`app/agent/propose.py`)를
+더한다 -- `run_turn`/`resume_turn`(U4 `app/agent/loop.py`)은 아직 없으므로
+그 이름은 미리 import 하지 않는다(ImportError 방지).
 """
 
 from __future__ import annotations
 
+from app.agent.propose import (
+    PROPOSAL_ARG_SCHEMA,
+    PROPOSAL_SCHEMA,
+    PROPOSAL_TOOL_NAME,
+    PROPOSERS,
+    ClaudeProposer,
+    FakeProposer,
+    GeminiProposer,
+    OpenAIProposer,
+    Proposer,
+    build_propose_prompt,
+    proposer_from_env,
+    validate_proposal,
+)
 from app.agent.types import (
     BUCKET_EXECUTE,
     BUCKET_HINT_ONLY,
@@ -42,6 +56,18 @@ from app.agent.types import (
 )
 
 __all__ = [
+    "PROPOSAL_ARG_SCHEMA",
+    "PROPOSAL_SCHEMA",
+    "PROPOSAL_TOOL_NAME",
+    "PROPOSERS",
+    "ClaudeProposer",
+    "FakeProposer",
+    "GeminiProposer",
+    "OpenAIProposer",
+    "Proposer",
+    "build_propose_prompt",
+    "proposer_from_env",
+    "validate_proposal",
     "BUCKET_EXECUTE",
     "BUCKET_HINT_ONLY",
     "GATE_BUCKETS",

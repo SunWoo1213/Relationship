@@ -243,3 +243,4 @@
 - 2026-09-24 20:59 | COMMIT | 24feebd docs(P5-loop): 3차 검증 통과·계획 승인 — 패키지 착수
 - 2026-09-24 20:59 | PUSH | origin dev 24feebd — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-24 21:18 | COMMIT | 3e4db92 feat(P5-loop): U1 루프 계약 타입과 trace 어휘 — 도는 코드는 아직 없다
+- 2026-09-24 21:21 | COMMIT | a3ebc36 harness(wiki): 커밋·기록·에이전트 산출물을 한국어로 쓰도록 규칙화
