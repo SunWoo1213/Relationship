@@ -229,3 +229,10 @@
 - 2026-09-23 15:39 | COMMIT | cf82868 harness(FIX-002): 게이트 검사가 재설계 전 패키지를 보고 있어 P5 이후가 막혔다
 - 2026-09-23 17:20 | PLAN | **P5-loop 계획 착수 — 2차 보류에서 중단(사용자 결정)**. architect 01-plan 초안(U1~U7) → 사용자 결정 12건 확정 → backlog 개정 3건 → 기계 검증 FAIL 12 → 형식 2건 수정 + FIX-002(cf82868) → FAIL 1 → verifier 1차 **보류**(H-1·H-2·H-3, 권고 R-1~R-8) → **결정 L 을 (i)→(iii) 하이브리드로 변경**(H-3, 기획서 72·176행) → architect 개정(U1~U8, 판정 표 27행) → 사용자 확정 M-1(d)·M-2(i) + backlog 리스크 로그 → FAIL 0 → verifier 2차 **보류**(H-1 잔존, H-4·H-5 신규, 권고 R-9~R-19). **점검표 8행 전부 통과, 원칙·카드 위반 0.** `CURRENT active` 는 계속 `none` — 계획 미승인이므로 제품 코드를 쓸 수 없다 | P5-loop
 - 2026-09-23 17:11 | COMMIT | b10ac6e docs(P5-loop): 계획을 두 번 검증했고 두 번 보류다 — 여기까지 기록하고 멈춘다
+- 2026-09-24 19:30 | DECISION | P5-loop 2차 보류는 (a) 범위 묶은 3차 개정으로 푼다(사용자). 남은 [권고]는 P5 끝날 때까지 보류. architect 3차 개정 — 01-plan 판정 표 27→29행(5a/5b 분할, 28행 M-1(d) 부정 신설), 새 미결 M-3 | P5-loop 원칙8
+- 2026-09-24 19:40 | VERIFY | verify-plan P5-loop FAIL 2(Refs 가 U1·U4 이어지는 줄로 밀림) → 첫 줄로 옮김(내용 불변) → 19:41 FAIL 0/WARN 8(registry 기존 행 7 의도 + R-19 하네스 정규식 `inspect.signa`). F-25b70f·F-d61978·F-9c9410 해소 | P5-loop evidence/20260924-1940-verify-plan.txt evidence/20260924-1941-verify-plan-2.txt
+- 2026-09-24 19:43 | DECISION | M-3 = 안 A(힌트가 있어도 new_person 에서 태그를 묻는다, 사용자). 01-plan 에 기록만 → verify-plan FAIL 0/WARN 8 | P5-loop evidence/20260924-1943-verify-plan-3.txt
+- 2026-09-24 19:45 | NOTE | verifier 3차 위임 실패 `Agent type 'verifier' not found` — 세션 에이전트 목록에 verifier 가 없다. 실패한 Agent 호출이 단계 승인 마커를 소모해 재승인 2회 | P5-loop FIX-003 L-004
+- 2026-09-24 19:50 | FIX | **FIX-003** — 원인: `.claude/agents/verifier.md` description 의 `L-002: ` 콜론이 YAML frontmatter 파싱을 깨뜨려(`mapping values are not allowed here`) 에이전트가 조용히 로드되지 않았다. `L-002 —` 로 수정. 같은 세션에서는 목록이 다시 읽히지 않아 세션 재시작 필요 | FIX-003 L-002
+- 2026-09-24 19:55 | NOTE | 사용자 요청으로 위키 기록 누락 점검: journal 에 오늘치 없음(HANDOFF 에만 있었다), FIX-003 미작성, 메인 세션 실수 3건이 HANDOFF 에만 있음, L-nnn 후보 흩어짐 → 네 가지 모두 보강(사용자 선택) | L-005 FIX-003
+- 2026-09-24 20:23 | NOTE | FIX-003 확인: 같은 세션에서 에이전트 목록이 갱신되어 verifier 가 다시 나타남(재시작 불필요) | FIX-003

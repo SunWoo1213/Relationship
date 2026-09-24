@@ -162,6 +162,23 @@ echo "== session-start 출력 존재 =="
 out="$(echo '{"source":"resume"}' | bash "$H/session-start.sh" | head -n 1)"
 printf '%s' "$out" | grep -q '세션 재개' && echo "ok   session-start prints header" || { echo "XX   session-start: $out"; fails=$((fails+1)); }
 
+echo "== 에이전트 frontmatter YAML 파싱 (FIX-003) =="
+for f in .claude/agents/*.md; do
+  msg="$(python - "$f" <<'PY'
+import sys, yaml
+t = open(sys.argv[1], encoding="utf-8").read()
+parts = t.split("---", 2)
+try:
+    d = yaml.safe_load(parts[1]) if len(parts) == 3 and parts[0].strip() == "" else None
+except yaml.YAMLError as e:
+    print("YAML 오류: " + str(e).splitlines()[0]); sys.exit(1)
+if not isinstance(d, dict) or not all(d.get(k) for k in ("name", "description", "model")):
+    print("frontmatter 없음 또는 name/description/model 누락"); sys.exit(1)
+PY
+)"; rc=$?
+  if [ "$rc" -eq 0 ]; then echo "ok   agent frontmatter parses: $f"; else echo "XX   agent frontmatter: $f -> $msg"; fails=$((fails+1)); fi
+done
+
 echo "== 결과: 실패 $fails =="
 [ "$fails" -eq 0 ] || exit 1
 exit 0

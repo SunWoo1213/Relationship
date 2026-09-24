@@ -154,3 +154,7 @@
 | 문서 | MIT 라이선스 | LICENSE | 하네스 | b6afc2c | 같은 경로로 main 에 직접 올라갔던 것을 FIX-001 병합으로 들였다. |
 | 문서 | 첫 실 LLM 호출 스모크 결과(openai 1/3 검증) | docs/wiki/evidence/20260919-openai-live-smoke.txt | 하네스 | e29ac75 | `er_smoke.py`("부장님" → 확신도 0.838 merge)·`baseline_smoke.py`(llm_single identity) 가 gpt-4o-mini 로 통과. main 에 직접 올라갔던 것을 FIX-001 병합으로 들였다. |
 | 문서 | FIX-001 main 병합(갈라진 배포 브랜치를 dev 로 되돌린다) | docs/wiki/fixes/FIX-001.md | FIX-001 | pending | 갈림점 `3c6108d`, main 전용 6커밋, `README.md` 충돌 1건을 양쪽 보존으로 해소. 회귀 1325 passed(skip 0)·verify-impl FAIL 0/WARN 0. **L-nnn 후보**: main 직접 커밋을 막는 장치가 없다 — 재발 방지는 GitHub 브랜치 보호 규칙이고 저장소 설정이라 사용자가 정한다. |
+| 문서 | FIX-003 verifier frontmatter YAML 오류(콜론)로 에이전트가 조용히 로드되지 않음 | docs/wiki/fixes/FIX-003.md | FIX-003 | pending | `.claude/agents/verifier.md` 3행 수정 |
+| 스크립트 | 에이전트 frontmatter YAML 파싱 자가 점검(test-guards.sh 절 추가) | .claude/scripts/test-guards.sh | FIX-003 | pending | 기존 파일 확장. evidence `20260924-1956-test-guards-FIX003.txt`·`20260924-1957-FIX003-negative.txt` |
+| 문서 | 교훈 L-005 메인 세션은 원문·실제 출력을 직접 보고 말하고 journal 에 남긴다 | docs/wiki/lessons/L-005-main-session-verify-first-hand.md | 하네스 | pending | |
+| 문서 | L-nnn 후보 목록(흩어진 후보 C-1~C-7 모음) | docs/wiki/lessons/CANDIDATES.md | 하네스 | pending | |
