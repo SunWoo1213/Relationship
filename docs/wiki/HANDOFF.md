@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-26 00:15 — **FIX-005(시간대) 구현 완료·확인됨, 커밋 승인 대기.** 전체 회귀 1481 passed(`docs/wiki/fixes/evidence/FIX-005/20260926-0010-*`). 실서버 8행 인물 "서준"이 user local 에 남아 테스트 20건을 깨뜨려 user_id 만 `row8-check-23175` 로 분리(사용자 승인). 다음: /commit → 실서버 재확인(사용자 기동, 같은 발화로 occurred_at 이 09:00+00 부근) → FIX 결과 해시 → active none. 별건 FIX 후보: 테스트·로컬 서버가 같은 user local 공유.
+갱신: 2026-09-26 00:45 — **FIX-005 완료**(구현 `1f07429` + 재확인 기록 커밋 대기). 실서버 재확인 통과: "어제 저녁" → KST 9월 24일 19:00. CURRENT active none. 다음: 이 기록 커밋(+푸시 여부) → L-003 → P6 또는 별건 FIX(테스트·로컬 서버 user local 공유). 사용자 환경 파일 15행 공백 값 정리는 사용자 몫. 테스트 서버(8000, APP_USER_ID=fix005-recheck)가 켜져 있을 수 있음.
 
-active: **FIX-005** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-postgres-1`(5433, pgvector) — 5432 는 다른 프로젝트
+active: **none** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-postgres-1`(5433, pgvector) — 5432 는 다른 프로젝트
 
 ## 마지막으로 끝낸 것
 - P5-loop U1~U8(`3e4db92`~`f0d3e26`) + 완료 커밋 `f9bfba7` + main 갈라짐 해소 병합 `36766c1` + 실서버 8행 증거 `ad4f30f` — 전부 푸시·main 승격됨. 재개 세션에서 끊겼던 verifier 04-review 를 다시 띄워 완료(`04-review.md`, verify-impl FAIL 0/WARN 0 `evidence/20260925-2200-verify-impl.txt`, 1474 passed, 05 열림 0/해소 23).
@@ -17,7 +17,7 @@ active: **FIX-005** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-post
 - journal 의 PUSH·RELEASE 줄(훅 자동)과 이 HANDOFF — 다음 커밋에 포함.
 
 ## 바로 다음에 할 것
-1. (진행 중 → FIX-005) 시간대: 실서버에서 "어제 저녁"이 `occurred_at 2026-09-24 18:00+00`(KST 새벽 3시)로 저장됨(`P5-loop/evidence/20260925-2325-row8-db-check.txt`). LLM 현지 시각을 UTC 로 저장하는 것으로 보임 — P6(패턴 90일 규칙·브리핑) 전에 `/devlog fix` 권장.
+1. (완료 FIX-005 `1f07429`) 시간대: 실서버에서 "어제 저녁"이 `occurred_at 2026-09-24 18:00+00`(KST 새벽 3시)로 저장됨(`P5-loop/evidence/20260925-2325-row8-db-check.txt`). LLM 현지 시각을 UTC 로 저장하는 것으로 보임 — P6(패턴 90일 규칙·브리핑) 전에 `/devlog fix` 권장.
 2. 다음 패키지 P6(메모리 승격·패턴 / 브리핑) — `/devlog start`, architect 위임은 L-004 승인 먼저.
 3. 재발 방지(사용자 몫): GitHub main 브랜치 보호 규칙 — 2026-09-23 PR #1 웹 병합으로 main 이 갈라졌었다(병합 커밋 `36766c1` 로 해소).
 4. 테스트 서버 uvicorn(8000)이 켜져 있을 수 있음 — 필요 없으면 종료.

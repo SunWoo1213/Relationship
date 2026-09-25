@@ -1,0 +1,4 @@
+# FIX-005 실서버 재확인 ① — 새 코드(1f07429), APP_USER_ID=fix005-recheck, 실 공급자, DB 5433
+# 본문: {"utterance":"어제 대학 동기 서준이랑 저녁 먹었어"}
+{"reply":"지금은 기억하지 못했어요. 잠시 뒤 다시 말씀해 주세요.","session_id":"49bae387-abec-47fa-8cd6-7434ff16410c","stored":{"persons":0,"events":0,"schedules":0},"pending_question":null,"stop_reason":null,"trace_ids":[266304]}
+HTTP 200

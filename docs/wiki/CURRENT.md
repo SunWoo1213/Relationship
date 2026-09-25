@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: FIX-005
+active: none
 frozen: none
 
 <!--
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- **FIX-005 완료(2026-09-26)** — 사용자 시간대(`APP_TIMEZONE`, 기본 Asia/Seoul). 구현 `1f07429`, 전체 1481 passed, 실서버 재확인 "어제 저녁" → KST 24일 19:00. 별건 FIX 후보: 테스트·로컬 서버가 같은 `APP_USER_ID=local` 공유(로컬 서버 사용 시 테스트 20건 깨짐). 다음: P6.
 - **P5-loop 완료(2026-09-25, verifier 04-review `완료`, 사용자 승인)** — verify-impl FAIL 0/WARN 0(`evidence/20260925-2200-verify-impl.txt`), 전체 회귀 1474 passed, 열린 소견 0/해소 23. U1 `3e4db92` · U2 `069bdc2` · U3 `8ecf75c` · U4 `7a2ec5c` · U5 `1835355` · U6 `d5c8ec9` · U7 `7df3ada` · U8 `f0d3e26`. R6·R7 구현완료. 남은 것: 판정 표 8행 실 공급자 curl(사용자, main 승격 전 권고), `docs/user-setup/` 은 RUNNING.md 로 갈음, 하네스 부채(verify-plan 토큰 스캔 오탐·findings.py 빈 표 중복), 개발 DB 확인 행 잔존. 다음 후보: P6(메모리 승격·패턴 / 브리핑).
 - **P5-loop 구현 진행(2026-09-25)** — U1 `3e4db92` · U2 `069bdc2` · U3 `8ecf75c` · U4 `7a2ec5c` · U5 `1835355` 완료(dev, 미푸시). FIX-004(인물 해석 테스트 전역 개수 단언) 진행. 다음 = U6 `POST /chat` → U7 재개 → U8 검증 → 04-review.
 - **P5-loop 계획 승인(2026-09-24)** — 01-plan 3차 개정(`7351363`) → verifier 3차 02-plan-verify **통과**(점검표 8/8, [필수] 0, verify-plan FAIL 0/WARN 8, 권고 R-20~R-27). `승인:` 줄은 F 6종·A 게이트 적용·총 제안 상한 `LOOP_MAX_PROPOSALS = 13` 을 포함한다(R-10·R-13). 승인 커밋에서 backlog P5 세분화 줄 개정(R-9)·01-plan M-3 안 B 잔존 문장 정리(R-21)를 했다. 확정 L(iii)·M-0·M-1(d)·M-2(i)·M-3 안 A. U1 부터 backend-agent(L-004 — 매번 승인). R-22·R-23·R-24 는 U2·U3·U5 03-log 에서 정한다.
