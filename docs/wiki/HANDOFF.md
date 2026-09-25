@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-25 22:25 — **P5-loop 완료(verifier 04-review `완료`, 사용자 승인).** 완료 문서·README 최신화까지 작업 트리에 반영, 완료 커밋 승인 대기 → 커밋 → 푸시(사용자 결정: P5 완료 뒤 한 번에) → L-003 승격 결정.
+갱신: 2026-09-25 22:25 — **P5-loop 완료(verifier 04-review `완료`, 사용자 승인).** 완료 커밋 `f9bfba7`(README 최신화 포함) → **dev 푸시 완료(`24feebd..f9bfba7`, 12커밋). 사용자 "main 승격" 결정 → main 에 GitHub PR #1 병합 커밋 `7eaf1f6`(2026-09-23 15:56, 내용은 dev 와 동일)이 있어 ff 불가 → 내용 무변경 병합 커밋을 dev 에 만들고 푸시 → `git push origin dev:main`.**
 
 active: **none** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-postgres-1`(5433, pgvector) — 5432 는 다른 프로젝트
 
@@ -14,10 +14,10 @@ active: **none** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-postgre
 - 완료 처리: 04-review `승인:` · review-index R6·R7 구현완료 · backlog P5 체크 · CURRENT active none · journal DONE · 01-plan 판정 표 표기 정정(테스트 파일명·`-k`)·user-setup → RUNNING.md 갈음(사용자 결정) · 03-log U8 해시 · 05 머리말 U8 메모 복원 · README(진행 표·테스트 수·실 LLM 미확인 명시).
 
 ## 커밋 안 된 변경
-- 위 완료 처리 문서 + README + P5-loop evidence(verifier 검토 증거 다수) → 완료 커밋 하나로.
+- journal 의 COMMIT 줄(훅 자동)과 이 HANDOFF 만 — 다음 커밋에 포함.
 
 ## 바로 다음에 할 것
-1. 완료 커밋(/commit, 사용자 승인) → `git push origin dev`(사용자 승인) → L-003: main 승격 여부 결정 대기(승격 전 판정 표 8행 실 공급자 curl 을 사용자가 돌려 보길 권고, `docs/RUNNING.md` 122행).
+1. main 승격 마무리(`approve-commit.sh --release` → `git push origin dev:main` → `git fetch origin main:main`). 재발 방지: GitHub main 브랜치 보호 규칙(사용자 몫)(승격 전 판정 표 8행 실 공급자 curl 을 사용자가 돌려 보길 권고, `docs/RUNNING.md` 122행).
 2. 다음 패키지 후보: P6(메모리 승격·패턴 감지 / 브리핑) — `/devlog start`, architect 위임은 L-004 승인 먼저.
 
 ## 열린 질문 · 사용자 결정 대기
