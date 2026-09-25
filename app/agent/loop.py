@@ -3,14 +3,15 @@ U4 해석 단계(`resolve_mentions()`) + U5 기록·응답 단계(`run_turn()`).
 
 ## 이 단위(U5)가 채우는 자리, 채우지 않는 자리
 
-U4 는 **해석 구간**(`resolve_mentions()`)만 채웠다. 이 단위(U5)는 그 위에
+U4 는 **해석 구간**(`resolve_mentions()`)만 채웠다. U5 는 그 위에
 **기록 구간**(게이트를 통과하고 `person_id` 가 확정된 제안만 실행)과
 **응답 구간**(`app/agent/respond.py` 호출)을 얹어 `run_turn()` 하나로
 잇는다 -- 인식(U2 `propose`) -> 게이트(U3 `check`) -> 해석(U4
-`resolve_mentions`) -> 기록(이 단위) -> 응답(이 단위)이 한 턴 안에서
-전부 돈다. `resume_turn()` 이라는 이름은 아직 없다 -- 재개(U7)가 채울
-자리이고, 이 단위가 그 이름을 미리 선언하면 아직 하지 않은 약속(답
-처리·`ResumeInput` 소비)을 한 것으로 오인될 수 있다.
+`resolve_mentions`) -> 기록(U5) -> 응답(U5)이 한 턴 안에서 전부 돈다.
+U7 이 파일 끝에 `resume_turn()` 을 더한다 -- `POST /answers/{question_id}`
+뒤 절반(답 처리 -> 해석 단계부터 재개 -> 기록 -> 응답)이며, `run_turn()`
+의 기록/응답 구간(`_record`/`build_reply`)과 해석 구간(`resolve_mentions`)
+을 그대로 재사용한다("resume_turn 만 추가한다" -- U7 절 참고).
 
 ## 이 모듈이 하지 않는 것 (원칙1·2·4, 판정 표 6·19·23행)
 
@@ -177,14 +178,19 @@ from app.agent.types import (
     STEP_LOOP_GATE,
     STEP_LOOP_RECORD,
     STEP_LOOP_RESOLVE_DONE,
+    STEP_LOOP_RESUME,
     STEP_LOOP_TURN,
     LOOP_TRACE_TOOL_NAME,
+    AcceptedProposal,
+    GateLimits,
     GateVerdict,
     PendingCall,
     PendingResume,
     Proposal,
+    ResumeInput,
     ScheduleResumeRef,
     StoredSummary,
+    ToolCallProposal,
     TurnResult,
 )
 from app.db.models import HIERARCHIES, RELATION_TAGS
@@ -480,14 +486,35 @@ def _resolve_mentions_impl(
     judge: Judge | None,
     config: ERConfig | None,
     resume_byte_limit: int,
+    preresolved: dict[str, int] | None = None,
 ) -> ResolveOutcome:
     mentions, first_index = _ordered_mentions(proposal, verdict)
     hints_by_mention = _match_create_person_hints(proposal, verdict, mentions)
 
-    person_ids: dict[str, int] = {}
+    #: U7 -- 재개(`resume_turn`)가 이번 답으로 이미 확정한 언급(`person_ids`
+    #: 시드). `run_turn`(인식부터 도는 첫 턴)은 이 인자를 넘기지 않아 빈
+    #: dict 그대로다 -- 기존 동작은 바뀌지 않는다.
+    person_ids: dict[str, int] = dict(preresolved or {})
     decisions: list[MentionDecision] = []
 
     for mention in mentions:
+        if mention in person_ids:
+            # U7 -- 이미 확정된 언급(재개 답이 가리키는 인물)은 resolve()
+            # 를 다시 부르지 않는다(결정 E, 원칙8 재현성). `trace_id=None`
+            # 은 "이번 해석 구간에서 새로 만든 er_resolve 행이 없다"는
+            # 뜻일 뿐이다 -- 확정 자체의 근거(merge/create_person)는 그
+            # 답을 처리한 `resume_turn` 이 이미 다른 tool_call 행으로
+            # 남겼다.
+            decisions.append(
+                MentionDecision(
+                    mention=mention,
+                    index=first_index[mention],
+                    band="merge",
+                    person_id=person_ids[mention],
+                )
+            )
+            continue
+
         hints = hints_by_mention.get(mention)
         resolution = resolve(ctx, mention, utterance, hints, judge=judge, config=config)
 
@@ -546,6 +573,7 @@ def resolve_mentions(
     judge: Judge | None = None,
     config: ERConfig | None = None,
     resume_byte_limit: int | None = None,
+    preresolved: dict[str, int] | None = None,
 ) -> ResolveOutcome:
     """U4 해석 구간의 공개 진입점. 게이트를 통과한 제안이 가리키는
     언급마다 `app.er.resolve()` -> `app.er.apply_resolution()` 을 부른다
@@ -557,6 +585,11 @@ def resolve_mentions(
     없이 결정적으로 돈다. `resume_byte_limit` 을 생략하면
     `app.settings.LOOP_MAX_RESUME_BYTES` 를 쓴다(테스트는 작은 값을 주입해
     상한 초과 케이스를 재현한다, `GateConfig` 와 같은 관례).
+
+    `preresolved`(U7 재개 전용, 기본 `None`)는 이미 확정된 언급 ->
+    `person_id` 시드다 -- `run_turn`(첫 턴)은 이 인자를 넘기지 않으므로
+    기존 동작은 바뀌지 않는다. `resume_turn` 이 답으로 확정한 언급을 다시
+    `resolve()` 하지 않기 위해서만 쓴다(결정 E).
 
     `agent_traces` 에 `step="loop_resolve_done"` 행 1개를 남긴다 --
     `output` 은 `ResolveOutcome.to_dict()`(언급별 결정 요약). `judge`/
@@ -581,6 +614,7 @@ def resolve_mentions(
             judge=judge,
             config=config,
             resume_byte_limit=resume_byte_limit,
+            preresolved=preresolved,
         )
 
     return _traced_resolve_mentions(ctx, proposal, verdict, utterance, limit)
@@ -672,13 +706,22 @@ def _ask_schedule(
     pending_calls: list[PendingCall],
     resume_byte_limit: int,
     now: datetime,
+    utterance: str,
 ) -> PendingQuestionOut:
     """M-2(i) -- `scheduled_at` 이 확정되지 않은 `add_schedule` 제안을
     대신해 `ask_user(kind="schedule")` 를 직접 부른다. `pending_calls[0]`
     이 이 질문을 일으킨 `add_schedule` 제안 자신이다(`ScheduleResumeRef.
     call_index=0`, 호출자가 그렇게 순서를 맞춰 넘긴다). `now` 는 호출자
     (`_record_impl`)가 이미 읽은 값을 그대로 받는다 -- `ctx.now()` 를 이
-    턴 안에서 두 번 불러 값이 갈릴 여지를 남기지 않는다."""
+    턴 안에서 두 번 불러 값이 갈릴 여지를 남기지 않는다.
+
+    **U7 확장** -- `context["utterance"]` 를 identity/new_person 질문과
+    같은 모양으로 최상위에 싣는다. `resume.pending_calls` 에 담긴
+    `add_event` 제안이 이 질문 답 뒤에 재개(U7)로 실행되려면 `raw_utterance`
+    가 필요한데, 이 질문 자신은(`_build_ask_payload` 가 만드는 identity/
+    new_person 질문과 달리) 그 값을 갖고 있지 않았다 -- 재개가 필요로
+    하는 값이므로 여기서 함께 싣는다(S3.4 13행 "재개에 필요한 것만"과
+    같은 방향, 발화 원문은 여전히 이 한 자리뿐이다)."""
 
     candidates = _schedule_candidates(now)
     schedule_options = {label: dt.isoformat() for label, dt in candidates}
@@ -698,7 +741,7 @@ def _ask_schedule(
         kind="schedule",
         question=question,
         options=options,
-        context={"resume": resume.to_dict()},
+        context={"utterance": utterance, "resume": resume.to_dict()},
     )
 
 
@@ -788,6 +831,7 @@ def _record_impl(
                 pending_calls=pending_calls,
                 resume_byte_limit=resume_byte_limit,
                 now=now,
+                utterance=utterance,
             )
             break
 
@@ -933,8 +977,329 @@ def run_turn(
         ],
     )
 
+    return _log_turn(ctx, utterance, turn)
+
+
+# ---------------------------------------------------------------------------
+# U7 -- resume_turn(): POST /answers/{question_id} 뒤 절반
+# (`app/api/deps.py::load_resume_input` 이 `PendingQuestion` 에서 값만 뽑아
+# 만든 `ResumeInput` 을 받는다 -- 이 파일은 그 ORM 을 직접 다루지 않는다,
+# 판정 표 23행)
+# ---------------------------------------------------------------------------
+
+
+def _log_turn(ctx: ToolContext, utterance: str, turn: TurnResult) -> TurnResult:
+    """`loop_turn` trace 행 1개(결정 F -- `run_turn`/`resume_turn` 공용,
+    U7 에서 `run_turn` 말미의 인라인 클로저를 이 이름으로 뽑아냈다. 동작은
+    바뀌지 않는다 -- 감싸는 대상·인자·step 이름이 전과 같다)."""
+
     @traced(LOOP_TRACE_TOOL_NAME, step=STEP_LOOP_TURN)
-    def _traced_turn(ctx: ToolContext, utterance: str, turn: TurnResult) -> TurnResult:
+    def _traced(ctx: ToolContext, utterance: str, turn: TurnResult) -> TurnResult:
         return turn
 
-    return _traced_turn(ctx, utterance, turn)
+    return _traced(ctx, utterance, turn)
+
+
+def _log_resume_entry(ctx: ToolContext, resume_input: ResumeInput) -> ResumeInput:
+    """`loop_resume` trace 행 1개(결정 F -- 재개 진입 자체를 기록한다).
+    `resume_input.to_dict()` 가 `input`/`output` 양쪽에 그대로 실린다
+    (`kind`·`context`·`answer`) -- `context` 는 이미 `pending_questions`
+    에 저장돼 있던 값이므로 새로 노출되는 비밀은 없다."""
+
+    @traced(LOOP_TRACE_TOOL_NAME, step=STEP_LOOP_RESUME)
+    def _traced(ctx: ToolContext, resume_input: ResumeInput) -> ResumeInput:
+        return resume_input
+
+    return _traced(ctx, resume_input)
+
+
+def _synthetic_proposal_and_verdict(
+    pending_calls: list[PendingCall],
+) -> tuple[Proposal, GateVerdict]:
+    """재개(U7)가 보류 제안(`resume.pending_calls`)을 다시 `resolve_mentions()`
+    -> `_record()` 에 먹이기 위한 합성 `Proposal`/`GateVerdict`. 게이트를
+    다시 태우지 않는다 -- `pending_calls` 는 이미 첫 턴에서
+    `bucket="execute"` 로 통과한 제안들이다(R-12 "같은 검사를 두 자리에서
+    하지 않는다"). 인덱스는 이 합성 턴 안에서만 의미가 있는 새 `0..n-1`
+    번호를 쓴다 -- 원본 `loop_extract` 인덱스와는 무관하며(그 행은 첫 턴의
+    별도 trace 행에 이미 있다, 이중 출처 금지), 이 합성 턴이 다시 되물으면
+    `_pending_calls_from` 이 **이 인덱스 기준으로** 새 `pending_calls` 를
+    만들어 다음 재개가 또 일관되게 이어받는다."""
+
+    tool_calls = [ToolCallProposal(name=c.name, args=dict(c.args)) for c in pending_calls]
+    accepted = [
+        AcceptedProposal(index=index, name=c.name, bucket=BUCKET_EXECUTE)
+        for index, c in enumerate(pending_calls)
+    ]
+    proposal = Proposal(tool_calls=tool_calls, raw={})
+    verdict = GateVerdict(
+        accepted=accepted, rejected=[], limits=GateLimits(0, 0, 0, 0), stop_reason=None
+    )
+    return proposal, verdict
+
+
+#: M-1(d) -- `new_person` 재개 답이 태그를 확정할 때, LLM 힌트(`resume.hints
+#: .hierarchy`)가 없거나 `HIERARCHIES` 밖이면 이 값으로 둔다(01-plan 확정
+#: M-1(d) "위계는 브리핑 영향이 작고 3종뿐이다").
+_DEFAULT_HIERARCHY = "동"
+
+
+#: U7 -- 저장된 `resume.pending_calls[].args` 안에서 `datetime` 이었다가
+#: JSON 저장(`ask_user` 의 `to_jsonable`)을 거쳐 ISO 문자열로 바뀌는 키.
+#: `add_event.occurred_at`/`add_schedule.scheduled_at` 뿐이다(둘 다
+#: `_execute_call` 이 실제 `datetime` 을 기대한다).
+_DATETIME_ARG_KEYS: tuple[str, ...] = ("occurred_at", "scheduled_at")
+
+
+def _hydrate_pending_call_args(args: dict[str, Any]) -> dict[str, Any]:
+    """재개가 저장된 제안 인자를 다시 실행 가능한 값으로 되살린다 -- 원래
+    턴(`run_turn`)에서는 `occurred_at`/`scheduled_at` 이 인식 단계(U2)가
+    만든 실제 `datetime` 객체였지만, `pending_questions.context` 로
+    저장되며 ISO 문자열이 됐다(`ask_user` 의 `to_jsonable`). 문자열이
+    아니거나(`None` 등) 파싱에 실패하면 원래 값을 그대로 둔다 -- 그
+    경우는 `add_event`/`add_schedule` 자신의 검증(`ToolError`)이 막고
+    `loop_record.output.failed[]` 로 남는다(R-24)."""
+
+    hydrated = dict(args)
+    for key in _DATETIME_ARG_KEYS:
+        value = hydrated.get(key)
+        if isinstance(value, str):
+            try:
+                hydrated[key] = datetime.fromisoformat(value)
+            except ValueError:
+                pass
+    return hydrated
+
+
+def _drop_calls_for_mention(pending_calls: list[PendingCall], mention: str) -> list[PendingCall]:
+    """부정 답(identity 거절/`new_person` 태그 옵션 밖) -- 그 언급에 딸린
+    보류 제안을 버린다(그 인물이 확정되지 않았으므로 실행할 `person_id`
+    가 없다). 다른(아직 손대지 않은) 언급의 제안은 그대로 남는다."""
+
+    return [c for c in pending_calls if c.args.get("person") != mention]
+
+
+def resume_turn(
+    ctx: ToolContext,
+    resume_input: ResumeInput,
+    *,
+    question_id: int,
+    judge: Judge | None = None,
+    config: ERConfig | None = None,
+) -> TurnResult:
+    """U7 -- `POST /answers/{question_id}` 뒤 절반. 답 저장(`answer_question`,
+    무수정 재사용) **뒤에** 저장된 `context` 로 해석 단계부터 다시 돈다
+    (결정 E -- 인식 LLM 을 다시 부르지 않는다). `resume_input` 은
+    `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아
+    만든 것이다 -- 이 함수도, `app/agent/` 어디도 그 ORM 을 직접 다루지
+    않는다(판정 표 23행).
+
+    ## `ResumeInput` 표기 정리 (01-plan 70행 vs U1 구현, 보고에 남긴다)
+
+    01-plan 70행은 `ResumeInput{kind, context, session_id}` 라 적었지만
+    U1(`app/agent/types.py`)이 실제로 만든 필드는 `kind`·`context`·`answer`
+    다 -- `session_id` 는 없다. 이 구현은 **U1 쪽(실제 타입)을 그대로
+    따른다**: `session_id` 는 이미 `ctx.session_id`(호출자 `build_ctx()` 가
+    답한 행의 세션으로 채운다, 결정 12)가 담당하므로 `ResumeInput` 에
+    다시 넣지 않는다. 대신 이 함수가 `create_person`(D1) 직전에 필요로
+    하는 **`question_id`**(어느 질문이 confirmed 인지)는 `ResumeInput`
+    안이 아니라 이 함수의 **별도 키워드 인자**로 받는다(`app.agent.types`
+    는 고치지 않는다) -- 라우트가 이미 경로 파라미터로 들고 있는 값이고,
+    `pending_questions.context`(저장되는 값)의 모양과는 무관한 "이 답이
+    어느 질문을 확정하는가"라는 호출 경로 정보이기 때문이다(같은 값을
+    두 자리에 중복해서 싣지 않는다).
+
+    ## 답 종류별 동작 (01-plan U7 확정 M-1(d)·M-2(i), 결정 J)
+
+    - **`identity`**: `context["candidate_ids"][answer]` 가 가리키는 그
+      인물에만 `update_person` 을 `new_alias=context["mention"]` 으로 부른다.
+      답이 후보 밖(ER 거절 옵션)이면 그 언급에 딸린 보류 제안을 버리고
+      아무것도 만들지 않는다(F-b97a06 긍정 답 규약과 같은 방향 -- 판단
+      근거가 없으면 확정하지 않는다).
+    - **`new_person`**(M-1(d)): 답이 `resume.tag_by_answer` 의 키이면
+      `relation_tag = tag_by_answer[answer]`(**답에서만** 온다),
+      `hierarchy` 는 `resume.hints.hierarchy` 가 `HIERARCHIES` 안이면 그
+      값, 아니면 `_DEFAULT_HIERARCHY`. `ctx.confirmed_question_id` 를
+      **이 함수 자신이** 세운 채(판정 표 5a -- 호출자가 미리 세워 뒀더라도
+      다시 명시적으로 확정한다) `context["mention"]` **하나만** 대상으로
+      `create_person` 을 부른다. 답이 태그 옵션 밖(ER 부정 옵션)이면
+      `create_person` 을 **0회** 부르고, 그 언급에 딸린 보류 제안도
+      버린다(판정 표 28행).
+    - **`schedule`**(M-2(i)): `resume.schedule_options[answer]` 로 시각을
+      **사전 조회**해(문자열을 다시 파싱하지 않는다) `add_schedule(
+      resume.schedule.person_id, resume.schedule.title, scheduled_at)`.
+      답이 `"모르겠어요"` 이거나 그 표 밖이면 0회. 이 질문을 일으킨
+      제안(`resume.schedule.call_index`)은 항상 `resume.pending_calls`
+      에서 제외하고 처리한다(중복 실행 금지) -- 스케줄링 여부와 무관하게
+      그 언급의 `person_id` 는 이미 알려져 있으므로(원래 턴에서 merge
+      됐던 값) 같은 언급에 딸린 **다른** 보류 제안이 있으면 재해석 없이
+      이어 실행한다.
+
+    ## 남은 보류 제안 (`resume.pending_calls`)
+
+    이번 답으로 버려지지 않은 나머지 제안은 합성 `Proposal`/`GateVerdict`
+    (`_synthetic_proposal_and_verdict` -- 게이트를 다시 태우지 않는다)로
+    `resolve_mentions()`/`_record()` 를 다시 타되, 이번 답이 확정한 언급은
+    `preresolved` 로 넘겨 `resolve()` 를 다시 부르지 않는다(결정 E, 원칙8).
+    그 결과 또 되묻거나(identity/new_person) `schedule` 질문이 새로
+    나오면 **그 자리에서 이 재개 턴을 끝낸다**(01-plan U7 "재개 중 남은
+    언급이 또 되물으면 그 자리에서 재개 턴을 끝내고") -- 방금 답한 첫
+    질문은 이미 `answer_question()` 이 `answered` 로 저장해 두었고, 이
+    함수는 그 행을 다시 건드리지 않는다(결정 J 의 1회 소비는 그 저장이
+    이미 지킨다).
+
+    `agent_traces` 에 `loop_resume`(재개 진입 자체) 행 1개를 남기고,
+    이어지는 `resolve_mentions()`/`_record()` 가 각자의 step 행을
+    남긴다(`loop_resolve_done`/`loop_record`) -- 진행할 보류 제안이
+    없어도(예: identity 답만 처리하고 끝나는 턴) 빈 목록으로 각 1행씩
+    남는다(U1 81행 "정확히 1행"과 같은 방향). `loop_extract`/`loop_gate`
+    행은 남기지 않는다 -- 인식 LLM 을 다시 부르지 않으므로(결정 E) 제안할
+    것도, 거를 것도 없다."""
+
+    kind = resume_input.kind
+    context = resume_input.context if isinstance(resume_input.context, dict) else {}
+    answer = resume_input.answer
+    utterance = context.get("utterance", "")
+    resume_raw = context.get("resume")
+    resume_raw = resume_raw if isinstance(resume_raw, dict) else {}
+
+    _log_resume_entry(ctx, resume_input)
+    resume_trace_id = ctx.last_trace_id
+
+    pending_calls = [
+        PendingCall(
+            index=call.get("index", position),
+            name=call["name"],
+            args=_hydrate_pending_call_args(call.get("args", {})),
+        )
+        for position, call in enumerate(resume_raw.get("pending_calls") or [])
+    ]
+
+    preresolved: dict[str, int] = {}
+    persons_created = 0
+    schedules_direct = 0
+
+    if kind == "identity":
+        mention = context.get("mention", "")
+        candidate_ids = context.get("candidate_ids")
+        candidate_ids = candidate_ids if isinstance(candidate_ids, dict) else {}
+        if answer in candidate_ids:
+            person_id = candidate_ids[answer]
+            app_tools.update_person(ctx, person_id, new_alias=mention)
+            preresolved[mention] = person_id
+        else:
+            # 거절(ER 옵션 밖) -- 이 언급을 확정하지 않는다(D1 과 같은
+            # 비대칭: 판단 근거가 없으면 확정하지 않는다).
+            pending_calls = _drop_calls_for_mention(pending_calls, mention)
+
+    elif kind == "new_person":
+        mention = context.get("mention", "")
+        tag_by_answer = resume_raw.get("tag_by_answer")
+        tag_by_answer = tag_by_answer if isinstance(tag_by_answer, dict) else {}
+        if answer in tag_by_answer:
+            relation_tag = tag_by_answer[answer]
+            hints = resume_raw.get("hints")
+            hierarchy_hint = hints.get("hierarchy") if isinstance(hints, dict) else None
+            hierarchy = hierarchy_hint if hierarchy_hint in HIERARCHIES else _DEFAULT_HIERARCHY
+            # 판정 표 5a -- create_person 바로 앞줄에서 confirmed_question_id
+            # 를 세운다(D1, 이 함수가 스스로 확정한다).
+            ctx.confirmed_question_id = question_id
+            created = app_tools.create_person(
+                ctx,
+                display_name=mention,
+                aliases=[mention] if mention else [],
+                relation_tag=relation_tag,
+                hierarchy=hierarchy,
+            )
+            preresolved[mention] = created.id
+            persons_created = 1
+        else:
+            # 판정 표 28행 -- 답이 태그 옵션 밖(ER 부정 옵션)이면
+            # create_person 을 0회 부른다.
+            pending_calls = _drop_calls_for_mention(pending_calls, mention)
+
+    elif kind == "schedule":
+        schedule_ref = resume_raw.get("schedule")
+        schedule_ref = schedule_ref if isinstance(schedule_ref, dict) else None
+        schedule_options = resume_raw.get("schedule_options")
+        schedule_options = schedule_options if isinstance(schedule_options, dict) else {}
+        call_index = schedule_ref.get("call_index") if schedule_ref is not None else None
+
+        schedule_mention: str | None = None
+        if isinstance(call_index, int) and 0 <= call_index < len(pending_calls):
+            person_field = pending_calls[call_index].args.get("person")
+            if isinstance(person_field, str):
+                schedule_mention = person_field
+
+        if (
+            schedule_ref is not None
+            and answer != SCHEDULE_UNKNOWN_OPTION
+            and answer in schedule_options
+        ):
+            scheduled_at = datetime.fromisoformat(schedule_options[answer])
+            app_tools.add_schedule(ctx, schedule_ref["person_id"], schedule_ref["title"], scheduled_at)
+            schedules_direct = 1
+        # "모르겠어요"·표 밖 답 -- add_schedule 0회(M-2(i)).
+
+        if schedule_ref is not None and schedule_mention is not None:
+            # 스케줄링 여부와 무관하게 이 언급의 person_id 는 이미 알려져
+            # 있다(원래 턴의 merge) -- 같은 언급에 딸린 다른 보류 제안이
+            # 있으면 재해석 없이 이어 실행한다.
+            preresolved[schedule_mention] = schedule_ref["person_id"]
+
+        if isinstance(call_index, int) and 0 <= call_index < len(pending_calls):
+            # 이 질문을 일으킨 제안 자신은 위에서 이미 처리했다(성공이든
+            # "모르겠어요" 든) -- 중복 실행 금지.
+            pending_calls = [c for i, c in enumerate(pending_calls) if i != call_index]
+
+    proposal, verdict = _synthetic_proposal_and_verdict(pending_calls)
+    outcome = resolve_mentions(
+        ctx,
+        proposal,
+        verdict,
+        utterance,
+        judge=judge,
+        config=config,
+        preresolved=preresolved,
+    )
+    resolve_trace_id = ctx.last_trace_id
+    record = _record(
+        ctx, proposal, verdict, outcome, utterance, resume_byte_limit=LOOP_MAX_RESUME_BYTES
+    )
+    record_trace_id = ctx.last_trace_id
+
+    if record.schedule_question is not None:
+        pending_question = record.schedule_question
+    elif outcome.stopped:
+        pending_question = _pending_question_from_resolve(outcome)
+    else:
+        pending_question = None
+
+    stop_reason = "ask_user" if pending_question is not None else None
+
+    reply = build_reply(
+        stored_events=record.events,
+        stored_schedules=record.schedules + schedules_direct,
+        failed_count=len(record.failed),
+        limit_hit=False,
+        pending_question=pending_question,
+    )
+
+    turn = TurnResult(
+        reply=reply,
+        session_id=ctx.session_id,
+        stored=StoredSummary(
+            persons=persons_created,
+            events=record.events,
+            schedules=record.schedules + schedules_direct,
+        ),
+        pending_question=pending_question,
+        stop_reason=stop_reason,
+        trace_ids=[
+            trace_id
+            for trace_id in (resume_trace_id, resolve_trace_id, record_trace_id)
+            if trace_id is not None
+        ],
+    )
+
+    return _log_turn(ctx, utterance, turn)

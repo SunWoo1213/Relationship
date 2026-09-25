@@ -49,7 +49,22 @@ FastAPI 의존성이다 -- 운영 경로는 각각 `None`/`None`/`_embedder_from
 문턱을 넘지 못해 되묻기로 빠지고), 반대로 키가 있는 환경에서는 테스트가
 실제 OpenAI 를 부르게 된다(네트워크 0 위반). `get_embedder()` 를 별도
 의존성으로 빼 `routes.chat` 이 `Depends` 로 주입하고 `build_chat_ctx()` 는
-그 값을 인자로 받기만 한다."""
+그 값을 인자로 받기만 한다.
+
+## U7 추가분 -- `load_resume_input()` + `build_ctx()` 확장 (재개, R6·R7)
+
+`load_resume_input(session, question_id)` 는 답 저장(`answer_question`)
+**뒤에** 불러 `app.agent.types.ResumeInput(kind, context, answer)` 를
+값으로 돌려준다(아래 함수 docstring 이 `ResumeInput` 표기 정리를 적는다).
+`build_ctx()` 는 이제 `embedder` 를 받는다(기본 `None`, 하위 호환) --
+재개가 `create_person`/`update_person(new_alias=…)` 로 새 별칭을 만들 수
+있으므로(위 U6 절 "embedder=None 구멍"과 같은 이유) `routes.submit_answer`
+가 `get_embedder()`(U6 이 이미 만든 의존성, 그대로 재사용)로 받은 값을
+넘긴다. `get_judge()` 도 같은 이유로 `routes.submit_answer` 가 재사용한다
+(재개 중 남은 언급을 `resolve()` 할 수 있으므로) -- `get_proposer()` 는
+재사용하지 않는다: `resume_turn()` 은 인식 LLM 을 다시 부르지 않으므로
+(결정 E) 이 의존성을 주입해도 쓰이지 않아, 불필요한 의존성을 라우트에
+더하지 않는다(U7 03-log 에 이 결정을 적는다)."""
 
 from __future__ import annotations
 
@@ -61,7 +76,7 @@ from collections.abc import Iterator
 from fastapi import Header, HTTPException
 from sqlalchemy.orm import Session
 
-from app.agent import Proposer
+from app.agent import Proposer, ResumeInput
 from app.db.models import PendingQuestion
 from app.db.session import SessionLocal
 from app.embedding import EmbeddingProvider, OpenAIEmbeddingProvider
@@ -84,12 +99,23 @@ def get_session() -> Iterator[Session]:
         session.close()
 
 
-def build_ctx(session: Session, question_id: int) -> ToolContext:
+def build_ctx(
+    session: Session, question_id: int, embedder: EmbeddingProvider | None = None
+) -> ToolContext:
     """답할 `pending_questions` 행을 조회해 그 `session_id` 로 `ToolContext`
     를 만든다(결정 12). 행이 없으면 `QuestionNotFound`.
 
-    `user_id = app_user_id()`(로컬 단일 사용자), `embedder=None`(답 저장은
-    별칭을 만들지 않는다), `now` 는 기본값(`datetime.now(timezone.utc)`)."""
+    `user_id = app_user_id()`(로컬 단일 사용자), `now` 는 기본값
+    (`datetime.now(timezone.utc)`).
+
+    **U7 추가** -- `embedder` 파라미터(기본 `None`, 하위 호환). 답 저장만
+    하던 시절(P2)에는 별칭을 만들지 않아 `embedder=None` 고정이었지만,
+    이제 이 ctx 로 재개(U7)가 `create_person`/`update_person(new_alias=…)`
+    를 부를 수 있으므로(01-plan 70행 리스크 "embedder=None 구멍") 호출자
+    (`routes.submit_answer`)가 `get_embedder()` 의존성(운영은
+    `_embedder_from_env()`, 테스트는 `fake_embedder`, `build_chat_ctx` 와
+    같은 관례, R-15)으로 받은 값을 넘긴다. 아무것도 넘기지 않으면 예전과
+    똑같이 `None` 이다."""
     question = session.get(PendingQuestion, question_id)
     if question is None:
         raise QuestionNotFound("question_not_found")
@@ -97,8 +123,39 @@ def build_ctx(session: Session, question_id: int) -> ToolContext:
         session=session,
         session_id=question.session_id,
         user_id=app_user_id(),
-        embedder=None,
+        embedder=embedder,
     )
+
+
+def load_resume_input(session: Session, question_id: int) -> ResumeInput:
+    """U7 -- `POST /answers/{question_id}` 뒤 절반이 읽을 재개 재료.
+    **답 저장(`answer_question`) 뒤에** 불러야 한다 -- `pending_questions
+    .answer` 컬럼이 이미 채워져 있어야 하기 때문이다(아래 참고). 행이
+    없으면 `QuestionNotFound`(이미 `build_ctx()`/`answer_question()` 이
+    지나간 뒤이므로 실제로는 거의 일어나지 않지만, 이 함수 자신도
+    존재를 가정하지 않는다).
+
+    `PendingQuestion` ORM 을 읽는 것은 이 모듈(`build_ctx`·이 함수)뿐이고
+    `app/agent/` 는 값(`kind`·`context`·`answer`)만 받는다(H-2 의 (b)
+    경로 차단, 판정 표 23행).
+
+    **`ResumeInput` 표기 정리(보고에 남긴 결정, `app/agent/loop.py::
+    resume_turn` docstring 과 같은 결정을 여기서도 적용한다)** -- 01-plan
+    70행은 `ResumeInput{kind, context, session_id}` 라 적었지만 U1
+    (`app/agent/types.py`)이 실제로 만든 필드는 `kind`·`context`·`answer`
+    다. 이 함수는 **U1 쪽(실제 타입)을 따른다**: `session_id` 는 넣지
+    않는다(`ToolContext.session_id` 가 이미 담당, 결정 12). 대신 `answer`
+    는 **요청 본문을 다시 읽지 않고 저장된 행에서 그대로 읽는다** --
+    라우트가 이 함수를 부르기 **전에** `answer_question(ctx, question_id,
+    body.answer)` 로 이미 `question.answer` 를 저장했으므로, 그 컬럼이
+    사용자가 방금 제출한 답과 항상 같다(단일 출처 -- 같은 값을 요청
+    본문과 DB 행 두 자리에서 따로 나르지 않는다)."""
+    question = session.get(PendingQuestion, question_id)
+    if question is None:
+        raise QuestionNotFound("question_not_found")
+    context = question.context if isinstance(question.context, dict) else {}
+    answer = question.answer if isinstance(question.answer, str) else ""
+    return ResumeInput(kind=question.kind, context=context, answer=answer)
 
 
 # ---------------------------------------------------------------------------

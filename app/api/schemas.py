@@ -13,7 +13,19 @@
 루프가 이미 고정한 스키마(01-plan U1 "세 output 스키마" 근처)를 HTTP
 경계에서 그대로 반사할 뿐, 새 직렬화 규칙을 만들지 않는다. 라우트는
 `ChatOut.model_validate(turn.to_dict())` 로 옮긴다.
-"""
+
+## U7 추가분 -- `AnswerOut` 확장 (재개, R6·R7)
+
+`AnswerOut` 은 답 저장 결과(`question_id`·`status`, P2 그대로) **뒤에**
+`ChatOut` 과 같은 다섯 필드(`reply`·`stored`·`pending_question`·
+`stop_reason`·`trace_ids`)를 이어 붙인다 -- `resume_turn()` 이 돌려주는
+`TurnResult` 를 `ChatOut` 과 같은 방식으로 그대로 반사한다(같은 값을
+두 가지 모양으로 만들지 않는다). 이 확장은 **기존 응답 모양을 바꾼다**
+-- `POST /answers/{question_id}` 는 이제 항상 재개까지 돈 결과를
+돌려주므로, `question_id`/`status` 두 필드만 보던 P2 시절의 응답과는
+다르다(`tests/test_api.py` 의 기존 단언은 이 확장에 맞춰 갱신했다 --
+단언을 없애지 않고 기대값만 넓혔다, 01-plan 리스크 절 "AnswerOut 확장은
+기존 테스트를 건드린다" 그대로)."""
 
 from __future__ import annotations
 
@@ -28,15 +40,6 @@ class AnswerIn(BaseModel):
     `app.tools.questions.answer_question` 이 한다(여기서는 형식만 본다)."""
 
     answer: str
-
-
-class AnswerOut(BaseModel):
-    """`POST /answers/{question_id}` 응답. S3.4 턴 N+1 앞 절반(답 저장)까지
-    -- 루프 재개·후속 툴 호출 결과는 담지 않는다(P5-loop 이 이 스키마를
-    확장한다)."""
-
-    question_id: int
-    status: str
 
 
 class HealthOut(BaseModel):
@@ -73,6 +76,21 @@ class ChatPendingQuestionOut(BaseModel):
     kind: str
     question: str
     options: list[str]
+
+
+class AnswerOut(BaseModel):
+    """`POST /answers/{question_id}` 응답. `question_id`/`status` 는 답
+    저장 자체의 결과(P2, 변경 없음)이고, 나머지 다섯 필드는 그 답으로
+    재개된 턴(`resume_turn()` 의 `TurnResult`)의 결과다(U7, 모듈 docstring
+    "U7 추가분" 참고) -- `ChatOut` 과 같은 다섯 필드를 그대로 쓴다."""
+
+    question_id: int
+    status: str
+    reply: str
+    stored: StoredOut
+    pending_question: ChatPendingQuestionOut | None = None
+    stop_reason: str | None = None
+    trace_ids: list[int] = Field(default_factory=list)
 
 
 class ChatOut(BaseModel):

@@ -3,9 +3,9 @@
 U1 시점에는 `app/agent/types.py` 의 계약 타입·trace 어휘만 있었다(01-plan
 U1 "코드가 도는 건 아직 없다"). U2 가 인식 단계(`app/agent/propose.py`)를
 더했고, U3 가 게이트(`app/agent/gate.py`)를 더했다. U5 가 기록·응답
-단계와 함께 `run_turn()`(`app/agent/loop.py`)을 더한다 -- `resume_turn`
-은 아직 없으므로(U7 몫) 그 이름은 미리 import 하지 않는다(ImportError
-방지, U4/U5 `loop.py` 모듈 docstring "이 단위가 채우는 자리" 참고).
+단계와 함께 `run_turn()`(`app/agent/loop.py`)을 더했다. U7 이
+`resume_turn()`(같은 파일)을 더해 `POST /answers/{question_id}` 뒤
+절반(R6·R7)을 잇는다.
 """
 
 from __future__ import annotations
@@ -28,6 +28,7 @@ from app.agent.loop import (
     RecordOutcome,
     ResolveOutcome,
     resolve_mentions,
+    resume_turn,
     run_turn,
 )
 from app.agent.propose import (
@@ -95,6 +96,7 @@ __all__ = [
     "RecordOutcome",
     "ResolveOutcome",
     "resolve_mentions",
+    "resume_turn",
     "run_turn",
     "PROPOSAL_ARG_SCHEMA",
     "PROPOSAL_SCHEMA",

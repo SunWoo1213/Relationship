@@ -144,7 +144,18 @@ def test_answer_success_saves_row_same_transaction(client: TestClient, db_sessio
 
     assert resp.status_code == 200
     body = resp.json()
-    assert body == {"question_id": asked.question_id, "status": "answered"}
+    # U7 -- AnswerOut 이 재개 결과(reply·stored·pending_question·stop_reason·
+    # trace_ids)까지 담도록 확장됐다(01-plan 리스크 절 "AnswerOut 확장은
+    # 기존 테스트를 건드린다" -- 단언을 없애지 않고 기대값을 넓힌다). 이
+    # 질문은 `context={}`(재개 재료 없음, 루프 밖에서 만든 질문)라 재개는
+    # 아무 것도 실행하지 못하고 빈 결과로 끝난다.
+    assert body["question_id"] == asked.question_id
+    assert body["status"] == "answered"
+    assert body["reply"]
+    assert body["stored"] == {"persons": 0, "events": 0, "schedules": 0}
+    assert body["pending_question"] is None
+    assert body["stop_reason"] is None
+    assert body["trace_ids"] and all(isinstance(i, int) for i in body["trace_ids"])
 
     # 같은 트랜잭션에서 직접 조회 -- 결정 13.
     row = db_session.execute(
