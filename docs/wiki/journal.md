@@ -252,3 +252,5 @@
 - 2026-09-25 16:50 | COMMIT | a2f5256 docs(P5-loop): FIX-004 커밋 해시를 기록에 채우고 재개 결정을 남긴다
 - 2026-09-25 17:48 | COMMIT | d5c8ec9 feat(P5-loop): U6 채팅 API — 발화 한 건을 받아 한 턴을 돌리고 답한다
 - 2026-09-25 18:40 | COMMIT | 7df3ada feat(P5-loop): U7 재개 — 답을 받으면 멈춘 턴을 그 자리에서 이어 간다
+- 2026-09-25 19:36 | COMMIT | f0d3e26 docs(P5-loop): U8 수용 기준 기계 검증 결과와 registry·README 갱신
+- 2026-09-25 22:20 | DONE | **P5-loop 완료** — verifier 04-review `결과: 완료`(재개 세션에서 이어 작성: 수용 기준 10조각 통과, 판정 표 28행 대조, 부정 22건, T_merge 미만 자동 병합 0), 사용자 승인. verify-impl **FAIL 0 / WARN 0**(`evidence/20260925-2200-verify-impl.txt`), 전체 회귀 1474 passed, 05 열림 0/해소 23. review-index R6·R7 구현완료. `docs/user-setup/` 갱신은 RUNNING.md 로 갈음(사용자 결정), 01-plan 판정 표 표기 정정, 03-log U8 해시 채움. 판정 표 8행(실 공급자 curl) 미실행 — 사용자 몫. `CURRENT active: none` | P5-loop

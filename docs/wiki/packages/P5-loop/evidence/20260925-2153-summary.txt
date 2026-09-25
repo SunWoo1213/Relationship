@@ -1,0 +1,2 @@
+verify-impl P5-loop 20260925-2153
+FAIL=0 WARN=0

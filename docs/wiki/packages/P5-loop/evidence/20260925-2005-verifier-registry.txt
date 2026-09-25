@@ -1,0 +1,56 @@
+## 16  grep -n "app/agent/\|POST /chat\|test_agent_\|test_api_chat\|test_api_answers_resume" docs/wiki/registry.md  (새 행 13 = 모듈 6 + 엔드포인트 1 + 테스트 6)
+33:| 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·실행법) | README.md | �
+65:| 엔드포인트 | GET /health · POST /answers/{id} | app/api/routes.py | P2-tools | 4d5817e | `/health`:
+161:| 모듈 | 루프 계약 타입·trace 어휘(GateVerdict·PendingResume·LoopError 등) | app/agent/types
+162:| 모듈 | 루프 패키지 재export 진입점 | app/agent/__init__.py | P5-loop | 3e4db92 | `run_turn`·
+163:| 모듈 | 인식 단계 — 발화 → tool_calls 제안(LLM 1회) | app/agent/propose.py | P5-loop | 069
+164:| 모듈 | 게이트 — LLM 제안을 코드가 거른다(L(iii)) | app/agent/gate.py | P5-loop | 8ecf75c
+165:| 모듈 | 에이전트 루프 오케스트레이션(해석·기록·응답, run_turn/resume_turn) | app/a
+166:| 모듈 | 응답 단계 — 결정적 템플릿 응답 문장 | app/agent/respond.py | P5-loop | 1835355 
+167:| 엔드포인트 | POST /chat | app/api/routes.py | P5-loop | d5c8ec9 | 발화 1건 → 인식(LLM 1회)�
+168:| 테스트 | 루프 계약 타입 왕복(to_dict)·step/bucket 어휘 고정 | tests/test_agent_types.py 
+169:| 테스트 | 인식 단계 — 스키마 강제·오류 어휘 매핑·FakeProposer | tests/test_agent_pr
+170:| 테스트 | 게이트 — 화이트리스트·인자 스키마·person_id 금지·상한(전부 부정 �
+171:| 테스트 | 해석·기록·응답 단계(run_turn, 되묻기 기본 케이스) | tests/test_agent_loop.
+172:| 테스트 | HTTP: POST /chat 한 흐름 | tests/test_api_chat.py | P5-loop | d5c8ec9 | 9건 — 요청 1
+173:| 테스트 | HTTP: POST /answers 재개(R6·R7 을 닫는 회귀) | tests/test_api_answers_resume.py | P5
+
+## 고친 기존 파일은 비고 확장(새 행 아님) — P5-loop 를 담은 행 번호와 경로
+33:| README.md | 하네스 
+53:| app/settings.py | P2-tools 
+64:| app/api/deps.py | P2-tools 
+65:| app/api/routes.py | P2-tools 
+66:| app/api/schemas.py | P2-tools 
+76:| tests/test_api.py | P2-tools 
+161:| app/agent/types.py | P5-loop 
+162:| app/agent/__init__.py | P5-loop 
+163:| app/agent/propose.py | P5-loop 
+164:| app/agent/gate.py | P5-loop 
+165:| app/agent/loop.py | P5-loop 
+166:| app/agent/respond.py | P5-loop 
+167:| app/api/routes.py | P5-loop 
+168:| tests/test_agent_types.py | P5-loop 
+169:| tests/test_agent_propose.py | P5-loop 
+170:| tests/test_agent_gate.py | P5-loop 
+171:| tests/test_agent_loop.py | P5-loop 
+172:| tests/test_api_chat.py | P5-loop 
+173:| tests/test_api_answers_resume.py | P5-loop 
+
+## 같은 경로의 행 수 (1 이어야 한다)
+app/api/routes.py: 2
+app/api/schemas.py: 1
+app/api/deps.py: 1
+app/settings.py: 1
+tests/test_api.py: 1
+README.md: 1
+app/er/judge.py: 1
+
+## F-e93529: app/er/judge.py 행 (P3-er 소속 그대로, P5-loop 비고 없음)
+84:| 모듈 | LLM 판정(3단계, 공급자 중립) | app/er/judge.py | P3-er | b1f2782 | 
+0
+
+## F-b38c2c: inspect.signa 행 없음
+0
+
+## registry diff 24feebd..HEAD (행 추가/변경 수)
+19	6	docs/wiki/registry.md

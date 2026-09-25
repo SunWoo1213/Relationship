@@ -1,0 +1,18 @@
+f0d3e26 docs(P5-loop): U8 수용 기준 기계 검증 결과와 registry·README 갱신
+7df3ada feat(P5-loop): U7 재개 — 답을 받으면 멈춘 턴을 그 자리에서 이어 간다
+d5c8ec9 feat(P5-loop): U6 채팅 API — 발화 한 건을 받아 한 턴을 돌리고 답한다
+a2f5256 docs(P5-loop): FIX-004 커밋 해시를 기록에 채우고 재개 결정을 남긴다
+1be4a56 fix(FIX-004): 인물 해석 테스트가 DB 전체 질문 수 대신 해석 전후를 비교한다
+1835355 feat(P5-loop): U5 기록·응답 단계 — 확인된 사람의 기록만 저장하고 사실만 답한다
+7a2ec5c feat(P5-loop): U4 해석 단계 — 언급을 인물에 잇고, 애매하면 되묻고 멈춘다
+8ecf75c feat(P5-loop): U3 게이트 — LLM 제안을 코드가 거르고 사유를 남긴다
+069bdc2 feat(P5-loop): U2 인식 단계 — 발화 한 건에서 툴 호출 제안을 받는다
+3e4db92 feat(P5-loop): U1 루프 계약 타입과 trace 어휘 — 도는 코드는 아직 없다
+24feebd docs(P5-loop): 3차 검증 통과·계획 승인 — 패키지 착수
+7351363 docs(P5-loop): 3차 개정 — 2차 보류 세 건만 고치고 범위를 넓히지 않았다
+20c2d7e harness(FIX-003): verifier 가 콜론 하나 때문에 조용히 사라져 있었다
+f5fde31 merge: 원격 dev 의 README 정리를 로컬 작업과 합친다
+b10ac6e docs(P5-loop): 계획을 두 번 검증했고 두 번 보류다 — 여기까지 기록하고 멈춘다
+cf82868 harness(FIX-002): 게이트 검사가 재설계 전 패키지를 보고 있어 P5 이후가 막혔다
+b676799 docs(P2-tools): 완료 — verifier 04-review 완료 판정·사용자 승인, R6 R7 R10 R18 구현완료, 패키지 닫음
+4d5817e feat(P2-tools): U8 FastAPI 골격 — GET /health·POST /answers/{id} 답 저장(200/404/409/422), 예외 매핑, 요청 단위 세션

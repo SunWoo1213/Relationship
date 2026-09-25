@@ -34,7 +34,7 @@
   - **`POST /answers/{question_id}` 확장(재개)** — 답 저장(P2 가 이미 함) **뒤에** 저장된 `context` 로 루프를 이어받아 후속 툴을 호출하고 그 결과를 응답에 담는다. S3.4 8행 "턴 N+1 … 저장된 context 로 루프 재개 → 후속 툴" 의 뒷부분.
   - **D1 확인 질문의 대상 바인딩·1회 소비**(R6 의 꼬리, P2 04-review 108행) — answered `new_person` 질문 하나로 임의의 이름을 `create_person` 할 수 있는 지금의 구멍을, **재개 경로가 `context` 에 적힌 대상(`mention`·`candidate_ids`)에만 쓰도록** 막는다. 소비 1회는 `answer_question` 의 `already_answered`(409)로 강제한다(결정 J).
   - **관측성** — 루프 고유 `agent_traces` 행(step 어휘는 결정 F). 툴 7종·ER 의 trace 는 기존 `@traced` 가 이미 남기므로 **덧붙이기만 하고 기존 규약은 건드리지 않는다**(원칙9). **제안된 툴(`loop_extract`)과 게이트 판정(`loop_gate`: 통과·거부·사유)을 실행된 `tool_call` 행과 함께 볼 수 있어야** P10 이 `docs/proposal.md` 176행 "툴 호출 정확도 | 올바른 툴을 선택한 비율"과 거부율을 잴 수 있다.
-  - **문서** — `registry.md` 행(새 모듈)·비고 확장(고친 기존 파일), `README.md` 실행법 한 절, `docs/user-setup/` 의 로컬 재현 절차(기존 카드 갱신, 새 카드 신설 금지).
+  - **문서** — `registry.md` 행(새 모듈)·비고 확장(고친 기존 파일), `README.md` 실행법 한 절, `docs/user-setup/` 의 로컬 재현 절차(기존 카드 갱신, 새 카드 신설 금지) — **완료 시 `docs/RUNNING.md` 로 갈음(사용자 결정 2026-09-25, 04-review §6-2)**.
 - 이 패키지에서 하지 않는 것 (각 줄 끝이 "왜 안 하는가"):
   - **3계층 메모리 승격·`fact_sources` 채우기**(S3.5·P6-memory) — 승격은 이벤트가 **쌓인 뒤** 도는 일이고, 이 패키지는 그 이벤트를 **만드는** 쪽이다. `add_event` 는 승격을 건드리지 않는다(registry 59행이 이미 못박았다).
   - **반복 패턴 감지(D9, 90일 3회 → `pattern:{type}`)** — 같은 이유로 P6-memory. 규칙이 보려면 같은 인물의 같은 `type` 이 3건 쌓여 있어야 하는데 이 패키지는 첫 건을 만드는 단계다.
@@ -60,7 +60,7 @@
 - `app/agent/gate.py` — 게이트. `check(proposal) -> GateVerdict`. 화이트리스트(`app.tools.TOOL_NAMES` import)·호출 가능 집합·`inspect.signature` 인자 대조·`person_id` 금지·상한(결정 A). **거부 사유 어휘·버킷 어휘·주입 인자 집합은 이 모듈이 단일 출처**(거부: `unknown_tool`·`not_callable_by_llm`·`bad_args`·`person_id_from_llm`·`needs_confirmation`·`limit` / 버킷: `execute`·`hint_only` / 주입 인자: `ctx`·`person_id`·`raw_utterance`, R-11)
 - `app/agent/loop.py` — 오케스트레이션. `run_turn(ctx, utterance, *, proposer=None, judge=None, config=None) -> TurnResult`, `resume_turn(ctx, resume_input) -> TurnResult`, 단계별 trace 기록, `PendingResume` 를 `dataclasses.replace` 로 `ask_payload` 에 얹는 자리
 - `app/agent/respond.py` — 응답 단계(결정 B(i) 템플릿 표)
-- `tests/test_agent_propose.py` · `tests/test_agent_gate.py` · `tests/test_agent_loop.py` · `tests/test_agent_resume.py` · `tests/test_api_chat.py`
+- `tests/test_agent_propose.py` · `tests/test_agent_gate.py` · `tests/test_agent_loop.py` · `tests/test_api_answers_resume.py` · `tests/test_api_chat.py`
 - `docs/wiki/packages/P5-loop/evidence/` — pytest·grep·curl 왕복·trace 조회·무변경 diff 출력
 
 **고치는 기존 파일** (아래 "허용 파일" 각주가 근거)
@@ -70,7 +70,7 @@
 - `app/api/deps.py` — 채팅용 `ToolContext` 조립(세션 헤더 규약, 결정 I) + **재개 입력 조립** `load_resume_input(session, question_id) -> ResumeInput{kind, context, session_id}`. `build_ctx()` 의 기존 규약(답할 행의 `session_id` 사용, 결정 12)은 **그대로 두고** 옆에 새 조립 함수를 둔다. 두 가지를 여기서 고친다: (1) `PendingQuestion` ORM 을 읽는 것은 **이 모듈뿐**이고 `app/agent/` 는 값(dict)만 받는다(H-2 의 (b) 경로 차단), (2) `build_ctx` 는 `embedder=None` 이었는데(주석: "답 저장은 별칭을 만들지 않는다") **재개는 `create_person`/`update_person(new_alias)` 로 별칭을 만든다** — 재개·채팅 ctx 는 실제 임베더를 받아야 새 인물이 이후 후보 검색에 보인다(아래 리스크)
 - `app/settings.py` — 루프 설정 상수(상한·추출 모델·타임아웃, 결정 A·G)
 - `tests/test_api.py` — `AnswerOut` 확장에 따른 기존 단언 갱신(단언을 **없애지 않는다**)
-- `docs/wiki/registry.md` · `README.md` · `docs/user-setup/`(해당 카드 갱신)
+- `docs/wiki/registry.md` · `README.md` · `docs/user-setup/`(해당 카드 갱신 → `docs/RUNNING.md` 로 갈음, 사용자 결정 2026-09-25)
 
 > **`app/` 허용 파일은 `app/agent/*`(신규 6)과 기존 4개뿐이다** — `app/api/routes.py`·`app/api/schemas.py`·`app/api/deps.py`·`app/settings.py`. 근거: (1) `app/er/*` 는 P4b 게이트 수치가 나온 코드이므로 무수정이어야 그 수치가 이 패키지 뒤에도 유효하다(원칙8), (2) `app/tools/*` 는 시그니처 v2 가 R10 으로 확정돼 `scripts/tools_check.py` 7/7 이 고정 증거다 — 루프는 **호출자**이지 툴의 공저자가 아니다, (3) `app/db/*` 를 고치면 스키마 v2 변경이 되어 S3.1·마이그레이션 이야기가 따라붙는다(`alembic check` 이 무변경 증거). 이 한 줄이 판정 표 "허용 파일" 행의 근거다. `app/main.py` 도 무수정이다 — 루프 오류는 예외로 올리지 않고 잡아서 정상 응답으로 내리기 때문이다(결정 G·H).
 
@@ -118,9 +118,9 @@
 | # | 무엇 | 명령 | 기대 출력 |
 |---|------|------|-----------|
 | 1 | 전체 테스트 | `POSTGRES_PORT=5433 python -m pytest tests/ -q -rs` | 1325(`1227026` 기준) + 신규 전부 통과, 실패 0·skip 0 |
-| 2 | 네트워크 0 | `POSTGRES_PORT=5433 python -m pytest tests/test_agent_propose.py tests/test_agent_gate.py tests/test_agent_loop.py tests/test_agent_resume.py tests/test_api_chat.py -q` | 전부 통과. 실 LLM·실 임베딩 호출 0(`FakeProposer`·`FakeJudge`·스텁 임베더) |
-| 3 | 한 흐름 | `POSTGRES_PORT=5433 python -m pytest tests/test_api_chat.py -q -k "one_flow or end_to_end"` | 통과 — 요청 1건 안에서 `events` 행 +1 이상, `ChatOut.reply` 비어 있지 않음 |
-| 4 | 재개 | `POSTGRES_PORT=5433 python -m pytest tests/test_agent_resume.py -q -k "resume"` | 통과 — `POST /answers/{id}` 요청 1건 뒤 `persons`/`events` 행 증가, 두 번째 재개는 409 |
+| 2 | 네트워크 0 | `POSTGRES_PORT=5433 python -m pytest tests/test_agent_propose.py tests/test_agent_gate.py tests/test_agent_loop.py tests/test_api_answers_resume.py tests/test_api_chat.py -q` | 전부 통과. 실 LLM·실 임베딩 호출 0(`FakeProposer`·`FakeJudge`·스텁 임베더) |
+| 3 | 한 흐름 | `POSTGRES_PORT=5433 python -m pytest tests/test_api_chat.py -q -k "test_chat_stores_event_and_replies_in_one_request"` | 통과 — 요청 1건 안에서 `events` 행 +1 이상, `ChatOut.reply` 비어 있지 않음 |
+| 4 | 재개 | `POSTGRES_PORT=5433 python -m pytest tests/test_api_answers_resume.py -q -k "resume"` | 통과 — `POST /answers/{id}` 요청 1건 뒤 `persons`/`events` 행 증가, 두 번째 재개는 409 |
 | 5a | 부정: ER 없는 인물 생성(D1, H-5) | `grep -rnE -B1 "create_person\(" app/agent/` | 일치 **1줄** — `app/agent/loop.py` 의 **재개 경로(`new_person` 답 처리)** 한 곳이고, `-B1` 앞줄이 `ctx.confirmed_question_id = …` 대입이다. 인식·게이트·기록 단계에는 0건(게이트는 `create_person` 을 이름 문자열로만 다루고 호출하지 않는다). 주석·docstring 에는 괄호 붙은 `create_person(` 표기를 쓰지 않는다(6행과 같은 규칙) |
 | 5b | 부정: 확인 없는 이름 변경(D6, H-5) | ① `grep -rnE -A4 "update_person\(" app/agent/ \| grep -n "display_name"` ② `grep -rnE "update_person\(" app/agent/` | ① **0건**. ② 호출은 **허용 목록 두 곳뿐**: (ㄱ) 기록 단계(U5) — 게이트를 통과한 LLM 제안의 `update_person(ctx, person_id, facts=…)`/`new_alias=…`(`person_id` 는 코드가 치환), (ㄴ) `identity` 재개(U7) — `update_person(ctx, person_id, new_alias=context["mention"])`(`person_id` = `candidate_ids[answer]`). 두 호출 모두 `confirmed_question_id` 가 필요 없다. 02-plan-verify 가 제안한 정규식 `update_person\(.*display_name\|display_name=` 은 **재개 경로의 `create_person(…, display_name=…)` 인자까지 잡아** 올바른 구현을 FAIL 시키므로 `update_person(` 호출 뒤 4줄로 한정했다 |
 | 6 | 부정: 임계치 재판정 없음 | `grep -rn "T_merge\|t_merge\|T_new\|t_new\|confidence" app/agent/` | **0건**(루프는 확신도·임계치를 읽지도 쓰지도 않는다 — 원칙1·2·4). 주석·docstring 도 포함이다: 설명이 필요하면 한국어 "확신도"로 쓴다. `context` 안의 `confidence_breakdown` 은 ER 이 만든 dict 를 **키 이름을 적지 않고** 통째로 넘기므로 걸리지 않는다. 잡히면 미충족 |
@@ -141,11 +141,11 @@
 | 21 | **부정: 인자 스키마** | `POSTGRES_PORT=5433 python -m pytest tests/test_agent_gate.py -q -k "bad_args"` | 통과 — 필수 인자 누락·미지 인자·타입 위반·`add_event.type` 고정 집합 위반이 모두 `bad_args` 로 거부. R-11 세 케이스: LLM 이 `raw_utterance` 를 준 `add_event` → `bad_args`(실행 0회, 원문 덮어쓰기 없음) / `update_person` 제안에 `display_name` → `needs_confirmation`(D6) / `create_person` 제안 → `rejected` 가 아니라 `accepted` 의 `bucket="hint_only"`, `app.tools.create_person` 호출 0회(spy) |
 | 22 | **거부 사유가 trace 에 남는다** (H-1) | 표 아래 **"7행 명령"** 을 `SEED=1 REJECTS=1` 로 실행(시드 DB + 거부 4종 섞인 제안, `FakeJudge`·스텁 임베더, R-17) | 줄 2 `rejected` = `[{1,update_person,person_id_from_llm},{2,search_person,not_callable_by_llm},{3,delete_person,unknown_tool},{4,add_event,bad_args}]`(인덱스 4 는 `raw_utterance` 를 준 제안), `accepted` = `[{0,add_event,execute}]`. 줄 3: `executed[].trace_id` 가 가리키는 행 = `[('tool_call','add_event')]` 1건 — **`executed` 수 = 그 행 수**(ER 내부 행은 세지 않는다). 거부된 4건의 이름(`update_person`·`search_person`·`delete_person`)으로 `executed` 에 잡힌 항목 0. 줄 4: `True` |
 | 23 | 부정: 루프가 `pending_questions` 를 직접 쓰지 않는다 | `grep -rnE "PendingQuestion\|flag_modified\|\.context *=" app/agent/` | **0건** — `context` 확장 경로는 `dataclasses.replace(resolution, …)` → `apply_resolution` → `ask_user` 하나뿐이다(S3.2 16행 "모든 툴 호출은 agent_traces 에 기록"을 우회하지 않는다) |
-| 24 | `context` 크기 상한(S3.4 13행) | `POSTGRES_PORT=5433 python -m pytest tests/test_agent_loop.py -q -k "resume_size"` | 통과 — `LOOP_MAX_RESUME_BYTES` 를 넘으면 `held_drafts` 를 버리고 `dropped` 수만 남기며, 저장된 `context` 에 전체 대화 이력이 없다(발화 원문은 ER 이 넣은 `utterance` 1건뿐) |
+| 24 | `context` 크기 상한(S3.4 13행) | `POSTGRES_PORT=5433 python -m pytest tests/test_agent_loop.py -q -k "resume_byte_limit"` | 통과 — `LOOP_MAX_RESUME_BYTES` 를 넘으면 `held_drafts` 를 버리고 `dropped` 수만 남기며, 저장된 `context` 에 전체 대화 이력이 없다(발화 원문은 ER 이 넣은 `utterance` 1건뿐) |
 | 25 | 대기 질문 유지(D2 파급, R-4) | `POSTGRES_PORT=5433 python -m pytest tests/test_api_chat.py -q -k "pending_survives"` | 통과 — 미답변 질문이 있는 세션에 `/chat` → 200, 기존 행 `answered_at` NULL·status `pending` 유지 |
 | 26 | DB 예외는 삼키지 않는다(R-3) | `POSTGRES_PORT=5433 python -m pytest tests/test_api_chat.py -q -k "db_error"` | 통과 — `SQLAlchemyError` 는 200 으로 내리지 않고 그대로 올라간다(`get_session` 의 `commit()` 이 `PendingRollbackError` 로 실패하는 것을 막는다) |
-| 27 | 재개로 만든 인물의 별칭 임베딩 (R-15) | `POSTGRES_PORT=5433 python -m pytest tests/test_agent_resume.py -q -k "alias_embedding"` | 통과 — `FakeProposer`·`FakeJudge`·스텁 임베더(`tests/conftest.py::fake_embedder`)를 주입한 발화 → `new_person` 답 재개 뒤 그 인물의 `person_aliases.embedding IS NOT NULL` 이 **전부 참**(키 없는 환경에서도 판정이 비지 않는다, R-17). `build_ctx` 의 `embedder=None` 을 재개 경로가 그대로 쓰면 이 테스트가 깨진다 |
-| 28 | 부정: M-1(d) 태그 옵션 밖 답(H-4) | `POSTGRES_PORT=5433 python -m pytest tests/test_agent_resume.py -q -k "new_person_reject"` | 통과 — `new_person` 질문에 ER 부정 옵션(태그 옵션 밖)으로 답하면 `app.tools.create_person` 호출 **0회**(spy), `persons` 행 수 불변, `loop_resume` trace 에 부정 답 기록 |
+| 27 | 재개로 만든 인물의 별칭 임베딩 (R-15) | `POSTGRES_PORT=5433 python -m pytest tests/test_api_answers_resume.py -q -k "alias_embedding"` | 통과 — `FakeProposer`·`FakeJudge`·스텁 임베더(`tests/conftest.py::fake_embedder`)를 주입한 발화 → `new_person` 답 재개 뒤 그 인물의 `person_aliases.embedding IS NOT NULL` 이 **전부 참**(키 없는 환경에서도 판정이 비지 않는다, R-17). `build_ctx` 의 `embedder=None` 을 재개 경로가 그대로 쓰면 이 테스트가 깨진다 |
+| 28 | 부정: M-1(d) 태그 옵션 밖 답(H-4) | `POSTGRES_PORT=5433 python -m pytest tests/test_api_answers_resume.py -q -k "new_person_reject"` | 통과 — `new_person` 질문에 ER 부정 옵션(태그 옵션 밖)으로 답하면 `app.tools.create_person` 호출 **0회**(spy), `persons` 행 수 불변, `loop_resume` trace 에 부정 답 기록 |
 
 - 증거 경로: `docs/wiki/packages/P5-loop/evidence/`. Docker Desktop 이 꺼져 있거나 키가 없으면 **우회하지 않고** 사용자에게 명령을 보여 주고 멈춘다(security §6).
 - **7행 명령**(7행 (가)(나)·22행 공용, 3차 개정 H-1·R-17). 조회 대상은 `agent_traces(id, session_id, step, tool_name, output)`(S3.1)·`pending_questions(id, kind, options, context)`, 세션은 매 실행 새 `tag`(같은 값을 `user_id` 로도 써서 (가) 의 빈 후보를 보장한다 — `search_person`·ER 후보 검색이 `Person.user_id == ctx.user_id` 로 거른다, `app/tools/persons.py` 165·191·204행, `app/er/candidates.py` 70행). `FakeJudge` 는 `app/er/judge.py` 419행(무수정 import), 스텁 임베더는 모든 문자열에 같은 단위벡터를 주는 람다(결정적, 네트워크 0 — 시드 별칭 "민수" 와 언급 "민수" 의 `s_emb` 가 1 이 된다). `SEED`·`REJECTS` 는 셸 변수:

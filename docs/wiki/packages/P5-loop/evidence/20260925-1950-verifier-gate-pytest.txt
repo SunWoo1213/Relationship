@@ -1,0 +1,21 @@
+$ PYTHONUTF8=1 python -m pytest tests/test_agent_gate.py -q -k "person_id_from_llm or unknown_tool or not_callable or bad_args or needs_confirmation or hint_only or never_calls or rejected_reason" -rA
+PASSED tests/test_agent_gate.py::test_person_id_from_llm_rejects_and_does_not_call_update_person
+PASSED tests/test_agent_gate.py::test_person_id_from_llm_applies_regardless_of_tool
+PASSED tests/test_agent_gate.py::test_unknown_tool_name_rejected
+PASSED tests/test_agent_gate.py::test_not_callable_by_llm_rejected[ask_user]
+PASSED tests/test_agent_gate.py::test_not_callable_by_llm_rejected[get_briefing]
+PASSED tests/test_agent_gate.py::test_not_callable_by_llm_rejected[search_person]
+PASSED tests/test_agent_gate.py::test_bad_args_missing_required
+PASSED tests/test_agent_gate.py::test_bad_args_unknown_key
+PASSED tests/test_agent_gate.py::test_bad_args_type_violation_event_type_not_in_fixed_set
+PASSED tests/test_agent_gate.py::test_bad_args_type_violation_wrong_python_type
+PASSED tests/test_agent_gate.py::test_bad_args_raw_utterance_rejected_no_overwrite
+PASSED tests/test_agent_gate.py::test_needs_confirmation_update_person_display_name
+PASSED tests/test_agent_gate.py::test_create_person_hint_only_bucket_not_rejected_not_called
+PASSED tests/test_agent_gate.py::test_create_person_bad_args_still_rejected
+PASSED tests/test_agent_gate.py::test_schedule_scheduled_at_unparsed_string_is_bad_args
+PASSED tests/test_agent_gate.py::test_event_occurred_at_unparsed_string_is_bad_args
+PASSED tests/test_agent_gate.py::test_rejected_reason_appears_in_verdict_to_dict
+PASSED tests/test_agent_gate.py::test_gate_never_calls_any_tool_regardless_of_verdict
+18 passed, 14 deselected in 0.37s
+EXIT:0

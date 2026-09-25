@@ -3,9 +3,11 @@
 > `findings.py` 가 검증 출력에서 만든다. 소견 본문(원인·해결 단계·재검증·영향)은 에이전트가 채우고, 해결 단계의 완료 판정 명령을 실제로 실행한 출력이 증거다. 소견은 지우지 않는다(해소만 한다).
 > 루프: 검증 → 소견 → 단계별 조치 → 재검증(같은 명령) → 해소. 같은 소견이 3회 재검증 후에도 열려 있으면 사용자에게 보고한다.
 
-갱신: 2026-09-25 (U8) | 출처: verify-plan | 열림: 8 (필수 0, [권고] 8) | 해소: 14
+갱신: 2026-09-25 22:05 (verifier 04-review) | 출처: verify-impl | 열림: 0 (필수 0) | 해소: 23
 
-> **U8 갱신 메모.** [권고] 8건 중 7건(`F-e93529`·`F-8e3e74`·`F-6ae8ad`·`F-d68447`·`F-fdb56f`·`F-7e6e84`·`F-0ffff5`)의 원인 분석을 채웠다. `F-e93529`(`app/er/judge.py`)는 하네스의 산출물-토큰 스캔 오탐(F-b38c2c 와 같은 계열)이라 이 패키지에서 조치하지 않는다. 나머지 6건은 P4b 선례(F-ed9327 등)와 같이 "기존 파일을 고치는 확장 패키지"라 **의도된 WARN**이며, 해결 단계에 적은 registry.md 비고 확장을 이번 작업에서 실제로 적용했다(커밋은 아직 없음 — 해시는 `/commit` 뒤 확정). `F-b38c2c`(이미 원인 분석 완료, 하네스 FIX 후보)는 이번에 다시 손대지 않았다. 상태는 커밋·04-review 전까지 "열림"으로 유지한다(해소 표시는 검증자 몫).
+> **U8 갱신 메모.** [권고] 8건 중 7건(`F-e93529`·`F-8e3e74`·`F-6ae8ad`·`F-d68447`·`F-fdb56f`·`F-7e6e84`·`F-0ffff5`)의 원인 분석을 채웠다. `F-e93529`(`app/er/judge.py`)는 하네스의 산출물-토큰 스캔 오탐(F-b38c2c 와 같은 계열)이라 이 패키지에서 조치하지 않는다. 나머지 6건은 P4b 선례(F-ed9327 등)와 같이 "기존 파일을 고치는 확장 패키지"라 **의도된 WARN**이며, 해결 단계에 적은 registry.md 비고 확장을 U8 작업에서 실제로 적용했다(커밋 `f0d3e26`). `F-b38c2c`(이미 원인 분석 완료, 하네스 FIX 후보)는 다시 손대지 않았다. 상태는 04-review 전까지 "열림"으로 유지한다(해소 표시는 검증자 몫).
+>
+> (메모 복원: 2026-09-25 verify-impl 이 머리말을 다시 쓰며 이 단락을 지워서, 재개 세션에서 되살렸다.)
 
 ## F-25b70f · [필수] 없음: docs/wiki/packages/P5-loop/02-plan-verify.md
 상태: 해소 | 발견: 2026-09-23 (verify-plan) | 해소: 2026-09-24
@@ -320,7 +322,7 @@ FAIL  P4 게이트 미통과: P5 이후는 P4-pilot-eval 완료 전에 시작할
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-e93529 · [권고] registry 에 다른 패키지로 이미 있음: app/er/judge.py → | 모듈 | LLM 판정(3단계, 공급자 중립) | app/er/judge.py | P3-er | b1f
-상태: 열림 | 발견: 2026-09-23 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-23 (verify-plan) | 해소: 2026-09-25 (verifier 04-review)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -339,14 +341,14 @@ WARN  registry 에 다른 패키지로 이미 있음: app/er/judge.py → | 모�
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P5-loop` (계획 단계면 `verify-plan.sh P5-loop`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `evidence/20260925-2145-verifier-remediation-closure.txt` — registry 84행은 P3-er 소속 그대로, P5-loop 소속 행·비고 0건(163행 propose.py 비고의 '재사용' 설명문만), app/er/judge.py 는 P5-loop 커밋 어디에도 없다 → 원인 분석의 닫힘 조건 충족. verify-impl 재실행: `evidence/20260925-2200-verify-impl.txt`(첫 실행 2155 는 04-review 표 형식 FAIL 2, 코드 무관)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-8e3e74 · [권고] registry 에 다른 패키지로 이미 있음: app/api/routes.py → | 엔드포인트 | GET /health · POST /answers/{id} | app/api/routes.py | P2-t
-상태: 열림 | 발견: 2026-09-23 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-23 (verify-plan) | 해소: 2026-09-25 (verifier 04-review)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -361,7 +363,7 @@ WARN  registry 에 다른 패키지로 이미 있음: app/api/routes.py → | �
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | `docs/wiki/registry.md` 65행 비고에 "P5-loop U6(`d5c8ec9`)·U7(`7df3ada`): `POST /chat`·`/answers` 재개 뒤 절반 추가" 한 줄 추가(새 행 생성 안 함) | `grep -n "app/api/routes.py" docs/wiki/registry.md` | 65행 비고에 `P5-loop` 문자열과 두 해시 포함, 행 수는 그대로 65행 1개 | 완료(U8, 커밋 전) |
+| 1 | `docs/wiki/registry.md` 65행 비고에 "P5-loop U6(`d5c8ec9`)·U7(`7df3ada`): `POST /chat`·`/answers` 재개 뒤 절반 추가" 한 줄 추가(새 행 생성 안 함) | `grep -n "app/api/routes.py" docs/wiki/registry.md` | 65행 비고에 `P5-loop` 문자열과 두 해시 포함, 행 수는 그대로 65행 1개 | 완료(U8, f0d3e26) |
 
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
@@ -370,14 +372,14 @@ WARN  registry 에 다른 패키지로 이미 있음: app/api/routes.py → | �
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P5-loop` (계획 단계면 `verify-plan.sh P5-loop`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `evidence/20260925-2145-verifier-remediation-closure.txt` — registry 65행 비고에 'P5-loop U6(d5c8ec9)·U7(7df3ada)' 포함, 경로 행 수 2 = 기존 행 + 계획된 POST /chat 엔드포인트 신규 행(167행, 01-plan U8 '엔드포인트 1'), git log 로 두 커밋이 routes.py 를 실제로 바꿈. verify-impl 재실행: `evidence/20260925-2200-verify-impl.txt`(첫 실행 2155 는 04-review 표 형식 FAIL 2, 코드 무관)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-6ae8ad · [권고] registry 에 다른 패키지로 이미 있음: app/api/schemas.py → | 엔드포인트 | API 요청/응답 스키마 | app/api/schemas.py | P2-tools
-상태: 열림 | 발견: 2026-09-23 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-23 (verify-plan) | 해소: 2026-09-25 (verifier 04-review)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -392,7 +394,7 @@ WARN  registry 에 다른 패키지로 이미 있음: app/api/schemas.py → | �
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | `docs/wiki/registry.md` 66행 비고에 "P5-loop U6(`d5c8ec9`)·U7(`7df3ada`): `ChatIn`/`ChatOut` 신설, `AnswerOut` 5필드로 확장" 한 줄 추가(새 행 생성 안 함) | `grep -n "app/api/schemas.py" docs/wiki/registry.md` | 66행 비고에 `P5-loop` 문자열과 두 해시 포함, 행 수는 그대로 66행 1개 | 완료(U8, 커밋 전) |
+| 1 | `docs/wiki/registry.md` 66행 비고에 "P5-loop U6(`d5c8ec9`)·U7(`7df3ada`): `ChatIn`/`ChatOut` 신설, `AnswerOut` 5필드로 확장" 한 줄 추가(새 행 생성 안 함) | `grep -n "app/api/schemas.py" docs/wiki/registry.md` | 66행 비고에 `P5-loop` 문자열과 두 해시 포함, 행 수는 그대로 66행 1개 | 완료(U8, f0d3e26) |
 
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
@@ -401,14 +403,14 @@ WARN  registry 에 다른 패키지로 이미 있음: app/api/schemas.py → | �
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P5-loop` (계획 단계면 `verify-plan.sh P5-loop`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `evidence/20260925-2145-verifier-remediation-closure.txt` — registry 66행 비고에 'P5-loop U6(d5c8ec9)·U7(7df3ada)' 포함, 경로 행 수 1. verify-impl 재실행: `evidence/20260925-2200-verify-impl.txt`(첫 실행 2155 는 04-review 표 형식 FAIL 2, 코드 무관)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-d68447 · [권고] registry 에 다른 패키지로 이미 있음: app/api/deps.py → | 엔드포인트 | 요청 단위 세션·ToolContext 조립 | app/api/deps.py |
-상태: 열림 | 발견: 2026-09-23 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-23 (verify-plan) | 해소: 2026-09-25 (verifier 04-review)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -423,7 +425,7 @@ WARN  registry 에 다른 패키지로 이미 있음: app/api/deps.py → | 엔�
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | `docs/wiki/registry.md` 64행 비고에 "P5-loop U6(`d5c8ec9`)·U7(`7df3ada`): 채팅용 ctx 조립(`build_chat_ctx`)·`load_resume_input`·임베더/제안자/판정기 의존성 추가" 한 줄 추가(새 행 생성 안 함) | `grep -n "app/api/deps.py" docs/wiki/registry.md` | 64행 비고에 `P5-loop` 문자열과 두 해시 포함, 행 수는 그대로 64행 1개 | 완료(U8, 커밋 전) |
+| 1 | `docs/wiki/registry.md` 64행 비고에 "P5-loop U6(`d5c8ec9`)·U7(`7df3ada`): 채팅용 ctx 조립(`build_chat_ctx`)·`load_resume_input`·임베더/제안자/판정기 의존성 추가" 한 줄 추가(새 행 생성 안 함) | `grep -n "app/api/deps.py" docs/wiki/registry.md` | 64행 비고에 `P5-loop` 문자열과 두 해시 포함, 행 수는 그대로 64행 1개 | 완료(U8, f0d3e26) |
 
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
@@ -432,14 +434,14 @@ WARN  registry 에 다른 패키지로 이미 있음: app/api/deps.py → | 엔�
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P5-loop` (계획 단계면 `verify-plan.sh P5-loop`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `evidence/20260925-2145-verifier-remediation-closure.txt` — registry 64행 비고에 'P5-loop U6(d5c8ec9)·U7(7df3ada)' 포함, 경로 행 수 1. verify-impl 재실행: `evidence/20260925-2200-verify-impl.txt`(첫 실행 2155 는 04-review 표 형식 FAIL 2, 코드 무관)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-fdb56f · [권고] registry 에 다른 패키지로 이미 있음: app/settings.py → | 모듈 | 런타임 설정값 | app/settings.py | P2-tools | f217190 | `app_use
-상태: 열림 | 발견: 2026-09-23 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-23 (verify-plan) | 해소: 2026-09-25 (verifier 04-review)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -454,7 +456,7 @@ WARN  registry 에 다른 패키지로 이미 있음: app/settings.py → | 모�
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | `docs/wiki/registry.md` 53행 비고에 "P5-loop U1(`3e4db92`): `LOOP_MAX_MENTIONS/EVENTS/SCHEDULES=5/5/3`·`LOOP_MAX_PROPOSALS=13`·`LOOP_MAX_RESUME_BYTES=8192` 등 루프 상수 추가" 한 줄 추가(새 행 생성 안 함) | `grep -n "app/settings.py" docs/wiki/registry.md` | 53행 비고에 `P5-loop` 문자열과 해시 포함, 행 수는 그대로 53행 1개 | 완료(U8, 커밋 전) |
+| 1 | `docs/wiki/registry.md` 53행 비고에 "P5-loop U1(`3e4db92`): `LOOP_MAX_MENTIONS/EVENTS/SCHEDULES=5/5/3`·`LOOP_MAX_PROPOSALS=13`·`LOOP_MAX_RESUME_BYTES=8192` 등 루프 상수 추가" 한 줄 추가(새 행 생성 안 함) | `grep -n "app/settings.py" docs/wiki/registry.md` | 53행 비고에 `P5-loop` 문자열과 해시 포함, 행 수는 그대로 53행 1개 | 완료(U8, f0d3e26) |
 
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
@@ -463,14 +465,14 @@ WARN  registry 에 다른 패키지로 이미 있음: app/settings.py → | 모�
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P5-loop` (계획 단계면 `verify-plan.sh P5-loop`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `evidence/20260925-2145-verifier-remediation-closure.txt` — registry 53행 비고에 P5-loop U1(3e4db92) 루프 상수 추가 기록, 경로 행 수 1, git log 로 3e4db92 가 settings.py 를 바꿈. verify-impl 재실행: `evidence/20260925-2200-verify-impl.txt`(첫 실행 2155 는 04-review 표 형식 FAIL 2, 코드 무관)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-7e6e84 · [권고] registry 에 다른 패키지로 이미 있음: tests/test_api.py → | 테스트 | HTTP: /health·/answers 200/404/409/422 | tests/test_api.py | P2-t
-상태: 열림 | 발견: 2026-09-23 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-23 (verify-plan) | 해소: 2026-09-25 (verifier 04-review)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -485,7 +487,7 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/test_api.py → | �
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | `docs/wiki/registry.md` 76행 비고에 "P5-loop U7(`7df3ada`): `AnswerOut` 5필드 확장에 따른 200 응답 단언 갱신, 404/409/422 단언 유지" 한 줄 추가(새 행 생성 안 함) | `grep -n "tests/test_api.py" docs/wiki/registry.md` | 76행 비고에 `P5-loop` 문자열과 해시 포함, 행 수는 그대로 76행 1개 | 완료(U8, 커밋 전) |
+| 1 | `docs/wiki/registry.md` 76행 비고에 "P5-loop U7(`7df3ada`): `AnswerOut` 5필드 확장에 따른 200 응답 단언 갱신, 404/409/422 단언 유지" 한 줄 추가(새 행 생성 안 함) | `grep -n "tests/test_api.py" docs/wiki/registry.md` | 76행 비고에 `P5-loop` 문자열과 해시 포함, 행 수는 그대로 76행 1개 | 완료(U8, f0d3e26) |
 
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
@@ -494,14 +496,14 @@ WARN  registry 에 다른 패키지로 이미 있음: tests/test_api.py → | �
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P5-loop` (계획 단계면 `verify-plan.sh P5-loop`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `evidence/20260925-2145-verifier-remediation-closure.txt` — registry 76행 비고에 'P5-loop U7(7df3ada)' 포함(404/409/422 단언 유지 명시), 경로 행 수 1. verify-impl 재실행: `evidence/20260925-2200-verify-impl.txt`(첫 실행 2155 는 04-review 표 형식 FAIL 2, 코드 무관)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-0ffff5 · [권고] registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
-상태: 열림 | 발견: 2026-09-23 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-23 (verify-plan) | 해소: 2026-09-25 (verifier 04-review)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -516,9 +518,9 @@ WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | �
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
 |---|--------------------|----------------|-----------|------|
-| 1 | `README.md` 16행(개요 상태 문장)에서 "에이전트 대화 루프 … 아직 없습니다"를 "에이전트 대화 루프(`POST /chat`·`/answers` 재개)까지 있습니다. 브리핑·화면·배포는 아직 없습니다"로 갱신, "핵심 기능" 절에 에이전트 루프 불릿 추가 | `grep -n "에이전트 대화 루프" README.md` | "아직 없습니다" 문구에서 "에이전트 대화 루프"가 빠지고 "브리핑·화면·배포"만 남는다 | 완료(U8, 커밋 전) |
-| 2 | `docs/RUNNING.md` "백엔드 실행 (FastAPI)" 절에 `/chat`·`/answers` 재개 curl 예 이어 붙이기(새 절 신설 안 함) | `grep -n "POST /chat" docs/RUNNING.md` | 해당 절 안에서 1건 이상 일치 | 완료(U8, 커밋 전) |
-| 3 | `docs/wiki/registry.md` 33행 비고에 "P5-loop U8: README 16행 개요 문장·핵심 기능 절 갱신(에이전트 루프 반영), `docs/RUNNING.md` 백엔드 실행 절에 `/chat`·재개 curl 이어 붙임 — README 재작성(`56ced8b`) 이후 '진행 표'가 없어 서술형 절로 대응" 한 줄 추가 | `grep -n "P5-loop" docs/wiki/registry.md` | 33행 비고에 `P5-loop` 포함 | 완료(U8, 커밋 전) |
+| 1 | `README.md` 16행(개요 상태 문장)에서 "에이전트 대화 루프 … 아직 없습니다"를 "에이전트 대화 루프(`POST /chat`·`/answers` 재개)까지 있습니다. 브리핑·화면·배포는 아직 없습니다"로 갱신, "핵심 기능" 절에 에이전트 루프 불릿 추가 | `grep -n "에이전트 대화 루프" README.md` | "아직 없습니다" 문구에서 "에이전트 대화 루프"가 빠지고 "브리핑·화면·배포"만 남는다 | 완료(U8, f0d3e26) |
+| 2 | `docs/RUNNING.md` "백엔드 실행 (FastAPI)" 절에 `/chat`·`/answers` 재개 curl 예 이어 붙이기(새 절 신설 안 함) | `grep -n "POST /chat" docs/RUNNING.md` | 해당 절 안에서 1건 이상 일치 | 완료(U8, f0d3e26) |
+| 3 | `docs/wiki/registry.md` 33행 비고에 "P5-loop U8: README 16행 개요 문장·핵심 기능 절 갱신(에이전트 루프 반영), `docs/RUNNING.md` 백엔드 실행 절에 `/chat`·재개 curl 이어 붙임 — README 재작성(`56ced8b`) 이후 '진행 표'가 없어 서술형 절로 대응" 한 줄 추가 | `grep -n "P5-loop" docs/wiki/registry.md` | 33행 비고에 `P5-loop` 포함 | 완료(U8, f0d3e26) |
 
 ### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
 | # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
@@ -527,11 +529,11 @@ WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | �
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P5-loop` (계획 단계면 `verify-plan.sh P5-loop`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `evidence/20260925-2145-verifier-remediation-closure.txt` — README 16행 개요 문장이 '에이전트 루프까지 있습니다. 브리핑·화면·배포는 아직 없습니다' 로 바뀜, 51행 핵심 기능 불릿 추가, docs/RUNNING.md 122행 POST /chat 절, registry 33행 비고에 P5-loop U8 기록 — 해결 단계 1~3 완료 판정 명령 전부 기대 출력과 일치. verify-impl 재실행: `evidence/20260925-2200-verify-impl.txt`(첫 실행 2155 는 04-review 표 형식 FAIL 2, 코드 무관)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
 
 ## F-d61978 · [필수] Refs 없음: - [ ] U1 **[backend-agent] 루프 계약 타입 + trace 어�
 상태: 해소 | 발견: 2026-09-24 (verify-plan) | 해소: 2026-09-24
@@ -586,7 +588,7 @@ FAIL  Refs 없음: - [ ] U4 **[backend-agent] 해석 단계 — ER 연결·되�
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-b38c2c · [권고] registry 에 다른 패키지로 이미 있음: inspect.signa → | 스크립트 | 툴 시그니처 기계 검증 | scripts/tools_check.py | P2-to
-상태: 열림 | 발견: 2026-09-24 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-24 (verify-plan) | 해소: 2026-09-25 (verifier 04-review)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -605,9 +607,35 @@ WARN  registry 에 다른 패키지로 이미 있음: inspect.signa → | 스크
 
 ### 재검증
 - 명령: `bash .claude/scripts/verify-impl.sh P5-loop` (계획 단계면 `verify-plan.sh P5-loop`)
-- 결과 파일(evidence/):
+- 결과 파일(evidence/): `evidence/20260925-2145-verifier-remediation-closure.txt` — registry 에 산출물 경로가 inspect.signa 인 행 0건 → 원인 분석의 닫힘 조건 충족(하네스 FIX 후보는 이 패키지 밖). verify-impl 재실행: `evidence/20260925-2200-verify-impl.txt`(첫 실행 2155 는 04-review 표 형식 FAIL 2, 코드 무관)
 
 ### 영향 확인
-- 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
-- FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
+- 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
+
+## F-14f3ef · [권고] 04-review.md 없음 (완료 검토 전이면 정상)
+상태: 해소 | 발견: 2026-09-25 (verify-impl) | 해소: 2026-09-25 (verifier 04-review)
+
+### 증상 (검증 출력 인용)
+```
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+```
+
+### 원인 분석
+- 가설: 완료 검토 전 정상 경고 — 첫 verifier 세션이 04-review.md 를 쓰기 전에 끊겨(HANDOFF 2026-09-25) 파일이 없었다. 계획·코드 결함 아님.
+- 확인 방법(명령): `ls docs/wiki/packages/P5-loop/04-review.md` → `POSTGRES_PORT=5433 bash .claude/scripts/verify-impl.sh P5-loop`
+- 확인 결과(2026-09-25 verifier): 04-review.md 작성(검토자 verifier, 결과 완료) 뒤 재실행 `evidence/20260925-2200-verify-impl.txt` — `FAIL=0 WARN=0`, "04-review.md 없음" WARN 소멸, 수용 기준 표 10행 증거 전부 PASS.
+
+### 해결 단계 (단계 하나 = 확인 가능한 변경 하나)
+| # | 변경 (파일 · 방법) | 완료 판정 명령 | 기대 출력 | 상태 |
+|---|--------------------|----------------|-----------|------|
+| 1 | `docs/wiki/packages/P5-loop/04-review.md` 작성(verifier) | `bash .claude/scripts/verify-impl.sh P5-loop` | `WARN  04-review.md 없음` 줄이 사라지고 `검토자 = verifier` PASS | 완료 |
+
+### 재검증
+- 명령: `bash .claude/scripts/verify-impl.sh P5-loop` (계획 단계면 `verify-plan.sh P5-loop`)
+- 결과 파일(evidence/): `evidence/20260925-2200-verify-impl.txt` (FAIL 0 / WARN 0). 첫 실행 `evidence/20260925-2155-verify-impl.txt` 는 04-review §2b 표 형식 때문에 FAIL 2 — 표를 2단계 절로 분리하고 8행 증거 열을 채운 뒤 재실행.
+
+### 영향 확인
+- 관련 카드(D/S/원칙)와 충돌: 없음
+- FIX/CR 로 올려야 하는가: 아니오
 

@@ -1,0 +1,8 @@
+$ PYTHONPATH=. PYTHONUTF8=1 POSTGRES_PORT=5433 SEED=1 REJECTS=0 JUDGE_SCORE=0.5 python row7.py   (verifier 직접 검사: 시드 인물 있음 + LLM 자기보고 0.5 → T_merge 미만이면 자동 병합 없이 identity 되묻기여야 한다)
+[('loop_extract', 'agent'), ('loop_gate', 'agent'), ('tool_call', 'search_person'), ('er_resolve', 'er'), ('tool_call', 'ask_user'), ('loop_resolve_done', 'agent'), ('loop_record', 'agent'), ('loop_turn', 'agent')]
+{"gate": {"limits": {"events": 5, "mentions": 5, "proposals": 13, "schedules": 3}, "accepted": [{"name": "add_event", "index": 0, "bucket": "execute"}], "rejected": [], "stop_reason": null}, "record": {"failed": [], "executed": []}, "pending_calls": [{"args": {"type": "meal", "person": "민수", "content": "민수와 저녁", "occurred_at": "2026-09-23T19:00:00+09:00"}, "name": "add_event", "index": 0}], "question": ["identity", ["김민수", "아니요, 다른 사람이에요"]]}
+[]
+True
+persons_with_tag= 1 (SEED=1 이면 시드 1명 자체, SEED=0 이면 0 이어야 한다 — 루프가 create_person 을 부르지 않았다)
+aliases_of_seed_person= 1 events_of_seed_person= 0 judge_score= 0.5 stop_reason= ask_user
+EXIT:0

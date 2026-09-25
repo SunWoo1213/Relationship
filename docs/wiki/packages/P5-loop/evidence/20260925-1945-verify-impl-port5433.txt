@@ -1,0 +1,22 @@
+== verify-impl P5-loop  (20260925-1939) ==
+........................................................................ [ 97%]
+..................................                                       [100%]
+1474 passed in 199.23s (0:03:19)
+PASS  pytest 통과 → evidence/20260925-1939-pytest.txt
+PASS  compileall 통과 → evidence/20260925-1939-lint.txt
+PASS  태그 P5-loop 커밋 18 건 → evidence/20260925-1939-commits.txt
+PASS  커밋에 태그 존재: D1
+PASS  커밋에 태그 존재: D12
+PASS  커밋에 태그 존재: D13
+PASS  커밋에 태그 존재: D2
+PASS  커밋에 태그 존재: FIX-004
+PASS  커밋에 태그 존재: R6
+PASS  커밋에 태그 존재: R7
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.3
+PASS  커밋에 태그 존재: S3.4
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P5-loop 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=1 → evidence/20260925-1939-summary.txt ==
+EXIT:0

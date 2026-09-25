@@ -1,0 +1,97 @@
+## 5a  grep -rnE -B1 "create_person\(" app/agent/ --include=*.py
+app/agent/loop.py-1206-            ctx.confirmed_question_id = question_id
+app/agent/loop.py:1207:            created = app_tools.create_person(
+exit=0
+
+## 5b-1  grep -rnE -A4 "update_person\(" app/agent/ --include=*.py | grep -n display_name
+exit=1
+
+## 5b-2  grep -rnE "update_person\(" app/agent/ --include=*.py
+app/agent/loop.py:771:        return app_tools.update_person(
+app/agent/loop.py:1188:            app_tools.update_person(ctx, person_id, new_alias=mention)
+exit=0
+
+## 6  grep -rn "T_merge\|t_merge\|T_new\|t_new\|confidence" app/agent/ --include=*.py
+exit=1
+
+## 9  grep -rnE "time\.sleep|asyncio\.sleep|while True" app/agent/ app/api/ --include=*.py
+exit=1
+
+## 23  grep -rnE "PendingQuestion\b|flag_modified|\.context *=" app/agent/ --include=*.py   (단어 경계 — PendingQuestionOut 제외)
+grep: conflicting matchers specified
+exit=2
+
+## 23-2  grep -rn "from app.db.models import\|import app.db.models\|PendingQuestion)" app/agent/ --include=*.py
+app/agent/gate.py:87:from app.db.models import EVENT_TYPES, HIERARCHIES, RELATION_TAGS
+app/agent/loop.py:196:from app.db.models import HIERARCHIES, RELATION_TAGS
+app/agent/propose.py:75:from app.db.models import EVENT_TYPES, HIERARCHIES, RELATION_TAGS
+app/agent/types.py:37:from app.db.models import EVENT_TYPES, QUESTION_KINDS, RELATION_TAGS
+exit=0
+
+## 15  grep -rniE "api_key|secret|password|OPENAI_|ANTHROPIC_|GEMINI_" app/agent/ --include=*.py | grep -viE "_MODEL|environ.get"
+app/agent/propose.py:48:(`call_with_error_mapping`/`call_with_gemini_error_mapping`), Gemini 스키마
+app/agent/propose.py:49:변환(`_to_gemini_schema`)을 그대로 재사용한다. `PROPOSERS` 는 이 모듈만의
+app/agent/propose.py:78:    call_with_gemini_error_mapping,
+app/agent/propose.py:80:    _to_gemini_schema,
+app/agent/propose.py:429:    재시도·오류 매핑은 `call_with_gemini_error_mapping()` 을 그대로
+app/agent/propose.py:465:            response_schema=_to_gemini_schema(PROPOSAL_SCHEMA),
+app/agent/propose.py:468:        response = call_with_gemini_error_mapping(
+exit=0
+
+## 10  git diff --name-only 1227026..HEAD -- app/
+app/agent/__init__.py
+app/agent/gate.py
+app/agent/loop.py
+app/agent/propose.py
+app/agent/respond.py
+app/agent/types.py
+app/api/deps.py
+app/api/routes.py
+app/api/schemas.py
+app/settings.py
+
+## 10-2 git diff --stat 1227026..HEAD -- app/er app/tools app/db app/main.py
+(빈 출력 = 무변경)
+
+## 14  git diff --name-only 1227026..HEAD -- data/ reports/
+(빈 출력 = 무변경)
+
+## 12  python scripts/tools_check.py
+[ok] get_briefing: CLAUDE.md (person_id, schedule_id?) == actual (ctx, person_id, schedule_id=None)
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+
+## 17  grep -n "^결과:" docs/wiki/packages/P4b-er-redesign/04-review.md
+144:결과: 완료
+
+## review-index R6 R7
+14:| R6 | M | 신규 인물 자동등록 vs 확인형 불일치 | 구현완료(f318d58, 8162e09 — create_person 은 answered new_person 질문+긍정 답 없이는 ConfirmationRequired; P5-loop 가 1회 소비·대상 바인딩 결정) | D1 → S3.4 → P2-tools, P5-loop |
+15:| R7 | M | ask_user 동기 반환 불가 | 구현완료(8162e09, 4d5817e — pending_questions 저장 후 {question_id,status:pending} 반환, POST /answers 답 저장; 재개 흐름은 P5-loop) | D2 → S3.4 → P2-tools, P5-loop |
+
+## README / RUNNING
+README.md:16:사용자가 평소처럼 대화하면 에이전트가 인물 · 사건 · 일정을 추출해 장기 메모리를 쌓고, 만남 직전에 필요한 맥락을 요약해 주는 것이 목표입니다. 한국어 대화는 같은 사람을 "팀장 → 김팀장 → 그 사람 → 부장님(승진 후)"처럼 부르기 때문에, 이 호칭들을 한 인물로 묶는 **엔티티 해석**이 전체 품질을 좌우합니다. 지금 저장소에는 엔티티 해석 파이프라인과 그 성능을 재는 평가 장치에 더해, 발화 한 건을 받아 인식 · 해석 · 기록 · 응답을 한 턴으로 돌리고(`POST /chat`) 되묻기를 비동기로 재개하는(`POST /answers/{question_id}`) 에이전트 루프까지 있습니다. 브리핑 · 화면 · 배포는 아직 없습니다.
+docs/RUNNING.md:122:`POST /chat`으로 발화 한 건을 보내면 인식(LLM 1회로 `tool_calls` 제안) → 게이트(화이트리스트·인자 스키마·`person_id` 직접 지정 금지·개수 상한) → 해석(엔티티 해석 4단계) → 기록 → 응답이 그 요청 하나 안에서 돈다. 헤더 `X-Session-Id`가 없으면 서버가 발급해 응답의 `session_id`로 돌려준다:
+
+## commits Refs
+f0d3e26 docs(P5-loop): U8 수용 기준 기계 검증 결과와 registry·README 갱신
+   
+7df3ada feat(P5-loop): U7 재개 — 답을 받으면 멈춘 턴을 그 자리에서 이어 간다
+   
+d5c8ec9 feat(P5-loop): U6 채팅 API — 발화 한 건을 받아 한 턴을 돌리고 답한다
+   
+a2f5256 docs(P5-loop): FIX-004 커밋 해시를 기록에 채우고 재개 결정을 남긴다
+   
+1be4a56 fix(FIX-004): 인물 해석 테스트가 DB 전체 질문 수 대신 해석 전후를 비교한다
+   
+1835355 feat(P5-loop): U5 기록·응답 단계 — 확인된 사람의 기록만 저장하고 사실만 답한다
+   
+7a2ec5c feat(P5-loop): U4 해석 단계 — 언급을 인물에 잇고, 애매하면 되묻고 멈춘다
+   
+8ecf75c feat(P5-loop): U3 게이트 — LLM 제안을 코드가 거르고 사유를 남긴다
+   
+069bdc2 feat(P5-loop): U2 인식 단계 — 발화 한 건에서 툴 호출 제안을 받는다
+   
+a3ebc36 harness(wiki): 커밋·기록·에이전트 산출물을 한국어로 쓰도록 규칙화
+   
+3e4db92 feat(P5-loop): U1 루프 계약 타입과 trace 어휘 — 도는 코드는 아직 없다
+   

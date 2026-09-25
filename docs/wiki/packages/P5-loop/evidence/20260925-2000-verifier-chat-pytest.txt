@@ -1,0 +1,12 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_api_chat.py -q -rA
+PASSED tests/test_api_chat.py::test_chat_stores_event_and_replies_in_one_request
+PASSED tests/test_api_chat.py::test_chat_new_person_returns_pending_question_id
+PASSED tests/test_api_chat.py::test_chat_issues_session_id_when_header_missing
+PASSED tests/test_api_chat.py::test_chat_reuses_given_session_id
+PASSED tests/test_api_chat.py::test_chat_invalid_session_id_header_returns_422
+PASSED tests/test_api_chat.py::test_chat_provider_error_returns_200_with_no_storage_and_loop_error_trace
+PASSED tests/test_api_chat.py::test_chat_db_error_does_not_return_200
+PASSED tests/test_api_chat.py::test_chat_pending_survives_when_new_utterance_arrives
+PASSED tests/test_api_chat.py::test_chat_partial_rollback_when_second_mention_resolve_fails
+9 passed in 2.08s
+EXIT:0

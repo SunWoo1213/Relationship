@@ -1,0 +1,50 @@
+# 01-plan 판정 표 "7행 명령" 원문 그대로(151~195행). SEED / REJECTS / JUDGE_SCORE 는 셸 변수.
+# JUDGE_SCORE 는 verifier 가 "T_merge 미만 자동 병합 없음" 을 직접 보기 위해 더한 변수 하나뿐이다
+# (기본 0.95 = 01-plan 원문과 같다).
+import json, os, uuid
+from sqlalchemy import text
+from app.db.session import SessionLocal
+from app.db.models import Person, PersonAlias
+from app.embedding import EMBEDDING_DIM
+from app.er.judge import FakeJudge
+from app.tools.context import ToolContext
+from app.agent import run_turn
+from app.agent.propose import FakeProposer
+U = '어제 민수랑 저녁 먹었어'; T = '2026-09-23T19:00:00+09:00'
+stub = lambda ts: [[1.0] + [0.0] * (EMBEDDING_DIM - 1) for _ in ts]
+seed, rej = os.environ['SEED'] == '1', os.environ['REJECTS'] == '1'
+score = float(os.environ.get('JUDGE_SCORE', '0.95'))
+calls = [{'name': 'add_event', 'args': {'person': '민수', 'type': 'meal', 'content': '민수와 저녁', 'occurred_at': T}}]
+if not seed:
+    calls.append({'name': 'create_person', 'args': {'display_name': '민수', 'aliases': ['민수'], 'relation_tag': '친구', 'hierarchy': '동'}})
+if rej:
+    calls += [{'name': 'update_person', 'args': {'person_id': 3, 'new_alias': '민수'}},
+              {'name': 'search_person', 'args': {'query': '민수'}},
+              {'name': 'delete_person', 'args': {'person': '민수'}},
+              {'name': 'add_event', 'args': {'person': '민수', 'type': 'meal', 'content': 'x', 'occurred_at': T, 'raw_utterance': 'x'}}]
+tag = 'verifier-row7-' + uuid.uuid4().hex[:8]
+s = SessionLocal(); judge = FakeJudge()
+if seed:
+    p = Person(user_id=tag, display_name='김민수', relation_tag='친구', hierarchy='동'); s.add(p); s.flush()
+    s.add(PersonAlias(person_id=p.id, alias='민수', source='confirmed', embedding=stub(['민수'])[0])); s.flush()
+    judge = FakeJudge(table={p.id: score})
+ctx = ToolContext(session=s, session_id=tag, user_id=tag, embedder=stub)
+r = run_turn(ctx, U, proposer=FakeProposer(table={U: calls}), judge=judge)
+s.commit()
+rows = s.execute(text('SELECT id, step, tool_name, output FROM agent_traces WHERE session_id=:s ORDER BY id'), {'s': r.session_id}).all()
+out = {st: o for _, st, _, o in rows if st in ('loop_gate', 'loop_record')}
+q = s.execute(text('SELECT kind, options, context FROM pending_questions WHERE id=:q'), {'q': r.pending_question.question_id}).one() if r.pending_question else None
+pend = q[2].get('resume', {}).get('pending_calls') if q else None
+print([(st, tn) for _, st, tn, _ in rows])
+print(json.dumps({'gate': out['loop_gate'], 'record': out['loop_record'], 'pending_calls': pend, 'question': [q[0], q[1]] if q else None}, ensure_ascii=False))
+ex = {e['trace_id'] for e in out['loop_record']['executed']}
+print([(st, tn) for i, st, tn, _ in rows if i in ex])
+acc = {a['index'] for a in out['loop_gate']['accepted']}
+parts = [{e['index'] for e in out['loop_record']['executed']}, {e['index'] for e in out['loop_record']['failed']}, {c['index'] for c in (pend or [])}, {a['index'] for a in out['loop_gate']['accepted'] if a['bucket'] == 'hint_only'}]
+print(acc == set().union(*parts) and sum(map(len, parts)) == len(acc))
+print('persons_with_tag=', s.execute(text('SELECT count(*) FROM persons WHERE user_id=:u'), {'u': tag}).scalar(), '(SEED=1 이면 시드 1명 자체, SEED=0 이면 0 이어야 한다 — 루프가 create_person 을 부르지 않았다)')
+if seed:
+    # verifier 추가 출력: 시드 인물의 별칭 수(자동 병합이 있었다면 new_alias 누적으로 2가 된다), 이벤트 수
+    print('aliases_of_seed_person=', s.execute(text('SELECT count(*) FROM person_aliases WHERE person_id=:p'), {'p': p.id}).scalar(),
+          'events_of_seed_person=', s.execute(text('SELECT count(*) FROM events WHERE person_id=:p'), {'p': p.id}).scalar(),
+          'judge_score=', score, 'stop_reason=', r.stop_reason)

@@ -1,0 +1,8 @@
+$ PYTHONPATH=. PYTHONUTF8=1 POSTGRES_PORT=5433 SEED=1 REJECTS=1 python row7.py   (01-plan 7행 명령 원문 + verifier 추가 출력 2줄; 22행 = 거부 4종·person_id_from_llm)
+[('loop_extract', 'agent'), ('loop_gate', 'agent'), ('tool_call', 'search_person'), ('er_resolve', 'er'), ('tool_call', 'update_person'), ('loop_resolve_done', 'agent'), ('tool_call', 'add_event'), ('loop_record', 'agent'), ('loop_turn', 'agent')]
+{"gate": {"limits": {"events": 5, "mentions": 5, "proposals": 13, "schedules": 3}, "accepted": [{"name": "add_event", "index": 0, "bucket": "execute"}], "rejected": [{"name": "update_person", "index": 1, "reason": "person_id_from_llm"}, {"name": "search_person", "index": 2, "reason": "not_callable_by_llm"}, {"name": "delete_person", "index": 3, "reason": "unknown_tool"}, {"name": "add_event", "index": 4, "reason": "bad_args"}], "stop_reason": null}, "record": {"failed": [], "executed": [{"name": "add_event", "index": 0, "trace_id": 246061}]}, "pending_calls": null, "question": null}
+[('tool_call', 'add_event')]
+True
+persons_with_tag= 1 (SEED=1 이면 시드 1명 자체, SEED=0 이면 0 이어야 한다 — 루프가 create_person 을 부르지 않았다)
+aliases_of_seed_person= 1 events_of_seed_person= 1 judge_score= 0.95 stop_reason= None
+EXIT:0

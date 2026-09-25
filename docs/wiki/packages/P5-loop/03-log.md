@@ -66,7 +66,7 @@
 - 남은 것 · 다음 단위: U7 에서 정한 것 — (1) `ResumeInput` 은 U1 구현(`kind·context·answer`)을 따른다. `session_id` 는 `ctx` 가 가진다. `answer` 는 답 저장 뒤 DB 컬럼에서 읽는다(단일 출처). 01-plan 70행 표기와의 차이는 여기서 정리한다. (2) `resume_turn(ctx, resume_input, *, question_id, …)` — 01-plan 61행 시그니처에 키워드 인자 하나를 더해, 호출 바로 앞줄에서 `confirmed_question_id` 를 세운다(판정 표 5a). 04-review 에서 명시적으로 확인한다. (3) `/answers` 는 인식 LLM 을 다시 부르지 않으므로 `get_proposer` 를 주입하지 않는다(`get_judge`·`get_embedder` 만). (4) 부정 답이면 그 언급의 보류 제안을 저장하지 않고 응답·`loop_resume` trace 에 남긴다(계획대로, 새 인물 질문으로 자동 전환하지 않는다). (5) 재개된 `add_event` 가 원문을 갖도록 `_ask_schedule` 이 `utterance` 를 싣는다. `LOOP_MAX_RESUME_BYTES` 는 변경 없음. 다음 = U8(05 [권고] 7건 원인 분석 먼저).
 - Refs: P5-loop R6 R7 D1 D2 S3.4 원칙1 원칙9
 
-## 2026-09-25 19:15 · docs(P5-loop): U8 수용 기준 기계 검증 + 문서·registry · pending
+## 2026-09-25 19:15 · docs(P5-loop): U8 수용 기준 기계 검증 + 문서·registry · f0d3e26
 - 변경: 05-remediation [권고] 7건의 원인 분석을 채웠다. F-e93529 는 하네스 오탐이라 조치하지 않았고, 나머지 6건은 registry 비고를 확장하는 것으로 조치했다. 판정 표를 실행해 evidence 29개를 남겼다(`20260925-1852-U8-row*.txt`, 요약 `20260925-1852-U8-summary.md`). registry.md 에 신규 13행(app/agent 모듈 6·POST /chat·테스트 6)을 추가하고 기존 6행 비고를 확장했다. README.md 개요·핵심 기능 절과 docs/RUNNING.md 백엔드 실행 절에 /chat·/answers 사용법을 더했다.
 - 이유(기획서·카드 연결): 01-plan U8, R-2(05 원인 분석 먼저), 판정 방법 표 전행, F-0ffff5·F-95c6a7 선례(비고 확장, 새 행 금지).
 - 정합성 확인: 원칙 8·9 — app/·tests/ 코드 무변경(10행), 실제 API 호출 0. 판정 표 결과:

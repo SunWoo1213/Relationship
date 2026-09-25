@@ -1,0 +1,12 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_agent_loop.py -q -rA -k "no_counseling or byte_limit or thresholds or equation or defers or failed or schedule"
+PASSED tests/test_agent_loop.py::test_loop_module_source_never_mentions_thresholds_or_confidence_literal
+PASSED tests/test_agent_loop.py::test_resume_byte_limit_drops_held_drafts_but_keeps_pending_calls
+PASSED tests/test_agent_loop.py::test_resume_within_byte_limit_keeps_held_drafts
+PASSED tests/test_agent_loop.py::test_run_turn_merge_executes_add_event_and_satisfies_accepted_equation
+PASSED tests/test_agent_loop.py::test_run_turn_new_person_defers_add_event_to_resume_pending_calls
+PASSED tests/test_agent_loop.py::test_run_turn_schedule_without_time_asks_schedule_question
+PASSED tests/test_agent_loop.py::test_run_turn_stopped_turn_defers_merged_mention_unconfirmed_schedule_to_pending_calls
+PASSED tests/test_agent_loop.py::test_run_turn_add_event_naive_datetime_is_caught_as_failed
+PASSED tests/test_agent_loop.py::test_run_turn_no_counseling_reply_for_emotional_utterance
+9 passed, 7 deselected in 1.50s
+EXIT:0
