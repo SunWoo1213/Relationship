@@ -1,0 +1,5 @@
+# 판정 표 8행 ① — 사용자가 OPENAI_MODEL 오타(openai-gpt-4o) 수정 후 재기동. 실 공급자 openai, uvicorn 127.0.0.1:8000, DB 5433
+# 본문(UTF-8 파일): {"utterance":"어제 대학 동기 서준이랑 저녁 먹었어"}
+$ curl -s -X POST http://127.0.0.1:8000/chat -H "Content-Type: application/json" --data-binary @chat.json
+{"reply":"이번 발화에서는 새로 기억한 것이 없어요.\n\"서준\"을(를) 새 인물로 기억해둘까요?","session_id":"6cfd4f4f-ae6d-4b55-8506-f86f86b17aea","stored":{"persons":0,"events":0,"schedules":0},"pending_question":{"question_id":6088,"status":"pending","kind":"new_person","question":"\"서준\"을(를) 새 인물로 기억해둘까요?","options":["가족으로 기억할게요","연인으로 기억할게요","친구로 기억할게요","직장으로 기억할게요","지인으로 기억할게요","아니요"]},"stop_reason":"ask_user","trace_ids":[253792,253793,253797,253798]}
+HTTP 200

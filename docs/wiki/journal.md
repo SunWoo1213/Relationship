@@ -256,3 +256,5 @@
 - 2026-09-25 22:20 | DONE | **P5-loop 완료** — verifier 04-review `결과: 완료`(재개 세션에서 이어 작성: 수용 기준 10조각 통과, 판정 표 28행 대조, 부정 22건, T_merge 미만 자동 병합 0), 사용자 승인. verify-impl **FAIL 0 / WARN 0**(`evidence/20260925-2200-verify-impl.txt`), 전체 회귀 1474 passed, 05 열림 0/해소 23. review-index R6·R7 구현완료. `docs/user-setup/` 갱신은 RUNNING.md 로 갈음(사용자 결정), 01-plan 판정 표 표기 정정, 03-log U8 해시 채움. 판정 표 8행(실 공급자 curl) 미실행 — 사용자 몫. `CURRENT active: none` | P5-loop
 - 2026-09-25 22:03 | COMMIT | f9bfba7 docs(P5-loop): 완료 검토 결과와 완료 처리, README 진행 상황 갱신
 - 2026-09-25 22:03 | PUSH | origin dev f9bfba7 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-25 22:06 | COMMIT | 36766c1 chore(git): main 에만 있던 PR #1 병합 기록을 dev 로 합친다
+- 2026-09-25 22:07 | PUSH | origin dev 36766c1 — 사용자 결정 대기(승격/수정) L-003

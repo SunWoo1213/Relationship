@@ -1,0 +1,24 @@
+# 판정 표 8행 ②의 DB 확인 + R-15 임베딩 확인 (psql, capstone2-postgres-1)
+  id   | display_name | relation_tag | hierarchy 
+-------+--------------+--------------+-----------
+ 23175 | 서준         | 친구         | 동
+(1 row)
+
+ alias | source | has_embedding | dims 
+-------+--------+---------------+------
+ 서준  | system | t             | 1536
+(1 row)
+
+ type |   content   |            raw_utterance            |      occurred_at       
+------+-------------+-------------------------------------+------------------------
+ meal | 저녁 먹었어 | 어제 대학 동기 서준이랑 저녁 먹었어 | 2026-09-24 18:00:00+00
+(1 row)
+
+  id  |      answer       | answered 
+------+-------------------+----------
+ 6088 | 친구로 기억할게요 | t
+(1 row)
+
+$ 같은 question_id 로 두 번째 답 (409 기대)
+{"detail":{"code":"already_answered","question_id":6088}}
+HTTP 409

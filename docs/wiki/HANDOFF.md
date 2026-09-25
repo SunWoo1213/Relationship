@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-25 22:25 — **P5-loop 완료(verifier 04-review `완료`, 사용자 승인).** 완료 커밋 `f9bfba7`(README 최신화 포함) → **dev 푸시 완료(`24feebd..f9bfba7`, 12커밋). 사용자 "main 승격" 결정 → main 에 GitHub PR #1 병합 커밋 `7eaf1f6`(2026-09-23 15:56, 내용은 dev 와 동일)이 있어 ff 불가 → 내용 무변경 병합 커밋을 dev 에 만들고 푸시 → `git push origin dev:main`.**
+갱신: 2026-09-25 23:30 — **P5-loop 완료(verifier 04-review `완료`, 사용자 승인).** 완료 커밋 `f9bfba7`(README 최신화 포함) → **dev 푸시 완료(`24feebd..f9bfba7`, 12커밋). 사용자 "main 승격" 결정 → main 에 GitHub PR #1 병합 커밋 `7eaf1f6`(2026-09-23 15:56, 내용은 dev 와 동일)이 있어 ff 불가 → 내용 무변경 병합 커밋을 dev 에 만들고 푸시 → `git push origin dev:main`.**
 
 active: **none** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-postgres-1`(5433, pgvector) — 5432 는 다른 프로젝트
 
@@ -17,7 +17,7 @@ active: **none** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-postgre
 - journal 의 COMMIT 줄(훅 자동)과 이 HANDOFF 만 — 다음 커밋에 포함.
 
 ## 바로 다음에 할 것
-1. main 승격 마무리(`approve-commit.sh --release` → `git push origin dev:main` → `git fetch origin main:main`). 재발 방지: GitHub main 브랜치 보호 규칙(사용자 몫)(승격 전 판정 표 8행 실 공급자 curl 을 사용자가 돌려 보길 권고, `docs/RUNNING.md` 122행).
+1. **dev `36766c1` 푸시됨(병합 커밋, ff 가능 확인).** 사용자가 승격 전 실서버·실 AI 확인(판정 표 8행)을 맡김 → 사용자가 `!` 로 키를 실은 셸에서 uvicorn(8000) 기동 → **8행 ① 실패**: 실 OpenAI 로 `/chat` 이 `JudgeUnavailable: api_error`(인식 단계 제안 요청이 APIStatusError, 저장 0, `evidence/20260925-2300-row8-chat.txt`; 재시도도 같은 실패 `evidence/20260925-2310-row8-chat-retry.txt` — 일시 장애 아님. PROPOSAL_SCHEMA 육안 점검은 문법 이상 없음). **원인 확정(진단 스크립트, 사용자 실행): 설정 오타 — 사용자 .env 의 `OPENAI_MODEL=openai-gpt-4o` 가 없는 모델이라 404 model_not_found. 코드 결함 아님.** 사용자가 모델명 고쳐 재기동 → **8행 통과**(`evidence/20260925-2325-row8-{chat,answer,db-check}.txt`): ① new_person 되묻기(옵션 6) → ② "친구로" 답 → 인물 서준(친구·동)·meal 이벤트 1·별칭 임베딩 1536 NOT NULL(R-15)·중복 답 409. **관찰(FIX 후보)**: "어제 저녁" occurred_at 이 `2026-09-24 18:00+00`(= KST 새벽 3시) — LLM 이 준 현지 시각을 UTC 로 저장하는 듯. 서버 8000 켜 둠. 서버는 `.env` 의 DATABASE_URL 이 5432 라 `unset DATABASE_URL` 로 기동(8000, 켜 둠). 사용자에게 진단 스크립트(scratchpad `diag_propose.py`) 실행 요청 → 원인 확인 → FIX 계획·승인 → 수정 → ②까지 재확인 → 승격 재확인 → main 승격 마무리(`approve-commit.sh --release` → `git push origin dev:main` → `git fetch origin main:main`). 재발 방지: GitHub main 브랜치 보호 규칙(사용자 몫)(승격 전 판정 표 8행 실 공급자 curl 을 사용자가 돌려 보길 권고, `docs/RUNNING.md` 122행).
 2. 다음 패키지 후보: P6(메모리 승격·패턴 감지 / 브리핑) — `/devlog start`, architect 위임은 L-004 승인 먼저.
 
 ## 열린 질문 · 사용자 결정 대기

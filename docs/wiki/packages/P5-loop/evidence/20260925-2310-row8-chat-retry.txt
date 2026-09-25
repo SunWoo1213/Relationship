@@ -1,0 +1,4 @@
+# 판정 표 8행 ① 재시도 — 같은 본문 {"utterance":"어제 대학 동기 서준이랑 저녁 먹었어"}
+$ curl -s -X POST http://127.0.0.1:8000/chat -H "Content-Type: application/json" --data-binary @chat.json
+{"reply":"지금은 기억하지 못했어요. 잠시 뒤 다시 말씀해 주세요.","session_id":"524015df-2244-4ce9-8bfa-81bab697cc5f","stored":{"persons":0,"events":0,"schedules":0},"pending_question":null,"stop_reason":null,"trace_ids":[253791]}
+HTTP 200

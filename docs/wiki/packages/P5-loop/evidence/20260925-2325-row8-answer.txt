@@ -1,0 +1,5 @@
+# 판정 표 8행 ② — ①의 question_id 6088 에 답. X-Session-Id 헤더 없음(행 8 지시)
+# 본문(UTF-8 파일): {"answer":"친구로 기억할게요"}
+$ curl -s -X POST http://127.0.0.1:8000/answers/6088 -H "Content-Type: application/json" --data-binary @answer.json
+{"question_id":6088,"status":"answered","reply":"기억했어요: 이벤트 1건.","stored":{"persons":1,"events":1,"schedules":0},"pending_question":null,"stop_reason":null,"trace_ids":[253801,253803,253805]}
+HTTP 200
