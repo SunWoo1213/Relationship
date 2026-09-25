@@ -5,23 +5,22 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-25 00:50 — **세션 마무리. P5-loop U1~U5 완료, FIX-004 완료(전체 1454 passed, 실패 0 · 스킵 0). 다음 세션은 푸시 여부 확인 → U6 부터.** 사용자 요청: "FIX-004 까지 진행하고 다음 세션에서 이어가도록 기록".
+갱신: 2026-09-25 (재개) — **재개 세션. 사용자 결정: 기록 정리 커밋 → 푸시는 P5-loop 완료 뒤 한 번에(지금은 안 올림) → U6 시작.**
 
 active: **P5-loop** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-postgres-1`(5433, pgvector) — 5432 `finance_postgres` 는 다른 프로젝트라 무관(사용자가 종료함)
 
 ## 이 세션에서 끝난 것 (커밋, 전부 dev · **미푸시**)
 - `24feebd` 계획 승인·활성화(푸시됨) → `3e4db92` U1 계약 타입 → `a3ebc36` 한국어 규칙(커밋 스킬·에이전트 4종) → `069bdc2` U2 인식(LLM 제안) → `8ecf75c` U3 게이트 → `7a2ec5c` U4 해석 → `1835355` U5 기록·응답
-- **미푸시 7개**(`3e4db92`~`1835355` + FIX-004 커밋 — `git log --oneline origin/dev..dev`). 푸시는 사용자 승인 뒤 `git push origin dev` → L-003 결정 대기.
+- **미푸시 7개**(`3e4db92`~`1835355` + FIX-004 `1be4a56` — `git log --oneline origin/dev..dev`). 커밋 안 된 것: journal 의 COMMIT 줄(훅 자동)·이 HANDOFF 의 해시 반영 — 다음 첫 커밋에 포함. 푸시는 사용자 승인 뒤 `git push origin dev` → L-003 결정 대기.
 - 단위별로 정한 것(R-22~R-25, 후보 시각 규칙, 사용자 결정)은 `packages/P5-loop/03-log.md` 각 항목 "남은 것" 칸에 있다. 다시 정하지 않는다.
 
 ## 지금 진행 중
-- 없음. FIX-004 는 커밋까지 끝났다(`fixes/FIX-004.md` `## 결과` 에 해시는 다음 커밋에서 채운다 — journal 에 해시가 있다).
+- 기록 정리 커밋(FIX-004·03-log 해시 채움, journal 줄) — 이 커밋이 끝나면 없음.
 
 ## 바로 다음에 할 것 (순서대로)
-1. `fixes/FIX-004.md` `## 결과` 의 "커밋: (메인 세션)" 을 FIX-004 해시로 바꾼다(`git log --oneline --grep FIX-004`), 03-log 마지막 항목 `pending` 도 같은 해시로 — 다음 커밋에 포함.
-2. 푸시 여부를 사용자에게 묻는다(미푸시 7개). 푸시하면 L-003 — 승격/수정/보류를 묻고 멈춘다.
-3. **U6 `POST /chat` — API 한 흐름**(01-plan 93행): `app/api/routes.py`·`schemas.py`·`deps.py`, 세션 id 서버 발급(결정 I), `get_session()` 재사용, 루프 예외는 삼켜 200(결정 G·H) — 단 `SQLAlchemyError` 는 올린다(R-3), 미답변 질문 유지(R-4), 테스트 `tests/test_api_chat.py`. backend-agent, **L-004 승인 먼저**.
-4. U7 재개 `POST /answers/{question_id}` 뒤 절반(R6·R7 을 닫는 단위) → U8 수용 기준 기계 검증·registry·README → `/devlog done`(verifier 04-review).
+1. **U6 `POST /chat` — API 한 흐름**(01-plan 93행): `app/api/routes.py`·`schemas.py`·`deps.py`, 세션 id 서버 발급(결정 I), `get_session()` 재사용, 루프 예외는 삼켜 200(결정 G·H) — 단 `SQLAlchemyError` 는 올린다(R-3), 미답변 질문 유지(R-4), 테스트 `tests/test_api_chat.py`. backend-agent, L-004 승인 받음(2026-09-25).
+2. U7 재개 `POST /answers/{question_id}` 뒤 절반(R6·R7 을 닫는 단위) → U8 수용 기준 기계 검증·registry·README → `/devlog done`(verifier 04-review).
+3. 푸시: 사용자 결정(2026-09-25) — P5-loop 완료 뒤 한 번에. 그 전에는 묻지 않는다.
 
 ## U6·U7·U8 에서 재확인할 것 (U5 가 남김)
 - `TurnResult.stop_reason` 값 집합("ask_user" / 게이트 "limit" / None)과 `trace_ids`(loop_turn 자신 제외 4행)가 U6 응답 스키마·U8 판정 표와 맞는가.
