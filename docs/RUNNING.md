@@ -119,7 +119,25 @@ curl -X POST http://localhost:8000/answers/1 \
 | 409 | 이미 답했거나(already_answered) 24시간이 지나 만료됨(expired) |
 | 422 | 저장된 `options` 밖의 답, 요청 본문 형식 오류 |
 
-이 두 엔드포인트(`GET /health`, `POST /answers/{question_id}`)는 답 저장까지만 한다 — 채팅·에이전트 루프(발화 → 툴 선택 → 응답, 저장된 context로 루프 재개)는 P5 에서 붙는다.
+`POST /chat`으로 발화 한 건을 보내면 인식(LLM 1회로 `tool_calls` 제안) → 게이트(화이트리스트·인자 스키마·`person_id` 직접 지정 금지·개수 상한) → 해석(엔티티 해석 4단계) → 기록 → 응답이 그 요청 하나 안에서 돈다. 헤더 `X-Session-Id`가 없으면 서버가 발급해 응답의 `session_id`로 돌려준다:
+
+```bash
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"utterance": "어제 민수랑 저녁 먹었어"}'
+```
+
+기대 출력(요약): `{"session_id": "...", "reply": "...", "stored": {"persons": [...], "events": [...], "schedules": [...]}, "pending_question": null, "stop_reason": null}` — 인물이 처음 언급됐거나 동일 인물 여부가 애매하면 `pending_question`에 `question_id`·`options`가 함께 온다(확신도가 `T_merge` 미만이면 자동으로 합치지 않고 되묻는다).
+
+되묻기로 끝난 턴은 `POST /answers/{question_id}`로 이어받는다 — 답 저장(P2) 뒤 **같은 요청 안에서** 저장된 `context`로 해석 · 기록 · 응답을 재개한다(P2 시점에는 답 저장까지만 했다):
+
+```bash
+curl -X POST http://localhost:8000/answers/1 \
+  -H "Content-Type: application/json" \
+  -d '{"answer": "친구로 기억할게요"}'
+```
+
+`AnswerOut`도 `ChatOut`과 같은 5필드(`session_id`·`reply`·`stored`·`pending_question`·`stop_reason`)를 돌려주므로, 재개 중 다른 언급이 다시 되물으면 새 `question_id`가 그대로 응답에 담겨 이어 답할 수 있다. 같은 `question_id`로 두 번째 `POST /answers`를 보내면 409(`already_answered`)다.
 
 ### 엔티티 해석(ER) 실행법
 

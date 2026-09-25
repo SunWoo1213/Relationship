@@ -1,0 +1,2 @@
+$ git diff --name-only 1227026..HEAD -- data/ reports/
+EXIT:0

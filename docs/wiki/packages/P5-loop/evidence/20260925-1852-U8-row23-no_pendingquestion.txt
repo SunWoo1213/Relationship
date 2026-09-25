@@ -1,0 +1,35 @@
+$ grep -rnE "PendingQuestion|flag_modified|\.context *=" app/agent/
+app/agent/loop.py:200:from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
+app/agent/loop.py:673:    schedule_question: PendingQuestionOut | None = None
+app/agent/loop.py:710:) -> PendingQuestionOut:
+app/agent/loop.py:793:    schedule_question: PendingQuestionOut | None = None
+app/agent/loop.py:891:def _pending_question_from_resolve(outcome: ResolveOutcome) -> PendingQuestionOut:
+app/agent/loop.py:892:    """해석 구간이 만든 identity/new_person 질문을 `PendingQuestionOut`
+app/agent/loop.py:893:    으로 다시 만든다 -- `PendingQuestion` ORM 을 조회하지 않고, 이 루프가
+app/agent/loop.py:903:    return PendingQuestionOut(
+app/agent/loop.py:985:# (`app/api/deps.py::load_resume_input` 이 `PendingQuestion` 에서 값만 뽑아
+app/agent/loop.py:1093:    `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아
+app/agent/respond.py:22:  `new_person`/`schedule` 공통, `app.tools.types.PendingQuestionOut`) --
+app/agent/respond.py:29:from app.tools.types import PendingQuestionOut
+app/agent/respond.py:41:    pending_question: PendingQuestionOut | None = None,
+app/agent/respond.py:45:    숫자·불리언·`PendingQuestionOut.question` 문자열만 입력으로 받는다 --
+app/agent/types.py:38:from app.tools.types import InvalidValue, PendingQuestionOut
+app/agent/types.py:406:    .load_resume_input`(U6/U7)이 `PendingQuestion` 행에서 `kind`·`context`
+app/agent/types.py:409:    로 더해 이 타입을 만든다 -- `app/agent/` 는 `PendingQuestion` ORM 을
+app/agent/types.py:450:    .PendingQuestionOut` 재사용 -- 새 직렬화 방식을 만들지 않는다). 비어
+app/agent/types.py:457:    pending_question: PendingQuestionOut | None = None
+Binary file app/agent/__pycache__/loop.cpython-313.pyc matches
+Binary file app/agent/__pycache__/respond.cpython-313.pyc matches
+Binary file app/agent/__pycache__/types.cpython-313.pyc matches
+exit=0
+
+--- 판단 메모 ---
+위 매치는 전부 'PendingQuestionOut'(app.tools.types 의 DTO, U1 설계상 재사용 대상)의 부분 문자열 일치다.
+PendingQuestion 은 'PendingQuestionOut' 의 접두 문자열이라 단순 grep 패턴이 구분하지 못한다 — 01-plan 자신도 이 DTO 이름을 patindexterm으로 쓴다.
+ORM PendingQuestion 직접 import 여부를 더 정밀하게 확인:
+$ grep -rn "app.db.models import" app/agent/ ; grep -rn "\.db\.models\.PendingQuestion\b" app/agent/
+app/agent/gate.py:87:from app.db.models import EVENT_TYPES, HIERARCHIES, RELATION_TAGS
+app/agent/loop.py:196:from app.db.models import HIERARCHIES, RELATION_TAGS
+app/agent/propose.py:75:from app.db.models import EVENT_TYPES, HIERARCHIES, RELATION_TAGS
+app/agent/types.py:37:from app.db.models import EVENT_TYPES, QUESTION_KINDS, RELATION_TAGS
+exit=1 (위 두 grep 모두 0건이면 exit=1)

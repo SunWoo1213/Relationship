@@ -1,0 +1,3 @@
+$ grep -n "^결과:" docs/wiki/packages/P4b-er-redesign/04-review.md
+144:결과: 완료
+EXIT:0

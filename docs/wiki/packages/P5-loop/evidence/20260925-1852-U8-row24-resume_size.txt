@@ -1,0 +1,8 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_agent_loop.py -q -k "resume_size"
+
+16 deselected in 0.20s
+EXIT:5
+--- -k 'resume_size' 매치 0건, 가장 가까운 실제 테스트로 재실행 ---
+..                                                                       [100%]
+2 passed, 14 deselected in 0.63s
+EXIT:0

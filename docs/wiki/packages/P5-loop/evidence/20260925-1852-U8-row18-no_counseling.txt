@@ -1,0 +1,4 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_agent_loop.py -q -k "no_counseling or scope"
+.                                                                        [100%]
+1 passed, 15 deselected in 0.39s
+EXIT:0

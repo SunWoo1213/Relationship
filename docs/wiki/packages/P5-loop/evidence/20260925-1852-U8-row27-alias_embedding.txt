@@ -1,0 +1,5 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_api_answers_resume.py -q -k "alias_embedding"
+.                                                                        [100%]
+1 passed, 10 deselected in 0.95s
+EXIT:0
+(주: 01-plan 은 tests/test_agent_resume.py 로 적었으나 실제 파일명은 tests/test_api_answers_resume.py 다)

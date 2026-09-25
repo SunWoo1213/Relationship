@@ -1,0 +1,6 @@
+$ PYTHONUTF8=1 POSTGRES_PORT=5433 SEED=1 REJECTS=0 python -c "..." (7행 명령 (나), 시드 DB — merge 로 끝남)
+[('loop_extract', 'agent'), ('loop_gate', 'agent'), ('tool_call', 'search_person'), ('er_resolve', 'er'), ('tool_call', 'update_person'), ('loop_resolve_done', 'agent'), ('tool_call', 'add_event'), ('loop_record', 'agent'), ('loop_turn', 'agent')]
+{"gate": {"limits": {"events": 5, "mentions": 5, "proposals": 13, "schedules": 3}, "accepted": [{"name": "add_event", "index": 0, "bucket": "execute"}], "rejected": [], "stop_reason": null}, "record": {"failed": [], "executed": [{"name": "add_event", "index": 0, "trace_id": 241940}]}, "pending_calls": null, "question": null}
+[('tool_call', 'add_event')]
+True
+EXIT:0

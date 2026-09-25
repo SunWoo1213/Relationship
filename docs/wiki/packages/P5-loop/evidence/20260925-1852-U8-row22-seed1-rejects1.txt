@@ -1,0 +1,6 @@
+$ PYTHONUTF8=1 POSTGRES_PORT=5433 SEED=1 REJECTS=1 python -c "..." (22행 — 7행 명령 공용, 거부 4종)
+[('loop_extract', 'agent'), ('loop_gate', 'agent'), ('tool_call', 'search_person'), ('er_resolve', 'er'), ('tool_call', 'update_person'), ('loop_resolve_done', 'agent'), ('tool_call', 'add_event'), ('loop_record', 'agent'), ('loop_turn', 'agent')]
+{"gate": {"limits": {"events": 5, "mentions": 5, "proposals": 13, "schedules": 3}, "accepted": [{"name": "add_event", "index": 0, "bucket": "execute"}], "rejected": [{"name": "update_person", "index": 1, "reason": "person_id_from_llm"}, {"name": "search_person", "index": 2, "reason": "not_callable_by_llm"}, {"name": "delete_person", "index": 3, "reason": "unknown_tool"}, {"name": "add_event", "index": 4, "reason": "bad_args"}], "stop_reason": null}, "record": {"failed": [], "executed": [{"name": "add_event", "index": 0, "trace_id": 241949}]}, "pending_calls": null, "question": null}
+[('tool_call', 'add_event')]
+True
+EXIT:0

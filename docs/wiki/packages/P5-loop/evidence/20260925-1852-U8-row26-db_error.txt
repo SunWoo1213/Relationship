@@ -1,0 +1,4 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_api_chat.py -q -k "db_error"
+.                                                                        [100%]
+1 passed, 8 deselected in 0.83s
+EXIT:0

@@ -1,0 +1,11 @@
+$ git diff --name-only 1227026..HEAD -- app/
+app/agent/__init__.py
+app/agent/gate.py
+app/agent/loop.py
+app/agent/propose.py
+app/agent/respond.py
+app/agent/types.py
+app/api/deps.py
+app/api/routes.py
+app/api/schemas.py
+app/settings.py

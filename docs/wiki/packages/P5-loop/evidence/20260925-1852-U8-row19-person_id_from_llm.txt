@@ -1,0 +1,4 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_agent_gate.py -q -k "person_id_from_llm"
+..                                                                       [100%]
+2 passed, 30 deselected in 0.18s
+EXIT:0

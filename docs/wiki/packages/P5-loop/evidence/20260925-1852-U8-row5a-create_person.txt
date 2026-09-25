@@ -1,0 +1,5 @@
+$ grep -rnE -B1 "create_person\(" app/agent/
+app/agent/loop.py-1206-            ctx.confirmed_question_id = question_id
+app/agent/loop.py:1207:            created = app_tools.create_person(
+---
+EXIT:0

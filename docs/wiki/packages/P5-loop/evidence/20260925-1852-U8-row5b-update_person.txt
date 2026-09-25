@@ -1,0 +1,6 @@
+$ grep -rnE -A4 "update_person\(" app/agent/ | grep -n "display_name"
+(exit=1, 0건이면 grep 자체는 exit 1)
+---
+$ grep -rnE "update_person\(" app/agent/
+app/agent/loop.py:771:        return app_tools.update_person(
+app/agent/loop.py:1188:            app_tools.update_person(ctx, person_id, new_alias=mention)

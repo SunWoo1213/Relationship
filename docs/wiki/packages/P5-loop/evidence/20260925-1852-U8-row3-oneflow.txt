@@ -1,0 +1,8 @@
+
+9 deselected in 0.64s
+EXIT:5
+
+9 deselected in 0.56s
+--- 보정: -k 키워드에 맞는 테스트 없음. 가장 가까운 실제 테스트로 재실행 ---
+.                                                                        [100%]
+1 passed in 0.99s

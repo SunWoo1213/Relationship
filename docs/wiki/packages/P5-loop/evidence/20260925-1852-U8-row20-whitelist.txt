@@ -1,0 +1,4 @@
+$ POSTGRES_PORT=5433 python -m pytest tests/test_agent_gate.py -q -k "unknown_tool or not_callable"
+....                                                                     [100%]
+4 passed, 28 deselected in 0.22s
+EXIT:0

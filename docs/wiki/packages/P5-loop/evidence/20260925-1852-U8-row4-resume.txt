@@ -1,0 +1,4 @@
+...........                                                              [100%]
+11 passed in 2.70s
+EXIT:0
+(주: 01-plan 은 tests/test_agent_resume.py 로 적었으나 실제 파일명은 tests/test_api_answers_resume.py 다)

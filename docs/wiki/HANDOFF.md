@@ -15,10 +15,10 @@ active: **P5-loop** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-post
 - 단위별로 정한 것(R-22~R-25, 후보 시각 규칙, 사용자 결정)은 `packages/P5-loop/03-log.md` 각 항목 "남은 것" 칸에 있다. 다시 정하지 않는다.
 
 ## 지금 진행 중
-- **U6 `POST /chat` 완료·커밋**(사용자 승인 2026-09-25): chat 9 passed(메인 세션이 재실행), 전체 1463 passed. 해시는 journal 참고, 03-log `pending` 은 다음 커밋에서 채운다.
+- 이번 세션 커밋: `a2f5256` 기록 정리 → `d5c8ec9` U6 → `7df3ada` U7(03-log U7 의 `pending` 은 다음 커밋에서 `7df3ada` 로 채운다). 미푸시 10개.
 - 예시 설정 파일에 들어가 있던 실제 형식 키는, 키가 이미 비밀 파일에 있다는 사용자 확인을 받은 뒤 `git restore` 로 되돌렸다(커밋·푸시된 적 없음).
-- **U7(재개) 완료·커밋(사용자 승인 2026-09-25, 해시는 journal — 03-log pending 은 다음 커밋에서)**: 메인 세션 재실행 46 passed, 전체 1474 passed. 03-log U7 항목·01-plan U7 [x] 반영, U6 해시 `d5c8ec9` 도 채움. 예상 밖 변경 파일 없음.
-- 다음: U8 — 05-remediation [권고] 7건 원인 분석 → 판정 표 전 명령(7행 포함) → registry·README → `/devlog done`(verifier). L-004 승인 먼저. 그다음 푸시(P5 완료 뒤 한 번에, 사용자 결정).
+- **U8 완료·커밋(사용자 승인 2026-09-25, 해시는 journal — 03-log pending 은 다음 커밋에서). 다음 = verifier 04-review(사용자 승인 받음).** 요약 `evidence/20260925-1852-U8-summary.md`. 불일치는 표기뿐(파일명 4행·`-k` 2행). 8행(수동 curl, 실제 LLM)은 미실행 — 사용자 몫. 03-log U8 항목 작성, U7 해시 채움.
+- (완료된 위임 기록) U8 위임(L-004 승인 2026-09-25): 05 [권고] 7건 원인 분석 → 판정 표 전 명령 실행·evidence(7행 포함, 행 삭제 금지, 실제 API 금지) → `evidence/*-U8-summary.md` → registry·README. 돌아오면 메인 세션이 summary·불일치 행을 확인하고, 커밋 승인을 받은 뒤 `/devlog done`(verifier 04-review, L-004 승인 먼저) → 완료 승인 → 푸시(사용자 결정: P5 완료 뒤 한 번에).
 
 ## 바로 다음에 할 것 (순서대로)
 1. (완료, 커밋 대기) **U6 `POST /chat` — API 한 흐름**(01-plan 93행): `app/api/routes.py`·`schemas.py`·`deps.py`, 세션 id 서버 발급(결정 I), `get_session()` 재사용, 루프 예외는 삼켜 200(결정 G·H) — 단 `SQLAlchemyError` 는 올린다(R-3), 미답변 질문 유지(R-4), 테스트 `tests/test_api_chat.py`. backend-agent, L-004 승인 받음(2026-09-25).

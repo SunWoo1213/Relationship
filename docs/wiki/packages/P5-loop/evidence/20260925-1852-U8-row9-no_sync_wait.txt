@@ -1,0 +1,2 @@
+$ grep -rnE "time\.sleep|asyncio\.sleep|while True" app/agent/ app/api/
+exit=1
