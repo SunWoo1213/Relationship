@@ -1,0 +1,5 @@
+dev url db: relationship
+databases on server: [('relationship',), ('relationship_test',), ('relationship_test_fix006_evidence',)]
+dev relationship.persons count (unchanged by test runs): 10
+relationship_test tables: [('agent_traces',), ('alembic_version',), ('events',), ('fact_sources',), ('pending_questions',), ('person_aliases',), ('person_facts',), ('persons',), ('push_subscriptions',), ('schedules',)]
+relationship_test alembic_version: [('0001',)]

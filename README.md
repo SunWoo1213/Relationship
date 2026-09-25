@@ -149,6 +149,8 @@ python -m alembic upgrade head
 python -m pytest -q tests/
 ```
 
+테스트는 `relationship_test` DB를 씁니다(로컬 서버 데이터와 분리, FIX-006) — 없으면 pytest가 스스로 만들고 마이그레이션합니다.
+
 로컬 포트 설정, 백엔드 실행, 채팅 API(`POST /chat` · `POST /answers/{id}`) 호출, 엔티티 해석 · 베이스라인 · 파일럿 평가 재현 방법은 [`docs/RUNNING.md`](docs/RUNNING.md)에 있습니다.
 
 ## 9. 문서 · License

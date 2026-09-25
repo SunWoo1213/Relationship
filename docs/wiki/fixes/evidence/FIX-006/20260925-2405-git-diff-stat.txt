@@ -1,0 +1,9 @@
+ .github/workflows/tests.yml |  9 ++++++-
+ README.md                   |  2 ++
+ docs/RUNNING.md             |  2 ++
+ docs/wiki/CURRENT.md        |  2 +-
+ docs/wiki/HANDOFF.md        |  4 +--
+ docs/wiki/journal.md        |  4 +++
+ docs/wiki/registry.md       |  8 +++---
+ tests/conftest.py           | 64 +++++++++++++++++++++++++++++++++++++++------
+ 8 files changed, 80 insertions(+), 15 deletions(-)

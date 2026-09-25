@@ -264,3 +264,8 @@
 - 2026-09-25 23:50 | FIX | FIX-005 시작 — 사용자 시간대 부재로 "어제 저녁"이 KST 새벽 3시로 저장(P5 8행 실서버에서 발견). 계획 승인, CURRENT active FIX-005, backend-agent 위임 | FIX-005
 - 2026-09-25 23:10 | COMMIT | 1f07429 fix(FIX-005): 사람이 말한 시각을 사용자 시간대(기본 서울)로 해석한다
 - 2026-09-26 00:45 | FIX | FIX-005 완료 — 구현 1f07429(1481 passed), 실서버 재확인 통과(occurred_at 2026-09-24 10:00+00 = KST 19:00). 테스트 20건 실패 원인이던 8행 인물은 user_id 만 분리(사용자 승인). active none | FIX-005
+- 2026-09-25 23:14 | COMMIT | 16b19a5 docs(FIX-005): 실서버 재확인 결과를 남기고 FIX 를 닫는다
+- 2026-09-25 23:14 | PUSH | origin dev 16b19a5 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-25 23:15 | RELEASE | origin main ← dev 16b19a5
+- 2026-09-26 01:00 | FIX | FIX-006 시작 — 테스트가 개발 DB·user local 을 로컬 서버와 공유(서버 사용 시 테스트 20건 실패). 방식 테스트 전용 DB(사용자 결정), 계획 승인, active FIX-006, backend-agent 위임 | FIX-006
+- 2026-09-26 01:15 | FIX | FIX-006 완료 — 테스트 전용 DB relationship_test, 1486 passed, 격리 증명(서준 local 재현 상태에서도 통과 → 복구). active none | FIX-006

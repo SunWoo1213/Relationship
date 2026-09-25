@@ -22,6 +22,8 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       # CI 전용 일회성 DB 값(비밀 아님). LLM · 임베딩은 테스트에서 스텁이다.
+      # DATABASE_URL 은 서비스 컨테이너의 기본 DB(relationship)를 가리키지만
+      # pytest 는 실제로는 거기에 붙지 않는다 -- 아래 참고.
       DATABASE_URL: postgresql+psycopg://app:pass@localhost:5432/relationship
       PYTHONUTF8: "1"
     steps:
@@ -32,7 +34,12 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-dev.txt
       - run: pip install -r requirements-dev.txt
-      - run: alembic upgrade head
+      # alembic upgrade head 를 여기서 개발 DB(relationship)에 직접 돌리던
+      # 단계는 뺐다(FIX-006). tests/conftest.py 가 pytest 세션 시작 시
+      # DATABASE_URL 의 DB 이름만 relationship_test 로 바꿔 그 DB 를 만들고
+      # (CREATE DATABASE) vector 확장 + alembic upgrade head 를 스스로
+      # 적용한다 -- 로컬 실행과 CI 가 같은 경로를 타므로 이 단계는
+      # 중복이었다.
       # -rs: DB 테스트가 skip되면 사유를 출력한다. skip이 있으면 실패로 본다.
       - run: |
           python -m pytest -q -rs tests/ | tee pytest.out

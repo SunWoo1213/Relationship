@@ -20,6 +20,8 @@ python scripts/embed_pilot.py
 
 로컬 DB가 떠 있지 않으면 DB가 필요한 통합 테스트는 **skip**되고 DB 없이 도는 테스트만 통과한다(예: P3-baselines 시점 627 passed · 232 skipped). 전체 통과(현재 918 passed)는 아래 "로컬 DB"와 "스키마 마이그레이션"을 마친 뒤 `POSTGRES_PORT`를 맞춰 실행한 결과다.
 
+**테스트는 `relationship_test`를 쓴다(FIX-006)** — 로컬 서버·개발 DB(`relationship`)의 데이터와 완전히 분리된 DB다. `tests/conftest.py`가 pytest 세션 시작 시 이 DB가 없으면 만들고(`CREATE DATABASE`, 개발 DB는 건드리지 않음) `vector` 확장과 `alembic upgrade head`를 스스로 적용한다. 이름은 `TEST_POSTGRES_DB` 환경변수로 바꿀 수 있고, 개발 DB와 같은 이름을 주면 즉시 오류로 중단한다.
+
 ### 로컬 DB (docker-compose + pgvector)
 
 사전 조건: Docker Desktop 실행 중. `.env`가 없다면 `.env.example`을 복사해 시작하고, DB 절의 `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` / `POSTGRES_PORT` 4개와 `DATABASE_URL`을 **같은 값**으로 유지한다(포트를 바꾸면 둘 다 바꾼다).

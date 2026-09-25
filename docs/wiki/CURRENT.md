@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- **FIX-006 완료(2026-09-26)** — 테스트 전용 DB `relationship_test`(tests/conftest.py·tests/db_bootstrap.py, `app/` 무변경). 1486 passed, 서준을 local 로 되돌린 격리 증명도 통과. 이제 로컬 서버(개발 DB)를 써도 테스트가 흔들리지 않는다.
 - **FIX-005 완료(2026-09-26)** — 사용자 시간대(`APP_TIMEZONE`, 기본 Asia/Seoul). 구현 `1f07429`, 전체 1481 passed, 실서버 재확인 "어제 저녁" → KST 24일 19:00. 별건 FIX 후보: 테스트·로컬 서버가 같은 `APP_USER_ID=local` 공유(로컬 서버 사용 시 테스트 20건 깨짐). 다음: P6.
 - **P5-loop 완료(2026-09-25, verifier 04-review `완료`, 사용자 승인)** — verify-impl FAIL 0/WARN 0(`evidence/20260925-2200-verify-impl.txt`), 전체 회귀 1474 passed, 열린 소견 0/해소 23. U1 `3e4db92` · U2 `069bdc2` · U3 `8ecf75c` · U4 `7a2ec5c` · U5 `1835355` · U6 `d5c8ec9` · U7 `7df3ada` · U8 `f0d3e26`. R6·R7 구현완료. 남은 것: 판정 표 8행 실 공급자 curl(사용자, main 승격 전 권고), `docs/user-setup/` 은 RUNNING.md 로 갈음, 하네스 부채(verify-plan 토큰 스캔 오탐·findings.py 빈 표 중복), 개발 DB 확인 행 잔존. 다음 후보: P6(메모리 승격·패턴 / 브리핑).
 - **P5-loop 구현 진행(2026-09-25)** — U1 `3e4db92` · U2 `069bdc2` · U3 `8ecf75c` · U4 `7a2ec5c` · U5 `1835355` 완료(dev, 미푸시). FIX-004(인물 해석 테스트 전역 개수 단언) 진행. 다음 = U6 `POST /chat` → U7 재개 → U8 검증 → 04-review.
