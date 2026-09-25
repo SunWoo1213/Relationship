@@ -51,3 +51,10 @@
 - 정합성 확인: 원칙·D·S 변경 없음, 원칙8(남은 행 삭제 안 함), 제품 코드 무변경 — 위반 없음. 전체 1454 passed, 실패 0 · 스킵 0.
 - 남은 것 · 다음 단위: 다음 세션 = 푸시 여부 확인 → U6 `POST /chat`(backend-agent, L-004). 판정 표 7행 명령은 U8 전까지 다시 돌리지 않는다.
 - Refs: FIX-004 P5-loop P3-er D2 원칙8
+
+## 2026-09-25 17:45 · feat(P5-loop): U6 POST /chat — 발화 한 건을 받아 한 턴을 돌리고 답한다 · pending
+- 변경: `app/api/deps.py`(`resolve_session_id`·`build_chat_ctx`·`_embedder_from_env`·`get_embedder`·`get_proposer`·`get_judge`)·`app/api/schemas.py`(`ChatIn`·`StoredOut`·`ChatPendingQuestionOut`·`ChatOut`)·`app/api/routes.py`(`POST /chat`·`_record_loop_error`) 추가. `tests/test_api_chat.py` 신규 9건. evidence `20260925-1739-U6-fix2-pytest-chat.txt`·`20260925-1739-U6-fix2-pytest-full.txt`·`20260925-1744-U6-main-recheck-chat.txt`(메인 세션 재실행). 첫 DB 실행 3 failed 기록은 `20260925-1712-U6-pytest-chat.txt`.
+- 이유(기획서·카드 연결): 01-plan U6, 결정 G·H·I, R-3·R-4·R-15, S3.4.
+- 정합성 확인: 원칙1·4·9 / D2 / S3.4 — 위반 없음. 허용 파일 3개만 변경(`app/agent`·`app/er`·`app/tools`·`app/db`·`app/main.py` 무변경). `app/agent/` 금지 리터럴 0건, `app/api/` "evaluation" 0건, 동기 대기 0건. chat 9 passed(메인 재실행), 전체 1463 passed · 실패 0 · 스킵 0.
+- 남은 것 · 다음 단위: U6 에서 정한 것 — (1) **부분 롤백**: `run_turn()` 을 `session.begin_nested()` 로 감싸서, 삼킨 예외가 나면 그 턴의 쓰기와 중간 trace 를 모두 되돌리고 바깥 트랜잭션에 `loop_error` 한 행만 남긴다(결정 G "저장 0", 사용자 승인 2026-09-25 — 언급 1 merge 뒤 언급 2 judge 오류 시 별칭이 커밋되던 빈틈). 테스트 `partial_rollback` 은 첫 언급 merge·둘째 resolve 호출을 먼저 단언한다. (2) **임베더 주입**: `get_embedder()` 의존성(운영 `_embedder_from_env()`, 테스트 `fake_embedder`)으로 chat 테스트가 키와 무관하게 네트워크 0 으로 돈다(사용자 승인 2026-09-25). (3) 세션 id 형식 `^[A-Za-z0-9._-]{1,128}$`, 위반이면 422. (4) 예외 턴 응답은 `stop_reason=None`·`trace_ids=[loop_error id]`. **U7 에서 재확인**: 재개 라우트도 `get_proposer`·`get_judge`·`get_embedder` 를 재사용하고, `load_resume_input` 은 `deps.py` 에만 둔다. 다음 = U7.
+- Refs: P5-loop R7 D2 S3.4 원칙1 원칙9

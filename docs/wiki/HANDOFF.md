@@ -15,10 +15,12 @@ active: **P5-loop** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-post
 - 단위별로 정한 것(R-22~R-25, 후보 시각 규칙, 사용자 결정)은 `packages/P5-loop/03-log.md` 각 항목 "남은 것" 칸에 있다. 다시 정하지 않는다.
 
 ## 지금 진행 중
-- 기록 정리 커밋(FIX-004·03-log 해시 채움, journal 줄) — 이 커밋이 끝나면 없음.
+- **U6 `POST /chat` 완료·커밋**(사용자 승인 2026-09-25): chat 9 passed(메인 세션이 재실행), 전체 1463 passed. 해시는 journal 참고, 03-log `pending` 은 다음 커밋에서 채운다.
+- 예시 설정 파일에 들어가 있던 실제 형식 키는, 키가 이미 비밀 파일에 있다는 사용자 확인을 받은 뒤 `git restore` 로 되돌렸다(커밋·푸시된 적 없음).
+- 다음: U7(재개) — 시작 전에 L-004 승인을 받는다.
 
 ## 바로 다음에 할 것 (순서대로)
-1. **U6 `POST /chat` — API 한 흐름**(01-plan 93행): `app/api/routes.py`·`schemas.py`·`deps.py`, 세션 id 서버 발급(결정 I), `get_session()` 재사용, 루프 예외는 삼켜 200(결정 G·H) — 단 `SQLAlchemyError` 는 올린다(R-3), 미답변 질문 유지(R-4), 테스트 `tests/test_api_chat.py`. backend-agent, L-004 승인 받음(2026-09-25).
+1. (완료, 커밋 대기) **U6 `POST /chat` — API 한 흐름**(01-plan 93행): `app/api/routes.py`·`schemas.py`·`deps.py`, 세션 id 서버 발급(결정 I), `get_session()` 재사용, 루프 예외는 삼켜 200(결정 G·H) — 단 `SQLAlchemyError` 는 올린다(R-3), 미답변 질문 유지(R-4), 테스트 `tests/test_api_chat.py`. backend-agent, L-004 승인 받음(2026-09-25).
 2. U7 재개 `POST /answers/{question_id}` 뒤 절반(R6·R7 을 닫는 단위) → U8 수용 기준 기계 검증·registry·README → `/devlog done`(verifier 04-review).
 3. 푸시: 사용자 결정(2026-09-25) — P5-loop 완료 뒤 한 번에. 그 전에는 묻지 않는다.
 
