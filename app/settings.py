@@ -1,4 +1,4 @@
-"""Refs: P2-tools S3.2 S3.3 D5 -- 런타임 설정값의 단일 출처.
+"""Refs: P2-tools S3.2 S3.3 D5 FIX-005 -- 런타임 설정값의 단일 출처.
 
 이 모듈이 `.env` 를 읽지 않는 이유(security.md §1): 비밀·설정은 `os.environ`
 으로만 읽는다. `.env` 파일 자체는 존재 확인도 하지 않는다. `APP_USER_ID`
@@ -31,6 +31,16 @@
 import 한다 -- `app.er.types` 가 `app.settings.SEARCH_TOP_K` 를 최상위에서
 import 하므로, 이 모듈이 최상위에서 `app.er.types` 를 다시 import 하면
 순환 import 가 된다.
+
+## APP_TIMEZONE (FIX-005)
+
+DB 는 계속 UTC(`timestamptz`)로 저장한다 -- 이 설정은 "사람이 말한
+시각"을 해석하는 자리(인식 프롬프트의 `now`, 일정 후보 생성, LLM 이
+오프셋 없이 준 ISO 8601 문자열 보정)에서만 쓰인다. `ctx.now()` 자체와
+DB 저장 방식은 이 설정과 무관하다(`app/agent/loop.py`·`app/agent/
+propose.py` 의 각 모듈 docstring "사용자 시간대" 절 참고). 기본값
+`Asia/Seoul` 은 단일 사용자 전제(`APP_USER_ID` 고정)에 맞춘 설정값
+하나다 -- 사용자별 시간대 컬럼은 다중 사용자 격리와 함께 다룰 몫이다.
 """
 
 from __future__ import annotations
@@ -38,11 +48,17 @@ from __future__ import annotations
 import os
 from datetime import timedelta
 from typing import TYPE_CHECKING
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 if TYPE_CHECKING:  # pragma: no cover -- 순환 import 회피, 타입 힌트 전용.
     from app.er.types import ERConfig
 
 DEFAULT_APP_USER_ID = "local"
+
+#: 사용자 발화의 상대 시각을 해석하는 기준 IANA 시간대 이름(FIX-005).
+#: `.env.example` 의 `APP_TIMEZONE` 이 이 값을 오버라이드한다(`user_
+#: timezone()`).
+DEFAULT_APP_TIMEZONE = "Asia/Seoul"
 
 #: 후보 검색(`search_person`)의 별칭 임베딩 top-K (D5/S3.3).
 SEARCH_TOP_K = 10
@@ -197,6 +213,26 @@ def er_config(env: dict[str, str] | None = None) -> "ERConfig":
         judge_max_retries=ER_JUDGE_MAX_RETRIES,
         penalized_merge_policy=penalized_merge_policy,
     )
+
+
+def user_timezone(env: dict[str, str] | None = None) -> ZoneInfo:
+    """`APP_TIMEZONE` 환경변수(없으면 `DEFAULT_APP_TIMEZONE = "Asia/Seoul"`)
+    를 IANA 시간대로 해석한다(FIX-005). 잘못된 이름이면 조용히 UTC 로
+    되돌아가지 않고 사람이 읽는 오류를 낸다 -- `app_user_id()`/`er_config()`
+    와 같은 `env` 인자 규약(생략하면 `os.environ`, `.env` 파일 자체는 읽지
+    않는다, security.md §1)."""
+    from app.tools.types import InvalidValue  # 지연 import -- 다른 settings 함수와 같은 관례.
+
+    if env is None:
+        env = dict(os.environ)
+    name = env.get("APP_TIMEZONE") or DEFAULT_APP_TIMEZONE
+    try:
+        return ZoneInfo(name)
+    except (ZoneInfoNotFoundError, ValueError) as exc:
+        raise InvalidValue(
+            f"user_timezone: APP_TIMEZONE={name!r} 은 유효한 IANA 시간대 이름이 "
+            "아니다(예: Asia/Seoul, UTC)"
+        ) from exc
 
 
 def app_user_id(env: dict[str, str] | None = None) -> str:

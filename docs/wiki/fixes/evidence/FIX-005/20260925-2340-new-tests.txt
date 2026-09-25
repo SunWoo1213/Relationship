@@ -1,0 +1,10 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Portpolio\Relationship
+plugins: anyio-4.12.1, langsmith-0.8.8, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 7 items
+
+tests\test_agent_timezone.py .......                                     [100%]
+
+============================== 7 passed in 1.06s ==============================

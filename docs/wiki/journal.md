@@ -258,3 +258,7 @@
 - 2026-09-25 22:03 | PUSH | origin dev f9bfba7 — 사용자 결정 대기(승격/수정) L-003
 - 2026-09-25 22:06 | COMMIT | 36766c1 chore(git): main 에만 있던 PR #1 병합 기록을 dev 로 합친다
 - 2026-09-25 22:07 | PUSH | origin dev 36766c1 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-25 22:19 | COMMIT | ad4f30f docs(P5-loop): 실제 서버·실제 AI 왕복 확인(판정 표 8행) 증거를 남긴다
+- 2026-09-25 22:19 | PUSH | origin dev ad4f30f — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-25 22:20 | RELEASE | origin main ← dev ad4f30f
+- 2026-09-25 23:50 | FIX | FIX-005 시작 — 사용자 시간대 부재로 "어제 저녁"이 KST 새벽 3시로 저장(P5 8행 실서버에서 발견). 계획 승인, CURRENT active FIX-005, backend-agent 위임 | FIX-005

@@ -16,3 +16,7 @@ anthropic==1.4.0
 # GeminiJudge) 런타임 의존성. 지연 import(GeminiJudge.__post_init__/judge
 # 본문 참고) -- 키·SDK 없이도 임포트 가능.
 google-genai==2.23.0
+# Refs: FIX-005 -- app.settings.user_timezone() 이 쓰는 IANA 시간대 DB.
+# Windows·슬림 컨테이너에도 tzdata 가 있게 고정 설치한다(표준 라이브러리
+# zoneinfo 는 시스템에 시간대 DB 가 없으면 이 패키지로 대체한다).
+tzdata==2025.3

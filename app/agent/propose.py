@@ -1,4 +1,4 @@
-"""Refs: P5-loop D11 S3.4 원칙1 원칙7 원칙9 -- U2 인식 단계(발화 -> tool_calls
+"""Refs: P5-loop FIX-005 D11 S3.4 원칙1 원칙7 원칙9 -- U2 인식 단계(발화 -> tool_calls
 제안, LLM 1회).
 
 ## step 이름과 파일 이름의 어긋남 (R-16)
@@ -43,6 +43,20 @@ ISO 8601 문자열이면 `datetime` 으로 바꾼다(형식 변환만). 비어 �
 "일정은 되묻는다"는 실제 판단은 U5(`loop.py`)와 게이트(U3, R-23)가
 한다. 이 모듈은 그 판단에 필요한 값을 만들 뿐이다.
 
+## 사용자 시간대 보정 (FIX-005 -- 파서가 단일 출처)
+
+`now` 는 호출자(`app/agent/loop.py`)가 이미 사용자 시간대로 지역화해
+넘긴다(`ctx.now().astimezone(user_timezone())`) -- 이 모듈은 `app.settings
+.user_timezone()` 을 직접 부르지 않는다(모듈 전역 상태를 새로 만들지
+않는다, "시간대는 인자로 전달"). `_parse_iso_datetime(value, tz)` 는 LLM
+이 오프셋 없이 벽시계 시각만 준 문자열(naive)에 그 `tz` 를 붙인다 --
+오프셋이 이미 있는 값은 그대로 존중한다. `tz` 의 출처는 항상 `now.tzinfo`
+(각 `Proposer.propose()` 가 받은 `now`)다 -- 프롬프트에 "now 와 같은
+오프셋을 붙인 ISO 8601"을 요구하는 안내 문장을 더했지만, 그것은
+**안내일 뿐**이고 실제 보정의 단일 출처는 이 파서다(원칙1 "프롬프트
+의존 금지"와 같은 태도 -- LLM 이 오프셋을 빠뜨려도 결과가 어긋나지
+않는다).
+
 ## 공급자 재사용 (D11) -- `app/er/judge.py` 는 import 만 한다
 등록표 개념(`select_provider`/`enabled_providers`)과 오류 매핑
 (`call_with_error_mapping`/`call_with_gemini_error_mapping`), Gemini 스키마
@@ -67,7 +81,7 @@ import inspect
 import json
 import os
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone, tzinfo
 from typing import Any, Callable, Protocol
 
 from app import tools as app_tools
@@ -225,8 +239,10 @@ def build_propose_prompt(utterance: str, now: datetime) -> tuple[str, str]:
         + "\n".join(f"- {line}" for line in tool_lines)
         + "\n\n위 발화를 보고 필요한 tool_calls 를 제안하라. 상대 시각"
         "('어제 저녁' 등)은 now 를 기준으로 절대 시각(ISO 8601 문자열)으로 "
-        "바꿔서 써라. 시각을 확정할 수 없으면 그 필드를 비우거나 null 로 "
-        "둬라. 기억할 것이 없으면 tool_calls 를 빈 배열로 답하라."
+        "바꿔서 써라. occurred_at/scheduled_at 은 now 와 같은 오프셋을 붙인 "
+        "ISO 8601 로 써라(예: now 가 +09:00 이면 그 값도 +09:00). 시각을 "
+        "확정할 수 없으면 그 필드를 비우거나 null 로 둬라. 기억할 것이 "
+        "없으면 tool_calls 를 빈 배열로 답하라."
     )
     return system, user_text
 
@@ -236,19 +252,27 @@ def build_propose_prompt(utterance: str, now: datetime) -> tuple[str, str]:
 # ---------------------------------------------------------------------------
 
 
-def _parse_iso_datetime(value: str) -> datetime | None:
+def _parse_iso_datetime(value: str, tz: tzinfo) -> datetime | None:
+    """ISO 8601 문자열을 `datetime` 으로 바꾼다. 오프셋이 없는 값(naive)
+    에는 `tz` 를 붙인다(FIX-005, `.replace(tzinfo=tz)` -- 값을 다른
+    시간대로 변환하지 않고 "이 벽시계 시각은 이 시간대다"라고 표시만
+    한다). 오프셋이 이미 있는 값은 그대로 둔다 -- 파서가 유일한 보정
+    지점이다(모듈 docstring "사용자 시간대 보정" 절)."""
     try:
-        return datetime.fromisoformat(value)
+        parsed = datetime.fromisoformat(value)
     except (TypeError, ValueError):
         return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=tz)
+    return parsed
 
 
-def _convert_datetime_args(name: str, args: dict[str, Any]) -> dict[str, Any]:
+def _convert_datetime_args(name: str, args: dict[str, Any], tz: tzinfo) -> dict[str, Any]:
     """`_DATETIME_ARG_NAMES[name]` 에 해당하는 키가 ISO 8601 문자열이면
-    `datetime` 으로 바꾼다(형식 변환만). 값이 없거나(`None`) 파싱에
-    실패하면 그대로 둔다 -- 파싱 실패 문자열은 게이트의 타입 검사가
-    `bad_args` 로 걸러내고(U3), `None`(결정 K "확정 불가")은 U3/U5 가
-    각각 판단한다(R-23)."""
+    `datetime` 으로 바꾼다(형식 변환 + FIX-005 시간대 보정). 값이
+    없거나(`None`) 파싱에 실패하면 그대로 둔다 -- 파싱 실패 문자열은
+    게이트의 타입 검사가 `bad_args` 로 걸러내고(U3), `None`(결정 K
+    "확정 불가")은 U3/U5 가 각각 판단한다(R-23)."""
 
     keys = _DATETIME_ARG_NAMES.get(name, ())
     if not keys:
@@ -257,7 +281,7 @@ def _convert_datetime_args(name: str, args: dict[str, Any]) -> dict[str, Any]:
     for key in keys:
         value = converted.get(key)
         if isinstance(value, str):
-            parsed = _parse_iso_datetime(value)
+            parsed = _parse_iso_datetime(value, tz)
             if parsed is not None:
                 converted[key] = parsed
             # 파싱 실패 -- 문자열 그대로 둔다(게이트가 타입 위반으로 처리).
@@ -265,12 +289,19 @@ def _convert_datetime_args(name: str, args: dict[str, Any]) -> dict[str, Any]:
     return converted
 
 
-def validate_proposal(raw: dict[str, Any]) -> Proposal:
+def validate_proposal(raw: dict[str, Any], tz: tzinfo = timezone.utc) -> Proposal:
     """구조화 출력(이미 dict)을 **형식만** 검증해 `Proposal` 로 바꾼다.
     실패하면 `app.er.types.JudgeUnavailable("schema")` -- `judge.py` 의
     판정 실패와 같은 신호를 쓴다(인식 단계도 "LLM 이 스키마대로 답하지
     못했다"는 같은 실패 종류를 공유한다, 결정 G 가 라우트에서 같이
     잡는다).
+
+    `tz` 는 오프셋 없는 `occurred_at`/`scheduled_at` 문자열에 붙일
+    시간대다(FIX-005). 각 `Proposer.propose(utterance, now)` 는 자신이
+    받은 `now.tzinfo` 를 그대로 넘긴다(모듈 docstring "사용자 시간대
+    보정" 절) -- 이 함수는 `app.settings` 를 import 하지 않는다. 생략하면
+    `timezone.utc`(직접 호출하는 단위 테스트를 위한 기본값일 뿐, 실제
+    호출 경로는 항상 명시적으로 넘긴다).
 
     검사하는 것: `raw` 가 dict 이고 `tool_calls` 가 list 이며, 각 원소가
     `{name: str, args: dict}` 모양인가. 검사하지 않는 것: `name` 이
@@ -294,9 +325,16 @@ def validate_proposal(raw: dict[str, Any]) -> Proposal:
             raise JudgeUnavailable("schema")
         if not isinstance(args, dict):
             raise JudgeUnavailable("schema")
-        parsed.append(ToolCallProposal(name=name, args=_convert_datetime_args(name, args)))
+        parsed.append(ToolCallProposal(name=name, args=_convert_datetime_args(name, args, tz)))
 
     return Proposal(tool_calls=parsed, raw=raw)
+
+
+def _tz_from_now(now: datetime) -> tzinfo:
+    """`now.tzinfo` 를 그대로 쓴다(FIX-005 시간대 보정의 출처). `now` 가
+    naive 로 들어오는 방어적인 경우에만 `timezone.utc` 로 대체한다 --
+    실제 호출 경로(`app/agent/loop.py`)는 항상 aware `now` 를 준다."""
+    return now.tzinfo if now.tzinfo is not None else timezone.utc
 
 
 # ---------------------------------------------------------------------------
@@ -356,7 +394,7 @@ class ClaudeProposer:
         if tool_use_input is None:
             raise JudgeUnavailable("schema")
 
-        return validate_proposal(tool_use_input)
+        return validate_proposal(tool_use_input, tz=_tz_from_now(now))
 
 
 @dataclass
@@ -419,7 +457,7 @@ class OpenAIProposer:
         except (TypeError, ValueError) as exc:
             raise JudgeUnavailable("schema") from exc
 
-        return validate_proposal(raw)
+        return validate_proposal(raw, tz=_tz_from_now(now))
 
 
 @dataclass
@@ -482,7 +520,7 @@ class GeminiProposer:
         except (TypeError, ValueError) as exc:
             raise JudgeUnavailable("schema") from exc
 
-        return validate_proposal(raw)
+        return validate_proposal(raw, tz=_tz_from_now(now))
 
 
 #: 이름 -> 무인자 팩토리의 등록표(D11 정신 -- 이름 집합·선택 로직은
@@ -514,9 +552,12 @@ def proposer_from_env(env: dict[str, str] | None = None) -> Proposer:
 class FakeProposer:
     """테스트용 결정적 `Proposer`(원칙8 -- LLM 은 재현 불가능하므로 자동
     테스트에 넣지 않는다). `table = {발화: [{"name":..., "args":...}, ...]}`
-    -- 표에 없는 발화는 빈 `tool_calls` 를 낸다. `now` 는 무시한다(표가
-    이미 절대 시각을 담고 있다고 가정 -- 결정적이어야 하므로 `now` 로
-    분기하지 않는다).
+    -- 표에 없는 발화는 빈 `tool_calls` 를 낸다. `now` 자체로 표를
+    분기하지는 않는다(표가 이미 절대 시각을 담고 있다고 가정 -- 결정적
+    이어야 하므로). **FIX-005**: `now.tzinfo` 만은 실제 공급자와 똑같이
+    `validate_proposal(tz=...)` 로 넘긴다 -- 그래야 표 안의 오프셋 없는
+    `occurred_at`/`scheduled_at` 문자열이 호출자가 준 `now` 의 시간대로
+    보정되는 경로를 테스트가 실제 경로와 같게 거친다.
 
     `validate_proposal()` 을 그대로 거쳐 만들어진다 -- 실제 공급자와
     같은 형식 검증·시각 변환 경로를 타서 게이트(U3) 테스트가 두 경로를
@@ -526,4 +567,6 @@ class FakeProposer:
 
     def propose(self, utterance: str, now: datetime) -> Proposal:
         calls = self.table.get(utterance, [])
-        return validate_proposal({"tool_calls": [dict(c) for c in calls]})
+        return validate_proposal(
+            {"tool_calls": [dict(c) for c in calls]}, tz=_tz_from_now(now)
+        )

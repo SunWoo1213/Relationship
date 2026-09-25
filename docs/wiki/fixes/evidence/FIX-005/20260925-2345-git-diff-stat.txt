@@ -1,0 +1,24 @@
+ .env.example             |  4 +++
+ app/agent/loop.py        | 28 +++++++++++++---
+ app/agent/propose.py     | 85 ++++++++++++++++++++++++++++++++++++------------
+ app/settings.py          | 38 +++++++++++++++++++++-
+ docs/wiki/CURRENT.md     |  2 +-
+ docs/wiki/HANDOFF.md     | 16 +++++----
+ docs/wiki/journal.md     |  4 +++
+ docs/wiki/registry.md    | 13 ++++----
+ requirements.txt         |  4 +++
+ tests/test_agent_loop.py | 20 ++++++++----
+ 10 files changed, 168 insertions(+), 46 deletions(-)
+ M .env.example
+ M app/agent/loop.py
+ M app/agent/propose.py
+ M app/settings.py
+ M docs/wiki/CURRENT.md
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/registry.md
+ M requirements.txt
+ M tests/test_agent_loop.py
+?? docs/wiki/fixes/FIX-005.md
+?? docs/wiki/fixes/evidence/
+?? tests/test_agent_timezone.py

@@ -1,4 +1,4 @@
-"""Refs: P5-loop D1 D2 D12 D13 S3.2 S3.3 S3.4 원칙1 원칙2 원칙4 원칙7 원칙9 --
+"""Refs: P5-loop FIX-005 D1 D2 D12 D13 S3.2 S3.3 S3.4 원칙1 원칙2 원칙4 원칙7 원칙9 --
 U4 해석 단계(`resolve_mentions()`) + U5 기록·응답 단계(`run_turn()`).
 
 ## 이 단위(U5)가 채우는 자리, 채우지 않는 자리
@@ -148,6 +148,20 @@ UNKNOWN_OPTION`). 발화 속 상대 날짜("다음 주 금요일" 등)를 다시
 들지 않고 `now` 이후 가장 가까운 이틀을 후보로 제시해 사용자가 직접
 고르게 한다(`_schedule_candidates`).
 
+## 사용자 시간대 (FIX-005)
+
+`_record_impl` 이 읽는 `now`(→ `_ask_schedule`/`_schedule_candidates`의
+기준 시각과 `_execute_call` 의 `occurred_at` 대체값으로 쓰인다)와
+`run_turn` 이 인식 프롬프트에 넘기는 `now` 는 모두 `ctx.now().astimezone(
+user_timezone())` 로 사용자 시간대(`APP_TIMEZONE`, 기본 `Asia/Seoul`)를
+붙인 뒤 쓴다. `ctx.now()` 자체(UTC)와 DB 저장(`timestamptz`)은 그대로다
+-- `astimezone()` 은 같은 절대 시각의 **표현**만 바꾸므로, `occurred_at`
+대체값으로 그대로 써도 저장되는 순간은 이전과 같다. 실제 값이 바뀌는
+자리는 (a) 인식 프롬프트의 `now` 문자열(칩·LLM 판단의 기준 벽시계 시각)과
+(b) `_schedule_candidates` 가 내일·모레를 계산하는 달력 연산 두 곳뿐이다
+(FIX-005 증상 -- 이 두 자리가 UTC 로 계산되면 칩 문구와 저장값의 "저녁
+7시"가 실제로는 다른 현지 시각을 가리켰다).
+
 ## 이 모듈이 하지 않는 것 (U5 추가분)
 
 - 응답 문장을 스스로 조립하지 않는다 -- `app/agent/respond.py::
@@ -195,7 +209,7 @@ from app.agent.types import (
 )
 from app.db.models import HIERARCHIES, RELATION_TAGS
 from app.er import ERConfig, Judge, Resolution, apply_resolution, resolve
-from app.settings import LOOP_MAX_RESUME_BYTES
+from app.settings import LOOP_MAX_RESUME_BYTES, user_timezone
 from app.tools.context import ToolContext, to_jsonable, traced
 from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
 
@@ -783,7 +797,11 @@ def _record_impl(
     *,
     resume_byte_limit: int,
 ) -> RecordOutcome:
-    now = ctx.now()
+    # FIX-005 -- 일정 후보(_schedule_candidates)의 달력 연산은 사용자
+    # 시간대 기준이어야 "내일 저녁 7시" 칩 문구와 저장값이 같은 현지
+    # 시각을 가리킨다. ctx.now() 자체(UTC)·DB 저장은 바뀌지 않는다(위
+    # 모듈 docstring "사용자 시간대" 절).
+    now = ctx.now().astimezone(user_timezone())
     accepted_execute = [a for a in verdict.accepted if a.bucket == BUCKET_EXECUTE]
 
     executed: list[dict[str, Any]] = []
@@ -930,7 +948,9 @@ def run_turn(
     다시 도는 재개는 저장된 `context` 를 읽는 별도 진입점이 필요하고,
     그 조립(`app.api.deps.load_resume_input`)은 U6/U7 의 산출물이다)."""
 
-    now = ctx.now()
+    # FIX-005 -- 인식 프롬프트의 now 는 사용자 시간대로 준다. ctx.now()
+    # 자체(UTC)는 바뀌지 않는다(위 모듈 docstring "사용자 시간대" 절).
+    now = ctx.now().astimezone(user_timezone())
     active_proposer = proposer if proposer is not None else proposer_from_env()
 
     proposal = _propose(ctx, utterance, now, active_proposer)

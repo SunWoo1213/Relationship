@@ -5,23 +5,25 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-25 23:30 — **P5-loop 완료(verifier 04-review `완료`, 사용자 승인).** 완료 커밋 `f9bfba7`(README 최신화 포함) → **dev 푸시 완료(`24feebd..f9bfba7`, 12커밋). 사용자 "main 승격" 결정 → main 에 GitHub PR #1 병합 커밋 `7eaf1f6`(2026-09-23 15:56, 내용은 dev 와 동일)이 있어 ff 불가 → 내용 무변경 병합 커밋을 dev 에 만들고 푸시 → `git push origin dev:main`.**
+갱신: 2026-09-26 00:15 — **FIX-005(시간대) 구현 완료·확인됨, 커밋 승인 대기.** 전체 회귀 1481 passed(`docs/wiki/fixes/evidence/FIX-005/20260926-0010-*`). 실서버 8행 인물 "서준"이 user local 에 남아 테스트 20건을 깨뜨려 user_id 만 `row8-check-23175` 로 분리(사용자 승인). 다음: /commit → 실서버 재확인(사용자 기동, 같은 발화로 occurred_at 이 09:00+00 부근) → FIX 결과 해시 → active none. 별건 FIX 후보: 테스트·로컬 서버가 같은 user local 공유.
 
-active: **none** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-postgres-1`(5433, pgvector) — 5432 는 다른 프로젝트
+active: **FIX-005** | frozen: none | 브랜치 `dev` | Docker DB `capstone2-postgres-1`(5433, pgvector) — 5432 는 다른 프로젝트
 
 ## 마지막으로 끝낸 것
-- P5-loop U1~U8 커밋(`3e4db92`~`f0d3e26`, 미푸시 11개). 재개 세션에서 끊겼던 verifier 04-review 를 다시 띄워 완료(`04-review.md`, verify-impl FAIL 0/WARN 0 `evidence/20260925-2200-verify-impl.txt`, 1474 passed, 05 열림 0/해소 23).
+- P5-loop U1~U8(`3e4db92`~`f0d3e26`) + 완료 커밋 `f9bfba7` + main 갈라짐 해소 병합 `36766c1` + 실서버 8행 증거 `ad4f30f` — 전부 푸시·main 승격됨. 재개 세션에서 끊겼던 verifier 04-review 를 다시 띄워 완료(`04-review.md`, verify-impl FAIL 0/WARN 0 `evidence/20260925-2200-verify-impl.txt`, 1474 passed, 05 열림 0/해소 23).
 - 완료 처리: 04-review `승인:` · review-index R6·R7 구현완료 · backlog P5 체크 · CURRENT active none · journal DONE · 01-plan 판정 표 표기 정정(테스트 파일명·`-k`)·user-setup → RUNNING.md 갈음(사용자 결정) · 03-log U8 해시 · 05 머리말 U8 메모 복원 · README(진행 표·테스트 수·실 LLM 미확인 명시).
 
 ## 커밋 안 된 변경
-- journal 의 COMMIT 줄(훅 자동)과 이 HANDOFF 만 — 다음 커밋에 포함.
+- journal 의 PUSH·RELEASE 줄(훅 자동)과 이 HANDOFF — 다음 커밋에 포함.
 
 ## 바로 다음에 할 것
-1. **dev `36766c1` 푸시됨(병합 커밋, ff 가능 확인).** 사용자가 승격 전 실서버·실 AI 확인(판정 표 8행)을 맡김 → 사용자가 `!` 로 키를 실은 셸에서 uvicorn(8000) 기동 → **8행 ① 실패**: 실 OpenAI 로 `/chat` 이 `JudgeUnavailable: api_error`(인식 단계 제안 요청이 APIStatusError, 저장 0, `evidence/20260925-2300-row8-chat.txt`; 재시도도 같은 실패 `evidence/20260925-2310-row8-chat-retry.txt` — 일시 장애 아님. PROPOSAL_SCHEMA 육안 점검은 문법 이상 없음). **원인 확정(진단 스크립트, 사용자 실행): 설정 오타 — 사용자 .env 의 `OPENAI_MODEL=openai-gpt-4o` 가 없는 모델이라 404 model_not_found. 코드 결함 아님.** 사용자가 모델명 고쳐 재기동 → **8행 통과**(`evidence/20260925-2325-row8-{chat,answer,db-check}.txt`): ① new_person 되묻기(옵션 6) → ② "친구로" 답 → 인물 서준(친구·동)·meal 이벤트 1·별칭 임베딩 1536 NOT NULL(R-15)·중복 답 409. **관찰(FIX 후보)**: "어제 저녁" occurred_at 이 `2026-09-24 18:00+00`(= KST 새벽 3시) — LLM 이 준 현지 시각을 UTC 로 저장하는 듯. 서버 8000 켜 둠. 서버는 `.env` 의 DATABASE_URL 이 5432 라 `unset DATABASE_URL` 로 기동(8000, 켜 둠). 사용자에게 진단 스크립트(scratchpad `diag_propose.py`) 실행 요청 → 원인 확인 → FIX 계획·승인 → 수정 → ②까지 재확인 → 승격 재확인 → main 승격 마무리(`approve-commit.sh --release` → `git push origin dev:main` → `git fetch origin main:main`). 재발 방지: GitHub main 브랜치 보호 규칙(사용자 몫)(승격 전 판정 표 8행 실 공급자 curl 을 사용자가 돌려 보길 권고, `docs/RUNNING.md` 122행).
-2. 다음 패키지 후보: P6(메모리 승격·패턴 감지 / 브리핑) — `/devlog start`, architect 위임은 L-004 승인 먼저.
+1. (진행 중 → FIX-005) 시간대: 실서버에서 "어제 저녁"이 `occurred_at 2026-09-24 18:00+00`(KST 새벽 3시)로 저장됨(`P5-loop/evidence/20260925-2325-row8-db-check.txt`). LLM 현지 시각을 UTC 로 저장하는 것으로 보임 — P6(패턴 90일 규칙·브리핑) 전에 `/devlog fix` 권장.
+2. 다음 패키지 P6(메모리 승격·패턴 / 브리핑) — `/devlog start`, architect 위임은 L-004 승인 먼저.
+3. 재발 방지(사용자 몫): GitHub main 브랜치 보호 규칙 — 2026-09-23 PR #1 웹 병합으로 main 이 갈라졌었다(병합 커밋 `36766c1` 로 해소).
+4. 테스트 서버 uvicorn(8000)이 켜져 있을 수 있음 — 필요 없으면 종료.
 
 ## 열린 질문 · 사용자 결정 대기
-- main 승격 시점 · 8행 실 공급자 확인.
+- (해결됨) main 승격 · 8행 실 공급자 확인. 실서버 기동 시 사용자 .env 의 DATABASE_URL 이 5432(다른 프로젝트 DB)를 가리켜 `unset DATABASE_URL` 이 필요했다 — .env 정리는 사용자 몫.
 - 보류(P5 끝날 때까지였던 것, 이제 꺼낼 차례): R-19(`verify-plan.sh` 7절 정규식) · `test-guards.sh` 옛 경로 · P4b 01-plan 111행 경로 오기 · 03-log `Refs: R8` 어휘 충돌 · 하네스 부채(verify-plan 토큰 스캔 오탐, findings.py 빈 표 중복, verify-impl 이 05 머리말 메모를 지우는 문제).
 - P9 착수 전: 09 카드 §2 결정 10개. 다중 사용자 격리 부채(F-fbaaae).
 

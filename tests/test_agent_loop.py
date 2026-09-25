@@ -596,9 +596,16 @@ def test_run_turn_stopped_turn_defers_merged_mention_unconfirmed_schedule_to_pen
 
 def test_run_turn_add_event_naive_datetime_is_caught_as_failed(db_session, fake_embedder):
     """R-24 -- 기록 단계가 게이트를 지난 제안 하나를 실행하다 `ToolError`
-    로 실패하면(여기서는 tz 정보 없는 ISO 문자열이 `datetime` 으로는
-    바뀌었지만 naive 라 `add_event` 가 거절한다) `loop_record.output.
-    failed[]` 에 담기고 다음 제안으로 넘어간다 -- 턴 전체가 죽지 않는다."""
+    로 실패하면 `loop_record.output.failed[]` 에 담기고 다음 제안으로
+    넘어간다 -- 턴 전체가 죽지 않는다.
+
+    FIX-005 이후: 오프셋 없는 ISO **문자열**은 `app.agent.propose.
+    _convert_datetime_args` 가 사용자 시간대를 붙여 더 이상 naive 로
+    남지 않는다(`tests/test_agent_timezone.py` 가 그 경로를 검증한다).
+    이 테스트는 그 경로를 우회해 raw **`datetime` 객체**(naive, 문자열이
+    아니므로 시간대 보정 대상이 아니다)를 직접 넣어 R-24 의 방어(naive
+    가 어떤 경로로든 `add_event` 까지 오면 여전히 거절된다)를 그대로
+    확인한다."""
 
     session_id = "loop-u5-failed"
     person = _make_person(db_session, display_name="김민수")
@@ -613,9 +620,10 @@ def test_run_turn_add_event_naive_datetime_is_caught_as_failed(db_session, fake_
                 "person": "팀장",
                 "type": "meal",
                 "content": "저녁",
-                # tz 오프셋이 없는 ISO 문자열 -- U2 가 datetime 으로는
-                # 바꾸지만(파싱 자체는 성공) naive 라 add_event 가 거절한다.
-                "occurred_at": "2026-09-23T19:00:00",
+                # raw naive datetime 객체 -- 문자열이 아니므로
+                # _convert_datetime_args 의 시간대 보정 대상이 아니다(FIX-005
+                # 이후에도 naive 그대로 add_event 에 닿아 거절된다).
+                "occurred_at": datetime(2026, 9, 23, 19, 0, 0),
             },
         }
     ]

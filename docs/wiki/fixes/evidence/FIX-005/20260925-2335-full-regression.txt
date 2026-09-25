@@ -1,0 +1,45 @@
+    
+        by_person = {c.person_id: c for c in result.candidates}
+        assert by_person[person1.id].s_rule == 0.0
+        assert by_person[person2.id].s_rule == 0.0
+        assert by_person[person1.id].s_emb is not None
+        assert by_person[person2.id].s_emb is not None
+    
+        ask_payload = result.ask_payload
+        assert ask_payload is not None
+        assert ask_payload["kind"] == "identity"
+>       assert set(ask_payload["context"]["candidate_ids"].values()) == {person1.id, person2.id}
+E       assert {23175, 23362, 23363} == {23362, 23363}
+E         
+E         Extra items in the left set:
+E         23175
+E         Use -v to get more diff
+
+tests\test_er_pipeline.py:577: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_agent_loop.py::test_identity_ends_turn_with_er_original_options
+FAILED tests/test_agent_loop.py::test_new_person_uses_tag_options_without_hint
+FAILED tests/test_agent_loop.py::test_new_person_uses_tag_options_even_with_hint_present
+FAILED tests/test_agent_loop.py::test_run_turn_new_person_defers_add_event_to_resume_pending_calls
+FAILED tests/test_agent_loop.py::test_run_turn_stopped_turn_defers_merged_mention_unconfirmed_schedule_to_pending_calls
+FAILED tests/test_api_answers_resume.py::test_answers_resume_round_trip_creates_person_and_stores_event
+FAILED tests/test_api_answers_resume.py::test_answers_resume_new_person_tag_answer_sets_relation_tag
+FAILED tests/test_api_answers_resume.py::test_answers_resume_second_submission_returns_409
+FAILED tests/test_api_answers_resume.py::test_answers_resume_create_person_only_targets_context_mention
+FAILED tests/test_api_answers_resume.py::test_answers_resume_new_person_reject_creates_nothing
+FAILED tests/test_api_answers_resume.py::test_answers_resume_second_mention_asks_new_question_first_stays_answered
+FAILED tests/test_api_answers_resume.py::test_answers_resume_new_person_alias_embedding
+FAILED tests/test_api_chat.py::test_chat_new_person_returns_pending_question_id
+FAILED tests/test_baseline_proposed.py::test_identity_band_keeps_person_id_none_and_carries_score
+FAILED tests/test_baseline_proposed.py::test_new_person_band_carries_excluded_candidates
+FAILED tests/test_baseline_proposed.py::test_no_side_effect_on_persons_aliases_or_questions[new_person]
+FAILED tests/test_er_pipeline.py::test_resolve_skips_llm_when_no_candidates_pass_rules_no_candidates
+FAILED tests/test_er_pipeline.py::test_resolve_identity_band_ask_payload_lists_candidate_options_identity_payload
+FAILED tests/test_er_pipeline.py::test_apply_resolution_aunt_excluded_creates_new_person_question_aunt
+FAILED tests/test_er_pipeline.py::test_apply_resolution_homonym_splits_into_identity_question_homonym
+20 failed, 1461 passed in 216.66s (0:03:36)
+
+[exited with code 0]
+
+--- 명령: POSTGRES_PORT=5433 python -m pytest -q tests/ (위 출력) ---
+20 failed 는 FIX-005 이전에도 있던 사전 존재 실패다(무관, 아래 대조 실행 참고).
