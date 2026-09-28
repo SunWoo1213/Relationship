@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: none
+active: P6-memory
 frozen: none
 
 <!--
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- **P6-memory 계획 승인(2026-09-28)** — architect 초안 → verifier 1차 보류(H-1~H-3) → 1차 개정 → 2차 통과 → 승인 전 변경(정리 기준 설정값) → 3차 보류 H-4(표기) → 수정 → 4차 통과(FAIL 0/WARN 0, 열린 소견 0). U1 부터 backend-agent(L-004 매번). 이월: F-bbf7fa 3단계(U1 `.env.example`), R-10(U6 추출기 지연 생성), R-15(U5 결정 F 스키마 `min_events`).
 - **CR-002 이행완료(문서, 2026-09-28)** — 반복 패턴 기간·횟수를 설정값으로(`PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`, 기본 365일·3회), D9→D14. 되돌린 코드 없음. 코드는 P6-memory U1·U2. P6-memory 01-plan 은 결정 A~G 확정(전부 권장, B 는 방법 2)·verify-plan FAIL 1(02-plan-verify 없음, 정상) — 다음 verifier 02-plan-verify(L-004 승인 먼저).
 - **FIX-006 완료(2026-09-26)** — 테스트 전용 DB `relationship_test`(tests/conftest.py·tests/db_bootstrap.py, `app/` 무변경). 1486 passed, 서준을 local 로 되돌린 격리 증명도 통과. 이제 로컬 서버(개발 DB)를 써도 테스트가 흔들리지 않는다.
 - **FIX-005 완료(2026-09-26)** — 사용자 시간대(`APP_TIMEZONE`, 기본 Asia/Seoul). 구현 `1f07429`, 전체 1481 passed, 실서버 재확인 "어제 저녁" → KST 24일 19:00. 별건 FIX 후보: 테스트·로컬 서버가 같은 `APP_USER_ID=local` 공유(로컬 서버 사용 시 테스트 20건 깨짐). 다음: P6.

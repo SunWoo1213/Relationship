@@ -1,0 +1,79 @@
+# P6-memory 01-plan 1차 개정본 — 새 주장·새 위험 확인 (verifier 2차, 2026-09-28 14:11, HEAD 2de7416)
+## 1. RecordOutcome 현재 정의 (loop.py 675-690) — U6·U7 가 event_person_ids·fact_keys_by_person 를 더하려는 자리
+@dataclass(frozen=True)
+class RecordOutcome:
+    """`loop_record.output` 스키마(U1 81행) + `run_turn` 이 응답·`TurnResult
+    .stored` 를 조립하는 데 쓰는 부가 정보. `to_dict()` 는 U1 이 고정한
+    두 키(`executed`/`failed`)만 낸다 -- 나머지 필드는 이중 출처를 만들지
+    않기 위해 trace 출력에는 담지 않는다(같은 값이 필요하면 `loop_turn`
+    행이 `TurnResult.to_dict()` 로 따로 남긴다)."""
+
+    executed: list[dict[str, Any]] = field(default_factory=list)
+    failed: list[dict[str, Any]] = field(default_factory=list)
+    events: int = 0
+    schedules: int = 0
+    schedule_question: PendingQuestionOut | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"executed": list(self.executed), "failed": list(self.failed)}
+## 2. loop.py 862행 executed[] 항목 (U7 주장: 인자가 없다)
+        executed.append({"index": accepted.index, "name": accepted.name, "trace_id": ctx.last_trace_id})
+## 3. loop.py 868-874 RecordOutcome 생성 자리 하나뿐
+868:    return RecordOutcome(
+## 4. RecordOutcome 을 직접 만들거나 필드를 단언하는 테스트 (없어야 새 필드가 기존 테스트와 충돌하지 않는다)
+exit=1
+## 5. loop_record.output 키 단언 (executed/failed 만) — tests/test_agent_loop.py
+409:    assert record_out["failed"] == []
+410:    assert len(record_out["executed"]) == 1
+411:    executed_entry = record_out["executed"][0]
+421:    executed_idx = {e["index"] for e in record_out["executed"]}
+422:    failed_idx = {f["index"] for f in record_out["failed"]}
+473:    assert record_out["executed"] == []
+474:    assert record_out["failed"] == []
+477:    executed_idx = {e["index"] for e in record_out["executed"]}
+478:    failed_idx = {f["index"] for f in record_out["failed"]}
+580:    assert record_out["failed"] == []
+581:    assert [e["name"] for e in record_out["executed"]] == ["add_event"]
+582:    assert record_out["executed"][0]["index"] == 0
+590:    executed_idx = {e["index"] for e in record_out["executed"]}
+591:    failed_idx = {f["index"] for f in record_out["failed"]}
+646:    assert record_out["executed"] == []
+647:    assert record_out["failed"] == [{"index": 0, "name": "add_event", "error": "InvalidValue"}]
+## 6. app/agent/__init__.py RecordOutcome 재export (추가 필드는 additive)
+28:    RecordOutcome,
+96:    "RecordOutcome",
+## 7. run_turn 이 proposer 기본값을 해소하는 시점 — 954행 즉시 호출(선례). extractor 를 같은 방식으로 두면 아래 8 의 이유로 기존 테스트가 깨질 수 있다
+    active_proposer = proposer if proposer is not None else proposer_from_env()
+## 8. 공급자 생성자는 클라이언트를 생성 시점에 만든다(OpenAI SDK 는 키가 없으면 생성자에서 예외) — propose.py
+            self.model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+        if self.client is None:
+            import openai  # 지연 import -- 키·SDK 없이도 app 임포트가 깨지지 않게.
+
+            self.client = openai.OpenAI(timeout=self.timeout, max_retries=self.max_retries)
+
+## 9. extractor 를 넘기지 않고 run_turn/resume_turn 을 부르는 기존 테스트 호출 수
+tests/test_agent_loop.py:8
+tests/test_api_answers_resume.py:0
+tests/test_api_chat.py:0
+## 10. 라우트 주입 자리 — get_proposer/get_judge 가 None 을 돌려주는 운영 경로(deps.py 214-237)
+1:def get_proposer() -> Proposer | None:
+6:    return None
+9:def get_judge() -> Judge | None:
+13:    return None
+16:def get_embedder() -> EmbeddingProvider | None:
+24:    return _embedder_from_env()
+## 11. 기존 테스트에서 한 인물에 이벤트 5건 이상 쌓는 루프 (승격 트리거가 기존 테스트 안에서 걸리는지)
+exit=1
+## 12. 계획이 새로 인용한 _owned_person (persons.py 371행) — security §5 재사용 대상 실재
+def _owned_person(session: Session, person_id: int, user_id: str) -> Person:
+## 13. .env.example 소유 = 하네스 (registry 38행)
+| 문서 | 환경변수 이름 목록(값 비움, 추적 유지) | .env.example | 하네�
+## 14. _record 는 traced 안쪽에서 _record_impl 을 돌리고 결과를 그대로 돌려준다(901행) — after_record 는 이 return 앞, traced 밖에 놓을 수 있다
+        )
+
+    return _traced(ctx, proposal, verdict, outcome, utterance)
+## 15. 계획 범위 밖 파일 확인: 01-plan 산출물 표에 app/er/·app/agent/gate.py·propose.py·respond.py 없음
+124:| 공급자 등록표·활성 스위치·오류 매핑 | `app/er/judge.py`(`select_provider`·`enabled_providers`·`call_with_error_mapping`·Gemini 매핑, D11) | import 만. `app/agent/propose.py`(P5-loop `069bdc2`)가 같은 방식의 선례 |
+표 행 중 매치 exit=0
+## 16. git 상태 (제품 코드 무변경)
+제품 코드 변경 exit=1

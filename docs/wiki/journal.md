@@ -275,3 +275,8 @@
 - 2026-09-28 13:20 | START | P6-memory 착수 절차 — 사용자 결정: P6 는 P6-memory → P6-briefing 순. architect 01-plan 초안(L-004 승인) | P6-memory
 - 2026-09-28 13:45 | DECISION | P6-memory 결정 A~G 전부 권장안(B 는 설명 후 방법 2 — trace 의 본 이벤트 id, 스키마 무변경) | P6-memory
 - 2026-09-28 14:00 | CR | CR-002 제기·승인·이행(문서) — 패턴 기간·횟수 설정값, 기본 365일·3회, D9→D14, frozen 해제 | CR-002 D14 P6-memory
+- 2026-09-28 13:40 | COMMIT | 2de7416 cr(CR-002): 반복 패턴 기간·횟수를 설정값으로, 기본 1년·3회
+- 2026-09-28 14:10 | VERIFY | P6-memory 02-plan-verify 1차 보류(H-1~H-3, 권고 R-1~R-9). 사용자: 필수+권고 모두 반영, architect 1차 개정 위임 | P6-memory
+- 2026-09-28 14:30 | VERIFY | P6-memory 2차 재검증 통과(8/8). 승인 전 사용자 요청: 정리 기준 5건도 설정값, 앱 내 사용자별 선택은 backlog(CR 필요). verifier 3차 확인 위임 | P6-memory
+- 2026-09-28 14:45 | VERIFY | P6-memory 3차 보류 H-4(01-plan 25행 표기) → 수정, R-12 S3.5 한 구절·R-13·R-14 반영, verifier 4차 위임 | P6-memory
+- 2026-09-28 14:55 | START | P6-memory 계획 승인(verifier 4차 통과), active P6-memory | P6-memory

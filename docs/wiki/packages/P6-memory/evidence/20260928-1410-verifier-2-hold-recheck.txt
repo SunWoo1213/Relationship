@@ -1,0 +1,45 @@
+# P6-memory 02-plan-verify 2차 — H-1~H-3 완료 판정 명령 실행 (verifier, 2026-09-28 14:09, HEAD 2de7416)
+# 명령은 05-remediation.md 해결 단계 표의 '완료 판정 명령' 칸을 awk 로 잘라내 그대로 실행했다(verifier 의 손 입력 없음).
+
+## F-bbf7fa 단계 1 (05 76행) — 기대: 1건(고치는 파일 표 행)
+$ grep -n 'env\.example. . 두 줄 추가' docs/wiki/packages/P6-memory/01-plan.md
+60:| `.env.example` | 두 줄 추가: `PATTERN_WINDOW_DAYS=`·`PATTERN_MIN_COUNT=`(값은 비워 두고 주석으로 "비우면 기본 365일 / 3회, 양의 정
+exit=0
+
+## F-bbf7fa 단계 2 (05 77행) — 기대: ≥3건(범위 줄·파일 표·U1)
+$ grep -n 'env.example' docs/wiki/packages/P6-memory/01-plan.md
+3:상태: 1차 개정본(architect 작성 — 결정 A~G 사용자 확정, 02-plan-verify 재검증은 verifier 몫) | 담당: backend-agent(`app/memory/`·`app
+25:  - **문서·설정 예시** — `registry.md` 새 행·비고 확장, `docs/RUNNING.md` 에 "승격·패턴이 언제 도는가" 한 절(설정 상수 6개
+60:| `.env.example` | 두 줄 추가: `PATTERN_WINDOW_DAYS=`·`PATTERN_MIN_COUNT=`(값은 비워 두고 주석으로 "비우면 기본 365일 / 3회, 양의 정
+67:- [ ] U1 골격 — 설정 상수 6개(그중 환경변수로 덮는 것은 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT` 2개), `.env.example` 에 그 2개의 
+233:- 1차 개정 때 추가로 읽음: `02-plan-verify.md` §3(H-1~H-3·R-1~R-9), `05-remediation.md`, `docs/wiki/registry.md` `.env.example` 행(38행, 소유
+exit=0
+
+## F-bbf7fa 단계 3 (05 78행) — 기대: 2건
+$ grep -n PATTERN .env.example
+exit=1
+
+## F-56df6c 단계 1 (05 104행) — 기대: 1건(결정 F 줄)
+$ grep -nF 'window:{from,to}, window_days, min_count' docs/wiki/packages/P6-memory/01-plan.md
+186:- step 3종 — `memory_pattern`: 이벤트 저장 인물마다 1행. output `{person_id, window:{from,to}, window_days, min_count, counts:{type:n}, changes
+exit=0
+
+## F-56df6c 단계 2 (05 105행) — 기대: 1건(U2 줄)
+$ grep -n 'U2 패턴 감지 규칙.*window_days' docs/wiki/packages/P6-memory/01-plan.md
+68:- [ ] U2 패턴 감지 규칙 — `detect_patterns(ctx, person_id) -> PatternResult`. 첫 줄에서 `app/tools/persons.py` 의 `_owned_person(ctx.session, pe
+exit=0
+
+## F-56df6c 단계 3 (05 106행) — 기대: 1건(판정 3행)
+$ grep -nE 'window_days=90' docs/wiki/packages/P6-memory/01-plan.md
+97:| 3 | ㄷ 창 경계 | 기본 설정에서 3건 중 1건이 `now − 365일 − 1초` | 패턴 없음. 정확히 `now − 365일` 은 포함. 환경변수로
+exit=0
+
+## F-14ad9f 단계 1 (05 132행) — 기대: 1건(지킬 불변식 줄)
+$ grep -nF 'delete\(Event' docs/wiki/packages/P6-memory/01-plan.md
+198:- **원문(`events`) 삭제·수정 금지.** 권위 있는 판정은 판정 표 13행 테스트(승격·패턴 전후 `events` 행 수·`raw_utterance`·`c
+exit=0
+
+## F-14ad9f 단계 2 (05 133행) — 기대: `0`
+$ grep -c 'rnE "delete\\([^E]' docs/wiki/packages/P6-memory/01-plan.md
+0
+exit=1

@@ -1,0 +1,2 @@
+# verifier 02-plan-verify 3차 보류 소견(H-4) — findings.py 입력용 (source=review)
+FAIL  H-4 01-plan 25행 .env.example 기본값 줄 개수가 2개/365/3 로 남아 60·67행(3줄·365/3/5)과 어긋남

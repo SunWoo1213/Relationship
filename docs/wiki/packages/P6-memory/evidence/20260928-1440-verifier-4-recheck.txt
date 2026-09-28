@@ -1,0 +1,136 @@
+== verifier 4차 재확인 — F-04ecbe(H-4) 완료 판정 명령 실행 (2026-09-28 14:40) ==
+방식: 05-remediation.md F-04ecbe 해결 단계 표에서 '완료 판정 명령' 칸을 awk 로 잘라내(표 칸의 '\|' 는 '|' 로 치환) 그대로 실행. 손 입력 없음.
+기준 트리: dev HEAD 2de7416, 미커밋 변경 =  M docs/backlog.md  M docs/wiki/HANDOFF.md  M docs/wiki/journal.md  M docs/wiki/specs/S3.5-memory-promotion.md ?? docs/wiki/packages/P6-memory/ 
+
+## §1 05 표 완료 판정 명령 (F-04ecbe 절 안의 표 행만)
+--- 단계 1
+명령: | |`|g|r|e|p| |-|c|E| |'|2|�|�|�|�|�|�|
+기대: |�|�|�| |�|�|�|
+출력: bash: -c: line 1: syntax error near unexpected token `|'
+bash: -c: line 1: `| |`|g|r|e|p| |-|c|E| |'|2|�|�|�|�|�|�|'
+exit: 2
+--- 단계 2
+명령: | |`|s|e|d| |-|n| |5|5|p| |d|o|c|s|/|w|i|k|i|/|p|a|c|k|a|g|e|s|/|P|6|-|m|e|m|o|r|y|/|0|1|-|p|l|a|n|.|m|d| |
+기대: | |g|r|e|p| |-|o| |"|M|E|M|O|R|Y|_|P|R|O|M|O|T|E|_|M|I|N|_|E|V|E|N|T|S|=|5|"| |
+출력: bash: -c: line 1: syntax error near unexpected token `|'
+bash: -c: line 1: `| |`|s|e|d| |-|n| |5|5|p| |d|o|c|s|/|w|i|k|i|/|p|a|c|k|a|g|e|s|/|P|6|-|m|e|m|o|r|y|/|0|1|-|p|l|a|n|.|m|d| |'
+exit: 2
+
+## §2 위임 프롬프트 지정 grep (개정 후 0건 기대)
+$ grep -nE '2개의|두 줄|365/3"' docs/wiki/packages/P6-memory/01-plan.md
+exit: 1 (1 = 0건)
+
+## §3 반대편 표기(3개/세 줄/365/3/5) — 25·60·67행 기대
+$ grep -nE '3개의|세 줄|365/3/5' docs/wiki/packages/P6-memory/01-plan.md
+14:`docs/resolution-plan.md` §3.5(187~192행)와 S3.5 카드의 네 문장을 코드로 옮긴다. 지금은 대화에서 나온 일이 `events`(에피소드 �
+25:  - **문서·설정 예시** — `registry.md` 새 행·비고 확장, `docs/RUNNING.md` 에 "승격·패턴이 언제 도는가" 한 절(설정 상수 6개
+60:| `.env.example` | 세 줄 추가: `PATTERN_WINDOW_DAYS=`·`PATTERN_MIN_COUNT=`·`MEMORY_PROMOTE_MIN_EVENTS=`(값은 비워 두고 주석으로 "비우면 �
+67:- [ ] U1 골격 — 설정 상수 6개(그중 환경변수로 덮는 것은 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS` 3개), `.
+exit: 0
+
+## §4 25행 원문(수정 후)
+  - **문서·설정 예시** — `registry.md` 새 행·비고 확장, `docs/RUNNING.md` 에 "승격·패턴이 언제 도는가" 한 절(설정 상수 6개 중 환경변수로 덮을 수 있는 것은 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS` 3개), `.env.example` 에 그 3개의 기본값 줄(이름과 "비우면 기본 365/3/5" 설명만 — 비밀 없음, D14·CR-002, security §1).
+
+## §5 R-13 — 55행 MEMORY_PROMOTE_MIN_EVENTS=5 횟수 (기대 1)
+$ sed -n 55p 01-plan.md | grep -o 'MEMORY_PROMOTE_MIN_EVENTS=5' | wc -l
+1
+$ grep -c 'MEMORY_PROMOTE_MIN_EVENTS' 01-plan.md (파일 전체 등장 행 수, 참고)
+5
+55행 원문:
+| `app/settings.py` | 상수 추가: `PATTERN_WINDOW_DAYS=365`·`PATTERN_MIN_COUNT=3`(D14 — 환경변수 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT` 로 덮어씀, 양의 정수만·아니면 `InvalidValue`·비우면 기본값; `MEMORY_PROMOTE_MIN_EVENTS=5` 도 환경변수 `MEMORY_PROMOTE_MIN_EVENTS` 로 덮어씀(같은 규칙, 기본 5 = S3.5 — 사용자 결정 2026-09-28 승인 전 추가, 읽기 함수 `promote_min_events(env=None)`); 읽기 함수 `pattern_config(env=None)`)·`PATTERN_KEY_PREFIX="pattern:"`·`MEMORY_PROMOTE_MAX_EVENTS`·`MEMORY_MAX_FACTS`(결정 D-4) | P2-tools |
+
+## §6 R-14 — U5·결정 F 에 min_events 기록 (3차 fc-3 §7 은 0건이었다)
+$ grep -nE 'min_events' 01-plan.md
+55:| `app/settings.py` | 상수 추가: `PATTERN_WINDOW_DAYS=365`·`PATTERN_MIN_COUNT=3`(D14 — 환경변수 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT` 로 덮어씀, 양의 정수만·아니면 `InvalidValue`·비우�
+67:- [ ] U1 골격 — 설정 상수 6개(그중 환경변수로 덮는 것은 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS` 3개), `.env.example` 에 그 3개의 기본값 줄(이름 + "비우�
+71:- [ ] U5 승격 — `promote_person(ctx, person_id, extractor) -> PromotionResult | None`. 첫 줄에서 `_owned_person(ctx.session, person_id, ctx.user_id)` 재사용(security §5, U2 와 같음). 미승격 판정(�
+exit: 0
+결정 F memory_promote output 스키마(186행) 에 min_events 가 있는가:
+187행(트리거 미달 unpromoted_count) 원문:
+- 트리거 미달(미승격 4건 이하)은 `memory_pattern` 행에 `unpromoted_count` 를 함께 적어 "왜 승격하지 않았나" 가 남게 한다.
+
+## §7 R-12 — S3.5 카드 diff·의미 확인
+$ git diff --stat docs/wiki/specs/S3.5-memory-promotion.md
+ docs/wiki/specs/S3.5-memory-promotion.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+$ git diff docs/wiki/specs/S3.5-memory-promotion.md (본문)
+S3.5 6행 vs resolution-plan §3.5 원문(승격 트리거 줄):
+190:- 승격 트리거: 같은 인물의 미승격 `events`가 5건 이상.
+S3.5 카드에 CLAUDE.md·D14·CR-002 와 어긋나는 숫자 변경이 있는가 — 카드 전체 숫자 목록:
+6:5건 8:365일 8:3회 8:90일 
+MEMORY_PROMOTE_MIN_EVENTS 가 카드·CR·CLAUDE.md 에 등장하는 곳(3차 §6 은 S3.5 포함 0건):
+docs/wiki/specs/S3.5-memory-promotion.md:6:- 승격 트리거: 같은 인물의 미승격 events ≥ 5건(설정값 `MEMORY_PROMOTE_MIN_EVENTS`, 기본 5 — 2026-09-28 사용자 결정, 기본값 불
+
+## §8 새 모순 검사 — 01-plan 안에서 '2개'·'두 줄'·'3개'·'세 줄' 이 섞여 쓰이는 행
+25:  - **문서·설정 예시** — `registry.md` 새 행·비고 확장, `docs/RUNNING.md` 에 "승격·패턴이 언제 도는가" 한 절(설정 상수 6개 중 환경변수로 덮을 수 있는 �
+67:- [ ] U1 골격 — 설정 상수 6개(그중 환경변수로 덮는 것은 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS` 3개), `.env.example` 에 그 3개의 기본값 �
+74:- [ ] U8 수용 기준 기계 검증·문서 — 아래 판정 표 전 행 실행, 전체 회귀(`POSTGRES_PORT=5433 pytest -rs`, skip 0), 금지 문자열 grep(판정 표 19행 — 명령은 "지�
+U8 74행 RUNNING 문구:
+RUNNING 절에 "설정 상수 6개 중 환경변수 3개" 로 적는다
+
+## §9 backlog 수용 기준 일치 재확인
+docs/backlog.md:79:- [ ] [backend-agent] 3계층 메모리 승격 + 패턴 감지 + `fact_sources` / 의존: P5 / 수용기준: 승격 후 사실→원문 링크 존재, 설정된 기간·횟수 규�
+docs/wiki/packages/P6-memory/01-plan.md:78:- 승격 후 사실→원문 링크 존재, 설정된 기간·횟수 규칙(기본 365일 3회)으로 `pattern:{type}` 사실 생성
+
+## §10 제품 코드 무변경
+$ git status --short | grep -v '^.. docs/'
+exit: 1 (1 = docs 밖 변경 0)
+
+## §1b (§1 은 awk 필드 분리가 글자 단위로 깨져 명령이 실행되지 않았다 — 같은 표 칸을 python 으로 잘라 재실행, 손 입력 없음)
+<stdin>:9: SyntaxWarning: invalid escape sequence '\|'
+Traceback (most recent call last):
+  File "<stdin>", line 7, in <module>
+  File "C:\Python313\Lib\re\__init__.py", line 267, in split
+    return _compile(pattern, flags).split(string, maxsplit)
+           ~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\re\__init__.py", line 350, in _compile
+    p = _compiler.compile(pattern, flags)
+  File "C:\Python313\Lib\re\_compiler.py", line 748, in compile
+    p = _parser.parse(p, flags)
+  File "C:\Python313\Lib\re\_parser.py", line 980, in parse
+    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)
+  File "C:\Python313\Lib\re\_parser.py", line 459, in _parse_sub
+    itemsappend(_parse(source, state, verbose, nested + 1,
+                ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       not nested and not items))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\re\_parser.py", line 779, in _parse
+    raise source.error("missing ), unterminated subpattern",
+                       source.tell() - start)
+re.PatternError: missing ), unterminated subpattern at position 0
+
+## §11 U5 71행·결정 F 186행 원문 (R-14 반영 자리)
+71행:
+- [ ] U5 승격 — `promote_person(ctx, person_id, extractor) -> PromotionResult | None`. 첫 줄에서 `_owned_person(ctx.session, person_id, ctx.user_id)` 재사용(security §5, U2 와 같음). 미승격 판정(결정 B(ii))은 `agent_traces` 를 **`session_id` 와 무관하게** `step='memory_promote' AND output->>'person_id' = :id` 로 세션을 넘어 누적 조회해 `considered_event_ids` 합집합에 없는 그 인물의 이벤트를 센다. 미승격 이벤트 ≥ `promote_min_events()`(기본 5, 환경변수로 덮음) 일 때만 추출기 1회 호출, 오래된 순 최대 `MEMORY_PROMOTE_MAX_EVENTS` 건. 사실마다 `(person_id, key)` upsert(결정 D-6) → `fact_sources(fact_id, event_id)` 연결. `memory_promote` trace 1행(tokens 는 추출기 사용량, 이번 판정에 실제로 쓴 `min_events`(R-14), `considered_event_ids`·사실별 `action`·이전 값·거부 사유). `events` 행은 읽기만 한다. 테스트에 다른 `user_id` 인물 id 로 호출 → `PersonNotFound`·추출기 호출 0 한 건, 다른 `session_id` 로 앞서 승격된 이벤트를 미승격으로 세지 않는 케이스 한 건. 판정: `pytest tests/test_memory_promote.py -v` · 증거 `evidence/*-u5-promote.txt` / Refs: P6-memory S3.5 S3.1 R8 원칙8 원칙9
+
+186행:
+- step 3종 — `memory_pattern`: 이벤트 저장 인물마다 1행. output `{person_id, window:{from,to}, window_days, min_count, counts:{type:n}, changes:[{type, action: created|updated|deleted|unchanged, fact_id, event_ids, previous_value}]}`, tokens 0. `window_days`·`min_count` 는 **이번 판정에 실제로 적용한** `pattern_config()` 값이다(D14 13행 "실제 쓴 기간·횟수를 패턴 trace 에 기록" — 설정을 바꾼 뒤에도 과거 판정을 재현할 수 있게, 원칙8·9). `memory_promote`: 트리거가 걸렸을 때만 1행. output `{person_id, unpromoted_count, considered_event_ids, facts:[{fact_id, key, action: created|updated|same, source_event_ids, previous_value}], rejected:[{index, key, reason}], llm:{provider, model}}`, tokens in/out = 추출기 사용량(`trace_tokens()`). `memory_error`: 승격·패턴 중 삼킨 예외 1행 `{person_id, stage, error}` — 프롬프트·키 원문 미기록(security §1). 세이브포인트 롤백 **뒤** 바깥 트랜잭션에서 쓴다(안에서 쓰면 롤백과 함께 사라진다 — U6).
+
+## §12 승격 트리거 5건 표기 — 카드·CR·INDEX·CLAUDE.md 사이 모순 여부
+exit: 0
+INDEX S3.5 줄:
+
+## §13 backlog 새 항목(3차 ④) 그대로인지
+ docs/backlog.md | 1 +
+ 1 file changed, 1 insertion(+)
+
+## §1c (§1b 는 python 인라인 문자열의 백슬래시가 셸 층에서 줄어 정규식 오류 — 스크립트 파일로 재실행. 표 칸을 파일에서 읽어 그대로 실행, 손 입력 없음)
+--- 단계 1 (05 표 상태 칸: 완료)
+명령: grep -cE '2개의|두 줄|365/3"' docs/wiki/packages/P6-memory/01-plan.md
+기대: `0`
+출력: 0
+exit: 1
+--- 단계 2 (05 표 상태 칸: 완료)
+명령: sed -n 55p docs/wiki/packages/P6-memory/01-plan.md | grep -o "MEMORY_PROMOTE_MIN_EVENTS=5" | wc -l
+기대: `1`
+출력: 1
+exit: 0
+
+## §12b 승격 트리거 5건 표기 — D14·CR-002·INDEX·CLAUDE.md·review-index (grep -E)
+exit: 1 (1 = 0건)
+INDEX 의 S3.5 줄:
+resolution-plan §3.5 승격 줄:
+190:- 승격 트리거: 같은 인물의 미승격 `events`가 5건 이상.
+
+## §13b backlog diff 본문
++- [ ] [미정 — CR 필요] 사용자별 메모리 설정을 앱 안에서 선택(패턴 기간·횟수, 카드 정리 기준) / 의존: P6-memory, P8 / 수용기준: (CR 에서 정함) — 사용자 요청 2026-09-28. 지금은 서버 �

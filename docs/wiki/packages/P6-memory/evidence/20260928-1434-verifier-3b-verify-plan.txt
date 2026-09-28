@@ -1,0 +1,43 @@
+== verify-plan P6-memory  (2026-09-28 14:34) ==
+PASS  존재: docs/wiki/packages/P6-memory/01-plan.md
+PASS  존재: docs/wiki/packages/P6-memory/02-plan-verify.md
+PASS  카드 존재: D06
+PASS  카드 존재: D11
+PASS  카드 존재: D14
+PASS  카드 존재: D6
+PASS  카드 존재: D9
+PASS  패키지 id 등록됨: P1-schema
+PASS  패키지 id 등록됨: P10-final-eval
+PASS  패키지 id 등록됨: P2-tools
+PASS  패키지 id 등록됨: P5-loop
+PASS  패키지 id 등록됨: P6-briefing
+PASS  패키지 id 등록됨: P6-memory
+PASS  검증 항목 존재: R11
+PASS  검증 항목 존재: R8
+PASS  Refs 있음: - [ ] U1 골격 — 설정 상수 6개(그중 환경변수�
+PASS  Refs 있음: - [ ] U2 패턴 감지 규칙 — `detect_patterns(ctx, pers
+PASS  Refs 있음: - [ ] U3 `pattern:` 접두 키 보호 — `update_person(fac
+PASS  Refs 있음: - [ ] U4 사실 추출기 — `FactExtractor.extract(person,
+PASS  Refs 있음: - [ ] U5 승격 — `promote_person(ctx, person_id, extracto
+PASS  Refs 있음: - [ ] U6 루프 연결 — `after_record(ctx, person_ids, ex
+PASS  Refs 있음: - [ ] U7 (결정 G 가 (ii) 일 때만) 루프 직접 사실
+PASS  Refs 있음: - [ ] U8 수용 기준 기계 검증·문서 — 아래 판�
+PASS  backlog 일치: 승격 후 사실→원문 링크 존재, 설정된 기간·
+PASS  의존 완료: P5-loop
+PASS  P4 게이트 통과 (P4b-er-redesign)
+PASS  검증자 = verifier (L-002)
+PASS  점검표 8행 존재
+PASS  점검표 모든 행에 판정(통과/보류) 있음
+PASS  보류 0건
+PASS  결과: 줄 존재
+PASS  점검표 모든 행에 근거 있음
+PASS  registry 중복 없음: app/memory/__init__.py
+PASS  registry 중복 없음: app/memory/types.py
+PASS  registry 중복 없음: app/memory/patterns.py
+PASS  registry 중복 없음: app/memory/extract.py
+PASS  registry 중복 없음: app/memory/promote.py
+PASS  registry 중복 없음: tests/test_memory_patterns.py
+PASS  registry 중복 없음: tests/test_memory_extract.py
+PASS  registry 중복 없음: tests/test_memory_promote.py
+PASS  registry 중복 없음: tests/test_memory_loop.py
+== 결과: FAIL=0 WARN=0 ==

@@ -1,0 +1,4 @@
+# verifier 02-plan-verify 보류 소견(H-1~H-3) — findings.py 입력용 (source=review)
+FAIL  H-1 D14 .env.example 기본값 줄이 01-plan U1·파일 표에 없음
+FAIL  H-2 D14 실제 쓴 기간·횟수 기록이 결정 F memory_pattern output 스키마·U2 에 없음
+FAIL  H-3 지킬 불변식 grep delete\( 이 C-5(i)·D-6·U2 의 사실·링크 삭제와 모순

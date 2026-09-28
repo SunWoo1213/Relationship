@@ -1,0 +1,114 @@
+# P6-memory 01-plan 사실 주장 확인 (verifier, 2026-09-28 13:50, HEAD 2de7416)
+## 1. propose.py PROPOSAL_ARG_SCHEMA.facts.key (계획 20행: enum 없는 문자열)
+150:                    "key": {"type": "string"},
+## 2. gate.py 231~239 (계획 20행: 모양만 본다)
+    if "facts" in args:
+        facts = args["facts"]
+        if not isinstance(facts, list):
+            return REASON_BAD_ARGS
+        for item in facts:
+            if not isinstance(item, dict) or set(item) != {"key", "value"}:
+                return REASON_BAD_ARGS
+            if not isinstance(item["key"], str) or not isinstance(item["value"], str):
+                return REASON_BAD_ARGS
+## 3. persons.py update_person facts 검사 (계획 20행: 키를 거르지 않는다)
+    if facts is not None:
+        for fact in facts:
+            key = fact.get("key") if isinstance(fact, dict) else None
+            value = fact.get("value") if isinstance(fact, dict) else None
+            if not isinstance(key, str) or not key.strip():
+                raise InvalidValue("update_person: fact key must be a non-empty string")
+            if not isinstance(value, str) or not value.strip():
+                raise InvalidValue("update_person: fact value must be a non-empty string")
+            normalized_key = key.strip()
+            normalized_value = value.strip()
+## 4. loop.py _record 호출 자리 (계획 21행: 962·1286행)
+962:    record = _record(
+1286:    record = _record(
+## 5. RecordOutcome 반환 필드 (person_id 수집 없음 — 리스크 208행)
+    return RecordOutcome(
+        executed=executed,
+        failed=failed,
+        events=events,
+        schedules=schedules,
+        schedule_question=schedule_question,
+    )
+## 6. app/agent 금지 리터럴 기준선 (판정 19행)
+app/agent/loop.py:1227:            created = app_tools.create_person(
+exit=0
+## 7. app/ 'evaluation' 기준선
+exit=1
+## 8. events UPDATE/DELETE 코드 (app/ 전체)
+exit=1
+## 9. models: PersonFact 인덱스(유일 제약 없음)·FactSource 복합 PK·CASCADE·AgentTrace.output JSONB
+    __table_args__ = (Index("ix_person_facts_person_id_key", "person_id", "key"),)
+    __table_args__ = (
+        PrimaryKeyConstraint("fact_id", "event_id"),
+        Index("ix_fact_sources_event_id", "event_id"),
+    )
+
+    fact_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("person_facts.id", ondelete="CASCADE"), nullable=False
+    )
+    event_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("events.id", ondelete="CASCADE"), nullable=False
+    )
+    input: Mapped[object] = mapped_column(JSONB, nullable=False)
+    output: Mapped[object] = mapped_column(JSONB, nullable=False)
+## 10. settings: DEFAULT_FACT_CONFIDENCE·user_timezone·PATTERN(미존재 기대)
+77:DEFAULT_FACT_CONFIDENCE = 1.0
+218:def user_timezone(env: dict[str, str] | None = None) -> ZoneInfo:
+exit=0
+## 11. judge.py 재사용 대상
+216:def call_with_error_mapping(errors_module: Any, fn: Callable[[], Any]) -> Any:
+565:def call_with_gemini_error_mapping(fn: Callable[[], Any]) -> Any:
+734:JUDGES: dict[str, Callable[[], Judge]] = {
+741:def enabled_providers(env: dict[str, str] | None = None) -> frozenset[str]:
+780:def select_provider(env: dict[str, str] | None = None) -> str:
+## 12. propose.py 의 judge import 선례
+from app.er.judge import (
+    call_with_error_mapping,
+    call_with_gemini_error_mapping,
+    select_provider,
+    _to_gemini_schema,
+)
+## 13. trace_tokens() 규약
+app/tools/context.py:157:    `tokens_out`: 반환값이 `trace_tokens() -> tuple[int, int]` 메서드를
+app/tools/context.py:219:            trace_tokens = getattr(result, "trace_tokens", None)
+app/tools/context.py:220:            if callable(trace_tokens):
+app/tools/context.py:221:                tokens_in, tokens_out = trace_tokens()
+app/er/types.py:246:    def trace_tokens(self) -> tuple[int, int]:
+## 14. traced() 예외 경로 — tool_error 행을 세이브포인트 안에 기록
+            except Exception as exc:
+                try:
+                    with ctx.session.begin_nested():
+                        ctx.session.add(
+## 15. records.py add_event: 패턴·승격 없음
+    **패턴 감지·승격·`fact_sources` 기록 없음**(원칙6·D9 는 P6-memory).
+## 16. .env.example PATTERN 줄 (D14 요구, 현재 없음)
+exit=1
+## 17. 존재 확인
+alembic.ini
+docs/RUNNING.md
+scripts/tools_check.py
+## 18. conftest: db_session·fake_embedder 픽스처, dbtest 는 마커
+74:        "dbtest: 실 PostgreSQL(로컬, POSTGRES_PORT 기본 5433) 접속이 필요한 테스트",
+115:def db_session(db_engine: Engine) -> Iterator[Session]:
+143:def fake_embedder() -> Callable[[list[str]], list[list[float]]]:
+## 19. P5-loop 04-review 결과·승인·P6 인계
+190:- **P6-memory**: 승격 훅은 `app/agent/loop.py` 의 `_record_impl`(기록 단계, `loop_record` 한 행) 뒤에 건다. `add_event` 는 `raw_utterance` 를 발화 원문 그대로 받는다(LLM 값이 아니라 루프 주입).
+196:결과: 완료
+197:승인: 사용자 (2026-09-25) — 완료 승인. §6-2 `docs/user-setup/` 갱신은 `docs/RUNNING.md` 로 갈음(사용자 결정), 01-plan 표기 정정. 판정 표 8행(실 공급자 curl)은 main 승격 전 사용자 실행 권고로 남긴다.
+## 20. review-index R8·R11
+16:| R8 | M | 시맨틱→원문 링크 없음 | 구현완료(4dfaf33, 09c2bd1 — fact_sources(fact_id, event_id) 복합 PK·FK CASCADE 2; P6-memory 가 승격 시 채움) | S3.1 `fact_sources` → P1-schema, P6-memory |
+19:| R11 | M | 반복 패턴 감지 메커니즘 없음 | 결정완료(CR-002: D9→D14, 기본 365일·3회 설정값) | D14 → S3.5 → P6-memory |
+## 21. backlog P6 수용기준
+- [ ] [backend-agent] 3계층 메모리 승격 + 패턴 감지 + `fact_sources` / 의존: P5 / 수용기준: 승격 후 사실→원문 링크 존재, 설정된 기간·횟수 규칙(기본 365일 3회)으로 `pattern:{type}` 사실 생성
+## 22. registry app/memory grep
+0
+## 23. git: HEAD·main
+2de7416 cr(CR-002): 반복 패턴 기간·횟수를 설정값으로, 기본 1년·3회
+1e4afb4 fix(FIX-006): 테스트는 전용 DB(relationship_test)에만 붙는다
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+?? docs/wiki/packages/P6-memory/
