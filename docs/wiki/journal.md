@@ -286,3 +286,5 @@
 - 2026-09-28 15:20 | FIX | FIX-007 승인(가짜 키 표기 통일·판정 bool 인물 번호 차단·alembic 템플릿 Refs) — backend-agent 위임 예정 | FIX-007
 - 2026-09-28 16:32 | COMMIT | aa91f34 docs(wiki): 옛 열린 소견 8건 해소 표시, 남은 3건은 FIX-007 로
 - 2026-09-28 17:30 | FIX | FIX-007 구현 완료(backend-agent), 메인 세션 전체 회귀 재실행 1488 passed skip 0 | FIX-007
+- 2026-09-28 17:07 | COMMIT | 80c2842 fix(FIX-007): 판정의 bool 인물 번호 차단, 가짜 키·템플릿 태그 정리
+- 2026-09-28 17:45 | STOP | 사용자 요청으로 멈춤 — FIX-007 완료(80c2842), 다음 = P6-memory U1 위임 승인 | P6-memory
