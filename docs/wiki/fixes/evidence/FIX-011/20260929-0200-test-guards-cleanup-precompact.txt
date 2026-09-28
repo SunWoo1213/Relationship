@@ -1,0 +1,27 @@
+# commit-cleanup · precompact 시험 추가 검증 (2026-09-29)
+# 이 둘만 자동 시험이 없어 사각지대였다. 12건을 추가했다.
+
+## 전체 결과
+== 결과: 실패 0 ==
+
+## 새 섹션 출력
+== commit-cleanup · precompact (격리된 임시 저장소에서) ==
+ok   commit-cleanup: 무관한 명령은 기록 없음
+ok   commit-cleanup: 커밋 성공 시 COMMIT 기록
+ok   commit-cleanup: 승인 마커 소비됨
+ok   commit-cleanup: 제목 불일치면 기록 없음
+ok   commit-cleanup: 제목 불일치면 마커 유지
+ok   commit-cleanup: 실패한 dev2 푸시는 기록 없음
+ok   commit-cleanup: 성공한 dev2 푸시는 기록
+ok   commit-cleanup: 실험 푸시는 작업을 잠그지 않음
+ok   commit-cleanup: 승격 시 PUSH 기록
+ok   commit-cleanup: 승격 뒤 L-003 대기 + 푸시 마커 소비
+ok   precompact: 압축 사유(auto) 기록
+ok   precompact: 압축 사유(manual) 기록
+== 결과: 실패 0 ==
+
+## 시험이 실제로 결함을 잡는지 (결함 주입 실험)
+commit-cleanup 의 dev2 푸시 성공 판정을 'if true' 로 되돌려 FIX-009 결함을 재현했을 때:
+  XX   commit-cleanup: 실패한 dev2 푸시는 기록 없음 (기대 0, 실제 1)
+  == 결과: 실패 2 ==
+→ 통과만 하는 시험이 아니라 회귀를 실제로 잡는다. 주입한 결함은 되돌렸고 원본과 diff 0 임을 확인했다.

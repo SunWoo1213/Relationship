@@ -200,6 +200,103 @@ PY
   if [ "$rc" -eq 0 ]; then echo "ok   agent frontmatter parses: $f"; else echo "XX   agent frontmatter: $f -> $msg"; fails=$((fails+1)); fi
 done
 
+echo "== commit-cleanup · precompact (격리된 임시 저장소에서) =="
+# 이 둘은 journal 에 쓰고 승인 마커를 지우므로, 진짜 저장소에서 시험하면 이력이 더러워진다.
+# CLAUDE_PROJECT_DIR 을 임시 저장소로 돌려 그 안에서만 돌린다.
+# 그동안 이 둘만 자동 시험이 없었고, 실제로 commit-cleanup 에 "실패한 푸시를 성공처럼
+# 기록" 하는 결함이 들어갔다가 사람 눈으로 발견됐다(FIX-009). 그래서 케이스를 넣는다.
+CC_T="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-cc-$$")"
+mkdir -p "$CC_T/.claude/hooks" "$CC_T/docs/wiki"
+cp "$H/commit-cleanup.sh" "$H/precompact.sh" "$H/_py.sh" "$CC_T/.claude/hooks/" 2>/dev/null
+printf '# journal\n' > "$CC_T/docs/wiki/journal.md"
+(
+  cd "$CC_T" || exit 1
+  git init -q . 2>/dev/null
+  git config user.email t@example.com; git config user.name tester
+  printf 'x\n' > f.txt; git add f.txt
+  git commit -qm "테스트용 첫 커밋" 2>/dev/null
+) >/dev/null 2>&1
+
+cc_run() {  # cc_run <명령문자열>
+  printf '{"tool_input":{"command":"%s"}}' "$1" \
+    | CLAUDE_PROJECT_DIR="$CC_T" bash "$CC_T/.claude/hooks/commit-cleanup.sh" >/dev/null 2>&1
+}
+cc_count() {  # grep -c 는 0건일 때 "0" 을 찍고 종료 코드 1 을 낸다. 둘을 섞지 않는다.
+  cc_n="$(grep -c "$1" "$CC_T/docs/wiki/journal.md" 2>/dev/null)" || cc_n="${cc_n:-0}"
+  printf '%s' "${cc_n:-0}"
+}
+cc_check() {  # cc_check <라벨> <기대수> <실제수>
+  if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "XX   $1 (기대 $2, 실제 $3)"; fails=$((fails+1)); fi
+}
+
+# 1) 커밋·푸시가 아닌 명령은 아무것도 남기지 않는다
+cc_run "git status --short"
+cc_check "commit-cleanup: 무관한 명령은 기록 없음" 0 "$(cc_count '| COMMIT |')"
+
+# 2) 초안 제목이 HEAD 제목과 같고 마커가 있으면 → 마커 삭제 + COMMIT 한 줄
+printf '테스트용 첫 커밋\n\n본문\n' > "$CC_T/.claude/commit-draft.txt"
+printf 'x\n' > "$CC_T/.claude/.commit-approved"
+cc_run "git commit -F .claude/commit-draft.txt"
+cc_check "commit-cleanup: 커밋 성공 시 COMMIT 기록" 1 "$(cc_count '| COMMIT |')"
+if [ -f "$CC_T/.claude/.commit-approved" ]; then
+  echo "XX   commit-cleanup: 1회용 승인 마커가 지워지지 않았다"; fails=$((fails+1))
+else
+  echo "ok   commit-cleanup: 승인 마커 소비됨"
+fi
+
+# 3) 초안 제목이 HEAD 와 다르면(=커밋이 실제로 안 된 것) 마커를 남기고 기록도 안 한다
+printf '다른 제목\n' > "$CC_T/.claude/commit-draft.txt"
+printf 'x\n' > "$CC_T/.claude/.commit-approved"
+cc_run "git commit -F .claude/commit-draft.txt"
+cc_check "commit-cleanup: 제목 불일치면 기록 없음" 1 "$(cc_count '| COMMIT |')"
+if [ -f "$CC_T/.claude/.commit-approved" ]; then
+  echo "ok   commit-cleanup: 제목 불일치면 마커 유지"
+else
+  echo "XX   commit-cleanup: 커밋되지 않았는데 마커를 지웠다"; fails=$((fails+1))
+fi
+rm -f "$CC_T/.claude/.commit-approved"
+
+# 4) 실험 푸시가 실패했으면(원격 추적 ref 가 HEAD 와 다르면) 기록하지 않는다 — FIX-009 회귀
+cc_run "git push origin dev2"
+cc_check "commit-cleanup: 실패한 dev2 푸시는 기록 없음" 0 "$(cc_count 'PUSH-dev2')"
+
+# 5) 실험 푸시가 성공했으면 한 줄 남기고, 작업을 잠그지 않는다
+( cd "$CC_T" && git update-ref refs/remotes/origin/dev2 "$(git rev-parse HEAD)" ) 2>/dev/null
+cc_run "git push origin dev2"
+cc_check "commit-cleanup: 성공한 dev2 푸시는 기록" 1 "$(cc_count 'PUSH-dev2')"
+if [ -f "$CC_T/.claude/.awaiting-decision" ]; then
+  echo "XX   commit-cleanup: 실험 푸시가 L-003 대기를 걸었다(작업이 잠긴다)"; fails=$((fails+1))
+else
+  echo "ok   commit-cleanup: 실험 푸시는 작업을 잠그지 않음"
+fi
+
+# 6) 검증 승격(dev2:dev)이 반영되면 푸시 마커를 지우고 L-003 대기를 건다
+( cd "$CC_T" && git update-ref refs/remotes/origin/dev "$(git rev-parse HEAD)" ) 2>/dev/null
+printf 'x\n' > "$CC_T/.claude/.push-approved"
+cc_run "git push origin dev2:dev"
+cc_check "commit-cleanup: 승격 시 PUSH 기록" 1 "$(cc_count '| PUSH |')"
+if [ -f "$CC_T/.claude/.awaiting-decision" ] && [ ! -f "$CC_T/.claude/.push-approved" ]; then
+  echo "ok   commit-cleanup: 승격 뒤 L-003 대기 + 푸시 마커 소비"
+else
+  echo "XX   commit-cleanup: 승격 뒤 대기 마커 또는 푸시 마커 처리가 틀렸다"; fails=$((fails+1))
+fi
+
+# 7) precompact 는 압축 사유를 그대로 적는다
+printf '{"trigger":"auto"}' | CLAUDE_PROJECT_DIR="$CC_T" bash "$CC_T/.claude/hooks/precompact.sh" >/dev/null 2>&1
+if grep -q '컨텍스트 압축(auto)' "$CC_T/docs/wiki/journal.md"; then
+  echo "ok   precompact: 압축 사유(auto) 기록"
+else
+  echo "XX   precompact: 압축 기록이 없거나 사유가 빠졌다"; fails=$((fails+1))
+fi
+printf '{"trigger":"manual"}' | CLAUDE_PROJECT_DIR="$CC_T" bash "$CC_T/.claude/hooks/precompact.sh" >/dev/null 2>&1
+if grep -q '컨텍스트 압축(manual)' "$CC_T/docs/wiki/journal.md"; then
+  echo "ok   precompact: 압축 사유(manual) 기록"
+else
+  echo "XX   precompact: manual 사유가 기록되지 않았다"; fails=$((fails+1))
+fi
+
+rm -rf "$CC_T"
+
 echo "== 결과: 실패 $fails =="
 [ "$fails" -eq 0 ] || exit 1
 exit 0
