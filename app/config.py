@@ -7,7 +7,7 @@
 동작 (scripts/db_check.py 와 완전히 동일):
   1. 환경변수 `DATABASE_URL` 이 있으면 그것으로 접속 정보를 만든다. 없으면
      `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` / `POSTGRES_PORT`
-     (없는 것은 기본값 app / pass / relationship / 5432)와
+     (없는 것은 기본값 app / pass / relationship / 5433)와
      `POSTGRES_HOST`(선택, 기본값 `localhost` -- 컨테이너 밖에서 접속할 때만 바꾼다)로
      접속 정보를 조립한다.
   2. `DATABASE_URL` 과 `POSTGRES_*` 가 둘 다 있고 값이 어긋나면 어긋난 변수
@@ -30,7 +30,11 @@ from urllib.parse import quote, urlsplit
 DEFAULT_USER = "app"
 DEFAULT_PASSWORD = "pass"
 DEFAULT_DB = "relationship"
-DEFAULT_PORT = "5432"
+#: 이 저장소의 docker-compose 는 PostgreSQL 을 호스트 5433 에 매핑한다(5432 는 다른
+#: 프로젝트가 쓴다). 기본값을 5432 로 두었더니 포트를 따로 주지 않은 실행이 전부
+#: 연결에 실패해 DB 테스트가 통째로 건너뛰어졌다 -- FIX-012. CI 는 DATABASE_URL 을
+#: 직접 주므로 이 값을 쓰지 않는다(아래 resolve_connection 의 DATABASE_URL 갈래).
+DEFAULT_PORT = "5433"
 DEFAULT_HOST = "localhost"
 
 

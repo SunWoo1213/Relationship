@@ -27,14 +27,19 @@ def test_database_url_wins_over_postgres_star_even_when_both_present():
 
 def test_postgres_star_assembly_falls_back_to_default_host_and_port():
     """DATABASE_URL 이 없으면 POSTGRES_* 로 조립하고, POSTGRES_HOST/PORT 를
-    지정하지 않으면 기본값(localhost/5432)을 쓴다."""
+    지정하지 않으면 기본값(localhost/5433)을 쓴다.
+
+    포트 값을 기호가 아니라 글자로 적는 이유: 기본값이 조용히 바뀌면 포트를 주지
+    않은 실행이 전부 엉뚱한 DB 로 가거나 연결에 실패한다(FIX-012). 그 변화를
+    여기서 잡는다.
+    """
     fake = {"POSTGRES_USER": "u", "POSTGRES_PASSWORD": "p", "POSTGRES_DB": "d"}
     conn, warnings = cfg.resolve_connection(fake)
     assert conn.source == "POSTGRES_*"
     assert conn.user == "u"
     assert conn.dbname == "d"
     assert conn.host == "localhost"
-    assert conn.port == "5432"
+    assert conn.port == "5433"
     assert warnings == []
 
 

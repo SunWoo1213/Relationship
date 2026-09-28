@@ -1,0 +1,25 @@
+# FIX-012 · DB 기본 포트 5433 검증 (2026-09-29)
+# 핵심: 환경변수를 전혀 주지 않고도 DB 테스트가 도는가
+
+$ echo "POSTGRES_PORT=${POSTGRES_PORT:-없음} DATABASE_URL=${DATABASE_URL:-없음}"
+POSTGRES_PORT=없음 DATABASE_URL=없음
+
+## 검증 1·4 — 환경변수 없이 전체 회귀
+1524 passed, 1 warning in 11.50s
+(고치기 전 같은 조건: 1215 passed, 309 skipped — 전부 port 5432 연결 실패)
+
+## 검증 2 — 환경변수 없이 구현 검증
+PASS  pytest 통과(/users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20260929-0154-pytest.txt
+PASS  compileall 통과(/users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20260929-0154-lint.txt
+(DB 미연결 FAIL 없음)
+
+## 검증 3 — DATABASE_URL 우선(CI 경로)
+12 passed in 0.01s
+
+## 검증 5 — 훅 자가 점검
+== 결과: 실패 0 ==
+
+## 바뀐 곳
+37:DEFAULT_PORT = "5433"
+22:DATABASE_URL=postgresql://app:pass@localhost:5433/relationship
+27:POSTGRES_PORT=5433

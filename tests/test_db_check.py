@@ -29,7 +29,7 @@ def test_postgres_only_assembles_conninfo():
 
 
 def test_defaults_used_when_nothing_set():
-    """DATABASE_URL 도 POSTGRES_* 도 없으면 compose 기본값(app/pass/relationship/5432)으로 조립한다."""
+    """DATABASE_URL 도 POSTGRES_* 도 없으면 compose 기본값(app/pass/relationship/5433)으로 조립한다."""
     conn, warnings = dc.resolve_connection({})
     assert conn.user == dc.DEFAULT_USER
     assert conn.password == dc.DEFAULT_PASSWORD
