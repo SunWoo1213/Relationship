@@ -82,6 +82,7 @@
 
 ### D9. 반복 패턴 감지 규칙 — 검증 11 **[권장안 승인]**
 
+- (CR-002, 2026-09-28: 기간·횟수는 설정값, 기본 **365일·3회** — `docs/wiki/decisions/D14-pattern-window-config.md`. 아래 90일은 원 결정 기록.)
 - 권장: 규칙 기반. 같은 인물의 `events.type`이 최근 90일 내 **3회 이상**이면 승격 시 `person_facts(key="pattern:{type}", value="{n}회 (날짜 목록)", confidence=1.0)`을 생성·갱신한다. LLM은 패턴 문장화만 담당한다.
 - 이유: 규칙이면 재현 가능하고 근거(이벤트 ID 목록)가 자동으로 남는다. 2장 포함 목록에 "반복 패턴 감지"를 추가한다.
 
@@ -188,7 +189,7 @@ agent_traces(id, session_id, step, tool_name, input, output, tokens_in, tokens_o
 
 - 승격 트리거: 같은 인물의 미승격 `events`가 5건 이상.
 - 승격 동작: LLM이 사실 후보를 뽑고 `person_facts`에 upsert, 각 사실에 `fact_sources`로 근거 이벤트를 연결.
-- 패턴: 같은 `type`이 90일 내 3회 이상 → `pattern:{type}` 사실 생성. 근거 이벤트를 `fact_sources`에 연결.
+- 패턴: 같은 `type`이 설정된 기간 내 설정된 횟수 이상(기본 365일·3회, CR-002·D14 — 원 결정은 90일) → `pattern:{type}` 사실 생성. 근거 이벤트를 `fact_sources`에 연결.
 - 원문은 어떤 경우에도 삭제하지 않는다.
 
 ### 3.6 브리핑 트리거와 푸시 (검증 12)

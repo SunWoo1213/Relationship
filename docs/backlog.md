@@ -76,7 +76,7 @@
 
 ### P6
 
-- [ ] [backend-agent] 3계층 메모리 승격 + 패턴 감지 + `fact_sources` / 의존: P5 / 수용기준: 승격 후 사실→원문 링크 존재, 90일 3회 규칙으로 `pattern:{type}` 사실 생성
+- [ ] [backend-agent] 3계층 메모리 승격 + 패턴 감지 + `fact_sources` / 의존: P5 / 수용기준: 승격 후 사실→원문 링크 존재, 설정된 기간·횟수 규칙(기본 365일 3회)으로 `pattern:{type}` 사실 생성
 - [ ] [backend-agent] 브리핑 생성 + 주기 작업(1분 간격) + 수동 트리거 / 의존: P5 / 수용기준: `POST /briefings/run`으로 브리핑 생성, `briefed_at` 기록
 
 ### P7

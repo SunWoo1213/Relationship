@@ -16,7 +16,7 @@
 | R8 | M | 시맨틱→원문 링크 없음 | 구현완료(4dfaf33, 09c2bd1 — fact_sources(fact_id, event_id) 복합 PK·FK CASCADE 2; P6-memory 가 승격 시 채움) | S3.1 `fact_sources` → P1-schema, P6-memory |
 | R9 | M | 인물당 임베딩 1개 | 구현완료(4dfaf33, 09c2bd1, a9cb254, 2c63c60 — 별칭 단위 임베딩·top-K 인물별 max·OpenAIEmbeddingProvider 런타임; **실 공급자 호출 확인**(2026-09-22 P4 U7 ef18143 — text-embedding-3-small N=1536, 40 시나리오 별칭 임베딩 `embedded == aliases` 40/40, 임베딩 배치 62회, `packages/P4-pilot-eval/evidence/20260922-1324-u7-real-run.txt`; `embedding_only` 베이스라인 오병합 0/132 — 별칭 max 집계가 실 임베딩에서 동작)) | D5 → S3.1 → P1-schema, P2-tools, P3-er |
 | R10 | M | 툴 시그니처 ↔ 스키마 불일치 | 구현완료(f2e9e05 — tools_check 7/7, CLAUDE.md 표 = 실제 시그니처) | S3.2 |
-| R11 | M | 반복 패턴 감지 메커니즘 없음 | 결정완료 | D9 → S3.5 → P6-memory |
+| R11 | M | 반복 패턴 감지 메커니즘 없음 | 결정완료(CR-002: D9→D14, 기본 365일·3회 설정값) | D14 → S3.5 → P6-memory |
 | R12 | M | 브리핑 트리거·푸시 구독 저장소 없음 | 결정완료 | S3.6 → P6-briefing, P7-push |
 | R13 | M | LLM·임베딩 비용 미산정 | 결정완료 | P0-cost |
 | R14 | M | CloudFront→EC2 TLS 미정 | 결정완료 | D7 → P9-infra |

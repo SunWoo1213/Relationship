@@ -269,3 +269,9 @@
 - 2026-09-25 23:15 | RELEASE | origin main ← dev 16b19a5
 - 2026-09-26 01:00 | FIX | FIX-006 시작 — 테스트가 개발 DB·user local 을 로컬 서버와 공유(서버 사용 시 테스트 20건 실패). 방식 테스트 전용 DB(사용자 결정), 계획 승인, active FIX-006, backend-agent 위임 | FIX-006
 - 2026-09-26 01:15 | FIX | FIX-006 완료 — 테스트 전용 DB relationship_test, 1486 passed, 격리 증명(서준 local 재현 상태에서도 통과 → 복구). active none | FIX-006
+- 2026-09-25 23:46 | COMMIT | 1e4afb4 fix(FIX-006): 테스트는 전용 DB(relationship_test)에만 붙는다
+- 2026-09-25 23:46 | PUSH | origin dev 1e4afb4 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-25 23:48 | RELEASE | origin main ← dev 1e4afb4
+- 2026-09-28 13:20 | START | P6-memory 착수 절차 — 사용자 결정: P6 는 P6-memory → P6-briefing 순. architect 01-plan 초안(L-004 승인) | P6-memory
+- 2026-09-28 13:45 | DECISION | P6-memory 결정 A~G 전부 권장안(B 는 설명 후 방법 2 — trace 의 본 이벤트 id, 스키마 무변경) | P6-memory
+- 2026-09-28 14:00 | CR | CR-002 제기·승인·이행(문서) — 패턴 기간·횟수 설정값, 기본 365일·3회, D9→D14, frozen 해제 | CR-002 D14 P6-memory

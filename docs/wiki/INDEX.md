@@ -44,7 +44,7 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | 태그 | 뜻 | 카드 위치 |
 |------|----|-----------|
 | `P0`~`P11` | 작업 패키지 (P0 = 착수 준비) | `packages/<id>/` |
-| `D1`~`D10`, `D11+` | 설계 결정 (D3 는 D12 로 대체됨 — CR-001; D13 규칙 필터 감점) | `decisions/Dnn-*.md` |
+| `D1`~`D10`, `D11+` | 설계 결정 (D3 는 D12 로 대체됨 — CR-001; D13 규칙 필터 감점; D9 는 D14 로 대체됨 — CR-002 패턴 기간 설정값) | `decisions/Dnn-*.md` |
 | `R1`~`R20` | 기획서 검증 항목 | `review-index.md` → 원문 `docs/proposal-review.md` |
 | `S3.1`~`S3.7` | 설계 명세 | `specs/S3.x-*.md` |
 | `원칙1`~`원칙9` | 불변 원칙 | `CLAUDE.md` |

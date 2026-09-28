@@ -21,7 +21,7 @@ skills: entity-resolution, agent-observability
   - 에피소드 메모리(events 테이블, raw_utterance 보존)
   - 시맨틱 메모리(person_facts, 인물 카드)
   - 승격 규칙: 동일 인물의 미승격 에피소드가 5건 이상이면 LLM이 사실 후보를 뽑아 `person_facts`에 upsert. **원문은 보존**하고 각 사실을 `fact_sources(fact_id, event_id)`로 근거 이벤트에 연결한다.
-- **반복 패턴 감지(규칙 기반)**: 같은 인물의 같은 `events.type`이 최근 90일 내 3회 이상이면 `person_facts(key="pattern:{type}", confidence=1.0)`을 생성·갱신하고 근거 이벤트를 `fact_sources`에 연결한다. LLM은 패턴 문장화만 담당한다.
+- **반복 패턴 감지(규칙 기반)**: 같은 인물의 같은 `events.type`이 설정된 기간 내 설정된 횟수 이상(`PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`, 기본 365일·3회 — D14, CR-002)이면 `person_facts(key="pattern:{type}", confidence=1.0)`을 생성·갱신하고 근거 이벤트를 `fact_sources`에 연결한다. LLM은 패턴 문장화만 담당한다.
 - **브리핑 트리거**: 백엔드 컨테이너 내 주기 작업(1분 간격)으로 `scheduled_at - now() ≤ 24h AND briefed_at IS NULL`인 일정에 `get_briefing` 실행 → 웹푸시 → `briefed_at` 기록. **수동 트리거 엔드포인트 `POST /briefings/run`**이 같은 함수를 호출한다(데모용).
 - **관측성**: 모든 step을 `agent_traces`에 기록(`agent-observability` 스킬).
 
