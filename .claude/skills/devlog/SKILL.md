@@ -32,7 +32,7 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 4. `packages/<id>/01-plan.md`를 `templates/plan.md`로 작성. 작업 단위(U1, U2 …)마다 `Refs:`. 수용 기준은 backlog와 **글자 그대로**.
 5. **기계 검증**: `mkdir -p packages/<id>/evidence` 후
    `bash .claude/scripts/verify-plan.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt`
-   FAIL/WARN 이 있으면 `python .claude/scripts/findings.py <id> <그 파일> --source verify-plan` → `05-remediation.md` 소견을 채우고 계획을 고친 뒤 다시 실행(FAIL 0 까지, 3회 한도).
+   FAIL/WARN 이 있으면 `bash .claude/scripts/findings.sh <id> <그 파일> --source verify-plan` → `05-remediation.md` 소견을 채우고 계획을 고친 뒤 다시 실행(FAIL 0 까지, 3회 한도).
 6. **`verifier` 에이전트에 위임**(L-002: 계획을 쓴 쪽이 점검표를 채우지 않는다)하여 `02-plan-verify.md`를 `templates/plan-verify.md`로 작성: `검증자: verifier (fable)`, 1절에 기계 검증 출력 전체, 2절 점검표 8행은 각각 **카드 파일명 + 인용 문장**을 근거로 판정. 위임 프롬프트에는 패키지 id·읽을 카드 목록·evidence 경로를 적는다. `verify-plan.sh`는 검증자 줄에 `verifier`가 없으면 FAIL 한다. 보류가 하나라도 있으면 `결과: 보류`로 두고 사용자에게 보고하고 멈춘다.
 7. 통과면 `AskUserQuestion`으로 계획 요약(목표·작업 단위·수용 기준·기계 검증 결과·읽은 카드)을 보여주고 승인을 받는다. 선택지: 승인 / 수정 요청 / 보류.
 8. 승인되면 `02-plan-verify.md`에 `승인: 사용자 (날짜)`, `CURRENT.md`에 `active: <id>`, `03-log.md`를 템플릿으로 생성, `journal.md`에 `START` 줄, `HANDOFF.md` 갱신, `/commit`(계획 문서 커밋).
@@ -40,7 +40,7 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 
 ### 검증 → 조치 루프 (구현 중 문제가 나왔을 때, `verification.md` "루프")
 1. `bash .claude/scripts/verify-impl.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt` (pytest 출력도 같은 방식으로 파일에)
-2. `python .claude/scripts/findings.py <id> <그 파일> --source verify-impl` → `05-remediation.md`에 소견 블록.
+2. `bash .claude/scripts/findings.sh <id> <그 파일> --source verify-impl` → `05-remediation.md`에 소견 블록.
 3. 소견마다 채운다: 원인 가설 → 확인 명령 실행·출력 인용 → **해결 단계 표**(단계 = 파일·방법 + 완료 판정 명령 + 기대 출력). 명령 없는 단계는 쓰지 않는다.
 4. 단계를 순서대로 실행하고 완료 판정 명령을 실제로 실행해 상태를 완료로. 결정·명세(D/S/원칙)를 바꿔야만 풀리는 소견은 멈추고 `/devlog fix` 또는 `/devlog change`로 올려 사용자에게 보고.
 5. 1의 같은 명령 재실행 → 2 재실행 → 사라진 소견은 자동 해소. 같은 소견이 3회 재검증 후에도 열려 있으면 재시도하지 않고 사용자에게 보고(원칙8).

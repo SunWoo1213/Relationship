@@ -1,0 +1,2 @@
+verify-impl P6-memory 20260929-0134
+FAIL=1 WARN=2

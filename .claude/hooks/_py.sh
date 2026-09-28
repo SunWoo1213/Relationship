@@ -32,5 +32,36 @@ for _hook_py_cand in python python3; do
 done
 unset _hook_py_cand
 
+# 특정 모듈이 실제로 되는 인터프리터를 찾는다 (FIX-011).
+#   hook_python_with <모듈명> [프로젝트루트]   → 찾으면 이름/경로를 출력하고 0, 못 찾으면 1
+#
+# 훅은 표준 라이브러리만 쓰므로 위의 HOOK_PY 로 충분하다. 반면 검증 스크립트는
+# pytest·ruff·yaml 처럼 프로젝트 의존성이 필요한데, 그것들은 보통 가상환경 안에만 있다.
+# 그래서 venv 를 먼저 보고, 없으면 시스템 인터프리터로 내려간다.
+# venv 경로는 OS 마다 다르다 — Unix 는 .venv/bin/python, Windows 는 .venv/Scripts/python.exe.
+# 여기서도 "있는가" 가 아니라 "그 모듈을 import 할 수 있는가" 로 판단한다.
+hook_python_with() {
+  _hpw_mod="${1:-}"
+  _hpw_root="${2:-}"
+  [ -n "$_hpw_mod" ] || return 1
+  for _hpw_c in \
+    "${_hpw_root:+$_hpw_root/.venv/bin/python}" \
+    "${_hpw_root:+$_hpw_root/.venv/Scripts/python.exe}" \
+    python python3; do
+    [ -n "$_hpw_c" ] || continue
+    case "$_hpw_c" in
+      */*) [ -x "$_hpw_c" ] || continue ;;
+      *)   command -v "$_hpw_c" >/dev/null 2>&1 || continue ;;
+    esac
+    if "$_hpw_c" -c "import $_hpw_mod" >/dev/null 2>&1; then
+      printf '%s' "$_hpw_c"
+      unset _hpw_mod _hpw_root _hpw_c
+      return 0
+    fi
+  done
+  unset _hpw_mod _hpw_root _hpw_c
+  return 1
+}
+
 # 인터프리터를 못 찾았다고 알리는 공용 문구 (차단 메시지·경고에 함께 쓴다)
 HOOK_PY_MISSING_MSG="파이썬 인터프리터를 찾지 못했다(python·python3 모두 없거나 실행되지 않는다). 훅이 입력을 읽을 수 없어 검사를 할 수 없다. 파이썬을 설치하고 PATH 에 넣으라 - 근거: docs/wiki/security.md, FIX-008"

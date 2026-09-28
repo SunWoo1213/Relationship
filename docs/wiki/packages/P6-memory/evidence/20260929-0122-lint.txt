@@ -1,0 +1,1 @@
+.claude/scripts/verify-impl.sh: line 50: python: command not found

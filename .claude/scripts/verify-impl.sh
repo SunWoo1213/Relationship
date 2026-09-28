@@ -10,6 +10,13 @@
 #   6 registry.md 에 이 패키지 행이 있는지 (구현 목록 등록)
 #   7 01-plan 작업 단위가 모두 [x] 인지
 # 종료 코드: FAIL 있으면 1. "완료했습니다"라는 문장은 증거가 아니다.
+#
+# 실행 방법 (FIX-011, 사용자 결정 2026-09-29): 환경 파일을 불러온 셸에서 돌린다.
+#     set -a; . ./.env; set +a
+#     bash .claude/scripts/verify-impl.sh <id>
+#   코드는 환경 파일을 스스로 읽지 않으므로(python-dotenv 미사용 — security §1), 이렇게 하지 않으면
+#   DB 포트가 기본값으로 잡혀 DB 테스트가 통째로 건너뛰어진다. 그 경우 아래 1번이 FAIL 한다.
+#   환경 파일이 없는 기기에서는 필요한 값만 앞에 붙여도 된다: POSTGRES_PORT=5433 bash …
 set -u
 export PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LC_ALL=C.UTF-8
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
@@ -26,30 +33,52 @@ bad() { printf 'FAIL  %s\n' "$1"; fail=$((fail+1)); }
 wrn() { printf 'WARN  %s\n' "$1"; warn=$((warn+1)); }
 cd "$ROOT" || exit 1
 
+# 파이썬 인터프리터 이름과 가상환경 경로는 OS 마다 다르다 (FIX-008·FIX-011).
+# hook_python_with 가 venv(Unix: .venv/bin/python, Windows: .venv/Scripts/python.exe) 를
+# 먼저 보고, 각 후보로 그 모듈을 실제 import 해 본 뒤 고른다.
+. "$ROOT/.claude/hooks/_py.sh"
+
 echo "== verify-impl $id  ($ts) =="
 
 # 1 테스트
 if [ -d tests ] || ls "$ROOT"/*/tests >/dev/null 2>&1; then
-  if python -m pytest --version >/dev/null 2>&1; then
+  PYTEST_PY="$(hook_python_with pytest "$ROOT" || true)"
+  if [ -n "$PYTEST_PY" ]; then
     # -rs: skip 사유를 증거에 남긴다(DB 미연결로 조용히 skip된 초록불 방지)
-    python -m pytest -q -rs "$@" > "$E/$ts-pytest.txt" 2>&1; rc=$?
+    "$PYTEST_PY" -m pytest -q -rs "$@" > "$E/$ts-pytest.txt" 2>&1; rc=$?
     tail -n 3 "$E/$ts-pytest.txt"
-    [ $rc -eq 0 ] && ok "pytest 통과 → evidence/$ts-pytest.txt" || bad "pytest 실패(rc=$rc) → evidence/$ts-pytest.txt"
-    grep -qE '[0-9]+ skipped' "$E/$ts-pytest.txt" && wrn "skip 있음 — 사유(SKIPPED 줄) 확인 → evidence/$ts-pytest.txt"
+    [ $rc -eq 0 ] && ok "pytest 통과($PYTEST_PY) → evidence/$ts-pytest.txt" || bad "pytest 실패(rc=$rc) → evidence/$ts-pytest.txt"
+    # DB 에 못 붙어 건너뛴 것은 "정상 skip" 이 아니라 검증이 안 된 것이다 (FIX-011).
+    # 이 기기에서 실제로 1215 passed / 309 skipped 인데 PASS 가 찍혔다 — 스크립트 주석이
+    # 경계하던 "조용한 초록불" 이 그대로 일어났다. 연결 실패 skip 은 FAIL 로 올린다.
+    if grep -qE 'SKIPPED.*(not reachable|Connection refused|OperationalError)' "$E/$ts-pytest.txt"; then
+      n_skip="$(grep -cE 'SKIPPED.*(not reachable|Connection refused|OperationalError)' "$E/$ts-pytest.txt")"
+      bad "DB 에 붙지 못해 건너뛴 테스트가 $n_skip 건 있다 — 테스트를 돌린 것이 아니다. DB 컨테이너를 띄우고 포트를 맞춰 다시 실행하라(예: POSTGRES_PORT=5433). → evidence/$ts-pytest.txt"
+    elif grep -qE '[0-9]+ skipped' "$E/$ts-pytest.txt"; then
+      wrn "skip 있음 — 사유(SKIPPED 줄) 확인 → evidence/$ts-pytest.txt"
+    fi
   else
-    wrn "pytest 미설치 — 테스트 증거 없음"
+    # 테스트를 돌리지 못한 것은 경고가 아니라 검증 실패다 (FIX-011).
+    # 예전에는 WARN 이어서, 인터프리터 이름이 안 맞는 기기에서 테스트 없이 완료 처리될 수 있었다.
+    bad "pytest 를 돌릴 인터프리터를 찾지 못했다 — 테스트 증거 없이 구현 검증을 통과시키지 않는다. 가상환경을 만들고 의존성을 설치하라(python -m venv .venv 뒤 requirements-dev.txt)"
   fi
 else
   wrn "tests/ 없음 — 이 패키지에 자동 테스트가 없다면 04-review 에 사유를 적으라"
 fi
 
 # 2 린트
-if python -m ruff --version >/dev/null 2>&1; then
-  python -m ruff check . > "$E/$ts-lint.txt" 2>&1 && ok "ruff 통과 → evidence/$ts-lint.txt" || wrn "ruff 경고/오류 → evidence/$ts-lint.txt"
-else
-  compileall_out="$(python -m compileall -q . 2>&1 | grep -v 'venv' || true)"
+RUFF_PY="$(hook_python_with ruff "$ROOT" || true)"
+LINT_PY="${RUFF_PY:-${PYTEST_PY:-$HOOK_PY}}"
+if [ -n "$RUFF_PY" ]; then
+  "$RUFF_PY" -m ruff check . > "$E/$ts-lint.txt" 2>&1 && ok "ruff 통과 → evidence/$ts-lint.txt" || wrn "ruff 경고/오류 → evidence/$ts-lint.txt"
+elif [ -n "$LINT_PY" ]; then
+  compileall_out="$("$LINT_PY" -m compileall -q . 2>&1 | grep -v 'venv' || true)"
   printf '%s\n' "${compileall_out:-compileall: ok}" > "$E/$ts-lint.txt"
-  [ -z "$compileall_out" ] && ok "compileall 통과 → evidence/$ts-lint.txt" || bad "문법 오류 → evidence/$ts-lint.txt"
+  [ -z "$compileall_out" ] && ok "compileall 통과($LINT_PY) → evidence/$ts-lint.txt" || bad "문법 오류 → evidence/$ts-lint.txt"
+else
+  # 인터프리터가 없어서 검사를 못 한 것을 "문법 오류" 로 적지 않는다 — 원인이 다르다 (FIX-011).
+  printf '%s\n' "$HOOK_PY_MISSING_MSG" > "$E/$ts-lint.txt"
+  bad "린트·문법 검사를 돌릴 인터프리터가 없다 → evidence/$ts-lint.txt"
 fi
 
 # 3 커밋 목록

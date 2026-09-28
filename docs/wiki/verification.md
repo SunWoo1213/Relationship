@@ -42,10 +42,23 @@
 
 ## 검증 → 조치 루프 (문제가 나왔을 때 에이전트가 따르는 순서)
 
+> **`verify-impl.sh` 는 환경 파일을 불러온 셸에서 돌린다** (FIX-011, 사용자 결정 2026-09-29 — A안).
+> 코드는 환경 파일을 스스로 읽지 않는다(`python-dotenv` 를 쓰지 않는다 — security §1). 그래서
+> DB 포트 같은 값을 파일에만 적어 두면 기본값(5432)으로 붙어 **DB 테스트가 통째로 건너뛰어진다.**
+> 지금은 그 경우 `verify-impl.sh` 가 FAIL 하지만, 애초에 이렇게 실행하면 걸리지 않는다:
+>
+> ```
+> set -a; . ./.env; set +a
+> bash .claude/scripts/verify-impl.sh <id>
+> ```
+>
+> 값을 출력하지 않는다(`echo`·`cat` 금지 — 훅이 막는다). 셸에 불러오기만 한다.
+> 환경 파일이 없는 기기에서는 필요한 값만 앞에 붙여도 된다: `POSTGRES_PORT=5433 bash …`.
+
 ```
 1. 검증 실행      bash .claude/scripts/verify-plan.sh <id>  또는  verify-impl.sh <id>
                   | tee docs/wiki/packages/<id>/evidence/<ts>-verify-*.txt
-2. 소견 생성      python .claude/scripts/findings.py <id> evidence/<ts>-verify-*.txt --source verify-impl
+2. 소견 생성      bash .claude/scripts/findings.sh <id> evidence/<ts>-verify-*.txt --source verify-impl
                   → 05-remediation.md 에 FAIL/WARN 마다 F-xxxxxx 블록 (같은 문제 = 같은 ID)
 3. 소견 채우기    블록마다: 원인 가설 → 확인 명령 실행·출력 인용 → 해결 단계 표
                   (단계 = 파일·방법 + 완료 판정 명령 + 기대 출력. 명령 없는 단계는 단계가 아니다)

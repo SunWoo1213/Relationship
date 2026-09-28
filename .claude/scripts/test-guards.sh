@@ -177,14 +177,9 @@ out="$(echo '{"source":"resume"}' | bash "$H/session-start.sh" | head -n 1)"
 printf '%s' "$out" | grep -q '세션 재개' && echo "ok   session-start prints header" || { echo "XX   session-start: $out"; fails=$((fails+1)); }
 
 echo "== 에이전트 frontmatter YAML 파싱 (FIX-003) =="
-# 이 검사만 PyYAML 이 필요하다. 훅용 인터프리터(맨 셸)에는 없을 수 있으므로,
-# yaml 을 import 할 수 있는 것을 따로 고른다 — 프로젝트 venv 를 먼저 본다.
-YAML_PY=""
-for cand in "$ROOT/.venv/bin/python" "$ROOT/.venv/Scripts/python.exe" "$HOOK_PY"; do
-  [ -n "$cand" ] || continue
-  command -v "$cand" >/dev/null 2>&1 || [ -x "$cand" ] || continue
-  if "$cand" -c 'import yaml' >/dev/null 2>&1; then YAML_PY="$cand"; break; fi
-done
+# 이 검사만 PyYAML 이 필요하다. 훅용 인터프리터(맨 셸)에는 없을 수 있으므로
+# 공용 탐지(FIX-011)로 yaml 이 되는 것을 고른다 — venv 를 먼저 본다.
+YAML_PY="$(hook_python_with yaml "$ROOT" || true)"
 if [ -z "$YAML_PY" ]; then
   echo "skip frontmatter 검사 (PyYAML 이 있는 인터프리터를 못 찾음 - pip install pyyaml)"
 fi

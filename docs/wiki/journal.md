@@ -297,3 +297,7 @@
 - 2026-09-29 00:40 | COMMIT | 2e293c8 harness(hooks): dev2 공유 푸시를 허용한다
 - 2026-09-29 00:41 | PUSH-dev2 | origin dev2 ← dev 2e293c8 (기기 간 공유, 사용자 지시)
 - 2026-09-29 03:00 | FIX | FIX-010 승인·구현 — 브랜치 3단계(dev2 실험 → dev 검증 → main 배포)로 전환. test-guards 실패 50 → 0 | FIX-010
+- 2026-09-29 01:05 | COMMIT | 3c0f0d9 harness(hooks): 브랜치를 3단계로 — dev2 실험, dev 검증, main 배포
+- 2026-09-29 01:05 | PUSH-dev2 | origin dev2 3c0f0d9 (실험 푸시)
+- 2026-09-29 04:30 | FIX | FIX-011 승인·구현 — 구현 검증이 테스트 없이 통과하던 것을 차단. DB 미연결 skip 도 FAIL 로 | FIX-011
+- 2026-09-29 05:00 | FIX | FIX-011 A안 확정 — 검증은 환경 파일을 올린 셸에서 실행. conftest 주석 포트 오기 수정 | FIX-011

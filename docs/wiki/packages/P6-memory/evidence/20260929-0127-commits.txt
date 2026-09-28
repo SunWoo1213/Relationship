@@ -1,0 +1,11 @@
+3c0f0d9 harness(hooks): 브랜치를 3단계로 — dev2 실험, dev 검증, main 배포
+2e293c8 harness(hooks): dev2 공유 푸시를 허용한다
+c4285ed harness(hooks): 훅이 파이썬을 못 찾으면 차단하게 고친다
+7564c5d feat(P6-memory): U1 메모리 설정 상수·타입 골격
+e48ac4c docs(wiki): 브랜치 역할 기록, dev2 추적 설정 반영
+80c2842 fix(FIX-007): 판정의 bool 인물 번호 차단, 가짜 키·템플릿 태그 정리
+aa91f34 docs(wiki): 옛 열린 소견 8건 해소 표시, 남은 3건은 FIX-007 로
+ec454dc docs(P6-memory): 4차 확인 통과·계획 승인 — 패키지 착수
+2de7416 cr(CR-002): 반복 패턴 기간·횟수를 설정값으로, 기본 1년·3회
+9cb35b6 feat(P2-tools): U5 add_event·add_schedule — EVENT_TYPES 검사·raw_utterance 원문 보존·aware 시각만·패턴 감지 없음
+5dc95bb docs(P1-schema): 완료 — verifier 04-review 완료 판정·사용자 승인, R8 R9 구현완료, 패키지 닫음
