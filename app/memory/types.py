@@ -37,6 +37,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 
 # ---------------------------------------------------------------------------
 # 패턴 감지 결과 (U2 `detect_patterns()` 가 반환. 로직은 아직 없음)
@@ -56,6 +57,19 @@ class PatternChange:
     event_ids: list[int] = field(default_factory=list)
     previous_value: str | None = None
 
+    def to_dict(self) -> dict[str, Any]:
+        """`memory_pattern` trace `output.changes[]` 항목 모양(결정 F).
+        `@traced`(`app.tools.context.to_jsonable`)가 이 메서드를 우선
+        쓴다 -- `PatternResult.to_dict()` 가 재귀 호출한다(U2)."""
+
+        return {
+            "type": self.type,
+            "action": self.action,
+            "fact_id": self.fact_id,
+            "event_ids": list(self.event_ids),
+            "previous_value": self.previous_value,
+        }
+
 
 @dataclass(frozen=True)
 class PatternResult:
@@ -72,6 +86,25 @@ class PatternResult:
     min_count: int
     counts: dict[str, int] = field(default_factory=dict)
     changes: list[PatternChange] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        """`memory_pattern` trace `output` 모양 그대로(결정 F, U2 가
+        `app/memory/patterns.py::detect_patterns()` 에서 채운다).
+        `window_from`/`window_to` 는 `window.from`/`window.to` 로
+        `isoformat()` 문자열이 된다 -- `app.tools.context.to_jsonable` 이
+        `@traced` 로 감싼 함수의 반환값에서 이 메서드를 우선 호출한다."""
+
+        return {
+            "person_id": self.person_id,
+            "window": {
+                "from": self.window_from.isoformat(),
+                "to": self.window_to.isoformat(),
+            },
+            "window_days": self.window_days,
+            "min_count": self.min_count,
+            "counts": dict(self.counts),
+            "changes": [change.to_dict() for change in self.changes],
+        }
 
 
 # ---------------------------------------------------------------------------

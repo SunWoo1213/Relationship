@@ -1,15 +1,18 @@
-"""Refs: P6-memory S3.5 D14 원칙6 원칙9 -- 골격(U1), 재export 전용.
+"""Refs: P6-memory S3.5 D14 원칙6 원칙9 -- 재export 전용.
 
-U2~U6 이 채울 진입점(`after_record()`·`detect_patterns()`·
-`promote_person()`, `app/memory/patterns.py`·`extract.py`·`promote.py`)은
-**아직 만들지 않는다** -- 이 파일은 `app.memory.types` 의 결과 타입·
-trace 어휘·`FACT_KEYS` 만 재export한다. 아직 없는 모듈을 import 하지
-않으므로 `python -c "import app.memory"` 가 U1 시점에도 성공한다(01-plan
-U1 항목의 판정 명령 중 하나).
+U1 은 `app.memory.types` 의 결과 타입·trace 어휘·`FACT_KEYS` 만 재export
+했다. U2 는 `app/memory/patterns.py::detect_patterns()`(규칙 기반 패턴
+감지, LLM·임베딩 미사용)를 여기에 더한다 -- `promote_person()`/
+`after_record()`(U5·U6)는 아직 없다. `detect_patterns` re-export 를
+더해도 `python -c "import app.memory"` 는 여전히 네트워크·LLM·임베딩
+없이 성공한다(`app/memory/patterns.py` 가 `app.memory.extract`/
+`app.er.judge`/`app.embedding` 을 직접 import 하지 않는다, 모듈
+docstring 참고).
 """
 
 from __future__ import annotations
 
+from app.memory.patterns import detect_patterns
 from app.memory.types import (
     FACT_KEYS,
     MEMORY_TRACE_STEPS,
@@ -40,4 +43,5 @@ __all__ = [
     "PromotedFact",
     "PromotionResult",
     "RejectedFact",
+    "detect_patterns",
 ]

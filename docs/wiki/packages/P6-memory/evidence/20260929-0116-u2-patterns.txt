@@ -1,0 +1,45 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 36 items
+
+tests/test_memory_patterns.py::test_pattern_config_constants_defaults_when_env_missing PASSED [  2%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_default_when_env_missing PASSED [  5%]
+tests/test_memory_patterns.py::test_pattern_config_constants_defaults_when_env_empty_string PASSED [  8%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_default_when_env_empty_string PASSED [ 11%]
+tests/test_memory_patterns.py::test_pattern_config_constants_reads_overrides_from_env PASSED [ 13%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_reads_override_from_env PASSED [ 16%]
+tests/test_memory_patterns.py::test_pattern_config_constants_uses_os_environ_when_env_is_none PASSED [ 19%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_uses_os_environ_when_env_is_none PASSED [ 22%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[0] PASSED [ 25%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[-1] PASSED [ 27%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[abc] PASSED [ 30%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[3.5] PASSED [ 33%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[0] PASSED [ 36%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[-1] PASSED [ 38%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[abc] PASSED [ 41%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[3.5] PASSED [ 44%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[0] PASSED [ 47%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[-1] PASSED [ 50%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[abc] PASSED [ 52%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[3.5] PASSED [ 55%]
+tests/test_memory_patterns.py::test_memory_code_constants_values PASSED  [ 58%]
+tests/test_memory_patterns.py::test_memory_trace_vocab_constants_values PASSED [ 61%]
+tests/test_memory_patterns.py::test_fact_keys_constants_has_no_pattern_prefixed_key PASSED [ 63%]
+tests/test_memory_patterns.py::test_detect_patterns_three_events_creates_pattern_fact PASSED [ 66%]
+tests/test_memory_patterns.py::test_detect_patterns_two_events_no_pattern PASSED [ 69%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_inclusive_default PASSED [ 72%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_exclusive_one_second_early PASSED [ 75%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_moves_with_env_override PASSED [ 77%]
+tests/test_memory_patterns.py::test_detect_patterns_excludes_future_occurred_at PASSED [ 80%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_mix_persons PASSED [ 83%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_mix_types PASSED [ 86%]
+tests/test_memory_patterns.py::test_detect_patterns_updates_existing_fact_same_id_on_new_event PASSED [ 88%]
+tests/test_memory_patterns.py::test_detect_patterns_deletes_fact_when_count_falls_below_threshold PASSED [ 91%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_touch_event_rows PASSED [ 94%]
+tests/test_memory_patterns.py::test_detect_patterns_other_users_person_raises_person_not_found PASSED [ 97%]
+tests/test_memory_patterns.py::test_patterns_module_does_not_import_llm_or_embedding_modules PASSED [100%]
+
+============================== 36 passed in 0.26s ==============================

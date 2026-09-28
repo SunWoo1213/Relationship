@@ -1,0 +1,41 @@
+# P6-memory U2 — 메인 세션 독립 재확인 (2026-09-29 01:21)
+# backend-agent 보고를 같은 명령 재실행으로 검증
+
+$ pytest tests/test_memory_patterns.py -q
+....................................                                     [100%]
+36 passed in 0.26s
+
+$ pytest -q -rs  (전체 회귀. U1 종료 시 1511)
+1524 passed, 1 warning in 11.30s
+
+## 불변식
+$ grep 원문 삭제·수정 패턴 in app/memory/
+0건 (원문 보존)
+
+$ app/memory/patterns.py 의 import 목록 (LLM·임베딩 없어야)
+70:from __future__ import annotations
+72:from datetime import timedelta
+74:from sqlalchemy import select
+76:from app.db.models import EVENT_TYPES, Event, FactSource, PersonFact
+77:from app.memory.types import (
+83:from app.settings import PATTERN_KEY_PREFIX, pattern_config, user_timezone
+84:from app.tools.context import ToolContext, traced
+85:from app.tools.persons import _owned_person
+
+$ grep -rnE 'T_merge|T_new|confidence|create_person\(' app/agent/ | wc -l  (기준선 1)
+       1
+
+$ grep -rn evaluation app/memory/
+0건
+
+## 변경 범위 (app/agent·app/tools·app/api·alembic 무변경)
+ M app/memory/__init__.py
+ M app/memory/types.py
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P6-memory/01-plan.md
+ M docs/wiki/packages/P6-memory/03-log.md
+ M tests/test_memory_patterns.py
+?? app/memory/patterns.py
+?? docs/wiki/packages/P6-memory/evidence/20260929-0116-u2-full-regression.txt
+?? docs/wiki/packages/P6-memory/evidence/20260929-0116-u2-patterns.txt
+?? docs/wiki/packages/P6-memory/evidence/20260929-0121-u2-main-recheck.txt
