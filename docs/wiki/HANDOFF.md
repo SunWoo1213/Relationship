@@ -15,7 +15,7 @@ active: **P6-memory** (FIX-007 병행) | frozen: none | 브랜치 `dev` | main =
 - FIX-006 `1e4afb4`(main 승격함): pytest 는 항상 `relationship_test` 에 붙는다(`tests/conftest.py`·`tests/db_bootstrap.py`, 없으면 만들고 마이그레이션, 개발 DB 이름과 같으면 거부). CI 의 개발 DB 마이그레이션 단계 제거. 1486 passed, 격리 증명 통과.
 
 ## 바로 다음에 할 것
-1. 소견 상태 정리 + FIX-007 문서 커밋(/commit) → **FIX-007** backend-agent 위임(L-004 승인 먼저; 가짜 키 3곳 통일 · `validate_judgement` bool 차단+테스트 · `alembic/script.py.mako` Refs 자리표시자) → 테스트 재확인 → 커밋 → FIX-007 결과 기록.
+1. (완료 `aa91f34`) 소견 상태 정리 + FIX-007 문서. **FIX-007 구현 끝, 커밋 대기** — 메인 재실행 1488 passed skip 0(5433). 결과는 FIX-007 `## 결과`. 내용: 가짜 키 3곳 통일 · `validate_judgement` bool 차단+테스트 · `alembic/script.py.mako` Refs 자리표시자) → 테스트 재확인 → 커밋 → FIX-007 결과 기록.
 2. **P6-memory U1**(골격: 설정 상수 6개 중 환경변수 3개 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`, `.env.example` 3줄, `app/memory/{__init__,types}.py`) → backend-agent(L-004 승인 먼저). 이후 U2~U8, 단위마다 `/commit`.
 3. 이월: R-10(U6 추출기 지연 생성), R-15(U5 결정 F 스키마 `min_events`). 그다음 `P6-briefing`(패턴 문장화·브리핑 직전 패턴 재계산). 이후 P9 AWS(Terraform).
 - 발견: 지금 루프가 `pattern:` 키 사실을 막지 않는다 → U3 가 막는다.

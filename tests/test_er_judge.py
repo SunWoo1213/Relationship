@@ -321,6 +321,20 @@ def test_openai_judge_s_llm_out_of_range_is_schema_error():
     assert str(excinfo.value) == "schema"
 
 
+@pytest.mark.parametrize("bogus_id", [True, False])
+def test_validate_judgement_rejects_bool_matched_person_id(bogus_id):
+    # FIX-007 F-036185 -- 파이썬에서 bool 은 int 의 서브클래스라 `True`/
+    # `False` 가 `isinstance(x, int)` 검사를 통과해 1/0번 후보로 잘못
+    # 귀속될 수 있었다(오병합, 원칙1). s_llm 의 bool 선차단과 같은 모양으로
+    # matched_person_id 도 bool 이면 스키마 오류로 거부해야 한다.
+    with pytest.raises(JudgeUnavailable) as excinfo:
+        validate_judgement(
+            {"matched_person_id": bogus_id, "s_llm": 0.9, "reason": "u"},
+            {0, 1},
+        )
+    assert str(excinfo.value) == "schema"
+
+
 def test_claude_judge_out_of_range_matched_id_is_out_of_range_id():
     client = StubClaudeClient(_claude_response(999, 0.9))
     judge = ClaudeJudge(client=client)
@@ -818,7 +832,7 @@ def test_judge_from_env_defaults_to_openai(monkeypatch):
 def test_judge_from_env_openai(monkeypatch):
     # OpenAI() 클라이언트는 생성 시점에 키 존재를 확인한다(Anthropic() 과
     # 달리) -- 실제로 호출하지 않으므로 더미 값으로 생성만 확인한다.
-    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-dummy")
+    monkeypatch.setenv("OPENAI_API_KEY", _FAKE_KEY_MARKER)
     judge = judge_from_env(env={"LLM_PROVIDER": "openai"})
     assert isinstance(judge, OpenAIJudge)
 
@@ -855,7 +869,7 @@ def test_judge_from_env_unknown_provider_rejected():
 
 def test_judge_from_env_uses_os_environ_when_env_omitted(monkeypatch):
     monkeypatch.setenv("LLM_PROVIDER", "openai")
-    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-dummy")
+    monkeypatch.setenv("OPENAI_API_KEY", _FAKE_KEY_MARKER)
     judge = judge_from_env()
     assert isinstance(judge, OpenAIJudge)
 

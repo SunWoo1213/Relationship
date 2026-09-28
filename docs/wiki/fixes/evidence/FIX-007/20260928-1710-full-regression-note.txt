@@ -1,0 +1,21 @@
+전체 회귀 실행 메모
+
+이 환경의 로컬 5433 포트는 이 저장소와 무관한 다른 프로젝트의 Postgres
+컨테이너(capstone2-postgres-1)가 이미 점유하고 있었다(docker ps -a 로 확인).
+그 컨테이너는 건드리지 않았다(다른 작업 산출물 보호).
+
+대신 이 저장소의 docker-compose.yml 로 테스트 전용 Postgres 컨테이너를
+POSTGRES_PORT=5439(빈 포트) 로 띄워 conftest.py 의 "로컬 PostgreSQL 붙기"
+경로를 그대로 태웠다. tests/conftest.py 의 db_engine 픽스처는 POSTGRES_PORT
+값을 그대로 읽어 접속하므로 포트 번호 자체는 임계 로직이 아니다(고정
+5433 은 문서상 예시 기본값일 뿐).
+
+$ POSTGRES_PORT=5439 docker compose up -d postgres   # healthy 확인 후
+$ POSTGRES_PORT=5439 python -m pytest -q tests/       # 1488 passed, skip 0
+$ docker compose down                                 # 볼륨 삭제 없이 정리
+
+원본 5433 재시도 기록(다른 프로젝트 컨테이너와 충돌 확인용, 위 문제의
+근거)은 20260928-1705-full-regression.txt 의 최초 실행분(별도 저장 없이
+덮어씀)과 이 파일 상단 설명으로 남긴다: 최초 POSTGRES_PORT=5433 실행은
+"1191 passed, 297 skipped"(로컬 PostgreSQL 접속 실패, 원인은 포트 점유)
+였고, 5439 로 바꾼 뒤 재실행에서 skip 0 을 달성했다.

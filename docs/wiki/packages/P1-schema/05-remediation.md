@@ -376,7 +376,7 @@ WARN  app/config.py ConnInfo 기본 dataclass repr/str 에 password 필드 포�
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-c7078e · [권고] alembic/script.py.mako 가 docstring 에 "Refs: P1-schema R8 R9 D4 D5 S3.1" 을 고정 — 후속 revision(P3-er 벡터 인덱스 등)이 P1-schema Refs 를 상속해 태그 추적(git log --grep)이 오염됨. revision 생성 시 Refs 줄을 그 패키지 태그로 고쳐 쓰는 절차 필요
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-28 (FIX-007, `docs/wiki/fixes/evidence/FIX-007/20260928-1702-mako-refs.txt`)
 
 ### 증상 (검증 출력 인용)
 ```

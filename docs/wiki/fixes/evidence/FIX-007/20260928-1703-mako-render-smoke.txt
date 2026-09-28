@@ -1,0 +1,17 @@
+$ python -m alembic revision -m "fix007 template smoke test"
+Generating .../alembic/versions/<hash>_fix007_template_smoke_test.py ...  done
+
+생성된 파일 상단(발췌, 확인 후 삭제함 — 실제 마이그레이션 아님):
+"""fix007 template smoke test
+
+Refs: TODO-패키지-태그
+
+Revision ID: <hash>
+Revises: 0001
+Create Date: ...
+
+"""
+
+확인: <%doc> 블록이 렌더링에서 사라지고, 실제 생성 파일의 Refs 줄에는
+"P1-schema" 가 없다(자리표시자만 남는다). 스모크로 만든 revision 파일은
+검증 후 삭제했다(alembic/versions/ 에 흔적 없음, git status 로 확인).

@@ -635,7 +635,7 @@ def test_proposer_from_env_rejects_disabled_provider():
 
 def test_proposer_from_env_uses_os_environ_when_env_omitted(monkeypatch):
     monkeypatch.setenv("LLM_PROVIDER", "openai")
-    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-dummy")
+    monkeypatch.setenv("OPENAI_API_KEY", _FAKE_KEY_MARKER)
     proposer = proposer_from_env()
     assert isinstance(proposer, OpenAIProposer)
 

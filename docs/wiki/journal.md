@@ -284,3 +284,5 @@
 - 2026-09-28 15:00 | STOP | 사용자 요청으로 세션 멈춤 — P6-memory active, U1 미착수(다음 세션 첫 일: U1 위임 승인) | P6-memory
 - 2026-09-28 15:10 | RESUME | 세션 재개 — 사용자 결정: 옛 열린 소견 정리 먼저. 8건 이미 반영 → 해소 표시, 3건 FIX-007 로 이관 | P6-memory
 - 2026-09-28 15:20 | FIX | FIX-007 승인(가짜 키 표기 통일·판정 bool 인물 번호 차단·alembic 템플릿 Refs) — backend-agent 위임 예정 | FIX-007
+- 2026-09-28 16:32 | COMMIT | aa91f34 docs(wiki): 옛 열린 소견 8건 해소 표시, 남은 3건은 FIX-007 로
+- 2026-09-28 17:30 | FIX | FIX-007 구현 완료(backend-agent), 메인 세션 전체 회귀 재실행 1488 passed skip 0 | FIX-007

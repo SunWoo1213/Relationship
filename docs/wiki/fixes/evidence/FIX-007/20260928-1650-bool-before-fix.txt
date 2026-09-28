@@ -1,0 +1,36 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+________ test_validate_judgement_rejects_bool_matched_person_id[True] _________
+
+bogus_id = True
+
+    @pytest.mark.parametrize("bogus_id", [True, False])
+    def test_validate_judgement_rejects_bool_matched_person_id(bogus_id):
+        # FIX-007 F-036185 -- 파이썬에서 bool 은 int 의 서브클래스라 `True`/
+        # `False` 가 `isinstance(x, int)` 검사를 통과해 1/0번 후보로 잘못
+        # 귀속될 수 있었다(오병합, 원칙1). s_llm 의 bool 선차단과 같은 모양으로
+        # matched_person_id 도 bool 이면 스키마 오류로 거부해야 한다.
+>       with pytest.raises(JudgeUnavailable) as excinfo:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+
+tests\test_er_judge.py:330: Failed
+________ test_validate_judgement_rejects_bool_matched_person_id[False] ________
+
+bogus_id = False
+
+    @pytest.mark.parametrize("bogus_id", [True, False])
+    def test_validate_judgement_rejects_bool_matched_person_id(bogus_id):
+        # FIX-007 F-036185 -- 파이썬에서 bool 은 int 의 서브클래스라 `True`/
+        # `False` 가 `isinstance(x, int)` 검사를 통과해 1/0번 후보로 잘못
+        # 귀속될 수 있었다(오병합, 원칙1). s_llm 의 bool 선차단과 같은 모양으로
+        # matched_person_id 도 bool 이면 스키마 오류로 거부해야 한다.
+>       with pytest.raises(JudgeUnavailable) as excinfo:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+
+tests\test_er_judge.py:330: Failed
+=========================== short test summary info ===========================
+FAILED tests/test_er_judge.py::test_validate_judgement_rejects_bool_matched_person_id[True]
+FAILED tests/test_er_judge.py::test_validate_judgement_rejects_bool_matched_person_id[False]
+2 failed, 73 deselected in 10.30s

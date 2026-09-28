@@ -175,6 +175,9 @@ def validate_judgement(raw: dict[str, Any], allowed_ids: set[int]) -> Judgement:
     - `s_llm` 이 `float`(또는 `int`, 그대로 float 변환)가 아니거나
       `0 <= s_llm <= 1` 을 벗어나면 `JudgeUnavailable(error="schema")`.
     - `matched_person_id` 가 `int`/`None` 이 아니면 `error="schema"`.
+      파이썬에서 `bool` 은 `int` 의 서브클래스이므로 `True`/`False` 도
+      먼저 걸러 거부한다(FIX-007 F-036185, `s_llm` 의 bool 선차단과
+      같은 모양 -- 오귀속으로 인한 오병합을 막는다, 원칙1).
     - `matched_person_id` 가 `allowed_ids ∪ {None}` 밖이면
       `error="out_of_range_id"`(F-5a97ef -- API 장애와 구분되는 유형).
     - `reason` 이 문자열이 아니면 `error="schema"`.
@@ -191,6 +194,8 @@ def validate_judgement(raw: dict[str, Any], allowed_ids: set[int]) -> Judgement:
     s_llm = raw.get("s_llm")
     reason = raw.get("reason")
 
+    if isinstance(matched_person_id, bool):
+        raise JudgeUnavailable("schema")
     if matched_person_id is not None and not isinstance(matched_person_id, int):
         raise JudgeUnavailable("schema")
 

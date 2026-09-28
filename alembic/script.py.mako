@@ -1,7 +1,11 @@
 """${message}
 
-Refs: P1-schema R8 R9 D4 D5 S3.1
-
+Refs: TODO-패키지-태그
+<%doc>
+생성 직후 이 줄을 그 패키지 태그로 바꾼다(예: 해당 작업의 P/D/R/S 태그 나열).
+고정 문자열로 두면 이후 만드는 모든 revision 이 같은 태그를 갖게 되어
+`git log --grep` 추적이 틀어진다(FIX-007 F-c7078e).
+</%doc>
 Revision ID: ${up_revision}
 Revises: ${down_revision | comma,n}
 Create Date: ${create_date}

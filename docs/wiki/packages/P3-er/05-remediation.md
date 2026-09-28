@@ -778,7 +778,7 @@ WARN  R4 실호출 미검증 — er_smoke 실 API evidence 파일이 없다(evid
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-46f1eb · [권고] tests/test_er_judge.py 505·526행이 더미 키를 "sk-test-dummy" 문자열로 setenv 한다 — U2·U8 이 secret-guard 때문에 채택한 _FAKE_KEY_MARKER 규약(sk- 접두 금지)과 불일치, 비밀 스캐너 오탐 원인. 같은 마커로 통일할 것(동작 변화 없음)
-상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+상태: 해소 | 발견: 2026-09-06 (review-impl) | 해소: 2026-09-28 (FIX-007, `docs/wiki/fixes/evidence/FIX-007/20260928-1700-no-fake-sk-keys.txt`)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -856,7 +856,7 @@ WARN  search_candidates(top_k=…) 인자가 search_person 에 전달되지 않�
 - FIX/CR 로 올려야 하는가: 아니오(P4/P5 01-plan 결정)
 
 ## F-036185 · [권고] judge.validate_judgement 가 bool 형 matched_person_id 를 int 로 통과시킨다(isinstance(True,int) — True in {1} 이 참이라 1번 후보로 귀속). strict 스키마가 실호출에서는 막지만 FakeJudge·비strict 응답 경로에 방어가 없다 — isinstance(x, bool) 선차단 한 줄과 테스트 1건을 P5 이전 사소 수정으로
-상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+상태: 해소 | 발견: 2026-09-06 (review-impl) | 해소: 2026-09-28 (FIX-007, `docs/wiki/fixes/evidence/FIX-007/20260928-1701-pytest-bool.txt`)
 
 ### 증상 (검증 출력 인용)
 ```
