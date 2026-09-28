@@ -1,0 +1,57 @@
+# 브랜치 구조 전환 검증 (2026-09-29)
+# 새 구조: dev2(실험, 아무때나) -> dev(검증 통과, 승인 필요) -> main(배포, 승격 승인)
+
+## A. 진짜 저장소 — 승인 마커가 없는 평소 상태
+### 1. 실험 푸시 (허용되어야)
+$ git push origin dev2
+-- 출력이 없으면 허용
+
+### 2. 검증 승격, 마커 없음 (거부되어야)
+$ git push origin dev2:dev
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 검증 승격(dev2:dev)은 /commit 절차에서 사용자가 승인해야 한다. 실험 푸시는 git push origin dev2 (근거: docs/wiki/security.md)"}}
+-- 출력이 없으면 허용
+
+### 4. dev 직접 푸시 (새 규칙상 거부)
+$ git push origin dev
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 푸시는 세 가지만 허용한다: origin dev2(실험) · origin dev2:dev(검증 승격, 승인 마커) · origin dev:main(최종 승격, 승격 마커). origin dev 직접 푸시와 main 직접 푸시는 금지 (근거: docs/wiki/security.md)"}}
+-- 출력이 없으면 허용
+
+### 5. main 승격, 마커 없음 (거부)
+$ git push origin dev:main
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] main 승격(dev:main)은 dev 를 실서버에서 검증한 뒤 /commit release 에서 사용자가 승인해야 한다 (근거: docs/wiki/security.md)"}}
+-- 출력이 없으면 허용
+
+### 6a. 강제 푸시 (거부)
+$ git push --force origin dev2
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 강제 푸시(--force, -f, +ref, --mirror, --delete) 금지. 새 커밋으로 고치라 (근거: docs/wiki/security.md)"}}
+-- 출력이 없으면 허용
+
+### 6b. origin 아닌 원격 (거부)
+$ git push backup dev2
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 푸시는 origin 으로만 허용한다 (근거: docs/wiki/security.md)"}}
+-- 출력이 없으면 허용
+
+### 6c. 목록에 없는 브랜치 (거부)
+$ git push origin feature-x
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 푸시는 세 가지만 허용한다: origin dev2(실험) · origin dev2:dev(검증 승격, 승인 마커) · origin dev:main(최종 승격, 승격 마커). origin dev 직접 푸시와 main 직접 푸시는 금지 (근거: docs/wiki/security.md)"}}
+-- 출력이 없으면 허용
+
+## B. 격리 사본 — 푸시 승인 마커가 있는 상태
+### 3. 검증 승격, 마커 있음 (허용되어야)
+$ git push origin dev2:dev
+-- 출력이 없으면 허용
+
+### 3b. 마커가 있어도 dev 직접 푸시는 거부
+$ git push origin dev
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 푸시는 세 가지만 허용한다: origin dev2(실험) · origin dev2:dev(검증 승격, 승인 마커) · origin dev:main(최종 승격, 승격 마커). origin dev 직접 푸시와 main 직접 푸시는 금지 (근거: docs/wiki/security.md)"}}
+-- 출력이 없으면 허용
+
+## C. 격리 사본 — 승격 마커가 있는 상태
+### 7. main 승격, 마커 있음 (허용되어야)
+$ git push origin dev:main
+-- 출력이 없으면 허용
+
+## 문법 검사
+OK   .claude/hooks/safety-guard.sh
+OK   .claude/hooks/commit-cleanup.sh
+OK   .claude/hooks/approve-commit.sh

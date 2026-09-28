@@ -294,3 +294,6 @@
 - 2026-09-29 00:26 | COMMIT | c4285ed harness(hooks): 훅이 파이썬을 못 찾으면 차단하게 고친다
 - 2026-09-29 00:30 | PUSH-dev2 | origin dev2 ← dev c4285ed (기기 간 공유, 사용자 지시)
 - 2026-09-29 01:20 | FIX | FIX-009 승인 — dev2 공유 푸시를 훅이 허용(마커 불요·방향 고정·L-003 대기 마커 없음). gh auth login 으로 기기 로그인 해결 | FIX-009
+- 2026-09-29 00:40 | COMMIT | 2e293c8 harness(hooks): dev2 공유 푸시를 허용한다
+- 2026-09-29 00:41 | PUSH-dev2 | origin dev2 ← dev 2e293c8 (기기 간 공유, 사용자 지시)
+- 2026-09-29 03:00 | FIX | FIX-010 승인·구현 — 브랜치 3단계(dev2 실험 → dev 검증 → main 배포)로 전환. test-guards 실패 50 → 0 | FIX-010

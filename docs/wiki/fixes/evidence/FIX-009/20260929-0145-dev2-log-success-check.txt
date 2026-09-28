@@ -1,0 +1,14 @@
+# dev2 푸시 기록 성공 판정 검증
+
+## 상황 A — origin/dev2 가 없다 (푸시가 실패한 것과 같은 상태)
+HEAD        = 528b9e4
+origin/dev2 = (없음)
+journal 의 PUSH-dev2 줄 수: 0  (기대: 0)
+
+## 상황 B — origin/dev2 가 HEAD 와 같다 (푸시 성공과 같은 상태)
+origin/dev2 = 528b9e4
+journal 의 PUSH-dev2 줄 수: 1  (기대: 1)
+
+## journal 내용
+# journal
+- 2026-09-29 00:42 | PUSH-dev2 | origin dev2 ← dev 528b9e4 (기기 간 공유, 사용자 지시)

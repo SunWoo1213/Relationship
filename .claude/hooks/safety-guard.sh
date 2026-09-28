@@ -68,18 +68,20 @@ GIT="${W}git([[:space:]]+-[^[:space:]]+([[:space:]]+[^[:space:]]+)?)*[[:space:]]
 if has "${GIT}push([[:space:]]|$)"; then
   has "${GIT}push[^;|&]*([[:space:]]-f([[:space:]]|$)|--force|--mirror|--delete|[[:space:]][+][a-zA-Z])" && deny "강제 푸시(--force, -f, +ref, --mirror, --delete) 금지. 새 커밋으로 고치라"
   has "${GIT}push[^;|&]*[[:space:]](-u[[:space:]]+|--set-upstream[[:space:]]+)?origin([[:space:]]|$)" || deny "푸시는 origin 으로만 허용한다"
-  # 브랜치 전략(L-001): 일상 푸시는 origin dev 로만. main 은 dev 를 실서버에서 검증한 뒤 /commit release 로 승격(dev:main)한다.
+  # 브랜치 전략(L-001 개정 2026-09-29): 실험 dev2 → 검증 승격 dev → 최종 승격 main.
+  #   dev2       : 작업·실험 브랜치. 아무때나 민다(마커 없음).
+  #   dev2:dev   : 실험에서 검증된 것을 dev 로 올린다. 사용자 승인 마커가 필요하고 뒤이어 L-003 대기.
+  #   dev:main   : dev 에서 끝난 것을 배포 브랜치로 올린다. 승격 마커 필요, fast-forward 만.
+  # origin dev 직접 푸시는 막는다 - dev 는 승격으로만 들어오는 곳이라 직접 밀면 검증 단계를 건너뛴다.
   if has "${GIT}push[^;|&]*[[:space:]]origin[[:space:]]+dev:main([[:space:]]|$)"; then
     [ -f "$RELEASE_MARK" ] || deny "main 승격(dev:main)은 dev 를 실서버에서 검증한 뒤 /commit release 에서 사용자가 승인해야 한다"
-  elif has "${GIT}push[^;|&]*[[:space:]]origin[[:space:]]+dev:dev2([[:space:]]|$)"; then
-    # dev2 = 기기 간 현재 상태 공유 브랜치(사용자 지시 2026-09-28: 커밋마다 dev2 에도 푸시).
-    # 이미 승인받아 커밋된 내용을 옮기는 것뿐이라 새 판단이 없으므로 푸시 마커를 요구하지 않는다.
-    # 방향은 dev:dev2 로 고정한다 - 작업 브랜치는 dev 하나이고, 뒤처진 로컬 dev2 에서 밀면 내용이 갈린다.
+  elif has "${GIT}push[^;|&]*[[:space:]]origin[[:space:]]+dev2:dev([[:space:]]|$)"; then
+    [ -f "$PUSH_MARK" ] || deny "검증 승격(dev2:dev)은 /commit 절차에서 사용자가 승인해야 한다. 실험 푸시는 git push origin dev2"
+  elif has "${GIT}push[^;|&]*[[:space:]]origin[[:space:]]+dev2([[:space:]]|$)"; then
+    # 실험 푸시 - 사용자가 아무때나 밀라고 한 자리다(2026-09-29 구조 확정). 마커를 요구하지 않는다.
     :
-  elif has "${GIT}push[^;|&]*[[:space:]]origin[[:space:]]+dev([[:space:]]|$)"; then
-    [ -f "$PUSH_MARK" ] || deny "푸시 승인 마커가 없다. /commit 절차에서 사용자가 푸시를 승인해야 한다"
   else
-    deny "푸시는 origin dev(작업) 와 origin dev:dev2(기기 간 공유) 로만 한다. main 직접 푸시 금지 - dev 를 실서버에서 검증한 뒤 /commit release 로 승격(git push origin dev:main)"
+    deny "푸시는 세 가지만 허용한다: origin dev2(실험) · origin dev2:dev(검증 승격, 승인 마커) · origin dev:main(최종 승격, 승격 마커). origin dev 직접 푸시와 main 직접 푸시는 금지"
   fi
 fi
 has "${GIT}reset[^;|&]*--hard" && deny "git reset --hard 금지. 되돌리려면 git revert 또는 사용자 요청"

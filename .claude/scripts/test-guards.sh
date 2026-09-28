@@ -11,8 +11,15 @@ export CLAUDE_PROJECT_DIR="$ROOT"
 H=".claude/hooks"
 fails=0
 
-mk()  { python -c "import json,sys;print(json.dumps({'tool_input':{'command':sys.argv[1]}}))" "$1"; }
-mkw() { python -c "import json,sys;print(json.dumps({'tool_input':{'file_path':sys.argv[1],'content':sys.argv[2]}}))" "$1" "$2"; }
+# 파이썬 인터프리터 이름은 OS 마다 다르다 (FIX-008). 훅과 같은 방식으로 찾아 쓴다.
+. "$ROOT/.claude/hooks/_py.sh"
+if [ -z "$HOOK_PY" ]; then
+  echo "XX   $HOOK_PY_MISSING_MSG"
+  exit 1
+fi
+
+mk()  { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_input':{'command':sys.argv[1]}}))" "$1"; }
+mkw() { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_input':{'file_path':sys.argv[1],'content':sys.argv[2]}}))" "$1" "$2"; }
 
 expect_deny() {  # hook, label, json
   out="$(printf '%s' "$3" | bash "$1")"
@@ -41,6 +48,10 @@ for c in \
   'git push origin HEAD:main' \
   'git push origin dev:main' \
   'git push origin dev' \
+  'git push origin dev2:dev' \
+  'git push origin feature-x' \
+  'git push origin dev2:main' \
+  'git push --force origin dev2' \
   'git push origin' \
   'git reset --hard HEAD~1' \
   'git checkout -- app/main.py' \
@@ -81,6 +92,8 @@ for c in \
   'python -m pytest -q' \
   'docker compose down' \
   'docker compose up -d' \
+  'git push origin dev2' \
+  'git push -u origin dev2' \
   'git log --oneline --grep D5' \
   'git remote -v' \
   'git diff --stat' \
@@ -106,13 +119,14 @@ expect_allow "$H/secret-guard.sh" '.env.example names only' "$(mkw 'C:\Capstone2
 expect_allow "$H/secret-guard.sh" 'db url without long password' "$(mkw 'C:\Capstone2\.env.example' 'DATABASE_URL=postgresql://app:pass@localhost:5432/relationship')"
 
 echo "== stage-gate =="
-gate() { python -c "import json,sys;print(json.dumps({'tool_input':{'file_path':sys.argv[1]}}))" "$1"; }
-expect_allow "$H/stage-gate.sh" 'docs path exempt' "$(gate 'C:\Capstone2\docs\wiki\x.md')"
-expect_allow "$H/stage-gate.sh" '.claude path exempt' "$(gate 'C:\Capstone2\.claude\skills\x\SKILL.md')"
+gate() { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_input':{'file_path':sys.argv[1]}}))" "$1"; }
+expect_allow "$H/stage-gate.sh" 'docs path exempt' "$(gate "$ROOT/docs/wiki/x.md")"
+expect_allow "$H/stage-gate.sh" '.claude path exempt' "$(gate "$ROOT/.claude/skills/x/SKILL.md")"
 expect_allow "$H/stage-gate.sh" 'outside project' "$(gate 'C:\Other\x.py')"
+expect_allow "$H/stage-gate.sh" 'windows path of another machine is outside' "$(gate 'C:\Capstone2\app\main.py')"
 act="$(grep -E '^active:' docs/wiki/CURRENT.md | head -n1 | sed -E 's/^active:[[:space:]]*//' | tr -d '[:space:]\r')"
 if [ "$act" = "none" ]; then
-  expect_deny "$H/stage-gate.sh" 'product code with active: none' "$(gate 'C:\Capstone2\app\main.py')"
+  expect_deny "$H/stage-gate.sh" 'product code with active: none' "$(gate "$ROOT/app/main.py")"
 else
   echo "skip active=$act (product code gate not tested)"
 fi
@@ -121,14 +135,14 @@ echo "== stage-gate: dev 푸시 후 결정 대기(L-003) =="
 AW=".claude/.awaiting-decision"
 if [ -f "$AW" ]; then echo "skip (실제 결정 대기 마커가 있음)"; else
   echo testhash > "$AW"
-  expect_deny  "$H/stage-gate.sh" 'awaiting: plan doc denied' "$(gate 'C:/Capstone2/docs/wiki/packages/x/01-plan.md')"
-  expect_allow "$H/stage-gate.sh" 'awaiting: HANDOFF allowed' "$(gate 'C:/Capstone2/docs/wiki/HANDOFF.md')"
+  expect_deny  "$H/stage-gate.sh" 'awaiting: plan doc denied' "$(gate "$ROOT/docs/wiki/packages/x/01-plan.md")"
+  expect_allow "$H/stage-gate.sh" 'awaiting: HANDOFF allowed' "$(gate "$ROOT/docs/wiki/HANDOFF.md")"
   expect_deny  "$H/commit-guard.sh" 'awaiting: commit denied' "$(mk 'git commit -F .claude/commit-draft.txt')"
   rm -f "$AW"
 fi
 
 echo "== delegate-guard: 단계 위임 승인(L-004) =="
-ag() { python -c "import json,sys;print(json.dumps({'tool_name':'Agent','tool_input':{'subagent_type':sys.argv[1],'description':'x','prompt':'y'}}))" "$1"; }
+ag() { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_name':'Agent','tool_input':{'subagent_type':sys.argv[1],'description':'x','prompt':'y'}}))" "$1"; }
 SA=".claude/.stage-approved"
 if [ -f "$SA" ]; then echo "skip (실제 단계 승인 마커가 있음)"; else
   expect_deny  "$H/delegate-guard.sh" 'verifier without marker' "$(ag verifier)"
@@ -142,10 +156,10 @@ fi
 echo "== findings.py 왕복 =="
 T="docs/wiki/packages/_selftest"; mkdir -p "$T"
 printf 'PASS  a\nFAIL  없음: docs/wiki/packages/x/01-plan.md\nWARN  보류 2 건\nFAILED tests/test_x.py::test_y - AssertionError\n' > "$T/out1.txt"
-python .claude/scripts/findings.py _selftest "$T/out1.txt" --source verify-plan >/dev/null; rc1=$?
+"$HOOK_PY" .claude/scripts/findings.py _selftest "$T/out1.txt" --source verify-plan >/dev/null; rc1=$?
 n_open="$(grep -c '^상태: 열림' "$T/05-remediation.md")"
 printf 'PASS  a\n' > "$T/out2.txt"
-python .claude/scripts/findings.py _selftest "$T/out2.txt" --source verify-plan >/dev/null; rc2=$?
+"$HOOK_PY" .claude/scripts/findings.py _selftest "$T/out2.txt" --source verify-plan >/dev/null; rc2=$?
 n_closed="$(grep -c '^상태: 해소' "$T/05-remediation.md")"
 if [ "$rc1" -eq 1 ] && [ "$n_open" -eq 3 ] && [ "$rc2" -eq 0 ] && [ "$n_closed" -eq 3 ]; then echo "ok   findings: 3 열림 → 3 해소, rc 1→0"; else echo "XX   findings: rc1=$rc1 open=$n_open rc2=$rc2 closed=$n_closed"; fails=$((fails+1)); fi
 rm -f "$T/out1.txt" "$T/out2.txt" "$T/05-remediation.md"; rmdir "$T" 2>/dev/null
@@ -163,8 +177,20 @@ out="$(echo '{"source":"resume"}' | bash "$H/session-start.sh" | head -n 1)"
 printf '%s' "$out" | grep -q '세션 재개' && echo "ok   session-start prints header" || { echo "XX   session-start: $out"; fails=$((fails+1)); }
 
 echo "== 에이전트 frontmatter YAML 파싱 (FIX-003) =="
+# 이 검사만 PyYAML 이 필요하다. 훅용 인터프리터(맨 셸)에는 없을 수 있으므로,
+# yaml 을 import 할 수 있는 것을 따로 고른다 — 프로젝트 venv 를 먼저 본다.
+YAML_PY=""
+for cand in "$ROOT/.venv/bin/python" "$ROOT/.venv/Scripts/python.exe" "$HOOK_PY"; do
+  [ -n "$cand" ] || continue
+  command -v "$cand" >/dev/null 2>&1 || [ -x "$cand" ] || continue
+  if "$cand" -c 'import yaml' >/dev/null 2>&1; then YAML_PY="$cand"; break; fi
+done
+if [ -z "$YAML_PY" ]; then
+  echo "skip frontmatter 검사 (PyYAML 이 있는 인터프리터를 못 찾음 - pip install pyyaml)"
+fi
 for f in .claude/agents/*.md; do
-  msg="$(python - "$f" <<'PY'
+  [ -n "$YAML_PY" ] || break
+  msg="$("$YAML_PY" - "$f" <<'PY'
 import sys, yaml
 t = open(sys.argv[1], encoding="utf-8").read()
 parts = t.split("---", 2)

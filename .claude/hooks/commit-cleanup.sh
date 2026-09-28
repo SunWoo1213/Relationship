@@ -33,19 +33,24 @@ if printf '%s' "$cmd" | grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-[^[:space:]
     fi
     exit 0
   fi
-  # dev2(기기 간 공유) 푸시는 승인 판단이 없는 백업이다. 푸시 마커를 쓰지 않고
-  # L-003 대기 마커도 만들지 않는다 — 만들면 커밋마다 dev2 로 밀 때마다 작업이 잠긴다.
-  if printf '%s' "$cmd" | grep -Eq 'origin[[:space:]]+dev:dev2([[:space:]]|$)'; then
-    [ -f "$JOURNAL" ] && printf -- '- %s | PUSH-dev2 | origin dev2 ← dev %s (기기 간 공유, 사용자 지시)\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)" >> "$JOURNAL"
+  # 검증 승격(dev2:dev)이 실제로 반영됐으면 푸시 마커를 지우고 L-003 대기를 건다.
+  # 성공 판정: 푸시가 되면 원격 추적 ref(origin/dev)가 HEAD 로 갱신되고, 실패하면 그대로 남는다.
+  if printf '%s' "$cmd" | grep -Eq 'origin[[:space:]]+dev2:dev([[:space:]]|$)'; then
+    if [ "$(git -C "$ROOT" rev-parse origin/dev 2>/dev/null)" = "$(git -C "$ROOT" rev-parse HEAD 2>/dev/null)" ]; then
+      rm -f "$PUSH_MARK"
+      [ -f "$JOURNAL" ] && printf -- '- %s | PUSH | origin dev ← dev2 %s — 사용자 결정 대기(승격/수정) L-003\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)" >> "$JOURNAL"
+      # L-003: dev 로 올린 뒤에는 사용자가 승격/수정을 정할 때까지 다음 작업을 막는다
+      git -C "$ROOT" rev-parse --short HEAD 2>/dev/null > "$AWAIT" || date +%s > "$AWAIT"
+    fi
     exit 0
   fi
-  if [ -f "$PUSH_MARK" ] && git -C "$ROOT" status -sb 2>/dev/null | head -n1 | grep -Evq 'ahead'; then
-    rm -f "$PUSH_MARK"
-    if [ -f "$JOURNAL" ]; then
-      printf -- '- %s | PUSH | origin dev %s — 사용자 결정 대기(승격/수정) L-003\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)" >> "$JOURNAL"
+  # 실험 푸시(dev2)는 승인 판단이 없다. 마커를 쓰지 않고 L-003 대기도 걸지 않는다 —
+  # 걸면 실험할 때마다 작업이 잠겨서 "아무때나 민다"는 목적이 사라진다.
+  if printf '%s' "$cmd" | grep -Eq 'origin[[:space:]]+dev2([[:space:]]|$)'; then
+    if [ "$(git -C "$ROOT" rev-parse origin/dev2 2>/dev/null)" = "$(git -C "$ROOT" rev-parse HEAD 2>/dev/null)" ]; then
+      [ -f "$JOURNAL" ] && printf -- '- %s | PUSH-dev2 | origin dev2 %s (실험 푸시)\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)" >> "$JOURNAL"
     fi
-    # L-003: dev 푸시 뒤에는 사용자가 승격/수정을 정할 때까지 다음 작업을 막는다
-    git -C "$ROOT" rev-parse --short HEAD 2>/dev/null > "$AWAIT" || date +%s > "$AWAIT"
+    exit 0
   fi
   exit 0
 fi

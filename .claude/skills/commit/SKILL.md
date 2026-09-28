@@ -41,6 +41,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
 Claude-Session: <이 세션의 URL>
 ```
 
+- **사람이 읽고 바로 알아볼 수 있게 쓴다** (사용자 지시 2026-09-29). 제목만 봐도 무엇이 달라졌는지 알 수 있어야 한다. 본문은 한 줄에 한 가지만 담아 짧게 끊고, 코드 식별자를 늘어놓는 대신 그 변경이 실제로 무슨 일을 하는지 평범한 말로 적는다. "이유" 줄에는 어느 카드의 요구를 실현하는지와 **왜 그 방법을 골랐는지**를 함께 쓴다. 커밋 메시지가 곧 개발 로그이고 기획서 변경 시 `git log --grep` 으로 되짚는 근거라, 읽어서 이해되지 않으면 제 역할을 못 한다.
 - **언어: 한국어.** 제목·본문(변경·이유·정합성·검증)과 `03-log.md`·`HANDOFF.md`·`journal.md` 항목은 한국어 문장으로 쓴다. 원문 그대로 두는 것: `type` 접두어, 코드 식별자·파일 경로·명령어·태그(Refs), `Co-Authored-By` 서명 줄.
 - `type`: `feat` `fix` `test` `docs` `eval` `refactor` `chore` `harness`(하네스·훅·스킬·위키) `cr`(기획서 변경 이행)
 - `scope`: 패키지 id(`P3-er`) 또는 영역(`wiki`, `hooks`, `schema`). CURRENT의 active와 다르면 이유를 이유 줄에 쓴다.
@@ -49,7 +50,8 @@ Claude-Session: <이 세션의 URL>
 ### 3. 사용자 승인 (AskUserQuestion)
 초안 전문과 `git diff --stat`을 보여주고 묻는다. 선택지:
 - **커밋** — 커밋만
-- **커밋 + 푸시** — origin **dev** 로 푸시까지 (main 직접 푸시는 없다 — §7)
+- **커밋 + 실험 푸시** — `origin dev2` 까지. 승인 마커가 필요 없으므로 이 선택은 그냥 "커밋하고 밀어 둔다"는 뜻이다
+- **커밋 + 검증 승격** — `origin dev2:dev` 까지. 실험이 통과했을 때만 고른다. 승격 뒤에는 L-003 으로 멈춘다 (§6.1)
 - **초안 수정** — 사용자의 수정 내용을 반영해 2번부터 다시
 - **취소**
 
@@ -67,20 +69,30 @@ bash .claude/hooks/approve-commit.sh --push     # 커밋 + 푸시
 4. `.githooks/pre-commit`이 비밀·대용량을 검사한다. 실패하면 원인을 고치고 3번(승인)부터 다시 — `--no-verify`는 금지.
 5. 성공하면 `commit-cleanup.sh`가 마커를 지우고 `journal.md`에 `COMMIT | <hash> <제목>` 줄을 붙인다. `03-log.md`의 `pending`을 해시로 바꾸는 것은 **다음 커밋**에 포함한다(고쳐 쓰지 않아도 journal에 해시가 있다).
 
-### 6. 푸시 (승인한 경우만) — 항상 `dev`
-```
-git push -u origin dev       # 첫 푸시
-git push origin dev
-```
-`safety-guard.sh`는 `origin dev` 이외(main 직접 푸시 포함)·강제 옵션·마커 없는 푸시를 거부한다. 푸시가 끝나면 cleanup이 푸시 마커를 지운다. 로컬 작업 브랜치는 항상 `dev`다(`git branch --show-current`로 확인, 아니면 `git checkout dev`).
+### 6. 푸시 — 실험이냐 승격이냐로 갈린다 (L-001 개정 2026-09-29)
 
-### 6.1 dev 푸시 뒤에는 멈춘다 (L-003)
+로컬 작업 브랜치는 항상 `dev2`다(`git branch --show-current`로 확인, 아니면 `git checkout dev2`).
+
+**실험 푸시** — 승인이 필요 없다. 커밋 뒤 바로 민다.
+```
+git push origin dev2
+```
+
+**검증 승격** — 실험이 통과했을 때만. 3번에서 사용자가 승인해야 한다.
+```
+git push origin dev2:dev
+```
+승격 뒤 로컬 `dev`를 맞춘다: `git fetch origin dev:dev`
+
+`safety-guard.sh`는 이 둘과 `dev:main` 승격 외의 모든 푸시를 거부한다. `origin dev` 직접 푸시도 거부다 — dev는 승격으로만 들어오는 곳이다. 강제 옵션과 마커 없는 승격도 거부한다. 승격이 끝나면 cleanup이 푸시 마커를 지운다.
+
+### 6.1 dev 로 올린 뒤에는 멈춘다 (L-003)
 푸시가 끝나면 cleanup 훅이 `.claude/.awaiting-decision` 마커를 만든다. 이 마커가 있는 동안 stage-gate 는 HANDOFF·journal·초안 외 모든 쓰기를, commit-guard 는 새 커밋을 거부한다.
 1. `HANDOFF.md`를 갱신하고 **즉시 `AskUserQuestion`**: "dev 에 <hash> 푸시됨. 실서버에서 확인 후 결정해 주세요" — 선택지: **main 승격** / **수정 필요(내용)** / **보류(나중에 결정)**.
 2. 승격 → §7. 수정 → `bash .claude/hooks/approve-commit.sh --decision fix` 로 마커를 지우고 FIX/작업 계속. 보류 → 마커를 둔 채 턴을 끝낸다(다음 세션 재개 시 다시 묻는다).
 3. 사용자가 정하기 전에는 다음 패키지·작업 단위를 시작하지 않는다.
 
-### 7. main 승격 — `/commit release` (L-001 브랜치 전략: dev → 실서버 검증 → main)
+### 7. main 승격 — `/commit release` (L-001: dev2 실험 → dev 검증 → 실서버 확인 → main)
 `main`은 배포 브랜치다. `dev`를 실제 서버에서 돌려 본 뒤에만 올린다.
 1. 사용자에게 승격 대상을 보인다: `git log --oneline origin/main..dev`(승격될 커밋), 실서버 검증 근거(사용자가 말한 결과·evidence 파일 경로).
 2. `AskUserQuestion` — 선택지: **승격** / 취소. 실서버 검증을 했는지 명시적으로 묻는다.
