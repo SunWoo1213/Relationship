@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-28 14:55 — **P6-memory 계획 승인·active 등록.** CR-002(패턴 기본 365일·3회 설정값) 커밋 `2de7416`. 계획은 verifier 4차 통과, 승인 전 변경으로 정리 기준 5건도 설정값. 다음: 계획 커밋 → U1 backend-agent(L-004 승인 먼저).
+갱신: 2026-09-28 15:20 — **세션 재개(`/devlog resume`). 사용자 결정: 옛 열린 소견부터 정리 → 그다음 U1.** 옛 소견 11건 중 8건은 이미 반영돼 있어 상태만 '해소'(근거 `fixes/evidence/20260928-1510-old-findings-recheck.txt`), 남은 3건(F-46f1eb·F-036185·F-c7078e)은 FIX-007 로 묶어 승인받음. P6-memory 는 active 그대로, U1 미착수.
 
-active: **none** | frozen: none | 브랜치 `dev` | main = dev = `1e4afb4` | Docker DB `capstone2-postgres-1`(5433): 개발 DB `relationship`, 테스트 DB `relationship_test` — 5432·5434 는 다른 프로젝트
+active: **P6-memory** (FIX-007 병행) | frozen: none | 브랜치 `dev` | main = `1e4afb4`, dev = `ec454dc`(미푸시 2커밋) | Docker DB `capstone2-postgres-1`(5433): 개발 DB `relationship`, 테스트 DB `relationship_test` — 5432·5434 는 다른 프로젝트
 
 ## 이번 세션에서 끝난 것
 - P5-loop 완료(verifier 04-review, 1474 passed) → README 최신화 → 실서버·실 AI 왕복 확인(판정 표 8행 통과) → main 승격. main 에 GitHub PR #1 병합 커밋이 있어 내용 무변경 병합 `36766c1` 로 맞췄다.
@@ -15,8 +15,8 @@ active: **none** | frozen: none | 브랜치 `dev` | main = dev = `1e4afb4` | Doc
 - FIX-006 `1e4afb4`(main 승격함): pytest 는 항상 `relationship_test` 에 붙는다(`tests/conftest.py`·`tests/db_bootstrap.py`, 없으면 만들고 마이그레이션, 개발 DB 이름과 같으면 거부). CI 의 개발 DB 마이그레이션 단계 제거. 1486 passed, 격리 증명 통과.
 
 ## 바로 다음에 할 것
-1. 계획 승인 커밋(`/commit`, `packages/P6-memory/` 전체 + S3.5 + backlog + CURRENT·HANDOFF·journal).
-2. **U1**(골격: 설정 상수 6개 중 환경변수 3개 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`, `.env.example` 3줄, `app/memory/{__init__,types}.py`) → backend-agent(L-004 승인 먼저). 이후 U2~U8 순서, 단위마다 `/commit`.
+1. 소견 상태 정리 + FIX-007 문서 커밋(/commit) → **FIX-007** backend-agent 위임(L-004 승인 먼저; 가짜 키 3곳 통일 · `validate_judgement` bool 차단+테스트 · `alembic/script.py.mako` Refs 자리표시자) → 테스트 재확인 → 커밋 → FIX-007 결과 기록.
+2. **P6-memory U1**(골격: 설정 상수 6개 중 환경변수 3개 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`, `.env.example` 3줄, `app/memory/{__init__,types}.py`) → backend-agent(L-004 승인 먼저). 이후 U2~U8, 단위마다 `/commit`.
 3. 이월: R-10(U6 추출기 지연 생성), R-15(U5 결정 F 스키마 `min_events`). 그다음 `P6-briefing`(패턴 문장화·브리핑 직전 패턴 재계산). 이후 P9 AWS(Terraform).
 - 발견: 지금 루프가 `pattern:` 키 사실을 막지 않는다 → U3 가 막는다.
 

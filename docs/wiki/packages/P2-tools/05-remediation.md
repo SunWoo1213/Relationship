@@ -370,7 +370,7 @@ WARN  U4 는 두 툴 + D1 검사 + D6 + 별칭 upsert(미결 7) + 사실 upsert(
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-4d2507 · [권고] security.md §5 'DELETE /persons/{id}' 는 backlog 어느 항목에도 없다(grep 0건) — P2 제외는 사용자 결정이나 갈 곳이 없다. architect 가 backlog 에 항목(P5-loop 묶음 또는 별도)을 세운다. 미결 8 의 JSONB 참조 정리 요건을 그 항목에 옮긴다
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-28 (재확인 — 이미 반영됨, `docs/wiki/fixes/evidence/20260928-1510-old-findings-recheck.txt`)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -448,7 +448,7 @@ WARN  04-review.md 없음 (완료 검토 전이면 정상)
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-ca12ad · [권고] @traced 의 tool_error 경로가 DB 유래 예외(flush 실패)를 가린다 — 실패한 flush 뒤 같은 세션에 AgentTrace add+flush 를 시도해 PendingRollbackError 가 원래 예외(예: DataError 'expected 1536 dimensions, not 1535')를 대체하고 tool_error 행도 남지 않는다. P2 의 자체 예외는 flush 전 검증 오류라 수용 기준에는 영향 없으나, P3-er 가 실제 임베딩 공급자를 꽂는 순간 도달 가능. 조치는 P3-er 첫 단위(begin_nested 세이브포인트 안에서 tool_error 기록 또는 F-4d8d96 의 별도 커넥션 결정과 묶음) — 근거 evidence/20260905-1942-review-tool-error-probe.txt
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-28 (재확인 — 이미 반영됨, `docs/wiki/fixes/evidence/20260928-1510-old-findings-recheck.txt`)
 
 ### 증상 (검증 출력 인용)
 ```

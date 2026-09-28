@@ -1,0 +1,49 @@
+# 옛 열린 소견 재확인 (2026-09-28, 메인 세션, 읽기 전용 명령)
+
+## F-0ffff5 — README 소유 행 수 (기대 1)
+$ grep -nE "^\| [^|]+\| [^|]+\| README.md \|" docs/wiki/registry.md | wc -l
+1
+
+## F-c57789 / F-8c9c5b — db_check 소유 행 수 (기대 1)
+$ grep -nE "\| scripts/db_check.py \|" docs/wiki/registry.md | wc -l
+1
+
+## F-36bed6 — registry app/config.py·app/db/base.py 커밋 열 vs git log
+$ git log --format=%h -- app/config.py app/db/base.py
+f217190
+d7113e9
+$ grep -nE "\| app/(config|db/base).py \|" docs/wiki/registry.md | cut -d"|" -f4,6
+ app/config.py | d7113e9 
+ app/db/base.py | d7113e9 
+
+## F-8eeb9b — ConnInfo.password repr 미노출
+$ grep -n "repr=False" app/config.py
+42:    password: str = field(repr=False)
+$ python -c "...resolve_connection({POSTGRES_PASSWORD: FAKE_SECRET_XYZ})..."
+False False
+
+## F-4d2507 — backlog 에 인물 완전 삭제 항목
+$ grep -nE 'DELETE /persons' docs/backlog.md
+38:- [ ] [backend-agent] `DELETE /persons/{id}` — 인물 단위 완전 삭제 / 의존: P2 / 수용기준: 인물·별칭·사실·이벤트·일정이 FK CAS
+
+## F-ca12ad — traced() tool_error 기록이 세이브포인트 안
+$ grep -n "begin_nested" app/tools/context.py
+57:이를 고치기 위해 tool_error 기록 시도를 `ctx.session.begin_nested()`
+167:    이 기록은 `ctx.session.begin_nested()` 세이브포인트 **안에서만** 시도한다
+195:                    with ctx.session.begin_nested():
+$ git log --format="%h %s" -S "begin_nested" -- app/tools/context.py
+2b82882 feat(P3-er): U1 @traced 세이브포인트로 F-ca12ad 수정, step 인자·trace_tokens 확장
+
+## F-d5c11e — P3-er 03-log 후속 줄
+$ grep -c "b3bcc2d" docs/wiki/packages/P3-er/03-log.md
+1
+
+## (FIX-007 로 이관) 아직 열린 3건
+$ grep -rnE "sk-[A-Za-z0-9_-]{5,}" --include=*.py tests/ app/ scripts/
+tests/test_agent_propose.py:638:    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-dummy")
+tests/test_er_judge.py:821:    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-dummy")
+tests/test_er_judge.py:858:    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-dummy")
+$ python -c "validate_judgement({matched_person_id: True, ...}, {1})"
+True
+$ grep -n "Refs" alembic/script.py.mako
+3:Refs: P1-schema R8 R9 D4 D5 S3.1

@@ -280,3 +280,7 @@
 - 2026-09-28 14:30 | VERIFY | P6-memory 2차 재검증 통과(8/8). 승인 전 사용자 요청: 정리 기준 5건도 설정값, 앱 내 사용자별 선택은 backlog(CR 필요). verifier 3차 확인 위임 | P6-memory
 - 2026-09-28 14:45 | VERIFY | P6-memory 3차 보류 H-4(01-plan 25행 표기) → 수정, R-12 S3.5 한 구절·R-13·R-14 반영, verifier 4차 위임 | P6-memory
 - 2026-09-28 14:55 | START | P6-memory 계획 승인(verifier 4차 통과), active P6-memory | P6-memory
+- 2026-09-28 14:55 | COMMIT | ec454dc docs(P6-memory): 4차 확인 통과·계획 승인 — 패키지 착수
+- 2026-09-28 15:00 | STOP | 사용자 요청으로 세션 멈춤 — P6-memory active, U1 미착수(다음 세션 첫 일: U1 위임 승인) | P6-memory
+- 2026-09-28 15:10 | RESUME | 세션 재개 — 사용자 결정: 옛 열린 소견 정리 먼저. 8건 이미 반영 → 해소 표시, 3건 FIX-007 로 이관 | P6-memory
+- 2026-09-28 15:20 | FIX | FIX-007 승인(가짜 키 표기 통일·판정 bool 인물 번호 차단·alembic 템플릿 Refs) — backend-agent 위임 예정 | FIX-007

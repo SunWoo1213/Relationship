@@ -882,7 +882,7 @@ WARN  judge.validate_judgement 가 bool 형 matched_person_id 를 int 로 통과
 - FIX/CR 로 올려야 하는가: 아니오
 
 ## F-d5c11e · [권고] 03-log U9 항목(pending)은 ".env.example registry 새 행을 만들지 않았다" 고 적었으나 커밋 b3bcc2d 는 그 행을 신설했다(registry.md 35행) — 03-log 와 커밋 내용 불일치, U9 항목 헤더가 여전히 pending. /devlog done 에서 03-log 에 후속 한 줄(고쳐 쓰지 않고 추가)로 해시·행 신설 사실을 남길 것
-상태: 열림 | 발견: 2026-09-06 (review-impl) | 해소: -
+상태: 해소 | 발견: 2026-09-06 (review-impl) | 해소: 2026-09-28 (재확인 — 이미 반영됨, `docs/wiki/fixes/evidence/20260928-1510-old-findings-recheck.txt`)
 
 ### 증상 (검증 출력 인용)
 ```

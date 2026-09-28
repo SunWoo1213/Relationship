@@ -110,7 +110,7 @@ FAIL  backlog 에 같은 문장이 없다: 증거 경로: `docs/wiki/packages/P1
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-0ffff5 · [권고] registry 에 다른 패키지로 이미 있음: README.md → | 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-28 (재확인 — 이미 반영됨, `docs/wiki/fixes/evidence/20260928-1510-old-findings-recheck.txt`)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -136,7 +136,7 @@ WARN  registry 에 다른 패키지로 이미 있음: README.md → | 문서 | �
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-c57789 · [권고] registry 에 다른 패키지로 이미 있음: db_check.py → | 스크립트 | DB 접속 검사(psycopg, `POSTGRES_*`↔`DATABASE_URL` 불일�
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-28 (재확인 — 이미 반영됨, `docs/wiki/fixes/evidence/20260928-1510-old-findings-recheck.txt`)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -162,7 +162,7 @@ WARN  registry 에 다른 패키지로 이미 있음: db_check.py → | 스크�
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-8c9c5b · [권고] registry 에 다른 패키지로 이미 있음: scripts/db_check.py → | 스크립트 | DB 접속 검사(psycopg, `POSTGRES_*`↔`DATABASE_URL` 불일�
-상태: 열림 | 발견: 2026-09-05 (verify-plan) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (verify-plan) | 해소: 2026-09-28 (재확인 — 이미 반영됨, `docs/wiki/fixes/evidence/20260928-1510-old-findings-recheck.txt`)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -324,7 +324,7 @@ WARN  04-review.md 없음 (완료 검토 전이면 정상)
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-36bed6 · [권고] registry.md 커밋 열 부정확: app/config.py 행(38)에 9397066·4dfaf33·09c2bd1·03e3ce3, app/db/base.py 행(39)에 4dfaf33 이 적혔으나 두 파일을 건드린 커밋은 d7113e9 뿐(git log -- app/config.py app/db/base.py). 03-log U5 "신규 행 11개" 도 실제 P1-schema 소유 행 10개(requirements 2파일이 1행)
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-28 (재확인 — 이미 반영됨, `docs/wiki/fixes/evidence/20260928-1510-old-findings-recheck.txt`)
 
 ### 증상 (검증 출력 인용)
 ```
@@ -350,7 +350,7 @@ WARN  registry.md 커밋 열 부정확: app/config.py 행(38)에 9397066·4dfaf3
 - FIX/CR 로 올려야 하는가: 아니오 | 예 (FIX-nnn / CR-nnn)
 
 ## F-8eeb9b · [권고] app/config.py ConnInfo 기본 dataclass repr/str 에 password 필드 포함 — 객체를 로그·예외 메시지에 찍으면 비밀 유출 경로(security.md §1). tests/test_config.py 는 safe_summary 만 검사. P0-compose db_check.py 에서 그대로 옮겨진 기존 결함(P2-tools 세션·엔진 도입 전에 field(repr=False) 권고)
-상태: 열림 | 발견: 2026-09-05 (review) | 해소: -
+상태: 해소 | 발견: 2026-09-05 (review) | 해소: 2026-09-28 (재확인 — 이미 반영됨, `docs/wiki/fixes/evidence/20260928-1510-old-findings-recheck.txt`)
 
 ### 증상 (검증 출력 인용)
 ```
