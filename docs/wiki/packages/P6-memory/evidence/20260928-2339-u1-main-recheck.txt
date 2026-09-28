@@ -1,0 +1,30 @@
+# P6-memory U1 — 메인 세션 독립 재확인 (2026-09-28 23:39)
+# 실행자: 메인 세션(서브에이전트 보고를 재실행으로 검증)
+
+$ POSTGRES_PORT=5433 pytest tests/test_memory_patterns.py -k constants -v
+tests/test_memory_patterns.py::test_memory_trace_vocab_constants_values PASSED [ 95%]
+tests/test_memory_patterns.py::test_fact_keys_constants_has_no_pattern_prefixed_key PASSED [100%]
+
+============================== 23 passed in 0.04s ==============================
+
+$ python -c 'import app.memory'
+import ok
+
+$ grep -nE 'PATTERN_|MEMORY_PROMOTE_MIN_EVENTS' .env.example
+58:PATTERN_WINDOW_DAYS=
+59:PATTERN_MIN_COUNT=
+61:MEMORY_PROMOTE_MIN_EVENTS=
+
+$ POSTGRES_PORT=5433 pytest -q -rs  (전체 회귀)
+1511 passed, 1 warning in 10.85s
+
+$ git status --short  (변경 범위 — app/agent·app/tools·app/api·alembic 무변경)
+ M .env.example
+ M app/settings.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P6-memory/03-log.md
+?? app/memory/
+?? docs/wiki/packages/P6-memory/evidence/20260928-2336-u1-skeleton.txt
+?? docs/wiki/packages/P6-memory/evidence/20260928-2339-u1-main-recheck.txt
+?? tests/test_memory_patterns.py

@@ -41,13 +41,29 @@ DB 저장 방식은 이 설정과 무관하다(`app/agent/loop.py`·`app/agent/
 propose.py` 의 각 모듈 docstring "사용자 시간대" 절 참고). 기본값
 `Asia/Seoul` 은 단일 사용자 전제(`APP_USER_ID` 고정)에 맞춘 설정값
 하나다 -- 사용자별 시간대 컬럼은 다중 사용자 격리와 함께 다룰 몫이다.
+
+## PATTERN_* / MEMORY_PROMOTE_* (D14 -- CR-002, S3.5, P6-memory U1)
+
+반복 패턴 감지(D14)·시맨틱 승격(S3.5) 트리거의 설정값 3개는 `er_config()`
+의 `_read_float`/`_read_choice` 와 같은 2층 규약(모듈 상수가 기본값,
+`.env.example` 이름이 있는 환경변수가 오버라이드, 생략하면 `os.environ`)
+을 따르되 값 규칙이 다르다 -- **양의 정수만** 허용하고 0·음수·비정수
+문자열(`"abc"`·`"3.5"` 포함)은 `InvalidValue`(`_read_positive_int()`).
+`pattern_config()` 가 기간·횟수를 `PatternConfig` 하나로 함께 돌려주는
+이유는 `memory_pattern` trace 가 "이번 판정에 실제로 쓴" 두 값을 같이
+적어야 하기 때문이다(D14 "코드에서 지켜야 할 것", 원칙8·9) -- 따로
+읽으면 호출자가 서로 다른 시점의 환경을 섞어 쓸 위험이 있다.
+
+`PATTERN_KEY_PREFIX`·`MEMORY_PROMOTE_MAX_EVENTS`·`MEMORY_MAX_FACTS` 는
+환경변수가 없는 코드 상수다(P6-memory 01-plan 결정 D-4·D-7) -- 값을
+바꾸려면 코드를 고쳐야 재현성이 흔들리지 않는다(원칙8).
 """
 
 from __future__ import annotations
 
 import os
 from datetime import timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 if TYPE_CHECKING:  # pragma: no cover -- 순환 import 회피, 타입 힌트 전용.
@@ -150,6 +166,97 @@ LOOP_MAX_PROPOSALS = LOOP_MAX_MENTIONS + LOOP_MAX_EVENTS + LOOP_MAX_SCHEDULES
 #: 유지) -- 정확한 채움 규칙은 U4/U5(`app/agent/loop.py`)가 정한다. 이
 #: 값은 초기 추정치이고 P5-loop U8 파일럿 실행에서 다시 확인한다.
 LOOP_MAX_RESUME_BYTES = 8192
+
+
+class PatternConfig(NamedTuple):
+    """`pattern_config()` 반환 타입 -- 판정 창(일)·최소 횟수를 함께
+    실어 날라 `memory_pattern` trace(`window_days`·`min_count`, D14)에
+    "이번 판정에 실제로 쓴" 값을 그대로 기록할 수 있게 한다(원칙8·9)."""
+
+    window_days: int
+    min_count: int
+
+
+#: 반복 패턴 감지(D14 -- CR-002, 원칙6) 판정 창(일)의 기본값. `.env.example`
+#: 의 `PATTERN_WINDOW_DAYS` 가 이 값을 오버라이드한다(`pattern_config()`,
+#: P6-memory U1). 1년 = 365일 고정(윤년 무관 -- D14).
+PATTERN_WINDOW_DAYS = 365
+
+#: 반복 패턴 감지(D14) 최소 횟수의 기본값. `.env.example` 의
+#: `PATTERN_MIN_COUNT` 가 이 값을 오버라이드한다(`pattern_config()`).
+PATTERN_MIN_COUNT = 3
+
+#: 시맨틱 승격(S3.5) 트리거 -- 같은 인물의 미승격 이벤트가 이 값 이상이면
+#: 승격(LLM 추출기 1회)이 돈다. 기본 5(2026-09-28 사용자 결정, 기본값
+#: 불변). `.env.example` 의 `MEMORY_PROMOTE_MIN_EVENTS` 가 이 값을
+#: 오버라이드한다(`promote_min_events()`).
+MEMORY_PROMOTE_MIN_EVENTS = 5
+
+#: 승격 사실 키의 예약 접두사(P6-memory 01-plan 결정 D-7) -- LLM 제안
+#: (루프 `update_person` 직접 사실이든 승격 추출기든)이 이 접두사로
+#: 시작하는 키를 만들 수 없다(`app/tools/persons.py` `update_person`,
+#: P6-memory U3). 환경변수로 덮지 않는 코드 상수다.
+PATTERN_KEY_PREFIX = "pattern:"
+
+#: 한 번 승격에 추출기 입력으로 넣는 이벤트 상한(오래된 순, 01-plan
+#: 결정 D-4). 코드 상수 -- 넘는 이벤트는 거부하지 않고 앞에서 자른다
+#: (P6-memory U5).
+MEMORY_PROMOTE_MAX_EVENTS = 20
+
+#: 한 번 승격에서 반영하는 사실 상한(01-plan 결정 D-4). 코드 상수 --
+#: 초과분은 거부하고 사유를 trace 에 남긴다(P6-memory U5).
+MEMORY_MAX_FACTS = 8
+
+
+def _read_positive_int(env: dict[str, str], name: str, default: int) -> int:
+    """환경변수 `name` 을 양의 정수로 읽는다(D14 "양의 정수만"). 없거나
+    빈 문자열이면 `default`. 0·음수·비정수 문자열(`"abc"`·`"3.5"` 등)은
+    `int()` 변환이 그대로 실패하므로 `InvalidValue` 로 다시 던진다(`er_
+    config()` 의 `_read_float`/`_read_choice` 와 같은 관례 -- 조용히
+    기본값으로 되돌아가지 않는다)."""
+    from app.tools.types import InvalidValue  # 지연 import -- 다른 settings 함수와 같은 관례.
+
+    raw = env.get(name)
+    if raw is None or raw == "":
+        return default
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise InvalidValue(
+            f"environment variable {name!r} must be a positive integer "
+            f"(got {raw!r})"
+        ) from exc
+    if value <= 0:
+        raise InvalidValue(
+            f"environment variable {name!r} must be a positive integer "
+            f"(got {raw!r})"
+        )
+    return value
+
+
+def pattern_config(env: dict[str, str] | None = None) -> PatternConfig:
+    """`.env.example` 의 `PATTERN_WINDOW_DAYS`/`PATTERN_MIN_COUNT` 를 읽어
+    `PatternConfig` 로 함께 돌려준다(D14/CR-002, P6-memory U1). 기간·횟수를
+    하나로 묶어 돌려주는 이유는 모듈 docstring "PATTERN_* /
+    MEMORY_PROMOTE_*" 절을 본다.
+
+    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/`er_config()`
+    와 같은 규약). `.env` 파일 자체는 읽지 않는다(security.md §1).
+    """
+    if env is None:
+        env = dict(os.environ)
+    return PatternConfig(
+        window_days=_read_positive_int(env, "PATTERN_WINDOW_DAYS", PATTERN_WINDOW_DAYS),
+        min_count=_read_positive_int(env, "PATTERN_MIN_COUNT", PATTERN_MIN_COUNT),
+    )
+
+
+def promote_min_events(env: dict[str, str] | None = None) -> int:
+    """`MEMORY_PROMOTE_MIN_EVENTS` 환경변수를 읽는다(S3.5, 기본 5). `env`
+    규약은 `pattern_config()` 와 같다."""
+    if env is None:
+        env = dict(os.environ)
+    return _read_positive_int(env, "MEMORY_PROMOTE_MIN_EVENTS", MEMORY_PROMOTE_MIN_EVENTS)
 
 
 def er_config(env: dict[str, str] | None = None) -> "ERConfig":

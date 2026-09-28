@@ -1,0 +1,45 @@
+=== POSTGRES_PORT=5433 pytest tests/test_memory_patterns.py -k constants -v ===
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 23 items
+
+tests/test_memory_patterns.py::test_pattern_config_constants_defaults_when_env_missing PASSED [  4%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_default_when_env_missing PASSED [  8%]
+tests/test_memory_patterns.py::test_pattern_config_constants_defaults_when_env_empty_string PASSED [ 13%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_default_when_env_empty_string PASSED [ 17%]
+tests/test_memory_patterns.py::test_pattern_config_constants_reads_overrides_from_env PASSED [ 21%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_reads_override_from_env PASSED [ 26%]
+tests/test_memory_patterns.py::test_pattern_config_constants_uses_os_environ_when_env_is_none PASSED [ 30%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_uses_os_environ_when_env_is_none PASSED [ 34%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[0] PASSED [ 39%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[-1] PASSED [ 43%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[abc] PASSED [ 47%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[3.5] PASSED [ 52%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[0] PASSED [ 56%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[-1] PASSED [ 60%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[abc] PASSED [ 65%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[3.5] PASSED [ 69%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[0] PASSED [ 73%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[-1] PASSED [ 78%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[abc] PASSED [ 82%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[3.5] PASSED [ 86%]
+tests/test_memory_patterns.py::test_memory_code_constants_values PASSED  [ 91%]
+tests/test_memory_patterns.py::test_memory_trace_vocab_constants_values PASSED [ 95%]
+tests/test_memory_patterns.py::test_fact_keys_constants_has_no_pattern_prefixed_key PASSED [100%]
+
+============================== 23 passed in 0.05s ==============================
+
+=== python -c "import app.memory; print('import ok')" ===
+import ok
+
+=== grep -nE "PATTERN_|MEMORY_PROMOTE_MIN_EVENTS" .env.example ===
+58:PATTERN_WINDOW_DAYS=
+59:PATTERN_MIN_COUNT=
+61:MEMORY_PROMOTE_MIN_EVENTS=
+
+=== POSTGRES_PORT=5433 pytest tests/test_settings*.py -q (기존 settings 테스트 회귀 확인) ===
+..                                                                       [100%]
+2 passed in 0.01s

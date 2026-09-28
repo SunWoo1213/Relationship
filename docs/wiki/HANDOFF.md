@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-28 18:10 — **브랜치 점검**: dev2 pull 오류 원인 = 로컬 dev2 추적 설정 없음 → 설정함, 로컬 dev2 를 `80c2842` 로 맞춤. 다음 = 이 커밋 뒤 사용자가 dev2 로 공유 푸시, 그다음 P6-memory U1 위임 승인. (이전: 17:45 — **사용자 요청으로 멈춤.** FIX-007 커밋 `80c2842`. 다음 세션 첫 일 = P6-memory U1 위임 승인. 커밋 안 된 것은 HANDOFF·journal 자동 줄뿐(다음 커밋에 포함). 사용자 몫 추가: backend-agent 가 5439 에 띄웠다 내린 임시 테스트 DB 의 도커 볼륨이 남아 있다(필요 없으면 직접 정리). (이전: 15:20 — **세션 재개(`/devlog resume`). 사용자 결정: 옛 열린 소견부터 정리 → 그다음 U1.** 옛 소견 11건 중 8건은 이미 반영돼 있어 상태만 '해소'(근거 `fixes/evidence/20260928-1510-old-findings-recheck.txt`), 남은 3건(F-46f1eb·F-036185·F-c7078e)은 FIX-007 로 묶어 승인받음. P6-memory 는 active 그대로, U1 미착수.
+갱신: 2026-09-28 23:45 — **P6-memory U1(골격) 구현 끝, 커밋 대기.** backend-agent 산출 → 메인 세션이 독립 재실행해 확인(상수 테스트 23 passed · `import app.memory` ok · `.env.example` 3건 · **전체 회귀 1511 passed skip 0**, 증거 `evidence/20260928-2339-u1-main-recheck.txt`). 변경 범위는 `app/settings.py`·`.env.example`·새 `app/memory/{__init__,types}.py`·새 `tests/test_memory_patterns.py` 뿐이고 `app/agent/`·`app/tools/`·`app/api/`·`alembic/` 무변경. 다음 = `/commit` 승인 → U2(패턴 규칙) 위임 승인. (이전: 23:10 — 세션 재개, dev 복귀, U1 위임.)
 
-active: **P6-memory** (FIX-007 병행) | frozen: none | 브랜치 `dev` | main = `1e4afb4`, dev = `80c2842`(origin/dev 와 같음) · dev2 = `80c2842`(로컬이 origin/dev2 추적) | Docker DB `capstone2-postgres-1`(5433): 개발 DB `relationship`, 테스트 DB `relationship_test` — 5432·5434 는 다른 프로젝트
+active: **P6-memory** (FIX-007 병행) | frozen: none | 브랜치 `dev` | main = `1e4afb4`, dev = dev2 = `e48ac4c`(셋 다 origin 과 같음) | Docker DB `capstone2-postgres-1`(5433): 개발 DB `relationship`, 테스트 DB `relationship_test` — 5432·5434 는 다른 프로젝트
 
 ## 이번 세션에서 끝난 것
 - P5-loop 완료(verifier 04-review, 1474 passed) → README 최신화 → 실서버·실 AI 왕복 확인(판정 표 8행 통과) → main 승격. main 에 GitHub PR #1 병합 커밋이 있어 내용 무변경 병합 `36766c1` 로 맞췄다.
@@ -15,8 +15,8 @@ active: **P6-memory** (FIX-007 병행) | frozen: none | 브랜치 `dev` | main =
 - FIX-006 `1e4afb4`(main 승격함): pytest 는 항상 `relationship_test` 에 붙는다(`tests/conftest.py`·`tests/db_bootstrap.py`, 없으면 만들고 마이그레이션, 개발 DB 이름과 같으면 거부). CI 의 개발 DB 마이그레이션 단계 제거. 1486 passed, 격리 증명 통과.
 
 ## 바로 다음에 할 것
-1. (완료) 옛 소견 정리 `aa91f34` · FIX-007 `80c2842`(1488 passed skip 0) — 열린 소견 0.
-2. **P6-memory U1**(골격: 설정 상수 6개 중 환경변수 3개 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`, `.env.example` 3줄, `app/memory/{__init__,types}.py`) → backend-agent(L-004 승인 먼저). 이후 U2~U8, 단위마다 `/commit`.
+1. (구현 끝·커밋 대기) **P6-memory U1**(골격: 설정 상수 6개 중 환경변수 3개 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`, `.env.example` 3줄, `app/memory/{__init__,types}.py`, 상수 테스트) — backend-agent 위임함(2026-09-28 23:10, L-004 마커 생성). **돌아오면 메인 세션이 `POSTGRES_PORT=5433 pytest tests/test_memory_patterns.py -k constants -v`·`python -c "import app.memory"`·`grep -nE "PATTERN_|MEMORY_PROMOTE_MIN_EVENTS" .env.example`(3건)을 직접 재실행해 확인한 뒤 `/commit` 승인.** 증거는 `packages/P6-memory/evidence/*-u1-skeleton.txt`.
+2. 이후 U2(패턴 규칙) → U3(`pattern:` 키 보호) → U4(추출기) → U5(승격) → U6(루프 연결) → U7(직접 사실 링크) → U8(기계 검증). 단위마다 위임 승인·`/commit`.
 3. 이월: R-10(U6 추출기 지연 생성), R-15(U5 결정 F 스키마 `min_events`). 그다음 `P6-briefing`(패턴 문장화·브리핑 직전 패턴 재계산). 이후 P9 AWS(Terraform).
 - 발견: 지금 루프가 `pattern:` 키 사실을 막지 않는다 → U3 가 막는다.
 
