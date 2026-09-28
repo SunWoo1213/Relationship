@@ -1,0 +1,58 @@
+# FIX-008 · 수정 후 검증 (2026-09-29, macOS)
+# 대조군: git show HEAD:<훅> — 수정 전 스크립트를 같은 입력으로 실행
+
+## 1. 인터프리터 탐지
+HOOK_PY=python3
+
+## 2. 파싱 복구 (훅과 같은 코드로 tool_input.command 추출)
+git add -A
+
+## 3. safety-guard — 입력: 전체 스테이징 명령 (규칙 D 위반)
+### 수정 전
+^^ 출력이 없으면 차단 실패(그대로 통과)
+### 수정 후
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] git add 는 명시 경로만. -A, -u, ., * 금지 (비밀·임시 파일이 섞인다) (근거: docs/wiki/security.md)"}}
+
+## 4. commit-guard — 입력: 초안 파일을 쓰지 않는 커밋 명령
+### 수정 전
+^^ 출력이 없으면 차단 실패
+### 수정 후
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"커밋 메시지는 승인된 초안 파일로만 전달한다: git commit -F .claude/commit-draft.txt"}}
+
+## 5. secret-guard — 입력: 비밀 파일 쓰기
+### 수정 전
+^^ 출력이 없으면 차단 실패
+### 수정 후
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[secret-guard] 비밀 파일 .env 는 에이전트가 쓰지 않는다. 사용자가 직접 만든다. 키 이름만 .env.example 에 적으라 (근거: docs/wiki/security.md)"}}
+
+## 6. delegate-guard — 입력: 승인 마커 없는 backend-agent 위임 (L-004)
+### 수정 전
+^^ 출력이 없으면 차단 실패
+### 수정 후
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[delegate-guard] 'backend-agent' 단계는 자동으로 시작하지 않는다 (L-004). AskUserQuestion 으로 사용자에게 시작 여부를 묻고, 승인 직후 bash .claude/hooks/approve-commit.sh --stage backend-agent 를 실행한 뒤 위임하라."}}
+
+## 7. stage-gate — 격리 사본(CURRENT active: none)에 절대경로 app/ 쓰기
+### 수정 전
+^^ 출력이 없으면 차단 실패
+### 수정 후
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"활성 작업이 없다(CURRENT.md active: none). /devlog start <패키지id> 로 계획(01-plan) → 계획검증(02-plan-verify) → 사용자 승인 → 등록을 마친 뒤 코드를 쓰라."}}
+
+## 8. 문법 검사 (bash -n)
+OK   .claude/hooks/_py.sh
+OK   .claude/hooks/approve-commit.sh
+OK   .claude/hooks/commit-cleanup.sh
+OK   .claude/hooks/commit-guard.sh
+OK   .claude/hooks/delegate-guard.sh
+OK   .claude/hooks/handoff-check.sh
+OK   .claude/hooks/precompact.sh
+OK   .claude/hooks/safety-guard.sh
+OK   .claude/hooks/secret-guard.sh
+OK   .claude/hooks/session-start.sh
+OK   .claude/hooks/stage-gate.sh
+
+## 9. 남은 옛 인터프리터 호출 (0건이어야 함)
+없음
+
+## 부수 발견
+- 6번을 처음 실행했을 때 남아 있던 .claude/.stage-approved 마커가 소비됐다.
+  P6-memory U1 위임 당시 훅이 고장나 있어 1회용 마커가 지워지지 않고 남아 있던 것이다.

@@ -23,8 +23,15 @@ ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 PUSH_MARK="$ROOT/.claude/.push-approved"
 RELEASE_MARK="$ROOT/.claude/.release-approved"
 
+# 파이썬 인터프리터 탐지 (FIX-008). 못 찾으면 통과시키지 않고 차단한다 — 조용히 여는 것이 결함이었다.
+. "$(dirname "$0")/_py.sh"
+if [ -z "$HOOK_PY" ]; then
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] %s"}}\n' "$HOOK_PY_MISSING_MSG"
+  exit 0
+fi
+
 input="$(cat)"
-cmd="$(printf '%s' "$input" | python -c 'import sys,json
+cmd="$(printf '%s' "$input" | "$HOOK_PY" -c 'import sys,json
 try:
     d=json.load(sys.stdin); print(d.get("tool_input",{}).get("command",""))
 except Exception:

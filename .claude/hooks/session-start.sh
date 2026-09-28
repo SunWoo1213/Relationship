@@ -7,7 +7,9 @@ ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 W="$ROOT/docs/wiki"
 
 input="$(cat)"
-src="$(printf '%s' "$input" | python -c 'import sys,json
+. "$(dirname "$0")/_py.sh"   # 파이썬 인터프리터 탐지 (FIX-008). 컨텍스트 주입을 막지 않도록 경고만 한다.
+[ -n "$HOOK_PY" ] || printf '%s\n' "[session-start] $HOOK_PY_MISSING_MSG" >&2
+src="$(printf '%s' "$input" | ${HOOK_PY:-false} -c 'import sys,json
 try:
     print(json.load(sys.stdin).get("source",""))
 except Exception:

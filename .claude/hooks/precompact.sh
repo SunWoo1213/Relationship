@@ -6,7 +6,9 @@ export PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LC_ALL=C.UTF-8
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 J="$ROOT/docs/wiki/journal.md"
 input="$(cat)"
-trig="$(printf '%s' "$input" | python -c 'import sys,json
+. "$(dirname "$0")/_py.sh"   # 파이썬 인터프리터 탐지 (FIX-008). 압축을 막지 않도록 경고만 한다.
+[ -n "$HOOK_PY" ] || printf '%s\n' "[precompact] $HOOK_PY_MISSING_MSG" >&2
+trig="$(printf '%s' "$input" | ${HOOK_PY:-false} -c 'import sys,json
 try:
     print(json.load(sys.stdin).get("trigger",""))
 except Exception:

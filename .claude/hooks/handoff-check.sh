@@ -13,8 +13,12 @@ export PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LC_ALL=C.UTF-8
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 HANDOFF="$ROOT/docs/wiki/HANDOFF.md"
 
+# 파이썬 인터프리터 탐지 (FIX-008). Stop 훅은 막으면 턴을 끝낼 수 없어 갇히므로 경고만 하고 통과한다.
+. "$(dirname "$0")/_py.sh"
+[ -n "$HOOK_PY" ] || printf '%s\n' "[handoff-check] $HOOK_PY_MISSING_MSG" >&2
+
 input="$(cat)"
-active="$(printf '%s' "$input" | python -c 'import sys,json
+active="$(printf '%s' "$input" | ${HOOK_PY:-false} -c 'import sys,json
 try:
     d=json.load(sys.stdin); print("1" if d.get("stop_hook_active") else "0")
 except Exception:

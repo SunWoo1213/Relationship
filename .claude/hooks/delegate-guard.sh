@@ -14,8 +14,15 @@ ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 MARK="$ROOT/.claude/.stage-approved"
 GATED="architect backend-agent eval-agent verifier"
 
+# 파이썬 인터프리터 탐지 (FIX-008). 못 찾으면 통과시키지 않고 차단한다.
+. "$(dirname "$0")/_py.sh"
+if [ -z "$HOOK_PY" ]; then
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[delegate-guard] %s"}}\n' "$HOOK_PY_MISSING_MSG"
+  exit 0
+fi
+
 input="$(cat)"
-sub="$(printf '%s' "$input" | python -c 'import sys,json
+sub="$(printf '%s' "$input" | "$HOOK_PY" -c 'import sys,json
 try:
     d=json.load(sys.stdin); print(d.get("tool_input",{}).get("subagent_type","") or "")
 except Exception:

@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-28 23:45 — **P6-memory U1(골격) 구현 끝, 커밋 대기.** backend-agent 산출 → 메인 세션이 독립 재실행해 확인(상수 테스트 23 passed · `import app.memory` ok · `.env.example` 3건 · **전체 회귀 1511 passed skip 0**, 증거 `evidence/20260928-2339-u1-main-recheck.txt`). 변경 범위는 `app/settings.py`·`.env.example`·새 `app/memory/{__init__,types}.py`·새 `tests/test_memory_patterns.py` 뿐이고 `app/agent/`·`app/tools/`·`app/api/`·`alembic/` 무변경. 다음 = `/commit` 승인 → U2(패턴 규칙) 위임 승인. (이전: 23:10 — 세션 재개, dev 복귀, U1 위임.)
+갱신: 2026-09-29 00:50 — **FIX-008 구현·검증 끝, 커밋 대기.** 훅 9개가 stdin 을 `python` 으로 파싱하는데 macOS 에는 `python` 이 없어(Windows 에서 넘어온 코드) **차단형 가드 5종이 전부 조용히 열려 있었다**. `.claude/hooks/_py.sh` 신설(`python`→`python3` 순, 실제 실행해 확인) + 호출 10곳 교체 + 차단형은 못 찾으면 deny. 전후 대조 증거 `fixes/evidence/FIX-008/20260929-0040-after-python-detect.txt`(수정 전 5종 모두 출력 없음=통과 → 수정 후 5종 모두 deny), 제품 회귀 1511 passed. 앞선 커밋 = P6-memory U1 `7564c5d`(dev, 미푸시). **사용자 지시: 커밋마다 원격 `dev2` 에도 푸시** — `safety-guard` 가 아직 `dev:dev2` 를 거부하므로 다음 작업으로 남아 있다. (이전: 23:55 — U1 커밋. 23:10 — 세션 재개, dev 복귀.)
 
 active: **P6-memory** (FIX-007 병행) | frozen: none | 브랜치 `dev` | main = `1e4afb4`, dev = dev2 = `e48ac4c`(셋 다 origin 과 같음) | Docker DB `capstone2-postgres-1`(5433): 개발 DB `relationship`, 테스트 DB `relationship_test` — 5432·5434 는 다른 프로젝트
 
@@ -15,8 +15,10 @@ active: **P6-memory** (FIX-007 병행) | frozen: none | 브랜치 `dev` | main =
 - FIX-006 `1e4afb4`(main 승격함): pytest 는 항상 `relationship_test` 에 붙는다(`tests/conftest.py`·`tests/db_bootstrap.py`, 없으면 만들고 마이그레이션, 개발 DB 이름과 같으면 거부). CI 의 개발 DB 마이그레이션 단계 제거. 1486 passed, 격리 증명 통과.
 
 ## 바로 다음에 할 것
-1. (구현 끝·커밋 대기) **P6-memory U1**(골격: 설정 상수 6개 중 환경변수 3개 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`, `.env.example` 3줄, `app/memory/{__init__,types}.py`, 상수 테스트) — backend-agent 위임함(2026-09-28 23:10, L-004 마커 생성). **돌아오면 메인 세션이 `POSTGRES_PORT=5433 pytest tests/test_memory_patterns.py -k constants -v`·`python -c "import app.memory"`·`grep -nE "PATTERN_|MEMORY_PROMOTE_MIN_EVENTS" .env.example`(3건)을 직접 재실행해 확인한 뒤 `/commit` 승인.** 증거는 `packages/P6-memory/evidence/*-u1-skeleton.txt`.
-2. 이후 U2(패턴 규칙) → U3(`pattern:` 키 보호) → U4(추출기) → U5(승격) → U6(루프 연결) → U7(직접 사실 링크) → U8(기계 검증). 단위마다 위임 승인·`/commit`.
+1. (완료 `7564c5d`) **P6-memory U1**(골격: 설정 상수 6개 중 환경변수 3개 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`, `.env.example` 3줄, `app/memory/{__init__,types}.py`, 상수 테스트) — backend-agent 위임함(2026-09-28 23:10, L-004 마커 생성). **돌아오면 메인 세션이 `POSTGRES_PORT=5433 pytest tests/test_memory_patterns.py -k constants -v`·`python -c "import app.memory"`·`grep -nE "PATTERN_|MEMORY_PROMOTE_MIN_EVENTS" .env.example`(3건)을 직접 재실행해 확인한 뒤 `/commit` 승인.** 증거는 `packages/P6-memory/evidence/*-u1-skeleton.txt`.
+2. (구현 끝·커밋 대기) **FIX-008** 훅 인터프리터 탐지. 커밋 후 `ls .claude/.commit-approved`(없어야 함)·`tail -1 docs/wiki/journal.md`(COMMIT 줄 자동 생성)로 후처리 훅이 실제로 도는지 확인해 FIX-008 `## 결과` 에 적는다. 다음 세션 시작 로그에 `(source: unknown)` 이 사라지는지도 본다.
+3. **`safety-guard` 에 `origin dev:dev2` 허용 추가**(사용자 지시 — 커밋마다 dev2 푸시). 그 전까지 dev2 푸시는 사용자가 `!git push origin dev:dev2` 로 직접.
+4. 이후 P6-memory U2(패턴 규칙) → U3(`pattern:` 키 보호) → U4(추출기) → U5(승격) → U6(루프 연결) → U7(직접 사실 링크) → U8(기계 검증). 단위마다 위임 승인·`/commit`.
 3. 이월: R-10(U6 추출기 지연 생성), R-15(U5 결정 F 스키마 `min_events`). 그다음 `P6-briefing`(패턴 문장화·브리핑 직전 패턴 재계산). 이후 P9 AWS(Terraform).
 - 발견: 지금 루프가 `pattern:` 키 사실을 막지 않는다 → U3 가 막는다.
 

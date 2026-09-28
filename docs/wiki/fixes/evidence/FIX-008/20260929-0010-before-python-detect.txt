@@ -1,0 +1,41 @@
+# FIX-008 · 수정 전 상태 증거 (2026-09-29 00:10, macOS)
+# 훅 9개가 stdin 을 python 으로 파싱하는데 이 기기에는 python 이 없다
+
+$ command -v python
+(없음 — 종료코드 1)
+
+$ command -v python3
+/Library/Frameworks/Python.framework/Versions/3.14/bin/python3
+
+$ ls /usr/bin/python
+ls: /usr/bin/python: No such file or directory
+
+## 훅이 쓰는 파싱 명령을 그대로 재현
+$ printf '{"tool_input":{"command":"git add -A"}}' | python -c '...'
+(eval):1: command not found: python
+종료코드=127 (command not found)
+
+$ 같은 입력을 python3 로
+git add -A
+
+## 그 결과 각 훅이 빈 값을 받고 조용히 통과하는 자리
+32:[ -n "$cmd" ] || exit 0
+25:[ -n "$fp" ] || exit 0
+23:[ -n "$sub" ] || exit 0
+
+## python 호출 지점 전체 (10곳 / 9파일)
+.claude/hooks/commit-guard.sh:22:cmd="$(printf '%s' "$input" | python -c 'import sys,json
+.claude/hooks/commit-cleanup.sh:12:cmd="$(printf '%s' "$input" | python -c 'import sys,json
+.claude/hooks/delegate-guard.sh:18:sub="$(printf '%s' "$input" | python -c 'import sys,json
+.claude/hooks/safety-guard.sh:27:cmd="$(printf '%s' "$input" | python -c 'import sys,json
+.claude/hooks/secret-guard.sh:13:fp="$(printf '%s' "$input" | python -c 'import sys,json
+.claude/hooks/secret-guard.sh:35:content="$(printf '%s' "$input" | python -c 'import sys,json
+.claude/hooks/precompact.sh:9:trig="$(printf '%s' "$input" | python -c 'import sys,json
+.claude/hooks/stage-gate.sh:19:fp="$(printf '%s' "$input" | python -c 'import sys,json
+.claude/hooks/handoff-check.sh:17:active="$(printf '%s' "$input" | python -c 'import sys,json
+.claude/hooks/session-start.sh:10:src="$(printf '%s' "$input" | python -c 'import sys,json
+
+## 관측된 실제 증상
+- 세션 시작 로그 첫 줄이 (source: unknown) — session-start.sh 파싱 실패
+- 커밋 7564c5d 뒤 .claude/.commit-approved 마커가 지워지지 않음 (commit-cleanup.sh 미동작)
+- 같은 커밋 뒤 journal.md 의 COMMIT 줄이 자동 생성되지 않아 수기로 넣음

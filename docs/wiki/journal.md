@@ -289,3 +289,5 @@
 - 2026-09-28 17:07 | COMMIT | 80c2842 fix(FIX-007): 판정의 bool 인물 번호 차단, 가짜 키·템플릿 태그 정리
 - 2026-09-28 17:45 | STOP | 사용자 요청으로 멈춤 — FIX-007 완료(80c2842), 다음 = P6-memory U1 위임 승인 | P6-memory
 - 2026-09-28 23:10 | RESUME | 세션 재개 — 커밋 안 된 변경 0·열린 소견 0. dev 로 복귀(dev=dev2=e48ac4c). P6-memory U1 위임 승인 | P6-memory
+- 2026-09-28 23:52 | COMMIT | 7564c5d feat(P6-memory): U1 메모리 설정 상수·타입 골격 (cleanup 훅 미동작으로 수기 기록)
+- 2026-09-29 00:20 | FIX | FIX-008 승인 — 훅 9개가 python 을 못 찾아 차단형 가드 5종이 조용히 열려 있었다(Windows→macOS 이전). _py.sh 탐지 신설 | FIX-008

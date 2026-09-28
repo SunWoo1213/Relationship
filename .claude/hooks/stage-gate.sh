@@ -15,8 +15,15 @@ export PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LC_ALL=C.UTF-8
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 CURRENT="$ROOT/docs/wiki/CURRENT.md"
 
+# 파이썬 인터프리터 탐지 (FIX-008). 못 찾으면 통과시키지 않고 차단한다.
+. "$(dirname "$0")/_py.sh"
+if [ -z "$HOOK_PY" ]; then
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[stage-gate] %s"}}\n' "$HOOK_PY_MISSING_MSG"
+  exit 0
+fi
+
 input="$(cat)"
-fp="$(printf '%s' "$input" | python -c 'import sys,json
+fp="$(printf '%s' "$input" | "$HOOK_PY" -c 'import sys,json
 try:
     d=json.load(sys.stdin); ti=d.get("tool_input",{})
     print(ti.get("file_path") or ti.get("notebook_path") or "")

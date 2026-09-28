@@ -1,0 +1,27 @@
+# FIX-008 · 수정 후 검증 (2026-09-29 00:30, macOS)
+
+## 1. 인터프리터 탐지
+$ bash -c '. .claude/hooks/_py.sh; echo $HOOK_PY'
+python3
+
+## 2. 파싱 복구 (고른 인터프리터로 훅과 같은 입력)
+git add -A
+
+## 3. 전후 대조 — 같은 입력(git add -A)을 safety-guard 에
+### 수정 전 (git show HEAD:.claude/hooks/safety-guard.sh)
+<<< 위가 비어 있으면 = 차단하지 못하고 통과했다는 뜻
+
+### 수정 후
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] git add 는 명시 경로만. -A, -u, ., * 금지 (비밀·임시 파일이 섞인다) (근거: docs/wiki/security.md)"}}
+
+## 4. 다른 가드들도 판정이 나오는가
+### commit-guard (승인 마커 없는 커밋)
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"커밋 메시지는 승인된 초안 파일로만 전달한다: git commit -F .claude/commit-draft.txt"}}
+
+### delegate-guard (마커 없는 backend-agent 위임)
+
+### secret-guard (.env 쓰기 시도)
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[secret-guard] 비밀 파일 .env 는 에이전트가 쓰지 않는다. 사용자가 직접 만든다. 키 이름만 .env.example 에 적으라 (근거: docs/wiki/security.md)"}}
+
+### stage-gate (활성 작업 밖 경로)
+

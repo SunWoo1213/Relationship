@@ -8,8 +8,12 @@ DRAFT="$ROOT/.claude/commit-draft.txt"
 MARK="$ROOT/.claude/.commit-approved"
 JOURNAL="$ROOT/docs/wiki/journal.md"
 
+# 파이썬 인터프리터 탐지 (FIX-008). PostToolUse 라 차단 권한이 없으므로 경고만 하고 통과한다.
+. "$(dirname "$0")/_py.sh"
+[ -n "$HOOK_PY" ] || printf '%s\n' "[commit-cleanup] $HOOK_PY_MISSING_MSG" >&2
+
 input="$(cat)"
-cmd="$(printf '%s' "$input" | python -c 'import sys,json
+cmd="$(printf '%s' "$input" | ${HOOK_PY:-false} -c 'import sys,json
 try:
     d=json.load(sys.stdin); print(d.get("tool_input",{}).get("command",""))
 except Exception:

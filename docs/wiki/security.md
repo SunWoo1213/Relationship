@@ -55,3 +55,9 @@
 ## 6. 예외가 필요할 때
 
 훅이 막은 명령이 정말 필요하면 에이전트는 **우회하지 않고** 사용자에게 명령을 그대로 보여주고 직접 실행을 요청한다(`! <command>`). 규칙 자체를 바꾸려면 이 카드와 훅을 같은 커밋에서 고치고 `L-nnn` 교훈을 남긴다.
+
+## 7. 훅이 스스로를 검사할 수 없을 때 (FIX-008)
+
+훅은 stdin JSON 을 파이썬으로 파싱한다. **파이썬 인터프리터를 찾지 못하면 차단형 가드(`safety-guard`·`secret-guard`·`stage-gate`·`commit-guard`·`delegate-guard`)는 통과시키지 않고 거부한다.** 입력을 읽지 못한 가드가 조용히 열리면 이 카드의 규칙이 전부 무력해지기 때문이다 — 실패는 닫는 방향이어야 한다.
+
+인터프리터 이름은 OS 마다 다르다(Windows 는 `python`, macOS 는 `python3`, 가상환경 안에서는 둘 다). `.claude/hooks/_py.sh` 가 `python` → `python3` 순으로 **실제 실행해 보고** 고르며, 각 훅은 그 결과(`$HOOK_PY`)를 쓴다. 다만 Stop 훅(`handoff-check`)과 차단 권한이 없는 보조 훅(`commit-cleanup`·`session-start`·`precompact`)은 경고만 하고 통과한다 — Stop 훅이 막으면 턴을 끝낼 수 없어 갇히기 때문이다.
