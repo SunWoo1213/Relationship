@@ -291,3 +291,6 @@
 - 2026-09-28 23:10 | RESUME | 세션 재개 — 커밋 안 된 변경 0·열린 소견 0. dev 로 복귀(dev=dev2=e48ac4c). P6-memory U1 위임 승인 | P6-memory
 - 2026-09-28 23:52 | COMMIT | 7564c5d feat(P6-memory): U1 메모리 설정 상수·타입 골격 (cleanup 훅 미동작으로 수기 기록)
 - 2026-09-29 00:20 | FIX | FIX-008 승인 — 훅 9개가 python 을 못 찾아 차단형 가드 5종이 조용히 열려 있었다(Windows→macOS 이전). _py.sh 탐지 신설 | FIX-008
+- 2026-09-29 00:26 | COMMIT | c4285ed harness(hooks): 훅이 파이썬을 못 찾으면 차단하게 고친다
+- 2026-09-29 00:30 | PUSH-dev2 | origin dev2 ← dev c4285ed (기기 간 공유, 사용자 지시)
+- 2026-09-29 01:20 | FIX | FIX-009 승인 — dev2 공유 푸시를 훅이 허용(마커 불요·방향 고정·L-003 대기 마커 없음). gh auth login 으로 기기 로그인 해결 | FIX-009

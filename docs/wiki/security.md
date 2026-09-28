@@ -19,6 +19,7 @@
 |------|------|
 | 강제 푸시(`--force`, `-f`, `+ref`, `--mirror`, `--delete`) 금지 | 새 커밋으로 고친다. 잘못된 커밋은 `git revert` |
 | 푸시는 `origin dev` 로만, `/commit` 절차에서 사용자가 승인한 뒤에만 | `/commit` 의 "커밋 + 푸시" 선택 → `git push -u origin dev` |
+| 예외 — `origin dev:dev2`(기기 간 상태 공유)는 승인 마커 없이 허용 (FIX-009, 사용자 지시 2026-09-28) | 이미 승인받아 커밋된 내용을 옮기는 백업이라 새 판단이 없다. 방향은 `dev:dev2` 로 고정하며(로컬 dev2 에서 미는 `origin dev2` 는 금지), L-003 대기 마커를 만들지 않는다 |
 | dev 푸시 뒤에는 사용자가 승격/수정을 정할 때까지 다음 작업·커밋 금지 (L-003, `.claude/.awaiting-decision`) | 푸시 직후 `AskUserQuestion`. 수정이면 `approve-commit.sh --decision fix`, 승격이면 `/commit release` |
 | `main` 직접 푸시 금지 (L-001 브랜치 전략: dev → 실서버 검증 → main) | `/commit release` — 사용자 승인 → `approve-commit.sh --release` → `git push origin dev:main` (fast-forward 만, 강제 옵션은 별도 차단) |
 | 커밋은 승인된 초안 파일로만, `--amend`·`--no-verify` 금지 | `/commit` |

@@ -33,6 +33,12 @@ if printf '%s' "$cmd" | grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-[^[:space:]
     fi
     exit 0
   fi
+  # dev2(기기 간 공유) 푸시는 승인 판단이 없는 백업이다. 푸시 마커를 쓰지 않고
+  # L-003 대기 마커도 만들지 않는다 — 만들면 커밋마다 dev2 로 밀 때마다 작업이 잠긴다.
+  if printf '%s' "$cmd" | grep -Eq 'origin[[:space:]]+dev:dev2([[:space:]]|$)'; then
+    [ -f "$JOURNAL" ] && printf -- '- %s | PUSH-dev2 | origin dev2 ← dev %s (기기 간 공유, 사용자 지시)\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)" >> "$JOURNAL"
+    exit 0
+  fi
   if [ -f "$PUSH_MARK" ] && git -C "$ROOT" status -sb 2>/dev/null | head -n1 | grep -Evq 'ahead'; then
     rm -f "$PUSH_MARK"
     if [ -f "$JOURNAL" ]; then

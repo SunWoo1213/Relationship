@@ -71,10 +71,15 @@ if has "${GIT}push([[:space:]]|$)"; then
   # 브랜치 전략(L-001): 일상 푸시는 origin dev 로만. main 은 dev 를 실서버에서 검증한 뒤 /commit release 로 승격(dev:main)한다.
   if has "${GIT}push[^;|&]*[[:space:]]origin[[:space:]]+dev:main([[:space:]]|$)"; then
     [ -f "$RELEASE_MARK" ] || deny "main 승격(dev:main)은 dev 를 실서버에서 검증한 뒤 /commit release 에서 사용자가 승인해야 한다"
+  elif has "${GIT}push[^;|&]*[[:space:]]origin[[:space:]]+dev:dev2([[:space:]]|$)"; then
+    # dev2 = 기기 간 현재 상태 공유 브랜치(사용자 지시 2026-09-28: 커밋마다 dev2 에도 푸시).
+    # 이미 승인받아 커밋된 내용을 옮기는 것뿐이라 새 판단이 없으므로 푸시 마커를 요구하지 않는다.
+    # 방향은 dev:dev2 로 고정한다 - 작업 브랜치는 dev 하나이고, 뒤처진 로컬 dev2 에서 밀면 내용이 갈린다.
+    :
   elif has "${GIT}push[^;|&]*[[:space:]]origin[[:space:]]+dev([[:space:]]|$)"; then
     [ -f "$PUSH_MARK" ] || deny "푸시 승인 마커가 없다. /commit 절차에서 사용자가 푸시를 승인해야 한다"
   else
-    deny "푸시는 origin dev 로만 한다. main 직접 푸시 금지 - dev 를 실서버에서 검증한 뒤 /commit release 로 승격(git push origin dev:main)"
+    deny "푸시는 origin dev(작업) 와 origin dev:dev2(기기 간 공유) 로만 한다. main 직접 푸시 금지 - dev 를 실서버에서 검증한 뒤 /commit release 로 승격(git push origin dev:main)"
   fi
 fi
 has "${GIT}reset[^;|&]*--hard" && deny "git reset --hard 금지. 되돌리려면 git revert 또는 사용자 요청"

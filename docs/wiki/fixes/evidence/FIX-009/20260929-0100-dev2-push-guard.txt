@@ -1,0 +1,44 @@
+# dev2 푸시 허용 검증 (2026-09-29)
+# safety-guard 에 푸시 명령을 넣어 허용/거부 판정을 확인한다
+
+## 1. 허용되어야 하는 것
+### dev2 공유 푸시
+$ git push origin dev:dev2
+(위가 비어 있으면 통과 = 허용)
+
+## 2. 여전히 거부되어야 하는 것
+### main 직접 푸시
+$ git push origin main
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 푸시는 origin dev(작업) 와 origin dev:dev2(기기 간 공유) 로만 한다. main 직접 푸시 금지 - dev 를 실서버에서 검증한 뒤 /commit release 로 승격(git push origin dev:main) (근거: docs/wiki/security.md)"}}
+(위가 비어 있으면 통과 = 허용)
+
+### 로컬 dev2 를 원격 dev2 로 (방향 고정)
+$ git push origin dev2
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 푸시는 origin dev(작업) 와 origin dev:dev2(기기 간 공유) 로만 한다. main 직접 푸시 금지 - dev 를 실서버에서 검증한 뒤 /commit release 로 승격(git push origin dev:main) (근거: docs/wiki/security.md)"}}
+(위가 비어 있으면 통과 = 허용)
+
+### dev2 로 강제 푸시
+$ git push --force origin dev:dev2
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 강제 푸시(--force, -f, +ref, --mirror, --delete) 금지. 새 커밋으로 고치라 (근거: docs/wiki/security.md)"}}
+(위가 비어 있으면 통과 = 허용)
+
+### origin 아닌 원격
+$ git push backup dev:dev2
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 푸시는 origin 으로만 허용한다 (근거: docs/wiki/security.md)"}}
+(위가 비어 있으면 통과 = 허용)
+
+## 3. dev 는 승인 마커가 여전히 필요한가
+### 마커 없는 dev 푸시
+$ git push origin dev
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 푸시 승인 마커가 없다. /commit 절차에서 사용자가 푸시를 승인해야 한다 (근거: docs/wiki/security.md)"}}
+(위가 비어 있으면 통과 = 허용)
+
+## 4. 승격은 그대로인가
+### 마커 없는 main 승격
+$ git push origin dev:main
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] main 승격(dev:main)은 dev 를 실서버에서 검증한 뒤 /commit release 에서 사용자가 승인해야 한다 (근거: docs/wiki/security.md)"}}
+(위가 비어 있으면 통과 = 허용)
+
+## 5. 문법 검사
+OK   .claude/hooks/safety-guard.sh
+OK   .claude/hooks/commit-cleanup.sh

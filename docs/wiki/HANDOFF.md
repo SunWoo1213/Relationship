@@ -5,9 +5,10 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-29 00:50 — **FIX-008 구현·검증 끝, 커밋 대기.** 훅 9개가 stdin 을 `python` 으로 파싱하는데 macOS 에는 `python` 이 없어(Windows 에서 넘어온 코드) **차단형 가드 5종이 전부 조용히 열려 있었다**. `.claude/hooks/_py.sh` 신설(`python`→`python3` 순, 실제 실행해 확인) + 호출 10곳 교체 + 차단형은 못 찾으면 deny. 전후 대조 증거 `fixes/evidence/FIX-008/20260929-0040-after-python-detect.txt`(수정 전 5종 모두 출력 없음=통과 → 수정 후 5종 모두 deny), 제품 회귀 1511 passed. 앞선 커밋 = P6-memory U1 `7564c5d`(dev, 미푸시). **사용자 지시: 커밋마다 원격 `dev2` 에도 푸시** — `safety-guard` 가 아직 `dev:dev2` 를 거부하므로 다음 작업으로 남아 있다. (이전: 23:55 — U1 커밋. 23:10 — 세션 재개, dev 복귀.)
+갱신: 2026-09-29 01:10 — **FIX-008 커밋 `c4285ed` 완료.** 커밋 후처리 훅이 실제로 되살아났다(마커 자동 삭제·journal COMMIT 줄 자동 생성·gitlog 갱신, 증거 `fixes/evidence/FIX-008/20260929-0026-post-commit-hook-works.txt`). 이 Stop 훅 경고 자체도 복구의 증거다. **이어서 dev2 푸시 허용을 구현했다(커밋 대기)**: `safety-guard` 에 `dev:dev2` 갈래 추가(마커 불요·방향 고정), `commit-cleanup` 은 dev2 푸시에 L-003 대기 마커를 만들지 않고 `PUSH-dev2` 줄만 남긴다. 검증 7종 통과(증거 `fixes/evidence/FIX-009/20260929-0100-dev2-push-guard.txt`). **막힌 곳: 이 맥에 GitHub 로그인이 없어 실제 푸시가 안 된다**(`could not read Username`) — 사용자가 `!gh auth login` 을 해야 한다(gh 2.101.0 설치됨, 미로그인). (이전: 00:50 — FIX-008 구현·검증. 23:55 — U1 커밋 `7564c5d`.)
 
-active: **P6-memory** (FIX-007 병행) | frozen: none | 브랜치 `dev` | main = `1e4afb4`, dev = dev2 = `e48ac4c`(셋 다 origin 과 같음) | Docker DB `capstone2-postgres-1`(5433): 개발 DB `relationship`, 테스트 DB `relationship_test` — 5432·5434 는 다른 프로젝트
+
+active: **P6-memory** | frozen: none | 브랜치 `dev` | main = `1e4afb4` · dev = `c4285ed`(origin/dev 보다 2커밋 앞섬, 미푸시) · 원격 dev2 = `e48ac4c` | Docker DB `capstone2-postgres-1`(5433): 개발 DB `relationship`, 테스트 DB `relationship_test` — 5432·5434 는 다른 프로젝트
 
 ## 이번 세션에서 끝난 것
 - P5-loop 완료(verifier 04-review, 1474 passed) → README 최신화 → 실서버·실 AI 왕복 확인(판정 표 8행 통과) → main 승격. main 에 GitHub PR #1 병합 커밋이 있어 내용 무변경 병합 `36766c1` 로 맞췄다.
@@ -16,14 +17,15 @@ active: **P6-memory** (FIX-007 병행) | frozen: none | 브랜치 `dev` | main =
 
 ## 바로 다음에 할 것
 1. (완료 `7564c5d`) **P6-memory U1**(골격: 설정 상수 6개 중 환경변수 3개 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`, `.env.example` 3줄, `app/memory/{__init__,types}.py`, 상수 테스트) — backend-agent 위임함(2026-09-28 23:10, L-004 마커 생성). **돌아오면 메인 세션이 `POSTGRES_PORT=5433 pytest tests/test_memory_patterns.py -k constants -v`·`python -c "import app.memory"`·`grep -nE "PATTERN_|MEMORY_PROMOTE_MIN_EVENTS" .env.example`(3건)을 직접 재실행해 확인한 뒤 `/commit` 승인.** 증거는 `packages/P6-memory/evidence/*-u1-skeleton.txt`.
-2. (구현 끝·커밋 대기) **FIX-008** 훅 인터프리터 탐지. 커밋 후 `ls .claude/.commit-approved`(없어야 함)·`tail -1 docs/wiki/journal.md`(COMMIT 줄 자동 생성)로 후처리 훅이 실제로 도는지 확인해 FIX-008 `## 결과` 에 적는다. 다음 세션 시작 로그에 `(source: unknown)` 이 사라지는지도 본다.
-3. **`safety-guard` 에 `origin dev:dev2` 허용 추가**(사용자 지시 — 커밋마다 dev2 푸시). 그 전까지 dev2 푸시는 사용자가 `!git push origin dev:dev2` 로 직접.
-4. 이후 P6-memory U2(패턴 규칙) → U3(`pattern:` 키 보호) → U4(추출기) → U5(승격) → U6(루프 연결) → U7(직접 사실 링크) → U8(기계 검증). 단위마다 위임 승인·`/commit`.
-3. 이월: R-10(U6 추출기 지연 생성), R-15(U5 결정 F 스키마 `min_events`). 그다음 `P6-briefing`(패턴 문장화·브리핑 직전 패턴 재계산). 이후 P9 AWS(Terraform).
+2. (완료 `c4285ed`) **FIX-008** 훅 인터프리터 탐지. 남은 확인 하나: 다음 세션 시작 로그에서 `(source: unknown)` 이 사라지는지 보고 FIX-008 `## 결과` 검증 4번에 적는다.
+3. (구현 끝·커밋 대기) **dev2 푸시 허용** — `safety-guard.sh`·`commit-cleanup.sh` 2파일. **사용자 몫: `!gh auth login`**(GitHub.com → HTTPS → Authenticate Git with your GitHub credentials? Yes → 브라우저 코드). 로그인 뒤 `git push origin dev:dev2` 로 `7564c5d`·`c4285ed` 를 올린다(원격 dev2 는 지금 `e48ac4c`). 이후로는 커밋마다 dev2 에도 푸시한다.
+4. 곁가지(급하지 않음): `safety-guard` 가 `git config --get-all credential.helper` 같은 **읽기 전용 조회**까지 막는다. 규칙 의도는 변경 금지이므로 조회는 허용하도록 다듬을 후보.
+5. 이후 P6-memory U2(패턴 규칙) → U3(`pattern:` 키 보호) → U4(추출기) → U5(승격) → U6(루프 연결) → U7(직접 사실 링크) → U8(기계 검증). 단위마다 위임 승인·`/commit`.
+6. 이월: R-10(U6 추출기 지연 생성), R-15(U5 결정 F 스키마 `min_events`). 그다음 `P6-briefing`(패턴 문장화·브리핑 직전 패턴 재계산). 이후 P9 AWS(Terraform).
 - 발견: 지금 루프가 `pattern:` 키 사실을 막지 않는다 → U3 가 막는다.
 
 ## 사용자 몫 (알려 둔 것)
-- **브랜치 역할(2026-09-28, 사용자 결정)**: main = 최종 완성, dev = 백업(작업·승인 푸시는 여전히 dev, L-001·L-003 그대로), dev2 = 다른 기기끼리 현재 상태 공유. 훅은 고치지 않았다 — dev2 푸시는 사용자가 `!git push origin dev:dev2` 로 직접. 로컬 dev2 는 origin/dev2 추적 설정함(`git pull` 가능). 주의: GitHub Desktop 에서 브랜치를 바꾸면 커밋 안 된 변경이 stash(`!!GitHub_Desktop<dev>`)로 들어간다 — 사라진 것처럼 보이면 `git stash list`.
+- **브랜치 역할(2026-09-28, 사용자 결정)**: main = 최종 완성, dev = 백업(작업·승인 푸시는 여전히 dev, L-001·L-003 그대로), dev2 = 다른 기기끼리 현재 상태 공유. **2026-09-29: 훅을 고쳐 `git push origin dev:dev2` 를 에이전트가 직접 할 수 있게 했다**(마커 불요, 방향 고정, L-003 대기 마커 없음). 로컬 dev2 는 origin/dev2 추적 설정함(`git pull` 가능). **다만 이 맥은 GitHub 미로그인이라 `!gh auth login` 이 선행돼야 한다.** 주의: GitHub Desktop 에서 브랜치를 바꾸면 커밋 안 된 변경이 stash(`!!GitHub_Desktop<dev>`)로 들어간다 — 사라진 것처럼 보이면 `git stash list`.
 - 환경 파일 15행에 공백이 섞인 값이 있다(`2.5: command not found`). `LLM_PROVIDER=openai`(하나만)·`LLM_PROVIDERS_ENABLED=`(비우면 셋 다 허용)·`OPENAI_MODEL=gpt-4o-mini` 로 정리하라고 안내했다. `DATABASE_URL` 이 5432(다른 프로젝트)를 가리켜 서버 기동 때 `unset DATABASE_URL` 이 필요했다.
 - 빈 DB `relationship_test_fix006_evidence` 정리(훅이 셸의 DB 삭제를 막음). GitHub main 브랜치 보호 규칙. 테스트 서버(8000)가 켜져 있으면 종료.
 
