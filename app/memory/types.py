@@ -127,9 +127,20 @@ class ExtractedFact:
 @dataclass(frozen=True)
 class Extraction:
     """`FactExtractor.extract(person, existing_facts, events)`(U4)의
-    반환 타입. `{facts: [...]}` 스키마 그대로(01-plan 결정 D-2)."""
+    반환 타입. `facts` 는 `{facts: [...]}` 스키마 그대로(01-plan 결정
+    D-2). `tokens_in`/`tokens_out`/`provider`/`model` 은 U4 가 이 골격에
+    더한 필드(U1 03-log "필드가 부족하면 그 단위 03-log 에 남긴다" 규약) --
+    `app.er.types.Judgement` 와 같은 이유다: 결정 F(`memory_promote`
+    trace 의 `tokens in/out = 추출기 사용량`)를 채우려면 승격(U5)이 이
+    호출 결과에서 실제 사용량을 읽어야 하는데, `Extraction` 자체가 그
+    값을 안 실으면 U5 가 값을 어디서도 구할 수 없다. `FakeFactExtractor`
+    는 네트워크를 타지 않으므로 기본값 `0`/`None` 그대로 둔다(원칙8)."""
 
     facts: list[ExtractedFact] = field(default_factory=list)
+    tokens_in: int = 0
+    tokens_out: int = 0
+    provider: str | None = None
+    model: str | None = None
 
 
 # ---------------------------------------------------------------------------

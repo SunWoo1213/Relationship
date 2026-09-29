@@ -321,3 +321,6 @@
 - 2026-09-29 13:56 | COMMIT | 688d208 harness(settings): 읽기 전용 Bash 를 허용하고 파일 편집은 툴로만 한다
 - 2026-09-29 13:56 | PUSH-dev2 | origin dev2 688d208 (실험 푸시)
 - 2026-09-29 14:05 | P6 | U3 `pattern:` 접두 키 보호를 backend-agent 에 위임 (L-004 마커 생성). 부분 반영 방지(정상 키와 pattern 키를 섞은 호출)도 함께 요구 | P6-memory D-7 원칙9
+- 2026-09-29 14:09 | COMMIT | 51b4d65 feat(P6-memory): U3 pattern 접두 키를 사람 손으로 못 쓰게 막는다
+- 2026-09-29 14:09 | PUSH-dev2 | origin dev2 51b4d65 (실험 푸시)
+- 2026-09-29 14:15 | P6 | U4 사실 추출기를 backend-agent 에 위임 (사용자 승인, L-004 마커 생성). 01-plan 이 U4 로 넘긴 결정 3종(입력 타입·타임아웃 상수·상한 초과 절단 순서)을 근거와 함께 03-log 에 남기도록 요구 | P6-memory S3.5 D11 R8 원칙7 원칙8

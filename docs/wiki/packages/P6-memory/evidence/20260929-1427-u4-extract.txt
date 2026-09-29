@@ -1,0 +1,242 @@
+=== POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_memory_extract.py -v ===
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 60 items
+
+tests/test_memory_extract.py::test_facts_schema_key_enum_matches_fact_keys PASSED [  1%]
+tests/test_memory_extract.py::test_facts_schema_top_level_requires_facts_only PASSED [  3%]
+tests/test_memory_extract.py::test_facts_schema_item_requires_all_three_fields PASSED [  5%]
+tests/test_memory_extract.py::test_build_extract_prompt_has_person_existing_facts_and_events PASSED [  6%]
+tests/test_memory_extract.py::test_build_extract_prompt_lists_fact_keys_and_pattern_prefix_ban PASSED [  8%]
+tests/test_memory_extract.py::test_build_extract_prompt_forbids_cross_person_relations_and_advice PASSED [ 10%]
+tests/test_memory_extract.py::test_build_extract_prompt_has_no_secrets_or_env_names PASSED [ 11%]
+tests/test_memory_extract.py::test_build_extract_prompt_empty_events_and_facts_render_placeholder PASSED [ 13%]
+tests/test_memory_extract.py::test_validate_extraction_accepts_well_formed_fact PASSED [ 15%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_key_outside_vocab PASSED [ 16%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_pattern_prefix_key_case_and_space_variants[pattern:meal] PASSED [ 18%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_pattern_prefix_key_case_and_space_variants[ pattern:meal ] PASSED [ 20%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_pattern_prefix_key_case_and_space_variants[Pattern:meal] PASSED [ 21%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_pattern_prefix_key_case_and_space_variants[PATTERN:MEAL] PASSED [ 23%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_pattern_prefix_key_case_and_space_variants[PaTtErN:conflict] PASSED [ 25%]
+tests/test_memory_extract.py::test_validate_extraction_non_prefixed_unknown_key_is_vocab_reason_not_prefix_reason PASSED [ 26%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_empty_value[] PASSED [ 28%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_empty_value[   ] PASSED [ 30%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_empty_value[\t\n] PASSED [ 31%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_source_event_id_not_in_input PASSED [ 33%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_empty_source_event_ids PASSED [ 35%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_fact_with_partially_unknown_event_ids PASSED [ 36%]
+tests/test_memory_extract.py::test_validate_extraction_middle_fact_rejected_others_pass_index_correct PASSED [ 38%]
+tests/test_memory_extract.py::test_validate_extraction_over_cap_rejects_from_the_index_after_the_cap PASSED [ 40%]
+tests/test_memory_extract.py::test_validate_extraction_strips_whitespace_from_accepted_key_and_value PASSED [ 41%]
+tests/test_memory_extract.py::test_validate_extraction_empty_input_is_a_noop PASSED [ 43%]
+tests/test_memory_extract.py::test_fake_fact_extractor_returns_table_entry_for_matching_event_id_set PASSED [ 45%]
+tests/test_memory_extract.py::test_fake_fact_extractor_missing_table_entry_returns_empty_extraction PASSED [ 46%]
+tests/test_memory_extract.py::test_fake_fact_extractor_is_deterministic_across_calls PASSED [ 48%]
+tests/test_memory_extract.py::test_fake_fact_extractor_counts_calls PASSED [ 50%]
+tests/test_memory_extract.py::test_fake_fact_extractor_fail_raises_judge_unavailable_and_still_counts PASSED [ 51%]
+tests/test_memory_extract.py::test_fake_fact_extractor_ignores_existing_facts_and_person_for_keying PASSED [ 53%]
+tests/test_memory_extract.py::test_claude_extractor_request_body_forces_tool_choice_and_schema PASSED [ 55%]
+tests/test_memory_extract.py::test_claude_extractor_parses_tool_use_into_extraction_with_usage PASSED [ 56%]
+tests/test_memory_extract.py::test_claude_extractor_no_tool_use_block_is_schema_error PASSED [ 58%]
+tests/test_memory_extract.py::test_claude_extractor_maps_timeout_error PASSED [ 60%]
+tests/test_memory_extract.py::test_claude_extractor_maps_rate_limit_error PASSED [ 61%]
+tests/test_memory_extract.py::test_claude_extractor_maps_connection_error PASSED [ 63%]
+tests/test_memory_extract.py::test_claude_extractor_default_model_follows_env PASSED [ 65%]
+tests/test_memory_extract.py::test_claude_extractor_reuses_er_judge_timeout_default PASSED [ 66%]
+tests/test_memory_extract.py::test_openai_extractor_request_body_forces_tool_choice_and_schema PASSED [ 68%]
+tests/test_memory_extract.py::test_openai_extractor_parses_tool_call_into_extraction PASSED [ 70%]
+tests/test_memory_extract.py::test_openai_extractor_no_tool_call_is_schema_error PASSED [ 71%]
+tests/test_memory_extract.py::test_openai_extractor_invalid_json_arguments_is_schema_error PASSED [ 73%]
+tests/test_memory_extract.py::test_openai_extractor_maps_timeout_error PASSED [ 75%]
+tests/test_memory_extract.py::test_openai_extractor_maps_connection_error PASSED [ 76%]
+tests/test_memory_extract.py::test_gemini_extractor_missing_model_env_raises_invalid_value PASSED [ 78%]
+tests/test_memory_extract.py::test_gemini_extractor_request_uses_facts_schema PASSED [ 80%]
+tests/test_memory_extract.py::test_gemini_extractor_parses_text_into_extraction PASSED [ 81%]
+tests/test_memory_extract.py::test_gemini_extractor_text_not_json_is_schema_error PASSED [ 83%]
+tests/test_memory_extract.py::test_gemini_extractor_no_text_is_schema_error PASSED [ 85%]
+tests/test_memory_extract.py::test_fact_extractors_table_has_exactly_three_keys_no_fake PASSED [ 86%]
+tests/test_memory_extract.py::test_extractor_from_env_builds_each_active_provider[anthropic-ANTHROPIC_API_KEY-ClaudeFactExtractor-extra_env0] PASSED [ 88%]
+tests/test_memory_extract.py::test_extractor_from_env_builds_each_active_provider[openai-OPENAI_API_KEY-OpenAIFactExtractor-extra_env1] PASSED [ 90%]
+tests/test_memory_extract.py::test_extractor_from_env_builds_each_active_provider[gemini-GEMINI_API_KEY-GeminiFactExtractor-extra_env2] PASSED [ 91%]
+tests/test_memory_extract.py::test_extractor_from_env_defaults_to_openai PASSED [ 93%]
+tests/test_memory_extract.py::test_extractor_from_env_unknown_provider_rejected PASSED [ 95%]
+tests/test_memory_extract.py::test_extractor_from_env_rejects_disabled_provider PASSED [ 96%]
+tests/test_memory_extract.py::test_extractor_from_env_uses_os_environ_when_env_omitted PASSED [ 98%]
+tests/test_memory_extract.py::test_dummy_key_marker_does_not_leak_into_exceptions_or_output PASSED [100%]
+
+=============================== warnings summary ===============================
+tests/test_memory_extract.py::test_gemini_extractor_request_uses_facts_schema
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 60 passed, 1 warning in 0.62s =========================
+
+=== POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_memory_patterns.py -v ===
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 36 items
+
+tests/test_memory_patterns.py::test_pattern_config_constants_defaults_when_env_missing PASSED [  2%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_default_when_env_missing PASSED [  5%]
+tests/test_memory_patterns.py::test_pattern_config_constants_defaults_when_env_empty_string PASSED [  8%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_default_when_env_empty_string PASSED [ 11%]
+tests/test_memory_patterns.py::test_pattern_config_constants_reads_overrides_from_env PASSED [ 13%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_reads_override_from_env PASSED [ 16%]
+tests/test_memory_patterns.py::test_pattern_config_constants_uses_os_environ_when_env_is_none PASSED [ 19%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_uses_os_environ_when_env_is_none PASSED [ 22%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[0] PASSED [ 25%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[-1] PASSED [ 27%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[abc] PASSED [ 30%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[3.5] PASSED [ 33%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[0] PASSED [ 36%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[-1] PASSED [ 38%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[abc] PASSED [ 41%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[3.5] PASSED [ 44%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[0] PASSED [ 47%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[-1] PASSED [ 50%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[abc] PASSED [ 52%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[3.5] PASSED [ 55%]
+tests/test_memory_patterns.py::test_memory_code_constants_values PASSED  [ 58%]
+tests/test_memory_patterns.py::test_memory_trace_vocab_constants_values PASSED [ 61%]
+tests/test_memory_patterns.py::test_fact_keys_constants_has_no_pattern_prefixed_key PASSED [ 63%]
+tests/test_memory_patterns.py::test_detect_patterns_three_events_creates_pattern_fact PASSED [ 66%]
+tests/test_memory_patterns.py::test_detect_patterns_two_events_no_pattern PASSED [ 69%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_inclusive_default PASSED [ 72%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_exclusive_one_second_early PASSED [ 75%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_moves_with_env_override PASSED [ 77%]
+tests/test_memory_patterns.py::test_detect_patterns_excludes_future_occurred_at PASSED [ 80%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_mix_persons PASSED [ 83%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_mix_types PASSED [ 86%]
+tests/test_memory_patterns.py::test_detect_patterns_updates_existing_fact_same_id_on_new_event PASSED [ 88%]
+tests/test_memory_patterns.py::test_detect_patterns_deletes_fact_when_count_falls_below_threshold PASSED [ 91%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_touch_event_rows PASSED [ 94%]
+tests/test_memory_patterns.py::test_detect_patterns_other_users_person_raises_person_not_found PASSED [ 97%]
+tests/test_memory_patterns.py::test_patterns_module_does_not_import_llm_or_embedding_modules PASSED [100%]
+
+============================== 36 passed in 0.28s ==============================
+
+=== POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_tools_persons.py -v ===
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 42 items
+
+tests/test_tools_persons.py::test_exact_alias_match_ranks_first_and_sets_flag PASSED [  2%]
+tests/test_tools_persons.py::test_partial_alias_match_when_query_is_substring_of_alias PASSED [  4%]
+tests/test_tools_persons.py::test_embedding_similarity_max_per_person_and_not_skipped PASSED [  7%]
+tests/test_tools_persons.py::test_no_embedder_marks_embedding_skipped_but_alias_match_still_works PASSED [  9%]
+tests/test_tools_persons.py::test_hints_do_not_exclude_candidates_only_set_rule_flags PASSED [ 11%]
+tests/test_tools_persons.py::test_invalid_hint_value_or_key_raises_invalid_value PASSED [ 14%]
+tests/test_tools_persons.py::test_other_user_persons_are_excluded PASSED [ 16%]
+tests/test_tools_persons.py::test_result_ordering_is_deterministic_with_id_tiebreak PASSED [ 19%]
+tests/test_tools_persons.py::test_empty_query_raises_invalid_value PASSED [ 21%]
+tests/test_tools_persons.py::test_search_person_writes_one_agent_trace_row PASSED [ 23%]
+tests/test_tools_persons.py::test_create_person_without_confirmed_question_id_raises PASSED [ 26%]
+tests/test_tools_persons.py::test_create_person_with_identity_kind_question_raises PASSED [ 28%]
+tests/test_tools_persons.py::test_create_person_with_unanswered_question_raises PASSED [ 30%]
+tests/test_tools_persons.py::test_create_person_with_mismatched_session_id_raises PASSED [ 33%]
+tests/test_tools_persons.py::test_create_person_with_negative_answer_raises PASSED [ 35%]
+tests/test_tools_persons.py::test_create_person_without_affirmative_options_in_context_raises PASSED [ 38%]
+tests/test_tools_persons.py::test_create_person_with_valid_confirmation_succeeds PASSED [ 40%]
+tests/test_tools_persons.py::test_create_person_fills_alias_embedding_when_embedder_present PASSED [ 42%]
+tests/test_tools_persons.py::test_create_person_leaves_alias_embedding_null_without_embedder PASSED [ 45%]
+tests/test_tools_persons.py::test_create_person_invalid_relation_tag_raises PASSED [ 47%]
+tests/test_tools_persons.py::test_create_person_invalid_hierarchy_raises PASSED [ 50%]
+tests/test_tools_persons.py::test_create_person_writes_one_agent_trace_row PASSED [ 52%]
+tests/test_tools_persons.py::test_update_person_new_alias_adds_row PASSED [ 54%]
+tests/test_tools_persons.py::test_update_person_duplicate_alias_does_not_add_row_and_never_downgrades PASSED [ 57%]
+tests/test_tools_persons.py::test_update_person_display_name_without_confirmation_raises PASSED [ 59%]
+tests/test_tools_persons.py::test_update_person_display_name_with_confirmation_updates_and_keeps_old_alias PASSED [ 61%]
+tests/test_tools_persons.py::test_update_person_display_name_same_value_requires_no_confirmation PASSED [ 64%]
+tests/test_tools_persons.py::test_update_person_facts_upsert_same_key_updates_single_row PASSED [ 66%]
+tests/test_tools_persons.py::test_update_person_facts_different_keys_create_two_rows PASSED [ 69%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[pattern:meal] PASSED [ 71%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[  pattern:meal  ] PASSED [ 73%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[Pattern:meal] PASSED [ 76%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[PATTERN:MEAL] PASSED [ 78%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[PaTtErN:conflict] PASSED [ 80%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[patterns] PASSED [ 83%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[pattern] PASSED [ 85%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[my_pattern:x] PASSED [ 88%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[\ud504\ub85c\uc81d\ud2b8 \ud328\ud134] PASSED [ 90%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_key_blocks_sibling_normal_key_too PASSED [ 92%]
+tests/test_tools_persons.py::test_update_person_other_users_person_raises_person_not_found PASSED [ 95%]
+tests/test_tools_persons.py::test_update_person_no_arguments_raises_invalid_value PASSED [ 97%]
+tests/test_tools_persons.py::test_update_person_writes_one_agent_trace_row PASSED [100%]
+
+============================== 42 passed in 0.34s ==============================
+
+=== POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs (전체 회귀) ===
+........................................................................ [  4%]
+........................................................................ [  9%]
+........................................................................ [ 13%]
+........................................................................ [ 18%]
+........................................................................ [ 22%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 45%]
+........................................................................ [ 49%]
+........................................................................ [ 54%]
+........................................................................ [ 58%]
+........................................................................ [ 63%]
+........................................................................ [ 67%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+........................................................................ [ 85%]
+........................................................................ [ 90%]
+........................................................................ [ 94%]
+........................................................................ [ 99%]
+..........                                                               [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/google/genai/types.py:42
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1594 passed, 1 warning in 12.56s
+
+=== python -c "import app.memory; print(app.memory.__all__)" ===
+['FACT_KEYS', 'MEMORY_TRACE_STEPS', 'MEMORY_TRACE_TOOL_NAME', 'STEP_MEMORY_ERROR', 'STEP_MEMORY_PATTERN', 'STEP_MEMORY_PROMOTE', 'Extraction', 'ExtractedFact', 'FactExtractor', 'FakeFactExtractor', 'PatternChange', 'PatternResult', 'PromotedFact', 'PromotionResult', 'RejectedFact', 'detect_patterns']
+
+=== grep -rn "select_provider\|call_with_error_mapping" app/memory/extract.py ===
+app/memory/extract.py:56:`select_provider`(공급자 선택+거부 판정의 유일한 자리)·
+app/memory/extract.py:57:`call_with_error_mapping`/`call_with_gemini_error_mapping`(예외 매핑 표)·
+app/memory/extract.py:69:그대로 쓸 수 없지만, 이름 집합과 선택 로직(`select_provider`)은 그
+app/memory/extract.py:88:    call_with_error_mapping,
+app/memory/extract.py:90:    select_provider,
+app/memory/extract.py:374:# 공급자 구현 (judge.py 의 등록표 개념·select_provider·오류 매핑 재사용, D11)
+app/memory/extract.py:416:        response = call_with_error_mapping(
+app/memory/extract.py:489:        response = call_with_error_mapping(
+app/memory/extract.py:615:#: `judge.py::JUDGES`/`select_provider` 와 공유하지만, 스키마가 달라 표
+app/memory/extract.py:628:    """`select_provider(env)`(`judge.py` 재사용) -> `FACT_EXTRACTORS[name]()`.
+app/memory/extract.py:632:    return FACT_EXTRACTORS[select_provider(env)]()
+
+=== grep -rnE "^PROVIDERS|^EXTRACTORS.*=.*\{" app/memory/extract.py (자체 등록표 자가점검, 0건이 정상) ===
+grep exit code: 1
+
+=== grep -rn "evaluation" app/memory/ ===
+grep exit code: 1
+
+=== grep -rnE "T_merge|T_new|confidence|create_person\(" app/agent/ (기준선 1건) ===
+app/agent/loop.py:1227:            created = app_tools.create_person(
+
+=== git status --short ===
+ M app/memory/__init__.py
+ M app/memory/types.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+?? app/memory/extract.py
+?? docs/wiki/packages/P6-memory/evidence/20260929-1427-u4-extract.txt
+?? tests/test_memory_extract.py
