@@ -209,6 +209,7 @@ from app.agent.types import (
 )
 from app.db.models import HIERARCHIES, RELATION_TAGS
 from app.er import ERConfig, Judge, Resolution, apply_resolution, resolve
+from app.memory import FactExtractor, after_record
 from app.settings import LOOP_MAX_RESUME_BYTES, user_timezone
 from app.tools.context import ToolContext, to_jsonable, traced
 from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
@@ -678,13 +679,20 @@ class RecordOutcome:
     .stored` 를 조립하는 데 쓰는 부가 정보. `to_dict()` 는 U1 이 고정한
     두 키(`executed`/`failed`)만 낸다 -- 나머지 필드는 이중 출처를 만들지
     않기 위해 trace 출력에는 담지 않는다(같은 값이 필요하면 `loop_turn`
-    행이 `TurnResult.to_dict()` 로 따로 남긴다)."""
+    행이 `TurnResult.to_dict()` 로 따로 남긴다).
+
+    `event_person_ids`(U6 추가) -- 이번 턴에 **실행에 성공한** `add_event`
+    의 `person_id`, 중복 제거·첫 등장 순(01-plan 72행). `app.memory.
+    after_record()` 가 어느 인물의 패턴·승격을 다시 볼지 정하는 유일한
+    재료다. `to_dict()` 에는 담지 않는다(U1 스키마 규약 -- `loop_record`
+    의 기존 키를 바꾸지 않는다, 03-log U6 항목에 이 결정을 남긴다)."""
 
     executed: list[dict[str, Any]] = field(default_factory=list)
     failed: list[dict[str, Any]] = field(default_factory=list)
     events: int = 0
     schedules: int = 0
     schedule_question: PendingQuestionOut | None = None
+    event_person_ids: list[int] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {"executed": list(self.executed), "failed": list(self.failed)}
@@ -809,6 +817,7 @@ def _record_impl(
     events = 0
     schedules = 0
     schedule_question: PendingQuestionOut | None = None
+    event_person_ids: list[int] = []
 
     for position, accepted in enumerate(accepted_execute):
         call = proposal.tool_calls[accepted.index]
@@ -862,6 +871,11 @@ def _record_impl(
         executed.append({"index": accepted.index, "name": accepted.name, "trace_id": ctx.last_trace_id})
         if accepted.name == "add_event":
             events += 1
+            # U6 -- app.memory.after_record() 가 다시 볼 인물 목록(중복
+            # 제거·첫 등장 순). add_event 가 성공했을 때만 담는다(위 try
+            # 블록을 통과한 뒤라 이 지점은 항상 성공 실행이다).
+            if person_id not in event_person_ids:
+                event_person_ids.append(person_id)
         elif accepted.name == "add_schedule":
             schedules += 1
 
@@ -871,6 +885,7 @@ def _record_impl(
         events=events,
         schedules=schedules,
         schedule_question=schedule_question,
+        event_person_ids=event_person_ids,
     )
 
 
@@ -882,9 +897,19 @@ def _record(
     utterance: str,
     *,
     resume_byte_limit: int,
+    extractor: FactExtractor | None = None,
 ) -> RecordOutcome:
     """`loop_record` trace 행 1개(U1 81행 "게이트를 지난 턴마다 정확히
-    1행" -- 되묻기로 실행이 0건이어도 `executed: []` 로 남긴다)."""
+    1행" -- 되묻기로 실행이 0건이어도 `executed: []` 로 남긴다).
+
+    U6 추가 -- `loop_record` trace 가 끝난 **뒤**(01-plan 72행) 한 줄로
+    `app.memory.after_record()` 를 부른다. `extractor` 는 `_traced` 의
+    바인딩 서명 밖에 둔다(`_propose`/`resolve_mentions` 가 `judge`/
+    `config`/`proposer` 를 trace `input` 에 안 찍히게 클로저로 감싸는 것과
+    같은 이유) -- `loop_record.output` 은 여전히 `executed`/`failed` 두
+    키뿐이다. `after_record` 는 `SQLAlchemyError` 를 제외하면 예외를
+    올리지 않으므로(`app/memory/hooks.py` 참고) 이 호출 뒤에도 `_record()`
+    의 반환은 항상 정상 `RecordOutcome` 이다."""
 
     @traced(LOOP_TRACE_TOOL_NAME, step=STEP_LOOP_RECORD)
     def _traced(
@@ -898,7 +923,9 @@ def _record(
             ctx, proposal, verdict, outcome, utterance, resume_byte_limit=resume_byte_limit
         )
 
-    return _traced(ctx, proposal, verdict, outcome, utterance)
+    record = _traced(ctx, proposal, verdict, outcome, utterance)
+    after_record(ctx, record.event_person_ids, extractor)
+    return record
 
 
 # ---------------------------------------------------------------------------
@@ -934,6 +961,7 @@ def run_turn(
     proposer: Proposer | None = None,
     judge: Judge | None = None,
     config: ERConfig | None = None,
+    extractor: FactExtractor | None = None,
 ) -> TurnResult:
     """U5 오케스트레이션 진입점(01-plan U5 "게이트를 통과하고 person_id
     가 확정된 제안만 실행 ... respond.py 가 결과를 문장으로 만든다").
@@ -942,6 +970,15 @@ def run_turn(
     LLM)를 쓴다 -- 테스트는 `FakeProposer` 를 주입해 네트워크 0 으로
     돈다(원칙8). `judge`/`config` 는 `resolve_mentions()` 로 그대로
     전달한다.
+
+    `extractor`(U6 추가) -- `_record()` 를 거쳐 `app.memory.after_record()`
+    로 그대로 전달한다. 생략(`None`)하면 `after_record()` 가
+    `_LazyFactExtractor` 로 감싸 승격 트리거가 걸릴 때만
+    `extractor_from_env()` 를 해소한다(★ R-10 해소,
+    `app/memory/hooks.py` 참고) -- `proposer`/`judge` 와 달리 이 함수
+    자신은 `extractor` 를 **즉시 해소하지 않는다**. 그래야 이 함수를
+    `extractor` 없이 부르는(대부분의) 회귀 테스트가 API 키 없는 환경에서
+    그대로 통과한다.
 
     `resume_turn(ctx, resume_input) -> TurnResult` 은 이 단위(U5)가 아니라
     U7 이 채운다 -- 여기서는 이름조차 선언하지 않는다(해석 단계부터
@@ -960,7 +997,13 @@ def run_turn(
     outcome = resolve_mentions(ctx, proposal, verdict, utterance, judge=judge, config=config)
     resolve_trace_id = ctx.last_trace_id
     record = _record(
-        ctx, proposal, verdict, outcome, utterance, resume_byte_limit=LOOP_MAX_RESUME_BYTES
+        ctx,
+        proposal,
+        verdict,
+        outcome,
+        utterance,
+        resume_byte_limit=LOOP_MAX_RESUME_BYTES,
+        extractor=extractor,
     )
     record_trace_id = ctx.last_trace_id
 
@@ -1106,6 +1149,7 @@ def resume_turn(
     question_id: int,
     judge: Judge | None = None,
     config: ERConfig | None = None,
+    extractor: FactExtractor | None = None,
 ) -> TurnResult:
     """U7 -- `POST /answers/{question_id}` 뒤 절반. 답 저장(`answer_question`,
     무수정 재사용) **뒤에** 저장된 `context` 로 해석 단계부터 다시 돈다
@@ -1113,6 +1157,10 @@ def resume_turn(
     `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아
     만든 것이다 -- 이 함수도, `app/agent/` 어디도 그 ORM 을 직접 다루지
     않는다(판정 표 23행).
+
+    `extractor`(U6 추가) -- `run_turn()` 과 같은 뜻으로 `_record()` 에
+    그대로 전달한다(모듈 docstring 대신 `run_turn` docstring "extractor"
+    절 참고 -- 지연 해소는 같은 `after_record()` 한 자리에서 일어난다).
 
     ## `ResumeInput` 표기 정리 (01-plan 70행 vs U1 구현, 보고에 남긴다)
 
@@ -1284,7 +1332,13 @@ def resume_turn(
     )
     resolve_trace_id = ctx.last_trace_id
     record = _record(
-        ctx, proposal, verdict, outcome, utterance, resume_byte_limit=LOOP_MAX_RESUME_BYTES
+        ctx,
+        proposal,
+        verdict,
+        outcome,
+        utterance,
+        resume_byte_limit=LOOP_MAX_RESUME_BYTES,
+        extractor=extractor,
     )
     record_trace_id = ctx.last_trace_id
 

@@ -59,6 +59,7 @@ from app.api.deps import (
     build_chat_ctx,
     build_ctx,
     get_embedder,
+    get_fact_extractor,
     get_judge,
     get_proposer,
     get_session,
@@ -77,6 +78,7 @@ from app.api.schemas import (
 from app.db.models import AgentTrace
 from app.embedding import EmbeddingProvider
 from app.er import Judge, JudgeUnavailable
+from app.memory import FactExtractor
 from app.tools.context import TRACE_MAX_STRING, ToolContext
 from app.tools.questions import answer_question
 from app.tools.types import ToolError
@@ -121,6 +123,7 @@ def submit_answer(
     session: Session = Depends(get_session),
     judge: Judge | None = Depends(get_judge),
     embedder: EmbeddingProvider | None = Depends(get_embedder),
+    extractor: FactExtractor | None = Depends(get_fact_extractor),
 ) -> AnswerOut:
     """S3.4 턴 N+1 **전체**(칩 선택 → 답 저장 → 재개, U7 -- R6·R7 을 닫는다).
     `answer_question` 호출까지는 P2 그대로다(01-plan 결정 1 "그 화살표는
@@ -144,14 +147,23 @@ def submit_answer(
     롤백" 절과 같은 이유) -- 삼키는 예외가 나면 재개 턴이 flush 한 모든
     행(재개가 만든 별칭·이벤트·일정·중간 trace)만 사라지고, **답 저장
     자체는 세이브포인트 밖이라 영향받지 않는다**(이미 답했다는 사실은
-    남아, 같은 질문으로 세 번째 재개를 시도해도 여전히 409 다)."""
+    남아, 같은 질문으로 세 번째 재개를 시도해도 여전히 409 다).
+
+    **P6-memory U6 추가분** -- `extractor` 는 `get_fact_extractor()`(운영
+    경로 `None`)를 `resume_turn()` 에 그대로 넘긴다. `resume_turn()` 안의
+    `_record()` 가 끝난 뒤 `app.memory.hooks.after_record()` 가 이번
+    재개로 이벤트가 저장된 인물의 패턴·승격을 처리한다 -- 실패해도
+    `SQLAlchemyError` 가 아니면 이 라우트까지 올라오지 않고
+    `memory_error` trace 로만 남는다(`app/memory/hooks.py` 참고)."""
     ctx = build_ctx(session, question_id, embedder=embedder)
     result = answer_question(ctx, question_id, body.answer)
     resume_input = load_resume_input(session, question_id)
 
     try:
         with session.begin_nested():
-            turn = resume_turn(ctx, resume_input, question_id=question_id, judge=judge)
+            turn = resume_turn(
+                ctx, resume_input, question_id=question_id, judge=judge, extractor=extractor
+            )
     except (LoopError, JudgeUnavailable, ToolError) as exc:
         error_trace = _record_loop_error(ctx, body.answer, exc)
         return AnswerOut(
@@ -215,6 +227,7 @@ def chat(
     proposer: Proposer | None = Depends(get_proposer),
     judge: Judge | None = Depends(get_judge),
     embedder: EmbeddingProvider | None = Depends(get_embedder),
+    extractor: FactExtractor | None = Depends(get_fact_extractor),
 ) -> ChatOut:
     """S3.4 턴 N -- 발화 한 건 = 턴 한 번(01-plan U6). 세션 귀속은 결정 I
     (`X-Session-Id` 없으면 서버가 발급해 응답 `session_id` 로 돌려준다).
@@ -247,11 +260,24 @@ def chat(
     세이브포인트 롤백 뒤에도 이전(존재하지 않게 된) 행의 id 를 들고 있을
     수 있지만, 이 함수도 `_record_loop_error()` 도 그 값을 읽지 않는다
     (아래 `trace_ids` 는 `error_trace.id` 하나뿐이다) -- 죽은 참조가 응답에
-    섞이지 않는다."""
+    섞이지 않는다.
+
+    **P6-memory U6 추가분** -- `extractor` 는 `get_fact_extractor()`(운영
+    경로 `None`)를 `run_turn()` 에 그대로 넘긴다. `run_turn()` 안의
+    `_record()` 가 끝난 뒤 `app.memory.hooks.after_record()` 가 이번
+    턴으로 이벤트가 저장된 인물의 패턴·승격을 처리한다(패턴 판정은 항상,
+    승격은 미승격 이벤트가 `MEMORY_PROMOTE_MIN_EVENTS` 이상일 때만) --
+    실패해도 `SQLAlchemyError` 가 아니면 이 라우트까지 올라오지 않고
+    `memory_error` trace 로만 남는다(`app/memory/hooks.py` 참고). 이
+    처리 자체는 위 "부분 롤백" 세이브포인트 **안**에서 돈다 -- 되묻기로
+    끝나 이번 턴에 저장된 이벤트가 없으면 `after_record()` 는 아무 것도
+    하지 않는다."""
     ctx = build_chat_ctx(session, session_id, embedder)
     try:
         with session.begin_nested():
-            turn = run_turn(ctx, body.utterance, proposer=proposer, judge=judge)
+            turn = run_turn(
+                ctx, body.utterance, proposer=proposer, judge=judge, extractor=extractor
+            )
     except (LoopError, JudgeUnavailable, ToolError) as exc:
         error_trace = _record_loop_error(ctx, body.utterance, exc)
         return ChatOut(

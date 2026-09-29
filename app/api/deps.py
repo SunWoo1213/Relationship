@@ -81,6 +81,7 @@ from app.db.models import PendingQuestion
 from app.db.session import SessionLocal
 from app.embedding import EmbeddingProvider, OpenAIEmbeddingProvider
 from app.er import Judge
+from app.memory import FactExtractor
 from app.settings import app_user_id
 from app.tools.context import ToolContext
 from app.tools.types import QuestionNotFound
@@ -235,3 +236,20 @@ def get_embedder() -> EmbeddingProvider | None:
     실제 OpenAI 호출 없이 네트워크 0 으로 돈다(`get_proposer()`/
     `get_judge()` 와 같은 관례)."""
     return _embedder_from_env()
+
+
+def get_fact_extractor() -> FactExtractor | None:
+    """`POST /chat`/`POST /answers/{id}` 이 `run_turn()`/`resume_turn()`
+    에 넘길 사실 추출기(P6-memory U6). 운영 경로는 `get_proposer()`/
+    `get_judge()` 와 같은 모양으로 항상 `None` 을 돌려준다 -- 다만 그
+    둘과 달리 `run_turn`/`resume_turn` 은 이 값을 **즉시** 해소하지
+    않는다. `None` 은 `app.memory.hooks.after_record()` 로 그대로
+    전달되고, 그 함수가 `_LazyFactExtractor` 로 감싸 승격 트리거가 걸릴
+    때(미승격 이벤트 ≥ `MEMORY_PROMOTE_MIN_EVENTS`)만
+    `app.memory.extract.extractor_from_env()` 를 해소한다(★ R-10 해소,
+    `app/memory/hooks.py` 모듈 docstring 참고) -- 트리거가 걸리지 않는
+    대부분의 요청은 API 키가 없어도 그대로 처리된다. 테스트는
+    `app.dependency_overrides[get_fact_extractor]` 로
+    `FakeFactExtractor`(`app.memory.extract`)를 주입해 네트워크 0 으로
+    돈다(`get_proposer()`/`get_judge()`/`get_embedder()` 와 같은 관례)."""
+    return None
