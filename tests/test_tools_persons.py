@@ -551,6 +551,78 @@ def test_update_person_facts_different_keys_create_two_rows(db_session):
     assert {row.confidence for row in rows} == {1.0}
 
 
+@pytest.mark.parametrize(
+    "key",
+    [
+        "pattern:meal",
+        "  pattern:meal  ",
+        "Pattern:meal",
+        "PATTERN:MEAL",
+        "PaTtErN:conflict",
+    ],
+)
+def test_update_person_facts_pattern_prefix_key_raises_invalid_value(db_session, key):
+    """U3(01-plan 69행, 결정 D-7 세 겹 중 셋째) -- `pattern:` 접두는 승격
+    (`app/memory/patterns.py`) 전용이다. 앞뒤 공백·대소문자 변형도 같은
+    접두로 본다."""
+    person = _make_person(db_session, display_name="김철수")
+    ctx = _ctx(db_session)
+
+    with pytest.raises(InvalidValue):
+        update_person(ctx, person.id, facts=[{"key": key, "value": "값"}])
+
+    rows = (
+        db_session.execute(select(PersonFact).where(PersonFact.person_id == person.id))
+        .scalars()
+        .all()
+    )
+    assert rows == []
+
+
+@pytest.mark.parametrize("key", ["patterns", "pattern", "my_pattern:x", "프로젝트 패턴"])
+def test_update_person_facts_non_pattern_prefix_key_is_not_blocked(db_session, key):
+    """`pattern:` 로 시작하지 않으면(접두사가 아니라 부분 문자열일 뿐이면)
+    막지 않는다 -- 경계를 넘겨 정상 사실을 걷어차지 않는다(01-plan 69행)."""
+    person = _make_person(db_session, display_name="김철수")
+    ctx = _ctx(db_session)
+
+    update_person(ctx, person.id, facts=[{"key": key, "value": "값"}])
+
+    rows = (
+        db_session.execute(
+            select(PersonFact)
+            .where(PersonFact.person_id == person.id)
+            .where(PersonFact.key == key)
+        )
+        .scalars()
+        .all()
+    )
+    assert len(rows) == 1
+    assert rows[0].value == "값"
+
+
+def test_update_person_facts_pattern_key_blocks_sibling_normal_key_too(db_session):
+    """5번 -- `facts` 에 정상 키와 `pattern:` 키가 섞이면 전체가 거부되고,
+    앞서 처리됐을 정상 키도 저장되지 않는다(부분 반영 금지, 원칙9). 먼저
+    전체를 검사하고 그 뒤에 쓰도록 구현했다(01-plan U3 권장)."""
+    person = _make_person(db_session, display_name="김철수")
+    ctx = _ctx(db_session)
+
+    with pytest.raises(InvalidValue):
+        update_person(
+            ctx,
+            person.id,
+            facts=[{"key": "취미", "value": "등산"}, {"key": "pattern:meal", "value": "3회"}],
+        )
+
+    rows = (
+        db_session.execute(select(PersonFact).where(PersonFact.person_id == person.id))
+        .scalars()
+        .all()
+    )
+    assert rows == []
+
+
 def test_update_person_other_users_person_raises_person_not_found(db_session):
     person = _make_person(db_session, user_id="other-user", display_name="타인")
     ctx = _ctx(db_session, user_id="local")

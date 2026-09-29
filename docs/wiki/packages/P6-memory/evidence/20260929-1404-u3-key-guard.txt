@@ -1,0 +1,165 @@
+=== POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_tools_persons.py -k pattern -v ===
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 42 items / 32 deselected / 10 selected
+
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[pattern:meal] PASSED [ 10%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[  pattern:meal  ] PASSED [ 20%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[Pattern:meal] PASSED [ 30%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[PATTERN:MEAL] PASSED [ 40%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[PaTtErN:conflict] PASSED [ 50%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[patterns] PASSED [ 60%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[pattern] PASSED [ 70%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[my_pattern:x] PASSED [ 80%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[\ud504\ub85c\uc81d\ud2b8 \ud328\ud134] PASSED [ 90%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_key_blocks_sibling_normal_key_too PASSED [100%]
+
+====================== 10 passed, 32 deselected in 0.25s =======================
+
+=== POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_tools_persons.py -v ===
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 42 items
+
+tests/test_tools_persons.py::test_exact_alias_match_ranks_first_and_sets_flag PASSED [  2%]
+tests/test_tools_persons.py::test_partial_alias_match_when_query_is_substring_of_alias PASSED [  4%]
+tests/test_tools_persons.py::test_embedding_similarity_max_per_person_and_not_skipped PASSED [  7%]
+tests/test_tools_persons.py::test_no_embedder_marks_embedding_skipped_but_alias_match_still_works PASSED [  9%]
+tests/test_tools_persons.py::test_hints_do_not_exclude_candidates_only_set_rule_flags PASSED [ 11%]
+tests/test_tools_persons.py::test_invalid_hint_value_or_key_raises_invalid_value PASSED [ 14%]
+tests/test_tools_persons.py::test_other_user_persons_are_excluded PASSED [ 16%]
+tests/test_tools_persons.py::test_result_ordering_is_deterministic_with_id_tiebreak PASSED [ 19%]
+tests/test_tools_persons.py::test_empty_query_raises_invalid_value PASSED [ 21%]
+tests/test_tools_persons.py::test_search_person_writes_one_agent_trace_row PASSED [ 23%]
+tests/test_tools_persons.py::test_create_person_without_confirmed_question_id_raises PASSED [ 26%]
+tests/test_tools_persons.py::test_create_person_with_identity_kind_question_raises PASSED [ 28%]
+tests/test_tools_persons.py::test_create_person_with_unanswered_question_raises PASSED [ 30%]
+tests/test_tools_persons.py::test_create_person_with_mismatched_session_id_raises PASSED [ 33%]
+tests/test_tools_persons.py::test_create_person_with_negative_answer_raises PASSED [ 35%]
+tests/test_tools_persons.py::test_create_person_without_affirmative_options_in_context_raises PASSED [ 38%]
+tests/test_tools_persons.py::test_create_person_with_valid_confirmation_succeeds PASSED [ 40%]
+tests/test_tools_persons.py::test_create_person_fills_alias_embedding_when_embedder_present PASSED [ 42%]
+tests/test_tools_persons.py::test_create_person_leaves_alias_embedding_null_without_embedder PASSED [ 45%]
+tests/test_tools_persons.py::test_create_person_invalid_relation_tag_raises PASSED [ 47%]
+tests/test_tools_persons.py::test_create_person_invalid_hierarchy_raises PASSED [ 50%]
+tests/test_tools_persons.py::test_create_person_writes_one_agent_trace_row PASSED [ 52%]
+tests/test_tools_persons.py::test_update_person_new_alias_adds_row PASSED [ 54%]
+tests/test_tools_persons.py::test_update_person_duplicate_alias_does_not_add_row_and_never_downgrades PASSED [ 57%]
+tests/test_tools_persons.py::test_update_person_display_name_without_confirmation_raises PASSED [ 59%]
+tests/test_tools_persons.py::test_update_person_display_name_with_confirmation_updates_and_keeps_old_alias PASSED [ 61%]
+tests/test_tools_persons.py::test_update_person_display_name_same_value_requires_no_confirmation PASSED [ 64%]
+tests/test_tools_persons.py::test_update_person_facts_upsert_same_key_updates_single_row PASSED [ 66%]
+tests/test_tools_persons.py::test_update_person_facts_different_keys_create_two_rows PASSED [ 69%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[pattern:meal] PASSED [ 71%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[  pattern:meal  ] PASSED [ 73%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[Pattern:meal] PASSED [ 76%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[PATTERN:MEAL] PASSED [ 78%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[PaTtErN:conflict] PASSED [ 80%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[patterns] PASSED [ 83%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[pattern] PASSED [ 85%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[my_pattern:x] PASSED [ 88%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[\ud504\ub85c\uc81d\ud2b8 \ud328\ud134] PASSED [ 90%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_key_blocks_sibling_normal_key_too PASSED [ 92%]
+tests/test_tools_persons.py::test_update_person_other_users_person_raises_person_not_found PASSED [ 95%]
+tests/test_tools_persons.py::test_update_person_no_arguments_raises_invalid_value PASSED [ 97%]
+tests/test_tools_persons.py::test_update_person_writes_one_agent_trace_row PASSED [100%]
+
+============================== 42 passed in 0.32s ==============================
+
+=== POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_memory_patterns.py -v ===
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 36 items
+
+tests/test_memory_patterns.py::test_pattern_config_constants_defaults_when_env_missing PASSED [  2%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_default_when_env_missing PASSED [  5%]
+tests/test_memory_patterns.py::test_pattern_config_constants_defaults_when_env_empty_string PASSED [  8%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_default_when_env_empty_string PASSED [ 11%]
+tests/test_memory_patterns.py::test_pattern_config_constants_reads_overrides_from_env PASSED [ 13%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_reads_override_from_env PASSED [ 16%]
+tests/test_memory_patterns.py::test_pattern_config_constants_uses_os_environ_when_env_is_none PASSED [ 19%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_uses_os_environ_when_env_is_none PASSED [ 22%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[0] PASSED [ 25%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[-1] PASSED [ 27%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[abc] PASSED [ 30%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[3.5] PASSED [ 33%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[0] PASSED [ 36%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[-1] PASSED [ 38%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[abc] PASSED [ 41%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[3.5] PASSED [ 44%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[0] PASSED [ 47%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[-1] PASSED [ 50%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[abc] PASSED [ 52%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[3.5] PASSED [ 55%]
+tests/test_memory_patterns.py::test_memory_code_constants_values PASSED  [ 58%]
+tests/test_memory_patterns.py::test_memory_trace_vocab_constants_values PASSED [ 61%]
+tests/test_memory_patterns.py::test_fact_keys_constants_has_no_pattern_prefixed_key PASSED [ 63%]
+tests/test_memory_patterns.py::test_detect_patterns_three_events_creates_pattern_fact PASSED [ 66%]
+tests/test_memory_patterns.py::test_detect_patterns_two_events_no_pattern PASSED [ 69%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_inclusive_default PASSED [ 72%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_exclusive_one_second_early PASSED [ 75%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_moves_with_env_override PASSED [ 77%]
+tests/test_memory_patterns.py::test_detect_patterns_excludes_future_occurred_at PASSED [ 80%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_mix_persons PASSED [ 83%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_mix_types PASSED [ 86%]
+tests/test_memory_patterns.py::test_detect_patterns_updates_existing_fact_same_id_on_new_event PASSED [ 88%]
+tests/test_memory_patterns.py::test_detect_patterns_deletes_fact_when_count_falls_below_threshold PASSED [ 91%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_touch_event_rows PASSED [ 94%]
+tests/test_memory_patterns.py::test_detect_patterns_other_users_person_raises_person_not_found PASSED [ 97%]
+tests/test_memory_patterns.py::test_patterns_module_does_not_import_llm_or_embedding_modules PASSED [100%]
+
+============================== 36 passed in 0.30s ==============================
+
+=== POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs ===
+........................................................................ [  4%]
+........................................................................ [  9%]
+........................................................................ [ 14%]
+........................................................................ [ 18%]
+........................................................................ [ 23%]
+........................................................................ [ 28%]
+........................................................................ [ 32%]
+........................................................................ [ 37%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 56%]
+........................................................................ [ 61%]
+........................................................................ [ 65%]
+........................................................................ [ 70%]
+........................................................................ [ 75%]
+........................................................................ [ 79%]
+........................................................................ [ 84%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+......................                                                   [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/google/genai/types.py:42
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1534 passed, 1 warning in 13.19s
+
+=== grep -rn "pattern" app/tools/persons.py ===
+app/tools/persons.py:524:        # U3(D-7 세 겹 중 셋째): `pattern:` 접두 키는 승격(`app/memory/patterns.py`)
+
+=== grep -rnE "T_merge|T_new|confidence|create_person\(" app/agent/ ===
+app/agent/loop.py:1227:            created = app_tools.create_person(
+
+=== git status --short ===
+ M app/tools/persons.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/fixes/FIX-013.md
+ M docs/wiki/journal.md
+ M tests/test_tools_persons.py
+?? docs/wiki/packages/P6-memory/evidence/20260929-1404-u3-key-guard.txt

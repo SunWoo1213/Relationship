@@ -84,7 +84,7 @@ from app.db.models import (
     RELATION_TAGS,
 )
 from app.embedding import EmbedderCallable, EmbeddingProvider, as_provider, check_dimension
-from app.settings import DEFAULT_FACT_CONFIDENCE, SEARCH_TOP_K
+from app.settings import DEFAULT_FACT_CONFIDENCE, PATTERN_KEY_PREFIX, SEARCH_TOP_K
 from app.tools.context import ToolContext, traced
 from app.tools.types import (
     AFFIRMATIVE_KEY,
@@ -521,6 +521,14 @@ def update_person(
         )
 
     if facts is not None:
+        # U3(D-7 세 겹 중 셋째): `pattern:` 접두 키는 승격(`app/memory/patterns.py`)
+        # 전용이다 -- 이 툴로는 만들 수도 덮어쓸 수도 없다. 앞뒤 공백·대소문자
+        # 변형("Pattern:", "PATTERN:")도 같은 접두로 취급해 막는다(01-plan 69행).
+        # 먼저 **전체 facts 를 검사**하고 나서 쓴다 -- 리스트 중간에서 막히면
+        # 앞쪽 사실만 반영된 채 InvalidValue 가 나가는 부분 반영을 만들기
+        # 때문이다(원칙9: 툴 호출 하나의 근거는 전부 반영되거나 전부 안 되어야
+        # trace 와 실제 상태가 어긋나지 않는다). 아래 두 번째 루프가 실제 upsert.
+        normalized_facts: list[tuple[str, str]] = []
         for fact in facts:
             key = fact.get("key") if isinstance(fact, dict) else None
             value = fact.get("value") if isinstance(fact, dict) else None
@@ -530,7 +538,13 @@ def update_person(
                 raise InvalidValue("update_person: fact value must be a non-empty string")
             normalized_key = key.strip()
             normalized_value = value.strip()
+            if normalized_key.casefold().startswith(PATTERN_KEY_PREFIX.casefold()):
+                raise InvalidValue(
+                    f"update_person: fact key must not use the reserved '{PATTERN_KEY_PREFIX}' prefix"
+                )
+            normalized_facts.append((normalized_key, normalized_value))
 
+        for normalized_key, normalized_value in normalized_facts:
             existing_fact = (
                 ctx.session.execute(
                     select(PersonFact)

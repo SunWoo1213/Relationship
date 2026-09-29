@@ -318,3 +318,6 @@
 - 2026-09-29 13:23 | FIX | FIX-013 계획 3차본 검증 **통과**(verifier, [필수] 0·[권고] 6). 격리 실험 6종 훅 × 30건 + 구멍 9건. 판정 evidence/FIX-013/20260929-1320-verify-3.md | FIX-013
 - 2026-09-29 13:36 | HARNESS | settings.json 에 읽기 전용 Bash 허용 목록 24줄 추가(auto mode 프롬프트 감소). 적용 뒤 test-guards.sh 실패 0 — 훅은 허용 목록과 무관하게 계속 돈다 | auto-mode
 - 2026-09-29 13:55 | COMMIT | e1ca8da harness(hooks): 커밋과 푸시를 한 명령에 묶어도 후처리가 다 돌게 한다
+- 2026-09-29 13:56 | COMMIT | 688d208 harness(settings): 읽기 전용 Bash 를 허용하고 파일 편집은 툴로만 한다
+- 2026-09-29 13:56 | PUSH-dev2 | origin dev2 688d208 (실험 푸시)
+- 2026-09-29 14:05 | P6 | U3 `pattern:` 접두 키 보호를 backend-agent 에 위임 (L-004 마커 생성). 부분 반영 방지(정상 키와 pattern 키를 섞은 호출)도 함께 요구 | P6-memory D-7 원칙9

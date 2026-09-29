@@ -52,3 +52,24 @@
 - 증거: `docs/wiki/packages/P6-memory/evidence/20260929-0116-u2-patterns.txt`, `docs/wiki/packages/P6-memory/evidence/20260929-0116-u2-full-regression.txt`
 - 메인 세션 독립 재확인(증거 `evidence/20260929-0121-u2-main-recheck.txt`): 같은 명령을 다시 돌려 36 passed·전체 1524 passed(1511 + 13, 늘어난 수가 새 테스트 수와 일치) 확인. `patterns.py` 의 import 문에 LLM·임베딩 없음, 원문 삭제·수정 패턴 0건, `app/agent/` 금지 리터럴 1건(기준선과 같음), `app/memory/` 에 "evaluation" 0건. 변경 범위에 `app/agent/`·`app/tools/`·`app/api/`·`alembic/` 없음. 창 경계(`>= now-N일`, `<= now`)·KST 날짜 표기·기준 미달 시 행 삭제와 이전 value 보존을 코드에서 직접 읽어 확인했다.
 - Refs: P6-memory D14 D9 S3.5 R11 security§5 원칙6 원칙8 원칙9
+
+## 2026-09-29 14:04 · fix(P6-memory): U3 `update_person` 의 `pattern:` 접두 키 차단 · pending
+- 변경:
+  - 고친 파일: `app/tools/persons.py` — `update_person` 의 `facts` 처리를 두 단계로 나눴다. 먼저 전체 `facts` 를 순회하며 키·값 형식을 검사하고 `normalized_key.casefold().startswith(PATTERN_KEY_PREFIX.casefold())` 로 `pattern:` 접두(공백 제거 후, 대소문자 무시)를 거부해 `(정규화 키, 정규화 값)` 목록을 만들고, 그 다음에야 이 목록으로 실제 upsert(추가/수정) 루프를 돈다. 접두 상수는 새로 만들지 않고 `app.settings.PATTERN_KEY_PREFIX` 를 import 해서 썼다(`from app.settings import DEFAULT_FACT_CONFIDENCE, PATTERN_KEY_PREFIX, SEARCH_TOP_K`) — `app/memory/patterns.py` 가 같은 상수를 쓰므로 두 경로의 접두 문자열이 한 곳에서만 정의된다.
+  - 고친 파일: `tests/test_tools_persons.py` — `test_update_person_facts_pattern_prefix_key_raises_invalid_value`(5종 파라미터: `pattern:meal`·앞뒤 공백·`Pattern:meal`·`PATTERN:MEAL`·`PaTtErN:conflict`, 전부 `InvalidValue` + `PersonFact` 0행), `test_update_person_facts_non_pattern_prefix_key_is_not_blocked`(4종: `patterns`·`pattern`(콜론 없음)·`my_pattern:x`·`프로젝트 패턴`, 정상 저장 확인), `test_update_person_facts_pattern_key_blocks_sibling_normal_key_too`(정상 키 + `pattern:` 키를 함께 넣으면 `InvalidValue` 이고 정상 키도 저장되지 않음) — 총 10건 신규. 함수 이름에 전부 `pattern` 을 넣어 `-k pattern` 으로 골라 걸리게 했다(경계 케이스의 파라미터 값이 한글이라 `-k pattern` 이 값 문자열만으로는 못 걸러서 함수명에 넣음).
+- 판단이 갈렸던 지점과 근거(요구 5번 — 부분 반영):
+  - **먼저 전체 키를 검사하고 나서 쓴다(권장안 채택).** 기존 구현은 `facts` 리스트를 한 번에 순회하며 각 사실마다 즉시 조회(`select`)·수정(`existing_fact.value = …`)·추가(`session.add(...)`)를 했다. SQLAlchemy 의 기본 autoflush 때문에, 두 번째 이후 사실을 조회하는 `select()` 호출이 그 전 사실의 미반영 변경을 먼저 DB 로 흘려보낼 수 있다 — 즉 세 번째 사실이 `pattern:` 접두라 `InvalidValue` 가 나기 전에, 첫·두 번째 사실은 이미 세션에 flush 되어 있을 수 있었다(커밋 여부와 무관하게 "이 호출 하나가 부분 반영된 상태"가 만들어진다). 이는 원칙9(모든 판정에 근거를 남긴다 — 호출 하나의 결과와 실제 DB 상태가 어긋나면 trace 를 봐도 무엇이 실제로 저장됐는지 알 수 없다)와 P5 R-24 규약("툴이 `InvalidValue` 를 던지면 루프가 `failed[]` 로 남긴다")이 "실행되지 않았다"고 기록하는 것과 실제 부분 반영이 남는 것이 어긋나는 문제였다. 그래서 검증 루프(추가 반영 없음)와 upsert 루프(검증 통과 후에만 실행)를 분리해, `InvalidValue` 가 나면 `facts` 어떤 항목도 세션에 손대지 않는다.
+  - **정상 키가 앞서 나와도 저장되지 않아야 한다** — 테스트 `test_update_person_facts_pattern_key_blocks_sibling_normal_key_too` 로 고정. 순서(정상 키가 `pattern:` 키보다 앞/뒤)에 무관하게 항상 전부-반영 또는 전부-거부다.
+- 이유(기획서·카드 연결): 01-plan 69행(U3 정의) — "`update_person(facts=…)` 은 `InvalidValue` 를 던진다. 키 앞뒤 공백과 대소문자 변형을 포함해서 막아야 한다". 결정 D-7(176행) 세 겹 차단 중 셋째("`update_person` 이 거부 — 루프 경로의 기존 구멍까지 막는다"), 그 앞 두 겹(스키마 enum·검증기)은 U4(`FactExtractor`)가 승격 경로에 만든다.
+- 정합성 확인: 원칙6(패턴 판정 로직은 `app/memory/patterns.py` 에만 있고 이 변경은 그 모듈을 건드리지 않음 — `app/memory/patterns.py` 무변경, `test_memory_patterns.py` 36 passed 그대로) · 원칙9(부분 반영 금지로 고정, 위 판단 참고) / D14 D9(대체) S3.2(툴 시그니처 무변경 — 인자·반환 타입 그대로, `InvalidValue` 는 기존에도 쓰던 예외) — 위반 없음. `app/agent/gate.py`·`app/agent/` 전체 무변경(아래 grep 기준선과 동일 1건).
+- 검증:
+  - `POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_tools_persons.py -k pattern -v` → **10 passed**(신규 전부, `-k pattern` 으로 정확히 10건만 선택됨. 함수명에 모두 `pattern` 을 넣어 한글 파라미터 값 1건도 함께 걸리게 함).
+  - `POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_tools_persons.py -v` → **42 passed**(U2 종료 시점 32 + 신규 10).
+  - `POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_memory_patterns.py -v` → **36 passed**(U2 와 동일, 회귀 없음).
+  - `POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs` → **1534 passed, skip 0**(U2 종료 시점 1524 + 신규 10, 늘어난 수가 새 테스트 수와 정확히 일치).
+  - `grep -rn "pattern" app/tools/persons.py` → 1건(524행, 주석. 실제 상수는 `PATTERN_KEY_PREFIX` 로 대문자라 소문자 grep 에는 잡히지 않음 — import 문과 `casefold()` 비교는 코드에서 직접 확인).
+  - `grep -rnE "T_merge|T_new|confidence|create_person\(" app/agent/` → `app/agent/loop.py:1227` 1건, U2 종료 시점 기준선과 동일(`app/agent/` 무변경).
+  - `git status --short` → 변경 파일은 `app/tools/persons.py`·`tests/test_tools_persons.py`(제품·테스트 코드) + 하네스 문서(`HANDOFF.md`·`FIX-013.md`·`journal.md`, 이 단위가 건드리지 않음, 메인 세션 소관) 뿐. `app/memory/`·`app/agent/`·`app/api/`·`alembic/` 없음.
+- 남은 것 · 다음 단위: U4 사실 추출기(`FactExtractor`, L-004 위임 승인 먼저). `registry.md`·`docs/RUNNING.md` 갱신은 U8 몫(이 단위에서 하지 않음). 이월 R-10(U6), R-15(U5).
+- 증거: `docs/wiki/packages/P6-memory/evidence/20260929-1404-u3-key-guard.txt`
+- Refs: P6-memory D14 D9 S3.2 원칙6 원칙9
