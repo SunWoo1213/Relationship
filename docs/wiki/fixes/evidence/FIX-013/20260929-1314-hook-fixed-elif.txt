@@ -1,0 +1,72 @@
+# 훅: fixed-elif.sh  (원본 .claude/hooks/commit-cleanup.sh 의 scratchpad 변이, 격리 임시 저장소에서 실행)
+# 명령: bash run-cc.sh hooks/fixed-elif.sh
+# diff orig.sh -> fixed-elif.sh:
+#   34,35d33
+#   <     exit 0
+#   <   fi
+#   38c36
+#   <   if printf '%s' "$cmd" | grep -Eq 'origin[[:space:]]+dev2:dev([[:space:]]|$)'; then
+#   ---
+#   >   elif printf '%s' "$cmd" | grep -Eq 'origin[[:space:]]+dev2:dev([[:space:]]|$)'; then
+#   45,46d42
+#   <     exit 0
+#   <   fi
+#   49c45
+#   <   if printf '%s' "$cmd" | grep -Eq 'origin[[:space:]]+dev2([[:space:]]|$)'; then
+#   ---
+#   >   elif printf '%s' "$cmd" | grep -Eq 'origin[[:space:]]+dev2([[:space:]]|$)'; then
+#   53d48
+#   <     exit 0
+#   55d49
+#   <   exit 0
+
+== 기존 12건 (test-guards.sh 226~300행 재현) ==
+ok   E1 무관한 명령은 기록 없음
+ok   E2 커밋 성공 시 COMMIT 기록
+ok   E2 승인 마커 소비됨
+ok   E3 제목 불일치면 기록 없음
+ok   E3 제목 불일치면 마커 유지
+ok   E4 실패한 dev2 푸시는 기록 없음
+ok   E5 성공한 dev2 푸시는 기록
+ok   E5 실험 푸시는 작업을 잠그지 않음
+ok   E6 승격 시 PUSH 기록
+ok   E6 승격 뒤 L-003 대기 + 푸시 마커 소비
+ok   E7 precompact 2건
+-- 상태: CM=없음 PM=없음 AW=있음 draft='다른 제목' HEAD='테스트용 첫 커밋' origin/dev2=6747168 origin/dev=6747168 HEAD=6747168
+== FIX-013 새 시험 6건 (3차본 시험 표의 전제·기대 그대로) ==
+ok   N1 commit&&push dev2: COMMIT 누적 2
+ok   N1 commit&&push dev2: PUSH-dev2 누적 2
+ok   N1 커밋 마커 소비
+ok   N2 commit&&push dev2:dev: COMMIT 누적 3
+ok   N2 commit&&push dev2:dev: PUSH 누적 2
+ok   N2 커밋 마커 소비
+ok   N2 푸시 마커 소비
+ok   N2 .awaiting-decision 생성
+ok   N3 푸시 실패: COMMIT 누적 4
+ok   N3 푸시 실패: PUSH-dev2 불변 2
+ok   N3 커밋 마커 소비
+ok   N4 푸시 단독: PUSH-dev2 누적 3
+ok   N4 푸시 단독: COMMIT 불변 4
+ok   N4 커밋 마커 과잉 소비 없음
+ok   N5 커밋 실패: PUSH-dev2 누적 4
+ok   N5 커밋 실패: COMMIT 불변 4
+ok   N5 커밋 마커 유지
+ok   N6 푸시 둘: PUSH 누적 3
+ok   N6 푸시 둘: PUSH-dev2 불변 4 (배타)
+-- 상태: CM=있음 PM=없음 AW=있음 draft='다른 제목' HEAD='두 번째 커밋' origin/dev2=8f65acd origin/dev=8f65acd HEAD=8f65acd
+-- journal --
+# journal
+- 2026-09-29 13:14 | COMMIT | 6747168 테스트용 첫 커밋
+- 2026-09-29 13:14 | PUSH-dev2 | origin dev2 6747168 (실험 푸시)
+- 2026-09-29 13:14 | PUSH | origin dev ← dev2 6747168 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-29 13:14 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
+- 2026-09-29 13:14 | NOTE | 컨텍스트 압축(manual). 재개 시 HANDOFF.md 확인 |
+- 2026-09-29 13:14 | PUSH-dev2 | origin dev2 6747168 (실험 푸시)
+- 2026-09-29 13:14 | COMMIT | 6747168 테스트용 첫 커밋
+- 2026-09-29 13:14 | PUSH | origin dev ← dev2 6747168 — 사용자 결정 대기(승격/수정) L-003
+- 2026-09-29 13:14 | COMMIT | 6747168 테스트용 첫 커밋
+- 2026-09-29 13:14 | COMMIT | 8f65acd 두 번째 커밋
+- 2026-09-29 13:14 | PUSH-dev2 | origin dev2 8f65acd (실험 푸시)
+- 2026-09-29 13:14 | PUSH-dev2 | origin dev2 8f65acd (실험 푸시)
+- 2026-09-29 13:14 | PUSH | origin dev ← dev2 8f65acd — 사용자 결정 대기(승격/수정) L-003
+== 결과: 실패 0 ==

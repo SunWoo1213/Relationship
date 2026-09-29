@@ -1,0 +1,64 @@
+# 구멍 실험: bash holes.sh (수정본 fixed-elif.sh / fixed-elif-reorder.sh / 원본 orig.sh 에 계획이 다루지 않은 표기를 넣는다)
+# 전제(공통): 초안 = HEAD 제목, 커밋 마커 있음, origin/dev2 = HEAD
+
+### H1 개행으로 이은 commit / push
+명령: git commit -F .claude/commit-draft.txt\ngit push origin dev2
+journal:
+  - 2026-09-29 13:16 | PUSH-dev2 | origin dev2 d70d893 (실험 푸시)
+  - 2026-09-29 13:16 | COMMIT | d70d893 테스트용 첫 커밋
+커밋 마커: 소비됨
+
+### H2 파이프로 이은 commit | tee 뒤 && push
+명령: git commit -F .claude/commit-draft.txt | tee /dev/null && git push origin dev2
+journal:
+  - 2026-09-29 13:16 | PUSH-dev2 | origin dev2 d70d893 (실험 푸시)
+  - 2026-09-29 13:16 | COMMIT | d70d893 테스트용 첫 커밋
+커밋 마커: 소비됨
+
+### H3 git -C . 표기
+명령: git -C . commit -F .claude/commit-draft.txt && git -C . push origin dev2
+journal:
+  - 2026-09-29 13:16 | PUSH-dev2 | origin dev2 d70d893 (실험 푸시)
+  - 2026-09-29 13:16 | COMMIT | d70d893 테스트용 첫 커밋
+커밋 마커: 소비됨
+
+### H4 push 가 commit 보다 앞
+명령: git push origin dev2 && git commit -F .claude/commit-draft.txt
+journal:
+  - 2026-09-29 13:16 | PUSH-dev2 | origin dev2 d70d893 (실험 푸시)
+  - 2026-09-29 13:16 | COMMIT | d70d893 테스트용 첫 커밋
+커밋 마커: 소비됨
+
+### H5 커밋 두 개 (HEAD 제목만 비교)
+명령: git commit -F .claude/commit-draft.txt && git commit -F other.txt && git push origin dev2
+journal:
+  - 2026-09-29 13:16 | PUSH-dev2 | origin dev2 d70d893 (실험 푸시)
+  - 2026-09-29 13:16 | COMMIT | d70d893 테스트용 첫 커밋
+커밋 마커: 소비됨
+
+### H6 dev2 푸시가 2>&1 로 끝남
+명령: git commit -F .claude/commit-draft.txt && git push origin dev2 2>&1
+journal:
+  - 2026-09-29 13:16 | PUSH-dev2 | origin dev2 d7614e9 (실험 푸시)
+  - 2026-09-29 13:16 | COMMIT | d7614e9 테스트용 첫 커밋
+커밋 마커: 소비됨
+
+### H7 dev:main 표기인데 승격 마커 없음 (elif 사슬 첫 조건 불성립 → 다음 갈래로 흐르나)
+명령: git commit -F .claude/commit-draft.txt && git push origin dev:main
+journal:
+  - 2026-09-29 13:16 | COMMIT | d7614e9 테스트용 첫 커밋
+커밋 마커: 소비됨
+
+### H8 (reorder 본) 개행으로 이은 commit / push
+명령: git commit -F .claude/commit-draft.txt\ngit push origin dev2
+journal:
+  - 2026-09-29 13:16 | COMMIT | d7614e9 테스트용 첫 커밋
+  - 2026-09-29 13:16 | PUSH-dev2 | origin dev2 d7614e9 (실험 푸시)
+커밋 마커: 소비됨
+
+### H9 (원본, 대조) 개행으로 이은 commit / push
+명령: git commit -F .claude/commit-draft.txt\ngit push origin dev2
+journal:
+  - 2026-09-29 13:16 | PUSH-dev2 | origin dev2 d7614e9 (실험 푸시)
+커밋 마커: 남음
+

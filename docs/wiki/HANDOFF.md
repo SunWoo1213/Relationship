@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-29 08:20 — **세션 인계용 정리(사용자 요청).** 지금 자리: **FIX-013 계획 3차본을 막 완성했고, 아직 검증받지 않았다.** 2차까지 모두 verifier 보류였다. 3차에서 바뀐 핵심: 수정 방식이 "`exit` 네 곳 삭제" 에서 **"세 `if` 를 `if/elif/elif` 사슬로 합치기"** 로 바뀌었다 — 지금 갈래의 배타를 만드는 것이 바로 그 `exit` 들이라, 지우기만 하면 한 명령이 여러 갈래를 타서 새 결함이 생긴다(verifier 격리 실험으로 확인). **다음에 할 일: 3차본을 verifier 에 재검증(L-004 승인 먼저) → 통과하면 사용자 승인 → 구현.** 구현 전에 검출력 확인 A·B·C 를 먼저 한다(FIX-013 회귀 표). 커밋은 훅+시험+문서 한 덩어리. (이전: 07:40 — 2차본 재검증 위임.)
+갱신: 2026-09-29 13:50 — **FIX-013 구현 완료, `/commit` 승인 대기.** 훅(커밋 처리를 앞으로 + 푸시 갈래 `if/elif/elif`) · 시험 6건(증분 판정) · `CC_HOOK` 오버라이드 · `SKILL.md` §6 문장. **회귀 표 6행 전부 충족**: `test-guards.sh` 실패 0(ok 116) · `pytest` 1524 passed skip 0 · 검출력 A(고치기 전 N1·N2·N3 실패) · B(N4 만) · C(N6 만). 증거 `fixes/evidence/FIX-013/20260929-1344·1346·1347*`. 다음: `/commit`(훅+시험+문서+journal 한 덩어리) → dev2 푸시(**단독 호출**). 그 뒤 **P6-memory U3**(`pattern:` 접두 키 보호). 곁들여 끝난 것: `settings.json` 읽기 전용 Bash 허용 목록 24줄 · CLAUDE.md·HANDOFF 에 "파일 변경은 Write/Edit 툴로만" 규칙 · `fixes/FIX-014.md`(후보) 신설. (이전: 13:35 — 3차본 검증 통과 / 13:09 — 3차본 검증 위임.)
 
 
 
@@ -38,7 +38,7 @@ active: **P6-memory** | frozen: none | 브랜치 `dev2`(작업·실험) | main =
 2. (완료 `c4285ed`) **FIX-008** 훅 인터프리터 탐지. 남은 확인 하나: 다음 세션 시작 로그에서 `(source: unknown)` 이 사라지는지 보고 FIX-008 `## 결과` 검증 4번에 적는다.
 3. (완료 `3c0f0d9`, dev2 푸시됨) **브랜치 3단계 전환 FIX-010** — 실험 `git push origin dev2`(마커 없음) → 검증 승격 `git push origin dev2:dev`(승인 마커 + L-003 대기) → 배포 `git push origin dev:main`. `origin dev` 직접 푸시는 거부.
 4. (완료 `217e523`·`cd09a60`) **FIX-011 구현 검증 복구 + 훅 시험 12건**. (완료 `0c46913`) **FIX-012 DB 기본 포트 5433**. **사용자 몫: Windows 기기 확인 5가지**(아래 "사용자 몫" 절).
-5. **(3차본 검증 대기) FIX-013** — 커밋+푸시 복합 명령에서 커밋 후처리가 건너뛰는 결함(`0c46913` 에서 실제 발생). 계획 `fixes/FIX-013.md` 의 **개정 이력 절부터 읽으면** 1·2차에서 무엇이 틀렸는지 알 수 있다. 3차본 요지: 푸시 갈래 세 개를 `if/elif/elif` 로 합치고 `exit` 를 없애 커밋 처리로 잇는다 · 복합 명령 시험 6건(전제에 ref 재동기화·`.awaiting-decision` 초기화 포함) · 검출력 확인 A·B·C 를 **고치기 전에** 수행 · `SKILL.md` §5~§6 에 "푸시는 별도 Bash 호출" 문장.
+5. **(구현 완료, 커밋 대기) FIX-013** — 커밋+푸시 복합 명령에서 커밋 후처리가 건너뛰는 결함. 4차본 검증 통과(verifier [필수] 0·[권고] 6, 전부 반영) → 구현. 훅은 커밋 처리를 앞으로 옮기고 푸시 갈래를 `if/elif/elif` 로 합쳤다. 시험 6건(증분 판정) + `CC_HOOK` 오버라이드 신설. **회귀 표 6행 전부 충족** — `test-guards.sh` 실패 0(ok 116) · `pytest` 1524 passed · 검출력 A·B·C 재현. 증거 `fixes/evidence/FIX-013/20260929-134*`.
 6. (완료 `d67d084`) **P6-memory U2 패턴 감지 규칙**. 다음은 **U3**(`pattern:` 접두 키 보호) → U4(추출기) → U5(승격) → U6(루프 연결) → U7(직접 사실 링크) → U8(기계 검증). 단위마다 L-004 위임 승인·`/commit`.
 7. 이월: R-10(U6 추출기 지연 생성), R-15(U5 결정 F 스키마 `min_events`). 그다음 `P6-briefing`(패턴 문장화·브리핑 직전 패턴 재계산). 이후 P9 AWS(Terraform).
 - 발견: 지금 루프가 `pattern:` 키 사실을 막지 않는다 → U3 가 막는다.
@@ -51,6 +51,7 @@ active: **P6-memory** | frozen: none | 브랜치 `dev2`(작업·실험) | main =
 
 ## 열린 질문 · 보류
 - **[결정됨 2026-09-29] 환경 파일은 코드가 읽지 않는다 — A안 유지**(셸에서 `set -a; . ./.env; set +a`). 코드가 `load_dotenv` 로 읽는 안을 검토했으나, 테스트 3개가 `app.main` 을 import 해서 "앱 시작할 때만 읽는다" 가 성립하지 않는다(진입점 `app/run.py` 분리가 필요). 오늘 문제의 실제 원인은 기본값 어긋남이었고 FIX-012 로 닫혔다. **P9(AWS 배포)에서 진입점을 정리할 때 재검토** — `lessons/CANDIDATES.md` C-8, 근거는 `fixes/FIX-012.md` "검토하고 보류한 것" 절.
+- **FIX-014(후보, 미착수)** — 훅의 판정 입력이 실제 행위와 어긋난다. ① Bash 편집(`sed -i`·heredoc·`>`)은 `stage-gate`·`secret-guard` 를 통째로 지나간다(활성 작업 게이트·frozen·L-003 잠금·비밀 검사가 동시에 열림). ② `commit-cleanup` 은 명령 **문자열**만 보므로 실행되지 않은 푸시를 기록할 수 있다(2026-09-29 실제 발생, 가짜 줄 삭제함). 당장은 운용 규칙으로 막아 뒀다(CLAUDE.md "파일 변경은 Write/Edit 툴로만"). 카드 `fixes/FIX-014.md`.
 - 보류 목록: R-19(`verify-plan.sh` 7절 정규식) · ~~`test-guards.sh` 옛 경로~~(FIX-010 에서 해소) · P4b 01-plan 111행 경로 오기 · 03-log `Refs: R8` 어휘 충돌 · 하네스 부채(verify-plan 토큰 스캔 오탐, findings.py 빈 표 중복, verify-impl 이 05 머리말 메모를 지우는 문제).
 - P9 전: 다중 사용자 격리 부채(F-fbaaae). 개발 DB 에 확인용 행(`judge-row7-*`·`verifier-row7-*`·`row8-check-23175`·`fix005-recheck`)이 남아 있다. 지우지 않는다.
 
@@ -60,4 +61,5 @@ active: **P6-memory** | frozen: none | 브랜치 `dev2`(작업·실험) | main =
 - 실서버 확인은 사용자가 `!` 로 기동한다(환경 파일은 훅이 막음). 이 세션에서 쓴 명령: `set -a; . ./.env; set +a; unset DATABASE_URL; APP_USER_ID=<확인용 이름> POSTGRES_PORT=5433 nohup python -m uvicorn app.main:app --port 8000 > <scratchpad>/uvicorn.log 2>&1 &`. 한국어 본문은 UTF-8 파일로 `--data-binary @file` 전송(인자로 주면 400).
 - **환경 파일은 셸에 올려 쓴다**(A안, FIX-011·FIX-012): `set -a; . ./.env; set +a`. 값은 출력하지 않는다. DB 포트는 이제 기본값이 5433 이라 포트만 필요하면 안 올려도 되지만(FIX-012), `DATABASE_URL`·API 키가 필요한 실행은 올려야 한다. DB 에 못 붙어 건너뛴 테스트가 있으면 `verify-impl.sh` 가 FAIL 한다.
 - **커밋과 푸시는 반드시 따로 실행한다**(FIX-013). 한 명령에 묶으면 `commit-cleanup` 이 푸시만 처리하고 끝나 마커가 남고 journal 줄이 빠진다. 푸시·승격은 단독 Bash 호출, 승인 마커 먼저. dev 푸시 뒤 `.awaiting-decision` 이 새 커밋을 막는다 → 사용자 결정 후 `--decision fix` 또는 `--release`.
+- **파일 변경은 Write/Edit 툴로만.** Bash(`sed -i`·heredoc·`>`)로 쓰면 `stage-gate`·`secret-guard` 가 입력 필드가 없어 통째로 통과한다 — 활성 작업 게이트·frozen·L-003 잠금·비밀 검사가 동시에 열린다. 실증 `scratchpad/guardhole/demo.txt`, 근본 수정은 FIX-014(후보). 읽기·검색은 Bash 로 해도 된다.
 - `app/` docstring 에 "evaluation" 금지. `app/agent/` 에 `T_merge|T_new|confidence`·`create_person(` 리터럴 금지.
