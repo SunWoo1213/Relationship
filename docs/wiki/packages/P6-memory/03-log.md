@@ -185,3 +185,89 @@
 - 남은 것 · 다음 단위: U8 수용 기준 기계 검증·문서(`registry.md`·`docs/RUNNING.md` 갱신, 전체 회귀·금지 문자열 grep·`alembic check`, L-004 위임 승인 먼저).
 - 증거: `docs/wiki/packages/P6-memory/evidence/20260929-1928-u7-direct-facts.txt`
 - Refs: P6-memory R8 S3.5 결정G(ii) 원칙6 원칙9
+
+## 2026-09-29 20:01 · docs(P6-memory): U8 수용 기준 기계 검증·문서 · pending
+- 변경: 이 단위는 새 기능을 만들지 않는다 — U1~U7 이 이미 만든 것이 01-plan 판정 표
+  21행을 실제로 통과함을 증명하고 문서를 맞추는 일이다. **제품 코드(`app/`)·테스트
+  코드(`tests/`)는 한 줄도 고치지 않았다.**
+  - 판정 표 21행 전부를 기존 테스트에 대응시켜 개별 재실행했다(아래 "판정 표 21행
+    분류" 참고). 21행 전부가 **충족**이었다 — 부분·없음이 하나도 없어 새 테스트를
+    만들 필요가 없었다.
+  - "지킬 불변식" 절 grep 3종을 그 절에 적힌 표기 그대로 재실행했다: `app/memory/`
+    Event 삭제·수정 0건, `app/agent/` 금지 리터럴 1건(`app/agent/loop.py:1352`,
+    기준선 `evidence/20260928-1350-verifier-fact-checks.txt` §6의 1227행 호출문과
+    동일 — U2~U7 이 그 앞쪽에 코드를 더해 줄 번호만 이동), `app/memory/` "evaluation"
+    0건. `app/memory/patterns.py` 의 LLM·임베딩 import 금지는 U2 가 만든 AST
+    테스트(`test_patterns_module_does_not_import_llm_or_embedding_modules`)로 재확인.
+  - `alembic check`(스키마 무변경 — "No new upgrade operations detected.") ·
+    `scripts/tools_check.py`(7/7 ok, 툴 7종 시그니처 무변경) 재실행.
+  - `POSTGRES_PORT=5433 pytest -q -rs` → **1621 passed, skip 0** — U7 03-log 종료
+    시점과 정확히 같은 수치(늘어난 테스트 0건이므로 0=0으로 일치).
+  - `docs/wiki/registry.md`: `app/tools/records.py` 행 비고의 "패턴 감지·승격
+    트리거 없음(원칙6·D9 는 P6-memory)"을 고쳤다 — 이제 `app/agent/loop.py` 의
+    기록 단계가 `after_record()` 를 부르므로 이 문장은 거짓이 되어 있었다. 그 외
+    `app/memory/types.py`(U1, 커밋 `7564c5d`) · `patterns.py`(U2, `d67d084`) ·
+    `extract.py`(U4, `48e3617`) · `promote.py`(U5, `b209581`) · `hooks.py`(U6,
+    `8d3967a`) · `direct_facts.py`(U7, `93c6d3f`) 모듈 행 6개와 대응 테스트 파일
+    (`test_memory_patterns.py`·`test_memory_extract.py`·`test_memory_promote.py`·
+    `test_memory_loop.py`) 행 4개를 신설했다(기존 행 형식 그대로, 총 10행 추가).
+  - `docs/RUNNING.md`: "### 승격·패턴이 언제 도는가 (P6-memory)" 절을 신설했다
+    ("엔티티 해석(ER) 실행법" 절과 "평가 데이터셋" 절 사이). 도는 순서(패턴→승격→
+    직접 사실 링크)·설정 상수 6개 중 환경변수로 덮을 수 있는 3개(`PATTERN_WINDOW_DAYS`
+    ·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`, 나머지 3개는 코드 고정)를
+    이름·기본값만으로 표에 담고, 실패 격리(세이브포인트·`memory_error`)와
+    `memory_promote` trace 가 LLM 승격 행과 U7 직접 링크 행(`output.source="direct"`)
+    두 종류를 함께 담는다는 점(승격 횟수는 행 수가 아니라 `source` 로 센다)을 적었다.
+    비밀 값은 어디에도 적지 않았다(security §1).
+- 판정 표 21행 분류(충족 21 / 부분 0 / 없음 0) — 전체 표는
+  `evidence/20260929-2001-u8-acceptance.txt` 에 있다. 요약:
+  - 1~8·13행(패턴, `test_memory_patterns.py`): 전부 충족. **8행 주석**: 01-plan
+    표 문구가 "이벤트 4건 그대로"라고 적었으나 실제 테스트 시나리오는 이벤트 3건
+    (창 밖으로 밀린 1건 + 남은 2건)이다. 해석 절(ㄱ~ㄹ)·결정 C-5 어디에도 "4건"을
+    요구하는 문장이 없고, 검증되는 성질(패턴 행 삭제·`fact_sources` CASCADE·이벤트
+    원문 보존·trace 이전 value)은 이벤트 개수와 무관하게 전부 확인되므로, 이 숫자
+    불일치는 01-plan 표 문구의 오기로 보이며 제품 코드·테스트의 결함으로 판단하지
+    않았다 — 메인 세션·verifier 판단을 위해 사실만 남긴다(코드는 고치지 않음).
+  - 9·16·17·18행(루프 연결, `test_memory_loop.py`): 전부 충족.
+  - 10~14행(승격, `test_memory_promote.py` + 14행은 `test_memory_extract.py` 도
+    함께): 전부 충족. 14행은 두 파일 모두에서 확인된다 — extract 쪽은 4개 거부
+    사유를 각각 독립 테스트로, promote 쪽은 `test_promote_person_rejects_invalid_
+    facts_but_keeps_valid_ones` 하나가 4개 사유를 한 번에 확인한다.
+  - 15행(툴 키 보호, `test_tools_persons.py -k pattern`): 충족. **주석**: 01-plan
+    이 든 예시 문자열 `" Pattern:meal "`(앞뒤 공백 + 대소문자 혼합)은 파라미터
+    목록에 글자 그대로는 없다 — 공백만 섞인 사례(`"  pattern:meal  "`)와 대소문자만
+    섞인 사례(`"Pattern:meal"`)가 각각 따로 있을 뿐이다. `app/tools/persons.py`
+    539~541행을 직접 읽어 `key.strip()` 뒤 `.casefold().startswith(...)`로 두
+    정규화가 항상 같은 두 줄을 함께 지나가는 것을 확인했으므로 결합 사례도 실질적
+    으로 커버된다고 판단했다(제품 코드 수정 불필요 — 있는 그대로 보고만 한다).
+  - 19행(불변식 grep 3종): 충족 — `evidence/20260929-2001-u8-invariants.txt`.
+  - 20~21행(무변경·전체 회귀): 충족 — `evidence/20260929-2001-u8-regression.txt`.
+  - **제품 코드를 고쳐야 한다고 판단한 것은 없다.** 8행·15행의 문구 불일치는 계획
+    표(01-plan)나 문서 쪽의 사소한 표현 차이이고, 실제로 검증돼야 할 동작(해석
+    절 ㄱ~ㄹ, 결정 C-5·D-7)은 전부 코드가 맞게 지키고 있다.
+  - 새로 만든 테스트: 없음(0건). 21행 전부가 기존 U1~U7 테스트만으로 충족이었다.
+- 이유(기획서·카드 연결): 01-plan 74행(U8 정의) — 판정 표 전 행 실행·전체 회귀·
+  금지 문자열 grep·`alembic check`·`tools_check.py`·`registry.md`/`RUNNING.md`
+  갱신을 그대로 옮겼다. R8(승격→원문 링크)·R11(반복 패턴)·D14(설정값)·S3.5(승격·
+  패턴 설계)·원칙8(재현 가능한 검증, "확인했습니다"가 아니라 명령과 출력)을
+  마지막으로 한 번 더 눈으로 확인하는 단위다.
+- 정합성 확인: 원칙8(모든 증거가 실행한 명령과 그 출력이다 — 요약만 있는 주장
+  없음) · 원칙9(판정 표 21행 각각을 어떤 테스트가 무엇을 검증하는지 근거로 남김)
+  / "하지 말 것" 준수 — 제품 코드·02-plan-verify·01-plan·`HANDOFF.md`·`journal.md`
+  ·`CURRENT.md` 미변경, 커밋·`git add`·푸시 없음, 실 API 키·네트워크 없음(전부
+  기존 스텁/가짜 구현으로 재실행). 04-review(완료 판정)는 verifier 몫이라 이 로그는
+  판정을 내리지 않는다 — 21행 분류표만 근거로 남긴다.
+- 검증: 위 "변경" 절의 모든 명령을 이 세션에서 직접 실행했다(개별 파일 3건,
+  `POSTGRES_PORT=5433` 실 PostgreSQL, 네트워크 0). 요약 수치: 패턴 36 passed·
+  루프 12 passed·승격 15 passed·추출기 거부 10 passed(선택 실행)·툴 키 보호 10
+  passed(선택 실행)·AST import 격리 1 passed·grep 3종 기대와 일치·`alembic check`
+  "No new upgrade operations detected."·`tools_check.py` 7/7 ok·전체 회귀 1621
+  passed skip 0(U7 종료 시점과 동일).
+- 남은 것 · 다음 단위: 04-review(verifier 몫) — 이 로그의 21행 분류표·grep 결과·
+  registry/RUNNING 변경을 입력으로 완료 판정을 내린다.
+- 증거: `docs/wiki/packages/P6-memory/evidence/20260929-2001-u8-acceptance.txt`,
+  `docs/wiki/packages/P6-memory/evidence/20260929-2001-u8-invariants.txt`,
+  `docs/wiki/packages/P6-memory/evidence/20260929-2001-u8-regression.txt`
+- **메인 세션 독립 재확인·보완(2026-09-29 20:15)**: U8 이 "충족 21 / 부분 0 / 없음 0" 으로 보고했으므로, 위임 때 내가 대응이 불확실하다고 짚어 둔 **네 행(3·8·14·17)을 테스트 본문까지 직접 읽어** 검산했다. 결과는 U8 보고와 같다 — 행 3 은 세 테스트(기본 창 포함 경계 `..._window_boundary_inclusive_default` · 1초 빠른 제외 `..._exclusive_one_second_early` · 환경변수로 경계 이동 `..._moves_with_env_override`), 행 8 은 `..._deletes_fact_when_count_falls_below_threshold` 하나가 네 성질(패턴 행 삭제 · `fact_sources` 빈 집합 · trace `deleted.previous_value` 일치 · 이벤트 id 집합 보존)을 전부 단언, 행 14 는 `..._rejects_invalid_facts_but_keeps_valid_ones` 가 거부 4종을 한 호출에 태우고 유효한 1건만 저장됨을 확인(extract 쪽은 사유별 개별 테스트), 행 17 은 `test_resume_turn_after_identity_answer_reaches_pattern_threshold` 가 되묻기 → 답 → 재개 → 누적 3건 → `pattern:conflict "3회"` + 링크 3건까지 단언. 기계 검증도 다시 돌려 같은 수치를 얻었다(전체 1621 passed skip 0 · grep 0/1건(`loop.py:1352`)/0 · `alembic check` "No new upgrade operations detected." · `tools_check` 7/7).
+- **보완 한 건(메인 세션)**: U8 이 "행 15 의 계획 예시 `" Pattern:meal "`(공백+대소문자 결합) 문자열 자체는 파라미터 목록에 없다" 고 보고했다. 코드 경로가 같다는 U8 판단은 맞지만(`key.strip()` 뒤 `.casefold().startswith(…)`), **수용 기준이 그 문자열을 명시**하므로 추론으로 닫지 않고 `tests/test_tools_persons.py` 의 파라미터에 그 값을 한 줄 더했다. `-k pattern` 10 → **11 passed**, 전체 1621 → **1622 passed, skip 0**(증가분 1 = 추가한 케이스 1). 이제 행 15 는 문자 그대로 충족이다. 행 8 의 "이벤트 4건" 은 계획 표 문구와 테스트 시나리오(3건)의 불일치로 남기고 고치지 않았다 — 결정 C-5·해석 절이 개수를 요구하지 않고, 검증되는 성질은 개수와 무관하다. **04-review 가 이 두 줄을 판정 입력으로 쓴다.**
+- Refs: P6-memory R8 R11 D14 S3.5 원칙8 원칙9

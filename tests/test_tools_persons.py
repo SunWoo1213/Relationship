@@ -559,6 +559,10 @@ def test_update_person_facts_different_keys_create_two_rows(db_session):
         "Pattern:meal",
         "PATTERN:MEAL",
         "PaTtErN:conflict",
+        # 01-plan 판정 표 15행이 든 예시 그대로 -- 공백과 대소문자를 **함께**
+        # 섞은 키. 위 두 변형(공백만/대소문자만)이 각각 통과하므로 코드
+        # 경로상 같지만, 수용 기준이 이 문자열을 명시하므로 그대로 고정한다.
+        " Pattern:meal ",
     ],
 )
 def test_update_person_facts_pattern_prefix_key_raises_invalid_value(db_session, key):

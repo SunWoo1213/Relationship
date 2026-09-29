@@ -178,6 +178,29 @@ python scripts/er_smoke.py --provider gemini      # GEMINI_API_KEY·GEMINI_MODEL
 
 - **임계치·가중치 조정**: 환경변수 이름 `T_MERGE`·`T_NEW`·`W_LLM`·`W_EMB`·`W_RULE`(값은 `.env.example`에 이름만 있다 — 이 문서와 에이전트는 `.env`를 읽지 않는다). 조정은 P4-pilot-eval의 트레이드오프 곡선 결과로만 한다.
 
+### 승격·패턴이 언제 도는가 (P6-memory)
+
+`app/memory/`가 에피소드 메모리(`events`, 원문 보존)를 시맨틱 메모리(`person_facts`)로 끌어올리고, 같은 일이 반복되는지 규칙으로 찾는다. `POST /chat`·`POST /answers/{id}` 어느 경로든 `add_event`가 실제로 실행된 턴이면, 그 턴의 기록 단계(`app/agent/loop.py::_record()`)가 끝난 뒤 **같은 요청 안에서** `app/memory/hooks.py::after_record()`가 그 인물마다 아래 순서로 한 번씩 돈다(결정 C-1):
+
+1. **패턴 감지** — `app/memory/patterns.py::detect_patterns()`. 같은 인물의 같은 `events.type`이 창(`PATTERN_WINDOW_DAYS`, 기본 365일) 안에 `PATTERN_MIN_COUNT`(기본 3)건 이상이면 `person_facts(key="pattern:{type}", value="{n}회 (날짜 목록)", confidence=1.0)`를 만들거나 갱신하고, 창 안 이벤트 전부를 `fact_sources`로 잇는다. 미달로 떨어지면(시간이 지나 창 밖으로 밀리면) 그 패턴 사실 행을 지운다 — 원문(`events`)은 그대로 둔다. **LLM·임베딩을 전혀 쓰지 않는다**(순수 SQL·파이썬, 원칙6) — `app/memory/patterns.py`는 `app.memory.extract`·`app.er.judge`·`app.embedding`을 import하지 않는다(테스트로 강제).
+2. **승격** — `app/memory/promote.py::promote_person()`. 그 인물의 아직 승격되지 않은 이벤트가 `MEMORY_PROMOTE_MIN_EVENTS`(기본 5)건 이상이면 사실 추출기(`app/memory/extract.py::FactExtractor`)를 **1회** 불러 사실 후보를 뽑고, 검증을 통과한 사실만 `person_facts`에 upsert하며 근거 이벤트를 `fact_sources`로 잇는다. **미달이면 추출기를 아예 만들지 않는다** — 운영 경로는 `_LazyFactExtractor`(지연 프록시)로 감싸져 있어, 트리거가 걸릴 때만 `extractor_from_env()`가 해소된다. 즉 **하루 종일 다섯 번째 이야기가 안 나오면 `ANTHROPIC_API_KEY`/`OPENAI_API_KEY`/`GEMINI_API_KEY`가 하나도 없어도 그 턴은 정상 처리된다.**
+3. **직접 사실 원문 링크**(U7, 결정 G(ii)) — `app/memory/direct_facts.py::link_direct_facts()`. 같은 턴에 같은 인물로 `update_person(facts=[...])`와 `add_event`가 **함께** 실행됐으면(인식 단계가 발화에서 곧바로 사실을 뽑아 쓴 경우), 그 사실들을 승격을 거치지 않고 그 턴의 이벤트에 바로 `fact_sources`로 잇는다. 이벤트가 없는 턴에 쓰인 사실은 링크 없이 두고 흔적만 trace에 남긴다.
+
+**설정 상수는 6개이고, 그중 환경변수로 덮을 수 있는 것은 3개뿐이다**(`app/settings.py`, 값은 `.env.example`에 이름만 있다 — security §1):
+
+| 이름 | 기본값 | 환경변수로 덮을 수 있는가 |
+|------|--------|---------------------------|
+| `PATTERN_WINDOW_DAYS` | 365 | 예 |
+| `PATTERN_MIN_COUNT` | 3 | 예 |
+| `MEMORY_PROMOTE_MIN_EVENTS` | 5 | 예 |
+| `MEMORY_PROMOTE_MAX_EVENTS` | 20 | 아니오 — 코드 상수 |
+| `MEMORY_MAX_FACTS` | 8 | 아니오 — 코드 상수 |
+| `PATTERN_KEY_PREFIX` | `"pattern:"` | 아니오 — 코드 상수 |
+
+**실패하면 어떻게 되나** — 패턴 감지·승격·직접 링크 전체를 세이브포인트(`ctx.session.begin_nested()`) 하나로 감싼다. 이 안에서 예외가 나면(예: LLM 공급자 타임아웃) 이 부분만 롤백되고 **그 턴에 저장된 이벤트는 잃지 않는다** — `add_event`는 이 세이브포인트 밖에서 이미 커밋 대상이었기 때문이다. 삼킨 예외는 `memory_error` trace 한 행(`{person_id, stage, error}` — 예외 타입 이름만, 프롬프트·메시지 원문은 남기지 않는다)으로 흔적이 남는다.
+
+**trace를 어디서 보나** — `agent_traces`의 `step='memory_pattern'`(패턴 판정 1행, tokens 항상 0)과 `step='memory_promote'`를 본다. `memory_promote`는 **두 종류가 섞여 있다** — LLM이 실제로 뽑은 승격 사실 행과, U7이 만든 직접 사실 링크 행이다. 트리거 미달 호출도 `memory_promote` 행을 남기므로(왜 승격하지 않았는지 근거로), **"승격이 몇 번 일어났나"를 세려면 행 수가 아니라 `output.source`를 봐야 한다** — LLM 승격 행은 이 키가 없고(또는 `considered_event_ids`가 채워져 있고), 직접 링크 행은 `output.source == "direct"`다.
+
 ### 평가 데이터셋(파일럿 40건)
 
 `data/scenarios/`는 엔티티 해석·이벤트 추출을 채점하기 위한 **한국어 대화 시나리오 40건**과 그 골드 라벨이다. 지표 계산(오병합률·미검출률·트레이드오프 곡선)은 여기서 하지 않는다 — P4-pilot-eval이 이 데이터를 읽어서 한다. 실명·연락처는 들어 있지 않다(가상 성명 목록 밖 이름은 검증기가 FAIL 한다).

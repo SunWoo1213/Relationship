@@ -1,0 +1,50 @@
+P6-memory U8 — "지킬 불변식" 절 grep 3종 (판정 표 19행, backend-agent, 2026-09-29 20:01)
+명령은 01-plan.md "## 지킬 불변식" 절에 적힌 표기 그대로 실행했다.
+
+===============================================================================
+grep 1 — Event 삭제·수정 금지 (원문 불변)
+$ grep -rnE "delete\(Event|update\(Event|\.raw_utterance\s*=[^=]|\.content\s*=[^=]" app/memory/
+===============================================================================
+(출력 없음)
+$ echo $?
+1
+
+기대: 0건. 실제: 0건(exit=1 은 grep 이 매칭을 못 찾았다는 뜻 — 정상). 충족.
+
+===============================================================================
+grep 2 — app/agent/ 에 확신도·인물 생성 리터럴을 새로 쓰지 않았는가
+$ grep -rnE "T_merge|T_new|confidence|create_person\(" app/agent/
+===============================================================================
+app/agent/loop.py:1352:            created = app_tools.create_person(
+
+기대: 기준선(evidence/20260928-1350-verifier-fact-checks.txt §6 "app/agent 금지 리터럴
+기준선(판정 19행)": `app/agent/loop.py:1227: created = app_tools.create_person(` 1건,
+그 외 0건)과 같음.
+실제: 1건, 같은 기존 호출문(`resume_turn` 안의 `create_person` 호출) — 줄 번호가
+1227 → 1352 로 이동한 것은 U2~U7 이 그 앞쪽에 코드·docstring 을 더했기 때문이고
+(U6 03-log·U7 03-log 가 각 단위에서 이미 이 이동을 확인해 기록해 두었다), 문장·
+호출 자체는 동일하다. 실제로 `app/agent/loop.py` 1352행을 읽어 `resume_turn` 의
+새_인물 확정 분기(`app_tools.create_person(ctx, display_name=..., aliases=...,
+relation_tag=..., hierarchy=...)`) 그대로임을 확인했다. 충족(기준선과 동일).
+
+===============================================================================
+grep 3 — app/memory/ docstring·주석에 "evaluation" 금지
+$ grep -rn "evaluation" app/memory/
+===============================================================================
+(출력 없음)
+$ echo $?
+1
+
+기대: 0건. 실제: 0건. 충족.
+
+===============================================================================
+보조 확인 — app/memory/patterns.py 가 app.memory.extract·app.er.judge·app.embedding
+을 import 하지 않는가 (U2 가 AST 로 강제한 테스트, 판정 19행의 취지를 코드로 고정)
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest \
+    tests/test_memory_patterns.py::test_patterns_module_does_not_import_llm_or_embedding_modules -v
+===============================================================================
+tests/test_memory_patterns.py::test_patterns_module_does_not_import_llm_or_embedding_modules PASSED [100%]
+============================== 1 passed in 0.04s ===============================
+
+결론: 3개 grep 전부 기대와 일치 — 원문 불변·app/agent/ 리터럴 기준선 불변·
+app/memory/ 에 "evaluation" 문구 없음. 판정 표 19행 충족.

@@ -1,0 +1,59 @@
+P6-memory U8 — 판정 표 20·21행: 무변경 확인 + 전체 회귀 (backend-agent, 2026-09-29 20:01)
+
+===============================================================================
+판정 표 20행 — 스키마 무변경
+$ POSTGRES_PORT=5433 .venv/bin/python -m alembic check
+===============================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+No new upgrade operations detected.
+
+기대: 차이 없음. 실제: "No new upgrade operations detected." — 스키마가 모델과
+일치하고 U1~U7 어느 단위도 스키마를 바꾸지 않았음을 확인. 충족.
+
+===============================================================================
+판정 표 20행 — 툴 7종 시그니처 무변경
+$ POSTGRES_PORT=5433 .venv/bin/python scripts/tools_check.py
+===============================================================================
+[ok] search_person: CLAUDE.md (query, hints?) == actual (ctx, query, hints=None)
+[ok] create_person: CLAUDE.md (display_name, aliases, relation_tag, hierarchy) == actual (ctx, display_name, aliases, relation_tag, hierarchy)
+[ok] update_person: CLAUDE.md (person_id, facts?, new_alias?, display_name?) == actual (ctx, person_id, facts=None, new_alias=None, display_name=None)
+[ok] add_event: CLAUDE.md (person_id, type, content, occurred_at, raw_utterance) == actual (ctx, person_id, type, content, occurred_at, raw_utterance)
+[ok] add_schedule: CLAUDE.md (person_id, title, scheduled_at) == actual (ctx, person_id, title, scheduled_at)
+[ok] get_briefing: CLAUDE.md (person_id, schedule_id?) == actual (ctx, person_id, schedule_id=None)
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+
+기대: 7/7 ok. 실제: 7/7 ok. 충족.
+
+===============================================================================
+판정 표 21행 — 전체 회귀
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs
+===============================================================================
+.venv/lib/python3.14/site-packages/google/genai/types.py:42
+  DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1621 passed, 1 warning in 13.99s
+
+기대: 실패 0·skip 0. 실제: 1621 passed, skip 0, 실패 0(경고 1건은 서드파티
+google-genai 패키지의 Python 3.17 대비 Deprecation 경고이고 P6-memory 코드와
+무관하다).
+
+U7 03-log(2026-09-29 19:28)가 남긴 종료 시점 수치도 "1621 passed, skip 0"이다.
+U8 은 이 세션에서 제품 코드(app/)도, 테스트 파일도 고치지 않았다 — 21행 전부가
+기존 U1~U7 테스트만으로 충족(부분/없음 0건)되었기 때문에 새 테스트를 추가할
+필요가 없었다. 따라서 "늘어난 수 = 새 테스트 수"는 0 = 0으로 정확히 일치한다.
+
+git status --short(이 세션에서 backend-agent 가 건드린 파일만):
+ M docs/RUNNING.md
+ M docs/wiki/registry.md
+(docs/wiki/HANDOFF.md·docs/wiki/journal.md 는 세션 시작 시점부터 이미 미커밋
+상태였다 — 메인 세션 소관, U8 이 건드리지 않았다.) app/·tests/·alembic/ 무변경.

@@ -1,0 +1,183 @@
+P6-memory U8 — 판정 표 21행 기계 검증 (backend-agent, 2026-09-29 20:01)
+POSTGRES_PORT=5433, .venv/bin/python, 실 PostgreSQL(로컬), 네트워크 0(전부 스텁/가짜 구현)
+
+===============================================================================
+판정 표 1~8·13행(패턴, test_memory_patterns.py) — 전체 재실행
+POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_memory_patterns.py -v
+===============================================================================
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- .venv/bin/python
+collecting ... collected 36 items
+
+tests/test_memory_patterns.py::test_pattern_config_constants_defaults_when_env_missing PASSED [  2%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_default_when_env_missing PASSED [  5%]
+tests/test_memory_patterns.py::test_pattern_config_constants_defaults_when_env_empty_string PASSED [  8%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_default_when_env_empty_string PASSED [ 11%]
+tests/test_memory_patterns.py::test_pattern_config_constants_reads_overrides_from_env PASSED [ 13%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_reads_override_from_env PASSED [ 16%]
+tests/test_memory_patterns.py::test_pattern_config_constants_uses_os_environ_when_env_is_none PASSED [ 19%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_uses_os_environ_when_env_is_none PASSED [ 22%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[0] PASSED [ 25%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[-1] PASSED [ 27%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[abc] PASSED [ 30%]
+tests/test_memory_patterns.py::test_pattern_config_constants_window_days_invalid_raises[3.5] PASSED [ 33%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[0] PASSED [ 36%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[-1] PASSED [ 38%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[abc] PASSED [ 41%]
+tests/test_memory_patterns.py::test_pattern_config_constants_min_count_invalid_raises[3.5] PASSED [ 44%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[0] PASSED [ 47%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[-1] PASSED [ 50%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[abc] PASSED [ 52%]
+tests/test_memory_patterns.py::test_promote_min_events_constants_invalid_raises[3.5] PASSED [ 55%]
+tests/test_memory_patterns.py::test_memory_code_constants_values PASSED  [ 58%]
+tests/test_memory_patterns.py::test_memory_trace_vocab_constants_values PASSED [ 61%]
+tests/test_memory_patterns.py::test_fact_keys_constants_has_no_pattern_prefixed_key PASSED [ 63%]
+tests/test_memory_patterns.py::test_detect_patterns_three_events_creates_pattern_fact PASSED [ 66%]
+tests/test_memory_patterns.py::test_detect_patterns_two_events_no_pattern PASSED [ 69%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_inclusive_default PASSED [ 72%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_exclusive_one_second_early PASSED [ 75%]
+tests/test_memory_patterns.py::test_detect_patterns_window_boundary_moves_with_env_override PASSED [ 77%]
+tests/test_memory_patterns.py::test_detect_patterns_excludes_future_occurred_at PASSED [ 80%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_mix_persons PASSED [ 83%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_mix_types PASSED [ 86%]
+tests/test_memory_patterns.py::test_detect_patterns_updates_existing_fact_same_id_on_new_event PASSED [ 88%]
+tests/test_memory_patterns.py::test_detect_patterns_deletes_fact_when_count_falls_below_threshold PASSED [ 91%]
+tests/test_memory_patterns.py::test_detect_patterns_does_not_touch_event_rows PASSED [ 94%]
+tests/test_memory_patterns.py::test_detect_patterns_other_users_person_raises_person_not_found PASSED [ 97%]
+tests/test_memory_patterns.py::test_patterns_module_does_not_import_llm_or_embedding_modules PASSED [100%]
+
+============================== 36 passed in 0.29s ==============================
+
+===============================================================================
+판정 표 9·16·17·18행(루프 연결, test_memory_loop.py) — 전체 재실행
+POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_memory_loop.py -v
+===============================================================================
+============================= test session starts ==============================
+collecting ... collected 12 items
+
+tests/test_memory_loop.py::test_pattern_only_turn_never_calls_extractor_and_has_zero_tokens PASSED [  8%]
+tests/test_memory_loop.py::test_extractor_failure_is_isolated_event_survives_and_memory_error_is_recorded PASSED [ 16%]
+tests/test_memory_loop.py::test_resume_turn_after_identity_answer_reaches_pattern_threshold PASSED [ 25%]
+tests/test_memory_loop.py::test_api_chat_three_turns_creates_pattern_fact_with_three_links PASSED [ 33%]
+tests/test_memory_loop.py::test_after_record_does_not_resolve_extractor_from_env_when_trigger_not_met PASSED [ 41%]
+tests/test_memory_loop.py::test_record_impl_event_person_ids_dedup_first_appearance_order PASSED [ 50%]
+tests/test_memory_loop.py::test_direct_fact_basic_turn_links_free_key_fact_to_same_turn_event PASSED [ 58%]
+tests/test_memory_loop.py::test_direct_fact_turn_without_event_leaves_fact_unlinked_and_traced PASSED [ 66%]
+tests/test_memory_loop.py::test_direct_fact_same_key_twice_in_one_turn_links_once PASSED [ 75%]
+tests/test_memory_loop.py::test_direct_fact_does_not_leak_across_different_persons PASSED [ 83%]
+tests/test_memory_loop.py::test_direct_fact_failed_update_person_call_is_not_collected PASSED [ 91%]
+tests/test_memory_loop.py::test_direct_fact_link_does_not_disturb_promotion_links_in_same_turn PASSED [100%]
+
+============================== 12 passed in 0.50s ==============================
+
+===============================================================================
+판정 표 10~14행(승격, test_memory_promote.py) — 전체 재실행
+POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_memory_promote.py -v
+===============================================================================
+============================= test session starts ==============================
+collecting ... collected 15 items
+
+tests/test_memory_promote.py::test_promote_person_five_unpromoted_events_creates_facts_with_source_links PASSED [  6%]
+tests/test_memory_promote.py::test_promote_person_four_unpromoted_events_does_not_trigger PASSED [ 13%]
+tests/test_memory_promote.py::test_promote_person_does_not_recount_already_considered_events PASSED [ 20%]
+tests/test_memory_promote.py::test_promote_person_unpromoted_events_are_not_lost_when_trigger_not_yet_met PASSED [ 26%]
+tests/test_memory_promote.py::test_promote_person_upsert_same_value_only_adds_link PASSED [ 33%]
+tests/test_memory_promote.py::test_promote_person_upsert_different_value_overwrites_and_replaces_links PASSED [ 40%]
+tests/test_memory_promote.py::test_promote_person_does_not_touch_event_rows PASSED [ 46%]
+tests/test_memory_promote.py::test_promote_person_rejects_invalid_facts_but_keeps_valid_ones PASSED [ 53%]
+tests/test_memory_promote.py::test_promote_person_caps_batch_at_oldest_twenty_events PASSED [ 60%]
+tests/test_memory_promote.py::test_promote_person_trace_output_matches_decision_f_schema PASSED [ 66%]
+tests/test_memory_promote.py::test_promote_person_trace_records_min_events_from_env_override PASSED [ 73%]
+tests/test_memory_promote.py::test_promote_person_non_trigger_trace_records_reason_and_empty_considered PASSED [ 80%]
+tests/test_memory_promote.py::test_promote_person_other_users_person_raises_person_not_found_without_calling_extractor PASSED [ 86%]
+tests/test_memory_promote.py::test_promote_person_ignores_session_id_when_counting_considered_events PASSED [ 93%]
+tests/test_memory_promote.py::test_promote_person_excludes_pattern_prefixed_facts_from_existing_facts_sent_to_extractor PASSED [100%]
+
+============================== 15 passed in 0.30s ==============================
+
+===============================================================================
+판정 표 14행(추출기 거부 4종, test_memory_extract.py 쪽) — 개별 실행
+POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_memory_extract.py -v \
+  -k "rejects_key_outside_vocab or rejects_pattern_prefix_key or rejects_empty_value or rejects_source_event_id_not_in_input"
+===============================================================================
+============================= test session starts ==============================
+collecting ... collected 60 items / 50 deselected / 10 selected
+
+tests/test_memory_extract.py::test_validate_extraction_rejects_key_outside_vocab PASSED [ 10%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_pattern_prefix_key_case_and_space_variants[pattern:meal] PASSED [ 20%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_pattern_prefix_key_case_and_space_variants[ pattern:meal ] PASSED [ 30%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_pattern_prefix_key_case_and_space_variants[Pattern:meal] PASSED [ 40%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_pattern_prefix_key_case_and_space_variants[PATTERN:MEAL] PASSED [ 50%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_pattern_prefix_key_case_and_space_variants[PaTtErN:conflict] PASSED [ 60%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_empty_value[] PASSED [ 70%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_empty_value[   ] PASSED [ 80%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_empty_value[\t\n] PASSED [ 90%]
+tests/test_memory_extract.py::test_validate_extraction_rejects_source_event_id_not_in_input PASSED [100%]
+
+====================== 10 passed, 50 deselected in 0.44s =======================
+
+===============================================================================
+판정 표 15행(툴 키 보호, test_tools_persons.py -k pattern) — 개별 실행
+POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_tools_persons.py -k pattern -v
+===============================================================================
+============================= test session starts ==============================
+collecting ... collected 42 items / 32 deselected / 10 selected
+
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[pattern:meal] PASSED [ 10%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[  pattern:meal  ] PASSED [ 20%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[Pattern:meal] PASSED [ 30%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[PATTERN:MEAL] PASSED [ 40%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_prefix_key_raises_invalid_value[PaTtErN:conflict] PASSED [ 50%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[patterns] PASSED [ 60%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[pattern] PASSED [ 70%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[my_pattern:x] PASSED [ 80%]
+tests/test_tools_persons.py::test_update_person_facts_non_pattern_prefix_key_is_not_blocked[프로젝트 패턴] PASSED [ 90%]
+tests/test_tools_persons.py::test_update_person_facts_pattern_key_blocks_sibling_normal_key_too PASSED [100%]
+
+====================== 10 passed, 32 deselected in 0.19s =======================
+
+===============================================================================
+AST import 격리(원칙6 자가점검, 판정 19행과 함께 쓰는 보조 확인)
+POSTGRES_PORT=5433 .venv/bin/python -m pytest \
+  tests/test_memory_patterns.py::test_patterns_module_does_not_import_llm_or_embedding_modules -v
+===============================================================================
+tests/test_memory_patterns.py::test_patterns_module_does_not_import_llm_or_embedding_modules PASSED [100%]
+============================== 1 passed in 0.04s ===============================
+
+===============================================================================
+판정 표 21행 판단용 사전 베이스라인 확인 — U7 종료 시점과 동일한지
+(POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs, 아래 회귀 증거 파일과 동일 실행)
+결과: 1621 passed, skip 0 — U7 03-log 가 남긴 종료 시점 수치(1621 passed, skip 0)와
+정확히 같다. U8 은 새 테스트를 추가하지 않았다(아래 "판정 표 21행 분류" 참고).
+===============================================================================
+
+===============================================================================
+판정 표 21행 분류표 (충족 21 / 부분 0 / 없음 0)
+===============================================================================
+
+| # | 분류 | 대응 테스트 | 비고 |
+|---|------|------------|------|
+| 1 | 충족 | test_detect_patterns_three_events_creates_pattern_fact | 3건→pattern 1행·confidence 1.0·"3회 (...)"·링크 3, trace output.window_days=365·min_count=3 도 이 테스트가 함께 확인 |
+| 2 | 충족 | test_detect_patterns_two_events_no_pattern | 2건 부정 케이스 |
+| 3 | 충족 | test_detect_patterns_window_boundary_inclusive_default · _exclusive_one_second_early · _moves_with_env_override | 기본 365일 경계(포함/제외) + 환경변수(90일·2건)로 경계 이동 + trace output.window_days=90·min_count=2 기록까지 전부 확인. 기본 설정 값(365·3)의 trace 기록은 1행 테스트가 확인 |
+| 4 | 충족 | test_detect_patterns_excludes_future_occurred_at | 미래 occurred_at 1건 제외 |
+| 5 | 충족 | test_detect_patterns_does_not_mix_persons | 민수/지훈 분리 |
+| 6 | 충족 | test_detect_patterns_does_not_mix_types | meal 2 + meeting 1 분리 |
+| 7 | 충족 | test_detect_patterns_updates_existing_fact_same_id_on_new_event | 3건→4번째 추가, 같은 fact id, value·링크 갱신 |
+| 8 | 충족(주석 참고) | test_detect_patterns_deletes_fact_when_count_falls_below_threshold | 행 삭제·FactSource 링크 CASCADE 제거·이벤트 행 보존·trace previous_value 전부 확인. **주석**: 01-plan 판정 표 8행 문구가 "이벤트 4건 그대로"라고 적었으나 이 테스트의 시나리오는 이벤트 3건(창 밖으로 밀린 1건 + 남은 2건)이다 — 해석 절(ㄱ~ㄹ)·결정 C-5 어디에도 "4건"이라는 수를 요구하는 문장이 없고, 검증되는 성질(패턴 삭제·CASCADE·원문 보존·이전 값 기록)은 이벤트 개수와 무관하게 전부 확인된다. 숫자 불일치는 01-plan 표 문구의 오기로 보이며 제품 코드·테스트의 결함이 아니다 |
+| 9 | 충족 | test_pattern_only_turn_never_calls_extractor_and_has_zero_tokens | extractor.call_count==0, memory_pattern trace tokens_in=tokens_out=0 |
+| 10 | 충족 | test_promote_person_five_unpromoted_events_creates_facts_with_source_links | 5건→사실 2개, 각 링크 ≥1(추출기가 준 id와 일치), raw_utterance/content 불변 |
+| 11 | 충족 | test_promote_person_four_unpromoted_events_does_not_trigger | 4건, 추출기 호출 0, 사실 0행 |
+| 12 | 충족 | test_promote_person_does_not_recount_already_considered_events | 5건 승격 후 1건 추가해도 추출기 호출 0(재승격 방지) |
+| 13 | 충족 | test_detect_patterns_does_not_touch_event_rows(패턴 쪽) + test_promote_person_does_not_touch_event_rows(승격 쪽) | 두 재계산 경로 모두 events 행 수·content·raw_utterance·occurred_at 불변 |
+| 14 | 충족 | test_memory_extract.py 4건(개별 사유) + test_promote_person_rejects_invalid_facts_but_keeps_valid_ones(4개 사유 동시) | pattern:meal / 어휘 밖 키 / 입력에 없는 이벤트 id / 빈 값 네 사유가 개별 거부되고 나머지 정상 사실(hobby)만 저장됨을 promote 쪽에서 한 번에 확인, extract 쪽은 각 사유를 독립적으로 확인 |
+| 15 | 충족(주석 참고) | test_update_person_facts_pattern_prefix_key_raises_invalid_value[...] 5종 파라미터 | 01-plan 예시 문자열 " Pattern:meal "(앞뒤 공백+대소문자 혼합) 자체는 파라미터 목록에 없으나, "  pattern:meal  "(공백만)과 "Pattern:meal"(대소문자만)이 각각 별도로 테스트되어 있고 구현(app/tools/persons.py 539~541행)이 `key.strip()` 뒤 `.casefold().startswith(...)`로 두 정규화를 항상 같은 코드 경로로 함께 적용하므로 결합 사례도 실질적으로 커버된다(직접 코드 확인) |
+| 16 | 충족 | test_extractor_failure_is_isolated_event_survives_and_memory_error_is_recorded | 추출기 timeout 예외 → 턴 정상 반환·이벤트 5건 보존·memory_error 1행({person_id, stage:"promote", error:"JudgeUnavailable"})·사실 0행 |
+| 17 | 충족 | test_resume_turn_after_identity_answer_reaches_pattern_threshold | identity 되묻기→답→재개에서 add_event 1건 실행, 누적 3건, 재개 응답 뒤 pattern:conflict 3회 생성, 링크 3 |
+| 18 | 충족 | test_api_chat_three_turns_creates_pattern_fact_with_three_links | TestClient POST /chat 3회(FakeProposer·FakeJudge·FakeFactExtractor 주입) → 세 번째 뒤 pattern:conflict + 링크 3 |
+| 19 | 충족 | grep 3종(아래 u8-invariants.txt) + test_patterns_module_does_not_import_llm_or_embedding_modules | 상세는 u8-invariants.txt |
+| 20 | 충족 | alembic check · scripts/tools_check.py | 상세는 u8-regression.txt |
+| 21 | 충족 | POSTGRES_PORT=5433 pytest -rs | 1621 passed, skip 0 — U7 종료 시점과 동일(U8 이 새 테스트를 추가하지 않음). 상세는 u8-regression.txt |
+
+요약: 충족 21 / 부분 0 / 없음 0. U8 은 제품 코드(app/)를 고치지 않았고, 새 테스트도
+만들지 않았다 — 21행 전부가 기존 U1~U7 테스트로 이미 충족되어 있었다.

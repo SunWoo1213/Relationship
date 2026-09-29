@@ -339,3 +339,5 @@
 - 2026-09-29 19:37 | COMMIT | 93c6d3f feat(P6-memory): U7 루프가 쓴 사실도 어느 대화에서 나왔는지 잇는다
 - 2026-09-29 19:38 | PUSH-dev2 | origin dev2 93c6d3f (실험 푸시)
 - 2026-09-29 19:50 | VERIFY | **U7 실 LLM 확인 성공**(메인 세션 직접, 사용자 `u7-check`). 루프가 쓴 사실 `소속=네이버`→링크 [16], `직장=네이버`→링크 [17] — U7 전에는 0건이던 자리다(`llm-check` 의 `이직` 은 0건). `memory_promote` 에 `source="direct"` 행 2건이 `links:[{key, action:"linked", fact_id, event_ids}]` 로 남고 `considered_event_ids` 키는 **없다**(설계대로). 같은 세션에서 승격도 정상 동작(`job=백엔드 개발자`·`workplace=네이버`·`hobby=등산`, 링크 각 2·3·2건) → 직접 링크 행이 미승격 판정을 오염시키지 않음이 실 데이터로 확인. `memory_error` 0행. 게이트도 확인(이미 있는 인물에 `create_person` 제안 → `bad_args` 거절). **새 발견(중요): 같은 사실이 키 3개로 중복 저장된다** — `소속=네이버`·`직장=네이버`(루프) + `workplace=네이버`(승격). 원인은 `PROPOSAL_ARG_SCHEMA.facts.key` 가 enum 없는 자유 문자열이고 툴 설명에도 어휘 지시가 없어서 LLM 이 매번 다른 한국어 키를 만드는 것(`이직`·`소속`·`직장`). 브리핑·인물 카드가 중복을 그대로 보여줄 것이다. **곁들여: 사실 제안 자체가 드물다** — 발화 7건 중 2건만 `update_person(facts=…)` 를 제안했다(나머지는 이벤트만). 즉 시맨틱 사실의 주 공급원은 승격(U5)이고 루프 경로는 보조다 | P6-memory U5 U7 D-5 R8 원칙9
+- 2026-09-29 19:56 | COMMIT | b416dd0 docs(P6-memory): U7 실 LLM 확인 결과와 사실 키 중복 문제를 남긴다
+- 2026-09-29 19:56 | PUSH-dev2 | origin dev2 b416dd0 (실험 푸시)
