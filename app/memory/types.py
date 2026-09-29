@@ -1,9 +1,10 @@
-"""Refs: P6-memory S3.5 D14 D11 원칙6 원칙8 원칙9 -- 골격(U1, U2 가
+"""Refs: P6-memory S3.5 D14 D11 R8 원칙6 원칙8 원칙9 -- 골격(U1, U2 가
 `PatternChange`/`PatternResult` 에 `to_dict()` 를, U5 가 `PromotedFact`/
 `RejectedFact`/`PromotionResult` 에 `to_dict()`/`trace_tokens()` 와
-`min_events`/`tokens_in`/`tokens_out` 필드를 더했다 -- U1 03-log "필드가
-부족하면 그 단위 03-log 에 남긴다" 규약). 결과 타입 + trace 어휘 상수 +
-사실 키 어휘만 정의한다. 도는 로직은 없다.
+`min_events`/`tokens_in`/`tokens_out` 필드를 더했다, U7 이 `DirectFactLink`/
+`DirectFactLinkResult` 를 더했다 -- U1 03-log "필드가 부족하면 그 단위
+03-log 에 남긴다" 규약). 결과 타입 + trace 어휘 상수 + 사실 키 어휘만
+정의한다. 도는 로직은 없다.
 
 ## 이 모듈이 하지 않는 것
 
@@ -248,6 +249,70 @@ class PromotionResult:
         않은 판정은 토큰도 0)."""
 
         return (self.tokens_in, self.tokens_out)
+
+
+# ---------------------------------------------------------------------------
+# 루프 직접 사실의 원문 연결 (U7 `link_direct_facts()` 가 반환)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class DirectFactLink:
+    """`update_person(facts=…)` 로 루프가 직접 쓴 사실 한 건의 이번 턴
+    연결 결과(01-plan 73행, 결정 G(ii)). `action` 은 `linked`/`unlinked`
+    2종 -- `unlinked` 인 이유는 `reason`(`no_event_this_turn`: 이번 턴에
+    이 인물 이벤트가 없음 / `fact_not_found`: `(person_id, key)` 조회가
+    빈 경우, 방어적 경로라 정상 흐름에서는 나타나지 않는다)."""
+
+    key: str
+    action: str
+    fact_id: int | None
+    event_ids: list[int] = field(default_factory=list)
+    reason: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        """`memory_promote` trace `output.links[]` 항목 모양(U7 이
+        `DirectFactLinkResult.to_dict()` 에서 재귀 호출한다, `PromotedFact.
+        to_dict()` 와 같은 이유 -- 없으면 `to_jsonable` 이 dataclass 를
+        `str()` 로 뭉갠다)."""
+
+        return {
+            "key": self.key,
+            "action": self.action,
+            "fact_id": self.fact_id,
+            "event_ids": list(self.event_ids),
+            "reason": self.reason,
+        }
+
+
+@dataclass(frozen=True)
+class DirectFactLinkResult:
+    """`link_direct_facts(ctx, person_id, fact_keys, event_ids)`(U7,
+    `app/memory/direct_facts.py`)의 반환 타입. **새 trace step 을 만들지
+    않는다**(01-plan 73행) -- `STEP_MEMORY_PROMOTE`("memory_promote")
+    step 을 재사용해 기록하고, `source="direct"` 로 LLM 승격
+    (`PromotionResult`) 행과 구분한다(`memory_promote` 행을 훑는 코드는
+    이 필드로 두 종류를 가른다).
+
+    **`considered_event_ids` 키를 절대 넣지 않는다.** `app/memory/
+    promote.py::_considered_event_ids()` 는 `step='memory_promote'` 인
+    모든 행을 `person_id` 로 누적 조회해 그 안의 `considered_event_ids`
+    합집합을 "이미 본 이벤트"로 삼는다 -- 이 타입이 그 키에 실제 이벤트
+    id 를 실으면, LLM 승격이 그 이벤트들을 영원히 미승격 후보에서 빠뜨리게
+    된다(U5 ★3 이 막은 것과 같은 종류의 조용한 데이터 유실). `to_dict()`
+    가 이 키를 내지 않는 것으로 이 성질을 코드 구조로 보장한다."""
+
+    person_id: int
+    event_ids: list[int] = field(default_factory=list)
+    links: list[DirectFactLink] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "person_id": self.person_id,
+            "source": "direct",
+            "event_ids": list(self.event_ids),
+            "links": [link.to_dict() for link in self.links],
+        }
 
 
 # ---------------------------------------------------------------------------

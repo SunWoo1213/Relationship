@@ -1,8 +1,26 @@
-"""Refs: P6-memory S3.5 R8 R11 원칙9 -- U6 루프 연결. `after_record(ctx,
-person_ids, extractor)` 하나만 정의한다. `app/agent/loop.py::_record()` 가
-`loop_record` trace 가 끝난 뒤 한 줄로 이 함수를 부른다(01-plan 72행) --
+"""Refs: P6-memory S3.5 R8 R11 원칙9 -- U6 루프 연결 + U7 직접 사실 링크.
+`after_record(ctx, person_ids, extractor, fact_keys_by_person=None,
+event_ids_by_person=None)` 하나만 정의한다. `app/agent/loop.py::_record()`
+가 `loop_record` trace 가 끝난 뒤 한 줄로 이 함수를 부른다(01-plan 72행) --
 `run_turn`/`resume_turn` 이 모두 `_record()` 를 지나므로 두 경로가 이
 한 자리에서 덮인다.
+
+## U7 -- 루프가 직접 쓴 사실의 원문 연결(결정 G(ii), 01-plan 73행)
+
+패턴 → 승격(결정 C-1, 아래 그대로) **뒤**, 같은 세이브포인트 안에서
+`fact_keys_by_person` 에 키가 있는 인물마다 `app.memory.direct_facts.
+link_direct_facts()` 를 한 번씩 부른다. 대상 인물 집합은 `person_ids`
+(이벤트가 저장된 인물)와 `fact_keys_by_person` 의 키(직접 사실을 쓴
+인물) 의 **합집합**이다 -- `update_person(facts=…)` 만 실행되고 같은
+인물의 `add_event` 가 없는 턴도 있을 수 있고(01-plan 73행 "이벤트가
+없는 턴의 사실은 연결 없이 두고 trace 에 unlinked 로 적는다"), 그 경우도
+"왜 연결하지 않았나"를 trace 에 남겨야 하기 때문이다. `event_ids_by_
+person` 은 각 인물의 **이번 턴** 이벤트 id 전부를 담고, 없는 인물은
+빈 목록으로 취급한다(`link_direct_facts` 가 "이벤트 없음"으로 판정).
+새 trace step 은 만들지 않는다 -- `STEP_MEMORY_PROMOTE`("memory_promote")
+를 재사용하고 `output.source="direct"` 로 LLM 승격 행과 구분한다(자세한
+근거는 `app/memory/types.py::DirectFactLinkResult` docstring, 03-log
+U7 항목 ②).
 
 ## ★ R-10 해소 -- `extractor` 지연 해소를 "지연 프록시"로 한다
 
@@ -52,16 +70,19 @@ trace, 그 안에서 `@traced` 가 남긴 `tool_error` 행, `PersonFact`/
 반환해 라우트가 200 으로 응답하고, 이 함수가 세이브포인트를 열기 **전에**
 `_record_impl` 이 이미 flush 해 둔 이벤트(`add_event`)를 잃지 않는다.
 
-`person_ids` 가 비어 있으면(이번 턴에 저장된 이벤트가 없음) 세이브포인트
-조차 열지 않는다."""
+`person_ids` 와 `fact_keys_by_person` 의 키가 **둘 다** 비어 있으면(이번
+턴에 저장된 이벤트도, 직접 쓴 사실도 없음) 세이브포인트조차 열지
+않는다(U7 이 이 조건을 `person_ids ∪ fact_keys_by_person 의 키` 로
+넓혔다 -- U6 시점에는 `person_ids` 하나만 봤다)."""
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.db.models import AgentTrace
+from app.memory.direct_facts import link_direct_facts
 from app.memory.extract import ExistingFact, Extraction, ExtractEvent, FactExtractor, extractor_from_env
 from app.memory.patterns import detect_patterns
 from app.memory.promote import promote_person
@@ -70,9 +91,13 @@ from app.tools.context import ToolContext
 
 #: `memory_error` output.stage 어휘(결정 F "memory_error: {person_id,
 #: stage, error}"). `detect_patterns` 에서 실패하면 "pattern", `promote_
-#: person` 에서 실패하면 "promote".
+#: person` 에서 실패하면 "promote", `link_direct_facts` 에서 실패하면
+#: "direct_fact"(U7). `stage` 는 trace `output` 안의 자유 문자열 필드일
+#: 뿐이라 이 세 번째 값을 더해도 `agent_traces.step` 어휘(정확히 3종,
+#: `memory_pattern`/`memory_promote`/`memory_error`)는 늘지 않는다.
 _STAGE_PATTERN = "pattern"
 _STAGE_PROMOTE = "promote"
+_STAGE_DIRECT_FACT = "direct_fact"
 
 
 class _LazyFactExtractor:
@@ -122,20 +147,39 @@ def after_record(
     ctx: ToolContext,
     person_ids: Sequence[int],
     extractor: FactExtractor | None = None,
+    *,
+    fact_keys_by_person: Mapping[int, Sequence[str]] | None = None,
+    event_ids_by_person: Mapping[int, Sequence[int]] | None = None,
 ) -> None:
     """01-plan U6 -- 루프 기록 단계(`_record()`) 의 `loop_record` trace 가
     끝난 뒤 부르는 메모리 계층 진입점. 이번 턴에 `add_event` 가 실제로
-    실행된 인물마다 ① `detect_patterns` ② `promote_person` 순서로
-    돈다(결정 C-1). `extractor` 가 `None` 이면(운영 경로) `_LazyFactExtractor`
-    로 감싼다(★ R-10 해소, 모듈 docstring 참고). 실패 격리는 모듈
-    docstring "실패 격리" 절 그대로다."""
+    실행된 인물(`person_ids`)마다 ① `detect_patterns` ② `promote_person`
+    순서로 돈다(결정 C-1). `extractor` 가 `None` 이면(운영 경로)
+    `_LazyFactExtractor` 로 감싼다(★ R-10 해소, 모듈 docstring 참고).
 
-    if not person_ids:
+    U7 추가 -- 그 뒤 `fact_keys_by_person`(`app/agent/loop.py::
+    RecordOutcome.fact_keys_by_person`)에 키가 있는 인물마다 ③
+    `link_direct_facts` 를 부른다(모듈 docstring "U7" 절). 대상 인물은
+    `person_ids ∪ fact_keys_by_person 의 키` -- 이벤트 없이 사실만 쓴
+    인물도 "연결 없음"을 trace 에 남기려면 이 호출까지는 닿아야 한다.
+
+    실패 격리는 모듈 docstring "실패 격리" 절 그대로다(①②③ 전부 같은
+    세이브포인트 안)."""
+
+    fact_keys_by_person = fact_keys_by_person or {}
+    event_ids_by_person = event_ids_by_person or {}
+
+    all_person_ids: list[int] = list(person_ids)
+    for pid in fact_keys_by_person:
+        if pid not in all_person_ids:
+            all_person_ids.append(pid)
+
+    if not all_person_ids:
         return
 
     resolved_extractor: FactExtractor = extractor if extractor is not None else _LazyFactExtractor()
 
-    person_id = person_ids[0]
+    person_id = all_person_ids[0]
     stage = _STAGE_PATTERN
     failure: Exception | None = None
     try:
@@ -145,6 +189,13 @@ def after_record(
                 detect_patterns(ctx, person_id)
                 stage = _STAGE_PROMOTE
                 promote_person(ctx, person_id, resolved_extractor)
+            for person_id in all_person_ids:
+                keys = list(fact_keys_by_person.get(person_id) or [])
+                if not keys:
+                    continue
+                stage = _STAGE_DIRECT_FACT
+                events_this_turn = list(event_ids_by_person.get(person_id) or [])
+                link_direct_facts(ctx, person_id, keys, events_this_turn)
     except SQLAlchemyError:
         raise
     except Exception as exc:  # noqa: BLE001 -- 의도적으로 넓게 잡는다(모듈 docstring "실패 격리")

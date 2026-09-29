@@ -378,3 +378,334 @@ def test_record_impl_event_person_ids_dedup_first_appearance_order(db_session):
     assert record.failed == []
     # 지훈(첫 등장) -> 민수 -> 지훈(중복, 다시 담지 않음)
     assert record.event_person_ids == [person_b.id, person_a.id]
+
+
+# ---------------------------------------------------------------------------
+# U7 -- 루프가 직접 쓴 사실(update_person(facts))의 원문 연결(결정 G(ii))
+# ---------------------------------------------------------------------------
+#
+# `_record_impl()` 을 직접 불러 `RecordOutcome`(fact_keys_by_person/
+# event_ids_by_person)을 얻은 뒤, U6 과 같은 방식으로 `hooks_module.
+# after_record()` 에 그대로 넘긴다(`_record()` 가 실제로 하는 일과 같다,
+# ER 판정은 이 테스트의 관심사가 아니므로 `ResolveOutcome` 을 손으로
+# 만든다 -- 위 절 관례와 같은 이유).
+
+
+def _direct_link_rows(db_session, session_id: str) -> list[AgentTrace]:
+    """`memory_promote` step 행 중 U7(`link_direct_facts`)이 남긴 것만
+    고른다 -- `source="direct"` 로 LLM 승격(`PromotionResult`) 행과
+    구분한다(`app/memory/types.py::DirectFactLinkResult` docstring)."""
+
+    return [
+        row
+        for row in _trace_rows(db_session, session_id, "memory_promote")
+        if isinstance(row.output, dict) and row.output.get("source") == "direct"
+    ]
+
+
+def _run_record_and_after_record(ctx, proposal, outcome, utterance, *, extractor=None):
+    """`_record()` 가 하는 일(게이트 -> `_record_impl` -> `after_record`)
+    을 손으로 재현한다 -- `loop_record` trace 자체는 이 테스트들의
+    관심사가 아니므로 `@traced` 로 감싸지 않고 `_record_impl` 을 직접
+    부른다(위 절 관례와 같은 이유)."""
+
+    verdict = gate_check(proposal)
+    record = loop_module._record_impl(
+        ctx, proposal, verdict, outcome, utterance, resume_byte_limit=LOOP_MAX_RESUME_BYTES
+    )
+    hooks_module.after_record(
+        ctx,
+        record.event_person_ids,
+        extractor if extractor is not None else FakeFactExtractor(),
+        fact_keys_by_person=record.fact_keys_by_person,
+        event_ids_by_person=record.event_ids_by_person,
+    )
+    return record
+
+
+@dbtest
+def test_direct_fact_basic_turn_links_free_key_fact_to_same_turn_event(db_session):
+    """기본 -- 같은 턴에 같은 인물로 `add_event` + `update_person(facts)`
+    가 함께 실행되면 그 사실에 `fact_sources` 링크가 생긴다. `FACT_KEYS`
+    (승격 전용 9종) 밖의 **자유 키**("이직")로 확인한다(01-plan 결정 D-5
+    는 승격에만 적용되고, 루프가 직접 쓰는 `update_person(facts)` 는
+    여전히 자유 키다 -- 위임 프롬프트 "왜 필요한가" 절이 실 왕복에서 본
+    바로 그 키)."""
+
+    session_id = "loop-u7-direct-basic"
+    person = _make_person(db_session, display_name="민수")
+    ctx = _ctx(db_session, session_id=session_id)
+
+    proposal = Proposal(
+        tool_calls=[
+            _call("add_event", person="민수", type="personal_share", content="이직 준비", occurred_at=NOW),
+            _call("update_person", person="민수", facts=[{"key": "이직", "value": "이직 준비 중"}]),
+        ],
+        raw={},
+    )
+    outcome = ResolveOutcome(person_ids={"민수": person.id}, stopped=False)
+
+    record = _run_record_and_after_record(ctx, proposal, outcome, "발화")
+
+    assert record.failed == []
+    assert record.fact_keys_by_person == {person.id: ["이직"]}
+    event_id = record.event_ids_by_person[person.id][0]
+
+    fact = db_session.execute(
+        select(PersonFact).where(PersonFact.person_id == person.id).where(PersonFact.key == "이직")
+    ).scalar_one()
+    assert fact.value == "이직 준비 중"
+
+    links = db_session.execute(select(FactSource).where(FactSource.fact_id == fact.id)).scalars().all()
+    assert [link.event_id for link in links] == [event_id]
+
+    direct_rows = _direct_link_rows(db_session, session_id)
+    assert len(direct_rows) == 1
+    assert direct_rows[0].output["person_id"] == person.id
+    assert direct_rows[0].output["links"] == [
+        {"key": "이직", "action": "linked", "fact_id": fact.id, "event_ids": [event_id], "reason": None}
+    ]
+
+    # 원문 불변 -- 이벤트 행은 그대로다.
+    events = db_session.execute(select(Event).where(Event.person_id == person.id)).scalars().all()
+    assert len(events) == 1
+    assert events[0].raw_utterance == "발화"
+    assert events[0].content == "이직 준비"
+
+
+@dbtest
+def test_direct_fact_turn_without_event_leaves_fact_unlinked_and_traced(db_session):
+    """이벤트 없는 턴 -- `update_person(facts)` 만 실행되고 `add_event`
+    가 없으면 링크 0건이고 trace 에 `unlinked` 가 남는다(01-plan 73행)."""
+
+    session_id = "loop-u7-direct-no-event"
+    person = _make_person(db_session, display_name="민수")
+    ctx = _ctx(db_session, session_id=session_id)
+
+    proposal = Proposal(
+        tool_calls=[_call("update_person", person="민수", facts=[{"key": "hobby", "value": "등산"}])],
+        raw={},
+    )
+    outcome = ResolveOutcome(person_ids={"민수": person.id}, stopped=False)
+
+    record = _run_record_and_after_record(ctx, proposal, outcome, "발화")
+
+    assert record.events == 0
+    assert record.event_person_ids == []
+    assert record.fact_keys_by_person == {person.id: ["hobby"]}
+
+    fact = db_session.execute(
+        select(PersonFact).where(PersonFact.person_id == person.id).where(PersonFact.key == "hobby")
+    ).scalar_one()
+
+    links = db_session.execute(select(FactSource).where(FactSource.fact_id == fact.id)).scalars().all()
+    assert links == []
+
+    direct_rows = _direct_link_rows(db_session, session_id)
+    assert len(direct_rows) == 1
+    assert direct_rows[0].output["links"] == [
+        {
+            "key": "hobby",
+            "action": "unlinked",
+            "fact_id": fact.id,
+            "event_ids": [],
+            "reason": "no_event_this_turn",
+        }
+    ]
+
+
+@dbtest
+def test_direct_fact_same_key_twice_in_one_turn_links_once(db_session):
+    """중복 -- 같은 턴에 같은 키로 `update_person` 이 두 번 실행되면
+    (예: 두 번의 언급이 같은 사실을 다시 확인) 링크가 1건이다(`fact_sources`
+    복합 기본키가 중복을 막는다 -- `RecordOutcome.fact_keys_by_person` 이
+    턴 단위로 이미 키를 중복 제거해 넘기므로, `link_direct_facts` 는 그
+    키에 대해 정확히 한 번만 호출된다)."""
+
+    session_id = "loop-u7-direct-duplicate-key"
+    person = _make_person(db_session, display_name="민수")
+    ctx = _ctx(db_session, session_id=session_id)
+
+    proposal = Proposal(
+        tool_calls=[
+            _call("add_event", person="민수", type="meeting", content="면접", occurred_at=NOW),
+            _call("update_person", person="민수", facts=[{"key": "job", "value": "이직 준비"}]),
+            _call("update_person", person="민수", facts=[{"key": "job", "value": "이직 확정"}]),
+        ],
+        raw={},
+    )
+    outcome = ResolveOutcome(person_ids={"민수": person.id}, stopped=False)
+
+    record = _run_record_and_after_record(ctx, proposal, outcome, "발화")
+
+    assert len(record.executed) == 3
+    # 턴 단위 중복 제거 -- 두 번째 update_person 은 키를 다시 더하지 않는다.
+    assert record.fact_keys_by_person == {person.id: ["job"]}
+
+    fact = db_session.execute(
+        select(PersonFact).where(PersonFact.person_id == person.id).where(PersonFact.key == "job")
+    ).scalar_one()
+    assert fact.value == "이직 확정"  # 두 번째 호출이 마지막으로 덮어씀
+
+    links = db_session.execute(select(FactSource).where(FactSource.fact_id == fact.id)).scalars().all()
+    assert len(links) == 1  # 복합 PK 중복 방지 -- 같은 이벤트가 두 번 이어지지 않는다
+
+    direct_rows = _direct_link_rows(db_session, session_id)
+    assert len(direct_rows) == 1
+    assert len(direct_rows[0].output["links"]) == 1  # key 도 한 번만 처리됨
+
+
+@dbtest
+def test_direct_fact_does_not_leak_across_different_persons(db_session):
+    """다른 인물 섞임 -- A 인물의 사실이 B 인물의 이벤트에 붙지 않는다."""
+
+    session_id = "loop-u7-direct-cross-person"
+    person_a = _make_person(db_session, display_name="민수")
+    person_b = _make_person(db_session, display_name="지훈")
+    ctx = _ctx(db_session, session_id=session_id)
+
+    proposal = Proposal(
+        tool_calls=[
+            _call("add_event", person="민수", type="personal_share", content="이직 이야기", occurred_at=NOW),
+            _call("update_person", person="민수", facts=[{"key": "job", "value": "이직 준비"}]),
+            _call("add_event", person="지훈", type="meal", content="점심", occurred_at=NOW),
+        ],
+        raw={},
+    )
+    outcome = ResolveOutcome(
+        person_ids={"민수": person_a.id, "지훈": person_b.id}, stopped=False
+    )
+
+    record = _run_record_and_after_record(ctx, proposal, outcome, "발화")
+
+    assert record.fact_keys_by_person == {person_a.id: ["job"]}  # 지훈에는 사실이 없다
+    event_id_a = record.event_ids_by_person[person_a.id][0]
+    event_id_b = record.event_ids_by_person[person_b.id][0]
+    assert event_id_a != event_id_b
+
+    fact = db_session.execute(
+        select(PersonFact).where(PersonFact.person_id == person_a.id).where(PersonFact.key == "job")
+    ).scalar_one()
+
+    links = db_session.execute(select(FactSource).where(FactSource.fact_id == fact.id)).scalars().all()
+    assert [link.event_id for link in links] == [event_id_a]  # 지훈의 이벤트는 섞이지 않는다
+
+    # 지훈 인물에는 어떤 사실도 생기지 않았다.
+    facts_b = db_session.execute(select(PersonFact).where(PersonFact.person_id == person_b.id)).scalars().all()
+    assert facts_b == []
+
+
+@dbtest
+def test_direct_fact_failed_update_person_call_is_not_collected(db_session):
+    """실패한 `update_person` -- 게이트를 지났지만 툴이 `InvalidValue` 로
+    실패한 호출의 키는 모으지 않는다(`failed[]` 로 간다). 빈 문자열 값은
+    게이트 ③ 의 타입 검사(문자열인지만 봄)를 통과하지만 `update_person`
+    자신의 검증(`InvalidValue`)이 막는다."""
+
+    session_id = "loop-u7-direct-failed-update"
+    person = _make_person(db_session, display_name="민수")
+    ctx = _ctx(db_session, session_id=session_id)
+
+    proposal = Proposal(
+        tool_calls=[
+            _call("add_event", person="민수", type="personal_share", content="근황", occurred_at=NOW),
+            _call("update_person", person="민수", facts=[{"key": "job", "value": ""}]),  # 빈 값 -- InvalidValue
+        ],
+        raw={},
+    )
+    outcome = ResolveOutcome(person_ids={"민수": person.id}, stopped=False)
+
+    record = _run_record_and_after_record(ctx, proposal, outcome, "발화")
+
+    assert len(record.failed) == 1
+    assert record.failed[0]["name"] == "update_person"
+    assert record.fact_keys_by_person == {}  # 실패한 호출의 키는 모으지 않는다
+
+    facts = db_session.execute(select(PersonFact).where(PersonFact.person_id == person.id)).scalars().all()
+    assert facts == []
+
+    direct_rows = _direct_link_rows(db_session, session_id)
+    assert direct_rows == []  # 이을 키가 없으니 link_direct_facts 자체가 불리지 않는다
+
+
+@dbtest
+def test_direct_fact_link_does_not_disturb_promotion_links_in_same_turn(db_session):
+    """승격 사실 링크 불변 -- 같은 턴에 승격도 일어났다면 U5 가 만든
+    링크가 U7 때문에 바뀌지 않는다. 미승격 이벤트 4건 + 이번 턴 1건으로
+    승격 트리거(`MEMORY_PROMOTE_MIN_EVENTS`, 기본 5)를 채우고, 같은 턴에
+    자유 키("연락처")로 직접 사실도 함께 쓴다 -- 두 경로는 서로 다른 키를
+    쓰므로(승격은 `FACT_KEYS` 9종, 직접 사실은 자유 키) 겹치지 않는다.
+    가짜 추출기의 근거는 **기존** 이벤트(id 재사용 없이, 사후에 실제
+    id 를 알아낸다 -- DB 시퀀스는 테스트 사이에 리셋되지 않으므로 id 를
+    미리 고정하지 않는다) 하나만 가리키게 해, 이번 턴 새 이벤트(직접
+    사실의 근거)와 절대 겹치지 않게 한다."""
+
+    session_id = "loop-u7-direct-with-promotion"
+    person = _make_person(db_session, display_name="민수")
+    ctx = _ctx(db_session, session_id=session_id)
+
+    pre_events = [_add_event(db_session, person, event_type="personal_share") for _ in range(4)]
+    promotion_source_id = pre_events[0].id
+
+    extractor = FakeFactExtractor()
+
+    proposal = Proposal(
+        tool_calls=[
+            _call("add_event", person="민수", type="personal_share", content="근황 공유", occurred_at=NOW),
+            _call("update_person", person="민수", facts=[{"key": "연락처", "value": "새 번호로 등록"}]),
+        ],
+        raw={},
+    )
+    outcome = ResolveOutcome(person_ids={"민수": person.id}, stopped=False)
+
+    # 승격 배치(오래된 순 5건)는 이번 턴 새 이벤트까지 포함해야 트리거가
+    # 걸린다 -- 가짜 추출기의 table 키는 그 5건 id 집합과 정확히 같아야
+    # 하므로, _record_impl 을 먼저 불러 실제 새 이벤트 id 를 얻은 뒤 표를
+    # 마저 채운다.
+    verdict = gate_check(proposal)
+    record = loop_module._record_impl(
+        ctx, proposal, verdict, outcome, "발화", resume_byte_limit=LOOP_MAX_RESUME_BYTES
+    )
+    event_id = record.event_ids_by_person[person.id][0]
+    extractor.table[frozenset(e.id for e in pre_events) | {event_id}] = [
+        {"key": "job", "value": "백엔드 개발자", "source_event_ids": [promotion_source_id]}
+    ]
+
+    hooks_module.after_record(
+        ctx,
+        record.event_person_ids,
+        extractor,
+        fact_keys_by_person=record.fact_keys_by_person,
+        event_ids_by_person=record.event_ids_by_person,
+    )
+
+    direct_fact = db_session.execute(
+        select(PersonFact).where(PersonFact.person_id == person.id).where(PersonFact.key == "연락처")
+    ).scalar_one()
+    direct_links = db_session.execute(
+        select(FactSource).where(FactSource.fact_id == direct_fact.id)
+    ).scalars().all()
+    assert [link.event_id for link in direct_links] == [event_id]
+
+    # 승격이 만든 job 사실은 U7 과 무관하게 그대로다 -- 링크는 추출기가
+    # 지목한 기존 이벤트(promotion_source_id)뿐이고 이번 턴 새 이벤트
+    # (event_id, 직접 사실의 근거)와 섞이지 않는다.
+    promoted_fact = db_session.execute(
+        select(PersonFact).where(PersonFact.person_id == person.id).where(PersonFact.key == "job")
+    ).scalar_one()
+    promoted_links = db_session.execute(
+        select(FactSource).where(FactSource.fact_id == promoted_fact.id)
+    ).scalars().all()
+    assert [link.event_id for link in promoted_links] == [promotion_source_id]
+
+    direct_rows = _direct_link_rows(db_session, session_id)
+    assert len(direct_rows) == 1
+    assert direct_rows[0].output["links"] == [
+        {
+            "key": "연락처",
+            "action": "linked",
+            "fact_id": direct_fact.id,
+            "event_ids": [event_id],
+            "reason": None,
+        }
+    ]

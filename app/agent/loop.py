@@ -210,7 +210,7 @@ from app.agent.types import (
 from app.db.models import HIERARCHIES, RELATION_TAGS
 from app.er import ERConfig, Judge, Resolution, apply_resolution, resolve
 from app.memory import FactExtractor, after_record
-from app.settings import LOOP_MAX_RESUME_BYTES, user_timezone
+from app.settings import LOOP_MAX_RESUME_BYTES, PATTERN_KEY_PREFIX, user_timezone
 from app.tools.context import ToolContext, to_jsonable, traced
 from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
 
@@ -685,7 +685,22 @@ class RecordOutcome:
     의 `person_id`, 중복 제거·첫 등장 순(01-plan 72행). `app.memory.
     after_record()` 가 어느 인물의 패턴·승격을 다시 볼지 정하는 유일한
     재료다. `to_dict()` 에는 담지 않는다(U1 스키마 규약 -- `loop_record`
-    의 기존 키를 바꾸지 않는다, 03-log U6 항목에 이 결정을 남긴다)."""
+    의 기존 키를 바꾸지 않는다, 03-log U6 항목에 이 결정을 남긴다).
+
+    `event_ids_by_person`/`fact_keys_by_person`(U7 추가) -- 결정 G(ii)
+    "같은 턴·같은 인물의 이벤트에 잇는다"를 실행하는 재료다.
+    `event_ids_by_person`: 이번 턴에 **실행에 성공한** `add_event` 가
+    돌려준 `EventOut.id` 를, `person_id` 별로 실행 순서 그대로 담는다
+    (같은 인물에 이벤트가 여러 건이면 전부 담긴다 -- U7 이 그 전부를
+    근거로 삼는다, 03-log U7 항목 참고). `fact_keys_by_person`: 이번
+    턴에 **실행에 성공한** `update_person(facts=…)` 호출의 키를
+    `person_id` 별로 중복 제거해 담는다 -- 키는 `app/tools/persons.py::
+    update_person` 이 실제로 저장하는 것과 같게 `key.strip()` 으로
+    정규화한다(그래야 `app.memory.direct_facts.link_direct_facts` 의
+    `(person_id, key)` 조회가 들어맞는다). `pattern:` 접두는 방어적으로
+    한 번 더 걸러 담지 않는다(U3 가 `update_person` 안에서 이미 거부하므로
+    실행 성공 호출에는 나타날 수 없지만, 이 딕셔너리는 그 불변식에 기대지
+    않는다). 둘 다 `to_dict()` 에는 담지 않는다(U1 스키마 규약)."""
 
     executed: list[dict[str, Any]] = field(default_factory=list)
     failed: list[dict[str, Any]] = field(default_factory=list)
@@ -693,6 +708,8 @@ class RecordOutcome:
     schedules: int = 0
     schedule_question: PendingQuestionOut | None = None
     event_person_ids: list[int] = field(default_factory=list)
+    event_ids_by_person: dict[int, list[int]] = field(default_factory=dict)
+    fact_keys_by_person: dict[int, list[str]] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {"executed": list(self.executed), "failed": list(self.failed)}
@@ -767,6 +784,35 @@ def _ask_schedule(
     )
 
 
+def _fact_keys_from_args(args: dict[str, Any]) -> list[str]:
+    """U7 -- 실행에 성공한 `update_person(facts=…)` 호출 하나에서 직접 쓴
+    사실의 키를 뽑는다(모듈 docstring `RecordOutcome.fact_keys_by_person`
+    참고). `app/tools/persons.py::update_person` 이 실제로 저장하는 키와
+    같게 앞뒤 공백만 제거한다(대소문자는 그대로 -- 그 툴이 키 자체를
+    `casefold()` 하지 않고 `pattern:` 접두 비교에만 `casefold()` 를 쓴다,
+    `app/tools/persons.py` 547행 부근). `pattern:` 접두(공백·대소문자
+    변형 포함)는 이 함수도 한 번 더 거른다 -- U3 가 `update_person` 안에서
+    이미 거부해 실행 성공 호출에는 나타날 수 없는 불변식이지만, 이 함수는
+    그 불변식에 기대지 않는다(01-plan 73행 "pattern: 접두 키는 대상이
+    아니다", 03-log U7 항목 ③)."""
+
+    keys: list[str] = []
+    for fact in args.get("facts") or []:
+        if not isinstance(fact, dict):
+            continue
+        key = fact.get("key")
+        if not isinstance(key, str):
+            continue
+        normalized = key.strip()
+        if not normalized:
+            continue
+        if normalized.casefold().startswith(PATTERN_KEY_PREFIX.casefold()):
+            continue
+        if normalized not in keys:
+            keys.append(normalized)
+    return keys
+
+
 def _execute_call(
     ctx: ToolContext, name: str, args: dict[str, Any], person_id: int, utterance: str, now: datetime
 ) -> Any:
@@ -818,6 +864,8 @@ def _record_impl(
     schedules = 0
     schedule_question: PendingQuestionOut | None = None
     event_person_ids: list[int] = []
+    event_ids_by_person: dict[int, list[int]] = {}
+    fact_keys_by_person: dict[int, list[str]] = {}
 
     for position, accepted in enumerate(accepted_execute):
         call = proposal.tool_calls[accepted.index]
@@ -863,7 +911,7 @@ def _record_impl(
             break
 
         try:
-            _execute_call(ctx, accepted.name, call.args, person_id, utterance, now)
+            result = _execute_call(ctx, accepted.name, call.args, person_id, utterance, now)
         except ToolError as exc:
             failed.append({"index": accepted.index, "name": accepted.name, "error": type(exc).__name__})
             continue
@@ -876,8 +924,24 @@ def _record_impl(
             # 블록을 통과한 뒤라 이 지점은 항상 성공 실행이다).
             if person_id not in event_person_ids:
                 event_person_ids.append(person_id)
+            # U7 -- 결정 G(ii) "같은 턴·같은 인물의 이벤트에 잇는다"가 이을
+            # 이벤트 id 자체(같은 인물에 여러 건이면 전부 담는다, 03-log
+            # U7 항목 ①).
+            event_ids_by_person.setdefault(person_id, []).append(result.id)
         elif accepted.name == "add_schedule":
             schedules += 1
+        elif accepted.name == "update_person":
+            # U7 -- 이번 턴에 이 인물로 직접 쓴 사실의 키(중복 제거, 첫
+            # 등장 순). facts 없이(new_alias/display_name 만) 성공한
+            # update_person 은 아무 키도 없어 딕셔너리에 빈 항목을 만들지
+            # 않는다(after_record 의 "keys 가 없으면 건너뛴다" 판정과
+            # 별개로, 여기서부터 깔끔하게 둔다).
+            new_keys = _fact_keys_from_args(call.args)
+            if new_keys:
+                bucket = fact_keys_by_person.setdefault(person_id, [])
+                for key in new_keys:
+                    if key not in bucket:
+                        bucket.append(key)
 
     return RecordOutcome(
         executed=executed,
@@ -886,6 +950,8 @@ def _record_impl(
         schedules=schedules,
         schedule_question=schedule_question,
         event_person_ids=event_person_ids,
+        event_ids_by_person=event_ids_by_person,
+        fact_keys_by_person=fact_keys_by_person,
     )
 
 
@@ -909,7 +975,12 @@ def _record(
     같은 이유) -- `loop_record.output` 은 여전히 `executed`/`failed` 두
     키뿐이다. `after_record` 는 `SQLAlchemyError` 를 제외하면 예외를
     올리지 않으므로(`app/memory/hooks.py` 참고) 이 호출 뒤에도 `_record()`
-    의 반환은 항상 정상 `RecordOutcome` 이다."""
+    의 반환은 항상 정상 `RecordOutcome` 이다.
+
+    U7 추가 -- `record.fact_keys_by_person`/`record.event_ids_by_person`
+    도 같은 호출에 함께 넘긴다(결정 G(ii), `app/memory/hooks.py::
+    after_record()` 가 패턴·승격 뒤 같은 세이브포인트 안에서
+    `app.memory.direct_facts.link_direct_facts()` 를 부른다)."""
 
     @traced(LOOP_TRACE_TOOL_NAME, step=STEP_LOOP_RECORD)
     def _traced(
@@ -924,7 +995,13 @@ def _record(
         )
 
     record = _traced(ctx, proposal, verdict, outcome, utterance)
-    after_record(ctx, record.event_person_ids, extractor)
+    after_record(
+        ctx,
+        record.event_person_ids,
+        extractor,
+        fact_keys_by_person=record.fact_keys_by_person,
+        event_ids_by_person=record.event_ids_by_person,
+    )
     return record
 
 
