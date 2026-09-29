@@ -1,0 +1,19 @@
+== FIX-015 실 LLM 왕복 확인 (20260930-0100) ==
+APP_USER_ID=fix015-check · X-Session-Id: fix015 · 공급자는 환경 설정 그대로
+
+-- 발화 4건과 루프가 제안한 사실 키 (loop_extract trace) --
+  trace 161  [{"key": "hobby", "value": "등산"}]
+  trace 171  [{"key": "workplace", "value": "네이버"}]
+  trace 181  [{"key": "likes", "value": "매운 음식"}, {"key": "dislikes", "value": "고수"}]
+
+-- 최종 person_facts (user_id=fix015-check) --
+  인물 4 지현 (친구/동)
+     key=hobby        value=등산  confidence=1.0
+     key=workplace    value=네이버  confidence=1.0
+     key=likes        value=매운 음식  confidence=1.0
+     key=dislikes     value=고수  confidence=1.0
+
+-- 판정 --
+  저장된 키: ['hobby', 'workplace', 'likes', 'dislikes']
+  FACT_KEYS 밖 키: 없음
+  memory_error 행: 0
