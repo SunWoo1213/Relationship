@@ -5,43 +5,47 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-29 23:50 — **P6-memory 가 끝났다. 활성 패키지가 없다(`active: none`). 커밋 `94373cc` · origin/dev2 = 여기.**
+갱신: 2026-09-30 01:15 — **P6-memory 완료 + FIX-015 완료(실 LLM 확인까지). 활성 작업이 없다(`active: none`). origin/dev2 = `26dcd22` — 전부 푸시됨.**
 
-verifier 04-review `결과: 완료` → 사용자 승인(2026-09-29). 승인 뒤 메인 세션이 [권고] 3건을 닫고 `verify-impl.sh P6-memory` 를 다시 돌려 **FAIL 0 / WARN 0** 을 받았다(`evidence/20260929-2337-*`, 이전 WARN 이던 "미완료 작업 단위 6개" 가 `PASS 작업 단위 모두 완료 표시` 로 바뀜).
+> **이 세션이 한 일 세 줄**: ① 중단돼 있던 P6-memory 04-review 를 승인하고 [권고] 3건을 닫아 패키지를 종료했다(`94373cc`) ② 거기서 "범위 밖 별건" 으로 넘어온 사실 키 중복을 FIX-015 로 고쳤다(`6e7b286`) ③ 그것이 실제 LLM 에서 동작하는지 왕복으로 확인하고 새 결함 2건을 찾았다(`26dcd22`). **다음 세션은 아래 "바로 다음에 할 것" 1번부터 고르면 된다 — 진행 중인 작업은 없다.**
 
-**그 뒤 FIX-015 도 끝냈다(2026-09-30, 커밋 `6e7b286` · origin/dev2 = 여기).** 사실 키 중복을 사용자가 **FIX + "스키마 enum 으로 유도"** 로 정했고, `app/agent/propose.py` 의 `PROPOSAL_ARG_SCHEMA.facts.key` 에 `app.memory.FACT_KEYS` 9종 enum 을 걸었다 — **제품 코드 실질 변경은 상수 한 줄**이다. 판정 표 5행 전부 충족(전체 **1624 passed skip 0** = 기준선 1622+2 · `tools_check` **7/7** = S3.2 무변경의 증거 · 회귀 4파일 121 · 기존 테스트 수정 0건). **실 LLM 왕복 확인도 통과했다(2026-09-30 01:00, 커밋 대기)** — 발화 4건에서 루프가 제안한 키가 `hobby`·`workplace`·`likes`·`dislikes` 로 **`FACT_KEYS` 밖 0건**, `memory_error` 0행(증거 `fixes/evidence/FIX-015/20260930-0100-real-llm-check.txt`). **결정적 증거는 trace 171** — 발화에 "**소속이** 네이버로 바뀌었어" 라는 말이 그대로 있는데도 LLM 이 `소속` 이 아니라 `workplace` 를 골랐다(수정 전 같은 자리에서 나온 것이 `소속`·`직장`·`이직`). **남는 한계**: 4발화 1회 관측이고, enum 은 여전히 유도이지 거부가 아니다 — 어휘 밖 키가 다시 관측되면 거부안((나) `update_person` 어휘 검사)을 별건으로 올린다. 이미 저장된 `소속`·`직장` 행은 지우지 않았다.
+**무엇이 돌아가게 됐나(P6-memory)**: 대화 턴마다 ① 같은 인물의 같은 종류 사건이 기본 365일 안에 3회 이상이면 `pattern:{type}` 사실이 규칙으로 생기고(LLM 0회), ② 미승격 이벤트가 5건 쌓이면 LLM 이 인물 사실로 승격하며, ③ 만들어진 사실은 전부 `fact_sources` 로 근거 원문에 이어진다. 커밋 U1 `7564c5d`·U2 `d67d084`·U3 `51b4d65`·U4 `48e3617`·U5 `b209581`·U6 `8d3967a`·U7 `93c6d3f`·U8 `4916db3`, 종료 `94373cc`. R8·R11 구현완료. 04-review FAIL 0/WARN 0, 전체 1622 passed skip 0. 상세는 `packages/P6-memory/04-review.md`, 이력은 journal 2026-09-29.
 
-**FIX / CR 판단 근거(다음에 같은 유형이 오면 재사용)** — 조사 결과(read-only, 2026-09-29 23:50): **사실 키 어휘를 정한 D 카드·S 카드·기획서 문장이 없다** — `S3.2` 는 `facts?: {key,value}[]` 시그니처만 적고(키에 어휘 제약을 걸어도 시그니처는 그대로라 `tools_check` 7/7 유지), `S3.5` 는 어휘를 말하지 않으며, `grep -rln "FACT_KEYS|사실 키|고정 어휘" docs/wiki/decisions/ docs/wiki/specs/ docs/proposal.md CLAUDE.md` 가 **0건**이다. D-5 는 P6-memory **패키지 안의 결정**이고 거기서도 루프의 자유 키는 "한계·리스크"로만 적혀 있다. → **원칙·D·S 를 바꾸지 않으므로 FIX 가 맞다**(devlog 규칙 "수정이 원칙·D·S를 바꾸면 FIX가 아니다" 의 반대). 선례도 있다: `app/agent/propose.py` 125~131행 docstring 이 "`type`/`relation_tag`/`hierarchy` 만 enum 으로 **유도**하고, 7종 밖 값의 거부는 게이트가 한다" 고 이미 정해 뒀다 — `facts.key` 에 `FACT_KEYS` enum 을 더하는 것은 그 설계를 따르는 것이다.
+**FIX-015 가 고친 것**: `app/agent/propose.py` 의 `PROPOSAL_ARG_SCHEMA.facts.key` 에 `app.memory.FACT_KEYS` 9종 enum(**제품 코드 실질 변경은 상수 한 줄**). 전체 **1624 passed skip 0** · `tools_check` 7/7(= S3.2 무변경의 증거). **실 LLM 왕복도 통과** — 발화 4건에서 제안된 키가 `hobby`·`workplace`·`likes`·`dislikes` 로 `FACT_KEYS` 밖 0건. **결정적 증거는 trace 171**: 발화에 "**소속이** 네이버로 바뀌었어" 가 그대로 있는데도 LLM 이 `소속` 이 아니라 `workplace` 를 골랐다(수정 전 같은 자리에서 나온 것이 `소속`·`직장`·`이직`). 증거 `fixes/evidence/FIX-015/20260930-0100-real-llm-check.txt`. **남는 한계**: 4발화 1회 관측이고 enum 은 유도이지 거부가 아니다 — 어휘 밖 키가 다시 나오면 거부안(`update_person` 어휘 검사)을 별건으로 올린다. 이미 저장된 `소속`·`직장` 행은 지우지 않았다.
 
-**무엇이 돌아가게 됐나(한 줄)**: 대화 턴마다 ① 같은 인물의 같은 종류 사건이 기본 365일 안에 3회 이상이면 `pattern:{type}` 사실이 규칙으로 생기고(LLM 0회), ② 미승격 이벤트가 5건 쌓이면 LLM 이 인물 사실로 승격하며, ③ 만들어진 사실은 전부 `fact_sources` 로 근거 원문에 이어진다. 실 LLM 왕복으로도 확인했다(journal 17:30·19:50).
+**FIX / CR 판단 근거(같은 유형이 또 오면 재사용)**: **어휘·규칙을 정한 카드가 있는가** 로 갈린다. 이번엔 `grep -rln "FACT_KEYS|사실 키|고정 어휘" docs/wiki/decisions/ docs/wiki/specs/ docs/proposal.md CLAUDE.md` 가 **0건**이었고, `S3.2` 는 시그니처만 적어 어휘를 걸어도 `tools_check` 7/7 이 유지됐다 → 원칙·D·S 를 안 바꾸므로 **FIX**. D-5 는 루프를 자유 키로 **정한** 게 아니라 P6-memory 의 **범위를 그은** 것이다.
 
-**커밋 U1 `7564c5d` · U2 `d67d084` · U3 `51b4d65` · U4 `48e3617` · U5 `b209581` · U6 `8d3967a` · U7 `93c6d3f` · U8 `4916db3`.** R8·R11 구현완료. 전체 회귀 **1622 passed skip 0** · `alembic check` 무변경 · `tools_check` 7/7.
+active: **none** | frozen: none | 브랜치 `dev2`(작업·실험) | main = `1e4afb4` · origin/dev = `e48ac4c` · **origin/dev2 = `26dcd22`(최신, 여기서 작업)** | Docker DB `capstone2-postgres-1`(5433): 개발 DB `relationship`, 테스트 DB `relationship_test` — 5432·5434 는 다른 프로젝트
 
-**verifier 가 독립 판정한 6가지는 전부 "미달 아님"으로 갈렸다** — 판정 표 8행은 계획 표기 문제, 사실 키 중복·루프 어휘·추출 품질·`/health` 는 **범위 밖 별건**(04-review §7). verifier 는 보고 수치를 옮기지 않고 재실행했고, `PATTERN_MIN_COUNT=2`·`MEMORY_PROMOTE_MIN_EVENTS=4`·`PATTERN_WINDOW_DAYS=400` 로 **일부러 어긋나게 주어 FAILED 가 나는 것까지** 확인했다(항상 통과하는 테스트가 아님, 원칙8).
-
-active: **none** | frozen: none | 브랜치 `dev2`(작업·실험) | main = `1e4afb4` · origin/dev = `e48ac4c` · origin/dev2 = `4916db3` | Docker DB `capstone2-postgres-1`(5433): 개발 DB `relationship`, 테스트 DB `relationship_test` — 5432·5434 는 다른 프로젝트
-
-## 커밋 안 된 변경 (이 세션이 만든 것)
-- `packages/P6-memory/04-review.md`(신규, verifier 작성 + 승인 줄·승인 뒤 처리 기록) · `evidence/` 17개(신규) · `05-remediation.md`(F-bbf7fa 3단계 닫음)
-- `01-plan.md`(U3~U8 체크박스) · `registry.md`(비고 6곳) · `review-index.md`(R8·R11) · `docs/backlog.md`(P6 첫 항목) · `docs/RUNNING.md`(202행 `memory_promote` 세 종류) · `CURRENT.md`(active 해제) · `journal.md`(DONE) · 이 파일
+## 커밋 안 된 변경
+- **`journal.md` 2줄뿐이다** — 훅이 `26dcd22` 커밋·푸시 직후 자동으로 적은 COMMIT·PUSH 줄. 이 저장소의 관례대로 다음 커밋에 그냥 실린다(해시는 커밋 뒤에야 알 수 있어 늘 한 박자 늦다). **따로 처리할 일이 아니다.**
+- 그 밖에는 없다. 제품 코드·문서 전부 `26dcd22` 에 들어가 origin/dev2 까지 올라갔다.
 
 ## 바로 다음에 할 것
-1. **커밋 안 된 잔여 3줄을 다음 커밋에 싣는다** — `journal.md` 의 COMMIT·PUSH 줄(훅이 자동 기록), `fixes/FIX-015.md` 결과 절의 해시 `6e7b286`, 이 파일. 이 저장소의 기존 관례다(해시는 커밋 뒤에야 알 수 있으므로 늘 한 박자 늦게 실린다).
-2. **새로 드러난 FIX 후보 2건을 어떻게 할지 정한다**(아래 "열린 질문" 참고). ① **응답 문구** — 사실만 저장된 턴이 "새로 기억한 것이 없어요" 라고 답한다(`respond.py::build_reply` 가 사실 건수를 안 받는다). 사용자에게 거짓말을 하는 셈이라 **가장 눈에 띄는 결함**이고 고치기는 작다. ② **추출 품질** — "매운 음식을 못 먹어" 를 `likes` 에 넣었다. P10-final-eval 몫이지만 `likes`/`dislikes` 혼동은 브리핑이 정반대 제안을 내게 하므로 P6-briefing 전에 한 번 볼 값어치가 있다.
-3. `dev` 승격 검토 — dev2 의 P6-memory 26커밋을 `git push origin dev2:dev`(승인 마커 먼저, 푸시 뒤 L-003 대기).
-4. FIX 후보 3건(아래 "열린 질문"): `/health` 빈 DB · `update_person` 부분 반영 · `memory_promote` `source` 키 비대칭(코드 한 줄, 문서는 이미 고침).
-5. 그다음 패키지: **`P6-briefing`**(패턴 문장화 · 브리핑 직전 패턴 재계산 — `detect_patterns` 는 순수 SQL 이라 다시 불러도 된다). 이후 P8 인물 카드, P9 AWS(Terraform).
+**진행 중인 작업이 없으므로 아래에서 고르면 된다.** 사용자에게 물은 마지막 질문이 "① 응답 문구 FIX / ② dev 승격 / ③ P6-briefing 착수 중 어디로 갈까요" 였고 **답을 받지 못한 채 세션이 끝났다** — 다음 세션은 이것부터 다시 묻는다.
+
+1. **[권장] FIX-016 응답 문구** — 사실만 저장된 턴이 "이번 발화에서는 새로 기억한 것이 없어요" 라고 답한다. FIX-015 실 확인에서 **세 턴 모두** 그랬다(사실 4건을 쓰고도). 원인은 `app/agent/respond.py::build_reply` 가 `stored_events`·`stored_schedules` 두 숫자만 받고 **사실 건수를 아예 받지 않는** 것이다(P5-loop 결정 B(i)). 사용자에게 "기억 안 했다" 고 해 놓고 인물 카드에는 사실이 쌓이므로 신뢰를 깎는다. 고치는 법: `RecordOutcome` 에서 사실 건수를 세어(U7 이 이미 `fact_keys_by_person` 을 모은다) `build_reply` 에 넘기고 "사실 N건" 을 문장에 더한다 — 결정 B(i)의 "숫자·불리언만 입력" 규약은 그대로 지켜진다. **FIX-015 와 같은 절차**(카드 → 승인 → 구현 → 검증 → 커밋)로 하면 되고, 크기도 비슷하다.
+2. **`dev` 승격 검토** — dev2 의 P6-memory + FIX-015 커밋을 `git push origin dev2:dev` 로 올린다. **승인 마커(`approve-commit.sh --push`) 가 먼저**이고, 푸시 뒤에는 L-003 대로 멈춰 사용자 결정을 기다린다. 승격 근거는 pytest·게이트다(P9 미착수라 실서버 배포는 아직 없다 — 2026-09-15·09-23 과 같은 판단).
+3. **`P6-briefing` 착수** — 패턴 문장화 · 브리핑 직전 패턴 재계산(`detect_patterns` 는 순수 SQL 이라 다시 불러도 된다). `/devlog start P6-briefing` → architect 01-plan → verifier 02-plan-verify → 승인. **단, 아래 "추출 품질" 이 열린 채로 들어가게 된다** — `likes`/`dislikes` 혼동은 브리핑이 정반대 제안을 내게 하므로, 착수 전에 `build_extract_prompt()` 의 키 설명을 한 번 볼지 정하는 게 좋다.
+4. 그 밖 FIX 후보 3건(아래 "열린 질문"): `/health` 빈 DB · `update_person` 부분 반영 · `memory_promote` `source` 키 비대칭(코드 한 줄, 문서는 이미 고쳤다).
+5. 그 뒤 패키지 순서: P6-briefing → P8 인물 카드 → P9 AWS(Terraform).
+
+## 이 세션에서 배운 것 (다음에 재사용)
+- **04-review 를 verifier 에 맡기면 메인 세션 몫이 남는다** — `review-index.md`·`registry.md`·`01-plan` 체크박스·`backlog` 는 verifier 가 고치지 않는다(계획·문서를 고치지 않는 역할이라서). 04-review §4·§5 가 "바꿔야 할 내용" 을 적어 주므로 그대로 옮기면 된다. 그 뒤 `verify-impl.sh` 를 **한 번 더** 돌려야 WARN 이 사라진 것을 증거로 남길 수 있다.
+- **verifier 가 넘긴 [권고] 중 "문서가 사실과 다르다" 는 그 자리에서 닫는다.** 이번에 `docs/RUNNING.md` 202행이 그랬다(`memory_promote` 는 `source` 로 갈린다고 적었는데 실제로는 직접 링크 행에만 있다). 코드 수정은 별건이어도 **틀린 문서를 남기는 것은 별건이 아니다**(사실성 규칙).
+- **FIX 인지 CR 인지는 "어휘·규칙을 정한 카드가 있는가" 로 갈린다.** grep 한 번이면 끝난다 — 아래 §"FIX / CR 판단 근거" 에 이번 판정을 통째로 남겨 뒀다.
+- **`.env` 는 셸에서 올리면 훅이 막지 않는다**(`set -a; . ./.env; set +a`). 다만 명령 문자열에 `.env` 가 들어간 **읽기·존재 확인**(`cat`, `[ -f .env ]`)은 `safety-guard` 가 막는다 — 존재 확인을 건너뛰고 바로 기동하면 된다.
 
 ## 다음 패키지가 알아야 할 것 (04-review §7 요약)
 - 진입점은 하나: `app.memory.after_record(ctx, person_ids, extractor=None, *, fact_keys_by_person=None, event_ids_by_person=None)` — 루프 `_record()` 뒤 한 자리에서만 부른다.
-- `person_facts` 에 **세 출처가 섞여 있다**: `pattern:*`(규칙, confidence 1.0, value `"{n}회 (날짜…)"`) · 승격 사실(`FACT_KEYS` 9키) · 루프 직접 사실(**자유 키** — 위 2번이 여기서 나온다). P8 "원문 펼치기" 는 `fact_sources → events.raw_utterance`(조회 API 는 아직 없다).
+- `person_facts` 에 **세 출처가 섞여 있다**: `pattern:*`(규칙, confidence 1.0, value `"{n}회 (날짜…)"`) · 승격 사실(`FACT_KEYS` 9키) · 루프 직접 사실(**FIX-015 이후 같은 9키로 유도된다. 다만 유도이지 거부가 아니므로 옛 자유 키 행(`소속`·`직장`·`이직`)이 DB 에 남아 있고 앞으로도 섞일 수 있다**). P8 "원문 펼치기" 는 `fact_sources → events.raw_utterance`(조회 API 는 아직 없다). **이벤트 없이 사실만 쓴 턴은 링크가 없다**(`action: unlinked`, `reason: no_event_this_turn`) — 카드에서 원문을 못 펼치는 사실이 존재한다.
 - **미승격 판정은 `agent_traces` 를 상태로 쓴다**(결정 B(ii)) — **trace 를 지우면 승격이 다시 돈다.**
 - `memory_promote` 는 세 종류다. 승격 횟수 = `considered_event_ids` 가 비어 있지 않은 행의 수(`docs/RUNNING.md` 202행 표).
 - 한계: 새 이벤트 없이 시간만 흐르면 패턴이 낡는다(결정 C-5) → 브리핑 직전 재계산이 필요한 이유.
 
 ## 옛 세션에서 끝난 것 (상세는 journal·04-review)
-- **P5-loop 완료** → main 승격(1474 passed, 실서버 왕복 확인). **FIX-005** 사용자 시간대 `APP_TIMEZONE`(기본 서울). **FIX-006** pytest 는 항상 테스트 전용 DB `relationship_test` 에만 붙는다. 셋 다 main 에 있다(main = `1e4afb4`).
-- 이 세션(09-28~29) 전반부는 **Windows → Mac 이전으로 조용히 망가진 하네스를 고치는 데** 썼다: FIX-008 `c4285ed`(훅 9개가 macOS 에 없는 `python` 을 불러 **차단형 가드 5종이 전부 열려 있었다**) · FIX-010 `3c0f0d9`(브랜치 3단계 + `test-guards.sh` 실패 50→0) · FIX-011 `217e523`·`cd09a60`(**구현 검증이 테스트를 한 건도 안 돌리고 통과하고 있었다**) · FIX-012 `0c46913`(DB 기본 포트 5433) · FIX-013 `e1ca8da`(커밋+푸시를 묶으면 후처리가 통째로 건너뜀).
+- **P5-loop 완료** → main 승격. **FIX-005** 사용자 시간대(기본 서울) · **FIX-006** pytest 는 항상 테스트 전용 DB `relationship_test` 에만 붙는다. 셋 다 main(`1e4afb4`)에 있다.
+- 09-28~29 전반부는 **Windows → Mac 이전으로 조용히 망가진 하네스 복구**였다 — FIX-008(훅이 macOS 에 없는 `python` 을 불러 **차단형 가드 5종이 전부 열려 있었다**) · FIX-010(브랜치 3단계) · FIX-011(**구현 검증이 테스트를 한 건도 안 돌리고 통과했다**) · FIX-012(DB 기본 포트 5433) · FIX-013(커밋+푸시를 묶으면 후처리가 건너뜀).
 
 ## 사용자 몫 (알려 둔 것)
 - **브랜치 역할(2026-09-29 확정, FIX-010)**: `dev2` = 작업·실험(아무때나 `git push origin dev2`) → `dev` = 검증을 통과한 것(`/commit` 승인 뒤 `git push origin dev2:dev`, 그 뒤 L-003 대기) → `main` = 배포(`/commit release`). `origin dev` 직접 푸시는 훅이 막는다. **다른 기기에서는 `origin/dev2` 를 받아 그 위에서 바로 작업한다**(`git checkout dev2 && git pull --ff-only`). 새 기기마다 `gh auth login` + `gh auth setup-git` 이 필요하다. 주의: GitHub Desktop 에서 브랜치를 바꾸면 커밋 안 된 변경이 stash(`!!GitHub_Desktop<dev>`)로 들어간다 — 사라진 것처럼 보이면 `git stash list`.
