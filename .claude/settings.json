@@ -1,5 +1,31 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(sed -n:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(diff:*)",
+      "Bash(bash -n:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git branch:*)",
+      "Bash(git fetch:*)",
+      "Bash(git remote -v)",
+      "Bash(bash .claude/scripts/test-guards.sh:*)",
+      "Bash(bash .claude/scripts/verify-plan.sh:*)",
+      "Bash(bash .claude/scripts/verify-impl.sh:*)",
+      "Bash(bash .claude/scripts/gitlog.sh:*)",
+      "Bash(bash .claude/scripts/findings.sh:*)"
+    ],
     "deny": [
       "Write(.claude/.commit-approved)",
       "Edit(.claude/.commit-approved)",

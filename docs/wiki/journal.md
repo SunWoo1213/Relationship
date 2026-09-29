@@ -317,3 +317,4 @@
 - 2026-09-29 13:09 | FIX | FIX-013 계획 3차본 검증 위임 — 새 verifier·새 컨텍스트, 격리 실험으로 A·B·C 검출력 주장 확인 요청 (L-002·L-004) | FIX-013
 - 2026-09-29 13:23 | FIX | FIX-013 계획 3차본 검증 **통과**(verifier, [필수] 0·[권고] 6). 격리 실험 6종 훅 × 30건 + 구멍 9건. 판정 evidence/FIX-013/20260929-1320-verify-3.md | FIX-013
 - 2026-09-29 13:36 | HARNESS | settings.json 에 읽기 전용 Bash 허용 목록 24줄 추가(auto mode 프롬프트 감소). 적용 뒤 test-guards.sh 실패 0 — 훅은 허용 목록과 무관하게 계속 돈다 | auto-mode
+- 2026-09-29 13:55 | COMMIT | e1ca8da harness(hooks): 커밋과 푸시를 한 명령에 묶어도 후처리가 다 돌게 한다
