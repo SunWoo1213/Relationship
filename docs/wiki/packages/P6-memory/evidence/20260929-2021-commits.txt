@@ -1,0 +1,26 @@
+4916db3 test(P6-memory): U8 수용 기준 21행을 증거로 닫고 운영 문서를 맞춘다
+b416dd0 docs(P6-memory): U7 실 LLM 확인 결과와 사실 키 중복 문제를 남긴다
+93c6d3f feat(P6-memory): U7 루프가 쓴 사실도 어느 대화에서 나왔는지 잇는다
+b1a36d1 docs(P6-memory): 실서버와 실 LLM 왕복 확인 결과를 남긴다
+8d3967a feat(P6-memory): U6 대화 턴마다 패턴 감지와 승격이 저절로 돈다
+b209581 feat(P6-memory): U5 이벤트가 5건 쌓이면 인물 사실로 승격한다
+48e3617 feat(P6-memory): U4 대화에서 인물 사실을 뽑아내는 추출기
+51b4d65 feat(P6-memory): U3 pattern 접두 키를 사람 손으로 못 쓰게 막는다
+688d208 harness(settings): 읽기 전용 Bash 를 허용하고 파일 편집은 툴로만 한다
+e1ca8da harness(hooks): 커밋과 푸시를 한 명령에 묶어도 후처리가 다 돌게 한다
+0526f63 docs(FIX-013): 커밋 후처리 누락 결함의 계획과 세션 인계 기록
+0c46913 fix(FIX-012): DB 기본 포트를 5433 으로 맞춘다
+cd09a60 harness(scripts): 훅 자가 점검의 사각지대 두 개를 없앤다
+d67d084 feat(P6-memory): U2 반복 패턴을 규칙으로 찾아낸다
+217e523 harness(scripts): 구현 검증이 테스트 없이 통과하던 것을 막는다
+3c0f0d9 harness(hooks): 브랜치를 3단계로 — dev2 실험, dev 검증, main 배포
+2e293c8 harness(hooks): dev2 공유 푸시를 허용한다
+c4285ed harness(hooks): 훅이 파이썬을 못 찾으면 차단하게 고친다
+7564c5d feat(P6-memory): U1 메모리 설정 상수·타입 골격
+e48ac4c docs(wiki): 브랜치 역할 기록, dev2 추적 설정 반영
+80c2842 fix(FIX-007): 판정의 bool 인물 번호 차단, 가짜 키·템플릿 태그 정리
+aa91f34 docs(wiki): 옛 열린 소견 8건 해소 표시, 남은 3건은 FIX-007 로
+ec454dc docs(P6-memory): 4차 확인 통과·계획 승인 — 패키지 착수
+2de7416 cr(CR-002): 반복 패턴 기간·횟수를 설정값으로, 기본 1년·3회
+9cb35b6 feat(P2-tools): U5 add_event·add_schedule — EVENT_TYPES 검사·raw_utterance 원문 보존·aware 시각만·패턴 감지 없음
+5dc95bb docs(P1-schema): 완료 — verifier 04-review 완료 판정·사용자 승인, R8 R9 구현완료, 패키지 닫음

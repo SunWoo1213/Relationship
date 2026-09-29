@@ -199,7 +199,15 @@ python scripts/er_smoke.py --provider gemini      # GEMINI_API_KEY·GEMINI_MODEL
 
 **실패하면 어떻게 되나** — 패턴 감지·승격·직접 링크 전체를 세이브포인트(`ctx.session.begin_nested()`) 하나로 감싼다. 이 안에서 예외가 나면(예: LLM 공급자 타임아웃) 이 부분만 롤백되고 **그 턴에 저장된 이벤트는 잃지 않는다** — `add_event`는 이 세이브포인트 밖에서 이미 커밋 대상이었기 때문이다. 삼킨 예외는 `memory_error` trace 한 행(`{person_id, stage, error}` — 예외 타입 이름만, 프롬프트·메시지 원문은 남기지 않는다)으로 흔적이 남는다.
 
-**trace를 어디서 보나** — `agent_traces`의 `step='memory_pattern'`(패턴 판정 1행, tokens 항상 0)과 `step='memory_promote'`를 본다. `memory_promote`는 **두 종류가 섞여 있다** — LLM이 실제로 뽑은 승격 사실 행과, U7이 만든 직접 사실 링크 행이다. 트리거 미달 호출도 `memory_promote` 행을 남기므로(왜 승격하지 않았는지 근거로), **"승격이 몇 번 일어났나"를 세려면 행 수가 아니라 `output.source`를 봐야 한다** — LLM 승격 행은 이 키가 없고(또는 `considered_event_ids`가 채워져 있고), 직접 링크 행은 `output.source == "direct"`다.
+**trace를 어디서 보나** — `agent_traces`의 `step='memory_pattern'`(패턴 판정 1행, tokens 항상 0)과 `step='memory_promote'`를 본다. **`memory_promote`에는 세 종류가 섞여 있으므로 행 수를 세면 안 된다.**
+
+| 무엇 | 어떻게 가려내나 | 특징 |
+|------|----------------|------|
+| LLM 승격 (실제로 사실이 생긴 것) | `output.source` 키 없음 **+ `considered_event_ids`가 비어 있지 않음** | tokens > 0, `llm`·`facts` 키 있음 |
+| 트리거 미달 (왜 승격하지 않았나) | `output.source` 키 없음 **+ `considered_event_ids == []`** | tokens 0/0, `unpromoted_count`·`min_events` 로 이유를 남긴다 |
+| 직접 사실 링크 (U7) | `output.source == "direct"` | `considered_event_ids` 키 **자체가 없다**, `links[]` 에 이은 사실 |
+
+즉 **"승격이 몇 번 일어났나"는 `considered_event_ids`가 비어 있지 않은 행의 수**다. `source` 키만으로는 승격 행과 미달 행이 갈리지 않는다(둘 다 키가 없다) — 세 종류가 같은 키 하나로 갈리게 하는 것은 `PromotionResult.to_dict()` 에 `source: "llm"`/`"skipped"` 를 더하는 별건 수정이다(P6-memory 04-review §6, FIX 후보).
 
 ### 평가 데이터셋(파일럿 40건)
 

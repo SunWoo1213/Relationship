@@ -1,0 +1,20 @@
+== verify-impl P6-memory  (20260929-2021) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1622 passed, 1 warning in 13.78s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20260929-2021-pytest.txt
+PASS  compileall 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20260929-2021-lint.txt
+PASS  태그 P6-memory 커밋 26 건 → evidence/20260929-2021-commits.txt
+PASS  커밋에 태그 존재: CR-002
+PASS  커밋에 태그 존재: D11
+PASS  커밋에 태그 존재: D14
+PASS  커밋에 태그 존재: D9
+PASS  커밋에 태그 존재: R11
+PASS  커밋에 태그 존재: R8
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.5
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P6-memory 행 있음
+WARN  미완료 작업 단위 6 개
+== 결과: FAIL=0 WARN=2 → evidence/20260929-2021-summary.txt ==

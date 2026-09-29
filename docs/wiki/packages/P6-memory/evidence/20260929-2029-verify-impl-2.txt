@@ -1,0 +1,27 @@
+== verify-impl P6-memory  (20260929-2029) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1622 passed, 1 warning in 12.93s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20260929-2029-pytest.txt
+PASS  compileall 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20260929-2029-lint.txt
+PASS  태그 P6-memory 커밋 26 건 → evidence/20260929-2029-commits.txt
+PASS  커밋에 태그 존재: CR-002
+PASS  커밋에 태그 존재: D11
+PASS  커밋에 태그 존재: D14
+PASS  커밋에 태그 존재: D9
+PASS  커밋에 태그 존재: R11
+PASS  커밋에 태그 존재: R8
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.5
+PASS  검토자 = verifier (L-002)
+PASS  증거 확인:  승격 후 사실→원문 링크 존재, 설정된 기간·횟수 규칙(기본 365일 3회)으로 `pat ← evidence/20260929-2024-verifier-recheck.
+PASS  증거 확인:  ㄱ "승격 후" = 같은 인물의 미승격 이벤트가 5건 이상일 때 승격이 한 번 돈 뒤 ( ← evidence/20260929-1457-u5-promote.txt (판
+PASS  증거 확인:  ㄴ "사실→원문 링크 존재" = 승격이 만들거나 갱신한 `person_facts` 행 전 ← evidence/20260929-1457-u5-promote.txt (1
+PASS  증거 확인:  ㄷ "설정된 기간·횟수 규칙(기본 365일 3회)" = 같은 인물·같은 type·`occ ← evidence/20260929-0116-u2-patterns.txt (
+PASS  증거 확인:  ㄹ "`pattern:{type}` 사실 생성" = `key="pattern:<type> ← evidence/20260929-0116-u2-patterns.txt (
+PASS  증거 확인:  (계획 내 보조 기준) 판정 표 19·20·21행 — 불변식 grep·`alembic c ← evidence/20260929-2001-u8-invariants.txt
+PASS  증거 확인:  (02-plan-verify 이월) F-bbf7fa 3단계 `.env.example` 설 ← evidence/20260929-2024-verifier-recheck.
+PASS  registry 에 P6-memory 행 있음
+WARN  미완료 작업 단위 6 개
+== 결과: FAIL=0 WARN=1 → evidence/20260929-2029-summary.txt ==

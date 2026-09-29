@@ -13,10 +13,10 @@
 | R5 | H | 임베딩 공급자 미정, 차원 1536은 가정 | 구현완료(876a450, reports/embed_pilot.md: OpenAI text-embedding-3-small, N=1536) | D4 → P0-embed-pilot |
 | R6 | M | 신규 인물 자동등록 vs 확인형 불일치 | 구현완료(f318d58, 8162e09, 8ecf75c, 7df3ada — create_person 은 answered new_person 질문+긍정 답 없이는 ConfirmationRequired; P5-loop 가 1회 소비·대상 바인딩 결정 → 완료, P5-loop 04-review) | D1 → S3.4 → P2-tools, P5-loop |
 | R7 | M | ask_user 동기 반환 불가 | 구현완료(8162e09, 4d5817e, d5c8ec9, 7df3ada — pending_questions 저장 후 {question_id,status:pending} 반환, POST /answers 답 저장; 재개 흐름은 P5-loop → 완료, P5-loop 04-review) | D2 → S3.4 → P2-tools, P5-loop |
-| R8 | M | 시맨틱→원문 링크 없음 | 구현완료(4dfaf33, 09c2bd1 — fact_sources(fact_id, event_id) 복합 PK·FK CASCADE 2; P6-memory 가 승격 시 채움) | S3.1 `fact_sources` → P1-schema, P6-memory |
+| R8 | M | 시맨틱→원문 링크 없음 | 구현완료(4dfaf33, 09c2bd1 — fact_sources(fact_id, event_id) 복합 PK·FK CASCADE 2; **P6-memory 가 실제로 채운다**: b209581 승격이 만든 사실마다 근거 이벤트 링크 · 93c6d3f 루프 직접 사실도 같은 턴 이벤트에 링크 · d67d084 패턴 사실은 창 안 이벤트 전부에 링크 → 완료, P6-memory 04-review §2 ㄴ) | S3.1 `fact_sources` → P1-schema, P6-memory |
 | R9 | M | 인물당 임베딩 1개 | 구현완료(4dfaf33, 09c2bd1, a9cb254, 2c63c60 — 별칭 단위 임베딩·top-K 인물별 max·OpenAIEmbeddingProvider 런타임; **실 공급자 호출 확인**(2026-09-22 P4 U7 ef18143 — text-embedding-3-small N=1536, 40 시나리오 별칭 임베딩 `embedded == aliases` 40/40, 임베딩 배치 62회, `packages/P4-pilot-eval/evidence/20260922-1324-u7-real-run.txt`; `embedding_only` 베이스라인 오병합 0/132 — 별칭 max 집계가 실 임베딩에서 동작)) | D5 → S3.1 → P1-schema, P2-tools, P3-er |
 | R10 | M | 툴 시그니처 ↔ 스키마 불일치 | 구현완료(f2e9e05 — tools_check 7/7, CLAUDE.md 표 = 실제 시그니처) | S3.2 |
-| R11 | M | 반복 패턴 감지 메커니즘 없음 | 결정완료(CR-002: D9→D14, 기본 365일·3회 설정값) | D14 → S3.5 → P6-memory |
+| R11 | M | 반복 패턴 감지 메커니즘 없음 | 구현완료(d67d084 규칙 기반 감지(LLM 0회)·8d3967a 대화 턴마다 자동 실행; CR-002/D14 기본 365일·3회 설정값 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT` → 완료, P6-memory 04-review §2 ㄷ·ㄹ) | D14 → S3.5 → P6-memory |
 | R12 | M | 브리핑 트리거·푸시 구독 저장소 없음 | 결정완료 | S3.6 → P6-briefing, P7-push |
 | R13 | M | LLM·임베딩 비용 미산정 | 결정완료 | P0-cost |
 | R14 | M | CloudFront→EC2 TLS 미정 | 결정완료 | D7 → P9-infra |

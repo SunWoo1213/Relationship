@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: P6-memory
+active: none
 frozen: none
 
 <!--
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- **P6-memory 완료(2026-09-29, verifier 04-review `결과: 완료`, 사용자 승인)** — verify-impl 2회(04-review 작성 전·후) 모두 **FAIL 0**, 2차 WARN 1(01-plan 체크박스 → 승인 뒤 해소). 수용 기준 ㄱ~ㄹ + 보조 2행 전부 통과, 열린 [필수] 소견 0(해소 6), 전체 회귀 **1622 passed skip 0** · `alembic check` 무변경 · `tools_check` 7/7. verifier 가 보고 수치를 옮기지 않고 직접 재실행했고 `PATTERN_MIN_COUNT=2`·`MEMORY_PROMOTE_MIN_EVENTS=4`·`PATTERN_WINDOW_DAYS=400` 로 **일부러 어긋나게 주어 FAILED 가 나는 것까지** 확인했다(항상 통과하는 테스트가 아님, 원칙8). U1 `7564c5d` · U2 `d67d084` · U3 `51b4d65` · U4 `48e3617` · U5 `b209581` · U6 `8d3967a` · U7 `93c6d3f` · U8 `4916db3`. **R8·R11 구현완료.** 실 LLM 왕복도 확인(journal 17:30·19:50). 승인 뒤 메인 세션이 [권고] 3건을 닫았다(01-plan 체크박스 · registry 비고 6곳 · 사실과 달랐던 `docs/RUNNING.md` 202행 `memory_promote` 세 종류 구분). **다음 = 사실 키 중복 결정(사용자 선택)**: `소속`·`직장`·`workplace` 가 같은 값으로 3행 저장된다 — 손볼 자리는 `app/agent/propose.py` 145행 `facts.key`(enum 없음) 또는 `update_person` 어휘 검사인데 **둘 다 P5-loop 행동 변경**이라 FIX/CR 판단이 먼저다. 브리핑·인물 카드가 중복을 그대로 보여주므로 P6-briefing·P8 전에 닫는다. 그 밖 FIX 후보 3건: `/health` 가 빈 DB 를 `ok` 보고 · `update_person` 인자 간 부분 반영 · `memory_promote` `source` 키 비대칭(코드). `dev` 승격 미검토.
 - **P6-memory 계획 승인(2026-09-28)** — architect 초안 → verifier 1차 보류(H-1~H-3) → 1차 개정 → 2차 통과 → 승인 전 변경(정리 기준 설정값) → 3차 보류 H-4(표기) → 수정 → 4차 통과(FAIL 0/WARN 0, 열린 소견 0). U1 부터 backend-agent(L-004 매번). 이월: F-bbf7fa 3단계(U1 `.env.example`), R-10(U6 추출기 지연 생성), R-15(U5 결정 F 스키마 `min_events`).
 - **CR-002 이행완료(문서, 2026-09-28)** — 반복 패턴 기간·횟수를 설정값으로(`PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`, 기본 365일·3회), D9→D14. 되돌린 코드 없음. 코드는 P6-memory U1·U2. P6-memory 01-plan 은 결정 A~G 확정(전부 권장, B 는 방법 2)·verify-plan FAIL 1(02-plan-verify 없음, 정상) — 다음 verifier 02-plan-verify(L-004 승인 먼저).
 - **FIX-006 완료(2026-09-26)** — 테스트 전용 DB `relationship_test`(tests/conftest.py·tests/db_bootstrap.py, `app/` 무변경). 1486 passed, 서준을 local 로 되돌린 격리 증명도 통과. 이제 로컬 서버(개발 DB)를 써도 테스트가 흔들리지 않는다.

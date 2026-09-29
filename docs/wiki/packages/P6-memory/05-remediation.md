@@ -80,6 +80,7 @@ FAIL  H-1 D14 .env.example 기본값 줄이 01-plan U1·파일 표에 없음
 ### 재검증
 - 명령: 1·2단계 = 위 표의 완료 판정 명령을 05 표에서 awk 로 잘라내 그대로 실행(verifier, 2026-09-28 14:09) · 3단계 = U1 뒤 `verify-impl.sh P6-memory` + 04-review
 - 결과 파일(evidence/): `20260928-1410-verifier-2-hold-recheck.txt` — 1단계 `60:` 1건(exit 0) · 2단계 3·25·60·67·233행 5건 ≥ 3(exit 0) · 3단계 0건(exit 1, 구현 전이라 기대대로). **계획 단계 소견 해소**(02-plan-verify 2차 §3-1). 3단계는 열린 채로 U1 이 닫는다(04-review 수용 기준 표에서 `grep -n PATTERN .env.example` 2건 확인)
+- 3단계 확인 결과(04-review, verifier 2026-09-29): U1 커밋 `7564c5d` 이후 `grep -nE "PATTERN_|MEMORY_PROMOTE_MIN_EVENTS" .env.example` → 58·59·61행 3건, 값 비어 있음(`evidence/20260929-2024-verifier-recheck.txt` §G). `PATTERN` 접두 줄은 2건(58·59행)으로 원래 기대와 일치. **3단계 충족 — 소견 전체 해소 유지.**
 
 ### 영향 확인
 - 관련 카드(D/S/원칙)와 충돌: 없음 | 있음 → 어느 카드
