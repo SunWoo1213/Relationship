@@ -1,0 +1,13 @@
+== FIX-015 완료 판정 (20260930-0007) ==
+
+--- 1. 스키마 enum == FACT_KEYS ---
+True
+
+--- 2. docstring 이 facts[].key 를 적는가 ---
+130:#: `facts[].key`(FIX-015) -- 만 enum 으로 LLM 을 **유도**한다(U2 범위
+132:#: 게이트가 한다"). `facts[].key` 의 어휘는 `app.memory.FACT_KEYS`
+
+--- 3. test_agent_propose.py ---
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+61 passed, 1 warning in 0.61s

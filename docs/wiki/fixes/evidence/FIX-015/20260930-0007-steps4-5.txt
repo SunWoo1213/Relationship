@@ -1,0 +1,16 @@
+--- 4. 회귀 4파일 ---
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+121 passed, 1 warning in 1.16s
+
+--- 5a. 전체 회귀 ---
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1624 passed, 1 warning in 14.19s
+
+--- 5b. tools_check ---
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+
+--- 5c. app/agent 금지 리터럴(기준선 1건) ---
+app/agent/loop.py:1352:            created = app_tools.create_person(

@@ -37,6 +37,8 @@ from app.agent.propose import (
 from app.agent.types import Proposal, ToolCallProposal
 from app.db.models import EVENT_TYPES, HIERARCHIES, RELATION_TAGS
 from app.er.types import JudgeUnavailable
+from app.memory import FACT_KEYS
+from app.settings import PATTERN_KEY_PREFIX
 
 #: P3-er F-46f1eb 규약과 같은 마커 -- 실제 키 형식이 아닌 표식(secret-guard
 #: 오탐 방지, `tests/test_er_judge.py` 와 동일).
@@ -65,6 +67,23 @@ def test_proposal_schema_relation_tag_enum_matches_relation_tags():
 
 def test_proposal_schema_hierarchy_enum_matches_hierarchies():
     assert PROPOSAL_ARG_SCHEMA["properties"]["hierarchy"]["enum"] == list(HIERARCHIES)
+
+
+def test_proposal_schema_fact_key_enum_matches_fact_keys():
+    # FIX-015. 루프가 제안하는 사실 키와 승격(P6-memory U4)이 쓰는 어휘가
+    # 갈라지면 같은 값이 `소속`/`직장`/`workplace` 처럼 여러 행으로 쌓인다.
+    # 어휘의 단일 출처는 `app.memory.FACT_KEYS` 하나뿐임을 못 박는다 --
+    # 한쪽에만 키를 더하면 이 단언이 깨진다.
+    key = PROPOSAL_ARG_SCHEMA["properties"]["facts"]["items"]["properties"]["key"]
+    assert key["enum"] == list(FACT_KEYS)
+
+
+def test_proposal_schema_fact_key_enum_excludes_pattern_prefix():
+    # D-7 세 겹 방어의 첫 겹. `pattern:{type}` 사실은 규칙이 만드는 것이라
+    # 사람도 LLM 도 손대지 못한다 -- 스키마 enum 에 그 접두가 아예 없고
+    # (여기), 검증기가 거부하고, `update_person` 이 거부한다(U3).
+    key = PROPOSAL_ARG_SCHEMA["properties"]["facts"]["items"]["properties"]["key"]
+    assert not any(k.casefold().startswith(PATTERN_KEY_PREFIX) for k in key["enum"])
 
 
 def test_proposal_schema_top_level_requires_tool_calls_only():

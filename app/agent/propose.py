@@ -94,6 +94,7 @@ from app.er.judge import (
     _to_gemini_schema,
 )
 from app.er.types import JudgeUnavailable
+from app.memory import FACT_KEYS
 from app.settings import ER_JUDGE_MAX_RETRIES, ER_JUDGE_TIMEOUT
 
 TOOL_NAMES = app_tools.TOOL_NAMES
@@ -124,10 +125,13 @@ _PROPOSAL_TOOL_DESCRIPTION = (
 
 #: 개별 `tool_calls[]` 원소의 `args` 스키마. 툴 7종의 인자를 합친
 #: 느슨한 모양이다(`additionalProperties: True`) -- 실제 필수/타입
-#: 검증은 게이트(U3, `inspect.signature` 대조)의 일이다(원칙1). `type`/
-#: `relation_tag`/`hierarchy` 만 CLAUDE.md 고정 집합 enum 으로 LLM 을
-#: **유도**한다(U2 범위 27행 "PROPOSAL_SCHEMA 의 enum 으로 유도할 뿐,
-#: 7종 밖 값의 거부는 게이트가 한다").
+#: 검증은 게이트(U3, `inspect.signature` 대조)의 일이다(원칙1). 고정
+#: 집합이 있는 네 자리 -- `type`/`relation_tag`/`hierarchy` 와
+#: `facts[].key`(FIX-015) -- 만 enum 으로 LLM 을 **유도**한다(U2 범위
+#: 27행 "PROPOSAL_SCHEMA 의 enum 으로 유도할 뿐, 7종 밖 값의 거부는
+#: 게이트가 한다"). `facts[].key` 의 어휘는 `app.memory.FACT_KEYS`
+#: 하나뿐이다 -- 승격(P6-memory U4)이 쓰는 그 어휘를 그대로 가져와,
+#: 루프가 쓴 사실과 승격이 쓴 사실이 같은 키로 모이게 한다(FIX-015).
 PROPOSAL_ARG_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
@@ -147,7 +151,7 @@ PROPOSAL_ARG_SCHEMA: dict[str, Any] = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "key": {"type": "string"},
+                    "key": {"type": "string", "enum": list(FACT_KEYS)},
                     "value": {"type": "string"},
                 },
                 "required": ["key", "value"],

@@ -5,9 +5,13 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-29 23:40 — **P6-memory 가 끝났다. 활성 패키지가 없다(`active: none`).**
+갱신: 2026-09-29 23:50 — **P6-memory 가 끝났다. 활성 패키지가 없다(`active: none`). 커밋 `94373cc` · origin/dev2 = 여기.**
 
-verifier 04-review `결과: 완료` → 사용자 승인(2026-09-29). 승인 뒤 메인 세션이 [권고] 3건을 닫고 `verify-impl.sh P6-memory` 를 다시 돌려 **FAIL 0 / WARN 0** 을 받았다(`evidence/20260929-2337-*`, 이전 WARN 이던 "미완료 작업 단위 6개" 가 `PASS 작업 단위 모두 완료 표시` 로 바뀜). **아직 커밋하지 않았다** — 이 세션의 마지막 할 일이 그 커밋과 dev2 푸시다.
+verifier 04-review `결과: 완료` → 사용자 승인(2026-09-29). 승인 뒤 메인 세션이 [권고] 3건을 닫고 `verify-impl.sh P6-memory` 를 다시 돌려 **FAIL 0 / WARN 0** 을 받았다(`evidence/20260929-2337-*`, 이전 WARN 이던 "미완료 작업 단위 6개" 가 `PASS 작업 단위 모두 완료 표시` 로 바뀜).
+
+**그 뒤 FIX-015 도 끝냈다(2026-09-30 00:07, 커밋 대기).** 사실 키 중복을 사용자가 **FIX + "스키마 enum 으로 유도"** 로 정했고, `app/agent/propose.py` 의 `PROPOSAL_ARG_SCHEMA.facts.key` 에 `app.memory.FACT_KEYS` 9종 enum 을 걸었다 — **제품 코드 실질 변경은 상수 한 줄**이다. 판정 표 5행 전부 충족(전체 **1624 passed skip 0** = 기준선 1622+2 · `tools_check` **7/7** = S3.2 무변경의 증거 · 회귀 4파일 121 · 기존 테스트 수정 0건). **한계 2가지**: ① enum 은 유도이지 거부가 아니다 — 게이트는 어휘를 검사하지 않으므로 LLM 이 그래도 어휘 밖 키를 내면 저장된다 ② **실 LLM 왕복으로 확인하지 않았다**(테스트는 가짜 제안기를 쓰므로 스키마가 어휘를 싣고 있다는 것까지만 보인다) — **그전까지 "중복이 사라졌다" 고 말하지 않는다.** 다음 실 왕복 때 `POST /chat` 으로 사실이 생기는 발화를 넣어 `person_facts.key` 가 `FACT_KEYS` 안에 드는지 보고 `fixes/FIX-015.md` 결과 절에 덧붙인다. 이미 저장된 `소속`·`직장` 행은 지우지 않았다.
+
+**FIX / CR 판단 근거(다음에 같은 유형이 오면 재사용)** — 조사 결과(read-only, 2026-09-29 23:50): **사실 키 어휘를 정한 D 카드·S 카드·기획서 문장이 없다** — `S3.2` 는 `facts?: {key,value}[]` 시그니처만 적고(키에 어휘 제약을 걸어도 시그니처는 그대로라 `tools_check` 7/7 유지), `S3.5` 는 어휘를 말하지 않으며, `grep -rln "FACT_KEYS|사실 키|고정 어휘" docs/wiki/decisions/ docs/wiki/specs/ docs/proposal.md CLAUDE.md` 가 **0건**이다. D-5 는 P6-memory **패키지 안의 결정**이고 거기서도 루프의 자유 키는 "한계·리스크"로만 적혀 있다. → **원칙·D·S 를 바꾸지 않으므로 FIX 가 맞다**(devlog 규칙 "수정이 원칙·D·S를 바꾸면 FIX가 아니다" 의 반대). 선례도 있다: `app/agent/propose.py` 125~131행 docstring 이 "`type`/`relation_tag`/`hierarchy` 만 enum 으로 **유도**하고, 7종 밖 값의 거부는 게이트가 한다" 고 이미 정해 뒀다 — `facts.key` 에 `FACT_KEYS` enum 을 더하는 것은 그 설계를 따르는 것이다.
 
 **무엇이 돌아가게 됐나(한 줄)**: 대화 턴마다 ① 같은 인물의 같은 종류 사건이 기본 365일 안에 3회 이상이면 `pattern:{type}` 사실이 규칙으로 생기고(LLM 0회), ② 미승격 이벤트가 5건 쌓이면 LLM 이 인물 사실로 승격하며, ③ 만들어진 사실은 전부 `fact_sources` 로 근거 원문에 이어진다. 실 LLM 왕복으로도 확인했다(journal 17:30·19:50).
 
@@ -22,8 +26,8 @@ active: **none** | frozen: none | 브랜치 `dev2`(작업·실험) | main = `1e4
 - `01-plan.md`(U3~U8 체크박스) · `registry.md`(비고 6곳) · `review-index.md`(R8·R11) · `docs/backlog.md`(P6 첫 항목) · `docs/RUNNING.md`(202행 `memory_promote` 세 종류) · `CURRENT.md`(active 해제) · `journal.md`(DONE) · 이 파일
 
 ## 바로 다음에 할 것
-1. **이 변경들을 `/commit`** 하고 `dev2` 에 푸시한다(커밋과 푸시는 **따로** 실행 — FIX-013).
-2. **사실 키 중복을 FIX 로 할지 CR 로 할지 정한다(사용자가 고른 다음 작업, 2026-09-29).** 아래 "열린 질문" 첫 줄이 전부다. 쟁점은 **D-5(고정 어휘 9키)가 승격만 구속하는가, 루프도 구속하는가** — 루프까지 구속하면 P5-loop 행동 변경이라 CR 이다. 손볼 자리 두 곳: (가) `app/agent/propose.py` 145행 `facts.key` 에 `FACT_KEYS` enum(선례: `type`·`relation_tag`·`hierarchy` 가 이미 enum) (나) `update_person` 이 어휘 밖 키 거부(U3 가 `pattern:` 을 막은 자리). **(가) 권장.** P6-briefing·P8 보다 먼저 닫는다.
+1. **FIX-015 변경을 `/commit`** 하고 `dev2` 에 푸시한다(커밋과 푸시는 **따로** 실행 — FIX-013). 커밋 대상: `app/agent/propose.py` · `tests/test_agent_propose.py` · `fixes/FIX-015.md` · `fixes/evidence/FIX-015/` 2개 · `CURRENT.md` · `journal.md` · 이 파일. **커밋 뒤 `fixes/FIX-015.md` 결과 절 머리에 해시를 적는다**(journal 의 COMMIT 줄과 함께 다음 커밋에 실린다 — 이 저장소의 기존 관례).
+2. **실 LLM 왕복으로 FIX-015 를 확인한다**(사용자 몫 — 아래 기동 명령). 확인할 것: 사실이 생기는 발화를 넣었을 때 `person_facts.key` 가 `FACT_KEYS` 9종 안에 드는가. 들면 FIX-015 결과 절에 덧붙이고, 그래도 자유 키가 나오면 **거부까지 하는 안((나) `update_person` 어휘 검사)을 별건으로 올린다.**
 3. `dev` 승격 검토 — dev2 의 P6-memory 26커밋을 `git push origin dev2:dev`(승인 마커 먼저, 푸시 뒤 L-003 대기).
 4. FIX 후보 3건(아래 "열린 질문"): `/health` 빈 DB · `update_person` 부분 반영 · `memory_promote` `source` 키 비대칭(코드 한 줄, 문서는 이미 고침).
 5. 그다음 패키지: **`P6-briefing`**(패턴 문장화 · 브리핑 직전 패턴 재계산 — `detect_patterns` 는 순수 SQL 이라 다시 불러도 된다). 이후 P8 인물 카드, P9 AWS(Terraform).
@@ -46,7 +50,7 @@ active: **none** | frozen: none | 브랜치 `dev2`(작업·실험) | main = `1e4
 - 빈 DB `relationship_test_fix006_evidence` 정리(훅이 셸의 DB 삭제를 막음). GitHub main 브랜치 보호 규칙. 테스트 서버(8000)가 켜져 있으면 종료.
 
 ## 열린 질문 · 보류
-- **[우선] 같은 사실이 키 3개로 중복 저장된다** — 실 LLM 에서 `소속=네이버`·`직장=네이버`(루프가 씀) + `workplace=네이버`(승격이 씀) 세 행이 한 인물에 동시에 있었다. 원인은 `app/agent/propose.py::PROPOSAL_ARG_SCHEMA` 의 `facts.key`(145행)가 **enum 없는 자유 문자열**이고 `_PROPOSAL_TOOL_DESCRIPTION`(120행)에도 어휘 지시가 없어 LLM 이 발화마다 다른 한국어 키를 만드는 것(관측: `이직`·`소속`·`직장`). 브리핑(P6-briefing)·인물 카드(P8)가 중복을 그대로 보여준다. verifier 판정: **P6-memory 범위 밖 별건이 맞다**(01-plan D-5·리스크 절이 "루프의 자유 키는 이 패키지에서 바꾸지 않는다" 고 명시했고 사용자가 그 계획을 승인했다) — **그러나 제품 결함으로는 실재한다.** 곁들여: 사실 제안 자체가 드물다(발화 7건 중 2건) — 시맨틱 사실의 주 공급원은 승격이고 루프는 보조다.
+- **[FIX-015 로 1차 처리함, 실 확인 대기] 같은 사실이 키 3개로 중복 저장된다** — 실 LLM 에서 `소속=네이버`·`직장=네이버`(루프가 씀) + `workplace=네이버`(승격이 씀) 세 행이 한 인물에 동시에 있었다. 원인은 `app/agent/propose.py::PROPOSAL_ARG_SCHEMA` 의 `facts.key`(145행)가 **enum 없는 자유 문자열**이고 `_PROPOSAL_TOOL_DESCRIPTION`(120행)에도 어휘 지시가 없어 LLM 이 발화마다 다른 한국어 키를 만드는 것(관측: `이직`·`소속`·`직장`). 브리핑(P6-briefing)·인물 카드(P8)가 중복을 그대로 보여준다. verifier 판정: **P6-memory 범위 밖 별건이 맞다**(01-plan D-5·리스크 절이 "루프의 자유 키는 이 패키지에서 바꾸지 않는다" 고 명시했고 사용자가 그 계획을 승인했다) — **그러나 제품 결함으로는 실재한다.** 곁들여: 사실 제안 자체가 드물다(발화 7건 중 2건) — 시맨틱 사실의 주 공급원은 승격이고 루프는 보조다.
 - **[FIX 후보] `/health` 가 테이블이 없어도 `db: up`·`status: ok` 를 반환한다.** 이번에 개발 DB 가 빈 것을 `/health` 로는 알 수 없었고 단서는 `alembic_revision: null` 뿐이었다. 마이그레이션 안 된 DB 를 "정상" 으로 보고하면 배포(P9) 뒤 같은 상황을 알아채기 어렵다. 이 패키지가 만든 결함이 아니다(`/health` 는 P2-tools `4d5817e`).
 - **[FIX 후보] `update_person` 의 인자 간 부분 반영** — `display_name`·`new_alias` 가 `facts` 검증보다 **앞에서** 적용된다(`app/tools/persons.py` 498~520행). 그래서 검증에 실패한 호출이 이름 변경을 남긴다. 고치는 법: `facts` 검증을 함수 맨 앞으로(테스트 2~3건).
 - **[FIX 후보] `memory_promote` 의 `source` 키 비대칭** — 세 종류 중 직접 링크 행에만 `source` 가 있다. `PromotionResult.to_dict()` 에 `source: "llm"`/`"skipped"` 를 더하면 한 키로 갈린다. **문서(`docs/RUNNING.md` 202행)는 이미 사실대로 고쳤다.**
