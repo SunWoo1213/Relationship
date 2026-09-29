@@ -324,3 +324,6 @@
 - 2026-09-29 14:09 | COMMIT | 51b4d65 feat(P6-memory): U3 pattern 접두 키를 사람 손으로 못 쓰게 막는다
 - 2026-09-29 14:09 | PUSH-dev2 | origin dev2 51b4d65 (실험 푸시)
 - 2026-09-29 14:15 | P6 | U4 사실 추출기를 backend-agent 에 위임 (사용자 승인, L-004 마커 생성). 01-plan 이 U4 로 넘긴 결정 3종(입력 타입·타임아웃 상수·상한 초과 절단 순서)을 근거와 함께 03-log 에 남기도록 요구 | P6-memory S3.5 D11 R8 원칙7 원칙8
+- 2026-09-29 14:33 | COMMIT | 48e3617 feat(P6-memory): U4 대화에서 인물 사실을 뽑아내는 추출기
+- 2026-09-29 14:33 | PUSH-dev2 | origin dev2 48e3617 (실험 푸시)
+- 2026-09-29 14:45 | P6 | U5 승격을 backend-agent 에 위임 (사용자 승인, L-004). **발견: 결정 F 186행이 모순** — `memory_promote` 는 "트리거 걸릴 때만 1행" 인데 미달 이유(`unpromoted_count`)는 `memory_pattern` 행에 적으라 하고, U2 가 이미 커밋한 `PatternResult` 에는 그 필드가 없다(패턴 모듈은 승격 이력을 모른다). 판단을 U5 에 넘기고 근거를 03-log 에 남기게 했다. 함께 요구: 미달 행의 `considered_event_ids` 는 반드시 빈 목록(세기만 한 이벤트를 넣으면 영구 미승격) | P6-memory 결정F 결정B R-14 원칙9

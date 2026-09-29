@@ -1,5 +1,9 @@
-"""Refs: P6-memory S3.5 D14 D11 원칙6 원칙8 원칙9 -- 골격(U1). 결과 타입 +
-trace 어휘 상수 + 사실 키 어휘만 정의한다. 도는 로직은 없다.
+"""Refs: P6-memory S3.5 D14 D11 원칙6 원칙8 원칙9 -- 골격(U1, U2 가
+`PatternChange`/`PatternResult` 에 `to_dict()` 를, U5 가 `PromotedFact`/
+`RejectedFact`/`PromotionResult` 에 `to_dict()`/`trace_tokens()` 와
+`min_events`/`tokens_in`/`tokens_out` 필드를 더했다 -- U1 03-log "필드가
+부족하면 그 단위 03-log 에 남긴다" 규약). 결과 타입 + trace 어휘 상수 +
+사실 키 어휘만 정의한다. 도는 로직은 없다.
 
 ## 이 모듈이 하지 않는 것
 
@@ -159,6 +163,19 @@ class PromotedFact:
     source_event_ids: list[int] = field(default_factory=list)
     previous_value: str | None = None
 
+    def to_dict(self) -> dict[str, Any]:
+        """`memory_promote` trace `output.facts[]` 항목 모양(결정 F, U5
+        가 추가 -- `PatternChange.to_dict()` 와 같은 이유, `@traced` 의
+        `to_jsonable` 이 이 메서드를 우선 쓴다)."""
+
+        return {
+            "fact_id": self.fact_id,
+            "key": self.key,
+            "action": self.action,
+            "source_event_ids": list(self.source_event_ids),
+            "previous_value": self.previous_value,
+        }
+
 
 @dataclass(frozen=True)
 class RejectedFact:
@@ -170,22 +187,67 @@ class RejectedFact:
     key: str | None
     reason: str
 
+    def to_dict(self) -> dict[str, Any]:
+        """`memory_promote` trace `output.rejected[]` 항목 모양(결정 F,
+        U5 가 추가 -- `PromotedFact.to_dict()` 와 같은 이유)."""
+
+        return {"index": self.index, "key": self.key, "reason": self.reason}
+
 
 @dataclass(frozen=True)
 class PromotionResult:
     """`promote_person(ctx, person_id, extractor)`(U5)의 반환 타입이자
+    `_promote_and_trace()`(`app/memory/promote.py`)가 매 호출마다 돌려주는
     `memory_promote` trace output(결정 F)의 바탕. 트리거가 걸리지 않았으면
-    (미승격 < `promote_min_events()`) `promote_person` 은 `None` 을
-    돌려준다(01-plan 시그니처 `PromotionResult | None`) -- 이 경우 이
-    타입은 만들어지지 않는다."""
+    (미승격 < `promote_min_events()`) **이 타입 자체는 여전히 만들어진다**
+    -- `considered_event_ids` 가 빈 리스트인 것으로 "이번 호출은 추출기를
+    부르지 않았다"를 표시한다(U5 가 U1 골격의 이 docstring을 수정 -- 근거는
+    `app/memory/promote.py` 모듈 docstring "★ 세 판단"과 03-log U5 항목).
+    공개 `promote_person()` 은 `considered_event_ids` 가 비어 있으면
+    `None` 을, 아니면 이 값 그대로를 호출자에게 돌려준다.
+
+    `min_events`/`tokens_in`/`tokens_out` 은 U5 가 이 골격에 더한 필드다
+    (U1 03-log "필드가 부족하면 그 단위 03-log 에 남긴다" 규약). `min_events`
+    는 이번 판정에 실제로 쓴 `promote_min_events()` 값(R-14, D14 와 같은
+    재현성 요구). `tokens_in`/`tokens_out` 은 `Extraction`(U4)이 실어 온
+    추출기 사용량이며, 트리거가 걸리지 않은 호출은 추출기를 부르지 않으므로
+    항상 `(0, 0)` 이다."""
 
     person_id: int
     unpromoted_count: int
+    min_events: int
     considered_event_ids: list[int] = field(default_factory=list)
     facts: list[PromotedFact] = field(default_factory=list)
     rejected: list[RejectedFact] = field(default_factory=list)
     llm_provider: str | None = None
     llm_model: str | None = None
+    tokens_in: int = 0
+    tokens_out: int = 0
+
+    def to_dict(self) -> dict[str, Any]:
+        """`memory_promote` trace `output` 모양 그대로(결정 F, U5 가
+        `app/memory/promote.py::_promote_and_trace()` 에서 채운다). U2 의
+        `PatternResult.to_dict()` 가 없으면 `to_jsonable` 이 dataclass 를
+        `str()` 로 뭉갠다는 것과 같은 이유로 U5 가 추가했다."""
+
+        return {
+            "person_id": self.person_id,
+            "unpromoted_count": self.unpromoted_count,
+            "min_events": self.min_events,
+            "considered_event_ids": list(self.considered_event_ids),
+            "facts": [fact.to_dict() for fact in self.facts],
+            "rejected": [rejected.to_dict() for rejected in self.rejected],
+            "llm": {"provider": self.llm_provider, "model": self.llm_model},
+        }
+
+    def trace_tokens(self) -> tuple[int, int]:
+        """`@traced` 가 `tokens_in`/`tokens_out` 을 채울 때 부르는 훅
+        (`app/tools/context.py::traced` docstring "성공" 절). `Extraction`
+        (U4)이 실어 온 추출기 사용량을 그대로 꺼내 쓴다 -- 트리거 미달
+        호출은 기본값 `(0, 0)` 그대로다(원칙6 과 같은 방향: LLM 을 부르지
+        않은 판정은 토큰도 0)."""
+
+        return (self.tokens_in, self.tokens_out)
 
 
 # ---------------------------------------------------------------------------

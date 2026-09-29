@@ -4,15 +4,16 @@ U1 은 `app.memory.types` 의 결과 타입·trace 어휘·`FACT_KEYS` 만 재ex
 했다. U2 는 `app/memory/patterns.py::detect_patterns()`(규칙 기반 패턴
 감지, LLM·임베딩 미사용)를 여기에 더했다. U4 는 01-plan 41행대로
 `app/memory/extract.py` 의 추출기 Protocol(`FactExtractor`)과 가짜
-(`FakeFactExtractor`)를 더한다 -- `promote_person()`/`after_record()`
-(U5·U6)는 아직 없다.
+(`FakeFactExtractor`)를 더했다. U5 는 `app/memory/promote.py::
+promote_person()`(LLM 사실 추출 + upsert 승격)을 더한다 -- `after_record()`
+(U6, 루프 연결)는 아직 없다.
 
 `detect_patterns` re-export 는 여전히 네트워크·LLM·임베딩 없이 성공한다
 (`app/memory/patterns.py` 는 `app.memory.extract`/`app.er.judge`/
 `app.embedding` 을 직접 import 하지 않는다, `patterns.py` 모듈 docstring
-참고). `app.memory.extract` 자체는 `app.er.judge` 를 import 하지만(D11
-재사용, `select_provider`/`call_with_error_mapping`), 두 모듈 모두 실제
-LLM 호출은 **함수를 부를 때**(`ClaudeFactExtractor.__post_init__` 등)
+참고). `app.memory.extract`·`app.memory.promote` 는 `app.er.judge` 를
+import 하지만(D11 재사용, `select_provider`/`call_with_error_mapping`),
+실제 LLM 호출은 **함수를 부를 때**(`ClaudeFactExtractor.__post_init__` 등)
 지연 import 로 SDK 를 불러올 뿐이라 `import app.memory` 자체는 네트워크를
 타지 않는다."""
 
@@ -20,6 +21,7 @@ from __future__ import annotations
 
 from app.memory.extract import FactExtractor, FakeFactExtractor
 from app.memory.patterns import detect_patterns
+from app.memory.promote import promote_person
 from app.memory.types import (
     FACT_KEYS,
     MEMORY_TRACE_STEPS,
@@ -53,4 +55,5 @@ __all__ = [
     "PromotionResult",
     "RejectedFact",
     "detect_patterns",
+    "promote_person",
 ]
