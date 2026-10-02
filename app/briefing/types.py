@@ -174,10 +174,21 @@ class BriefingRunResult:
     """`run_briefings(...)`(U5)의 반환 타입이자 `POST /briefings/run`
     (U6) 응답·`briefing_run` trace output(결정 I)의 바탕. `briefings`/
     `skipped` 항목 하나하나는 평범한 dict 다 -- U6 가 응답 모양으로
-    그대로 쓸 수 있게 한다."""
+    그대로 쓸 수 있게 한다.
+
+    **U6 추가 -- `session_id`**: 이 실행이 남긴 모든 trace 가 공유하는
+    `"briefing:<uuid4>"`(결정 I, `run.py` 의 `run_ctx.session_id`)다. U5
+    시점에는 이 값을 돌려줄 필요가 없어(테스트가 `tool_name`+`step` 으로
+    trace 를 조회했다, `app/briefing/run.py` 모듈 docstring "실행 하나의
+    session_id" 절) 필드가 없었지만, `POST /briefings/run` 응답의
+    `run_id`(위임 프롬프트 요구)가 바로 이 값이어야 그 실행이 남긴
+    trace 를 사용자가 되짚을 수 있다(원칙9) -- 그래서 U6 가 이 필드를
+    더한다. 기존 호출부(U5 테스트)는 `to_dict()` 를 쓰지 않고 DB 조회로
+    trace 를 찾으므로 이 추가로 깨지지 않는다(U6 03-log 확인)."""
 
     trigger: str
     now: datetime
+    session_id: str
     briefings: list[dict[str, Any]] = field(default_factory=list)
     skipped: list[dict[str, Any]] = field(default_factory=list)
     errors: int = 0
@@ -186,6 +197,7 @@ class BriefingRunResult:
         return {
             "trigger": self.trigger,
             "now": self.now.isoformat(),
+            "session_id": self.session_id,
             "briefings": [dict(item) for item in self.briefings],
             "skipped": [dict(item) for item in self.skipped],
             "errors": self.errors,

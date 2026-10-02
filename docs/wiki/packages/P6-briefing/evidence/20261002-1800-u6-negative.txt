@@ -1,0 +1,52 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 7 items / 5 deselected / 2 selected
+
+tests/test_api_briefings.py::test_run_briefings_other_user_schedule_id_returns_404 FAILED [ 50%]
+tests/test_api_briefings.py::test_run_briefings_missing_schedule_id_returns_404 FAILED [100%]
+
+=================================== FAILURES ===================================
+____________ test_run_briefings_other_user_schedule_id_returns_404 _____________
+
+app_and_client = (<fastapi.applications.FastAPI object at 0x10c9a96a0>, <starlette.testclient.TestClient object at 0x10c9aaba0>)
+db_session = <sqlalchemy.orm.session.Session object at 0x10c9a9940>
+
+    def test_run_briefings_other_user_schedule_id_returns_404(app_and_client, db_session) -> None:
+        app, client = app_and_client
+        other_person = _make_person(db_session, user_id="other-user")
+        other_schedule = _make_schedule(db_session, other_person, scheduled_at=NOW + timedelta(hours=3))
+    
+        resp = client.post("/briefings/run", json={"schedule_id": other_schedule.id})
+    
+>       assert resp.status_code == 404
+E       assert 200 == 404
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/test_api_briefings.py:213: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+______________ test_run_briefings_missing_schedule_id_returns_404 ______________
+
+app_and_client = (<fastapi.applications.FastAPI object at 0x10c9aa3c0>, <starlette.testclient.TestClient object at 0x10ca3a350>)
+db_session = <sqlalchemy.orm.session.Session object at 0x10ca3ac10>
+
+    def test_run_briefings_missing_schedule_id_returns_404(app_and_client, db_session) -> None:
+        """존재하지 않는 `schedule_id`(다른 사용자가 아니라 아예 없는 행)도
+        같은 404 `not_found` 로 매핑된다(`ScheduleNotFound` 공통 핸들러)."""
+        app, client = app_and_client
+    
+        resp = client.post("/briefings/run", json={"schedule_id": 999_999_999})
+    
+>       assert resp.status_code == 404
+E       assert 200 == 404
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/test_api_briefings.py:227: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_briefings.py::test_run_briefings_other_user_schedule_id_returns_404
+FAILED tests/test_api_briefings.py::test_run_briefings_missing_schedule_id_returns_404
+======================= 2 failed, 5 deselected in 0.29s ========================

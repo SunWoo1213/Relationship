@@ -1,0 +1,33 @@
+# U6 실서버 curl 확인 — uvicorn :8765, APP_USER_ID=brief-u5-check, 개발 DB relationship, 실 OpenAI
+Fri Oct  2 09:54:50 UTC 2026
+
+## 1) 본문 없음 — 일정 1·2 는 U5 확인에서 이미 브리핑, 3 은 창 밖 → briefings [] 기대
+{"run_id":"briefing:ea023f83-7c32-4cc8-a58d-be95f31f89a8","generated_at":"2026-10-02T09:54:50.984191Z","briefings":[],"skipped":[]}
+HTTP 200
+
+## 2) schedule_id=1 강제 재생성(결정 C)
+{"run_id":"briefing:09520bc4-dbe3-45d9-ab04-75681f7bc436","generated_at":"2026-10-02T09:54:51.028300Z","briefings":[{"schedule_id":1,"person_id":5,"composer":"llm","pattern_sentences":[{"key":"pattern:conflict","sentence":"3회 (2026-03-16, 2026-06-14, 2026-09-20)"}],"lines":[{"text":"민수는 고수를 진짜 싫어하더라","basis":{"fact_keys":["dislikes"],"event_ids":[]}}],"suggestion":{"text":"저녁 약속에 고수가 포함되지 않도록 유의하라.","basis":{"fact_keys":["dislikes"],"event_ids":[]}},"push":"not_configured"}],"skipped":[]}
+HTTP 200
+
+## 3) schedule_id=3 (창 밖, 아직 브리핑 안 됨) 강제
+{"run_id":"briefing:390ff889-2d10-4091-a158-58c4391bcd79","generated_at":"2026-10-02T09:54:54.248313Z","briefings":[{"schedule_id":3,"person_id":6,"composer":"llm","pattern_sentences":[],"lines":[{"text":"지현이는 매운 음식을 못 먹는다.","basis":{"fact_keys":["likes"],"event_ids":[]}},{"text":"2026년 9월 25일에 점심을 같이 먹었다.","basis":{"fact_keys":[],"event_ids":[23]}}],"suggestion":{"text":"회의 전 지현의 식성에 맞는 음식을 준비하라.","basis":{"fact_keys":["likes"],"event_ids":[]}},"push":"not_configured"}],"skipped":[]}
+HTTP 200
+
+## 4) 없는 일정 → 404
+{"detail":{"code":"not_found"}}
+HTTP 404
+
+## 5) schedules.briefed_at (1·3 은 방금 갱신, 2 는 U5 시각 그대로 기대)
+  1 민수와 저녁 약속 2026-10-02 09:54:51.041797+00:00
+  2 지현과 점심 2026-10-02 07:41:14.524264+00:00
+  3 지현과 회의(창 밖) 2026-10-02 09:54:54.262771+00:00
+
+## 6) 서버를 APP_USER_ID=u6-other-user 로 다시 띄워 brief-u5-check 의 일정 1 지정 → 404, briefed_at 불변 기대
+{"detail":{"code":"not_found"}}
+HTTP 404
+## 6b) 같은 서버에서 본문 없음 → 그 사용자 일정 없음, briefings []
+{"run_id":"briefing:27721ac8-11f0-4260-a53f-49e7949568f4","generated_at":"2026-10-02T09:55:20.259138Z","briefings":[],"skipped":[]}
+HTTP 200
+  schedule 1 briefed_at after other-user request: 2026-10-02 09:54:51.041797+00:00
+## 서버 종료
+       0

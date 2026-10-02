@@ -58,6 +58,12 @@ BriefingRunResult`. 이유:
 같은 `ctx` 를 이 호출 뒤에도 다른 목적으로 쓸 수 있어(예: 같은 요청
 안의 다른 처리) 부수효과를 피하려 `replace()` 로 새 객체를 쓴다.
 
+**U6 추가** -- `BriefingRunResult.session_id` 에 `run_ctx.session_id` 를
+그대로 담아 돌려준다. `POST /briefings/run`(U6)의 응답 `run_id` 가 이
+값이어야 그 실행이 남긴 `briefing_run`/`briefing_compose` trace 를
+사용자가 되짚을 수 있다(원칙9) -- U5 시점에는 테스트가 `tool_name`+
+`step` 으로 trace 를 찾았으므로 이 필드가 없었다.
+
 ## `SQLAlchemyError` 처리 규약 (`app/memory/hooks.py::after_record` 와
 ## 같은 방식 -- 위임 프롬프트가 요구한 정렬)
 
@@ -325,6 +331,7 @@ def run_briefings(
     return BriefingRunResult(
         trigger=trigger,
         now=now,
+        session_id=run_ctx.session_id,
         briefings=briefings,
         skipped=skipped,
         errors=errors,

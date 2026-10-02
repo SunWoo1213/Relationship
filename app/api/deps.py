@@ -64,19 +64,48 @@ FastAPI 의존성이다 -- 운영 경로는 각각 `None`/`None`/`_embedder_from
 (재개 중 남은 언급을 `resolve()` 할 수 있으므로) -- `get_proposer()` 는
 재사용하지 않는다: `resume_turn()` 은 인식 LLM 을 다시 부르지 않으므로
 (결정 E) 이 의존성을 주입해도 쓰이지 않아, 불필요한 의존성을 라우트에
-더하지 않는다(U7 03-log 에 이 결정을 적는다)."""
+더하지 않는다(U7 03-log 에 이 결정을 적는다).
+
+## U6 추가분 -- `POST /briefings/run` 용 의존성 (P6-briefing, Refs: P6-briefing S3.6 R12 원칙9)
+
+`get_briefing_composer()` 는 `get_fact_extractor()` 와 같은 "지연 생성"
+규약을 따른다 -- 이 함수 자신은 import 시점(앱 기동)에는 호출되지
+않고, `POST /briefings/run` 요청이 들어와 FastAPI 가 이 의존성을 해소할
+때에만 `composer_from_env()`(D11, 공급자 선택)를 부른다. 그래서 LLM
+공급자 키가 없는 환경에서도 앱 기동·다른 엔드포인트 호출은 깨지지
+않는다 -- 실패는 이 엔드포인트를 실제로 부를 때만 `JudgeUnavailable`
+로 드러난다. 테스트는 `app.dependency_overrides[get_briefing_composer]`
+로 `FakeBriefingComposer`(`app.briefing.compose`)를 주입해 네트워크
+0 으로 돈다(`get_proposer`/`get_judge`/`get_embedder`/`get_fact_extractor`
+와 같은 관례).
+
+`get_now()` 는 `run_briefings()`(U5)가 대상 선정(`select_due_schedules`)
+의 창 계산에 쓸 "지금"을 공급한다. `/chat`·`/answers/{id}` 와 달리 이
+엔드포인트는 "다가오는 일정"이라는 **시간 창**으로 대상을 고르므로
+(`scheduled_at` 과 "지금"의 차이가 결과를 가른다), 테스트가 일정 시각을
+고정된 기준 없이 실제 벽시계와 맞추려면 매 실행마다 변하는 값을
+떠안아야 한다 -- 기존 `ctx.now` 주입 관례(`ToolContext.now`, 비-HTTP
+테스트가 전부 쓰는 방식)를 HTTP 의존성 모양으로 옮긴 것으로,
+`get_proposer`/`get_judge`/`get_embedder` 와 **같은 어휘의 확장**이다
+(새 메커니즘을 만들지 않는다). 운영 경로는 실제 시계
+(`datetime.now(timezone.utc)`)를 돌려주고, 테스트는
+`app.dependency_overrides[get_now]` 로 고정 시계(`lambda: FIXED_NOW`)를
+주입한다. `build_briefing_ctx()` 가 이 값을 그대로 `ToolContext.now` 에
+싣는다."""
 
 from __future__ import annotations
 
 import os
 import re
 import uuid
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
+from datetime import datetime, timezone
 
 from fastapi import Header, HTTPException
 from sqlalchemy.orm import Session
 
 from app.agent import Proposer, ResumeInput
+from app.briefing import BriefingComposer, composer_from_env
 from app.db.models import PendingQuestion
 from app.db.session import SessionLocal
 from app.embedding import EmbeddingProvider, OpenAIEmbeddingProvider
@@ -253,3 +282,44 @@ def get_fact_extractor() -> FactExtractor | None:
     `FakeFactExtractor`(`app.memory.extract`)를 주입해 네트워크 0 으로
     돈다(`get_proposer()`/`get_judge()`/`get_embedder()` 와 같은 관례)."""
     return None
+
+
+# ---------------------------------------------------------------------------
+# U6 -- `POST /briefings/run` 의존성(P6-briefing, 모듈 docstring "U6 추가분" 참고)
+# ---------------------------------------------------------------------------
+
+
+def get_briefing_composer() -> BriefingComposer:
+    """`POST /briefings/run` 이 `run_briefings()` 에 넘길 문장 생성기.
+    운영 경로는 요청이 들어올 때 `composer_from_env()`(D11)를 불러
+    공급자를 고른다 -- import·앱 기동 시점에는 아무것도 생성하지 않는다
+    (모듈 docstring "U6 추가분" 참고, `get_fact_extractor()` 와 같은
+    지연 생성 규약). 테스트는
+    `app.dependency_overrides[get_briefing_composer]` 로
+    `FakeBriefingComposer`(`app.briefing.compose`)를 주입한다."""
+    return composer_from_env()
+
+
+def get_now() -> Callable[[], datetime]:
+    """`POST /briefings/run` 이 `ToolContext.now` 에 넘길 시계(모듈
+    docstring "U6 추가분" 참고). 운영 경로는 실제 시계를 돌려준다.
+    테스트는 `app.dependency_overrides[get_now]` 로 고정 시계를
+    주입해(`get_proposer()`/`get_judge()`/`get_embedder()` 와 같은
+    관례) 일정의 `scheduled_at` 과 비교되는 "지금"을 고정한다."""
+    return lambda: datetime.now(timezone.utc)
+
+
+def build_briefing_ctx(session: Session, now: Callable[[], datetime]) -> ToolContext:
+    """`POST /briefings/run`(U6) 용 `ToolContext` 조립. `session_id` 는
+    `run_briefings()`(U5)가 내부에서 자신만의 `"briefing:<uuid4>"` 로
+    바꿔 쓰므로(결정 I, `app/briefing/run.py` 모듈 docstring "실행 하나의
+    session_id" 절) 여기서 넣는 값은 그 전까지만 쓰인다 -- 그래도
+    추적 가능하도록 `build_chat_ctx()` 와 같은 생성 관례로
+    `"briefings-api:<uuid4>"` 를 쓴다. `user_id = app_user_id()` 고정
+    (로컬 단일 사용자 전제, `build_chat_ctx()`와 같은 이유)."""
+    return ToolContext(
+        session=session,
+        session_id=f"briefings-api:{uuid.uuid4()}",
+        user_id=app_user_id(),
+        now=now,
+    )

@@ -371,3 +371,5 @@
 - 2026-10-02 14:54 | PUSH-dev2 | origin dev2 cfb55ea (실험 푸시)
 - 2026-10-02 16:12 | COMMIT | a2f032d feat(P6-briefing): U4 LLM 이 브리핑 문장을 쓰고 코드가 한 줄씩 검사한다
 - 2026-10-02 16:12 | PUSH-dev2 | origin dev2 a2f032d (실험 푸시)
+- 2026-10-02 17:43 | COMMIT | e037728 feat(P6-briefing): U5 일정마다 브리핑을 만들고 실패한 일정만 되돌리는 실행 함수
+- 2026-10-02 17:43 | PUSH-dev2 | origin dev2 e037728 (실험 푸시)

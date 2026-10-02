@@ -25,10 +25,24 @@
 돌려주므로, `question_id`/`status` 두 필드만 보던 P2 시절의 응답과는
 다르다(`tests/test_api.py` 의 기존 단언은 이 확장에 맞춰 갱신했다 --
 단언을 없애지 않고 기대값만 넓혔다, 01-plan 리스크 절 "AnswerOut 확장은
-기존 테스트를 건드린다" 그대로)."""
+기존 테스트를 건드린다" 그대로).
+
+## U6 추가분 -- `BriefingRunIn`/`BriefingRunOut` (P6-briefing `POST /briefings/run`)
+
+Refs: P6-briefing S3.6 R12 원칙9 -- U6. `app.briefing.types.
+BriefingRunResult.briefings[]`/`skipped[]` 는 평범한 dict 목록이라
+(모듈 docstring 참고) 이 모듈이 그 모양을 그대로 pydantic 모델로
+감싼다(결정 11과 같은 경계 -- `*Out` dataclass 를 재사용하지 않는다).
+`run_id` 는 `BriefingRunResult.session_id`(`"briefing:<uuid4>"`, 결정
+I)를 그대로 옮긴 것이다 -- 그 실행이 남긴 `briefing_run`/
+`briefing_compose` trace 를 사용자가 되짚을 수 있다(원칙9). 어떤
+필드에도 `raw_utterance` 원문을 담지 않는다(01-plan "지킬 불변식" --
+`get_briefing` 의 `EventOut` 결정과 같은 이유, `BriefingItemOut` 은
+`app.briefing.run` 이 이미 원문을 뺀 dict 를 그대로 받는다)."""
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -105,3 +119,86 @@ class ChatOut(BaseModel):
     pending_question: ChatPendingQuestionOut | None = None
     stop_reason: str | None = None
     trace_ids: list[int] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# U6 추가분 -- `POST /briefings/run` (P6-briefing, 모듈 docstring 참고)
+# ---------------------------------------------------------------------------
+
+
+class BriefingRunIn(BaseModel):
+    """`POST /briefings/run` 요청 본문. 본문 전체가 선택이다(결정 C(ii))
+    -- 본문을 아예 안 보내면 `app.api.routes` 가 이 모델의 기본값
+    (`schedule_id=None`)으로 다룬다(`routes.run_briefings_endpoint` 의
+    파라미터가 `BriefingRunIn | None = None` 인 이유는 그 라우트 docstring
+    참고)."""
+
+    schedule_id: int | None = None
+
+
+class BriefingBasisOut(BaseModel):
+    """줄·제안 공통 근거 모양(`app.briefing.types.BriefingLine`/
+    `Suggestion` 의 `basis` 그대로, 결정 D)."""
+
+    fact_keys: list[str] = Field(default_factory=list)
+    event_ids: list[int] = Field(default_factory=list)
+
+
+class BriefingLineOut(BaseModel):
+    """요약 줄 하나(`app.briefing.types.BriefingLine.to_dict()` 그대로)."""
+
+    text: str
+    basis: BriefingBasisOut
+
+
+class BriefingSuggestionOut(BaseModel):
+    """한 줄 행동 제안(원칙7, `app.briefing.types.Suggestion.to_dict()`
+    그대로)."""
+
+    text: str
+    basis: BriefingBasisOut
+
+
+class BriefingPatternSentenceOut(BaseModel):
+    """패턴 문장 하나 -- 패턴 판정은 규칙(원칙6), 문장화만 LLM/템플릿."""
+
+    key: str
+    sentence: str
+
+
+class BriefingItemOut(BaseModel):
+    """브리핑 생성 성공 일정 하나(`app.briefing.run.run_briefings()` 가
+    조립한 `briefings[]` 항목 그대로, 01-plan 76행 응답 모양). `push` 는
+    `Notifier.notify()` 의 반환 문자열(결정 J, `NullNotifier` 는 항상
+    `"not_configured"`). **원문(`raw_utterance`)을 담는 필드가 없다**
+    (01-plan "지킬 불변식")."""
+
+    schedule_id: int
+    person_id: int
+    composer: Literal["llm", "template"]
+    pattern_sentences: list[BriefingPatternSentenceOut] = Field(default_factory=list)
+    lines: list[BriefingLineOut] = Field(default_factory=list)
+    suggestion: BriefingSuggestionOut | None = None
+    push: str
+
+
+class BriefingSkippedOut(BaseModel):
+    """실패해 격리된 일정 하나(`run_briefings()` 의 `skipped[]` 항목 --
+    `app/briefing/run.py` "SQLAlchemyError 처리 규약" 절). `reason` 은
+    예외 클래스명뿐이다(security §1, 예외 원문 미포함)."""
+
+    schedule_id: int
+    reason: str
+
+
+class BriefingRunOut(BaseModel):
+    """`POST /briefings/run` 응답(01-plan 76행 응답 모양). `run_id` 는
+    `app.briefing.types.BriefingRunResult.session_id`(`"briefing:<uuid4>"`,
+    결정 I)를 그대로 옮긴 것 -- 그 실행이 남긴 `briefing_run`/
+    `briefing_compose` trace 를 이 값으로 되짚을 수 있다(원칙9).
+    `generated_at` 은 그 실행의 `ctx.now()`(`BriefingRunResult.now`)다."""
+
+    run_id: str
+    generated_at: datetime
+    briefings: list[BriefingItemOut] = Field(default_factory=list)
+    skipped: list[BriefingSkippedOut] = Field(default_factory=list)

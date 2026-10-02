@@ -1,12 +1,35 @@
 """Refs: P2-tools U8 R6 R7 D1 D2 S3.4 -- FastAPI 라우트(`GET /health`,
-`POST /answers/{question_id}`, `POST /chat`).
+`POST /answers/{question_id}`, `POST /chat`, `POST /briefings/run`).
 
 이 모듈은 도메인 예외를 잡지 않는다 -- 예외가 나면 그대로 올라가
 `app/main.py` 의 예외 핸들러(결정 11 "예외 매핑은 한 곳에서")가 처리한다.
 유일한 예외는 `GET /health` 의 `alembic_version` 조회 실패(테이블 없음)를
 그 자리에서 `None` 으로 흡수하는 것과, `POST /chat`·`POST /answers/{id}`
 가 루프 예외를 결정 G·H(01-plan U6/U7)에 따라 직접 삼키는 것뿐이다 --
-둘 다 "판정"이 아니라 정해진 규약대로 흡수하는 것이다.
+둘 다 "판정"이 아니라 정해진 규약대로 흡수하는 것이다. `POST
+/briefings/run`(P6-briefing U6, 아래 절)은 이 둘과 달리 예외를 전혀
+삼키지 않는다 -- `ScheduleNotFound` 도 `app/main.py` 의 공통 404 매핑에
+맡긴다(아래 "P6-briefing U6" 절 참고).
+
+## P6-briefing U6 -- `POST /briefings/run` (Refs: P6-briefing S3.6 R12 원칙9)
+
+`run_briefings(ctx, ...)`(U5, `app/briefing/run.py`)를 `trigger="manual"`
+로 그대로 부른다 -- 1분 주기 작업(U7)과 **같은 함수**(S3.6 "수동 트리거
+= 같은 함수", `trigger` 값만 다르다). `ScheduleNotFound`(요청한
+`schedule_id` 가 없거나 다른 사용자 소유, 결정 C(ii))는 이 라우트가
+잡지 않는다 -- `app/main.py` 가 이미 `PersonNotFound`/`QuestionNotFound`/
+`ScheduleNotFound` 를 공통으로 404 `{"detail":{"code":"not_found"}}` 에
+매핑해 두었으므로(결정 11) 그대로 올리면 된다. `run_briefings()` 자신이
+일정마다 세이브포인트로 실패를 격리하므로(U5 "SQLAlchemyError 처리
+규약") 이 라우트는 `/chat`/`/answers/{id}` 처럼 호출 전체를
+`session.begin_nested()` 로 다시 감싸지 않는다 -- 그 장치는 "언급
+여러 개 중 하나가 실패하면 그 턴 전체를 저장 0 으로 되돌린다"는 루프
+고유의 요구(결정 G "저장 0") 때문이었고, 이 엔드포인트는 일정 단위
+결과를 그대로 보여주는 것이 맞다(실패한 일정은 `skipped[]` 에, 성공한
+일정은 `briefings[]` 에). `ToolContext` 조립은 `build_briefing_ctx()`
+(`app/api/deps.py` "U6 추가분" 절)가 하고, `now`·`composer` 는 각각
+`get_now()`/`get_briefing_composer()` 의존성이 공급한다(운영 경로는
+실제 시계·`composer_from_env()`, 테스트는 고정 시계·`FakeBriefingComposer`).
 
 ## U7 -- `POST /answers/{question_id}` 뒤 절반 (01-plan 94행, R6·R7 을 닫는다)
 
@@ -49,6 +72,9 @@ trace까지 전부) 바깥 트랜잭션에는 손대지 않은 채 `_record_loop
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from datetime import datetime
+
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -56,11 +82,14 @@ from sqlalchemy.orm import Session
 from app.agent import LoopError, Proposer, resume_turn, run_turn
 from app.agent.types import LOOP_TRACE_TOOL_NAME, STEP_LOOP_ERROR
 from app.api.deps import (
+    build_briefing_ctx,
     build_chat_ctx,
     build_ctx,
+    get_briefing_composer,
     get_embedder,
     get_fact_extractor,
     get_judge,
+    get_now,
     get_proposer,
     get_session,
     load_resume_input,
@@ -69,12 +98,17 @@ from app.api.deps import (
 from app.api.schemas import (
     AnswerIn,
     AnswerOut,
+    BriefingItemOut,
+    BriefingRunIn,
+    BriefingRunOut,
+    BriefingSkippedOut,
     ChatIn,
     ChatOut,
     ChatPendingQuestionOut,
     HealthOut,
     StoredOut,
 )
+from app.briefing import BriefingComposer, run_briefings
 from app.db.models import AgentTrace
 from app.embedding import EmbeddingProvider
 from app.er import Judge, JudgeUnavailable
@@ -289,3 +323,29 @@ def chat(
             trace_ids=[error_trace.id],
         )
     return ChatOut.model_validate(turn.to_dict())
+
+
+@router.post("/briefings/run", response_model=BriefingRunOut)
+def run_briefings_endpoint(
+    body: BriefingRunIn | None = None,
+    session: Session = Depends(get_session),
+    composer: BriefingComposer = Depends(get_briefing_composer),
+    now: Callable[[], datetime] = Depends(get_now),
+) -> BriefingRunOut:
+    """P6-briefing U6(모듈 docstring 절 참고) -- 1분 주기 작업과 **같은
+    함수**(`run_briefings`, `trigger="manual"`)를 부른다. 본문은 전부
+    선택이다(결정 C(ii)) -- 비어 있으면(`body is None`) 주기 작업과
+    같은 창 선정이 일어나고, `schedule_id` 를 주면 그 한 건만 창·
+    `briefed_at` 과 무관하게 즉시(다시) 브리핑한다.
+
+    `ScheduleNotFound` 는 여기서 잡지 않는다 -- 모듈 docstring 참고,
+    `app/main.py` 의 공통 404 매핑이 처리한다."""
+    schedule_id = body.schedule_id if body is not None else None
+    ctx = build_briefing_ctx(session, now)
+    result = run_briefings(ctx, composer=composer, schedule_id=schedule_id, trigger="manual")
+    return BriefingRunOut(
+        run_id=result.session_id,
+        generated_at=result.now,
+        briefings=[BriefingItemOut(**item) for item in result.briefings],
+        skipped=[BriefingSkippedOut(**item) for item in result.skipped],
+    )

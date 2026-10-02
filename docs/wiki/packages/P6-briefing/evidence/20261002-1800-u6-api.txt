@@ -1,0 +1,16 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 7 items
+
+tests/test_api_briefings.py::test_run_briefings_creates_briefing_and_marks_briefed PASSED [ 14%]
+tests/test_api_briefings.py::test_run_briefings_second_call_finds_nothing PASSED [ 28%]
+tests/test_api_briefings.py::test_run_briefings_other_user_schedule_id_returns_404 PASSED [ 42%]
+tests/test_api_briefings.py::test_run_briefings_missing_schedule_id_returns_404 PASSED [ 57%]
+tests/test_api_briefings.py::test_run_briefings_schedule_id_forces_regeneration PASSED [ 71%]
+tests/test_api_briefings.py::test_run_briefings_response_never_contains_raw_utterance PASSED [ 85%]
+tests/test_api_briefings.py::test_run_briefings_allows_request_without_body PASSED [100%]
+
+============================== 7 passed in 0.34s ===============================
