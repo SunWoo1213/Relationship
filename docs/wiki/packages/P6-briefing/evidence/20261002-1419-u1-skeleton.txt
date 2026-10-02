@@ -1,0 +1,29 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 16 items
+
+tests/test_briefing_select.py::test_briefing_code_constants_values PASSED [  6%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_default_false_when_env_missing PASSED [ 12%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_default_false_when_env_empty_string PASSED [ 18%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_true_values[1] PASSED [ 25%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_true_values[true] PASSED [ 31%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_uses_os_environ_when_env_is_none PASSED [ 37%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[0] PASSED [ 43%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[yes] PASSED [ 50%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[no] PASSED [ 56%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[false] PASSED [ 62%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[TRUE] PASSED [ 68%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[True] PASSED [ 75%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[ 1] PASSED [ 81%]
+tests/test_briefing_select.py::test_briefing_trace_vocab_constants_values PASSED [ 87%]
+tests/test_briefing_select.py::test_briefing_forbidden_expressions_constants_values PASSED [ 93%]
+tests/test_briefing_select.py::test_null_notifier_constants_returns_not_configured_and_sends_nothing PASSED [100%]
+
+============================== 16 passed in 0.06s ==============================
+--- import app.briefing ---
+ok briefing
+--- grep .env.example ---
+64:BRIEFING_SCHEDULER_ENABLED=

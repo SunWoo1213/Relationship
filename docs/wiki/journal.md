@@ -361,3 +361,5 @@
 - 2026-10-02 11:48 | PUSH | origin dev ← dev2 36c288e — 사용자 결정 대기(승격/수정) L-003
 - 2026-10-02 11:55 | DECISION | L-003 결정 = main 승격 보류 · 다음 작업 계속(사용자). origin/main `f05d017` 은 사용자가 직접 올린 포트폴리오용 README 개편 — 그대로 둔다 | L-003
 - 2026-10-02 14:10 | START | P6-briefing 계획 승인 — architect 초안(L-004) → 결정 A~K 사용자 확정(전부 권장안) → verifier 1차 보류 H-1·H-2 → 문서 수정(S3.6 카드·resolution-plan §3.6 보충 줄, CR 불필요) → 2차 통과(FAIL 0/WARN 0). active P6-briefing | P6-briefing R12 R19 S3.6
+- 2026-10-02 14:13 | COMMIT | 688c4a4 docs(P6-briefing): 브리핑 패키지 계획을 검증·승인하고 착수한다
+- 2026-10-02 14:13 | PUSH-dev2 | origin dev2 688c4a4 (실험 푸시)

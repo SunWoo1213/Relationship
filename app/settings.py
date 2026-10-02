@@ -57,6 +57,19 @@ propose.py` 의 각 모듈 docstring "사용자 시간대" 절 참고). 기본�
 `PATTERN_KEY_PREFIX`·`MEMORY_PROMOTE_MAX_EVENTS`·`MEMORY_MAX_FACTS` 는
 환경변수가 없는 코드 상수다(P6-memory 01-plan 결정 D-4·D-7) -- 값을
 바꾸려면 코드를 고쳐야 재현성이 흔들리지 않는다(원칙8).
+
+## BRIEFING_* (S3.6, P6-briefing U1)
+
+브리핑 트리거(S3.6)가 쓰는 설정값 3개(`BRIEFING_LEAD_HOURS`=24·
+`BRIEFING_INTERVAL_SECONDS`=60·`BRIEFING_SUGGESTION_MAX_CHARS`=80, 01-plan
+결정 B·A·E)는 환경변수로 덮지 않는 **코드 상수**다 -- `PATTERN_KEY_PREFIX`
+와 같은 이유(원칙8, 값을 바꾸려면 코드를 고쳐 재현성을 지킨다). 이
+셋과 달리 주기 작업을 켜고 끄는 스위치(`BRIEFING_SCHEDULER_ENABLED`)만
+환경변수로 읽는다 -- `briefing_scheduler_enabled(env=None)` 가 비우면
+`False`(기본 꺼짐, 01-plan 결정 A "기존 테스트가 `TestClient` 로 앱을
+띄울 때 매분 루프가 돌면 안 된다"), `"1"`/`"true"` 는 `True`, 그 밖의
+값은 `_read_positive_int()` 와 같은 관례로 `InvalidValue`(조용히 꺼진
+채로 되돌아가지 않는다 -- 잘못 설정한 줄 모르고 배포하는 것을 막는다).
 """
 
 from __future__ import annotations
@@ -167,6 +180,22 @@ LOOP_MAX_PROPOSALS = LOOP_MAX_MENTIONS + LOOP_MAX_EVENTS + LOOP_MAX_SCHEDULES
 #: 값은 초기 추정치이고 P5-loop U8 파일럿 실행에서 다시 확인한다.
 LOOP_MAX_RESUME_BYTES = 8192
 
+#: 브리핑 대상 선정(U2)의 창 상한 -- "`scheduled_at - now() ≤ 24h`"
+#: (S3.6, P6-briefing 결정 B(i) 확정: `now ≤ scheduled_at ≤ now + 24h`,
+#: 이미 지난 일정은 제외). `.env.example` 에 없는 코드 상수다(모듈
+#: docstring "BRIEFING_*" 절).
+BRIEFING_LEAD_HOURS = 24
+
+#: 1분 주기 작업(U7)의 실행 간격(초). 코드 상수 -- 테스트는 이 값을
+#: 쓰지 않고 짧은 간격을 직접 주입한다(01-plan U7 "실 시간 1분을
+#: 기다리지 않는다").
+BRIEFING_INTERVAL_SECONDS = 60
+
+#: 브리핑 제안 한 줄의 최대 글자 수(01-plan 결정 E(ii), 원칙7 "한 줄
+#: 행동 제안으로 한정"). 검증기(U4)가 이 값을 넘는 제안을 `too_long`
+#: 사유로 거부한다. 코드 상수.
+BRIEFING_SUGGESTION_MAX_CHARS = 80
+
 
 class PatternConfig(NamedTuple):
     """`pattern_config()` 반환 타입 -- 판정 창(일)·최소 횟수를 함께
@@ -257,6 +286,34 @@ def promote_min_events(env: dict[str, str] | None = None) -> int:
     if env is None:
         env = dict(os.environ)
     return _read_positive_int(env, "MEMORY_PROMOTE_MIN_EVENTS", MEMORY_PROMOTE_MIN_EVENTS)
+
+
+def briefing_scheduler_enabled(env: dict[str, str] | None = None) -> bool:
+    """`BRIEFING_SCHEDULER_ENABLED` 환경변수를 읽는다(S3.6, P6-briefing
+    01-plan 결정 A(i)). 비었거나 없으면 `False`(기본 꺼짐 -- 기존
+    `TestClient` 테스트가 앱을 띄울 때 실제 DB 를 매분 훑는 루프가
+    돌면 안 된다). `"1"` 또는 `"true"` 만 `True` 다. 그 밖의 값은
+    조용히 꺼진 채로 되돌아가지 않고 `InvalidValue` 로 사람이 읽는
+    오류를 낸다(`pattern_config()`/`er_config()` 와 같은 관례 -- 잘못
+    설정한 줄 모르고 배포하는 것을 막는다, 원칙8).
+
+    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/
+    `pattern_config()` 와 같은 규약). `.env` 파일 자체는 읽지 않는다
+    (security.md §1).
+    """
+    from app.tools.types import InvalidValue  # 지연 import -- 다른 settings 함수와 같은 관례.
+
+    if env is None:
+        env = dict(os.environ)
+    raw = env.get("BRIEFING_SCHEDULER_ENABLED")
+    if raw is None or raw == "":
+        return False
+    if raw in ("1", "true"):
+        return True
+    raise InvalidValue(
+        "environment variable 'BRIEFING_SCHEDULER_ENABLED' must be '1' or "
+        f"'true' to enable, or empty to disable (got {raw!r})"
+    )
 
 
 def er_config(env: dict[str, str] | None = None) -> "ERConfig":
