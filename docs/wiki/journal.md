@@ -380,3 +380,8 @@
 - 2026-10-02 20:04 | COMMIT | e2cca80 test(P6-briefing): U8 수용 기준 30행을 증거로 닫고 운영 문서를 맞춘다
 - 2026-10-02 20:04 | PUSH-dev2 | origin dev2 e2cca80 (실험 푸시)
 - 2026-10-02 20:40 | DONE | **P6-briefing 완료**(verifier 04-review `결과: 완료`, 사용자 승인 — §2-1 (e) 주기 작업 루프 수준 실패는 로그로만 남는 점을 보고 수용, P9 전 FIX 후보). verify-impl FAIL 0/WARN 0(승인 뒤 재실행 `evidence/20261002-2035-verify-impl-after-approval.txt`), verifier 직접 재실행 1721 passed skip 0 · alembic 무변경 · tools_check 7/7 · 수용 기준 34행 PASS · 열린 [필수] 0. 메인 세션이 04-review §4·§5 를 반영: review-index R12 구현완료(절반, 푸시는 P7)·R19 구현완료, backlog 체크, registry 사실과 다른 설명 3곳(DB 오류 격리·테스트 10건·금지 표현 14개), RUNNING.md `stage` 오기·`skipped[]` 설명. active none | P6-briefing R12 R19 S3.6 원칙7 원칙9
+- 2026-10-02 20:37 | COMMIT | f9500fe docs(P6-briefing): 브리핑 패키지를 완료로 닫는다
+- 2026-10-02 20:37 | PUSH-dev2 | origin dev2 f9500fe (실험 푸시)
+- 2026-10-02 20:40 | DECISION | L-003 결정 = main 승격 보류 · FIX-017 로 계속(사용자) | L-003
+- 2026-10-02 20:52 | FIX | **FIX-017 완료** — 사실 키 뜻 설명(`FACT_KEY_DESCRIPTIONS`)을 루프 제안기·승격 추출기 프롬프트에. 실 LLM 전후(발화 7×2): 제안기 11/14 → 14/14, 추출기 14/14 → (금지형 문구에서 12/14) → 안내형으로 고쳐 14/14. 1724 passed skip 0 · tools_check 7/7 | FIX-017 P5-loop P6-memory S3.2 S3.5
+- 2026-10-02 20:39 | PUSH | origin dev ← dev2 f9500fe — 사용자 결정 대기(승격/수정) L-003

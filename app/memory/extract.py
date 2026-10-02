@@ -90,7 +90,7 @@ from app.er.judge import (
     select_provider,
 )
 from app.er.types import JudgeUnavailable
-from app.memory.types import FACT_KEYS, ExtractedFact, Extraction, RejectedFact
+from app.memory.types import FACT_KEY_DESCRIPTIONS, FACT_KEYS, ExtractedFact, Extraction, RejectedFact
 from app.settings import ER_JUDGE_MAX_RETRIES, ER_JUDGE_TIMEOUT, MEMORY_MAX_FACTS, PATTERN_KEY_PREFIX
 
 # ---------------------------------------------------------------------------
@@ -213,7 +213,9 @@ def build_extract_prompt(
     system = (
         "너는 한국어 대화 기록에서 한 인물에 관한 사실만 뽑는 보조 도구다. "
         f"뽑을 수 있는 키는 다음 {len(FACT_KEYS)}종뿐이다: "
-        f"{', '.join(FACT_KEYS)}. 이 목록 밖의 키나 'pattern:' 으로 시작하는 "
+        f"{', '.join(FACT_KEYS)}. 키의 뜻(FIX-017): "
+        + "; ".join(f"{key} = {desc}" for key, desc in FACT_KEY_DESCRIPTIONS.items())
+        + ". 이 목록 밖의 키나 'pattern:' 으로 시작하는 "
         "키는 절대 쓰지 마라. 두 사람 사이의 관계(예: '민수와 지훈이 사이가 "
         "안 좋다')나 감정 해석·조언은 사실로 만들지 마라 -- 오직 이 인물 "
         "한 사람에 관해 실제로 있었던 사실만 다룬다. 근거가 부족하면 사실을 "

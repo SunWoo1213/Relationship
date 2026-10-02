@@ -112,6 +112,17 @@ def test_build_propose_prompt_has_utterance_now_and_tool_names():
         assert name in combined
 
 
+def test_build_propose_prompt_includes_fact_key_descriptions():
+    """FIX-017 -- 루프 제안기 프롬프트에도 사실 키의 뜻이 들어간다(전에는
+    키 이름조차 프롬프트에 없고 스키마 enum 에만 있었다)."""
+
+    from app.memory import FACT_KEY_DESCRIPTIONS
+
+    _, user_text = build_propose_prompt("지현이는 매운 음식을 못 먹어", NOW)
+    for key, desc in FACT_KEY_DESCRIPTIONS.items():
+        assert f"- {key}: {desc}" in user_text
+
+
 def test_build_propose_prompt_marks_not_callable_tools():
     system, _ = build_propose_prompt("u", NOW)
     assert "search_person" in system

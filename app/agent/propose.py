@@ -94,7 +94,7 @@ from app.er.judge import (
     _to_gemini_schema,
 )
 from app.er.types import JudgeUnavailable
-from app.memory import FACT_KEYS
+from app.memory import FACT_KEY_DESCRIPTIONS, FACT_KEYS
 from app.settings import ER_JUDGE_MAX_RETRIES, ER_JUDGE_TIMEOUT
 
 TOOL_NAMES = app_tools.TOOL_NAMES
@@ -247,6 +247,9 @@ def build_propose_prompt(utterance: str, now: datetime) -> tuple[str, str]:
         "ISO 8601 로 써라(예: now 가 +09:00 이면 그 값도 +09:00). 시각을 "
         "확정할 수 없으면 그 필드를 비우거나 null 로 둬라. 기억할 것이 "
         "없으면 tool_calls 를 빈 배열로 답하라."
+        "\n\n인물에 관한 사실(update_person 의 facts)을 제안할 때 key 는 "
+        "아래 뜻에 맞는 것을 고른다(FIX-017):\n"
+        + "\n".join(f"- {key}: {desc}" for key, desc in FACT_KEY_DESCRIPTIONS.items())
     )
     return system, user_text
 

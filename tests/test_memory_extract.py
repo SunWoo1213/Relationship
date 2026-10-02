@@ -110,6 +110,28 @@ def test_build_extract_prompt_lists_fact_keys_and_pattern_prefix_ban():
     assert "pattern:" in system
 
 
+def test_fact_key_descriptions_match_fact_keys_exactly():
+    """FIX-017 -- 뜻 설명은 어휘와 같은 키·같은 순서다(어휘가 갈라지면 실패)."""
+
+    from app.memory.types import FACT_KEY_DESCRIPTIONS
+
+    assert tuple(FACT_KEY_DESCRIPTIONS) == FACT_KEYS
+    assert all(desc.strip() for desc in FACT_KEY_DESCRIPTIONS.values())
+    # "못 먹어" 같은 부정 표현은 dislikes 로 간다고 적혀 있어야 한다.
+    assert "못 먹어" in FACT_KEY_DESCRIPTIONS["dislikes"]
+    assert "workplace" in FACT_KEY_DESCRIPTIONS["job"]  # 회사 이름은 job 이 아니라 workplace
+
+
+def test_build_extract_prompt_includes_fact_key_descriptions():
+    """FIX-017 -- 추출기 프롬프트가 키 이름만이 아니라 뜻도 보여 준다."""
+
+    from app.memory.types import FACT_KEY_DESCRIPTIONS
+
+    system, _ = build_extract_prompt("민수", [], [])
+    for key, desc in FACT_KEY_DESCRIPTIONS.items():
+        assert f"{key} = {desc}" in system
+
+
 def test_build_extract_prompt_forbids_cross_person_relations_and_advice():
     system, _ = build_extract_prompt("민수", [], [])
     assert "두 사람 사이의 관계" in system

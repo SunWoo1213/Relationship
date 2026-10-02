@@ -29,6 +29,7 @@ from app.memory.hooks import after_record
 from app.memory.patterns import detect_patterns
 from app.memory.promote import promote_person
 from app.memory.types import (
+    FACT_KEY_DESCRIPTIONS,
     FACT_KEYS,
     MEMORY_TRACE_STEPS,
     MEMORY_TRACE_TOOL_NAME,
@@ -47,6 +48,7 @@ from app.memory.types import (
 )
 
 __all__ = [
+    "FACT_KEY_DESCRIPTIONS",
     "FACT_KEYS",
     "MEMORY_TRACE_STEPS",
     "MEMORY_TRACE_TOOL_NAME",

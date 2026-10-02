@@ -364,3 +364,24 @@ FACT_KEYS: tuple[str, ...] = (
     "life_event",
     "contact_note",
 )
+
+#: FIX-017 -- 각 사실 키의 뜻을 LLM 에게 보여 줄 한국어 설명. `FACT_KEYS`
+#: 와 같은 순서·같은 키여야 한다(테스트가 확인). 루프 제안기
+#: (`app/agent/propose.py::build_propose_prompt`)와 승격 추출기
+#: (`app/memory/extract.py::build_extract_prompt`)가 이 하나만 쓴다 --
+#: 뜻이 코드 주석에만 있어 LLM 이 "못 먹어" 같은 부정 표현을 `likes` 로
+#: 넣던 것을 줄인다(유도이지 거부가 아니다).
+FACT_KEY_DESCRIPTIONS: dict[str, str] = {
+    "job": "직업·직급·하는 일 (예: 개발자, 과장). 회사 이름은 여기가 아니라 workplace",
+    "workplace": "소속 회사·학교·조직 이름 (예: 네이버, 카카오)",
+    "family": "가족 사항 (예: 아이 둘, 부모님과 같이 삶)",
+    "hobby": "취미·관심사 (예: 등산, 사진)",
+    # "…은 절대 넣지 않는다" 처럼 금지형으로 쓰면 추출기가 "못 먹어" 문장에서
+    # 사실을 아예 내지 않았다(실 LLM 3/3 빈 결과) -- 어디로 보내는지 알려 주는
+    # 안내형으로 쓴다(evidence/FIX-017/*-extractor-wording-ablation.txt).
+    "likes": "좋아하는 것(부정이 붙은 대상은 dislikes 로)",
+    "dislikes": "싫어하는 것·못 먹는 것·피하는 것. '못 먹어', '싫어해', '별로 안 좋아해', '피해/피하셔' 처럼 부정이 붙은 대상은 모두 여기",
+    "health": "건강·식이 제한 (예: 허리 디스크, 채식)",
+    "life_event": "이사·결혼·출산·이직 같은 근황",
+    "contact_note": "연락·만남 습관 (예: 주말에만 연락됨)",
+}

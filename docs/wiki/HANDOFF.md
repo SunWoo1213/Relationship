@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-02 20:40 — **P6-briefing 완료(verifier 04-review `완료`, 사용자 승인). 활성 작업이 없다(`active: none`).** 완료 커밋이 dev2 에 올라가면 진행 중인 것은 없다.
+갱신: 2026-10-02 20:55 — **P6-briefing 완료(`f9500fe`) → dev 승격(origin/dev = `f9500fe`), main 승격 보류(L-003 결정, 대기 해제). FIX-017(사실 키 뜻 설명) 완료 — 커밋은 journal COMMIT 줄.** 활성 작업 없음.
 
 > **2026-10-02 세션 한 일**: ① FIX-016 응답 문구(`36c288e`) ② dev 승격(`36c288e`, main 은 보류) ③ **P6-briefing 전체** — 계획 `688c4a4` → U1 `e2155f9` · U2 `db3c645` · U3 `cfb55ea` · U4 `a2f032d` · U5 `e037728` · U6 `8589e37` · U7 `a67692e` · U8 `e2cca80` → 완료. 전체 **1721 passed skip 0**, R12(절반)·R19 구현완료.
 
@@ -17,8 +17,7 @@ active: **none** | frozen: none | 브랜치 `dev2` | origin/dev = `36c288e` · *
 - P6-briefing 완료 커밋 전이면: 04-review·CURRENT·journal·review-index·backlog·registry·RUNNING.md·이 파일·evidence. 한 커밋으로(`/commit`, Refs `P6-briefing R12 R19 S3.6`).
 
 ## 바로 다음에 할 것 (사용자에게 물어서 고른다)
-1. **dev 승격 검토** — dev2 의 P6-briefing 커밋(10개)을 `git push origin dev2:dev`(승인 마커 `--push` 먼저, 뒤에 L-003 대기). main 승격은 README 가 갈라져 있어 fast-forward 가 안 된다 → 그때 README 를 어느 쪽으로 둘지 사용자에게 묻는다.
-2. **FIX 후보 — `likes`/`dislikes` 뜻 반전**: "매운 음식을 못 먹어" → `likes`. 출처는 루프 제안기 `app/agent/propose.py`(승격 추출기 `extract.py` 도 같은 키 설명). 브리핑은 원문을 함께 보여 줘서 실 확인에선 정반대 제안이 안 나왔지만 근거 라벨은 여전히 `likes`.
+1. ~~dev 승격~~(`f9500fe`) · ~~FIX-017 likes/dislikes~~(완료 — `fixes/FIX-017.md`; 교훈: 프롬프트 금지형 "절대 넣지 않는다" 는 사실 자체를 버리게 한다, 안내형으로). main 승격은 README 갈라짐 때문에 할 때 사용자에게 README 를 어느 쪽으로 둘지 묻는다.
 3. **다음 패키지**: P7-push(웹푸시) 또는 P8(인물 카드·프론트). P7 은 아래 인계 두 줄을 먼저 정해야 한다.
 4. 그 밖 FIX 후보: `/health` 빈 DB 를 ok · `update_person` 부분 반영 · `memory_promote` `source` 키 비대칭 · 주기 작업 루프 수준 실패가 trace 없이 로그로만(P9 전) · 루프가 잠근 일정을 수동 지정하면 404(낮음).
 
