@@ -1,0 +1,36 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 27 items
+
+tests/test_briefing_select.py::test_briefing_code_constants_values PASSED [  3%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_default_false_when_env_missing PASSED [  7%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_default_false_when_env_empty_string PASSED [ 11%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_true_values[1] PASSED [ 14%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_true_values[true] PASSED [ 18%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_uses_os_environ_when_env_is_none PASSED [ 22%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[0] PASSED [ 25%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[yes] PASSED [ 29%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[no] PASSED [ 33%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[false] PASSED [ 37%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[TRUE] PASSED [ 40%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[True] PASSED [ 44%]
+tests/test_briefing_select.py::test_briefing_scheduler_enabled_constants_invalid_raises[ 1] PASSED [ 48%]
+tests/test_briefing_select.py::test_briefing_trace_vocab_constants_values PASSED [ 51%]
+tests/test_briefing_select.py::test_briefing_forbidden_expressions_constants_values PASSED [ 55%]
+tests/test_briefing_select.py::test_null_notifier_constants_returns_not_configured_and_sends_nothing PASSED [ 59%]
+tests/test_briefing_select.py::test_select_due_schedules_window_upper_boundary_inclusive PASSED [ 62%]
+tests/test_briefing_select.py::test_select_due_schedules_window_upper_boundary_exclusive PASSED [ 66%]
+tests/test_briefing_select.py::test_select_due_schedules_excludes_past_schedule PASSED [ 70%]
+tests/test_briefing_select.py::test_select_due_schedules_excludes_already_briefed PASSED [ 74%]
+tests/test_briefing_select.py::test_select_due_schedules_excludes_other_user PASSED [ 77%]
+tests/test_briefing_select.py::test_select_due_schedules_schedule_id_other_user_raises_not_found PASSED [ 81%]
+tests/test_briefing_select.py::test_select_due_schedules_schedule_id_missing_raises_not_found PASSED [ 85%]
+tests/test_briefing_select.py::test_select_due_schedules_orders_by_scheduled_at_ascending PASSED [ 88%]
+tests/test_briefing_select.py::test_select_due_schedules_schedule_id_mode_ignores_window_and_briefed_at PASSED [ 92%]
+tests/test_briefing_select.py::test_select_due_schedules_schedule_id_mode_owned_within_window PASSED [ 96%]
+tests/test_briefing_select.py::test_select_due_schedules_concurrent_sessions_skip_locked PASSED [100%]
+
+============================== 27 passed in 0.20s ==============================

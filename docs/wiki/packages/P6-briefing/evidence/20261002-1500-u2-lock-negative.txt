@@ -1,0 +1,302 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 1 item
+
+tests/test_briefing_select.py::test_select_due_schedules_concurrent_sessions_skip_locked FAILED [100%]
+
+=================================== FAILURES ===================================
+__________ test_select_due_schedules_concurrent_sessions_skip_locked ___________
+
+self = <sqlalchemy.engine.base.Connection object at 0x10bda57c0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x10b808f50>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x10bddcc50>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x10be00410>
+parameters = [{'scheduled_at_1': datetime.datetime(2026, 10, 10, 19, 0, tzinfo=datetime.timezone.utc), 'scheduled_at_2': datetime.d...ime(2026, 10, 11, 19, 0, tzinfo=datetime.timezone.utc), 'user_id_1': 'brief-u2-lock-02e886cdef2040ebab39a5366130db43'}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=localhost port=5433 user=app database=relationship_test) at 0x10bd10890>
+query = 'SELECT schedules.id, schedules.person_id, schedules.title, schedules.scheduled_at, schedules.briefed_at \nFROM schedu...:TIMESTAMP WITH TIME ZONE AND schedules.briefed_at IS NULL ORDER BY schedules.scheduled_at ASC FOR UPDATE OF schedules'
+params = {'scheduled_at_1': datetime.datetime(2026, 10, 10, 19, 0, tzinfo=datetime.timezone.utc), 'scheduled_at_2': datetime.datetime(2026, 10, 11, 19, 0, tzinfo=datetime.timezone.utc), 'user_id_1': 'brief-u2-lock-02e886cdef2040ebab39a5366130db43'}
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.LockNotAvailable: canceling statement due to lock timeout
+E           CONTEXT:  while locking tuple (0,13) in relation "schedules"
+
+.venv/lib/python3.14/site-packages/psycopg/cursor.py:117: LockNotAvailable
+
+The above exception was the direct cause of the following exception:
+
+db_engine = Engine(postgresql+psycopg://app:***@localhost:5433/relationship_test)
+
+    @pytest.mark.dbtest
+    def test_select_due_schedules_concurrent_sessions_skip_locked(db_engine) -> None:
+        """판정 9행 -- 세션(커넥션) 두 개가 같은 순간 고르면, 한 세션이 이미
+        잠근 일정은 다른 세션의 결과에 나타나지 않는다(FOR UPDATE ... SKIP
+        LOCKED). 일정을 2건 두어, A 가 schedule_id 지정 모드로 한 건만 잠근
+        채 커밋하지 않고 있을 때 B 가 기본 모드로 고르면 **나머지 한 건만**
+        가져가는 것까지 확인한다.
+    
+        동작 확인 방법(위임 프롬프트 6항): 이 테스트를 켜 둔 채 `select.py`
+        의 두 `with_for_update(..., skip_locked=True)` 에서 `skip_locked=True`
+        를 **일시적으로** 지우면 B 세션이 A 의 잠금을 기다리다 `lock_timeout`
+        에 걸려 예외로 실패한다(증거 `evidence/*-u2-lock-negative.txt`). 원복
+        후에는 통과한다(증거 `evidence/*-u2-select.txt`).
+        """
+        user_id = f"brief-u2-lock-{uuid.uuid4().hex}"
+    
+        setup_session = Session(bind=db_engine)
+        try:
+            person = Person(
+                user_id=user_id, display_name="락테스트", relation_tag="친구", hierarchy="동"
+            )
+            setup_session.add(person)
+            setup_session.flush()
+            schedule_a = Schedule(
+                person_id=person.id, title="A 일정", scheduled_at=_T + timedelta(hours=1)
+            )
+            schedule_b = Schedule(
+                person_id=person.id, title="B 일정", scheduled_at=_T + timedelta(hours=2)
+            )
+            setup_session.add_all([schedule_a, schedule_b])
+            setup_session.commit()
+            person_id = person.id
+            schedule_a_id = schedule_a.id
+            schedule_b_id = schedule_b.id
+        finally:
+            setup_session.close()
+    
+        conn_a = db_engine.connect()
+        conn_b = db_engine.connect()
+        session_a = Session(bind=conn_a)
+        session_b = Session(bind=conn_b)
+        try:
+            session_a.begin()
+            ctx_a = ToolContext(
+                session=session_a, session_id="briefing:lock-a", user_id=user_id, now=lambda: _T
+            )
+            # A 가 schedule_a 하나만 잠그고 커밋하지 않은 채 트랜잭션을 열어 둔다.
+            locked_by_a = select_due_schedules(ctx_a, lead_hours=24, schedule_id=schedule_a_id)
+            assert [row.id for row in locked_by_a] == [schedule_a_id]
+    
+            session_b.begin()
+            # B 가 A 의 잠금을 영원히 기다리지 않도록 짧은 lock_timeout 을 건다
+            # (skip_locked 를 일시적으로 뺐을 때도 테스트가 멈추지 않게 하는
+            # 안전장치 -- 위임 프롬프트 6항 괄호 안내).
+            session_b.execute(text("SET LOCAL lock_timeout = '2s'"))
+            ctx_b = ToolContext(
+                session=session_b, session_id="briefing:lock-b", user_id=user_id, now=lambda: _T
+            )
+>           result_b = select_due_schedules(ctx_b, lead_hours=24)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_briefing_select.py:421: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/briefing/select.py:73: in select_due_schedules
+    ctx.session.execute(
+.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py:2372: in execute
+    return self._execute_internal(
+.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py:2270: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+.venv/lib/python3.14/site-packages/sqlalchemy/orm/context.py:306: in orm_execute_statement
+    result = conn.execute(
+.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=localhost port=5433 user=app database=relationship_test) at 0x10bd10890>
+query = 'SELECT schedules.id, schedules.person_id, schedules.title, schedules.scheduled_at, schedules.briefed_at \nFROM schedu...:TIMESTAMP WITH TIME ZONE AND schedules.briefed_at IS NULL ORDER BY schedules.scheduled_at ASC FOR UPDATE OF schedules'
+params = {'scheduled_at_1': datetime.datetime(2026, 10, 10, 19, 0, tzinfo=datetime.timezone.utc), 'scheduled_at_2': datetime.datetime(2026, 10, 11, 19, 0, tzinfo=datetime.timezone.utc), 'user_id_1': 'brief-u2-lock-02e886cdef2040ebab39a5366130db43'}
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.OperationalError: (psycopg.errors.LockNotAvailable) canceling statement due to lock timeout
+E           CONTEXT:  while locking tuple (0,13) in relation "schedules"
+E           [SQL: SELECT schedules.id, schedules.person_id, schedules.title, schedules.scheduled_at, schedules.briefed_at 
+E           FROM schedules JOIN persons ON schedules.person_id = persons.id 
+E           WHERE persons.user_id = %(user_id_1)s::VARCHAR AND schedules.scheduled_at >= %(scheduled_at_1)s::TIMESTAMP WITH TIME ZONE AND schedules.scheduled_at <= %(scheduled_at_2)s::TIMESTAMP WITH TIME ZONE AND schedules.briefed_at IS NULL ORDER BY schedules.scheduled_at ASC FOR UPDATE OF schedules]
+E           [parameters: {'user_id_1': 'brief-u2-lock-02e886cdef2040ebab39a5366130db43', 'scheduled_at_1': datetime.datetime(2026, 10, 10, 19, 0, tzinfo=datetime.timezone.utc), 'scheduled_at_2': datetime.datetime(2026, 10, 11, 19, 0, tzinfo=datetime.timezone.utc)}]
+E           (Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+.venv/lib/python3.14/site-packages/psycopg/cursor.py:117: OperationalError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+=========================== short test summary info ============================
+FAILED tests/test_briefing_select.py::test_select_due_schedules_concurrent_sessions_skip_locked
+============================== 1 failed in 2.37s ===============================

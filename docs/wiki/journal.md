@@ -363,3 +363,5 @@
 - 2026-10-02 14:10 | START | P6-briefing 계획 승인 — architect 초안(L-004) → 결정 A~K 사용자 확정(전부 권장안) → verifier 1차 보류 H-1·H-2 → 문서 수정(S3.6 카드·resolution-plan §3.6 보충 줄, CR 불필요) → 2차 통과(FAIL 0/WARN 0). active P6-briefing | P6-briefing R12 R19 S3.6
 - 2026-10-02 14:13 | COMMIT | 688c4a4 docs(P6-briefing): 브리핑 패키지 계획을 검증·승인하고 착수한다
 - 2026-10-02 14:13 | PUSH-dev2 | origin dev2 688c4a4 (실험 푸시)
+- 2026-10-02 14:27 | COMMIT | e2155f9 feat(P6-briefing): U1 브리핑 패키지의 뼈대와 설정값을 만든다
+- 2026-10-02 14:27 | PUSH-dev2 | origin dev2 e2155f9 (실험 푸시)
