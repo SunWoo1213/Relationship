@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: none
+active: P6-briefing
 frozen: none
 
 <!--
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- **P6-briefing 계획 승인(2026-10-02)** — architect 초안 → 결정 A~K 사용자 확정(전부 권장안) → verifier 1차 보류(H-1 없는 오류 이름 `JudgeTimeout`, H-2 결정 B 는 S3.6 좁힘 → 카드·resolution-plan 보충 줄, CR 불필요) → 문서 수정 → 2차 통과(verify-plan FAIL 0/WARN 0, 열린 소견 0/해소 4). U1 부터 backend-agent(L-004 매번). 권고 R-1(U2 SKIP LOCKED 픽스처)·R-2(U7 `routes.py` 96행)·R-4(U4 지어낸 패턴 키)·R-5(U5 세션 팩토리)·R-6(P8 인계).
 - **FIX-016 완료(2026-10-02)** — 사실만 저장한 턴이 "새로 기억한 것이 없어요" 라고 답하던 것을 "기억했어요: 사실 N건." 으로 고쳤다. `build_reply` 에 `stored_facts`(기본 0), `RecordOutcome.facts` 속성, 호출 두 곳. 결정 B(i) "숫자만 입력" 유지. 전체 **1627 passed skip 0** · `tools_check` 7/7 · 수정 전 코드로 새 테스트 3 failed 확인. API 스키마(`StoredSummary`)는 그대로.
 - **FIX-015 완료(2026-09-30)** — 루프가 제안하는 사실 키를 고정 어휘로 유도한다. `app/agent/propose.py` 의 `PROPOSAL_ARG_SCHEMA.facts.key` 에 `app.memory.FACT_KEYS` 9종 enum 을 걸었다(제품 코드 실질 변경 = 상수 한 줄). 원인은 같은 스키마의 `type`·`relation_tag`·`hierarchy` 는 enum 으로 유도하면서 `facts.key` 만 자유 문자열로 남아 LLM 이 발화마다 다른 한국어 키(`이직`·`소속`·`직장`)를 만든 것. **FIX 인 근거**: 사실 키 어휘를 정한 D 카드·S 카드·기획서 문장이 0건(`grep` 확인)이고 `S3.2` 시그니처는 불변(`tools_check` 7/7 유지). D-5 는 루프를 자유 키로 정한 게 아니라 P6-memory 의 범위를 그은 것이다. 판정 표 5행 전부 충족 — 전체 **1624 passed skip 0**(기준선 1622+2) · 회귀 4파일 121 · 기존 테스트 수정 0건. **한계: enum 은 유도이지 거부가 아니다** — 게이트는 어휘를 검사하지 않으므로 LLM 이 그래도 어휘 밖 키를 내면 저장된다. **실 LLM 왕복으로 아직 확인하지 않았다** — 그전까지 "중복이 사라졌다" 고 말하지 않는다. 이미 저장된 `소속`·`직장` 행은 지우지 않았다.
 - **P6-memory 완료(2026-09-29, verifier 04-review `결과: 완료`, 사용자 승인)** — verify-impl 2회(04-review 작성 전·후) 모두 **FAIL 0**, 2차 WARN 1(01-plan 체크박스 → 승인 뒤 해소). 수용 기준 ㄱ~ㄹ + 보조 2행 전부 통과, 열린 [필수] 소견 0(해소 6), 전체 회귀 **1622 passed skip 0** · `alembic check` 무변경 · `tools_check` 7/7. verifier 가 보고 수치를 옮기지 않고 직접 재실행했고 `PATTERN_MIN_COUNT=2`·`MEMORY_PROMOTE_MIN_EVENTS=4`·`PATTERN_WINDOW_DAYS=400` 로 **일부러 어긋나게 주어 FAILED 가 나는 것까지** 확인했다(항상 통과하는 테스트가 아님, 원칙8). U1 `7564c5d` · U2 `d67d084` · U3 `51b4d65` · U4 `48e3617` · U5 `b209581` · U6 `8d3967a` · U7 `93c6d3f` · U8 `4916db3`. **R8·R11 구현완료.** 실 LLM 왕복도 확인(journal 17:30·19:50). 승인 뒤 메인 세션이 [권고] 3건을 닫았다(01-plan 체크박스 · registry 비고 6곳 · 사실과 달랐던 `docs/RUNNING.md` 202행 `memory_promote` 세 종류 구분). **다음 = 사실 키 중복 결정(사용자 선택)**: `소속`·`직장`·`workplace` 가 같은 값으로 3행 저장된다 — 손볼 자리는 `app/agent/propose.py` 145행 `facts.key`(enum 없음) 또는 `update_person` 어휘 검사인데 **둘 다 P5-loop 행동 변경**이라 FIX/CR 판단이 먼저다. 브리핑·인물 카드가 중복을 그대로 보여주므로 P6-briefing·P8 전에 닫는다. 그 밖 FIX 후보 3건: `/health` 가 빈 DB 를 `ok` 보고 · `update_person` 인자 간 부분 반영 · `memory_promote` `source` 키 비대칭(코드). `dev` 승격 미검토.

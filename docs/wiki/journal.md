@@ -356,3 +356,8 @@
 - 2026-09-30 01:31 | COMMIT | d79381a docs: 다음 세션이 이어받을 수 있게 HANDOFF 를 다시 쓴다
 - 2026-09-30 01:32 | PUSH-dev2 | origin dev2 d79381a (실험 푸시)
 - 2026-10-02 11:50 | FIX | **FIX-016 완료** — 사실만 저장한 턴이 "이번 발화에서는 새로 기억한 것이 없어요" 라고 답하던 것을 "기억했어요: 사실 N건." 으로(FIX-015 실 확인 새 발견 ②). `app/agent/respond.py::build_reply` 에 `stored_facts`(기본 0) · `app/agent/loop.py::RecordOutcome.facts` 속성(인물별 중복 제거 키 수) · 호출 두 곳(`run_turn`·재개). 결정 B(i) "숫자만 입력" 유지, `StoredSummary` 불변. 사용자 승인 후 메인 세션 구현. 새 테스트 3건 — 수정 전 코드로 3 failed(증상 재현), 수정 후 통과. 원칙7 부정 테스트 무수정 통과. 전체 **1627 passed skip 0**(1624+3) · `tools_check` 7/7 — `fixes/evidence/FIX-016/20261002-1144-*` | FIX-016 P5-loop P6-memory S3.2 원칙7 원칙9
+- 2026-10-02 11:46 | COMMIT | 36c288e fix(FIX-016): 사실만 저장한 턴도 무엇을 기억했는지 답한다
+- 2026-10-02 11:46 | PUSH-dev2 | origin dev2 36c288e (실험 푸시)
+- 2026-10-02 11:48 | PUSH | origin dev ← dev2 36c288e — 사용자 결정 대기(승격/수정) L-003
+- 2026-10-02 11:55 | DECISION | L-003 결정 = main 승격 보류 · 다음 작업 계속(사용자). origin/main `f05d017` 은 사용자가 직접 올린 포트폴리오용 README 개편 — 그대로 둔다 | L-003
+- 2026-10-02 14:10 | START | P6-briefing 계획 승인 — architect 초안(L-004) → 결정 A~K 사용자 확정(전부 권장안) → verifier 1차 보류 H-1·H-2 → 문서 수정(S3.6 카드·resolution-plan §3.6 보충 줄, CR 불필요) → 2차 통과(FAIL 0/WARN 0). active P6-briefing | P6-briefing R12 R19 S3.6

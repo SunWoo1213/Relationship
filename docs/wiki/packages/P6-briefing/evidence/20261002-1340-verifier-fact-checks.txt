@@ -1,0 +1,126 @@
+# P6-briefing 02-plan-verify 사실 대조 (verifier, 20261002-1340) — 01-plan 의 경로·행·해시·함수명 표본을 저장소와 대조한 명령과 출력
+## §1 해시 (01-plan 5·7·9행)
+36c288e fix(FIX-016): 사실만 저장한 턴도 무엇을 기억했는지 답한다
+26dcd22 docs(FIX-015): 실 LLM 왕복으로 사실 키 유도가 동작함을 확인한다
+6e7b286 fix(FIX-015): 루프가 제안하는 사실 키를 고정 어휘로 유도한다
+94373cc docs(P6-memory): 메모리 승격·패턴 감지 패키지를 완료로 닫는다
+d67d084 feat(P6-memory): U2 반복 패턴을 규칙으로 찾아낸다
+3c0f0d9 harness(hooks): 브랜치를 3단계로 — dev2 실험, dev 검증, main 배포
+7564c5d feat(P6-memory): U1 메모리 설정 상수·타입 골격
+f9bfba7 docs(P5-loop): 완료 검토 결과와 완료 처리, README 진행 상황 갱신
+7c94aad feat(P2-tools): U7 get_briefing — 자료 조회(facts·최근 events 5·다가오는 schedules 3)·schedule_id 시 briefed_at 기록, 문장화 없음
+## §2 registry 행 번호 (01-plan 재사용 표)
+38:| 문서 | 환경변수 이름 목록(값 비움, 추적 유지) | .env.examp
+51:| 테스트 | 저장소 루트 `sys.path` 등록(공용 fixture) | tests/conf
+52:| 모듈 | 엔진·세션(session_scope) | app/db/session.py | P2-tools | f21
+53:| 모듈 | 런타임 설정값 | app/settings.py | P2-tools | f217190 | `app_
+56:| 모듈 | 툴 반환 DTO·예외 계층 | app/tools/types.py | P2-tools | 4e
+57:| 모듈 | ToolContext·@traced | app/tools/context.py | P2-tools | 4eca3e9 |
+58:| 모듈 | search_person·create_person·update_person | app/tools/persons.py
+61:| 모듈 | get_briefing | app/tools/briefing.py | P2-tools | 7c94aad | `perso
+64:| 엔드포인트 | 요청 단위 세션·ToolContext 조립 | app/api/deps.p
+177:| 모듈 | 반복 패턴 감지(규칙, LLM·임베딩 0) | app/memory/patte
+## §3 registry 중복 grep (01-plan 146행 '0건')
+0
+## §4 함수·상수 실존
+63:@traced("get_briefing")
+64:def get_briefing(
+92:def detect_patterns(ctx: ToolContext, person_id: int) -> PatternResult:
+371:def _owned_person(session: Session, person_id: int, user_id: str) -> Person:
+221:def call_with_error_mapping(errors_module: Any, fn: Callable[[], Any]) -> Any:
+739:JUDGES: dict[str, Callable[[], Judge]] = {
+785:def select_provider(env: dict[str, str] | None = None) -> str:
+620:FACT_EXTRACTORS: dict[str, Callable[[], FactExtractor]] = {
+627:def extractor_from_env(env: dict[str, str] | None = None) -> FactExtractor:
+90:def get_session() -> Iterator[Session]:
+241:def get_fact_extractor() -> FactExtractor | None:
+79:def session_scope() -> Iterator[Session]:
+97:BRIEFING_RECENT_EVENTS = 5
+98:BRIEFING_UPCOMING_SCHEDULES = 3
+199:PATTERN_KEY_PREFIX = "pattern:"
+325:def user_timezone(env: dict[str, str] | None = None) -> ZoneInfo:
+345:def app_user_id(env: dict[str, str] | None = None) -> str:
+356:FACT_KEYS: tuple[str, ...] = (
+86:TRACE_MAX_STRING = 2000
+92:class ToolContext:
+145:def traced(tool_name: str, step: str = "tool_call") -> Callable[[F], F]:
+71:class EventOut:
+96:class ScheduleOut:
+132:class BriefingOut:
+173:class ScheduleNotFound(ToolError):
+100:REASON_NOT_CALLABLE_BY_LLM = "not_callable_by_llm"
+223:    session_id: Mapped[str] = mapped_column(Text, nullable=False)
+252:    session_id: Mapped[str] = mapped_column(Text, nullable=False)
+## §5 JudgeTimeout (01-plan U4·판정 21행 '기존 오류 어휘') — 실존 여부
+grep -rn JudgeTimeout app tests → 0 건
+app/er/types.py:49:class JudgeUnavailable(Exception):
+app/er/types.py:128:class Judgement:
+app/er/judge.py:128:class Judge(Protocol):
+class JudgeUnavailable(Exception):
+    """3단계 LLM 판정 실패(타임아웃·API 오류·스키마 위반·범위 밖 `s_llm`,
+    1회 재시도 후에도 실패 -- 결정3-c). 예외 메시지에는 응답 본문·프롬프트
+    원문·키를 담지 않는다(security.md §1). 호출자(`pipeline.py`, U6)는 이
+    예외를 잡아 `s_llm=0.0` + 규칙 통과 후보 유무에 따른 강제 강등으로
+    바꾼다 -- 위로 다시 던지지 않는다(원칙1: 실패는 "죽는 것"이 아니라
+    "묻는 것"으로 흡수한다)."""
+
+## §6 lifespan 결정의 소재 (위임 2번)
+app/main.py:10:-- 접속 확인은 `GET /health` 가 요청이 왔을 때만 한다. lifespan 훅도 두지
+app/main.py:11:않는다(접속 확인은 lifespan 의 일이 아니다).
+app/api/routes.py:96:    lifespan 은 엔진을 만들지도 접속을 확인하지도 않는다).
+docs/wiki/packages/P2-tools/01-plan.md:145:- **리스크 — `TestClient` 와 앱 lifespan 이 실 엔진을 만든다.** `create_app()` 이 import·기동 시�
+## §7 리스크 A 기존 테스트 (U7 회귀에 포함되는지)
+9:`create_app()` 이 엔진을 만들지 않는다는 것(리스크 A)만은 DB 없이 도는
+262:# 리스크 A -- create_app() 은 엔진을 만들지 않는다. DB 불필요.
+270:    def _counting_get_engine():
+274:    monkeypatch.setattr(db_session_module, "get_engine", _counting_get_engine)
+## §8 TestClient 사용 파일·횟수 (01-plan 258행 '4파일 9곳')
+tests/test_memory_loop.py:1
+tests/test_api_chat.py:3
+tests/test_api.py:3
+tests/test_api_answers_resume.py:2
+## §9 기준선 1627 (판정 30행)
+30:1627 passed, 1 warning in 13.46s
+## §10 .env.example 의 VAPID (01-plan 28행 '어디에도 쓰지 않는다' 대조)
+31:# 웹푸시 (P7) — VAPID 키는 .env / SSM 에만
+32:VAPID_PUBLIC_KEY=
+33:VAPID_PRIVATE_KEY=
+34:VAPID_SUBJECT=mailto:you@example.com
+## §11 requirements 스케줄러·푸시 의존성
+0
+## §12 기획서에 24h 공식이 있는가 (결정 B 판정)
+150:schedules(id, person_id, title, scheduled_at, briefed_at)
+resolution-plan §3.6:
+### 3.6 브리핑 트리거와 푸시 (검증 12)
+
+- 백엔드 컨테이너 내 주기 작업(1분 간격): `schedules.scheduled_at - now() ≤ 24h AND briefed_at IS NULL`인 항목에 대해 `get_briefing` 실행 → 웹푸시 발송 → `briefed_at` 기록.
+- 수동 트리거 엔드포인트 `POST /briefings/run`은 같은 함수를 호출한다. 데모의 "시간 앞당기기"와 "발표자 수동 트리거 버튼"이 이걸로 해결된다.
+## §13 conftest db_session 트랜잭션 모델 (판정 9행 동시 실행 가능성)
+def db_session(db_engine: Engine) -> Iterator[Session]:
+    """바깥 트랜잭션 + SAVEPOINT 로 격리된 세션. 끝나면 항상 rollback."""
+    connection = db_engine.connect()
+    outer_transaction = connection.begin()
+    session = Session(bind=connection, join_transaction_mode="create_savepoint")
+    try:
+        yield session
+    finally:
+        session.close()
+        outer_transaction.rollback()
+        connection.close()
+## §14 FIX-015 실 LLM 증거 (결정 G 사실)
+7:  trace 181  [{"key": "likes", "value": "매운 음식"}, {"key": "dislikes", "value": "고수"}]
+13:     key=likes        value=매운 음식  confidence=1.0
+## §15 선행 패키지 결과 줄·CURRENT
+docs/wiki/packages/P5-loop/04-review.md:196:결과: 완료
+docs/wiki/packages/P4b-er-redesign/04-review.md:144:결과: 완료
+docs/wiki/packages/P6-memory/04-review.md:152:결과: 완료
+3:active: none
+4:frozen: none
+## §16 backlog 수용 기준 원문
+- [ ] [backend-agent] 브리핑 생성 + 주기 작업(1분 간격) + 수동 트리거 / 의존: P5 / 수용기준: `POST /briefings/run`으로 브리핑 생성, `briefed_at` 기록
+- `POST /briefings/run`으로 브리핑 생성, `briefed_at` 기록
+## §17 get_briefing 의 upcoming 창 (과거 제외 선례)
+- `upcoming_schedules`: `schedules` 중 `scheduled_at >= generated_at`
+  (과거 제외) `ASC` 상위 `settings.BRIEFING_UPCOMING_SCHEDULES`(3)건.
+            .where(Schedule.person_id == person.id)
+            .where(Schedule.scheduled_at >= now)

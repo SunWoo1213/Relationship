@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-02 11:50 — **FIX-016 완료(응답 문구). 활성 작업이 없다(`active: none`).** 커밋·dev2 푸시는 `/commit` 으로 진행(해시는 journal COMMIT 줄).
+갱신: 2026-10-02 12:00 — **dev 승격 완료: origin/dev = `36c288e`(dev2 27커밋 fast-forward, 사용자 승인). L-003 결정 = main 승격 보류 · 다음 작업 계속(사용자, 2026-10-02) — 대기 마커 해제됨.** **main 이 갈라져 있다**: origin/main = `f05d017`(2026-10-02 사용자가 main 에 직접 커밋한 README 개편, 부모 `1e4afb4`). **사용자 의도(2026-10-02): 포트폴리오용 README 수정이라 그대로 둔다** — 되돌리거나 dev 로 끌어오지 않는다. 다만 다음 main 승격 때는 `dev:main` 이 fast-forward 가 아니므로 그 시점에 README 를 어느 쪽으로 둘지 사용자에게 묻는다(dev2 의 `9b2e187` 도 README 를 고쳤다). FIX-016 완료 `36c288e`. 활성 작업 없음. 미커밋은 훅이 적은 journal 줄뿐. **주의**: 승격 준비 중 `approve-commit.sh` 를 잘못 불러 이미 쓴 초안에 대한 커밋 마커(`.claude/.commit-approved`)가 남아 있다 — 훅이 직접 삭제를 막으므로 다음 `/commit` 이 새 초안으로 덮어쓴다(초안 해시가 달라 옛 초안으로는 커밋되지 않는다).
 
 > **2026-10-02 세션**: 재개 질문에 사용자가 FIX-016 을 골랐다. 사실만 저장한 턴이 "새로 기억한 것이 없어요" 라고 답하던 것을 "기억했어요: 사실 N건." 으로 고쳤다 — `build_reply(stored_facts=)` + `RecordOutcome.facts` 속성 + 호출 두 곳. 결정 B(i) "숫자만 입력" 유지, API 스키마 불변. **1627 passed skip 0**(1624+3) · tools_check 7/7 · 수정 전 코드로 새 테스트 3 failed 확인. 상세 `fixes/FIX-016.md`.
 >
@@ -26,9 +26,10 @@ active: **none** | frozen: none | 브랜치 `dev2`(작업·실험) | main = `1e4
 ## 바로 다음에 할 것
 **진행 중인 작업이 없다.** FIX-016 커밋 뒤 아래에서 고른다.
 
-1. ~~FIX-016 응답 문구~~ — **완료(2026-10-02)**.
+1. ~~FIX-016 응답 문구~~ — **완료(2026-10-02)**. ~~dev 승격~~ — 완료(`36c288e`, main 승격은 보류).
+0. **P6-briefing 계획 승인 완료(2026-10-02 14:10) — `CURRENT active: P6-briefing`.** 계획 문서 커밋 뒤 **다음 = U1 골격(backend-agent, L-004 승인 먼저)**. 이하 경과 기록: **P6-briefing 01-plan** — 사용자 착수 승인(2026-10-02, L-004 architect 마커 소비) → architect 초안 완료(`packages/P6-briefing/01-plan.md`, U1~U8, 판정 표 30행). 결정 A~K **사용자 확정 = 전부 권장안**(01-plan "확정" 줄). `verify-plan.sh` FAIL 1(02-plan-verify 없음, 정상)/WARN 0 — `evidence/20261002-1206-verify-plan.txt`. verifier 1차 02-plan-verify = **보류**([필수] H-1 `JudgeTimeout` 없는 이름 · H-2 결정 B 는 S3.6 좁힘). 사용자 승인으로 메인 세션이 문서만 고침(01-plan 21·6·28행, S3.6 카드 보충 줄, resolution-plan §3.6 보충 줄, 05-remediation 해결 단계) → **verifier 2차 재검증 진행 중**. 다음: 통과면 계획 승인 → `CURRENT active` → 계획 문서 커밋. 권고 R-1·R-2·R-4·R-5·R-6 은 U2·U4·U5·U7 03-log 에서. 아직 미커밋.
 2. **`dev` 승격 검토** — dev2 의 P6-memory + FIX-015 + FIX-016 커밋을 `git push origin dev2:dev` 로 올린다. **승인 마커(`approve-commit.sh --push`) 가 먼저**이고, 푸시 뒤에는 L-003 대로 멈춰 사용자 결정을 기다린다. 승격 근거는 pytest·게이트다(P9 미착수라 실서버 배포는 아직 없다 — 2026-09-15·09-23 과 같은 판단).
-3. **`P6-briefing` 착수** — 패턴 문장화 · 브리핑 직전 패턴 재계산(`detect_patterns` 는 순수 SQL 이라 다시 불러도 된다). `/devlog start P6-briefing` → architect 01-plan → verifier 02-plan-verify → 승인. **단, 아래 "추출 품질" 이 열린 채로 들어가게 된다** — `likes`/`dislikes` 혼동은 브리핑이 정반대 제안을 내게 하므로, 착수 전에 `build_extract_prompt()` 의 키 설명을 한 번 볼지 정하는 게 좋다.
+3. ~~`P6-briefing` 착수~~ → 위 0번에서 진행 중. **FIX 후보 추가(결정 G)**: `likes`/`dislikes` 뜻 반전 — 관측 사례(trace 181)의 출처는 승격 추출기가 아니라 **루프 제안기 `app/agent/propose.py`** 다(이전 HANDOFF 가 `build_extract_prompt()` 로 잘못 적었다, architect 확인). 손볼 자리: `propose.py`(와 `extract.py`) 키 설명에 부정 표현 → `dislikes` 지시.
 4. 그 밖 FIX 후보 3건(아래 "열린 질문"): `/health` 빈 DB · `update_person` 부분 반영 · `memory_promote` `source` 키 비대칭(코드 한 줄, 문서는 이미 고쳤다).
 5. 그 뒤 패키지 순서: P6-briefing → P8 인물 카드 → P9 AWS(Terraform).
 

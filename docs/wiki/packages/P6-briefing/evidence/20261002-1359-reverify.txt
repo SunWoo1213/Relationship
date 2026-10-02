@@ -1,0 +1,87 @@
+== P6-briefing 계획 검증 재검증(2차) — verifier (fable) 2026-10-02 13:59 ==
+# 05-remediation F-256944(H-1)·F-4029df(H-2) 의 재검증 명령을 그대로 실행한 출력. 수정한 쪽(메인 세션)의 설명이 아니라 파일을 직접 본다.
+
+## F-256944 (H-1) 재검증
+$ grep -c "JudgeTimeout" docs/wiki/packages/P6-briefing/01-plan.md   # 기대 0
+0
+$ grep -c 'JudgeUnavailable("timeout")' docs/wiki/packages/P6-briefing/01-plan.md   # 기대 1
+1
+$ grep -n "Judge" docs/wiki/packages/P6-briefing/01-plan.md   # 어느 행에 남았나
+118:| 21 | 템플릿 대체(결정 D) | 독립 | 가짜 생성기가 `JudgeUnavailable("timeout")`(기존 오류 어휘 — `app/er/types.py` 49행, `judge.py` 232행. 새 클래스 없음) | 브리핑 `composer="template"`, 제안 `null`, `briefed_at` 기록됨, `briefing_compose` output `fallback_reason` | test_briefing_run |
+$ sed -n 74p docs/wiki/packages/P6-briefing/01-plan.md | grep -c "Judge"   # U4 행에 Judge 문자열이 있나 (소견 제목 "74행" 검증)
+0
+$ sed -n 74p docs/wiki/packages/P6-briefing/01-plan.md | grep -o "기존 오류 어휘[^.]*" 
+(없음)
+$ grep -rn "JudgeTimeout" app tests | wc -l   # 코드에 그 이름이 생기지 않았나 (기대 0)
+       0
+$ grep -n "^class Judge" app/er/types.py ; grep -n 'JudgeUnavailable("timeout")' app/er/judge.py   # 01-plan 118행이 인용한 행 번호 대조
+49:class JudgeUnavailable(Exception):
+128:class Judgement:
+232:        raise JudgeUnavailable("timeout") from exc
+625:                raise JudgeUnavailable("timeout") from exc
+$ git diff --stat 36c288e -- app tests   # 코드 무변경 확인 (기대: 빈 출력)
+
+## F-4029df (H-2) 재검증
+$ grep -n "now ≤ scheduled_at\|지난 일정 제외" docs/wiki/specs/S3.6-briefing-push.md docs/resolution-plan.md   # 각 1건 이상
+docs/resolution-plan.md:198:  - (2026-10-02 보충: 창은 `now ≤ scheduled_at ≤ now + 24h` — 이미 지난 일정은 제외. P6-briefing 결정 B(i), `docs/wiki/specs/S3.6-briefing-push.md`. 위 공식은 원 결정 기록.)
+docs/wiki/specs/S3.6-briefing-push.md:6:  - 보충(2026-10-02, P6-briefing 결정 B(i) 사용자 확정): 창은 `now ≤ scheduled_at ≤ now + 24h` — **이미 지난 일정은 제외**한다(만남 "직전" 맥락. 서버가 꺼져 있다 켜져도 지난 약속 브리핑이 한꺼번에 생기지 않는다). `get_briefing` 의 `upcoming_schedules`(`scheduled_at >= now`)와 같은 방향. 기획서 본문에 이 공식이 없어 CR 이 아니라 카드 보충이다(02-plan-verify H-2).
+$ sed -n 103p docs/wiki/packages/P6-briefing/01-plan.md   # 판정 표 6행 — "선정 안 됨" 만
+| 6 | 지난 일정(결정 B) | 독립 | 일정 `T−1s`, `briefed_at` NULL | 선정 안 됨(결정 B(i) 확정, S3.6 카드 보충 줄) | 〃 |
+$ grep -c "(ii) 를 고르면 선정됨\|권장안 (i) 이면" docs/wiki/packages/P6-briefing/01-plan.md   # 조건문 잔존 (기대 0)
+0
+$ git diff -- docs/wiki/specs/S3.6-briefing-push.md docs/resolution-plan.md   # 보충이 추가 줄뿐인지 (원 공식 삭제 없음)
+diff --git a/docs/resolution-plan.md b/docs/resolution-plan.md
+index a5959ca..a71c1fa 100644
+--- a/docs/resolution-plan.md
++++ b/docs/resolution-plan.md
+@@ -195,6 +195,7 @@ agent_traces(id, session_id, step, tool_name, input, output, tokens_in, tokens_o
+ ### 3.6 브리핑 트리거와 푸시 (검증 12)
+ 
+ - 백엔드 컨테이너 내 주기 작업(1분 간격): `schedules.scheduled_at - now() ≤ 24h AND briefed_at IS NULL`인 항목에 대해 `get_briefing` 실행 → 웹푸시 발송 → `briefed_at` 기록.
++  - (2026-10-02 보충: 창은 `now ≤ scheduled_at ≤ now + 24h` — 이미 지난 일정은 제외. P6-briefing 결정 B(i), `docs/wiki/specs/S3.6-briefing-push.md`. 위 공식은 원 결정 기록.)
+ - 수동 트리거 엔드포인트 `POST /briefings/run`은 같은 함수를 호출한다. 데모의 "시간 앞당기기"와 "발표자 수동 트리거 버튼"이 이걸로 해결된다.
+ 
+ ### 3.7 평가 명세 (D3, D10)
+diff --git a/docs/wiki/specs/S3.6-briefing-push.md b/docs/wiki/specs/S3.6-briefing-push.md
+index e50a36c..235f791 100644
+--- a/docs/wiki/specs/S3.6-briefing-push.md
++++ b/docs/wiki/specs/S3.6-briefing-push.md
+@@ -3,6 +3,7 @@
+ 원문: `docs/resolution-plan.md` §3.6 · 관련: R12 원칙7(경계) · 적용: P6-briefing, P7-push
+ 
+ - 주기 작업(컨테이너 내, 1분): `scheduled_at - now() ≤ 24h AND briefed_at IS NULL` → `get_briefing` → 웹푸시 → `briefed_at`.
++  - 보충(2026-10-02, P6-briefing 결정 B(i) 사용자 확정): 창은 `now ≤ scheduled_at ≤ now + 24h` — **이미 지난 일정은 제외**한다(만남 "직전" 맥락. 서버가 꺼져 있다 켜져도 지난 약속 브리핑이 한꺼번에 생기지 않는다). `get_briefing` 의 `upcoming_schedules`(`scheduled_at >= now`)와 같은 방향. 기획서 본문에 이 공식이 없어 CR 이 아니라 카드 보충이다(02-plan-verify H-2).
+ - 수동 트리거 `POST /briefings/run` = 같은 함수. 데모 "시간 앞당기기"와 "발표자 수동 버튼" 겸용.
+ - 브리핑 내용: 기록된 사실·패턴·최근 사건. **제안은 사실에서 도출되는 한 줄 행동 제안으로 한정**, 감정·고민 대화 금지.
+ - 푸시 구독은 `push_subscriptions`. VAPID 키는 SSM/환경변수, 코드·저장소에 두지 않는다.
+$ git diff --numstat -- docs/wiki/specs/S3.6-briefing-push.md docs/resolution-plan.md   # 기대: 추가 1 삭제 0 씩
+1	0	docs/resolution-plan.md
+1	0	docs/wiki/specs/S3.6-briefing-push.md
+$ grep -n "24h\|24시간\|scheduled_at - now" docs/proposal.md | wc -l   # 기획서 본문에 공식 없음 → CR 아님 (기대 0)
+       0
+$ git diff --stat -- docs/proposal.md docs/wiki/decisions CLAUDE.md docs/backlog.md docs/wiki/review-index.md   # 기획서·D 카드·원칙·backlog·검증 항목 무변경 (기대: 빈 출력)
+$ sed -n 29,30p app/tools/briefing.py   # 보충이 인용한 get_briefing 선례
+- `upcoming_schedules`: `schedules` 중 `scheduled_at >= generated_at`
+  (과거 제외) `ASC` 상위 `settings.BRIEFING_UPCOMING_SCHEDULES`(3)건.
+$ grep -n "scheduled_at >= \|scheduled_at >=" app/tools/briefing.py
+29:- `upcoming_schedules`: `schedules` 중 `scheduled_at >= generated_at`
+124:            .where(Schedule.scheduled_at >= now)
+$ grep -rn "24h\|scheduled_at - now\|now ≤ scheduled_at" docs/wiki/specs docs/wiki/decisions docs/wiki/review-index.md   # 같은 공식을 적은 다른 카드가 있나 (충돌 범위)
+docs/wiki/specs/S3.6-briefing-push.md:5:- 주기 작업(컨테이너 내, 1분): `scheduled_at - now() ≤ 24h AND briefed_at IS NULL` → `get_briefing` → 웹푸시 → `briefed_at`.
+docs/wiki/specs/S3.6-briefing-push.md:6:  - 보충(2026-10-02, P6-briefing 결정 B(i) 사용자 확정): 창은 `now ≤ scheduled_at ≤ now + 24h` — **이미 지난 일정은 제외**한다(만남 "직전" 맥락. 서버가 꺼져 있다 켜져도 지난 약속 브리핑이 한꺼번에 생기지 않는다). `get_briefing` 의 `upcoming_schedules`(`scheduled_at >= now`)와 같은 방향. 기획서 본문에 이 공식이 없어 CR 이 아니라 카드 보충이다(02-plan-verify H-2).
+docs/wiki/decisions/D02-ask-user-async.md:9:**파급** `pending_questions` 테이블 (S3.1). 프론트 확인 칩 = 미답변 pending_questions 렌더링. 미답변 24h 만료. 답 없이 새 발화가 오면 대기 질문 유지하고 새 발화 우선.
+
+## R-3 (권고) 01-plan 28행 VAPID 문장 대조
+$ sed -n 28p docs/wiki/packages/P6-briefing/01-plan.md | grep -o "VAPID 키 값을[^(]*"
+VAPID 키 값을 코드·문서·`.env.example` 어디에도 쓰지 않으며 `.env.example` 31~34행의 기존 P7 용 빈 이름 줄
+$ sed -n 31,34p .env.example
+# 웹푸시 (P7) — VAPID 키는 .env / SSM 에만
+VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
+VAPID_SUBJECT=mailto:you@example.com
+
+## 01-plan 의 결정 B 관련 다른 문장 (조건문·'verifier 판정 필요' 잔존 여부)
+$ grep -n "verifier 판정\|verifier 가 02-plan-verify" docs/wiki/packages/P6-briefing/01-plan.md
+150:> **확정(사용자, 2026-10-02) — 전부 권장안**: **A(i)** 앱 lifespan 비동기 루프 + `BRIEFING_SCHEDULER_ENABLED`(기본 꺼짐) · **B(i)** `now ≤ scheduled_at ≤ now+24h`(지난 일정 제외 — S3.6 해석 여부는 verifier 판정) · **C(ii)** 선택 `schedule_id` · **D(i)** LLM 1회 구조화 출력 + 코드 검증 + 실패 시 템플릿 대체(`briefed_at` 기록) · **E(ii)** 프롬프트 + 코드 검증기 · **F(ii)** `pattern:*` + `FACT_KEYS` 만, 그 밖 키는 `excluded_facts`·trace · **G(ii)** 소비 쪽 방어, 프롬프트 수정은 별개 FIX 후보(선행 조건 아님) · **H(i)** 응답 + `briefing_compose` trace 에만(스키마 무변경) · **I** 권장 어휘 그대로 · **J(i)** `Notifier` + `NullNotifier` · **K(i)** 브리핑 대상 인물만 직전 재계산. 아래 각 항목의 "권장" 이 곧 확정안이다.
+170:**권장: (i).** 다만 (i) 은 S3.6 문장의 **해석을 좁히는 것**이므로 verifier 가 02-plan-verify 에서 "명세 안의 해석인가, 명세 변경인가" 를 판정해야 한다. 변경으로 판정되면 S3.6 카드에 한 줄 보충(문서 FIX)이 필요하다 — CR 까지는 아니라고 본다(검증 항목·결정을 바꾸지 않는다).
+262:- **결정 B(i) 의 명세 해석 여부** — verifier 판정 필요(결정 B 본문).

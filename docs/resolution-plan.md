@@ -195,6 +195,7 @@ agent_traces(id, session_id, step, tool_name, input, output, tokens_in, tokens_o
 ### 3.6 브리핑 트리거와 푸시 (검증 12)
 
 - 백엔드 컨테이너 내 주기 작업(1분 간격): `schedules.scheduled_at - now() ≤ 24h AND briefed_at IS NULL`인 항목에 대해 `get_briefing` 실행 → 웹푸시 발송 → `briefed_at` 기록.
+  - (2026-10-02 보충: 창은 `now ≤ scheduled_at ≤ now + 24h` — 이미 지난 일정은 제외. P6-briefing 결정 B(i), `docs/wiki/specs/S3.6-briefing-push.md`. 위 공식은 원 결정 기록.)
 - 수동 트리거 엔드포인트 `POST /briefings/run`은 같은 함수를 호출한다. 데모의 "시간 앞당기기"와 "발표자 수동 트리거 버튼"이 이걸로 해결된다.
 
 ### 3.7 평가 명세 (D3, D10)

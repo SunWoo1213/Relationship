@@ -1,0 +1,4 @@
+# verifier 02-plan-verify 1차 보류 소견(H-1·H-2) — findings.py 입력용 (source=review)
+# 근거는 evidence/20261002-1340-verifier-fact-checks.txt §5(H-1)·§12·§17(H-2)
+FAIL  H-1 01-plan 74행(U4)·118행(판정 21행)의 `JudgeTimeout` 은 저장소에 없는 클래스다(grep 0건) — 기존 오류 어휘는 `JudgeUnavailable("timeout")`(app/er/types.py 49행, judge.py 232행)
+FAIL  H-2 결정 B(i) `now ≤ scheduled_at ≤ now+24h` 는 S3.6·resolution-plan §3.6 공식 `scheduled_at - now() ≤ 24h` 의 해석이 아니라 하한을 더한 명세 좁힘이다 — S3.6 카드·resolution-plan §3.6 에 한 줄 보충 필요(CR 불필요)
