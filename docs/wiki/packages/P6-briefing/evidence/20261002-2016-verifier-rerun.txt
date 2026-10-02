@@ -1,0 +1,67 @@
+# verifier(fable) 직접 재실행 — 판정 표 28~30행·무변경 (2026-10-02 20:16)
+
+## pytest skip 확인 (verify-impl 1차가 돌린 evidence/20261002-2016-pytest.txt)
+31:1721 passed, 1 warning in 15.60s
+
+## alembic check
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+No new upgrade operations detected.
+rc=
+
+## tools_check
+[ok] get_briefing: CLAUDE.md (person_id, schedule_id?) == actual (ctx, person_id, schedule_id=None)
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+
+## git diff --stat 36c288e -- app/tools/briefing.py app/agent app/memory app/er
+(lines: 0)
+
+## 불변식 grep (01-plan 지킬 불변식 절 명령 그대로)
+[1] grep -rniE "pywebpush|vapid|push_subscriptions|PushSubscription" app/briefing/ app/api/ app/main.py
+count=0
+[2] grep -rnE "delete\(Event|update\(Event|\.raw_utterance\s*=[^=]|\.content\s*=[^=]" app/briefing/
+count=0
+[3a] select.py/inputs.py 실제 import 문
+app/briefing/select.py:30:from __future__ import annotations
+app/briefing/select.py:32:from datetime import timedelta
+app/briefing/select.py:34:from sqlalchemy import select
+app/briefing/select.py:36:from app.db.models import Person, Schedule
+app/briefing/select.py:37:from app.tools.context import ToolContext
+app/briefing/select.py:38:from app.tools.types import ScheduleNotFound
+app/briefing/inputs.py:54:from __future__ import annotations
+app/briefing/inputs.py:56:from typing import Any
+app/briefing/inputs.py:58:from sqlalchemy import select
+app/briefing/inputs.py:60:from app.briefing.types import BriefingInput
+app/briefing/inputs.py:61:from app.db.models import Event, FactSource, PersonFact, Schedule
+app/briefing/inputs.py:62:from app.memory.patterns import detect_patterns
+app/briefing/inputs.py:63:from app.memory.types import FACT_KEYS
+app/briefing/inputs.py:64:from app.settings import PATTERN_KEY_PREFIX
+app/briefing/inputs.py:65:from app.tools.briefing import get_briefing
+app/briefing/inputs.py:66:from app.tools.context import ToolContext
+[3b] grep -rnE "PersonFact\(|insert\(PersonFact|update\(PersonFact" app/briefing/
+count=0
+[5] grep -rn "evaluation" app/briefing/
+count=0
+[6] grep -rn "raw_utterance" app/api/schemas.py app/briefing/run.py app/briefing/types.py
+app/briefing/types.py:267:    정할 그 밖의 어휘). **인자에 원문(`raw_utterance`)을 담지 않는다**
+app/api/schemas.py:39:필드에도 `raw_utterance` 원문을 담지 않는다(01-plan "지킬 불변식" --
+app/api/schemas.py:173:    `"not_configured"`). **원문(`raw_utterance`)을 담는 필드가 없다**
+
+## .env.example VAPID 줄 불변 (R-3)
+0
+31:# 웹푸시 (P7) — VAPID 키는 .env / SSM 에만
+32:VAPID_PUBLIC_KEY=
+33:VAPID_PRIVATE_KEY=
+34:VAPID_SUBJECT=mailto:you@example.com
+64:BRIEFING_SCHEDULER_ENABLED=
+
+## 미커밋 변경
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+?? docs/wiki/packages/P6-briefing/evidence/20261002-2016-commits.txt
+?? docs/wiki/packages/P6-briefing/evidence/20261002-2016-lint.txt
+?? docs/wiki/packages/P6-briefing/evidence/20261002-2016-pytest.txt
+?? docs/wiki/packages/P6-briefing/evidence/20261002-2016-summary.txt
+?? docs/wiki/packages/P6-briefing/evidence/20261002-2016-verifier-rerun.txt
+?? docs/wiki/packages/P6-briefing/evidence/20261002-2016-verify-impl.txt

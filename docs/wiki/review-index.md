@@ -17,14 +17,14 @@
 | R9 | M | 인물당 임베딩 1개 | 구현완료(4dfaf33, 09c2bd1, a9cb254, 2c63c60 — 별칭 단위 임베딩·top-K 인물별 max·OpenAIEmbeddingProvider 런타임; **실 공급자 호출 확인**(2026-09-22 P4 U7 ef18143 — text-embedding-3-small N=1536, 40 시나리오 별칭 임베딩 `embedded == aliases` 40/40, 임베딩 배치 62회, `packages/P4-pilot-eval/evidence/20260922-1324-u7-real-run.txt`; `embedding_only` 베이스라인 오병합 0/132 — 별칭 max 집계가 실 임베딩에서 동작)) | D5 → S3.1 → P1-schema, P2-tools, P3-er |
 | R10 | M | 툴 시그니처 ↔ 스키마 불일치 | 구현완료(f2e9e05 — tools_check 7/7, CLAUDE.md 표 = 실제 시그니처) | S3.2 |
 | R11 | M | 반복 패턴 감지 메커니즘 없음 | 구현완료(d67d084 규칙 기반 감지(LLM 0회)·8d3967a 대화 턴마다 자동 실행; CR-002/D14 기본 365일·3회 설정값 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT` → 완료, P6-memory 04-review §2 ㄷ·ㄹ) | D14 → S3.5 → P6-memory |
-| R12 | M | 브리핑 트리거·푸시 구독 저장소 없음 | 결정완료 | S3.6 → P6-briefing, P7-push |
+| R12 | M | 브리핑 트리거·푸시 구독 저장소 없음 | 구현완료(절반 — 브리핑 트리거: P6-briefing e2155f9…e2cca80, 주기 작업+`POST /briefings/run`. 푸시 구독 저장·발송은 P7-push) | S3.6 → P6-briefing, P7-push |
 | R13 | M | LLM·임베딩 비용 미산정 | 결정완료 | P0-cost |
 | R14 | M | CloudFront→EC2 TLS 미정 | 결정완료 | D7 → P9-infra |
 | R15 | L | 데모 날짜 9/10(화) 달력 불일치 | 결정완료 | P11-demo |
 | R16 | L | 부록 수치가 결과처럼 읽힘 | 해소(문서) | proposal.md 상단 안내 |
 | R17 | L | 제목 "관계 그래프" ↔ A–B 제외 | 해소(문서) | D8 |
 | R18 | L | 승진 후 display_name 정책 없음 | 구현완료(f318d58 — update_person: 별칭 누적·삭제 없음, display_name 변경은 확인 필요+새 이름 별칭 누적) | D6 → S3.2 → P2-tools |
-| R19 | L | 브리핑 제안 ↔ 상담 제외 경계 | 해소(문서) | 원칙7 → S3.6 |
+| R19 | L | 브리핑 제안 ↔ 상담 제외 경계 | 구현완료(a2f032d — 근거 필수·한 줄·80자·금지 표현 검증기, 제안과 요약 줄. 한계: 목록 밖 표현은 통과 → P10) | 원칙7 → S3.6 |
 | R20 | L | AWS 크레딧 조건부 | 결정완료 | 착수 준비(사용자) |
 
 사용법: 태스크가 R을 인용하면 "구현대기"인지 확인하고 "다음 카드"를 따라간다. 커밋 `Refs:`에 R 번호를 넣어 닫는다. 한 R을 닫는 커밋이 모두 들어가면 상태를 "구현완료(커밋 해시)"로 바꾼다.

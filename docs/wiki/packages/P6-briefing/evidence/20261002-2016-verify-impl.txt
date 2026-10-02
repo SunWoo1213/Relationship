@@ -1,0 +1,19 @@
+== verify-impl P6-briefing  (20261002-2016) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1721 passed, 1 warning in 15.60s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261002-2016-pytest.txt
+PASS  compileall 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261002-2016-lint.txt
+PASS  태그 P6-briefing 커밋 12 건 → evidence/20261002-2016-commits.txt
+PASS  커밋에 태그 존재: D11
+PASS  커밋에 태그 존재: D14
+PASS  커밋에 태그 존재: R12
+PASS  커밋에 태그 존재: R19
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.5
+PASS  커밋에 태그 존재: S3.6
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P6-briefing 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=1 → evidence/20261002-2016-summary.txt ==

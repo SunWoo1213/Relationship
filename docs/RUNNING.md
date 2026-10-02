@@ -236,7 +236,7 @@ curl -s -o /dev/null -w '%{http_code}\n' -X POST http://localhost:8000/briefings
 | `run_id` | 이 실행의 `agent_traces.session_id`(`"briefing:<uuid4>"`) — 이 값으로 그 실행이 남긴 trace 전부를 조회할 수 있다 |
 | `generated_at` | 이 실행이 쓴 "지금"(`ctx.now()`) |
 | `briefings[]` | 새로 생성된 브리핑 — `schedule_id`·`person_id`·`composer`(`"llm"`\|`"template"`)·`pattern_sentences`·`lines`(근거 `fact_keys`/`event_ids` 포함)·`suggestion`(없을 수 있음)·`push`(`"not_configured"` — 웹푸시는 P7-push) |
-| `skipped[]` | 대상에서 빠지거나 실패한 일정 — `schedule_id`·`reason` |
+| `skipped[]` | 처리 중 실패해 그 일정만 되돌려진 것 — `schedule_id`·`reason`(예외 이름). 창 밖·이미 브리핑된 일정은 처음부터 고르지 않으므로 여기 나오지 않는다 |
 
 응답 어디에도 `raw_utterance`(원문) 필드는 없다 — 근거는 사실 키·이벤트 id 로만 돌려준다(`get_briefing`의 `EventOut` 결정과 같은 이유).
 
@@ -252,7 +252,7 @@ BRIEFING_SCHEDULER_ENABLED=1 uvicorn app.main:create_app --factory --port 8000
 **동작 확인법** — uvicorn 콘솔 자체는 성공 시 조용하다(예외가 나야 `logger.exception()`이 찍힌다). 확인은 DB와 trace로 한다:
 
 - `schedules.briefed_at`이 그 실행의 `now`로 채워졌는지 직접 조회한다.
-- `agent_traces`에서 `tool_name='briefing' AND step='briefing_run' AND output->>'trigger'='scheduler'`(주기 작업) 또는 `output->>'trigger'='manual'`(수동)로 그 실행의 `briefing_run` 1행을 찾고, 같은 `session_id`로 `step='briefing_compose'`(일정마다 1행 — 근거 `used_facts`/`excluded_facts`/`lines[].basis`/`suggestion.basis`·토큰 사용량) 또는 실패 시 `step='briefing_error'`(`stage`는 `select`\|`compose`\|`notify` 3종만 실제로 쓰인다)를 조회한다.
+- `agent_traces`에서 `tool_name='briefing' AND step='briefing_run' AND output->>'trigger'='scheduler'`(주기 작업) 또는 `output->>'trigger'='manual'`(수동)로 그 실행의 `briefing_run` 1행을 찾고, 같은 `session_id`로 `step='briefing_compose'`(일정마다 1행 — 근거 `used_facts`/`excluded_facts`/`lines[].basis`/`suggestion.basis`·토큰 사용량) 또는 실패 시 `step='briefing_error'`(`stage`는 `briefing`\|`compose`\|`notify` 3종만 실제로 쓰인다)를 조회한다.
 
 **패턴·사실의 세 출처** — 브리핑 직전에 `detect_patterns`를 다시 불러 `pattern:*` 사실을 최신으로 만든다(브리핑 대상 인물만, 인물 카드의 낡은 패턴까지 지우지는 않는다 — P8 인계). 브리핑에는 `pattern:*`와 `FACT_KEYS` 9종만 쓰고, 그 밖의 옛 자유 키(`소속`·`직장`·`이직` 등)는 브리핑 요약에서 빠지고 trace의 `excluded_facts`에만 남는다(삭제·수정하지 않는다).
 

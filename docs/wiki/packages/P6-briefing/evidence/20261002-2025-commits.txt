@@ -1,0 +1,12 @@
+e2cca80 test(P6-briefing): U8 수용 기준 30행을 증거로 닫고 운영 문서를 맞춘다
+a67692e feat(P6-briefing): U7 서버가 켜져 있으면 1분마다 브리핑을 저절로 만든다
+8589e37 feat(P6-briefing): U6 POST /briefings/run 으로 브리핑을 바로 만든다
+e037728 feat(P6-briefing): U5 일정마다 브리핑을 만들고 실패한 일정만 되돌리는 실행 함수
+a2f032d feat(P6-briefing): U4 LLM 이 브리핑 문장을 쓰고 코드가 한 줄씩 검사한다
+cfb55ea feat(P6-briefing): U3 브리핑에 넘길 재료를 모으고 낡은 패턴과 옛 사실 키를 걸러낸다
+db3c645 feat(P6-briefing): U2 브리핑할 일정을 고르고 같은 일정을 두 번 집지 않게 잠근다
+e2155f9 feat(P6-briefing): U1 브리핑 패키지의 뼈대와 설정값을 만든다
+688c4a4 docs(P6-briefing): 브리핑 패키지 계획을 검증·승인하고 착수한다
+6e7b286 fix(FIX-015): 루프가 제안하는 사실 키를 고정 어휘로 유도한다
+d67d084 feat(P6-memory): U2 반복 패턴을 규칙으로 찾아낸다
+7c94aad feat(P2-tools): U7 get_briefing — 자료 조회(facts·최근 events 5·다가오는 schedules 3)·schedule_id 시 briefed_at 기록, 문장화 없음

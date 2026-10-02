@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: P6-briefing
+active: none
 frozen: none
 
 <!--
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- **P6-briefing 완료(2026-10-02, verifier 04-review `결과: 완료`, 사용자 승인)** — verify-impl FAIL 0/WARN 0, verifier 직접 재실행 1721 passed skip 0 · `alembic check` 무변경 · tools_check 7/7 · 수용 기준 34행 PASS, 열린 [필수] 0. 계획 `688c4a4` · U1 `e2155f9` · U2 `db3c645` · U3 `cfb55ea` · U4 `a2f032d` · U5 `e037728` · U6 `8589e37` · U7 `a67692e` · U8 `e2cca80`. R12(절반 — 푸시는 P7)·R19 구현완료. U4~U7 은 단위마다 실 OpenAI·실서버로도 확인. 사용자 결정으로 바뀐 것: 금지 표현을 요약 줄에도·14개, DB 오류도 일정 단위 격리, 주기 작업 루프 수준 실패는 로그로만(P9 전 FIX 후보). 인계: P7 — 요약 줄에 원문 그대로·푸시 실패 시 `briefed_at`; P10 — 패턴 문장이 규칙 값 복사·금지 표현 목록 밖 통과; FIX 후보 — `likes`/`dislikes` 반전(`propose.py`·`extract.py`), 루프가 잠근 일정을 수동 지정하면 404. 개발 DB 확인용 사용자 `brief-u5-check` 행은 남김.
 - **P6-briefing 계획 승인(2026-10-02)** — architect 초안 → 결정 A~K 사용자 확정(전부 권장안) → verifier 1차 보류(H-1 없는 오류 이름 `JudgeTimeout`, H-2 결정 B 는 S3.6 좁힘 → 카드·resolution-plan 보충 줄, CR 불필요) → 문서 수정 → 2차 통과(verify-plan FAIL 0/WARN 0, 열린 소견 0/해소 4). U1 부터 backend-agent(L-004 매번). 권고 R-1(U2 SKIP LOCKED 픽스처)·R-2(U7 `routes.py` 96행)·R-4(U4 지어낸 패턴 키)·R-5(U5 세션 팩토리)·R-6(P8 인계).
 - **FIX-016 완료(2026-10-02)** — 사실만 저장한 턴이 "새로 기억한 것이 없어요" 라고 답하던 것을 "기억했어요: 사실 N건." 으로 고쳤다. `build_reply` 에 `stored_facts`(기본 0), `RecordOutcome.facts` 속성, 호출 두 곳. 결정 B(i) "숫자만 입력" 유지. 전체 **1627 passed skip 0** · `tools_check` 7/7 · 수정 전 코드로 새 테스트 3 failed 확인. API 스키마(`StoredSummary`)는 그대로.
 - **FIX-015 완료(2026-09-30)** — 루프가 제안하는 사실 키를 고정 어휘로 유도한다. `app/agent/propose.py` 의 `PROPOSAL_ARG_SCHEMA.facts.key` 에 `app.memory.FACT_KEYS` 9종 enum 을 걸었다(제품 코드 실질 변경 = 상수 한 줄). 원인은 같은 스키마의 `type`·`relation_tag`·`hierarchy` 는 enum 으로 유도하면서 `facts.key` 만 자유 문자열로 남아 LLM 이 발화마다 다른 한국어 키(`이직`·`소속`·`직장`)를 만든 것. **FIX 인 근거**: 사실 키 어휘를 정한 D 카드·S 카드·기획서 문장이 0건(`grep` 확인)이고 `S3.2` 시그니처는 불변(`tools_check` 7/7 유지). D-5 는 루프를 자유 키로 정한 게 아니라 P6-memory 의 범위를 그은 것이다. 판정 표 5행 전부 충족 — 전체 **1624 passed skip 0**(기준선 1622+2) · 회귀 4파일 121 · 기존 테스트 수정 0건. **한계: enum 은 유도이지 거부가 아니다** — 게이트는 어휘를 검사하지 않으므로 LLM 이 그래도 어휘 밖 키를 내면 저장된다. **실 LLM 왕복으로 아직 확인하지 않았다** — 그전까지 "중복이 사라졌다" 고 말하지 않는다. 이미 저장된 `소속`·`직장` 행은 지우지 않았다.

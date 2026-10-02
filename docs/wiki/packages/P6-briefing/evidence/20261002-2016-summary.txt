@@ -1,0 +1,2 @@
+verify-impl P6-briefing 20261002-2016
+FAIL=0 WARN=1

@@ -1,0 +1,43 @@
+# verifier(fable) 부정 케이스 직접 실행 (2026-10-02 20:2x) — 코드 무변경, 설정·입력만 바꿈
+## git diff --stat HEAD -- app tests (실험 전)
+(빈 출력이어야 함)
+
+## A. 판정 표 부정 행 node id 실행 (금지 표현 · 창 경계/지난 일정 · 다른 사용자 404 · 템플릿 대체 · DB 오류 격리 · 스위치 꺼짐)
+..................................                                       [100%]
+34 passed in 1.18s
+
+## B. 어긋남 실험 1 — 환경변수 APP_USER_ID=other-user 로 404 테스트 실행 (기대: FAIL, 200 이 돌아옴 — 다른 사용자가 '앱 사용자' 가 되면 404 가 사라져야 테스트가 소유 격리를 실제로 검사하는 것)
+>       assert resp.status_code == 404
+E       assert 200 == 404
+1 failed in 0.32s
+
+## C. 어긋남 실험 2 — 판정 25행 '꺼짐' 테스트를 스위치=1 로 복제 (기대: FAIL)
+_______________ test_disabled_assertion_with_switch_on_must_fail _______________
+    def test_disabled_assertion_with_switch_on_must_fail(monkeypatch: pytest.MonkeyPatch) -> None:
+>       assert calls == []  # 원본 단언 그대로 — 스위치가 켜졌으니 실패해야 한다
+E       assert [1, 1, 1, 1, 1, 1, ...] == []
+FAILED ::test_disabled_assertion_with_switch_on_must_fail - assert [1, 1, 1, ...
+
+## D. 어긋남 실험 3 — 창 경계: lead_hours 24 / 23.9999 / 24+1s, 지난 일정, 다른 사용자 (테스트 DB, 롤백)
+lead_hours=24      -> ['T+0', 'T+24h']
+lead_hours=23.9999 -> ['T+0']
+lead_hours=24+1s   -> ['T+0', 'T+24h', 'T+24h+1s']
+other user          -> []
+RESULT: window/past/other-user negative checks OK (nothing committed)
+
+## E. 어긋남 실험 4 — 검증기 입력: 목록 안/밖 감정 표현, 80/81자, eligible, 템플릿 대체
+forbidden list size = 14
+[suggestion] '민수의 기분을 먼저 위로해 주세요.' -> kept=False reasons=['forbidden_expression']
+[suggestion] '요즘 많이 힘들 거예요, 고수는 피하세요.' -> kept=False reasons=['forbidden_expression']
+[line] 스트레스 -> kept=False reasons=['forbidden_expression']
+[suggestion, 목록 밖] '슬퍼하는… 다독여' -> kept=True reasons=[]
+[len 80] kept=True [] / [len 81] kept=False ['too_long']
+[eligible=False] kept=False ['basis_not_eligible'] / [eligible=True] kept=True []
+[fake fail=timeout] JudgeUnavailable(timeout)
+[fake fail=None] provider=fake suggestion=None
+[template] provider=template suggestion=None lines=['dislikes: 고수'] tokens=(0, 0)
+RESULT: validator negative/limit checks OK
+
+## git diff --stat HEAD -- app tests (실험 후, 빈 출력이어야 함)
+## 테스트 DB 잔여 확인
+verifier-neg-user rows: 0

@@ -1,0 +1,53 @@
+== verify-impl P6-briefing  (20261002-2026) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1721 passed, 1 warning in 15.25s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261002-2026-pytest.txt
+PASS  compileall 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261002-2026-lint.txt
+PASS  태그 P6-briefing 커밋 12 건 → evidence/20261002-2026-commits.txt
+PASS  커밋에 태그 존재: D11
+PASS  커밋에 태그 존재: D14
+PASS  커밋에 태그 존재: R12
+PASS  커밋에 태그 존재: R19
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.5
+PASS  커밋에 태그 존재: S3.6
+PASS  검토자 = verifier (L-002)
+PASS  증거 확인:  `POST /briefings/run`으로 브리핑 생성, `briefed_at` 기록  ← 8589e37, evidence/20261002-2016-pytest.t
+PASS  증거 확인:  해석 ㄱ — HTTP `POST /briefings/run` 200, 처리 경로가 주기  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  해석 ㄴ — 창 안 미브리핑 일정마다 `briefings[]` 1건(패턴 문장·요약 줄· ← evidence/20261002-1950-u8-rows-1to10.txt
+PASS  증거 확인:  해석 ㄷ — `briefed_at == now`, 재실행 시 재선정 없음, 실패 일정은  ← evidence/20261002-1950-u8-rows-1to10.txt
+PASS  증거 확인:  판정 1 ㄱ·ㄴ·ㄷ 양성(API 한 흐름)  ← evidence/20261002-1950-u8-rows-1to10.txt
+PASS  증거 확인:  판정 2 ㄷ 재실행 멱등  ← evidence/20261002-1950-u8-rows-1to10.txt
+PASS  증거 확인:  판정 3 ㄱ 같은 함수  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 4 창 경계 양성 `T+24h`  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 5 창 경계 부정 `T+24h+1s`  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 6 지난 일정 `T−1s` 선정 안 됨(결정 B(i), S3.6 보충 줄)  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 7 이미 브리핑됨  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 8 다른 사용자 격리 / API 404 `not_found`, `briefed_at ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 9 동시 실행 `SKIP LOCKED`  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 10 수동 강제(결정 C)  ← evidence/20261002-1950-u8-rows-1to10.txt
+PASS  증거 확인:  판정 11 패턴 재계산(결정 K)  ← evidence/20261002-1950-u8-rows-11to20.tx
+PASS  증거 확인:  판정 12 사실 세 출처(결정 F)  ← evidence/20261002-1950-u8-rows-11to20.tx
+PASS  증거 확인:  판정 13 같은 키 여러 행  ← evidence/20261002-1950-u8-rows-11to20.tx
+PASS  증거 확인:  판정 14 원칙7 부정 — 근거 없는 제안 `no_basis`  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 15 원칙7 부정 — 감정·고민 표현 `forbidden_expression`  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 16 원칙7 부정 — 한 줄 위반 `not_one_line`/`too_long`  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 17 근거 위조 `unknown_basis` 그 줄만  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 18 근거 자격(결정 G) `basis_not_eligible`  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 19 패턴 판정은 규칙(원칙6) `count_mismatch` → 템플릿  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 20 프롬프트 경계 문구  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 21 템플릿 대체(결정 D) `JudgeUnavailable("timeout")`  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 22 실패 격리(일정 2건 중 첫 건 DB 예외)  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 23 근거 기록(원칙9) trace 키·tokens  ← evidence/20261002-1950-u8-rows-21to27.tx
+PASS  증거 확인:  판정 24 푸시 없음(결정 J) `not_configured`, `Notifier` 인자 ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 25 주기 작업 스위치 꺼짐 0회 / 켜짐 ≥1·종료 취소  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 26 주기 작업 내구성  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 27 원문 불변(1·11행 전후)  ← evidence/20261002-2016-verifier-negative
+PASS  증거 확인:  판정 28 불변식 grep 전부 0건  ← evidence/20261002-2016-verifier-rerun.tx
+PASS  증거 확인:  판정 29 무변경 — alembic · tools_check 7/7 · diff 빈 출력 ← evidence/20261002-2016-verifier-rerun.tx
+PASS  증거 확인:  판정 30 전체 회귀 실패 0·skip 0·≥1627  ← evidence/20261002-2016-pytest.txt (1721 
+PASS  registry 에 P6-briefing 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=0 → evidence/20261002-2026-summary.txt ==
