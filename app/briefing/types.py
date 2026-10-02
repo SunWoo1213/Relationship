@@ -25,7 +25,17 @@
   (`{pattern_sentences, lines, suggestion}`) 그대로다. `basis` 는
   `{"fact_keys": [...], "event_ids": [...]}` 모양의 평범한 dict 로 둔다
   -- 검증기(U4 `validate_briefing()`)가 이 모양을 강제하며, 이 모듈
-  자체는 구조를 검사하지 않는다(로직 없음).
+  자체는 구조를 검사하지 않는다(로직 없음). `tokens_in`/`tokens_out`/
+  `provider`/`model` 은 U4 가 이 골격에 더한 필드다(U1 03-log "필드가
+  부족하면 그 단위 03-log 에 남긴다" 규약, `app/memory/types.py::
+  Extraction`/`PromotionResult` 와 같은 이유) -- `compose()` 가 직접
+  `ComposedBriefing` 을 반환하므로(승격의 `Extraction`→`PromotionResult`
+  처럼 감싸는 중간 타입이 없다), 생성기 사용량을 실어 나를 자리가 이
+  타입 자체여야 한다. `to_dict()` 는 **이 네 필드를 싣지 않는다** --
+  결정 D 스키마 3 키(`pattern_sentences`/`lines`/`suggestion`) 그대로
+  유지해 API 응답·`briefing_compose` trace `output` 양쪽에서 같은 모양을
+  재사용할 수 있게 한다(U5 가 `provider`/`model`/토큰은 trace `output`
+  의 다른 키 `llm{provider, model}`로 따로 옮겨 담는다, 결정 I).
 - `BriefingRunResult` -- `run_briefings(...)`(U5)의 반환 타입이자
   `POST /briefings/run`(U6) 응답·`briefing_run` trace output(결정 I)의
   바탕.
@@ -129,13 +139,29 @@ class ComposedBriefing:
     pattern_sentences: list[dict[str, Any]] = field(default_factory=list)
     lines: list[BriefingLine] = field(default_factory=list)
     suggestion: Suggestion | None = None
+    tokens_in: int = 0
+    tokens_out: int = 0
+    provider: str | None = None
+    model: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
+        """결정 D 스키마 3 키 그대로(`tokens_in`/`tokens_out`/`provider`/
+        `model` 은 싣지 않는다 -- 모듈 docstring 참고)."""
+
         return {
             "pattern_sentences": [dict(item) for item in self.pattern_sentences],
             "lines": [line.to_dict() for line in self.lines],
             "suggestion": self.suggestion.to_dict() if self.suggestion is not None else None,
         }
+
+    def trace_tokens(self) -> tuple[int, int]:
+        """`app/tools/context.py::traced` docstring "성공" 절의 훅과 같은
+        이름 관례(U4 가 직접 `@traced` 로 감싸지는 않지만, U5 가 이
+        메서드를 호출해 `briefing_compose` trace 의 `tokens_in`/
+        `tokens_out` 을 채운다 -- `Extraction`/`PromotionResult` 와 같은
+        이유)."""
+
+        return (self.tokens_in, self.tokens_out)
 
 
 # ---------------------------------------------------------------------------
@@ -197,7 +223,7 @@ BRIEFING_TRACE_STEPS: tuple[str, ...] = (STEP_BRIEFING_RUN, STEP_BRIEFING_COMPOS
 # 금지 표현 목록 (01-plan 결정 E(ii) 초안 -- 원칙7 경계의 보조 방어)
 # ---------------------------------------------------------------------------
 
-#: 제안 한 줄 검증기(U4)가 거부하는 감정·고민·상담 관련 표현 초안. 이
+#: 검증기(U4)가 제안과 요약 줄에서 거부하는 감정·고민·상담 관련 표현 초안. 이
 #: 목록은 완전하지 않다(01-plan 193행 "돌려 말하면 통과한다") -- 1차
 #: 방어는 프롬프트의 "근거 필수" 지시이고 이 목록은 보조다. 값을
 #: 바꾸려면 코드를 고친다(환경변수로 덮지 않는 코드 상수, 원칙8).
@@ -209,7 +235,10 @@ BRIEFING_FORBIDDEN_EXPRESSIONS: tuple[str, ...] = (
     "상담",
     "스트레스",
     "마음이",
+    "마음을",  # U4 실 LLM 재확인 -- "팀장님의 마음을 이해하고 배려하는 대화" 가 통과했다
+    "배려",  # 같은 사례. "마음" 전체는 "마음에 드는 식당" 같은 정상 문장까지 막으므로 조사까지 붙여 좁게 잡는다
     "힘드",
+    "힘들",  # U4 실 LLM 확인 -- "힘드" 는 "힘드셨" 만 잡고 "힘들어"·"힘들 거예요" 는 놓쳤다
     "우울",
     "속상",
     "서운",

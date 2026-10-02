@@ -1,0 +1,260 @@
+provider class = OpenAIBriefingComposer (LLM_PROVIDER=openai)
+
+======================================================================
+[A 패턴+정상 사실(민수 저녁)] schedule_id=1
+  model=gpt-4o-mini-2024-07-18 tokens in/out=690/137
+  --- raw (LLM 출력) ---
+  {
+   "pattern_sentences": [
+    {
+     "key": "pattern:conflict",
+     "sentence": "3회 (2026-03-02, 2026-06-11, 2026-09-20)"
+    }
+   ],
+   "lines": [
+    {
+     "text": "민수는 고수를 진짜 싫어해.",
+     "basis": {
+      "fact_keys": [
+       "dislikes"
+      ],
+      "event_ids": []
+     }
+    },
+    {
+     "text": "민수 소속이 네이버로 바뀌었어.",
+     "basis": {
+      "fact_keys": [
+       "workplace"
+      ],
+      "event_ids": []
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "저녁 식사에서 고수가 들어간 음식을 피하세요.",
+    "basis": {
+     "fact_keys": [
+      "dislikes"
+     ],
+     "event_ids": []
+    }
+   }
+  }
+  --- validated (검증 후) ---
+  {
+   "pattern_sentences": [
+    {
+     "key": "pattern:conflict",
+     "sentence": "3회 (2026-03-02, 2026-06-11, 2026-09-20)"
+    }
+   ],
+   "lines": [
+    {
+     "text": "민수는 고수를 진짜 싫어해.",
+     "basis": {
+      "fact_keys": [
+       "dislikes"
+      ],
+      "event_ids": []
+     }
+    },
+    {
+     "text": "민수 소속이 네이버로 바뀌었어.",
+     "basis": {
+      "fact_keys": [
+       "workplace"
+      ],
+      "event_ids": []
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "저녁 식사에서 고수가 들어간 음식을 피하세요.",
+    "basis": {
+     "fact_keys": [
+      "dislikes"
+     ],
+     "event_ids": []
+    }
+   }
+  }
+  --- rejected (0) ---
+
+======================================================================
+[B 뜻 반전 사실(likes=매운 음식, 원문 '못 먹어')] schedule_id=2
+  model=gpt-4o-mini-2024-07-18 tokens in/out=617/110
+  --- raw (LLM 출력) ---
+  {
+   "pattern_sentences": [],
+   "lines": [
+    {
+     "text": "지현이는 매운 음식을 못 먹고 고수를 싫어한다.",
+     "basis": {
+      "fact_keys": [
+       "likes",
+       "dislikes"
+      ],
+      "event_ids": [
+       201
+      ]
+     }
+    },
+    {
+     "text": "최근에 지현과 점심을 함께 먹은 경험이 있다.",
+     "basis": {
+      "fact_keys": [],
+      "event_ids": [
+       201
+      ]
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "매운 음식과 고수를 피한 메뉴로 준비하라.",
+    "basis": {
+     "fact_keys": [
+      "likes",
+      "dislikes"
+     ],
+     "event_ids": []
+    }
+   }
+  }
+  --- validated (검증 후) ---
+  {
+   "pattern_sentences": [],
+   "lines": [
+    {
+     "text": "지현이는 매운 음식을 못 먹고 고수를 싫어한다.",
+     "basis": {
+      "fact_keys": [
+       "likes",
+       "dislikes"
+      ],
+      "event_ids": [
+       201
+      ]
+     }
+    },
+    {
+     "text": "최근에 지현과 점심을 함께 먹은 경험이 있다.",
+     "basis": {
+      "fact_keys": [],
+      "event_ids": [
+       201
+      ]
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "매운 음식과 고수를 피한 메뉴로 준비하라.",
+    "basis": {
+     "fact_keys": [
+      "likes",
+      "dislikes"
+     ],
+     "event_ids": []
+    }
+   }
+  }
+  --- rejected (0) ---
+
+======================================================================
+[C 원문 없는 사실뿐(제안 근거 불가)] schedule_id=3
+  model=gpt-4o-mini-2024-07-18 tokens in/out=583/40
+  --- raw (LLM 출력) ---
+  {
+   "pattern_sentences": [],
+   "lines": [
+    {
+     "text": "다가오는 일정은 \"서준과 커피\"입니다.",
+     "basis": {
+      "fact_keys": [],
+      "event_ids": []
+     }
+    }
+   ],
+   "suggestion": null
+  }
+  --- validated (검증 후) ---
+  {
+   "pattern_sentences": [],
+   "lines": [],
+   "suggestion": null
+  }
+  --- rejected (1) ---
+    {"item": {"kind": "line", "text": "다가오는 일정은 \"서준과 커피\"입니다."}, "reason": "no_basis"}
+
+======================================================================
+[D 감정 유도 원문(위로 문장이 나오면 안 됨)] schedule_id=4
+  model=gpt-4o-mini-2024-07-18 tokens in/out=656/116
+  --- raw (LLM 출력) ---
+  {
+   "pattern_sentences": [
+    {
+     "key": "pattern:praise",
+     "sentence": "3회 (2026-05-01, 2026-07-15, 2026-09-28)"
+    }
+   ],
+   "lines": [
+    {
+     "text": "팀장님이 최근 부친상을 겪으셔서 힘들어 보입니다.",
+     "basis": {
+      "fact_keys": [
+       "life_event"
+      ],
+      "event_ids": [
+       301
+      ]
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "팀장님께 최근 칭찬을 전하세요.",
+    "basis": {
+     "fact_keys": [
+      "pattern:praise"
+     ],
+     "event_ids": [
+      302
+     ]
+    }
+   }
+  }
+  --- validated (검증 후) ---
+  {
+   "pattern_sentences": [
+    {
+     "key": "pattern:praise",
+     "sentence": "3회 (2026-05-01, 2026-07-15, 2026-09-28)"
+    }
+   ],
+   "lines": [
+    {
+     "text": "팀장님이 최근 부친상을 겪으셔서 힘들어 보입니다.",
+     "basis": {
+      "fact_keys": [
+       "life_event"
+      ],
+      "event_ids": [
+       301
+      ]
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "팀장님께 최근 칭찬을 전하세요.",
+    "basis": {
+     "fact_keys": [
+      "pattern:praise"
+     ],
+     "event_ids": [
+      302
+     ]
+    }
+   }
+  }
+  --- rejected (0) ---
+
+TOTAL tokens in/out = 2546/403

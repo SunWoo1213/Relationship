@@ -1,0 +1,32 @@
+git diff --stat 36c288e -- app/tools/briefing.py app/agent app/memory app/er
+---
+grep: app/briefing imports of app.er.judge / app.embedding (compose.py 허용, select/inputs 금지)
+app/briefing/select.py:36:from app.db.models import Person, Schedule
+app/briefing/select.py:37:from app.tools.context import ToolContext
+app/briefing/select.py:38:from app.tools.types import ScheduleNotFound
+app/briefing/inputs.py:60:from app.briefing.types import BriefingInput
+app/briefing/inputs.py:61:from app.db.models import Event, FactSource, PersonFact, Schedule
+app/briefing/inputs.py:62:from app.memory.patterns import detect_patterns
+app/briefing/inputs.py:63:from app.memory.types import FACT_KEYS
+app/briefing/inputs.py:64:from app.settings import PATTERN_KEY_PREFIX
+app/briefing/inputs.py:65:from app.tools.briefing import get_briefing
+app/briefing/inputs.py:66:from app.tools.context import ToolContext
+---
+grep evaluation
+0건
+---
+grep PersonFact( in app/briefing/
+0건
+---
+grep push/vapid in app/briefing
+0건
+--- grep evaluation in app/briefing/ ---
+0건
+--- grep PersonFact( in app/briefing/ ---
+0건
+--- grep push/vapid in app/briefing/ ---
+0건
+--- select.py/inputs.py import 금지 확인(app.er.judge/app.embedding/app.briefing.compose) ---
+app/briefing/inputs.py:44:  (U4)의 몫이다. 이 모듈은 `app.briefing.compose`·`app.er.judge`·
+app/briefing/inputs.py:45:  `app.embedding` 을 import 하지 않는다(01-plan "지킬 불변식" -- 패턴
+app/briefing/select.py:4:네트워크 import 없음(`app.briefing.compose`·`app.er.judge`·`app.embedding`

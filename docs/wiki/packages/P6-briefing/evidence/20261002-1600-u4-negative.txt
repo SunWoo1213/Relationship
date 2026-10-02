@@ -1,0 +1,174 @@
+## P6-briefing U4 -- 검증기 규칙 4종 부정 테스트가 진짜 검증하는지 확인
+방법: app/briefing/compose.py 의 해당 조건문을 'if False and ...' 로 임시 비활성화 -> 표적 테스트 실행(FAIL 확인) -> Edit 로 원복 -> 재실행(PASS 확인).
+
+### 1) unknown_basis(line) 비활성화 (line 504 'if False and (...)') -> 기대: FAIL
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 1 item
+
+tests/test_briefing_compose.py::test_validate_briefing_rejects_only_the_line_with_fabricated_basis FAILED [100%]
+
+=================================== FAILURES ===================================
+______ test_validate_briefing_rejects_only_the_line_with_fabricated_basis ______
+
+    def test_validate_briefing_rejects_only_the_line_with_fabricated_basis():
+        briefing_input = _briefing_input(
+            used_facts=[_fact("hobby", "등산")], recent_events=[_event(20)]
+        )
+        raw = ComposedBriefing(
+            pattern_sentences=[],
+            lines=[
+                BriefingLine(text="등산을 좋아합니다.", basis=_basis(fact_keys=["hobby"])),
+                BriefingLine(text="지어낸 줄입니다.", basis=_basis(fact_keys=["없는키"])),
+                BriefingLine(text="지어낸 이벤트입니다.", basis=_basis(event_ids=[999])),
+            ],
+            suggestion=None,
+        )
+    
+        composed, rejected = validate_briefing(briefing_input, raw)
+    
+>       assert [line.text for line in composed.lines] == ["등산을 좋아합니다."]
+E       AssertionError: assert ['등산을 좋아합니다.'...'지어낸 이벤트입니다.'] == ['등산을 좋아합니다.']
+E         
+E         Left contains 2 more items, first extra item: '지어낸 줄입니다.'
+E         
+E         Full diff:
+E           [
+E               '등산을 좋아합니다.',
+E         +     '지어낸 줄입니다.',
+E         +     '지어낸 이벤트입니다.',
+E           ]
+
+tests/test_briefing_compose.py:286: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_briefing_compose.py::test_validate_briefing_rejects_only_the_line_with_fabricated_basis
+============================== 1 failed in 0.08s ===============================
+
+(1 원복 확인: grep TEMP-NEGATIVE-TEST unknown_basis 0건 이후 진행)
+
+### 2) forbidden_expression(suggestion) 비활성화 -> 기대: FAIL
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 1 item
+
+tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_with_forbidden_expression FAILED [100%]
+
+=================================== FAILURES ===================================
+_____ test_validate_briefing_rejects_suggestion_with_forbidden_expression ______
+
+    def test_validate_briefing_rejects_suggestion_with_forbidden_expression():
+        briefing_input = _briefing_input(used_facts=[_fact("hobby", "등산")])
+        raw = ComposedBriefing(
+            pattern_sentences=[],
+            lines=[],
+            suggestion=Suggestion(
+                text="민수의 기분을 먼저 위로해 주세요.", basis=_basis(fact_keys=["hobby"])
+            ),
+        )
+    
+        composed, rejected = validate_briefing(briefing_input, raw)
+    
+>       assert composed.suggestion is None
+E       AssertionError: assert Suggestion(text='민수의 기분을 먼저 위로해 주세요.', basis={'fact_keys': ['hobby'], 'event_ids': []}) is None
+E        +  where Suggestion(text='민수의 기분을 먼저 위로해 주세요.', basis={'fact_keys': ['hobby'], 'event_ids': []}) = ComposedBriefing(pattern_sentences=[], lines=[], suggestion=Suggestion(text='민수의 기분을 먼저 위로해 주세요.', basis={'fact_keys': ['hobby'], 'event_ids': []}), tokens_in=0, tokens_out=0, provider=None, model=None).suggestion
+
+tests/test_briefing_compose.py:227: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_with_forbidden_expression
+============================== 1 failed in 0.06s ===============================
+
+(2 원복 확인 이후 진행)
+
+### 3) count_mismatch(pattern) 비활성화 -> 기대: FAIL
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 1 item
+
+tests/test_briefing_compose.py::test_validate_briefing_replaces_pattern_sentence_with_template_on_count_mismatch FAILED [100%]
+
+=================================== FAILURES ===================================
+_ test_validate_briefing_replaces_pattern_sentence_with_template_on_count_mismatch _
+
+    def test_validate_briefing_replaces_pattern_sentence_with_template_on_count_mismatch():
+        rule_value = "3회 (2026-03-02, 2026-06-11, 2026-09-20)"
+        briefing_input = _briefing_input(used_facts=[_fact("pattern:conflict", rule_value)])
+        raw = ComposedBriefing(
+            pattern_sentences=[{"key": "pattern:conflict", "sentence": "민수와 다섯 번 다퉜어요."}],
+            lines=[],
+            suggestion=None,
+        )
+    
+        composed, rejected = validate_briefing(briefing_input, raw)
+    
+>       assert composed.pattern_sentences == [{"key": "pattern:conflict", "sentence": rule_value}]
+E       AssertionError: assert [{'key': 'pat... 다섯 번 다퉜어요.'}] == [{'key': 'pat...2026-09-20)'}]
+E         
+E         At index 0 diff: {'key': 'pattern:conflict', 'sentence': '민수와 다섯 번 다퉜어요.'} != {'key': 'pattern:conflict', 'sentence': '3회 (2026-03-02, 2026-06-11, 2026-09-20)'}
+E         
+E         Full diff:
+E           [
+E               {
+E                   'key': 'pattern:conflict',...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_briefing_compose.py:346: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_briefing_compose.py::test_validate_briefing_replaces_pattern_sentence_with_template_on_count_mismatch
+============================== 1 failed in 0.06s ===============================
+
+(3 원복 확인 이후 진행)
+
+### 4) basis_not_eligible(suggestion) 비활성화 -> 기대: FAIL
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 1 item
+
+tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_basis_not_eligible FAILED [100%]
+
+=================================== FAILURES ===================================
+_________ test_validate_briefing_rejects_suggestion_basis_not_eligible _________
+
+    def test_validate_briefing_rejects_suggestion_basis_not_eligible():
+        briefing_input = _briefing_input(used_facts=[_fact("job", "백엔드 개발자", eligible=False)])
+        raw = ComposedBriefing(
+            pattern_sentences=[],
+            lines=[],
+            suggestion=Suggestion(text="이직 축하 인사를 건네세요.", basis=_basis(fact_keys=["job"])),
+        )
+    
+        composed, rejected = validate_briefing(briefing_input, raw)
+    
+>       assert composed.suggestion is None
+E       AssertionError: assert Suggestion(text='이직 축하 인사를 건네세요.', basis={'fact_keys': ['job'], 'event_ids': []}) is None
+E        +  where Suggestion(text='이직 축하 인사를 건네세요.', basis={'fact_keys': ['job'], 'event_ids': []}) = ComposedBriefing(pattern_sentences=[], lines=[], suggestion=Suggestion(text='이직 축하 인사를 건네세요.', basis={'fact_keys': ['job'], 'event_ids': []}), tokens_in=0, tokens_out=0, provider=None, model=None).suggestion
+
+tests/test_briefing_compose.py:307: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_basis_not_eligible
+============================== 1 failed in 0.06s ===============================
+
+### 원복 확인 -- grep TEMP-NEGATIVE-TEST app/briefing/compose.py
+0
+
+### 전체 테스트 재통과 확인
+..................................                                       [100%]
+=============================== warnings summary ===============================
+tests/test_briefing_compose.py::test_gemini_composer_parses_json_text_into_composed_briefing
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+34 passed, 1 warning in 0.86s

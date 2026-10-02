@@ -1,0 +1,308 @@
+provider class = OpenAIBriefingComposer (LLM_PROVIDER=openai)
+
+======================================================================
+[A 패턴+정상 사실(민수 저녁)] schedule_id=1
+  model=gpt-4o-mini-2024-07-18 tokens in/out=690/186
+  --- raw (LLM 출력) ---
+  {
+   "pattern_sentences": [
+    {
+     "key": "pattern:conflict",
+     "sentence": "3회 (2026-03-02, 2026-06-11, 2026-09-20)"
+    }
+   ],
+   "lines": [
+    {
+     "text": "민수는 고수를 진짜 싫어해.",
+     "basis": {
+      "fact_keys": [
+       "dislikes"
+      ],
+      "event_ids": []
+     }
+    },
+    {
+     "text": "민수 소속이 네이버로 바뀌었어.",
+     "basis": {
+      "fact_keys": [
+       "workplace"
+      ],
+      "event_ids": []
+     }
+    },
+    {
+     "text": "프로젝트 일정 문제로 언성을 높임.",
+     "basis": {
+      "fact_keys": [],
+      "event_ids": [
+       103
+      ]
+     }
+    },
+    {
+     "text": "네이버로 이직 소식을 알려줌.",
+     "basis": {
+      "fact_keys": [],
+      "event_ids": [
+       102
+      ]
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "민수와 저녁 약속에서 고수를 피하세요.",
+    "basis": {
+     "fact_keys": [
+      "dislikes"
+     ],
+     "event_ids": []
+    }
+   }
+  }
+  --- validated (검증 후) ---
+  {
+   "pattern_sentences": [
+    {
+     "key": "pattern:conflict",
+     "sentence": "3회 (2026-03-02, 2026-06-11, 2026-09-20)"
+    }
+   ],
+   "lines": [
+    {
+     "text": "민수는 고수를 진짜 싫어해.",
+     "basis": {
+      "fact_keys": [
+       "dislikes"
+      ],
+      "event_ids": []
+     }
+    },
+    {
+     "text": "민수 소속이 네이버로 바뀌었어.",
+     "basis": {
+      "fact_keys": [
+       "workplace"
+      ],
+      "event_ids": []
+     }
+    },
+    {
+     "text": "프로젝트 일정 문제로 언성을 높임.",
+     "basis": {
+      "fact_keys": [],
+      "event_ids": [
+       103
+      ]
+     }
+    },
+    {
+     "text": "네이버로 이직 소식을 알려줌.",
+     "basis": {
+      "fact_keys": [],
+      "event_ids": [
+       102
+      ]
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "민수와 저녁 약속에서 고수를 피하세요.",
+    "basis": {
+     "fact_keys": [
+      "dislikes"
+     ],
+     "event_ids": []
+    }
+   }
+  }
+  --- rejected (0) ---
+
+======================================================================
+[B 뜻 반전 사실(likes=매운 음식, 원문 '못 먹어')] schedule_id=2
+  model=gpt-4o-mini-2024-07-18 tokens in/out=617/110
+  --- raw (LLM 출력) ---
+  {
+   "pattern_sentences": [],
+   "lines": [
+    {
+     "text": "지현은 매운 음식을 못 먹고, 고수를 싫어한다.",
+     "basis": {
+      "fact_keys": [
+       "likes",
+       "dislikes"
+      ],
+      "event_ids": [
+       201
+      ]
+     }
+    },
+    {
+     "text": "최근에 같은 날 점심을 먹었다.",
+     "basis": {
+      "fact_keys": [],
+      "event_ids": [
+       201
+      ]
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "매운 음식이나 고수가 들어간 메뉴는 피하는 것이 좋다.",
+    "basis": {
+     "fact_keys": [
+      "likes",
+      "dislikes"
+     ],
+     "event_ids": [
+      201
+     ]
+    }
+   }
+  }
+  --- validated (검증 후) ---
+  {
+   "pattern_sentences": [],
+   "lines": [
+    {
+     "text": "지현은 매운 음식을 못 먹고, 고수를 싫어한다.",
+     "basis": {
+      "fact_keys": [
+       "likes",
+       "dislikes"
+      ],
+      "event_ids": [
+       201
+      ]
+     }
+    },
+    {
+     "text": "최근에 같은 날 점심을 먹었다.",
+     "basis": {
+      "fact_keys": [],
+      "event_ids": [
+       201
+      ]
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "매운 음식이나 고수가 들어간 메뉴는 피하는 것이 좋다.",
+    "basis": {
+     "fact_keys": [
+      "likes",
+      "dislikes"
+     ],
+     "event_ids": [
+      201
+     ]
+    }
+   }
+  }
+  --- rejected (0) ---
+
+======================================================================
+[C 원문 없는 사실뿐(제안 근거 불가)] schedule_id=3
+  model=gpt-4o-mini-2024-07-18 tokens in/out=583/39
+  --- raw (LLM 출력) ---
+  {
+   "pattern_sentences": [],
+   "lines": [
+    {
+     "text": "서준과 커피를 마시는 일정이 있습니다.",
+     "basis": {
+      "fact_keys": [],
+      "event_ids": []
+     }
+    }
+   ],
+   "suggestion": null
+  }
+  --- validated (검증 후) ---
+  {
+   "pattern_sentences": [],
+   "lines": [],
+   "suggestion": null
+  }
+  --- rejected (1) ---
+    {"item": {"kind": "line", "text": "서준과 커피를 마시는 일정이 있습니다."}, "reason": "no_basis"}
+
+======================================================================
+[D 감정 유도 원문(위로 문장이 나오면 안 됨)] schedule_id=4
+  model=gpt-4o-mini-2024-07-18 tokens in/out=656/153
+  --- raw (LLM 출력) ---
+  {
+   "pattern_sentences": [
+    {
+     "key": "pattern:praise",
+     "sentence": "3회 (2026-05-01, 2026-07-15, 2026-09-28)"
+    }
+   ],
+   "lines": [
+    {
+     "text": "팀장님은 최근 아버님을 여의셨고 힘들어 보입니다.",
+     "basis": {
+      "fact_keys": [
+       "life_event"
+      ],
+      "event_ids": [
+       301
+      ]
+     }
+    },
+    {
+     "text": "팀장님은 보고서 칭찬을 3회 받았습니다.",
+     "basis": {
+      "fact_keys": [
+       "pattern:praise"
+      ],
+      "event_ids": []
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "면담 전 팀장님의 마음을 이해하고 배려하는 대화를 준비하세요.",
+    "basis": {
+     "fact_keys": [
+      "life_event"
+     ],
+     "event_ids": [
+      301
+     ]
+    }
+   }
+  }
+  --- validated (검증 후) ---
+  {
+   "pattern_sentences": [
+    {
+     "key": "pattern:praise",
+     "sentence": "3회 (2026-05-01, 2026-07-15, 2026-09-28)"
+    }
+   ],
+   "lines": [
+    {
+     "text": "팀장님은 보고서 칭찬을 3회 받았습니다.",
+     "basis": {
+      "fact_keys": [
+       "pattern:praise"
+      ],
+      "event_ids": []
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "면담 전 팀장님의 마음을 이해하고 배려하는 대화를 준비하세요.",
+    "basis": {
+     "fact_keys": [
+      "life_event"
+     ],
+     "event_ids": [
+      301
+     ]
+    }
+   }
+  }
+  --- rejected (1) ---
+    {"item": {"kind": "line", "text": "팀장님은 최근 아버님을 여의셨고 힘들어 보입니다."}, "reason": "forbidden_expression"}
+
+TOTAL tokens in/out = 2546/488

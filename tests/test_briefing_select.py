@@ -127,7 +127,10 @@ def test_briefing_forbidden_expressions_constants_values() -> None:
         "상담",
         "스트레스",
         "마음이",
+        "마음을",  # U4 실 LLM 재확인 뒤 추가(사용자 결정 2026-10-02)
+        "배려",  # 〃
         "힘드",
+        "힘들",  # U4 실 LLM 확인 뒤 추가(사용자 결정 2026-10-02)
         "우울",
         "속상",
         "서운",

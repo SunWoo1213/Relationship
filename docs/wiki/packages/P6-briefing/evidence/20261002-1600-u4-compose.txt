@@ -1,0 +1,49 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 34 items
+
+tests/test_briefing_compose.py::test_briefing_schema_top_level_keys PASSED [  2%]
+tests/test_briefing_compose.py::test_briefing_schema_line_and_suggestion_share_basis_shape PASSED [  5%]
+tests/test_briefing_compose.py::test_briefing_schema_suggestion_is_nullable PASSED [  8%]
+tests/test_briefing_compose.py::test_build_briefing_prompt_includes_boundary_sentence_and_no_relation_request PASSED [ 11%]
+tests/test_briefing_compose.py::test_validate_briefing_happy_path_keeps_everything PASSED [ 14%]
+tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_without_basis PASSED [ 17%]
+tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_with_forbidden_expression PASSED [ 20%]
+tests/test_briefing_compose.py::test_validate_briefing_rejects_multiline_suggestion PASSED [ 23%]
+tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_over_max_chars PASSED [ 26%]
+tests/test_briefing_compose.py::test_validate_briefing_rejects_only_the_line_with_fabricated_basis PASSED [ 29%]
+tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_basis_not_eligible PASSED [ 32%]
+tests/test_briefing_compose.py::test_validate_briefing_accepts_suggestion_basis_backed_by_event_even_if_fact_not_eligible PASSED [ 35%]
+tests/test_briefing_compose.py::test_validate_briefing_replaces_pattern_sentence_with_template_on_count_mismatch PASSED [ 38%]
+tests/test_briefing_compose.py::test_validate_briefing_accepts_pattern_sentence_with_matching_native_korean_number PASSED [ 41%]
+tests/test_briefing_compose.py::test_validate_briefing_rejects_fabricated_pattern_key PASSED [ 44%]
+tests/test_briefing_compose.py::test_validate_briefing_fills_missing_pattern_with_template_sentence PASSED [ 47%]
+tests/test_briefing_compose.py::test_template_briefing_has_no_suggestion_and_literal_pattern_value PASSED [ 50%]
+tests/test_briefing_compose.py::test_fake_briefing_composer_is_deterministic_and_counts_calls PASSED [ 52%]
+tests/test_briefing_compose.py::test_fake_briefing_composer_returns_empty_briefing_for_unknown_schedule PASSED [ 55%]
+tests/test_briefing_compose.py::test_fake_briefing_composer_raises_judge_unavailable_when_fail_set PASSED [ 58%]
+tests/test_briefing_compose.py::test_claude_composer_request_body_forces_tool_choice_and_schema PASSED [ 61%]
+tests/test_briefing_compose.py::test_claude_composer_parses_tool_use_into_composed_briefing_with_usage PASSED [ 64%]
+tests/test_briefing_compose.py::test_claude_composer_no_tool_use_block_is_schema_error PASSED [ 67%]
+tests/test_briefing_compose.py::test_openai_composer_parses_tool_call_into_composed_briefing PASSED [ 70%]
+tests/test_briefing_compose.py::test_openai_composer_no_tool_calls_is_schema_error PASSED [ 73%]
+tests/test_briefing_compose.py::test_gemini_composer_requires_gemini_model_env PASSED [ 76%]
+tests/test_briefing_compose.py::test_gemini_composer_parses_json_text_into_composed_briefing PASSED [ 79%]
+tests/test_briefing_compose.py::test_briefing_composers_registry_has_three_providers PASSED [ 82%]
+tests/test_briefing_compose.py::test_composer_from_env_builds_each_active_provider[anthropic-ANTHROPIC_API_KEY-ClaudeBriefingComposer-extra_env0] PASSED [ 85%]
+tests/test_briefing_compose.py::test_composer_from_env_builds_each_active_provider[openai-OPENAI_API_KEY-OpenAIBriefingComposer-extra_env1] PASSED [ 88%]
+tests/test_briefing_compose.py::test_composer_from_env_builds_each_active_provider[gemini-GEMINI_API_KEY-GeminiBriefingComposer-extra_env2] PASSED [ 91%]
+tests/test_briefing_compose.py::test_composer_from_env_defaults_to_openai PASSED [ 94%]
+tests/test_briefing_compose.py::test_composer_from_env_unknown_provider_rejected PASSED [ 97%]
+tests/test_briefing_compose.py::test_composer_from_env_rejects_disabled_provider PASSED [100%]
+
+=============================== warnings summary ===============================
+tests/test_briefing_compose.py::test_gemini_composer_parses_json_text_into_composed_briefing
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 34 passed, 1 warning in 0.62s =========================
