@@ -126,8 +126,12 @@ _LOOP_ERROR_REPLY = "지금은 기억하지 못했어요. 잠시 뒤 다시 말�
 
 @router.get("/health", response_model=HealthOut)
 def health(session: Session = Depends(get_session)) -> HealthOut:
-    """DB 접속 확인(리스크 A -- 접속 확인은 여기서만 한다, `create_app()`/
-    lifespan 은 엔진을 만들지도 접속을 확인하지도 않는다).
+    """DB 접속 확인(리스크 A -- 접속 확인은 여기서만 한다. 스위치
+    (`BRIEFING_SCHEDULER_ENABLED`)가 꺼져 있으면 `create_app()`/lifespan
+    은 엔진을 만들지도 접속을 확인하지도 않는다. 켜져 있으면 lifespan 이
+    1분 주기 브리핑 작업(P6-briefing U7)만 띄울 뿐, 그 자신이 엔진을
+    만들거나 접속을 확인하지는 않는다 -- 그 작업이 실행마다 여는
+    `session_scope()` 가 비로소 엔진을 쓴다).
 
     `SELECT 1` 이 실패하면(또는 `get_session` 자체가 실패하면) 예외가 그대로
     올라가 `app/main.py` 의 전역 `Exception` 핸들러가 503

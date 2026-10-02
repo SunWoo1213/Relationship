@@ -6,8 +6,9 @@
 `build_briefing_input`(U3), `app/briefing/compose.py` 의
 `BriefingComposer`·`BRIEFING_SCHEMA`·`build_briefing_prompt`·
 `validate_briefing`·`composer_from_env`·`FakeBriefingComposer`·
-`template_briefing`(U4), `app/briefing/run.py` 의 `run_briefings`(U5)다.
-"""
+`template_briefing`(U4), `app/briefing/run.py` 의 `run_briefings`(U5),
+`app/briefing/scheduler.py` 의 `run_scheduler_loop`·`start_scheduler_task`·
+`default_run_once`(U7)."""
 
 from __future__ import annotations
 
@@ -23,6 +24,12 @@ from app.briefing.compose import (
 )
 from app.briefing.inputs import build_briefing_input
 from app.briefing.run import run_briefings
+from app.briefing.scheduler import (
+    RunOnce,
+    default_run_once,
+    run_scheduler_loop,
+    start_scheduler_task,
+)
 from app.briefing.select import select_due_schedules
 from app.briefing.types import (
     BRIEFING_FORBIDDEN_EXPRESSIONS,
@@ -57,12 +64,16 @@ __all__ = [
     "FakeBriefingComposer",
     "NullNotifier",
     "Notifier",
+    "RunOnce",
     "Suggestion",
     "build_briefing_input",
     "build_briefing_prompt",
     "composer_from_env",
+    "default_run_once",
     "run_briefings",
+    "run_scheduler_loop",
     "select_due_schedules",
+    "start_scheduler_task",
     "template_briefing",
     "validate_briefing",
 ]

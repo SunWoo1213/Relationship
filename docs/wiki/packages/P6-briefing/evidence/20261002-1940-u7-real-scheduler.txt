@@ -1,0 +1,28 @@
+# U7 실서버 주기 작업 확인 — 메인 세션, 사용자 승인 2026-10-02
+# uvicorn app.main:create_app --factory --port 8765, BRIEFING_SCHEDULER_ENABLED=1, APP_USER_ID=brief-u5-check, 개발 DB relationship, 실 OpenAI
+# 10:39:46 UTC 일정 4(민수와 커피, +2h, briefed_at NULL) 추가 → 서버 기동 → HTTP 요청 없이 대기
+
+## 주기 작업 실행 기록(briefing_run, trigger=scheduler)
+  #212 2026-10-02 10:40:47.766948+00:00 session=briefing:52c893b7-e95c-49ed-ad1d-858ccabaeccb selected=[4] briefed=[4] skipped=[] errors=0
+  #213 2026-10-02 10:41:51.846058+00:00 session=briefing:206517f5-7003-46f4-afd6-2699fdb4eced selected=[] briefed=[] skipped=[] errors=0
+  #214 2026-10-02 10:42:51.872696+00:00 session=briefing:65020177-4ac6-431a-96d2-77d3097afe34 selected=[] briefed=[] skipped=[] errors=0
+
+## 일정 4 의 briefing_compose
+  #211 session=briefing:52c893b7-e95c-49ed-ad1d-858ccabaeccb composer=llm tokens=743/106 push=not_configured rejected=[]
+  pattern_sentences: [{'key': 'pattern:conflict', 'sentence': '3회 (2026-03-16, 2026-06-14, 2026-09-20)'}]
+  lines: ['민수는 고수를 진짜 싫어하더라.']
+  suggestion: 고수를 피하는 메뉴를 고려해 보세요.
+
+## 일정 4 briefed_at: 2026-10-02 10:40:47.780976+00:00
+
+## uvicorn 로그(Ctrl-C 상당 SIGINT 로 종료)
+INFO:     Started server process [17692]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [17692]
+
+## 종료 뒤 포트 8765 리스너 수:        0

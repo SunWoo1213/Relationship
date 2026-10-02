@@ -1,0 +1,55 @@
+U7 부정 테스트 확인 (위임 프롬프트 지시 2건) -- 끈 뒤 FAIL 확인, 즉시 Edit 로 원복.
+
+===========================================================================
+(a) 삼키기(except Exception)를 끄면 판정26 테스트가 FAIL 해야 한다
+===========================================================================
+변경: app/briefing/scheduler.py run_scheduler_loop() 의
+  except Exception:
+을 임시로
+  except KeyError:  # TEMP-NEGATIVE-TEST -- 일부러 좁혀서 삼키기를 끈다
+로 좁혀 RuntimeError 가 더 이상 잡히지 않게 함.
+
+명령: POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_briefing_scheduler.py::test_scheduler_keeps_running_after_run_once_raises -v
+
+결과(발췌):
+    def _flaky_run_once() -> None:
+        calls.append(1)
+        if len(calls) == 1:
+>           raise RuntimeError("boom -- 첫 호출만 일부러 실패")
+E           RuntimeError: boom -- 첫 호출만 일부러 실패
+tests/test_briefing_scheduler.py:124: RuntimeError
+FAILED tests/test_briefing_scheduler.py::test_scheduler_keeps_running_after_run_once_raises
+1 failed in 0.57s
+
+-> 예외가 lifespan 종료 경로(await task)까지 그대로 올라가 테스트가 FAIL 함을 확인.
+   Edit 로 즉시 원복(`except Exception:` 복구).
+
+===========================================================================
+(b) 스위치 검사를 끄면 판정25 "꺼짐" 테스트가 FAIL 해야 한다
+===========================================================================
+변경: app/main.py _lifespan() 의
+  if briefing_scheduler_enabled():
+을 임시로
+  if True:  # TEMP-NEGATIVE-TEST -- 스위치 검사를 끈다
+로 바꿔 스위치 값과 무관하게 항상 태스크를 띄우게 함.
+
+명령: POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_briefing_scheduler.py::test_scheduler_disabled_by_default_does_not_call_run_once -v
+
+결과(발췌):
+>       assert calls == []
+E       AssertionError: assert [1, 1, 1, 1, 1, 1, ...] == []
+E         Left contains 14 more items, first extra item: 1
+FAILED tests/test_briefing_scheduler.py::test_scheduler_disabled_by_default_does_not_call_run_once
+1 failed in 0.49s
+
+-> 스위치를 비워도 주기 작업이 돌아 호출이 14회 쌓였음(태스크가 떠 있었다는 직접 증거).
+   Edit 로 즉시 원복(`if briefing_scheduler_enabled():` 복구).
+
+===========================================================================
+원복 확인
+===========================================================================
+$ grep -c "TEMP-NEGATIVE-TEST" app/briefing/scheduler.py app/main.py
+app/briefing/scheduler.py:0
+app/main.py:0
+
+원복 후 재실행(5 passed) -- evidence/20261002-1930-u7-scheduler.txt 참고.

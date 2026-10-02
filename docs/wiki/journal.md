@@ -373,3 +373,5 @@
 - 2026-10-02 16:12 | PUSH-dev2 | origin dev2 a2f032d (실험 푸시)
 - 2026-10-02 17:43 | COMMIT | e037728 feat(P6-briefing): U5 일정마다 브리핑을 만들고 실패한 일정만 되돌리는 실행 함수
 - 2026-10-02 17:43 | PUSH-dev2 | origin dev2 e037728 (실험 푸시)
+- 2026-10-02 19:22 | COMMIT | 8589e37 feat(P6-briefing): U6 POST /briefings/run 으로 브리핑을 바로 만든다
+- 2026-10-02 19:23 | PUSH-dev2 | origin dev2 8589e37 (실험 푸시)

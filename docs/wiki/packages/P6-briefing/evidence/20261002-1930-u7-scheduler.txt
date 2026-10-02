@@ -1,0 +1,14 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 5 items
+
+tests/test_briefing_scheduler.py::test_scheduler_disabled_by_default_does_not_call_run_once PASSED [ 20%]
+tests/test_briefing_scheduler.py::test_scheduler_enabled_calls_run_once_and_stops_after_context_exit PASSED [ 40%]
+tests/test_briefing_scheduler.py::test_scheduler_keeps_running_after_run_once_raises PASSED [ 60%]
+tests/test_briefing_scheduler.py::test_invalid_switch_value_fails_app_startup PASSED [ 80%]
+tests/test_briefing_scheduler.py::test_manual_endpoint_and_scheduler_call_the_same_run_briefings_object PASSED [100%]
+
+============================== 5 passed in 1.57s ===============================

@@ -1,0 +1,8 @@
+== pywebpush/vapid/push_subscriptions grep ==
+exit=1
+== events 삭제·수정 grep ==
+exit=1
+== person_facts 직접 쓰기 grep(app/briefing 전체) ==
+exit=1
+== evaluation grep ==
+exit=1

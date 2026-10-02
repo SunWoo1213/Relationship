@@ -7,8 +7,26 @@
 `app.api.routes` → `app.api.deps` → `app.db.session` 체인 어디에도 즉시
 실행되는 `get_engine()` 호출이 없다(`SessionLocal` 은 호출 시점까지 엔진
 생성을 미루는 프록시). `import app.main` 만으로는 DB 접속을 시도하지 않는다
--- 접속 확인은 `GET /health` 가 요청이 왔을 때만 한다. lifespan 훅도 두지
-않는다(접속 확인은 lifespan 의 일이 아니다).
+-- 접속 확인은 `GET /health` 가 요청이 왔을 때만 한다. **스위치
+(`BRIEFING_SCHEDULER_ENABLED`)가 꺼져 있으면 lifespan 은 아무것도 하지
+않는다**(기본값이 꺼짐이므로 리스크 A 는 그대로 유지된다). 켜져 있을
+때만 lifespan 이 1분 주기 브리핑 작업(P6-briefing U7, `app/briefing/
+scheduler.py`)을 띄운다 -- 그 작업 자신이 실행마다 `session_scope()` 로
+세션을 여는 것이지, `create_app()`/lifespan 자신이 엔진을 만들거나
+DB 접속을 확인하는 것은 아니다(접속 확인은 여전히 `GET /health` 전용).
+
+## 주기 작업 lifespan (P6-briefing U7, S3.6 결정 A(i))
+
+`_lifespan()` 은 `briefing_scheduler_enabled()`(`app/settings.py`)를 앱
+시작 시 한 번 읽는다. `False`(기본값)면 아무 태스크도 만들지 않고 바로
+`yield` 한다 -- 위 리스크 A 가 그대로 유지된다. `True` 면
+`start_scheduler_task()`(`app/briefing/scheduler.py`)로 `asyncio.Task`
+하나를 만들어 1분(기본)마다 `run_briefings(trigger="scheduler")` 가
+돌게 하고, 앱 종료 시(`finally`) 그 태스크를 취소하고 끝날 때까지
+기다린다. 스위치 값이 `1`/`true`/빈 문자열이 아닌 다른 값이면
+`briefing_scheduler_enabled()` 가 `InvalidValue` 를 던지고, 그 예외는
+여기서 잡지 않는다 -- **앱 시작 자체가 실패한다**(원칙8 "조용히 꺼진
+채로 넘어가지 않는다", 02-plan-verify 위임 지시).
 
 예외 매핑 표(01-plan U8 지시):
 
@@ -37,10 +55,17 @@ FastAPI 가 이미 더 구체적인 클래스로 기본 핸들러를 등록해 �
 
 from __future__ import annotations
 
+import asyncio
+import contextlib
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.api import router
+from app.briefing.scheduler import start_scheduler_task
+from app.settings import briefing_scheduler_enabled
 from app.tools.types import (
     ConfirmationRequired,
     InvalidValue,
@@ -96,9 +121,32 @@ def _unhandled_exception_handler(request: Request, exc: Exception) -> JSONRespon
     return JSONResponse(status_code=500, content={"detail": {"code": "internal_error"}})
 
 
+@asynccontextmanager
+async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """스위치(`BRIEFING_SCHEDULER_ENABLED`)가 켜졌을 때만 1분 주기 브리핑
+    작업(P6-briefing U7)을 띄운다. 모듈 docstring "주기 작업 lifespan"
+    절 참고 -- 꺼져 있으면(기본값) 아무것도 하지 않아 엔진 생성·DB 접속이
+    없는 리스크 A 를 그대로 유지한다. `briefing_scheduler_enabled()` 가
+    `InvalidValue` 를 던지면 여기서 잡지 않고 그대로 올려 앱 시작을
+    실패시킨다(원칙8)."""
+    task: asyncio.Task[None] | None = None
+    if briefing_scheduler_enabled():
+        task = start_scheduler_task()
+    try:
+        yield
+    finally:
+        if task is not None:
+            task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await task
+
+
 def create_app() -> FastAPI:
-    """앱 팩토리. 엔진을 만들지 않고 DB 접속도 확인하지 않는다(리스크 A)."""
-    app = FastAPI(title="관계 메모리 에이전트 API")
+    """앱 팩토리. 스위치가 꺼져 있으면(기본값) lifespan 은 아무것도 하지
+    않아 엔진을 만들지 않고 DB 접속도 확인하지 않는다(리스크 A). 켜져
+    있으면 lifespan 이 1분 주기 브리핑 작업만 띄운다(P6-briefing U7,
+    모듈 docstring 참고)."""
+    app = FastAPI(title="관계 메모리 에이전트 API", lifespan=_lifespan)
     app.include_router(router)
 
     app.add_exception_handler(PersonNotFound, _not_found_handler)
