@@ -365,3 +365,5 @@
 - 2026-10-02 14:13 | PUSH-dev2 | origin dev2 688c4a4 (실험 푸시)
 - 2026-10-02 14:27 | COMMIT | e2155f9 feat(P6-briefing): U1 브리핑 패키지의 뼈대와 설정값을 만든다
 - 2026-10-02 14:27 | PUSH-dev2 | origin dev2 e2155f9 (실험 푸시)
+- 2026-10-02 14:43 | COMMIT | db3c645 feat(P6-briefing): U2 브리핑할 일정을 고르고 같은 일정을 두 번 집지 않게 잠근다
+- 2026-10-02 14:43 | PUSH-dev2 | origin dev2 db3c645 (실험 푸시)

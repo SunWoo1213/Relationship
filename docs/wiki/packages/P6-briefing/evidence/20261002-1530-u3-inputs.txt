@@ -1,0 +1,15 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 6 items
+
+tests/test_briefing_inputs.py::test_build_briefing_input_recomputes_pattern_and_deletes_when_window_shrinks PASSED [ 16%]
+tests/test_briefing_inputs.py::test_build_briefing_input_keeps_pattern_and_fact_key_excludes_legacy_key PASSED [ 33%]
+tests/test_briefing_inputs.py::test_build_briefing_input_keeps_only_latest_row_for_same_key PASSED [ 50%]
+tests/test_briefing_inputs.py::test_build_briefing_input_attaches_up_to_two_recent_sources_and_marks_eligibility PASSED [ 66%]
+tests/test_briefing_inputs.py::test_build_briefing_input_records_briefed_at PASSED [ 83%]
+tests/test_briefing_inputs.py::test_build_briefing_input_does_not_leak_other_person_data PASSED [100%]
+
+============================== 6 passed in 0.26s ===============================
