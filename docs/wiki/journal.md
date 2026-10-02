@@ -385,3 +385,6 @@
 - 2026-10-02 20:40 | DECISION | L-003 결정 = main 승격 보류 · FIX-017 로 계속(사용자) | L-003
 - 2026-10-02 20:52 | FIX | **FIX-017 완료** — 사실 키 뜻 설명(`FACT_KEY_DESCRIPTIONS`)을 루프 제안기·승격 추출기 프롬프트에. 실 LLM 전후(발화 7×2): 제안기 11/14 → 14/14, 추출기 14/14 → (금지형 문구에서 12/14) → 안내형으로 고쳐 14/14. 1724 passed skip 0 · tools_check 7/7 | FIX-017 P5-loop P6-memory S3.2 S3.5
 - 2026-10-02 20:39 | PUSH | origin dev ← dev2 f9500fe — 사용자 결정 대기(승격/수정) L-003
+- 2026-10-02 20:54 | COMMIT | 608694b fix(FIX-017): 사실 키의 뜻을 LLM 에게 알려 "안 좋아해" 가 likes 로 가지 않게 한다
+- 2026-10-02 20:54 | PUSH-dev2 | origin dev2 608694b (실험 푸시)
+- 2026-10-02 21:30 | PLAN | P7-push 계획 검증 통과·**승인 대기** — 착수 승인(L-004) → architect 01-plan(U1~U8, 판정 표 26행) → 결정 A~G 사용자 확정(전부 권장안) → verifier 02-plan-verify `통과`(8/8, [필수] 0, verify-plan FAIL 0/WARN 0, 권고 R-1~R-10). 계획 승인 질문에 사용자가 "다음 세션에서 이어가게 기록" 을 택함 → 승인 안 됨, active none. 다음 세션은 승인 질문부터 | P7-push R12 S3.6
