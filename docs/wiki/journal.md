@@ -369,3 +369,5 @@
 - 2026-10-02 14:43 | PUSH-dev2 | origin dev2 db3c645 (실험 푸시)
 - 2026-10-02 14:54 | COMMIT | cfb55ea feat(P6-briefing): U3 브리핑에 넘길 재료를 모으고 낡은 패턴과 옛 사실 키를 걸러낸다
 - 2026-10-02 14:54 | PUSH-dev2 | origin dev2 cfb55ea (실험 푸시)
+- 2026-10-02 16:12 | COMMIT | a2f032d feat(P6-briefing): U4 LLM 이 브리핑 문장을 쓰고 코드가 한 줄씩 검사한다
+- 2026-10-02 16:12 | PUSH-dev2 | origin dev2 a2f032d (실험 푸시)

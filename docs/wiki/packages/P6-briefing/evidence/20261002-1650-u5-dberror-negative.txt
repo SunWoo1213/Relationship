@@ -1,0 +1,9 @@
+## 격리 분기를 옛 동작(항상 raise)으로 되돌린 상태
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+=========================== short test summary info ============================
+FAILED tests/test_briefing_run.py::test_run_briefings_isolates_real_db_error_other_schedule_still_briefed
+1 failed, 9 deselected in 0.30s
+
+## 원복 후
+0
+10 passed in 0.29s

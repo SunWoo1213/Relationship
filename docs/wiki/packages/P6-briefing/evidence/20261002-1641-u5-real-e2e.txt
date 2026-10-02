@@ -1,0 +1,100 @@
+database = relationship
+seeded schedules: [1, 2, 3] (마지막은 30시간 뒤 — 선정되면 안 됨)
+composer = OpenAIBriefingComposer
+
+===== run 1: briefings=2 skipped=0 errors=0
+{
+ "trigger": "manual",
+ "now": "2026-10-02T07:41:11.311940+00:00",
+ "briefings": [
+  {
+   "schedule_id": 1,
+   "person_id": 5,
+   "composer": "llm",
+   "pattern_sentences": [
+    {
+     "key": "pattern:conflict",
+     "sentence": "현재까지 민수와의 갈등이 3회 발생했습니다."
+    }
+   ],
+   "lines": [
+    {
+     "text": "민수는 고수를 진짜 싫어합니다.",
+     "basis": {
+      "fact_keys": [
+       "dislikes"
+      ],
+      "event_ids": []
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "저녁 약속 시 고수를 피하는 것이 좋습니다.",
+    "basis": {
+     "fact_keys": [
+      "dislikes"
+     ],
+     "event_ids": []
+    }
+   },
+   "push": "not_configured"
+  },
+  {
+   "schedule_id": 2,
+   "person_id": 6,
+   "composer": "llm",
+   "pattern_sentences": [],
+   "lines": [
+    {
+     "text": "지현이는 매운 음식을 못 먹는다.",
+     "basis": {
+      "fact_keys": [
+       "likes"
+      ],
+      "event_ids": []
+     }
+    }
+   ],
+   "suggestion": {
+    "text": "점심 메뉴를 매운 음식이 아닌 것으로 선택하라.",
+    "basis": {
+     "fact_keys": [
+      "likes"
+     ],
+     "event_ids": [
+      23
+     ]
+    }
+   },
+   "push": "not_configured"
+  }
+ ],
+ "skipped": [],
+ "errors": 0
+}
+
+===== run 2: briefings=0 skipped=0 errors=0
+{
+ "trigger": "manual",
+ "now": "2026-10-02T07:41:17.214537+00:00",
+ "briefings": [],
+ "skipped": [],
+ "errors": 0
+}
+
+===== schedules.briefed_at
+  1 '민수와 저녁 약속' briefed_at=2026-10-02 07:41:11.342113+00:00
+  2 '지현과 점심' briefed_at=2026-10-02 07:41:14.524264+00:00
+  3 '지현과 회의(창 밖)' briefed_at=None
+
+===== briefing traces (this user's runs)
+  #193 briefing_compose session=briefing:e65faa21-a46c-4e94-9b4e-23db74818f80 tokens=739/95 keys=['composer', 'event_ids', 'excluded_facts', 'lines', 'llm', 'pattern_sentences', 'pattern_trace_id', 'person_id', 'push', 'rejected', 'schedule_id', 'suggestion', 'used_facts']
+    composer: llm | fallback: None | push: not_configured
+    excluded_facts: [{"key": "소속", "reason": "not_fact_key", "fact_id": 19}]
+    rejected: []
+  #196 briefing_compose session=briefing:e65faa21-a46c-4e94-9b4e-23db74818f80 tokens=584/69 keys=['composer', 'event_ids', 'excluded_facts', 'lines', 'llm', 'pattern_sentences', 'pattern_trace_id', 'person_id', 'push', 'rejected', 'schedule_id', 'suggestion', 'used_facts']
+    composer: llm | fallback: None | push: not_configured
+    excluded_facts: []
+    rejected: []
+  #197 briefing_run session=briefing:e65faa21-a46c-4e94-9b4e-23db74818f80 tokens=0/0 keys=['briefed', 'errors', 'lead_hours', 'now', 'schedule_id_arg', 'selected', 'skipped', 'trigger', 'window']
+  #198 briefing_run session=briefing:3ef63cc8-37bf-49d1-98aa-10ab10f7fc21 tokens=0/0 keys=['briefed', 'errors', 'lead_hours', 'now', 'schedule_id_arg', 'selected', 'skipped', 'trigger', 'window']
