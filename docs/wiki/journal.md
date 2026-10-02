@@ -375,3 +375,5 @@
 - 2026-10-02 17:43 | PUSH-dev2 | origin dev2 e037728 (실험 푸시)
 - 2026-10-02 19:22 | COMMIT | 8589e37 feat(P6-briefing): U6 POST /briefings/run 으로 브리핑을 바로 만든다
 - 2026-10-02 19:23 | PUSH-dev2 | origin dev2 8589e37 (실험 푸시)
+- 2026-10-02 19:48 | COMMIT | a67692e feat(P6-briefing): U7 서버가 켜져 있으면 1분마다 브리핑을 저절로 만든다
+- 2026-10-02 19:48 | PUSH-dev2 | origin dev2 a67692e (실험 푸시)

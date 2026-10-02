@@ -1,0 +1,22 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 13 items
+
+tests/test_api_briefings.py::test_run_briefings_creates_briefing_and_marks_briefed PASSED [  7%]
+tests/test_api_briefings.py::test_run_briefings_second_call_finds_nothing PASSED [ 15%]
+tests/test_briefing_scheduler.py::test_manual_endpoint_and_scheduler_call_the_same_run_briefings_object PASSED [ 23%]
+tests/test_briefing_select.py::test_select_due_schedules_window_upper_boundary_inclusive PASSED [ 30%]
+tests/test_briefing_select.py::test_select_due_schedules_window_upper_boundary_exclusive PASSED [ 38%]
+tests/test_briefing_select.py::test_select_due_schedules_excludes_past_schedule PASSED [ 46%]
+tests/test_briefing_select.py::test_select_due_schedules_excludes_already_briefed PASSED [ 53%]
+tests/test_briefing_select.py::test_select_due_schedules_excludes_other_user PASSED [ 61%]
+tests/test_briefing_select.py::test_select_due_schedules_schedule_id_other_user_raises_not_found PASSED [ 69%]
+tests/test_api_briefings.py::test_run_briefings_other_user_schedule_id_returns_404 PASSED [ 76%]
+tests/test_api_briefings.py::test_run_briefings_missing_schedule_id_returns_404 PASSED [ 84%]
+tests/test_briefing_select.py::test_select_due_schedules_concurrent_sessions_skip_locked PASSED [ 92%]
+tests/test_api_briefings.py::test_run_briefings_schedule_id_forces_regeneration PASSED [100%]
+
+============================== 13 passed in 0.44s ==============================

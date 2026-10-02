@@ -209,6 +209,55 @@ python scripts/er_smoke.py --provider gemini      # GEMINI_API_KEY·GEMINI_MODEL
 
 즉 **"승격이 몇 번 일어났나"는 `considered_event_ids`가 비어 있지 않은 행의 수**다. `source` 키만으로는 승격 행과 미달 행이 갈리지 않는다(둘 다 키가 없다) — 세 종류가 같은 키 하나로 갈리게 하는 것은 `PromotionResult.to_dict()` 에 `source: "llm"`/`"skipped"` 를 더하는 별건 수정이다(P6-memory 04-review §6, FIX 후보).
 
+### 브리핑이 언제·어떻게 도는가 (P6-briefing)
+
+`app/briefing/`이 만남 직전 맥락을 브리핑으로 만든다. 자료 조회·`briefed_at` 기록 자체는 기존 `get_briefing` 툴(P2-tools, 시그니처 무변경)이 그대로 하고, 이 패키지는 그 앞뒤에 ① 패턴 재계산 ② LLM 문장화·코드 검증 ③ 대상 선정·실행(주기·수동 공용)을 둔다.
+
+**경로 두 개, 함수 하나** — 1분 주기 작업과 수동 트리거 `POST /briefings/run`은 **같은 함수** `app.briefing.run.run_briefings(ctx, *, composer, notifier=NullNotifier(), schedule_id=None, trigger, lead_hours=BRIEFING_LEAD_HOURS)`를 부른다(`trigger` 값만 `"scheduler"`/`"manual"`로 다르다). 대상은 `persons.user_id = ctx.user_id`인 일정 중 `now ≤ scheduled_at ≤ now + BRIEFING_LEAD_HOURS`(기본 24시간, 지난 일정은 제외)이고 `briefed_at IS NULL`인 것이다(`FOR UPDATE ... SKIP LOCKED`로 두 경로가 같은 일정을 동시에 집지 않는다).
+
+```bash
+# 본문 없음 — 창 안의 미브리핑 일정 전부를 브리핑
+curl -s -X POST http://localhost:8000/briefings/run | python3 -m json.tool
+
+# 일정 하나만 강제(이미 브리핑했어도 다시 생성, briefed_at 갱신)
+curl -s -X POST http://localhost:8000/briefings/run \
+  -H 'Content-Type: application/json' \
+  -d '{"schedule_id": 1}' | python3 -m json.tool
+
+# 존재하지 않거나 다른 사용자 소유의 schedule_id -- 404
+curl -s -o /dev/null -w '%{http_code}\n' -X POST http://localhost:8000/briefings/run \
+  -H 'Content-Type: application/json' -d '{"schedule_id": 999999999}'
+```
+
+응답 `BriefingRunOut`의 주요 필드:
+
+| 필드 | 뜻 |
+|------|-----|
+| `run_id` | 이 실행의 `agent_traces.session_id`(`"briefing:<uuid4>"`) — 이 값으로 그 실행이 남긴 trace 전부를 조회할 수 있다 |
+| `generated_at` | 이 실행이 쓴 "지금"(`ctx.now()`) |
+| `briefings[]` | 새로 생성된 브리핑 — `schedule_id`·`person_id`·`composer`(`"llm"`\|`"template"`)·`pattern_sentences`·`lines`(근거 `fact_keys`/`event_ids` 포함)·`suggestion`(없을 수 있음)·`push`(`"not_configured"` — 웹푸시는 P7-push) |
+| `skipped[]` | 대상에서 빠지거나 실패한 일정 — `schedule_id`·`reason` |
+
+응답 어디에도 `raw_utterance`(원문) 필드는 없다 — 근거는 사실 키·이벤트 id 로만 돌려준다(`get_briefing`의 `EventOut` 결정과 같은 이유).
+
+**주기 작업 스위치** — 환경변수 `BRIEFING_SCHEDULER_ENABLED`(기본 꺼짐, `.env.example`에 이름만 있고 값은 비어 있다). 비우면 꺼짐, `1`이나 `true`(대소문자 무관 아님 — 정확히 이 두 문자열)만 켜짐이고, 그 밖의 값(`"0"`·`"yes"`·`"TRUE"` 등)을 주면 **앱 시작 자체가 실패**한다(`InvalidValue` — 원칙8, 조용히 꺼진 채로 넘어가지 않는다).
+
+```bash
+# 켜서 기동 — 1분(BRIEFING_INTERVAL_SECONDS)마다 창 안의 미브리핑 일정을 저절로 브리핑한다
+BRIEFING_SCHEDULER_ENABLED=1 uvicorn app.main:create_app --factory --port 8000
+```
+
+**켜 둔 채 두면 매분 돈다** — 대상 일정이 없으면 그 주기는 LLM 호출이 0회다(`select_due_schedules`가 빈 목록을 돌려주면 그걸로 끝). 대상이 있을 때만 일정 수만큼 LLM이 불린다. 여러 워커(프로세스)를 띄우면 그만큼 루프도 늘어난다 — `SKIP LOCKED`로 중복 브리핑은 막지만, **스위치는 한 프로세스에서만 켠다**(P9-infra 배포 시 주의).
+
+**동작 확인법** — uvicorn 콘솔 자체는 성공 시 조용하다(예외가 나야 `logger.exception()`이 찍힌다). 확인은 DB와 trace로 한다:
+
+- `schedules.briefed_at`이 그 실행의 `now`로 채워졌는지 직접 조회한다.
+- `agent_traces`에서 `tool_name='briefing' AND step='briefing_run' AND output->>'trigger'='scheduler'`(주기 작업) 또는 `output->>'trigger'='manual'`(수동)로 그 실행의 `briefing_run` 1행을 찾고, 같은 `session_id`로 `step='briefing_compose'`(일정마다 1행 — 근거 `used_facts`/`excluded_facts`/`lines[].basis`/`suggestion.basis`·토큰 사용량) 또는 실패 시 `step='briefing_error'`(`stage`는 `select`\|`compose`\|`notify` 3종만 실제로 쓰인다)를 조회한다.
+
+**패턴·사실의 세 출처** — 브리핑 직전에 `detect_patterns`를 다시 불러 `pattern:*` 사실을 최신으로 만든다(브리핑 대상 인물만, 인물 카드의 낡은 패턴까지 지우지는 않는다 — P8 인계). 브리핑에는 `pattern:*`와 `FACT_KEYS` 9종만 쓰고, 그 밖의 옛 자유 키(`소속`·`직장`·`이직` 등)는 브리핑 요약에서 빠지고 trace의 `excluded_facts`에만 남는다(삭제·수정하지 않는다).
+
+**웹푸시는 P7-push** — 이 패키지는 `Notifier` Protocol과 기본 `NullNotifier`(항상 `"not_configured"`)만 둔다. 구독 저장(`push_subscriptions`)·VAPID 키·실제 발송은 다루지 않는다.
+
 ### 평가 데이터셋(파일럿 40건)
 
 `data/scenarios/`는 엔티티 해석·이벤트 추출을 채점하기 위한 **한국어 대화 시나리오 40건**과 그 골드 라벨이다. 지표 계산(오병합률·미검출률·트레이드오프 곡선)은 여기서 하지 않는다 — P4-pilot-eval이 이 데이터를 읽어서 한다. 실명·연락처는 들어 있지 않다(가상 성명 목록 밖 이름은 검증기가 FAIL 한다).

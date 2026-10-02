@@ -171,7 +171,22 @@ def test_build_briefing_input_recomputes_pattern_and_deletes_when_window_shrinks
     schedule = _make_schedule(db_session, person, scheduled_at=later)
     ctx = _ctx(db_session, now=lambda: later)
 
+    def _event_snapshot() -> list[tuple]:
+        return [
+            (row.id, row.type, row.content, row.raw_utterance, row.occurred_at)
+            for row in db_session.execute(
+                select(Event).where(Event.person_id == person.id).order_by(Event.id)
+            ).scalars()
+        ]
+
+    events_before = _event_snapshot()
+
     result = build_briefing_input(ctx, schedule)
+
+    # 판정 27행(원문 불변, U8 에서 보강) -- 패턴 재계산은 사실만 지우고
+    # 근거 이벤트의 원문·내용·시각은 한 글자도 바꾸지 않는다.
+    db_session.expire_all()
+    assert _event_snapshot() == events_before
 
     assert all(fact["key"] != "pattern:conflict" for fact in result.used_facts)
     assert all(fact["key"] != "pattern:conflict" for fact in result.excluded_facts)
@@ -191,6 +206,29 @@ def test_build_briefing_input_recomputes_pattern_and_deletes_when_window_shrinks
         select(func.count()).select_from(Event).where(Event.person_id == person.id)
     ).scalar_one()
     assert event_count == 3
+
+
+@pytest.mark.parametrize("module_path", ["app/briefing/select.py", "app/briefing/inputs.py"])
+def test_selection_and_inputs_do_not_import_llm_or_embedding(module_path: str) -> None:
+    """01-plan "지킬 불변식" ③(U8 에서 보강) -- 대상 선정·입력 조립은 규칙과
+    SQL 뿐이다(원칙6 "패턴 판정은 규칙, LLM 은 문장화만"). 두 모듈의 실제
+    import 문(docstring 언급 제외)에 LLM·임베딩·생성기 모듈이 없어야 한다."""
+
+    import ast
+    from pathlib import Path
+
+    source = (Path(__file__).resolve().parents[1] / module_path).read_text(encoding="utf-8")
+    imported: list[str] = []
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            imported.extend(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported.append(node.module)
+
+    forbidden = ("app.er", "app.embedding", "app.briefing.compose", "anthropic", "openai", "google")
+    offending = [name for name in imported if name.split(".")[0] in forbidden or name.startswith(forbidden)]
+    assert imported, "import 문을 하나도 못 찾았다 -- 검사 자체가 깨졌다"
+    assert offending == []
 
 
 # ---------------------------------------------------------------------------

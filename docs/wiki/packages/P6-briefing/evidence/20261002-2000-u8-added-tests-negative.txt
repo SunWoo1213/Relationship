@@ -1,0 +1,9 @@
+## 일부러 어긴 코드(inputs.py 가 이벤트 원문을 바꿈 · select.py 가 app.er.judge 를 import)
+FAILED tests/test_briefing_inputs.py::test_build_briefing_input_recomputes_pattern_and_deletes_when_window_shrinks
+FAILED tests/test_briefing_inputs.py::test_selection_and_inputs_do_not_import_llm_or_embedding[app/briefing/select.py]
+2 failed, 1 passed, 5 deselected in 0.21s
+
+## 원복 후
+TEMP 표식 남은 수: app/briefing/inputs.py:0 app/briefing/select.py:0 
+app/ diff vs a67692e:        0 줄
+8 passed in 0.25s

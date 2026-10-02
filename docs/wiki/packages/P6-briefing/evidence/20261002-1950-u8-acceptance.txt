@@ -1,0 +1,136 @@
+P6-briefing U8 — 수용 기준 기계 검증 (2026-10-02)
+담당: backend-agent · 커밋하지 않음(증거 파일만 작성) · app/·기존 테스트 미수정
+DB: capstone2-postgres-1 컨테이너(5433 포트, pgvector/pgvector:pg16) — 이미 기동 중이었음.
+    docker compose up -d 는 포트 충돌로 relationship-postgres-1 생성에 실패했으나(동일 호스트
+    포트 5433 을 다른 compose 프로젝트의 컨테이너가 이미 점유), 기존 capstone2-postgres-1 로
+    모든 검증이 정상 수행됨을 확인(pg_isready 성공). 생성 실패한 빈 컨테이너는 docker rm 으로만
+    정리(볼륨·기존 컨테이너는 건드리지 않음).
+
+========================================================================
+1. 판정 표 28행 — "지킬 불변식" 절 명령을 그대로 실행 (전부 0건 기대)
+========================================================================
+(상세 출력: 20261002-1950-u8-invariants.txt)
+
+[1] 푸시 발송 코드 없음
+    grep -rniE "pywebpush|vapid|push_subscriptions|PushSubscription" app/briefing/ app/api/ app/main.py
+    → 0건 (exit=1, 매치 없음) PASS
+
+[2] 원문(events) 삭제·수정 금지
+    grep -rnE "delete\(Event|update\(Event|\.raw_utterance\s*=[^=]|\.content\s*=[^=]" app/briefing/
+    → 0건 (exit=1) PASS (권위 있는 판정은 판정 표 27행 테스트 — §4 참고)
+
+[3] 패턴 판정에 LLM 없음(원칙6)
+    - app/briefing/select.py·inputs.py 의 실제 import 문(`^(import|from) `)을 확인한 결과
+      app.briefing.compose·app.er.judge·app.embedding 을 import 하지 않음(두 파일 모두
+      docstring 상의 언급뿐, 실제 import/from 문 0건) PASS
+    - grep -rnE "PersonFact\(|insert\(PersonFact|update\(PersonFact" app/briefing/ → 0건 PASS
+    - [미확인] 01-plan 은 "테스트가 모듈 import 목록 단언"이라고 적었으나, 실제로
+      tests/test_briefing_select.py·tests/test_briefing_inputs.py 를 grep 한 결과
+      app.briefing.compose/app.er.judge/app.embedding 미import을 단언하는 자동 테스트를
+      찾지 못했다(sys.modules·importlib 검사도 없음). 불변식 자체는 지금 코드가 지키고
+      있으나(수동 grep 으로 확인), 회귀를 막는 자동 테스트는 없다 — 이 패키지의 발견 사항으로
+      보고하고 고치지 않았다(위임 범위 — 기능 코드·기존 테스트 불변).
+
+[4] 기존 코드 무변경
+    git diff --stat 36c288e -- app/tools/briefing.py app/agent app/memory app/er
+    → 빈 출력 PASS
+
+[5] "evaluation" 금지
+    grep -rn "evaluation" app/briefing/ → 0건 (exit=1) PASS
+
+[6] 응답·Notifier 인자에 raw_utterance 원문 미포함
+    grep -rn "raw_utterance" app/api/schemas.py app/briefing/run.py app/briefing/types.py
+    → 3건 모두 docstring/주석("원문을 담지 않는다"는 설명 문장)뿐, 실제 필드·인자 아님.
+      권위 있는 판정은 판정 표 24행 테스트(§4 rows 21-27) — PASS
+
+판정 표 28행 종합: PASS (①②④⑤ 코드상 0건, ③은 grep 0건이나 보강 테스트 부재를 "미확인"으로
+남김, ⑥은 테스트로 확인)
+
+========================================================================
+2. 판정 표 29행 — 무변경
+========================================================================
+(상세 출력: 20261002-1950-u8-alembic-check.txt · 20261002-1950-u8-tools-check.txt ·
+ 20261002-1950-u8-invariants.txt)
+
+- POSTGRES_PORT=5433 .venv/bin/alembic check
+  → "No new upgrade operations detected." rc=0 PASS
+- .venv/bin/python scripts/tools_check.py
+  → 7/7 ok (search_person·create_person·update_person·add_event·add_schedule·get_briefing·
+    ask_user 전부 CLAUDE.md 시그니처 v2 와 일치) rc=0 PASS
+- git diff --stat 36c288e -- app/tools/briefing.py app/agent app/memory app/er
+  → 빈 출력 PASS
+
+판정 표 29행 종합: PASS
+
+========================================================================
+3. 판정 표 30행 — 전체 회귀
+========================================================================
+(상세 출력: 20261002-1950-u8-full-regression.txt)
+
+POSTGRES_PORT=5433 .venv/bin/python -m pytest -rs
+→ 1719 passed, 0 failed, 0 skipped, 1 warning(google-genai 라이브러리 DeprecationWarning,
+  이 패키지와 무관), 16.55s
+
+기대값(이 위임 프롬프트): 실패 0·skip 0·≥1719 → 정확히 1719 로 PASS.
+(01-plan 127행의 "≥1627"은 U1 이전 FIX-016 기준선 표기가 갱신되지 않은 것 — U7 03-log 가 이미
+ 1719 passed 를 보고했고 이번 재실행도 같은 수. 01-plan 체크박스·표는 건드리지 않음.)
+
+판정 표 30행 종합: PASS
+
+========================================================================
+4. 1~27행 매핑표 — 각 행을 확인하는 테스트와 실제 실행 결과
+========================================================================
+전부 node id 로 개별 실행해 통과를 확인했다(상세: 20261002-1950-u8-rows-1to10.txt ·
+-rows-11to20.txt · -rows-21to27.txt. 세 파일 합계 1~27행에 쓰인 서로 다른 테스트 함수 34개
+전부 PASSED, 0 FAILED).
+
+| # | 확인할 것 | 테스트(파일::함수) | 결과 |
+|---|----------|--------------------|------|
+| 1 | ㄱ·ㄴ·ㄷ 양성(API 한 흐름) | tests/test_api_briefings.py::test_run_briefings_creates_briefing_and_marks_briefed | PASS |
+| 2 | ㄷ 재실행 멱등 | tests/test_api_briefings.py::test_run_briefings_second_call_finds_nothing | PASS |
+| 3 | ㄱ 같은 함수 | tests/test_briefing_scheduler.py::test_manual_endpoint_and_scheduler_call_the_same_run_briefings_object | PASS |
+| 4 | 창 경계 양성 | tests/test_briefing_select.py::test_select_due_schedules_window_upper_boundary_inclusive | PASS |
+| 5 | 창 경계 부정 | tests/test_briefing_select.py::test_select_due_schedules_window_upper_boundary_exclusive | PASS |
+| 6 | 지난 일정(결정 B) | tests/test_briefing_select.py::test_select_due_schedules_excludes_past_schedule | PASS |
+| 7 | 이미 브리핑됨 | tests/test_briefing_select.py::test_select_due_schedules_excludes_already_briefed | PASS |
+| 8 | 다른 사용자 격리 | tests/test_briefing_select.py::test_select_due_schedules_excludes_other_user (기본 모드) + ::test_select_due_schedules_schedule_id_other_user_raises_not_found (지정 모드) + tests/test_api_briefings.py::test_run_briefings_other_user_schedule_id_returns_404 (API 404) + ::test_run_briefings_missing_schedule_id_returns_404 | PASS (4건 모두) |
+| 9 | 동시 실행 | tests/test_briefing_select.py::test_select_due_schedules_concurrent_sessions_skip_locked | PASS |
+| 10 | 수동 강제(결정 C) | tests/test_api_briefings.py::test_run_briefings_schedule_id_forces_regeneration | PASS |
+| 11 | 패턴 재계산(결정 K) | tests/test_briefing_inputs.py::test_build_briefing_input_recomputes_pattern_and_deletes_when_window_shrinks | PASS |
+| 12 | 사실 세 출처(결정 F) | tests/test_briefing_inputs.py::test_build_briefing_input_keeps_pattern_and_fact_key_excludes_legacy_key | PASS |
+| 13 | 같은 키 여러 행 | tests/test_briefing_inputs.py::test_build_briefing_input_keeps_only_latest_row_for_same_key | PASS |
+| 14 | 원칙7 부정 — 근거 없는 제안 | tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_without_basis | PASS |
+| 15 | 원칙7 부정 — 감정·고민 표현 | tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_with_forbidden_expression (+ ::rejects_suggestion_about_their_feelings, ::rejects_suggestion_with_conjugated_himdeul, ::rejects_line_with_forbidden_expression_keeps_others — 전부 §3 전체 회귀에서 PASS, 대표 1건만 개별 node id 로 재확인) | PASS |
+| 16 | 원칙7 부정 — 한 줄 위반 | tests/test_briefing_compose.py::test_validate_briefing_rejects_multiline_suggestion + ::test_validate_briefing_rejects_suggestion_over_max_chars | PASS |
+| 17 | 근거 위조 | tests/test_briefing_compose.py::test_validate_briefing_rejects_only_the_line_with_fabricated_basis | PASS |
+| 18 | 근거 자격(결정 G) | tests/test_briefing_compose.py::test_validate_briefing_rejects_suggestion_basis_not_eligible (+ ::accepts_suggestion_basis_backed_by_event_even_if_fact_not_eligible, 전체 회귀 PASS) | PASS |
+| 19 | 패턴 판정은 규칙(원칙6) | tests/test_briefing_compose.py::test_validate_briefing_replaces_pattern_sentence_with_template_on_count_mismatch | PASS |
+| 20 | 프롬프트 경계 문구 | tests/test_briefing_compose.py::test_build_briefing_prompt_includes_boundary_sentence_and_no_relation_request | PASS |
+| 21 | 템플릿 대체(결정 D) | tests/test_briefing_run.py::test_run_briefings_falls_back_to_template_on_judge_unavailable | PASS |
+| 22 | 실패 격리 | tests/test_briefing_run.py::test_run_briefings_isolates_real_db_error_other_schedule_still_briefed(진짜 DB 예외, 판정 표 문구와 가장 가까움) + ::test_run_briefings_isolates_failure_other_schedule_still_briefed(일반 예외, 더 넓은 범위) | PASS (둘 다) |
+| 23 | 근거 기록(원칙9) | tests/test_briefing_run.py::test_run_briefings_records_full_trace_fields_with_generator_tokens | PASS |
+| 24 | 푸시 없음(결정 J) | tests/test_briefing_run.py::test_run_briefings_push_not_configured_by_default + ::test_run_briefings_calls_fake_notifier_once_without_raw_utterance | PASS |
+| 25 | 주기 작업 스위치 | tests/test_briefing_scheduler.py::test_scheduler_disabled_by_default_does_not_call_run_once + ::test_scheduler_enabled_calls_run_once_and_stops_after_context_exit | PASS |
+| 26 | 주기 작업 내구성 | tests/test_briefing_scheduler.py::test_scheduler_keeps_running_after_run_once_raises | PASS |
+| 27 | 원문 불변 | tests/test_briefing_run.py::test_run_briefings_does_not_mutate_events (명시적 raw_utterance·content 동일성 비교) — [부분 미확인] tests/test_briefing_inputs.py 의 11행 테스트(test_build_briefing_input_recomputes_pattern_and_deletes_when_window_shrinks)는 이벤트 **행 수**(event_count==3)만 확인하고 raw_utterance·content 값 자체의 동일성은 비교하지 않는다 — "1·11행 전후" 라는 01-plan 문구가 요구하는 11행 쪽 raw_utterance 비교는 run.py 쪽 테스트로 대체 확인한 것이며 inputs.py 자체에는 없다 | PASS(run.py) / 미확인(inputs.py 의 raw_utterance 값 비교) |
+| 28 | 불변식 grep | 위 §1 | PASS(①②④⑤⑥) / 미확인(③의 자동 테스트 부재) |
+| 29 | 무변경 | 위 §2 | PASS |
+| 30 | 전체 회귀 | 위 §3 | PASS |
+
+종합: 30행 중 28행 PASS, 2행(3·27) 은 "코드 자체는 불변식을 지키고 있으나 이를 강제하는
+자동 테스트가 없거나 부분적"이라는 의미의 미확인. FAIL 0건.
+
+========================================================================
+5. 발견한 문제(고치지 않음 — 위임 범위가 app/·기존 테스트 수정을 금지)
+========================================================================
+(a) 01-plan "지킬 불변식" 절이 "app/briefing/select.py·inputs.py 는 ...을 import하지 않는다
+    (테스트가 모듈 import 목록 단언)"이라고 적었으나, 그런 단언 테스트가 실제로는 없다
+    (tests/test_briefing_select.py·tests/test_briefing_inputs.py grep 결과 0건). 지금은 수동
+    grep 으로만 지켜지고 있어 향후 실수로 import 가 추가돼도 자동으로 잡히지 않는다.
+(b) tests/test_briefing_inputs.py 의 11행 테스트(패턴 재계산)는 사건이 삭제되지 않았음을
+    "개수"로만 확인하고 raw_utterance/content 값 동일성은 비교하지 않는다. 27행("1·11행
+    전후 동일")의 11행 쪽은 완전히 덮이지 않는다 — run.py 쪽 테스트(1행 해당)로만 raw_utterance
+    동일성이 실제로 확인된다.
+(c) 01-plan 127행(판정 표 30행 기대값)이 "≥1627"로 남아 있다 — U1~U7 를 거치며 1719 까지
+    늘었고 이 문서 자체를 U8 이 고치라는 지시는 없었다(01-plan 체크박스·표는 건드리지 않기로
+    위임 프롬프트에 명시). 실제 기준은 이 위임 프롬프트의 "≥1719"이고 그대로 PASS.
