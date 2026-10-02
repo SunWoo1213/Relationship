@@ -668,3 +668,98 @@ def test_run_turn_no_counseling_reply_for_emotional_utterance(db_session, fake_e
     assert result.reply == "이번 발화에서는 새로 기억한 것이 없어요."
     for banned in ("힘드셨", "위로", "괜찮", "공감", "힘내", "그랬구나"):
         assert banned not in result.reply
+
+
+# ---------------------------------------------------------------------------
+# FIX-016 -- 사실만 저장한 턴의 응답 문장
+# ---------------------------------------------------------------------------
+
+
+def test_run_turn_fact_only_reply_counts_facts(db_session, fake_embedder):
+    """FIX-016 -- 이벤트 없이 `update_person(facts=…)` 만 성공한 턴이
+    "새로 기억한 것이 없어요" 라고 답하지 않고 사실 건수를 말한다."""
+
+    session_id = "loop-fix016-fact-only"
+    person = _make_person(db_session, display_name="김민수")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+
+    utterance = "팀장은 주말마다 등산 다녀"
+    calls = [
+        {
+            "name": "update_person",
+            "args": {"person": "팀장", "facts": [{"key": "hobby", "value": "등산"}]},
+        }
+    ]
+
+    result = run_turn(
+        ctx,
+        utterance,
+        proposer=FakeProposer(table={utterance: calls}),
+        judge=FakeJudge(table={person.id: 0.95}),
+    )
+
+    assert result.pending_question is None
+    assert result.stored.events == 0
+    assert result.reply == "기억했어요: 사실 1건."
+
+
+def test_run_turn_reply_counts_events_and_facts_together(db_session, fake_embedder):
+    """FIX-016 -- 이벤트와 사실이 함께 저장되면 둘 다 문장에 나온다. 같은
+    턴에 같은 키를 두 번 써도 `person_facts` 행은 하나이므로 한 건으로
+    센다(`RecordOutcome.fact_keys_by_person` 중복 제거)."""
+
+    session_id = "loop-fix016-event-and-facts"
+    person = _make_person(db_session, display_name="김민수")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+    ctx = _ctx(db_session, session_id=session_id, embedder=fake_embedder)
+
+    utterance = "어제 팀장이랑 저녁 먹었는데 고수를 싫어하고 등산을 좋아한대"
+    calls = [
+        {
+            "name": "add_event",
+            "args": {
+                "person": "팀장",
+                "type": "meal",
+                "content": "저녁",
+                "occurred_at": NOW.isoformat(),
+            },
+        },
+        {
+            "name": "update_person",
+            "args": {
+                "person": "팀장",
+                "facts": [
+                    {"key": "dislikes", "value": "고수"},
+                    {"key": "hobby", "value": "등산"},
+                ],
+            },
+        },
+        {
+            "name": "update_person",
+            "args": {"person": "팀장", "facts": [{"key": "hobby", "value": "주말 등산"}]},
+        },
+    ]
+
+    result = run_turn(
+        ctx,
+        utterance,
+        proposer=FakeProposer(table={utterance: calls}),
+        judge=FakeJudge(table={person.id: 0.95}),
+    )
+
+    assert result.pending_question is None
+    assert result.reply == "기억했어요: 이벤트 1건, 사실 2건."
+
+
+def test_build_reply_without_facts_is_unchanged():
+    """FIX-016 -- `stored_facts` 를 넘기지 않거나 0 이면 기존 문장 그대로다
+    (원칙7 부정 테스트의 고정 문장이 바뀌지 않는다)."""
+
+    from app.agent.respond import build_reply
+
+    assert build_reply(stored_events=0, stored_schedules=0) == "이번 발화에서는 새로 기억한 것이 없어요."
+    assert build_reply(stored_events=0, stored_schedules=0, stored_facts=0) == (
+        "이번 발화에서는 새로 기억한 것이 없어요."
+    )
+    assert build_reply(stored_events=1, stored_schedules=1) == "기억했어요: 이벤트 1건, 일정 1건."

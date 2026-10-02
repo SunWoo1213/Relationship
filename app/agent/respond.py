@@ -15,6 +15,10 @@
 
 - `stored_events`/`stored_schedules`: 그 턴에 실제로 `add_event`/
   `add_schedule` 이 성공한 건수(기록 단계, U5 `loop.py`).
+- `stored_facts`(FIX-016): 그 턴에 실행에 성공한 `update_person(facts=…)`
+  의 키 수(인물별 중복 제거, `RecordOutcome.fact_keys_by_person`). 사실만
+  저장한 턴이 "새로 기억한 것이 없어요" 라고 답하던 것을 막는다. 키·값
+  문자열은 받지 않고 건수만 받는다(결정 B(i) 규약 유지).
 - `failed_count`: 게이트를 통과했지만 실행 중 `ToolError` 로 끝난 제안 수
   (R-24, `loop_record.output.failed`).
 - `limit_hit`: 게이트 상한 초과로 일부 제안이 버려졌는가(결정 A(i)).
@@ -36,6 +40,7 @@ def build_reply(
     *,
     stored_events: int,
     stored_schedules: int,
+    stored_facts: int = 0,
     failed_count: int = 0,
     limit_hit: bool = False,
     pending_question: PendingQuestionOut | None = None,
@@ -51,6 +56,8 @@ def build_reply(
         parts.append(f"이벤트 {stored_events}건")
     if stored_schedules:
         parts.append(f"일정 {stored_schedules}건")
+    if stored_facts:
+        parts.append(f"사실 {stored_facts}건")
 
     if parts:
         sentence = "기억했어요: " + ", ".join(parts) + "."

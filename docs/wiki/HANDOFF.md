@@ -5,9 +5,11 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-09-30 01:15 — **P6-memory 완료 + FIX-015 완료(실 LLM 확인까지). 활성 작업이 없다(`active: none`). origin/dev2 = `26dcd22` — 전부 푸시됨.**
+갱신: 2026-10-02 11:50 — **FIX-016 완료(응답 문구). 활성 작업이 없다(`active: none`).** 커밋·dev2 푸시는 `/commit` 으로 진행(해시는 journal COMMIT 줄).
 
-> **이 세션이 한 일 세 줄**: ① 중단돼 있던 P6-memory 04-review 를 승인하고 [권고] 3건을 닫아 패키지를 종료했다(`94373cc`) ② 거기서 "범위 밖 별건" 으로 넘어온 사실 키 중복을 FIX-015 로 고쳤다(`6e7b286`) ③ 그것이 실제 LLM 에서 동작하는지 왕복으로 확인하고 새 결함 2건을 찾았다(`26dcd22`). **다음 세션은 아래 "바로 다음에 할 것" 1번부터 고르면 된다 — 진행 중인 작업은 없다.**
+> **2026-10-02 세션**: 재개 질문에 사용자가 FIX-016 을 골랐다. 사실만 저장한 턴이 "새로 기억한 것이 없어요" 라고 답하던 것을 "기억했어요: 사실 N건." 으로 고쳤다 — `build_reply(stored_facts=)` + `RecordOutcome.facts` 속성 + 호출 두 곳. 결정 B(i) "숫자만 입력" 유지, API 스키마 불변. **1627 passed skip 0**(1624+3) · tools_check 7/7 · 수정 전 코드로 새 테스트 3 failed 확인. 상세 `fixes/FIX-016.md`.
+>
+> **2026-09-30 세션**: ① P6-memory 종료(`94373cc`) ② 사실 키 중복을 FIX-015 로(`6e7b286`) ③ 실 LLM 왕복 확인 + 새 결함 2건 발견(`26dcd22`) — 그중 응답 문구가 FIX-016 이다.
 
 **무엇이 돌아가게 됐나(P6-memory)**: 대화 턴마다 ① 같은 인물의 같은 종류 사건이 기본 365일 안에 3회 이상이면 `pattern:{type}` 사실이 규칙으로 생기고(LLM 0회), ② 미승격 이벤트가 5건 쌓이면 LLM 이 인물 사실로 승격하며, ③ 만들어진 사실은 전부 `fact_sources` 로 근거 원문에 이어진다. 커밋 U1 `7564c5d`·U2 `d67d084`·U3 `51b4d65`·U4 `48e3617`·U5 `b209581`·U6 `8d3967a`·U7 `93c6d3f`·U8 `4916db3`, 종료 `94373cc`. R8·R11 구현완료. 04-review FAIL 0/WARN 0, 전체 1622 passed skip 0. 상세는 `packages/P6-memory/04-review.md`, 이력은 journal 2026-09-29.
 
@@ -18,14 +20,14 @@
 active: **none** | frozen: none | 브랜치 `dev2`(작업·실험) | main = `1e4afb4` · origin/dev = `e48ac4c` · **origin/dev2 = `26dcd22`(최신, 여기서 작업)** | Docker DB `capstone2-postgres-1`(5433): 개발 DB `relationship`, 테스트 DB `relationship_test` — 5432·5434 는 다른 프로젝트
 
 ## 커밋 안 된 변경
-- **`journal.md` 2줄뿐이다** — 훅이 `26dcd22` 커밋·푸시 직후 자동으로 적은 COMMIT·PUSH 줄. 이 저장소의 관례대로 다음 커밋에 그냥 실린다(해시는 커밋 뒤에야 알 수 있어 늘 한 박자 늦다). **따로 처리할 일이 아니다.**
-- 그 밖에는 없다. 제품 코드·문서 전부 `26dcd22` 에 들어가 origin/dev2 까지 올라갔다.
+- FIX-016 커밋 전이면: `app/agent/respond.py`·`app/agent/loop.py`·`tests/test_agent_loop.py`·`docs/wiki/fixes/FIX-016.md`·`fixes/evidence/FIX-016/`·`CURRENT.md`·`journal.md`·이 파일. 전부 한 커밋으로 묶는다(`/commit`, Refs `FIX-016 P5-loop P6-memory S3.2 원칙7 원칙9`).
+- journal 의 COMMIT·PUSH 줄은 훅이 커밋 뒤에 적으므로 늘 한 박자 늦게 다음 커밋에 실린다 — 따로 처리할 일이 아니다.
 
 ## 바로 다음에 할 것
-**진행 중인 작업이 없으므로 아래에서 고르면 된다.** 사용자에게 물은 마지막 질문이 "① 응답 문구 FIX / ② dev 승격 / ③ P6-briefing 착수 중 어디로 갈까요" 였고 **답을 받지 못한 채 세션이 끝났다** — 다음 세션은 이것부터 다시 묻는다.
+**진행 중인 작업이 없다.** FIX-016 커밋 뒤 아래에서 고른다.
 
-1. **[권장] FIX-016 응답 문구** — 사실만 저장된 턴이 "이번 발화에서는 새로 기억한 것이 없어요" 라고 답한다. FIX-015 실 확인에서 **세 턴 모두** 그랬다(사실 4건을 쓰고도). 원인은 `app/agent/respond.py::build_reply` 가 `stored_events`·`stored_schedules` 두 숫자만 받고 **사실 건수를 아예 받지 않는** 것이다(P5-loop 결정 B(i)). 사용자에게 "기억 안 했다" 고 해 놓고 인물 카드에는 사실이 쌓이므로 신뢰를 깎는다. 고치는 법: `RecordOutcome` 에서 사실 건수를 세어(U7 이 이미 `fact_keys_by_person` 을 모은다) `build_reply` 에 넘기고 "사실 N건" 을 문장에 더한다 — 결정 B(i)의 "숫자·불리언만 입력" 규약은 그대로 지켜진다. **FIX-015 와 같은 절차**(카드 → 승인 → 구현 → 검증 → 커밋)로 하면 되고, 크기도 비슷하다.
-2. **`dev` 승격 검토** — dev2 의 P6-memory + FIX-015 커밋을 `git push origin dev2:dev` 로 올린다. **승인 마커(`approve-commit.sh --push`) 가 먼저**이고, 푸시 뒤에는 L-003 대로 멈춰 사용자 결정을 기다린다. 승격 근거는 pytest·게이트다(P9 미착수라 실서버 배포는 아직 없다 — 2026-09-15·09-23 과 같은 판단).
+1. ~~FIX-016 응답 문구~~ — **완료(2026-10-02)**.
+2. **`dev` 승격 검토** — dev2 의 P6-memory + FIX-015 + FIX-016 커밋을 `git push origin dev2:dev` 로 올린다. **승인 마커(`approve-commit.sh --push`) 가 먼저**이고, 푸시 뒤에는 L-003 대로 멈춰 사용자 결정을 기다린다. 승격 근거는 pytest·게이트다(P9 미착수라 실서버 배포는 아직 없다 — 2026-09-15·09-23 과 같은 판단).
 3. **`P6-briefing` 착수** — 패턴 문장화 · 브리핑 직전 패턴 재계산(`detect_patterns` 는 순수 SQL 이라 다시 불러도 된다). `/devlog start P6-briefing` → architect 01-plan → verifier 02-plan-verify → 승인. **단, 아래 "추출 품질" 이 열린 채로 들어가게 된다** — `likes`/`dislikes` 혼동은 브리핑이 정반대 제안을 내게 하므로, 착수 전에 `build_extract_prompt()` 의 키 설명을 한 번 볼지 정하는 게 좋다.
 4. 그 밖 FIX 후보 3건(아래 "열린 질문"): `/health` 빈 DB · `update_person` 부분 반영 · `memory_promote` `source` 키 비대칭(코드 한 줄, 문서는 이미 고쳤다).
 5. 그 뒤 패키지 순서: P6-briefing → P8 인물 카드 → P9 AWS(Terraform).

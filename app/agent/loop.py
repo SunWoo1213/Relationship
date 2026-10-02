@@ -711,6 +711,13 @@ class RecordOutcome:
     event_ids_by_person: dict[int, list[int]] = field(default_factory=dict)
     fact_keys_by_person: dict[int, list[str]] = field(default_factory=dict)
 
+    @property
+    def facts(self) -> int:
+        """FIX-016 -- 이번 턴에 직접 쓴 사실 수(인물별 중복 제거한 키 수 =
+        `person_facts` 에 쓰인 행 수). 응답 문장(`build_reply`)에만 쓴다."""
+
+        return sum(len(keys) for keys in self.fact_keys_by_person.values())
+
     def to_dict(self) -> dict[str, Any]:
         return {"executed": list(self.executed), "failed": list(self.failed)}
 
@@ -1099,6 +1106,7 @@ def run_turn(
     reply = build_reply(
         stored_events=record.events,
         stored_schedules=record.schedules,
+        stored_facts=record.facts,
         failed_count=len(record.failed),
         limit_hit=verdict.stop_reason == "limit",
         pending_question=pending_question,
@@ -1431,6 +1439,7 @@ def resume_turn(
     reply = build_reply(
         stored_events=record.events,
         stored_schedules=record.schedules + schedules_direct,
+        stored_facts=record.facts,
         failed_count=len(record.failed),
         limit_hit=False,
         pending_question=pending_question,
