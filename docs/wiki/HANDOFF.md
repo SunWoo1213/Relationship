@@ -5,51 +5,36 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-05 20:00 (U4 완료 — R-6 assert→명시적 if 보완 포함, 전체 1802 passed skip 0, 이 커밋으로 기록. 03-log U4 `pending` 치환은 다음 커밋에. U4 커밋 `8e9af9e`(푸시됨). **FIX-018 완료 `7bc2e60`** — dev2 첫 CI `success`(1802 passed, run 37299302544). 워크플로 푸시엔 토큰 `workflow` scope 필요(사용자가 추가함). 결과 기록은 다음 커밋에. **FIX-019 완료(이 커밋, 1804 passed skip 0, 수정 전 재현 FAILED 확인)**. 다음 **FIX-020(UNIQUE 3개+ON CONFLICT, 계획 승인됨 `fixes/FIX-020.md`, 미커밋)** backend-agent → 개발 DB 는 사용자가 `alembic upgrade head`. 그 다음 **`gh run list --branch dev2` 로 첫 dev2 CI 결과 확인**, 결과를 FIX-018 결과 절에 덧붙임 → 동시성 FIX 계획 → U5. 끊겼으면 `git status` 로 U4 산출물 확인 후 테스트 재실행부터) · 이전: 2026-10-05 14:20 — **P7-push 계획 승인됨(사용자 2026-10-05), `active: P7-push`.** 승인 기록 커밋(02-plan-verify 승인 줄·CURRENT·03-log·journal START) 후 **U1 위임 승인 질문**이 다음이다. P6-briefing 완료(`f9500fe`, dev 승격됨) · FIX-017 완료(`608694b`).
+갱신: 2026-10-05 20:20 — **세션 종료 지점(사용자 "다른 세션에서 이어서" 지시).** 진행 중인 작업 없음. 마지막 커밋 `4912865`(FIX-019, dev2 푸시됨 — 그 CI run `37301747971` 은 종료 시점에 in_progress, **다음 세션 첫 확인**).
 
-> **2026-10-02 세션 한 일**: ① FIX-016 응답 문구(`36c288e`) ② dev 승격(`36c288e`, main 은 보류) ③ **P6-briefing 전체** — 계획 `688c4a4` → U1 `e2155f9` · U2 `db3c645` · U3 `cfb55ea` · U4 `a2f032d` · U5 `e037728` · U6 `8589e37` · U7 `a67692e` · U8 `e2cca80` → 완료. 전체 **1721 passed skip 0**, R12(절반)·R19 구현완료.
+active: **P7-push**(U1~U4 완료, U5~U8 남음) | frozen: none | 브랜치 `dev2` | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 포트폴리오 README — 그대로) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1804 passed skip 0**
 
-**무엇이 돌아가게 됐나(P6-briefing)**: 서버를 `BRIEFING_SCHEDULER_ENABLED=1` 로 띄우면 1분마다 24시간 안·미브리핑 일정을 골라(지난 일정 제외) 패턴을 다시 계산하고, LLM 이 패턴 문장·요약 줄·한 줄 제안을 쓰고, 코드 검증기가 근거 없는 줄·감정/상담 표현·틀린 패턴 횟수를 버린 뒤 `briefed_at` 을 남긴다. LLM 이 실패하면 제안 없는 템플릿. `POST /briefings/run` 은 같은 함수(본문 없음 = 주기 작업과 동일, `schedule_id` = 그 일정 즉시 재생성). 사용법 `docs/RUNNING.md` "브리핑" 절. **U4~U7 은 단위마다 실 OpenAI·실서버로도 확인했다**(사용자 요청 — evidence `*-real-*.txt`).
-
-active: **P7-push** | frozen: none | 브랜치 `dev2` | origin/dev = `f9500fe` · **origin/main = `f05d017`(사용자가 직접 올린 포트폴리오용 README — 그대로 둔다)** | Docker DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test`
+> **2026-10-05 세션 한 일**: P7 계획 승인 `a69af80` → U1 `85393e0`(pywebpush·VAPID 설정) · U2 `6c98516`(구독 저장 API) · U3 `f256259`(알림 본문, 원문 미포함) · U4 `8e9af9e`(발송기·알림기, R-6 assert→명시적 if) · FIX 후보 기록 `47adb1e` · **FIX-018** `7bc2e60`(dev2 에도 CI — dev2 첫 CI success) · **FIX-019** `4912865`(answer_question 행 잠금, 수정 전 재현 FAILED 확인). 저장소 밖: 복기·면접 자료 01~16 + PDF.
 
 ## 커밋 안 된 변경
-- 없음(U1 `85393e0` 커밋·dev2 푸시 후 HANDOFF·journal 자동 줄만).
+- 없음 — 세션 종료 기록 커밋에 `fixes/FIX-020.md`(계획·승인, 구현 전)·이 HANDOFF·journal 을 넣었다(다른 기기에서도 이어가도록).
 
-## 바로 다음에 할 것
-- **복기·면접 자료(저장소 밖, 커밋 금지)**: `~/Desktop/Portfolio/wiki/interview/relationship/` 01~16 + PDF. 작업 단위·패키지·FIX 가 끝날 때마다 영향받는 파일을 고치고 그 README "갱신 기록" 한 줄 → `python3 양식/도구/interview_pdf.py relationship`(Portfolio 에서). 규칙은 Portfolio `CLAUDE.md` 6절. **P7 완료 시 `08-웹푸시.md` 갱신 필수.**
-0. **[진행 중] P7-push U4 발송기·알림기** — U3 푸시 본문 작성기 완료(전체 1783 passed skip 0, 커밋 직후 03-log U3 `pending` 치환은 다음 커밋에). U4 사용자 위임 승인 → backend-agent 실행. 돌아오면 판정 12·14~21행·R-2(픽스처 부정 확인)·R-6·R-8 을 직접 재확인 → 자세한 설명과 `/commit` → U5(두 경로 연결) 승인. U2 완료 `6c98516`(dev2 푸시, 전체 1771 passed skip 0). 03-log U2 항목 `pending` → `6c98516` 치환은 다음 커밋에. **커밋 승인 질문 때도 요약이 아니라 예시·요청/응답·이유를 담은 자세한 설명을 먼저 준다**(U2 에서 사용자가 "자세하게 알려주세요" 로 되물음). U1 완료 `85393e0`(dev2 푸시) — 전체 1756 passed skip 0, `pywebpush==2.5.0`, 상수 10초/1일/120자(U1 이 고름). 03-log U1 항목 `pending` → `85393e0` 치환은 다음 커밋에. 계획 상태(참고):
-   - 01-plan: architect 초안, U1~U8, 판정 표 26행(1~25 자동, 26 = 사용자가 Chrome 에서 알림 수신 — 증거 5종 `evidence/*-u8-chrome-manual.txt`). 결정 A~G **사용자 확정 = 전부 권장안**(01-plan "확정" 줄): A 확인 전용 `/push-dev/` 정적 페이지(`PUSH_DEV_PAGE_ENABLED` 기본 꺼짐) · B 알림 = 인물 이름·일정 제목 + 시각·제안 한 줄(요약 줄·패턴 제외 — 원문 노출 차단) · C 발송 실패는 상태 문자열만, `briefed_at` 항상 기록 · D `pywebpush` 하나 버전 고정, VAPID 키는 사용자가 만들어 `.env`(값 출력 금지), 키 없으면 `NullNotifier` · E 404/410 구독 행 ORM 삭제 + trace 에 id 만 · F `GET /push/vapid-public-key`·`POST /push/subscriptions`, trace `tool_name="push"` step `push_send` · G 테스트는 `FakePushSender` 만.
-   - 02-plan-verify: verifier(fable) **`결과: 통과`**, 점검표 8/8, [필수] 0, verify-plan 2차 **FAIL 0 / WARN 0**(`evidence/20261002-2123-verify-plan-2.txt`). 원칙5 와 확인 페이지는 양립(해석, CR 불필요 — 단 "제품 자료 미조회·기본 꺼짐·운영 미사용" 세 조건을 04-review 에서 증거로). 권고 **R-1~R-10** 은 구현 단위에서 반영(02-plan-verify §3 — 특히 R-2 `pywebpush` import 시점, R-6 일정 소유 단언, R-8 예외 메시지에 endpoint 섞임 방지).
-   - 승인 완료(2026-10-05). 단위마다 **무엇을 하는지 자세히 설명한 뒤** 위임 승인을 받는다.
-   - U8 전 사용자 몫: VAPID 키 생성해 `.env` 에 넣기, macOS 알림 권한·집중 모드 확인, Chrome 에서 `/push-dev/` 로 구독.
-1. ~~dev 승격~~(`f9500fe`) · ~~FIX-017 likes/dislikes~~(완료 — `fixes/FIX-017.md`; 교훈: 프롬프트 금지형 "절대 넣지 않는다" 는 사실 자체를 버리게 한다, 안내형으로). main 승격은 README 갈라짐 때문에 할 때 사용자에게 README 를 어느 쪽으로 둘지 묻는다.
-3. P8(인물 카드·프론트 3화면) — frontend-agent 가 아직 없다. `/push-dev/` 의 구독 처리를 PWA 로 옮기는 일이 P8 몫.
-4. **복기 자료 작성 중 드러난 FIX 후보(2026-10-05, 메인 세션 grep 확인)**: `app/tools/questions.py::answer_question` 에 행 잠금 없음(동시 두 답 통과 가능) · `app/db/models.py` 에 PK 외 UNIQUE 제약 0개(사실·별칭·구독 upsert 경쟁) · `app/er/judge.py` 4행 docstring "어떤 공급자의 API 도 로그 확률을 제공하지 않는다" 는 과일반화(OpenAI logprobs 있음 — "Claude API 기준" 으로) · 작업 메모리("최근 N턴") 미구현(S3.5 와 불일치 — FIX/CR 판단 필요) · 임베딩을 건너뛰면 `s_emb=0` 이 관측값처럼 합산됨(규칙 결측만 재정규화 — D12 와 비대칭, 안전 방향이나 문서 없음) · `search_person` 의 질의 임베딩 예외 처리 경로 미확인 · `.env.example` 의 `EMBEDDING_PROVIDER`·`EMBEDDING_MODEL`·`APP_ENV` 를 읽는 코드 없음 · 인물 분리(오병합 되돌리기) 기능이 툴·backlog 어디에도 없음. 루프 인식 단계 `loop_extract` trace 토큰이 0 으로 남는 것으로 보임(`Proposal` 에 `trace_tokens()` 없음 — 원칙9, 미실측) · `_upsert_fact` 는 `one_or_none()` 이라 같은 키 중복 행이면 예외 · 지난 일정 제외(결정 B) 때문에 서버가 꺼진 동안 지난 약속은 영영 브리핑 안 됨. 하네스: `session-start.sh` 53행이 아직 "dev 에서만 작업"(지금은 dev2) 이라고 출력 · commit SKILL "첫 커밋" 절에도 같은 낡은 dev 문구.
-5. **관측성 도구 검토(2026-10-05, 사용자 질문에 메인 세션 의견 — 결정 아님)**: Langfuse·Jaeger 지금 미도입 권고(① `agent_traces` 가 근거 추적 + 메모리 승격 상태를 겸해 DB 안에 있어야 함 ② 원문 발화가 개인 데이터라 외부 전송 불가, 셀프호스팅은 v3 구성이 무거움 ③ 단일 프로세스라 분산 트레이싱 이득 작음). 대신 FIX 후보: `loop_extract` 토큰 0 수정 · trace 에 `latency_ms`·`prompt_version`(프롬프트 해시) · 비용 집계 쿼리. Langfuse 는 P10 에서 로컬 셀프호스팅·평가 데이터 한정 내보내기로 재검토. 사용자가 원하면 D 카드 후보로 기록.
-6. **테스트 방식 점검 — 사용자가 "차례대로 진행" 지시(2026-10-05)**. 순서: U4 커밋 → **FIX-018(CI dev2, 계획 승인됨 `fixes/FIX-018.md`)** → ② 동시성 재현 테스트+수정(FIX 2건, 계획 먼저) → ③ ruff(DTZ)·커버리지 → ⑤ Python 버전·Windows·훅 자가점검 CI → ④ live 스모크·프롬프트 회귀(P10 과 함께) → 나머지. 항목마다 계획 승인 후 진행. 항목: 우선순위 순 ① CI 가 `main`·`dev` 푸시에만 돈다 — 실제 작업 브랜치 `dev2` 는 CI 0회(`.github/workflows/tests.yml` on.push.branches) ② 동시성 테스트가 `SKIP LOCKED` 1건뿐 — `answer_question` 이중 답·UNIQUE 없는 upsert 경쟁은 알려진 결함인데 재현 테스트 없음 ③ 정적 검사 없음(ruff·mypy) — FIX-005 naive datetime·FIX-007 bool⊂int 류를 기계가 잡을 수 있었음 ④ 실 공급자 계약 검증이 수동 1회·OpenAI 만(Anthropic·Gemini 실호출 0), 프롬프트 변경 회귀 세트 없음 ⑤ CI Python 3.13 vs 로컬 3.14, Windows·훅 자가점검(`test-guards.sh`) CI 미포함 ⑥ 커버리지 측정 없음 ⑦ 세이브포인트 격리라 커밋 경계 버그가 숨음 ⑧ 마이그레이션 down/up 미검증 ⑨ 순수 함수 속성 기반 테스트 없음.
-7. 그 밖 FIX 후보: `/health` 빈 DB 를 ok · `update_person` 부분 반영 · `memory_promote` `source` 키 비대칭 · 주기 작업 루프 수준 실패가 trace 없이 로그로만(P9 전) · 루프가 잠근 일정을 수동 지정하면 404(낮음).
+## 바로 다음에 할 것 (순서대로)
+0. **확인**: `gh run list --branch dev2 --limit 2` — FIX-019 커밋의 CI 결과(동시성 테스트가 Linux 에서도 통과하는지). 실패면 그것부터.
+1. **FIX-020 · UNIQUE 제약 3개 + ON CONFLICT**(계획 **승인됨** — `fixes/FIX-020.md`, 사용자가 CR 아닌 FIX 로 판단). 대상: `person_facts(person_id,key)` · `person_aliases(person_id,alias)` · `push_subscriptions(user_id,endpoint)`. 순서: 재현 테스트(수정 전 FAILED) → models + Alembic `0002`(중복 있으면 멈춤, down/up 왕복) → 세 upsert 를 `INSERT … ON CONFLICT` → S3.1 카드 보충 한 줄. backend-agent 위임 전 **L-004 승인 질문**. 개발 DB 중복 0건 확인됨(2026-10-05). 끝나면 **사용자에게 개발 DB `alembic upgrade head` 요청**.
+2. **테스트 점검 나머지(사용자 "차례대로" 지시, 항목마다 계획→승인)**: ③ ruff(+`DTZ`)·커버리지 리포트(기존 위반은 기준선, 새 위반만 막기) → ⑤ CI Python 3.13↔로컬 3.14 정렬·Windows job·`test-guards.sh` CI → ⑦ 커밋 경계 통합 테스트(`/chat`·브리핑 실제 커밋) → ⑧ 마이그레이션 down/up(FIX-020 에서 일부) → ⑨ 순수 함수 속성 기반 테스트 → ④ live 스모크(`@pytest.mark.live`, 기본 꺼짐)·프롬프트 회귀 세트(P10 과 함께).
+3. **P7-push U5~U8**: U5 두 경로 연결(`deps.get_notifier`·`scheduler.default_run_once` → `notifier_from_env`, R-1 같은 세션) → U6 `/push-dev/` 확인 페이지 → U7 판정 1~25행·RUNNING.md·registry → U8 Chrome 실발송(사용자: VAPID 키 생성 `.env`, macOS 알림 권한). 그 뒤 verifier 04-review. **P7 완료 시 복기 자료 `08-웹푸시.md` 갱신 필수.**
+4. 사용자 질문에 답한 의견(결정 아님): Langfuse·Jaeger 지금 미도입 — 대신 `loop_extract` 토큰 0 수정·trace `latency_ms`·`prompt_version`·비용 집계(FIX 후보). 원하면 D 카드로.
 
-## 다음 패키지가 알아야 할 것 (P6-briefing 04-review §6·§7)
-- **P7-push**: `Notifier` 자리에 `WebPushNotifier` 를 끼운다(`app/briefing/types.py`, 호출 자리 `app/briefing/run.py` 217~218행). 원문 노출·실패 시 `briefed_at` 은 위 0번의 결정 B·C 로 정해졌다(아직 승인 전).
-- **P8**: 브리핑 조회는 `briefing_compose` trace 에서(스키마에 브리핑 테이블 없음, 결정 H). 사용자 귀속은 `output.person_id → persons.user_id`. 응답 `run_id` = trace `session_id`.
-- **P10**: 패턴 "문장화" 가 규칙 값 복사("3회 (날짜…)")에 그침(실 LLM 5회 중 4회), 요약 줄 반말. 금지 표현 목록(14개)은 보조 방어 — 목록 밖 "슬퍼하… 다독여" 는 통과(verifier 실증).
-- 운영: 스위치는 프로세스 하나에서만 켠다(워커 여럿이면 루프도 여럿 — `SKIP LOCKED` 로 중복 브리핑은 막힘). 서버를 켜 둔 채 두면 매분 돈다(대상 없으면 LLM 0회).
-- P6-memory 인계는 그대로 유효: `person_facts` 세 출처(브리핑은 `pattern:*`+9키만 쓰고 옛 자유 키는 제외), trace 를 지우면 승격이 다시 돈다.
+## FIX 후보 (복기 자료 작성·점검 중 코드로 확인, 미착수)
+- `app/er/judge.py` 4행 docstring 과일반화(OpenAI 는 logprobs 있음 → "Claude API 기준") · 작업 메모리("최근 N턴") 미구현 — S3.5 와 불일치(FIX/CR 판단) · 임베딩 건너뛰면 `s_emb=0` 이 관측값처럼 합산(D12 와 비대칭) · `search_person` 질의 임베딩 예외 경로 미확인 · `.env.example` 의 `EMBEDDING_PROVIDER`·`EMBEDDING_MODEL`·`APP_ENV` 읽는 코드 없음 · 인물 분리(오병합 되돌리기) 기능 없음 · `loop_extract` trace 토큰 0(미실측) · 지난 일정 제외로 서버 꺼진 동안 지난 약속은 브리핑 안 됨 · `temperature=0` 은 Gemini 경로 4곳뿐(OpenAI·Claude 기본값).
+- 하네스: `session-start.sh` 53행 "dev 에서만 작업" 낡은 문구(지금 dev2) · commit SKILL "첫 커밋" 절 같은 문구.
+- 이전부터: `/health` 빈 DB 를 ok · `update_person` 부분 반영 · `memory_promote` `source` 키 비대칭 · 주기 작업 루프 수준 실패가 로그로만 · 루프가 잠근 일정 수동 지정 시 404.
 
-## 사용자 몫 (알려 둔 것)
-- 브랜치: `dev2` 작업 → `dev` 검증(`dev2:dev`, L-003 대기) → `main` 배포. 다른 기기는 `git checkout dev2 && git pull --ff-only`.
-- **[미확인] Windows 기기에서 훅·검증 스크립트 확인**(`test-guards.sh` 실패 0, `verify-impl.sh` pytest 통과, `_py.sh` 가 `python` 선택, venv `.venv/Scripts/python.exe`, 커밋 마커 자동 삭제).
-- 환경 파일 15행 공백 값 정리 · 빈 DB `relationship_test_fix006_evidence` 정리 · GitHub main 브랜치 보호 규칙.
+## 저장소 밖 — 복기·면접 자료(커밋 금지)
+- `~/Desktop/Portfolio/wiki/interview/relationship/` 01~16 + `Relationship-복기자료.pdf`(311쪽). 규칙: Portfolio `CLAUDE.md` 6절 — 패키지·FIX 가 끝나면 영향 파일 갱신 → 그 README "갱신 기록" 한 줄 → Portfolio 에서 `python3 양식/도구/interview_pdf.py relationship`. FIX-018·019·U3·U4 는 **아직 자료에 반영 안 함**(다음 갱신 때 `08`·`11`·`13`·`14`·`16`).
 
-## 열린 질문 · 보류
-- 환경 파일은 코드가 읽지 않는다(셸 `set -a; . ./.env; set +a`) — P9 에서 재검토(C-8).
-- FIX-014(후보): Bash 편집은 `stage-gate`·`secret-guard` 를 지나간다 — 운용 규칙(Write/Edit 만)으로 막아 둠.
-- 하네스 부채: `verify-impl.sh` 5번이 `## 2.` 아래 `###` 하위 절 표까지 수용 기준으로 읽음(awk 종료 조건 `^##+ `, 04-review §6-11) · verify-plan 토큰 스캔 오탐 · findings.py 빈 표 중복.
-- P9 전: 다중 사용자 격리 부채(F-fbaaae). 개발 DB 확인용 행(`brief-u5-check` 인물 2·일정 4 포함)은 지우지 않는다. `.claude/.commit-approved` 에 옛 마커가 남아 있었으나 이후 커밋이 덮어써 소비됨.
+## 사용자 몫
+- 브랜치: `dev2` 작업 → `dev` 검증(`dev2:dev`, L-003) → `main`. 다른 기기: `git checkout dev2 && git pull --ff-only`. **워크플로 파일을 바꾸는 푸시는 gh 토큰 `workflow` scope 필요(2026-10-05 추가함).**
+- [미확인] Windows 에서 훅·검증 스크립트 확인 · 환경 파일 15행 공백 · 빈 DB `relationship_test_fix006_evidence` 정리 · GitHub main 브랜치 보호.
 
 ## 주의
-- **언어: 전부 한국어.** 결과는 예시와 쉬운 말로 먼저 설명하고 승인을 묻는다. **사용자는 단위마다 무엇을 하는지 자세한 설명을 듣고 승인하길 원한다.**
-- 위임은 묻고 시작(L-004). 서브에이전트 보고는 테스트 재실행·grep 으로 재확인(이번 세션에서 U5 DB 오류 처리·U8 빠진 테스트를 이렇게 잡았다).
-- 실서버: `set -a; . ./.env; set +a; export POSTGRES_PORT=5433 APP_USER_ID=<확인용>; .venv/bin/uvicorn app.main:create_app --factory --port 8765` — 끝나면 반드시 `pkill -f "uvicorn app.main:create_app --factory --port 8765"`. 키 값 출력 금지.
-- **커밋과 푸시는 따로 실행**(FIX-013). **파일 변경은 Write/Edit 툴로만.** `app/` docstring 에 "evaluation" 금지.
+- **언어: 전부 한국어.** 위임·커밋 승인 질문 전에 **예시·요청/응답·이유를 담은 자세한 설명**을 먼저 준다(사용자가 요약만 보고 "자세하게" 되물은 적 있음).
+- 위임은 묻고 시작(L-004). 서브에이전트 보고는 테스트 재실행·grep 으로 재확인(이번 세션: U4 `assert` 문제를 이렇게 잡음). 동시성 테스트는 여러 번 돌려 본다.
+- 하네스·훅 변경은 계획 먼저 보이고 승인(L-004·사용자 지시). **커밋과 푸시는 따로 실행**(FIX-013). **파일 변경은 Write/Edit 툴로만.** `app/` docstring 에 "evaluation" 금지, `app/push/sender.py` 외에 발송 라이브러리 이름 문자열 금지(불변식 grep).
+- 실서버: `set -a; . ./.env; set +a; export POSTGRES_PORT=5433 APP_USER_ID=<확인용>; .venv/bin/uvicorn app.main:create_app --factory --port 8765` — 끝나면 `pkill -f "uvicorn app.main:create_app --factory --port 8765"`. 키 값 출력 금지.
