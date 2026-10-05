@@ -2,8 +2,16 @@ name: tests
 
 on:
   push:
-    branches: [main, dev]
+    # dev2 = 작업·실험 브랜치(L-001 개정 2026-09-29). 커밋이 전부 여기 쌓이므로
+    # CI 도 여기서 돌아야 한다(FIX-018 — 이전엔 dev 승격 때 처음 돌았다).
+    branches: [main, dev, dev2]
   pull_request:
+
+# dev2 는 커밋마다 푸시하므로 같은 브랜치에 연달아 밀면 옛 실행을 취소하고
+# 최신 커밋만 끝까지 돌린다(FIX-018).
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   pytest:
