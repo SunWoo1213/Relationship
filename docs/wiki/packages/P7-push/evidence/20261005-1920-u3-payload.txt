@@ -1,0 +1,66 @@
+=== 1) pytest tests/test_push_payload.py -v ===
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 12 items
+
+tests/test_push_payload.py::test_build_push_payload_includes_time_and_suggestion_only PASSED [  8%]
+tests/test_push_payload.py::test_build_push_payload_never_contains_lines_or_pattern_sentences PASSED [ 16%]
+tests/test_push_payload.py::test_build_push_payload_without_suggestion_uses_fallback_tail PASSED [ 25%]
+tests/test_push_payload.py::test_build_push_payload_body_within_limit_for_realistic_suggestion PASSED [ 33%]
+tests/test_push_payload.py::test_build_push_payload_truncates_body_when_exceeding_limit PASSED [ 41%]
+tests/test_push_payload.py::test_build_push_payload_ttl_clamped_to_range[t+30s-clamped-to-60] PASSED [ 50%]
+tests/test_push_payload.py::test_build_push_payload_ttl_clamped_to_range[t+3h-exact] PASSED [ 58%]
+tests/test_push_payload.py::test_build_push_payload_ttl_clamped_to_range[t+30h-clamped-to-max] PASSED [ 66%]
+tests/test_push_payload.py::test_build_push_payload_time_uses_app_timezone_not_utc PASSED [ 75%]
+tests/test_push_payload.py::test_build_push_payload_time_differs_between_timezones PASSED [ 83%]
+tests/test_push_payload.py::test_build_push_payload_is_pure_same_input_same_output PASSED [ 91%]
+tests/test_push_payload.py::test_build_push_payload_does_not_mutate_composed PASSED [100%]
+
+============================== 12 passed in 0.05s ==============================
+
+=== 2) grep -rln pywebpush app/  (기대: 0건) ===
+(매치 없음 -- 0건)
+
+=== 3) grep -n 'lines|pattern_sentences' app/push/payload.py (읽는 코드가 아니라 docstring 언급만인지 확인) ===
+19:- **`composed.lines`·`composed.pattern_sentences` 를 읽지 않는다**
+81:    `composed.lines`·`composed.pattern_sentences` 는 절대 읽지 않는다."""
+
+=== 4) grep -n evaluation app/push/payload.py (기대: 0건) ===
+(매치 없음 -- 0건)
+
+=== 5) 전체 회귀: POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs (기준선 1771 passed skip 0) ===
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 16%]
+........................................................................ [ 20%]
+........................................................................ [ 24%]
+........................................................................ [ 28%]
+........................................................................ [ 32%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+........................................................................ [ 48%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+........................................................................ [ 92%]
+........................................................................ [ 96%]
+.......................................................                  [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/google/genai/types.py:42
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1783 passed, 1 warning in 16.22s

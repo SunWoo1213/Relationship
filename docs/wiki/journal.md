@@ -397,3 +397,5 @@
 - 2026-10-05 15:03 | PUSH-dev2 | origin dev2 85393e0 (실험 푸시)
 - 2026-10-05 15:20 | COMMIT | 6c98516 feat(P7-push): U2 브라우저 알림 구독을 저장하는 API 를 만든다
 - 2026-10-05 15:20 | PUSH-dev2 | origin dev2 6c98516 (실험 푸시)
+- 2026-10-05 19:16 | COMMIT | 47adb1e docs(P7-push): 복기 자료를 쓰다 찾은 FIX 후보를 HANDOFF 에 모아 둔다
+- 2026-10-05 19:16 | PUSH-dev2 | origin dev2 47adb1e (실험 푸시)
