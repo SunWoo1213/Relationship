@@ -14,10 +14,10 @@
 active: **P7-push** | frozen: none | 브랜치 `dev2` | origin/dev = `f9500fe` · **origin/main = `f05d017`(사용자가 직접 올린 포트폴리오용 README — 그대로 둔다)** | Docker DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test`
 
 ## 커밋 안 된 변경
-- 승인 기록(02-plan-verify 승인 줄 · CURRENT · `packages/P7-push/03-log.md` · journal START · 이 파일) — `/commit` 대기. 커밋되면 이 줄을 지운다.
+- U1 산출물: `requirements.txt`(`pywebpush==2.5.0`) · `app/push/`(신규) · `app/settings.py` · `.env.example` · `tests/test_push_settings.py` · evidence `20261005-1449-u1-skeleton.txt` · 03-log · journal · HANDOFF — `/commit` 대기.
 
 ## 바로 다음에 할 것
-0. **[최우선] P7-push U1 위임 승인 질문**(L-004 — 단위가 무엇을 하는지 자세히 설명한 뒤 `approve-commit.sh --stage backend-agent` → backend-agent). U1 프롬프트에 권고 R-2(`pywebpush` import 시점) 포함. 계획 상태(참고):
+0. **[진행 중] P7-push U1** — backend-agent 구현 끝, 메인 세션 재확인 완료(`test_push_settings` 32 passed · 전체 1756 passed skip 0 · `pip check` 깨짐 없음 · `repr` 에 개인키 `***` · `app/` 안 `pywebpush` 문자열 0건). **`/commit` 승인 대기.** 그다음 U2 구독 저장(위임 승인 먼저). 계획 상태(참고):
    - 01-plan: architect 초안, U1~U8, 판정 표 26행(1~25 자동, 26 = 사용자가 Chrome 에서 알림 수신 — 증거 5종 `evidence/*-u8-chrome-manual.txt`). 결정 A~G **사용자 확정 = 전부 권장안**(01-plan "확정" 줄): A 확인 전용 `/push-dev/` 정적 페이지(`PUSH_DEV_PAGE_ENABLED` 기본 꺼짐) · B 알림 = 인물 이름·일정 제목 + 시각·제안 한 줄(요약 줄·패턴 제외 — 원문 노출 차단) · C 발송 실패는 상태 문자열만, `briefed_at` 항상 기록 · D `pywebpush` 하나 버전 고정, VAPID 키는 사용자가 만들어 `.env`(값 출력 금지), 키 없으면 `NullNotifier` · E 404/410 구독 행 ORM 삭제 + trace 에 id 만 · F `GET /push/vapid-public-key`·`POST /push/subscriptions`, trace `tool_name="push"` step `push_send` · G 테스트는 `FakePushSender` 만.
    - 02-plan-verify: verifier(fable) **`결과: 통과`**, 점검표 8/8, [필수] 0, verify-plan 2차 **FAIL 0 / WARN 0**(`evidence/20261002-2123-verify-plan-2.txt`). 원칙5 와 확인 페이지는 양립(해석, CR 불필요 — 단 "제품 자료 미조회·기본 꺼짐·운영 미사용" 세 조건을 04-review 에서 증거로). 권고 **R-1~R-10** 은 구현 단위에서 반영(02-plan-verify §3 — 특히 R-2 `pywebpush` import 시점, R-6 일정 소유 단언, R-8 예외 메시지에 endpoint 섞임 방지).
    - 승인 완료(2026-10-05). 단위마다 **무엇을 하는지 자세히 설명한 뒤** 위임 승인을 받는다.

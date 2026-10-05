@@ -70,6 +70,27 @@ propose.py` 의 각 모듈 docstring "사용자 시간대" 절 참고). 기본�
 띄울 때 매분 루프가 돌면 안 된다"), `"1"`/`"true"` 는 `True`, 그 밖의
 값은 `_read_positive_int()` 와 같은 관례로 `InvalidValue`(조용히 꺼진
 채로 되돌아가지 않는다 -- 잘못 설정한 줄 모르고 배포하는 것을 막는다).
+
+## PUSH_* (S3.6, P7-push U1)
+
+웹푸시 발송기(U4)가 쓰는 설정값 셋 중 `PUSH_TIMEOUT_SECONDS`·
+`PUSH_TTL_MAX_SECONDS`·`PUSH_BODY_MAX_CHARS` 는 `BRIEFING_*` 와 같은
+이유로 환경변수로 덮지 않는 **코드 상수**다(원칙8 -- 값을 바꾸려면
+코드를 고쳐 재현성을 지킨다). 01-plan 이 구체적인 값을 정하지 않아
+U1 이 합리적인 기본값을 골랐다(근거는 각 상수 docstring):
+`PUSH_TIMEOUT_SECONDS=10.0`(결정 C 리스크 절 "권장 10초"), `PUSH_TTL_
+MAX_SECONDS=86400`(`BRIEFING_LEAD_HOURS`=24h 와 같은 창 -- 브리핑은
+그 창 밖의 일정을 만들지 않으므로 TTL 상한도 그만큼이면 충분하다),
+`PUSH_BODY_MAX_CHARS=120`(시각 표기 + `" · 제안: "` + `BRIEFING_
+SUGGESTION_MAX_CHARS`=80 글자 제안이 거의 안 잘리는 선).
+
+`vapid_config(env=None)`/`push_dev_page_enabled(env=None)` 는 환경변수를
+읽는다(2층, `.env.example` 31~34행 이름 그대로 + `PUSH_DEV_PAGE_ENABLED`
+신규 한 줄). 값(개인키 포함)은 **반환만** 하고 로그·trace 에 쓰지
+않는다 -- 호출자(U4 `notifier_from_env()`)가 책임진다. `VapidConfig`/
+`VAPID_PARTIAL` 타입은 `app/push/types.py`(DB·LLM 미의존)에 둔다 --
+`er_config()` 가 `ERConfig` 를 지연 import 하는 것과 같은 순환 import
+회피 이유다.
 """
 
 from __future__ import annotations
@@ -81,6 +102,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 if TYPE_CHECKING:  # pragma: no cover -- 순환 import 회피, 타입 힌트 전용.
     from app.er.types import ERConfig
+    from app.push.types import VapidConfig, _VapidPartial
 
 DEFAULT_APP_USER_ID = "local"
 
@@ -195,6 +217,25 @@ BRIEFING_INTERVAL_SECONDS = 60
 #: 행동 제안으로 한정"). 검증기(U4)가 이 값을 넘는 제안을 `too_long`
 #: 사유로 거부한다. 코드 상수.
 BRIEFING_SUGGESTION_MAX_CHARS = 80
+
+#: 발송기(U4 `PyWebPushSender`)가 구독 하나에 거는 HTTP 시간 초과(초).
+#: P7-push 01-plan 리스크 절 "권장 10초" -- 1-plan 이 구체값을 정하지
+#: 않아 U1 이 고른 값(모듈 docstring "PUSH_*" 절). `.env.example` 에
+#: 없는 코드 상수(원칙8).
+PUSH_TIMEOUT_SECONDS = 10.0
+
+#: 웹푸시 `ttl` 헤더 상한(초) -- `build_push_payload()`(U3)가 일정까지
+#: 남은 초를 `[60, PUSH_TTL_MAX_SECONDS]` 로 자른다(01-plan 결정, 판정
+#: 표 13행). `BRIEFING_LEAD_HOURS`(24h)와 같은 창 -- 브리핑은 그 창
+#: 밖의 일정을 만들지 않으므로 TTL 상한도 그만큼이면 충분하다(모듈
+#: docstring "PUSH_*" 절). 코드 상수.
+PUSH_TTL_MAX_SECONDS = 86400
+
+#: 푸시 알림 본문의 최대 글자 수 -- `build_push_payload()`(U3)가 이
+#: 값을 넘는 본문을 자른다(01-plan 산출물 절). 시각 표기 + `" · 제안: "`
+#: + `BRIEFING_SUGGESTION_MAX_CHARS`(80자) 제안이 거의 안 잘리는 선으로
+#: U1 이 고른 값(모듈 docstring "PUSH_*" 절). 코드 상수.
+PUSH_BODY_MAX_CHARS = 120
 
 
 class PatternConfig(NamedTuple):
@@ -312,6 +353,63 @@ def briefing_scheduler_enabled(env: dict[str, str] | None = None) -> bool:
         return True
     raise InvalidValue(
         "environment variable 'BRIEFING_SCHEDULER_ENABLED' must be '1' or "
+        f"'true' to enable, or empty to disable (got {raw!r})"
+    )
+
+
+def vapid_config(env: dict[str, str] | None = None) -> "VapidConfig | _VapidPartial | None":
+    """`VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT`(`.env.example`
+    31~34행, S3.6 "VAPID 키는 SSM/환경변수")를 읽는다(결정 D). 세 이름이
+    **모두** 있으면 `VapidConfig`, **전무**하면 `None`, **일부만**
+    있으면 `app.push.types.VAPID_PARTIAL` 싱글톤("반쪽" -- 어느 이름이
+    비었는지는 담지 않는다, security §1)을 돌려준다.
+
+    값(개인키 포함)은 **반환만** 하고 이 함수 자신은 로그·trace 에
+    아무것도 쓰지 않는다 -- 호출자(U4 `notifier_from_env()`)가 그 값을
+    어떻게 쓰는지 책임진다. 앱 기동은 이 함수를 부르지 않는다(결정 D
+    "앱 기동은 막지 않는다 -- 키는 브리핑이 돌 때 지연해서 읽는다").
+
+    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/`pattern_
+    config()` 와 같은 규약). `.env` 파일 자체는 읽지 않는다(security.md
+    §1).
+    """
+    from app.push.types import VAPID_PARTIAL, VapidConfig  # 지연 import -- 순환 import 회피.
+
+    if env is None:
+        env = dict(os.environ)
+    public_key = env.get("VAPID_PUBLIC_KEY") or ""
+    private_key = env.get("VAPID_PRIVATE_KEY") or ""
+    subject = env.get("VAPID_SUBJECT") or ""
+
+    present = sum(1 for value in (public_key, private_key, subject) if value)
+    if present == 0:
+        return None
+    if present < 3:
+        return VAPID_PARTIAL
+    return VapidConfig(public_key=public_key, private_key=private_key, subject=subject)
+
+
+def push_dev_page_enabled(env: dict[str, str] | None = None) -> bool:
+    """`PUSH_DEV_PAGE_ENABLED` 환경변수를 읽는다(결정 A, P7-push U1).
+    비었거나 없으면 `False`(기본 꺼짐 -- `/push-dev/` 경로 자체가
+    등록되지 않는다, U6 판정 22행). `"1"` 또는 `"true"` 만 `True` 다.
+    그 밖의 값은 `briefing_scheduler_enabled()` 와 같은 관례로
+    `InvalidValue`(조용히 꺼진 채로 되돌아가지 않는다, 원칙8).
+
+    `env` 를 생략하면 `os.environ` 을 읽는다. `.env` 파일 자체는 읽지
+    않는다(security.md §1).
+    """
+    from app.tools.types import InvalidValue  # 지연 import -- 다른 settings 함수와 같은 관례.
+
+    if env is None:
+        env = dict(os.environ)
+    raw = env.get("PUSH_DEV_PAGE_ENABLED")
+    if raw is None or raw == "":
+        return False
+    if raw in ("1", "true"):
+        return True
+    raise InvalidValue(
+        "environment variable 'PUSH_DEV_PAGE_ENABLED' must be '1' or "
         f"'true' to enable, or empty to disable (got {raw!r})"
     )
 
