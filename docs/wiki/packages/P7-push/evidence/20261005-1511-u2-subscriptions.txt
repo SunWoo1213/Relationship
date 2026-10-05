@@ -1,0 +1,65 @@
+=== POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_push_subscriptions.py -v ===
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 15 items
+
+tests/test_push_subscriptions.py::test_create_subscription_returns_id_and_created_true PASSED [  6%]
+tests/test_push_subscriptions.py::test_create_subscription_persists_row_with_user_and_keys PASSED [ 13%]
+tests/test_push_subscriptions.py::test_create_subscription_expiration_time_is_accepted_but_not_stored PASSED [ 20%]
+tests/test_push_subscriptions.py::test_create_subscription_same_endpoint_updates_keys_without_new_row PASSED [ 26%]
+tests/test_push_subscriptions.py::test_create_subscription_invalid_body_returns_422_and_no_row[http-not-https] PASSED [ 33%]
+tests/test_push_subscriptions.py::test_create_subscription_invalid_body_returns_422_and_no_row[empty-endpoint] PASSED [ 40%]
+tests/test_push_subscriptions.py::test_create_subscription_invalid_body_returns_422_and_no_row[missing-auth-key] PASSED [ 46%]
+tests/test_push_subscriptions.py::test_create_subscription_invalid_body_returns_422_and_no_row[empty-p256dh] PASSED [ 53%]
+tests/test_push_subscriptions.py::test_create_subscription_invalid_body_returns_422_and_no_row[non-base64url-p256dh] PASSED [ 60%]
+tests/test_push_subscriptions.py::test_create_subscription_invalid_body_returns_422_and_no_row[endpoint-too-long] PASSED [ 66%]
+tests/test_push_subscriptions.py::test_vapid_public_key_returns_200_when_fully_configured PASSED [ 73%]
+tests/test_push_subscriptions.py::test_vapid_public_key_returns_404_when_not_configured PASSED [ 80%]
+tests/test_push_subscriptions.py::test_vapid_public_key_returns_404_when_partially_configured PASSED [ 86%]
+tests/test_push_subscriptions.py::test_list_subscriptions_only_returns_own_user PASSED [ 93%]
+tests/test_push_subscriptions.py::test_list_subscriptions_same_endpoint_different_users_are_separate_rows PASSED [100%]
+
+============================== 15 passed in 0.34s ==============================
+
+=== POSTGRES_PORT=5433 .venv/bin/alembic check ===
+No new upgrade operations detected.
+
+=== grep -rln "pywebpush" app/ ===
+(0 matches)
+
+=== POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs (전체 회귀) ===
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 16%]
+........................................................................ [ 20%]
+........................................................................ [ 24%]
+........................................................................ [ 28%]
+........................................................................ [ 32%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+........................................................................ [ 48%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 65%]
+........................................................................ [ 69%]
+........................................................................ [ 73%]
+........................................................................ [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 97%]
+...........................................                              [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/google/genai/types.py:42
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1771 passed, 1 warning in 14.81s

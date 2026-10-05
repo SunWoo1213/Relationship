@@ -68,14 +68,44 @@ trace까지 전부) 바깥 트랜잭션에는 손대지 않은 채 `_record_loop
 중간 trace 대신 이 `loop_error` 행의 `output.error`/`output.message` 로만
 남는다 -- 이 트레이드오프는 "저장 0"을 정확히 지키기 위해 의도한 것이다
 (원칙9의 예외: 실패한 턴은 근거 대신 실패 사실 자체를 남긴다).
-"""
+
+## P7-push U2 -- `GET /push/vapid-public-key` · `POST /push/subscriptions`
+(Refs: P7-push S3.1 S3.6 R12)
+
+구독 저장 API 는 "툴"이 아니다(`ToolContext`를 쓰지 않는다) -- 인물·사건·
+일정과 달리 구독은 에이전트 루프가 호출하는 자원이 아니라 브라우저가
+직접 등록하는 자원이다. 그래서 이 두 라우트는 `agent_traces` 를 남기지
+않는다(`GET /health` 와 같은 이유, 01-plan 결정 F "구독 저장 API 는
+판정이 아니므로 trace 를 남기지 않는다").
+
+`GET /push/vapid-public-key` 는 `app.settings.vapid_config()` 를 직접
+부른다(의존성으로 감싸지 않는다 -- 이 값은 요청마다 달라질 이유가 없고,
+`push_dev_page_enabled()`/`briefing_scheduler_enabled()` 와 같이 설정
+함수를 라우트가 그대로 호출하는 기존 관례를 따른다). 세 이름이 모두
+있으면 공개키만 200 으로 돌려주고, 전무(`None`)·반쪽(`VAPID_PARTIAL`)이면
+**둘 다** 404 `{"detail":{"code":"push_not_configured"}}` 다(01-plan U2
+"미설정·반쪽 404" -- 어느 쪽인지 구분해 응답하지 않는다. "반쪽"을
+구분해 알리는 것은 **발송 결과**(U4 `WebPushNotifier`, 상태
+`"misconfigured"`) 몫이고, 이 공개키 조회는 "지금 구독을 받을 수
+있는가"만 답한다). `app.main.create_app()` 에 새 예외 핸들러를 등록하지
+않고 `fastapi.HTTPException` 을 라우트가 직접 던진다 -- `resolve_session_id`
+(`app/api/deps.py`)의 422 와 같은 경계(이 코드는 `app.tools.types.ToolError`
+계층이 아니다, U2 범위에서 `app/main.py` 를 고치지 않는다).
+
+`POST /push/subscriptions` 는 본문 검증(`https://` 시작·길이 상한·
+base64url)을 `app/api/schemas.py::PushSubscriptionIn` 의 pydantic
+필드 검증기가 맡는다(`ChatIn.utterance` 의 `Field(min_length=1)` 과
+같은 경계 -- 어긋나면 FastAPI 기본 422). 사용자 귀속은
+`app_user_id()`(로컬 단일 사용자, `build_chat_ctx()` 와 같음) 고정이고,
+저장은 `app.push.save_subscription()`(U2, 같은 `(user_id, endpoint)`
+는 행을 늘리지 않고 `keys` 만 갱신)에 그대로 맡긴다."""
 
 from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import datetime
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -106,13 +136,18 @@ from app.api.schemas import (
     ChatOut,
     ChatPendingQuestionOut,
     HealthOut,
+    PushSubscriptionIn,
+    PushSubscriptionOut,
     StoredOut,
+    VapidPublicKeyOut,
 )
 from app.briefing import BriefingComposer, run_briefings
 from app.db.models import AgentTrace
 from app.embedding import EmbeddingProvider
 from app.er import Judge, JudgeUnavailable
 from app.memory import FactExtractor
+from app.push import VAPID_PARTIAL, save_subscription
+from app.settings import app_user_id, vapid_config
 from app.tools.context import TRACE_MAX_STRING, ToolContext
 from app.tools.questions import answer_question
 from app.tools.types import ToolError
@@ -353,3 +388,30 @@ def run_briefings_endpoint(
         briefings=[BriefingItemOut(**item) for item in result.briefings],
         skipped=[BriefingSkippedOut(**item) for item in result.skipped],
     )
+
+
+@router.get("/push/vapid-public-key", response_model=VapidPublicKeyOut)
+def get_vapid_public_key() -> VapidPublicKeyOut:
+    """P7-push U2(모듈 docstring 절 참고) -- VAPID 공개키만 돌려준다.
+    세 이름(`VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT`)이
+    전무하거나 반쪽이면 404 `push_not_configured`(01-plan 결정 D·F)."""
+    config = vapid_config()
+    if config is None or config is VAPID_PARTIAL:
+        raise HTTPException(status_code=404, detail={"code": "push_not_configured"})
+    return VapidPublicKeyOut(public_key=config.public_key)
+
+
+@router.post("/push/subscriptions", response_model=PushSubscriptionOut)
+def create_push_subscription(
+    body: PushSubscriptionIn,
+    session: Session = Depends(get_session),
+) -> PushSubscriptionOut:
+    """P7-push U2(모듈 docstring 절 참고) -- 같은 `(user_id, endpoint)`
+    는 행을 늘리지 않고 `keys` 만 갱신한다(결정 F(i))."""
+    result = save_subscription(
+        session,
+        app_user_id(),
+        body.endpoint,
+        {"p256dh": body.keys.p256dh, "auth": body.keys.auth},
+    )
+    return PushSubscriptionOut(id=result.id, created=result.created)

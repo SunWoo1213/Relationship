@@ -393,3 +393,5 @@
 - 2026-10-05 14:20 | START | P7-push — 사용자 계획 승인(02-plan-verify `통과`, 결정 A~G 전부 권장안). active: P7-push. 다음 U1 골격·의존성·설정(backend-agent, L-004 승인 먼저) | P7-push R12 S3.6
 - 2026-10-05 14:29 | COMMIT | a69af80 docs(P7-push): 웹푸시 계획을 승인받고 작업을 시작한다
 - 2026-10-05 14:29 | PUSH-dev2 | origin dev2 a69af80 (실험 푸시)
+- 2026-10-05 15:03 | COMMIT | 85393e0 feat(P7-push): U1 웹푸시 라이브러리를 들이고 키 설정을 읽는 자리를 만든다
+- 2026-10-05 15:03 | PUSH-dev2 | origin dev2 85393e0 (실험 푸시)

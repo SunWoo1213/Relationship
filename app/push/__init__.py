@@ -11,15 +11,21 @@ U4 는 그 라이브러리의 발송 함수 이름을 **import 시점에 묶지 
 픽스처가 기본 경로를 잡게 하려면, 호출 시점에 속성으로 찾아야 한다.
 이 문장이 U1 03-log 가 남기는 방침 기록이다).
 
-U2~U4 가 `save_subscription`/`list_subscriptions`(구독 저장)·
-`build_push_payload`(본문 작성)·`WebPushNotifier`/`notifier_from_env`
-(발송기·알림기)를 이 자리에 추가로 재export 한다 -- 지금은 아직 그
-모듈들이 없으므로(01-plan "산출물" 절, U1 "도는 발송 코드 없음") 아래
-목록에 없다.
+U3~U4 가 `build_push_payload`(본문 작성)·`WebPushNotifier`/
+`notifier_from_env`(발송기·알림기)를 이 자리에 추가로 재export 한다 --
+지금은 아직 그 모듈들이 없으므로(01-plan "산출물" 절) 아래 목록에 없다.
+
+## U2 추가분 -- 구독 저장 (Refs: P7-push S3.1 S3.6 R12)
+
+`save_subscription`/`list_subscriptions`/`SavedSubscription`
+(`app/push/subscriptions.py`)을 재export 한다. `app/api/routes.py` 의
+`GET /push/vapid-public-key`·`POST /push/subscriptions` 가 이 자리에서
+가져다 쓴다.
 """
 
 from __future__ import annotations
 
+from app.push.subscriptions import SavedSubscription, list_subscriptions, save_subscription
 from app.push.types import (
     PUSH_STATUSES,
     PUSH_TRACE_TOOL_NAME,
@@ -42,4 +48,7 @@ __all__ = [
     "PushSender",
     "SendResult",
     "VapidConfig",
+    "SavedSubscription",
+    "list_subscriptions",
+    "save_subscription",
 ]

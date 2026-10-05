@@ -42,10 +42,11 @@ I)를 그대로 옮긴 것이다 -- 그 실행이 남긴 `briefing_run`/
 
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class AnswerIn(BaseModel):
@@ -202,3 +203,71 @@ class BriefingRunOut(BaseModel):
     generated_at: datetime
     briefings: list[BriefingItemOut] = Field(default_factory=list)
     skipped: list[BriefingSkippedOut] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# P7-push U2 추가분 -- `GET /push/vapid-public-key` · `POST /push/subscriptions`
+# (Refs: P7-push S3.1 S3.6 R12)
+# ---------------------------------------------------------------------------
+
+#: 엔드포인트 길이 상한(01-plan U2 "endpoint 는 … 길이 상한"). 알려진 푸시
+#: 서비스(FCM 등) 엔드포인트는 수백 자 수준이고, 2048 은 흔히 쓰이는 URL
+#: 길이 상한 관행과 같다 -- `PUSH_*` 코드 상수(U1, `app/settings.py`)와
+#: 같은 "근거를 docstring 에" 관례.
+_PUSH_ENDPOINT_MAX_LENGTH = 2048
+
+#: base64url 문자 집합(패딩 `=` 없음 -- 브라우저가 돌려주는 `p256dh`/`auth`
+#: 값의 실제 인코딩, 01-plan U2 "base64url").
+_BASE64URL_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+
+
+class VapidPublicKeyOut(BaseModel):
+    """`GET /push/vapid-public-key` 응답(결정 F). 공개키만 담는다 --
+    개인키 값은 어떤 응답 모델에도 필드로 두지 않는다(security §1)."""
+
+    public_key: str
+
+
+class PushSubscriptionKeysIn(BaseModel):
+    """브라우저 `PushSubscription.toJSON().keys` 그대로(결정 F). 두 값
+    모두 비지 않은 base64url 문자열이어야 한다(01-plan U2 판정 3행) --
+    그 밖의 값은 pydantic 이 422 로 되돌린다(`ChatIn.utterance` 의
+    `Field(min_length=1)` 과 같은 경계, 결정 11)."""
+
+    p256dh: str
+    auth: str
+
+    @field_validator("p256dh", "auth")
+    @classmethod
+    def _validate_base64url(cls, value: str) -> str:
+        if not value or not _BASE64URL_RE.fullmatch(value):
+            raise ValueError("push subscription key must be a non-empty base64url string")
+        return value
+
+
+class PushSubscriptionIn(BaseModel):
+    """`POST /push/subscriptions` 요청 본문(결정 F) -- 브라우저
+    `PushSubscription.toJSON()` 모양 그대로 받는다. `expirationTime` 은
+    **받기만 하고 저장하지 않는다**(`push_subscriptions` 에 그 열이
+    없다, 01-plan 결정 F)."""
+
+    endpoint: str
+    keys: PushSubscriptionKeysIn
+    expirationTime: float | None = None
+
+    @field_validator("endpoint")
+    @classmethod
+    def _validate_endpoint(cls, value: str) -> str:
+        if not value.startswith("https://"):
+            raise ValueError("endpoint must start with https://")
+        if len(value) > _PUSH_ENDPOINT_MAX_LENGTH:
+            raise ValueError("endpoint exceeds maximum length")
+        return value
+
+
+class PushSubscriptionOut(BaseModel):
+    """`POST /push/subscriptions` 응답(결정 F, 01-plan 판정 1·2행) --
+    개인키·구독 비밀 값을 담지 않는다(security §1)."""
+
+    id: int
+    created: bool
