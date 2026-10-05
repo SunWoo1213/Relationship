@@ -11,10 +11,6 @@ U4 는 그 라이브러리의 발송 함수 이름을 **import 시점에 묶지 
 픽스처가 기본 경로를 잡게 하려면, 호출 시점에 속성으로 찾아야 한다.
 이 문장이 U1 03-log 가 남기는 방침 기록이다).
 
-U4 가 `WebPushNotifier`/`notifier_from_env`(발송기·알림기)를 이 자리에
-추가로 재export 한다 -- 지금은 아직 그 모듈들이 없으므로(01-plan
-"산출물" 절) 아래 목록에 없다.
-
 ## U2 추가분 -- 구독 저장 (Refs: P7-push S3.1 S3.6 R12)
 
 `save_subscription`/`list_subscriptions`/`SavedSubscription`
@@ -27,11 +23,21 @@ U4 가 `WebPushNotifier`/`notifier_from_env`(발송기·알림기)를 이 자리
 `build_push_payload`(`app/push/payload.py`)를 재export 한다. 순수
 함수이고 `composed.lines`/`composed.pattern_sentences` 를 읽지 않는다
 (결정 B, 모듈 docstring).
+
+## U4 추가분 -- 발송기·알림기 (Refs: P7-push S3.6 S3.1 R12 원칙9)
+
+`WebPushNotifier`/`MisconfiguredNotifier`/`notifier_from_env`
+(`app/push/notifier.py`)와 `PyWebPushSender`(`app/push/sender.py`)를
+재export 한다. `app/push/sender.py` 는 결정 D 가 고른 VAPID 발송
+라이브러리를 import 하는 **유일한** 모듈이다(지킬 불변식) -- 이 파일은
+그 이름을 import 하지 않고 그 모듈이 만든 클래스만 가져온다.
 """
 
 from __future__ import annotations
 
+from app.push.notifier import MisconfiguredNotifier, WebPushNotifier, notifier_from_env
 from app.push.payload import build_push_payload
+from app.push.sender import PyWebPushSender
 from app.push.subscriptions import SavedSubscription, list_subscriptions, save_subscription
 from app.push.types import (
     PUSH_STATUSES,
@@ -59,4 +65,8 @@ __all__ = [
     "list_subscriptions",
     "save_subscription",
     "build_push_payload",
+    "WebPushNotifier",
+    "MisconfiguredNotifier",
+    "notifier_from_env",
+    "PyWebPushSender",
 ]

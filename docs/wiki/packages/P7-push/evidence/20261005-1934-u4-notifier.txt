@@ -1,0 +1,86 @@
+== 명령 1: POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_push_notifier.py -v ==
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 18 items
+
+tests/test_push_notifier.py::test_notify_payload_sent_to_sender_never_contains_raw_utterance PASSED [  5%]
+tests/test_push_notifier.py::test_notify_no_subscription_sends_nothing_and_records_trace PASSED [ 11%]
+tests/test_push_notifier.py::test_notify_partial_removes_gone_subscription_keeps_other PASSED [ 16%]
+tests/test_push_notifier.py::test_notify_single_subscription_404_is_removed_and_status_failed PASSED [ 22%]
+tests/test_push_notifier.py::test_run_briefings_with_transient_push_failure_keeps_briefed_at_and_does_not_resend PASSED [ 27%]
+tests/test_push_notifier.py::test_pywebpush_sender_maps_success_to_sent PASSED [ 33%]
+tests/test_push_notifier.py::test_pywebpush_sender_maps_404_410_to_gone PASSED [ 38%]
+tests/test_push_notifier.py::test_pywebpush_sender_maps_other_http_error_to_failed_with_status_preserved PASSED [ 44%]
+tests/test_push_notifier.py::test_pywebpush_sender_maps_timeout_to_timeout_with_class_name_only PASSED [ 50%]
+tests/test_push_notifier.py::test_pywebpush_sender_maps_arbitrary_exception_to_error_with_class_name_only PASSED [ 55%]
+tests/test_push_notifier.py::test_notify_records_full_trace_shape_without_leaking_secrets_in_exception_message PASSED [ 61%]
+tests/test_push_notifier.py::test_pywebpush_sender_exception_message_secrets_not_in_send_result PASSED [ 66%]
+tests/test_push_notifier.py::test_notify_asserts_schedule_person_belongs_to_notifier_user PASSED [ 72%]
+tests/test_push_notifier.py::test_r2_default_sender_path_is_actually_intercepted_by_the_fixture PASSED [ 77%]
+tests/test_push_notifier.py::test_r2_negative_check_unpatched_default_path_really_calls_the_library PASSED [ 83%]
+tests/test_push_notifier.py::test_notifier_from_env_returns_null_notifier_when_no_keys PASSED [ 88%]
+tests/test_push_notifier.py::test_notifier_from_env_returns_misconfigured_notifier_when_partial PASSED [ 94%]
+tests/test_push_notifier.py::test_notifier_from_env_returns_web_push_notifier_when_fully_configured PASSED [100%]
+
+============================== 18 passed in 0.29s ==============================
+
+== 명령 2: grep -rln "pywebpush" app/ (기대: app/push/sender.py 한 줄) ==
+app/push/sender.py
+
+== 명령 3: git diff --stat f256259 -- app/briefing (기대: 빈 출력) ==
+(빈 출력 -- P6-briefing 코드 무변경)
+
+== 명령 4: R-2 부정 확인 -- 픽스처를 끈 상태에서 PyWebPushSender() 기본값 경로가
+   실제로 그 픽스처에 잡히는지(픽스처가 켜졌을 때 기본 경로 호출 -> 실패로 잡힘).
+   아래 두 테스트가 각각 양성/부정 확인이다:
+   - test_r2_default_sender_path_is_actually_intercepted_by_the_fixture (픽스처 ON -> _PyWebPushPatchMarker 로 잡힘)
+   - test_r2_negative_check_unpatched_default_path_really_calls_the_library (픽스처 OFF -> 다른 예외 클래스, 패치 미적용 증명)
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 18 items / 16 deselected / 2 selected
+
+tests/test_push_notifier.py::test_r2_default_sender_path_is_actually_intercepted_by_the_fixture PASSED [ 50%]
+tests/test_push_notifier.py::test_r2_negative_check_unpatched_default_path_really_calls_the_library PASSED [100%]
+
+======================= 2 passed, 16 deselected in 0.12s =======================
+
+== 명령 5: 전체 회귀 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs (기준선 1783 passed skip 0) ==
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 19%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 39%]
+........................................................................ [ 43%]
+........................................................................ [ 47%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 63%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 79%]
+........................................................................ [ 83%]
+........................................................................ [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 95%]
+........................................................................ [ 99%]
+.                                                                        [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/google/genai/types.py:42
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1801 passed, 1 warning in 15.50s
