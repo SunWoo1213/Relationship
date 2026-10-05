@@ -388,3 +388,6 @@
 - 2026-10-02 20:54 | COMMIT | 608694b fix(FIX-017): 사실 키의 뜻을 LLM 에게 알려 "안 좋아해" 가 likes 로 가지 않게 한다
 - 2026-10-02 20:54 | PUSH-dev2 | origin dev2 608694b (실험 푸시)
 - 2026-10-02 21:30 | PLAN | P7-push 계획 검증 통과·**승인 대기** — 착수 승인(L-004) → architect 01-plan(U1~U8, 판정 표 26행) → 결정 A~G 사용자 확정(전부 권장안) → verifier 02-plan-verify `통과`(8/8, [필수] 0, verify-plan FAIL 0/WARN 0, 권고 R-1~R-10). 계획 승인 질문에 사용자가 "다음 세션에서 이어가게 기록" 을 택함 → 승인 안 됨, active none. 다음 세션은 승인 질문부터 | P7-push R12 S3.6
+- 2026-10-02 21:27 | COMMIT | fa5802d docs(P7-push): 웹푸시 계획을 검증까지 마치고 승인 대기로 남긴다
+- 2026-10-02 21:27 | PUSH-dev2 | origin dev2 fa5802d (실험 푸시)
+- 2026-10-05 14:20 | START | P7-push — 사용자 계획 승인(02-plan-verify `통과`, 결정 A~G 전부 권장안). active: P7-push. 다음 U1 골격·의존성·설정(backend-agent, L-004 승인 먼저) | P7-push R12 S3.6

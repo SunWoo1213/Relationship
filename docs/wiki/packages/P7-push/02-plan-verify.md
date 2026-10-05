@@ -99,7 +99,7 @@ FAIL 이 하나라도 있으면 아래 결과는 통과가 될 수 없다. FAIL/
 
 ## 4. 결정
 결과: 통과
-승인: (사용자 승인 전 비워 둔다 → "사용자 (YYYY-MM-DD)")
+승인: 사용자 (2026-10-05) — 결정 A~G 전부 권장안(2026-10-02 확정) 그대로, 권고 R-1~R-10 은 해당 구현 단위에서 반영
 
 ## 1-2. 기계 검증 2차 출력 (이 문서 작성 뒤 — 그대로 붙인다)
 명령: `bash .claude/scripts/verify-plan.sh P7-push | tee docs/wiki/packages/P7-push/evidence/20261002-2123-verify-plan-2.txt`
