@@ -249,8 +249,16 @@ def answer_question(ctx: ToolContext, question_id: int, answer: str) -> PendingQ
     -- `pending_questions` 에 `user_id` 컬럼이 없어 "다른 사용자의 질문"을
     걸러낼 수 없다. P5-loop 이 세션을 사용자에게 귀속시키는 계층으로 이
     사각지대를 메워야 한다.
+
+    **FIX-019** -- `with_for_update=True` 로 행을 잠근 채 읽는다. 잠금 없는
+    조회는 두 요청이 거의 동시에 오면 둘 다 `answered_at IS NULL` 을 읽고
+    둘 다 통과해(PostgreSQL 기본 격리 수준 READ COMMITTED) 재개가 두 번
+    돈다 -- 순차 요청에서만 성립하던 "재개 최대 1회"(결정 J)가 동시
+    요청에서는 깨진다(오병합 방지 장치인 `ask_user` 를 우회하는 경로,
+    원칙1). 먼저 도착한 요청이 커밋할 때까지 나중 요청은 블로킹됐다가
+    커밋 후의 최신(answered) 행을 읽어 `already_answered` 로 끝난다.
     """
-    question = ctx.session.get(PendingQuestion, question_id)
+    question = ctx.session.get(PendingQuestion, question_id, with_for_update=True)
     if question is None:
         raise QuestionNotFound("question_not_found")
 

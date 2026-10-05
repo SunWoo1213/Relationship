@@ -403,3 +403,5 @@
 - 2026-10-05 19:23 | PUSH-dev2 | origin dev2 f256259 (실험 푸시)
 - 2026-10-05 19:44 | COMMIT | 8e9af9e feat(P7-push): U4 알림을 실제로 보내는 발송기와 알림기를 만든다
 - 2026-10-05 19:44 | PUSH-dev2 | origin dev2 8e9af9e (실험 푸시)
+- 2026-10-05 19:48 | COMMIT | 7bc2e60 fix(FIX-018): 작업 브랜치 dev2 에도 CI 를 돌린다
+- 2026-10-05 19:52 | PUSH-dev2 | origin dev2 7bc2e60 (실험 푸시)

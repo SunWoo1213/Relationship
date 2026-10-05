@@ -1,0 +1,11 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+plugins: anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_answer_concurrency.py::test_answer_question_second_connection_sees_already_answered PASSED [ 50%]
+tests/test_answer_concurrency.py::test_post_answers_concurrent_requests_exactly_one_resume PASSED [100%]
+
+============================== 2 passed in 1.48s ===============================
