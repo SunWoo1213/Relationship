@@ -1,0 +1,12 @@
+=== run 1 ===
+....................                                                     [100%]
+20 passed in 0.59s
+.venv/bin/python -m pytest -q tests/test_properties.py  0.87s user 0.06s system 99% cpu 0.931 total
+=== run 2 ===
+....................                                                     [100%]
+20 passed in 0.59s
+.venv/bin/python -m pytest -q tests/test_properties.py  0.87s user 0.06s system 99% cpu 0.932 total
+=== run 3 ===
+....................                                                     [100%]
+20 passed in 0.60s
+.venv/bin/python -m pytest -q tests/test_properties.py  0.87s user 0.06s system 99% cpu 0.929 total

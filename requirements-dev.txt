@@ -10,3 +10,7 @@ jsonschema==4.26.0
 ruff==0.16.10
 mypy==2.4.0
 pytest-cov==7.1.0
+# Refs: FIX-024 원칙1 원칙2 원칙3 원칙7 -- 순수 함수 성질 기반 테스트
+# (tests/test_properties.py). sortedcontainers 는 hypothesis 의 추이
+# 의존성(pip 가 함께 설치)이라 따로 적지 않는다.
+hypothesis==6.168.5
