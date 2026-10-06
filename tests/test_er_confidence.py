@@ -188,6 +188,15 @@ def test_t_new_greater_than_t_merge_rejected() -> None:
         ERConfig(t_new=0.9, t_merge=0.5)
 
 
+def test_w_llm_plus_w_emb_zero_rejected_at_construction() -> None:
+    # FIX-025(FIX-024 발견①) -- 가중치 합은 1.0 이라 그 검증은 통과하지만,
+    # rule_checked=0(미측정)일 때 combine() 의 재정규화 분모가 0 이 되는
+    # 설정(w_llm=w_emb=0, w_rule=1.0)은 생성 시점에 InvalidValue 로 막는다
+    # (ZeroDivisionError 가 아니다).
+    with pytest.raises(InvalidValue):
+        ERConfig(w_llm=0.0, w_emb=0.0, w_rule=1.0)
+
+
 # ---------------------------------------------------------------------------
 # combine() — s_rule 분모 0, s_emb 클램프, 자기보고 범위 검증
 # ---------------------------------------------------------------------------
@@ -254,6 +263,14 @@ def test_er_config_reads_overrides_from_env() -> None:
 def test_er_config_invalid_float_string_raises_invalid_value() -> None:
     with pytest.raises(InvalidValue):
         er_config({"T_MERGE": "not-a-number"})
+
+
+def test_er_config_rejects_env_weights_with_zero_llm_emb_sum() -> None:
+    # FIX-025 -- 환경변수로 넘어온 가중치도 ERConfig.__post_init__ 의 새
+    # 검증 경로(w_llm+w_emb<=허용오차)를 그대로 탄다(2층 오버라이드가
+    # 1층과 같은 보호를 받는지 확인).
+    with pytest.raises(InvalidValue):
+        er_config({"W_LLM": "0", "W_EMB": "0", "W_RULE": "1"})
 
 
 def test_er_config_empty_string_falls_back_to_default() -> None:

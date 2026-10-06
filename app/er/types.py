@@ -315,6 +315,17 @@ class ERConfig:
     검증한다 -- 위반하면 `InvalidValue`(원칙8: 튜닝은 P4 결과로만 하고,
     잘못된 설정으로 조용히 돌아가지 않는다).
 
+    **FIX-025**: `w_llm + w_emb` 가 허용 오차(1e-9) 안에서 0 이면(예:
+    `w_llm=0, w_emb=0, w_rule=1.0` -- 가중치 합은 1.0 이라 위 검증은
+    통과한다) 생성 시점에 `InvalidValue` 로 거부한다.
+    `app/er/confidence.py::combine()` 은 `rule_checked=0`(규칙 미측정)일
+    때 `(w_llm*s_llm + w_emb*s_emb) / (w_llm + w_emb)` 로 재정규화하는데,
+    이 분모가 0 이면 `ZeroDivisionError`(처리되지 않은 예외, FIX-024
+    발견①)가 된다. `rule_checked` 는 런타임에만 정해지는 값이라 설정
+    시점에는 "이 설정으로 언젠가 미측정 경로를 탈 수 있는가"만 알 수
+    있으므로, 그 가능성 자체를 생성 시점에 막는다 -- 다른 두 검증과 같은
+    원칙8 정신("잘못된 설정으로 조용히 돌아가지 않는다").
+
     `penalized_merge_policy`(D13·P4b 결정 A·B, U3): 감점 후보(`penalized_by`
     비어 있지 않음)가 3단계에서 `band == "merge"` 로 귀속됐을 때의 보수
     분기 정책 -- `"ask"`(기본, 결정 A(i))는 `identity` 로 강등하되
@@ -341,6 +352,13 @@ class ERConfig:
         if abs(weight_sum - 1.0) > _WEIGHT_SUM_TOLERANCE:
             raise InvalidValue(
                 f"ERConfig: weights must sum to 1.0 (got {weight_sum!r})"
+            )
+        if abs(self.w_llm + self.w_emb) <= _WEIGHT_SUM_TOLERANCE:
+            raise InvalidValue(
+                "ERConfig: w_llm + w_emb must be > 0 -- rule_checked=0"
+                "(규칙 미측정)일 때 (w_llm*s_llm + w_emb*s_emb) / "
+                "(w_llm + w_emb) 재정규화가 정의되지 않는다(FIX-025, "
+                f"got w_llm={self.w_llm!r}, w_emb={self.w_emb!r})"
             )
         if not (0.0 <= self.t_new <= self.t_merge <= 1.0):
             raise InvalidValue(

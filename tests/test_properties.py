@@ -1,61 +1,61 @@
-"""Refs: FIX-024 FIX-021 D10 D12 D13 P7-push 원칙1 원칙2 원칙3 원칙7 --
-순수 함수의 "항상 지켜야 할 성질" 을 예시가 아니라 `hypothesis` 로 무작위
-탐색해 확인한다. 대상은 전부 **순수 함수**(DB·LLM·네트워크 호출 없음):
-`app/er/confidence.py::combine`/`band_for`/`decide`, `app/push/
-payload.py::build_push_payload`, `app/briefing/compose.py::
-validate_briefing`.
+"""Refs: FIX-025 FIX-024 FIX-021 D10 D12 D13 P7-push 원칙1 원칙2 원칙3
+원칙7 -- 순수 함수의 "항상 지켜야 할 성질" 을 예시가 아니라 `hypothesis`
+로 무작위 탐색해 확인한다. 대상은 전부 **순수 함수**(DB·LLM·네트워크
+호출 없음): `app/er/confidence.py::combine`/`band_for`/`decide`,
+`app/push/payload.py::build_push_payload`, `app/briefing/compose.py::
+validate_briefing`, `app/er/types.py::ERConfig`.
 
 ## 이 파일이 하지 않는 것
 
-- 제품 코드(`app/`)를 고치지 않는다(위임 범위, FIX-024). 성질 탐색 중
-  실제로 깨지는 입력을 찾으면 **그 입력을 최소 반례로 고정한 회귀
-  테스트**(`pytest.raises` 로 "지금 이렇게 예외를 던진다"를 그대로
-  단언)만 추가하고, 그 입력은 "항상 성립해야 하는" 넓은 성질 테스트의
-  탐색 범위에서는 `assume()`/전용 전략으로 제외한다 -- 성질 테스트
-  자체가 실패 상태로 남지 않는다(이 파일의 완료 판정은 `pytest
-  tests/test_properties.py` 가 **passed** 로 끝나는 것, FIX-024 판정
-  표 2~5행). 아래 "FIX-024 에서 발견한 위반(보고용, 미수정)" 절에 모든
-  최소 반례를 모아 둔다.
+- 제품 코드(`app/`)를 고치지 않는다(위임 범위, FIX-024/FIX-025). 성질
+  탐색 중 실제로 깨지는 입력을 찾으면 **그 입력을 최소 반례로 고정한
+  회귀 테스트**만 추가하고, 수정은 사용자 결정을 거쳐 별도 FIX 로
+  한다(이 파일의 완료 판정은 `pytest tests/test_properties.py` 가
+  **passed** 로 끝나는 것, FIX-024 판정 표 2~5행).
 
-## FIX-024 에서 발견한 위반(보고용, 미수정)
+## FIX-024 에서 발견한 위반 -- FIX-025 로 수정 (xfail 8건 -> 일반 테스트)
 
-제품 코드는 고치지 않고 아래 7개 최소 반례를 회귀 테스트로만 고정한다
-(각 테스트 docstring 에 반복). 사용자 결정 후 별도 FIX 로 다룬다.
+FIX-024 의 넓은 탐색(`hypothesis`)이 찾은 최소 반례 7종(⑥은 2건)을
+FIX-024 는 `xfail(strict=True)` 로만 고정해 두고 제품 코드를 고치지
+않았다. **FIX-025 가 아래 7건을 모두 고쳤다** -- 이 파일은 이제 "예외
+없음 + 잘못된 설정/항목이 버려지고 이유가 기록된다"를 **일반 테스트**로
+단언한다(더 이상 xfail 이 아니다).
 
 1. `app/er/confidence.py::combine` -- `rule_checked=0`(미측정)인데
    `config.w_llm + config.w_emb == 0`(예: `w_llm=0, w_emb=0, w_rule=1`,
-   가중치 합 1.0 이라 `ERConfig` 생성 자체는 통과)이면 분모가 0 이 되어
-   `ZeroDivisionError` 를 던진다 -- `InvalidValue` 가 아니라 처리되지
-   않은 예외. `test_combine_raises_zero_division_when_rule_unmeasured_and_llm_emb_weights_zero_FOUND`.
+   가중치 합 1.0 이라 예전에는 `ERConfig` 생성 자체가 통과했다)이면
+   재정규화 분모가 0 이 되어 `ZeroDivisionError` 를 던지던 자리. FIX-025
+   는 **`combine()` 호출 이전, `ERConfig` 생성 시점**에 `InvalidValue`
+   를 던지도록 막았다(`app/er/types.py::ERConfig.__post_init__`).
+   `test_er_config_rejects_weights_that_cannot_renormalize_when_rule_unmeasured`.
 2~3. `app/briefing/compose.py::validate_briefing` -- `BriefingLine.text`
-   또는 `Suggestion.text` 가 `None` 이면(기본 근거는 정상적으로 알려진
-   값이라 `no_basis`/`unknown_basis` 를 통과) 금지 표현·줄바꿈 검사의
-   `in` 연산이 `TypeError: argument of type 'NoneType' is not
-   iterable`(제안) / `not a container or iterable`(요약 줄)로 죽는다.
-   `test_validate_briefing_raises_when_line_text_is_none_FOUND`,
-   `test_validate_briefing_raises_when_suggestion_text_is_none_FOUND`.
+   또는 `Suggestion.text` 가 `None`(비문자열)이면 예전에는 금지 표현·
+   줄바꿈 검사의 `in` 연산이 `TypeError` 로 죽었다. FIX-025 는 `text`
+   타입 가드(`REASON_MALFORMED`)를 앞에 두어 그 줄/제안만 버리고
+   나머지는 유지한다.
+   `test_validate_briefing_drops_line_with_non_string_text`,
+   `test_validate_briefing_drops_suggestion_with_non_string_text`.
 4~5. 같은 함수 -- `BriefingLine.basis`/`Suggestion.basis` 가 `None` 이면
-   `basis.get(...)` 에서 `AttributeError` 로 죽는다.
-   `test_validate_briefing_raises_when_line_basis_is_none_FOUND`,
-   `test_validate_briefing_raises_when_suggestion_basis_is_none_FOUND`.
+   예전에는 `basis.get(...)` 에서 `AttributeError` 로 죽었다. FIX-025
+   는 `_is_valid_basis_shape()` 로 `basis` 가 dict 인지부터 확인한다.
+   `test_validate_briefing_drops_line_with_none_basis`,
+   `test_validate_briefing_drops_suggestion_with_none_basis`.
 6. 같은 함수 -- `basis["fact_keys"]`/`basis["event_ids"]` 원소가 해시
-   불가능한 값(예: 중첩 리스트)이면 `known_fact_keys`/`known_event_ids`
-   집합 멤버십 검사(`in`)에서 `TypeError: unhashable type`. FIX-021
-   이 고친 `pattern_sentences[].key` 와 **같은 종류**지만 그때 고친
-   자리가 아니다(줄·제안의 근거 원소는 아직 `isinstance` 가드가 없다).
-   `test_validate_briefing_raises_when_fact_keys_element_is_unhashable_FOUND`.
+   불가능한 값(예: 중첩 리스트)이면 예전에는 `known_fact_keys`/
+   `known_event_ids` 집합 멤버십 검사(`in`)에서 `TypeError: unhashable
+   type` 로 죽었다. FIX-025 의 `_is_valid_basis_shape()` 는 원소가
+   `str`/`int` 가 아니면(리스트·dict 포함) `malformed` 로 거부한다.
+   `test_validate_briefing_drops_line_with_unhashable_basis_element`.
 7. 같은 함수 -- `pattern_sentences[].sentence` 가 `None` 이 아닌데
-   문자열도 아니면(예: 정수) `_extract_mentioned_counts` 의 정규식
-   `findall` 이 `TypeError: expected string or bytes-like object` 로
-   죽는다(`sentence=None` 자체는 `missing_pattern` 분기로 안전하게
-   처리된다 -- 이 반례와 다르다).
-   `test_validate_briefing_raises_when_pattern_sentence_is_non_string_non_none_FOUND`.
+   문자열도 아니면(예: 정수) 예전에는 `_extract_mentioned_counts` 의
+   정규식 `findall` 이 `TypeError` 로 죽었다(`sentence=None` 자체는
+   `missing_pattern` 분기로 원래부터 안전했다). FIX-025 는 타입 가드를
+   추가해 그 패턴만 `malformed` 로 거부하고 템플릿 문장으로 채운다.
+   `test_validate_briefing_replaces_non_string_pattern_sentence_with_template`.
 
-이 7건은 전부 FIX-021 이 세운 전제("`validate_briefing()` 은 `raw` 를
-**직접** 받을 수도 있어 `_parse_composed` 를 거치지 않은 경로를
-보장하지 않는다")와 같은 자리에서 나왔다 -- FIX-021 은 `key` 필드 하나만
-고쳤고, 나머지 필드(`text`·`basis`·`fact_keys`/`event_ids` 원소·
-`sentence`)는 그대로다.
+아래 넓은 탐색 테스트(`test_validate_briefing_never_raises_for_weird_
+typed_input`)도 이제 이 7건이 쓰던 입력(`None`·중첩 리스트·비문자열)을
+탐색 범위에서 빼지 않는다 -- 고쳤으므로 더 넓혀도 통과해야 한다.
 """
 
 from __future__ import annotations
@@ -70,7 +70,7 @@ import pytest
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
 
-from app.briefing.compose import validate_briefing
+from app.briefing.compose import REASON_MALFORMED, validate_briefing
 from app.briefing.types import BriefingInput, BriefingLine, ComposedBriefing, Suggestion
 from app.er.confidence import band_for, combine, decide
 from app.er.types import ERConfig, Judgement, ScoredCandidate
@@ -97,11 +97,24 @@ def _unit_float() -> st.SearchStrategy[float]:
     return st.floats(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False)
 
 
+#: FIX-025 -- `ERConfig.__post_init__` 가 `w_llm + w_emb` 를 허용 오차
+#: 안에서 0 으로 만드는 가중치 조합을 생성 시점에 `InvalidValue` 로
+#: 거부하므로, 이 전략이 만드는 가중치는 그 조건을 피해야 `ERConfig(...)`
+#: 호출 자체가 깨지지 않는다(1e-9 보다 넉넉한 여유 1e-6 을 둬 경계
+#: 부동소수 오차로 인한 가양성/가음성을 피한다).
+_RENORMALIZE_MARGIN = 1e-6
+
+
 @st.composite
 def _weights_summing_to_one(draw: st.DrawFn) -> tuple[float, float, float]:
     """`(w_llm, w_emb, w_rule)` -- 합이 1.0(부동소수 표현 오차 이내)인
-    세 음이 아닌 가중치. `[0,1]` 위 두 점을 잘라 세 구간 길이로 쓴다."""
+    세 음이 아닌 가중치. `[0,1]` 위 두 점을 잘라 세 구간 길이로 쓴다.
+    `w_llm + w_emb`(= 두 번째 절단점 `b`)가 `ERConfig` 생성을 막을 만큼
+    작은 조합은 제외한다(FIX-025, 그 조합은 별도로
+    `test_er_config_rejects_weights_that_cannot_renormalize_when_rule_unmeasured`
+    가 고정한다)."""
     a, b = sorted(draw(st.lists(_unit_float(), min_size=2, max_size=2)))
+    assume(b > _RENORMALIZE_MARGIN)  # w_llm + w_emb == b
     return a, b - a, 1.0 - b
 
 
@@ -151,11 +164,12 @@ def test_combine_result_within_unit_interval(
     rule_checked: int,
 ) -> None:
     """신호 ∈ [0,1] 이면 결과 ∈ [0,1](판정 표 2행 1절). `w_llm+w_emb==0`
-    이면서 `rule_checked==0` 인 조합은 별도 발견(①)으로 고정했으므로
-    여기서는 제외한다(아래 `assume`)."""
+    이면서 `rule_checked==0` 인 조합(FIX-024 발견①)은 `ERConfig` 생성
+    시점에 `InvalidValue` 로 막히므로(FIX-025) `_weights_summing_to_one()`
+    전략 자체가 이미 그 조합을 걸러낸다 -- 여기서는 별도 assume 이 필요
+    없다."""
     w_llm, w_emb, w_rule = weights
     assume(abs((w_llm + w_emb + w_rule) - 1.0) <= 1e-9)
-    assume(not (rule_checked == 0 and (w_llm + w_emb) < 1e-12))
 
     config = ERConfig(w_llm=w_llm, w_emb=w_emb, w_rule=w_rule)
     confidence = combine(s_llm, s_emb, s_rule, config, rule_checked=rule_checked)
@@ -179,10 +193,10 @@ def test_combine_result_within_observed_signal_range(
 ) -> None:
     """관측된 신호만 재정규화한 결과는 관측 신호들의 min~max 사이(D12,
     판정 표 2행 2절) -- 가중합(가중치 음수 없음·합 1)은 항상 입력들의
-    볼록결합이므로 입력 범위를 벗어날 수 없다."""
+    볼록결합이므로 입력 범위를 벗어날 수 없다. `w_llm+w_emb==0` 조합은
+    `_weights_summing_to_one()` 이 이미 걸러낸다(FIX-025)."""
     w_llm, w_emb, w_rule = weights
     assume(abs((w_llm + w_emb + w_rule) - 1.0) <= 1e-9)
-    assume(not (rule_checked == 0 and (w_llm + w_emb) < 1e-12))
 
     config = ERConfig(w_llm=w_llm, w_emb=w_emb, w_rule=w_rule)
     confidence = combine(s_llm, s_emb, s_rule, config, rule_checked=rule_checked)
@@ -219,20 +233,15 @@ def test_combine_single_signal_alone_never_reaches_merge_default_config(
     assert band_for(confidence, config) != "merge"
 
 
-@pytest.mark.xfail(strict=True, raises=ZeroDivisionError, reason="FIX-024 발견① -- FIX-025 에서 수정 예정(고치면 통과해 xfail 표시를 떼라고 알린다)")
-def test_combine_raises_zero_division_when_rule_unmeasured_and_llm_emb_weights_zero_FOUND() -> None:
-    """FIX-024 발견①(보고, 미수정) -- `rule_checked=0`(미측정)이고
-    `w_llm=w_emb=0·w_rule=1.0`(가중치 합 1.0 이라 `ERConfig` 생성 자체는
-    통과)이면 `combine()` 이 `(w_llm*s_llm+w_emb*s_emb)/(w_llm+w_emb)`
-    에서 0 으로 나눠 `ZeroDivisionError` 를 던진다. `InvalidValue` 가
-    아니라 처리되지 않은 예외라서, 호출부가 이 경로만 따로 잡지 않으면
-    그대로 올라간다(원칙8 "잘못된 입력으로 조용히 계산하지 않는다" 는
-    지켜지지만 예외 종류가 설계 의도와 다르다). 최소 반례:
-    `combine(0.0, 0.0, 0.0, ERConfig(w_llm=0.0, w_emb=0.0, w_rule=1.0),
-    rule_checked=0)`. 제품 코드는 고치지 않는다(FIX-024 위임 범위) --
-    사용자 결정 후 별도 FIX."""
-    config = ERConfig(w_llm=0.0, w_emb=0.0, w_rule=1.0)
-    combine(0.0, 0.0, 0.0, config, rule_checked=0)
+def test_er_config_rejects_weights_that_cannot_renormalize_when_rule_unmeasured() -> None:
+    """FIX-024 발견①을 FIX-025 가 고쳤다 -- `w_llm=w_emb=0·w_rule=1.0`
+    (가중치 합 1.0 이라 예전에는 `ERConfig` 생성 자체가 통과했다)은
+    `rule_checked=0`(미측정)일 때 `combine()` 의 재정규화 분모
+    `w_llm+w_emb` 가 0 이 되어 `ZeroDivisionError` 를 던지던 조합이다.
+    FIX-025 는 이 조합 자체를 `ERConfig` **생성 시점**에 `InvalidValue`
+    로 막는다 -- `combine()` 은 이제 이 입력으로 호출될 일이 없다."""
+    with pytest.raises(InvalidValue):
+        ERConfig(w_llm=0.0, w_emb=0.0, w_rule=1.0)
 
 
 # ===========================================================================
@@ -488,30 +497,56 @@ def _fuzz_briefing_input() -> BriefingInput:
     )
 
 
-def _weird_text() -> st.SearchStrategy[str]:
-    # "이상한 값" -- 빈 문자열·아주 긴 문자열·일반 텍스트(한글·기호 포함).
-    # None 은 여기 넣지 않는다 -- 발견②③으로 이미 별도 고정했다.
-    return st.one_of(st.just(""), st.text(min_size=0, max_size=200))
+def _weird_text() -> st.SearchStrategy[Any]:
+    # "이상한 값" -- 빈 문자열·아주 긴 문자열·일반 텍스트(한글·기호 포함)·
+    # None·비문자열(정수·리스트). FIX-025 이후 검증기가 이들을 예외 없이
+    # `malformed` 로 거부하므로 넓은 탐색에 포함한다(발견②③⑦과 같은
+    # 종류의 입력).
+    return st.one_of(
+        st.none(),
+        st.just(""),
+        st.text(min_size=0, max_size=200),
+        st.integers(),
+        st.lists(st.text(max_size=5), max_size=3),
+    )
 
 
-def _fact_key_item() -> st.SearchStrategy[str]:
-    return st.one_of(st.sampled_from(_KNOWN_FACT_KEYS), st.text(min_size=0, max_size=12))
+def _fact_key_item() -> st.SearchStrategy[Any]:
+    # FIX-025 이후: 해시 불가능한 원소(중첩 리스트)·비문자열·None 도
+    # 포함한다(발견⑥과 같은 종류의 입력).
+    return st.one_of(
+        st.sampled_from(_KNOWN_FACT_KEYS),
+        st.text(min_size=0, max_size=12),
+        st.none(),
+        st.integers(),
+        st.lists(st.text(max_size=5), max_size=2),
+    )
 
 
-def _event_id_item() -> st.SearchStrategy[int]:
-    # "거대 정수" 포함 -- 파이썬 int 는 임의 정밀도라 오버플로가 없다.
-    return st.one_of(st.sampled_from(_KNOWN_EVENT_IDS), st.integers(min_value=-(10**15), max_value=10**15))
+def _event_id_item() -> st.SearchStrategy[Any]:
+    # "거대 정수" 포함(파이썬 int 는 임의 정밀도) + FIX-025 이후 해시
+    # 불가능한 원소·비정수·`bool`(FIX-007 관례 -- `bool` 은 `int` 로 치지
+    # 않는다)도 포함한다(발견⑥과 같은 종류의 입력).
+    return st.one_of(
+        st.sampled_from(_KNOWN_EVENT_IDS),
+        st.integers(min_value=-(10**15), max_value=10**15),
+        st.booleans(),
+        st.none(),
+        st.text(max_size=5),
+        st.lists(st.integers(), max_size=2),
+    )
 
 
-def _basis_strategy() -> st.SearchStrategy[dict[str, Any]]:
-    # 원소는 전부 해시 가능(str/int) -- 해시 불가 원소는 발견⑥으로
-    # 별도 고정했다(이 전략의 탐색 범위 밖).
-    return st.fixed_dictionaries(
+def _basis_strategy() -> st.SearchStrategy[Any]:
+    well_formed = st.fixed_dictionaries(
         {
             "fact_keys": st.lists(_fact_key_item(), max_size=4),
             "event_ids": st.lists(_event_id_item(), max_size=4),
         }
     )
+    # FIX-025 이후: `basis` 자체가 dict 가 아닌 경우(None·리스트·문자열)도
+    # 넓은 탐색에 포함한다(발견④⑤와 같은 종류의 입력).
+    return st.one_of(well_formed, st.none(), st.just([]), st.just("not-a-dict"))
 
 
 def _line_strategy() -> st.SearchStrategy[BriefingLine]:
@@ -523,7 +558,8 @@ def _suggestion_strategy() -> st.SearchStrategy[Suggestion | None]:
 
 
 def _pattern_sentence_strategy() -> st.SearchStrategy[dict[str, Any]]:
-    # sentence 는 문자열만(비 None·비문자열은 발견⑦로 별도 고정).
+    # sentence: FIX-025 이후 비문자열(None 포함)도 넓은 탐색에 포함한다
+    # (발견⑦과 같은 종류의 입력).
     return st.fixed_dictionaries(
         {
             "key": st.one_of(st.sampled_from(_KNOWN_FACT_KEYS), st.just("unknown:key"), st.just("")),
@@ -545,10 +581,10 @@ def _composed_strategy() -> st.SearchStrategy[ComposedBriefing]:
 @_HYP
 def test_validate_briefing_never_raises_for_weird_typed_input(composed: ComposedBriefing) -> None:
     """`from_type`/`builds` 로 만든 "이상한(빈 문자열·아주 긴 문자열·
-    알려지지 않은 키/거대 id)" 값에도 예외를 던지지 않는다(docstring
-    약속, 판정 표 5행) -- 단, `text`/`basis` 가 `None` 이거나 근거 원소가
-    해시 불가능하거나 패턴 문장이 비문자열인 입력은 발견②~⑦로 이미 고정된
-    별도 반례라 이 넓은 탐색 범위에서는 제외한다(모듈 docstring 설명)."""
+    알려지지 않은 키/거대 id·`None`·중첩 리스트·비문자열)" 값에도 예외를
+    던지지 않는다(docstring 약속, 판정 표 5행). FIX-025 가 발견②~⑦을
+    고쳐 이제는 이 입력들을 넓은 탐색 범위에서 뺄 필요가 없다 -- 전부
+    `malformed` 로 거부되고 나머지 항목은 유지된다."""
     briefing_input = _fuzz_briefing_input()
     result, rejected = validate_briefing(briefing_input, composed)
     assert isinstance(result, ComposedBriefing)
@@ -556,89 +592,126 @@ def test_validate_briefing_never_raises_for_weird_typed_input(composed: Composed
 
 
 # ---------------------------------------------------------------------------
-# 발견②~⑦ 최소 반례(보고용, 미수정) -- 위 넓은 탐색에서 의도적으로 제외한
-# 입력들이 실제로 무엇을 던지는지 고정한다.
+# 발견②~⑦ 최소 반례 -- FIX-025 가 고친 뒤에도 "예외 없음 + 그 항목이
+# 버려지고 rejected 에 이유가 남는다" 가 성립하는지 그대로 고정한다.
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.xfail(strict=True, raises=TypeError, reason="FIX-024 발견② -- FIX-025 에서 수정 예정")
-def test_validate_briefing_raises_when_line_text_is_none_FOUND() -> None:
-    """FIX-024 발견②(보고, 미수정) -- `BriefingLine.text=None`(근거는
-    알려진 사실 키라 `no_basis`/`unknown_basis` 를 통과)이면 금지 표현
-    검사 `bad in line.text` 가 `TypeError: argument of type 'NoneType'
-    is not a container or iterable` 로 죽는다. 최소 반례: 아래 그대로.
-    제품 코드는 고치지 않는다(FIX-024 위임 범위) -- 사용자 결정 후 별도
-    FIX."""
+def test_validate_briefing_drops_line_with_non_string_text() -> None:
+    """FIX-024 발견②를 FIX-025 가 고쳤다 -- `BriefingLine.text=None`
+    (근거는 알려진 사실 키라 `no_basis`/`unknown_basis` 는 통과했을
+    값)이면 예전에는 금지 표현 검사 `bad in line.text` 가 `TypeError` 로
+    죽었다. 이제는 예외 없이 그 줄만 버리고 `rejected` 에 `malformed`
+    사유를 남긴다."""
     briefing_input = _fuzz_briefing_input()
     line = BriefingLine(text=None, basis={"fact_keys": ["likes"], "event_ids": []})  # type: ignore[arg-type]
     composed = ComposedBriefing(pattern_sentences=[], lines=[line], suggestion=None)
-    validate_briefing(briefing_input, composed)
+
+    result, rejected = validate_briefing(briefing_input, composed)
+
+    assert result.lines == []
+    assert {"item": {"kind": "line", "text": None, "basis": line.basis}, "reason": REASON_MALFORMED} in rejected
 
 
-@pytest.mark.xfail(strict=True, raises=TypeError, reason="FIX-024 발견③ -- FIX-025 에서 수정 예정")
-def test_validate_briefing_raises_when_suggestion_text_is_none_FOUND() -> None:
-    """FIX-024 발견③(보고, 미수정) -- `Suggestion.text=None` 이면 줄바꿈
-    검사 `"\\n" in suggestion.text` 가 같은 종류의 `TypeError` 로 죽는다
-    (발견②와 같은 뿌리, 자리만 다르다). 제품 코드는 고치지 않는다."""
+def test_validate_briefing_drops_suggestion_with_non_string_text() -> None:
+    """FIX-024 발견③을 FIX-025 가 고쳤다 -- `Suggestion.text=None` 이면
+    예전에는 줄바꿈 검사 `"\\n" in suggestion.text` 가 같은 종류의
+    `TypeError` 로 죽었다(발견②와 같은 뿌리, 자리만 다르다). 이제는
+    제안을 버리고 `malformed` 사유를 남긴다."""
     briefing_input = _fuzz_briefing_input()
     suggestion = Suggestion(text=None, basis={"fact_keys": ["likes"], "event_ids": []})  # type: ignore[arg-type]
     composed = ComposedBriefing(pattern_sentences=[], lines=[], suggestion=suggestion)
-    validate_briefing(briefing_input, composed)
+
+    result, rejected = validate_briefing(briefing_input, composed)
+
+    assert result.suggestion is None
+    # `_fuzz_briefing_input()` 은 두 패턴 키(`pattern:conflict`/
+    # `pattern:praise`)를 포함하는데 `composed` 가 패턴 문장을 하나도
+    # 주지 않아 `missing_pattern` 거부가 함께 섞인다 -- 이 테스트의
+    # 관심사가 아니므로 `in` 으로 확인한다.
+    assert {
+        "item": {"kind": "suggestion", "text": None, "basis": suggestion.basis},
+        "reason": REASON_MALFORMED,
+    } in rejected
 
 
-@pytest.mark.xfail(strict=True, raises=AttributeError, reason="FIX-024 발견④ -- FIX-025 에서 수정 예정")
-def test_validate_briefing_raises_when_line_basis_is_none_FOUND() -> None:
-    """FIX-024 발견④(보고, 미수정) -- `BriefingLine.basis=None` 이면
-    `line.basis.get(...)` 에서 `AttributeError: 'NoneType' object has no
-    attribute 'get'`. 제품 코드는 고치지 않는다."""
+def test_validate_briefing_drops_line_with_none_basis() -> None:
+    """FIX-024 발견④를 FIX-025 가 고쳤다 -- `BriefingLine.basis=None`
+    이면 예전에는 `line.basis.get(...)` 에서 `AttributeError` 로 죽었다.
+    이제는 그 줄을 버리고 `malformed` 사유를 남긴다."""
     briefing_input = _fuzz_briefing_input()
     line = BriefingLine(text="안녕", basis=None)  # type: ignore[arg-type]
     composed = ComposedBriefing(pattern_sentences=[], lines=[line], suggestion=None)
-    validate_briefing(briefing_input, composed)
+
+    result, rejected = validate_briefing(briefing_input, composed)
+
+    assert result.lines == []
+    assert {"item": {"kind": "line", "text": "안녕", "basis": None}, "reason": REASON_MALFORMED} in rejected
 
 
-@pytest.mark.xfail(strict=True, raises=AttributeError, reason="FIX-024 발견⑤ -- FIX-025 에서 수정 예정")
-def test_validate_briefing_raises_when_suggestion_basis_is_none_FOUND() -> None:
-    """FIX-024 발견⑤(보고, 미수정) -- `Suggestion.basis=None` 도 같은
-    뿌리의 `AttributeError`. 제품 코드는 고치지 않는다."""
+def test_validate_briefing_drops_suggestion_with_none_basis() -> None:
+    """FIX-024 발견⑤를 FIX-025 가 고쳤다 -- `Suggestion.basis=None` 도
+    같은 뿌리의 `AttributeError` 였다. 이제는 제안을 버리고 `malformed`
+    사유를 남긴다."""
     briefing_input = _fuzz_briefing_input()
     suggestion = Suggestion(text="제안", basis=None)  # type: ignore[arg-type]
     composed = ComposedBriefing(pattern_sentences=[], lines=[], suggestion=suggestion)
-    validate_briefing(briefing_input, composed)
+
+    result, rejected = validate_briefing(briefing_input, composed)
+
+    assert result.suggestion is None
+    assert {
+        "item": {"kind": "suggestion", "text": "제안", "basis": None},
+        "reason": REASON_MALFORMED,
+    } in rejected
 
 
-@pytest.mark.xfail(strict=True, raises=TypeError, reason="FIX-024 발견⑥ -- FIX-025 에서 수정 예정")
 @pytest.mark.parametrize("field", ["fact_keys", "event_ids"])
-def test_validate_briefing_raises_when_fact_keys_element_is_unhashable_FOUND(field: str) -> None:
-    """FIX-024 발견⑥(보고, 미수정) -- `basis["fact_keys"]`(또는
-    `event_ids`) 원소가 해시 불가능(예: 중첩 리스트)하면 알려진 키/id
-    집합 멤버십 검사(`element not in known_set`)가 `TypeError:
-    unhashable type`. FIX-021 이 고친 `pattern_sentences[].key` 와 같은
-    종류의 문제지만 **줄·제안의 근거 원소**는 아직 `isinstance` 가드가
-    없다. 제품 코드는 고치지 않는다."""
+def test_validate_briefing_drops_line_with_unhashable_basis_element(field: str) -> None:
+    """FIX-024 발견⑥을 FIX-025 가 고쳤다 -- `basis["fact_keys"]`(또는
+    `event_ids`) 원소가 해시 불가능(예: 중첩 리스트)하면 예전에는 알려진
+    키/id 집합 멤버십 검사(`element not in known_set`)가 `TypeError:
+    unhashable type` 로 죽었다(FIX-021 이 고친 `pattern_sentences[].key`
+    와 같은 종류지만 줄·제안의 근거 원소는 그때 고치지 않았다). 이제는
+    `_is_valid_basis_shape()` 가 원소 타입을 먼저 확인해 그 줄을 버리고
+    `malformed` 사유를 남긴다."""
     briefing_input = _fuzz_briefing_input()
     basis: dict[str, Any] = {"fact_keys": [], "event_ids": []}
     basis[field] = [["중첩", "리스트"]]
     line = BriefingLine(text="안녕", basis=basis)
     composed = ComposedBriefing(pattern_sentences=[], lines=[line], suggestion=None)
-    validate_briefing(briefing_input, composed)
+
+    result, rejected = validate_briefing(briefing_input, composed)
+
+    assert result.lines == []
+    assert {"item": {"kind": "line", "text": "안녕", "basis": basis}, "reason": REASON_MALFORMED} in rejected
 
 
-@pytest.mark.xfail(strict=True, raises=TypeError, reason="FIX-024 발견⑦ -- FIX-025 에서 수정 예정")
-def test_validate_briefing_raises_when_pattern_sentence_is_non_string_non_none_FOUND() -> None:
-    """FIX-024 발견⑦(보고, 미수정) -- `pattern_sentences[].sentence` 가
-    `None` 이 아니면서 문자열도 아니면(예: 정수) `_extract_mentioned_
-    counts` 의 정규식 `findall` 이 `TypeError: expected string or
-    bytes-like object` 로 죽는다(`sentence=None` 자체는 `missing_
-    pattern` 분기로 안전하다 -- 이 반례와 다르다). 제품 코드는 고치지
-    않는다."""
+def test_validate_briefing_replaces_non_string_pattern_sentence_with_template() -> None:
+    """FIX-024 발견⑦을 FIX-025 가 고쳤다 -- `pattern_sentences[].sentence`
+    가 `None` 이 아니면서 문자열도 아니면(예: 정수) 예전에는
+    `_extract_mentioned_counts` 의 정규식 `findall` 이 `TypeError` 로
+    죽었다(`sentence=None` 자체는 `missing_pattern` 분기로 원래부터
+    안전했다 -- 이 반례와 다르다). 이제는 `malformed` 사유로 거부하고
+    규칙 `value` 그대로 템플릿 문장으로 채운다(`missing_pattern` 과 같은
+    보강 성격)."""
     briefing_input = _fuzz_briefing_input()
     composed = ComposedBriefing(
         pattern_sentences=[{"key": "pattern:conflict", "sentence": 12345}],
         lines=[],
         suggestion=None,
     )
-    validate_briefing(briefing_input, composed)
+
+    result, rejected = validate_briefing(briefing_input, composed)
+
+    # `_fuzz_briefing_input()` 의 `pattern:praise` 는 `composed` 가 문장을
+    # 아예 주지 않아 `missing_pattern` 으로 따로 채워진다(이 테스트의
+    # 관심사가 아니다) -- `pattern:conflict` 항목만 확인한다.
+    assert {"key": "pattern:conflict", "sentence": "3회 (2026-01-01)"} in result.pattern_sentences
+    assert {
+        "item": {"kind": "pattern", "key": "pattern:conflict", "sentence": 12345},
+        "reason": REASON_MALFORMED,
+    } in rejected
 
 
 # ===========================================================================

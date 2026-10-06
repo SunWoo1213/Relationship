@@ -32,7 +32,7 @@
   `rejected:[{item, reason}]` 로 모아 돌려준다. 나머지 항목은 그대로
   유지한다(원칙7 "제안이 버려져도 나머지 줄은 유지").
 
-## 검증기 거부 사유 7종 + R-4 보강
+## 검증기 거부 사유 8종 + R-4 보강 (FIX-025 `malformed` 추가)
 
 | 사유 코드 | 대상 | 조건 |
 |-----------|------|------|
@@ -43,11 +43,21 @@
 | `too_long` | 제안만 | `BRIEFING_SUGGESTION_MAX_CHARS` 초과 |
 | `forbidden_expression` | 줄·제안 | `BRIEFING_FORBIDDEN_EXPRESSIONS` 부분 문자열 포함. 요약 줄은 그 줄만 버린다(사용자 결정 2026-10-02 — 실 LLM 확인에서 "부친상을 겪으셔서 힘들어 보입니다" 줄이 통과했다, 03-log U4) |
 | `count_mismatch` | 패턴만 | 생성기 문장에서 뽑은 숫자 집합에 규칙 `value` 의 `n` 이 없음 -> 그 패턴만 템플릿 문장(`value` 그대로)으로 대체 |
+| `malformed` | 줄·제안·패턴 | **FIX-025** -- 줄·제안의 `text` 가 비문자열, `basis` 가 dict 아님(또는 `fact_keys`/`event_ids` 원소가 잘못된 타입 -- 해시 불가능한 값 포함, `event_ids` 는 `bool` 을 `int` 로 치지 않는다, FIX-007 관례), 패턴 문장 `sentence` 가 `None` 이 아니면서 비문자열이면 이 사유로 거부한다. 패턴은 `count_mismatch`/`missing_pattern` 과 같이 템플릿 문장으로 대체한다 -- 거부라기보다 보강 |
 
 패턴 사실 중 생성기가 아예 빠뜨린 키는(R-4 "입력 패턴을 생성기가
 빠뜨리면 템플릿 문장으로 채운다") `missing_pattern` 사유로 기록하고
 템플릿 문장으로 채운다 -- 거부라기보다 보강이지만, 근거 추적을 위해
 `rejected[]` 에 함께 남긴다(원칙9).
+
+`malformed`(FIX-025)는 "타입이 깨져 의미 검증 자체를 할 수 없는 입력"을
+걸러내는 **형태 가드**다 -- 나머지 7개 사유는 모두 "타입은 정상인데
+의미가 맞지 않는" 경우를 가른다. FIX-024 가 `hypothesis` 로 찾은 7건
+(`tests/test_properties.py`)이 전부 이 가드 하나로 닫힌다 -- `text=None`
+(발견②③), `basis=None`(발견④⑤), `basis` 원소가 해시 불가능(발견⑥),
+`pattern_sentences[].sentence` 가 비문자열(발견⑦). `combine()` 의
+`ZeroDivisionError`(발견①)는 이 모듈이 아니라 `app/er/types.py::ERConfig`
+생성 시점에서 막는다(별도 수정).
 
 ## 근거 자격 판단(결정 G, U3 03-log 인계 — 이 단위가 정한 것)
 
@@ -422,9 +432,43 @@ REASON_COUNT_MISMATCH = "count_mismatch"
 #: 남긴다(원칙9).
 REASON_MISSING_PATTERN = "missing_pattern"
 
+#: FIX-025 -- 줄·제안의 `text` 가 비문자열이거나 `basis` 가 dict 가
+#: 아니거나(또는 `fact_keys`/`event_ids` 원소 타입이 잘못됐거나), 패턴
+#: 문장 `sentence` 가 `None` 이 아니면서 비문자열이면 이 사유로 거부한다
+#: (모듈 docstring "검증기 거부 사유" 절 참고). `basis` 를 더 해석할 수
+#: 없는 "형태" 문제라서 `no_basis`/`unknown_basis`(둘 다 타입은 정상인데
+#: 내용이 비는/모르는 경우)와 구분한다.
+REASON_MALFORMED = "malformed"
+
 
 def _suggestion_basis_ids(fact_keys: list[str], event_ids: list[int]) -> tuple[list[str], list[int]]:
     return list(fact_keys), list(event_ids)
+
+
+def _is_valid_basis_shape(basis: Any) -> bool:
+    """`basis` 가 안전하게 더 처리할 수 있는 모양인지 본다(FIX-025) --
+    `dict` 이고, `fact_keys`(있다면)는 전부 `str`, `event_ids`(있다면)는
+    `bool` 을 제외한 `int`(FIX-007 관례 -- `bool` 은 `int` 의 서브클래스지만
+    여기서는 `int` 로 치지 않는다)인 리스트인가. 키가 아예 없으면 빈
+    리스트로 취급하는 기존 `.get(key, [])` 동작과 맞춰 안전하다.
+
+    이 함수가 `True` 를 돌려주면 이후 `basis.get(...)` 호출과 "알려진
+    키/이벤트 id 집합 멤버십 검사"(`in`)가 예외 없이 안전하다 -- 해시
+    불가능한 원소(리스트·dict 등)는 `str`/`int` 도 아니므로 이 단계에서
+    이미 걸러진다(FIX-024 발견⑥과 같은 뿌리를 한 곳에서 막는다)."""
+
+    if not isinstance(basis, dict):
+        return False
+    fact_keys = basis.get("fact_keys", [])
+    event_ids = basis.get("event_ids", [])
+    if not isinstance(fact_keys, list) or not all(isinstance(key, str) for key in fact_keys):
+        return False
+    if not isinstance(event_ids, list):
+        return False
+    for event_id in event_ids:
+        if isinstance(event_id, bool) or not isinstance(event_id, int):
+            return False
+    return True
 
 
 def validate_briefing(
@@ -482,6 +526,18 @@ def validate_briefing(
             final_patterns.append({"key": key, "sentence": _template_pattern_sentence(value)})
             continue
 
+        if not isinstance(sentence, str):
+            # FIX-025 발견⑦ -- `sentence` 가 `None` 이 아니면서 문자열도
+            # 아니면(예: 정수) 아래 숫자 추출 정규식(`_extract_mentioned_
+            # counts`)이 비문자열 입력을 받아 TypeError 로 죽던 자리다.
+            # `missing_pattern` 과 같은 보강 성격으로 템플릿 문장으로
+            # 채운다.
+            rejected.append(
+                {"item": {"kind": "pattern", "key": key, "sentence": sentence}, "reason": REASON_MALFORMED}
+            )
+            final_patterns.append({"key": key, "sentence": _template_pattern_sentence(value)})
+            continue
+
         rule_n = _extract_rule_count(value)
         mentioned = _extract_mentioned_counts(sentence)
         if rule_n is not None and rule_n not in mentioned:
@@ -496,6 +552,16 @@ def validate_briefing(
     # --- 요약 줄 ---
     final_lines: list[BriefingLine] = []
     for line in raw.lines:
+        if not isinstance(line.text, str) or not _is_valid_basis_shape(line.basis):
+            # FIX-025 발견②④⑥ -- `text` 가 비문자열이거나 `basis` 모양이
+            # 안전하지 않으면(dict 아님·원소 타입 불량) 아래 `.get`/`in`
+            # 호출이 TypeError/AttributeError 로 죽기 전에 거부한다
+            # (무예외 약속).
+            rejected.append(
+                {"item": {"kind": "line", "text": line.text, "basis": line.basis}, "reason": REASON_MALFORMED}
+            )
+            continue
+
         fact_keys, event_ids = _suggestion_basis_ids(
             line.basis.get("fact_keys", []), line.basis.get("event_ids", [])
         )
@@ -532,39 +598,48 @@ def validate_briefing(
     final_suggestion: Suggestion | None = None
     if raw.suggestion is not None:
         suggestion = raw.suggestion
-        fact_keys, event_ids = _suggestion_basis_ids(
-            suggestion.basis.get("fact_keys", []), suggestion.basis.get("event_ids", [])
-        )
-
-        reason: str | None = None
-        if not fact_keys and not event_ids:
-            reason = REASON_NO_BASIS
-        else:
-            unknown_keys = [key for key in fact_keys if key not in known_fact_keys]
-            unknown_events = [event_id for event_id in event_ids if event_id not in known_event_ids]
-            if unknown_keys or unknown_events:
-                reason = REASON_UNKNOWN_BASIS
-            elif "\n" in suggestion.text or "\r" in suggestion.text:
-                reason = REASON_NOT_ONE_LINE
-            elif len(suggestion.text) > BRIEFING_SUGGESTION_MAX_CHARS:
-                reason = REASON_TOO_LONG
-            elif any(bad in suggestion.text for bad in BRIEFING_FORBIDDEN_EXPRESSIONS):
-                reason = REASON_FORBIDDEN_EXPRESSION
-            else:
-                has_eligible_fact = any(key in eligible_fact_keys for key in fact_keys)
-                has_event_basis = bool(event_ids)
-                if not has_eligible_fact and not has_event_basis:
-                    reason = REASON_BASIS_NOT_ELIGIBLE
-
-        if reason is not None:
+        if not isinstance(suggestion.text, str) or not _is_valid_basis_shape(suggestion.basis):
+            # FIX-025 발견③⑤⑥ -- 줄과 같은 이유(무예외 약속).
             rejected.append(
                 {
-                    "item": {"kind": "suggestion", "text": suggestion.text, "basis": dict(suggestion.basis)},
-                    "reason": reason,
+                    "item": {"kind": "suggestion", "text": suggestion.text, "basis": suggestion.basis},
+                    "reason": REASON_MALFORMED,
                 }
             )
         else:
-            final_suggestion = suggestion
+            fact_keys, event_ids = _suggestion_basis_ids(
+                suggestion.basis.get("fact_keys", []), suggestion.basis.get("event_ids", [])
+            )
+
+            reason: str | None = None
+            if not fact_keys and not event_ids:
+                reason = REASON_NO_BASIS
+            else:
+                unknown_keys = [key for key in fact_keys if key not in known_fact_keys]
+                unknown_events = [event_id for event_id in event_ids if event_id not in known_event_ids]
+                if unknown_keys or unknown_events:
+                    reason = REASON_UNKNOWN_BASIS
+                elif "\n" in suggestion.text or "\r" in suggestion.text:
+                    reason = REASON_NOT_ONE_LINE
+                elif len(suggestion.text) > BRIEFING_SUGGESTION_MAX_CHARS:
+                    reason = REASON_TOO_LONG
+                elif any(bad in suggestion.text for bad in BRIEFING_FORBIDDEN_EXPRESSIONS):
+                    reason = REASON_FORBIDDEN_EXPRESSION
+                else:
+                    has_eligible_fact = any(key in eligible_fact_keys for key in fact_keys)
+                    has_event_basis = bool(event_ids)
+                    if not has_eligible_fact and not has_event_basis:
+                        reason = REASON_BASIS_NOT_ELIGIBLE
+
+            if reason is not None:
+                rejected.append(
+                    {
+                        "item": {"kind": "suggestion", "text": suggestion.text, "basis": dict(suggestion.basis)},
+                        "reason": reason,
+                    }
+                )
+            else:
+                final_suggestion = suggestion
 
     composed = ComposedBriefing(
         pattern_sentences=final_patterns,
