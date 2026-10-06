@@ -1021,6 +1021,7 @@ def test_stub_output_cannot_land_in_reports(capsys: pytest.CaptureFixture[str]) 
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.dbtest
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")
 def test_dry_run_chain_produces_all_outputs(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -1051,6 +1052,7 @@ def test_dry_run_chain_produces_all_outputs(
     assert {row["t_new"] for row in rows} == {T_NEW}
 
 
+@pytest.mark.dbtest
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")
 def test_dry_run_logs_embedded_alias_count_per_scenario(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -1067,6 +1069,7 @@ def test_dry_run_logs_embedded_alias_count_per_scenario(
         assert line.endswith("ok")
 
 
+@pytest.mark.dbtest
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")
 def test_dry_run_dumps_traces_before_rollback_and_rechecks(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -1102,6 +1105,7 @@ def test_dry_run_dumps_traces_before_rollback_and_rechecks(
     assert cli.main(["--recheck-traces", str(traces)]) == cli.RC_OK
 
 
+@pytest.mark.dbtest
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")
 def test_dry_run_traces_per_scenario_caps_the_dump(tmp_path: Path) -> None:
     out_dir = tmp_path / "out"
@@ -1128,6 +1132,7 @@ def test_dry_run_traces_per_scenario_caps_the_dump(tmp_path: Path) -> None:
     assert len(lines) == 6  # 시나리오 2개 × 3줄
 
 
+@pytest.mark.dbtest
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")
 def test_dry_run_metrics_json_is_byte_identical(tmp_path: Path) -> None:
     first = tmp_path / "a"
@@ -1138,6 +1143,7 @@ def test_dry_run_metrics_json_is_byte_identical(tmp_path: Path) -> None:
         assert (first / name).read_bytes() == (second / name).read_bytes(), name
 
 
+@pytest.mark.dbtest
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")
 def test_commit_and_run_mode_land_in_meta(tmp_path: Path) -> None:
     out_dir = tmp_path / "out"
@@ -1166,6 +1172,7 @@ def test_commit_and_run_mode_land_in_meta(tmp_path: Path) -> None:
     assert "0123456789abcdef" in body
 
 
+@pytest.mark.dbtest
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")
 def test_chain_gzips_raw_and_feeds_the_gz_to_every_stage(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -1203,6 +1210,7 @@ def test_chain_gzips_raw_and_feeds_the_gz_to_every_stage(
     assert "[fail]" not in out
 
 
+@pytest.mark.dbtest
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")
 def test_chain_drop_raw_plain_leaves_only_the_gz(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -1220,6 +1228,7 @@ def test_chain_drop_raw_plain_leaves_only_the_gz(
         assert (out_dir / name).exists(), name
 
 
+@pytest.mark.dbtest
 @pytest.mark.usefixtures("db_engine", "no_provider_factories")
 def test_dry_run_leaves_no_rows_and_no_reports_files(tmp_path: Path) -> None:
     from sqlalchemy import func, select

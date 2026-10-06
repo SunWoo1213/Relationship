@@ -9,6 +9,14 @@ on:
 
 # dev2 는 커밋마다 푸시하므로 같은 브랜치에 연달아 밀면 옛 실행을 취소하고
 # 최신 커밋만 끝까지 돌린다(FIX-018).
+#
+# 그룹 키는 `${{ github.ref }}` 하나뿐이라 워크플로 실행(run) 단위로
+# 묶인다 -- GitHub Actions 문서상 `cancel-in-progress` 는 "같은 그룹의
+# 이전 run 전체" 를 취소하는 것이지 "한 run 안의 job 끼리" 를 취소하는
+# 것이 아니다. 즉 같은 run 안에서 matrix(3.13/3.14)·windows 세 job 은
+# 서로 취소하지 않고 나란히 돈다 -- 이 결론은 문서·그룹 키 설계에 근거한
+# 것이고, 실제 동시 실행 여부는 이번 FIX 의 dev2 푸시 후 `gh run view` 로
+# 확인한다(FIX-022 결과절, "푸시 후 확인"으로 비워 둠).
 concurrency:
   group: tests-${{ github.ref }}
   cancel-in-progress: true
@@ -16,6 +24,13 @@ concurrency:
 jobs:
   pytest:
     runs-on: ubuntu-latest
+    # Refs: FIX-022 -- CI 는 그동안 3.13 뿐이었다. 로컬 Mac `.venv` 는 3.14 라
+    # mypy 기준선이 CI 에서만 깨진 적이 있다(FIX-021 보완). 두 버전을 모두
+    # 돌려 다음에도 버전 차이가 CI 에서야 드러나는 일을 줄인다.
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.13", "3.14"]
     services:
       postgres:
         image: pgvector/pgvector:pg16
@@ -38,8 +53,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python-version }}
           cache: pip
+          # actions/setup-python 의 pip 캐시 키는 내부적으로 파이썬 설치
+          # 경로(python-version 에 따라 달라짐)를 포함하므로 버전마다
+          # 자동으로 다른 캐시를 쓴다 -- matrix 축만 추가하면 된다(별도
+          # 키 지정 불필요).
           cache-dependency-path: requirements-dev.txt
       - run: pip install -r requirements-dev.txt
       # Refs: FIX-021 -- app/tests/scripts/evaluation 전부(select 는
@@ -63,4 +82,46 @@ jobs:
       # 내부에서 subprocess 로 실행해 파이프 종료 코드 문제를 피한다 --
       # `mypy | 도구` 형태로 쓰면 기존 오류 때문에 mypy 자체가 항상
       # 비영(非零)으로 끝나 pipefail 에 걸린다).
+      #
+      # [tool.mypy] python_version = "3.13"(pyproject.toml) 은 그대로 둔다 --
+      # mypy 가 검사하는 "대상" 버전 기준이지, 이 단계를 어느 인터프리터로
+      # 실행하는지와는 별개다(지원 최저 버전 기준 고정, FIX-021).
       - run: python scripts/mypy_check.py --run
+      # Refs: FIX-022 -- 훅 자가 점검은 그동안 사람이 손으로 돌릴 때만
+      # 실행됐다. 매 CI 실행마다 돌려 훅 회귀를 기계가 먼저 잡는다.
+      - run: bash .claude/scripts/test-guards.sh
+
+  windows:
+    # Refs: FIX-022 -- "Mac·Windows 양쪽에서 동작" 이 명시 요구(FIX-008·010·
+    # 011)인데 CI 는 ubuntu 하나뿐이었다. Windows 러너는 Postgres 서비스
+    # 컨테이너를 쓸 수 없으므로(리눅스 컨테이너 전용) DB 테스트는 돌리지
+    # 않는다 -- `-m "not dbtest"` 로 전부 deselect(스킵이 아니라 애초에
+    # 선택되지 않음). dbtest 로 표시되지 않은 채 DB 를 쓰는 테스트가 있으면
+    # 이 경로에서 접속 실패로 드러난다(FIX-022 수정안 3행이 9건을 표시해
+    # 막은 것과 같은 회귀를 여기서도 계속 잡는다).
+    runs-on: windows-latest
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
+      - run: python -m ruff check app tests scripts evaluation
+      # shell: bash -- Git Bash(Windows 러너에 기본 설치)를 명시로 고정한다.
+      # 리눅스 job 과 같은 grep 판정식을 그대로 재사용하려는 목적이고,
+      # PowerShell 의 다른 종료 코드/파이프 의미론을 섞지 않기 위해서다.
+      # DATABASE_URL 등 DB 접속 환경변수는 일부러 주지 않는다 -- dbtest 가
+      # deselect 되므로 db_engine 픽스처 자체가 호출되지 않고(접속 시도
+      # 없음), 값을 줘도 결과가 같아야 정상이다(tests/db_bootstrap.py 의
+      # apply_test_database_env 는 DB 에 붙지 않는 순수 계산만 한다).
+      - shell: bash
+        run: |
+          python -m pytest -q -rs -m "not dbtest" tests/ | tee pytest.out
+          if grep -qE '[0-9]+ skipped' pytest.out; then echo "::error::skipped tests found"; exit 1; fi
+      # test-guards.sh 자체가 bash 스크립트이므로 Git Bash 로 돌린다.
+      - shell: bash
+        run: bash .claude/scripts/test-guards.sh

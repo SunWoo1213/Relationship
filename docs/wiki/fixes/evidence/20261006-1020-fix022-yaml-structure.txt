@@ -1,0 +1,23 @@
+top-level keys: ['name', True, 'concurrency', 'jobs']
+jobs: ['pytest', 'windows']
+pytest.strategy: {'fail-fast': False, 'matrix': {'python-version': ['3.13', '3.14']}}
+pytest.runs-on: ubuntu-latest
+pytest step run commands:
+ - actions/checkout@v4
+ - actions/setup-python@v5
+ - pip install -r requirements-dev.txt
+ - python -m ruff check app tests scripts evaluation
+ - python -m pytest -q -rs --cov=app --cov-branch --cov-report=term tests/ | tee pytest.out
+ - python scripts/mypy_check.py --run
+ - bash .claude/scripts/test-guards.sh
+
+windows.runs-on: windows-latest
+windows.env: {'PYTHONUTF8': '1'}
+ - None | actions/checkout@v4
+ - None | actions/setup-python@v5
+ - None | pip install -r requirements-dev.txt
+ - None | python -m ruff check app tests scripts evaluation
+ - bash | python -m pytest -q -rs -m "not dbtest" tests/ | tee pytest.out
+ - bash | bash .claude/scripts/test-guards.sh
+
+concurrency: {'group': 'tests-${{ github.ref }}', 'cancel-in-progress': True}

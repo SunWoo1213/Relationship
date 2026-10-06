@@ -414,3 +414,5 @@
 - 2026-10-06 09:35 | PUSH-dev2 | origin dev2 7459925 (실험 푸시)
 - 2026-10-06 10:04 | COMMIT | b124c8e fix(FIX-021): ruff·mypy·커버리지를 CI 에 넣어 기계가 결함을 먼저 잡게 한다
 - 2026-10-06 10:04 | PUSH-dev2 | origin dev2 b124c8e (실험 푸시)
+- 2026-10-06 10:08 | COMMIT | 3e4d67c fix(FIX-021): mypy 대상 버전을 3.13 으로 고정해 CI 와 로컬 결과를 맞춘다
+- 2026-10-06 10:08 | PUSH-dev2 | origin dev2 3e4d67c (실험 푸시)
