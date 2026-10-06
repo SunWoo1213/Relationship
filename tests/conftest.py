@@ -224,21 +224,22 @@ def grouped_embedder() -> Callable[..., Callable[[list[str]], list[list[float]]]
 
         def _embed(texts: list[str]) -> list[list[float]]:
             vectors: list[list[float]] = []
-            for text in texts:
-                group_name = string_to_group.get(text)
+            for alias_text in texts:  # text 로 두면 위 sqlalchemy.text 임포트를 가린다(F402)
+                group_name = string_to_group.get(alias_text)
                 if group_name is None:
                     vectors.append(
                         _grouped_vector_for_seed(
-                            f"__unregistered__:{text}", dimension=dim, seed=seed
+                            f"__unregistered__:{alias_text}", dimension=dim, seed=seed
                         )
                     )
                     continue
                 base = _base_vector(group_name)
                 noise = _grouped_vector_for_seed(
-                    f"__noise__:{group_name}:{text}", dimension=dim, seed=seed
+                    f"__noise__:{group_name}:{alias_text}", dimension=dim, seed=seed
                 )
                 combined = [
-                    base_weight * b + noise_weight * n for b, n in zip(base, noise)
+                    base_weight * b + noise_weight * n
+                    for b, n in zip(base, noise, strict=True)
                 ]
                 norm = sum(v * v for v in combined) ** 0.5 or 1.0
                 vectors.append([v / norm for v in combined])

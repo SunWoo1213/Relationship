@@ -1,0 +1,6 @@
+[new] 기준선에 없는 새 오류:
+  + app/embedding.py: [return-value] Incompatible return value type (got "int", expected "str") (x1)
+
+[FAIL] 새 오류 1건 -- scripts/mypy_baseline.txt 와 비교해 결함이면 고치고,
+기준선에 넣을 것이면 --update-baseline 로 재생성 후 사람이 검토하고 커밋한다.
+exit=1

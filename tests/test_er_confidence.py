@@ -127,7 +127,7 @@ def test_threshold_sweep_null_matched_person_id_never_merges() -> None:
     rng = random.Random(20260906)
     t_merge_values = [0.5, 0.6, 0.7, 0.8, 0.9, 0.95]
     count = 0
-    for i in range(2000):
+    for _i in range(2000):
         t_merge = rng.choice(t_merge_values)
         t_new = rng.uniform(0.0, t_merge)
         config = ERConfig(t_new=t_new, t_merge=t_merge)

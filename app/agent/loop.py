@@ -478,7 +478,9 @@ def _extend_for_ask(
     )
     if resolution.band == "new_person":
         tags = list(NEW_PERSON_TAG_OPTIONS)
-        resume = replace(resume, tag_by_answer=dict(zip(tags, RELATION_TAGS)))
+        # strict=True -- app/agent/types.py 모듈 레벨 assert 가 두 튜플의
+        # 길이가 같음을 보장한다(1:1 매핑, FIX-021).
+        resume = replace(resume, tag_by_answer=dict(zip(tags, RELATION_TAGS, strict=True)))
 
     resume = _apply_resume_byte_limit(resume, limit=resume_byte_limit)
 

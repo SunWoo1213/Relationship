@@ -109,8 +109,12 @@ class OpenAIEmbeddingProvider:
 def cosine_matrix(vectors: Sequence[Sequence[float]]) -> list[list[float]]:
     """코사인 유사도 행렬. 의존성 없이 순수 파이썬(30×N 이라 충분히 빠르다)."""
     norms = [math.sqrt(sum(x * x for x in v)) or 1.0 for v in vectors]
-    unit = [[x / n for x in v] for v, n in zip(vectors, norms)]
-    return [[sum(a * b for a, b in zip(u, w)) for w in unit] for u in unit]
+    # 둘 다 strict=True -- norms 는 vectors 에서 그대로 만든 1:1 리스트이고,
+    # unit 의 모든 벡터는 같은 임베딩 공급자가 낸 같은 차원이다.
+    unit = [[x / n for x in v] for v, n in zip(vectors, norms, strict=True)]
+    return [
+        [sum(a * b for a, b in zip(u, w, strict=True)) for w in unit] for u in unit
+    ]
 
 
 def similarity(labels: Sequence[str], matrix: Sequence[Sequence[float]], a: str, b: str) -> float:

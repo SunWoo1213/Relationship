@@ -25,7 +25,7 @@ import app.agent.loop as loop_module
 from app.agent.gate import check
 from app.agent.loop import resolve_mentions, run_turn
 from app.agent.propose import FakeProposer
-from app.agent.types import NEW_PERSON_TAG_OPTIONS, Proposal, ToolCallProposal
+from app.agent.types import GateVerdict, NEW_PERSON_TAG_OPTIONS, Proposal, ToolCallProposal
 from app.db.models import AgentTrace, ALIAS_SOURCES, Event, PendingQuestion, Person, PersonAlias, Schedule
 from app.er import AlreadyApplied, apply_resolution
 from app.er.judge import FakeJudge
@@ -65,7 +65,7 @@ def _call(name: str, **args) -> ToolCallProposal:
     return ToolCallProposal(name=name, args=args)
 
 
-def _verdict_for(*calls: ToolCallProposal) -> tuple[Proposal, "GateVerdict"]:
+def _verdict_for(*calls: ToolCallProposal) -> tuple[Proposal, GateVerdict]:
     proposal = Proposal(tool_calls=list(calls), raw={})
     return proposal, check(proposal)
 
@@ -189,7 +189,9 @@ def test_new_person_uses_tag_options_even_with_hint_present(db_session, fake_emb
 
     resume = row.context["resume"]
     assert resume["hints"] == {"relation_tag": "가족", "hierarchy": "상"}
-    assert resume["tag_by_answer"] == dict(zip(tags, ["가족", "연인", "친구", "직장", "지인"]))
+    assert resume["tag_by_answer"] == dict(
+        zip(tags, ["가족", "연인", "친구", "직장", "지인"], strict=True)
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -623,7 +625,7 @@ def test_run_turn_add_event_naive_datetime_is_caught_as_failed(db_session, fake_
                 # raw naive datetime 객체 -- 문자열이 아니므로
                 # _convert_datetime_args 의 시간대 보정 대상이 아니다(FIX-005
                 # 이후에도 naive 그대로 add_event 에 닿아 거절된다).
-                "occurred_at": datetime(2026, 9, 23, 19, 0, 0),
+                "occurred_at": datetime(2026, 9, 23, 19, 0, 0),  # noqa: DTZ001  # 의도된 naive(위 주석 참고) -- 거절 경로 자체를 시험한다
             },
         }
     ]

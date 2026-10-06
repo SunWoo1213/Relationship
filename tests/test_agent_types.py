@@ -95,7 +95,7 @@ def test_accepted_proposal_rejects_unknown_bucket():
 
 def test_tag_options_for_new_person_map_onto_relation_tags_one_to_one():
     assert len(NEW_PERSON_TAG_OPTIONS) == len(RELATION_TAGS)
-    mapping = dict(zip(NEW_PERSON_TAG_OPTIONS, RELATION_TAGS))
+    mapping = dict(zip(NEW_PERSON_TAG_OPTIONS, RELATION_TAGS, strict=True))
     assert len(mapping) == len(RELATION_TAGS)  # 옵션 문자열 중복 없음
     assert set(mapping.values()) == set(RELATION_TAGS)
     # 01-plan 84행 원문 순서 그대로.
@@ -213,7 +213,8 @@ def test_pending_resume_identity_shape_omits_kind_specific_fields():
 
 
 def test_pending_resume_new_person_shape_includes_tag_by_answer():
-    tag_by_answer = dict(zip(NEW_PERSON_TAG_OPTIONS, RELATION_TAGS))
+    # strict=True -- app/agent/types.py 모듈 레벨 assert 가 길이 일치를 보장한다.
+    tag_by_answer = dict(zip(NEW_PERSON_TAG_OPTIONS, RELATION_TAGS, strict=True))
     resume = PendingResume(mention="민수", tag_by_answer=tag_by_answer)
     d = resume.to_dict()
     assert json.loads(json.dumps(d)) == d

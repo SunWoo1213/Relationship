@@ -399,7 +399,7 @@ def test_run_briefings_records_full_trace_fields_with_generator_tokens(db_sessio
 
 def test_run_briefings_push_not_configured_by_default(db_session) -> None:
     person = _make_person(db_session)
-    schedule = _make_schedule(db_session, person, scheduled_at=_T0 + timedelta(hours=1))
+    _make_schedule(db_session, person, scheduled_at=_T0 + timedelta(hours=1))
     ctx = _ctx(db_session)
 
     result = run_briefings(ctx, composer=FakeBriefingComposer(), trigger="manual")
@@ -440,7 +440,7 @@ def test_run_briefings_does_not_mutate_events(db_session) -> None:
     event = _add_event(
         db_session, person, event_type="conflict", occurred_at=_T0 - timedelta(days=1), content="다툼"
     )
-    schedule = _make_schedule(db_session, person, scheduled_at=_T0 + timedelta(hours=1))
+    _make_schedule(db_session, person, scheduled_at=_T0 + timedelta(hours=1))
     ctx = _ctx(db_session)
 
     before_raw = event.raw_utterance

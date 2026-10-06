@@ -1320,7 +1320,7 @@ def _run_chain(args: argparse.Namespace, scenarios: list[dict[str, Any]]) -> int
     )
     print(f"[run] run_mode={run_mode} run_id={run_id}")
     print(f"[run] dataset_hash={dataset_hash}")
-    print(f"[run] dataset_hash_method=sorted(data/scenarios/*.json) 의 파일명+내용 sha256")
+    print("[run] dataset_hash_method=sorted(data/scenarios/*.json) 의 파일명+내용 sha256")
     print(f"[run] commit={args.commit or '(미지정)'}")
     print(f"[run] out={out_dir}")
 

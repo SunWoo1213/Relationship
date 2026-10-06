@@ -152,7 +152,10 @@ def main(argv: list[str] | None = None) -> int:
         for batch in chunk(targets, args.batch_size):
             alias_texts = [alias for _alias_id, alias in batch]
             vectors = provider.embed(alias_texts)
-            for (alias_id, _alias), vector in zip(batch, vectors):
+            # strict=True -- provider 가 반환한 벡터 수가 배치 크기와
+            # 다르면(API 응답 이상) 잘못된 벡터를 다른 별칭에 쓰기 전에
+            # 바로 예외로 멈춘다(FIX-021 -- 이전엔 조용히 잘렸다).
+            for (alias_id, _alias), vector in zip(batch, vectors, strict=True):
                 check_dimension(vector)
                 alias_row = session.get(PersonAlias, alias_id)
                 alias_row.embedding = vector

@@ -167,7 +167,8 @@ def run_briefings(
     ctx: ToolContext,
     *,
     composer: BriefingComposer,
-    notifier: Notifier = NullNotifier(),
+    notifier: Notifier = NullNotifier(),  # noqa: B008 -- NullNotifier 는 필드
+    # 없는 frozen dataclass(app/briefing/types.py) 라 공유돼도 안전하다(상태 없음).
     schedule_id: int | None = None,
     trigger: Literal["scheduler", "manual"],
     lead_hours: float = BRIEFING_LEAD_HOURS,

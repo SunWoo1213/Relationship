@@ -5,3 +5,8 @@ pytest==9.0.3
 # (scripts/validate_scenarios.py). 런타임(requirements.txt)에는 넣지 않는다 --
 # 제품 코드는 평가 데이터셋을 읽지 않는다(사용자 결정).
 jsonschema==4.26.0
+# Refs: FIX-021 원칙8 -- 정적 검사·커버리지(ruff·mypy·pytest-cov). 제품
+# requirements.txt 는 건드리지 않는다(개발 전용).
+ruff==0.16.10
+mypy==2.4.0
+pytest-cov==7.1.0

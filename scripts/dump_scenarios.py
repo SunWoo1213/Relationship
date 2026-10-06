@@ -244,7 +244,7 @@ def build_packet(directory: Path, stamp: str) -> str:
     lines: list[str] = [
         f"# P1-pilot-dataset 라벨 검수 패킷 ({stamp})",
         "",
-        f"- 생성: `python scripts/dump_scenarios.py` (U5 산출물, 판정 없음 — L-002)",
+        "- 생성: `python scripts/dump_scenarios.py` (U5 산출물, 판정 없음 — L-002)",
         f"- 대상: `{directory.as_posix()}` · 시나리오 {len(scenarios)}건"
         f" · schema_version {manifest.get('schema_version')}",
         "- 이 문서는 **검수 요청서**다. 판정은 검수자(verifier 새 컨텍스트 또는"
@@ -338,8 +338,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.out:
         out = Path(args.out)
     else:
+        # .astimezone() 는 naive 가 아니라 "현재 시스템 시간대가 붙은" 값을
+        # 만든다 -- 벽시계 값(시·분)은 그대로이므로 strftime 출력은 바뀌지
+        # 않는다(FIX-021 DTZ005).
         out = DEFAULT_OUT_DIR / (
-            datetime.now().strftime("%Y%m%d-%H%M") + "-review-packet.md"
+            datetime.now().astimezone().strftime("%Y%m%d-%H%M") + "-review-packet.md"
         )
     out.parent.mkdir(parents=True, exist_ok=True)
     text = build_packet(directory, stamp_from_path(out))

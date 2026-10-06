@@ -119,7 +119,7 @@ def test_add_event_blank_content_raises_invalid_value(db_session, bad_content):
 def test_add_event_naive_occurred_at_raises_invalid_value(db_session):
     person = _make_person(db_session)
     ctx = _ctx(db_session)
-    naive = datetime(2026, 5, 1, 9, 30)  # tzinfo 없음
+    naive = datetime(2026, 5, 1, 9, 30)  # noqa: DTZ001  # 의도된 naive -- 거절 경로 자체를 시험한다
 
     with pytest.raises(InvalidValue):
         add_event(
@@ -277,7 +277,7 @@ def test_add_schedule_blank_title_raises_invalid_value(db_session, bad_title):
 def test_add_schedule_naive_scheduled_at_raises_invalid_value(db_session):
     person = _make_person(db_session)
     ctx = _ctx(db_session)
-    naive = datetime(2026, 5, 1, 9, 30)
+    naive = datetime(2026, 5, 1, 9, 30)  # noqa: DTZ001  # 의도된 naive -- 거절 경로 자체를 시험한다
 
     with pytest.raises(InvalidValue):
         add_schedule(ctx, person.id, "약속", naive)

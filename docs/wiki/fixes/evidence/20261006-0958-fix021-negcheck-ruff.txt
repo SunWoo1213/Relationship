@@ -1,0 +1,8 @@
+DTZ005 `datetime.datetime.now()` called without a `tz` argument
+  --> app/tools/records.py:49:26
+   |
+49 | _FIX021_NEGATIVE_CHECK = datetime.now()  # 임시 -- ruff DTZ005 부정 확인용, 되돌릴 것
+   |                          ^^^^^^^^^^^^^^
+help: Pass a `datetime.timezone` object to the `tz` parameter
+
+Found 1 error.

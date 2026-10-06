@@ -42,6 +42,9 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-dev.txt
       - run: pip install -r requirements-dev.txt
+      # Refs: FIX-021 -- app/tests/scripts/evaluation 전부(select 는
+      # pyproject.toml, F/B/DTZ). 실패하면 바로 CI 가 멈춘다.
+      - run: python -m ruff check app tests scripts evaluation
       # alembic upgrade head 를 여기서 개발 DB(relationship)에 직접 돌리던
       # 단계는 뺐다(FIX-006). tests/conftest.py 가 pytest 세션 시작 시
       # DATABASE_URL 의 DB 이름만 relationship_test 로 바꿔 그 DB 를 만들고
@@ -49,6 +52,15 @@ jobs:
       # 적용한다 -- 로컬 실행과 CI 가 같은 경로를 타므로 이 단계는
       # 중복이었다.
       # -rs: DB 테스트가 skip되면 사유를 출력한다. skip이 있으면 실패로 본다.
+      # --cov-report=term 은 fail_under(pyproject.toml, 90%)를 넣어 커버리지가
+      # 떨어지면 이 단계가 실패한다(FIX-021).
       - run: |
-          python -m pytest -q -rs tests/ | tee pytest.out
+          python -m pytest -q -rs --cov=app --cov-branch --cov-report=term tests/ | tee pytest.out
           if grep -qE '[0-9]+ skipped' pytest.out; then echo "::error::skipped tests found"; exit 1; fi
+      # Refs: FIX-021 -- mypy 전체를 게이트로 쓰면 기존 오류(SQLAlchemy 열
+      # 추론 연쇄, 37건) 때문에 모든 PR 이 항상 실패한다. scripts/
+      # mypy_baseline.txt 에 없는 "새" 오류만 실패시킨다(--run 이 mypy 를
+      # 내부에서 subprocess 로 실행해 파이프 종료 코드 문제를 피한다 --
+      # `mypy | 도구` 형태로 쓰면 기존 오류 때문에 mypy 자체가 항상
+      # 비영(非零)으로 끝나 pipefail 에 걸린다).
+      - run: python scripts/mypy_check.py --run

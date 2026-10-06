@@ -311,7 +311,7 @@ def test_question_status_expired_exactly_at_24h_and_after(db_session):
 def test_question_status_naive_now_raises_invalid_value(db_session):
     row = _make_question_row(db_session, created_at=_BASE_TIME)
     with pytest.raises(InvalidValue):
-        question_status(row, datetime(2026, 1, 2, 12, 0, 0))  # naive
+        question_status(row, datetime(2026, 1, 2, 12, 0, 0))  # noqa: DTZ001  # 의도된 naive -- 거절 경로 자체를 시험한다
 
 
 def test_question_statuses_constant_matches_three_values():

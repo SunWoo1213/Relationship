@@ -208,7 +208,9 @@ def search_person(
     embedding_ran = provider is not None and embedded_alias_count > 0
     similarity_by_person: dict[int, float] = {}
 
-    if embedding_ran:
+    if provider is not None and embedding_ran:
+        # provider is not None 은 의미상 embedding_ran 에 이미 포함되지만
+        # (208행 정의), mypy 좁히기를 위해 그대로 반복한다 -- 동작은 같다(FIX-021).
         query_vector = provider.embed([q])[0]
         distance_col = PersonAlias.embedding.cosine_distance(query_vector).label("distance")
         topk_stmt = (
@@ -385,7 +387,16 @@ def _add_alias(
         inserted_id = session.execute(stmt).scalar_one_or_none()
         session.flush()
         if inserted_id is not None:
-            return session.get(PersonAlias, inserted_id)
+            inserted = session.get(PersonAlias, inserted_id)
+            if inserted is None:
+                # 같은 세션이 방금 RETURNING 으로 받은 id 다 -- 삭제 없음
+                # 불변(D6)상 None 일 수 없다. mypy 반환 타입 좁히기 겸
+                # 불변이 깨지면 조용히 None 을 돌려주는 대신 바로 멈춘다.
+                raise RuntimeError(
+                    f"방금 삽입한 별칭(id={inserted_id})을 찾을 수 없다 -- "
+                    "삭제 없음 불변(D6) 위반"
+                )
+            return inserted
 
         # 충돌 -- 다른 커넥션이 먼저 같은 (person_id, alias) 를 만들었다.
         # 방금 계산한 embedding 은 버리고 재조회한다.

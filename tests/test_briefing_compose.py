@@ -455,6 +455,29 @@ def test_validate_briefing_rejects_fabricated_pattern_key():
     assert fabricated[0]["reason"] == REASON_UNKNOWN_BASIS
 
 
+def test_validate_briefing_rejects_pattern_sentence_with_unhashable_key():
+    """FIX-021 mypy 좁히기 회귀 -- `key` 가 str 이 아니면(여기서는 해시
+    불가능한 list) `in` 연산으로 TypeError 가 나던 경로를, 던지지 않고
+    거부 목록으로 보내는지 확인한다(모듈 docstring "예외를 던지지 않는다").
+    `_parse_composed` 를 거치지 않고 `ComposedBriefing` 을 직접 만들어
+    이 가드를 우회 없이 직접 때린다."""
+
+    rule_value = "3회 (2026-03-02, 2026-06-11, 2026-09-20)"
+    briefing_input = _briefing_input(used_facts=[_fact("pattern:conflict", rule_value)])
+    raw = ComposedBriefing(
+        pattern_sentences=[{"key": ["해시", "불가능"], "sentence": "망가진 입력"}],
+        lines=[],
+        suggestion=None,
+    )
+
+    composed, rejected = validate_briefing(briefing_input, raw)
+
+    assert composed.pattern_sentences == [{"key": "pattern:conflict", "sentence": rule_value}]
+    broken = [item for item in rejected if item["item"].get("key") == ["해시", "불가능"]]
+    assert len(broken) == 1
+    assert broken[0]["reason"] == REASON_UNKNOWN_BASIS
+
+
 # ---------------------------------------------------------------------------
 # R-4 보강 2 -- 입력 패턴을 생성기가 빠뜨리면 템플릿 문장으로 채움
 # ---------------------------------------------------------------------------
@@ -728,8 +751,10 @@ def test_openai_composer_no_tool_calls_is_schema_error():
 
 
 def test_gemini_composer_requires_gemini_model_env(monkeypatch):
+    from app.tools.types import InvalidValue
+
     monkeypatch.delenv("GEMINI_MODEL", raising=False)
-    with pytest.raises(Exception):
+    with pytest.raises(InvalidValue):
         GeminiBriefingComposer(client=StubGeminiClient(response=_gemini_briefing_response(_SAMPLE_BRIEFING_OUTPUT)))
 
 

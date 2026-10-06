@@ -194,7 +194,8 @@ class _MemoEmbedder:
                 )
             self.inner_calls += 1
             self.inner_texts += len(missing)
-            for text, vector in zip(missing, vectors):
+            # strict=True -- 바로 위에서 길이가 같음을 이미 확인했다.
+            for text, vector in zip(missing, vectors, strict=True):
                 self._cache[text] = list(vector)
         return [list(self._cache[t]) for t in texts]
 
@@ -623,7 +624,10 @@ def _run_scenario(
             memo = memos.get(name)
             if memo is not None:
                 memo.reset()
-            for sweep_index, (t_merge, config) in enumerate(zip(grid, configs)):
+            # strict=True -- configs 는 grid 에서 그대로 만든 1:1 리스트다.
+            for sweep_index, (t_merge, config) in enumerate(
+                zip(grid, configs, strict=True)
+            ):
                 calls_before = memo.inner_calls if memo is not None else 0
                 decision = resolvers[name].resolve_mention(
                     ctx, item["surface"], utterance, None, config=config

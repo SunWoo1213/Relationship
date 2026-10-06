@@ -377,9 +377,11 @@ def test_grouped_embedder_similarity_self_check(grouped_embedder):
         assert abs(norm - 1.0) < 1e-6
 
     def cos(a: list[float], b: list[float]) -> float:
-        return sum(x * y for x, y in zip(a, b))
+        # strict=True -- 위 for 문이 모든 벡터의 길이가 EMBEDDING_DIM 임을 이미 확인했다.
+        return sum(x * y for x, y in zip(a, b, strict=True))
 
-    by_name = dict(zip(names, vectors))
+    # strict=True -- names·vectors 는 같은 리스트에서 함께 만들었다(1:1).
+    by_name = dict(zip(names, vectors, strict=True))
     # 같은 그룹("kim"): 팀장/김팀장/부장님 서로 ≥ 0.8.
     for a, b in (("팀장", "김팀장"), ("팀장", "부장님"), ("김팀장", "부장님")):
         assert cos(by_name[a], by_name[b]) >= 0.8

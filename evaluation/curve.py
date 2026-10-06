@@ -497,7 +497,8 @@ def _d10_direction(metrics: Mapping[str, Any]) -> dict[str, Any]:
     violations: list[dict[str, Any]] = []
     nulls: list[str] = []
     pairs = 0
-    for lower, upper in zip(keys, keys[1:]):
+    # strict=False -- 연속 쌍(슬라이딩 윈도) 의도로 keys[1:] 가 항상 1 짧다.
+    for lower, upper in zip(keys, keys[1:], strict=False):
         pairs += 1
         a = _mapping(lookup[lower], f"{PROPOSED}[{lower}]")
         b = _mapping(lookup[upper], f"{PROPOSED}[{upper}]")
@@ -805,7 +806,9 @@ def validate_metrics_document(doc: Any) -> list[str]:
         if not isinstance(grid, list):
             problems.append(f"meta.grid: list expected (got {type(grid).__name__})")
         elif len(grid) != len(EXPECTED_GRID) or any(
-            abs(float(a) - b) > _EPS for a, b in zip(grid, EXPECTED_GRID)
+            # strict=True -- 길이가 다르면 위 or 의 단락 평가로 여기 닿지 않는다.
+            abs(float(a) - b) > _EPS
+            for a, b in zip(grid, EXPECTED_GRID, strict=True)
         ):
             problems.append(
                 f"meta.grid: must be the 10-point grid {list(EXPECTED_GRID)} (got {grid})"

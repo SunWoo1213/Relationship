@@ -10,7 +10,6 @@ F-5a97ef -- U5 3단계(LLM 판정) 테스트 + U1 등록표·활성 스위치 �
 from __future__ import annotations
 
 import json
-import os
 from types import SimpleNamespace
 
 import httpx

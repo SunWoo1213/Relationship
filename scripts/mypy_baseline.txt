@@ -1,0 +1,43 @@
+# Refs: FIX-021 -- mypy app --ignore-missing-imports 기준선.
+# scripts/mypy_check.py 가 생성·비교한다. 줄 번호는 없다(리팩터로
+# 흔들리는 잡음을 피하려고 정규화). 사람이 검토하고 커밋한 목록만
+# '알려진 오류' 로 인정한다 -- --update-baseline 출력을 그대로
+# 커밋하지 않는다(새로 생긴 진짜 결함을 조용히 기준선에 넣는 것을
+# 막기 위함, 원칙8).
+app/agent/gate.py: [arg-type] Argument 1 to "add" of "set" has incompatible type "Any | None"; expected "str"
+app/agent/loop.py: [arg-type] Argument 4 to "add_schedule" has incompatible type "Any | None"; expected "datetime"
+app/agent/loop.py: [assignment] Incompatible types in assignment (expression has type "str | None", variable has type "str")
+app/api/routes.py: [union-attr] Item "_VapidPartial" of "VapidConfig | _VapidPartial" has no attribute "public_key"
+app/briefing/inputs.py: [arg-type] Argument "scheduled_at" to "BriefingInput" has incompatible type "object"; expected "datetime"
+app/briefing/inputs.py: [attr-defined] "object" has no attribute "isoformat"
+app/embedding.py: [return-value] Incompatible return value type (got "EmbeddingProvider | Callable[[list[str]], list[list[float]]]", expected "EmbeddingProvider | None")
+app/embedding.py: [return-value] Incompatible return value type (got "_CallableEmbeddingProvider", expected "EmbeddingProvider | None")
+app/er/pipeline.py: [arg-type] Argument "action" to "AppliedResolution" has incompatible type "Any | None"; expected "str"
+app/er/pipeline.py: [index] Value of type "object" is not indexable
+app/main.py: [arg-type] Argument 1 to "int" has incompatible type "Any | None"; expected "str | Buffer | SupportsInt | SupportsIndex"
+app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], ConfirmationRequired], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"
+app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], InvalidValue], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"
+app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], QuestionNotAnswerable], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"
+app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], ToolError], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"
+app/memory/patterns.py: [attr-defined] "object" has no attribute "astimezone"
+app/memory/promote.py: [arg-type] Argument "occurred_at" to "ExtractEvent" has incompatible type "object"; expected "datetime"
+app/memory/promote.py: [var-annotated] Need type annotation for "stmt"
+app/push/notifier.py: [arg-type] Argument "keys" to "send" of "PushSender" has incompatible type "object"; expected "dict[str, str]"
+app/push/notifier.py: [arg-type] Argument "vapid" to "WebPushNotifier" has incompatible type "VapidConfig | _VapidPartial"; expected "VapidConfig"
+app/push/subscriptions.py: [var-annotated] Need type annotation for "stmt"
+app/tools/briefing.py: [arg-type] Argument "briefed_at" to "ScheduleOut" has incompatible type "object"; expected "datetime | None"
+app/tools/briefing.py: [arg-type] Argument "created_at" to "EventOut" has incompatible type "object"; expected "datetime"
+app/tools/briefing.py: [arg-type] Argument "occurred_at" to "EventOut" has incompatible type "object"; expected "datetime"
+app/tools/briefing.py: [arg-type] Argument "scheduled_at" to "ScheduleOut" has incompatible type "object"; expected "datetime"
+app/tools/briefing.py: [arg-type] Argument "scheduled_at" to "ScheduleOut" has incompatible type "object"; expected "datetime"
+app/tools/briefing.py: [attr-defined] "object" has no attribute "isoformat"
+app/tools/questions.py: [call-overload] No overload variant of "list" matches argument type "object"
+app/tools/questions.py: [call-overload] No overload variant of "list" matches argument type "object"
+app/tools/questions.py: [call-overload] No overload variant of "list" matches argument type "object"
+app/tools/questions.py: [operator] Unsupported operand types for + ("object" and "timedelta")
+app/tools/questions.py: [operator] Unsupported operand types for <= ("timedelta" and "datetime")
+app/tools/questions.py: [operator] Unsupported right operand type for in ("object")
+app/tools/records.py: [arg-type] Argument "briefed_at" to "ScheduleOut" has incompatible type "object"; expected "datetime | None"
+app/tools/records.py: [arg-type] Argument "created_at" to "EventOut" has incompatible type "object"; expected "datetime"
+app/tools/records.py: [arg-type] Argument "occurred_at" to "EventOut" has incompatible type "object"; expected "datetime"
+app/tools/records.py: [arg-type] Argument "scheduled_at" to "ScheduleOut" has incompatible type "object"; expected "datetime"

@@ -460,7 +460,12 @@ def validate_briefing(
     for entry in raw.pattern_sentences:
         key = entry.get("key")
         sentence = entry.get("sentence", "")
-        if key not in allowed_pattern_key_set:
+        # isinstance 좁히기 -- `_parse_composed` 를 거치면 key 는 항상
+        # 비어있지 않은 str 이지만(그 쪽에서 이미 검증), 이 함수는 "예외를
+        # 던지지 않는다" 는 docstring 약속이 있어 어긋난 입력(해시 불가능한
+        # 타입 포함)도 던지지 않고 거부 목록으로 보낸다(FIX-021 -- 이전엔
+        # key 가 해시 불가능하면 `in` 에서 TypeError 로 이 함수가 죽었다).
+        if not isinstance(key, str) or key not in allowed_pattern_key_set:
             rejected.append(
                 {"item": {"kind": "pattern", "key": key, "sentence": sentence}, "reason": REASON_UNKNOWN_BASIS}
             )

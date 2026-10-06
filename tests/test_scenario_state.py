@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from dataclasses import FrozenInstanceError
 from datetime import datetime, timezone
 from typing import Any
 
@@ -224,7 +225,7 @@ def test_specs_are_frozen() -> None:
     spec = seed_person_specs(SCENARIOS["sc-025"])[0]
 
     assert isinstance(spec, PersonSpec)
-    with pytest.raises(Exception):
+    with pytest.raises(FrozenInstanceError):
         spec.display_name = "다른 사람"  # type: ignore[misc]
 
 
@@ -505,6 +506,6 @@ def test_state_is_frozen_and_jsonable(db_session) -> None:
 
     assert isinstance(state, ScenarioState)
     assert state.scenario_id == "sc-025"
-    with pytest.raises(Exception):
+    with pytest.raises(FrozenInstanceError):
         state.alias_count = 99  # type: ignore[misc]
     assert json.loads(json.dumps(state.to_dict(), ensure_ascii=False)) == state.to_dict()

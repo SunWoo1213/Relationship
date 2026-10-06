@@ -1,0 +1,24 @@
+# Refs: FIX-021 원칙8 -- 정적 검사·커버리지 설정을 한 곳에 모은다.
+# pytest 설정은 여기 두지 않는다 -- tests/conftest.py 가 이미 수집·DB 전환을
+# 맡고 있고(ini 섹션이 지금까지 없었다), 이 파일 도입으로 기존 동작을
+# 바꾸지 않기 위해서다.
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.ruff.lint]
+# F = pyflakes(미사용 임포트·이름 등) · B = flake8-bugbear(흔한 버그 패턴) ·
+# DTZ = flake8-datetimez(시간대 없는 datetime -- FIX-005 류 재발 방지).
+select = ["F", "B", "DTZ"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI 의 `Depends(...)` 기본 인자는 B008(가변 기본값 함수호출) 오탐이다
+# -- FastAPI 가 매 요청마다 다시 평가하는 관례된 패턴(공식 문서 권장 형태).
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Path", "fastapi.Body"]
+
+[tool.coverage.run]
+branch = true
+source = ["app"]
+
+[tool.coverage.report]
+fail_under = 90

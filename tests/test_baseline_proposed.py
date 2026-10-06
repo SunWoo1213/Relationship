@@ -112,7 +112,8 @@ def _assert_faithful_transfer(
     assert [c.display_name for c in decision.candidates] == [
         c.display_name for c in reference.candidates
     ]
-    for got, expected in zip(decision.candidates, reference.candidates):
+    # strict=True -- 바로 위 두 assert 가 candidates 길이·순서 일치를 이미 확인했다.
+    for got, expected in zip(decision.candidates, reference.candidates, strict=True):
         assert got.signals["s_emb"] == pytest.approx(expected.s_emb)
         assert got.signals["s_rule"] == pytest.approx(expected.s_rule)
         assert got.signals["passed_rules"] == (1.0 if expected.passed_rules else 0.0)
