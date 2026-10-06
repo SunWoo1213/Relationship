@@ -83,7 +83,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from sqlalchemy import func, select
+from sqlalchemy import and_, case, func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
@@ -596,6 +596,18 @@ def update_person(
         # 않는다. 값·confidence 는 항상 이번 호출 값으로 덮어쓴다(기존
         # 분기와 동일 -- 이 경로는 `_upsert_fact`(app/memory/promote.py)와
         # 달리 "값이 같으면 유지" 구분이 없었다).
+        #
+        # FIX-026(F-20-1 회귀) -- `updated_at` 은 `Column(onupdate=
+        # func.now())` 라 ORM UPDATE 에는 자동 적용되지만 이 Core
+        # `ON CONFLICT DO UPDATE` 의 `set_` 에는 적용되지 않는다. FIX-020
+        # 이전 ORM 코드는 값이 같아도 `.value`/`.confidence` 를 항상
+        # 대입했지만(분기 없음), SQLAlchemy 유닛오브워크는 대입 전후 값이
+        # **모두** 같으면 UPDATE 문 자체를 내지 않아 `updated_at` 이
+        # 그대로였다(실측으로 확인, `tests/test_fact_updated_at.py` 가
+        # 그 동작을 고정한다). 그래서 `value`·`confidence` 가 **둘 다**
+        # 이전과 같을 때만 `updated_at` 을 유지한다 -- 하나라도 다르면(예:
+        # 값은 같은데 `confidence` 가 과거에 다른 값으로 저장돼 있었던
+        # 경우) 전진시킨다.
         for normalized_key, normalized_value in normalized_facts:
             stmt = (
                 pg_insert(PersonFact)
@@ -607,7 +619,20 @@ def update_person(
                 )
                 .on_conflict_do_update(
                     index_elements=["person_id", "key"],
-                    set_={"value": normalized_value, "confidence": DEFAULT_FACT_CONFIDENCE},
+                    set_={
+                        "value": normalized_value,
+                        "confidence": DEFAULT_FACT_CONFIDENCE,
+                        "updated_at": case(
+                            (
+                                and_(
+                                    PersonFact.value == normalized_value,
+                                    PersonFact.confidence == DEFAULT_FACT_CONFIDENCE,
+                                ),
+                                PersonFact.updated_at,
+                            ),
+                            else_=func.now(),
+                        ),
+                    },
                 )
             )
             ctx.session.execute(stmt)

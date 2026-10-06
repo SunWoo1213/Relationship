@@ -1,0 +1,150 @@
+F.F....F                                                                 [100%]
+=================================== FAILURES ===================================
+_________ test_promote_upsert_fact_advances_updated_at_on_value_change _________
+
+db_engine = Engine(postgresql+psycopg://app:***@localhost:5433/relationship_test)
+
+    def test_promote_upsert_fact_advances_updated_at_on_value_change(db_engine) -> None:
+        user_id = f"fix026-promote-diff-{uuid.uuid4().hex}"
+        person_id = _make_person(db_engine, user_id=user_id)
+    
+        session = Session(bind=db_engine)
+        try:
+            r1 = _upsert_fact(session, person_id, ExtractedFact(key="hobby", value="등산", source_event_ids=[]))
+            session.commit()
+            assert r1.action == "created"
+            t1 = session.execute(
+                select(PersonFact.updated_at).where(PersonFact.id == r1.fact_id)
+            ).scalar_one()
+    
+            time.sleep(_SLEEP)
+            r2 = _upsert_fact(
+                session, person_id, ExtractedFact(key="hobby", value="클라이밍", source_event_ids=[])
+            )
+            session.commit()
+            t2 = session.execute(
+                select(PersonFact.updated_at).where(PersonFact.id == r2.fact_id)
+            ).scalar_one()
+    
+            assert r2.action == "updated"
+            assert r2.fact_id == r1.fact_id
+>           assert t2 > t1, "값이 바뀌었는데 updated_at 이 전진하지 않았다(FIX-026 F-20-1 회귀)"
+E           AssertionError: 값이 바뀌었는데 updated_at 이 전진하지 않았다(FIX-026 F-20-1 회귀)
+E           assert datetime.datetime(2026, 10, 6, 5, 44, 56, 861818, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')) > datetime.datetime(2026, 10, 6, 5, 44, 56, 861818, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))
+
+tests/test_fact_updated_at.py:98: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+_________ test_update_person_facts_advances_updated_at_on_value_change _________
+
+db_engine = Engine(postgresql+psycopg://app:***@localhost:5433/relationship_test)
+
+    def test_update_person_facts_advances_updated_at_on_value_change(db_engine) -> None:
+        user_id = f"fix026-updperson-diff-{uuid.uuid4().hex}"
+        session_id = f"fix026-updperson-diff-session-{uuid.uuid4().hex}"
+        person_id = _make_person(db_engine, user_id=user_id)
+    
+        session = Session(bind=db_engine)
+        try:
+            ctx = ToolContext(session=session, session_id=session_id, user_id=user_id)
+            update_person(ctx, person_id, facts=[{"key": "hobby", "value": "등산"}])
+            session.commit()
+            t1 = session.execute(
+                select(PersonFact.updated_at)
+                .where(PersonFact.person_id == person_id)
+                .where(PersonFact.key == "hobby")
+            ).scalar_one()
+    
+            time.sleep(_SLEEP)
+            update_person(ctx, person_id, facts=[{"key": "hobby", "value": "클라이밍"}])
+            session.commit()
+            t2 = session.execute(
+                select(PersonFact.updated_at)
+                .where(PersonFact.person_id == person_id)
+                .where(PersonFact.key == "hobby")
+            ).scalar_one()
+    
+>           assert t2 > t1, "값이 바뀌었는데 updated_at 이 전진하지 않았다(FIX-026 F-20-1 회귀)"
+E           AssertionError: 값이 바뀌었는데 updated_at 이 전진하지 않았다(FIX-026 F-20-1 회귀)
+E           assert datetime.datetime(2026, 10, 6, 5, 44, 57, 41409, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')) > datetime.datetime(2026, 10, 6, 5, 44, 57, 41409, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))
+
+tests/test_fact_updated_at.py:166: AssertionError
+________ test_detect_patterns_concurrent_connections_result_in_one_row _________
+
+db_engine = Engine(postgresql+psycopg://app:***@localhost:5433/relationship_test)
+
+    @pytest.mark.dbtest
+    def test_detect_patterns_concurrent_connections_result_in_one_row(db_engine) -> None:
+        user_id = f"fix026-pattern-{uuid.uuid4().hex}"
+        person_id = _make_person(db_engine, user_id=user_id)
+        now = datetime(2026, 10, 6, 9, 0, 0, tzinfo=timezone.utc)
+    
+        # 패턴 기준(기본 PATTERN_MIN_COUNT=3)을 채우는 이벤트를 미리 커밋해
+        # 둔다 -- 두 커넥션 모두 이 이벤트들을 그대로 본다. 경쟁은
+        # `person_facts(person_id, "pattern:conflict")` 행 생성 자리에서
+        # 일어난다.
+        setup = Session(bind=db_engine)
+        try:
+            for days_ago in (10, 5, 1):
+                setup.add(
+                    Event(
+                        person_id=person_id,
+                        type="conflict",
+                        content="내용",
+                        raw_utterance="raw",
+                        occurred_at=now - timedelta(days=days_ago),
+                    )
+                )
+            setup.commit()
+        finally:
+            setup.close()
+    
+        conn_a = db_engine.connect()
+        conn_b = db_engine.connect()
+        session_a = Session(bind=conn_a)
+        session_b = Session(bind=conn_b)
+        session_id_a = f"fix026-pattern-a-{uuid.uuid4().hex}"
+        session_id_b = f"fix026-pattern-b-{uuid.uuid4().hex}"
+        try:
+            session_a.begin()
+            ctx_a = ToolContext(session=session_a, session_id=session_id_a, user_id=user_id, now=lambda: now)
+            result_a = detect_patterns(ctx_a, person_id)
+            assert any(change.type == "conflict" and change.action == "created" for change in result_a.changes)
+            # A 는 아직 커밋하지 않는다.
+    
+            session_b.begin()
+            result_holder: dict[str, object] = {}
+    
+            def _call_b() -> None:
+                ctx_b = ToolContext(
+                    session=session_b, session_id=session_id_b, user_id=user_id, now=lambda: now
+                )
+                try:
+                    result_holder["result"] = detect_patterns(ctx_b, person_id)
+                except Exception as exc:  # noqa: BLE001 -- 수정 전에는 IntegrityError 가 나야 정상 재현
+                    result_holder["error"] = exc
+    
+            thread_b = threading.Thread(target=_call_b)
+            thread_b.start()
+            thread_b.join(timeout=0.5)
+            assert thread_b.is_alive(), (
+                "B 가 A 의 커밋을 기다리지 않고 곧바로 끝났다 -- "
+                "두 평범한 INSERT 가 유일 인덱스에서 블로킹하지 않았다(예상 밖의 환경)"
+            )
+    
+            session_a.commit()
+    
+            thread_b.join(timeout=_WAIT_TIMEOUT)
+            assert not thread_b.is_alive(), "B 가 A 커밋 후에도 끝나지 않았다"
+    
+            if "error" in result_holder:
+                session_b.rollback()
+>               pytest.fail(
+                    "B 가 IntegrityError 로 실패했다 -- patterns.py 의 person_facts 저장이 "
+                    f"아직 ON CONFLICT 로 바뀌지 않았다(FIX-026 R-20-1): {result_holder['error']!r}"
+                )
+E               Failed: B 가 IntegrityError 로 실패했다 -- patterns.py 의 person_facts 저장이 아직 ON CONFLICT 로 바뀌지 않았다(FIX-026 R-20-1): IntegrityError('(psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "uq_person_facts_person_id_key"\nDETAIL:  Key (person_id, key)=(3781, pattern:conflict) already exists.')
+
+tests/test_upsert_concurrency.py:412: Failed
+3 failed, 5 passed in 3.17s

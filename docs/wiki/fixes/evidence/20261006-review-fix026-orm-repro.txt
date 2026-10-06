@@ -1,0 +1,10 @@
+engine db: relationship_test
+확인1 dirty?: True
+확인1 UPDATE 문 발행 수: 0 | updated_at 유지?: True
+확인2 UPDATE 문 발행 수: 1 | updated_at 전진?: True
+확인3 (conf 0.5 → 같은 값 재저장) updated_at 전진?: True | confidence 복원?: True | value: 등산
+확인3b (둘 다 같음) updated_at 유지?: True
+확인4a 첫 실행 actions: [('meal', 'created')]
+확인4b 변화 없는 재실행 changes: [] | updated_at 유지?: True
+확인4c 이벤트 추가 후 action: ['updated'] | previous_value 3회?: True | value 4회?: True | updated_at 전진?: True | 링크 3→4?: (3, 4)
+확인4d 기준 미달 actions: [('meal', 'deleted', '4회 (2026-09-26, 2026-10-01, 2026-10-04, 2026-10-05)')] | 행 남음?: False

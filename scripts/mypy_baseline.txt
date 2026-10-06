@@ -20,6 +20,7 @@ app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has
 app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], QuestionNotAnswerable], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"
 app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], ToolError], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"
 app/memory/patterns.py: [attr-defined] "object" has no attribute "astimezone"
+app/memory/patterns.py: [var-annotated] Need type annotation for "stmt"
 app/memory/promote.py: [arg-type] Argument "occurred_at" to "ExtractEvent" has incompatible type "object"; expected "datetime"
 app/memory/promote.py: [var-annotated] Need type annotation for "stmt"
 app/push/notifier.py: [arg-type] Argument "keys" to "send" of "PushSender" has incompatible type "object"; expected "dict[str, str]"

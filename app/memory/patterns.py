@@ -65,13 +65,41 @@
 `changes[]`(만들었거나/갱신했거나/지운 사실만 담는다. 값·링크 모두 그대로면
 DB 를 쓰지 않고 `changes` 에도 넣지 않는다 -- "변경 없음"은 로그 부재로
 표현한다).
+
+## 동시성 (FIX-026 R-20-1)
+
+`person_facts` 의 `UNIQUE(person_id, key)` 제약(FIX-020, 0002 리비전)이
+생긴 뒤에도 이 모듈의 패턴 사실 생성/갱신은 "조회 후 분기"로 남아
+있었다 -- 두 커넥션이 동시에 같은 `(person_id, "pattern:{type}")` 을
+새로 만들면 둘 다 "없음"을 읽고 둘 다 평범한 `INSERT` 를 내 하나가
+`IntegrityError`(턴 전체 500)로 실패했다(`app.memory.promote._upsert_fact`
+가 FIX-020 에서 이미 쓴 것과 같은 결함). 이 모듈도 같은 해법을 쓴다 --
+"있으면 UPDATE, 없으면 INSERT" 분기를 `INSERT ... ON CONFLICT
+(person_id, key) DO UPDATE` 한 문장으로 바꾸고, RETURNING `(xmax = 0)`
+으로 "이번 문장에서 새로 삽입됐는가"(`inserted`)를 판정한다(promote.py
+와 동일한 관례, 모듈 docstring 아래 `_upsert_or_delete_pattern_fact`
+참고). `value`·`confidence`·`fact_sources` 동기화·`PatternChange`
+반환값(`created`/`updated`/삭제는 `deleted`, 변경 없음은 로그 부재)은
+그대로다 -- 바뀐 것은 저장 문장 하나뿐이다. `updated_at` 은
+`app.memory.promote._upsert_fact` 와 같은 이유(F-20-1, `Column(onupdate=
+func.now())` 가 Core `ON CONFLICT` 의 `set_` 에는 적용되지 않는다)로
+값이 같을 때만 유지하는 CASE 를 쓴다.
+
+세션 식별자 맵 부작용은 promote.py 처럼 `session.expire_all()` 로
+전체를 비우지 않는다 -- 이 함수는 한 인물의 7종 type 을 순서대로
+처리하며 매 반복이 서로 다른 `PersonFact` 행(서로 다른 `key`)을 다루므로,
+이번 반복에서 이미 로드해 둔 `existing`(바로 이 upsert 가 갱신한 행)
+**하나만** `session.expire()` 하면 된다 -- 다음에 그 객체의 속성을
+다시 읽을 일이 있다면(이 함수 자신은 다시 읽지 않지만, 같은 세션을 쓰는
+호출자가 이어서 읽을 수 있다) 새 값을 가져온다.
 """
 
 from __future__ import annotations
 
 from datetime import timedelta
 
-from sqlalchemy import select
+from sqlalchemy import case, func, literal_column, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from app.db.models import EVENT_TYPES, Event, FactSource, PersonFact
 from app.memory.types import (
@@ -138,17 +166,17 @@ def detect_patterns(ctx: ToolContext, person_id: int) -> PatternResult:
 
         if len(items) < config.min_count:
             if existing is not None:
-                previous_value = existing.value
-                fact_id = existing.id
+                deleted_previous_value = existing.value
+                deleted_fact_id = existing.id
                 ctx.session.delete(existing)
                 ctx.session.flush()
                 changes.append(
                     PatternChange(
                         type=event_type,
                         action="deleted",
-                        fact_id=fact_id,
+                        fact_id=deleted_fact_id,
                         event_ids=[],
-                        previous_value=previous_value,
+                        previous_value=deleted_previous_value,
                     )
                 )
             continue
@@ -156,33 +184,53 @@ def detect_patterns(ctx: ToolContext, person_id: int) -> PatternResult:
         event_ids = [event_id for event_id, _ in items]
         dates = [occurred_at.astimezone(tz).date().isoformat() for _, occurred_at in items]
         value = f"{len(items)}회 ({', '.join(dates)})"
+        previous_value = existing.value if existing is not None else None
 
-        if existing is None:
-            fact = PersonFact(
+        # FIX-026(R-20-1) -- "조회 후 분기"가 아니라 `INSERT ... ON
+        # CONFLICT (person_id, key) DO UPDATE` 한 문장으로 끝낸다(모듈
+        # docstring "동시성(FIX-026 R-20-1)" 절). 위에서 읽은 `existing` 은
+        # `previous_value` 표시용 추정치일 뿐 -- 새로 삽입됐는지는 이
+        # 문장의 RETURNING `(xmax = 0)` 으로 판정한다(`inserted`,
+        # app.memory.promote._upsert_fact 와 같은 관례).
+        stmt = (
+            pg_insert(PersonFact)
+            .values(
                 person_id=person.id,
                 key=key,
                 value=value,
                 confidence=_PATTERN_CONFIDENCE,
             )
-            ctx.session.add(fact)
-            ctx.session.flush()
-            for event_id in event_ids:
-                ctx.session.add(FactSource(fact_id=fact.id, event_id=event_id))
-            ctx.session.flush()
-            changes.append(
-                PatternChange(
-                    type=event_type,
-                    action="created",
-                    fact_id=fact.id,
-                    event_ids=event_ids,
-                    previous_value=None,
-                )
+            .on_conflict_do_update(
+                index_elements=["person_id", "key"],
+                set_={
+                    "value": value,
+                    "confidence": _PATTERN_CONFIDENCE,
+                    # FIX-026(F-20-1 과 같은 이유 -- `onupdate=func.now()`
+                    # 는 Core `ON CONFLICT` 의 `set_` 에 적용되지 않는다)
+                    # -- 값이 그대로면 updated_at 을 건드리지 않는다.
+                    "updated_at": case(
+                        (PersonFact.value == value, PersonFact.updated_at),
+                        else_=func.now(),
+                    ),
+                },
             )
-            continue
+            .returning(PersonFact.id, literal_column("(xmax = 0)").label("inserted"))
+        )
+        row = ctx.session.execute(stmt).one()
+        ctx.session.flush()
+        if existing is not None:
+            # 이 upsert 는 Core 문이라 ORM 유닛오브워크를 거치지 않는다 --
+            # 위에서 이미 로드해 둔 `existing` 객체는 이 UPDATE 를 자동으로
+            # 반영하지 않는다(app/memory/promote.py 의 같은 FIX-020 주석
+            # 참고). 이 객체 하나만 expire 한다(세션 전체를 비우지 않는다,
+            # 모듈 docstring 참고).
+            ctx.session.expire(existing)
+        fact_id: int = row.id
+        inserted: bool = row.inserted
 
         existing_links = set(
             ctx.session.execute(
-                select(FactSource.event_id).where(FactSource.fact_id == existing.id)
+                select(FactSource.event_id).where(FactSource.fact_id == fact_id)
             )
             .scalars()
             .all()
@@ -190,7 +238,23 @@ def detect_patterns(ctx: ToolContext, person_id: int) -> PatternResult:
         target_links = set(event_ids)
         to_add = target_links - existing_links
         to_remove = existing_links - target_links
-        value_changed = existing.value != value
+
+        if inserted:
+            for event_id in event_ids:
+                ctx.session.add(FactSource(fact_id=fact_id, event_id=event_id))
+            ctx.session.flush()
+            changes.append(
+                PatternChange(
+                    type=event_type,
+                    action="created",
+                    fact_id=fact_id,
+                    event_ids=event_ids,
+                    previous_value=None,
+                )
+            )
+            continue
+
+        value_changed = previous_value != value
 
         if not value_changed and not to_add and not to_remove:
             # 값·링크 모두 이전과 같다 -- DB 를 건드리지 않고 trace 에도
@@ -198,18 +262,14 @@ def detect_patterns(ctx: ToolContext, person_id: int) -> PatternResult:
             # 표현한다).
             continue
 
-        previous_value = existing.value
-        existing.value = value
-        existing.confidence = _PATTERN_CONFIDENCE
-
         for event_id in to_add:
-            ctx.session.add(FactSource(fact_id=existing.id, event_id=event_id))
+            ctx.session.add(FactSource(fact_id=fact_id, event_id=event_id))
 
         if to_remove:
             stale_links = (
                 ctx.session.execute(
                     select(FactSource)
-                    .where(FactSource.fact_id == existing.id)
+                    .where(FactSource.fact_id == fact_id)
                     .where(FactSource.event_id.in_(to_remove))
                 )
                 .scalars()
@@ -223,7 +283,7 @@ def detect_patterns(ctx: ToolContext, person_id: int) -> PatternResult:
             PatternChange(
                 type=event_type,
                 action="updated",
-                fact_id=existing.id,
+                fact_id=fact_id,
                 event_ids=event_ids,
                 previous_value=previous_value,
             )

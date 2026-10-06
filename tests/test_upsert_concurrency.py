@@ -1,5 +1,5 @@
-"""Refs: FIX-020 P1-schema P2-tools P6-memory P7-push S3.1 D6 원칙1 -- "한
-인물·한 키(또는 한 사용자·한 엔드포인트)에 한 행" 규칙이 동시 저장에서도
+"""Refs: FIX-020 FIX-026 P1-schema P2-tools P6-memory P7-push S3.1 D6 원칙1 --
+"한 인물·한 키(또는 한 사용자·한 엔드포인트)에 한 행" 규칙이 동시 저장에서도
 지켜지는지 검증한다.
 
 증상(FIX-020.md): `person_facts(person_id, key)`·`person_aliases
@@ -8,7 +8,18 @@
 외 UNIQUE 제약이 없었다. 두 커넥션이 동시에 upsert 하면 둘 다 "없음"을
 읽고 둘 다 INSERT 해 **중복 행**이 생긴다.
 
-세 테스트 모두 같은 틀(`tests/test_answer_concurrency.py` 패턴)을 쓴다:
+네 번째 절(FIX-026 R-20-1): `app.memory.patterns.detect_patterns` 의
+`pattern:{type}` 사실 저장은 FIX-020 이후에도 "조회 후 삽입"이 남아
+있었다. `person_facts` 에는 이미 UNIQUE 제약이 있으므로 중복 행 대신
+**충돌한 평범한 INSERT 가 `IntegrityError`** 로 실패한다 -- 두 커넥션
+모두 "없음"을 읽고(READ COMMITTED) 둘 다 `INSERT`(ON CONFLICT 없음)를
+내면, 하나는 유일 인덱스가 다른 트랜잭션의 미커밋 행과 충돌하는 동안
+**블로킹**되었다가(평범한 INSERT 도 유일 인덱스 충돌 후보에 대해서는
+PostgreSQL 이 먼저 커밋을 기다린다), 상대가 커밋하는 순간 진짜 충돌로
+드러나 `IntegrityError` 를 던진다. ON CONFLICT DO UPDATE 로 바꾸면 그
+블로킹 이후 충돌을 그대로 흡수해 갱신으로 합류한다.
+
+세 테스트(1~3)는 같은 틀(`tests/test_answer_concurrency.py` 패턴)을 쓴다:
 커넥션 둘(`db_engine` 직접 커밋, `db_session` 롤백 픽스처로는 커밋되지
 않은 행이 다른 커넥션에 보이지 않아 경쟁을 재현할 수 없다)로 A 가 upsert
 함수를 호출해 행을 아직 커밋하지 않고 있는 동안, B 를 별도 스레드에서
@@ -32,17 +43,19 @@ from __future__ import annotations
 
 import threading
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
 import pytest
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from app.db.models import Person, PersonAlias, PersonFact, PushSubscription
+from app.db.models import AgentTrace, Event, FactSource, Person, PersonAlias, PersonFact, PushSubscription
+from app.memory.patterns import detect_patterns
 from app.memory.promote import _upsert_fact
 from app.memory.types import ExtractedFact
 from app.push.subscriptions import save_subscription
+from app.tools.context import ToolContext
 from app.tools.persons import ALIAS_SOURCES, _add_alias
 
 dbtest = pytest.mark.dbtest
@@ -319,6 +332,127 @@ def test_save_subscription_concurrent_connections_result_in_one_row(db_engine) -
             cleanup.execute(
                 delete(PushSubscription).where(PushSubscription.user_id == user_id)
             )
+            cleanup.commit()
+        finally:
+            cleanup.close()
+
+
+# ---------------------------------------------------------------------------
+# 4) person_facts(person_id, key) via app.memory.patterns.detect_patterns
+#    (FIX-026 R-20-1)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.dbtest
+def test_detect_patterns_concurrent_connections_result_in_one_row(db_engine) -> None:
+    user_id = f"fix026-pattern-{uuid.uuid4().hex}"
+    person_id = _make_person(db_engine, user_id=user_id)
+    now = datetime(2026, 10, 6, 9, 0, 0, tzinfo=timezone.utc)
+
+    # 패턴 기준(기본 PATTERN_MIN_COUNT=3)을 채우는 이벤트를 미리 커밋해
+    # 둔다 -- 두 커넥션 모두 이 이벤트들을 그대로 본다. 경쟁은
+    # `person_facts(person_id, "pattern:conflict")` 행 생성 자리에서
+    # 일어난다.
+    setup = Session(bind=db_engine)
+    try:
+        for days_ago in (10, 5, 1):
+            setup.add(
+                Event(
+                    person_id=person_id,
+                    type="conflict",
+                    content="내용",
+                    raw_utterance="raw",
+                    occurred_at=now - timedelta(days=days_ago),
+                )
+            )
+        setup.commit()
+    finally:
+        setup.close()
+
+    conn_a = db_engine.connect()
+    conn_b = db_engine.connect()
+    session_a = Session(bind=conn_a)
+    session_b = Session(bind=conn_b)
+    session_id_a = f"fix026-pattern-a-{uuid.uuid4().hex}"
+    session_id_b = f"fix026-pattern-b-{uuid.uuid4().hex}"
+    try:
+        session_a.begin()
+        ctx_a = ToolContext(session=session_a, session_id=session_id_a, user_id=user_id, now=lambda: now)
+        result_a = detect_patterns(ctx_a, person_id)
+        assert any(change.type == "conflict" and change.action == "created" for change in result_a.changes)
+        # A 는 아직 커밋하지 않는다.
+
+        session_b.begin()
+        result_holder: dict[str, object] = {}
+
+        def _call_b() -> None:
+            ctx_b = ToolContext(
+                session=session_b, session_id=session_id_b, user_id=user_id, now=lambda: now
+            )
+            try:
+                result_holder["result"] = detect_patterns(ctx_b, person_id)
+            except Exception as exc:  # noqa: BLE001 -- 수정 전에는 IntegrityError 가 나야 정상 재현
+                result_holder["error"] = exc
+
+        thread_b = threading.Thread(target=_call_b)
+        thread_b.start()
+        thread_b.join(timeout=0.5)
+        assert thread_b.is_alive(), (
+            "B 가 A 의 커밋을 기다리지 않고 곧바로 끝났다 -- "
+            "두 평범한 INSERT 가 유일 인덱스에서 블로킹하지 않았다(예상 밖의 환경)"
+        )
+
+        session_a.commit()
+
+        thread_b.join(timeout=_WAIT_TIMEOUT)
+        assert not thread_b.is_alive(), "B 가 A 커밋 후에도 끝나지 않았다"
+
+        if "error" in result_holder:
+            session_b.rollback()
+            pytest.fail(
+                "B 가 IntegrityError 로 실패했다 -- patterns.py 의 person_facts 저장이 "
+                f"아직 ON CONFLICT 로 바뀌지 않았다(FIX-026 R-20-1): {result_holder['error']!r}"
+            )
+
+        session_b.commit()
+        assert "result" in result_holder
+
+        check_session = Session(bind=db_engine)
+        try:
+            rows = (
+                check_session.execute(
+                    select(PersonFact)
+                    .where(PersonFact.person_id == person_id)
+                    .where(PersonFact.key == "pattern:conflict")
+                )
+                .scalars()
+                .all()
+            )
+            assert len(rows) == 1, f"중복 행 생성됨: {len(rows)}건"
+            assert rows[0].value.startswith("3회")
+        finally:
+            check_session.close()
+    finally:
+        session_a.close()
+        session_b.close()
+        conn_a.close()
+        conn_b.close()
+
+        cleanup = Session(bind=db_engine)
+        try:
+            fact_ids = (
+                cleanup.execute(select(PersonFact.id).where(PersonFact.person_id == person_id))
+                .scalars()
+                .all()
+            )
+            if fact_ids:
+                cleanup.execute(delete(FactSource).where(FactSource.fact_id.in_(fact_ids)))
+            cleanup.execute(delete(PersonFact).where(PersonFact.person_id == person_id))
+            cleanup.execute(delete(Event).where(Event.person_id == person_id))
+            cleanup.execute(
+                delete(AgentTrace).where(AgentTrace.session_id.in_([session_id_a, session_id_b]))
+            )
+            cleanup.execute(delete(Person).where(Person.id == person_id))
             cleanup.commit()
         finally:
             cleanup.close()

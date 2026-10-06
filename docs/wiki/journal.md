@@ -422,3 +422,5 @@
 - 2026-10-06 10:43 | PUSH-dev2 | origin dev2 125976a (실험 푸시)
 - 2026-10-06 13:12 | COMMIT | a9ae04f test(FIX-024): 순수 함수의 항상 지켜야 할 성질을 hypothesis 로 확인한다
 - 2026-10-06 13:12 | PUSH-dev2 | origin dev2 a9ae04f (실험 푸시)
+- 2026-10-06 14:08 | COMMIT | 3cd378c fix(FIX-025): 성질 테스트가 찾은 위반 7건을 고친다
+- 2026-10-06 14:08 | PUSH-dev2 | origin dev2 3cd378c (실험 푸시)

@@ -106,7 +106,7 @@ step='memory_promote' AND output->>'person_id' = '<id>'` 로 누적 조회해,
 
 from __future__ import annotations
 
-from sqlalchemy import case, literal_column, select
+from sqlalchemy import case, func, literal_column, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
@@ -181,6 +181,18 @@ def _upsert_fact(session: Session, person_id: int, fact: ExtractedFact) -> Promo
                 "confidence": case(
                     (PersonFact.value == fact.value, PersonFact.confidence),
                     else_=DEFAULT_FACT_CONFIDENCE,
+                ),
+                # FIX-026(F-20-1 회귀) -- `Column(onupdate=func.now())`
+                # (app/db/models.py `PersonFact.updated_at`)은 ORM 유닛오브
+                # 워크의 UPDATE 에만 자동 적용되고 이 `ON CONFLICT DO UPDATE`
+                # 의 `set_` 에는 적용되지 않는다(SQLAlchemy 공식 경고) --
+                # 명시하지 않으면 값이 바뀌어도 `updated_at` 이 멈춘다. 값이
+                # 같을 때(action="same") 기존 ORM 경로는 `.value`/
+                # `.confidence` 를 아예 건드리지 않아 `updated_at` 도
+                # 그대로였다(위 `confidence` CASE 와 같은 조건으로 맞춘다).
+                "updated_at": case(
+                    (PersonFact.value == fact.value, PersonFact.updated_at),
+                    else_=func.now(),
                 ),
             },
         )

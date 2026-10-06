@@ -1,0 +1,4 @@
+All checks passed!
+ruff exit=0
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)
+mypy_check exit=0

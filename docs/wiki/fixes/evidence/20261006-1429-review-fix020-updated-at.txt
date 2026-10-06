@@ -1,0 +1,57 @@
+# verifier 사후 검토(FIX-018~025) — FIX-020 upsert 뒤 person_facts.updated_at 갱신 여부
+# 명령: POSTGRES_PORT=5433 .venv/bin/python <scratchpad>/check_updated_at.py  (테스트 DB relationship_test 만 사용, 만든 행은 finally 로 삭제)
+# 스크립트 본문:
+#   """verifier 검증 스크립트 — FIX-020 뒤 person_facts.updated_at 이 값 변경 시 갱신되는지.
+#   테스트 DB(relationship_test)만 사용, 만든 행은 finally 로 지운다."""
+#   import os, sys, time, uuid
+#   os.environ.setdefault("POSTGRES_PORT", "5433")
+#   sys.path.insert(0, "/Users/sunwoo/Desktop/Portfolio/Relationship")
+#   from tests.db_bootstrap import apply_test_database_env
+#   dev, test = apply_test_database_env()
+#   assert test != dev and test.endswith("_test"), (dev, test)
+#   from sqlalchemy import select, delete
+#   from sqlalchemy.orm import Session
+#   from app.db.session import get_engine
+#   from app.db.models import Person, PersonFact
+#   from app.memory.promote import _upsert_fact
+#   from app.memory.types import ExtractedFact
+#   engine = get_engine()
+#   print("engine db:", engine.url.database)
+#   uid = f"verifier-fix020-{uuid.uuid4().hex}"
+#   s = Session(bind=engine)
+#   pid = None
+#   try:
+#       p = Person(user_id=uid, display_name="검증", relation_tag="친구", hierarchy="동")
+#       s.add(p); s.commit(); pid = p.id
+#       r1 = _upsert_fact(s, pid, ExtractedFact(key="hobby", value="등산", source_event_ids=[]))
+#       s.commit()
+#       t1 = s.execute(select(PersonFact.updated_at, PersonFact.value).where(PersonFact.id == r1.fact_id)).one()
+#       time.sleep(0.05)
+#       s.expire_all()
+#       r2 = _upsert_fact(s, pid, ExtractedFact(key="hobby", value="클라이밍", source_event_ids=[]))
+#       s.commit()
+#       t2 = s.execute(select(PersonFact.updated_at, PersonFact.value).where(PersonFact.id == r2.fact_id)).one()
+#       print("action2:", r2.action, "previous:", r2.previous_value)
+#       print("row1:", t1); print("row2:", t2)
+#       print("updated_at advanced after value change?:", t2[0] > t1[0])
+#       # 대조: ORM 속성 변경(FIX-020 이전 방식)은 onupdate 가 걸린다
+#       time.sleep(0.05)
+#       f = s.get(PersonFact, r2.fact_id); f.value = "독서"; s.commit(); s.expire_all()
+#       t3 = s.execute(select(PersonFact.updated_at, PersonFact.value).where(PersonFact.id == r2.fact_id)).one()
+#       print("row3 (ORM update):", t3); print("ORM path advanced?:", t3[0] > t2[0])
+#   finally:
+#       s.rollback()
+#       if pid is not None:
+#           s.execute(delete(PersonFact).where(PersonFact.person_id == pid))
+#           s.execute(delete(Person).where(Person.id == pid)); s.commit()
+#       s.close()
+# ---- 출력 ----
+engine db: relationship_test
+action2: updated previous: 등산
+row1: (datetime.datetime(2026, 10, 6, 5, 29, 1, 286341, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), '등산')
+row2: (datetime.datetime(2026, 10, 6, 5, 29, 1, 286341, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), '클라이밍')
+updated_at advanced after value change?: False
+row3 (ORM update): (datetime.datetime(2026, 10, 6, 5, 29, 1, 358595, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), '독서')
+ORM path advanced?: True
+# ---- 컴파일된 SQL (SET 절에 updated_at 없음) ----
+INSERT INTO person_facts (person_id, key, value, confidence) VALUES (%(person_id)s, %(key)s, %(value)s, %(confidence)s) ON CONFLICT (person_id, key) DO UPDATE SET value = %(param_1)s, confidence = CASE WHEN (person_facts.value = %(value_1)s) THEN person_facts.confidence ELSE %(param_2)s END RETURNING person_facts.id, (xmax = 0) AS inserted
