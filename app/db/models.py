@@ -50,6 +50,7 @@ from sqlalchemy import (
     Integer,
     PrimaryKeyConstraint,
     Text,
+    UniqueConstraint,
     func,
     text,
 )
@@ -119,6 +120,12 @@ class PersonAlias(Base):
     __table_args__ = (
         Index("ix_person_aliases_person_id", "person_id"),
         Index("ix_person_aliases_alias", "alias"),
+        # 보충(FIX-020) -- 인물당 같은 문자열 별칭 하나(D6 "격상만", 미결 7).
+        # name 은 일부러 지정하지 않는다 -- MetaData.naming_convention 의
+        # "uq" 템플릿은 %(constraint_name)s 토큰이 없어(app/db/base.py),
+        # name 을 지정하면 그 값이 그대로 최종 이름이 되어 버리고 convention
+        # 이 적용되지 않는다(실측 확인, ck/fk 템플릿과 다른 점).
+        UniqueConstraint("person_id", "alias"),
     )
 
     id: Mapped[int] = _pk()
@@ -133,7 +140,12 @@ class PersonAlias(Base):
 
 class PersonFact(Base):
     __tablename__ = "person_facts"
-    __table_args__ = (Index("ix_person_facts_person_id_key", "person_id", "key"),)
+    __table_args__ = (
+        Index("ix_person_facts_person_id_key", "person_id", "key"),
+        # 보충(FIX-020) -- 인물당 키 하나(결정 D-6). name 미지정 이유는
+        # PersonAlias.__table_args__ 의 주석 참고(uq 템플릿 특성).
+        UniqueConstraint("person_id", "key"),
+    )
 
     id: Mapped[int] = _pk()
     person_id: Mapped[int] = mapped_column(
@@ -234,6 +246,11 @@ class PendingQuestion(Base):
 
 class PushSubscription(Base):
     __tablename__ = "push_subscriptions"
+    __table_args__ = (
+        # 보충(FIX-020) -- 사용자당 같은 endpoint 하나(P7 결정 F(i)). name
+        # 미지정 이유는 PersonAlias.__table_args__ 의 주석 참고.
+        UniqueConstraint("user_id", "endpoint"),
+    )
 
     id: Mapped[int] = _pk()
     user_id: Mapped[str] = mapped_column(Text, nullable=False)

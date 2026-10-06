@@ -1,13 +1,17 @@
-"""Refs: P7-push S3.1 S3.6 R12 -- U2 구독 저장(`save_subscription`·
+"""Refs: P7-push S3.1 S3.6 R12 FIX-020 -- U2 구독 저장(`save_subscription`·
 `list_subscriptions`).
 
 `save_subscription`: 같은 `(user_id, endpoint)` 조합이면 기존 행의
 `keys` 만 갱신하고 같은 `id` 를 `created=False` 로 돌려준다. 없으면 새
-행을 만들어 `created=True` 로 돌려준다(01-plan 결정 F(i) "앱에서
-`(user_id, endpoint)` 로 조회 후 있으면 `keys` 만 갱신" -- 스키마
-(`push_subscriptions`, S3.1)에 유일 제약이 없으므로 앱 계층에서 멱등성을
-흉내낸다. 동시 요청 경쟁은 01-plan "지킬 불변식" 밖, 리스크 절 "같은
-엔드포인트 경쟁" 참고 -- 이 패키지 범위에서 해결하지 않는다).
+행을 만들어 `created=True` 로 돌려준다(01-plan 결정 F(i)).
+
+### 동시성 (FIX-020)
+
+`push_subscriptions` 에는 `UNIQUE(user_id, endpoint)` 제약이 있다(0002
+리비전, 01-plan 당시 리스크 절 "같은 엔드포인트 경쟁"이 남겨 둔 숙제를
+여기서 닫는다). `INSERT ... ON CONFLICT (user_id, endpoint) DO UPDATE
+keys` 한 문장으로 끝내 두 요청이 동시에 같은 구독을 보내도 중복 행이
+생기지 않는다 -- 조회 후 분기하지 않는다.
 
 `list_subscriptions`: `user_id` 조건이 **항상** 걸린다(security.md §5
 "모든 조회는 user_id 조건" -- 판정 표 5행 "사용자 격리"). `WebPushNotifier`
@@ -25,7 +29,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from sqlalchemy import select
+from sqlalchemy import literal_column, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 from app.db.models import PushSubscription
@@ -45,30 +50,24 @@ class SavedSubscription:
 def save_subscription(
     session: Session, user_id: str, endpoint: str, keys: dict[str, str]
 ) -> SavedSubscription:
-    """`(user_id, endpoint)` 로 기존 행을 조회한다(결정 F(i)). 있으면
-    `keys` 만 갱신하고 같은 `id` 를 `created=False` 로 돌려준다. 없으면
-    새 행을 만들어 `created=True` 로 돌려준다.
+    """`(user_id, endpoint)` 로 upsert 한다(결정 F(i), 모듈 docstring
+    "동시성(FIX-020)" 절). 있으면 `keys` 만 갱신하고 같은 `id` 를
+    `created=False` 로 돌려준다. 없으면 새 행을 만들어 `created=True` 로
+    돌려준다. `INSERT ... ON CONFLICT DO UPDATE` 한 문장이라 조회 후
+    분기하지 않는다 -- 두 요청이 동시에 와도 중복 행이 생기지 않는다."""
 
-    `keys` 는 통째로 새 dict 로 바꿔 넣는다(부분 갱신이 아니다) --
-    `PushSubscription.keys` 는 `MutableDict` 가 아니므로 통째 재대입이어야
-    SQLAlchemy 가 변경을 감지한다."""
-
-    existing = session.execute(
-        select(PushSubscription).where(
-            PushSubscription.user_id == user_id,
-            PushSubscription.endpoint == endpoint,
+    stmt = (
+        pg_insert(PushSubscription)
+        .values(user_id=user_id, endpoint=endpoint, keys=dict(keys))
+        .on_conflict_do_update(
+            index_elements=["user_id", "endpoint"],
+            set_={"keys": dict(keys)},
         )
-    ).scalar_one_or_none()
-
-    if existing is not None:
-        existing.keys = dict(keys)
-        session.flush()
-        return SavedSubscription(id=existing.id, created=False)
-
-    row = PushSubscription(user_id=user_id, endpoint=endpoint, keys=dict(keys))
-    session.add(row)
+        .returning(PushSubscription.id, literal_column("(xmax = 0)").label("inserted"))
+    )
+    row = session.execute(stmt).one()
     session.flush()
-    return SavedSubscription(id=row.id, created=True)
+    return SavedSubscription(id=row.id, created=row.inserted)
 
 
 def list_subscriptions(session: Session, user_id: str) -> list[PushSubscription]:

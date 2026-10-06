@@ -1,0 +1,143 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_______ test_upsert_person_fact_concurrent_connections_result_in_one_row _______
+
+db_engine = Engine(postgresql+psycopg://app:***@localhost:5433/relationship_test)
+
+    @pytest.mark.dbtest
+    def test_upsert_person_fact_concurrent_connections_result_in_one_row(db_engine) -> None:
+        user_id = f"fix020-fact-{uuid.uuid4().hex}"
+        person_id = _make_person(db_engine, user_id=user_id)
+    
+        conn_a = db_engine.connect()
+        conn_b = db_engine.connect()
+        session_a = Session(bind=conn_a)
+        session_b = Session(bind=conn_b)
+        try:
+            session_a.begin()
+            result_a = _upsert_fact(
+                session_a, person_id, ExtractedFact(key="hobby", value="등산", source_event_ids=[])
+            )
+            assert result_a.action == "created"
+            # A 는 아직 커밋하지 않는다 -- (person_id, key) 가 유일 인덱스에
+            # 올라갔지만 커밋 전이라 B 가 그 결과를 기다려야 한다(수정 후 기대).
+    
+            session_b.begin()
+            result_holder: dict[str, object] = {}
+    
+            def _call_b() -> None:
+                result_holder["result"] = _upsert_fact(
+                    session_b,
+                    person_id,
+                    ExtractedFact(key="hobby", value="등산 (갱신)", source_event_ids=[]),
+                )
+    
+            thread_b = threading.Thread(target=_call_b)
+            thread_b.start()
+            thread_b.join(timeout=0.5)
+>           assert thread_b.is_alive(), (
+                "B 가 A 의 커밋을 기다리지 않고 곧바로 끝났다 -- "
+                "person_facts 에 UNIQUE(person_id, key) 제약/ON CONFLICT 가 아직 없다(FIX-020 결함)"
+            )
+E           AssertionError: B 가 A 의 커밋을 기다리지 않고 곧바로 끝났다 -- person_facts 에 UNIQUE(person_id, key) 제약/ON CONFLICT 가 아직 없다(FIX-020 결함)
+E           assert False
+E            +  where False = is_alive()
+E            +    where is_alive = <Thread(Thread-1 (_call_b), stopped 6178435072)>.is_alive
+
+tests/test_upsert_concurrency.py:105: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+___________ test_add_alias_concurrent_connections_result_in_one_row ____________
+
+db_engine = Engine(postgresql+psycopg://app:***@localhost:5433/relationship_test)
+fake_embedder = <function fake_embedder.<locals>._embed at 0x10bbf43b0>
+
+    @pytest.mark.dbtest
+    def test_add_alias_concurrent_connections_result_in_one_row(db_engine, fake_embedder) -> None:
+        user_id = f"fix020-alias-{uuid.uuid4().hex}"
+        person_id = _make_person(db_engine, user_id=user_id)
+        person_like = SimpleNamespace(id=person_id)
+    
+        conn_a = db_engine.connect()
+        conn_b = db_engine.connect()
+        session_a = Session(bind=conn_a)
+        session_b = Session(bind=conn_b)
+        try:
+            session_a.begin()
+            row_a = _add_alias(
+                session_a,
+                person_like,
+                "김팀장",
+                source=ALIAS_SOURCES[0],
+                embedder=fake_embedder,
+            )
+            assert row_a.source == ALIAS_SOURCES[0]
+            # A 는 아직 커밋하지 않는다.
+    
+            session_b.begin()
+            result_holder: dict[str, object] = {}
+    
+            def _call_b() -> None:
+                result_holder["row"] = _add_alias(
+                    session_b,
+                    person_like,
+                    "김팀장",
+                    source=ALIAS_SOURCES[1],
+                    embedder=fake_embedder,
+                )
+    
+            thread_b = threading.Thread(target=_call_b)
+            thread_b.start()
+            thread_b.join(timeout=0.5)
+>           assert thread_b.is_alive(), (
+                "B 가 A 의 커밋을 기다리지 않고 곧바로 끝났다 -- "
+                "person_aliases 에 UNIQUE(person_id, alias) 제약/ON CONFLICT 가 아직 없다(FIX-020 결함)"
+            )
+E           AssertionError: B 가 A 의 커밋을 기다리지 않고 곧바로 끝났다 -- person_aliases 에 UNIQUE(person_id, alias) 제약/ON CONFLICT 가 아직 없다(FIX-020 결함)
+E           assert False
+E            +  where False = is_alive()
+E            +    where is_alive = <Thread(Thread-2 (_call_b), stopped 6178435072)>.is_alive
+
+tests/test_upsert_concurrency.py:194: AssertionError
+_______ test_save_subscription_concurrent_connections_result_in_one_row ________
+
+db_engine = Engine(postgresql+psycopg://app:***@localhost:5433/relationship_test)
+
+    @pytest.mark.dbtest
+    def test_save_subscription_concurrent_connections_result_in_one_row(db_engine) -> None:
+        user_id = f"fix020-push-{uuid.uuid4().hex}"
+        endpoint = "https://example.invalid/push/fix-020"
+    
+        conn_a = db_engine.connect()
+        conn_b = db_engine.connect()
+        session_a = Session(bind=conn_a)
+        session_b = Session(bind=conn_b)
+        try:
+            session_a.begin()
+            result_a = save_subscription(session_a, user_id, endpoint, {"p256dh": "AAA", "auth": "BBB"})
+            assert result_a.created is True
+            # A 는 아직 커밋하지 않는다.
+    
+            session_b.begin()
+            result_holder: dict[str, object] = {}
+    
+            def _call_b() -> None:
+                result_holder["result"] = save_subscription(
+                    session_b, user_id, endpoint, {"p256dh": "CCC", "auth": "DDD"}
+                )
+    
+            thread_b = threading.Thread(target=_call_b)
+            thread_b.start()
+            thread_b.join(timeout=0.5)
+>           assert thread_b.is_alive(), (
+                "B 가 A 의 커밋을 기다리지 않고 곧바로 끝났다 -- "
+                "push_subscriptions 에 UNIQUE(user_id, endpoint) 제약/ON CONFLICT 가 아직 없다(FIX-020 결함)"
+            )
+E           AssertionError: B 가 A 의 커밋을 기다리지 않고 곧바로 끝났다 -- push_subscriptions 에 UNIQUE(user_id, endpoint) 제약/ON CONFLICT 가 아직 없다(FIX-020 결함)
+E           assert False
+E            +  where False = is_alive()
+E            +    where is_alive = <Thread(Thread-3 (_call_b), stopped 6178435072)>.is_alive
+
+tests/test_upsert_concurrency.py:271: AssertionError
+3 failed in 0.43s

@@ -81,6 +81,22 @@ step='memory_promote' AND output->>'person_id' = '<id>'` 로 누적 조회해,
   (`action="updated"`). 원문 `events` 행 자체는 절대 건드리지 않는다 --
   이 모듈이 `session.delete()` 에 넘기는 것은 `FactSource` 링크뿐이다.
 
+### 동시성 (FIX-020)
+
+`person_facts` 에는 `UNIQUE(person_id, key)` 제약이 있다(0002 리비전).
+`_upsert_fact` 는 "있는지 조회 후 분기해서 INSERT/UPDATE"가 아니라
+`INSERT ... ON CONFLICT (person_id, key) DO UPDATE` 한 문장으로 끝낸다
+-- 두 커넥션이 동시에 같은 키를 upsert 해도 PostgreSQL 이 두 번째 문장을
+첫 번째 트랜잭션이 끝날 때까지 블로킹했다가 충돌 처리로 합류시키므로
+중복 행이 생기지 않는다(애플리케이션이 조회 후 분기하면 그 사이에 경쟁이
+끼어든다 -- FIX-020.md 증상). `action`("created"/"same"/"updated")과
+`previous_value` 는 그 원자적 upsert 와는 별도로, upsert 직전에 읽은
+"이전 값 추정치"(`existing_value_before`)로 판정한다 -- 이 사전 읽기는
+잠그지 않으므로(트레이스 표시용일 뿐 데이터 정합성의 근거가 아니다) 아주
+좁은 동시성 창에서는 실제 "직전 값"과 어긋날 수 있지만, upsert 문
+자체가 원자적이라 **저장되는 값과 행 개수는 항상 정확하다** -- 어긋날
+수 있는 것은 trace 의 `action`/`previous_value` 표시뿐이다.
+
 ## 이벤트 상한 (결정 D-4)
 
 미승격 이벤트를 `occurred_at` 오름차순으로 정렬해 그대로 잘라 앞쪽(가장
@@ -90,7 +106,8 @@ step='memory_promote' AND output->>'person_id' = '<id>'` 로 누적 조회해,
 
 from __future__ import annotations
 
-from sqlalchemy import select
+from sqlalchemy import case, literal_column, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 from app.db.models import AgentTrace, Event, FactSource, PersonFact
@@ -129,63 +146,95 @@ def _considered_event_ids(session: Session, person_id: int) -> set[int]:
 
 def _upsert_fact(session: Session, person_id: int, fact: ExtractedFact) -> PromotedFact:
     """`(person_id, fact.key)` 로 upsert 한다(결정 D-6, 모듈 docstring
-    참고). `fact` 는 이미 `validate_extraction()` 을 거쳐 키·값이
-    정규화되어 있다."""
+    "동시성(FIX-020)" 절 참고). `fact` 는 이미 `validate_extraction()` 을
+    거쳐 키·값이 정규화되어 있다.
 
-    existing = (
-        session.execute(
-            select(PersonFact).where(PersonFact.person_id == person_id).where(PersonFact.key == fact.key)
-        )
-        .scalars()
-        .one_or_none()
-    )
+    실제 upsert 는 `INSERT ... ON CONFLICT (person_id, key) DO UPDATE`
+    한 문장이다(UNIQUE 제약은 0002 리비전). `existing_value_before` 는
+    그 문장 **이전에** 읽은 "이전 값 추정치"일 뿐 -- `action`/
+    `previous_value` 판정에만 쓰고, 저장되는 값·행 개수는 전적으로 저
+    원자적 SQL 문이 결정한다."""
 
-    if existing is None:
-        row = PersonFact(
+    existing_value_before = session.execute(
+        select(PersonFact.value)
+        .where(PersonFact.person_id == person_id)
+        .where(PersonFact.key == fact.key)
+    ).scalar_one_or_none()
+
+    stmt = (
+        pg_insert(PersonFact)
+        .values(
             person_id=person_id,
             key=fact.key,
             value=fact.value,
             confidence=DEFAULT_FACT_CONFIDENCE,
         )
-        session.add(row)
-        session.flush()
+        .on_conflict_do_update(
+            index_elements=["person_id", "key"],
+            set_={
+                "value": fact.value,
+                # 값이 그대로면(action="same") 기존 confidence 를 건드리지
+                # 않는다 -- `PersonFact.value` 는 SET 절 안에서 충돌 대상
+                # 행의 갱신 *전* 값을 가리킨다(표준 UPSERT 의미론, EXCLUDED
+                # 와 반대편). 기존 코드의 3분기("같음 -> 값만 유지, confidence
+                # 불변" 대 "다름 -> 값·confidence 모두 갱신")를 그대로 보존한다.
+                "confidence": case(
+                    (PersonFact.value == fact.value, PersonFact.confidence),
+                    else_=DEFAULT_FACT_CONFIDENCE,
+                ),
+            },
+        )
+        .returning(PersonFact.id, literal_column("(xmax = 0)").label("inserted"))
+    )
+    row = session.execute(stmt).one()
+    session.flush()
+    # 이 upsert 는 Core 문(ORM 유닛오브워크를 거치지 않는다)이라, 같은
+    # 세션에 이미 로드돼 있던 PersonFact ORM 객체(예: `_promote_and_trace`
+    # 가 먼저 읽어 둔 `existing_rows`)는 이 UPDATE 를 자동으로 반영하지
+    # 않는다 -- `session.get()`/식별자 맵 히트가 갱신 전 값을 그대로
+    # 돌려주는 사일런트 버그가 된다(FIX-020 회귀 테스트가 드러냈다).
+    # `expire_all()` 로 다음 접근 때 다시 읽게 한다(이미 flush 했으므로
+    # 안전 -- 대기 중인 변경을 잃지 않는다).
+    session.expire_all()
+    fact_id: int = row.id
+    inserted: bool = row.inserted
+
+    existing_links = set(
+        session.execute(select(FactSource.event_id).where(FactSource.fact_id == fact_id)).scalars().all()
+    )
+
+    if inserted:
+        # 새 행 -- 충돌 없이 바로 INSERT 됐다(`existing_value_before` 는
+        # `None` 이었어야 정상, 아주 좁은 동시성 창에서만 어긋날 수 있다).
         for event_id in fact.source_event_ids:
-            session.add(FactSource(fact_id=row.id, event_id=event_id))
+            session.add(FactSource(fact_id=fact_id, event_id=event_id))
         session.flush()
         return PromotedFact(
-            fact_id=row.id,
+            fact_id=fact_id,
             key=fact.key,
             action="created",
             source_event_ids=list(fact.source_event_ids),
             previous_value=None,
         )
 
-    existing_links = set(
-        session.execute(select(FactSource.event_id).where(FactSource.fact_id == existing.id)).scalars().all()
-    )
-
-    if existing.value == fact.value:
+    if existing_value_before == fact.value:
         to_add = set(fact.source_event_ids) - existing_links
         for event_id in to_add:
-            session.add(FactSource(fact_id=existing.id, event_id=event_id))
+            session.add(FactSource(fact_id=fact_id, event_id=event_id))
         session.flush()
         return PromotedFact(
-            fact_id=existing.id,
+            fact_id=fact_id,
             key=fact.key,
             action="same",
             source_event_ids=sorted(existing_links | set(fact.source_event_ids)),
             previous_value=None,
         )
 
-    previous_value = existing.value
-    existing.value = fact.value
-    existing.confidence = DEFAULT_FACT_CONFIDENCE
-
     if existing_links:
         stale_links = (
             session.execute(
                 select(FactSource)
-                .where(FactSource.fact_id == existing.id)
+                .where(FactSource.fact_id == fact_id)
                 .where(FactSource.event_id.in_(existing_links))
             )
             .scalars()
@@ -196,15 +245,15 @@ def _upsert_fact(session: Session, person_id: int, fact: ExtractedFact) -> Promo
         session.flush()
 
     for event_id in fact.source_event_ids:
-        session.add(FactSource(fact_id=existing.id, event_id=event_id))
+        session.add(FactSource(fact_id=fact_id, event_id=event_id))
     session.flush()
 
     return PromotedFact(
-        fact_id=existing.id,
+        fact_id=fact_id,
         key=fact.key,
         action="updated",
         source_event_ids=list(fact.source_event_ids),
-        previous_value=previous_value,
+        previous_value=existing_value_before,
     )
 
 

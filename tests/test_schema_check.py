@@ -60,6 +60,17 @@ def test_model_index_expectations_returns_ten_names_and_the_partial_index():
     assert partial_name in names
 
 
+def test_model_unique_constraint_expectations_returns_fix_020_three():
+    """Refs: FIX-020 -- UniqueConstraint 3개(person_facts/person_aliases/
+    push_subscriptions)가 `Base.metadata` 에서 그대로 나온다(중복 정의 방지)."""
+    expected = sc.model_unique_constraint_expectations()
+    assert expected == {
+        ("person_facts", "uq_person_facts_person_id_key"),
+        ("person_aliases", "uq_person_aliases_person_id_alias"),
+        ("push_subscriptions", "uq_push_subscriptions_user_id_endpoint"),
+    }
+
+
 def test_compute_exit_code_is_zero_when_all_pass_or_info_or_skip():
     results = [
         sc.CheckResult("a", "PASS"),

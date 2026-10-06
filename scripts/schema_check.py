@@ -74,6 +74,19 @@ def _missing_values(values: tuple[str, ...], haystack: str) -> list[str]:
     return [v for v in values if v not in haystack]
 
 
+def model_unique_constraint_expectations() -> set[tuple[str, str]]:
+    """모델(`Base.metadata`)에 정의된 UNIQUE 제약의 `(table, 이름)` 집합(FIX-020).
+
+    DB 없이도 계산 가능 -- 테스트가 이 함수만 호출해 제약 이름을 검증한다.
+    """
+    names: set[tuple[str, str]] = set()
+    for table in Base.metadata.tables.values():
+        for constraint in table.constraints:
+            if constraint.__class__.__name__ == "UniqueConstraint":
+                names.add((table.name, constraint.name))
+    return names
+
+
 def model_index_expectations() -> tuple[set[str], str | None]:
     """모델(`Base.metadata`)에 정의된 인덱스 이름 집합과, 그중 부분 인덱스 이름 하나를 반환한다.
 
@@ -231,6 +244,27 @@ def _check_foreign_keys(cur, results: list[CheckResult]) -> None:
     )
 
 
+def _check_unique_constraints(cur, results: list[CheckResult]) -> None:
+    """person_facts/person_aliases/push_subscriptions 의 UNIQUE 제약 3개
+    (FIX-020) -- 이름·대상 테이블은 `Base.metadata` 에서 가져온다(중복
+    정의 방지, `model_unique_constraint_expectations()`)."""
+    expected = model_unique_constraint_expectations()
+
+    cur.execute(
+        "SELECT conrelid::regclass::text, conname FROM pg_constraint "
+        "WHERE contype = 'u' AND conrelid::regclass::text = ANY(%s)",
+        (list(EXPECTED_TABLES),),
+    )
+    actual = {(t, n) for t, n in cur.fetchall()}
+    missing = sorted(expected - actual)
+    _emit(
+        results,
+        "UNIQUE constraints exist (FIX-020 person_facts/person_aliases/push_subscriptions)",
+        "PASS" if not missing else "FAIL",
+        f"expected={sorted(expected)} missing={missing}",
+    )
+
+
 def _check_indexes(cur, results: list[CheckResult]) -> None:
     expected_names, partial_name = model_index_expectations()
 
@@ -344,6 +378,7 @@ def run_all_checks(cur, expect_empty: bool) -> list[CheckResult]:
         _check_embedding_vector(cur, results)
         _check_fact_sources_pk(cur, results)
         _check_foreign_keys(cur, results)
+        _check_unique_constraints(cur, results)
         _check_indexes(cur, results)
     else:
         _emit(

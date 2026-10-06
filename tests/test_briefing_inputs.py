@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 
 from app.briefing.inputs import build_briefing_input
 from app.db.models import AgentTrace, Event, FactSource, Person, PersonFact, Schedule
@@ -264,39 +265,30 @@ def test_build_briefing_input_keeps_pattern_and_fact_key_excludes_legacy_key(
 
 # ---------------------------------------------------------------------------
 # 판정 표 13행 -- 같은 키 여러 행은 updated_at desc 첫 행만
+#
+# Refs: FIX-020 -- `person_facts` 에 `UNIQUE(person_id, key)` 제약이
+# 생겨(0002 리비전) 같은 키의 두 번째 행을 **만드는 것 자체가** DB
+# 수준에서 막힌다. 이 테스트는 원래 그 전제(같은 키 행이 둘 있는 상태)를
+# 직접 만들어 `build_briefing_input` 의 "최신 행만 used_facts, 나머지는
+# superseded_by_newer" 방어 분기(app/briefing/inputs.py, 결정 F)를
+# 검증했지만, FIX-020 이후로는 그 전제 자체를 재현할 수 없다(같은 세션
+# 안에서도 두 번째 INSERT 가 즉시 `IntegrityError` 로 끝난다 -- Postgres
+# UNIQUE 제약은 커밋을 기다리지 않고 문장 단위로 검사한다). 방어 분기
+# 코드 자체(app/briefing/inputs.py)는 FIX-020 범위 밖이라 건드리지
+# 않는다 -- 대신 이 테스트는 그 전제가 이제 DB 제약으로 원천 차단됨을
+# 확인한다(dead code 가 된 분기를 "실행해서" 증명할 수 없다는 뜻이지,
+# 그 분기가 틀렸다는 뜻은 아니다).
 # ---------------------------------------------------------------------------
 
 
-def test_build_briefing_input_keeps_only_latest_row_for_same_key(db_session) -> None:
+def test_person_facts_same_key_second_insert_rejected_by_unique_constraint(db_session) -> None:
     person = _make_person(db_session)
-    old = _make_fact(
+    _make_fact(
         db_session, person, key="likes", value="사진찍기", updated_at=_T0 - timedelta(days=5)
     )
-    new = _make_fact(db_session, person, key="likes", value="등산", updated_at=_T0)
 
-    schedule = _make_schedule(db_session, person, scheduled_at=_T0 + timedelta(hours=1))
-    ctx = _ctx(db_session)
-
-    result = build_briefing_input(ctx, schedule)
-
-    used_likes = [fact for fact in result.used_facts if fact["key"] == "likes"]
-    assert len(used_likes) == 1
-    assert used_likes[0]["fact_id"] == new.id
-    assert used_likes[0]["value"] == "등산"
-
-    excluded_likes = [fact for fact in result.excluded_facts if fact["key"] == "likes"]
-    assert len(excluded_likes) == 1
-    assert excluded_likes[0]["fact_id"] == old.id
-    assert excluded_likes[0]["reason"] == "superseded_by_newer"
-
-    # 원본 행은 수정·삭제되지 않는다(01-plan U3 "원본 행은 수정·삭제하지
-    # 않는다").
-    remaining = (
-        db_session.execute(select(PersonFact).where(PersonFact.person_id == person.id))
-        .scalars()
-        .all()
-    )
-    assert {row.id for row in remaining} == {old.id, new.id}
+    with pytest.raises(IntegrityError, match="uq_person_facts_person_id_key"):
+        _make_fact(db_session, person, key="likes", value="등산", updated_at=_T0)
 
 
 # ---------------------------------------------------------------------------

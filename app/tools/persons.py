@@ -65,6 +65,18 @@ D1("승인 시에만 `create_person`")과 D6("확인을 거친 경우에만 `dis
 `system` 으로 격상되어도 기존 `confirmed_at` 값은 지우지 않는다(확인
 이력을 잃지 않는다). 다른 인물의 같은 별칭 문자열은 이 규칙과 무관하다
 (동명이인 허용, 막지 않는다).
+
+### 동시성 (FIX-020)
+
+`person_aliases` 에는 `UNIQUE(person_id, alias)` 제약이 있다(0002
+리비전). `_add_alias` 는 먼저 평범한 SELECT 로 존재를 확인해(임베딩 API
+호출 여부를 가르는 데만 쓴다 -- 있으면 임베딩을 계산하지 않는다), 없을
+때만 임베딩을 계산한 뒤 `INSERT ... ON CONFLICT (person_id, alias) DO
+NOTHING` 으로 삽입을 시도한다. 두 커넥션이 동시에 같은 (person_id, alias)
+를 "없음"으로 보고 둘 다 이 경로를 타면(아주 좁은 동시성 창) 임베딩
+API 가 두 번 불릴 수 있지만, 실제 INSERT 는 하나만 성공하고 나머지는
+충돌로 끝난다(FIX-020.md 증상 -- 중복 행은 생기지 않는다). 충돌이면
+그 결과를 버리고(임베딩도 버린다) 재조회해 격상 규칙을 그대로 적용한다.
 """
 
 from __future__ import annotations
@@ -72,6 +84,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 from sqlalchemy import func, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 from app.db.models import (
@@ -331,10 +344,18 @@ def _add_alias(
     embedder: "EmbeddingProvider | EmbedderCallable | None" = None,
     confirmed_at=None,
 ) -> PersonAlias:
-    """별칭 upsert(모듈 docstring "별칭 격상 규칙" 표). 같은 인물에 같은
-    문자열이 이미 있으면 새 행을 만들지 않고 격상만 한다 -- 삭제·격하 없음
-    (미결 7, D6). 새로 만들 때 `embedder` 가 있으면(`app.embedding.as_provider`
-    로 정규화) 그 자리에서 임베딩을 채운다(D5 "확정되면 즉시 임베딩").
+    """별칭 upsert(모듈 docstring "별칭 격상 규칙"·"동시성(FIX-020)" 절).
+    같은 인물에 같은 문자열이 이미 있으면 새 행을 만들지 않고 격상만 한다
+    -- 삭제·격하 없음(미결 7, D6). 새로 만들 때 `embedder` 가 있으면
+    (`app.embedding.as_provider` 로 정규화) 그 자리에서 임베딩을 채운다
+    (D5 "확정되면 즉시 임베딩").
+
+    순서(비용 최소화 + 동시성 안전, FIX-020): 먼저 평범한 SELECT 로 존재를
+    확인한다 -- 있으면 임베딩 API 를 부르지 않고 곧바로 격상 판정으로
+    간다. 없으면 임베딩을 계산한 뒤 `ON CONFLICT (person_id, alias) DO
+    NOTHING` 으로 삽입을 시도한다. 그 삽입이 충돌로 끝나면(동시에 다른
+    커넥션이 먼저 같은 별칭을 만들었다는 뜻) 방금 계산한 임베딩은 버리고
+    재조회해 격상 규칙을 적용한다.
     """
     existing = session.execute(
         select(PersonAlias)
@@ -342,30 +363,44 @@ def _add_alias(
         .where(PersonAlias.alias == alias)
     ).scalar_one_or_none()
 
-    if existing is not None:
-        if _ALIAS_RANK[source] > _ALIAS_RANK[existing.source]:
-            existing.source = source
-            if source == ALIAS_SOURCES[1] and existing.confirmed_at is None:
-                existing.confirmed_at = confirmed_at
-            session.flush()
-        return existing
+    if existing is None:
+        embedding = None
+        provider = as_provider(embedder)
+        if provider is not None:
+            embedding = provider.embed([alias])[0]
+            check_dimension(embedding)
 
-    embedding = None
-    provider = as_provider(embedder)
-    if provider is not None:
-        embedding = provider.embed([alias])[0]
-        check_dimension(embedding)
+        stmt = (
+            pg_insert(PersonAlias)
+            .values(
+                person_id=person.id,
+                alias=alias,
+                source=source,
+                embedding=embedding,
+                confirmed_at=confirmed_at if source == ALIAS_SOURCES[1] else None,
+            )
+            .on_conflict_do_nothing(index_elements=["person_id", "alias"])
+            .returning(PersonAlias.id)
+        )
+        inserted_id = session.execute(stmt).scalar_one_or_none()
+        session.flush()
+        if inserted_id is not None:
+            return session.get(PersonAlias, inserted_id)
 
-    row = PersonAlias(
-        person_id=person.id,
-        alias=alias,
-        source=source,
-        embedding=embedding,
-        confirmed_at=confirmed_at if source == ALIAS_SOURCES[1] else None,
-    )
-    session.add(row)
-    session.flush()
-    return row
+        # 충돌 -- 다른 커넥션이 먼저 같은 (person_id, alias) 를 만들었다.
+        # 방금 계산한 embedding 은 버리고 재조회한다.
+        existing = session.execute(
+            select(PersonAlias)
+            .where(PersonAlias.person_id == person.id)
+            .where(PersonAlias.alias == alias)
+        ).scalar_one()
+
+    if _ALIAS_RANK[source] > _ALIAS_RANK[existing.source]:
+        existing.source = source
+        if source == ALIAS_SOURCES[1] and existing.confirmed_at is None:
+            existing.confirmed_at = confirmed_at
+        session.flush()
+    return existing
 
 
 def _owned_person(session: Session, person_id: int, user_id: str) -> Person:
@@ -544,29 +579,34 @@ def update_person(
                 )
             normalized_facts.append((normalized_key, normalized_value))
 
+        # (person_id, key) 에 UNIQUE 제약이 있다(FIX-020, 0002 리비전) --
+        # "조회 후 분기"가 아니라 `INSERT ... ON CONFLICT DO UPDATE` 한
+        # 문장으로 끝내 두 요청이 동시에 같은 키를 보내도 중복 행이 생기지
+        # 않는다. 값·confidence 는 항상 이번 호출 값으로 덮어쓴다(기존
+        # 분기와 동일 -- 이 경로는 `_upsert_fact`(app/memory/promote.py)와
+        # 달리 "값이 같으면 유지" 구분이 없었다).
         for normalized_key, normalized_value in normalized_facts:
-            existing_fact = (
-                ctx.session.execute(
-                    select(PersonFact)
-                    .where(PersonFact.person_id == person.id)
-                    .where(PersonFact.key == normalized_key)
-                    .order_by(PersonFact.updated_at.desc())
+            stmt = (
+                pg_insert(PersonFact)
+                .values(
+                    person_id=person.id,
+                    key=normalized_key,
+                    value=normalized_value,
+                    confidence=DEFAULT_FACT_CONFIDENCE,
                 )
-                .scalars()
-                .first()
+                .on_conflict_do_update(
+                    index_elements=["person_id", "key"],
+                    set_={"value": normalized_value, "confidence": DEFAULT_FACT_CONFIDENCE},
+                )
             )
-            if existing_fact is not None:
-                existing_fact.value = normalized_value
-                existing_fact.confidence = DEFAULT_FACT_CONFIDENCE
-            else:
-                ctx.session.add(
-                    PersonFact(
-                        person_id=person.id,
-                        key=normalized_key,
-                        value=normalized_value,
-                        confidence=DEFAULT_FACT_CONFIDENCE,
-                    )
-                )
+            ctx.session.execute(stmt)
+
+        # 이 upsert 는 Core 문이라 ORM 유닛오브워크를 거치지 않는다 --
+        # 같은 세션에 이미 로드돼 있던 PersonFact 객체가 있다면 이 UPDATE
+        # 를 자동으로 반영하지 않는다(app/memory/promote.py 의 같은 FIX-020
+        # 주석 참고). `expire_all()` 로 다음 접근 때 다시 읽게 한다.
+        ctx.session.flush()
+        ctx.session.expire_all()
 
     ctx.session.flush()
     return _person_out(ctx.session, person)
