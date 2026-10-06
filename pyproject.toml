@@ -16,6 +16,13 @@ select = ["F", "B", "DTZ"]
 # -- FastAPI 가 매 요청마다 다시 평가하는 관례된 패턴(공식 문서 권장 형태).
 extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Path", "fastapi.Body"]
 
+[tool.mypy]
+# 대상 버전을 CI(Python 3.13)에 고정한다. typeshed 는 대상 버전마다 시그니처가
+# 달라(예: 3.13 의 `int()` 는 SupportsTrunc 도 받는다) 로컬 3.14 와 CI 3.13 의
+# 오류 문구가 갈라져 기준선 비교가 CI 에서만 실패했다(FIX-021 보완, run
+# 37397329951). 어느 기기·인터프리터에서 돌려도 같은 결과가 나오게 한다.
+python_version = "3.13"
+
 [tool.coverage.run]
 branch = true
 source = ["app"]

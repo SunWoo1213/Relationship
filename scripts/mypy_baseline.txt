@@ -14,7 +14,7 @@ app/embedding.py: [return-value] Incompatible return value type (got "EmbeddingP
 app/embedding.py: [return-value] Incompatible return value type (got "_CallableEmbeddingProvider", expected "EmbeddingProvider | None")
 app/er/pipeline.py: [arg-type] Argument "action" to "AppliedResolution" has incompatible type "Any | None"; expected "str"
 app/er/pipeline.py: [index] Value of type "object" is not indexable
-app/main.py: [arg-type] Argument 1 to "int" has incompatible type "Any | None"; expected "str | Buffer | SupportsInt | SupportsIndex"
+app/main.py: [arg-type] Argument 1 to "int" has incompatible type "Any | None"; expected "str | Buffer | SupportsInt | SupportsIndex | SupportsTrunc"
 app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], ConfirmationRequired], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"
 app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], InvalidValue], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"
 app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], QuestionNotAnswerable], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"
