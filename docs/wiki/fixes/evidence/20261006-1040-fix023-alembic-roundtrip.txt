@@ -1,0 +1,6 @@
+target DB (must not be the dev DB 'relationship'): relationship_test
+0002 (head)
+---downgrade base---
+---upgrade head---
+---check---
+No new upgrade operations detected.

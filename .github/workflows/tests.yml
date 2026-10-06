@@ -76,6 +76,26 @@ jobs:
       - run: |
           python -m pytest -q -rs --cov=app --cov-branch --cov-report=term tests/ | tee pytest.out
           if grep -qE '[0-9]+ skipped' pytest.out; then echo "::error::skipped tests found"; exit 1; fi
+      # Refs: FIX-023 -- 마이그레이션 다운그레이드→업그레이드 왕복을 CI
+      # 서비스 DB 의 **테스트 DB**(relationship_test, 위 pytest 단계에서
+      # tests/conftest.py 의 `db_engine` 픽스처가 이미 만들고 head 까지
+      # 올려 둔 것)에서도 확인한다 -- 개발 DB(relationship, 이 job env 의
+      # `DATABASE_URL` 이 가리키는 곳)는 손대지 않는다. `app/config.py` 의
+      # 우선순위(`DATABASE_URL` > `POSTGRES_*`)상 `POSTGRES_DB` 만 덮어써서는
+      # 안 되므로(이미 `DATABASE_URL` 이 있으면 그쪽이 이긴다), 이 단계의
+      # `env:` 에서 `DATABASE_URL` 자체를 DB 이름만 바꿔 다시 준다(로컬
+      # 실행 때 쓴 `POSTGRES_PORT=5433 POSTGRES_DB=relationship_test` 방식
+      # ─ FIX-020 증거 `docs/wiki/fixes/evidence/20261006-0940-fix020-alembic
+      # .txt` ─ 과 같은 뜻, CI 접속 정보만 다를 뿐). 대상 DB 이름을 먼저
+      # 출력해 개발 DB 가 아님을 실행 로그로 남긴다.
+      - name: Alembic downgrade/upgrade round trip (test DB)
+        env:
+          DATABASE_URL: postgresql+psycopg://app:pass@localhost:5432/relationship_test
+        run: |
+          echo "target DB (must not be the dev DB 'relationship'): relationship_test"
+          python -m alembic downgrade base
+          python -m alembic upgrade head
+          python -m alembic check
       # Refs: FIX-021 -- mypy 전체를 게이트로 쓰면 기존 오류(SQLAlchemy 열
       # 추론 연쇄, 37건) 때문에 모든 PR 이 항상 실패한다. scripts/
       # mypy_baseline.txt 에 없는 "새" 오류만 실패시킨다(--run 이 mypy 를

@@ -416,3 +416,5 @@
 - 2026-10-06 10:04 | PUSH-dev2 | origin dev2 b124c8e (실험 푸시)
 - 2026-10-06 10:08 | COMMIT | 3e4d67c fix(FIX-021): mypy 대상 버전을 3.13 으로 고정해 CI 와 로컬 결과를 맞춘다
 - 2026-10-06 10:08 | PUSH-dev2 | origin dev2 3e4d67c (실험 푸시)
+- 2026-10-06 10:25 | COMMIT | 80ae193 fix(FIX-022): CI 에서 Python 두 버전과 Windows, 훅 자가 점검까지 확인한다
+- 2026-10-06 10:25 | PUSH-dev2 | origin dev2 80ae193 (실험 푸시)
