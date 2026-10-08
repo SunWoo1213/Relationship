@@ -45,6 +45,14 @@ deny() {
 # 경로 정규화 (백슬래시 → 슬래시, 루트 기준 상대경로)
 fp="$(printf '%s' "$fp" | sed 's#\\#/#g')"
 root_fwd="$(printf '%s' "$ROOT" | sed 's#\\#/#g')"
+# FIX-028: Windows(Git Bash)에서는 같은 위치가 /tmp/x · /d/a/x · C:/…/Temp/x 처럼 여러 표기로 들어온다
+# (환경변수는 MSYS 변환을 안 받고, 네이티브 프로그램 인자는 받는다). cygpath 가 있으면 둘 다 C:/ 표기로
+# 맞춘다. 절대경로(/ 로 시작)만 변환한다 — 상대경로·C:/ 표기는 그대로. 실패하면 원래 값 유지.
+# 경로 인식만 맞출 뿐 거부/허용 규칙은 바꾸지 않는다. cygpath 가 없으면(Mac·Linux) 아무 일도 안 한다.
+if command -v cygpath >/dev/null 2>&1; then
+  case "$fp" in /*) _c="$(cygpath -m -- "$fp" 2>/dev/null)" && [ -n "$_c" ] && fp="$_c" ;; esac
+  case "$root_fwd" in /*) _c="$(cygpath -m -- "$root_fwd" 2>/dev/null)" && [ -n "$_c" ] && root_fwd="$_c" ;; esac
+fi
 # C:/... 와 /c/... 두 표기 모두 처리
 root_drive="$(printf '%s' "$root_fwd" | sed -E 's#^/([a-zA-Z])/#\U\1:/#')"
 rel="$fp"

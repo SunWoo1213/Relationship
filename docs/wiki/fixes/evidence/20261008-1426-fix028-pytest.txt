@@ -1,0 +1,2 @@
+# 명령: .venv/bin/python -m pytest -q   (Mac, 회귀 — .py 변경 없음이라 ruff 비대상)
+1840 passed, 1 warning in 21.42s

@@ -426,3 +426,5 @@
 - 2026-10-06 14:08 | PUSH-dev2 | origin dev2 3cd378c (실험 푸시)
 - 2026-10-06 15:13 | COMMIT | 90f249c fix(FIX-026): 사실 값을 바꾸면 updated_at 도 갱신하고 패턴 사실 저장도 ON CONFLICT 로 바꾼다
 - 2026-10-06 15:13 | PUSH-dev2 | origin dev2 90f249c (실험 푸시)
+- 2026-10-08 14:15 | COMMIT | 2264d56 harness(FIX-027): FIX 커밋도 verifier 검증 없이는 못 하게 커밋 훅으로 막는다
+- 2026-10-08 14:15 | PUSH-dev2 | origin dev2 2264d56 (실험 푸시)

@@ -1,0 +1,17 @@
+# gh run view 37731482215 --log-failed (dev2 2264d56, FIX-027 커밋) — windows job, test-guards.sh 해당 절 발췌
+# 결과: pytest (3.13) success · pytest (3.14) success · windows failure ("== 결과: 실패 4 ==", exit code 1)
+
+== stage-gate: R-27-5 보호 경로(.claude/hooks·scripts·settings.json·.github/workflows) ==
+XX   .claude/hooks/x.sh 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+XX   .claude/scripts/x.py 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+XX   .claude/settings.json 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+XX   .github/workflows/x.yml 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+ok   allow  .claude/skills 는 여전히 면제(R-27-5 범위 밖)
+ok   allow  R-27-5 활성 작업 있으면 allow: /d/a/Relationship/Relationship/.claude/hooks/_py.sh
+ok   allow  R-27-5 활성 작업 있으면 allow: /d/a/Relationship/Relationship/.claude/scripts/test-guards.sh
+ok   allow  R-27-5 활성 작업 있으면 allow: /d/a/Relationship/Relationship/.claude/settings.json
+ok   allow  R-27-5 활성 작업 있으면 allow: /d/a/Relationship/Relationship/.github/workflows/tests.yml
+== stage-gate: dev 푸시 후 결정 대기(L-003) ==
+...
+== 결과: 실패 4 ==
+##[error]Process completed with exit code 1.

@@ -1,0 +1,4 @@
+# 명령: .venv/bin/python -m pytest -q (Mac, verifier 재실행, 작업 트리 미커밋 diff 상태)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1840 passed, 1 warning in 20.00s

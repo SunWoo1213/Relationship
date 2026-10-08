@@ -1,0 +1,42 @@
+# 명령: bash .claude/scripts/test-guards.sh   (Mac, dev2, 수정 후 / rc=0)
+# 아래는 전체 출력 229줄 중 핵심 발췌 — 전체는 모두 "ok"/"skip" 이고 XX 0건. 마지막 줄이 결과.
+# (전체 출력 확인: `bash .claude/scripts/test-guards.sh | grep -c '^XX'` → 0)
+
+== commit-guard: FIX-027 제품 코드 verifier 게이트 (격리된 임시 저장소) ==
+ok   DENY   FIX-028 대조: FG_T 마커 없는 커밋은 거부(저장소 인식)
+ok   DENY   1) app/ + 검증 줄 없음
+ok   DENY   2) 검증 줄 있음 + review 문서 없음
+ok   DENY   2b) 검증 줄이 자리표뿐 → DENY
+ok   allow  3) 검증 줄 + review 문서 모두 있음(R-27-3 기준 충족)
+ok   allow  4) docs/ 만 스테이징 → allow
+ok   allow  5) feat(...) + app/ → 새 규칙 미적용
+... (F-27-5 / R-27-8 / F-27-4 / F-27-6 / F-27-2 / R-27-3 / R-27-1 / R-27-7 모두 ok)
+== stage-gate ==
+ok   allow  docs path exempt
+ok   allow  .claude path exempt
+ok   allow  outside project
+ok   allow  windows path of another machine is outside
+skip active=P7-push (product code gate not tested)
+== stage-gate: F-27-1 새 FIX 템플릿 호환(계획 점검: 통과 + 검증: 자리표) ==
+ok   DENY   FIX-028 대조: SG_T 안 app/x.py (active: none) 거부 — 경로가 프로젝트 안으로 인식됨
+ok   allow  새 템플릿(계획 점검: 통과 + 검증: 자리표) → app/ 쓰기 가능
+ok   allow  옛 템플릿(검증: 통과 한 줄) 도 그대로 호환
+== stage-gate: R-27-5 보호 경로(.claude/hooks·scripts·settings.json·.github/workflows) ==
+ok   DENY   FIX-028 대조: SG_T app/x.py (active: none) 거부 — 프로젝트 안 인식
+ok   DENY   .claude/hooks/x.sh (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   DENY   .claude/scripts/x.py (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   DENY   .claude/settings.json (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   DENY   .github/workflows/x.yml (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   allow  .claude/skills 는 여전히 면제(R-27-5 범위 밖)
+ok   allow  R-27-5 활성 작업 있으면 allow: .../.claude/hooks/_py.sh
+ok   allow  R-27-5 활성 작업 있으면 allow: .../.claude/scripts/test-guards.sh
+ok   allow  R-27-5 활성 작업 있으면 allow: .../.claude/settings.json
+ok   allow  R-27-5 활성 작업 있으면 allow: .../.github/workflows/tests.yml
+== stage-gate: dev 푸시 후 결정 대기(L-003) ==
+ok   DENY   awaiting: plan doc denied
+ok   allow  awaiting: HANDOFF allowed
+ok   DENY   awaiting: commit denied
+== commit-cleanup · precompact (격리된 임시 저장소에서) ==
+ok   commit-cleanup: 무관한 명령은 기록 없음
+... (26건 모두 ok; CC_T 도 native_path 적용)
+== 결과: 실패 0 ==

@@ -21,6 +21,14 @@ fi
 mk()  { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_input':{'command':sys.argv[1]}}))" "$1"; }
 mkw() { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_input':{'file_path':sys.argv[1],'content':sys.argv[2]}}))" "$1" "$2"; }
 
+# FIX-028: mktemp -d 가 주는 경로는 Git Bash(Windows)에서 /tmp/tmp.xxx 같은 MSYS 표기다. 네이티브 python 의
+# 인자는 MSYS 가 C:/Users/.../Temp/... 로 자동 변환하지만 환경변수(CLAUDE_PROJECT_DIR)는 변환하지 않아
+# 훅이 두 표기를 맞추지 못하고 "프로젝트 밖"으로 보고 공허하게 allow 했다. 임시 저장소 경로를 만든 직후
+# 네이티브(C:/...) 표기로 통일한다. cygpath 가 없으면(Mac·Linux) 값을 그대로 쓴다 — 동작 무변경.
+native_path() {
+  if command -v cygpath >/dev/null 2>&1; then cygpath -m "$1" 2>/dev/null || printf '%s' "$1"; else printf '%s' "$1"; fi
+}
+
 expect_deny() {  # hook, label, json
   out="$(printf '%s' "$3" | bash "$1")"
   if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   $2"; else echo "XX   should DENY but allowed: $2"; fails=$((fails+1)); fi
@@ -115,7 +123,7 @@ expect_allow "$H/commit-guard.sh" 'git status' "$(mk 'git status')"
 echo "== commit-guard: FIX-027 제품 코드 verifier 게이트 (격리된 임시 저장소) =="
 # 이 절은 실제 commit-guard.sh 를 CLAUDE_PROJECT_DIR 를 임시 저장소로 돌려 그대로 호출한다
 # (fix_guard_check.py 를 직접 부르는 우회 없이, 실제 훅 경로 — 마커·초안·해시 일치까지 — 를 탄다).
-FG_T="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-fg-$$")"
+FG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-fg-$$")")"
 mkdir -p "$FG_T/.claude" "$FG_T/app" "$FG_T/docs/wiki/fixes"
 (
   cd "$FG_T" || exit 1
@@ -124,6 +132,12 @@ mkdir -p "$FG_T/.claude" "$FG_T/app" "$FG_T/docs/wiki/fixes"
   printf 'init\n' > README.md; git add README.md
   git commit -qm "테스트용 첫 커밋" 2>/dev/null
 ) >/dev/null 2>&1
+
+fg_ctl() {  # 대조(FIX-028 C): 마커 없는 커밋은 이 임시 저장소에서도 DENY 여야 한다 — 훅이 FG_T 를 자기 프로젝트로 인식한다는 증거
+  out="$(printf '%s' "$(mk 'git commit -F .claude/commit-draft.txt')" | CLAUDE_PROJECT_DIR="$FG_T" bash "$H/commit-guard.sh")"
+  if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   FIX-028 대조: FG_T 마커 없는 커밋은 거부(저장소 인식)"; else echo "XX   FIX-028 대조 실패: FG_T 에서 마커 없는 커밋이 allow 됨(공허 통과 위험)"; fails=$((fails+1)); fi
+}
+fg_ctl
 
 fg_draft() {  # fg_draft <초안 첫 줄>
   printf '%s\n\n본문\n' "$1" > "$FG_T/.claude/commit-draft.txt"
@@ -348,9 +362,14 @@ else
 fi
 
 echo "== stage-gate: F-27-1 새 FIX 템플릿 호환(계획 점검: 통과 + 검증: 자리표) =="
-SG_T="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-sg-$$")"
+SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-sg-$$")")"
 mkdir -p "$SG_T/docs/wiki/fixes" "$SG_T/app"
 sg_gate() { printf '%s' "$(gate "$SG_T/$1")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh"; }
+
+# FIX-028 C 대조: active: none 이면 app/ 쓰기는 DENY 여야 한다 — 이게 allow 면 훅이 SG_T 를
+# "프로젝트 밖"으로 본 것이므로 아래 allow 시험들은 공허 통과다 → 실패로 센다.
+printf 'active: none\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+if sg_gate app/x.py | grep -q '"deny"'; then echo "ok   DENY   FIX-028 대조: SG_T 안 app/x.py (active: none) 거부 — 경로가 프로젝트 안으로 인식됨"; else echo "XX   FIX-028 대조 실패: SG_T 가 프로젝트 밖으로 인식됨(공허 통과 위험)"; fails=$((fails+1)); fi
 
 printf 'active: FIX-999\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
 printf '# FIX-999\n\n계획 점검: 통과(메인 세션, 점검표 1~8)\n검증: (verifier 가 쓴다 — 제품 코드를 바꾸면 커밋 전 review-FIX-nnn.md 와 함께)\n승인: 사용자 (2026-10-06)\n' \
@@ -364,9 +383,12 @@ if [ -z "$out" ]; then echo "ok   allow  옛 템플릿(검증: 통과 한 줄) �
 rm -rf "$SG_T"
 
 echo "== stage-gate: R-27-5 보호 경로(.claude/hooks·scripts·settings.json·.github/workflows) =="
-SG_T="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-sg2-$$")"
+SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-sg2-$$")")"
 mkdir -p "$SG_T/docs/wiki"
 printf 'active: none\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+# FIX-028 C 대조: 같은 저장소에서 제품 코드 쓰기가 DENY 되는지 먼저 확인(프로젝트 안 인식)
+out="$(printf '%s' "$(gate "$SG_T/app/x.py")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
+if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   FIX-028 대조: SG_T app/x.py (active: none) 거부 — 프로젝트 안 인식"; else echo "XX   FIX-028 대조 실패: SG_T 가 프로젝트 밖으로 인식됨"; fails=$((fails+1)); fi
 for p in '.claude/hooks/x.sh' '.claude/scripts/x.py' '.claude/settings.json' '.github/workflows/x.yml'; do
   out="$(printf '%s' "$(gate "$SG_T/$p")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
   if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   $p (활성 작업 없음, R-27-5 — 더는 면제되지 않음)"; else echo "XX   $p 가 여전히 면제돼 allow 됐다(R-27-5 회귀)"; fails=$((fails+1)); fi
@@ -453,7 +475,7 @@ echo "== commit-cleanup · precompact (격리된 임시 저장소에서) =="
 # CLAUDE_PROJECT_DIR 을 임시 저장소로 돌려 그 안에서만 돌린다.
 # 그동안 이 둘만 자동 시험이 없었고, 실제로 commit-cleanup 에 "실패한 푸시를 성공처럼
 # 기록" 하는 결함이 들어갔다가 사람 눈으로 발견됐다(FIX-009). 그래서 케이스를 넣는다.
-CC_T="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-cc-$$")"
+CC_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-cc-$$")")"
 mkdir -p "$CC_T/.claude/hooks" "$CC_T/docs/wiki"
 # 시험할 commit-cleanup 훅의 경로. 기본은 작업 트리의 것이고, 변이 훅으로 검출력을 확인할 때만
 # 바꿔 넣는다:  CC_HOOK=<scratchpad>/mut-exitonly.sh bash .claude/scripts/test-guards.sh

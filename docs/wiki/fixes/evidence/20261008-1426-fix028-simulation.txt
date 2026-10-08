@@ -1,0 +1,31 @@
+# FIX-028 D 시뮬레이션 — Mac 에서 가짜 cygpath 스텁(PATH 앞)으로 Windows 표기 불일치를 흉내 낸다.
+# 스크립트: scratchpad/sim.sh (스텁: "/p" → "C:/fake/p", C:/ 는 그대로). 수정 전 훅 = `git show HEAD:.claude/hooks/stage-gate.sh`.
+# 임시 저장소는 active: none 이므로 app/ 쓰기는 "프로젝트 안"으로 인식될 때만 DENY 된다.
+# ($T 는 mktemp -d 경로를 치환한 표시)
+# 출력 JSON 은 모두 json.load 로 유효성 확인(INVALID_JSON 표시 없음 = F-27-2 유지).
+
+-- 시나리오: ROOT 환경변수=MSYS 표기($T), file_path=네이티브 표기(C:/fake$T/app/x.py)
+allow     수정 전 훅, 스텁 없음 (버그 재현: allow 면 공허 통과)
+allow     수정 전 훅, 스텁 있음 (cygpath 를 안 쓰므로 동일)
+DENY      수정 후 훅, 스텁 있음 (기대 DENY)
+-- 둘 다 MSYS 표기
+DENY      수정 후 훅, 스텁 있음, ROOT·fp 모두 $T (기대 DENY)
+-- 둘 다 네이티브 표기
+DENY      수정 후 훅, 스텁 있음, ROOT·fp 모두 C:/fake (기대 DENY)
+-- 백슬래시 fp
+DENY      수정 후 훅, fp 백슬래시 (기대 DENY)
+-- 프로젝트 밖 (기대 allow, 과차단 없음)
+allow     수정 후 훅, 다른 위치 /elsewhere/app/x.py
+allow     수정 후 훅, C:\Capstone2\app\main.py
+-- 상대경로 (기대 allow: 기존과 동일)
+allow     수정 후 훅, app/x.py
+allow     수정 전 훅, app/x.py
+-- 면제 경로 (기대 allow)
+allow     수정 후 훅, docs/wiki/x.md (네이티브 표기)
+-- 보호 경로 (기대 DENY)
+DENY      수정 후 훅, .claude/hooks/x.sh (네이티브 표기)
+-- 가짜 cygpath 가 실패할 때 원래 값 유지
+DENY      수정 후 훅, cygpath 실패 + 같은 표기 (기대 DENY)
+
+# 한계: 스텁은 cygpath 의 변환 규칙(/tmp→C:/Users/.../Temp 등)을 실제와 똑같이 재현하지 못한다. MSYS 의 인자 자동 변환,
+#   네이티브 python 의 실제 경로 해석, test-guards.sh 가 Windows 에서 실패 0 이 되는지는 Mac 에서 확인 불가 → CI(windows-latest) 에서 확인.

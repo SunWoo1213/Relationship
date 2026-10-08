@@ -1,0 +1,155 @@
+# review-FIX-028 변이 시험 (verifier, Mac) — 스크립트: scratchpad/sim-fix028.sh (본문은 파일 끝에 첨부)
+# 기준: HEAD 2264d56 + 작업 트리 미커밋 diff. 실행: bash sim-fix028.sh
+
+# sed 치환 횟수 (old/new): 11 / 12
+# 옛 훅에는 cygpath 없음: 0 회 · 새 훅: 5 회
+# 옛 test-guards 에 native_path 없음: 0 회 · 새: 5 회
+
+== S1 CI 실패 재현(수정 전 전부)  [test-guards=old · stage-gate=old · cygpath=none · python=스텁(인자 변환)]
+   XX   .claude/hooks/x.sh 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .claude/scripts/x.py 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .claude/settings.json 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .github/workflows/x.yml 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   == 결과: 실패 4 ==
+
+== S2 새 test-guards(A+C) + 옛 훅, cygpath 없음 → 대조가 불일치를 잡는가  [test-guards=new · stage-gate=old · cygpath=none · python=스텁(인자 변환)]
+   ok   DENY   FIX-028 대조: FG_T 마커 없는 커밋은 거부(저장소 인식)
+   XX   FIX-028 대조 실패: SG_T 가 프로젝트 밖으로 인식됨(공허 통과 위험)
+   XX   FIX-028 대조 실패: SG_T 가 프로젝트 밖으로 인식됨
+   XX   .claude/hooks/x.sh 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .claude/scripts/x.py 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .claude/settings.json 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .github/workflows/x.yml 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   == 결과: 실패 6 ==
+
+== S0 새 test-guards + 새 훅, cygpath 없음 → 대조는 훅이 아니라 경로 인식을 본다  [test-guards=new · stage-gate=new · cygpath=none · python=스텁(인자 변환)]
+   ok   DENY   FIX-028 대조: FG_T 마커 없는 커밋은 거부(저장소 인식)
+   XX   FIX-028 대조 실패: SG_T 가 프로젝트 밖으로 인식됨(공허 통과 위험)
+   XX   FIX-028 대조 실패: SG_T 가 프로젝트 밖으로 인식됨
+   XX   .claude/hooks/x.sh 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .claude/scripts/x.py 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .claude/settings.json 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .github/workflows/x.yml 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   == 결과: 실패 6 ==
+
+== S3 수정 전부(A+B+C) + cygpath 스텁 → 실패 0 기대  [test-guards=new · stage-gate=new · cygpath=stub · python=스텁(인자 변환)]
+   ok   DENY   FIX-028 대조: FG_T 마커 없는 커밋은 거부(저장소 인식)
+   ok   DENY   FIX-028 대조: SG_T 안 app/x.py (active: none) 거부 — 경로가 프로젝트 안으로 인식됨
+   ok   DENY   FIX-028 대조: SG_T app/x.py (active: none) 거부 — 프로젝트 안 인식
+   == 결과: 실패 0 ==
+
+== S4 A+C 만(옛 훅) + cygpath 스텁 → A 단독으로 충분한가  [test-guards=new · stage-gate=old · cygpath=stub · python=스텁(인자 변환)]
+   ok   DENY   FIX-028 대조: FG_T 마커 없는 커밋은 거부(저장소 인식)
+   ok   DENY   FIX-028 대조: SG_T 안 app/x.py (active: none) 거부 — 경로가 프로젝트 안으로 인식됨
+   ok   DENY   FIX-028 대조: SG_T app/x.py (active: none) 거부 — 프로젝트 안 인식
+   == 결과: 실패 0 ==
+
+== S5 B 만(옛 test-guards) + cygpath 스텁 → B 단독으로 충분한가  [test-guards=old · stage-gate=new · cygpath=stub · python=스텁(인자 변환)]
+   == 결과: 실패 0 ==
+
+== S6 B 만 + cygpath 가 -- 거부 → B 가 무효가 되면 드러나는가  [test-guards=old · stage-gate=new · cygpath=nodash · python=스텁(인자 변환)]
+   XX   .claude/hooks/x.sh 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .claude/scripts/x.py 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .claude/settings.json 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   XX   .github/workflows/x.yml 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+   == 결과: 실패 4 ==
+
+== S7 A+B+C + cygpath 가 -- 거부 → A 가 B 의 무효를 가리는가  [test-guards=new · stage-gate=new · cygpath=nodash · python=스텁(인자 변환)]
+   ok   DENY   FIX-028 대조: FG_T 마커 없는 커밋은 거부(저장소 인식)
+   ok   DENY   FIX-028 대조: SG_T 안 app/x.py (active: none) 거부 — 경로가 프로젝트 안으로 인식됨
+   ok   DENY   FIX-028 대조: SG_T app/x.py (active: none) 거부 — 프로젝트 안 인식
+   == 결과: 실패 0 ==
+
+== JSON 유효성: 새 훅 + cygpath 스텁, 불일치 표기(ROOT=/var 형, fp=/private/var 형) DENY 출력
+   app/x.py (json file_path=/private/var/folders/bs/dry3bl8532q22pr3…) → "permissionDecision":"deny" · 유효 JSON
+   .claude/hooks/x.sh (json file_path=/private/var/folders/bs/dry3bl8532q22pr3…) → "permissionDecision":"deny" · 유효 JSON
+   docs/wiki/x.md (json file_path=/private/var/folders/bs/dry3bl8532q22pr3…) → allow(빈 출력)
+
+########## 스크립트 본문 ##########
+#!/usr/bin/env bash
+# review-FIX-028 변이 시험 (verifier, Mac)
+# Windows(MSYS) 의 "네이티브 프로그램 인자만 경로 변환, 환경변수는 그대로" 를 Mac 에서 흉내 낸다:
+#   - python 스텁: 인자 중 /var/… · /tmp/… 로 시작하는 것을 /private/var/… · /private/tmp/… 로 바꿔 python3 에 넘긴다
+#     (= MSYS 가 /tmp/x 를 C:/…/Temp/x 로 바꾸는 역할). Mac 에서 두 표기는 같은 위치다.
+#   - cygpath 스텁: `cygpath -m [--] P` → P 가 /var/… · /tmp/… 면 /private 접두(= 네이티브 표기), 아니면 그대로.
+#   - cygpath-nodash 스텁: `--` 를 거부(usage, exit 1) — "cygpath 가 -- 를 못 받는다면" 가정.
+# 훅·스크립트의 옛(HEAD)/새(작업 트리) 버전을 조합해 test-guards.sh 전체를 돌리고 XX 줄만 센다.
+set -u
+SP="$(cd "$(dirname "$0")" && pwd)"
+PROJ="/Users/sunwoo/Desktop/Portfolio/Relationship"
+export CLAUDE_PROJECT_DIR="$PROJ"
+REAL_PY="$(command -v python3)"
+
+mkdir -p "$SP/stub-py" "$SP/stub-cyg" "$SP/stub-cyg-nodash" "$SP/hook-old" "$SP/hook-new"
+cat > "$SP/stub-py/python" <<EOF
+#!/usr/bin/env bash
+# MSYS 인자 변환 흉내: /var/… /tmp/… → /private/…
+args=()
+for a in "\$@"; do
+  case "\$a" in /var/*|/tmp/*) a="/private\$a" ;; esac
+  args+=("\$a")
+done
+exec "$REAL_PY" "\${args[@]}"
+EOF
+cat > "$SP/stub-cyg/cygpath" <<'EOF'
+#!/usr/bin/env bash
+# cygpath -m [--] PATH 흉내
+mode=""; p=""
+while [ $# -gt 0 ]; do
+  case "$1" in -m) mode=m; shift ;; --) shift; p="$1"; break ;; -*) echo "unknown option" >&2; exit 1 ;; *) p="$1"; break ;; esac
+done
+[ -n "$p" ] || { echo "usage" >&2; exit 1; }
+case "$p" in /var/*|/tmp/*) printf '%s\n' "/private$p" ;; *) printf '%s\n' "$p" ;; esac
+EOF
+cat > "$SP/stub-cyg-nodash/cygpath" <<'EOF'
+#!/usr/bin/env bash
+# `--` 를 거부하는 cygpath 흉내
+mode=""; p=""
+while [ $# -gt 0 ]; do
+  case "$1" in -m) mode=m; shift ;; --) echo "cygpath: unknown option -- -" >&2; exit 1 ;; -*) echo "unknown option" >&2; exit 1 ;; *) p="$1"; break ;; esac
+done
+[ -n "$p" ] || { echo "usage" >&2; exit 1; }
+case "$p" in /var/*|/tmp/*) printf '%s\n' "/private$p" ;; *) printf '%s\n' "$p" ;; esac
+EOF
+chmod +x "$SP/stub-py/python" "$SP/stub-cyg/cygpath" "$SP/stub-cyg-nodash/cygpath"
+
+# 훅 옛/새 (옛 = HEAD, 새 = 작업 트리). _py.sh 는 훅 옆에 있어야 한다.
+git -C "$PROJ" show HEAD:.claude/hooks/stage-gate.sh > "$SP/hook-old/stage-gate.sh"
+cp "$PROJ/.claude/hooks/stage-gate.sh" "$SP/hook-new/stage-gate.sh"
+cp "$PROJ/.claude/hooks/_py.sh" "$SP/hook-old/_py.sh"; cp "$PROJ/.claude/hooks/_py.sh" "$SP/hook-new/_py.sh"
+# test-guards 옛/새. stage-gate 호출만 SG_HOOK 으로 바꿔치기할 수 있게 한다(그 외 무변경).
+git -C "$PROJ" show HEAD:.claude/scripts/test-guards.sh | sed 's#"\$H/stage-gate.sh"#"${SG_HOOK:-$H/stage-gate.sh}"#g' > "$SP/tg-old.sh"
+sed 's#"\$H/stage-gate.sh"#"${SG_HOOK:-$H/stage-gate.sh}"#g' "$PROJ/.claude/scripts/test-guards.sh" > "$SP/tg-new.sh"
+echo "# sed 치환 횟수 (old/new): $(grep -c 'SG_HOOK' "$SP/tg-old.sh") / $(grep -c 'SG_HOOK' "$SP/tg-new.sh")"
+echo "# 옛 훅에는 cygpath 없음: $(grep -c cygpath "$SP/hook-old/stage-gate.sh") 회 · 새 훅: $(grep -c cygpath "$SP/hook-new/stage-gate.sh") 회"
+echo "# 옛 test-guards 에 native_path 없음: $(grep -c native_path "$SP/tg-old.sh") 회 · 새: $(grep -c native_path "$SP/tg-new.sh") 회"
+echo
+
+run() {  # run <라벨> <tg: old|new> <hook: old|new> <cyg: none|stub|nodash>
+  label="$1"; tg="$2"; hook="$3"; cyg="$4"
+  path="$SP/stub-py:$PATH"
+  case "$cyg" in stub) path="$SP/stub-cyg:$path" ;; nodash) path="$SP/stub-cyg-nodash:$path" ;; esac
+  out="$(cd "$PROJ" && PATH="$path" SG_HOOK="$SP/hook-$hook/stage-gate.sh" bash "$SP/tg-$tg.sh" 2>&1)"
+  echo "== $label  [test-guards=$tg · stage-gate=$hook · cygpath=$cyg · python=스텁(인자 변환)]"
+  printf '%s\n' "$out" | grep -E '^XX|FIX-028|^== 결과' | sed 's/^/   /'
+  echo
+}
+
+run "S1 CI 실패 재현(수정 전 전부)"                     old old none
+run "S2 새 test-guards(A+C) + 옛 훅, cygpath 없음 → 대조가 불일치를 잡는가" new old none
+run "S0 새 test-guards + 새 훅, cygpath 없음 → 대조는 훅이 아니라 경로 인식을 본다" new new none
+run "S3 수정 전부(A+B+C) + cygpath 스텁 → 실패 0 기대"     new new stub
+run "S4 A+C 만(옛 훅) + cygpath 스텁 → A 단독으로 충분한가" new old stub
+run "S5 B 만(옛 test-guards) + cygpath 스텁 → B 단독으로 충분한가" old new stub
+run "S6 B 만 + cygpath 가 -- 거부 → B 가 무효가 되면 드러나는가" old new nodash
+run "S7 A+B+C + cygpath 가 -- 거부 → A 가 B 의 무효를 가리는가" new new nodash
+
+echo "== JSON 유효성: 새 훅 + cygpath 스텁, 불일치 표기(ROOT=/var 형, fp=/private/var 형) DENY 출력"
+T="$(mktemp -d)"; mkdir -p "$T/docs/wiki"; printf 'active: none\nfrozen: none\n' > "$T/docs/wiki/CURRENT.md"
+for rel in app/x.py .claude/hooks/x.sh docs/wiki/x.md; do
+  j="$(PATH="$SP/stub-py:$PATH" python -c "import json,sys;print(json.dumps({'tool_input':{'file_path':sys.argv[1]}}))" "$T/$rel")"
+  o="$(printf '%s' "$j" | PATH="$SP/stub-cyg:$SP/stub-py:$PATH" CLAUDE_PROJECT_DIR="$T" bash "$SP/hook-new/stage-gate.sh")"
+  if [ -z "$o" ]; then v="allow(빈 출력)"; elif printf '%s' "$o" | "$REAL_PY" -c 'import json,sys;json.load(sys.stdin)' 2>/dev/null; then v="$(printf '%s' "$o" | grep -o '"permissionDecision":"[a-z]*"') · 유효 JSON"; else v="INVALID_JSON"; fi
+  echo "   $rel (json file_path=$(printf '%s' "$j" | grep -o '/private[^"]*' | head -c 40)…) → $v"
+done
+rm -rf "$T"
