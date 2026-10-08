@@ -428,3 +428,5 @@
 - 2026-10-06 15:13 | PUSH-dev2 | origin dev2 90f249c (실험 푸시)
 - 2026-10-08 14:15 | COMMIT | 2264d56 harness(FIX-027): FIX 커밋도 verifier 검증 없이는 못 하게 커밋 훅으로 막는다
 - 2026-10-08 14:15 | PUSH-dev2 | origin dev2 2264d56 (실험 푸시)
+- 2026-10-08 14:49 | COMMIT | dfb661a fix(FIX-028): Windows 에서 임시 저장소 훅 시험이 경로 표기 차이로 실패하던 것을 고친다
+- 2026-10-08 14:49 | PUSH-dev2 | origin dev2 dfb661a (실험 푸시)
