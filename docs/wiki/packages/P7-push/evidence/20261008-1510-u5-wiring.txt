@@ -1,0 +1,63 @@
+P7-push U5 두 경로 연결 -- 판정 출력 (2026-10-08, 브랜치 dev2, POSTGRES_PORT=5433, 테스트 DB relationship_test)
+명령은 저장소 루트에서 실행. 출력은 실제 실행 결과를 그대로 옮긴 것이다(키 값 출력 없음).
+
+## 1 tests/test_push_wiring.py -v
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_push_wiring.py -v
+tests/test_push_wiring.py::test_manual_path_override_receives_same_session_and_sends PASSED
+tests/test_push_wiring.py::test_manual_path_real_get_notifier_with_keys_sends_via_fake_sender PASSED
+tests/test_push_wiring.py::test_manual_path_without_keys_is_not_configured PASSED
+tests/test_push_wiring.py::test_manual_path_half_keys_is_misconfigured PASSED
+tests/test_push_wiring.py::test_scheduler_passes_null_notifier_without_keys PASSED
+tests/test_push_wiring.py::test_scheduler_passes_misconfigured_notifier_with_half_keys PASSED
+tests/test_push_wiring.py::test_scheduler_passes_web_push_notifier_sharing_session_user_and_clock PASSED
+tests/test_push_wiring.py::test_scheduler_end_to_end_sends_and_records PASSED
+tests/test_push_wiring.py::test_scheduler_end_to_end_without_keys_keeps_old_behavior PASSED
+9 passed in 0.71s
+
+## 2 안정성 -- 같은 파일 3회 반복
+9 passed in 0.52s
+9 passed in 0.52s
+9 passed in 0.54s
+
+## 3 P6-briefing 회귀 (tests/test_briefing_*.py tests/test_api_briefings.py)
+95 passed, 1 warning in 2.89s     (키 없는 환경에서 push == "not_configured" 그대로)
+
+## 4 push 전체 (tests/test_push_*.py)
+87 passed in 0.72s
+
+## 5 전체 회귀
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -rs -q
+1849 passed, 1 warning in 21.97s     (skip 0)
+참고 -- test_push_wiring.py 를 뺀 같은 명령: 1840 passed (1840 + 9 = 1849)
+
+## 6 ruff
+$ .venv/bin/ruff check app tests scripts evaluation
+All checks passed!
+
+## 7 mypy
+$ .venv/bin/python scripts/mypy_check.py --run
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)
+
+## 8 alembic check (스키마 무변경)
+No new upgrade operations detected.
+
+## 9 불변식 grep
+$ grep -rln "pywebpush" app/
+app/push/sender.py                      (기대: 이 한 줄뿐)
+$ grep -rn "evaluation" app/push app/api/deps.py app/briefing/scheduler.py
+(0건, exit=1)
+$ grep -rnE "BEGIN (EC )?PRIVATE KEY" app tests
+(0건, exit=1)
+$ grep -rnE "[\"'][A-Za-z0-9_-]{43}[\"']" tests/test_push_wiring.py
+(0건, exit=1)                           (VAPID 개인키 모양 리터럴 없음 -- 키는 테스트 안에서 생성)
+$ grep -rn "raw_utterance" app/push
+(0건, exit=1)
+
+## 10 시그니처·P6 코드 무변경
+$ git diff --stat -- app/briefing/run.py app/briefing/types.py app/push/notifier.py app/push/sender.py
+(빈 출력 = run_briefings·Notifier·NullNotifier·notifier_from_env 무변경)
+$ git status --short app tests
+ M app/api/deps.py
+ M app/api/routes.py
+ M app/briefing/scheduler.py
+?? tests/test_push_wiring.py

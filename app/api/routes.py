@@ -119,6 +119,7 @@ from app.api.deps import (
     get_embedder,
     get_fact_extractor,
     get_judge,
+    get_notifier,
     get_now,
     get_proposer,
     get_session,
@@ -141,7 +142,7 @@ from app.api.schemas import (
     StoredOut,
     VapidPublicKeyOut,
 )
-from app.briefing import BriefingComposer, run_briefings
+from app.briefing import BriefingComposer, Notifier, run_briefings
 from app.db.models import AgentTrace
 from app.embedding import EmbeddingProvider
 from app.er import Judge, JudgeUnavailable
@@ -370,6 +371,7 @@ def run_briefings_endpoint(
     session: Session = Depends(get_session),
     composer: BriefingComposer = Depends(get_briefing_composer),
     now: Callable[[], datetime] = Depends(get_now),
+    notifier: Notifier = Depends(get_notifier),
 ) -> BriefingRunOut:
     """P6-briefing U6(모듈 docstring 절 참고) -- 1분 주기 작업과 **같은
     함수**(`run_briefings`, `trigger="manual"`)를 부른다. 본문은 전부
@@ -381,7 +383,9 @@ def run_briefings_endpoint(
     `app/main.py` 의 공통 404 매핑이 처리한다."""
     schedule_id = body.schedule_id if body is not None else None
     ctx = build_briefing_ctx(session, now)
-    result = run_briefings(ctx, composer=composer, schedule_id=schedule_id, trigger="manual")
+    result = run_briefings(
+        ctx, composer=composer, notifier=notifier, schedule_id=schedule_id, trigger="manual"
+    )
     return BriefingRunOut(
         run_id=result.session_id,
         generated_at=result.now,

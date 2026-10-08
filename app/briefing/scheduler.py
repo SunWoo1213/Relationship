@@ -76,6 +76,7 @@ from collections.abc import Callable
 from app.briefing.compose import composer_from_env
 from app.briefing.run import run_briefings
 from app.db.session import session_scope
+from app.push.notifier import notifier_from_env
 from app.settings import BRIEFING_INTERVAL_SECONDS, app_user_id
 from app.tools.context import ToolContext
 
@@ -95,7 +96,11 @@ def default_run_once() -> None:
             session_id=f"briefing-scheduler:{uuid.uuid4()}",
             user_id=app_user_id(),
         )
-        run_briefings(ctx, composer=composer_from_env(), trigger="scheduler")
+        # P7-push U5 -- 같은 세션·같은 시계(`ctx.now`)로 알림기를 만든다. 키가
+        # 없으면 `NullNotifier`(기존 동작), 있으면 `WebPushNotifier`. 수동 경로
+        # (`app/api/deps.py::get_notifier`)와 같은 함수를 쓴다.
+        notifier = notifier_from_env(session, ctx.user_id, ctx.now)
+        run_briefings(ctx, composer=composer_from_env(), notifier=notifier, trigger="scheduler")
 
 
 async def run_scheduler_loop(*, interval_seconds: float, run_once: RunOnce) -> None:

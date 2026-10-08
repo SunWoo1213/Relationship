@@ -101,16 +101,17 @@ import uuid
 from collections.abc import Callable, Iterator
 from datetime import datetime, timezone
 
-from fastapi import Header, HTTPException
+from fastapi import Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 
 from app.agent import Proposer, ResumeInput
-from app.briefing import BriefingComposer, composer_from_env
+from app.briefing import BriefingComposer, Notifier, composer_from_env
 from app.db.models import PendingQuestion
 from app.db.session import SessionLocal
 from app.embedding import EmbeddingProvider, OpenAIEmbeddingProvider
 from app.er import Judge
 from app.memory import FactExtractor
+from app.push.notifier import notifier_from_env
 from app.settings import app_user_id
 from app.tools.context import ToolContext
 from app.tools.types import QuestionNotFound
@@ -307,6 +308,28 @@ def get_now() -> Callable[[], datetime]:
     주입해(`get_proposer()`/`get_judge()`/`get_embedder()` 와 같은
     관례) 일정의 `scheduled_at` 과 비교되는 "지금"을 고정한다."""
     return lambda: datetime.now(timezone.utc)
+
+
+def get_notifier(
+    session: Session = Depends(get_session),
+    now: Callable[[], datetime] = Depends(get_now),
+) -> Notifier:
+    """P7-push U5 -- `POST /briefings/run` 이 `run_briefings()` 에 넘길
+    알림기. `notifier_from_env()`(U4)가 VAPID 설정 세 가지 상태(전무 ->
+    `NullNotifier`, 반쪽 -> `MisconfiguredNotifier`, 전부 -> `WebPushNotifier`)
+    를 알림기로 사상한다 -- 키가 없는 환경에서는 예전과 똑같이
+    `push == "not_configured"` 다.
+
+    **세션은 요청과 같은 것**(`Depends(get_session)` 은 같은 요청 안에서
+    캐시되므로 엔드포인트의 `session` 과 동일 객체다)을 쓴다 --
+    `WebPushNotifier` 가 이 세션으로 구독·인물을 읽고 `push_send` trace 를
+    쓰므로, 다른 세션이면 `briefed_at`·trace 가 커밋 시점에 따라 갈린다
+    (02-plan-verify R-1). 테스트가 `app.dependency_overrides[get_notifier]`
+    로 가짜 알림기를 넣을 때도 오버라이드 함수가 `Depends(get_session)` 을
+    선언해 같은 세션을 받아야 한다. `user_id = app_user_id()`(로컬 단일
+    사용자 전제, `build_briefing_ctx()` 와 같음), `now` 는 `get_now()` 가
+    준 같은 시계다."""
+    return notifier_from_env(session, app_user_id(), now)
 
 
 def build_briefing_ctx(session: Session, now: Callable[[], datetime]) -> ToolContext:
