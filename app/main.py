@@ -60,12 +60,14 @@ import contextlib
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+from pathlib import Path
+
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 from app.api import router
 from app.briefing.scheduler import start_scheduler_task
-from app.settings import briefing_scheduler_enabled
+from app.settings import briefing_scheduler_enabled, push_dev_page_enabled
 from app.tools.types import (
     ConfirmationRequired,
     InvalidValue,
@@ -75,6 +77,35 @@ from app.tools.types import (
     ScheduleNotFound,
     ToolError,
 )
+
+
+#: 개발·확인 전용 구독 페이지 정적 파일 위치(P7-push U6, 결정 A).
+_DEVPAGE_DIR = Path(__file__).resolve().parent / "push" / "devpage"
+
+
+def _register_push_dev_page(app: FastAPI) -> None:
+    """`PUSH_DEV_PAGE_ENABLED` 가 켜졌을 때만 `/push-dev/` 세 경로를 등록한다
+    (P7-push U6, 결정 A -- 제품 화면이 아닌 확인 도구). 꺼져 있으면 경로
+    자체가 없어 404 다. 세 파일만 명시적으로 서빙하므로 경로 탐색(`..`)이
+    불가능하다. 잘못된 스위치 값은 `briefing_scheduler_enabled()` 와 같이
+    `InvalidValue` 가 그대로 올라온다(원칙8)."""
+    if not push_dev_page_enabled():
+        return
+
+    files = {
+        "/push-dev/": ("index.html", "text/html; charset=utf-8"),
+        "/push-dev/sw.js": ("sw.js", "application/javascript"),
+        "/push-dev/devpage.js": ("devpage.js", "application/javascript"),
+    }
+    for route_path, (filename, media_type) in files.items():
+        file_path = _DEVPAGE_DIR / filename
+
+        def _serve(
+            file_path: Path = file_path, media_type: str = media_type
+        ) -> FileResponse:
+            return FileResponse(file_path, media_type=media_type)
+
+        app.add_api_route(route_path, _serve, methods=["GET"], include_in_schema=False)
 
 
 def _not_found_handler(request: Request, exc: Exception) -> JSONResponse:
@@ -148,6 +179,7 @@ def create_app() -> FastAPI:
     모듈 docstring 참고)."""
     app = FastAPI(title="관계 메모리 에이전트 API", lifespan=_lifespan)
     app.include_router(router)
+    _register_push_dev_page(app)
 
     app.add_exception_handler(PersonNotFound, _not_found_handler)
     app.add_exception_handler(QuestionNotFound, _not_found_handler)

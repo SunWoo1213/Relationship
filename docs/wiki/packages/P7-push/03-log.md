@@ -50,7 +50,7 @@
 - 남은 것 · 다음 단위: U5 두 경로 연결(`app/api/deps.py::get_notifier`, `scheduler.default_run_once()` 가 `notifier_from_env(...)` 를 만들어 넘기는 한 자리) — backend-agent, L-004 승인 먼저. U4 가 U5 에 넘기는 것: `notifier_from_env(session, user_id, now, env=None)` 시그니처 그대로 의존성에서 쓸 수 있다(세션·지금은 요청/주기 작업이 각자 들고 있는 것을 그대로 넘기면 된다).
 - Refs: P7-push S3.6 S3.1 R12 원칙9
 
-## 2026-10-08 · feat(P7-push): U5 두 경로 연결 — pending
+## 2026-10-08 · feat(P7-push): U5 두 경로 연결 — 55fc0f3
 - 변경: `app/api/deps.py` 에 `get_notifier(session=Depends(get_session), now=Depends(get_now)) -> Notifier` 추가(`notifier_from_env(session, app_user_id(), now)`, `Depends`·`Notifier`·`notifier_from_env` import). `app/api/routes.py::run_briefings_endpoint` 가 `notifier: Notifier = Depends(get_notifier)` 를 받아 `run_briefings(..., notifier=notifier, ...)` 로 넘김. `app/briefing/scheduler.py::default_run_once()` 가 같은 `session_scope()` 세션에서 `notifier_from_env(session, ctx.user_id, ctx.now)` 를 만들어 `run_briefings(..., notifier=notifier, trigger="scheduler")` 에 넘김(`ctx.now` = `ToolContext` 기본 시계라 ctx 와 같은 출처). `tests/test_push_wiring.py` 신규 9건. `run_briefings()`·`Notifier`·`NullNotifier`·`notifier_from_env` 시그니처 무변경(`git diff --stat` 빈 출력, evidence 10절).
 - 이유(기획서·카드 연결): 01-plan U5 그대로. S3.6 "주기 작업 → get_briefing → 웹푸시 → briefed_at" 의 두 호출 지점(P6-briefing 04-review §7 ④)이 둘 다 같은 `notifier_from_env()` 를 쓰게 해 수동·주기가 다른 알림기를 갖는 일을 막는다.
 - 권고 반영: **R-1** -- `get_notifier` 가 `Depends(get_session)` 을 받아 요청 세션을 공유하고(FastAPI 는 같은 요청 안에서 의존성 결과를 캐시), 테스트의 오버라이드 함수도 `Depends(get_session)`·`Depends(get_now)` 를 선언해 같은 세션을 받는다 -- `seen["session"] is db_session` 단언으로 직접 확인. R-2~R-10 중 U5 에 해당하는 항목은 02-plan-verify 에서 찾지 못했다(R-2 import 시점 방침은 U4 에서 반영, 이 단위는 `app/` 에 발송 라이브러리 이름 문자열을 쓰지 않음).
@@ -61,3 +61,13 @@
 - 알린 것: 전체 회귀 기준선이 U4 log 의 1802 에서 1840(wiring 제외)으로 올라 있다 -- U4 이후 다른 커밋(FIX 계열 테스트)이 더한 것으로 보이며 이 단위의 변경이 아니다(원인 커밋은 확인하지 않음).
 - 남은 것 · 다음 단위: U6 개발·확인 전용 구독 페이지(`app/push/devpage/`·`app/main.py` 한 자리) — backend-agent, L-004 승인 먼저.
 - Refs: P7-push S3.6 R12
+
+## 2026-10-08 · feat(P7-push): U6 개발·확인 전용 구독 페이지 — pending
+- 변경: `app/push/devpage/index.html`(버튼 1개·상태 줄·수신 기록 목록, 인라인 스크립트 없음)·`sw.js`(`push` 이벤트에서 `event.waitUntil(showNotification(title, {body, tag}))` 후 열린 클라이언트에 `{received_at, schedule_id, tag}` 만 `postMessage`; `notificationclick` 은 열린 확인 페이지에 포커스만)·`devpage.js`(버튼 클릭 → `Notification.requestPermission` → `register("/push-dev/sw.js", {scope: "/push-dev/"})` → `GET /push/vapid-public-key` → base64url→`Uint8Array` → `pushManager.subscribe({userVisibleOnly: true, applicationServerKey})` → `POST /push/subscriptions`(`subscription.toJSON()`), 상태·오류는 단순 텍스트). `app/main.py` 에 `_register_push_dev_page(app)` 와 `create_app()` 한 줄. `tests/test_push_devpage.py` 24건.
+- 이유(기획서·카드 연결): 01-plan U6 / 결정 A(i) -- 수용 기준(데스크톱 Chrome 수신)을 P7 안에서 사람이 확인하기 위한 도구. 원칙5 양립 조건 ① 인물·브리핑 조회 없음(grep 0건) ② 스위치 기본 꺼짐 -- 꺼지면 경로 자체 없음(404) ③ P8 인계(아래).
+- 직접 정한 것: 잘못된 스위치 값은 `briefing_scheduler_enabled()` 와 같이 `InvalidValue` 를 잡지 않는다 -- 다만 그 함수는 lifespan 에서, 이쪽은 `create_app()` 에서 읽는다(라우트 등록이 앱 생성 시점이라서). 값이 잘못되면 `app.main` import 자체가 실패한다(조용히 꺼진 채 넘어가지 않음, 원칙8). 세 파일은 `add_api_route` 로 명시 등록해 `StaticFiles` 를 쓰지 않는다(경로 탐색 면 자체가 없음). `/push-dev`(끝 슬래시 없음)는 FastAPI 기본 동작상 307 일 수 있어 테스트가 404/307 둘 다 허용하되 본문에 소스가 없음을 본다. 알림 클릭은 열린 확인 페이지 포커스(없으면 `/push-dev/` 열기)만 -- 브리핑 화면 이동은 P8.
+- **R-7 반영 · P8 인계**: registry 행 유형을 "확인 도구(제품 화면 아님, 스위치 기본 꺼짐)" 로 적었다. **P8 인계: 제품 화면에서 `/push-dev/` 를 링크하지 않는다. PWA 서비스 워커가 같은 `push` 처리(표시·`tag`)를 가져가고, 이 페이지를 지울지는 P8 이 정한다. 운영(P9)에서는 `PUSH_DEV_PAGE_ENABLED` 를 켜지 않는다.**
+- 정합성 확인: 불변식 grep 전부 기대값(`/chat|/briefings|/persons|/answers` 0건, 외부 `http` 0건, `pywebpush` = `sender.py` 한 줄, `evaluation`·`raw_utterance` 0건, 키 값 0건, 로그에 엔드포인트·키 0건). 스키마 무변경. 브라우저 동작은 보지 않았다(U8).
+- 검증: `tests/test_push_devpage.py` **24 passed**. 전체 회귀 **1873 passed**(1849+24, skip 0). ruff All checks passed. mypy `[ok] 새 오류 없음 (현재 38건, 기준선 38건)`(기준선 갱신 안 함). 증거: `evidence/20261008-1515-u6-devpage.txt`.
+- 남은 것 · 다음 단위: U7 수용 기준 기계 검증·문서(`RUNNING.md` 한 절 포함, 이때 U6 행 hash 와 registry pending 정리) -- backend-agent, L-004 승인 먼저. U8 은 실제 브라우저·실발송.
+- Refs: P7-push S3.6 원칙5

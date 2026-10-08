@@ -431,3 +431,5 @@
 - 2026-10-08 14:49 | COMMIT | dfb661a fix(FIX-028): Windows 에서 임시 저장소 훅 시험이 경로 표기 차이로 실패하던 것을 고친다
 - 2026-10-08 14:49 | PUSH-dev2 | origin dev2 dfb661a (실험 푸시)
 - 2026-10-08 15:02 | COMMIT | d5f1db0 docs(FIX-028): Windows 를 포함한 CI 세 job 성공 결과를 FIX 문서에 기록한다
+- 2026-10-08 15:02 | COMMIT | 55fc0f3 feat(P7-push): 브리핑 수동 실행과 1분 주기 작업이 웹푸시 알림기를 쓰게 연결한다
+- 2026-10-08 15:03 | PUSH-dev2 | origin dev2 55fc0f3 (실험 푸시)

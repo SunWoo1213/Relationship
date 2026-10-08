@@ -1,0 +1,35 @@
+# P7-push U6 증거 -- 개발·확인 전용 구독 페이지 (2026-10-08)
+
+## 1. pytest tests/test_push_devpage.py -v (POSTGRES_PORT=5433)
+24건 전부 PASSED (0.35s)
+- 꺼짐(기본 None·빈 값 "") x 세 경로 = 6건 404
+- 켜짐 "1"·"true": 세 경로 200, html text/html, sw.js·devpage.js application/javascript (2건)
+- sw.js: addEventListener("push" / showNotification / waitUntil / postMessage (1건)
+- sw.js 가 페이지로 보내는 객체 키 = {received_at, schedule_id, tag} 뿐 (1건)
+- devpage.js: /push/vapid-public-key · /push/subscriptions · userVisibleOnly · applicationServerKey · toJSON() · /push-dev/sw.js · requestPermission (1건)
+- 잘못된 값 yes·0·TRUE·on -> create_app() 이 InvalidValue (4건)
+- 경로 탐색/그 밖 경로 /push-dev/../main.py · ..%2F · %2e%2e · index.html · other.js · /push-dev -> 404(또는 307), 본문에 소스 없음 (6건)
+- 불변식: 제품 데이터 경로 0건 / 외부 http 0건·인라인 스크립트 0건 / title·body DOM 미사용 (3건)
+
+## 2. 전체 회귀 (POSTGRES_PORT=5433 pytest -rs -q) 마지막 줄
+1873 passed, 1 warning in 21.82s   (U5 시점 1849 + 24, skip 0)
+
+## 3. ruff check app tests scripts evaluation
+All checks passed!
+
+## 4. python scripts/mypy_check.py --run
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)   (기준선 갱신 안 함)
+
+## 5. 01-plan 불변식 grep (rc=1 은 0건)
+$ grep -nE "/chat|/briefings|/persons|/answers" app/push/devpage/*     -> 0건 (rc=1)
+$ grep -n "http" app/push/devpage/*                                     -> 0건 (rc=1)
+$ grep -rln pywebpush app/                                              -> app/push/sender.py 한 줄
+$ grep -rn evaluation app/push/                                         -> 0건 (rc=1)
+$ grep -rn raw_utterance app/push/                                      -> 0건 (rc=1)
+$ grep -rnE "VAPID_PRIVATE_KEY *= *[A-Za-z0-9_-]{20,}" . (py/md/js/html/.env.example, .venv·.git 제외) -> 0건 (rc=1)
+$ grep -rnE "logger\.[a-z]+\(.*(endpoint|p256dh|auth|keys|vapid)" app/push/ app/api/ -> 0건 (rc=1)
+
+## 6. 변경 파일
+M app/main.py (_register_push_dev_page 한 자리 + create_app 한 줄)
+A app/push/devpage/index.html, sw.js, devpage.js
+A tests/test_push_devpage.py
