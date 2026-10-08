@@ -62,7 +62,7 @@
 - 남은 것 · 다음 단위: U6 개발·확인 전용 구독 페이지(`app/push/devpage/`·`app/main.py` 한 자리) — backend-agent, L-004 승인 먼저.
 - Refs: P7-push S3.6 R12
 
-## 2026-10-08 · feat(P7-push): U6 개발·확인 전용 구독 페이지 — pending
+## 2026-10-08 · feat(P7-push): U6 개발·확인 전용 구독 페이지 — 572045a
 - 변경: `app/push/devpage/index.html`(버튼 1개·상태 줄·수신 기록 목록, 인라인 스크립트 없음)·`sw.js`(`push` 이벤트에서 `event.waitUntil(showNotification(title, {body, tag}))` 후 열린 클라이언트에 `{received_at, schedule_id, tag}` 만 `postMessage`; `notificationclick` 은 열린 확인 페이지에 포커스만)·`devpage.js`(버튼 클릭 → `Notification.requestPermission` → `register("/push-dev/sw.js", {scope: "/push-dev/"})` → `GET /push/vapid-public-key` → base64url→`Uint8Array` → `pushManager.subscribe({userVisibleOnly: true, applicationServerKey})` → `POST /push/subscriptions`(`subscription.toJSON()`), 상태·오류는 단순 텍스트). `app/main.py` 에 `_register_push_dev_page(app)` 와 `create_app()` 한 줄. `tests/test_push_devpage.py` 24건.
 - 이유(기획서·카드 연결): 01-plan U6 / 결정 A(i) -- 수용 기준(데스크톱 Chrome 수신)을 P7 안에서 사람이 확인하기 위한 도구. 원칙5 양립 조건 ① 인물·브리핑 조회 없음(grep 0건) ② 스위치 기본 꺼짐 -- 꺼지면 경로 자체 없음(404) ③ P8 인계(아래).
 - 직접 정한 것: 잘못된 스위치 값은 `briefing_scheduler_enabled()` 와 같이 `InvalidValue` 를 잡지 않는다 -- 다만 그 함수는 lifespan 에서, 이쪽은 `create_app()` 에서 읽는다(라우트 등록이 앱 생성 시점이라서). 값이 잘못되면 `app.main` import 자체가 실패한다(조용히 꺼진 채 넘어가지 않음, 원칙8). 세 파일은 `add_api_route` 로 명시 등록해 `StaticFiles` 를 쓰지 않는다(경로 탐색 면 자체가 없음). `/push-dev`(끝 슬래시 없음)는 FastAPI 기본 동작상 307 일 수 있어 테스트가 404/307 둘 다 허용하되 본문에 소스가 없음을 본다. 알림 클릭은 열린 확인 페이지 포커스(없으면 `/push-dev/` 열기)만 -- 브리핑 화면 이동은 P8.
@@ -71,3 +71,13 @@
 - 검증: `tests/test_push_devpage.py` **24 passed**. 전체 회귀 **1873 passed**(1849+24, skip 0). ruff All checks passed. mypy `[ok] 새 오류 없음 (현재 38건, 기준선 38건)`(기준선 갱신 안 함). 증거: `evidence/20261008-1515-u6-devpage.txt`.
 - 남은 것 · 다음 단위: U7 수용 기준 기계 검증·문서(`RUNNING.md` 한 절 포함, 이때 U6 행 hash 와 registry pending 정리) -- backend-agent, L-004 승인 먼저. U8 은 실제 브라우저·실발송.
 - Refs: P7-push S3.6 원칙5
+
+## 2026-10-08 · docs(P7-push): U7 수용 기준 기계 검증·문서 — pending
+- 변경: 제품 코드 변경 0. `docs/RUNNING.md` 에 "웹푸시 켜기·확인하기" 한 절(VAPID 키를 사용자가 만드는 명령·`.env` 이름 4개(값 없음)·서버 기동·`/push-dev/` 구독·`POST /briefings/run`·trace 조회·macOS 알림 권한·끄는 법)과 위 "웹푸시는 P7-push" 문단 정정. `registry.md` — U1~U5 행이 빠져 있던 것을 새로 채우고(`app/push/types.py`·`subscriptions.py`·`payload.py`·`sender.py`·`notifier.py`, `app/settings.py`·`routes.py`/`schemas.py`·`deps.py` 비고, 테스트 5파일) 기존 pending 행(U5 비고 3곳 `55fc0f3`, U6 3행 `572045a`)을 실제 해시로. `01-plan.md` U7 `[x]`.
+- 이유(기획서·카드 연결): 01-plan U7 / 판정 표 1~25행 / "지킬 불변식" 절 / S3.6 R12.
+- 결과: 판정 표 **1~22행 전부 통과**(`evidence/20261008-1536-u7-judgment-table.txt`, 행별 명령은 표의 파일::테스트). 23행(불변식 grep 8종) 전부 기대값, 24행 `alembic check`="No new upgrade operations detected."·`tools_check` 7/7. 25행 전체 회귀 **1873 passed, skip 0**(기준선 1724 이상). ruff(CI 범위) All checks passed · mypy 새 오류 없음(38/38, 기준선 갱신 안 함). 증거 `evidence/20261008-1536-u7-invariants-nochange.txt`·`-u7-regression.txt`.
+- **불일치 1건(보고, 고치지 않음)**: 24행 `git diff --stat 608694b -- <P6 판정 근거 경로>` 가 **빈 출력이 아니다**(8파일, +451/-145). 원인은 608694b 이후 들어온 **FIX 커밋 5개**(FIX-019 `4912865`·FIX-020 `7459925`·FIX-021 `b124c8e`·FIX-025 `3cd378c`·FIX-026 `90f249c`)이고, `--grep P7-push` 로 뽑은 12개 커밋(U1~U6 feat 6개 + 문서) 중 이 경로를 바꾼 것은 0건이다(grep 에 걸린 `7459925`·`32db187`·`b89c936` 은 본문 Refs/문구에 P7-push 가 적혀서일 뿐). `git diff --stat 90f249c HEAD -- <같은 경로>` = 빈 출력. 특히 `app/briefing/compose.py`(FIX-021·025)·`run.py`(FIX-021)는 P6 판정 근거 코드라, 04-review 에서 기준을 "P7 단위 커밋의 변경 0건"으로 읽을지 정해야 한다. 기준·기대값은 바꾸지 않았다.
+- 참고: 01-plan 판정 표 23행은 불변식 절의 8개 명령을 그대로 실행했다(키 값 grep 은 로그인 셸이 zsh 라 `bash -c` 로 실행). `ruff format --check` 는 저장소 전체 115파일이 대상이라 판정에서 뺐다(CI 에 없음). `ruff check .`(인자 없음)의 3건은 `.claude/scripts/findings.py` 의 기존 항목.
+- RUNNING.md 키 생성 방법: U1 에서 확인한 `py-vapid==1.9.4`(`pywebpush` 의존성)의 `Vapid().generate_keys()` 를 쓰는 파이썬 한 줄(개인키 32바이트 원시값 base64url 43자, 공개키 비압축 점 base64url 87자 — 에이전트는 값을 출력하지 않고 길이·`Vapid.from_string` 왕복 일치만 확인). 에이전트가 키 값이 나오는 명령을 실행해 화면에 낸 적 없음.
+- 남은 것 · 다음 단위: U8 데스크톱 Chrome 실발송 확인(사용자·메인 세션, 판정 표 26행, RUNNING.md 절의 ①~⑧). 그 뒤 verifier 04-review.
+- Refs: P7-push S3.6 R12 원칙8 원칙9

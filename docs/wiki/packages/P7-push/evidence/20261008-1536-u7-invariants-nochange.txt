@@ -1,0 +1,90 @@
+P7-push U7 · 판정 표 23행(불변식 grep)·24행(무변경) — HEAD 572045a, 2026-10-08
+셸 주의: 로그인 셸이 zsh 라 --include 글롭이 깨져 키 grep 은 bash -c 로 그대로 실행했다(명령 문자열은 01-plan 그대로).
+
+== 23행 · "지킬 불변식" 절 명령 그대로 ==
+[1] $ grep -rln "pywebpush" app/
+app/push/sender.py
+기대: app/push/sender.py 한 줄  → 통과
+
+[2] $ grep -rnE "VAPID_PRIVATE_KEY *= *[A-Za-z0-9_-]{20,}" . --include=*.py --include=*.md --include=*.js --include=*.html --include=.env.example
+(출력 없음, grep rc=1)  기대: 0건  → 통과
+    (저장소 루트 전체 — .venv 포함해 0건)
+    $ git diff 608694b -- .env.example
+    @@ -62,3 +62,6 @@ MEMORY_PROMOTE_MIN_EVENTS=
+     # 브리핑 1분 주기 작업 스위치(S3.6, P6-briefing) — 비우면 꺼짐, 1 이면 1분마다 브리핑
+     BRIEFING_SCHEDULER_ENABLED=
+    +
+    +# 개발·확인 전용 구독 페이지(P7-push) — 비우면 꺼짐(/push-dev/ 경로 없음), 운영에서는 비워 둔다
+    +PUSH_DEV_PAGE_ENABLED=
+    기대: 추가 1줄(PUSH_DEV_PAGE_ENABLED=)과 그 주석뿐, 31~34행 VAPID 이름 줄 무변경 → 통과(31~34행은 diff 에 없음)
+
+[3] $ grep -rnE "logger\.[a-z]+\(.*(endpoint|p256dh|auth|keys|vapid)" app/push/ app/api/
+(출력 없음, rc=1)  기대: 0건  → 통과
+
+[4] P6-briefing 판정 근거 코드 무변경 → 24행 참조 (아래). 불일치 소견 있음(FIX 커밋 유래, P7 단위 커밋 아님).
+
+[5] $ alembic check → "No new upgrade operations detected."  → 통과 (24행 참조)
+
+[6] $ grep -rn "raw_utterance" app/push/
+(출력 없음, rc=1)  기대: 0건  → 통과
+
+[7] $ grep -nE "/chat|/briefings|/persons|/answers" app/push/devpage/*.js app/push/devpage/*.html
+(출력 없음, rc=1)  기대: 0건  → 통과
+
+[8] $ grep -rn "evaluation" app/push/
+(출력 없음, rc=1)  기대: 0건  → 통과
+
+== 24행 · 무변경 ==
+$ POSTGRES_PORT=5433 .venv/bin/alembic check
+No new upgrade operations detected.                          기대 일치 → 통과
+
+$ POSTGRES_PORT=5433 .venv/bin/python scripts/tools_check.py
+[ok] add_schedule … [ok] get_briefing … [ok] ask_user …
+RESULT: 7/7 ok                                               기대 일치 → 통과
+
+$ git diff --stat 608694b -- app/briefing/run.py app/briefing/select.py app/briefing/inputs.py app/briefing/compose.py app/briefing/types.py app/agent app/memory app/er app/tools
+ app/agent/loop.py       |   4 +-
+ app/briefing/compose.py | 140 +++++++++++++++++++++++++++++---------
+ app/briefing/run.py     |   3 +-
+ app/er/types.py         |  18 +++++
+ app/memory/patterns.py  | 120 ++++++++++++++++++++++++---------
+ app/memory/promote.py   | 127 ++++++++++++++++++++++++++---------
+ app/tools/persons.py    | 174 ++++++++++++++++++++++++++++++++++--------------
+ app/tools/questions.py  |  10 ++-
+ 8 files changed, 451 insertions(+), 145 deletions(-)
+기대: 빈 출력  → 출력이 비어 있지 않음 (기준은 바꾸지 않았다). 원인 분해:
+
+$ git status --short -- <같은 경로>   → 빈 출력(미커밋 변경 없음. 위 diff 는 전부 커밋된 변경)
+
+$ git log --oneline 608694b..HEAD -- <같은 경로>   (이 경로를 바꾼 커밋 5개 — 전부 FIX)
+커밋     종류   제목                                                                   바꾼 파일(경로 한정)
+-------  -----  ---------------------------------------------------------------------  ------------------------------------------
+4912865  FIX-019 같은 질문에 답이 동시에 두 번 와도 재개는 한 번만 돈다                   app/tools/questions.py (+9/-1)
+7459925  FIX-020 한 인물·한 키에 한 행 같은 규칙을 DB 가 지키게 한다                      app/memory/promote.py, app/tools/persons.py
+b124c8e  FIX-021 ruff·mypy·커버리지를 CI 에 넣어 기계가 결함을 먼저 잡게 한다              app/agent/loop.py, app/briefing/compose.py, app/briefing/run.py, app/tools/persons.py
+3cd378c  FIX-025 성질 테스트가 찾은 위반 7건을 고친다                                    app/briefing/compose.py, app/er/types.py
+90f249c  FIX-026 사실 값을 바꾸면 updated_at 도 갱신하고 패턴 사실 저장도 ON CONFLICT 로 …   app/memory/patterns.py, app/memory/promote.py, app/tools/persons.py
+(참고: 7459925 의 파일 수는 2, 합 diff 의 persons.py/promote.py 는 FIX-020/021/026 이 겹쳐 쌓인 값)
+
+$ git log --format=%h --grep 'P7-push' 608694b..HEAD  → 12개 커밋. 각각 이 경로의 변경 파일 수:
+커밋     제목                                                       경로 변경 파일 수  P7 단위 여부
+-------  ---------------------------------------------------------  -----------------  ------------------------------------------
+fa5802d  docs(P7-push): 계획 검증 승인 대기                              0               P7 문서
+a69af80  docs(P7-push): 계획 승인·착수                                  0               P7 문서
+85393e0  feat(P7-push): U1                                              0               P7 단위
+6c98516  feat(P7-push): U2                                              0               P7 단위
+47adb1e  docs(P7-push): FIX 후보 HANDOFF                                0               P7 문서
+f256259  feat(P7-push): U3                                              0               P7 단위
+8e9af9e  feat(P7-push): U4                                              0               P7 단위
+b89c936  docs(wiki): HANDOFF 정리                                       0               본문 Refs 에 P7-push 언급(grep 걸림), 문서
+7459925  fix(FIX-020)                                                   2               P7 아님 — 본문 Refs 줄에 "P7-push" 가 적혀 grep 에 걸렸을 뿐 FIX 커밋
+32db187  docs(readme)                                                   0               P7 아님 — 본문에 "활성 패키지 P7-push와 무관" 문구로 grep 에 걸림
+55fc0f3  feat(P7-push): U5                                              0               P7 단위
+572045a  feat(P7-push): U6                                              0               P7 단위
+
+판정:
+ - P7-push 단위 커밋(U1~U6 feat + 계획/문서 커밋)이 이 경로를 바꾼 것: 0건 → 이 패키지 불변식 "P6 판정 근거 코드 무변경" 은 P7 몫으로는 지켜졌다.
+ - 표의 기대값 "608694b 기준 빈 출력"은 불일치(8개 파일 diff). 원인은 608694b(FIX-017) 이후 들어온 FIX-019/020/021/025/026 5개 커밋이며, 01-plan(2026-10-02 작성)이 예상하지 못한 것이다.
+ - 확인: `git diff --stat 90f249c HEAD -- <같은 경로>`(마지막 FIX 커밋 이후) = 빈 출력, `git diff --stat 85393e0^ HEAD -- <같은 경로>`(P7 U1 직전~HEAD) = 위와 같은 8파일(=FIX 5개가 만든 변경이 전부). 즉 P7-push 가 시작된 뒤 이 경로를 만진 것은 FIX 뿐이다.
+ - 주의: FIX-021 b124c8e 가 compose.py(+7)·run.py(+3) 를, FIX-025 3cd378c 가 compose.py(+133)·er/types.py 를 바꿨다 — compose.py/run.py 는 P6-briefing 판정 근거 코드다. 이 변경이 P6 수용 기준 판정에 영향을 주는지는 FIX-021/025 의 verifier 리뷰(docs/wiki/fixes/review-FIX-018-025.md) 몫이며 U7 범위 밖. 04-review 는 기준을 "P7 단위 커밋의 경로 변경 0건 + 90f249c 이후 무변경"으로 읽을지 사용자/verifier 가 정해야 한다.
+ - 스키마: P7 단위 커밋 6개 모두 alembic/·app/db/ 변경 0. 608694b 이후 스키마를 바꾼 커밋은 FIX-020 7459925(alembic/versions/0002_unique_upsert_keys.py) 하나뿐이고 `alembic check` 는 현재 HEAD 기준 "No new upgrade operations detected." 이다.

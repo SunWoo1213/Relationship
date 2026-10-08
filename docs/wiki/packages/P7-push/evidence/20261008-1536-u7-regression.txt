@@ -1,0 +1,22 @@
+P7-push U7 · 판정 표 25행(전체 회귀) 및 정적 검사 — HEAD 572045a, 2026-10-08
+
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -rs -p no:cacheprovider
+======================= 1873 passed, 1 warning in 21.62s =======================
+rc=0
+기대: 실패 0·skip 0·≥1724 → 실패 0 · skip 0(-rs 에 SKIPPED 줄 없음) · 1873 ≥ 1724 → 통과
+(U6 03-log 의 1849+24=1873 과 일치. push 테스트 111건 = devpage 24 + notifier 19 + payload 12 + settings 32 + subscriptions 15 + wiring 9)
+경고 1건: google.genai 의 DeprecationWarning(_UnionGenericAlias, 라이브러리 내부 — 이 패키지와 무관)
+
+$ POSTGRES_PORT=5433 .venv/bin/alembic check
+No new upgrade operations detected.
+
+$ POSTGRES_PORT=5433 .venv/bin/python scripts/tools_check.py
+RESULT: 7/7 ok
+
+$ .venv/bin/ruff check app tests scripts evaluation        (CI 범위: .github/workflows 66·133행 동일)
+All checks passed!
+참고: 인자 없는 `ruff check .` 는 .claude/scripts/findings.py 의 3건(DTZ005 x2, F541)을 보고한다 — CI 범위 밖의 기존 하네스 스크립트이고 이 패키지 변경이 아니다.
+참고: `ruff format --check` 는 저장소 전체 115개 파일이 대상이라고 보고한다 — CI 에 format 검사가 없고(워크플로 grep 0건) P7 파일에만 한정한 값이 아니므로 판정에 쓰지 않는다.
+
+$ POSTGRES_PORT=5433 .venv/bin/python scripts/mypy_check.py --run
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)         (기준선 갱신하지 않음)

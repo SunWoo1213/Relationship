@@ -256,7 +256,62 @@ BRIEFING_SCHEDULER_ENABLED=1 uvicorn app.main:create_app --factory --port 8000
 
 **패턴·사실의 세 출처** — 브리핑 직전에 `detect_patterns`를 다시 불러 `pattern:*` 사실을 최신으로 만든다(브리핑 대상 인물만, 인물 카드의 낡은 패턴까지 지우지는 않는다 — P8 인계). 브리핑에는 `pattern:*`와 `FACT_KEYS` 9종만 쓰고, 그 밖의 옛 자유 키(`소속`·`직장`·`이직` 등)는 브리핑 요약에서 빠지고 trace의 `excluded_facts`에만 남는다(삭제·수정하지 않는다).
 
-**웹푸시는 P7-push** — 이 패키지는 `Notifier` Protocol과 기본 `NullNotifier`(항상 `"not_configured"`)만 둔다. 구독 저장(`push_subscriptions`)·VAPID 키·실제 발송은 다루지 않는다.
+**웹푸시는 P7-push** — 이 패키지는 `Notifier` Protocol과 기본 `NullNotifier`(항상 `"not_configured"`)만 둔다. 구독 저장(`push_subscriptions`)·VAPID 키·실제 발송은 다음 절(웹푸시 켜기·확인하기)이다. VAPID 키를 넣지 않으면 응답 `push` 는 계속 `"not_configured"` 다.
+
+### 웹푸시 켜기·확인하기 (P7-push)
+
+브리핑이 만들어지면 그 사용자의 구독마다 VAPID 로 서명한 푸시를 보낸다(`app/push/`). 키가 없으면 아무것도 보내지 않고 위 절의 동작 그대로다. 아래 ①~⑧ 은 데스크톱 Chrome 에서 알림이 실제로 뜨는지 사람이 확인하는 절차다(자동 테스트는 가짜 발송기만 쓰며 실제 푸시 서비스로 아무것도 보내지 않는다).
+
+**① VAPID 키는 사용자가 직접 만든다** — 에이전트·자동 도구는 이 명령을 실행하지 않는다(키 값이 화면과 대화 기록에 남는다). 터미널에서 직접 한 번 실행해 나온 두 줄을 `.env` 에 붙여 넣는다. 설치된 `py-vapid`(`pywebpush` 의존성)의 키 생성을 쓰고 개인키는 32바이트 원시값, 공개키는 비압축 점(65바이트)을 base64url 로 인코딩한 값이다(브라우저 `applicationServerKey` 가 받는 형식).
+
+```bash
+# bash/zsh — 프로젝트 루트에서. 출력 두 줄(VAPID_PRIVATE_KEY=…, VAPID_PUBLIC_KEY=…)을 .env 에 옮긴다
+.venv/bin/python -c "import base64;from py_vapid import Vapid;from cryptography.hazmat.primitives import serialization as s;v=Vapid();v.generate_keys();b=lambda x:base64.urlsafe_b64encode(x).rstrip(b'=').decode();print('VAPID_PRIVATE_KEY='+b(v.private_key.private_numbers().private_value.to_bytes(32,'big')));print('VAPID_PUBLIC_KEY='+b(v.public_key.public_bytes(s.Encoding.X962,s.PublicFormat.UncompressedPoint)))"
+```
+
+**② `.env` 에 넣을 이름** — 값은 이 문서·`.env.example`·코드·로그·증거 파일에 쓰지 않는다. `.env` 는 git 에 올라가지 않는다.
+
+| 이름 | 값 |
+|------|-----|
+| `VAPID_PUBLIC_KEY` | ①에서 나온 공개키 |
+| `VAPID_PRIVATE_KEY` | ①에서 나온 개인키 — 어디에도 공유하지 않는다 |
+| `VAPID_SUBJECT` | 본인 연락처 `mailto:…` 형식(비우면 "반쪽 설정" 으로 본다) |
+| `PUSH_DEV_PAGE_ENABLED` | `1` — 확인용 구독 페이지(`/push-dev/`)를 켠다. 비우면 꺼짐(경로 자체가 없다) |
+
+세 VAPID 이름이 전부 비어 있으면 푸시를 보내지 않는다(`push == "not_configured"`). 일부만 있으면 보내지 않고 `push == "misconfigured"` 로 드러낸다(조용히 꺼진 것처럼 보이지 않게).
+
+**③ 서버 기동** — 코드는 `.env` 를 읽지 않으므로 셸에 먼저 불러온다(값을 화면에 찍지 않는다). `localhost` 는 브라우저가 서비스 워커·푸시를 허용하는 보안 컨텍스트로 취급한다.
+
+```bash
+set -a; . ./.env; set +a
+uvicorn app.main:create_app --factory --port 8000
+```
+
+**④ 구독하기** — 데스크톱 Chrome 으로 `http://localhost:8000/push-dev/` 를 열어 "알림 받기" 를 누르고 권한을 허용한다. 페이지에 `구독 저장됨 id=N` 이 뜨면 `push_subscriptions` 에 한 행이 생긴 것이다(같은 브라우저로 다시 눌러도 행이 늘지 않고 키만 갱신된다). 이 페이지는 제품 화면이 아닌 개발·확인 도구이며 인물·브리핑 데이터를 보여 주지 않는다.
+
+**⑤ 브리핑 일정 준비** — 24시간 안에 들어오는 일정이 하나 있어야 한다. 예: `POST /chat` 으로 "내일 저녁 7시에 민수랑 저녁 약속" 한 건을 입력하고 만들어진 `schedule_id` 를 적어 둔다.
+
+**⑥ 푸시 보내 보기** — 같은 함수를 부르는 수동 트리거로 확인한다(일정을 지정하면 이미 브리핑한 일정도 다시 만든다).
+
+```bash
+curl -s -X POST http://localhost:8000/briefings/run \
+  -H 'Content-Type: application/json' -d '{"schedule_id": 1}' | python3 -m json.tool
+```
+
+기대: `briefings[0].push == "sent"`. 그 밖 값의 뜻 — `no_subscription`(구독 0건) · `partial`/`failed`(일부/전부 실패, 푸시 서비스가 404·410 으로 돌려준 만료 구독은 행이 삭제된다) · `not_configured`/`misconfigured`(②). 발송이 실패해도 `briefed_at` 은 기록되므로 자동 재발송은 없다 — 다시 보내려면 이 명령을 다시 실행한다. 1분 주기 작업(`BRIEFING_SCHEDULER_ENABLED=1`)도 같은 알림기를 쓴다.
+
+**⑦ 기록 확인** — 푸시 서비스가 받았는지(`results[].status_code` 가 2xx)는 trace 로 본다. 엔드포인트 URL·암호 키·VAPID 키는 trace 에 남지 않고 구독 id 와 응답 코드만 남는다.
+
+```sql
+SELECT id, session_id, input, output FROM agent_traces
+ WHERE tool_name='push' AND step='push_send' ORDER BY id DESC LIMIT 1;
+```
+
+확인 페이지의 **수신 기록** 줄(시각·`schedule_id`·`tag`)은 서비스 워커까지 도착했다는 증거다.
+
+**⑧ macOS 알림 권한** — 푸시가 도착해도 OS 가 막으면 화면에 안 보인다. "시스템 설정 → 알림 → Google Chrome" 에서 알림 허용이 켜져 있는지, 집중 모드(방해 금지)가 꺼져 있는지 확인한다. Chrome 이 완전히 종료돼 있으면 데스크톱 Chrome 은 푸시를 받지 못한다. ⑦ 은 보이는데 알림이 안 뜨면 "전달됨·표시 안 됨" 으로 원인을 나눠 적는다.
+
+**끄는 법** — `.env` 의 `PUSH_DEV_PAGE_ENABLED` 를 비우고 서버를 다시 띄우면 `/push-dev/` 경로가 사라진다(운영에서는 켜지 않는다). 푸시 자체를 끄려면 `VAPID_*` 세 이름을 비운다(응답 `push` 가 `not_configured`). 이미 만든 구독 행은 남아 있어도 무해하다. 구독 해제 API 는 아직 없다(P8).
 
 ### 평가 데이터셋(파일럿 40건)
 

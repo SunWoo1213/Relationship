@@ -1,0 +1,69 @@
+P7-push U7 · 판정 표 1~22행 실행 (HEAD 572045a, dev2, 2026-10-08 15:32~15:36)
+명령 형식: POSTGRES_PORT=5433 .venv/bin/python -m pytest <표의 파일>::<테스트> -v   (Python 3.14.7 venv)
+행마다 독립 실행. 아래 출력은 각 실행의 PASSED/결과 줄 그대로(핵심). 26행(Chrome 실수신)은 U8 몫이라 실행하지 않았다.
+전부 FakePushSender·일회용 키 — 실제 푸시 서비스 발송 0, .env 열지 않음.
+
+행  확인할 것                         테스트(파일::이름)                                                                 결과줄                                  판정
+--  --------------------------------  ---------------------------------------------------------------------------------  --------------------------------------  ----
+ 1  구독 저장 양성(200 {id,created:true}, 행1·user_id·keys)
+                                      test_push_subscriptions::test_create_subscription_returns_id_and_created_true       PASSED                                  통과
+                                      test_push_subscriptions::test_create_subscription_persists_row_with_user_and_keys   PASSED   (2 passed in 0.59s)
+ 2  같은 엔드포인트(행수1·같은 id·created:false·두번째 keys)
+                                      test_push_subscriptions::test_create_subscription_same_endpoint_updates_keys_without_new_row   PASSED (1 passed)   통과
+ 3  잘못된 본문 422·행0(http://·빈 endpoint·auth 누락·빈/비base64url p256dh·길이초과)
+                                      test_push_subscriptions::test_create_subscription_invalid_body_returns_422_and_no_row  6 케이스 전부 PASSED (6 passed)   통과
+ 4  공개키 API 200/404/404
+                                      test_vapid_public_key_returns_200_when_fully_configured / _404_when_not_configured / _404_when_partially_configured   3 passed   통과
+ 5  사용자 격리
+                                      test_list_subscriptions_only_returns_own_user                                       1 passed                                통과
+ 6  수동 경로 한 흐름(push=="sent", 발송 2회, briefed_at==T, push_send trace 1행)
+                                      test_push_wiring::test_manual_path_override_receives_same_session_and_sends         1 passed                                통과
+ 7  주기 경로도 같은 알림기(키 있음 WebPushNotifier / 없음 NullNotifier / 반쪽 Misconfigured)
+                                      test_push_wiring::test_scheduler_passes_null_notifier_without_keys
+                                      test_push_wiring::test_scheduler_passes_misconfigured_notifier_with_half_keys
+                                      test_push_wiring::test_scheduler_passes_web_push_notifier_sharing_session_user_and_clock   3 passed   통과
+ 8  키 없을 때 기존 동작(push=="not_configured", 발송0)
+                                      test_push_wiring::test_manual_path_without_keys_is_not_configured
+                                      test_push_wiring::test_scheduler_end_to_end_without_keys_keeps_old_behavior         2 passed   통과
+                                      + P6 회귀 6파일(tests/test_briefing_*.py tests/test_api_briefings.py)               95 passed (아래 별도 실행)   통과
+ 9  반쪽 설정(push=="misconfigured", 발송0, briefed_at 기록)
+                                      test_push_wiring::test_manual_path_half_keys_is_misconfigured                       1 passed                                통과
+10  본문 규칙(제목/시각/제안, 요약 줄·패턴 문장 없음)
+                                      test_push_payload::test_build_push_payload_includes_time_and_suggestion_only
+                                      test_push_payload::test_build_push_payload_never_contains_lines_or_pattern_sentences   2 passed   통과
+11  제안 없음 → "{시각} · 브리핑이 준비됐어요"
+                                      test_push_payload::test_build_push_payload_without_suggestion_uses_fallback_tail    1 passed                                통과
+12  원문 미포함(발송기가 받은 페이로드 JSON 에 raw_utterance 문자열 없음)
+                                      test_push_notifier::test_notify_payload_sent_to_sender_never_contains_raw_utterance 1 passed                                통과
+13  길이·TTL(60 / 10800 / PUSH_TTL_MAX_SECONDS)
+                                      test_push_payload::...body_within_limit_for_realistic_suggestion, ...truncates_body_when_exceeding_limit,
+                                      ...ttl_clamped_to_range[t+30s-clamped-to-60 | t+3h-exact | t+30h-clamped-to-max]    5 passed   통과
+14  구독 0건 → no_subscription, 발송0, briefed_at 기록
+                                      test_push_notifier::test_notify_no_subscription_sends_nothing_and_records_trace     1 passed                                통과
+15  만료 410+201 → partial, 410 행 삭제·201 유지, removed==[id]
+                                      test_push_notifier::test_notify_partial_removes_gone_subscription_keeps_other       1 passed                                통과
+16  404 단독 → 행 삭제, failed, briefed_at 기록
+                                      test_push_notifier::test_notify_single_subscription_404_is_removed_and_status_failed 1 passed                               통과
+17  일시 오류 503/시간 초과 → failed, briefing_error 0행, briefed_at 기록, 재선정·생성기 추가 호출 0
+                                      test_push_notifier::test_run_briefings_with_transient_push_failure_keeps_briefed_at_and_does_not_resend   1 passed   통과
+18  발송기 예외 매핑 sent/gone/failed(500)/timeout/error(<클래스>)
+                                      test_push_notifier -k pywebpush_sender_maps   5 passed, 14 deselected              통과
+19  근거 기록(push_send 1행: tool_name="push", input/output 모양, tokens 0/0)
+                                      test_push_notifier::test_notify_records_full_trace_shape_without_leaking_secrets_in_exception_message   1 passed   통과
+20  비밀 미기록(endpoint·p256dh·auth·VAPID 키 값 0회, 예외 메시지 감시 문자열 포함 — R-8)
+                                      같은 테스트 + test_pywebpush_sender_exception_message_secrets_not_in_send_result    2 passed   통과
+21  네트워크 0(pywebpush.webpush "불리면 실패" 픽스처 아래 전부 통과, R-2 부정 확인 포함)
+                                      tests/test_push_notifier.py tests/test_push_wiring.py   28 passed in 0.57s
+                                      (포함: test_r2_default_sender_path_is_actually_intercepted_by_the_fixture,
+                                             test_r2_negative_check_unpatched_default_path_really_calls_the_library)      통과
+22  확인 페이지 스위치(꺼짐 404 x3 경로 / 켜짐 200·application/javascript·push 리스너·showNotification)
+                                      tests/test_push_devpage.py   24 passed in 0.36s                                     통과
+
+판정 요약: 1~22행 전부 통과, 불일치 0, FAILED/ERROR 0 (PASSED 줄 93개, FAILED·ERROR 줄 0개).
+
+P6 회귀 6파일(행 8 보조):
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_briefing_*.py tests/test_api_briefings.py -q
+95 passed, 1 warning in 2.83s
+
+행 4 비고: "응답 본문에 개인키 값 없음"·"설정값과 같음" 단언은 test_vapid_public_key_returns_200_when_fully_configured 안에 있다.
+행 13 비고: "APP_TIMEZONE 이 UTC 가 아닌 값" 케이스(02-plan-verify R-10)는 test_build_push_payload_time_uses_app_timezone_not_utc 로 별도 존재(전체 회귀에서 통과).

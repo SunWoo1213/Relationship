@@ -433,3 +433,5 @@
 - 2026-10-08 15:02 | COMMIT | d5f1db0 docs(FIX-028): Windows 를 포함한 CI 세 job 성공 결과를 FIX 문서에 기록한다
 - 2026-10-08 15:02 | COMMIT | 55fc0f3 feat(P7-push): 브리핑 수동 실행과 1분 주기 작업이 웹푸시 알림기를 쓰게 연결한다
 - 2026-10-08 15:03 | PUSH-dev2 | origin dev2 55fc0f3 (실험 푸시)
+- 2026-10-08 15:23 | COMMIT | 572045a feat(P7-push): 웹푸시 구독을 만들어 보는 개발·확인 전용 페이지 /push-dev/ 를 추가한다
+- 2026-10-08 15:23 | PUSH-dev2 | origin dev2 572045a (실험 푸시)
