@@ -1,0 +1,17 @@
+# verifier 3차 리뷰 — 구현자 변이 시험 `20261008-1400-fix027-rework2-mutation.sh` 를 그대로 재실행 (2026-10-08 13:50)
+# 판정: F-27-5 7/7 · F-27-6 3/3 뒤집힘 — test-guards 의 해당 케이스가 검사를 실제로 본다(항상 통과하는 테스트가 아님).
+# (지난 재리뷰 H절 변이 2건은 sed 대상 문구가 사라져 무효 — 이 시험이 그것을 대체한다.)
+== 변이 1: F-27-5 검사 무력화 (commit_args_check.py -> exit 0) ==
+명령                                                         원본 훅 변이 훅
+git commit -a -F .claude/commit-draft.txt                      DENY       allow      뒤집힘(케이스 유효)
+git commit -F .claude/commit-draft.txt app/a.py                DENY       allow      뒤집힘(케이스 유효)
+git commit --file=.claude/commit-draft.txt app/a.py            DENY       allow      뒤집힘(케이스 유효)
+git commit app/a.py -F .claude/commit-draft.txt                DENY       allow      뒤집힘(케이스 유효)
+git commit --file .claude/commit-draft.txt app/a.py            DENY       allow      뒤집힘(케이스 유효)
+git commit --pathspec-from-file=p -F .claude/commit-draft.txt  DENY       allow      뒤집힘(케이스 유효)
+git commit --include app/a.py -F .claude/commit-draft.txt      DENY       allow      뒤집힘(케이스 유효)
+
+== 변이 2: F-27-6 판정을 옛 정규식(^검증:\s*통과\b.*verifier, 한 줄만 맞으면 통과)으로 되돌림 ==
+검증: 통과 — 메인 세션 (verifier 생략)         원본 DENY   변이 allow  뒤집힘(케이스 유효)
+검증: 통과 — verifier 리뷰 생략(문서만)       원본 DENY   변이 allow  뒤집힘(케이스 유효)
+검증: (verifier 가 쓴다)\n검증: 통과 — verifier (fable) 원본 DENY   변이 allow  뒤집힘(케이스 유효)

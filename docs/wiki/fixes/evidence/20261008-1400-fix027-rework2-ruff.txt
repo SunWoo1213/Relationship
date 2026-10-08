@@ -1,0 +1,43 @@
+DTZ005 `datetime.datetime.now()` called without a `tz` argument
+   --> .claude/scripts/findings.py:129:13
+    |
+127 |         return 2
+128 |     path = os.path.join(pdir, "05-remediation.md")
+129 |     today = datetime.now().strftime("%Y-%m-%d")
+    |             ^^^^^^^^^^^^^^
+130 |     now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    |
+help: Pass a `datetime.timezone` object to the `tz` parameter
+
+DTZ005 `datetime.datetime.now()` called without a `tz` argument
+   --> .claude/scripts/findings.py:130:11
+    |
+128 |     path = os.path.join(pdir, "05-remediation.md")
+129 |     today = datetime.now().strftime("%Y-%m-%d")
+130 |     now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    |           ^^^^^^^^^^^^^^
+131 |
+132 |     existing = io.open(path, encoding="utf-8").read() if os.path.exists(path) else ""
+    |
+help: Pass a `datetime.timezone` object to the `tz` parameter
+
+F541 [*] f-string without any placeholders
+   --> .claude/scripts/findings.py:163:38
+    |
+161 |         b = blocks[i]
+162 |         if i not in seen and status_of(b) == "열림" and source_of(b) == source:
+163 |             b = re.sub(r"^상태:\s*열림", f"상태: 해소", b, count=1, flags=re.M)
+    |                                          ^^^^^^^^^^^^^
+164 |             b = re.sub(r"\|\s*해소:\s*-", f"| 해소: {today}", b, count=1)
+165 |             blocks[i] = b
+    |
+help: Remove extraneous `f` prefix
+    |
+162 |         if i not in seen and status_of(b) == "열림" and source_of(b) == source:
+    -             b = re.sub(r"^상태:\s*열림", f"상태: 해소", b, count=1, flags=re.M)
+163 +             b = re.sub(r"^상태:\s*열림", "상태: 해소", b, count=1, flags=re.M)
+164 |             b = re.sub(r"\|\s*해소:\s*-", f"| 해소: {today}", b, count=1)
+    |
+
+Found 3 errors.
+[*] 1 fixable with the `--fix` option.

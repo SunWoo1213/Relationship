@@ -424,3 +424,5 @@
 - 2026-10-06 13:12 | PUSH-dev2 | origin dev2 a9ae04f (실험 푸시)
 - 2026-10-06 14:08 | COMMIT | 3cd378c fix(FIX-025): 성질 테스트가 찾은 위반 7건을 고친다
 - 2026-10-06 14:08 | PUSH-dev2 | origin dev2 3cd378c (실험 푸시)
+- 2026-10-06 15:13 | COMMIT | 90f249c fix(FIX-026): 사실 값을 바꾸면 updated_at 도 갱신하고 패턴 사실 저장도 ON CONFLICT 로 바꾼다
+- 2026-10-06 15:13 | PUSH-dev2 | origin dev2 90f249c (실험 푸시)

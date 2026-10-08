@@ -1,0 +1,18 @@
+# verifier 재리뷰(FIX-027 재작업) — 변이 시험: test-guards.sh 의 F-27-3 케이스가 검사를 실제로 보는가
+# 스크립트: 20261008-1321-review-fix027-mutation.sh · 2026-10-08 13:21 · 원본 훅은 건드리지 않고 복사본만 변이
+# 결론: (a) 실제 저장소(승인 마커 없음)에서 도는 test-guards 의 F-27-3 세 케이스는 검사를 제거해도 규칙 1 로 DENY → 항상 통과하는 테스트(증거 아님).
+#       (b) 마커·초안을 갖춘 격리 저장소에서는 검사를 제거하면 allow 로 뒤집힌다 → 검사 자체는 실효. 케이스를 FG_T 절(격리 저장소)로 옮겨야 한다.
+변이 적용 확인(원본과 다른 줄):
+   >   if printf '%s' "$cmd" | grep -Eq '(^|[[:space:]])(--never-match-xyz)([[:space:]]|$)'; then
+   >   if printf '%s' "$cmd" | grep -Eq -- '--never-match-abc'; then
+(a) 실제 저장소(마커 없음) — test-guards.sh 의 F-27-3 세 케이스를 변이 복사본으로:
+   git commit -a -F .claude/commit-draft.txt -> 승인 마커가 없다. /commit 스킬로 초안을 만들고 사용자 승인을 받은 뒤 커밋하라.
+   git commit -F .claude/commit-draft.txt app/a.py -> 승인 마커가 없다. /commit 스킬로 초안을 만들고 사용자 승인을 받은 뒤 커밋하라.
+   git commit --include app/a.py -F .claude/commit-draft.txt -> 승인 마커가 없다. /commit 스킬로 초안을 만들고 사용자 승인을 받은 뒤 커밋하라.
+(b) 격리 저장소(마커·초안 있음, feat 초안) — 같은 세 명령을 변이 복사본으로:
+   git commit -a -F .claude/commit-draft.txt -> allow (변이로 뒤집힘 = 검사가 실효)
+   git commit -F .claude/commit-draft.txt app/a.py -> allow (변이로 뒤집힘 = 검사가 실효)
+   git commit --include app/a.py -F .claude/commit-draft.txt -> allow (변이로 뒤집힘 = 검사가 실효)
+(c) 같은 격리 저장소를 원본 훅으로(대조):
+   git commit -a -F .claude/commit-draft.txt -> DENY
+   git commit -F .claude/commit-draft.txt app/a.py -> DENY

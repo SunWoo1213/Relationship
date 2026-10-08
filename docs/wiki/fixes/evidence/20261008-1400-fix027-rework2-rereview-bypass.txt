@@ -1,0 +1,126 @@
+== A. 제품 코드 미스테이징 상태에서 커밋 대상을 늘리는 플래그·인자 (F-27-3 추가 형태) ==
+ok   [DENY] git commit --file=.claude/commit-draft.txt app/a.py   (--file= 뒤 pathspec)
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-fi
+ok   [DENY] git commit --file .claude/commit-draft.txt app/a.py   (--file 뒤 pathspec)
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-fi
+ok   [DENY] git commit app/a.py -F .claude/commit-draft.txt      (pathspec 이 -F 앞)
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-fi
+ok   [DENY] git commit --pathspec-from-file=paths.txt -F draft   (pathspec 파일, -F 앞)
+       -> git commit 인자 '--pathspec-from-file=paths.txt' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathsp
+ok   [DENY] git commit -F draft --pathspec-from-file=paths.txt   (pathspec 파일, -F 뒤)
+       -> git commit 인자 '--pathspec-from-file=paths.txt' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathsp
+ok   [DENY] git commit -aF .claude/commit-draft.txt               (묶음 플래그)
+       -> git commit 인자 '-aF' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-file·-a
+ok   [DENY] git commit -am x                                       (묶음 플래그 -am)
+       -> git commit 인자 '-am' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-file·-a
+ok   [DENY] git -c user.name=x commit -a -F draft                  (git -c 뒤 -a)
+       -> git commit 인자 '-a' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-file·-a/
+ok   [DENY] git commit --all --file=.claude/commit-draft.txt
+       -> git commit 인자 '--all' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-file·
+ok   [DENY] git commit -F draft -- app/a.py                        (-- 구분자)
+       -> git commit 인자 '--' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-file·-a/
+ok   [DENY] git commit -i app/a.py -F draft
+       -> git commit 인자 '-i' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-file·-a/
+ok   [DENY] git commit -o app/a.py -F draft
+       -> git commit 인자 '-o' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-file·-a/
+ok   [allow] git commit -F draft && git push origin dev2            (정상 + 후속 명령, 오탐 없어야)
+ok   [DENY] GIT_INDEX_FILE=/tmp/idx git commit -F draft           (환경변수로 색인 바꿔치기)
+       -> GIT_* 환경변수 접두(예: GIT_INDEX_FILE=…)가 붙은 git commit 은 허용하지 않는다. 훅이 검사한 색인과 실제 커밋 색인이 달라질 수 있다.
+== A2. 위 우회가 실제 git 에서 app/ 를 커밋에 넣는지 (이론이 아닌 재현) ==
+       fix(FIX-999): 경로
+        app/a.py | 2 +-
+        app/a.py | 2 +-
+        app/a.py | 2 +-
+== B. 제목이 FIX-nnn 을 담지만 TITLE_RE 를 빗나가는 형태 (app/ 스테이징 상태) ==
+ok   [DENY] fix(FIX-999 재작업): 괄호 안 추가 단어
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] fix(FIX-999/hooks): 슬래시
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] fix(FIX-999; FIX-998): 세미콜론
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-998, FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-998.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifi
+ok   [DENY] fix(FIX-999)(hooks): 괄호 둘
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] fix-hooks(FIX-999): 유형에 하이픈
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] fix2(FIX-999): 유형에 숫자
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] fix[FIX-999]: 대괄호
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] fix: FIX-999 제목 뒤
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+!!   [allow] (기대 DENY) fix(FIX_999): 밑줄
+!!   [allow] (기대 DENY) fix(FIX 999): 공백
+ok   [DENY] fix(FIX-999) CRLF 초안 (회귀)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] 제목 앞 공백·탭 (strip 되어 검사되나)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+== C. 검증 줄 문구 (F-27-4 추가 형태) — review 문서는 R-27-3 기준 충족 상태 ==
+ok   [DENY] 검증: 통과 — 메인 세션 (verifier 생략)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] 검증: 통과(점검표 1~8) — verifier 리뷰는 아직
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] 검증: 통과 — verifier 리뷰 생략(문서만)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] 검증: 통과 — 메인 세션, verifier 는 다음 커밋에서
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] 검증: 통과 — verifier 아님
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] 검증: 통과하지 못함 — verifier (fable) 보류
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [allow] 검증: 통과 — Verifier (fable)
+ok   [allow] 검증:통과—verifier
+ok   [DENY] 검증: 줄 두 개(자리표 + 결과 절의 통과)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [DENY] 검증: 보류가 먼저, 통과가 뒤(옛 판정 잔존)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가
+ok   [allow] 기준: 정상 통과 줄
+== D. fail-closed 추가 경로 — 출력이 항상 유효 JSON 인가 ==
+ok   [DENY] 초안 자체가 UTF-8 아님(outer except 경로)
+       -> [fix-guard] 판단 중 예기치 않은 오류 — 거부: UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+       훅 stdout 유효 JSON
+ok   [DENY] review 문서가 UTF-8 아님
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/review-FIX-999.md (verifier 커밋 전 리뷰 문서)가 없거나 기준(0바이트 아님·검토자: verifier·git 추적
+       훅 stdout 유효 JSON
+ok   [DENY] review-FIX-999.md 가 디렉터리
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/review-FIX-999.md (verifier 커밋 전 리뷰 문서)가 없거나 기준(0바이트 아님·검토자: verifier·git 추적
+       훅 stdout 유효 JSON
+ok   [allow] 기준: 정상(회복 확인)
+ok   [DENY] ROOT 경로에 따옴표·공백 + git 저장소 아님
+       -> [fix-guard] 스테이징된 파일 목록을 확인할 수 없다(git diff 실패): Command '['git', 'diff', '--cached', '--name-only']' returned non-zero exit status 129.
+       훅 stdout 유효 JSON
+== E. 회귀 — 비-FIX 커밋·문서만 바꾼 FIX·규칙 1~5 ==
+ok   [allow] docs/ 만 스테이징한 fix(FIX-999) → 검증 줄 없어도 allow
+ok   [allow] .claude/ 만 스테이징한 harness(FIX-999) → allow
+ok   [allow] feat(P7-push) + app/ → 규칙 6 미적용 allow
+ok   [allow] docs(readme) + app/ → 규칙 6 미적용 allow
+ok   [DENY] 규칙 2: -m
+       -> git commit 인자 '-m' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from-file·-a/
+ok   [DENY] 규칙 4: --amend
+       -> --amend 는 승인 절차에서 허용하지 않는다. 새 커밋으로 만들어라.
+ok   [DENY] 규칙 1: 마커 없음
+       -> 승인 마커가 없다. /commit 스킬로 초안을 만들고 사용자 승인을 받은 뒤 커밋하라.
+ok   [allow] git status (커밋 아님) allow
+ok   [allow] git log --all (commit 아닌 명령에 --all) allow
+ok   [allow] git add -i 는 commit-guard 대상 아님(allow; safety-guard 몫)
+== F. 실제 저장소(FIX-027 커밋 자체) — 규칙 6 단독 판정 ==
+       현재 스테이징(0개) + harness(FIX-027) 제목 → rc=0 (0 이면 규칙 6 해당 없음)
+       fix(FIX-027) 제목 → rc=0
+       (app/·alembic/ 스테이징 없음: 0 개)
+== G. stage-gate — 실제 저장소 상태(active: P7-push)에서 보호 경로·frozen 상호작용 ==
+ok   [allow] stage-gate .claude/hooks/commit-guard.sh
+ok   [allow] stage-gate .claude/scripts/fix_guard_check.py
+ok   [allow] stage-gate .claude/settings.json
+ok   [allow] stage-gate .github/workflows/tests.yml
+ok   [allow] stage-gate .claude/commit-draft.txt
+ok   [allow] stage-gate .claude/gitlog.md
+ok   [allow] stage-gate .claude/skills/devlog/SKILL.md
+ok   [allow] stage-gate .claude/agents/verifier.md
+ok   [allow] stage-gate docs/wiki/CURRENT.md
+메모  [DENY] frozen 중 .claude/hooks/ 쓰기 (동결 중 훅 수리는 CR 해제 뒤에만 가능)
+ok   [allow] active: FIX-nnn(계획 점검: 통과+승인) 으로 .claude/hooks/ 쓰기 — 활성 패키지 없이도 훅 수리 가능(교착 없음)
+ok   [DENY] 02-plan-verify 없는 패키지로 .claude/hooks/ 쓰기 (R-27-5 가 실제로 건다)
+== H. 변이 시험 — test-guards 의 새 케이스가 깨진 검사를 실제로 잡는가 (복사본만 변이, 원본 무변경) ==
+       변이1 적용 줄 수: 1
+!!   변이1인데도 DENY (케이스가 검사를 안 보고 있을 가능성)
+!!   변이2(-a 검사 제거)인데도 -a 가 DENY (다른 규칙에 걸림?) -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDeci
+== 끝 ==

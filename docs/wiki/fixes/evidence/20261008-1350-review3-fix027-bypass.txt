@@ -1,0 +1,189 @@
+# verifier 3차 리뷰 — 20261008-1350-review3-fix027-bypass.sh 실행 출력 (2026-10-08 13:50). rc=0.
+# 집계: ok 69 · `!!` 11 · 메모 23 (grep -c '^ok' / '^!!' / '^메모').
+# `!!` 분류: (a) A-전치 8건(`(git`·`/usr/bin/git`·`bash -c "git`·`sh -c`·`eval`·`-c alias`·`$(git`·`git.exe`) = 훅 앞단 bash grep 이 git commit 으로 감지하지 못해
+#            규칙 1~6 전체가 건너뛰어짐 — HEAD(FIX-027 이전) 훅과 동일(-extra.txt (1)) → 기존 구멍, 이 FIX 의 회귀 아님 → R-27-10.
+#            (b) `xargs git commit` 1건(마커 있음) = 파서가 stdin 으로 덧붙는 경로를 못 봄, 실제 git 이 app/a.py 커밋 → R-27-11.
+#            (c) `>(cat) app/a.py` 1건 = 파서 allow 지만 실제 git 이 `/dev/fd/63 outside repository` 로 실패(-extra.txt (2)) → 실질 우회 아님, 메모.
+#            (d) C절 마지막 1건 = 검토자 라벨 오류(제목 괄호 안에 FIX-999 를 넣었으므로 DENY 가 맞음). 정정 케이스 -extra.txt (3) allow.
+#            (e) A-전치 "마커 없음 xargs" 는 ok(DENY) — 규칙 1 로 막힘.
+== A. 허용 목록 파서 — 셸 문법 형태 (app/a.py 는 추적·미스테이징) ==
+ok   [DENY] 따옴표: git commit -F '.claude/commit-draft.txt' app/a.py
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] 따옴표: git commit -F .claude/commit-draft.txt 'app/a.py'
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] 따옴표: git commit -F .claude/commit-draft.txt "app/a.py"
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] 이스케이프: git commit -F .claude/commit-draft.txt app/a\.py
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] 명령 치환: git commit -F .claude/commit-draft.txt $(echo app/a.py)
+       -> git commit 인자 '$' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from
+ok   [DENY] 백틱: git commit -F .claude/commit-draft.txt `echo app/a.py`
+       -> git commit 인자 '`echo' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-
+ok   [DENY] 역슬래시 줄바꿈: git commit -F .claude/commit-draft.txt \<NL>app/a.py
+       -> git commit 인자 ' ' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-from
+!!   [allow] (기대 DENY) 서브셸: (git commit -F .claude/commit-draft.txt app/a.py)
+ok   [DENY] 서브셸+cd: ( cd . ; git commit app/a.py -F .claude/commit-draft.txt )
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] env git commit -F .claude/commit-draft.txt app/a.py
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] command git commit -F .claude/commit-draft.txt app/a.py
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] exec git commit -F .claude/commit-draft.txt app/a.py
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] 공백 없는 구분자: git commit -F .claude/commit-draft.txt;git commit app/a.py -F .claude/commit-draft.txt
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] 공백 없는 구분자: git commit -F .claude/commit-draft.txt&&git commit -a -F .claude/commit-draft.txt
+       -> git commit 인자 '-a' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-fro
+ok   [DENY] git -c a=b -c c=d commit -F .claude/commit-draft.txt app/a.py
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] git --git-dir=.git commit -F .claude/commit-draft.txt app/a.py
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] git --git-dir .git --work-tree . commit -F .claude/commit-draft.txt app/a.py
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] -n(=--no-verify 단축, 옛 규칙 4 는 문자열 --no-verify 만 봤다): git commit -n -F .claude/commit-draft.txt
+       -> git commit 인자 '-n' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-fro
+ok   [DENY] --signoff/--allow-empty/-q 등 허용 목록 밖 옵션: git commit -q -F .claude/commit-draft.txt
+       -> git commit 인자 '-q' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-fro
+ok   [DENY] -F 붙여쓰기(git 은 허용): git commit -F.claude/commit-draft.txt
+       -> git commit 인자 '-F.claude/commit-draft.txt' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(
+ok   [DENY] --file= 뒤 --: git commit --file=.claude/commit-draft.txt --
+       -> git commit 인자 '--' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathspec-fro
+ok   [DENY] 리다이렉션 뒤 경로: git commit -F .claude/commit-draft.txt 2>&1 app/a.py
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+!!   [allow] (기대 DENY) 리다이렉션 >(…) 뒤 경로: git commit -F .claude/commit-draft.txt >(cat) app/a.py
+ok   [DENY] 변수 경로(fail-closed): D=.claude/commit-draft.txt; git commit -F $D
+       -> -F/--file 의 값은 .claude/commit-draft.txt 여야 한다.
+ok   [DENY] 홈 변수 경로(fail-closed): git commit -F "$PWD/.claude/commit-draft.txt"
+       -> -F/--file 의 값은 .claude/commit-draft.txt 여야 한다.
+ok   [DENY] $'…' 인용: git commit -F .claude/commit-draft.txt $'app/a.py'
+       -> git commit 인자 '$app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--paths
+ok   [DENY] 파이프 뒤 commit: echo x | git commit -F .claude/commit-draft.txt app/a.py
+       -> git commit 인자 'app/a.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pathsp
+ok   [DENY] deny 출력 JSON 안전성: 따옴표·공백 경로
+       -> git commit 인자 'app/a b.py' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--path
+       훅 stdout 유효 JSON
+ok   [DENY] deny 출력 JSON 안전성: 따옴표·역슬래시 섞인 인자
+       -> git commit 인자 'app/"q".py\x' 는 허용되지 않는다. 허용: -F .claude/commit-draft.txt (또는 --file=…/--file …) 만. 커밋 대상은 git add 로 스테이징한 것으로만 정한다 — 경로(pathspec)·--pa
+       훅 stdout 유효 JSON
+ok   [DENY] 따옴표 불일치(fail-closed): git commit -F .claude/commit-draft.txt "app/a.py
+       -> 명령을 해석할 수 없다(No closing quotation) — 커밋 인자를 검사할 수 없어 거부한다.
+== A-허용. 정상 형태(오탐 없어야) ==
+ok   [allow] 정상: git commit -F .claude/commit-draft.txt
+ok   [allow] 정상: git commit --file=.claude/commit-draft.txt
+ok   [allow] 정상: git add a b && git commit -F .claude/commit-draft.txt
+ok   [allow] 정상: git commit -F .claude/commit-draft.txt && git push origin dev2
+ok   [allow] 정상: git commit -F .claude/commit-draft.txt | cat
+ok   [allow] 정상: git commit -F .claude/commit-draft.txt >/dev/null 2>&1
+ok   [allow] 정상: git commit -F .claude/commit-draft.txt # 주석 app/a.py
+ok   [allow] 정상(두 줄): git add README.md<NL>git commit -F .claude/commit-draft.txt
+메모 [DENY] 단따옴표 초안 경로: git commit -F '.claude/commit-draft.txt' (파서 allow, 규칙 2 case 는 DENY — 불일치지만 fail-closed) (참고 기대 allow)
+       -> 커밋 메시지는 승인된 초안 파일로만 전달한다: git commit -F .claude/commit-draft.txt
+메모 [DENY] 이중 공백: git commit -F  .claude/commit-draft.txt (규칙 2 case 가 단일 공백만 — fail-closed) (참고 기대 allow)
+       -> 커밋 메시지는 승인된 초안 파일로만 전달한다: git commit -F .claude/commit-draft.txt
+메모 [allow] 인용된 연산자: git commit -F .claude/commit-draft.txt '&&' app/a.py (파서는 && 를 구분자로 보고 allow; 실제 git 은 pathspec '&&' 불일치로 실패) (참고 기대 DENY)
+       실제 git: error: pathspec '&&' did not match any file(s) known to git
+== A-전치. 셸 감지 정규식(bash grep) 앞단을 빗나가는 형태 — 규칙 1~6 전체가 건너뛰어지는지 (마커 제거 상태) ==
+ok   [DENY] 마커 없음 기준: git commit -F .claude/commit-draft.txt → 규칙 1 DENY
+       -> 승인 마커가 없다. /commit 스킬로 초안을 만들고 사용자 승인을 받은 뒤 커밋하라.
+!!   [allow] (기대 DENY) /usr/bin/git commit -F .claude/commit-draft.txt app/a.py (마커 없음)
+!!   [allow] (기대 DENY) bash -c "git commit -a -F .claude/commit-draft.txt" (마커 없음)
+!!   [allow] (기대 DENY) sh -c 'git commit -m x' (마커 없음)
+!!   [allow] (기대 DENY) eval "git commit -m x" (마커 없음)
+!!   [allow] (기대 DENY) git -c alias.ci=commit ci -a -F .claude/commit-draft.txt (마커 없음)
+ok   [DENY] echo app/a.py | xargs git commit -F .claude/commit-draft.txt (마커 없음 — git commit 자체는 감지됨)
+       -> 승인 마커가 없다. /commit 스킬로 초안을 만들고 사용자 승인을 받은 뒤 커밋하라.
+!!   [allow] (기대 DENY) $(git commit -m x) (마커 없음)
+!!   [allow] (기대 DENY) git.exe commit -m x (Windows 표기, 마커 없음)
+!!   [allow] (기대 DENY) 마커 있음: echo app/a.py | xargs git commit -F .claude/commit-draft.txt (xargs 가 경로를 덧붙임)
+       실제 git 재현(xargs):
+        app/a.py | 2 +-
+== A-환경. GIT_* 접두 변형 (R-27-8) ==
+ok   [DENY] GIT_INDEX_FILE=x git commit -F .claude/commit-draft.txt
+       -> GIT_* 환경변수 접두(예: GIT_INDEX_FILE=…)가 붙은 git commit 은 허용하지 않는다. 훅이 검사한 색인과 실제 커밋 색인이 달라질 수 있다.
+ok   [DENY] export GIT_INDEX_FILE=x; git commit -F .claude/commit-draft.txt
+       -> GIT_* 환경변수 접두(예: GIT_INDEX_FILE=…)가 붙은 git commit 은 허용하지 않는다. 훅이 검사한 색인과 실제 커밋 색인이 달라질 수 있다.
+ok   [DENY] env GIT_INDEX_FILE=x git commit -F .claude/commit-draft.txt
+       -> GIT_* 환경변수 접두(예: GIT_INDEX_FILE=…)가 붙은 git commit 은 허용하지 않는다. 훅이 검사한 색인과 실제 커밋 색인이 달라질 수 있다.
+ok   [DENY] GIT_DIR=/x GIT_WORK_TREE=/y git commit -F .claude/commit-draft.txt
+       -> GIT_* 환경변수 접두(예: GIT_INDEX_FILE=…)가 붙은 git commit 은 허용하지 않는다. 훅이 검사한 색인과 실제 커밋 색인이 달라질 수 있다.
+메모 [allow] git -c core.hooksPath=/dev/null commit -F .claude/commit-draft.txt (commit-guard 는 allow; safety-guard 몫) (참고 기대 allow)
+ok   [DENY] 같은 명령 safety-guard
+       -> [safety-guard] 훅 우회 옵션(--no-verify, core.hooksPath=) 금지 (근거: docs/wiki/security.md)
+메모 [allow] FOO=1 git commit -F .claude/commit-draft.txt (GIT_ 아닌 접두 — allow 가 맞다) (참고 기대 allow)
+== B. 검증: 줄 — 부정어 목록 회피·오탐 (app/ 스테이징, review 문서 R-27-3 충족) ==
+메모 [allow] 부정어 목록 밖 표현: 검증: 통과 — verifier 미검토 (참고 기대 DENY)
+메모 [allow] 부정어 목록 밖 표현: 검증: 통과 — verifier 리뷰 없이 (참고 기대 DENY)
+메모 [allow] 부정어 목록 밖 표현: 검증: 통과 — verifier 없음 (참고 기대 DENY)
+메모 [allow] 부정어 목록 밖 표현: 검증: 통과 — verifier 스킵 (참고 기대 DENY)
+메모 [allow] 부정어 목록 밖 표현: 검증: 통과 — verifier (메인 세션 작성) (참고 기대 DENY)
+메모 [allow] 부정어 목록 밖 표현: 검증: 통과 — verifier 불필요 (참고 기대 DENY)
+메모 [allow] 부정어 목록 밖 표현: 검증: 통과 — verifier TODO (참고 기대 DENY)
+메모 [allow] 부정어 목록 밖 표현: 검증: 통과 — verifier 보류 (참고 기대 DENY)
+메모 [allow] 부정어 목록 밖 표현: 검증: 통과 — verifier (보류, [필수] 2건) (참고 기대 DENY)
+메모 [allow] 부정어 목록 밖 표현: 검증: 통과 — verifier 추후 (참고 기대 DENY)
+ok   [DENY] 거부돼야: 검증: 통过 — verifier
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [DENY] 거부돼야: 검증: 통과 — verifier 가 보지 않음
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [DENY] 거부돼야: 검증: 통과 — verifier 를 거치지 못함
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [DENY] 거부돼야: 검증: 통과 — verifier (메인 세션이 대신 씀)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [DENY] 거부돼야: 검증: 통과 — verifier 생략
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [DENY] 거부돼야: 검증: 통과 · verifier (fable)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [DENY] 거부돼야: 검증: 통과 (verifier (fable))
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [DENY] 거부돼야: 검증 : 통과 — verifier (fable)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+-- 정상 판정 줄이 부정어 목록에 걸리는 오탐(fail-closed, verifier 가 어휘를 피해야 함) --
+메모 [DENY] 오탐 후보: 검증: 통과 — verifier (fable) 2026-10-08, review-FIX-999.md (R-27-2 제외, 이월) (참고 기대 allow)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+메모 [DENY] 오탐 후보: 검증: 통과 — verifier (fable) 2026-10-08 — 남은 권고는 별도 FIX 예정 (참고 기대 allow)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+메모 [DENY] 오탐 후보: 검증: 통과 — verifier (fable) — 아직 Windows CI 미확인 (참고 기대 allow)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [allow] 이번 리뷰가 쓸 형태: 검증: 통과 — verifier 3차 리뷰 (review-FIX-nnn.md)
+ok   [allow] SKILL 6단계 예시 형태
+ok   [allow] 들여쓴 검증: 줄(strip 후 검사)
+ok   [DENY] 굵게 표기 **검증:** (줄 0개 → 거부)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [allow] 인용 블록 '> 검증:' 은 세지 않음 → allow
+ok   [DENY] 설명 문장이 줄 첫머리에 검증: 으로 시작 → 2줄 → DENY(fail-closed)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+== C. 제목 ID 추출(R-27-7) 경계 ==
+메모 [allow] 범위 밖(사용자 결정): fix(FIX_999): 밑줄 (참고 기대 DENY)
+메모 [allow] 범위 밖(사용자 결정): fix(FIX 999): 공백 (참고 기대 DENY)
+ok   [DENY] 대상: Fix-999 제목
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [DENY] 대상: fix: fix-0999 소문자
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [DENY] 대상: harness(FIX-999): x
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+메모 [DENY] 오탐 후보: 'hotfix-999' 가 FIX-999 로 잡혀 DENY(ID_RE 에 단어 경계 없음) (참고 기대 allow)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+메모 [DENY] 오탐 후보: 'prefix-3' → FIX-003.md(옛 템플릿 검증 줄) 검사 (참고 기대 allow)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-003 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-003.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+!!   [DENY] (기대 allow) 제목에 FIX 번호 없음 → 대상 밖 allow
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+== D. 이 커밋(FIX-027 자체) — 실제 저장소 ==
+       제목 'harness(FIX-027): FIX 에도 verifier 검증을 커밋 훅으로 강제' → fix_guard_check rc=0 (스테이징 app/·alembic/ 0 개)
+       제목 'fix(FIX-027): x' → fix_guard_check rc=0 (스테이징 app/·alembic/ 0 개)
+       제목 'harness(hooks): FIX-027 2차 재작업' → fix_guard_check rc=0 (스테이징 app/·alembic/ 0 개)
+       commit 스킬 명령 'git commit -F .claude/commit-draft.txt' → commit_args_check rc=0
+       실제 저장소(마커 없음) 훅 판정 → 승인 마커가 없다. /commit 스킬로 초안을 만들고 사용자 승인을 받은 뒤 커밋하라.
+       FIX-027.md '^검증:' 줄 수: 1 / review-FIX-027.md '검토자: verifier' 줄: 2
+메모 [DENY] 현재 FIX-027.md(검증: 보류 줄) 를 app/ 변경 FIX 로 가정 → DENY 가 맞다 (참고 기대 DENY)
+       -> [fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-027 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-027.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verif
+ok   [allow] 검증: 줄을 '통과 — verifier 3차 리뷰 (review-FIX-027.md)' 로 바꾼 사본 + review 문서 스테이징 → allow(교착 없음)
+== E. stage-gate 정상 흐름(실제 저장소 active: P7-push) ==
+ok   [allow] stage-gate .claude/hooks/commit-guard.sh
+ok   [allow] stage-gate .claude/scripts/commit_args_check.py
+ok   [allow] stage-gate .claude/settings.json
+ok   [allow] stage-gate .github/workflows/tests.yml
+ok   [allow] stage-gate app/main.py
+ok   [allow] stage-gate docs/wiki/fixes/review-FIX-027.md
+ok   [allow] stage-gate docs/wiki/fixes/FIX-027.md
+ok   [allow] stage-gate docs/wiki/fixes/evidence/x.txt
+== 끝 ==

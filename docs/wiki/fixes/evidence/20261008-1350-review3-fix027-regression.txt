@@ -1,0 +1,32 @@
+# verifier 3차 리뷰 — 회귀 명령 직접 실행 (2026-10-08 13:50)
+# app/·tests/ 는 이 FIX 에서 무변경(git diff --stat: .claude/hooks 2 · .claude/scripts 1 · skills/devlog · CLAUDE.md · HANDOFF · journal · templates/fix.md 만).
+
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs   (끝 2줄)
+1840 passed, 1 warning in 20.42s
+pytest rc=0
+
+$ .venv/bin/python scripts/mypy_check.py --run
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)
+mypy rc=0
+
+$ .venv/bin/ruff check .claude/scripts/commit_args_check.py .claude/scripts/fix_guard_check.py
+All checks passed!
+# (구현자 증거 rework2-ruff.txt 의 3건은 전부 .claude/scripts/findings.py 129·130·163행 — 이 FIX 가 건드리지 않은 기존 파일. 범위 밖, 별도 FIX 후보.)
+
+$ 사전 상태 확인
+git diff --cached --name-only | wc -l  → 0 (스테이징 없음)
+ls -a .claude | grep '^\.'            → 마커 파일 없음(.commit-approved·.awaiting-decision·.stage-approved 모두 없음)
+docs/wiki/CURRENT.md                  → active: P7-push / frozen: none
+grep -c '^검증:' docs/wiki/fixes/FIX-027.md           → 1
+grep -n '^검토자:' docs/wiki/fixes/review-FIX-027.md   → 3행·76행 (verifier)
+git config --get-regexp '^alias'      → (없음)
+
+$ 지난 재리뷰 H절 변이의 sed 대상 문구가 현재 코드에 있는가 (0 = 변이 미적용 → 무효)
+grep -c 'pattern = re.compile(r"^검증:' .claude/scripts/fix_guard_check.py        → 0
+grep -c -- '(-a|--all|-i|--include|-o|--only)' .claude/hooks/commit-guard.sh      → 0
+
+$ HEAD(FIX-027 이전) commit-guard.sh 의 규칙 4
+git show HEAD:.claude/hooks/commit-guard.sh | grep -n 'no-verify'
+8:#   4. --amend / --no-verify 금지
+59:    *"--no-verify"*) deny "--no-verify 는 허용하지 않는다." ;;
+# → 단축형 `-n` 은 문자열 일치 밖이었다. 2차 재작업의 허용 목록이 `-n` 을 거부한다(review3-bypass.txt A절).

@@ -1,0 +1,16 @@
+# verifier 3차 리뷰 — `검증:` 줄 갱신 후 자가 점검 (2026-10-08, 갱신된 실제 FIX-027.md·review-FIX-027.md 사용)
+# 결론: 새 줄 `검증: 통과 — verifier 3차 리뷰 (review-FIX-027.md)` 는 정규식·단일 줄·부정어 규칙을 만족(격리 저장소에서 규칙 6 전체 경로 allow),
+#       대조군(review 문서 untracked)은 DENY — 항상 통과하는 시험이 아님. 실제 저장소에서는 app/·alembic/ 스테이징 0개라 규칙 6 비대상(rc=0).
+# 스크립트 본문은 scratchpad 의 review3-selfcheck.sh(아래 출력으로 갈음).
+== 실제 문서 상태 ==
+FIX-027.md 검증: 줄 → 34:검증: 통과 — verifier 3차 리뷰 (review-FIX-027.md)
+FIX-027.md '^검증:' 줄 수 → 1
+review-FIX-027.md '^검토자:.*verifier' 줄 수 → 3 (46041 bytes)
+== 실제 저장소(스테이징 app/·alembic/ 0 개) ==
+  제목 'harness(FIX-027): FIX 에도 verifier 검증을 커밋 훅으로 강제' → fix_guard_check rc=0
+  제목 'fix(FIX-027): x' → fix_guard_check rc=0
+== 격리 저장소: 실제 두 문서 복사 + app/ 스테이징 + review 문서 스테이징 + fix(FIX-027) 제목 (규칙 6 전체 경로) ==
+ok   [allow] 갱신된 FIX-027.md + review-FIX-027.md 로 규칙 6 통과
+  fix_guard_check 단독 rc=0
+ok   [DENY] review 문서 untracked 로 되돌리면 거부(대조군)
+== 끝 ==

@@ -1,0 +1,82 @@
+ok   [DENY] fix(FIX-999): 정상
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] Fix(FIX-999): 대문자
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] FIX(FIX-999): 대문자2
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] fix (FIX-999): 공백
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] fix(FIX-999, FIX-998): 둘
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-998, FIX-999 \ucee4
+ok   [DENY] fix(FIX-999)!: 느낌표
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] feat(FIX-999): feat
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] docs(FIX-999): docs
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] harness(FIX-999): harness
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] chore(FIX-999): chore
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] fix(FIX-27): 세 자리 아님
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-027 \ucee4\ubc0b\uc
+ok   [allow] fix(P7-push): 본문에만 FIX [정책: 대상 밖]
+ok   [DENY] draft 첫 줄이 빈 줄
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] draft 첫 줄 UTF-8 BOM
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] draft CRLF 줄끝
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] alembic/ 만 스테이징
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [allow] app/한글.py [범위 밖: R-27-2, 이번 라운드 미처리]
+ok   [DENY] git commit -a -F draft
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "git commit \uc778\uc790 '-a' \ub294 \ud5c8\uc6a9\ub418\uc9c0 \uc54a\ub294\ub2e4. \ud5c8\uc6a9: -F .claude/
+ok   [DENY] git commit -F draft app/a.py
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "git commit \uc778\uc790 'app/a.py' \ub294 \ud5c8\uc6a9\ub418\uc9c0 \uc54a\ub294\ub2e4. \ud5c8\uc6a9: -F .c
+ok   [DENY] git commit --include app/a.py -F draft
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "git commit \uc778\uc790 '--include' \ub294 \ud5c8\uc6a9\ub418\uc9c0 \uc54a\ub294\ub2e4. \ud5c8\uc6a9: -F .
+ok   [DENY] 검증: 보류 — verifier (fable) 2026-10-06, review-FIX-999.md [필수] 2건
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] 검증: 통과(점검표 1~8) — verifier 리뷰는 아직
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] 검증: verifier 에게 요청 예정
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] 검증: 통과 — 메인 세션 (verifier 생략)
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] 검증: 줄 두 개
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] 인용·목록 안의 검증 줄만
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [allow] FIX 문서 CRLF
+ok   [DENY] review 문서 0바이트
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] review 문서에 검토자 줄 없음
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] review 문서 untracked(디스크에만)
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+ok   [DENY] FIX 문서가 UTF-8 아님
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc81c\ud488 \ucf54\ub4dc(app/\u00b7alembic/)\ub97c \ubc14\uafb8\ub294 FIX-999 \ucee4\ubc0b\uc
+       훅 stdout 은 유효한 JSON
+ok   [allow] 기준: 정상
+ok   [DENY] ROOT 가 git 저장소가 아님
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[fix-guard] \uc2a4\ud14c\uc774\uc9d5\ub41c \ud30c\uc77c \ubaa9\ub85d\uc744 \ud655\uc778\ud560 \uc218 \uc5c
+ok   [DENY] 훅 복사본에서 fix_guard_check.py 부재
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "python: can't open file '/var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T/tmp.cbzHye6qaC/.claude/hooks/../
+   인자 부족 rc=2
+   초안 없음 rc=2
+ok   [DENY] 기존 1: 마커 없음
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "\uc2b9\uc778 \ub9c8\ucee4\uac00 \uc5c6\ub2e4. /commit \uc2a4\ud0ac\ub85c \ucd08\uc548\uc744 \ub9cc\ub4e4\u
+ok   [DENY] 기존 2: -m 사용
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "git commit \uc778\uc790 '-m' \ub294 \ud5c8\uc6a9\ub418\uc9c0 \uc54a\ub294\ub2e4. \ud5c8\uc6a9: -F .claude/
+ok   [DENY] 기존 3: 해시 불일치
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "\ucd08\uc548\uc774 \uc2b9\uc778 \uc774\ud6c4\uc5d0 \ubc14\ub00c\uc5c8\ub2e4. \ucd08\uc548\uc744 \ub2e4\uc2
+ok   [DENY] 기존 4: --amend
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "--amend \ub294 \uc2b9\uc778 \uc808\ucc28\uc5d0\uc11c \ud5c8\uc6a9\ud558\uc9c0 \uc54a\ub294\ub2e4. \uc0c8 \
+ok   [DENY] 기존 4b: --no-verify
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "--no-verify \ub294 \ud5c8\uc6a9\ud558\uc9c0 \uc54a\ub294\ub2e4."}}
+ok   [DENY] 기존 5: 마커 조작
+       -> {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "commit \uc2b9\uc778 \ub9c8\ucee4\ub294 \uc9c1\uc811 \uc870\uc791\ud560 \uc218 \uc5c6\ub2e4. /commit \uc808
+ok   [allow] 기존: 정상 feat 커밋 허용
+ok   [allow] stage-gate: 새 템플릿으로 app/ 쓰기
+ok   [allow] stage-gate: 옛 템플릿

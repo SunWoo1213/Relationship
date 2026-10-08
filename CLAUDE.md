@@ -110,6 +110,7 @@ agent_traces(id, session_id, step, tool_name, input, output, tokens_in, tokens_o
 - **계획·구현·검증 단계는 자동 시작하지 않는다(L-004).** architect·backend-agent·eval-agent·verifier 를 띄우기 전에 매번 AskUserQuestion 으로 시작 승인을 받고 `approve-commit.sh --stage <에이전트>` 마커를 만든다. `delegate-guard.sh`(PreToolUse Agent)가 강제한다.
 - **제품 코드는 활성 작업이 있어야 쓸 수 있다.** `/devlog start <id>` → 01-plan → 02-plan-verify(기계 검증 `verify-plan.sh` + 점검표 8행 + 카드 인용) → 사용자 승인 → `CURRENT.md active`. `stage-gate.sh`가 막는다. 한 번에 활성 패키지 하나. P4 파일럿 평가 전에 P5 이후 시작 금지.
 - **작업 단위(사소한 수정 포함)마다 `/commit`.** LLM이 초안(변경·이유·정합성·검증·Refs)을 쓰고 사용자가 AskUserQuestion으로 승인한 뒤에만 커밋한다. `git add`는 명시 경로만. 푸시도 승인 필요. 서브에이전트는 커밋하지 않는다.
+- **FIX 도 패키지와 같은 검증 분리를 따른다(L-002 확장, FIX-027).** 메인 세션은 FIX 코드를 직접 고치지 않고 구현 에이전트(`backend-agent`·`eval-agent`)에 위임하며, 제품 코드(`app/`·`alembic/`)를 바꾸는 FIX/test 커밋은 `docs/wiki/fixes/FIX-nnn.md`의 `검증:` 줄에 "통과"와 verifier 판정이 모두 있고 `review-FIX-nnn.md`가 있어야 `commit-guard.sh`가 허용한다.
 - **계획·검증·구현은 모두 위키에 남긴다.** `packages/<id>/01~05`, `registry.md`(무엇이 있는가 — 단위 시작 전 grep, 중복 구현 금지), `journal.md`(시간순), `HANDOFF.md`(지금 어디·다음 무엇).
 - **검증은 가시적 증거로만.** "확인했습니다"는 검증이 아니다. `verify-plan.sh`/`verify-impl.sh` 출력 파일, 테스트 출력, 재현 명령 출력, 커밋 해시, 존재하는 파일 경로만 증거다(`docs/wiki/verification.md`). FAIL/WARN은 `findings.py`로 `05-remediation.md` 소견이 되고, 소견마다 원인·해결 단계·완료 판정 명령·재검증을 채워 닫는다. 같은 소견이 3회 재검증 후에도 열려 있으면 사용자에게 보고한다(재시도 남발 금지, 원칙8).
 - **기획서가 바뀌면 `/devlog change`.** CR 문서 → 태그로 영향 범위(R→D→S→P→`git log --grep`) → 사용자 결정 → `CURRENT.md frozen` 동결 → 카드·CLAUDE.md·backlog 갱신 → 코드 revert/FIX → 해제. 기획서 본문은 원본 유지, 상단 안내문에만 한 줄.

@@ -46,12 +46,14 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 5. 1의 같은 명령 재실행 → 2 재실행 → 사라진 소견은 자동 해소. 같은 소견이 3회 재검증 후에도 열려 있으면 재시도하지 않고 사용자에게 보고(원칙8).
 6. 소견 해소도 작업 단위 → `/commit` (Refs 에 F-id).
 
-### `/devlog fix <한 줄 제목>`
+### `/devlog fix <한 줄 제목>`   (FIX-027: 계획 점검과 검증을 분리 — 메인 세션은 FIX 코드를 직접 고치지 않는다)
 1. 다음 번호 `FIX-nnn`으로 `fixes/FIX-nnn.md`를 `templates/fix.md`로 작성. 증상은 검증 출력·테스트 출력 인용, 원인, 수정안, 회귀 테스트(명령).
 2. **기획서 정합성**: 수정이 원칙·D·S를 바꾸면 FIX가 아니다 → D 카드 갱신 또는 `/devlog change`.
-3. 정합성 점검표 적용 → `검증: 통과`, `AskUserQuestion` 승인 → `승인:` 기록.
+3. 정합성 점검표 적용 → **메인 세션이** `계획 점검: 통과`(점검표 1~8, 근거 요약)를 쓴다. `AskUserQuestion` 승인 → `승인:` 기록. **`검증:` 줄은 메인 세션이 쓰지 않는다** — 빈 칸(`검증: (verifier 가 쓴다 — 제품 코드를 바꾸면 커밋 전 review-FIX-nnn.md 와 함께)`)으로 둔다. L-002 는 패키지뿐 아니라 FIX 에도 적용된다. `stage-gate.sh` 는 코드를 쓰기 전 이 `계획 점검:` 줄과 `승인:` 만 본다(F-27-1) — `검증:` 줄의 실제 판정은 6단계에서 커밋 시점에 본다.
 4. 활성 패키지가 있으면 그대로 두고 FIX를 진행한다. 없으면 `CURRENT.md active: FIX-nnn`.
-5. 수정 후 `/commit` (`Refs: FIX-nnn`). `## 결과`에 해시·테스트 출력 경로, `journal.md`에 `FIX` 줄, active를 원래 값으로.
+5. **구현은 구현 에이전트(`backend-agent`·`eval-agent` — 평가 산출물 `evaluation/`·`reports/` 를 바꾸는 FIX 는 eval-agent)에 위임한다(L-004)**: 띄우기 전 `AskUserQuestion`으로 시작 승인 → `approve-commit.sh --stage <에이전트>`. 메인 세션은 코드를 직접 고치지 않는다(조율·승인·커밋만, CLAUDE.md "팀 구성").
+6. **제품 코드(`app/`·`alembic/`)를 바꾼 FIX/test 커밋은 verifier 리뷰가 먼저다.** 구현 에이전트 작업이 끝나면 `AskUserQuestion`으로 시작 승인 → `approve-commit.sh --stage verifier`(L-004, 5단계와 같은 절차) 뒤 `verifier`에게 커밋 전 코드 리뷰를 맡겨 `fixes/review-FIX-nnn.md`(`검토자: verifier (fable)`, 본 것·직접 실행한 검증 명령·판정 근거·소견)를 쓰게 하고, 통과하면 verifier 가 `FIX-nnn.md`의 `검증:` 줄을 채운다(예: `검증: 통과 — verifier (fable) 2026-10-06, review-FIX-nnn.md`). `commit-guard.sh`가 이 두 가지(검증 줄에 `통과` 와 `verifier` 둘 다 + review 문서 존재·추적 여부)를 커밋 시점에 확인해, 없으면 거부한다(FIX-027). 훅·문서만 바꾸는 FIX(제품 코드 무변경)는 review 문서를 생략할 수 있지만 `검증:` 줄은 여전히 verifier 가 쓴다.
+7. 수정 후 `/commit` (`Refs: FIX-nnn`). `## 결과`에 해시·테스트 출력 경로, `journal.md`에 `FIX` 줄, active를 원래 값으로.
 
 ### `/devlog done`
 1. `bash .claude/scripts/verify-impl.sh <id> | tee …/evidence/<ts>-verify-impl.txt` → FAIL 은 루프로. 열린 [필수] 소견이 있으면 완료가 아니다.

@@ -6,9 +6,14 @@
 #
 #   CURRENT.md 형식:   active: P1-schema      (패키지)  또는   active: FIX-003 (수정)
 #   패키지 → docs/wiki/packages/<id>/02-plan-verify.md 에 "결과: 통과" 와 "승인: <비어있지 않음>"
-#   수정   → docs/wiki/fixes/<id>.md 에 "검증: 통과" 와 "승인: <비어있지 않음>"
+#   수정   → docs/wiki/fixes/<id>.md 에 "계획 점검: 통과"(새 템플릿, FIX-027 이후) 또는
+#            "검증: 통과"(FIX-001~026 옛 템플릿, 한 줄뿐) 와 "승인: <비어있지 않음>".
+#            코드를 쓰기 전 이 게이트가 보는 것은 "계획 점검"(메인 세션)뿐이다. verifier 의
+#            실제 `검증:` 판정(통과/보류)은 코드가 다 생긴 뒤 커밋 시점에
+#            commit-guard.sh 규칙 6 이 본다 — 역할이 다르다(F-27-1, FIX-027 재작업).
 #
-# 면제 경로: docs/, .claude/, reports/, CLAUDE.md, README.md, .gitignore, .env.example, LICENSE
+# 면제 경로: docs/, .claude/(단 hooks/·scripts/·settings.json 은 제외, R-27-5), reports/,
+#           CLAUDE.md, README.md, .gitignore, .env.example, LICENSE, .github/(단 workflows/ 는 제외)
 
 set -u
 export PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LC_ALL=C.UTF-8
@@ -65,11 +70,18 @@ if [ -f "$AWAIT" ]; then
   esac
 fi
 
-# 면제 경로
+# R-27-5: 하네스 자체(훅·스크립트·설정·CI)는 면제 경로 중 가장 느슨한 쓰기였다 — 활성 작업
+# 게이트 없이 .claude/* 전체가 통째로 면제됐다. 이 저장소의 가드 결함 이력(FIX-002·003·008·
+# 013·014 후보)이 전부 여기서 났고, FIX-027 자신도 독립 리뷰에서 [필수] 4건이 나왔다. 그래서
+# 이 네 경로만 면제에서 빼 아래 활성 작업 게이트를 그대로 타게 한다(제품 코드와 동일 취급).
+# 순서가 중요하다 — 이 case 가 먼저 와야 다음 case 의 넓은 ".claude/*" 패턴에 먼저 걸려
+# 조용히 면제되는 일이 없다.
 case "$rel" in
+  .claude/hooks/*|.claude/scripts/*|.claude/settings.json|.github/workflows/*) ;;  # 면제하지 않고 아래로 통과(게이트 적용)
   docs/*|.claude/*|.githooks/*|.github/*|reports/*|CLAUDE.md|README.md|.gitignore|.gitattributes|.env.example|LICENSE) exit 0 ;;
 esac
 
+# R-27-9: 아래 frozen(CR 동결) 검사는 하네스 경로(.claude/hooks·scripts·settings·workflows)도 막는다 — 의도된 동작이다. CR 이행 중에는 가드 규칙을 바꾸지 않는다(기획서 변경과 가드 변경이 한꺼번에 움직이면 무엇이 원인인지 추적이 안 된다). 훅 결함은 CR 해제(frozen: none) 뒤에 FIX 로 고친다.
 [ -f "$CURRENT" ] || deny "docs/wiki/CURRENT.md 가 없다. devlog 스킬 절차로 계획·계획검증 기록을 만들고 활성 작업을 등록하라."
 
 # 기획서 변경 요청(CR)이 열려 있으면 제품 코드 쓰기 전면 차단 (docs/·.claude/ 는 위에서 면제됨)
@@ -85,7 +97,12 @@ case "$active" in
   FIX-*)
     rec="$ROOT/docs/wiki/fixes/$active.md"
     [ -f "$rec" ] || deny "수정 기록 $active 이(가) docs/wiki/fixes/ 에 없다. fix 템플릿으로 먼저 기록하라."
-    grep -Eq '^검증:[[:space:]]*통과' "$rec" || deny "$active 의 수정 계획 검증이 '통과'가 아니다. 원인·수정안·기획서 정합성을 검증하고 '검증: 통과'를 기록하라."
+    # F-27-1: 코드를 쓰기 전 게이트는 "계획 점검"(메인 세션)만 본다. verifier 의 실제
+    # `검증:` 판정은 코드가 생긴 뒤 커밋 시점에 commit-guard.sh 규칙 6 이 본다(역할 분담).
+    # 새 템플릿은 `계획 점검: 통과` 줄을 쓰고, FIX-001~026 의 옛 템플릿은 `검증: 통과` 한
+    # 줄뿐이었으므로 둘 중 하나만 있어도 통과시켜 과거 FIX 문서와 호환한다.
+    grep -Eq '^계획 점검:[[:space:]]*통과' "$rec" || grep -Eq '^검증:[[:space:]]*통과' "$rec" \
+      || deny "$active 의 계획 점검이 '통과'가 아니다. 원인·수정안·기획서 정합성을 검증하고 '계획 점검: 통과'를 기록하라."
     grep -Eq '^승인:[[:space:]]*[^[:space:]]' "$rec" || deny "$active 에 사용자 승인 기록이 없다. AskUserQuestion 으로 승인받고 '승인: 사용자 (날짜)'를 기록하라."
     ;;
   *)

@@ -108,6 +108,222 @@ expect_deny  "$H/commit-guard.sh" 'git commit -m x (no marker)' "$(mk 'git commi
 expect_deny  "$H/commit-guard.sh" 'git commit --amend' "$(mk 'git commit --amend -F .claude/commit-draft.txt')"
 expect_allow "$H/commit-guard.sh" 'git status' "$(mk 'git status')"
 
+# (F-27-3/F-27-5 의 스테이징 우회 케이스는 승인 마커·초안이 있는 격리 저장소가 필요해서 아래
+#  FG_T 절로 옮겼다 — 마커 없는 실제 저장소에서는 규칙 1 로 먼저 DENY 돼 검사와 무관하게
+#  항상 통과하는 무의미한 테스트였다.)
+
+echo "== commit-guard: FIX-027 제품 코드 verifier 게이트 (격리된 임시 저장소) =="
+# 이 절은 실제 commit-guard.sh 를 CLAUDE_PROJECT_DIR 를 임시 저장소로 돌려 그대로 호출한다
+# (fix_guard_check.py 를 직접 부르는 우회 없이, 실제 훅 경로 — 마커·초안·해시 일치까지 — 를 탄다).
+FG_T="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-fg-$$")"
+mkdir -p "$FG_T/.claude" "$FG_T/app" "$FG_T/docs/wiki/fixes"
+(
+  cd "$FG_T" || exit 1
+  git init -q .
+  git config user.email t@example.com; git config user.name tester
+  printf 'init\n' > README.md; git add README.md
+  git commit -qm "테스트용 첫 커밋" 2>/dev/null
+) >/dev/null 2>&1
+
+fg_draft() {  # fg_draft <초안 첫 줄>
+  printf '%s\n\n본문\n' "$1" > "$FG_T/.claude/commit-draft.txt"
+  "$HOOK_PY" -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" \
+    "$FG_T/.claude/commit-draft.txt" > "$FG_T/.claude/.commit-approved"
+}
+fg_run() {
+  printf '%s' "$(mk 'git commit -F .claude/commit-draft.txt')" \
+    | CLAUDE_PROJECT_DIR="$FG_T" bash "$H/commit-guard.sh"
+}
+fg_check() {  # fg_check <라벨> <deny|allow> <출력>
+  if [ "$2" = "deny" ]; then
+    if printf '%s' "$3" | grep -q '"deny"'; then echo "ok   DENY   $1"; else echo "XX   fix-guard should DENY: $1 -> $(printf '%s' "$3" | head -c 150)"; fails=$((fails+1)); fi
+  else
+    if [ -z "$3" ]; then echo "ok   allow  $1"; else echo "XX   fix-guard should ALLOW: $1 -> $(printf '%s' "$3" | head -c 150)"; fails=$((fails+1)); fi
+  fi
+}
+
+# 케이스 1: fix(FIX-999) + app/ 스테이징 + 검증 줄 없음(FIX-999.md 자체가 없음) → DENY
+printf 'x\n' > "$FG_T/app/a.py"
+( cd "$FG_T" && git add app/a.py )
+rm -f "$FG_T/docs/wiki/fixes/FIX-999.md" "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+fg_draft 'fix(FIX-999): 테스트'
+fg_check "1) app/ + 검증 줄 없음" deny "$(fg_run)"
+
+# 케이스 2: 검증 줄은 있으나 review 문서 없음 → DENY
+printf '검증: 통과 — verifier (fable) 2026-10-06\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+rm -f "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+fg_check "2) 검증 줄 있음 + review 문서 없음" deny "$(fg_run)"
+
+# 케이스 2b: 검증 줄이 템플릿 자리표(괄호)뿐 → "verifier" 문자열은 있어도 DENY
+#   review 문서는 R-27-3 기준(검토자: verifier 줄 + 스테이징)을 갖춰서 만든다 — 이 케이스가
+#   DENY 여야 하는 이유가 review 문서가 아니라 FIX 문서 쪽(자리표)임을 분명히 하기 위해서다.
+printf '검증: (verifier 가 쓴다)\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+printf '검토자: verifier (fable)\n' > "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+( cd "$FG_T" && git add docs/wiki/fixes/review-FIX-999.md )
+fg_check "2b) 검증 줄이 자리표뿐 → DENY" deny "$(fg_run)"
+
+# 케이스 3: 검증 줄(통과+verifier)·review 문서(검토자: verifier·스테이징, R-27-3) 둘 다 있음 → allow
+printf '검증: 통과 — verifier (fable) 2026-10-06, review-FIX-999.md\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "3) 검증 줄 + review 문서 모두 있음(R-27-3 기준 충족)" allow "$(fg_run)"
+
+# 케이스 4: fix(FIX-999) + docs/ 만 스테이징(제품 코드 무변경) → allow, 검증 줄 없어도 무관
+( cd "$FG_T" && git reset -q app/a.py ) 2>/dev/null
+printf 'docs change\n' > "$FG_T/docs/readme2.md"
+( cd "$FG_T" && git add docs/readme2.md )
+( cd "$FG_T" && git reset -q docs/wiki/fixes/review-FIX-999.md ) 2>/dev/null  # 케이스 2b/3 에서 스테이징된 것 정리
+rm -f "$FG_T/docs/wiki/fixes/FIX-999.md" "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+fg_check "4) docs/ 만 스테이징 → allow" allow "$(fg_run)"
+
+# 케이스 5: feat(P7-push) + app/ → FIX 패턴이 아니므로 새 규칙 미적용(기존 규칙만, allow)
+( cd "$FG_T" && git add app/a.py )
+fg_draft 'feat(P7-push): 테스트'
+fg_check "5) feat(...) + app/ → 새 규칙 미적용" allow "$(fg_run)"
+
+# ── F-27-5: git commit 인자 허용 목록 (승인 마커·초안이 있는 격리 저장소에서 — 검사를 빼면
+#    아래 DENY 케이스가 allow 로 뒤집힌다; 변이 시험은 evidence 의 rework2-mutation 참조) ──
+fg_cmd() {  # fg_cmd <git commit 명령 문자열>
+  printf '%s' "$(mk "$1")" | CLAUDE_PROJECT_DIR="$FG_T" bash "$H/commit-guard.sh"
+}
+D='.claude/commit-draft.txt'
+for c in "git commit -F $D" "git commit -F \"$D\"" "git commit --file=$D" "git commit --file $D" \
+         "git commit --file=\"$D\"" "git -c user.name=x commit -F $D" "git -C . commit -F $D" \
+         "cd . && git commit -F $D" "git commit -F $D 2>&1" "git commit -F $D && git push origin dev2" ; do
+  fg_check "F-27-5) 허용 형태 → allow: $c" allow "$(fg_cmd "$c")"
+done
+for c in "git commit -a -F $D" "git commit -F $D app/a.py" "git commit --file=$D app/a.py" \
+         "git commit app/a.py -F $D" "git commit --file $D app/a.py" "git commit --pathspec-from-file=p -F $D" \
+         "git commit -F $D --pathspec-from-file p" "git commit --pathspec-file-nul -F $D" "git commit -F $D -- app/a.py" \
+         "git commit -F $D --all" "git commit -i -F $D" "git commit -F $D --include app/a.py" "git commit -o -F $D" \
+         "git commit --only -F $D" "git commit -am x -F $D" "git commit -aF $D" "git commit -m x" \
+         "git -c x=y commit -a -F $D" "git -C . commit -F $D app/a.py" "git commit -F $D ./app/a.py" \
+         "git commit -F $D && git commit -a -F $D" "git commit -F $D ; git commit app/a.py -F $D" ; do
+  fg_check "F-27-5) 허용 목록 밖 → DENY: $c" deny "$(fg_cmd "$c")"
+done
+# R-27-8: GIT_* 환경변수 접두
+fg_check "R-27-8) GIT_INDEX_FILE= 접두 → DENY" deny "$(fg_cmd "GIT_INDEX_FILE=/tmp/idx git commit -F $D")"
+fg_check "R-27-8) GIT_AUTHOR_NAME= 접두(&& 뒤) → DENY" deny "$(fg_cmd "cd . && GIT_AUTHOR_NAME=x git commit -F $D")"
+
+# ── FIX-027 재작업(review-FIX-027.md 소견 반영) — F-27-4: 검증 줄에 "통과" 와 "verifier"
+#    가 둘 다 있어야 한다 ───────────────────────────────────────────────────────
+( cd "$FG_T" && git add app/a.py ) 2>/dev/null  # app/ 계속 스테이징 상태 보장
+printf '검토자: verifier (fable)\n' > "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+( cd "$FG_T" && git add docs/wiki/fixes/review-FIX-999.md )
+printf '검증: 보류 — verifier (fable) 2026-10-06 [필수] 2건\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_draft 'fix(FIX-999): 테스트'
+fg_check "F-27-4) 검증: 보류 — verifier ('통과' 없음) → DENY" deny "$(fg_run)"
+printf '검증: 통과 — 메인 세션\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-4) 검증: 통과 — 메인 세션 ('verifier' 없음) → DENY" deny "$(fg_run)"
+printf '검증: 통과 — verifier (fable) 2026-10-06, review-FIX-999.md\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-4) 통과 + verifier 모두 있음 → allow(회귀)" allow "$(fg_run)"
+
+# ── F-27-6: `검증:` 줄 판정 강화 — 구분자 바로 뒤 verifier · 부정/유보 표현 거부 · 줄 둘 이상 거부 ──
+printf '검증: 통과 — 메인 세션 (verifier 생략)\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-6) 통과 — 메인 세션 (verifier 생략) → DENY" deny "$(fg_run)"
+printf '검증: 통과 — verifier 리뷰 생략(문서만)\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-6) 통과 — verifier 리뷰 생략(문서만) → DENY(부정어 '생략': 통과를 자칭하지만 리뷰를 안 했다는 뜻)" deny "$(fg_run)"
+printf '검증: 통과(점검표 1~8) — verifier 리뷰는 아직\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-6) 통과(점검표 1~8) — verifier 리뷰는 아직 → DENY" deny "$(fg_run)"
+printf '검증: 통과 — 메인 세션, verifier 는 다음 커밋에서\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-6) 통과 — 메인 세션, verifier 는 다음 커밋에서 → DENY(구분자 바로 뒤가 verifier 아님)" deny "$(fg_run)"
+printf '검증: 통과 — verifier 아님\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-6) 통과 — verifier 아님 → DENY(부정어)" deny "$(fg_run)"
+printf '검증: (verifier 가 쓴다 — 자리표)\n\n## 결과\n검증: 통과 — verifier (fable) 2026-10-08\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-6) 검증: 줄 두 개(자리표 + 통과) → DENY" deny "$(fg_run)"
+printf '검증: 보류 — verifier (fable)\n검증: 통과 — verifier (fable)\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-6) 검증: 줄 두 개(보류 + 옛 통과) → DENY" deny "$(fg_run)"
+printf '검증: 통과 — verifier 재리뷰 (review-FIX-999.md)\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-6) 정상 '통과 — verifier 재리뷰 (review-FIX-nnn.md)' → allow" allow "$(fg_run)"
+printf '검증: 통과 -- Verifier (fable) 2026-10-08\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+fg_check "F-27-6) 구분자 '--'·대소문자 Verifier → allow" allow "$(fg_run)"
+printf '검증: 통과 — verifier (fable) 2026-10-06, review-FIX-999.md\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+
+# ── F-27-2: FIX 문서가 UTF-8 이 아니어도 훅 출력은 항상 유효한 JSON 이고 deny ──────
+printf '\xff\xfe\xff\xfe' > "$FG_T/docs/wiki/fixes/FIX-999.md"   # 유효한 UTF-8 이 아닌 바이트열
+fg_out="$(fg_run)"
+if printf '%s' "$fg_out" | grep -q '"deny"'; then
+  echo "ok   DENY   F-27-2) FIX 문서가 UTF-8 아님"
+else
+  echo "XX   F-27-2) FIX 문서가 UTF-8 아님인데 DENY 가 아니다: $(printf '%s' "$fg_out" | head -c 150)"; fails=$((fails+1))
+fi
+if printf '%s' "$fg_out" | "$HOOK_PY" -c 'import sys,json
+json.load(sys.stdin)' >/dev/null 2>&1; then
+  echo "ok   F-27-2) 훅 stdout 이 유효한 JSON"
+else
+  echo "XX   F-27-2) 훅 stdout 이 유효한 JSON 이 아니다: $(printf '%s' "$fg_out" | head -c 200)"; fails=$((fails+1))
+fi
+
+# ── R-27-3: review 문서 기준(0바이트 아님 · 검토자: verifier · git 추적) ──────────
+printf '검증: 통과 — verifier (fable) 2026-10-06, review-FIX-999.md\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+: > "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+( cd "$FG_T" && git add docs/wiki/fixes/review-FIX-999.md )
+fg_check "R-27-3) review 문서 0바이트 → DENY" deny "$(fg_run)"
+printf '# 검토자 줄 없이 내용만\n' > "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+( cd "$FG_T" && git add docs/wiki/fixes/review-FIX-999.md )
+fg_check "R-27-3) review 문서에 검토자: verifier 줄 없음 → DENY" deny "$(fg_run)"
+printf '검토자: verifier (fable)\n' > "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+( cd "$FG_T" && git reset -q docs/wiki/fixes/review-FIX-999.md ) 2>/dev/null  # 디스크에만, untracked
+fg_check "R-27-3) review 문서 untracked(디스크에만) → DENY" deny "$(fg_run)"
+( cd "$FG_T" && git add docs/wiki/fixes/review-FIX-999.md )
+fg_check "R-27-3) review 문서 스테이징됨 → allow(회귀)" allow "$(fg_run)"
+
+# ── R-27-1: 제목 유형 제한 해제·형식 정규화 ──────────────────────────────────────
+fg_draft_raw() {  # fg_draft_raw <첫 줄 그대로(개행·BOM 포함 가능)>
+  printf '%s' "$1" > "$FG_T/.claude/commit-draft.txt"
+  "$HOOK_PY" -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" \
+    "$FG_T/.claude/commit-draft.txt" > "$FG_T/.claude/.commit-approved"
+}
+rm -f "$FG_T/docs/wiki/fixes/FIX-999.md" "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+( cd "$FG_T" && git reset -q docs/wiki/fixes/review-FIX-999.md ) 2>/dev/null
+for t in 'Fix(FIX-999): 대문자' 'FIX(FIX-999): 대문자2' 'fix (FIX-999): 괄호 앞 공백' \
+         'feat(FIX-999): feat 유형' 'docs(FIX-999): docs 유형' 'harness(FIX-999): harness 유형' \
+         'chore(FIX-999): chore 유형' ; do
+  fg_draft "$t"; fg_check "R-27-1) 제목 변형 — $t → DENY(검증 문서 없음)" deny "$(fg_run)"
+done
+fg_draft_raw "$(printf '\xef\xbb\xbffix(FIX-999): BOM\n\n본문\n')"
+fg_check "R-27-1) 제목 UTF-8 BOM → DENY(검증 문서 없음)" deny "$(fg_run)"
+fg_draft_raw "$(printf '\nfix(FIX-999): 첫 줄이 빈 줄\n\n본문\n')"
+fg_check "R-27-1) 초안 첫 줄이 빈 줄(git 과 동일하게 다음 줄을 본다) → DENY(검증 문서 없음)" deny "$(fg_run)"
+
+# 복수 ID: 제목에 둘 이상이면 전부 검사 대상 — 하나라도 미비하면 DENY, 전부 충족해야 allow
+printf '검증: 통과 — verifier (fable), review-FIX-998.md\n' > "$FG_T/docs/wiki/fixes/FIX-998.md"
+printf '검토자: verifier (fable)\n' > "$FG_T/docs/wiki/fixes/review-FIX-998.md"
+( cd "$FG_T" && git add docs/wiki/fixes/review-FIX-998.md )
+fg_draft 'fix(FIX-999, FIX-998): 복수 ID'
+fg_check "R-27-1) 복수 ID — FIX-999 쪽만 미비 → DENY" deny "$(fg_run)"
+printf '검증: 통과 — verifier (fable), review-FIX-999.md\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+printf '검토자: verifier (fable)\n' > "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+( cd "$FG_T" && git add docs/wiki/fixes/review-FIX-999.md )
+fg_check "R-27-1) 복수 ID — 둘 다 충족 → allow" allow "$(fg_run)"
+rm -f "$FG_T/docs/wiki/fixes/FIX-998.md" "$FG_T/docs/wiki/fixes/review-FIX-998.md" \
+      "$FG_T/docs/wiki/fixes/FIX-999.md" "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+( cd "$FG_T" && git reset -q docs/wiki/fixes/review-FIX-998.md docs/wiki/fixes/review-FIX-999.md ) 2>/dev/null
+
+# 번호 정규화: "FIX-27"(두 자리)도 정수로 봐서 "FIX-027.md" 파일을 찾는다
+printf '검증: 통과 — verifier (fable), review-FIX-027.md\n' > "$FG_T/docs/wiki/fixes/FIX-027.md"
+printf '검토자: verifier (fable)\n' > "$FG_T/docs/wiki/fixes/review-FIX-027.md"
+( cd "$FG_T" && git add docs/wiki/fixes/review-FIX-027.md )
+fg_draft 'fix(FIX-27): 번호 정규화'
+fg_check "R-27-1) fix(FIX-27) → FIX-027.md 로 정규화해 찾음 → allow" allow "$(fg_run)"
+rm -f "$FG_T/docs/wiki/fixes/FIX-027.md" "$FG_T/docs/wiki/fixes/review-FIX-027.md"
+( cd "$FG_T" && git reset -q docs/wiki/fixes/review-FIX-027.md ) 2>/dev/null
+
+# 정책(본문 Refs 전용·패키지 제목): 제목이 FIX-nnn 을 명시하지 않으면 대상 밖 — 과도하게
+# 넓히면(본문 전체에서 FIX-\d+ 검색) 무관한 언급에도 반응하므로 의도적으로 두는 동작이다.
+fg_draft 'fix(P7-push): 본문에만 FIX 언급'
+fg_check "R-27-1) 제목이 패키지 id(FIX 아님) → allow(정책 — 패키지는 02-plan-verify 가 따로 게이트)" allow "$(fg_run)"
+
+# R-27-7: 제목 줄 안에 FIX-nnn 이 있으면 형태와 무관하게 규칙 6 대상(FIX-999 문서 없음 → DENY)
+for t in 'fix(FIX-999 재작업): x' 'fix(FIX-999/hooks): x' 'fix-hooks(FIX-999): x' 'fix[FIX-999]: x' \
+         'fix: FIX-999 후속' 'fix(FIX-999; FIX-998): x' 'fix2(fix-999): x' 'harness: FIX-0999 정리' ; do
+  fg_draft "$t"; fg_check "R-27-7) 제목 형태 — $t → DENY(검증 문서 없음)" deny "$(fg_run)"
+done
+fg_draft 'fix(FIX-999): 정상 형태도 여전히 대상'
+fg_check "R-27-7) 정상 형태 회귀 → DENY(검증 문서 없음)" deny "$(fg_run)"
+fg_draft 'feat(P7-push): FIX 번호 없는 제목'
+fg_check "R-27-7) 제목에 FIX-nnn 없음 → allow(대상 밖)" allow "$(fg_run)"
+
+rm -rf "$FG_T"
+
 echo "== secret-guard =="
 expect_deny  "$H/secret-guard.sh" 'openai key literal' "$(mkw 'C:\Capstone2\app\config.py' "KEY=\"$FAKE_OPENAI\"")"
 expect_deny  "$H/secret-guard.sh" 'aws key literal' "$(mkw 'C:\Capstone2\infra\main.tf' "access_key = \"$FAKE_AWS\"")"
@@ -130,6 +346,38 @@ if [ "$act" = "none" ]; then
 else
   echo "skip active=$act (product code gate not tested)"
 fi
+
+echo "== stage-gate: F-27-1 새 FIX 템플릿 호환(계획 점검: 통과 + 검증: 자리표) =="
+SG_T="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-sg-$$")"
+mkdir -p "$SG_T/docs/wiki/fixes" "$SG_T/app"
+sg_gate() { printf '%s' "$(gate "$SG_T/$1")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh"; }
+
+printf 'active: FIX-999\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+printf '# FIX-999\n\n계획 점검: 통과(메인 세션, 점검표 1~8)\n검증: (verifier 가 쓴다 — 제품 코드를 바꾸면 커밋 전 review-FIX-nnn.md 와 함께)\n승인: 사용자 (2026-10-06)\n' \
+  > "$SG_T/docs/wiki/fixes/FIX-999.md"
+out="$(sg_gate app/new.py)"
+if [ -z "$out" ]; then echo "ok   allow  새 템플릿(계획 점검: 통과 + 검증: 자리표) → app/ 쓰기 가능"; else echo "XX   새 템플릿인데 거부됨: $(printf '%s' "$out" | head -c 150)"; fails=$((fails+1)); fi
+
+printf '# FIX-999\n\n검증: 통과(점검표 1~8)\n승인: 사용자 (2026-10-06)\n' > "$SG_T/docs/wiki/fixes/FIX-999.md"
+out="$(sg_gate app/new.py)"
+if [ -z "$out" ]; then echo "ok   allow  옛 템플릿(검증: 통과 한 줄) 도 그대로 호환"; else echo "XX   옛 템플릿인데 거부됨: $(printf '%s' "$out" | head -c 150)"; fails=$((fails+1)); fi
+rm -rf "$SG_T"
+
+echo "== stage-gate: R-27-5 보호 경로(.claude/hooks·scripts·settings.json·.github/workflows) =="
+SG_T="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-sg2-$$")"
+mkdir -p "$SG_T/docs/wiki"
+printf 'active: none\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+for p in '.claude/hooks/x.sh' '.claude/scripts/x.py' '.claude/settings.json' '.github/workflows/x.yml'; do
+  out="$(printf '%s' "$(gate "$SG_T/$p")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
+  if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   $p (활성 작업 없음, R-27-5 — 더는 면제되지 않음)"; else echo "XX   $p 가 여전히 면제돼 allow 됐다(R-27-5 회귀)"; fails=$((fails+1)); fi
+done
+out="$(printf '%s' "$(gate "$SG_T/.claude/skills/x/SKILL.md")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
+if [ -z "$out" ]; then echo "ok   allow  .claude/skills 는 여전히 면제(R-27-5 범위 밖)"; else echo "XX   .claude/skills 까지 막혔다(범위 과확대)"; fails=$((fails+1)); fi
+rm -rf "$SG_T"
+# 실제 저장소(활성 작업 있음)에서는 그 작업의 게이트를 그대로 타 allow 되어야 한다(교착 없음 확인)
+for p in "$ROOT/.claude/hooks/_py.sh" "$ROOT/.claude/scripts/test-guards.sh" "$ROOT/.claude/settings.json" "$ROOT/.github/workflows/tests.yml"; do
+  expect_allow "$H/stage-gate.sh" "R-27-5 활성 작업 있으면 allow: $p" "$(gate "$p")"
+done
 
 echo "== stage-gate: dev 푸시 후 결정 대기(L-003) =="
 AW=".claude/.awaiting-decision"

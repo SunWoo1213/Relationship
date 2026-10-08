@@ -1,0 +1,165 @@
+# review-FIX-027 — verifier 가 직접 돌린 우회·fail-closed 시험 출력
+# 실행: bash <scratchpad>/bypass.sh  (격리된 mktemp 저장소, 프로젝트 파일 무수정, HEAD=90f249c + 작업 트리 diff)
+# 판독: "ok" = 기대와 일치, "!!" = 기대와 다름(기대 DENY 인데 allow 면 우회 성공).
+# 시험 스크립트 본문은 이 파일 끝에 붙임.
+
+== A. 제목 변형 (app/ 스테이징, 검증 문서 전혀 없음 → 모두 DENY 가 바람직) ==
+ok   [DENY] fix(FIX-999): 정상
+!!   [allow] (기대 DENY) Fix(FIX-999): 대문자
+!!   [allow] (기대 DENY) FIX(FIX-999): 대문자2
+!!   [allow] (기대 DENY) fix (FIX-999): 공백
+!!   [allow] (기대 DENY) fix(FIX-999, FIX-998): 둘
+ok   [DENY] fix(FIX-999)!: 느낌표
+!!   [allow] (기대 DENY) feat(FIX-999): feat
+!!   [allow] (기대 DENY) docs(FIX-999): docs
+!!   [allow] (기대 DENY) harness(FIX-999): harness
+!!   [allow] (기대 DENY) chore(FIX-999): chore
+ok   [DENY] fix(FIX-27): 세 자리 아님        (FIX-27.md 를 찾아 없으므로 DENY — fail-closed 방향, 맞음)
+!!   [allow] (기대 DENY) fix(P7-push): 본문에만 FIX
+!!   [allow] (기대 DENY) draft 첫 줄이 빈 줄 (git 은 strip 함)
+!!   [allow] (기대 DENY) draft 첫 줄 UTF-8 BOM
+ok   [DENY] draft CRLF 줄끝
+
+== B. 경로 변형 (fix(FIX-999), 검증 문서 없음) ==
+ok   [DENY] alembic/ 만 스테이징
+   (git diff --cached --name-only 출력: "app/\355\225\234\352\270\200.py")
+!!   [allow] (기대 DENY) app/한글.py (core.quotepath 기본 → 따옴표 인용 경로)
+   (app/a.py 는 추적 중·수정됨·미스테이징, staged=0)
+!!   [allow] (기대 DENY) git commit -a -F draft (미스테이징 app/ 를 -a 로 포함)
+!!   [allow] (기대 DENY) git commit -F draft app/a.py (pathspec 으로 포함)
+!!   [allow] (기대 DENY) git commit --include app/a.py -F draft
+
+== C. 검증 줄 위조 (fix(FIX-999) + app/ 스테이징 + review 문서 존재) ==
+!!   [allow] (기대 DENY) 검증: 보류 — verifier (fable) 2026-10-06, review-FIX-999.md [필수] 2건
+!!   [allow] (기대 DENY) 검증: 통과(점검표 1~8) — verifier 리뷰는 아직
+!!   [allow] (기대 DENY) 검증: verifier 에게 요청 예정
+!!   [allow] (기대 DENY) 검증: 통과 — 메인 세션 (verifier 생략)
+!!   [allow] (기대 DENY) 검증: 줄 두 개(자리표 + 결과 절의 두 번째 줄)
+ok   [DENY] 인용·목록 안의 검증 줄만 (정상 줄 없음)
+ok   [allow] FIX 문서 CRLF + 정상 검증 줄 (allow 가 맞다)
+!!   [allow] (기대 DENY) review 문서가 0바이트 빈 파일
+!!   [allow] (기대 DENY) review 문서에 검토자: verifier 줄 없음
+   (review 문서 git 상태: ?? docs/wiki/fixes/review-FIX-999.md)
+ok   [allow] review 문서 untracked·미스테이징 (디스크에만)     ← 구현 docstring 대로의 동작. FIX-027.md 수정안 B("스테이징 또는 HEAD")와는 다르다.
+ok   [DENY] FIX 문서가 UTF-8 이 아님 (UnicodeDecodeError 경로)
+       -> {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Traceback (most recent call last):
+  File \"/Users/sunwoo/Desktop/Portfolio/Relationship/.claude/hooks/../script
+       !! 훅 stdout 이 유효한 JSON 이 아니다: Invalid control character at: line 1 column 143 (char 142)
+   (전체: Traceback 이 여러 줄로 permissionDecisionReason 안에 그대로 들어감 — deny() 는 \ 와 " 만 이스케이프하고 줄바꿈은 처리하지 않는다.
+    fix_guard_check.py:107 → _verification_line_ok → read_text(encoding="utf-8") 에서 UnicodeDecodeError(ValueError 계열, OSError 아님 → except 에 안 걸림))
+
+== D. fail-closed ==
+ok   [allow] 기준: 모두 갖춘 정상 상태
+ok   [DENY] ROOT 가 git 저장소가 아님 (git diff 실패)
+       -> "[fix-guard] 스테이징된 파일 목록을 확인할 수 없다(git diff 실패): Command '['git', 'diff', '--…"  (rc=2)
+ok   [DENY] 훅 복사본에서 fix_guard_check.py 부재
+       -> "…/Python: can't open file '…'"  (rc=2, 한 줄 메시지 → 유효 JSON)
+--   [무효] PATH 에 파이썬 없음 — 시험 방법 오류(PATH 를 비우면 bash 자체가 사라짐). 이 분기는 commit-guard.sh:24~28(FIX-008, 변경 없음)로 기존과 동일.
+   인자 부족 rc=2
+   초안 없음 rc=2
+ok   [DENY] 기존 1: 마커 없음
+ok   [DENY] 기존 2: -m 사용
+ok   [DENY] 기존 3: 초안 변경 후 해시 불일치
+ok   [DENY] 기존 4: --amend
+ok   [DENY] 기존 4b: --no-verify
+ok   [DENY] 기존 5: 마커 조작
+ok   [allow] 기존: 정상 feat 커밋 허용
+
+== E. stage-gate 와 새 템플릿의 충돌 (active: FIX-999, 패키지 없음, backend-agent 가 app/ 를 쓰는 순간) ==
+!!   [DENY] (기대 allow) stage-gate: 새 템플릿(계획 점검: 통과 + 검증: 자리표 + 승인) 으로 app/ 쓰기 → allow 여야 구현 가능
+       -> "FIX-999 의 수정 계획 검증이 '통과'가 아니다. 원인·수정안·기획서 정합성을 검증하고 '검증: 통과'를 기록하라."  (stage-gate.sh:88)
+ok   [allow] stage-gate: 옛 템플릿(검증: 통과 — 메인 세션이 씀) → allow (비교용)
+
+== 참고: 같은 세션에서 bash .claude/scripts/test-guards.sh 재실행 ==
+63: == commit-guard: FIX-027 제품 코드 verifier 게이트 (격리된 임시 저장소) ==
+64: ok   DENY   1) app/ + 검증 줄 없음
+65: ok   DENY   2) 검증 줄 있음 + review 문서 없음
+66: ok   DENY   2b) 검증 줄이 자리표뿐 → DENY
+67: ok   allow  3) 검증 줄 + review 문서 모두 있음
+68: ok   allow  4) docs/ 만 스테이징 → allow
+69: ok   allow  5) feat(...) + app/ → 새 규칙 미적용
+138: == 결과: 실패 0 ==
+(구현자 증거 docs/wiki/fixes/evidence/20261006-1604-fix027-test-guards.txt 와 일치)
+
+==================== 시험 스크립트 (bypass.sh) ====================
+#!/usr/bin/env bash
+set -u
+export PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LC_ALL=C.UTF-8
+PROJ="/Users/sunwoo/Desktop/Portfolio/Relationship"
+H="$PROJ/.claude/hooks"
+. "$H/_py.sh"
+T="$(mktemp -d)"
+mkdir -p "$T/.claude" "$T/app" "$T/alembic" "$T/docs/wiki/fixes"
+( cd "$T" && git init -q . && git config user.email t@example.com && git config user.name tester \
+  && printf 'init\n' > README.md && git add README.md && git commit -qm init ) >/dev/null 2>&1
+
+mk() { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_input':{'command':sys.argv[1]}}))" "$1"; }
+mkw() { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_input':{'file_path':sys.argv[1],'content':sys.argv[2]}}))" "$1" "$2"; }
+draft_raw() { printf '%s' "$1" > "$T/.claude/commit-draft.txt"; approve; }
+draft() { printf '%s\n\n본문\n' "$1" > "$T/.claude/commit-draft.txt"; approve; }
+approve() { "$HOOK_PY" -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" "$T/.claude/commit-draft.txt" > "$T/.claude/.commit-approved"; }
+run() { printf '%s' "$(mk "${1:-git commit -F .claude/commit-draft.txt}")" | CLAUDE_PROJECT_DIR="$T" bash "$H/commit-guard.sh"; }
+show() { local verdict
+  if printf '%s' "$3" | grep -q '"deny"'; then verdict=DENY; elif [ -z "$3" ]; then verdict=allow; else verdict="OTHER"; fi
+  if [ "$verdict" = "$2" ]; then echo "ok   [$verdict] $1"; else echo "!!   [$verdict] (기대 $2) $1"; fi
+  [ -n "$3" ] && printf '       -> %s\n' "$(printf '%s' "$3" | head -c 220)"; }
+stage_app() { printf 'x\n' > "$T/app/a.py"; ( cd "$T" && git add app/a.py ); }
+clear_docs() { rm -f "$T/docs/wiki/fixes/FIX-999.md" "$T/docs/wiki/fixes/review-FIX-999.md"; }
+
+# A
+stage_app; clear_docs
+for t in 'fix(FIX-999): 정상' 'Fix(FIX-999): 대문자' 'FIX(FIX-999): 대문자2' 'fix (FIX-999): 공백' 'fix(FIX-999, FIX-998): 둘' 'fix(FIX-999)!: 느낌표' 'feat(FIX-999): feat' 'docs(FIX-999): docs' 'harness(FIX-999): harness' 'chore(FIX-999): chore' 'fix(FIX-27): 세 자리 아님' 'fix(P7-push): 본문에만 FIX' ; do
+  draft "$t"; show "$t" DENY "$(run)"; done
+draft_raw $'\nfix(FIX-999): 첫 줄 공백\n\n본문\n';  show 'draft 첫 줄이 빈 줄' DENY "$(run)"
+draft_raw $'\xef\xbb\xbffix(FIX-999): BOM\n\n본문\n'; show 'draft 첫 줄 UTF-8 BOM' DENY "$(run)"
+draft_raw $'fix(FIX-999): CRLF\r\n\r\n본문\r\n';      show 'draft CRLF 줄끝' DENY "$(run)"
+# B
+draft 'fix(FIX-999): 경로'; ( cd "$T" && git reset -q app/a.py )
+printf 'x\n' > "$T/alembic/v1.py"; ( cd "$T" && git add alembic/v1.py ); show 'alembic/ 만 스테이징' DENY "$(run)"
+( cd "$T" && git reset -q alembic/v1.py )
+printf 'x\n' > "$T/app/한글.py"; ( cd "$T" && git add 'app/한글.py' ); show 'app/한글.py' DENY "$(run)"
+( cd "$T" && git reset -q 'app/한글.py' && rm -f 'app/한글.py' )
+printf 'y\n' > "$T/app/a.py"; ( cd "$T" && git add app/a.py && git commit -qm "app 추적" && printf 'z\n' > app/a.py )
+show 'git commit -a -F draft' DENY "$(run 'git commit -a -F .claude/commit-draft.txt')"
+show 'git commit -F draft app/a.py' DENY "$(run 'git commit -F .claude/commit-draft.txt app/a.py')"
+show 'git commit --include app/a.py -F draft' DENY "$(run 'git commit --include app/a.py -F .claude/commit-draft.txt')"
+( cd "$T" && git add app/a.py )
+# C
+printf '리뷰\n' > "$T/docs/wiki/fixes/review-FIX-999.md"
+for line in '검증: 보류 — verifier (fable) 2026-10-06, review-FIX-999.md [필수] 2건' '검증: 통과(점검표 1~8) — verifier 리뷰는 아직' '검증: verifier 에게 요청 예정' '검증: 통과 — 메인 세션 (verifier 생략)' ; do
+  printf '%s\n' "$line" > "$T/docs/wiki/fixes/FIX-999.md"; show "$line" DENY "$(run)"; done
+printf '검증: (verifier 가 쓴다)\n\n## 결과\n검증: 통과 — verifier (fable)\n' > "$T/docs/wiki/fixes/FIX-999.md"; show '검증: 줄 두 개' DENY "$(run)"
+printf '> 검증: 통과 — verifier (fable)\n- 검증: 통과 — verifier (fable)\n' > "$T/docs/wiki/fixes/FIX-999.md"; show '인용·목록 안의 검증 줄만' DENY "$(run)"
+printf '검증: 통과 — verifier (fable) 2026-10-06, review-FIX-999.md\r\n' > "$T/docs/wiki/fixes/FIX-999.md"; show 'FIX 문서 CRLF' allow "$(run)"
+printf '검증: 통과 — verifier (fable) 2026-10-06, review-FIX-999.md\n' > "$T/docs/wiki/fixes/FIX-999.md"
+: > "$T/docs/wiki/fixes/review-FIX-999.md"; show 'review 문서 0바이트' DENY "$(run)"
+printf '# 아무 내용\n' > "$T/docs/wiki/fixes/review-FIX-999.md"; show 'review 문서에 검토자 줄 없음' DENY "$(run)"
+show 'review 문서 untracked' allow "$(run)"
+printf '\xff\xfe검증: 통과 — verifier\n' > "$T/docs/wiki/fixes/FIX-999.md"; out="$(run)"; show 'FIX 문서가 UTF-8 아님' DENY "$out"
+printf '%s' "$out" | "$HOOK_PY" -c 'import sys,json
+try: json.load(sys.stdin); print("       훅 stdout 은 유효한 JSON")
+except Exception as e: print("       !! 훅 stdout 이 유효한 JSON 이 아니다:", e)'
+# D
+printf '검증: 통과 — verifier (fable), review-FIX-999.md\n' > "$T/docs/wiki/fixes/FIX-999.md"; printf '검토자: verifier (fable)\n' > "$T/docs/wiki/fixes/review-FIX-999.md"
+show '기준: 정상' allow "$(run)"
+NG="$(mktemp -d)"; mkdir -p "$NG/.claude"; cp "$T/.claude/commit-draft.txt" "$T/.claude/.commit-approved" "$NG/.claude/"
+show 'ROOT 가 git 저장소가 아님' DENY "$(printf '%s' "$(mk 'git commit -F .claude/commit-draft.txt')" | CLAUDE_PROJECT_DIR="$NG" bash "$H/commit-guard.sh")"; rm -rf "$NG"
+HC="$(mktemp -d)"; mkdir -p "$HC/.claude/hooks" "$HC/.claude/scripts"; cp "$H/commit-guard.sh" "$H/_py.sh" "$HC/.claude/hooks/"
+show '훅 복사본에서 fix_guard_check.py 부재' DENY "$(printf '%s' "$(mk 'git commit -F .claude/commit-draft.txt')" | CLAUDE_PROJECT_DIR="$T" bash "$HC/.claude/hooks/commit-guard.sh")"; rm -rf "$HC"
+"$HOOK_PY" "$PROJ/.claude/scripts/fix_guard_check.py" "$T" >/dev/null 2>&1; echo "   인자 부족 rc=$?"
+"$HOOK_PY" "$PROJ/.claude/scripts/fix_guard_check.py" "$T" "$T/없는초안.txt" >/dev/null 2>&1; echo "   초안 없음 rc=$?"
+draft 'feat(P7): 기존 규칙 유지 확인'
+show '기존 1: 마커 없음' DENY "$(rm -f "$T/.claude/.commit-approved"; run)"; approve
+show '기존 2: -m 사용' DENY "$(run 'git commit -m x')"
+show '기존 3: 해시 불일치' DENY "$(printf 'changed\n' >> "$T/.claude/commit-draft.txt"; run)"; approve
+show '기존 4: --amend' DENY "$(run 'git commit --amend -F .claude/commit-draft.txt')"
+show '기존 4b: --no-verify' DENY "$(run 'git commit --no-verify -F .claude/commit-draft.txt')"
+show '기존 5: 마커 조작' DENY "$(run 'rm .claude/.commit-approved')"
+show '기존: 정상 feat 커밋 허용' allow "$(run)"
+# E
+printf 'active: FIX-999\nfrozen: none\n' > "$T/docs/wiki/CURRENT.md"
+printf '# FIX-999\n\n계획 점검: 통과(메인 세션, 점검표 1~8)\n검증: (verifier 가 쓴다 — 제품 코드를 바꾸면 커밋 전 review-FIX-nnn.md 와 함께)\n승인: 사용자 (2026-10-06)\n' > "$T/docs/wiki/fixes/FIX-999.md"
+show 'stage-gate: 새 템플릿으로 app/ 쓰기' allow "$(printf '%s' "$(mkw "$T/app/new.py" 'x=1')" | CLAUDE_PROJECT_DIR="$T" bash "$H/stage-gate.sh")"
+printf '# FIX-999\n\n검증: 통과(점검표 1~8)\n승인: 사용자 (2026-10-06)\n' > "$T/docs/wiki/fixes/FIX-999.md"
+show 'stage-gate: 옛 템플릿' allow "$(printf '%s' "$(mkw "$T/app/new.py" 'x=1')" | CLAUDE_PROJECT_DIR="$T" bash "$H/stage-gate.sh")"
+rm -rf "$T"

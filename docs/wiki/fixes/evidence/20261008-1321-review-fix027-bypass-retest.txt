@@ -1,0 +1,52 @@
+# verifier 재리뷰(FIX-027 재작업) — 구현자의 재시험 스크립트를 그대로 다시 돌린 결과
+# 명령: bash docs/wiki/fixes/evidence/20261006-1700-fix027-rework-bypass-retest.sh
+# 2026-10-08 13:21 · HEAD 1ddab52 + 작업 트리 미커밋 diff · Mac
+# 결과: ok 40 · !! 3 — 구현자 증거 파일(20261006-1700-…-bypass-retest.txt 41·44·45행)의 !! 3건과 동일하게 재현.
+#       그 3건은 FIX-027.md·HANDOFF·journal 어디에도 설명이 없다(grep 0건).
+# (각 판정 아래 "-> {json}" 상세 줄은 생략 — 전부 유효 JSON deny 였고 사유는 rereview-bypass.txt 에 사람이 읽을 수 있게 남김)
+ok   [DENY] fix(FIX-999): 정상
+ok   [DENY] Fix(FIX-999): 대문자
+ok   [DENY] FIX(FIX-999): 대문자2
+ok   [DENY] fix (FIX-999): 공백
+ok   [DENY] fix(FIX-999, FIX-998): 둘
+ok   [DENY] fix(FIX-999)!: 느낌표
+ok   [DENY] feat(FIX-999): feat
+ok   [DENY] docs(FIX-999): docs
+ok   [DENY] harness(FIX-999): harness
+ok   [DENY] chore(FIX-999): chore
+ok   [DENY] fix(FIX-27): 세 자리 아님
+ok   [allow] fix(P7-push): 본문에만 FIX [정책: 대상 밖]
+ok   [DENY] draft 첫 줄이 빈 줄
+ok   [DENY] draft 첫 줄 UTF-8 BOM
+ok   [DENY] draft CRLF 줄끝
+ok   [DENY] alembic/ 만 스테이징
+ok   [allow] app/한글.py [범위 밖: R-27-2, 이번 라운드 미처리]
+ok   [DENY] git commit -a -F draft
+ok   [DENY] git commit -F draft app/a.py
+ok   [DENY] git commit --include app/a.py -F draft
+ok   [DENY] 검증: 보류 — verifier (fable) 2026-10-06, review-FIX-999.md [필수] 2건
+!!   [allow] (기대 DENY) 검증: 통과(점검표 1~8) — verifier 리뷰는 아직
+ok   [DENY] 검증: verifier 에게 요청 예정
+!!   [allow] (기대 DENY) 검증: 통과 — 메인 세션 (verifier 생략)
+!!   [allow] (기대 DENY) 검증: 줄 두 개
+ok   [DENY] 인용·목록 안의 검증 줄만
+ok   [allow] FIX 문서 CRLF
+ok   [DENY] review 문서 0바이트
+ok   [DENY] review 문서에 검토자 줄 없음
+ok   [DENY] review 문서 untracked(디스크에만)
+ok   [DENY] FIX 문서가 UTF-8 아님
+       훅 stdout 은 유효한 JSON
+ok   [allow] 기준: 정상
+ok   [DENY] ROOT 가 git 저장소가 아님
+ok   [DENY] 훅 복사본에서 fix_guard_check.py 부재
+   인자 부족 rc=2
+   초안 없음 rc=2
+ok   [DENY] 기존 1: 마커 없음
+ok   [DENY] 기존 2: -m 사용
+ok   [DENY] 기존 3: 해시 불일치
+ok   [DENY] 기존 4: --amend
+ok   [DENY] 기존 4b: --no-verify
+ok   [DENY] 기존 5: 마커 조작
+ok   [allow] 기존: 정상 feat 커밋 허용
+ok   [allow] stage-gate: 새 템플릿으로 app/ 쓰기
+ok   [allow] stage-gate: 옛 템플릿
