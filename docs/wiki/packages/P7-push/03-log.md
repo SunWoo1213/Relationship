@@ -72,7 +72,7 @@
 - 남은 것 · 다음 단위: U7 수용 기준 기계 검증·문서(`RUNNING.md` 한 절 포함, 이때 U6 행 hash 와 registry pending 정리) -- backend-agent, L-004 승인 먼저. U8 은 실제 브라우저·실발송.
 - Refs: P7-push S3.6 원칙5
 
-## 2026-10-08 · docs(P7-push): U7 수용 기준 기계 검증·문서 — pending
+## 2026-10-08 · docs(P7-push): U7 수용 기준 기계 검증·문서 — b73aaf0
 - 변경: 제품 코드 변경 0. `docs/RUNNING.md` 에 "웹푸시 켜기·확인하기" 한 절(VAPID 키를 사용자가 만드는 명령·`.env` 이름 4개(값 없음)·서버 기동·`/push-dev/` 구독·`POST /briefings/run`·trace 조회·macOS 알림 권한·끄는 법)과 위 "웹푸시는 P7-push" 문단 정정. `registry.md` — U1~U5 행이 빠져 있던 것을 새로 채우고(`app/push/types.py`·`subscriptions.py`·`payload.py`·`sender.py`·`notifier.py`, `app/settings.py`·`routes.py`/`schemas.py`·`deps.py` 비고, 테스트 5파일) 기존 pending 행(U5 비고 3곳 `55fc0f3`, U6 3행 `572045a`)을 실제 해시로. `01-plan.md` U7 `[x]`.
 - 이유(기획서·카드 연결): 01-plan U7 / 판정 표 1~25행 / "지킬 불변식" 절 / S3.6 R12.
 - 결과: 판정 표 **1~22행 전부 통과**(`evidence/20261008-1536-u7-judgment-table.txt`, 행별 명령은 표의 파일::테스트). 23행(불변식 grep 8종) 전부 기대값, 24행 `alembic check`="No new upgrade operations detected."·`tools_check` 7/7. 25행 전체 회귀 **1873 passed, skip 0**(기준선 1724 이상). ruff(CI 범위) All checks passed · mypy 새 오류 없음(38/38, 기준선 갱신 안 함). 증거 `evidence/20261008-1536-u7-invariants-nochange.txt`·`-u7-regression.txt`.
@@ -81,3 +81,11 @@
 - RUNNING.md 키 생성 방법: U1 에서 확인한 `py-vapid==1.9.4`(`pywebpush` 의존성)의 `Vapid().generate_keys()` 를 쓰는 파이썬 한 줄(개인키 32바이트 원시값 base64url 43자, 공개키 비압축 점 base64url 87자 — 에이전트는 값을 출력하지 않고 길이·`Vapid.from_string` 왕복 일치만 확인). 에이전트가 키 값이 나오는 명령을 실행해 화면에 낸 적 없음.
 - 남은 것 · 다음 단위: U8 데스크톱 Chrome 실발송 확인(사용자·메인 세션, 판정 표 26행, RUNNING.md 절의 ①~⑧). 그 뒤 verifier 04-review.
 - Refs: P7-push S3.6 R12 원칙8 원칙9
+
+## 2026-10-10 · docs(P7-push): U8 데스크톱 Chrome 실발송 확인 — pending
+- 변경: 제품 코드 변경 0. 증거 파일 1개(`evidence/20261010-1950-u8-chrome-manual.txt`), `01-plan.md` U8 `[x]`, U7 행 hash `b73aaf0`.
+- 실행 주체: 사용자 — VAPID 키 생성(RUNNING.md ① 명령 직접 실행)·`.env` 4줄·macOS 알림 권한·`/push-dev/` 구독(권한 허용)·화면 확인. 메인 세션 — Docker 기동·서버 기동(포트 8765, `.env` 는 셸에 불러오기만, 값 출력 없음)·`POST /chat`·`POST /answers/4`·DB 조회·`POST /briefings/run`. 메인 세션은 키 생성 명령을 실행하지 않았다.
+- 결과: 판정 표 26행 다섯 항목 모두 증거 파일에 있음 — ③ 구독 1행(`fcm.googleapis.com`) · ⑤ `push == "sent"` · ⑥ trace 232 `status_code 201` · ⑦ 수신 기록 `2026-10-10T10:49:55.624Z schedule_id=5 tag=schedule-5` · ⑧ 사용자 확인 "브리핑이 준비됐다고 떴어, 수신기록 줄이 생겼어". `briefed_at` 기록됨. 최종 판정은 verifier.
+- 참고: 일정 준비 발화에서 에이전트가 "민수" 를 자동 등록하지 않고 `ask_user(kind="new_person")` 로 물었다(원칙1·2 그대로). 브리핑 `lines` 빈 것은 저장된 사실이 일정 1건뿐이라서. RUNNING.md 예시 포트(8000)와 실행 포트(8765) 차이는 04-review 소견 후보.
+- 남은 것 · 다음 단위: verifier 04-review(24행 기준 해석 포함, L-004 승인 먼저) → 복기자료 08-웹푸시 갱신.
+- Refs: P7-push S3.6 R12 원칙8

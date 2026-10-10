@@ -435,3 +435,5 @@
 - 2026-10-08 15:03 | PUSH-dev2 | origin dev2 55fc0f3 (실험 푸시)
 - 2026-10-08 15:23 | COMMIT | 572045a feat(P7-push): 웹푸시 구독을 만들어 보는 개발·확인 전용 페이지 /push-dev/ 를 추가한다
 - 2026-10-08 15:23 | PUSH-dev2 | origin dev2 572045a (실험 푸시)
+- 2026-10-08 15:48 | COMMIT | b73aaf0 docs(P7-push): 수용 기준 1~25행을 기계로 확인하고 웹푸시 켜는 법을 RUNNING 에 적는다
+- 2026-10-08 15:48 | PUSH-dev2 | origin dev2 b73aaf0 (실험 푸시)

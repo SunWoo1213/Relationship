@@ -1,0 +1,63 @@
+# P7-push U8 — 데스크톱 Chrome 실발송 확인 (판정 표 26행)
+# 실행: 2026-10-10 (KST 19:4x) · 사용자 + 메인 세션 · macOS · 데스크톱 Chrome
+# 키: 사용자가 RUNNING.md 웹푸시 절 ① 명령을 직접 실행해 .env 에 4줄 입력(VAPID_PUBLIC_KEY·VAPID_PRIVATE_KEY·VAPID_SUBJECT·PUSH_DEV_PAGE_ENABLED=1).
+#      메인 세션은 키 생성 명령을 실행하지 않았고 .env 를 읽거나 값을 출력하지 않았다(셸에 불러오기만 함). 이 파일에 키·엔드포인트 경로·암호 키 없음.
+
+## 준비
+- Docker Desktop 기동 → capstone2-postgres-1 Up (DB relationship, 5433)
+- 서버: set -a; . ./.env; set +a; .venv/bin/uvicorn app.main:create_app --factory --port 8765
+  로그: "Application startup complete." / GET /push-dev/ 200 OK  (PUSH_DEV_PAGE_ENABLED=1 반영)
+- ⑤ 일정 준비: POST /chat {"utterance":"내일 저녁 7시에 민수랑 저녁 약속 있어"}
+  → stop_reason "ask_user", kind "new_person" (question_id 4) — 자동 등록하지 않고 물음
+  POST /answers/4 {"answer":"친구로 기억할게요"} → stored {persons:1, events:0, schedules:1}
+  schedules: id=5 | 민수 | 저녁 약속 | 2026-10-11 10:00:00+00 (KST 19:00) | briefed_at 비어 있음
+
+## ③ 구독 행 1개 (엔드포인트는 호스트만)
+SELECT id, user_id, created_at, <endpoint 호스트> FROM push_subscriptions;
+ id | user_id |          created_at           | endpoint_host
+  1 | local   | 2026-10-10 10:49:18.888874+00 | fcm.googleapis.com
+(1 row)
+- 사용자: /push-dev/ 에서 "알림 받기" → 권한 허용 → 페이지에 "구독 저장됨 id=1"
+
+## ⑤ 발송 응답 push == "sent"
+POST /briefings/run {"schedule_id": 5}  (briefing 본문 필드는 생략해 출력)
+{
+ "run_id": "briefing:008c046d-dd56-44e9-aca4-09979a3c0f2b",
+ "generated_at": "2026-10-10T10:49:53.931602Z",
+ "briefings": [
+  {"schedule_id": 5, "person_id": 7, "composer": "llm",
+   "pattern_sentences": [], "lines": [], "suggestion": null,
+   "push": "sent"}
+ ],
+ "skipped": []
+}
+- lines 가 빈 것은 민수에 대해 저장된 사실이 이 일정 하나뿐이기 때문(결함 아님).
+
+## ⑥ push_send trace — results[].status_code 2xx
+SELECT id, session_id, input, output FROM agent_traces WHERE tool_name='push' AND step='push_send' ORDER BY id DESC LIMIT 1;
+ id=232 | session_id=push:06a320a1-49d8-4729-b4e2-f67ef68b3b7f
+ input  = {"person_id": 7, "schedule_id": 5, "subscription_ids": [1]}
+ output = {"ttl": 83404, "reason": null, "status": "sent",
+           "payload": {"body": "10/11 19:00 · 브리핑이 준비됐어요", "title": "민수 · 저녁 약속"},
+           "removed": [], "results": [{"outcome": "sent", "status_code": 201, "subscription_id": 1}],
+           "schedule_id": 5}
+- trace 에는 구독 id·응답 코드만 남고 엔드포인트 URL·암호 키·VAPID 키 없음.
+SELECT id, briefed_at FROM schedules WHERE id=5;
+  5 | 2026-10-10 10:49:53.941258+00   (결정 C — 발송 후 briefed_at 기록)
+
+## ⑦ 확인 페이지 수신 기록 줄 (사용자가 페이지에서 복사)
+2026-10-10T10:49:55.624Z schedule_id=5 tag=schedule-5
+- 발송(10:49:53.93Z) 후 약 1.7초 뒤 서비스 워커 도착.
+
+## ⑧ 사용자 확인 문장 (원문 그대로)
+"브리핑이 준비됐다고 떴어, 수신기록 줄이 생겼어"
+- macOS 알림 권한: 사용자가 시스템 설정 → 알림 → Google Chrome 허용을 켰다고 확인("알림 권한도 켰어요").
+- 판정: 전달됨 + 화면 표시됨.
+
+## 26행 판정
+③ 구독 행 1개(호스트만) ✔ · ⑤ push == "sent" ✔ · ⑥ status_code 201 ✔ · ⑦ 수신 기록 줄(시각·schedule_id·tag) ✔ · ⑧ 사용자 확인 문장 ✔ → 다섯 개 모두 이 파일에 있음.
+최종 판정은 verifier 04-review 몫.
+
+## 참고 (소견 후보)
+- RUNNING.md ③⑥ 예시는 포트 8000, 이번 실행은 8765(HANDOFF 지정). 문서 예시 포트 정리 여부는 04-review 에서.
+- 서버가 .env 를 읽지 않아 Docker·셸 불러오기를 수동으로 해야 함(RUNNING.md ③에 이미 적혀 있음).
