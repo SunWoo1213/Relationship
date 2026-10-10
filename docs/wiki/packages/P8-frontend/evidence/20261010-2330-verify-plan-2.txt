@@ -1,0 +1,14 @@
+$ bash .claude/scripts/verify-plan.sh P8-frontend   (메인 세션 실행, architect 개정본 — 사용자 결정 반영 뒤)
+1회차(개정 직후): FAIL=2 WARN=0
+  FAIL  없음: docs/wiki/packages/P8-frontend/02-plan-verify.md
+  FAIL  Refs 없음: - [ ] U0 하네스 — frontend-agent 신설·위임 게이트·FIX 게이트 `web/` 확대 —
+  원인: verify-plan.sh 48행은 작업 단위 첫 줄에서만 'Refs:' 를 찾는다. U0 은 Refs 가 하위 줄(판정 줄 끝)에만 있었다.
+  조치(메인 세션, 형식만): 01-plan 87행 U0 첫 줄 끝에 같은 "/ Refs: P8-frontend L-002 L-004 원칙5" 를 덧붙임. 내용 무변경.
+2회차: FAIL=1 WARN=0 · PASS 70줄
+  FAIL  없음: docs/wiki/packages/P8-frontend/02-plan-verify.md   ← verifier 계획 검증 전 정상 상태
+  PASS  Refs 있음: U0 ~ U10 (11줄) · backlog 일치 · 의존 완료 P5-loop·P6-briefing·P6-memory·P7-push · P4 게이트 · registry 중복 없음(오프라인 예정 파일 3개 제거 반영)
+
+메인 세션 추가 확인 (01-plan "확인 필요" 1항):
+$ grep -n "docs/\*|.claude/\*" .claude/hooks/stage-gate.sh
+89:  docs/*|.claude/*|.githooks/*|.github/*|reports/*|CLAUDE.md|README.md|.gitignore|.gitattributes|.env.example|LICENSE) exit 0 ;;
+→ 면제 목록에 web/ 없음 = web/ 쓰기는 활성 작업·계획 검증·승인 게이트 대상(이미 막힘). U0 ⑨(stage-gate 에 web/ 추가)는 불필요로 보이며, U0 에서 test-guards 로 "활성 작업 없음 → web/ 쓰기 거부" 를 실제로 확인해 03-log 에 기록한다.

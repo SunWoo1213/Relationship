@@ -1,0 +1,149 @@
+== 재검증(개정 2) — verifier (fable) 직접 실행, 2026-10-10 23:35 ==
+명령: bash .claude/scripts/verify-plan.sh P8-frontend
+(출력 그대로)
+
+== verify-plan P8-frontend  (2026-10-10 23:35) ==
+PASS  존재: docs/wiki/packages/P8-frontend/01-plan.md
+PASS  존재: docs/wiki/packages/P8-frontend/02-plan-verify.md
+PASS  카드 존재: D1
+PASS  카드 존재: D7
+PASS  패키지 id 등록됨: P11-demo
+PASS  패키지 id 등록됨: P2-tools
+PASS  패키지 id 등록됨: P3-baselines
+PASS  패키지 id 등록됨: P5-loop
+PASS  패키지 id 등록됨: P6-briefing
+PASS  패키지 id 등록됨: P7-push
+PASS  패키지 id 등록됨: P8-frontend
+PASS  패키지 id 등록됨: P9-infra
+PASS  검증 항목 존재: R12
+PASS  검증 항목 존재: R19
+PASS  검증 항목 존재: R8
+PASS  Refs 있음: - [ ] U0 하네스 — frontend-agent 신설·위임 게이트·FIX 게이트 `web/` 확대 —
+PASS  Refs 있음: - [ ] U1 인물 목록·카드 조회 API — [backend-agent] `GET /persons` →
+PASS  Refs 있음: - [ ] U2 원문 조회 API(결정 F 확정) — [backend-agent] `GET /events/{
+PASS  Refs 있음: - [ ] U3 대기 질문·브리핑 조회 API — [backend-agent] `GET /questions/
+PASS  Refs 있음: - [ ] U4 프론트 골격·디자인 토큰·도구·CI — [frontend-agent] 첫 명령 `node -
+PASS  Refs 있음: - [ ] U5 채팅 화면 + 확인 칩 — [frontend-agent] 발화 입력·전송(`POST /api
+PASS  Refs 있음: - [ ] U6 인물 카드 화면 + 원문 펼치기 — [frontend-agent] `#/persons` 인물
+PASS  Refs 있음: - [ ] U7 브리핑 화면 + 수동 브리핑 버튼 — [frontend-agent] `#/briefings`
+PASS  Refs 있음: - [ ] U8 PWA·푸시 구독 — [frontend-agent] `manifest.webmanifest`
+PASS  Refs 있음: - [ ] U9 E2E·자동 판정 전체·문서 — [frontend-agent: E2E·프론트 행·불변식 gr
+PASS  Refs 있음: - [ ] U10 사람 점검 — 실서버·실 LLM·데스크톱 Chrome — [사용자·메인 세션] (에이전트
+PASS  backlog 일치: 채팅 확인 칩, 카드 원문 펼치기, 브리핑 화면
+PASS  의존 완료: P5-loop
+PASS  의존 완료: P6-briefing
+PASS  의존 완료: P6-memory
+PASS  의존 완료: P7-push
+PASS  P4 게이트 통과 (P4b-er-redesign)
+PASS  검증자 = verifier (L-002)
+PASS  점검표 8행 존재
+PASS  점검표 모든 행에 판정(통과/보류) 있음
+PASS  보류 0건
+PASS  결과: 줄 존재
+PASS  점검표 모든 행에 근거 있음
+PASS  registry 중복 없음: .claude/agents/frontend-agent.md
+PASS  registry 중복 없음: app/api/read.py
+PASS  registry 중복 없음: tests/test_api_read_persons.py
+PASS  registry 중복 없음: tests/test_api_read_raw.py
+PASS  registry 중복 없음: tests/test_api_questions_pending.py
+PASS  registry 중복 없음: tests/test_api_read_briefings.py
+PASS  registry 중복 없음: web/package.json
+PASS  registry 중복 없음: web/package-lock.json
+PASS  registry 중복 없음: web/tsconfig.json
+PASS  registry 중복 없음: web/vite.config.ts
+PASS  registry 중복 없음: web/index.html
+PASS  registry 중복 없음: web/tailwind.config.ts
+PASS  registry 중복 없음: web/components.json
+PASS  registry 중복 없음: web/src/main.tsx
+PASS  registry 중복 없음: web/src/App.tsx
+PASS  registry 중복 없음: web/src/routes.ts
+PASS  registry 중복 없음: web/src/styles/tokens.css
+PASS  registry 중복 없음: web/src/api/client.ts
+PASS  registry 중복 없음: web/src/api/types.ts
+PASS  registry 중복 없음: web/src/session.ts
+PASS  registry 중복 없음: web/src/screens/ChatScreen.tsx
+PASS  registry 중복 없음: web/src/screens/PersonCardScreen.tsx
+PASS  registry 중복 없음: web/src/screens/BriefingScreen.tsx
+PASS  registry 중복 없음: web/src/push.ts
+PASS  registry 중복 없음: web/public/sw.js
+PASS  registry 중복 없음: web/public/manifest.webma
+PASS  registry 중복 없음: web/public/icon-192.png
+PASS  registry 중복 없음: web/public/icon-512.png
+PASS  registry 중복 없음: web/src/__tests__/chat.test.tsx
+PASS  registry 중복 없음: web/src/__tests__/card.test.tsx
+PASS  registry 중복 없음: web/src/__tests__/briefing.test.tsx
+PASS  registry 중복 없음: web/src/__tests__/routes.test.ts
+PASS  registry 중복 없음: web/src/__tests__/sw.test.ts
+PASS  registry 중복 없음: web/src/__tests__/push.test.ts
+PASS  registry 중복 없음: web/src/__tests__/network.test.ts
+PASS  registry 중복 없음: web/playwright.config.ts
+PASS  registry 중복 없음: web/e2e/chat.spec.ts
+PASS  registry 중복 없음: web/e2e/card.spec.ts
+PASS  registry 중복 없음: web/e2e/briefing.spec.ts
+PASS  registry 중복 없음: web/e2e/fixtures/api.ts
+== 결과: FAIL=0 WARN=0 ==
+
+(참고: 1차와 달리 `web/src/__tests__/network.test.ts` 1행이 늘었다 — R-5 반영분. "점검표 8행" 검사는 이 재검증 시점의 02-plan-verify 1차 본문을 센 것이다.)
+
+== git 기록 (bash .claude/scripts/gitlog.sh P8-frontend P8, 23:35) ==
+dev2 HEAD 50fd7fc [origin/dev2] (= 01-plan 8행 시작 해시, origin 과 같음) · dev f9500fe · main(origin) 0e943eb
+태그 'P8-frontend' 커밋: 없음 (01-plan 9행과 일치)
+미커밋: M docs/wiki/HANDOFF.md · M docs/wiki/journal.md · ?? docs/wiki/packages/P8-frontend/ (문서만, 제품 코드 0)
+
+== R-1 해소 판정 — 실제 코드 위치 재확인 ==
+$ grep -n -E 'app/|alembic/|web/' .claude/scripts/fix_guard_check.py
+22:    2. `git diff --cached --name-only` 에 `app/` 또는 `alembic/` 로 시작하는
+45:# 적고 app/ 를 바꾸는 커밋은 전부 FIX 커밋으로 본다. 대소문자 무시, `FIX-27`→027 정규화,
+180:    touches_product_code = any(p.startswith("app/") or p.startswith("alembic/") for p in staged)
+203:            "[fix-guard] 제품 코드(app/·alembic/)를 바꾸는 {0} 커밋은 verifier 검증이 "
+$ grep -n -E "app/|alembic/|web/|fix_guard_check" .claude/hooks/commit-guard.sh
+11:#   6. fix(FIX-nnn)/test(FIX-nnn) 초안이 app/·alembic/ 을 스테이징했으면
+71:  # 더 붙이는 것)으로 git add 없이 커밋 대상을 늘리면 "스테이징된 파일에 app/ 없음" 으로
+100:  # 6. FIX-027: 제품 코드(app/·alembic/)를 바꾸는 fix(FIX-nnn)/test(FIX-nnn) 커밋은
+106:  fix_guard_out="$("$HOOK_PY" "$(dirname "$0")/../scripts/fix_guard_check.py" "$ROOT" "$DRAFT" 2>&1)"
+→ 판정 코드는 fix_guard_check.py 180행 하나. commit-guard.sh 의 app/·alembic/ 은 11·71·100행 전부 '#' 주석.
+$ grep -n 'startswith("web/")' .claude/scripts/fix_guard_check.py
+(0건 — 아직 U0 전이므로 정상)
+$ ls .claude/hooks/approve-commit.sh → 존재 (01-plan 77·91행 경로 `.claude/hooks/approve-commit.sh` 와 일치)
+$ grep -n "GATED" .claude/hooks/delegate-guard.sh → 15:GATED="architect backend-agent eval-agent verifier"
+$ grep -n "web/" .claude/hooks/stage-gate.sh → 0건 (면제 목록 88~89행 방식 — 01-plan 89행 "0건이 정상" 과 일치)
+
+== R-1 해소 판정 — 01-plan 개정 2 의 대상 파일 ==
+$ grep -n "fix_guard_check.py" docs/wiki/packages/P8-frontend/01-plan.md | cut -d: -f1 | tr '\n' ' '
+24 77 88 90 91 233 372 414
+$ grep -n 'startswith("web/")' docs/wiki/packages/P8-frontend/01-plan.md | cut -d: -f1 | tr '\n' ' '
+77 88 91
+→ F-ce7d18 해결 단계 1행 기대 출력("첫 명령에 77·88·91행 + 24·233·372·414행", "둘째 명령에 88·91행")을 넘어선다(77행에도 있음).
+
+== R-1 해소 판정 — "주석만 고쳐도 통과" 가 되는지 직접 시험 (scratchpad 격리 저장소, 제품 파일 무변경) ==
+저장소: <scratchpad>/fg (git init, web/x.ts·app/a.py, 초안 "fix(FIX-999): web 만 바꾸는 FIX", FIX-999.md 없음)
+시험 1  web/x.ts 스테이징 + 현재 fix_guard_check.py            → exit=0 (통과 — 지금 게이트는 web/ 를 모른다)
+시험 2  app/a.py 스테이징 + 현재 fix_guard_check.py            → exit=1 "[fix-guard] 제품 코드(app/·alembic/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: …" (거부 — 판정은 180행 조건)
+시험 3  203행 메시지만 "app/·alembic/·web/" 로 바꾼 복사본 + web/x.ts → exit=0 (메시지·주석만으로는 게이트가 안 열린다 → `grep "web/"` 만으로는 판정 불가)
+시험 4  180행에 `or p.startswith("web/")` 를 넣은 복사본 + web/x.ts   → exit=1 (거부 — 01-plan 88행 ④ 의 수정이 실제로 게이트를 연다)
+시험 5  파일 맨 위에 주석 `# TODO: p.startswith("web/")` 한 줄만 더한 복사본 + web/x.ts → grep -c 'startswith("web/")' = 1 이지만 exit=0
+        → 01-plan 91행의 grep 판정 단독으로는 주석에 속을 수 있다. 같은 91행이 요구하는 test-guards ⑤ "web/ FIX 커밋 거부/허용" 실제 시험과 **묶음으로만** 판정이 성립한다(04-review 에서 둘 다 요구 — §5 새 소견 N-1).
+
+== 권고 반영 확인 (01-plan 개정 2) ==
+R-2  24·77·88⑤·89·372행: stage-gate.sh 무수정, `grep web/ stage-gate.sh` 판정 삭제, test-guards "활성 작업 없음 → web/x.ts 쓰기 거부" 1경우 추가 (408행 gate 헬퍼·367행 sg_gate 선례 확인)
+R-3  90행 적용 순서 ②·③ → ① → ④~⑧, "(다) PASS 전 frontend-agent 위임 금지" 03-log 기록 · 371행 리스크 1
+R-4  367행 불변식 10 `grep -rlE "Sheet|Dialog|Drawer" web/src --include=*.tsx | grep -v "^web/src/components/ui/"` → 1파일 · 346행 결정 N 참조
+R-5  154행 27b(Vitest `fetch('https://example.invalid')` reject + Playwright `page.on('request')` URL 전부 preview 호스트/`/api/`) · 69행 network.test.ts · 100행 U9 · 120행 서문 · 299행 결정 J
+R-6  136행 11행 `git diff --stat 50fd7fc -- app alembic ':!app/api/routes.py' ':!app/api/schemas.py' ':!app/api/read.py'`
+     $ git diff --stat 50fd7fc -- app alembic ':!app/api/routes.py' ':!app/api/schemas.py' ':!app/api/read.py' → 빈 출력, exit 0 (지금 무변경)
+     $ git ls-files -- app alembic ':!app/api/routes.py' ':!app/api/schemas.py' ':!app/api/read.py' | grep '^app/api/' → app/api/__init__.py, app/api/deps.py  (app/api 전체 4파일 중 routes·schemas 만 빠짐 → 의도대로. read.py 는 아직 없음)
+R-7  274행 "R-7 은 택하지 않음(사용자 2026-10-10 — 권고 묶음에서 제외, S3.1 카드 무변경)" 한 줄 있음
+R-8  95행 U4(npx 버전 고정·npm 스크립트 셸 삭제 금지) · 227행 초안 ⑦⑧ · 373행 리스크 3(settings.json allow 는 사용자 결정) · 374행 리스크 4
+R-9  94행 U3 `tool_name='briefing' AND step='briefing_compose'` 둘 다, `output->>'schedule_id'`·`'person_id'` (run.py 224~225행) · 135행 10행 부정 케이스(briefing_run·briefing_error 혼입, 일정 3 은 briefing_error 만)
+     $ sed -n '223,225p' app/briefing/run.py → 223 `compose_output: dict[str, Any] = {` / 224 `"schedule_id": schedule.id,` / 225 `"person_id": person_id,`
+     $ grep app/briefing/types.py → BRIEFING_TRACE_TOOL_NAME="briefing"(215행) · STEP_BRIEFING_RUN="briefing_run"(219) · STEP_BRIEFING_COMPOSE="briefing_compose"(223) · STEP_BRIEFING_ERROR="briefing_error"(229); run.py 155~156·260~261·322~323행이 세 step 을 같은 tool_name 으로 기록 → 10행 부정 케이스가 실제 데이터 모양과 맞는다
+R-10 164행 32행 "수정 반영 횟수: n" + 04-review n ≤ 1 · 377행 리스크 7
+R-11 133행 8행 "`[]` + DB 쓰기 0(요청 전후 pending_questions·agent_traces 행 수 변화 0)" — app/api/deps.py 207~208행 `if x_session_id is None: return str(uuid.uuid4())` (저장 없음) → 행 수 비교로 판정 가능
+R-12 382행 리스크 12 (하네스 FIX 후보, 범위 밖) — 이번 verify-plan 출력에도 `web/public/manifest.webma` 그대로
+R-13 100행 U9 "커밋은 2개가 될 수 있다(U9a·U9b — 03-log 에 해시 2개)"
+
+== 개정 2 번호 체계 ==
+자동 판정 행(1~28·17b·27b): 30 / 사람 점검 행(29~32): 4 / 불변식 1~10 / 체크리스트 1~20 / 리스크 1~12 / U 첫 줄 Refs 11/11
+"자동 30행" 표기: 100·101·120·297행 일관 / 원칙5·7 경계: 37행(네 번째 화면)·40행(경계 문장)·319행(원칙7 경계 문장)·체크리스트 18항 유지
+수용 기준: "- 채팅 확인 칩, 카드 원문 펼치기, 브리핑 화면" = backlog 88행 (PASS backlog 일치)
+02-plan-verify 점검표 행 수(재검증 전): 8

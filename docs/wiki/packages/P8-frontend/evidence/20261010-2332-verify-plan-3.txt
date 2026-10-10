@@ -1,0 +1,23 @@
+$ bash .claude/scripts/verify-plan.sh P8-frontend   (메인 세션 실행, 01-plan 개정 2 — verifier 소견 R-1~R-13 반영 뒤, verifier 재검증 전)
+== verify-plan P8-frontend  (2026-10-10 23:32) ==
+PASS  존재: docs/wiki/packages/P8-frontend/01-plan.md
+PASS  존재: docs/wiki/packages/P8-frontend/02-plan-verify.md
+PASS  카드 존재: D1
+PASS  카드 존재: D7
+PASS  패키지 id 등록됨: P11-demo · P2-tools · P3-baselines · P5-loop · P6-briefing · P7-push · P8-frontend · P9-infra (8줄)
+PASS  검증 항목 존재: R12 · R19 · R8 (3줄)
+PASS  Refs 있음: U0 ~ U10 (11줄)
+PASS  backlog 일치: 채팅 확인 칩, 카드 원문 펼치기, 브리핑 화면
+PASS  의존 완료: P5-loop · P6-briefing · P6-memory · P7-push
+PASS  P4 게이트 통과 (P4b-er-redesign)
+PASS  검증자 = verifier (L-002)
+PASS  점검표 8행 존재
+PASS  점검표 모든 행에 판정(통과/보류) 있음
+PASS  보류 0건
+PASS  결과: 줄 존재
+PASS  점검표 모든 행에 근거 있음
+PASS  registry 중복 없음: 계획 예정 파일 40개
+== 결과: FAIL=0 WARN=0 ==
+
+주의(메인 세션): "보류 0건" 은 점검표 8행 판정 열 기준이다. 02-plan-verify §4 `결과:` 는 아직 verifier 1차 판정 `보류`([필수] R-1 F-ce7d18) 그대로이며, 통과 전환은 verifier 재검증 몫이다.
+R-1 반영 확인: grep -n "fix_guard_check.py" 01-plan.md → 24·77·88·90·91·233·372·414행.

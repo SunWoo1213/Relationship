@@ -447,3 +447,6 @@
 - 2026-10-10 21:41 | PUSH-dev2 | origin dev2 50fd7fc (실험 푸시)
 - 2026-10-10 23:55 | NOTE | `50fd7fc` CI run 38052897284 세 job 실패 발견(개발과정 해설 작성 에이전트 보고, 메인 세션 재현) — test-guards R-27-5 "활성 작업 있으면 allow" 4건이 실제 저장소 CURRENT active 에 의존, P7 완료로 active none 이 되자 실패. 메인 세션이 완료 커밋 뒤 CI 를 확인하지 않아 늦게 발견 | FIX-030
 - 2026-10-11 00:15 | FIX | **FIX-030 완료** — test-guards 의 실제 저장소 의존 시험 4건을 격리 저장소(active FIX-998)로 바꾸고 active none 대조 deny 4건 추가. 수정 전 active none 에서 실패 4 → 후 0, 실제 저장소 active FIX-030·none 둘 다 실패 0(ok 215/216). verifier 통과([필수] 0, 변이 3건). 훅 무변경 | FIX-030 FIX-027 R-27-5
+- 2026-10-11 00:16 | COMMIT | c37c99a fix(FIX-030): 훅 자가 시험이 저장소의 현재 작업 상태에 따라 실패하던 것을 고친다
+- 2026-10-11 00:16 | PUSH-dev2 | origin dev2 c37c99a (실험 푸시)
+- 2026-10-11 00:40 | START | P8-frontend — 사용자 계획 승인(2026-10-10, 02-plan-verify 재검증 `통과`, 결정 A~N 확정·오프라인 제외, 조건: U1~U9 모든 단위 커밋 전 verifier 리뷰 · 디자인 추가 수정은 추후 별도 작업). FIX-030 `c37c99a`(CI run 38062960426 세 job success) 뒤 활성화. active: P8-frontend. 다음 U0 하네스(훅 diff 계획 먼저 승인) | P8-frontend R12 R19 R8 원칙5
