@@ -3,7 +3,7 @@
 > /commit 이 커밋마다 항목 하나를 **아래에** 붙인다(LLM 작성). 이어서 작업하는 에이전트는 마지막 두 항목만 읽으면 된다.
 > 형식은 고정. 지우거나 고쳐 쓰지 않는다.
 
-## 2026-10-11 00:40 · docs(P8-frontend): 프론트 3화면 계획을 검증·승인까지 마치고 활성화한다 · pending
+## 2026-10-11 00:40 · docs(P8-frontend): 프론트 3화면 계획을 검증·승인까지 마치고 활성화한다 · ab29daa
 - 변경: 01-plan(architect 초안 → 사용자 결정 반영 개정 1 → verifier 소견 반영 개정 2), 02-plan-verify(verifier 1차 보류 [필수] R-1 → 재검증 통과, 사용자 승인 기록), 05-remediation(`F-ce7d18` 해소), 증거 8개(메인 세션 3 · verifier 5), 이 03-log 생성. CURRENT active P8-frontend.
 - 이유(기획서·카드 연결): backlog P8 첫 줄 수용 기준 "채팅 확인 칩, 카드 원문 펼치기, 브리핑 화면". 사용자 확정 결정 A~N(A frontend-agent 신설 sonnet · C 같은 출처 + `/api` 접두 · F 원문 조회 API 2개 · L 챗봇형 UI Tailwind+shadcn/ui · M 오프라인 제외 — 기획서 부록 A 385행 · N ChatGPT 식 왼쪽 사이드바).
 - 정합성 확인: 원칙 / D / S / 보안 — verifier 점검표 8행 통과(1차부터). 원칙5(화면 3개)·원칙7(경계 문장)·원칙9(조회는 판정 아님) 해석은 02-plan-verify §2-1 판정. 오프라인은 CR 없이 범위에서 제외.
