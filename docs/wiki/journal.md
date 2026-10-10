@@ -437,3 +437,6 @@
 - 2026-10-08 15:23 | PUSH-dev2 | origin dev2 572045a (실험 푸시)
 - 2026-10-08 15:48 | COMMIT | b73aaf0 docs(P7-push): 수용 기준 1~25행을 기계로 확인하고 웹푸시 켜는 법을 RUNNING 에 적는다
 - 2026-10-08 15:48 | PUSH-dev2 | origin dev2 b73aaf0 (실험 푸시)
+- 2026-10-10 19:57 | COMMIT | 6428180 docs(P7-push): 데스크톱 Chrome 에 실제 웹푸시 알림이 뜨는 것을 확인해 기록한다
+- 2026-10-10 19:57 | PUSH-dev2 | origin dev2 6428180 (실험 푸시)
+- 2026-10-10 20:45 | FIX | **FIX-029 완료** — `app.push` 를 먼저 import 하면 순환 import 로 실패하던 것(P7-push 04-review 에서 verifier 발견, U5 `55fc0f3` 도입)을 `app/briefing/scheduler.py` 의 `notifier_from_env` import 를 `default_run_once()` 안으로 옮겨 끊었다. 새 `tests/test_import_order.py`(서브프로세스 단독 import 9모듈) — 수정 전 6 failed → 후 9 passed. 전체 **1882 passed skip 0** · mypy 새 오류 0 · verifier 리뷰 통과([필수] 0) | FIX-029 F-c7c1e5 P7-push S3.6

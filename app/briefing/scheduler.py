@@ -76,7 +76,6 @@ from collections.abc import Callable
 from app.briefing.compose import composer_from_env
 from app.briefing.run import run_briefings
 from app.db.session import session_scope
-from app.push.notifier import notifier_from_env
 from app.settings import BRIEFING_INTERVAL_SECONDS, app_user_id
 from app.tools.context import ToolContext
 
@@ -89,6 +88,10 @@ RunOnce = Callable[[], None]
 def default_run_once() -> None:
     """주기 작업 한 번의 실제 실행(모듈 docstring "실행 하나" 절). 운영
     경로가 `start_scheduler_task()` 를 통해 기본으로 쓰는 함수다."""
+
+    # 지연 import -- 모듈 상단에 두면 `app.push` 를 먼저 올릴 때
+    # push.notifier -> briefing 패키지 -> 이 모듈 -> push.notifier 로 순환한다(FIX-029).
+    from app.push.notifier import notifier_from_env
 
     with session_scope() as session:
         ctx = ToolContext(

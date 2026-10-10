@@ -1,0 +1,31 @@
+FIX-029 증거 (2026-10-10, dev2, backend-agent)
+
+## 1. 대조 실험 (표 C) -- A 적용 전, tests/test_import_order.py 만 먼저 만든 상태
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_import_order.py -q
+FAILED ...[app.push]
+FAILED ...[app.push.notifier]
+FAILED ...[app.push.sender]
+FAILED ...[app.push.payload]
+FAILED ...[app.push.subscriptions]
+FAILED ...[app.push.types]
+6 failed, 3 passed in 2.88s
+(app.briefing / app.briefing.scheduler / app.main 은 통과 -- 증거 20261010-2005 와 일치)
+실패 사유(발췌): ImportError: cannot import name 'notifier_from_env' from partially
+initialized module 'app.push.notifier' (most likely due to a circular import)
+  at app/briefing/scheduler.py line 79
+
+## 2. A 적용 후 (scheduler.py 지연 import)
+$ for m in app.push app.push.notifier app.push.sender app.push.payload app.push.subscriptions app.push.types app.briefing app.briefing.scheduler app.main; do .venv/bin/python -c "import $m" || echo "FAIL $m"; done
+출력: FAIL 줄 0 (9개 모두 exit 0)
+
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_import_order.py tests/test_push_wiring.py -q
+18 passed in 3.09s   (import_order 9 + push_wiring 9)
+
+## 3. 전체 회귀 (표 D)
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -rs
+1882 passed, 1 warning in 22.66s   (= 1873 + 9, skip 0)
+
+## 4. 정적 검사
+$ .venv/bin/ruff check app tests scripts evaluation  -> All checks passed!
+$ .venv/bin/mypy app tests/test_import_order.py  -> Found 39 errors in 15 files
+  scheduler.py / test_import_order.py 에서 난 오류 0건 (기존 오류는 app/main.py 등 다른 파일)

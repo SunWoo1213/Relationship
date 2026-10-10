@@ -1,0 +1,66 @@
+review-FIX-029 증거 2/2 — 회귀·정적 검사·순환 전수 조사·CI 조건 모사 (verifier, 2026-10-10 20:3x, dev2, 기준 HEAD 6428180 + 미커밋 diff)
+
+## 1. 작업 트리 — 바뀐 코드 파일은 2개뿐 (문서·증거 제외)
+$ git status --short  (docs/wiki/packages/P7-push/ 의 untracked 증거 제외)
+ M app/briefing/scheduler.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+?? docs/wiki/fixes/FIX-029.md
+?? docs/wiki/fixes/evidence/20261010-2030-fix029-contrast-and-regression.txt
+?? tests/test_import_order.py
+$ git diff app/briefing/scheduler.py
+-from app.push.notifier import notifier_from_env            (모듈 상단 79행 제거)
++    # 지연 import -- 모듈 상단에 두면 `app.push` 를 먼저 올릴 때
++    # push.notifier -> briefing 패키지 -> 이 모듈 -> push.notifier 로 순환한다(FIX-029).
++    from app.push.notifier import notifier_from_env         (default_run_once() 본문 첫머리)
+
+## 2. 표 A 루프 (9개 모듈 단독 import)
+$ for m in app.push app.push.notifier app.push.sender app.push.payload app.push.subscriptions app.push.types app.briefing app.briefing.scheduler app.main; do .venv/bin/python -c "import $m" && echo "OK $m" || echo "FAIL $m"; done
+OK app.push / OK app.push.notifier / OK app.push.sender / OK app.push.payload / OK app.push.subscriptions / OK app.push.types / OK app.briefing / OK app.briefing.scheduler / OK app.main
+FAIL 줄 0
+
+## 3. 표 B + E
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_import_order.py tests/test_push_wiring.py -q
+18 passed in 3.00s
+
+## 4. 표 D 전체 회귀
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -rs
+1882 passed, 1 warning in 22.52s      (skip 0, warning 은 google.genai DeprecationWarning — 기존)
+
+## 5. 정적 검사 (CI 와 같은 기준)
+$ .venv/bin/python scripts/mypy_check.py --run
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)     exit=0
+$ .venv/bin/ruff check app tests scripts evaluation
+All checks passed!
+(참고) $ .venv/bin/python -m mypy app tests/test_import_order.py              -> Found 39 errors in 15 files
+       $ .venv/bin/python -m mypy app tests/test_import_order.py --ignore-missing-imports -> Found 38 errors in 14 files
+       scheduler.py / test_import_order.py 에서 난 오류 0건 (grep -c 0). 구현자가 적은 "39건" 은 --ignore-missing-imports 없이 돌린 수치.
+
+## 6. 순환 잔존 전수 조사 — app/ 아래 모든 모듈을 새 서브프로세스로 단독 import (pkgutil.walk_packages)
+OK app, app.agent, app.agent.gate, app.agent.loop, app.agent.propose, app.agent.respond, app.agent.types,
+   app.api, app.api.deps, app.api.routes, app.api.schemas,
+   app.briefing, app.briefing.compose, app.briefing.inputs, app.briefing.run, app.briefing.scheduler, app.briefing.select, app.briefing.types,
+   app.config, app.db, app.db.base, app.db.models, app.db.session, app.embedding,
+   app.er, app.er.candidates, app.er.confidence, app.er.dictionary, app.er.judge, app.er.pipeline, app.er.rules, app.er.types,
+   app.main, app.memory, app.memory.direct_facts, app.memory.extract, app.memory.hooks, app.memory.patterns, app.memory.promote, app.memory.types,
+   app.push, app.push.notifier, app.push.payload, app.push.sender, app.push.subscriptions, app.push.types,
+   app.settings, app.tools, app.tools.briefing, app.tools.context, app.tools.persons, app.tools.questions, app.tools.records, app.tools.types
+총 54개 모듈, 실패 0개
+(app.push.devpage 라는 모듈은 없다 — /push-dev/ 는 app.api.routes 에 있다. 위 목록이 app/ 전부다.)
+
+## 7. CI 조건 모사
+(a) 최소 환경변수만(PYTHONUTF8=1, PATH) — Windows job 처럼 DATABASE_URL·POSTGRES_* 없이, subprocess(env=minimal)
+exit=0 app.push / exit=0 app.push.notifier / exit=0 app.briefing / exit=0 app.briefing.scheduler / exit=0 app.main
+(b) 다른 cwd(/private/tmp)에서 `python -c "import app.push"` -> ModuleNotFoundError: No module named 'app'
+    => 테스트가 cwd=REPO_ROOT(파일 기준 절대경로) 를 고정한 것이 필요한 설계임을 확인.
+(c) app 안에 dotenv 로딩 없음(grep "dotenv" app/ -> 0건) — 로컬 성공이 .env 에 기댄 것이 아님.
+
+## 8. 몽키패치 지점 (tests/ 전체 grep)
+setattr(scheduler_module, ...) 대상: BRIEFING_INTERVAL_SECONDS(3), composer_from_env(2), default_run_once(3), run_briefings(2), session_scope(1)
+-> `notifier_from_env` 를 scheduler 전역으로 패치하는 테스트 0건. test_push_wiring (c) 3건은 notifier_module.PyWebPushSender 를 패치하므로 지연 import 와 양립(18 passed 로 확인).
+
+## 9. app.push 를 모듈 상단에서 import 하는 app 모듈 (순환 진입점 목록)
+app/api/deps.py:114    from app.push.notifier import notifier_from_env
+app/api/routes.py:150  from app.push import VAPID_PARTIAL, save_subscription
+app/settings.py:105, 376  지연 import(함수 안, "순환 import 회피" 주석) — 같은 방식의 선례
+app/briefing/scheduler.py:94  (이번 FIX, 지연 import)
