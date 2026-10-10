@@ -396,10 +396,27 @@ done
 out="$(printf '%s' "$(gate "$SG_T/.claude/skills/x/SKILL.md")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
 if [ -z "$out" ]; then echo "ok   allow  .claude/skills 는 여전히 면제(R-27-5 범위 밖)"; else echo "XX   .claude/skills 까지 막혔다(범위 과확대)"; fails=$((fails+1)); fi
 rm -rf "$SG_T"
-# 실제 저장소(활성 작업 있음)에서는 그 작업의 게이트를 그대로 타 allow 되어야 한다(교착 없음 확인)
-for p in "$ROOT/.claude/hooks/_py.sh" "$ROOT/.claude/scripts/test-guards.sh" "$ROOT/.claude/settings.json" "$ROOT/.github/workflows/tests.yml"; do
-  expect_allow "$H/stage-gate.sh" "R-27-5 활성 작업 있으면 allow: $p" "$(gate "$p")"
+
+# FIX-030: 활성 작업이 있으면 보호 경로도 그 작업의 게이트를 타 allow 되어야 한다(교착 없음 확인).
+# 예전에는 실제 저장소($ROOT)로 시험해, 시험을 돌리는 순간의 docs/wiki/CURRENT.md active: 값에 결과가
+# 묶였다(active: none 이면 실패). 이제 격리 저장소에 활성 FIX-998 을 직접 만들어 저장소 상태와 무관하게 한다.
+SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-sg3-$$")")"
+mkdir -p "$SG_T/docs/wiki/fixes"
+printf 'active: FIX-998\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+printf '# FIX-998\n\n계획 점검: 통과(메인 세션, 점검표 1~8)\n검증: (verifier 가 쓴다)\n승인: 사용자 (2026-10-10)\n' \
+  > "$SG_T/docs/wiki/fixes/FIX-998.md"
+for p in '.claude/hooks/x.sh' '.claude/scripts/x.py' '.claude/settings.json' '.github/workflows/x.yml'; do
+  out="$(printf '%s' "$(gate "$SG_T/$p")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
+  if [ -z "$out" ]; then echo "ok   allow  R-27-5 활성 작업 있으면 allow: $p (격리 저장소, active: FIX-998)"; else echo "XX   R-27-5 활성 작업 있는데 거부됨: $p -> $(printf '%s' "$out" | head -c 150)"; fails=$((fails+1)); fi
 done
+# FIX-030 대조: 같은 저장소를 active: none 으로 바꾸면 같은 4경로가 DENY 여야 한다 —
+# "프로젝트 안으로 인식됐고, 활성 작업 때문에 위에서 allow 된 것" 임을 분리해 보인다(공허 통과 방지).
+printf 'active: none\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+for p in '.claude/hooks/x.sh' '.claude/scripts/x.py' '.claude/settings.json' '.github/workflows/x.yml'; do
+  out="$(printf '%s' "$(gate "$SG_T/$p")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
+  if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   FIX-030 대조: $p (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)"; else echo "XX   FIX-030 대조 실패: $p 가 active: none 인데 allow 됐다"; fails=$((fails+1)); fi
+done
+rm -rf "$SG_T"
 
 echo "== stage-gate: dev 푸시 후 결정 대기(L-003) =="
 AW=".claude/.awaiting-decision"

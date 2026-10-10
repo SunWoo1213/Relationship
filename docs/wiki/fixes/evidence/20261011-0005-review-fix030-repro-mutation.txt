@@ -1,0 +1,150 @@
+review-FIX-030 증거 2/2 — verifier (fable) 2026-10-11 00:05
+결함 재현(전/후) · 변이 시험 M1~M3 · CI 원본 로그. 실제 저장소의 CURRENT.md·훅·마커는 건드리지 않았다.
+
+[준비] scratchpad(<S> = …/scratchpad/rv030) 에서
+  git show HEAD:.claude/scripts/test-guards.sh > <S>/old-test-guards.sh        # 수정 전(50fd7fc)
+  cp .claude/scripts/test-guards.sh <S>/new-test-guards.sh                      # 수정 후(작업 트리) — md5 가 복제본 안 사본과 동일
+  <S>/clone-none  = cp -R .claude + cp -R .github + docs/wiki/CURRENT.md 'active: none / frozen: none' (마커 파일 없음 확인)
+  <S>/clone-allow = 위와 같되 .claude/hooks/stage-gate.sh 를 '#!/usr/bin/env bash / exit 0' 으로 교체(M3 전용)
+  변이 사본: sed 로 FIX-998 printf 한 줄만 바꾼 <S>/mut1-no-approval.sh, <S>/mut2-plan-hold.sh (diff 로 1줄 변경만 확인)
+  실행: CLAUDE_PROJECT_DIR=<복제본> bash <스크립트>   (스크립트 8행 ROOT="${CLAUDE_PROJECT_DIR:-…}" → 복제본의 hooks·CURRENT 를 쓴다)
+  집계는 python 으로 바이너리 안전하게 셌다(M2 출력에 잘린 UTF-8 바이트가 있어 Mac grep 이 거부함 — review R-30-2).
+
+[CI 원본] gh run view 38052897284 --json conclusion,headSha,jobs
+  {"conclusion":"failure","headSha":"50fd7fc5daec1536a8881a490fe6099cc8407101","jobs":[{"conclusion":"failure","name":"pytest (3.14)"},{"conclusion":"failure","name":"windows"},{"conclusion":"failure","name":"pytest (3.13)"}]}
+  gh run view 38052897284 --log-failed | grep -E 'XX|결과: 실패'  (세 job 모두 같은 4줄 + '== 결과: 실패 4 ==')
+  pytest (3.13) XX   should ALLOW but denied: R-27-5 활성 작업 있으면 allow: /home/runner/work/Relationship/Relationship/.claude/hooks/_py.sh -> {"hookSpecificOutput":…"deny"…
+  pytest (3.13) XX   … /home/runner/work/Relationship/Relationship/.claude/scripts/test-guards.sh -> …
+  pytest (3.13) XX   … /home/runner/work/Relationship/Relationship/.claude/settings.json -> …
+  pytest (3.13) XX   … /home/runner/work/Relationship/Relationship/.github/workflows/tests.yml -> …
+  pytest (3.13) == 결과: 실패 4 ==
+  pytest (3.14) (같은 4줄) == 결과: 실패 4 ==
+  windows       XX   … /d/a/Relationship/Relationship/.claude/hooks/_py.sh … (같은 4경로) == 결과: 실패 4 ==
+
+====================================================================================================
+[전] HEAD(50fd7fc) 스크립트, 복제본 active: none      → ok 208 / XX 4 / == 결과: 실패 4 ==   (CI 와 같은 4줄)
+--- stage-gate 절 원문 ---
+== stage-gate ==
+ok   allow  docs path exempt
+ok   allow  .claude path exempt
+ok   allow  outside project
+ok   allow  windows path of another machine is outside
+ok   DENY   product code with active: none
+== stage-gate: F-27-1 새 FIX 템플릿 호환(계획 점검: 통과 + 검증: 자리표) ==
+ok   DENY   FIX-028 대조: SG_T 안 app/x.py (active: none) 거부 — 경로가 프로젝트 안으로 인식됨
+ok   allow  새 템플릿(계획 점검: 통과 + 검증: 자리표) → app/ 쓰기 가능
+ok   allow  옛 템플릿(검증: 통과 한 줄) 도 그대로 호환
+== stage-gate: R-27-5 보호 경로(.claude/hooks·scripts·settings.json·.github/workflows) ==
+ok   DENY   FIX-028 대조: SG_T app/x.py (active: none) 거부 — 프로젝트 안 인식
+ok   DENY   .claude/hooks/x.sh (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   DENY   .claude/scripts/x.py (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   DENY   .claude/settings.json (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   DENY   .github/workflows/x.yml (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   allow  .claude/skills 는 여전히 면제(R-27-5 범위 밖)
+XX   should ALLOW but denied: R-27-5 활성 작업 있으면 allow: <S>/clone-none/.claude/hooks/_py.sh -> {"hookSpecificOutput":{"hookEventName":"PreToolU
+XX   should ALLOW but denied: R-27-5 활성 작업 있으면 allow: <S>/clone-none/.claude/scripts/test-guards.sh -> {"hookSpecificOutput":{"hookEventName"
+XX   should ALLOW but denied: R-27-5 활성 작업 있으면 allow: <S>/clone-none/.claude/settings.json -> {"hookSpecificOutput":{"hookEventName":"PreTool
+XX   should ALLOW but denied: R-27-5 활성 작업 있으면 allow: <S>/clone-none/.github/workflows/tests.yml -> {"hookSpecificOutput":{"hookEventName":"P
+== stage-gate: dev 푸시 후 결정 대기(L-003) ==
+ok   DENY   awaiting: plan doc denied
+ok   allow  awaiting: HANDOFF allowed
+ok   DENY   awaiting: commit denied
+--- stage-gate 절 밖 XX: 없음 ---
+== 결과: 실패 4 ==
+
+====================================================================================================
+[후] 작업 트리 스크립트, 복제본 active: none         → ok 216 / XX 0 / == 결과: 실패 0 ==
+--- stage-gate 절 원문 ---
+== stage-gate ==
+ok   allow  docs path exempt
+ok   allow  .claude path exempt
+ok   allow  outside project
+ok   allow  windows path of another machine is outside
+ok   DENY   product code with active: none
+== stage-gate: F-27-1 새 FIX 템플릿 호환(계획 점검: 통과 + 검증: 자리표) ==
+ok   DENY   FIX-028 대조: SG_T 안 app/x.py (active: none) 거부 — 경로가 프로젝트 안으로 인식됨
+ok   allow  새 템플릿(계획 점검: 통과 + 검증: 자리표) → app/ 쓰기 가능
+ok   allow  옛 템플릿(검증: 통과 한 줄) 도 그대로 호환
+== stage-gate: R-27-5 보호 경로(.claude/hooks·scripts·settings.json·.github/workflows) ==
+ok   DENY   FIX-028 대조: SG_T app/x.py (active: none) 거부 — 프로젝트 안 인식
+ok   DENY   .claude/hooks/x.sh (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   DENY   .claude/scripts/x.py (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   DENY   .claude/settings.json (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   DENY   .github/workflows/x.yml (활성 작업 없음, R-27-5 — 더는 면제되지 않음)
+ok   allow  .claude/skills 는 여전히 면제(R-27-5 범위 밖)
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/hooks/x.sh (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/scripts/x.py (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/settings.json (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .github/workflows/x.yml (격리 저장소, active: FIX-998)
+ok   DENY   FIX-030 대조: .claude/hooks/x.sh (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+ok   DENY   FIX-030 대조: .claude/scripts/x.py (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+ok   DENY   FIX-030 대조: .claude/settings.json (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+ok   DENY   FIX-030 대조: .github/workflows/x.yml (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+== stage-gate: dev 푸시 후 결정 대기(L-003) ==
+ok   DENY   awaiting: plan doc denied
+ok   allow  awaiting: HANDOFF allowed
+ok   DENY   awaiting: commit denied
+== 결과: 실패 0 ==
+
+====================================================================================================
+[변이 M1] FIX-998 의 '승인:' 줄 제거(수정 후 스크립트 사본), 복제본 active: none   → ok 212 / XX 4 / == 결과: 실패 4 ==
+  변경 1줄: printf '# FIX-998\n\n계획 점검: 통과(메인 세션, 점검표 1~8)\n검증: (verifier 가 쓴다)\n'   (승인 줄 삭제)
+XX   R-27-5 활성 작업 있는데 거부됨: .claude/hooks/x.sh -> {…"permissionDecision":"deny","permissionDecisionReason":"FIX-998 에 사용자 승인 기록이 없
+XX   R-27-5 활성 작업 있는데 거부됨: .claude/scripts/x.py -> {… "FIX-998 에 사용자 승인 기록이 없
+XX   R-27-5 활성 작업 있는데 거부됨: .claude/settings.json -> {… "FIX-998 에 사용자 승인 기록이 없
+XX   R-27-5 활성 작업 있는데 거부됨: .github/workflows/x.yml -> {… "FIX-998 에 사용자 승인 기록이 없
+ok   DENY   FIX-030 대조: .claude/hooks/x.sh (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+ok   DENY   FIX-030 대조: .claude/scripts/x.py (…)
+ok   DENY   FIX-030 대조: .claude/settings.json (…)
+ok   DENY   FIX-030 대조: .github/workflows/x.yml (…)
+  (stage-gate 절 밖 XX 없음)
+
+====================================================================================================
+[변이 M2] FIX-998 의 '계획 점검: 통과' → '계획 점검: 보류'(수정 후 스크립트 사본), 복제본 active: none   → ok 212 / XX 4 / == 결과: 실패 4 ==
+XX   R-27-5 활성 작업 있는데 거부됨: .claude/hooks/x.sh -> {… "FIX-998 의 계획 점검이 '통과'가 �   ← head -c 150 이 글자 중간에서 잘라 바이트가 깨짐(R-30-2)
+XX   R-27-5 활성 작업 있는데 거부됨: .claude/scripts/x.py -> {… "FIX-998 의 계획 점검이 '통과'가 �
+XX   R-27-5 활성 작업 있는데 거부됨: .claude/settings.json -> {… "FIX-998 의 계획 점검이 '통과'가 �
+XX   R-27-5 활성 작업 있는데 거부됨: .github/workflows/x.yml -> {… "FIX-998 의 계획 점검이 '통과'가 �
+ok   DENY   FIX-030 대조: .claude/hooks/x.sh (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+ok   DENY   FIX-030 대조: .claude/scripts/x.py (…)
+ok   DENY   FIX-030 대조: .claude/settings.json (…)
+ok   DENY   FIX-030 대조: .github/workflows/x.yml (…)
+  (stage-gate 절 밖 XX 없음)
+
+====================================================================================================
+[변이 M3] 복제본 clone-allow 의 .claude/hooks/stage-gate.sh 를 항상 allow(exit 0) 로 교체, 수정 후 스크립트 원본, active: none
+         → ok 204 / XX 12 / == 결과: 실패 12 ==  (XX 12 는 전부 stage-gate 절; 실제 저장소 .claude/hooks 는 git status 무변경)
+== stage-gate ==
+ok   allow  docs path exempt
+ok   allow  .claude path exempt
+ok   allow  outside project
+ok   allow  windows path of another machine is outside
+XX   should DENY but allowed: product code with active: none
+== stage-gate: F-27-1 새 FIX 템플릿 호환(계획 점검: 통과 + 검증: 자리표) ==
+XX   FIX-028 대조 실패: SG_T 가 프로젝트 밖으로 인식됨(공허 통과 위험)
+ok   allow  새 템플릿(계획 점검: 통과 + 검증: 자리표) → app/ 쓰기 가능
+ok   allow  옛 템플릿(검증: 통과 한 줄) 도 그대로 호환
+== stage-gate: R-27-5 보호 경로(.claude/hooks·scripts·settings.json·.github/workflows) ==
+XX   FIX-028 대조 실패: SG_T 가 프로젝트 밖으로 인식됨
+XX   .claude/hooks/x.sh 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+XX   .claude/scripts/x.py 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+XX   .claude/settings.json 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+XX   .github/workflows/x.yml 가 여전히 면제돼 allow 됐다(R-27-5 회귀)
+ok   allow  .claude/skills 는 여전히 면제(R-27-5 범위 밖)
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/hooks/x.sh (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/scripts/x.py (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/settings.json (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .github/workflows/x.yml (격리 저장소, active: FIX-998)
+XX   FIX-030 대조 실패: .claude/hooks/x.sh 가 active: none 인데 allow 됐다
+XX   FIX-030 대조 실패: .claude/scripts/x.py 가 active: none 인데 allow 됐다
+XX   FIX-030 대조 실패: .claude/settings.json 가 active: none 인데 allow 됐다
+XX   FIX-030 대조 실패: .github/workflows/x.yml 가 active: none 인데 allow 됐다
+== stage-gate: dev 푸시 후 결정 대기(L-003) ==
+XX   should DENY but allowed: awaiting: plan doc denied
+ok   allow  awaiting: HANDOFF allowed
+ok   DENY   awaiting: commit denied
+== 결과: 실패 12 ==
+
+====================================================================================================
+[잔여물] 실행 후 clone-none·clone-allow 의 .claude 에 숨김 마커 없음, docs/wiki/packages 없음, $TMPDIR 에 tg-sg3-* 없음.
+         실제 저장소: git status --short 는 시험 전과 동일(M .claude/scripts/test-guards.sh · CURRENT.md · HANDOFF.md · journal.md, ?? FIX-030.md · evidence · P8-frontend/), CURRENT.md active: FIX-030 그대로.

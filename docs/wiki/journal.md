@@ -443,3 +443,7 @@
 - 2026-10-10 20:44 | COMMIT | e555142 fix(FIX-029): 푸시 모듈을 먼저 불러오면 순환 import 로 실패하던 것을 고친다
 - 2026-10-10 20:44 | PUSH-dev2 | origin dev2 e555142 (실험 푸시)
 - 2026-10-10 21:40 | DONE | **P7-push 완료**(verifier 04-review `결과: 완료`, 사용자 승인 — 순환 import 는 FIX-029 `e555142` 로 먼저 닫음, 24행 "P7 단위 커밋 변경 0건" 해석). 판정 표 1~26행 통과 · 26행 데스크톱 Chrome 실수신(`6428180`) · 승인 뒤 verify-impl FAIL 0/WARN 1(ruff 하네스 기존, 이관) · 1882 passed skip 0 · CI run 38049456285 세 job success. 메인 세션이 권고 반영: 03-log U8 해시 · 01-plan U1~U4 `[x]` · registry 구독 행 비고(FIX-020 유일 제약) · RUNNING.md 포트·Docker 안내 · review-index R12 구현완료 · backlog P7 체크. active none | P7-push R12 S3.6 원칙5 원칙8 원칙9
+- 2026-10-10 21:41 | COMMIT | 50fd7fc docs(P7-push): 웹푸시 패키지를 완료 검토·사용자 승인으로 닫는다
+- 2026-10-10 21:41 | PUSH-dev2 | origin dev2 50fd7fc (실험 푸시)
+- 2026-10-10 23:55 | NOTE | `50fd7fc` CI run 38052897284 세 job 실패 발견(개발과정 해설 작성 에이전트 보고, 메인 세션 재현) — test-guards R-27-5 "활성 작업 있으면 allow" 4건이 실제 저장소 CURRENT active 에 의존, P7 완료로 active none 이 되자 실패. 메인 세션이 완료 커밋 뒤 CI 를 확인하지 않아 늦게 발견 | FIX-030
+- 2026-10-11 00:15 | FIX | **FIX-030 완료** — test-guards 의 실제 저장소 의존 시험 4건을 격리 저장소(active FIX-998)로 바꾸고 active none 대조 deny 4건 추가. 수정 전 active none 에서 실패 4 → 후 0, 실제 저장소 active FIX-030·none 둘 다 실패 0(ok 215/216). verifier 통과([필수] 0, 변이 3건). 훅 무변경 | FIX-030 FIX-027 R-27-5

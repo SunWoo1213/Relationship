@@ -1,0 +1,27 @@
+FIX-030 증거 (2026-10-10 23:55, backend-agent)
+방법: 실제 저장소 CURRENT.md 는 건드리지 않고, scratchpad 에 .claude 복제본(+ CURRENT.md active: none)을 만들어
+      CLAUDE_PROJECT_DIR=<복제본> 으로 test-guards.sh 를 실행했다(C: 저장소 상태 무관 확인).
+
+[1] 수정 전 스크립트, 복제본 active: none  (CI 실패 재현)
+XX   should ALLOW but denied: R-27-5 활성 작업 있으면 allow: <경로>  (4줄)
+== 결과: 실패 4 ==
+
+[2] 수정 전 스크립트, 실제 저장소 active: FIX-030
+ok 211줄, == 결과: 실패 0 ==   (상태 의존 확인: 같은 스크립트가 active 값에 따라 0/4)
+
+[3] 수정 후 스크립트, 실제 저장소 active: FIX-030
+ok 215줄, == 결과: 실패 0 ==
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/hooks/x.sh (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/scripts/x.py (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/settings.json (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .github/workflows/x.yml (격리 저장소, active: FIX-998)
+ok   DENY   FIX-030 대조: .claude/hooks/x.sh (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+ok   DENY   FIX-030 대조: .claude/scripts/x.py (...)
+ok   DENY   FIX-030 대조: .claude/settings.json (...)
+ok   DENY   FIX-030 대조: .github/workflows/x.yml (...)
+
+[4] 수정 후 스크립트, 복제본 active: none  (CI 와 같은 상태)
+ok 216줄 (active: none 이라 "product code with active: none" 시험이 추가로 실행됨), == 결과: 실패 0 ==
+
+[5] 전체 회귀: POSTGRES_PORT=5433 .venv/bin/python -m pytest -q
+1882 passed, 1 warning in 22.87s

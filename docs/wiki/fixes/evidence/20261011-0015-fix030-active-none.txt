@@ -1,0 +1,21 @@
+FIX-030 표 C — 실제 저장소 CURRENT.md 를 active: none 으로 되돌린 뒤 재실행 (메인 세션, 2026-10-11)
+
+$ head -4 docs/wiki/CURRENT.md | tail -2
+active: none
+frozen: none
+
+$ bash .claude/scripts/test-guards.sh   → exit 0, ok 줄 216
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/hooks/x.sh (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/scripts/x.py (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .claude/settings.json (격리 저장소, active: FIX-998)
+ok   allow  R-27-5 활성 작업 있으면 allow: .github/workflows/x.yml (격리 저장소, active: FIX-998)
+ok   DENY   FIX-030 대조: .claude/hooks/x.sh (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+ok   DENY   FIX-030 대조: .claude/scripts/x.py (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+ok   DENY   FIX-030 대조: .claude/settings.json (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+ok   DENY   FIX-030 대조: .github/workflows/x.yml (같은 저장소 active: none → 거부, 위 allow 는 활성 작업 덕분)
+== 결과: 실패 0 ==
+(XX 줄 0)
+
+비교: 같은 실제 저장소에서 active: FIX-030 일 때 ok 215 / 실패 0 (backend-agent·메인 세션·verifier 각각).
+ok 개수 차이 1 은 357~362행 "product code with active: none" 시험이 실제 CURRENT 가 none 일 때만 돌고 그 밖에는 skip 하기 때문(verifier R-30-1 이 지적한 남은 상태 의존 skip 형 시험).
+수정 전 스크립트를 active: none 에서 돌리면 실패 4(verifier 재현 evidence/20261011-0005-review-fix030-repro-mutation.txt, CI run 38052897284 와 동일).
