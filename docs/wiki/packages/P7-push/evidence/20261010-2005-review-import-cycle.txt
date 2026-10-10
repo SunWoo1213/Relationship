@@ -1,0 +1,30 @@
+P7-push 04-review · verifier(fable) 가 변이 실험 중 발견한 결함 — app.push 단독 import 가 순환 import 로 실패한다 · HEAD 6428180 · 2026-10-10 20:03
+
+$ for m in app.push app.push.notifier app.push.sender app.push.payload app.push.subscriptions app.push.types app.briefing app.main; do .venv/bin/python -c "import $m"; done
+import app.push               ImportError: cannot import name 'notifier_from_env' from partially initialized module 'app.push.notifier' (most likely due to a circular import)
+import app.push.notifier      ImportError: (같은 메시지)
+import app.push.sender        ImportError: (같은 메시지)
+import app.push.payload       ImportError: (같은 메시지)
+import app.push.subscriptions ImportError: (같은 메시지)
+import app.push.types         ImportError: (같은 메시지)
+import app.briefing           (성공)
+import app.main               (성공)
+
+$ .venv/bin/python -c "import app.briefing, app.push; print('ok')"
+ok: briefing→push 순서      ← app.briefing(또는 app.main) 을 먼저 import 하면 성립한다. 제품 진입점(uvicorn app.main)·테스트(conftest 가 app.main/app.briefing 을 먼저 올림)는 이 순서라 깨지지 않는다.
+
+순환 경로(traceback 그대로):
+  app/push/__init__.py:38   from app.push.notifier import ...
+  app/push/notifier.py:65   from app.briefing.types import ComposedBriefing, NullNotifier
+  app/briefing/__init__.py:27  from app.briefing.scheduler import (...)
+  app/briefing/scheduler.py:79 from app.push.notifier import notifier_from_env     ← 부분 초기화된 모듈에서 이름을 찾아 실패
+
+도입 커밋:
+$ git show 8e9af9e:app/briefing/scheduler.py | grep -n "app.push"   → 없음(U4 시점에는 순환 없음)
+$ git show 55fc0f3 -- app/briefing/scheduler.py | grep "^+.*import"  → +from app.push.notifier import notifier_from_env   (U5 가 모듈 상단에 추가)
+
+영향:
+- 01-plan U1 판정 명령 `python -c "import app.push"` 가 HEAD 에서 실패한다(U1 evidence 20261005-1449-u1-skeleton.txt 명령 2 는 U1 시점 성공 — 그때는 notifier.py 가 없었다). U5 03-log·evidence 는 이 명령을 다시 돌리지 않았다.
+- 수용 기준(판정 표 1~26행)·전체 회귀 1873 passed·실서버 U8 에는 영향 없음(전부 app.main 이 먼저 올라가는 순서).
+- 앞으로 `app.push` 를 먼저 import 하는 스크립트·테스트 파일(예: tests/test_push_*.py 만 단독으로 `python -m pytest tests/test_push_payload.py` 로 돌릴 때 conftest 가 app.main 을 먼저 올리지 않는 구성이 되면)에서 깨진다.
+→ 04-review §6 FIX 후보 · 05-remediation 소견(출처 review, [권고]). 제품 코드는 verifier 가 고치지 않는다.

@@ -1,0 +1,44 @@
+== verify-impl P7-push  (20261010-2010) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1873 passed, 1 warning in 22.99s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261010-2010-pytest.txt
+WARN  ruff 경고/오류 → evidence/20261010-2010-lint.txt
+PASS  태그 P7-push 커밋 15 건 → evidence/20261010-2010-commits.txt
+PASS  커밋에 태그 존재: R12
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.6
+PASS  검토자 = verifier (L-002)
+PASS  증거 확인:  데스크톱 Chrome에서 알림 수신 (`docs/backlog.md` 84행 그대로)  ← evidence/20261010-1950-u8-chrome-manual.
+PASS  증거 확인:  해석 ㄱ 구독 저장 — `POST /push/subscriptions` → `push_s ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  해석 ㄴ VAPID 발송 — 수동·주기 경로 모두 `WebPushNotifier`, 결과 ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  해석 ㄷ 알림이 사람 눈에 보임, 본문은 결정 B 규칙·원문 없음  ← evidence/20261010-1950-u8-chrome-manual.
+PASS  증거 확인:  1행 ㄱ 구독 저장 양성  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  2행 ㄱ 같은 엔드포인트 → 행 1·같은 id·created false·keys 갱신  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  3행 ㄱ 잘못된 본문 422·행 0  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  4행 ㄱ 공개키 API 200/404/404  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  5행 ㄱ 사용자 격리  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  6행 ㄴ 발송 양성(수동 경로 한 흐름)  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  7행 ㄴ 주기 경로도 같은 알림기  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  8행 ㄴ 키 없을 때 기존 동작  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  9행 ㄴ 반쪽 설정 → misconfigured, 발송 0, briefed_at  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  10행 ㄷ 본문 규칙(결정 B)  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  11행 ㄷ 제안 없음 꼬리  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  12행 ㄷ 원문 미포함(페이로드 JSON)  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  13행 ㄷ 길이·TTL  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  14행 구독 0건 → no_subscription  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  15행 만료 410+201 → partial·행 삭제·removed  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  16행 만료 404 단독 → failed·행 삭제  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  17행 일시 오류 → failed, briefing_error 0, 재선정 0  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  18행 발송기 예외 매핑 5종  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  19행 근거 기록(push_send trace 모양, tokens 0/0)  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  20행 비밀 미기록  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  21행 네트워크 0  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  22행 확인 페이지 스위치  ← evidence/20261008-1536-u7-judgment-table
+PASS  증거 확인:  23행 불변식 grep 8종  ← evidence/20261008-1536-u7-invariants-noc
+PASS  증거 확인:  24행 무변경(alembic check · tools_check · P6 경로 diff) ← evidence/20261008-1536-u7-invariants-noc
+PASS  증거 확인:  25행 전체 회귀 ≥1724·skip 0  ← evidence/20261008-1536-u7-regression.txt
+PASS  증거 확인:  26행 ㄷ 사람 확인 — Chrome 알림 수신(③⑤⑥⑦⑧ 한 파일)  ← evidence/20261010-1950-u8-chrome-manual.
+PASS  registry 에 P7-push 행 있음
+WARN  미완료 작업 단위 4 개
+== 결과: FAIL=0 WARN=2 → evidence/20261010-2010-summary.txt ==

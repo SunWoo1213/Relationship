@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: P7-push
+active: none
 frozen: none
 
 <!--
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- **P7-push 완료(2026-10-10, verifier 04-review `결과: 완료`, 사용자 승인)** — 판정 표 1~26행 통과, 열린 [필수] 0. 26행은 데스크톱 Chrome 실수신(구독 id=1 fcm · `push "sent"` · FCM 201 · 수신 기록 · 사용자 화면 확인, `6428180`). 04-review 에서 verifier 가 찾은 순환 import(`F-c7c1e5`)는 사용자 결정으로 먼저 FIX-029 `e555142` 로 닫음(CI 세 job success). 24행은 사용자 해석 "P7 단위 커밋의 그 경로 변경 0건" 으로 통과(FIX-019·020·021·025·026 만 그 경로 변경). 결정 A 확인 페이지는 원칙5 와 양립(CR 불필요). 승인 뒤 verify-impl FAIL 0 / WARN 1(ruff 하네스 기존 3건, 이관) · 1882 passed. U1 `85393e0` · U2 `6c98516` · U3 `f256259` · U4 `8e9af9e` · U5 `55fc0f3` · U6 `572045a` · U7 `b73aaf0` · U8 `6428180`. R12 구현완료. 남은 것: L 후보(U7 에이전트가 계획 문구와 달리 VAPID 키 생성 명령 실행 — 값 노출 없음) · FIX 후보(R-29-1 import 테스트 목록 전수화, R-29-3 notifier→briefing.types 구조, ruff findings.py, 발송이 일정 잠금 안에서 네트워크 타는 구조) · 인계 P8(구독 해제 API·프론트 구독 UI)·P10(본문 원문 조각 표본 점검).
 - **P7-push 계획 승인(2026-10-05)** — architect 01-plan(U1~U8, 판정 표 26행) → 결정 A~G 사용자 확정(2026-10-02, 전부 권장안) → verifier 02-plan-verify `통과`(점검표 8/8, [필수] 0, verify-plan 2차 FAIL 0/WARN 0) → 사용자 승인. U1~U7 backend-agent(L-004 매번, 단위마다 자세한 설명 뒤 승인), U8 은 사용자·메인 세션(실발송). 권고 R-1~R-10 은 단위별 반영(특히 R-2 `pywebpush` import 시점, R-6 일정 소유 단언, R-8 예외 메시지 감시 문자열). 원칙5 양립 조건 ①②③ 은 04-review 에서 증거로.
 - **FIX-017 완료(2026-10-02)** — 사실 키 9종의 뜻(`FACT_KEY_DESCRIPTIONS`, `app/memory/types.py` 단일 출처)을 루프 제안기·승격 추출기 프롬프트에 넣었다. 실 LLM(발화 7×2) 루프 제안기 11/14 → 14/14, 추출기 14/14 유지(금지형 문구는 추출기를 12/14 로 떨어뜨려 안내형으로 바꿈). 1724 passed skip 0 · tools_check 7/7. 이미 저장된 잘못된 행은 그대로.
 - **P6-briefing 완료(2026-10-02, verifier 04-review `결과: 완료`, 사용자 승인)** — verify-impl FAIL 0/WARN 0, verifier 직접 재실행 1721 passed skip 0 · `alembic check` 무변경 · tools_check 7/7 · 수용 기준 34행 PASS, 열린 [필수] 0. 계획 `688c4a4` · U1 `e2155f9` · U2 `db3c645` · U3 `cfb55ea` · U4 `a2f032d` · U5 `e037728` · U6 `8589e37` · U7 `a67692e` · U8 `e2cca80`. R12(절반 — 푸시는 P7)·R19 구현완료. U4~U7 은 단위마다 실 OpenAI·실서버로도 확인. 사용자 결정으로 바뀐 것: 금지 표현을 요약 줄에도·14개, DB 오류도 일정 단위 격리, 주기 작업 루프 수준 실패는 로그로만(P9 전 FIX 후보). 인계: P7 — 요약 줄에 원문 그대로·푸시 실패 시 `briefed_at`; P10 — 패턴 문장이 규칙 값 복사·금지 표현 목록 밖 통과; FIX 후보 — `likes`/`dislikes` 반전(`propose.py`·`extract.py`), 루프가 잠근 일정을 수동 지정하면 404. 개발 DB 확인용 사용자 `brief-u5-check` 행은 남김.

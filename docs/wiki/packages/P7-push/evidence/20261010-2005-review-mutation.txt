@@ -1,0 +1,38 @@
+P7-push 04-review · 변이 실험 — "항상 통과하는 테스트" 가 아닌지 확인 · verifier(fable) · HEAD 6428180 · 2026-10-10 20:04
+방법: 제품 코드는 손대지 않고 scratchpad 의 pytest 플러그인(`-p mutations`, MUT 환경변수)이 pytest_configure 에서 메모리 안의 함수·상수만 바꿔 끼운다.
+      (플러그인은 app.main 을 먼저 import 한다 — app.push 를 먼저 올리면 순환 import 로 깨지기 때문. 20261010-2005-review-import-cycle.txt)
+기대: 불변식을 깨뜨리면 그 행의 테스트가 FAILED 로 떨어져야 한다. 변이 없이 같은 테스트는 전부 통과해야 한다.
+
+[M1] MUT=payload_leaks_lines — build_push_payload 가 요약 줄 첫 문장을 본문에 덧붙인다(결정 B 위반, 판정 10·12행)
+$ MUT=payload_leaks_lines PYTHONPATH=<scratchpad> POSTGRES_PORT=5433 .venv/bin/python -m pytest -p mutations -q tests/test_push_payload.py::test_build_push_payload_never_contains_lines_or_pattern_sentences tests/test_push_notifier.py::test_notify_payload_sent_to_sender_never_contains_raw_utterance
+E       assert '민수는 고수를 진짜 싫어하더라 요약줄감시문자열' not in '{"title": "...ttl": 64800}'
+E         '민수는 고수를 진짜 싫어하더라 요약줄감시문자열' is contained here: … 식당을 고르세요 민수는 고수를 진짜 싫어하더라 요약줄감시문자열", "tag": "schedule-1", …
+E       assert '민수는 고수를 진짜 싫어하더라 U4원문감시문자열' not in '{"endpoint"...eout": 10.0}'
+E         '민수는 고수를 진짜 싫어하더라 U4원문감시문자열' is contained here: … "tag": "schedule-2000", "schedule_id": 2000, "ttl": 10800}, "ttl": 10800, "timeout": 10.0}
+→ 2 failed (판정 10행·12행 테스트 둘 다 잡는다)
+
+[M2] MUT=subscriptions_ignore_user — list_subscriptions 가 user_id 조건을 뺀다(security §5 위반, 판정 5행)
+$ MUT=subscriptions_ignore_user … tests/test_push_subscriptions.py::test_list_subscriptions_only_returns_own_user
+E       assert [680, 681] == [681]
+E         At index 0 diff: 680 != 681
+FAILED tests/test_push_subscriptions.py::test_list_subscriptions_only_returns_own_user
+1 failed in 0.24s
+
+[M3] MUT=devpage_always_on — push_dev_page_enabled() 가 항상 True(결정 A 조건 ② 위반, 판정 22행)
+$ MUT=devpage_always_on … tests/test_push_devpage.py::test_off_by_default_three_paths_404
+E       AssertionError: assert 200 == 404      (×6 — /push-dev/, /push-dev/sw.js, /push-dev/devpage.js × 값 없음·빈 값)
+FAILED tests/test_push_devpage.py::test_off_by_default_three_paths_404[/push-dev/-None]
+FAILED tests/test_push_devpage.py::test_off_by_default_three_paths_404[/push-dev/-]
+… 6 failed
+
+[M4] MUT=sender_no_gone — _GONE_STATUS_CODES = () (결정 E 위반, 판정 18행)
+$ MUT=sender_no_gone … tests/test_push_notifier.py::test_pywebpush_sender_maps_404_410_to_gone tests/test_push_notifier.py::test_r2_default_sender_path_is_actually_intercepted_by_the_fixture
+E           AssertionError: assert 'failed' == 'gone'
+FAILED tests/test_push_notifier.py::test_pywebpush_sender_maps_404_410_to_gone
+1 failed, 1 passed in 0.07s      (R-2 픽스처 테스트는 변이와 무관하므로 통과 — 변이가 겨냥한 행만 떨어진다)
+
+[대조] MUT 없음, 같은 5개 테스트 묶음
+$ MUT= PYTHONPATH=<scratchpad> POSTGRES_PORT=5533 … (M1~M4 의 테스트 5개)
+10 passed in 0.50s
+
+판정: 네 변이 모두 해당 테스트가 FAILED 로 떨어졌고 변이 없이는 통과 → 판정 5·10·12·18·22행의 테스트는 실패 조건을 실제로 검사한다.

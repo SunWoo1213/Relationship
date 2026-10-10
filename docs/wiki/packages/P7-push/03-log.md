@@ -82,7 +82,7 @@
 - 남은 것 · 다음 단위: U8 데스크톱 Chrome 실발송 확인(사용자·메인 세션, 판정 표 26행, RUNNING.md 절의 ①~⑧). 그 뒤 verifier 04-review.
 - Refs: P7-push S3.6 R12 원칙8 원칙9
 
-## 2026-10-10 · docs(P7-push): U8 데스크톱 Chrome 실발송 확인 — pending
+## 2026-10-10 · docs(P7-push): U8 데스크톱 Chrome 실발송 확인 — 6428180
 - 변경: 제품 코드 변경 0. 증거 파일 1개(`evidence/20261010-1950-u8-chrome-manual.txt`), `01-plan.md` U8 `[x]`, U7 행 hash `b73aaf0`.
 - 실행 주체: 사용자 — VAPID 키 생성(RUNNING.md ① 명령 직접 실행)·`.env` 4줄·macOS 알림 권한·`/push-dev/` 구독(권한 허용)·화면 확인. 메인 세션 — Docker 기동·서버 기동(포트 8765, `.env` 는 셸에 불러오기만, 값 출력 없음)·`POST /chat`·`POST /answers/4`·DB 조회·`POST /briefings/run`. 메인 세션은 키 생성 명령을 실행하지 않았다.
 - 결과: 판정 표 26행 다섯 항목 모두 증거 파일에 있음 — ③ 구독 1행(`fcm.googleapis.com`) · ⑤ `push == "sent"` · ⑥ trace 232 `status_code 201` · ⑦ 수신 기록 `2026-10-10T10:49:55.624Z schedule_id=5 tag=schedule-5` · ⑧ 사용자 확인 "브리핑이 준비됐다고 떴어, 수신기록 줄이 생겼어". `briefed_at` 기록됨. 최종 판정은 verifier.

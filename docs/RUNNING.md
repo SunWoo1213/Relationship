@@ -287,6 +287,8 @@ set -a; . ./.env; set +a
 uvicorn app.main:create_app --factory --port 8000
 ```
 
+포트 번호는 예시다 — 다른 번호(예: `8765`)로 띄웠다면 ④·⑥의 주소도 같은 번호로 바꾼다. 서버가 쓰는 Postgres(`capstone2-postgres-1`)가 떠 있어야 하므로 Docker Desktop 을 먼저 켠다.
+
 **④ 구독하기** — 데스크톱 Chrome 으로 `http://localhost:8000/push-dev/` 를 열어 "알림 받기" 를 누르고 권한을 허용한다. 페이지에 `구독 저장됨 id=N` 이 뜨면 `push_subscriptions` 에 한 행이 생긴 것이다(같은 브라우저로 다시 눌러도 행이 늘지 않고 키만 갱신된다). 이 페이지는 제품 화면이 아닌 개발·확인 도구이며 인물·브리핑 데이터를 보여 주지 않는다.
 
 **⑤ 브리핑 일정 준비** — 24시간 안에 들어오는 일정이 하나 있어야 한다. 예: `POST /chat` 으로 "내일 저녁 7시에 민수랑 저녁 약속" 한 건을 입력하고 만들어진 `schedule_id` 를 적어 둔다.

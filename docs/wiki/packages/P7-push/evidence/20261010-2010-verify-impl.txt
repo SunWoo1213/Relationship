@@ -1,0 +1,14 @@
+== verify-impl P7-push  (20261010-1959) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1873 passed, 1 warning in 21.70s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261010-1959-pytest.txt
+WARN  ruff 경고/오류 → evidence/20261010-1959-lint.txt
+PASS  태그 P7-push 커밋 15 건 → evidence/20261010-1959-commits.txt
+PASS  커밋에 태그 존재: R12
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.6
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P7-push 행 있음
+WARN  미완료 작업 단위 4 개
+== 결과: FAIL=0 WARN=3 → evidence/20261010-1959-summary.txt ==

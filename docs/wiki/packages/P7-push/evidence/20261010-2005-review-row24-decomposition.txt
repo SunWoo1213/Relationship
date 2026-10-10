@@ -1,0 +1,52 @@
+P7-push 04-review · 판정 표 24행 "무변경" — verifier(fable) 직접 재실행 · HEAD 6428180 · 2026-10-10 20:01
+사용자 결정(2026-10-10): 24행 기준을 "P7 단위 커밋의 그 경로 변경이 0건이면 통과" 로 읽는다. 아래가 그 해석을 뒷받침하는 커밋별 분해다.
+
+경로(01-plan 24행 그대로): app/briefing/run.py app/briefing/select.py app/briefing/inputs.py app/briefing/compose.py app/briefing/types.py app/agent app/memory app/er app/tools
+
+$ for h in $(git log --format=%h 608694b..HEAD); do git show --stat --format= $h -- <경로>; done   (경로를 건드린 파일 수 · 파일 목록)
+6428180  0   docs(P7-push): 데스크톱 Chrome 에 실제 웹푸시 알림이 뜨는 것을 확인해 기록한다
+b73aaf0  0   docs(P7-push): 수용 기준 1~25행을 기계로 확인하고 웹푸시 켜는 법을 RUNNING 에 적는다
+572045a  0   feat(P7-push): 웹푸시 구독을 만들어 보는 개발·확인 전용 페이지 /push-dev/ 를 추가한다
+55fc0f3  0   feat(P7-push): 브리핑 수동 실행과 1분 주기 작업이 웹푸시 알림기를 쓰게 연결한다
+d5f1db0  0   docs(FIX-028)
+dfb661a  0   fix(FIX-028)
+2264d56  0   harness(FIX-027)
+1ddab52  0   Merge remote-tracking branch 'origin/main' into dev2
+b7f376b  0   Merge remote-tracking branch 'origin/dev' into dev2
+0e943eb  0   docs(readme)
+8b192c6  0   docs(readme)
+32db187  0   docs(readme)
+90f249c  3   fix(FIX-026)   app/memory/patterns.py app/memory/promote.py app/tools/persons.py
+3cd378c  2   fix(FIX-025)   app/briefing/compose.py app/er/types.py
+a9ae04f  0   test(FIX-024)
+125976a  0   test(FIX-023)
+80ae193  0   fix(FIX-022)
+3e4d67c  0   fix(FIX-021) mypy 3.13
+b124c8e  4   fix(FIX-021)   app/agent/loop.py app/briefing/compose.py app/briefing/run.py app/tools/persons.py
+7459925  2   fix(FIX-020)   app/memory/promote.py app/tools/persons.py
+b89c936  0   docs(wiki) HANDOFF
+4912865  1   fix(FIX-019)   app/tools/questions.py
+7bc2e60  0   fix(FIX-018)
+8e9af9e  0   feat(P7-push): U4
+f256259  0   feat(P7-push): U3
+47adb1e  0   docs(P7-push)
+6c98516  0   feat(P7-push): U2
+85393e0  0   feat(P7-push): U1
+a69af80  0   docs(P7-push) 계획 승인
+fa5802d  0   docs(P7-push) 계획 검증
+
+$ git diff --stat 90f249c HEAD -- <경로>
+(빈 출력 — 마지막 FIX 커밋 이후 HEAD 까지 이 경로 변경 0)
+
+$ git diff --stat 608694b HEAD -- <경로>
+ 8 files changed, 451 insertions(+), 145 deletions(-)     (U7 evidence 20261008-1536-u7-invariants-nochange.txt 와 같은 값)
+
+$ git status --short -- <경로>
+(빈 출력 — 미커밋 변경 없음)
+
+$ P7 단위 커밋 8개(85393e0 6c98516 f256259 8e9af9e 55fc0f3 572045a b73aaf0 6428180)의 변경 경로에 docs/wiki/fixes 포함 여부
+85393e0 fixes-paths=0 / 6c98516 fixes-paths=0 / f256259 fixes-paths=0 / 8e9af9e fixes-paths=0 / 55fc0f3 fixes-paths=0 / 572045a fixes-paths=0 / b73aaf0 fixes-paths=0 / 6428180 fixes-paths=0
+→ P7 단위 커밋은 FIX 문서·FIX 코드와 섞이지 않았다. 각 커밋의 변경 파일은 app/push/·app/api/·app/briefing/scheduler.py·app/main.py·app/settings.py·requirements.txt·.env.example·tests/test_push_*.py·docs/ 뿐(git show --stat 로 확인).
+
+판정(verifier): 608694b..HEAD 에서 24행 경로를 바꾼 커밋은 FIX-019 4912865 · FIX-020 7459925 · FIX-021 b124c8e · FIX-025 3cd378c · FIX-026 90f249c 다섯뿐이고 P7-push 단위·문서 커밋은 전부 0 → 사용자 해석 기준으로 통과.
+참고: FIX-020 7459925 는 24행 경로 밖에서 P7 파일 app/push/subscriptions.py(ON CONFLICT upsert)와 alembic/versions/0002(UNIQUE(user_id, endpoint))·docs/wiki/specs/S3.1 보충 줄을 바꿨다(04-review §6-3).

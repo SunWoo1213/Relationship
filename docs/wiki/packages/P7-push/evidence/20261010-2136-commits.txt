@@ -1,0 +1,16 @@
+e555142 fix(FIX-029): 푸시 모듈을 먼저 불러오면 순환 import 로 실패하던 것을 고친다
+6428180 docs(P7-push): 데스크톱 Chrome 에 실제 웹푸시 알림이 뜨는 것을 확인해 기록한다
+b73aaf0 docs(P7-push): 수용 기준 1~25행을 기계로 확인하고 웹푸시 켜는 법을 RUNNING 에 적는다
+572045a feat(P7-push): 웹푸시 구독을 만들어 보는 개발·확인 전용 페이지 /push-dev/ 를 추가한다
+55fc0f3 feat(P7-push): 브리핑 수동 실행과 1분 주기 작업이 웹푸시 알림기를 쓰게 연결한다
+32db187 docs(readme): 문제 해결 사례를 핵심 4건으로 줄이고 포트폴리오 형식으로 정리
+7459925 fix(FIX-020): 한 인물·한 키에 한 행 같은 규칙을 DB 가 지키게 한다
+b89c936 docs(wiki): 다음 세션이 이어갈 수 있게 HANDOFF 를 정리하고 FIX-020 계획을 남긴다
+8e9af9e feat(P7-push): U4 알림을 실제로 보내는 발송기와 알림기를 만든다
+f256259 feat(P7-push): U3 브리핑을 알림 제목·본문으로 바꾸는 함수를 만든다
+47adb1e docs(P7-push): 복기 자료를 쓰다 찾은 FIX 후보를 HANDOFF 에 모아 둔다
+6c98516 feat(P7-push): U2 브라우저 알림 구독을 저장하는 API 를 만든다
+85393e0 feat(P7-push): U1 웹푸시 라이브러리를 들이고 키 설정을 읽는 자리를 만든다
+a69af80 docs(P7-push): 웹푸시 계획을 승인받고 작업을 시작한다
+fa5802d docs(P7-push): 웹푸시 계획을 검증까지 마치고 승인 대기로 남긴다
+7c94aad feat(P2-tools): U7 get_briefing — 자료 조회(facts·최근 events 5·다가오는 schedules 3)·schedule_id 시 briefed_at 기록, 문장화 없음
