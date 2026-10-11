@@ -50,7 +50,7 @@ if [ -x "$ROOT/.claude/scripts/gitlog.sh" ] || [ -f "$ROOT/.claude/scripts/gitlo
   git -C "$ROOT" status -sb 2>/dev/null | head -n1
   git -C "$ROOT" log --oneline --no-color -5 2>/dev/null
   cur="$(git -C "$ROOT" branch --show-current 2>/dev/null)"
-  [ "$cur" = "dev" ] || echo "--- 주의: 현재 브랜치가 '$cur' 이다. 작업·푸시는 dev 에서만 한다 (git checkout dev). ---"
+  [ "$cur" = "dev2" ] || echo "--- 주의: 현재 브랜치가 '$cur' 이다. 작업·실험 푸시는 dev2 · dev 는 dev2:dev 승격으로만 (L-001, git checkout dev2). ---"
 fi
 if [ "$src" = "compact" ]; then
   echo "--- 주의: 컨텍스트가 압축됐다. 위 HANDOFF 가 압축 전 상태와 다르면 먼저 HANDOFF 를 고치고 계속하라. ---"

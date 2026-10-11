@@ -497,12 +497,18 @@ expect_allow "$H/stage-gate.sh" 'docs path exempt' "$(gate "$ROOT/docs/wiki/x.md
 expect_allow "$H/stage-gate.sh" '.claude path exempt' "$(gate "$ROOT/.claude/skills/x/SKILL.md")"
 expect_allow "$H/stage-gate.sh" 'outside project' "$(gate 'C:\Other\x.py')"
 expect_allow "$H/stage-gate.sh" 'windows path of another machine is outside' "$(gate 'C:\Capstone2\app\main.py')"
-act="$(grep -E '^active:' docs/wiki/CURRENT.md | head -n1 | sed -E 's/^active:[[:space:]]*//' | tr -d '[:space:]\r')"
-if [ "$act" = "none" ]; then
-  expect_deny "$H/stage-gate.sh" 'product code with active: none' "$(gate "$ROOT/app/main.py")"
-else
-  echo "skip active=$act (product code gate not tested)"
-fi
+# FIX-032(R-30-1): 예전에는 실제 docs/wiki/CURRENT.md 의 active: 를 읽어 none 일 때만 "제품 코드 거부" 를
+# 시험하고 아니면 skip 했다. 이제 격리 저장소(active: none / FIX-998)에서 항상 시험한다 — 실제 저장소 상태 무관.
+SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-sg0-$$")")"
+mkdir -p "$SG_T/docs/wiki/fixes" "$SG_T/app"
+printf 'active: none\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+out="$(printf '%s' "$(gate "$SG_T/app/main.py")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
+if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   product code with active: none (격리 저장소, 실제 CURRENT.md 미사용)"; else echo "XX   product code with active: none 인데 allow 됐다(또는 SG_T 가 프로젝트 밖으로 인식됨)"; fails=$((fails+1)); fi
+printf 'active: FIX-998\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+printf '# FIX-998\n\n계획 점검: 통과(메인 세션, 점검표 1~8)\n검증: (verifier 가 쓴다)\n승인: 사용자 (2026-10-11)\n' > "$SG_T/docs/wiki/fixes/FIX-998.md"
+out="$(printf '%s' "$(gate "$SG_T/app/main.py")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
+if [ -z "$out" ]; then echo "ok   allow  product code with active: FIX-998 (같은 격리 저장소 대조 — 위 DENY 는 활성 작업 부재 때문)"; else echo "XX   active: FIX-998 인데 거부됨: $(printf '%s' "$out" | head -c 150)"; fails=$((fails+1)); fi
+rm -rf "$SG_T"
 
 echo "== stage-gate: F-27-1 새 FIX 템플릿 호환(계획 점검: 통과 + 검증: 자리표) =="
 SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-sg-$$")")"
@@ -564,42 +570,60 @@ done
 rm -rf "$SG_T"
 
 echo "== stage-gate: dev 푸시 후 결정 대기(L-003) =="
-AW=".claude/.awaiting-decision"
-if [ -f "$AW" ]; then echo "skip (실제 결정 대기 마커가 있음)"; else
-  echo testhash > "$AW"
-  expect_deny  "$H/stage-gate.sh" 'awaiting: plan doc denied' "$(gate "$ROOT/docs/wiki/packages/x/01-plan.md")"
-  expect_allow "$H/stage-gate.sh" 'awaiting: HANDOFF allowed' "$(gate "$ROOT/docs/wiki/HANDOFF.md")"
-  expect_deny  "$H/commit-guard.sh" 'awaiting: commit denied' "$(mk 'git commit -F .claude/commit-draft.txt')"
-  rm -f "$AW"
-fi
+# FIX-032(R-30-1): 예전에는 실제 .claude/.awaiting-decision 을 만들고 지웠고(있으면 절 전체 skip), 이제는
+# CLAUDE_PROJECT_DIR=<격리 저장소> 로 훅을 돌려 실제 마커를 건드리지 않는다. skip 분기 없음.
+SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-aw-$$")")"
+mkdir -p "$SG_T/.claude" "$SG_T/docs/wiki"
+AW="$SG_T/.claude/.awaiting-decision"
+aw_gate()  { printf '%s' "$(gate "$SG_T/$1")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh"; }
+aw_commit() { printf '%s' "$(mk 'git commit -F .claude/commit-draft.txt')" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/commit-guard.sh"; }
+# FIX-028 C 대조: 마커가 없으면 docs 경로는 면제 → allow. 아래 DENY 가 "마커 때문" 임을 분리하고 SG_T 가 프로젝트 안으로 인식됨을 보인다.
+out="$(aw_gate docs/wiki/packages/x/01-plan.md)"
+if [ -z "$out" ]; then echo "ok   allow  FIX-028 대조: 마커 없음 → 계획 문서 쓰기 가능 (격리 저장소)"; else echo "XX   FIX-028 대조 실패: 마커 없는데 거부됨: $(printf '%s' "$out" | head -c 100)"; fails=$((fails+1)); fi
+echo testhash > "$AW"
+out="$(aw_gate docs/wiki/packages/x/01-plan.md)"
+if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   awaiting: plan doc denied (격리 저장소 마커)"; else echo "XX   should DENY but allowed: awaiting: plan doc denied"; fails=$((fails+1)); fi
+out="$(aw_gate docs/wiki/HANDOFF.md)"
+if [ -z "$out" ]; then echo "ok   allow  awaiting: HANDOFF allowed"; else echo "XX   should ALLOW but denied: awaiting: HANDOFF allowed -> $(printf '%s' "$out" | head -c 100)"; fails=$((fails+1)); fi
+out="$(aw_commit)"
+if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   awaiting: commit denied (격리 저장소 마커)"; else echo "XX   should DENY but allowed: awaiting: commit denied"; fails=$((fails+1)); fi
+rm -rf "$SG_T"
 
 echo "== delegate-guard: 단계 위임 승인(L-004) =="
 ag() { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_name':'Agent','tool_input':{'subagent_type':sys.argv[1],'description':'x','prompt':'y'}}))" "$1"; }
-SA=".claude/.stage-approved"
-if [ -f "$SA" ]; then echo "skip (실제 단계 승인 마커가 있음)"; else
-  expect_deny  "$H/delegate-guard.sh" 'verifier without marker' "$(ag verifier)"
-  expect_allow "$H/delegate-guard.sh" 'Explore not gated' "$(ag Explore)"
-  echo architect > "$SA"
-  expect_deny  "$H/delegate-guard.sh" 'marker=architect but backend-agent' "$(ag backend-agent)"
-  expect_allow "$H/delegate-guard.sh" 'marker=architect, architect allowed (consumed)' "$(ag architect)"
-  [ ! -f "$SA" ] && echo "ok   marker consumed after allow" || { echo "XX   marker not consumed"; fails=$((fails+1)); rm -f "$SA"; }
-  # P8-frontend U0: frontend-agent 도 게이트 대상
-  expect_deny  "$H/delegate-guard.sh" 'frontend-agent without marker' "$(ag frontend-agent)"
-  echo frontend-agent > "$SA"
-  expect_allow "$H/delegate-guard.sh" 'marker=frontend-agent, frontend-agent allowed (consumed)' "$(ag frontend-agent)"
-  [ ! -f "$SA" ] && echo "ok   frontend-agent marker consumed after allow" || { echo "XX   frontend-agent marker not consumed"; fails=$((fails+1)); rm -f "$SA"; }
-fi
+# FIX-032(R-30-1): 실제 .claude/.stage-approved 를 만들거나 지우지 않는다 — 격리 저장소를 CLAUDE_PROJECT_DIR 로 준다. skip 분기 없음.
+SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-dg-$$")")"
+mkdir -p "$SG_T/.claude"
+SA="$SG_T/.claude/.stage-approved"
+dg() { printf '%s' "$1" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/delegate-guard.sh"; }   # 인자: ag 의 JSON
+dg_deny()  { if dg "$2" | grep -q '"deny"'; then echo "ok   DENY   $1"; else echo "XX   should DENY but allowed: $1"; fails=$((fails+1)); fi; }
+dg_allow() { out="$(dg "$2")"; if [ -z "$out" ]; then echo "ok   allow  $1"; else echo "XX   should ALLOW but denied: $1 -> $(printf '%s' "$out" | head -c 100)"; fails=$((fails+1)); fi; }
+dg_deny  'verifier without marker (격리 저장소)' "$(ag verifier)"
+dg_allow 'Explore not gated' "$(ag Explore)"
+echo architect > "$SA"
+dg_deny  'marker=architect but backend-agent' "$(ag backend-agent)"
+dg_allow 'marker=architect, architect allowed (consumed)' "$(ag architect)"
+# FIX-028 C 대조: 격리 저장소의 마커가 소비(삭제)됐다 = 훅이 SG_T 를 자기 프로젝트로 읽었다(실제 저장소 마커를 본 것이 아님).
+[ ! -f "$SA" ] && echo "ok   marker consumed after allow — FIX-028 대조: 훅이 SG_T 를 자기 프로젝트로 인식" || { echo "XX   marker not consumed (훅이 SG_T 를 안 봤을 수 있음)"; fails=$((fails+1)); rm -f "$SA"; }
+# P8-frontend U0: frontend-agent 도 게이트 대상
+dg_deny  'frontend-agent without marker' "$(ag frontend-agent)"
+echo frontend-agent > "$SA"
+dg_allow 'marker=frontend-agent, frontend-agent allowed (consumed)' "$(ag frontend-agent)"
+[ ! -f "$SA" ] && echo "ok   frontend-agent marker consumed after allow" || { echo "XX   frontend-agent marker not consumed"; fails=$((fails+1)); rm -f "$SA"; }
+rm -rf "$SG_T"
 
 echo "== findings.py 왕복 =="
-T="docs/wiki/packages/_selftest"; mkdir -p "$T"
+# FIX-032(R-30-1): findings.py 는 CLAUDE_PROJECT_DIR 환경변수를 ROOT 로 읽는다 → 격리 저장소에서 돌려 실제 docs/wiki/packages 를 건드리지 않는다.
+FD_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-fd-$$")")"
+T="$FD_T/docs/wiki/packages/_selftest"; mkdir -p "$T"
 printf 'PASS  a\nFAIL  없음: docs/wiki/packages/x/01-plan.md\nWARN  보류 2 건\nFAILED tests/test_x.py::test_y - AssertionError\n' > "$T/out1.txt"
-"$HOOK_PY" .claude/scripts/findings.py _selftest "$T/out1.txt" --source verify-plan >/dev/null; rc1=$?
+CLAUDE_PROJECT_DIR="$FD_T" "$HOOK_PY" "$ROOT/.claude/scripts/findings.py" _selftest "$T/out1.txt" --source verify-plan >/dev/null; rc1=$?
 n_open="$(grep -c '^상태: 열림' "$T/05-remediation.md")"
 printf 'PASS  a\n' > "$T/out2.txt"
-"$HOOK_PY" .claude/scripts/findings.py _selftest "$T/out2.txt" --source verify-plan >/dev/null; rc2=$?
+CLAUDE_PROJECT_DIR="$FD_T" "$HOOK_PY" "$ROOT/.claude/scripts/findings.py" _selftest "$T/out2.txt" --source verify-plan >/dev/null; rc2=$?
 n_closed="$(grep -c '^상태: 해소' "$T/05-remediation.md")"
 if [ "$rc1" -eq 1 ] && [ "$n_open" -eq 3 ] && [ "$rc2" -eq 0 ] && [ "$n_closed" -eq 3 ]; then echo "ok   findings: 3 열림 → 3 해소, rc 1→0"; else echo "XX   findings: rc1=$rc1 open=$n_open rc2=$rc2 closed=$n_closed"; fails=$((fails+1)); fi
-rm -f "$T/out1.txt" "$T/out2.txt" "$T/05-remediation.md"; rmdir "$T" 2>/dev/null
+rm -rf "$FD_T"
 
 echo "== verify-plan (없는 패키지 → FAIL 종료 1) =="
 bash .claude/scripts/verify-plan.sh ZZ-no-such-package >/dev/null 2>&1; rc=$?
@@ -614,7 +638,26 @@ echo "== session-start 출력 존재 =="
 # Windows Git Bash 에서 파이프 닫힘이 쓰는 쪽을 끝내지 못해 멈출 수 있다(근본 원인 미확정).
 full="$(echo '{"source":"resume"}' | bash "$H/session-start.sh")"
 out="$(printf '%s\n' "$full" | head -n 1)"
-printf '%s' "$out" | grep -q '세션 재개' && echo "ok   session-start prints header" || { echo "XX   session-start: $out"; fails=$((fails+1)); }
+# FIX-032(R-31-2): Windows 멈춤 재발 시 원인을 좁히도록 훅 전체 출력 바이트 수를 ok 줄에 남긴다.
+printf '%s' "$out" | grep -q '세션 재개' && echo "ok   session-start prints header (full=${#full} bytes)" || { echo "XX   session-start: $out (full=${#full} bytes)"; fails=$((fails+1)); }
+
+# FIX-032(L-001): 브랜치 경고는 dev2 가 기준이다(작업·실험 푸시는 dev2, dev 는 dev2:dev 승격으로만). 격리 저장소에서 브랜치만 만든다(커밋 없음).
+SS_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-ss-$$")")"
+mkdir -p "$SS_T/docs/wiki" "$SS_T/.claude/scripts"
+git -C "$SS_T" init -q 2>/dev/null
+git -C "$SS_T" checkout -q -b dev2 2>/dev/null
+ss_run() { echo '{"source":"resume"}' | CLAUDE_PROJECT_DIR="$SS_T" bash "$H/session-start.sh"; }
+cp "$ROOT/.claude/scripts/gitlog.sh" "$SS_T/.claude/scripts/gitlog.sh" 2>/dev/null
+ss_out="$(ss_run)"
+if printf '%s' "$ss_out" | grep -q -- '--- git ('; then
+  if printf '%s' "$ss_out" | grep -q '주의: 현재 브랜치'; then echo "XX   session-start: dev2 인데 브랜치 경고가 나왔다"; fails=$((fails+1)); else echo "ok   session-start: 브랜치 dev2 → 경고 없음 (격리 저장소)"; fi
+  git -C "$SS_T" checkout -q -b other 2>/dev/null
+  ss_out="$(ss_run)"
+  if printf '%s' "$ss_out" | grep -q "주의: 현재 브랜치가 'other'"; then echo "ok   session-start: 브랜치 other → 경고 (격리 저장소)"; else echo "XX   session-start: 브랜치 other 인데 경고가 없다"; fails=$((fails+1)); fi
+else
+  echo "XX   session-start: 격리 저장소에서 git 블록이 출력되지 않음 — 브랜치 시험 불가"; fails=$((fails+1))
+fi
+rm -rf "$SS_T"
 
 echo "== 에이전트 frontmatter YAML 파싱 (FIX-003) =="
 # 이 검사만 PyYAML 이 필요하다. 훅용 인터프리터(맨 셸)에는 없을 수 있으므로

@@ -1,0 +1,121 @@
+# FIX-032 verifier 보조 점검 출력 (전체) — 검토자: verifier (fable) · 2026-10-11 21:43~21:46
+# 각 절 첫 줄이 실행한 명령이다. 출력은 가공 없이 그대로다.
+
+== 1. git diff --stat de35242 ==
+ .claude/agents/backend-agent.md |   2 +-
+ .claude/agents/eval-agent.md    |   2 +-
+ .claude/hooks/session-start.sh  |   2 +-
+ .claude/scripts/test-guards.sh  | 109 ++++++++++++++++++++++++++++------------
+ .claude/skills/commit/SKILL.md  |   6 +--
+ docs/wiki/HANDOFF.md            |   4 +-
+ docs/wiki/fixes/FIX-014.md      |   1 +
+ docs/wiki/journal.md            |   2 +
+ 8 files changed, 87 insertions(+), 41 deletions(-)
+
+== 1b. git diff --name-only de35242 -- .claude/hooks ==
+.claude/hooks/session-start.sh
+
+== 2. grep -n "skip\|CURRENT.md\|\.stage-approved\|\.awaiting-decision\|_selftest" .claude/scripts/test-guards.sh ==
+500:# FIX-032(R-30-1): 예전에는 실제 docs/wiki/CURRENT.md 의 active: 를 읽어 none 일 때만 "제품 코드 거부" 를
+501:# 시험하고 아니면 skip 했다. 이제 격리 저장소(active: none / FIX-998)에서 항상 시험한다 — 실제 저장소 상태 무관.
+504:printf 'active: none\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+506:if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   product code with active: none (격리 저장소, 실제 CURRENT.md 미사용)"; else echo "XX   product code with active: none 인데 allow 됐다(또는 SG_T 가 프로젝트 밖으로 인식됨)"; fails=$((fails+1)); fi
+507:printf 'active: FIX-998\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+520:printf 'active: none\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+525:printf 'active: FIX-999\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+539:printf 'active: none\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+552:# 예전에는 실제 저장소($ROOT)로 시험해, 시험을 돌리는 순간의 docs/wiki/CURRENT.md active: 값에 결과가
+556:printf 'active: FIX-998\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+565:printf 'active: none\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+573:# FIX-032(R-30-1): 예전에는 실제 .claude/.awaiting-decision 을 만들고 지웠고(있으면 절 전체 skip), 이제는
+574:# CLAUDE_PROJECT_DIR=<격리 저장소> 로 훅을 돌려 실제 마커를 건드리지 않는다. skip 분기 없음.
+577:AW="$SG_T/.claude/.awaiting-decision"
+594:# FIX-032(R-30-1): 실제 .claude/.stage-approved 를 만들거나 지우지 않는다 — 격리 저장소를 CLAUDE_PROJECT_DIR 로 준다. skip 분기 없음.
+597:SA="$SG_T/.claude/.stage-approved"
+618:T="$FD_T/docs/wiki/packages/_selftest"; mkdir -p "$T"
+620:CLAUDE_PROJECT_DIR="$FD_T" "$HOOK_PY" "$ROOT/.claude/scripts/findings.py" _selftest "$T/out1.txt" --source verify-plan >/dev/null; rc1=$?
+623:CLAUDE_PROJECT_DIR="$FD_T" "$HOOK_PY" "$ROOT/.claude/scripts/findings.py" _selftest "$T/out2.txt" --source verify-plan >/dev/null; rc2=$?
+667:  echo "skip frontmatter 검사 (PyYAML 이 있는 인터프리터를 못 찾음 - pip install pyyaml)"
+759:if [ -f "$CC_T/.claude/.awaiting-decision" ]; then
+770:if [ -f "$CC_T/.claude/.awaiting-decision" ] && [ ! -f "$CC_T/.claude/.push-approved" ]; then
+810:#     .awaiting-decision 을 먼저 지운다. 위 시험 6 이 만들어 두었기 때문에,
+812:rm -f "$CC_T/.claude/.awaiting-decision"
+822:   && [ -f "$CC_T/.claude/.awaiting-decision" ]; then
+876:rm -f "$CC_T/.claude/.awaiting-decision"
+888:rm -f "$CC_T/.claude/.awaiting-decision" "$CC_T/.claude/.commit-approved" "$CC_T/.claude/.push-approved"
+901:if [ -f "$CC_T/.claude/.push-approved" ] && [ -f "$CC_T/.claude/.commit-approved" ] && [ ! -f "$CC_T/.claude/.awaiting-decision" ]; then
+912:rm -f "$CC_T/.claude/.commit-approved" "$CC_T/.claude/.push-approved" "$CC_T/.claude/.awaiting-decision"
+# 판독: 매치된 경로는 전부 $SG_T / $FD_T / $CC_T(격리 디렉터리) 아래이거나 주석이다. 667행 skip 은 PyYAML 부재(환경) 분기로 저장소 상태와 무관하다.
+#       실제 $ROOT 의 CURRENT.md·마커·_selftest 를 읽거나 쓰는 줄은 없다.
+
+== 2b. 훅·스크립트가 ROOT 를 어디서 얻나 ==
+grep -n "CLAUDE_PROJECT_DIR\|ROOT=" .claude/hooks/stage-gate.sh .claude/hooks/delegate-guard.sh .claude/hooks/commit-guard.sh .claude/hooks/session-start.sh .claude/scripts/findings.py
+.claude/hooks/commit-guard.sh:19:ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
+.claude/hooks/commit-guard.sh:104:  # 테스트에서 CLAUDE_PROJECT_DIR 로 다른 저장소를 가리킬 수 있어, 스크립트 파일 자체를
+.claude/hooks/stage-gate.sh:20:ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
+.claude/hooks/delegate-guard.sh:13:ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
+.claude/scripts/findings.py:27:ROOT = os.environ.get("CLAUDE_PROJECT_DIR") or os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+.claude/hooks/session-start.sh:6:ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
+grep -n "stage-approved\|ROOT" .claude/hooks/delegate-guard.sh
+7:# 로 1회용 마커(.claude/.stage-approved, 내용 = 에이전트 이름)를 만든 뒤에만 그 에이전트를 띄울 수 있다.
+13:ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
+14:MARK="$ROOT/.claude/.stage-approved"
+grep -n "awaiting-decision\|CURRENT.md" .claude/hooks/stage-gate.sh   (발췌: 경로 정의 줄)
+21:CURRENT="$ROOT/docs/wiki/CURRENT.md"
+73:AWAIT="$ROOT/.claude/.awaiting-decision"
+grep -n "awaiting-decision" .claude/hooks/commit-guard.sh | head -1
+52:AWAIT="$ROOT/.claude/.awaiting-decision"
+# 판독: 네 훅·findings.py 모두 마커·CURRENT.md 를 $ROOT 기준으로만 읽고, $ROOT 는 CLAUDE_PROJECT_DIR 이 우선한다.
+#       따라서 CLAUDE_PROJECT_DIR=$SG_T 로 돌린 시험은 실제 저장소 마커 유무와 무관하다(정적 근거).
+
+== 4. session-start.sh 53행 현재 문구 (sed -n 53p) ==
+  [ "$cur" = "dev2" ] || echo "--- 주의: 현재 브랜치가 '$cur' 이다. 작업·실험 푸시는 dev2 · dev 는 dev2:dev 승격으로만 (L-001, git checkout dev2). ---"
+
+== 4b. ${#full} 이 세는 것 — 문자 수인가 바이트 수인가 ==
+echo "LANG=$LANG LC_ALL=$LC_ALL"
+LANG=ko_KR.UTF-8 LC_ALL=ko_KR.UTF-8
+s='한글'; echo "chars=${#s} bytes=$(printf '%s' "$s" | wc -c | tr -d ' ')"
+chars=2 bytes=6
+full="$(echo '{"source":"resume"}' | bash .claude/hooks/session-start.sh 2>/dev/null)"; echo "\${#full}=${#full}  wc -c=$(printf '%s' "$full" | wc -c | tr -d ' ')"
+${#full}=14323  wc -c=20800
+# 판독: UTF-8 로케일에서 ${#var} 는 문자 수다. ok 줄의 "full=… bytes" 라벨은 실제로는 문자 수(한글이 많아 바이트의 약 69%).
+#       진단 지표로는 쓸 수 있으나(단조 증가) 라벨이 틀리고, 로케일이 C 인 환경(Windows Git Bash 일부)에선 바이트가 찍혀 OS 간 비교가 안 된다 → [권고].
+
+== 5. 낡은 문구 잔존 ==
+grep -rn 'checkout dev)\|dev 에서 \|dev 에서만\|dev 브랜치에서\|브랜치 `dev`' .claude | grep -v 'dev2'
+.claude/hooks/safety-guard.sh:74:  #   dev:main   : dev 에서 끝난 것을 배포 브랜치로 올린다. 승격 마커 필요, fast-forward 만.
+# 판독: 이 한 줄은 dev→main 승격 설명으로 L-001 과 맞는 문장(낡은 문구 아님).
+grep -n 'dev 에서만\|dev 브랜치에서만' docs/wiki/*.md
+docs/wiki/HANDOFF.md:42:- 하네스: **R-30-1** … `session-start.sh` 53행·commit SKILL 의 "dev 에서만" 낡은 문구 · …
+# 판독: 후보 목록(역사 기록)에서 낡은 문구를 "고칠 대상"으로 언급한 것. 지시문 아님.
+grep -n "Fable\|Opus\|Sonnet\|Claude-Session\|Co-Authored" .claude/skills/commit/SKILL.md
+40:<세션 시스템 안내(attribution reminder)가 주는 Co-Authored-By 줄을 그대로 쓴다. Claude-Session: 줄은 안내에 있을 때만 쓴다>
+43:- **서명 줄은 고정값이 아니다(FIX-032).** 모델명은 세션마다 달라지므로 이 템플릿에 적어 두지 않는다. 세션이 알려 주는 `Co-Authored-By` 줄을 한 글자도 바꾸지 않고 마지막에 붙이고, 안내에 `Claude-Session:` 줄이 없으면 쓰지 않는다.
+45:- **언어: 한국어.** … 원문 그대로 두는 것: `type` 접두어, 코드 식별자·파일 경로·명령어·태그(Refs), `Co-Authored-By` 서명 줄.
+# 판독: 모델명 고정값 없음.
+sed -n 111,116p .claude/skills/commit/SKILL.md  ("첫 커밋" 절)
+## 첫 커밋 (저장소에 커밋이 없을 때)
+- `git config core.hooksPath .githooks`가 설정돼 있는지 확인(`git config core.hooksPath`).
+- 원격이 `https://github.com/SunWoo1213/Relationship.git`인지 확인(`git remote -v`).
+- 하네스 전체를 `harness(wiki): …` 한 커밋으로. 이후부터는 작업 단위별.
+- 작업 브랜치 `dev2`가 없으면 `git checkout -b dev2`로 만들고 이후 모든 커밋은 dev2 에서 한다. 푸시는 `origin dev2`, `dev` 는 `dev2:dev` 승격으로만 갱신한다(L-001, §6·§7).
+
+== 6. 구현자·메인 세션 증거 파일 ==
+ls -la docs/wiki/fixes/evidence/ | grep fix032
+-rw-r--r--@   1 sunwoo  staff   3107 10월 11 21:34 20261011-2133-fix032-before.txt
+-rw-r--r--@   1 sunwoo  staff  22986 10월 11 21:34 20261011-2133-fix032-test-guards.txt
+-rw-r--r--@   1 sunwoo  staff  23276 10월 11 21:44 20261011-2215-fix032-marker-present.txt
+grep -c '^ok ' docs/wiki/fixes/evidence/20261011-2215-fix032-marker-present.txt
+333
+grep -n "^XX\|^skip\|== 결과" docs/wiki/fixes/evidence/20261011-2215-fix032-marker-present.txt
+365:== 결과: 실패 0 ==
+(마커 상태는 그 파일 7~11행 머리말 — 메인 세션 기록: 실행 전 cat → verifier / 실행 후 cat → verifier 불변 / .awaiting-decision 없음 / git status 변경 파일 8 동일)
+
+== 7. 환경 ==
+git version 2.55.0
+GNU bash, version 3.2.57(1)-release (arm64-apple-darwin26)
+grep -c "mktemp -d" .claude/scripts/test-guards.sh → 12 (FIX-032 이전부터 11회 사용된 관용구)
+grep -n "windows" .github/workflows/*.yml | head -3
+16:# 것이 아니다. 즉 같은 run 안에서 matrix(3.13/3.14)·windows 세 job 은
+116:  windows:
+124:    runs-on: windows-latest

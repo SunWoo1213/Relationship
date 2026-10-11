@@ -37,10 +37,10 @@ diff를 `docs/wiki` 카드와 대조한다 — devlog 스킬의 점검표 1~4, 8
 검증: <실행한 테스트/명령과 결과. 없으면 "없음(문서)">
 Refs: <P-id> <D..> <S..> <R..> <FIX-/CR- 있으면>
 
-Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
-Claude-Session: <이 세션의 URL>
+<세션 시스템 안내(attribution reminder)가 주는 Co-Authored-By 줄을 그대로 쓴다. Claude-Session: 줄은 안내에 있을 때만 쓴다>
 ```
 
+- **서명 줄은 고정값이 아니다(FIX-032).** 모델명은 세션마다 달라지므로 이 템플릿에 적어 두지 않는다. 세션이 알려 주는 `Co-Authored-By` 줄을 한 글자도 바꾸지 않고 마지막에 붙이고, 안내에 `Claude-Session:` 줄이 없으면 쓰지 않는다.
 - **사람이 읽고 바로 알아볼 수 있게 쓴다** (사용자 지시 2026-09-29). 제목만 봐도 무엇이 달라졌는지 알 수 있어야 한다. 본문은 한 줄에 한 가지만 담아 짧게 끊고, 코드 식별자를 늘어놓는 대신 그 변경이 실제로 무슨 일을 하는지 평범한 말로 적는다. "이유" 줄에는 어느 카드의 요구를 실현하는지와 **왜 그 방법을 골랐는지**를 함께 쓴다. 커밋 메시지가 곧 개발 로그이고 기획서 변경 시 `git log --grep` 으로 되짚는 근거라, 읽어서 이해되지 않으면 제 역할을 못 한다.
 - **언어: 한국어.** 제목·본문(변경·이유·정합성·검증)과 `03-log.md`·`HANDOFF.md`·`journal.md` 항목은 한국어 문장으로 쓴다. 원문 그대로 두는 것: `type` 접두어, 코드 식별자·파일 경로·명령어·태그(Refs), `Co-Authored-By` 서명 줄.
 - `type`: `feat` `fix` `test` `docs` `eval` `refactor` `chore` `harness`(하네스·훅·스킬·위키) `cr`(기획서 변경 이행)
@@ -112,4 +112,4 @@ git push origin dev2:dev
 - `git config core.hooksPath .githooks`가 설정돼 있는지 확인(`git config core.hooksPath`).
 - 원격이 `https://github.com/SunWoo1213/Relationship.git`인지 확인(`git remote -v`).
 - 하네스 전체를 `harness(wiki): …` 한 커밋으로. 이후부터는 작업 단위별.
-- 작업 브랜치 `dev`가 없으면 `git checkout -b dev`로 만들고 이후 모든 커밋·푸시는 dev 에서 한다(§6·§7).
+- 작업 브랜치 `dev2`가 없으면 `git checkout -b dev2`로 만들고 이후 모든 커밋은 dev2 에서 한다. 푸시는 `origin dev2`, `dev` 는 `dev2:dev` 승격으로만 갱신한다(L-001, §6·§7).
