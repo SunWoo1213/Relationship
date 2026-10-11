@@ -1,0 +1,38 @@
+# FIX-014 재검증(verifier, 새 컨텍스트) — 범위·검출력·문서 대조 (위임 프롬프트 확인 4·6·8)
+# 2026-10-11 · 기준 HEAD d16375e · 작업 트리 미커밋(git status: M 15 · ?? 15 — 1차 verifier 증거 7개·재작업 증거 3개·review-FIX-014.md 포함)
+
+## §1 검출력(확인 4) — rework-before 가 재작업 코드 없는 상태를 반영하는가
+명령: diff <(sed -n '/^== bash-write-guard/,/^== commit-guard: FIX-027/p' evidence/20261011-1858-fix014-rework-before.txt) <(같은 절, 이번 tg.txt)
+결과: 달라지는 줄 = 16쌍(XX should DENY but allowed → ok DENY, R-14-1 8건·R-14-2 4건·R-14-3 4건) + before 끝의 `== 결과: 실패 16 ==` 줄. 그 밖 0줄.
+명령: diff <(1609-after 의 FIX-014 절) <(rework-before 의 FIX-014 절)
+결과: rework-before = 1609-after + 새 거부 기대 16줄(XX) + 새 허용 기대 7줄(ok) + 결과 줄. 즉 before 는 "시험만 추가, 코드는 1차 그대로" 상태다. 삭제·변경된 기존 줄 0.
+명령: diff evidence/20261011-1609-fix014-after.txt <이번 tg.txt>
+결과: 1609-after 의 머리말 주석 4줄 제거분 + FIX-014 절에 새 23줄(ok) 추가. FIX-014 절 밖 변화 0줄 → 재작업이 다른 가드 시험에 영향 없음.
+판정: 유효. 검출력(전) → 통과(후) 순서가 지켜졔고 차이가 FIX-014 절에만 있다.
+
+## §2 test-guards 직접 실행(확인 5)
+bash .claude/scripts/test-guards.sh → rc=0 · ok 287 · XX 0 · skip 1(active=P8-frontend) · `== 결과: 실패 0 ==` → evidence/20261011-verifier-fix014-recheck-test-guards.txt(306행 전체)
+
+## §3 문서(확인 6)
+grep -rn 'tee docs/wiki' .claude docs/wiki/verification.md →
+  .claude/scripts/test-guards.sh:191:expect_deny "$BW" 'FIX-014 대조: 같은 명령을 프로젝트 안 경로로 바꾸면 거부' "$(mk "python -m pytest -q | tee docs/wiki/out.txt")"
+  (1건 — 거부 기대 시험의 입력 문자열. 지시 명령 아님.) → 조건 충족.
+고친 문구 3곳과 실제 동작 대조 — 이 재검증 자체가 그 절차로 진행됐다:
+  verifier.md 24·32행 / SKILL.md 34~35·43행 / verification.md 60~61행: "출력을 Write 툴로 evidence 에 저장(긴 출력은 스크래치패드 리터럴 절대 경로로 `>` 한 뒤 Read → Write)"
+  실측: `bash .claude/scripts/test-guards.sh > /private/tmp/claude-501/…/scratchpad/tg.txt 2>&1` → 훅 allow(드라이버 A14 도 allow) → Read → Write 로 recheck-test-guards.txt 저장 성공.
+        드라이버 출력도 같은 경로. 1차 verifier 는 `$SP/…` 변수 경로로 막혔다(…-intrusion.txt 끝 기록) — 문서가 "리터럴 절대 경로" 를 명시한 것이 그 함정을 막는다.
+R-14-7 잔존(권고): backend-agent.md 71행·eval-agent.md 61행 "임시 파일은 `/tmp`·스크래치패드에만 쓴다", frontend-agent.md 53행(스크래치패드 언급 없음) — "리터럴 절대 경로" 조건은 verifier.md 에만 있다. C3(`> $SP/x`) 가 여전히 deny 이므로 함정은 그대로다.
+CLAUDE.md 120행·security.md §4b·bash_write_check.py 머리말·bash-write-guard.sh 머리말: 한계 문장은 "프로그램 실행의 부작용" 만 적고 heredoc 본문 치환은 FIX-014.md 결과절(95행)에만 있다.
+
+## §4 FIX-014.md 결과절 ↔ 드라이버(확인 8)
+FIX-014.md 102행 "남는 불일치 15건(전부 아래 한계·C 계열)" + 103~111행 한계 목록:
+  R-14-5 X6 X7 X8 X11 X12 · R-14-6 X9 X10 · R-14-8 X15 X16 · mkdir X17 · rm X18 · C1 C2 C3 · (C5 는 문서 수정 전 기대)
+이번 드라이버(C5 기대 deny 로 갱신): 불일치 14 = 침입 11(X6 X7 X8 X9 X10 X11 X12 X15 X16 X17 X18) + 오탐 3(C1 C2 C3). 번호별 일치. C5 deny 일치.
+단, 결과절 95행 "heredoc 본문 안의 `$(…)` 치환은 재귀 분석하지 않는다" 는 절반만 맞다 — 셸(`bash <<EOF`)의 본문은 iter_cmds 로 재귀 분석되고(V27·N19 deny), 비셸(`cat <<EOF`)의 본문만 분석하지 않는다(E1·E2 allow). 그리고 셸 본문의 `$(…)`·`$VAR` 는 "재귀 분석" 되지만 그 결과가 실행 코드라는 점은 보지 않는다(N25·N26 allow). 새 소견 R-14-13.
+결과절 111행 "`node < file`(stdin 코드)" 범위 밖 사각 → `… | node`·`… | perl`·`… | ruby`(E3~E5) 도 같다. python 만 C2 로 차단되는 비대칭. 새 소견 R-14-14(권고).
+
+## §5 재작업 diff 범위(확인 — 계획 밖 변경 여부)
+git diff HEAD --stat 대상: .claude/agents/{backend,eval,frontend,verifier}.md · .claude/hooks/commit-cleanup.sh · .claude/scripts/test-guards.sh · .claude/settings.json · .claude/skills/devlog/SKILL.md · CLAUDE.md · docs/wiki/{HANDOFF,journal,registry,security,verification}.md · docs/wiki/fixes/FIX-014.md
+신규: .claude/hooks/bash-write-guard.sh(47행) · .claude/scripts/bash_write_check.py(1135행) · evidence 10개 · review-FIX-014.md
+재작업분(bash_write_check.py): Frag.stdin_dynamic/piped/pipe_src(69~71행) · parse 파이프 추적(264~273·326~332·343~353행) · _pipe_literal(423~441) · _stdin_codes(444~452) · _shell_codes 의 stdin 분기(463~465·476~477) · _find_exec_frags(497~523) · _frag_cmds(526~538) · cmd_python 의 _need_static(976)·stdin_dynamic(988~990) · _need_static(999~1003) · _inline(1005~1013) · cmd_perl 의 _need_static(877)
+제품 코드(app/·tests/·alembic/) 변경 없음(git status). 계획 밖 변경 없음.

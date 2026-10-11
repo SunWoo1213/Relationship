@@ -57,7 +57,8 @@
 
 ```
 1. 검증 실행      bash .claude/scripts/verify-plan.sh <id>  또는  verify-impl.sh <id>
-                  | tee docs/wiki/packages/<id>/evidence/<ts>-verify-*.txt
+                  → 출력을 Write 툴로 docs/wiki/packages/<id>/evidence/<ts>-verify-*.txt 에 저장
+                  (또는 스크래치패드 리터럴 절대 경로로 > 한 뒤 Read → Write. 프로젝트 안 tee·> 는 훅이 거부)
 2. 소견 생성      bash .claude/scripts/findings.sh <id> evidence/<ts>-verify-*.txt --source verify-impl
                   → 05-remediation.md 에 FAIL/WARN 마다 F-xxxxxx 블록 (같은 문제 = 같은 ID)
 3. 소견 채우기    블록마다: 원인 가설 → 확인 명령 실행·출력 인용 → 해결 단계 표

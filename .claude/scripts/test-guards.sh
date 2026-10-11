@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # test-guards.sh — 훅·스크립트 자가 점검. 훅을 고친 뒤 반드시 실행하고 출력을 evidence 로 남긴다.
-#   bash .claude/scripts/test-guards.sh | tee docs/wiki/evidence/<ts>-test-guards.txt
+#   bash .claude/scripts/test-guards.sh > <스크래치패드>/out.txt   (그 뒤 Write 툴로 docs/wiki/.../evidence/ 에 저장)
+#   (FIX-014: 프로젝트 안 경로로 tee·> 하는 Bash 는 bash-write-guard 가 거부한다 — 증거 파일은 Write 툴로 쓴다)
 # 기대: 모든 줄이 "ok" 로 시작. "XX" 가 있으면 훅 회귀.
 # 주의: 가짜 비밀 문자열은 실행 시점에 조합한다 — 이 파일 자체가 secret-guard 에 걸리지 않도록.
 set -u
@@ -20,6 +21,7 @@ fi
 
 mk()  { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_input':{'command':sys.argv[1]}}))" "$1"; }
 mkw() { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_input':{'file_path':sys.argv[1],'content':sys.argv[2]}}))" "$1" "$2"; }
+mkp() { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_name':'PowerShell','tool_input':{'command':sys.argv[1]}}))" "$1"; }  # PowerShell 도구 입력 (FIX-014)
 
 # FIX-028: mktemp -d 가 주는 경로는 Git Bash(Windows)에서 /tmp/tmp.xxx 같은 MSYS 표기다. 네이티브 python 의
 # 인자는 MSYS 가 C:/Users/.../Temp/... 로 자동 변환하지만 환경변수(CLAUDE_PROJECT_DIR)는 변환하지 않아
@@ -115,6 +117,128 @@ echo "== commit-guard =="
 expect_deny  "$H/commit-guard.sh" 'git commit -m x (no marker)' "$(mk 'git commit -m x')"
 expect_deny  "$H/commit-guard.sh" 'git commit --amend' "$(mk 'git commit --amend -F .claude/commit-draft.txt')"
 expect_allow "$H/commit-guard.sh" 'git status' "$(mk 'git status')"
+
+echo "== bash-write-guard: 프로젝트 안 Bash 쓰기 거부 (FIX-014) =="
+# 검출력 먼저(수정안 8): 이 절은 훅을 만들기 전에 한 번 돌려 거부 기대 시험이 XX 로 실패하는 것을 증거로 남겼다
+# (docs/wiki/fixes/evidence/*-fix014-before.txt). 판정 본체는 .claude/scripts/bash_write_check.py.
+BW="$H/bash-write-guard.sh"
+BW_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-bw-$$")")"   # 임시 영역 허용 경로 시험용
+# 거부 기대 8건 (수정안 9)
+expect_deny "$BW" 'FIX-014 heredoc 로 app/ 쓰기: cat > app/x.py <<EOF' "$(mk "$(printf 'cat > app/x.py <<EOF\nprint(1)\nEOF')")"
+expect_deny "$BW" 'FIX-014 echo k > docs/wiki/HANDOFF.md' "$(mk 'echo k > docs/wiki/HANDOFF.md')"
+expect_deny "$BW" "FIX-014 sed -i '' s/a/b/ app/main.py" "$(mk "sed -i '' s/a/b/ app/main.py")"
+expect_deny "$BW" 'FIX-014 printf x | tee app/x.py' "$(mk 'printf x | tee app/x.py')"
+expect_deny "$BW" 'FIX-014 cp /tmp/x app/x.py (목적지가 프로젝트 안)' "$(mk 'cp /tmp/x app/x.py')"
+expect_deny "$BW" "FIX-014 python3 -c open('app/x.py','w')" "$(mk "python3 -c \"open('app/x.py','w')\"")"
+expect_deny "$BW" 'FIX-014 echo x > "$X" (대상 판정 불가)' "$(mk 'echo x > "$X"')"
+expect_deny "$BW" 'FIX-014 PowerShell Set-Content app/x.py' "$(mkp 'Set-Content app/x.py')"
+# 거부 기대 보강 (수정안 2 목록 나머지 — 파서가 형태별로 실제 판정하는지)
+expect_deny "$BW" 'FIX-014 >> 덧붙이기' "$(mk 'echo x >> app/x.py')"
+expect_deny "$BW" 'FIX-014 perl -pi -e' "$(mk "perl -pi -e 's/a/b/' app/x.py")"
+expect_deny "$BW" 'FIX-014 dd of=' "$(mk 'dd if=/tmp/a of=app/x.py')"
+expect_deny "$BW" 'FIX-014 touch' "$(mk 'touch app/new.py')"
+expect_deny "$BW" 'FIX-014 python Path.write_text' "$(mk "python3 -c \"from pathlib import Path; Path('app/x.py').write_text('x')\"")"
+expect_deny "$BW" 'FIX-014 python3 - <<PY heredoc 안의 open(…,w)' "$(mk "$(printf "python3 - <<PY\nopen('app/x.py','w').write('x')\nPY")")"
+expect_deny "$BW" 'FIX-014 bash -c 안에 숨긴 리다이렉트' "$(mk "bash -c 'echo hi > app/x.py'")"
+expect_deny "$BW" 'FIX-014 명령 치환 안의 리다이렉트' "$(mk 'echo $(cat x > app/y)')"
+expect_deny "$BW" 'FIX-014 xargs sed -i (대상이 stdin)' "$(mk 'ls | xargs sed -i s/a/b/')"
+expect_deny "$BW" 'FIX-014 curl -o app/…' "$(mk 'curl -o app/x.py http://x')"
+expect_deny "$BW" 'FIX-014 PowerShell Out-File 파이프' "$(mkp 'echo x | Out-File app/x.txt')"
+expect_deny "$BW" 'FIX-014 node writeFileSync' "$(mk "node -e \"require('fs').writeFileSync('app/x.js','x')\"")"
+# 재작업 R-14-1~3 (verifier 침입 X1~X5·X13): 코드를 stdin 으로 받는 셸·동적 인라인 코드·find -exec 로 감싼 쓰기
+expect_deny "$BW" "FIX-014 R-14-1 printf '…' | bash (파이프 입력 셸)" "$(mk "printf 'echo x > app/x.py' | bash")"
+expect_deny "$BW" "FIX-014 R-14-1 echo '…' | sh" "$(mk "echo 'echo x > app/x.py' | sh")"
+expect_deny "$BW" "FIX-014 R-14-1 bash <<< '…' (here-string)" "$(mk "bash <<< 'echo x > app/x.py'")"
+expect_deny "$BW" "FIX-014 R-14-1 cat f | bash (파이프 앞이 리터럴 아님)" "$(mk 'cat /tmp/f | bash')"
+expect_deny "$BW" "FIX-014 R-14-1 bash < file (stdin 리다이렉트)" "$(mk 'bash < /tmp/script.sh')"
+expect_deny "$BW" "FIX-014 R-14-1 bash -s < file" "$(mk 'bash -s < /tmp/script.sh')"
+expect_deny "$BW" "FIX-014 R-14-1 bash <<< \"\$(cat f)\" (동적 here-string)" "$(mk 'bash <<< "$(cat /tmp/f)"')"
+expect_deny "$BW" "FIX-014 R-14-1 (cat f; echo x) | bash (그룹 출력)" "$(mk '(cat /tmp/f; echo x) | bash')"
+expect_deny "$BW" "FIX-014 R-14-2 python3 -c \"\$(cat f)\" (동적 인라인)" "$(mk 'python3 -c "$(cat /tmp/p.py)"')"
+expect_deny "$BW" "FIX-014 R-14-2 node -e \"\$(cat f)\"" "$(mk 'node -e "$(cat /tmp/x.js)"')"
+expect_deny "$BW" "FIX-014 R-14-2 perl -e \"\$(cat f)\"" "$(mk 'perl -e "$(cat /tmp/x.pl)"')"
+expect_deny "$BW" "FIX-014 R-14-2 ruby -e \"\$(cat f)\"" "$(mk 'ruby -e "$(cat /tmp/x.rb)"')"
+expect_deny "$BW" "FIX-014 R-14-3 find app -exec sed -i … {} +" "$(mk "find app -name '*.py' -exec sed -i s/a/b/ {} +")"
+expect_deny "$BW" "FIX-014 R-14-3 find -execdir tee" "$(mk 'find app -execdir tee {} \;')"
+expect_deny "$BW" "FIX-014 R-14-3 find -exec sh -c 'echo > …'" "$(mk "find app -exec sh -c 'echo hi > \$0' {} \\;")"
+expect_deny "$BW" "FIX-014 R-14-3 find -exec -ok cp 목적지 (프로젝트 안)" "$(mk 'find /tmp -ok cp {} app/ \;')"
+# 2차 재작업 R-14-12 — xargs 자리표(-I{}·-i)가 코드 자리에 오면 코드는 파이프 입력에서 온 것이다
+expect_deny "$BW" "FIX-014 R-14-12 echo '…' | xargs -I{} bash -c {} (자리표=코드)" "$(mk "echo 'echo x > app/x.py' | xargs -I{} bash -c {}")"
+expect_deny "$BW" "FIX-014 R-14-12 echo '…' | xargs -I{} sh -c '{}'" "$(mk "echo 'echo x > app/x.py' | xargs -I{} sh -c '{}'")"
+expect_deny "$BW" "FIX-014 R-14-12 printf open(…) | xargs -0 -I{} python3 -c {}" "$(mk "printf \"open('app/x.py','w')\" | xargs -0 -I{} python3 -c {}")"
+expect_deny "$BW" "FIX-014 R-14-12 xargs -i sh -c '{}' (-i 기본 자리표)" "$(mk "echo 'echo x > app/x.py' | xargs -i sh -c '{}'")"
+expect_deny "$BW" "FIX-014 R-14-12 xargs -I@ node -e @" "$(mk "echo \"require('fs').writeFileSync('app/x.js','')\" | xargs -I@ node -e @")"
+expect_deny "$BW" "FIX-014 R-14-12 cat f | xargs -I{} bash -c {} (파이프 앞이 리터럴 아님)" "$(mk 'cat /tmp/f | xargs -I{} bash -c {}')"
+# 2차 재작업 R-14-13 — 따옴표 없는 heredoc 구분자의 본문은 바깥 셸이 먼저 확장한다
+expect_deny "$BW" "FIX-014 R-14-13 bash <<EOF \$(cat f) (셸 stdin 본문이 동적)" "$(mk "$(printf 'bash <<EOF\n$(cat /tmp/f)\nEOF')")"
+expect_deny "$BW" "FIX-014 R-14-13 bash <<EOF \$CMD (본문이 변수)" "$(mk "$(printf 'bash <<EOF\n$CMD\nEOF')")"
+expect_deny "$BW" "FIX-014 R-14-13 bash <<-EOF \$CMD (탭 제거형)" "$(mk "$(printf 'bash <<-EOF\n\t$CMD\n\tEOF')")"
+expect_deny "$BW" "FIX-014 R-14-13 cat <<EOF \$(echo x > app/x.py) (비셸 본문의 치환)" "$(mk "$(printf 'cat <<EOF\n$(echo x > app/x.py)\nEOF')")"
+expect_deny "$BW" "FIX-014 R-14-13 cat <<EOF 백틱 치환" "$(mk "$(printf 'cat <<EOF\n`echo x > app/x.py`\nEOF')")"
+# 2차 재작업 R-14-14 — 비셸 인터프리터가 stdin 으로 받는 코드 (python 과 같은 규칙)
+expect_deny "$BW" "FIX-014 R-14-14 printf writeFileSync | node" "$(mk "printf \"require('fs').writeFileSync('app/x.js','')\" | node")"
+expect_deny "$BW" "FIX-014 R-14-14 echo open(\">…\") | perl" "$(mk "echo 'open(\">app/x.py\")' | perl")"
+expect_deny "$BW" "FIX-014 R-14-14 echo File.write | ruby" "$(mk "echo \"File.write('app/x.rb','x')\" | ruby")"
+expect_deny "$BW" "FIX-014 R-14-14 echo file_put_contents | php" "$(mk "echo 'file_put_contents(\"app/x.php\",\"x\");' | php")"
+expect_deny "$BW" "FIX-014 R-14-14 cat f | node - (파이프 앞이 리터럴 아님)" "$(mk 'cat /tmp/f.js | node -')"
+expect_deny "$BW" "FIX-014 R-14-14 node < file (stdin 파일)" "$(mk 'node < /tmp/f.js')"
+# 3차 재작업 R-14-16 — deno·bun 서브명령(run·eval) 뒤 '-'·무인자 stdin 코드
+expect_deny "$BW" "FIX-014 R-14-16 printf writeTextFileSync | deno run -" "$(mk "printf \"Deno.writeTextFileSync('app/x.js','')\" | deno run -")"
+expect_deny "$BW" "FIX-014 R-14-16 … | deno run -A - (플래그가 서브명령과 - 사이)" "$(mk "printf \"Deno.writeTextFileSync('app/x.js','')\" | deno run -A -")"
+expect_deny "$BW" "FIX-014 R-14-16 … | deno run --allow-write - " "$(mk "printf \"Deno.writeTextFileSync('app/x.js','')\" | deno run --allow-write -")"
+expect_deny "$BW" "FIX-014 R-14-16 … | deno eval (인자 없이 stdin)" "$(mk "printf \"Deno.writeTextFileSync('app/x.js','')\" | deno eval")"
+expect_deny "$BW" "FIX-014 R-14-16 … | bun run -" "$(mk "printf \"require('fs').writeFileSync('app/x.js','')\" | bun run -")"
+expect_deny "$BW" "FIX-014 R-14-16 cat f | deno run - (동적 → 거부)" "$(mk 'cat /tmp/f.js | deno run -')"
+expect_deny "$BW" "FIX-014 R-14-16 deno eval \"Deno.writeTextFileSync(…)\" (정적 인라인 쓰기)" "$(mk "deno eval \"Deno.writeTextFileSync('app/x.js','')\"")"
+# 허용 기대 6건 (수정안 6) — 오탐이면 정상 작업이 멈춘다
+expect_allow "$BW" 'FIX-014 git commit -F … 2>&1' "$(mk 'git commit -F .claude/commit-draft.txt 2>&1')"
+expect_allow "$BW" 'FIX-014 curl -o <임시>/x' "$(mk "curl -o $BW_T/x https://example.com")"
+expect_allow "$BW" 'FIX-014 pytest | tee <임시>/out.txt' "$(mk "python -m pytest -q | tee $BW_T/out.txt")"
+expect_allow "$BW" 'FIX-014 echo x >&2' "$(mk 'echo x >&2')"
+expect_allow "$BW" 'FIX-014 cmd 2>/dev/null' "$(mk 'ls nonexist 2>/dev/null')"
+expect_allow "$BW" 'FIX-014 grep a b > /tmp/x' "$(mk 'grep a b > /tmp/x')"
+# 허용 기대 보강 — 읽기·검색·따옴표 안 문자·임시 변수
+expect_allow "$BW" 'FIX-014 따옴표 안의 > 는 리다이렉트가 아님' "$(mk 'echo "a > b"')"
+expect_allow "$BW" 'FIX-014 sed -n (읽기)' "$(mk 'sed -n 1,5p app/main.py')"
+expect_allow "$BW" 'FIX-014 sed 결과를 임시로' "$(mk "sed 's/a/b/' app/x.py > /tmp/y")"
+expect_allow "$BW" 'FIX-014 python open() 읽기' "$(mk "python3 -c \"print(open('app/x.py').read())\"")"
+expect_allow "$BW" 'FIX-014 > $TMPDIR/x' "$(mk 'echo x > $TMPDIR/x')"
+expect_allow "$BW" 'FIX-014 cp 목적지가 임시' "$(mk 'cp app/a.py /tmp/b')"
+expect_allow "$BW" 'FIX-014 검증 스크립트 실행' "$(mk 'bash .claude/scripts/test-guards.sh')"
+expect_allow "$BW" 'FIX-014 PowerShell 읽기' "$(mkp 'Get-Content app/x.py | Select-Object -First 3')"
+expect_allow "$BW" 'FIX-014 PowerShell $env:TEMP 쓰기' "$(mkp 'Set-Content $env:TEMP\x.txt hi')"
+# 재작업 오탐 방지 — 쓰기 없는 stdin 셸·find -exec 읽기 명령은 열어 둔다
+expect_allow "$BW" "FIX-014 R-14-1 printf 'ls' | bash (쓰기 없는 리터럴)" "$(mk "printf 'ls' | bash")"
+expect_allow "$BW" "FIX-014 R-14-1 bash <<< 'ls' (쓰기 없는 here-string)" "$(mk "bash <<< 'ls -la'")"
+expect_allow "$BW" "FIX-014 R-14-1 echo 'echo x > /tmp/y' | sh (임시 쓰기)" "$(mk "echo 'echo x > /tmp/y' | sh")"
+expect_allow "$BW" "FIX-014 R-14-2 python3 -c \"print(1)\" (정적 코드)" "$(mk 'python3 -c "print(1)"')"
+expect_allow "$BW" "FIX-014 R-14-3 find -exec grep -l (읽기)" "$(mk "find app -name '*.py' -exec grep -l x {} +")"
+expect_allow "$BW" "FIX-014 R-14-3 find -exec wc -l (읽기)" "$(mk 'find app -exec wc -l {} +')"
+expect_allow "$BW" "FIX-014 R-14-3 find /tmp -exec sed -i (임시 영역)" "$(mk 'find /tmp/tg -exec sed -i s/a/b/ {} +')"
+# 2차 재작업 오탐 방지 — 자리표가 인자 자리·따옴표 구분자·값 치환뿐인 heredoc·쓰기 없는 stdin 코드는 열어 둔다
+expect_allow "$BW" "FIX-014 R-14-12 xargs -I{} grep -n x {} (자리표=인자 자리)" "$(mk 'echo app/a.py | xargs -I{} grep -n x {}')"
+expect_allow "$BW" "FIX-014 R-14-12 xargs -I{} sh -c 'wc -l {}' (코드는 정적, 자리표는 안쪽 인자)" "$(mk "echo app/a.py | xargs -I{} sh -c 'wc -l {}'")"
+expect_allow "$BW" "FIX-014 R-14-12 echo 'print(1)' | xargs -I{} python3 -c {} (쓰기 없는 코드)" "$(mk "echo 'print(1)' | xargs -I{} python3 -c {}")"
+expect_allow "$BW" "FIX-014 R-14-13 cat <<EOF \$(date) (쓰기 없는 치환)" "$(mk "$(printf 'cat <<EOF\n$(date)\nEOF')")"
+expect_allow "$BW" "FIX-014 R-14-13 cat <<'EOF' \$(echo x > app/x.py) (인용 구분자 — 치환 없음)" "$(mk "$(printf "cat <<'EOF'\n\$(echo x > app/x.py)\nEOF")")"
+expect_allow "$BW" "FIX-014 R-14-13 python3 <<EOF print(1) (쓰기 없는 비셸 heredoc)" "$(mk "$(printf 'python3 <<EOF\nprint(1)\nEOF')")"
+expect_allow "$BW" "FIX-014 R-14-13 cat <<EOF \$HOME (값 치환뿐인 비셸 heredoc)" "$(mk "$(printf 'cat <<EOF\n$HOME\nEOF')")"
+expect_allow "$BW" "FIX-014 R-14-13 bash <<EOF ls (쓰기 없는 셸 heredoc)" "$(mk "$(printf 'bash <<EOF\nls -la\nEOF')")"
+expect_allow "$BW" "FIX-014 R-14-14 echo 'console.log(1)' | node (쓰기 없는 stdin 코드)" "$(mk "echo 'console.log(1)' | node")"
+expect_allow "$BW" "FIX-014 R-14-14 echo 'puts 1' | ruby" "$(mk "echo 'puts 1' | ruby")"
+expect_allow "$BW" "FIX-014 R-14-14 node --version | cat (stdin 코드 아님)" "$(mk 'node --version | cat')"
+expect_allow "$BW" "FIX-014 R-14-14 echo x | node script.js (스크립트 파일 실행)" "$(mk 'echo x | node script.js')"
+expect_allow "$BW" "FIX-014 R-14-16 echo 'console.log(1)' | deno run - (쓰기 없는 stdin 코드)" "$(mk "echo 'console.log(1)' | deno run -")"
+expect_allow "$BW" "FIX-014 R-14-16 deno run app/x.ts (실제 파일 실행)" "$(mk 'deno run app/x.ts')"
+expect_allow "$BW" "FIX-014 R-14-16 bun run build (package.json 스크립트)" "$(mk 'bun run build')"
+expect_allow "$BW" "FIX-014 R-14-16 deno eval \"console.log(1)\" (쓰기 없는 정적 인라인)" "$(mk 'deno eval "console.log(1)"')"
+expect_allow "$BW" "FIX-014 R-14-16 deno run -A app/x.ts (플래그 + 파일)" "$(mk 'deno run -A app/x.ts')"
+# 대조(공허 통과 방지): 훅이 정말 이 저장소 판정을 하고 있다 — 같은 훅이 임시 경로는 열고 프로젝트 경로는 닫는다
+expect_deny "$BW" 'FIX-014 대조: 같은 명령을 프로젝트 안 경로로 바꾸면 거부' "$(mk "python -m pytest -q | tee docs/wiki/out.txt")"
+# 파이썬을 못 찾으면 차단 (FIX-008) — PATH 를 비워 인터프리터 탐지가 실패하게 한다
+out="$(printf '%s' "$(mk 'echo hi')" | PATH="" /bin/bash "$BW" 2>/dev/null)"
+if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   FIX-014 파이썬 탐지 실패 시 차단(FIX-008)"; else echo "XX   FIX-014 파이썬 탐지 실패인데 통과함: $(printf '%s' "$out" | head -c 100)"; fails=$((fails+1)); fi
+rm -rf "$BW_T"
 
 # (F-27-3/F-27-5 의 스테이징 우회 케이스는 승인 마커·초안이 있는 격리 저장소가 필요해서 아래
 #  FG_T 절로 옮겼다 — 마커 없는 실제 저장소에서는 규칙 1 로 먼저 DENY 돼 검사와 무관하게
@@ -530,6 +654,9 @@ mkdir -p "$CC_T/.claude/hooks" "$CC_T/docs/wiki"
 CC_HOOK="${CC_HOOK:-$H/commit-cleanup.sh}"
 cp "$CC_HOOK" "$CC_T/.claude/hooks/commit-cleanup.sh" 2>/dev/null
 cp "$H/precompact.sh" "$H/_py.sh" "$CC_T/.claude/hooks/" 2>/dev/null
+# FIX-014: commit-cleanup 이 실행되는 git 조각을 뽑는 판정 스크립트도 훅 옆(../scripts)에 있어야 한다
+mkdir -p "$CC_T/.claude/scripts"
+cp "$ROOT/.claude/scripts/bash_write_check.py" "$CC_T/.claude/scripts/" 2>/dev/null
 printf '# journal\n' > "$CC_T/docs/wiki/journal.md"
 (
   cd "$CC_T" || exit 1
@@ -711,6 +838,32 @@ cc_snap
 cc_run "git push origin dev2 && git push origin dev2:dev"
 cc_delta "commit-cleanup N6 푸시 둘: PUSH +1" 1 "$cc_b_push" '| PUSH |'
 cc_delta "commit-cleanup N6 푸시 둘: PUSH-dev2 +0 (배타)" 0 "$cc_b_p2" 'PUSH-dev2'
+
+# ── 결함 ② (FIX-014): 명령 문자열이 아니라 실행되는 git 조각만 본다 ──────────────
+# 다른 명령의 인자 속 `git push origin dev2` 글자 때문에 journal 에 가짜 PUSH 줄이 남고
+# 마커가 소비되던 결함(2026-09-29 실제 발생). `echo …` 는 git 을 실행하지 않는다.
+rm -f "$CC_T/.claude/.awaiting-decision" "$CC_T/.claude/.commit-approved" "$CC_T/.claude/.push-approved"
+cc_sync_ref dev2      # 성공 판정(origin/dev2 == HEAD)이 우연히 맞아떨어지는 상태 — 옛 훅은 여기서 가짜 줄을 남겼다
+cc_sync_ref dev
+cc_head_subject > "$CC_T/.claude/commit-draft.txt"
+printf 'x\n' > "$CC_T/.claude/.commit-approved"
+printf 'x\n' > "$CC_T/.claude/.push-approved"
+cc_snap
+cc_run "echo git push origin dev2"
+cc_delta "FIX-014 ② 인자 속 'git push origin dev2' 글자: PUSH-dev2 +0 (가짜 줄 없음)" 0 "$cc_b_p2" 'PUSH-dev2'
+cc_run "echo git push origin dev2:dev"
+cc_delta "FIX-014 ② 인자 속 'git push origin dev2:dev' 글자: PUSH +0" 0 "$cc_b_push" '| PUSH |'
+cc_run "echo git commit -F .claude/commit-draft.txt"
+cc_delta "FIX-014 ② 인자 속 'git commit' 글자: COMMIT +0" 0 "$cc_b_commit" '| COMMIT |'
+if [ -f "$CC_T/.claude/.push-approved" ] && [ -f "$CC_T/.claude/.commit-approved" ] && [ ! -f "$CC_T/.claude/.awaiting-decision" ]; then
+  echo "ok   FIX-014 ② 인자 속 글자로는 승인 마커가 소비되지 않고 L-003 잠금도 걸리지 않음"
+else
+  echo "XX   FIX-014 ② 실행되지 않은 git 글자 때문에 마커가 소비됐거나 L-003 잠금이 걸렸다"; fails=$((fails+1))
+fi
+# 실제 git 조각은 기존처럼 기록된다 (`;` 앞의 echo 는 무관)
+cc_snap
+cc_run "echo hi ; git push origin dev2"
+cc_delta "FIX-014 ② 실제 'git push origin dev2' 조각: PUSH-dev2 +1 (기존 동작 유지)" 1 "$cc_b_p2" 'PUSH-dev2'
 
 # 뒤에 붙는 시험이 이 절의 전제를 다시 읽지 않아도 되게 마커를 정리한다
 rm -f "$CC_T/.claude/.commit-approved" "$CC_T/.claude/.push-approved" "$CC_T/.claude/.awaiting-decision"

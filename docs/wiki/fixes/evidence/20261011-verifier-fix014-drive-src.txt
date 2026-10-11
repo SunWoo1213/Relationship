@@ -1,0 +1,195 @@
+# FIX-014 verifier 침입·오탐 드라이버 원문 (drive.py). 재실행: 스크래치패드에 drive.py 로 저장한 뒤
+#   python3 <스크래치패드>/drive.py /Users/sunwoo/Desktop/Portfolio/Relationship <스크래치패드 절대경로> > <스크래치패드>/drive.txt
+# 출력 마지막 줄 '불일치 N' 이 0 이면 침입 X1~X18 이 전부 막히고 오탐 C1~C5 가 전부 열린 것이다(재검증 판정 명령으로 쓸 수 있다 —
+# 단 C1·C2·C3 은 보수적 거부를 그대로 두기로 결정하면 기대를 deny 로 바꿔 쓴다).
+
+"""FIX-014 verifier 드라이버 — bash-write-guard.sh 를 stdin JSON 으로 직접 호출해 deny/allow 표를 만든다."""
+import json, os, subprocess, sys
+
+ROOT = sys.argv[1]
+SP = sys.argv[2]
+HOOK = os.path.join(ROOT, ".claude", "hooks", "bash-write-guard.sh")
+ENV = dict(os.environ, CLAUDE_PROJECT_DIR=ROOT)
+
+
+def run(cmd, tool="Bash"):
+    payload = json.dumps({"tool_name": tool, "tool_input": {"command": cmd}})
+    p = subprocess.run(["bash", HOOK], input=payload.encode(), capture_output=True, env=ENV, timeout=30)
+    out = p.stdout.decode("utf-8", "replace").strip()
+    if not out:
+        return "allow", ""
+    try:
+        d = json.loads(out)
+        dec = d["hookSpecificOutput"]["permissionDecision"]
+        reason = d["hookSpecificOutput"].get("permissionDecisionReason", "")
+        return dec, reason
+    except Exception:
+        return "??", out[:200]
+
+
+INTRUSION = [
+    ("S9-1 cat > app/x.py <<EOF", "Bash", "cat > app/x.py <<EOF\nprint(1)\nEOF", "deny"),
+    ("S9-2 echo k > docs/wiki/HANDOFF.md", "Bash", "echo k > docs/wiki/HANDOFF.md", "deny"),
+    ("S9-3 sed -i '' s/a/b/ app/main.py", "Bash", "sed -i '' s/a/b/ app/main.py", "deny"),
+    ("S9-4 printf x | tee app/x.py", "Bash", "printf x | tee app/x.py", "deny"),
+    ("S9-5 cp /tmp/x app/x.py", "Bash", "cp /tmp/x app/x.py", "deny"),
+    ("S9-6 python3 -c open('app/x.py','w')", "Bash", "python3 -c \"open('app/x.py','w')\"", "deny"),
+    ("S9-7 echo x > \"$X\"", "Bash", 'echo x > "$X"', "deny"),
+    ("S9-8 PS Set-Content app/x.py", "PowerShell", "Set-Content app/x.py", "deny"),
+    ("V1 python3 - <<PY open(…,'w')", "Bash", "python3 - <<PY\nopen('app/x.py','w')\nPY", "deny"),
+    ("V2 bash -c 'echo x > app/x.py'", "Bash", "bash -c 'echo x > app/x.py'", "deny"),
+    ("V3 eval \"echo x > app/x.py\"", "Bash", 'eval "echo x > app/x.py"', "deny"),
+    ("V4 cat <<EOF >app/x.py", "Bash", "cat <<EOF >app/x.py\nhi\nEOF", "deny"),
+    ("V5 echo x >> ./app/x.py", "Bash", "echo x >> ./app/x.py", "deny"),
+    ("V6 cp a \"$CLAUDE_PROJECT_DIR/app/x.py\"", "Bash", 'cp a "$CLAUDE_PROJECT_DIR/app/x.py"', "deny"),
+    ("V7 node -e writeFileSync('app/x.js')", "Bash", "node -e \"require('fs').writeFileSync('app/x.js','')\"", "deny"),
+    ("V8 PS 'x' | Out-File app\\x.py", "PowerShell", "'x' | Out-File app\\x.py", "deny"),
+    ("V9 env X=app/x.py sh -c 'echo > $X'", "Bash", "env X=app/x.py sh -c 'echo > $X'", "deny"),
+    ("V10 printf x | dd of=app/x.py", "Bash", "printf x | dd of=app/x.py", "deny"),
+    ("V11 install -m 644 a app/x.py", "Bash", "install -m 644 a app/x.py", "deny"),
+    ("V12 echo x > $(pwd)/app/x.py", "Bash", "echo x > $(pwd)/app/x.py", "deny"),
+    ("V13 절대 경로 리터럴 > <ROOT>/app/x.py", "Bash", f"echo x > {ROOT}/app/x.py", "deny"),
+    ("V14 : > app/x.py", "Bash", ": > app/x.py", "deny"),
+    ("V15 >app/x.py (명령 없는 리다이렉트)", "Bash", ">app/x.py", "deny"),
+    ("V16 echo x 1> app/x.py", "Bash", "echo x 1> app/x.py", "deny"),
+    ("V17 exec 3>app/x.py", "Bash", "exec 3>app/x.py", "deny"),
+    ("V18 { echo a; echo b; } > app/x.py", "Bash", "{ echo a; echo b; } > app/x.py", "deny"),
+    ("V19 echo x | tee -a app/x.py", "Bash", "echo x | tee -a app/x.py", "deny"),
+    ("V20 sed -i.bak s/a/b/ app/main.py", "Bash", "sed -i.bak s/a/b/ app/main.py", "deny"),
+    ("V21 truncate -s 0 app/x.py", "Bash", "truncate -s 0 app/x.py", "deny"),
+    ("V22 ln -s a app/x", "Bash", "ln -s a app/x", "deny"),
+    ("V23 mv app/a.py app/b.py", "Bash", "mv app/a.py app/b.py", "deny"),
+    ("V24 echo x >| app/x.py", "Bash", "echo x >| app/x.py", "deny"),
+    ("V25 echo x &> app/x.py", "Bash", "echo x &> app/x.py", "deny"),
+    ("V26 sh -c \"$(echo …)\" (동적 코드)", "Bash", "sh -c \"$(echo 'echo x > app/x.py')\"", "deny"),
+    ("V27 bash <<'EOF' heredoc 본문", "Bash", "bash <<'EOF'\necho x > app/x.py\nEOF", "deny"),
+    ("V28 xargs -I{} sh -c 'echo > {}'", "Bash", "ls app | xargs -I{} sh -c 'echo > {}'", "deny"),
+    ("V29 vim -c wq app/x.py", "Bash", "vim -c 'wq' app/x.py", "deny"),
+    ("V30 patch app/x.py < /tmp/p", "Bash", "patch app/x.py < /tmp/p", "deny"),
+    ("V31 rsync a app/", "Bash", "rsync -a /tmp/a app/", "deny"),
+    ("V32 curl -O http://x", "Bash", "curl -O http://x/y.py", "deny"),
+    ("V33 wget http://x", "Bash", "wget http://x/y.py", "deny"),
+    ("V34 python3 shutil.copy(…,'app/x.py')", "Bash", "python3 -c \"import shutil; shutil.copy('/tmp/a','app/x.py')\"", "deny"),
+    ("V35 PS Copy-Item a -Destination app\\x.py", "PowerShell", "Copy-Item a -Destination app\\x.py", "deny"),
+    ("V36 PS [IO.File]::WriteAllText", "PowerShell", "[IO.File]::WriteAllText('app\\x.py','x')", "deny"),
+    ("V37 echo x > ~/x (프로젝트 밖·임시 아님)", "Bash", "echo x > ~/x", "deny"),
+    ("V38 python3 -c 'p=…; open(p,\"w\")' 변수 경로", "Bash", "python3 -c \"p='app/x.py'; open(p,'w')\"", "deny"),
+    ("V39 python3 -c open(file=…, mode='w')", "Bash", "python3 -c \"open(file='app/x.py', mode='w')\"", "deny"),
+    ("V40 echo x 2> app/err.log", "Bash", "python -m pytest 2> app/err.log", "deny"),
+    ("X1 printf 'echo x > app/x.py' | bash (stdin 코드)", "Bash", "printf 'echo x > app/x.py' | bash", "deny"),
+    ("X2 bash <<< 'echo x > app/x.py' (here-string)", "Bash", "bash <<< 'echo x > app/x.py'", "deny"),
+    ("X3 python3 -c \"$(cat /tmp/p.py)\" (동적 코드)", "Bash", 'python3 -c "$(cat /tmp/p.py)"', "deny"),
+    ("X4 node -e \"$(cat /tmp/x.js)\" (동적 코드)", "Bash", 'node -e "$(cat /tmp/x.js)"', "deny"),
+    ("X5 find app -exec sed -i s/a/b/ {} +", "Bash", "find app -name '*.py' -exec sed -i s/a/b/ {} +", "deny"),
+    ("X6 awk 'BEGIN{print \"x\" > \"app/x.py\"}'", "Bash", "awk 'BEGIN{print \"x\" > \"app/x.py\"}'", "deny"),
+    ("X7 perl -e 'open(my $f, \">\", \"app/x.py\")'", "Bash", "perl -e 'open(my $f, \">\", \"app/x.py\"); print $f \"x\"'", "deny"),
+    ("X8 php -r file_put_contents('app/x.py')", "Bash", "php -r 'file_put_contents(\"app/x.py\",\"x\");'", "deny"),
+    ("X9 PS iex 'Set-Content app\\x.py hi'", "PowerShell", "iex 'Set-Content app\\x.py hi'", "deny"),
+    ("X10 PS cmd /c \"echo x > app\\x.py\"", "PowerShell", 'cmd /c "echo x > app\\x.py"', "deny"),
+    ("X11 python3 builtins.open('docs/zz.md','w')", "Bash", "python3 -c \"import builtins as b; b.open('docs/zz.md','w')\"", "deny"),
+    ("X12 python3 exec(b64decode(…)) 난독", "Bash", "python3 -c \"exec(__import__('base64').b64decode('b3Blbign'))\"", "deny"),
+    ("X13 echo … | sh", "Bash", "echo 'echo x > app/x.py' | sh", "deny"),
+    ("X14 bash -s < /tmp/script.sh", "Bash", "bash -s < /tmp/script.sh", "deny"),
+    ("X15 tar -xf /tmp/a.tar -C app", "Bash", "tar -xf /tmp/a.tar -C app", "deny"),
+    ("X16 unzip /tmp/a.zip -d app", "Bash", "unzip /tmp/a.zip -d app", "deny"),
+    ("X17 mkdir app/newdir", "Bash", "mkdir -p app/newdir", "deny"),
+    ("X18 rm app/x.py", "Bash", "rm app/x.py", "deny"),
+    ("L1 python3 -c os.system('echo x > app/x.py')", "Bash", "python3 -c \"import os; os.system('echo x > app/x.py')\"", "limit"),
+    ("L2 python3 -c subprocess.run(…, shell=True)", "Bash", "python3 -c \"import subprocess; subprocess.run('echo x > app/x.py', shell=True)\"", "limit"),
+    ("L3 git apply /tmp/p.diff", "Bash", "git apply /tmp/p.diff", "limit"),
+    ("L4 bash /tmp/write.sh", "Bash", "bash /tmp/write.sh", "limit"),
+    ("L5 python3 /tmp/write.py", "Bash", "python3 /tmp/write.py", "limit"),
+    ("L6 ruff format app/", "Bash", "ruff format app/", "limit"),
+    ("L7 npm run build (web/dist 생성)", "Bash", "npm run build", "limit"),
+    ("L8 alembic revision --autogenerate", "Bash", "alembic revision --autogenerate -m x", "limit"),
+]
+
+FALSE_POS = [
+    ("S6-1 git commit -F .claude/commit-draft.txt 2>&1", "Bash", "git commit -F .claude/commit-draft.txt 2>&1", "allow"),
+    ("S6-2 curl -o <SP>/x", "Bash", f"curl -o {SP}/x https://example.com", "allow"),
+    ("S6-3 pytest | tee <SP>/out.txt", "Bash", f"python -m pytest -q | tee {SP}/out.txt", "allow"),
+    ("S6-4 echo x >&2", "Bash", "echo x >&2", "allow"),
+    ("S6-5 cmd 2>/dev/null", "Bash", "ls nonexist 2>/dev/null", "allow"),
+    ("S6-6 grep a b > /tmp/x", "Bash", "grep a b > /tmp/x", "allow"),
+    ("W1 git commit -F .claude/commit-draft.txt", "Bash", "git commit -F .claude/commit-draft.txt", "allow"),
+    ("W2 git push origin dev2", "Bash", "git push origin dev2", "allow"),
+    ("W3 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q 2>&1 | tail -1", "Bash", "POSTGRES_PORT=5433 .venv/bin/python -m pytest -q 2>&1 | tail -1", "allow"),
+    ("W4 bash test-guards.sh > <SP>/x.txt 2>&1", "Bash", f"bash .claude/scripts/test-guards.sh > {SP}/x.txt 2>&1", "allow"),
+    ("W5 gh run view … --json x --jq …", "Bash", "gh run view 123 --json jobs --jq '.jobs[].name'", "allow"),
+    ("W6 grep -rn x app/ | head", "Bash", "grep -rn x app/ | head", "allow"),
+    ("W7 python3 -c \"print(1)\"", "Bash", 'python3 -c "print(1)"', "allow"),
+    ("W8 curl -o <SP>/x.json", "Bash", f"curl -o {SP}/x.json https://api.github.com", "allow"),
+    ("W9 echo \"$(date)\" >> /tmp/x", "Bash", 'echo "$(date)" >> /tmp/x', "allow"),
+    ("W10 bash .claude/scripts/gitlog.sh P8-frontend", "Bash", "bash .claude/scripts/gitlog.sh P8-frontend", "allow"),
+    ("W11 bash .claude/scripts/approve-commit.sh --stage verifier", "Bash", "bash .claude/scripts/approve-commit.sh --stage verifier", "allow"),
+    ("W12 git diff --stat HEAD", "Bash", "git diff --stat HEAD", "allow"),
+    ("W13 cat <<'EOF' (읽기 전용 heredoc)", "Bash", "cat <<'EOF'\nhello\nEOF", "allow"),
+    ("W14 python3 - <<'PY' print(1)", "Bash", "python3 - <<'PY'\nprint(1)\nPY", "allow"),
+    ("W15 echo \"a > b\" (따옴표 안)", "Bash", 'echo "a > b"', "allow"),
+    ("W16 git log --oneline -5 | head", "Bash", "git log --oneline -5 | head", "allow"),
+    ("W17 docker compose up -d", "Bash", "docker compose up -d", "allow"),
+    ("W18 alembic upgrade head", "Bash", "alembic upgrade head", "allow"),
+    ("W19 .venv/bin/python -m pytest tests/test_x.py -q", "Bash", ".venv/bin/python -m pytest tests/test_x.py -q", "allow"),
+    ("W20 mktemp -d", "Bash", "mktemp -d", "allow"),
+    ("W21 echo x > /dev/null", "Bash", "echo x > /dev/null", "allow"),
+    ("W22 diff <(echo a) <(echo b)", "Bash", "diff <(echo a) <(echo b)", "allow"),
+    ("W23 for f in app/*.py; do echo \"$f\"; done", "Bash", 'for f in app/*.py; do echo "$f"; done', "allow"),
+    ("W24 [ -f app/x.py ] && echo yes", "Bash", "[ -f app/x.py ] && echo yes", "allow"),
+    ("W25 wc -l < app/main.py", "Bash", "wc -l < app/main.py", "allow"),
+    ("W26 cp app/a.py /tmp/b", "Bash", "cp app/a.py /tmp/b", "allow"),
+    ("W27 pip install -r requirements.txt", "Bash", "pip install -r requirements.txt", "allow"),
+    ("W28 git add app/x.py docs/y.md", "Bash", "git add app/x.py docs/y.md", "allow"),
+    ("W29 echo x > $TMPDIR/x", "Bash", "echo x > $TMPDIR/x", "allow"),
+    ("W30 echo x > \"$TMPDIR/x\"", "Bash", 'echo x > "$TMPDIR/x"', "allow"),
+    ("W31 echo x > ${TMPDIR}/x", "Bash", "echo x > ${TMPDIR}/x", "allow"),
+    ("W32 python3 -c print(open('app/x.py').read())", "Bash", "python3 -c \"print(open('app/x.py').read())\"", "allow"),
+    ("W33 sed -n 1,5p app/main.py", "Bash", "sed -n 1,5p app/main.py", "allow"),
+    ("W34 PS Get-Content app\\x.py", "PowerShell", "Get-Content app\\x.py | Select-Object -First 3", "allow"),
+    ("W35 PS Set-Content $env:TEMP\\x.txt hi", "PowerShell", "Set-Content $env:TEMP\\x.txt hi", "allow"),
+    ("W36 jq . reports/metrics.json", "Bash", "jq . reports/metrics.json", "allow"),
+    ("W37 echo x > \"<SP>/x\" (리터럴 따옴표)", "Bash", f'echo x > "{SP}/x"', "allow"),
+    ("W38 git -C . status", "Bash", "git -C . status", "allow"),
+    ("W39 time python -m pytest -q", "Bash", "time python -m pytest -q", "allow"),
+    ("W40 timeout 60 bash .claude/scripts/test-guards.sh", "Bash", "timeout 60 bash .claude/scripts/test-guards.sh", "allow"),
+    ("W41 curl -s http://localhost:8000/health", "Bash", "curl -s http://localhost:8000/health", "allow"),
+    ("W42 ls -la > /private/tmp/x", "Bash", "ls -la > /private/tmp/x", "allow"),
+    ("W43 python3 .claude/scripts/findings.py …", "Bash", "python3 .claude/scripts/findings.py P8-frontend /tmp/x --source verify-impl", "allow"),
+    ("W44 ruff check app/", "Bash", "ruff check app/", "allow"),
+    ("W45 echo x | tee (대상 없음)", "Bash", "echo x | tee", "allow"),
+    ("W46 git stash list", "Bash", "git stash list", "allow"),
+    ("W47 npm install", "Bash", "npm install", "allow"),
+    ("W48 git log --grep 'FIX-014' --oneline", "Bash", "git log --grep 'FIX-014' --oneline", "allow"),
+    ("W49 grep -n 'tee docs/' .claude/agents/verifier.md", "Bash", "grep -n 'tee docs/' .claude/agents/verifier.md", "allow"),
+    ("C1 cd /tmp && echo x > y (cd 뒤 상대 경로)", "Bash", "cd /tmp && echo x > y", "allow"),
+    ("C2 echo 'print(1)' | python3 (stdin 코드)", "Bash", "echo 'print(1)' | python3", "allow"),
+    ("C3 echo x > $SP/x (스크래치패드 변수)", "Bash", "echo x > $SP/x", "allow"),
+    ("C4 echo x > \"$CLAUDE_SCRATCHPAD/x\"", "Bash", 'echo x > "$CLAUDE_SCRATCHPAD/x"', "allow"),
+    ("C5 bash .claude/scripts/verify-plan.sh P8 | tee docs/wiki/packages/P8/evidence/x.txt (verifier.md 24행 지시)", "Bash",
+     "bash .claude/scripts/verify-plan.sh P8-frontend | tee docs/wiki/packages/P8-frontend/evidence/x.txt", "allow"),
+]
+
+
+def table(title, rows):
+    mism = 0
+    print(f"## {title}")
+    print("| # | 라벨 | 툴 | 기대 | 실제 | 판정 | 사유(앞 90자) |")
+    print("|---|---|---|---|---|---|---|")
+    for i, (label, tool, cmd, exp) in enumerate(rows, 1):
+        dec, reason = run(cmd, tool)
+        if exp == "limit":
+            mark = "한계(막지 않음)" if dec == "allow" else "deny(한계인데도 막힘)"
+        else:
+            ok = (dec == exp)
+            mark = "일치" if ok else "**불일치**"
+            if not ok:
+                mism += 1
+        r = reason.replace("|", "\\|").replace("\n", " ")[:90]
+        lab = label.replace("|", "\\|")
+        print(f"| {i} | {lab} | {tool} | {exp} | {dec} | {mark} | {r} |")
+    print()
+    return mism
+
+
+m1 = table("침입 시도 (기대 deny)", INTRUSION)
+m2 = table("오탐 (기대 allow)", FALSE_POS)
+print(f"불일치 {m1 + m2} (침입 {m1} · 오탐 {m2})")

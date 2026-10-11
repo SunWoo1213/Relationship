@@ -21,7 +21,7 @@ model: fable
 
 입력: 패키지 id, `01-plan.md`, 위임 프롬프트가 지정한 카드 목록.
 1. `bash .claude/scripts/gitlog.sh <id> <태그>` 로 선행 패키지 완료 커밋·같은 태그 커밋·미커밋 변경을 본다.
-2. `bash .claude/scripts/verify-plan.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt` 를 실행한다.
+2. `bash .claude/scripts/verify-plan.sh <id>` 를 실행해 출력을 받고, **Write 툴로** `docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt` 에 저장한다(`tee`·`>` 로 프로젝트 안에 쓰면 bash-write-guard 가 거부한다. 출력이 길면 스크래치패드 **리터럴 절대 경로**로 `>` 한 뒤 Read → Write).
 3. `02-plan-verify.md`(`templates/plan-verify.md`)를 쓴다. `검증자: verifier (fable)`. 1절에 출력 전체, 2절 점검표 8행은 각각 카드 파일명 + 인용 문장. 점검표 항목:
    범위(원칙7 제외 목록) / 원칙1~9 / D 카드 "코드에서 지켜야 할 것" / S 카드 스키마·시그니처 v2·임계치 2개·ask_user 비동기 / 의존 순서·P4 게이트(커밋 해시로) / 수용 기준 = backlog 글자 그대로 / 단위마다 Refs / security.md.
 4. 계획이 **하지 않는 것**을 명시했는지, 작업 단위가 커밋 하나 크기인지, 수용 기준이 기계적으로 판정 가능한지 본다. 아니면 보류 + 이유.
@@ -29,7 +29,7 @@ model: fable
 
 ## 완료 검토 (`/devlog done` 1~2단계에서 호출)
 
-1. `bash .claude/scripts/verify-impl.sh <id> | tee …/evidence/<ts>-verify-impl.txt`. FAIL 이면 `python .claude/scripts/findings.py <id> <파일> --source verify-impl` 로 소견을 만들고 **원인 분석 칸까지만** 채운다(해결은 구현 에이전트).
+1. `bash .claude/scripts/verify-impl.sh <id>` 의 출력을 Write 툴로 `…/evidence/<ts>-verify-impl.txt` 에 저장한다(긴 출력은 스크래치패드 리터럴 절대 경로로 `>` 한 뒤 Read → Write). FAIL 이면 `python .claude/scripts/findings.py <id> <파일> --source verify-impl` 로 소견을 만들고 **원인 분석 칸까지만** 채운다(해결은 구현 에이전트).
 2. `04-review.md`(`templates/package-review.md`)를 쓴다. `검토자: verifier (fable)`. 수용 기준 표의 증거 열은 evidence 파일·해시·경로만. 부정 케이스는 **직접 명령을 실행**해 출력 파일을 evidence 에 남긴다.
 3. 구현이 계획(01-plan 범위·"하지 않는 것")을 넘었는지, 03-log Refs 가 커밋에 있는지, registry 에 올렸는지, 테스트가 실제로 실패 조건을 검사하는지(항상 통과하는 테스트는 증거가 아니다) 본다.
 4. `결과: 완료 | 부분완료` 와 §6 열린 문제를 보고하고 멈춘다.

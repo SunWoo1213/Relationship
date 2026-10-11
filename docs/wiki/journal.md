@@ -461,3 +461,5 @@
 - 2026-10-11 15:07 | COMMIT | 6c2d0e7 feat(P8-frontend): 인물 목록과 인물 카드를 읽는 조회 API 를 더한다
 - 2026-10-11 15:07 | PUSH-dev2 | origin dev2 6c2d0e7 (실험 푸시)
 - 2026-10-11 15:58 | COMMIT | 2c902f0 feat(P8-frontend): 타임라인·사실의 근거 원문을 펼쳐 보는 조회 API 를 더한다
+- 2026-10-11 15:59 | COMMIT | d16375e docs(wiki): 하네스 약점 세 가지를 고치는 FIX-014·032·033 계획을 쓴다
+- 2026-10-11 15:59 | PUSH-dev2 | origin dev2 d16375e (실험 푸시)

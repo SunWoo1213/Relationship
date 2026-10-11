@@ -1,0 +1,70 @@
+# FIX-014 결함 ② 직접 시험 — commit-cleanup.sh 를 격리 저장소(스크래치패드 /…/scratchpad/cc-iso, git init)에서 stdin JSON 으로 호출
+# 2026-10-11 · 종료 코드 0 · 명령: bash <스크래치패드>/cc_test.sh (원문은 아래 "스크립트 원문")
+# 준비: origin/dev2·origin/dev 추적 ref 를 HEAD 로 맞춰 "성공 판정이 우연히 맞아떨어지는" 상태(옛 훅이 가짜 줄을 남기던 조건) + 초안 제목 = HEAD 제목 + 커밋·푸시 승인 마커 둘 다 있음.
+# 판정: 인자 속 글자 5건 → journal·마커·L-003 전부 무변화. 실제 git 조각 4건 → PUSH-dev2 +1·+1, COMMIT +1 + 커밋 마커 소비, PUSH +1 + 푸시 마커 소비 + .awaiting-decision 생성. 기대와 전부 일치.
+# 부수 증거: 이 검증 세션 동안 살아 있는 저장소의 docs/wiki/journal.md 는 465줄 그대로(마지막 줄 15:59 PUSH-dev2 d16375e) — verifier 가 실행한 Bash 명령 문자열 안에 'git push origin dev2' 글자가 인자로 여러 번 들어갔지만 가짜 줄이 생기지 않았다.
+
+[준비] COMMIT=0 PUSH-dev2=0 PUSH=0 | commit-approved=yes push-approved=yes awaiting=no
+--- 인자 속 글자 (기대: 전부 변화 없음) ---
+python -c 인자 'git push origin dev2'     → COMMIT=0 PUSH-dev2=0 PUSH=0 | commit-approved=yes push-approved=yes awaiting=no
+grep 인자 'git commit'                   → COMMIT=0 PUSH-dev2=0 PUSH=0 | commit-approved=yes push-approved=yes awaiting=no
+echo 인자 'git push origin dev2:dev'     → COMMIT=0 PUSH-dev2=0 PUSH=0 | commit-approved=yes push-approved=yes awaiting=no
+printf 인자 'git commit -F …'           → COMMIT=0 PUSH-dev2=0 PUSH=0 | commit-approved=yes push-approved=yes awaiting=no
+sed 스크립트 인자                       → COMMIT=0 PUSH-dev2=0 PUSH=0 | commit-approved=yes push-approved=yes awaiting=no
+--- 실제 git 조각 (기대: 기존처럼 처리) ---
+git push origin dev2                      → COMMIT=0 PUSH-dev2=1 PUSH=0 | commit-approved=yes push-approved=yes awaiting=no   [기대 PUSH-dev2 +1]
+echo hi; git push origin dev2             → COMMIT=0 PUSH-dev2=2 PUSH=0 | commit-approved=yes push-approved=yes awaiting=no   [기대 PUSH-dev2 +1]
+git commit -F …                           → COMMIT=1 PUSH-dev2=2 PUSH=0 | commit-approved=no push-approved=yes awaiting=no   [기대 COMMIT +1, commit-approved no]
+git push origin dev2:dev                  → COMMIT=1 PUSH-dev2=2 PUSH=1 | commit-approved=no push-approved=no awaiting=yes   [기대 PUSH +1, push-approved no, awaiting yes]
+--- journal ---
+# journal
+- 2026-10-11 16:29 | PUSH-dev2 | origin dev2 c75893b (실험 푸시)
+- 2026-10-11 16:29 | PUSH-dev2 | origin dev2 c75893b (실험 푸시)
+- 2026-10-11 16:29 | COMMIT | c75893b 격리 첫 커밋
+- 2026-10-11 16:29 | PUSH | origin dev ← dev2 c75893b — 사용자 결정 대기(승격/수정) L-003
+
+## --git-fragments 모드 단독 확인 (fc_test.sh 끝부분)
+printf '{not json' | python3 .claude/scripts/bash_write_check.py --git-fragments   → 출력 없음, rc=0 (기록 누락 방향, 의도)
+'echo hi; git push origin dev2 && python3 -c "print(1)"'  → frag: git push origin dev2   (echo·python 조각은 나오지 않음)
+
+## 스크립트 원문 (cc_test.sh — 재실행용)
+#!/usr/bin/env bash
+set -u
+R=/Users/sunwoo/Desktop/Portfolio/Relationship
+SP=<스크래치패드 절대경로>
+T="$SP/cc-iso"
+rm -f "$T"/.claude/.commit-approved "$T"/.claude/.push-approved "$T"/.claude/.awaiting-decision 2>/dev/null
+mkdir -p "$T/.claude/hooks" "$T/.claude/scripts" "$T/docs/wiki"
+cp "$R/.claude/hooks/commit-cleanup.sh" "$R/.claude/hooks/_py.sh" "$T/.claude/hooks/"
+cp "$R/.claude/scripts/bash_write_check.py" "$T/.claude/scripts/"
+printf '# journal\n' > "$T/docs/wiki/journal.md"
+if [ ! -d "$T/.git" ]; then
+  ( cd "$T" && git init -q . && git config user.email t@example.com && git config user.name tester \
+    && printf 'x\n' > f.txt && git add f.txt && git commit -qm "격리 첫 커밋" ) >/dev/null 2>&1
+fi
+run() { printf '{"tool_name":"Bash","tool_input":{"command":%s}}' "$(python3 -c 'import json,sys;print(json.dumps(sys.argv[1]))' "$1")" \
+        | CLAUDE_PROJECT_DIR="$T" bash "$T/.claude/hooks/commit-cleanup.sh" >/dev/null 2>&1; }
+cnt() { c="$(grep -c "$1" "$T/docs/wiki/journal.md" 2>/dev/null)" || c="${c:-0}"; printf '%s' "${c:-0}"; }
+state() { printf 'COMMIT=%s PUSH-dev2=%s PUSH=%s | commit-approved=%s push-approved=%s awaiting=%s\n' \
+  "$(cnt '| COMMIT |')" "$(cnt 'PUSH-dev2')" "$(cnt '| PUSH |')" \
+  "$([ -f "$T/.claude/.commit-approved" ] && echo yes || echo no)" \
+  "$([ -f "$T/.claude/.push-approved" ] && echo yes || echo no)" \
+  "$([ -f "$T/.claude/.awaiting-decision" ] && echo yes || echo no)"; }
+sync_ref() { ( cd "$T" && git update-ref "refs/remotes/origin/$1" "$(git rev-parse HEAD)" ) 2>/dev/null; }
+sync_ref dev2; sync_ref dev
+( cd "$T" && git log -1 --format=%s ) > "$T/.claude/commit-draft.txt"
+printf 'x\n' > "$T/.claude/.commit-approved"
+printf 'x\n' > "$T/.claude/.push-approved"
+echo "[준비] $(state)"
+echo "--- 인자 속 글자 (기대: 전부 변화 없음) ---"
+run 'python3 -c "print(\"git push origin dev2\")"';          echo "python -c 인자 'git push origin dev2'     → $(state)"
+run 'grep "git commit" docs/wiki/journal.md';                echo "grep 인자 'git commit'                   → $(state)"
+run 'echo "git push origin dev2:dev"';                       echo "echo 인자 'git push origin dev2:dev'     → $(state)"
+run "printf '%s' 'git commit -F .claude/commit-draft.txt'";  echo "printf 인자 'git commit -F …'           → $(state)"
+run 'sed -n "/git push origin dev2/p" x';                    echo "sed 스크립트 인자                       → $(state)"
+echo "--- 실제 git 조각 (기대: 기존처럼 처리) ---"
+run 'git push origin dev2';                                  echo "git push origin dev2                      → $(state)   [기대 PUSH-dev2 +1]"
+run 'echo hi; git push origin dev2';                         echo "echo hi; git push origin dev2             → $(state)   [기대 PUSH-dev2 +1]"
+run 'git commit -F .claude/commit-draft.txt';                echo "git commit -F …                           → $(state)   [기대 COMMIT +1, commit-approved no]"
+run 'git push origin dev2:dev';                              echo "git push origin dev2:dev                  → $(state)   [기대 PUSH +1, push-approved no, awaiting yes]"
+echo "--- journal ---"; cat "$T/docs/wiki/journal.md"

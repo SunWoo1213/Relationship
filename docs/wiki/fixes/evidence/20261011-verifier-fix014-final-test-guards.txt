@@ -1,0 +1,48 @@
+# FIX-014 3차 검증 — test-guards.sh 직접 실행 (verifier, fable, 2026-10-11)
+# 명령: bash .claude/scripts/test-guards.sh > <스크래치패드 리터럴>/tg.txt 2>&1  → rc=0
+#       (그 뒤 Read → Write 로 이 파일에 옮김. 프로젝트 안 > 는 bash-write-guard 가 거부하므로 고친 문서 3곳 절차대로)
+# 집계: ok 316 · XX 0 · skip 1(active=P8-frontend) · 총 335행 · "== 결과: 실패 0 =="
+# 전체 출력은 2차 evidence 20261011-verifier-fix014-recheck-test-guards.txt 와 동일(diff = 머리말 주석 6줄뿐, 시험 결과 줄 전부 일치).
+# 아래는 FIX-014 절(거부 기대 R-14-12/13/14 + 허용 + 대조 + fail-closed)의 글자 그대로 발췌.
+
+== bash-write-guard: 프로젝트 안 Bash 쓰기 거부 (FIX-014) ==
+# 거부 기대(수정안 9 + 보강 + R-14-1~3)는 전부 ok DENY (…중략, 2차와 동일…)
+ok   DENY   FIX-014 R-14-12 echo '…' | xargs -I{} bash -c {} (자리표=코드)
+ok   DENY   FIX-014 R-14-12 echo '…' | xargs -I{} sh -c '{}'
+ok   DENY   FIX-014 R-14-12 printf open(…) | xargs -0 -I{} python3 -c {}
+ok   DENY   FIX-014 R-14-12 xargs -i sh -c '{}' (-i 기본 자리표)
+ok   DENY   FIX-014 R-14-12 xargs -I@ node -e @
+ok   DENY   FIX-014 R-14-12 cat f | xargs -I{} bash -c {} (파이프 앞이 리터럴 아님)
+ok   DENY   FIX-014 R-14-13 bash <<EOF $(cat f) (셸 stdin 본문이 동적)
+ok   DENY   FIX-014 R-14-13 bash <<EOF $CMD (본문이 변수)
+ok   DENY   FIX-014 R-14-13 bash <<-EOF $CMD (탭 제거형)
+ok   DENY   FIX-014 R-14-13 cat <<EOF $(echo x > app/x.py) (비셸 본문의 치환)
+ok   DENY   FIX-014 R-14-13 cat <<EOF 백틱 치환
+ok   DENY   FIX-014 R-14-14 printf writeFileSync | node
+ok   DENY   FIX-014 R-14-14 echo open(">…") | perl
+ok   DENY   FIX-014 R-14-14 echo File.write | ruby
+ok   DENY   FIX-014 R-14-14 echo file_put_contents | php
+ok   DENY   FIX-014 R-14-14 cat f | node - (파이프 앞이 리터럴 아님)
+ok   DENY   FIX-014 R-14-14 node < file (stdin 파일)
+ok   allow  FIX-014 git commit -F … 2>&1
+ok   allow  FIX-014 curl -o <임시>/x
+ok   allow  FIX-014 pytest | tee <임시>/out.txt
+ok   allow  FIX-014 echo x >&2
+ok   allow  FIX-014 cmd 2>/dev/null
+ok   allow  FIX-014 grep a b > /tmp/x
+ok   allow  FIX-014 R-14-12 xargs -I{} grep -n x {} (자리표=인자 자리)
+ok   allow  FIX-014 R-14-12 xargs -I{} sh -c 'wc -l {}' (코드는 정적, 자리표는 안쪽 인자)
+ok   allow  FIX-014 R-14-12 echo 'print(1)' | xargs -I{} python3 -c {} (쓰기 없는 코드)
+ok   allow  FIX-014 R-14-13 cat <<EOF $(date) (쓰기 없는 치환)
+ok   allow  FIX-014 R-14-13 cat <<'EOF' $(echo x > app/x.py) (인용 구분자 — 치환 없음)
+ok   allow  FIX-014 R-14-13 python3 <<EOF print(1) (쓰기 없는 비셸 heredoc)
+ok   allow  FIX-014 R-14-13 cat <<EOF $HOME (값 치환뿐인 비셸 heredoc)
+ok   allow  FIX-014 R-14-13 bash <<EOF ls (쓰기 없는 셸 heredoc)
+ok   allow  FIX-014 R-14-14 echo 'console.log(1)' | node (쓰기 없는 stdin 코드)
+ok   allow  FIX-014 R-14-14 echo 'puts 1' | ruby
+ok   allow  FIX-014 R-14-14 node --version | cat (stdin 코드 아님)
+ok   allow  FIX-014 R-14-14 echo x | node script.js (스크립트 파일 실행)
+ok   DENY   FIX-014 대조: 같은 명령을 프로젝트 안 경로로 바꾸면 거부
+ok   DENY   FIX-014 파이썬 탐지 실패 시 차단(FIX-008)
+...
+== 결과: 실패 0 ==

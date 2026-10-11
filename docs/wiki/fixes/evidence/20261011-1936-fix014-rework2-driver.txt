@@ -1,0 +1,265 @@
+# FIX-014 2차 재작업 — verifier 드라이버 2종 재실행 (수정 후, 전체 출력, 요약 아님)
+# 복원: tail -n +6 docs/wiki/fixes/evidence/20261011-verifier-fix014-recheck-drive2-src.txt > <스크래치패드 리터럴>/drive2.py
+#       tail -n +6 docs/wiki/fixes/evidence/20261011-verifier-fix014-drive-src.txt > <스크래치패드 리터럴>/drive.py   (C5 기대만 allow → deny 로 갱신: 재검증 R1 과 같은 조건)
+# 실행: python3 <스크래치패드>/drive2.py /Users/sunwoo/Desktop/Portfolio/Relationship <스크래치패드 리터럴> > <스크래치패드>/drive2-out.txt 2>&1
+#       python3 <스크래치패드>/drive.py  /Users/sunwoo/Desktop/Portfolio/Relationship <스크래치패드 리터럴> > <스크래치패드>/drive-out.txt 2>&1
+# 결과: drive2.py 마지막 줄 "불일치 0"  (N25·N26·N27·N28·N30 deny 로 전환, A1~A20 전부 allow, E1~E5 는 이제 deny(막힘), E6~E11 은 기록만 — R-14-15 후속 후보)
+#       drive.py  마지막 줄 "불일치 14 (침입 11 · 오탐 3)"  — 재검증이 확인한 14 와 번호별 동일(X6 X7 X8 X9 X10 X11 X12 X15 X16 X17 X18 + C1 C2 C3). 새 오탐 0.
+
+################################ drive2.py 출력 ################################
+## 새 우회 — 코드를 stdin 으로 받는 셸 (기대 deny)
+| # | 라벨 | 기대 | 실제 | 판정 | 사유(앞 110자) |
+|---|---|---|---|---|---|
+| N1 cat <<EOF \| bash (heredoc 리터럴을 파이프로) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N2 bash -s <<< 'echo x > app/x.py' | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N3 sh -s -- <<EOF … EOF | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N4 python3 - <<< "open('app/x.py','w')" | deny | deny | 일치 | [bash-write-guard] python open() 쓰기: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — st |
+| N5 echo … \| tee /tmp/s.sh \| bash (tee 는 임시, 뒤 bash 는 파이프 입력) | deny | deny | 일치 | [bash-write-guard] bash 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N6 zsh <<< "$(cat f)" (동적 here-string) | deny | deny | 일치 | [bash-write-guard] zsh 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N7 echo … \| bash - ('-' 인자) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N8 echo … \| /bin/bash (절대 경로 셸) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N9 echo … \| env bash (env 접두) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N10 echo … \| command sh | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N11 echo -e … \| bash (echo 플래그) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N12 printf '%s\n' … \| bash (printf 서식) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N13 echo "$CMD" \| bash (동적 echo 인자) | deny | deny | 일치 | [bash-write-guard] bash 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N14 { echo …; } \| bash (그룹) | deny | deny | 일치 | [bash-write-guard] bash 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N15 echo … \| (bash) (서브셸 안) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N16 echo … \|& bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N17 echo … \| bash 2>/dev/null | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N18 echo <base64> \| base64 -d \| bash | deny | deny | 일치 | [bash-write-guard] bash 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N19 bash <<< 'bash <<< "echo x > app/x.py"' (중첩) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N20 cat <<'EOF' \| sh -s (따옴표 구분자 + -s) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N21 cat <<EOF \| tee /tmp/a \| bash (연쇄) | deny | deny | 일치 | [bash-write-guard] bash 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N22 cat /tmp/f \| sh -s | deny | deny | 일치 | [bash-write-guard] sh 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N23 curl -s http://x \| sh (파이프 앞이 명령 출력) | deny | deny | 일치 | [bash-write-guard] sh 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N24 echo … \| bash -c "$(cat)" (동적 -c) | deny | deny | 일치 | [bash-write-guard] bash 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N25 bash <<EOF … $(cat /tmp/f) … EOF (heredoc 본문이 동적 — 실행 코드 미지) | deny | deny | 일치 | [bash-write-guard] bash 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N26 bash <<EOF … $CMD … EOF (heredoc 본문이 변수) | deny | deny | 일치 | [bash-write-guard] bash 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N27 echo … \| xargs -I{} bash -c {} (xargs 가 코드를 -c 인자로) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N28 echo … \| xargs -I{} sh -c '{}' | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N29 echo … \| xargs bash -c (-c 다음 인자 없음) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N30 printf … \| xargs -0 -I{} python3 -c {} | deny | deny | 일치 | [bash-write-guard] python open() 쓰기: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — st |
+| N31 echo … \| xargs python3 -c (-c 다음 인자 없음) | deny | deny | 일치 | [bash-write-guard] python 이 stdin 에서 코드를 읽는다. 내용을 검사할 수 없다. 파일 쓰기는 Write/Edit 툴로 하라 (FIX-014). |
+| N32 bash -c 'eval "$(cat /tmp/f)"' (안쪽 eval 동적) | deny | deny | 일치 | [bash-write-guard] eval 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N33 echo … \| sh -eu (옵션만) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N34 printf 'echo x > app/%s' x.py \| bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/%s' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate( |
+
+## 새 우회 — 동적 인라인 코드·find -exec·xargs (기대 deny)
+| # | 라벨 | 기대 | 실제 | 판정 | 사유(앞 110자) |
+|---|---|---|---|---|---|
+| N40 find . -name x -execdir sh -c 'echo > a' \; (상대 경로 쓰기) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'a' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate(활성 작업 |
+| N41 find app -ok mv a {} \; | deny | deny | 일치 | [bash-write-guard] mv 목적지: 쓰기 대상 'app' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate(활성 작업· |
+| N42 xargs -I{} sh -c 'echo > {}' < list | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 '{}' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate(활성 작 |
+| N43 find app -exec sh -c 'echo > "$1"' _ {} \; (동적 대상) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 경로 '$1' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할 수 없으면 통과가 아니라 차단한다(security.md).  |
+| N44 find /tmp/x -exec sh -c 'echo x > app/x.py' \; (시작 경로 임시, 명령은 프로젝트 쓰기) | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N45 find . -exec python3 -c "open('{}','w')" \; | deny | deny | 일치 | [bash-write-guard] python open() 쓰기: 쓰기 대상 '.' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| N46 find app -type f -okdir cp /tmp/a {} \; | deny | deny | 일치 | [bash-write-guard] cp 목적지: 쓰기 대상 'app' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate(활성 작업· |
+| N47 find app -exec perl -pi -e s/a/b/ {} + | deny | deny | 일치 | [bash-write-guard] perl -i: 쓰기 대상 'app' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate(활성 작업 |
+| N48 find app \( -name a -o -name b \) -exec tee {} \; (괄호 뒤 -exec) | deny | deny | 일치 | [bash-write-guard] tee: 쓰기 대상 'app' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate(활성 작업·동결· |
+| N49 find app -exec bash -c "$(cat /tmp/f)" \; (-exec 안 동적 코드) | deny | deny | 일치 | [bash-write-guard] bash 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| N50 python3 -c "$X" (변수 인라인) | deny | deny | 일치 | [bash-write-guard] python 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다. 검사할 수 없으면 차단한다 (FIX-014). |
+| N51 node --eval "$(cat f)" | deny | deny | 일치 | [bash-write-guard] node 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다. 검사할 수 없으면 차단한다 (FIX-014). |
+| N52 node -p "$(cat f)" | deny | deny | 일치 | [bash-write-guard] node 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다. 검사할 수 없으면 차단한다 (FIX-014). |
+| N53 ruby -e "$X" | deny | deny | 일치 | [bash-write-guard] ruby 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다. 검사할 수 없으면 차단한다 (FIX-014). |
+| N54 perl -E "$(cat f)" | deny | deny | 일치 | [bash-write-guard] perl 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다. 검사할 수 없으면 차단한다 (FIX-014). |
+| N55 python3 -Ic "$(cat f)" (옵션 묶음) | deny | deny | 일치 | [bash-write-guard] python 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다. 검사할 수 없으면 차단한다 (FIX-014). |
+| N56 python3 -c "$(cat f)" < /dev/null (-c 동적 + stdin) | deny | deny | 일치 | [bash-write-guard] python 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다. 검사할 수 없으면 차단한다 (FIX-014). |
+| N57 echo app/x.py \| xargs touch | deny | deny | 일치 | [bash-write-guard] touch: 쓰기 대상 파일을 판정할 수 없다(xargs 로 stdin 에서 옴). Write/Edit 툴을 쓰라 (FIX-014). |
+| N58 echo app/x.py \| xargs -I@ cp /tmp/a @ | deny | deny | 일치 | [bash-write-guard] cp 목적지: 쓰기 대상 '@' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate(활성 작업·동결 |
+| N59 ls app \| xargs -n1 -I{} tee {} | deny | deny | 일치 | [bash-write-guard] tee: 쓰기 대상 '{}' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate(활성 작업·동결·L |
+
+## 경계·한계 기록 (deny 가 아니어도 소견은 §재검증에서 분류)
+| # | 라벨 | 기대 | 실제 | 판정 | 사유(앞 110자) |
+|---|---|---|---|---|---|
+| E1 cat <<EOF … $(echo x > app/x.py) … EOF (셸이 아닌 cat 의 heredoc 본문 치환 — 문서화된 한계) | limit | deny | deny(막힘) | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| E2 cat <<EOF > /tmp/x … $(echo x > app/x.py) … EOF | limit | deny | deny(막힘) | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gat |
+| E3 echo 'open(…)' \| perl (perl stdin 프로그램 — R-14-5 류) | limit | deny | deny(막힘) | [bash-write-guard] 인라인 perl 코드의 파일 쓰기 대상을 판정할 수 없다. 프로젝트 파일은 Write/Edit 툴로 쓰라 (FIX-014). |
+| E4 echo 'writeFileSync' \| node (node stdin 코드 — 문서 '범위 밖 사각') | limit | deny | deny(막힘) | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| E5 echo 'File.write' \| ruby (ruby stdin) | limit | deny | deny(막힘) | [bash-write-guard] 인라인 ruby 코드의 파일 쓰기 대상을 판정할 수 없다. 프로젝트 파일은 Write/Edit 툴로 쓰라 (FIX-014). |
+| E6 . /tmp/s (source 스크립트 파일 — L4 류) | limit | allow | 한계(막지 않음) | (stdout 없음, rc=0) |
+| E7 source /tmp/s | limit | allow | 한계(막지 않음) | (stdout 없음, rc=0) |
+| E8 echo 'Set-Content app/x.py hi' \| pwsh -Command - (PS stdin — R-14-6 류) | limit | allow | 한계(막지 않음) | (stdout 없음, rc=0) |
+| E9 xargs -a /tmp/list sed -i s/a/b/ (GNU xargs 파일 입력) | limit | allow | 한계(막지 않음) | (stdout 없음, rc=0) |
+| E10 echo … \| busybox sh | limit | allow | 한계(막지 않음) | (stdout 없음, rc=0) |
+| E11 find app -delete (문서 '범위 밖 사각') | limit | allow | 한계(막지 않음) | (stdout 없음, rc=0) |
+| E12 bash <<EOF … echo x > \$F … EOF (이스케이프된 변수) | limit | deny | deny(막힘) | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 경로 '$F' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할 수 없으면 통과가 아니라 차단한다(security.md).  |
+
+## 오탐 회귀 — 재작업 허용 7건 + 대조 (기대 allow)
+| # | 라벨 | 기대 | 실제 | 판정 | 사유(앞 110자) |
+|---|---|---|---|---|---|
+| A1 printf 'ls' \| bash | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A2 bash <<< 'ls -la' | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A3 echo 'echo x > /tmp/y' \| sh | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A4 python3 -c "print(1)" | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A5 find app -name '*.py' -exec grep -l x {} + | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A6 find app -exec wc -l {} + | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A7 find /tmp/tg -exec sed -i s/a/b/ {} + | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A8 cat <<EOF \| bash … ls … EOF (쓰기 없는 heredoc 파이프 — N1 대조) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A9 echo 'ls' \| bash -s (쓰기 없는 -s) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A10 python3 - <<< 'print(1)' (쓰기 없는 here-string — N4 대조) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A11 find . -name '*.py' -exec sh -c 'wc -l "$1"' _ {} \; (읽기) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A12 find app -exec cp {} /tmp/bak/ \; (목적지 임시) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A13 echo 'print(1)' \| xargs -I{} python3 -c {} (쓰기 없음) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A14 bash .claude/scripts/test-guards.sh > <SP>/tg.txt 2>&1 | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A15 python3 <SP>/drive.py <ROOT> <SP> > <SP>/out.txt | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A16 git diff HEAD -- .claude/scripts/test-guards.sh | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A17 grep -rn 'tee docs/wiki' .claude docs/wiki/verification.md | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A18 diff <SP>/a.txt <SP>/b.txt \| head | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A19 echo hi \| cat | allow | allow | 일치 | (stdout 없음, rc=0) |
+| A20 cat /tmp/f \| grep x | allow | allow | 일치 | (stdout 없음, rc=0) |
+
+## fail-closed 회귀
+| # | 입력 | 실제 | 사유(앞 110자) |
+|---|---|---|---|
+| F1 깨진 JSON | deny | [bash-write-guard] 훅 입력을 해석할 수 없어 검사하지 못했다(JSONDecodeError) — 차단한다. |
+| F2 PATH 비움 (파이썬 탐지 실패) | deny | [bash-write-guard] 파이썬 인터프리터를 찾지 못해 검사할 수 없다 - FIX-008 |
+| F3 빈 stdin | deny | [bash-write-guard] 훅 입력을 해석할 수 없어 검사하지 못했다(JSONDecodeError) — 차단한다. |
+| F4 here-string 4단 중첩 | allow | (stdout 없음, rc=0) |
+
+불일치 0 (셸 stdin 0 · 동적·find·xargs 0 · 오탐 0)
+
+################################ drive.py 출력 (C5 기대 deny) ################################
+## 침입 시도 (기대 deny)
+| # | 라벨 | 툴 | 기대 | 실제 | 판정 | 사유(앞 90자) |
+|---|---|---|---|---|---|---|
+| 1 | S9-1 cat > app/x.py <<EOF | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 2 | S9-2 echo k > docs/wiki/HANDOFF.md | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'docs/wiki/HANDOFF.md' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지  |
+| 3 | S9-3 sed -i '' s/a/b/ app/main.py | Bash | deny | deny | 일치 | [bash-write-guard] sed -i: 쓰기 대상 'app/main.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 4 | S9-4 printf x \| tee app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] tee: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고 |
+| 5 | S9-5 cp /tmp/x app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] cp 목적지: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴 |
+| 6 | S9-6 python3 -c open('app/x.py','w') | Bash | deny | deny | 일치 | [bash-write-guard] python open() 쓰기: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Wr |
+| 7 | S9-7 echo x > "$X" | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 경로 '$X' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할 수 없으면 통과가 아니라 |
+| 8 | S9-8 PS Set-Content app/x.py | PowerShell | deny | deny | 일치 | [bash-write-guard] PowerShell set-content: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 |
+| 9 | V1 python3 - <<PY open(…,'w') | Bash | deny | deny | 일치 | [bash-write-guard] python open() 쓰기: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Wr |
+| 10 | V2 bash -c 'echo x > app/x.py' | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 11 | V3 eval "echo x > app/x.py" | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 12 | V4 cat <<EOF >app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 13 | V5 echo x >> ./app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>>': 쓰기 대상 './app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/ |
+| 14 | V6 cp a "$CLAUDE_PROJECT_DIR/app/x.py" | Bash | deny | deny | 일치 | [bash-write-guard] cp 목적지: 쓰기 대상 경로 '$CLAUDE_PROJECT_DIR/app/x.py' 를 판정할 수 없다(변수·명령 치환·계산된 |
+| 15 | V7 node -e writeFileSync('app/x.js') | Bash | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Ed |
+| 16 | V8 PS 'x' \| Out-File app\x.py | PowerShell | deny | deny | 일치 | [bash-write-guard] PowerShell out-file: 쓰기 대상 'app\x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 |
+| 17 | V9 env X=app/x.py sh -c 'echo > $X' | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 경로 '$X' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할 수 없으면 통과가 아니라 |
+| 18 | V10 printf x \| dd of=app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] dd of=: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴 |
+| 19 | V11 install -m 644 a app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] install 목적지: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/E |
+| 20 | V12 echo x > $(pwd)/app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 경로 '$(pwd)/app/x.py' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할  |
+| 21 | V13 절대 경로 리터럴 > <ROOT>/app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 '/Users/sunwoo/Desktop/Portfolio/Relationship/app/x.py |
+| 22 | V14 : > app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 23 | V15 >app/x.py (명령 없는 리다이렉트) | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 24 | V16 echo x 1> app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 25 | V17 exec 3>app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 26 | V18 { echo a; echo b; } > app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 27 | V19 echo x \| tee -a app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] tee: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고 |
+| 28 | V20 sed -i.bak s/a/b/ app/main.py | Bash | deny | deny | 일치 | [bash-write-guard] sed -i: 쓰기 대상 'app/main.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 29 | V21 truncate -s 0 app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] truncate: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit |
+| 30 | V22 ln -s a app/x | Bash | deny | deny | 일치 | [bash-write-guard] ln 목적지: 쓰기 대상 'app/x' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고 |
+| 31 | V23 mv app/a.py app/b.py | Bash | deny | deny | 일치 | [bash-write-guard] mv 목적지: 쓰기 대상 'app/b.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴 |
+| 32 | V24 echo x >\| app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>\|': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/E |
+| 33 | V25 echo x &> app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '&>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Ed |
+| 34 | V26 sh -c "$(echo …)" (동적 코드) | Bash | deny | deny | 일치 | [bash-write-guard] sh 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| 35 | V27 bash <<'EOF' heredoc 본문 | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 36 | V28 xargs -I{} sh -c 'echo > {}' | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 '{}' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고 |
+| 37 | V29 vim -c wq app/x.py | Bash | deny | deny | 일치 | [bash-write-guard] vi/vim 의 스크립트 모드는 파일을 쓴다. Write/Edit 툴로 쓰라 (FIX-014). |
+| 38 | V30 patch app/x.py < /tmp/p | Bash | deny | deny | 일치 | [bash-write-guard] patch 는 대상 파일을 직접 고친다. 프로젝트 파일은 Write/Edit 툴로 고쳐라 (FIX-014). |
+| 39 | V31 rsync a app/ | Bash | deny | deny | 일치 | [bash-write-guard] rsync 목적지: 쓰기 대상 'app/' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 |
+| 40 | V32 curl -O http://x | Bash | deny | deny | 일치 | [bash-write-guard] curl -O 는 현재 디렉터리에 파일을 만든다. -o <임시경로> 로 대상을 지정하라 (FIX-014). |
+| 41 | V33 wget http://x | Bash | deny | deny | 일치 | [bash-write-guard] wget 은 현재 디렉터리에 파일을 만든다. -O <임시경로> 로 대상을 지정하라 (FIX-014). |
+| 42 | V34 python3 shutil.copy(…,'app/x.py') | Bash | deny | deny | 일치 | [bash-write-guard] python 파일 복사·이동: 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Wri |
+| 43 | V35 PS Copy-Item a -Destination app\x.py | PowerShell | deny | deny | 일치 | [bash-write-guard] PowerShell 복사·이동 목적지: 쓰기 대상 'app\x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말 |
+| 44 | V36 PS [IO.File]::WriteAllText | PowerShell | deny | deny | 일치 | [bash-write-guard] PowerShell 의 .NET 파일 쓰기([IO.File]::Write… · StreamWriter)는 대상을 판정할 수 없다 |
+| 45 | V37 echo x > ~/x (프로젝트 밖·임시 아님) | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 '~/x' 는 프로젝트 밖이지만 임시 영역(/tmp·$TMPDIR·스크래치패드)도 아니다. 허용하 |
+| 46 | V38 python3 -c 'p=…; open(p,"w")' 변수 경로 | Bash | deny | deny | 일치 | [bash-write-guard] python open() 쓰기: 인라인 코드가 쓰는 파일 경로를 판정할 수 없다(문자열 상수가 아님). 프로젝트 파일은 Writ |
+| 47 | V39 python3 -c open(file=…, mode='w') | Bash | deny | deny | 일치 | [bash-write-guard] python open() 쓰기: 인라인 코드가 쓰는 파일 경로를 판정할 수 없다(문자열 상수가 아님). 프로젝트 파일은 Writ |
+| 48 | V40 echo x 2> app/err.log | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/err.log' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/ |
+| 49 | X1 printf 'echo x > app/x.py' \| bash (stdin 코드) | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 50 | X2 bash <<< 'echo x > app/x.py' (here-string) | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 51 | X3 python3 -c "$(cat /tmp/p.py)" (동적 코드) | Bash | deny | deny | 일치 | [bash-write-guard] python 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다. 검사할 수 없으면 차단한다 (FIX-014). |
+| 52 | X4 node -e "$(cat /tmp/x.js)" (동적 코드) | Bash | deny | deny | 일치 | [bash-write-guard] node 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다. 검사할 수 없으면 차단한다 (FIX-014). |
+| 53 | X5 find app -exec sed -i s/a/b/ {} + | Bash | deny | deny | 일치 | [bash-write-guard] sed -i: 쓰기 대상 'app' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 |
+| 54 | X6 awk 'BEGIN{print "x" > "app/x.py"}' | Bash | deny | allow | **불일치** |  |
+| 55 | X7 perl -e 'open(my $f, ">", "app/x.py")' | Bash | deny | allow | **불일치** |  |
+| 56 | X8 php -r file_put_contents('app/x.py') | Bash | deny | allow | **불일치** |  |
+| 57 | X9 PS iex 'Set-Content app\x.py hi' | PowerShell | deny | allow | **불일치** |  |
+| 58 | X10 PS cmd /c "echo x > app\x.py" | PowerShell | deny | allow | **불일치** |  |
+| 59 | X11 python3 builtins.open('docs/zz.md','w') | Bash | deny | allow | **불일치** |  |
+| 60 | X12 python3 exec(b64decode(…)) 난독 | Bash | deny | allow | **불일치** |  |
+| 61 | X13 echo … \| sh | Bash | deny | deny | 일치 | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edi |
+| 62 | X14 bash -s < /tmp/script.sh | Bash | deny | deny | 일치 | [bash-write-guard] bash 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). 검사할 수 없으면 차단한다 (FIX-014). |
+| 63 | X15 tar -xf /tmp/a.tar -C app | Bash | deny | allow | **불일치** |  |
+| 64 | X16 unzip /tmp/a.zip -d app | Bash | deny | allow | **불일치** |  |
+| 65 | X17 mkdir app/newdir | Bash | deny | allow | **불일치** |  |
+| 66 | X18 rm app/x.py | Bash | deny | allow | **불일치** |  |
+| 67 | L1 python3 -c os.system('echo x > app/x.py') | Bash | limit | allow | 한계(막지 않음) |  |
+| 68 | L2 python3 -c subprocess.run(…, shell=True) | Bash | limit | allow | 한계(막지 않음) |  |
+| 69 | L3 git apply /tmp/p.diff | Bash | limit | allow | 한계(막지 않음) |  |
+| 70 | L4 bash /tmp/write.sh | Bash | limit | allow | 한계(막지 않음) |  |
+| 71 | L5 python3 /tmp/write.py | Bash | limit | allow | 한계(막지 않음) |  |
+| 72 | L6 ruff format app/ | Bash | limit | allow | 한계(막지 않음) |  |
+| 73 | L7 npm run build (web/dist 생성) | Bash | limit | allow | 한계(막지 않음) |  |
+| 74 | L8 alembic revision --autogenerate | Bash | limit | allow | 한계(막지 않음) |  |
+
+## 오탐 (기대 allow)
+| # | 라벨 | 툴 | 기대 | 실제 | 판정 | 사유(앞 90자) |
+|---|---|---|---|---|---|---|
+| 1 | S6-1 git commit -F .claude/commit-draft.txt 2>&1 | Bash | allow | allow | 일치 |  |
+| 2 | S6-2 curl -o <SP>/x | Bash | allow | allow | 일치 |  |
+| 3 | S6-3 pytest \| tee <SP>/out.txt | Bash | allow | allow | 일치 |  |
+| 4 | S6-4 echo x >&2 | Bash | allow | allow | 일치 |  |
+| 5 | S6-5 cmd 2>/dev/null | Bash | allow | allow | 일치 |  |
+| 6 | S6-6 grep a b > /tmp/x | Bash | allow | allow | 일치 |  |
+| 7 | W1 git commit -F .claude/commit-draft.txt | Bash | allow | allow | 일치 |  |
+| 8 | W2 git push origin dev2 | Bash | allow | allow | 일치 |  |
+| 9 | W3 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q 2>&1 \| tail -1 | Bash | allow | allow | 일치 |  |
+| 10 | W4 bash test-guards.sh > <SP>/x.txt 2>&1 | Bash | allow | allow | 일치 |  |
+| 11 | W5 gh run view … --json x --jq … | Bash | allow | allow | 일치 |  |
+| 12 | W6 grep -rn x app/ \| head | Bash | allow | allow | 일치 |  |
+| 13 | W7 python3 -c "print(1)" | Bash | allow | allow | 일치 |  |
+| 14 | W8 curl -o <SP>/x.json | Bash | allow | allow | 일치 |  |
+| 15 | W9 echo "$(date)" >> /tmp/x | Bash | allow | allow | 일치 |  |
+| 16 | W10 bash .claude/scripts/gitlog.sh P8-frontend | Bash | allow | allow | 일치 |  |
+| 17 | W11 bash .claude/scripts/approve-commit.sh --stage verifier | Bash | allow | allow | 일치 |  |
+| 18 | W12 git diff --stat HEAD | Bash | allow | allow | 일치 |  |
+| 19 | W13 cat <<'EOF' (읽기 전용 heredoc) | Bash | allow | allow | 일치 |  |
+| 20 | W14 python3 - <<'PY' print(1) | Bash | allow | allow | 일치 |  |
+| 21 | W15 echo "a > b" (따옴표 안) | Bash | allow | allow | 일치 |  |
+| 22 | W16 git log --oneline -5 \| head | Bash | allow | allow | 일치 |  |
+| 23 | W17 docker compose up -d | Bash | allow | allow | 일치 |  |
+| 24 | W18 alembic upgrade head | Bash | allow | allow | 일치 |  |
+| 25 | W19 .venv/bin/python -m pytest tests/test_x.py -q | Bash | allow | allow | 일치 |  |
+| 26 | W20 mktemp -d | Bash | allow | allow | 일치 |  |
+| 27 | W21 echo x > /dev/null | Bash | allow | allow | 일치 |  |
+| 28 | W22 diff <(echo a) <(echo b) | Bash | allow | allow | 일치 |  |
+| 29 | W23 for f in app/*.py; do echo "$f"; done | Bash | allow | allow | 일치 |  |
+| 30 | W24 [ -f app/x.py ] && echo yes | Bash | allow | allow | 일치 |  |
+| 31 | W25 wc -l < app/main.py | Bash | allow | allow | 일치 |  |
+| 32 | W26 cp app/a.py /tmp/b | Bash | allow | allow | 일치 |  |
+| 33 | W27 pip install -r requirements.txt | Bash | allow | allow | 일치 |  |
+| 34 | W28 git add app/x.py docs/y.md | Bash | allow | allow | 일치 |  |
+| 35 | W29 echo x > $TMPDIR/x | Bash | allow | allow | 일치 |  |
+| 36 | W30 echo x > "$TMPDIR/x" | Bash | allow | allow | 일치 |  |
+| 37 | W31 echo x > ${TMPDIR}/x | Bash | allow | allow | 일치 |  |
+| 38 | W32 python3 -c print(open('app/x.py').read()) | Bash | allow | allow | 일치 |  |
+| 39 | W33 sed -n 1,5p app/main.py | Bash | allow | allow | 일치 |  |
+| 40 | W34 PS Get-Content app\x.py | PowerShell | allow | allow | 일치 |  |
+| 41 | W35 PS Set-Content $env:TEMP\x.txt hi | PowerShell | allow | allow | 일치 |  |
+| 42 | W36 jq . reports/metrics.json | Bash | allow | allow | 일치 |  |
+| 43 | W37 echo x > "<SP>/x" (리터럴 따옴표) | Bash | allow | allow | 일치 |  |
+| 44 | W38 git -C . status | Bash | allow | allow | 일치 |  |
+| 45 | W39 time python -m pytest -q | Bash | allow | allow | 일치 |  |
+| 46 | W40 timeout 60 bash .claude/scripts/test-guards.sh | Bash | allow | allow | 일치 |  |
+| 47 | W41 curl -s http://localhost:8000/health | Bash | allow | allow | 일치 |  |
+| 48 | W42 ls -la > /private/tmp/x | Bash | allow | allow | 일치 |  |
+| 49 | W43 python3 .claude/scripts/findings.py … | Bash | allow | allow | 일치 |  |
+| 50 | W44 ruff check app/ | Bash | allow | allow | 일치 |  |
+| 51 | W45 echo x \| tee (대상 없음) | Bash | allow | allow | 일치 |  |
+| 52 | W46 git stash list | Bash | allow | allow | 일치 |  |
+| 53 | W47 npm install | Bash | allow | allow | 일치 |  |
+| 54 | W48 git log --grep 'FIX-014' --oneline | Bash | allow | allow | 일치 |  |
+| 55 | W49 grep -n 'tee docs/' .claude/agents/verifier.md | Bash | allow | allow | 일치 |  |
+| 56 | C1 cd /tmp && echo x > y (cd 뒤 상대 경로) | Bash | allow | deny | **불일치** | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 'y' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐 |
+| 57 | C2 echo 'print(1)' \| python3 (stdin 코드) | Bash | allow | deny | **불일치** | [bash-write-guard] python 이 stdin 에서 코드를 읽는다. 내용을 검사할 수 없다. 파일 쓰기는 Write/Edit 툴로 하라 (FIX-0 |
+| 58 | C3 echo x > $SP/x (스크래치패드 변수) | Bash | allow | deny | **불일치** | [bash-write-guard] 리다이렉트 '>': 쓰기 대상 경로 '$SP/x' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할 수 없으면 통과가  |
+| 59 | C4 echo x > "$CLAUDE_SCRATCHPAD/x" | Bash | allow | allow | 일치 |  |
+| 60 | C5 bash .claude/scripts/verify-plan.sh P8 \| tee docs/wiki/packages/P8/evidence/x.txt (verifier.md 24행 지시) | Bash | deny | deny | 일치 | [bash-write-guard] tee: 쓰기 대상 'docs/wiki/packages/P8-frontend/evidence/x.txt' 는 프로젝트 안이다.  |
+
+불일치 14 (침입 11 · 오탐 3)

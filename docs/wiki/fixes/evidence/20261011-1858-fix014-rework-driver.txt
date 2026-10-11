@@ -1,0 +1,23 @@
+# FIX-014 재작업 — verifier 드라이버 재실행 (수정 후)
+# 복원: tail -n +6 docs/wiki/fixes/evidence/20261011-verifier-fix014-drive-src.txt > <스크래치패드>/drive.py
+# 실행: python3 <스크래치패드>/drive.py /Users/sunwoo/Desktop/Portfolio/Relationship <스크래치패드> > <스크래치패드>/drive-out.txt
+# 전체 표는 스크래치패드(drive-out.txt, 유실 가능)에만 있고 아래는 [필수] 범위와 불일치 행의 원문 발췌다. 재실행으로 재현된다.
+# 마지막 줄: 불일치 15 (침입 11 · 오탐 4)   ← 수정 전 verifier 보고: 침입 X1~X18 중 18건이 allow(뚫림)였다.
+# 오탐 40+ 종 W1~W49·S6-* 는 전부 일치(새 오탐 0).
+
+## [필수] 범위 — 전부 deny 로 바뀜
+| 49 | X1 printf 'echo x > app/x.py' | bash (stdin 코드)   | deny | deny | 일치 | 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다 (파이프 앞 리터럴을 재귀 분석)
+| 50 | X2 bash <<< 'echo x > app/x.py' (here-string)        | deny | deny | 일치 | 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다 (here-string 을 heredoc 급으로 재귀)
+| 51 | X3 python3 -c "$(cat /tmp/p.py)" (동적 코드)           | deny | deny | 일치 | python 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다
+| 52 | X4 node -e "$(cat /tmp/x.js)" (동적 코드)              | deny | deny | 일치 | node 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다
+| 53 | X5 find app -exec sed -i s/a/b/ {} +                  | deny | deny | 일치 | sed -i: 쓰기 대상 'app' 는 프로젝트 안이다 ({} → find 시작 경로)
+| 61 | X13 echo … | sh                                      | deny | deny | 일치 | 리다이렉트 '>': 쓰기 대상 'app/x.py' 는 프로젝트 안이다
+| 62 | X14 bash -s < /tmp/script.sh                          | deny | deny | 일치 | bash 가 실행할 코드를 판정할 수 없다 (stdin 파일)
+
+## 남는 불일치 15건 — 모두 [필수] 범위 밖
+- 한계로 남는 침입 11건(권고 R-14-5·6·8 및 범위 밖): X6 X7 X8 X11 X12 (R-14-5 인터프리터 휴리스틱), X9 X10 (R-14-6 PowerShell iex·cmd /c), X15 X16 (R-14-8 tar -C·unzip -d), X17 X18 (mkdir·rm — 쓰기 목록 밖).
+- 보수적 거부로 의도된 오탐 4건(권고 R-14-7, 우회 있음): C1 (cd 미추적) · C2 (python stdin 코드) · C3 (변수 경로 $SP).
+- C5 (verify-plan.sh | tee docs/wiki/packages/…): 훅은 의도대로 거부한다. 문제는 문서가 이 명령을 지시한 것이었고 R-14-4 로 문서를 고쳤다
+  (`grep -rn 'tee docs/wiki' .claude docs/wiki/verification.md` → test-guards.sh 191행 시험 입력 문자열 1건만 남음, 명령 아님).
+  드라이버 기대값(allow)은 verifier 가 문서 수정 전 기준으로 쓴 것이므로 deny 로 갱신해야 한다.
+- 합계: 11 + 3(C1~C3) + 1(C5) = 15.

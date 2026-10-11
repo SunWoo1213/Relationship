@@ -1,0 +1,156 @@
+# FIX-014 4차(좁은) 검증 — R-14-16 직접·변형 / 오탐 / (?:Sync)? 회귀 / 작업 흐름 / 후속 탐색 / fail-closed (verifier, fable, 2026-10-11)
+# 드라이버: 스크래치패드 drive5.py (소스 전문: 20261011-verifier-fix014-r16-drive5-src.txt). 라이브 훅 .claude/hooks/bash-write-guard.sh 를 stdin JSON 으로 호출, CLAUDE_PROJECT_DIR=ROOT.
+# 명령: python3 <스크래치패드 리터럴>/drive5.py /Users/sunwoo/Desktop/Portfolio/Relationship <스크래치패드 리터럴> > <스크래치패드 리터럴>/drive5-out.txt 2>&1 → rc=0 (그 뒤 Read → Write 로 이 파일에 옮김)
+# 집계: R-14-16 41건 중 deny 40 · 불일치 1(#32 `deno run - <<EOF $(cat f)` = 3차 후속 후보 R-14-18 의 deno 인스턴스, R-14-16 아님 — 정적 heredoc #17·#18 은 deny)
+#       오탐 26건 allow 전부 일치 · (?:Sync)? 회귀 20건 불일치 0 · 작업 흐름 P1~P20 불일치 0 · fail-closed F1·F3 deny
+# 아래는 drive5-out.txt 전체 출력(한 글자도 줄이지 않음).
+
+## R-14-16 직접·변형 (기대 deny)
+| # | 라벨 | 기대 | 실제 | 판정 | 사유(앞 110자) |
+|---|---|---|---|---|---|
+| 1 | V14-3 printf W | deno run - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 2 | 3차 bun run - (BW) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 3 | 3차 deno eval (stdin, 무인자) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 4 | deno run -A - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 5 | deno run --allow-write - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 6 | deno run --allow-write=app --quiet - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 7 | deno run -A --unstable - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 8 | deno eval - (stdin) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 9 | deno eval "W" (정적 인라인) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 10 | deno eval --ext=ts "W" (=값 옵션) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 11 | deno eval -p "W" | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 12 | bun x - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 13 | bun - (서브명령 없음) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 14 | bun run --silent - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 15 | deno x - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 16 | deno - (서브명령 없음) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 17 | deno run - <<EOF W | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 18 | deno run -A - <<'EOF' W (인용 구분자) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 19 | deno run - <<< W | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 20 | bun run - <<EOF BW | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 21 | bun run - <<< BW | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 22 | deno eval <<< W | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 23 | deno eval <<EOF W | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 24 | cat f | deno run - | deny | deny | 일치 | [bash-write-guard] node 가 파이프 입력에서 코드를 읽는데 파이프 앞이 정적 리터럴이 아니다. 내용을 검사할 수 없다 (FIX-014). |
+| 25 | cat f | bun run - | deny | deny | 일치 | [bash-write-guard] node 가 파이프 입력에서 코드를 읽는데 파이프 앞이 정적 리터럴이 아니다. 내용을 검사할 수 없다 (FIX-014). |
+| 26 | cat f | deno eval | deny | deny | 일치 | [bash-write-guard] node 가 파이프 입력에서 코드를 읽는데 파이프 앞이 정적 리터럴이 아니다. 내용을 검사할 수 없다 (FIX-014). |
+| 27 | deno run - < f | deny | deny | 일치 | [bash-write-guard] node 가 stdin(동적 here-string·파일)에서 코드를 읽는다. 내용을 검사할 수 없다 (FIX-014). |
+| 28 | bun run - < f | deny | deny | 일치 | [bash-write-guard] node 가 stdin(동적 here-string·파일)에서 코드를 읽는다. 내용을 검사할 수 없다 (FIX-014). |
+| 29 | echo "$(cat f)" | deno run - | deny | deny | 일치 | [bash-write-guard] node 가 파이프 입력에서 코드를 읽는데 파이프 앞이 정적 리터럴이 아니다. 내용을 검사할 수 없다 (FIX-014). |
+| 30 | deno eval "$(cat f)" (동적 인라인) | deny | deny | 일치 | [bash-write-guard] node 인라인 코드가 변수·명령 치환을 포함해 내용을 판정할 수 없다. 검사할 수 없으면 차단한다 (FIX-014). |
+| 31 | deno run - <<< "$(cat f)" | deny | deny | 일치 | [bash-write-guard] node 가 stdin(동적 here-string·파일)에서 코드를 읽는다. 내용을 검사할 수 없다 (FIX-014). |
+| 32 | deno run - <<EOF $(cat f) | deny | allow | **불일치** | (stdout 없음, rc=0) |
+| 33 | curl … | deno run -A - | deny | deny | 일치 | [bash-write-guard] node 가 파이프 입력에서 코드를 읽는데 파이프 앞이 정적 리터럴이 아니다. 내용을 검사할 수 없다 (FIX-014). |
+| 34 | printf WA(async writeTextFile) | deno run - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 35 | printf WB(writeFileSync) | deno run - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 36 | printf BB(Bun.write) | bun run - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 37 | printf BW(fs.writeFileSync) | deno run - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 38 | printf W | /usr/local/bin/deno run - (절대 경로) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 39 | printf W | deno run - 2>/dev/null | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 40 | cd app && printf W | deno run - | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 41 | xargs -I{} deno eval {} (자리표 코드) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+R-14-16 직접·변형 (기대 deny): 불일치 1 — deno run - <<EOF $(cat f)
+
+## 오탐 — deno/bun 정상 사용 (기대 allow)
+| # | 라벨 | 기대 | 실제 | 판정 | 사유(앞 110자) |
+|---|---|---|---|---|---|
+| 1 | deno run app/x.ts | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 2 | deno run -A app/x.ts | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 3 | deno run --allow-all app/x.ts | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 4 | deno run -A npm:prettier --check . | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 5 | bun run build | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 6 | bun run test | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 7 | bun run app/x.ts | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 8 | bun test | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 9 | bun install | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 10 | bun x prettier --check . | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 11 | deno eval "console.log(1)" | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 12 | deno eval "Deno.readTextFileSync('app/x')" (읽기) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 13 | echo 'console.log(1)' | deno run - | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 14 | echo 'console.log(1)' | bun run - | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 15 | echo 'console.log(1)' | deno eval | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 16 | deno --version | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 17 | bun --version | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 18 | deno -V | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 19 | deno task dev | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 20 | deno fmt --check | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 21 | deno lint app | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 22 | deno test -A | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 23 | deno check app/x.ts | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 24 | deno run - <<< 'console.log(1)' | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 25 | printf writeTextFileSync(/tmp) | deno run - (임시 경로) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 26 | echo W | grep deno (실행 아님) | allow | allow | 일치 | (stdout 없음, rc=0) |
+오탐 — deno/bun 정상 사용 (기대 allow): 불일치 0
+
+## (?:Sync)? 회귀 — node 기존 패턴·R-14-14 유지
+| # | 라벨 | 기대 | 실제 | 판정 | 사유(앞 110자) |
+|---|---|---|---|---|---|
+| 1 | node -e fs.writeFileSync(app) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 2 | node -e fs.writeFile(app) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 3 | node -e fs.appendFileSync(app) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 4 | node -e fs.copyFileSync(/tmp→app) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/b.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 5 | node -e fs.copyFileSync(app→/tmp) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 6 | node -e fs.writeFileSync(/tmp) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 7 | node -e Deno.writeTextFile(app) (옛 패턴) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 8 | node -e Deno.writeTextFileSync(app) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 9 | node -e Deno.writeFileSync(app) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 10 | node -e Bun.write(app) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 11 | node -e writeFileSync(변수 경로) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 인라인 코드가 쓰는 파일 경로를 판정할 수 없다(문자열 상수가 아님). 프로젝트 파일은 Write/Edit 툴로 쓰라 (FIX-014). |
+| 12 | node -e console.log('writeFileSync') (문자열뿐) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 13 | node -e fs.readFileSync(app) | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 14 | echo BW | node (3차 R-14-14 유지) | deny | deny | 일치 | [bash-write-guard] node 파일 쓰기: 쓰기 대상 'app/x.js' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-ga |
+| 15 | echo File.write | ruby | deny | deny | 일치 | [bash-write-guard] 인라인 ruby 코드의 파일 쓰기 대상을 판정할 수 없다. 프로젝트 파일은 Write/Edit 툴로 쓰라 (FIX-014). |
+| 16 | echo open(>) | perl | deny | deny | 일치 | [bash-write-guard] 인라인 perl 코드의 파일 쓰기 대상을 판정할 수 없다. 프로젝트 파일은 Write/Edit 툴로 쓰라 (FIX-014). |
+| 17 | echo file_put_contents | php | deny | deny | 일치 | [bash-write-guard] 인라인 php 코드의 파일 쓰기 대상을 판정할 수 없다. 프로젝트 파일은 Write/Edit 툴로 쓰라 (FIX-014). |
+| 18 | node < f | deny | deny | 일치 | [bash-write-guard] node 가 stdin(동적 here-string·파일)에서 코드를 읽는다. 내용을 검사할 수 없다 (FIX-014). |
+| 19 | echo 'puts 1' | ruby | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 20 | echo 'console.log(1)' | node | allow | allow | 일치 | (stdout 없음, rc=0) |
+(?:Sync)? 회귀 — node 기존 패턴·R-14-14 유지: 불일치 0
+
+## 작업 흐름 P1~P20 (기대 allow)
+| # | 라벨 | 기대 | 실제 | 판정 | 사유(앞 110자) |
+|---|---|---|---|---|---|
+| 1 | P1 git status | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 2 | P2 git add 명시 경로 && commit -F | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 3 | P3 git push origin dev2 | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 4 | P4 pytest | tee 스크래치패드 | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 5 | P5 gh pr view | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 6 | P6 grep -rn | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 7 | P7 cat <<'EOF' 인용 구분자 | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 8 | P8 echo 'console.log(1)' | node | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 9 | P9 스크래치패드 리터럴 > | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 10 | P10 find 읽기 | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 11 | P11 diff 파이프 | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 12 | P12 bash gitlog.sh | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 13 | P13 python -m alembic upgrade head | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 14 | P14 npm run build | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 15 | P15 curl -o 스크래치패드 | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 16 | P16 sed -n 읽기 | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 17 | P17 ls -la | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 18 | P18 python3 -c print | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 19 | P19 wc -l | sort | allow | allow | 일치 | (stdout 없음, rc=0) |
+| 20 | P20 echo x >&2 ; cmd 2>/dev/null | allow | allow | 일치 | (stdout 없음, rc=0) |
+작업 흐름 P1~P20 (기대 allow): 불일치 0
+
+## 후속 탐색 (기록만 — 집계 제외)
+| # | 라벨 | 실제 | 사유(앞 110자) |
+|---|---|---|---|
+| Q1 deno run -c deno.json - (-c 를 node '문법검사'로 오인) | allow | (stdout 없음, rc=0) |
+| Q2 deno run --check - (--check 를 node 문법검사로 오인) | allow | (stdout 없음, rc=0) |
+| Q3 deno run --config deno.json - (값옵션 띄어쓰기) | allow | (stdout 없음, rc=0) |
+| Q4 deno run --import-map m.json - | allow | (stdout 없음, rc=0) |
+| Q5 deno eval --ext ts "W" (값옵션 띄어쓰기 → 값이 코드로 오인) | allow | (stdout 없음, rc=0) |
+| Q6 bun run -c bunfig.toml - | allow | (stdout 없음, rc=0) |
+| Q7 bun run --cwd app - | allow | (stdout 없음, rc=0) |
+| Q8 printf W | deno repl (repl 이 파이프 stdin 평가) | allow | (stdout 없음, rc=0) |
+| Q9 deno run -r app/x.ts 뒤 파이프 (보수 오탐?) | deny | [bash-write-guard] node 가 파이프 입력에서 코드를 읽는데 파이프 앞이 정적 리터럴이 아니다. 내용을 검사할 수 없다 (FIX-014). |
+| Q10 bunx - | allow | (stdout 없음, rc=0) |
+| Q11 deno run - <<< "$W" (변수 here-string) | deny | [bash-write-guard] node 가 stdin(동적 here-string·파일)에서 코드를 읽는다. 내용을 검사할 수 없다 (FIX-014). |
+| Q12 node <<EOF $(cat f) (R-14-18 재확인) | allow | (stdout 없음, rc=0) |
+| Q13 deno run - <<EOF $(cat f) (deno 로 R-14-18) | allow | (stdout 없음, rc=0) |
+
+## fail-closed
+| F1 깨진 JSON | deny | [bash-write-guard] 훅 입력을 해석할 수 없어 검사하지 못했다(JSONDecodeError) — 차단한다. |
+| F3 빈 stdin | deny | [bash-write-guard] 훅 입력을 해석할 수 없어 검사하지 못했다(JSONDecodeError) — 차단한다. |
+
+4차 불일치 1 (R-14-16 1 · 오탐 0 · Sync회귀 0 · 작업흐름 0)

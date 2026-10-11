@@ -1,0 +1,49 @@
+# FIX-014 3차 재작업(R-14-16) — 드라이버 재실행 (수정 후, 전체 출력)
+# 복원/실행은 20261011-1936-fix014-rework2-driver.txt 헤더와 동일(drive2.py · drive.py 는 verifier 소스를 스크래치패드에 복원, drive.py C5 기대만 deny 로 갱신).
+# drive4.py = 이번에 새로 쓴 R-14-16 변형 드라이버(스크래치패드, 라이브 훅 bash-write-guard.sh 를 stdin JSON 으로 호출). 소스는 아래에 전문 수록.
+# 결과: drive4 "R-14-16 변형 불일치 0" · drive2 "불일치 0" · drive "불일치 14 (침입 11 · 오탐 3)" (직전 재작업과 번호별 동일 — 새 오탐 0).
+
+################################ drive4.py 소스 ################################
+# import json, subprocess, sys
+# ROOT = "/Users/sunwoo/Desktop/Portfolio/Relationship"
+# W = "Deno.writeTextFileSync('app/x.js','')" ; BW = "require('fs').writeFileSync('app/x.js','')"
+# 각 케이스: 명령을 {"tool_input":{"command":cmd}} JSON 으로 bash-write-guard.sh 에 넣고 stdout 에 "deny" 가 있으면 deny, 없으면 allow.
+# 케이스 20건(아래 표의 라벨 = 명령). 환경: CLAUDE_PROJECT_DIR=ROOT, PYTHONUTF8=1.
+
+################################ drive4.py 출력 ################################
+| 라벨 | 기대 | 실제 | 판정 |
+|---|---|---|---|
+| V14-3 printf W \| deno run - | deny | deny | 일치 |
+| printf W \| deno run -A - | deny | deny | 일치 |
+| printf W \| deno run --allow-write --quiet - | deny | deny | 일치 |
+| printf W \| deno eval | deny | deny | 일치 |
+| printf BW \| bun run - | deny | deny | 일치 |
+| printf BW \| bun - | deny | deny | 일치 |
+| printf BW \| bun x - | deny | deny | 일치 |
+| cat /tmp/f.js \| deno run - | deny | deny | 일치 |
+| cat /tmp/f.js \| bun run - | deny | deny | 일치 |
+| deno eval "W" (정적 인라인 쓰기) | deny | deny | 일치 |
+| deno run - <<EOF W | deny | deny | 일치 |
+| echo 'console.log(1)' \| deno run - | allow | allow | 일치 |
+| deno run app/x.ts | allow | allow | 일치 |
+| deno run -A app/x.ts | allow | allow | 일치 |
+| bun run build | allow | allow | 일치 |
+| bun run app/x.ts | allow | allow | 일치 |
+| deno eval "console.log(1)" | allow | allow | 일치 |
+| deno --version | allow | allow | 일치 |
+| bun --version | allow | allow | 일치 |
+| echo 'console.log(1)' \| bun run - | allow | allow | 일치 |
+R-14-16 변형 불일치 0
+
+################################ drive2.py 출력 (마지막 줄 = 불일치 0) ################################
+## 새 우회 — 코드를 stdin 으로 받는 셸 (기대 deny): N1~N34 전부 deny/일치
+## 새 우회 — 동적 인라인 코드·find -exec·xargs (기대 deny): N40~N59 전부 deny/일치
+## 경계·한계 기록: E1~E5·E12 deny(막힘), E6~E11 한계(막지 않음 — R-14-15 후속 후보, 이번 범위 밖)
+## 오탐 회귀 A1~A20 전부 allow/일치
+## fail-closed F1~F3 deny, F4 allow
+불일치 0 (셸 stdin 0 · 동적·find·xargs 0 · 오탐 0)
+# (행별 전체 표는 20261011-1936-fix014-rework2-driver.txt 와 판정 동일. 이번 실행 원본 111줄 중 표 행은 그 파일과 같은 라벨·같은 판정.)
+
+################################ drive.py 출력 (마지막 줄) ################################
+# 불일치 14 (침입 11 · 오탐 3) — X6 X7 X8 X9 X10 X11 X12 X15 X16 X17 X18 (침입 11, 후속 후보) + C1 C2 C3 (오탐 3, 이전부터 동일). C5 는 deny 기대로 일치. 새 오탐 0.
+불일치 14 (침입 11 · 오탐 3)

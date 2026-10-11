@@ -1,6 +1,6 @@
 # security — 기본 보안 규칙 카드
 
-> 집행부: `.claude/hooks/safety-guard.sh`(명령), `secret-guard.sh`(파일 쓰기), `.githooks/pre-commit`(git), `settings.json` deny 목록.
+> 집행부: `.claude/hooks/safety-guard.sh`(명령), `secret-guard.sh`(파일 쓰기), `bash-write-guard.sh`(Bash 파일 쓰기, FIX-014), `.githooks/pre-commit`(git), `settings.json` deny 목록.
 > 이 카드는 **왜 막는지**와 **대신 어떻게 하는지**를 적는다. 훅 메시지가 이 카드를 가리킨다.
 
 ## 1. 비밀(API 키·비밀번호·개인키)
@@ -45,6 +45,18 @@
 | 셸에서 `DROP`/`TRUNCATE` 금지 | Alembic 마이그레이션 파일로 작성해 검토 |
 | 로컬 서버 이외로 데이터 전송(`curl -d/-F/-T`, `scp`, `rclone`) 금지 | 외부 API 호출은 코드(SDK)로, 키는 환경변수 |
 
+## 4b. Bash 로 프로젝트 파일 쓰기 (FIX-014)
+
+집행부: `.claude/hooks/bash-write-guard.sh` + `.claude/scripts/bash_write_check.py` (PreToolUse `Bash|PowerShell`).
+
+| 규칙 | 대신 |
+|------|------|
+| Bash/PowerShell 로 **프로젝트 안** 파일을 쓰지 않는다: `>`·`>>`·`tee`·`sed -i`·`perl -pi`·`cp`/`mv`/`install`/`ln` 목적지·`touch`·`truncate`·`dd of=`·`curl -o`·heredoc 리다이렉트·python/node 인라인 `open(…,'w')`·`write_text`·`fs.writeFile`·PowerShell `Set-Content`/`Out-File`/`Add-Content` — `stage-gate`(활성 작업·동결·L-003)와 `secret-guard`(비밀)는 Write/Edit 입력만 읽어서 Bash 쓰기는 전부 그냥 지나갔다 | **Write/Edit 툴**로 쓴다. 임시 파일·로그는 `/tmp`·`$TMPDIR`·스크래치패드에 쓴다 |
+| 쓰기 대상 경로를 판정할 수 없으면(`> "$X"`·명령 치환·계산된 경로) 통과가 아니라 차단 | 절대 임시 경로로 바꾸거나 Write/Edit 툴을 쓴다 |
+| 한계(의도): `pytest`·`pip install`·`npm install`·`alembic upgrade`·`python scripts/x.py`·`git` 하위 명령·`bash .claude/scripts/*.sh` 처럼 **프로그램이 스스로 파일을 쓰는 것**은 막지 않는다. npm scripts 간접 실행도 같다 | 운용 규칙(CLAUDE.md)과 verifier 리뷰가 맡는다 |
+
+같은 구조 분해(따옴표·`;`·`&&`·`||`·`|`·줄바꿈·heredoc·명령 치환)를 `commit-cleanup.sh` 도 쓴다 — 실행되는 첫 단어가 `git` 인 조각만 커밋·푸시로 본다(다른 명령의 인자 속 `git push origin dev2` 글자로 journal·마커가 오염되던 결함 ②).
+
 ## 5. 제품 코드가 지킬 것 (기획서 9장 "제3자 개인정보")
 
 - 인물 단위 완전 삭제 API (`DELETE /persons/{id}` → CASCADE).
@@ -59,6 +71,6 @@
 
 ## 7. 훅이 스스로를 검사할 수 없을 때 (FIX-008)
 
-훅은 stdin JSON 을 파이썬으로 파싱한다. **파이썬 인터프리터를 찾지 못하면 차단형 가드(`safety-guard`·`secret-guard`·`stage-gate`·`commit-guard`·`delegate-guard`)는 통과시키지 않고 거부한다.** 입력을 읽지 못한 가드가 조용히 열리면 이 카드의 규칙이 전부 무력해지기 때문이다 — 실패는 닫는 방향이어야 한다.
+훅은 stdin JSON 을 파이썬으로 파싱한다. **파이썬 인터프리터를 찾지 못하면 차단형 가드(`safety-guard`·`secret-guard`·`stage-gate`·`commit-guard`·`delegate-guard`·`bash-write-guard`)는 통과시키지 않고 거부한다.** 입력을 읽지 못한 가드가 조용히 열리면 이 카드의 규칙이 전부 무력해지기 때문이다 — 실패는 닫는 방향이어야 한다.
 
 인터프리터 이름은 OS 마다 다르다(Windows 는 `python`, macOS 는 `python3`, 가상환경 안에서는 둘 다). `.claude/hooks/_py.sh` 가 `python` → `python3` 순으로 **실제 실행해 보고** 고르며, 각 훅은 그 결과(`$HOOK_PY`)를 쓴다. 다만 Stop 훅(`handoff-check`)과 차단 권한이 없는 보조 훅(`commit-cleanup`·`session-start`·`precompact`)은 경고만 하고 통과한다 — Stop 훅이 막으면 턴을 끝낼 수 없어 갇히기 때문이다.

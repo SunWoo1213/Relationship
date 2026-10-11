@@ -31,7 +31,8 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 3. `review-index.md`에서 이 패키지가 닫는 R → "다음 카드"(D, S)를 연다. 원문은 카드가 지시하는 절만. `registry.md`를 grep 해 이미 있는 산출물을 확인한다. **git log 를 본다(L-001)**: `bash .claude/scripts/gitlog.sh <id> <D/S 태그>` — 선행 패키지 완료 커밋, 같은 태그의 기존 커밋, 미커밋 변경을 확인하고 02-plan-verify 점검표 5·7 의 근거에 커밋 해시를 적는다. 현재 브랜치가 `dev2`(작업·실험 브랜치, L-001 개정 2026-09-29)인지 확인한다.
 4. `packages/<id>/01-plan.md`를 `templates/plan.md`로 작성. 작업 단위(U1, U2 …)마다 `Refs:`. 수용 기준은 backlog와 **글자 그대로**.
 5. **기계 검증**: `mkdir -p packages/<id>/evidence` 후
-   `bash .claude/scripts/verify-plan.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt`
+   `bash .claude/scripts/verify-plan.sh <id>` 를 실행하고 출력을 **Write 툴로** `docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt` 에 저장한다
+   (`tee`·`>` 는 프로젝트 안 쓰기라 bash-write-guard 가 거부한다. 긴 출력은 스크래치패드 리터럴 절대 경로로 `>` 한 뒤 Read → Write).
    FAIL/WARN 이 있으면 `bash .claude/scripts/findings.sh <id> <그 파일> --source verify-plan` → `05-remediation.md` 소견을 채우고 계획을 고친 뒤 다시 실행(FAIL 0 까지, 3회 한도).
 6. **`verifier` 에이전트에 위임**(L-002: 계획을 쓴 쪽이 점검표를 채우지 않는다)하여 `02-plan-verify.md`를 `templates/plan-verify.md`로 작성: `검증자: verifier (fable)`, 1절에 기계 검증 출력 전체, 2절 점검표 8행은 각각 **카드 파일명 + 인용 문장**을 근거로 판정. 위임 프롬프트에는 패키지 id·읽을 카드 목록·evidence 경로를 적는다. `verify-plan.sh`는 검증자 줄에 `verifier`가 없으면 FAIL 한다. 보류가 하나라도 있으면 `결과: 보류`로 두고 사용자에게 보고하고 멈춘다.
 7. 통과면 `AskUserQuestion`으로 계획 요약(목표·작업 단위·수용 기준·기계 검증 결과·읽은 카드)을 보여주고 승인을 받는다. 선택지: 승인 / 수정 요청 / 보류.
@@ -39,7 +40,7 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 9. 이 시점부터 제품 코드를 쓸 수 있다. 작업 단위 하나가 끝날 때마다 `/commit`. 새 산출물은 `registry.md`에 행 추가.
 
 ### 검증 → 조치 루프 (구현 중 문제가 나왔을 때, `verification.md` "루프")
-1. `bash .claude/scripts/verify-impl.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt` (pytest 출력도 같은 방식으로 파일에)
+1. `bash .claude/scripts/verify-impl.sh <id>` 의 출력을 Write 툴로 `docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt` 에 저장 (pytest 출력도 같은 방식으로 파일에. 긴 출력은 스크래치패드 리터럴 절대 경로로 `>` 한 뒤 Read → Write)
 2. `bash .claude/scripts/findings.sh <id> <그 파일> --source verify-impl` → `05-remediation.md`에 소견 블록.
 3. 소견마다 채운다: 원인 가설 → 확인 명령 실행·출력 인용 → **해결 단계 표**(단계 = 파일·방법 + 완료 판정 명령 + 기대 출력). 명령 없는 단계는 쓰지 않는다.
 4. 단계를 순서대로 실행하고 완료 판정 명령을 실제로 실행해 상태를 완료로. 결정·명세(D/S/원칙)를 바꿔야만 풀리는 소견은 멈추고 `/devlog fix` 또는 `/devlog change`로 올려 사용자에게 보고.

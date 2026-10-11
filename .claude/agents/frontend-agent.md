@@ -50,7 +50,7 @@ model: sonnet
 - 제품 코드는 `CURRENT.md active`에 등록된 패키지의 `01-plan.md` 작업 단위(U번호) 범위 안에서만 쓴다.
 - 만들기 전에 `docs/wiki/registry.md`를 grep 한다. 새로 만든 것은 registry 행으로 보고한다.
 - 검증은 증거로만: 실행한 명령과 출력을 `packages/<id>/evidence/`에 파일로 남기고 경로를 보고한다. "확인했습니다"만 쓰지 않는다.
-- **파일 변경은 Write/Edit 툴로만 한다 — Bash 로 파일을 쓰지 않는다**(heredoc·`>`·`sed -i` 금지). Bash 는 실행·읽기·검색에만 쓴다.
+- **파일 변경은 Write/Edit 툴로만 한다 — Bash 로 파일을 쓰지 않는다**(heredoc·`>`·`sed -i` 금지). `bash-write-guard` 훅이 프로젝트 안 Bash 쓰기를 거부한다(FIX-014). Bash 는 실행·읽기·검색에만 쓴다.
 - 커밋·푸시·사용자 승인은 하지 않는다(메인 세션이 `/commit`, `AskUserQuestion`). 작업 단위가 끝나면 보고하고 멈춘다.
 - 비밀(`.env`, 키) 읽기·출력 금지, 강제 푸시, 재귀 삭제, destroy/prune/DROP 금지 — `docs/wiki/security.md`.
 - **git log 를 본다 (L-001)**: 구현 착수 전에 `bash .claude/scripts/gitlog.sh <패키지 id>` 를 실행해 브랜치 상태·최근 커밋을 확인한다. 작업 브랜치는 `dev2` 다(`git branch --show-current`).

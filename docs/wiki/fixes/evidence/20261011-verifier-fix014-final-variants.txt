@@ -1,0 +1,54 @@
+# FIX-014 3차(최종) 검증 — 지정 3건 가까운 변형 + 오탐 회귀 + 새 우회 탐색 (verifier, fable, 2026-10-11)
+# 드라이버: 스크래치패드 drive3.py (bash-write-guard.sh 를 stdin JSON 으로 직접 호출). 라이브 훅 + 모듈 직접 두 경로로 교차 확인.
+# 결론: R-14-12·R-14-13 은 지정·명명 변형 전부 deny. R-14-14 는 명명 변형 `deno run -` 이 ALLOW(뚫림) = 덜 닫힘 → 보류.
+
+######## drive3.py 출력 (라이브 훅) ########
+## R-14-12 xargs 자리표 변형 (deny) — V12-1~15 전부 '일치'(deny). -I%·--replace=@·-i%·-0I{}·띄어쓴 -I {}·node/ruby/python 코드자리 모두 deny.
+## R-14-13 heredoc 본문 확장 변형 (deny) — V13-1~10,12 '일치'(deny). 유일 불일치: V13-11 python3 <<EOF $(...) → allow (새 우회, 후속 후보).
+## R-14-14 비셸 stdin 코드 변형 (deny) — V14-1,2,4~12 '일치'(deny). 유일 불일치: V14-3 deno run - → allow (명명 변형 뚫림, 보류 사유).
+## 오탐 회귀 P1~P20 — 전부 allow (일치). 새 오탐 0.
+## 새 우회 탐색(기록) Z1~Z9 allow(후속 후보) · Z10 gawk -i inplace deny.
+지정변형+오탐 불일치 2  (V13-11 python heredoc 동적본문 · V14-3 deno run -)
+
+######## 모듈 직접 교차확인 (bash_write_check.WriteChecker.check, 셸 이스케이프 영향 배제) ########
+# R-14-14 명명 변형:
+        deny  node -
+        deny  nodejs
+        deny  bun
+       allow  bun run -        <- 뚫림 (R-14-14 덜 닫힘)
+       allow  deno run -       <- 뚫림 (명령 프롬프트가 명명한 변형, 보류 사유)
+       allow  deno eval        <- 뚫림
+        deny  php stdin
+        deny  ruby -
+        deny  perl -
+# R-14-12 명명 변형:
+        deny  -I% bash -c %
+        deny  --replace=@ sh -c @
+        deny  -i sh -c {}
+# R-14-13 명명 변형(셸 heredoc):
+        deny  bash <<-EOF tab $CMD
+        deny  bash <<EOF backtick
+        deny  bash <<EOF ${VAR}
+        deny  bash <<EOF $VAR
+# 새 우회(기록):
+       allow  python3 <<EOF $(cat f)   <- cmd_python 이 heredoc_dyn 을 보지 않음 (후속 후보)
+       allow  node <<EOF $(cat f)      <- _stdin_code_list 이 heredoc_dyn 을 보지 않음 (후속 후보)
+       allow  ruby <<EOF $(cat f)      <- 동상 (후속 후보)
+
+######## deno/bun 직접 재확인 (라이브 훅) ########
+--- echo "<write>" | deno run -            : allow   (뚫림)
+--- echo "<write>" | deno run - (Deno.write): allow   (뚫림)
+--- deno run app/x.ts                       : allow   (스크립트 실행 — 정상)
+--- echo "<write>" | deno  (서브명령 없음)   : deny
+--- echo "<write>" | bun -                  : deny
+--- echo "<write>" | bun  (서브명령 없음)    : deny
+--- echo "<write>" | bun run -              : allow   (뚫림)
+# 원인 추정: cmd_node(=cmd_deno=cmd_bun) 의 _interp_codes 2차 루프에서 서브명령 'run'/'eval' 이
+#   값옵션도 '-'도 아닌 위치인수라 "스크립트 파일 실행"으로 보고 list(frag.heredocs)=[] 를 돌려주며 조기 반환 →
+#   그 뒤의 stdin 코드 판정(_stdin_code_list)에 도달하지 못한다. deno/bun 의 표준 stdin 실행형(`deno run -`·`bun run -`·`deno eval`)이 전부 열린다.
+# FIX-014.md 118행은 "node·nodejs·bun·deno·ruby·perl·php" 가 파이프/heredoc/<파일 stdin 코드를 받으면 거부한다고 명시하므로,
+#   deno·bun 의 서브명령 stdin 형은 그 명시된 범위 안에서 덜 닫힌 것이다.
+
+######## 정적 python heredoc 쓰기는 정상 차단 확인(대조) ########
+--- python3 <<EOF ␤ open("app/x.py","w") ␤ EOF : deny   (정적 본문은 검사됨 — 동적 본문 $()만 샌다)
+--- python3 - <<EOF open("app/x.py","w") EOF    : deny

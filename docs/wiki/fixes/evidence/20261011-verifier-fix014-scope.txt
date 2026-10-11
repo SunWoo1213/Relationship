@@ -1,0 +1,62 @@
+# FIX-014 verifier — 범위·검출력 증거 정합·문서 정합 확인 출력 (2026-10-11, 기준 HEAD d16375e, 작업 트리 미커밋)
+
+## 1. git status --short / git diff --stat HEAD
+ M .claude/agents/backend-agent.md        |  1 +
+ M .claude/agents/eval-agent.md           |  1 +
+ M .claude/agents/frontend-agent.md       |  2 +-
+ M .claude/hooks/commit-cleanup.sh        | 18 ++++++---
+ M .claude/scripts/test-guards.sh         | 84 +++++++++++++++++++++++++++++++++++++++-
+ M .claude/settings.json                  |  7 ++++
+ M CLAUDE.md                              |  2 +-
+ M docs/wiki/HANDOFF.md                   |  3 +-      (검증 대상 아님)
+ M docs/wiki/fixes/FIX-014.md             |  6 ++-
+ M docs/wiki/journal.md                   |  2 +       (검증 대상 아님)
+ M docs/wiki/registry.md                  |  2 +
+ M docs/wiki/security.md                  | 16 +++++++-
+?? .claude/hooks/bash-write-guard.sh                    (신규 47행)
+?? .claude/scripts/bash_write_check.py                  (신규 1027행)
+?? docs/wiki/fixes/evidence/20261011-1609-fix014-after.txt
+?? docs/wiki/fixes/evidence/20261011-1609-fix014-before.txt
+ 12 files changed, 132 insertions(+), 12 deletions(-)
+
+## 2. settings.json 변경 = PreToolUse "Bash|PowerShell" 배열에 훅 블록 1개 추가(+7행)만
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/bash-write-guard.sh\"",
+            "timeout": 15,
+            "statusMessage": "Bash 파일 쓰기 가드 확인 중"
+          }
+(safety-guard → commit-guard → bash-write-guard 순. 다른 matcher·deny/allow 목록 무변경)
+
+## 3. commit-cleanup.sh 변경 = gitcmd 생성 1곳 + grep 대상 `$cmd`→`$gitcmd` 5곳 (판정을 좁히는 방향만; 넓히는 변경 없음)
+gitcmd="$(printf '%s' "$input" | ${HOOK_PY:-false} "$(dirname "$0")/../scripts/bash_write_check.py" --git-fragments 2>/dev/null)"
+… grep -Eq '…commit…'  / '…push…' / 'origin dev:main' / 'origin dev2:dev' / 'origin dev2'  ← 모두 "$gitcmd"
+
+## 4. 검출력 증거(before) 유효성
+- before 의 "bash: .claude/hooks/bash-write-guard.sh: No such file or directory" 줄 수: 36 = FIX-014 절 시험 호출 수(거부 20 + 허용 15 + 대조 1). 훅 파일이 실제로 없었다.
+- before XX 26 (거부 기대 20 + 대조 1 + 파이썬 탐지 1 + 결함 ② 4) → after XX 0. ok 238 → 264 (+26).
+- diff <(before 6행~) <(after 5행~) 에서 바뀐 줄 중 'FIX-014'·'No such file'·'결과: 실패' 를 제외하면 **0줄** — FIX-014 절 밖의 기존 시험은 before/after 가 동일하게 ok.
+- 구현자 고백(bash_write_check.py 가 before 전에 이미 존재)에 대한 판정: 시험은 훅 진입점(`$BW`=bash-write-guard.sh)과 commit-cleanup.sh 를 대상으로 하므로, 호출하는 훅·settings 등록·commit-cleanup 수정이 없는 상태는 곧 "배포 전 상태" 와 동일하다. 판정 스크립트 단독으로는 아무것도 호출하지 않으므로 before 가 재는 "고치기 전 훅에서 새 시험이 실패하는가" 라는 질문의 답은 유효하다. 단 before 는 "판정 스크립트가 깨졌을 때도 시험이 잡는가" 는 말해 주지 않는다 — 그것은 after 의 대조 시험(임시 경로 allow ↔ 프로젝트 경로 deny)과 verifier 의 fail-closed F4~F6 이 대신 보여 준다.
+
+## 5. verifier 직접 실행 test-guards vs after 본문: diff 0줄 (20261011-verifier-fix014-test-guards.txt)
+
+## 6. CLAUDE.md 120행 (앞 140자)
+- **파일 변경은 Write/Edit 툴로만 한다 — Bash 로 파일을 쓰지 않는다. 훅이 강제한다(FIX-014, 2026-10-11).** `stage-gate.sh`·`secret-guard.sh` 는 `tool_input.file_path`
+
+## 7. 환경 (이 세션)
+CLAUDE_SCRATCHPAD 미설정 · TMPDIR 설정됨(/var/folders/bs/dry3…)
+→ bash_write_check.py `_TMP_DYN_RE` 의 `$CLAUDE_SCRATCHPAD` 허용 분기는 이 환경에서 작동하지 않는다. 스크래치패드 허용은 리터럴 경로(/private/tmp/ 접두 또는 경로 성분 'scratchpad')로만 동작한다(드라이버 W37·S6-2·S6-3·W4·W8 이 그 경로로 allow).
+
+## 8. 살아 있는 저장소 journal (검증 전후 무변화)
+465줄 · 마지막 2줄:
+- 2026-10-11 15:59 | COMMIT | d16375e docs(wiki): 하네스 약점 세 가지를 고치는 FIX-014·032·033 계획을 쓴다
+- 2026-10-11 15:59 | PUSH-dev2 | origin dev2 d16375e (실험 푸시)
+
+## 9. 아직 `| tee docs/…` 를 지시하는 문서 (grep, FIX-014 줄 제외)
+.claude/agents/verifier.md:24:  bash .claude/scripts/verify-plan.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt
+.claude/agents/verifier.md:32:  bash .claude/scripts/verify-impl.sh <id> | tee …/evidence/<ts>-verify-impl.txt
+.claude/skills/devlog/SKILL.md:34: bash .claude/scripts/verify-plan.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt
+.claude/skills/devlog/SKILL.md:42: bash .claude/scripts/verify-impl.sh <id> | tee docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt
+docs/wiki/verification.md:60:        | tee docs/wiki/packages/<id>/evidence/<ts>-verify-*.txt
+→ 드라이버 C5 로 실측: 이 명령은 지금 bash-write-guard 가 거부한다.

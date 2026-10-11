@@ -1,0 +1,35 @@
+# FIX-014 3차(최종) 검증 요약 — verifier (fable) · 2026-10-11 · 1·2차와 다른 새 컨텍스트
+# 기준: 작업 트리(d16375e + 1·2차 재작업 누적). 코드·훅·계획·문서는 고치지 않았다. 임시 파일은 스크래치패드 리터럴 절대 경로.
+
+[확인 1] 지정 3건 해소 — drive2.py 복원 재실행 `불일치 0`, drive.py(C5 기대 deny) `불일치 14`.
+  drive2  마지막 줄: 불일치 0 (셸 stdin 0 · 동적·find·xargs 0 · 오탐 0)  → N25·N26·N27·N28·N30 deny, A1~A20 allow, E1~E5 deny.
+  drive   마지막 줄: 불일치 14 (침입 11 · 오탐 3)  → 번호별 X6 X7 X8 X9 X10 X11 X12 X15 X16 X17 X18 + C1 C2 C3.
+  → FIX-014.md 120행·2차 재검증 R1 과 번호별 일치.
+
+[확인 1b] 지정 건 가까운 변형(명령 프롬프트 지정) — final-variants.txt.
+  R-14-12: -I%·--replace=@·-i%·-0I{}·띄어쓴 -I {}·node/ruby/python 코드자리 → 전부 deny. 완전히 닫힘.
+  R-14-13: <<-EOF·백틱·${VAR}·$VAR (셸 heredoc) → 전부 deny. 셸 heredoc 범위에서 완전히 닫힘.
+  R-14-14: node-·nodejs·bun·php·ruby-·perl- → deny. 그러나 `deno run -`·`deno eval`·`bun run -` → ALLOW(뚫림).
+           `deno run -` 은 명령 프롬프트 변형 목록에 명시된 건이며 FIX-014.md 118행이 deno·bun 을 명시 범위에 넣었다 → 덜 닫힘.
+
+[확인 2] 오탐 회귀 0 — drive3 P1~P20 전부 allow, drive2 A1~A20 전부 allow, drive W1~W49·S6·C4 allow.
+  C1·C2·C3 은 1·2차와 동일한 '보수적 거부'(절대경로·-c/heredoc·리터럴 우회 있음, 문서화됨) — 새로 막힌 정상 명령 아님.
+  새로 막힌 정상 작업 명령 0.
+
+[확인 3] 검출력 — rework2-before(FIX-014 절) XX 17 ↔ after 0. before↔after diff 는 FIX-014 절 17줄(XX→ok DENY)+결과줄뿐.
+  이번 내 tg.txt ↔ 2차 recheck-test-guards.txt diff = 머리말 주석 6줄뿐(시험 결과 줄 동일). → 차이는 FIX-014 절에만.
+
+[확인 4] test-guards 직접 실행 — `bash .claude/scripts/test-guards.sh` rc 0 · ok 316 · XX 0 · skip 1(active=P8-frontend) · "== 결과: 실패 0 ==".
+  FIX-014 절 거부 기대 R-14-12 6 · R-14-13 5 · R-14-14 6 전부 ok DENY, 허용 12건 ok allow, 대조/FIX-008 ok DENY.
+  전체 출력: 20261011-verifier-fix014-final-test-guards.txt.
+
+[확인 5] fail-closed — drive2 F1 깨진 JSON deny · F2 PATH 비움 deny(FIX-008) · F3 빈 stdin deny. 회귀 없음.
+
+[확인 6] 문서 — grep -rn 'tee docs/wiki' .claude docs/wiki/verification.md → test-guards.sh:191(시험 입력 문자열) 1건.
+  verifier.md/SKILL.md/verification.md 의 'Write 툴/리터럴 절대경로 >' 문구는 이 검증이 그 절차대로 실행해 확인(스크래치패드 리터럴 > allow, $SP/x deny).
+  CLAUDE.md 120행·security.md §4b/§7·에이전트 정의: 최종 동작과 어긋남 없음.
+
+[확인 7] FIX-014.md 결과절 ↔ 드라이버 — 120행 "불일치 14" 번호별 일치. 95행 한계 문장(따옴표 구분자 heredoc)도 동작과 일치.
+  단 118행 "deno" 명시 범위가 실제로는 `deno run -`/`bun run -`/`deno eval` 에서 덜 닫힘 — 아래 후속 후보/보류 사유.
+
+[확인 8] 새 우회 탐색(기록용, [필수] 아님) — final-variants.txt Z1~Z10 및 아래 R-14-16~18.

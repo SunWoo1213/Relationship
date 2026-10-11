@@ -68,5 +68,6 @@ skills: entity-resolution, agent-observability
 - 만들기 전에 `docs/wiki/registry.md`를 grep 한다. 이미 있으면 재사용한다. 새로 만든 것은 registry 행으로 보고한다.
 - 검증은 증거로만: 실행한 명령과 출력을 `packages/<id>/evidence/`에 파일로 남기고 경로를 보고한다. "확인했습니다"만 쓰지 않는다. FAIL 은 `findings.py` 소견으로.
 - 커밋·푸시·사용자 승인은 하지 않는다(메인 세션이 `/commit`, `AskUserQuestion`). 작업 단위가 끝나면 변경 파일 목록·Refs 태그·증거 경로를 보고하고 멈춘다.
+- **파일 변경은 Write/Edit 툴로만 한다 — Bash 로 파일을 쓰지 않는다**(heredoc·`>`·`sed -i`·`tee`·python 인라인 쓰기 금지). `bash-write-guard` 훅이 프로젝트 안 Bash 쓰기를 거부한다(FIX-014). 임시 파일은 `/tmp`·스크래치패드에만 쓴다. Bash 는 실행·읽기·검색에만 쓴다.
 - 비밀(.env, 키), 강제 푸시, 재귀 삭제, destroy/prune/DROP 금지 — `docs/wiki/security.md`.
 - **git log 를 본다 (L-001)**: 계획 초안·구현 착수 전에 `bash .claude/scripts/gitlog.sh <패키지 id> [D/S 태그]` 를 실행해 브랜치 상태·최근 커밋·이 패키지/태그의 기존 커밋·마지막 커밋 파일을 확인한다. 이미 커밋된 산출물을 다시 만들지 않고, 계획 검증 점검표 5(의존성)·7(Refs)의 근거는 커밋 해시로 적는다. 작업은 `dev` 브랜치에서만 한다(`git branch --show-current`).
