@@ -1,0 +1,53 @@
+# FIX-031 verifier 부정 케이스 — session-start 판정 로직 옛(489행)/새(491~493행) 대조 (2026-10-11, Mac)
+# 사본 스크립트: scratchpad/fix031/judge.sh(새 로직) · judge-old.sh(옛 로직) · fake-*.sh(가짜 훅 4종)
+
+--- [fake-ok.sh] 내용:
+printf '## 세션 재개 — 테스트\n둘째 줄\n셋째 줄\n'
+--- [fake-ok.sh] 새 로직:
+ok   session-start prints header
+fails=0
+--- [fake-ok.sh] 옛 로직:
+ok   session-start prints header
+fails=0
+--- [fake-bad-2ndline.sh] 내용:
+printf '다른 헤더\n세션 재개 가 둘째 줄에만 있음\n'
+--- [fake-bad-2ndline.sh] 새 로직:
+XX   session-start: 다른 헤더
+fails=1
+--- [fake-bad-2ndline.sh] 옛 로직:
+XX   session-start: 다른 헤더
+fails=1
+--- [fake-empty.sh] 내용:
+:
+--- [fake-empty.sh] 새 로직:
+XX   session-start: 
+fails=1
+--- [fake-empty.sh] 옛 로직:
+XX   session-start: 
+fails=1
+--- [fake-bad-string.sh] 내용:
+printf '## 세션 시작 — 재개 아님\n둘째 줄\n'
+--- [fake-bad-string.sh] 새 로직:
+XX   session-start: ## 세션 시작 — 재개 아님
+fails=1
+--- [fake-bad-string.sh] 옛 로직:
+XX   session-start: ## 세션 시작 — 재개 아님
+fails=1
+
+=== 실제 .claude/hooks/session-start.sh 첫 줄 — 옛/새 동일성 ===
+old_first_line=[=== 세션 재개 컨텍스트 (source: resume) — 전문 읽기 금지, 아래와 INDEX.md 만으로 시작 ===]
+new_first_line=[=== 세션 재개 컨텍스트 (source: resume) — 전문 읽기 금지, 아래와 INDEX.md 만으로 시작 ===]
+SAME first line
+full_bytes=14119
+
+=== grep: 훅 출력을 파이프로 바로 head 에 넘기는 곳 ===
+(없음 — 변경 후 0건)
+
+=== .github/workflows/tests.yml job 키 확인 ===
+pytest runs-on= ubuntu-latest timeout-minutes= 20
+windows runs-on= windows-latest timeout-minutes= 20
+
+=== git diff --stat (FIX-031 범위 2파일) ===
+ .claude/scripts/test-guards.sh | 5 ++++-
+ .github/workflows/tests.yml    | 4 ++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)

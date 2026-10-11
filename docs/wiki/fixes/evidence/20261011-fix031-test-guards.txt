@@ -1,0 +1,19 @@
+$ bash .claude/scripts/test-guards.sh   (exit=0, 2026-10-11, Mac, FIX-031 수정 후)
+$ grep -c '^XX' <출력>  -> 0
+$ python3 -c "import yaml,sys; yaml.safe_load(open(sys.argv[1])); print('yaml ok')" .github/workflows/tests.yml  -> yaml ok
+
+[출력 240줄 전체 중 ok/XX 요약 — 원본은 실행 시 스크래치패드 tg.txt, 섹션별 전부 ok]
+== safety-guard: 차단되어야 하는 것 == (37건 ok DENY)
+== safety-guard: 허용되어야 하는 것 == (18건 ok allow)
+== commit-guard == / FIX-027 verifier 게이트 == 전부 ok
+== secret-guard == 8건 ok
+== stage-gate == (skip active=P8-frontend: 제품 코드 게이트 미시험) 나머지 ok
+== delegate-guard == 8건 ok (frontend-agent 3줄 포함)
+== findings.py 왕복 == ok
+== verify-plan == ok
+== handoff-check == ok
+== session-start 출력 존재 ==
+ok   session-start prints header        <- FIX-031 으로 고친 시험(출력을 변수로 끝까지 받은 뒤 첫 줄 선택)
+== 에이전트 frontmatter YAML 파싱 (FIX-003) == 5건 ok
+== commit-cleanup · precompact == 29건 ok
+== 결과: 실패 0 ==

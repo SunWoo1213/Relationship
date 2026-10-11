@@ -486,7 +486,10 @@ out="$(echo '{"stop_hook_active":true}' | bash "$H/handoff-check.sh")"
 [ -z "$out" ] && echo "ok   handoff-check passes when stop_hook_active" || { echo "XX   handoff-check: $out"; fails=$((fails+1)); }
 
 echo "== session-start 출력 존재 =="
-out="$(echo '{"source":"resume"}' | bash "$H/session-start.sh" | head -n 1)"
+# FIX-031: 훅 출력을 head 로 중간에 끊지 않고 끝까지 받은 뒤 첫 줄을 고른다.
+# Windows Git Bash 에서 파이프 닫힘이 쓰는 쪽을 끝내지 못해 멈출 수 있다(근본 원인 미확정).
+full="$(echo '{"source":"resume"}' | bash "$H/session-start.sh")"
+out="$(printf '%s\n' "$full" | head -n 1)"
 printf '%s' "$out" | grep -q '세션 재개' && echo "ok   session-start prints header" || { echo "XX   session-start: $out"; fails=$((fails+1)); }
 
 echo "== 에이전트 frontmatter YAML 파싱 (FIX-003) =="
