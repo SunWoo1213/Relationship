@@ -2,54 +2,51 @@
 
 > 목적: 컨텍스트가 끊겨도(압축·세션 종료·토큰 소진·크래시) 이 파일만 읽고 같은 자리에서 이어간다.
 > 갱신 시점: (1) /commit 마다 (2) 작업 단위 하나가 끝날 때 (3) 컨텍스트가 절반 넘게 찼다고 판단될 때 (4) 큰 파일·여러 파일을 읽기 직전 (5) 턴을 끝내기 전 — `handoff-check.sh`(Stop 훅)가 변경 파일보다 이 문서가 오래됐으면 종료를 막는다.
-> 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
+> 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-11 22:20 (FIX-014 종결 — CI 38136995433 success · FIX-032 구현 완료·마커 있는 상태 증거 `evidence/20261011-2215-fix032-marker-present.txt` 작성 · verifier 검증 진행 중 · 미커밋: FIX-032 변경 5 + FIX-014.md 해시·run 줄 + 이 HANDOFF + journal — FIX-032 커밋에 함께)
+갱신: 2026-10-12 00:10 (세션 종료 기록 — 사용자 지시 "검증 끝나면 기록하고 멈춰라". FIX-033 verifier 재검증 통과, 커밋 승인 대기 중)
 
-active: **P8-frontend**(계획 승인 2026-10-10 · 활성화 `ab29daa` 2026-10-11 · **U0~U10 전부 미착수**) | frozen: none | 브랜치 `dev2` = origin/dev2 `ab29daa`(CI run 38064243729 세 job success) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 포트폴리오 README — 그대로) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1882 passed skip 0** · test-guards ok 216 실패 0
+active: **P8-frontend**(U0·U1·U2 완료 — **U3 부터**) | frozen: none | 브랜치 `dev2` = origin/dev2 `22a6822`(+ FIX-033 커밋 예정) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
 
-## 2026-10-10~11 세션에 끝낸 것 (상세는 journal·각 03-log)
-- **P7-push 완료** — U8 Chrome 실수신 `6428180` → verifier 04-review `완료` → 그 검토에서 찾은 순환 import 를 **FIX-029** `e555142` 로 먼저 닫음 → 완료 처리 `50fd7fc`.
-- **FIX-030** `c37c99a` — `50fd7fc` CI 실패(test-guards R-27-5 시험 4건이 실제 저장소 `CURRENT active` 에 의존) 를 격리 저장소 + 대조로 고침. 교훈: **완료·문서 커밋도 푸시 뒤 CI 를 확인한다**(이번에 놓쳤음).
-- **P8-frontend 계획** — architect 초안 → 사용자 결정 A~N → 개정 1 → verifier 1차 보류([필수] R-1 FIX 게이트 실제 판정 파일 `.claude/scripts/fix_guard_check.py:180`) → 개정 2 → 재검증 통과 → **사용자 승인** → FIX-030 뒤 활성화 `ab29daa`.
+## 2026-10-11 세션에 끝낸 것 (커밋 순, 전부 origin/dev2·CI 세 job success)
+| 커밋 | 내용 | CI(windows) |
+|---|---|---|
+| `440a0e5` | **U0** frontend-agent 신설(sonnet) · 위임 게이트 · FIX 게이트 `web/` · settings npm 4개 | 38111227562 windows 멈춤 → FIX-031 |
+| `6479c1d` | **FIX-031** test-guards session-start `\| head` 멈춤 수정 + `timeout-minutes: 20` | 38116488226 3분32초 |
+| `6c2d0e7` | **U1** `GET /persons`·`GET /persons/{id}` (verifier 1차 보류 → 테스트 보강 → 통과, 변이 7건) | 38117011109 |
+| `2c902f0` | **U2** `GET /events/{id}/raw`·`GET /persons/{pid}/facts/{fid}/sources` (변이 8건) | 38119853036 |
+| `d16375e` | FIX-014·032·033 **계획** 문서 | (문서) |
+| `de35242` | **FIX-014** `bash-write-guard` — 프로젝트 안 Bash 쓰기 거부 + commit-cleanup 조각 판정 (verifier 4라운드) | 38136995433 4분14초 |
+| `22a6822` | **FIX-032** test-guards 저장소 의존 격리(skip 0) · session-start 바이트 · dev2 문구 · 서명 고정값 | 38141012624 3분59초 |
+| (대기) | **FIX-033** 에이전트 규칙 (a)~(d) · verifier 변이 시험 의무 · verification.md 변이 절 (verifier 재검증 통과 `FIX-033.md` 30행) | — |
 
-## P8 에서 사용자가 정한 것 (01-plan "결정 항목" 이 원문)
-- A frontend-agent 신설(sonnet) · B Vite+React+TS, `web/`, CI ubuntu·windows(E2E 는 ubuntu) · C 같은 출처 + `/api` 접두를 프록시가 벗김(운영 정적 서빙 S3 vs Caddy 는 P9) · D localStorage `session_id`, 인증 범위 밖 · E 칩: 입력 막지 않음·미답변 전부·409 안내 · F 원문 조회 API 2개(`GET /events/{id}/raw`, `GET /persons/{pid}/facts/{fid}/sources`) · G 브리핑 화면은 `briefing_compose` trace 최신 1행 · H "알림 받기" 는 브리핑 화면, 알림 클릭 → 그 일정, 구독 해제 없음 · I 캐시 없음 · J 자동화 먼저 → 사람 점검 · K 잠금 404 는 안내만 · L 챗봇형 UI(인스타 DM·ChatGPT·Gemini·Claude 같은 경험), Tailwind+shadcn/ui, P8 안 수정 1회 상한 · **M 오프라인 제외**(기획서 부록 A 385행 — 다시 넣으려면 CR) · N ChatGPT 식 왼쪽 사이드바(데스크톱 고정, 모바일 메뉴 버튼 서랍, 하단 탭바 없음).
-- **승인 조건**(02-plan-verify `승인:` 줄): ① **U1~U9 모든 작업 단위는 커밋 전에 verifier 코드 리뷰**(L-004 승인 → `--stage verifier` → 리뷰 문서) ② 디자인 추가 수정은 추후 사용자가 요청하면 별도 작업으로.
-
-## 커밋 안 된 변경
-- **U0 하네스 변경 전부(미커밋)** — 사용자 승인(2026-10-11 "이대로 적용" · settings.json "npm 스크립트만 허용": `npm run`·`npm test`·`npm ci`·`npm install`) 뒤 적용: delegate-guard·approve-commit(`frontend-agent`) · 신규 `.claude/agents/frontend-agent.md` · `fix_guard_check.py` 182행 `web/` · commit-guard 주석 · test-guards 새 6줄 · settings.json · CLAUDE.md · devlog SKILL · INDEX · 증거 `evidence/20261011-1237-u0-harness.txt`(test-guards **실패 0, ok 222**) · journal 자동 줄 2개(`2341f9e`).
-- verifier 리뷰 **통과**([필수] 0, 권고 R-U0-1~4 — 1·2 반영, 3·4 는 03-log) → 사용자 승인 "커밋 + 실험 푸시" → U0 커밋(이 HANDOFF 와 같은 커밋). 다음 커밋에 journal 자동 줄·03-log `pending` 해시.
+## 커밋 안 된 변경 (FIX-033 커밋 하나로 들어갈 것 — 사용자 승인 대기)
+- FIX-033 문서 9 + `review-FIX-033.md` + evidence 11 · `FIX-032.md` 결과절 해시·run 줄 · 이 HANDOFF · journal 자동 줄. 초안 `.claude/commit-draft.txt`(docs(FIX-033): …). 승인 안 받고 세션이 끊겼으면 **다음 세션 첫 질문이 이 커밋 승인**.
 
 ## 바로 다음에 할 것 (순서대로)
-1. **FIX-031 진행 중**(사용자 승인 2026-10-11, backend-agent 위임) — U0 CI run 38111227562 windows job 이 test-guards `session-start` 시험(488행 `| head -n 1`)에서 33분 멈춤 → 사용자 승인으로 취소. U0 새 시험은 Windows 에서도 전부 ok. 수정: 출력 전체를 받은 뒤 첫 줄 + 워크플로 `timeout-minutes: 20`. 다음: 보고 재확인 → verifier `검증:` 줄(L-004) → U1 과 **별도** /commit → 푸시 → windows success 확인(= U0 Windows 확인 R-U0-4 겸함).
-   - **완료(15:05)**: FIX-031 `6479c1d` → CI run 38116488226 세 job success(windows 3분 32초 — 가설과 일치, U0 Windows 확인 겸함). U1 재검토 통과 → 사용자 승인 → U1 `6c2d0e7` → CI run 38117011109 세 job success. **미커밋(다음 커밋에 넣을 것)**: FIX-031.md 결과절(해시·run·소요 시간 기록됨) · U0 증거 파일 끝 Windows 결과(기록됨) · 이 HANDOFF · journal 자동 줄. 03-log 의 U0·U1 `pending` 은 journal 해시로 대신(고쳐 쓰지 않음).
-   - **U2 진행 중**(2026-10-11 15:20 사용자 "계속 진행" 승인 → backend-agent 위임, 마커 소비): 원문 조회 API 2개 — 작업 트리의 `app/api/read.py`·`routes.py`·`schemas.py` 변경과 새 `tests/test_api_read_raw.py` 는 U2 진행분. 끊겼으면 `git status` → 재실행 확인 → verifier 리뷰(L-004) → /commit.
-   - **U2 완료** `2c902f0` · FIX 계획 문서 `d16375e` — origin/dev2, CI run 38119853036 세 job success(windows 3분 35초).
-   - **FIX-014 구현 진행 중**(16:05, 사용자 "시작" — ⚠️ 메인 세션이 승인 **전에** `--stage backend-agent` 마커를 만든 절차 위반 1건, 사용자에게 보고하고 그 마커로 진행. 03-log/FIX-014 결과절에 남길 것). 산출물: `.claude/hooks/bash-write-guard.sh`·`.claude/scripts/bash_write_check.py`·settings.json 등록·commit-cleanup 조각 판정·test-guards 새 시험·`fixes/evidence/*-fix014-before.txt`(검출력)·`-after.txt`. **구현 완료(16:20) — 메인 세션 재확인**: test-guards 실패 0·ok 264(전 222), before 증거 XX 26, settings.json diff 는 훅 등록 1블록만, 훅 직접 프로브 8건(거부 4·허용 4) 기대와 일치. **verifier 검증 = 보류**(16:50, `fixes/review-FIX-014.md`): 침입 86건 중 68 deny·**18 뚫림**, [필수] 4 — R-14-1 stdin 셸(`printf … | bash`·`bash <<< …`) · R-14-2 동적 인라인(`python3 -c "$(cat …)"`) · R-14-3 `find -exec sed -i` · R-14-4 문서가 `| tee docs/wiki/…/evidence/` 를 지시(verifier.md 24·32, devlog SKILL 34·42, verification.md 60 — 지금 거부됨). 메인 세션이 4건 모두 직접 재현 확인. [권고] 7(R-14-5~11). **재작업 완료(19:00) — 메인 세션 재확인**: test-guards 실패 0·ok 287(전 264), rework-before XX 16, 뚫렸던 4건(stdin 셸·here-string·동적 `-c`·`find -exec`) 전부 DENY, 허용 4건(`printf 'ls' | bash`·`find -exec grep`·정적 `-c`·pytest 파이프) 유지, `tee docs/wiki` 지시 0건. 증거 `evidence/20261011-1858-fix014-rework-{before,after,driver}.txt`(after·driver 는 요약본 — R-31-3 과 같은 결함, FIX-033 에 넘김). **재검증 = 보류(2차, 19:30)**: 1차 [필수] 4건 전부 해소 확인. **새 [필수] 2건** — R-14-12 xargs 자리표(`… | xargs -I{} bash -c {}`, `{}` 가 리터럴로 보여 코드 "{}" 만 분석) · R-14-13 heredoc 본문의 `$(…)`·`$VAR`(`bash <<EOF`/`$(cat f)`/`EOF`, 비셸 `cat <<EOF`/`$(echo x > app/x.py)`/`EOF`). 새 [권고] R-14-14 stdin 코드 차단이 python 에만(`| node`·`| perl` allow) · R-14-15. 메인 세션 재현: 4건 뚫림 확인(형제 `xargs bash -c` 는 deny). 라이브 훅으로도 뚫려 실제 파일 생성 확인(verifier). **사용자 결정(19:35)**: "R-14-12·13·14 고치고 **이번이 마지막 필수 라운드**" — 3차 검증에서 새로 나오는 우회는 후속 FIX 후보로 기록하고 FIX-014 를 닫는다(지정 3건 미해소는 보류 유지). **2차 재작업 완료(20:00) — 메인 세션 재확인**: test-guards 실패 0·ok 316(전 287), rework2-before XX 17, 뚫렸던 3경로(xargs 자리표·heredoc `$(…)`·비셸 stdin 코드 node/perl) DENY, 허용 6건(인자 자리표 xargs·`$(date)` heredoc·인용 구분자 heredoc·`console.log | node`·commit·pytest 파이프) allow, drive2 불일치 0·drive 불일치 14 유지. 증거 `evidence/20261011-1936-fix014-rework2-{before,after,driver}.txt`(전체 출력). **3차 검증 = 보류(한 건, 20:30)**: R-14-12·13 완결, 오탐 0, test-guards 0(ok 316), fail-closed ok. **R-14-14 가 `deno run -`·`bun run -`·`deno eval` 에서 뚫림**(메인 세션 재현: `node -`·`bun` 은 deny, `run -` 서브명령만 allow — `_interp_codes` 가 `run`/`eval` 을 스크립트 파일로 봐 조기 반환). FIX-014.md 118행이 deno·bun 을 명시 범위에 넣었으므로 "지정 건 덜 닫힘" = 회차 상한 규칙상 보류 사유. 후속 후보 R-14-16(이 건)·17·18 기록됨. **사용자 결정(20:35) (a)**: R-14-16 만 더 닫고 좁은 재검증(FIX-014.md 승인 줄에 기록). **3차 재작업 완료(21:05) — 메인 세션 재확인**: test-guards 실패 0·ok 328(전 316), rework3-before XX 7, `deno run -`·`bun run -`·`cat f | deno run -` DENY, 허용 4건(`console.log | deno run -`·`deno run app/x.ts`·`bun run build`·정적 `deno eval`) allow, node 회귀 없음. 지시 밖 1줄: `node()` 쓰기 정규식에 `(?:Sync)?` 추가(`Deno.writeTextFileSync` 누락 — 없으면 deno 거부가 안 됨, 정당). 증거 `evidence/20261011-2100-fix014-rework3-*.txt`(driver 의 drive2 표는 요약 — FIX-033 범주). **4차 검증 통과(21:40)** — `FIX-014.md` 86행 `검증: 통과 — verifier (fable) …`. 신규 후속 후보 R-14-19(deno/bun 옵션 표, 1순위)·R-14-20 을 FIX-014.md "### 마무리" 에 기록. 사용자 승인 → **FIX-014 커밋 `de35242`**(48 파일) → origin/dev2 푸시. **CI run 38136995433 세 job success(windows 4분 14초)** — 훅 자가 시험 106건 Windows 통과, FIX-014 완전 종결(run id 를 FIX-014.md 마무리 절에 기록, 미커밋). **FIX-032 구현 완료(22:10) — 메인 세션 재확인**: test-guards 실패 0·ok 333·**skip 0**(전 skip 1), 실제 마커 2개·`_selftest` 부재 불변, session-start `full=13784 bytes` 표시·`other` 브랜치 경고 격리 시험 ok, 낡은 dev 문구·서명 고정값 0건. 증거 `evidence/20261011-2133-fix032-{before,test-guards}.txt`(before 는 diff+발췌 — 사유 명시). 사용자 승인(22:15) → verifier 마커 생성 → **마커 있는 상태 test-guards: 실패 0·ok 333·skip 0, 마커 `verifier` 전후 불변, `.awaiting-decision` 없음, 변경 파일 8 불변** → 증거 `evidence/20261011-2215-fix032-marker-present.txt`(Write 예정) → **verifier 통과(22:45, `FIX-032.md` 41행 검증 줄, [필수] 0 · 권고 R-32-1 `${#full}` 문자 수 라벨 → 다음 하네스 FIX · R-32-2 · R-32-3 결과절 채움)**. 커밋 초안 작성. 다음: 사용자 커밋 승인(FIX-032 5 + review + evidence 5 + FIX-014.md 해시·run 줄 + HANDOFF + journal) → 푸시 → CI windows → **FIX-033 위임 승인** → P8 U3. 다음: 푸시·CI 확인 → **FIX-014 구현 위임 승인**(backend-agent) → 032 → 033 → U3(R-U2-2 docstring·R-U2-3 값 테스트 포함).
-   - **약점 해결 결정(사용자 15:30)**: FIX-014 방식 "프로젝트 안 Bash 쓰기 거부" · 순서 "U2 끝내고 FIX 먼저(U3 전)" · 범위 승인. 계획 문서 작성 완료(미커밋): `fixes/FIX-014.md`(수정안 1~11 채움) · `FIX-032.md`(test-guards 저장소 의존·session-start 바이트·낡은 dev 문구·서명 고정값) · `FIX-033.md`(값 단언·계획 밖 값 사전 보고·전체 출력 증거·변이 시험 방법). 각 구현 위임은 따로 승인. 순서 FIX-014 → 032 → 033(같은 파일 겹침).
-   - 복기자료 `17-개발과정-해설.md` 에 U0·FIX-031·U1 절 미기록(문제점을 한계·교훈으로 넣을 예정).
-   - **U1 verifier 리뷰 = 보류**(`review-u1-read-persons.md`): [필수] R-U1-1 `last_contact_at` max→min 변이를 테스트가 못 잡음 → backend-agent 재작업(테스트 단언) 뒤 재검토. 권고 R-U1-2(Bash 로 파일 씀 — 03-log 기록) · R-U1-3(`UPCOMING_SCHEDULES_LIMIT=10` 계획에 없음 — 사용자 결정) · R-U1-4(별칭 정렬 SQL vs Python) · R-U1-5(03-log 기록).
-2. **U1 진행 중**(2026-10-11 사용자 승인 → backend-agent 위임, 마커 소비) — 산출물 `tests/test_api_read_persons.py`·`evidence/*-u1-read-persons.txt`. 끊겼으면 `git status` 로 작업 트리 확인 후 재실행·재확인 → verifier 리뷰(L-004) → /commit. R-U0-3: 사용자 결정 "security.md 에는 추가하지 않는다"(단위별 verifier 점검만).
-2. ~~U0 하네스~~(적용 완료, 아래는 참고용 원래 계획)(메인 세션 담당, 01-plan U0 87~91행) — **훅을 고치기 전에 diff 계획을 사용자에게 먼저 보이고 AskUserQuestion 승인**(사용자 지시 plan-before-editing). 적용 순서: ② `delegate-guard.sh` `GATED` 에 `frontend-agent` · ③ `approve-commit.sh` `--stage` case·usage → ① `.claude/agents/frontend-agent.md`(01-plan 결정 A "초안 내용", `model: sonnet`) → ④ **`.claude/scripts/fix_guard_check.py` 180행** 에 `or p.startswith("web/")`(+203행 메시지·22행 docstring; `commit-guard.sh` 는 11·100행 주석 정합만) → ⑤ `test-guards.sh` 5경우(frontend-agent 위임 마커 없음 거부/있음 허용 · `web/` FIX 커밋 `검증:`·review 없음 거부/있음 허용 · 활성 작업 없음 → `web/x.ts` 쓰기 거부) → ⑥ CLAUDE.md 팀 표·FIX 문장 경로 ⑦ devlog SKILL 역할표 ⑧ INDEX P8 행. 같은 질문에서 **`.claude/settings.json` allow 에 npm/npx 를 넣을지** 사용자에게 묻는다(안 넣으면 매번 권한 프롬프트).
-   - 적용 뒤 `bash .claude/scripts/test-guards.sh` PASS **전에는 frontend-agent 위임 금지**(R-3, 03-log 에 기록) → verifier 커밋 전 훅 diff 리뷰(L-004 승인 먼저) → `/commit` → 푸시 → **CI windows 포함 세 job 확인**. 판정 증거 `evidence/*-u0-harness.txt`. verifier 권고 N-1: `grep 'startswith("web/")'` 단독은 증거가 아니다 — test-guards 거부/허용 출력과 묶는다.
-3. **U1~U3**(backend-agent): 인물 목록·카드 조회 → 원문 조회 API 2개(사용자 격리 404, trace 없음) → 대기 질문·브리핑 조회(조인 `tool_name='briefing' AND step='briefing_compose'`). 단위마다 verifier 리뷰 → /commit.
-4. **U4~U9**(frontend-agent) → **U10 사람 점검**(체크리스트 20항, 수정 반영 횟수 기록) → verifier 04-review.
-5. **마디마다 복기자료 갱신**: `~/Desktop/Portfolio/wiki/interview/relationship/17-개발과정-해설.md` 에 이어서 기록(사용자 요청 2026-10-10, 메모리 keep-dev-process-explainer-updated) + 관련 주제 파일 + README 갱신 기록 → `python3 양식/도구/interview_pdf.py relationship`(Portfolio 에서, 인자는 폴더 이름만).
+1. **FIX-033 커밋**(승인 → `approve-commit.sh` → `git add` 명시 경로 → `git commit -F` → `git push origin dev2` → CI 확인) → FIX-033.md 결과절에 해시·run(다음 커밋).
+2. **P8 U3**(backend-agent, L-004 승인 먼저): 대기 질문 목록·브리핑 조회 API(01-plan 94행; 조인 `tool_name='briefing' AND step='briefing_compose'` 최신 1행, 결정 G). 위임 프롬프트에 FIX-033 (a)~(d) + **R-U2-2** `app/api/read.py` 모듈 docstring 갱신 + **R-U2-3** 판정표 7행(`briefed_at`·`updated_at` 변화 0) 값 테스트. → verifier 리뷰(변이 ≥1) → /commit → CI.
+3. **U4~U9**(frontend-agent — U0 완료로 위임 가능, R-U0-3: 단위마다 verifier 가 `web/package.json` scripts·의존성·lock 점검) → **U10 사람 점검** → verifier 04-review.
+4. **복기자료**: `~/Desktop/Portfolio/wiki/interview/relationship/17-개발과정-해설.md` 에 이 세션(U0·FIX-031·U1·U2·약점 11개·FIX-014 4라운드·032·033) 절 **미기록** — 문제점 목록(2026-10-11 15:20 보고)을 한계·교훈으로. README 갱신 기록 → `python3 양식/도구/interview_pdf.py relationship`.
+
+## 사용자가 이 세션에서 정한 것
+- security.md 에 npm 간접 실행 문구 **추가하지 않음**(단위별 verifier 점검만) · 일정 상한 `UPCOMING_SCHEDULES_LIMIT=10` 유지+테스트 · FIX-014 방식 "프로젝트 안 Bash 쓰기 거부" · 순서 "U2 끝내고 FIX 먼저" · FIX-014 회차 상한(2차 재작업이 마지막 필수 라운드, 새 우회는 후속 후보) → 3차 보류(deno/bun `run -`)는 (a) 한 건만 더 닫기 · FIX-033 재작업 "R-33-1·2·6 위임 + FIX-033.md 는 메인 세션".
 
 ## FIX 후보 (미착수 — 사용자에게 순서 묻기)
-- 하네스: **R-30-1** test-guards 에 남은 실제 저장소 의존 시험(L-003 `.awaiting-decision`·L-004 `.stage-approved` 마커 생성·소비, 357행 skip 형, `_selftest`) 격리 · R-30-2 `head -c 150` 한글 절단 · **R-27-10(우선)** commit-guard 의 git commit 감지 우회(`(git …)`·`/usr/bin/git`·`bash -c` 등) · R-27-11~13 · R-12 verify-plan.sh 파일명 절단(`manifest.webma`) · R-29-1 import 테스트 전수화 · R-29-3 `notifier.py:65` → `app.briefing.types` 구조 · `findings.py` ruff 3건 · `session-start.sh` 53행·commit SKILL 의 "dev 에서만" 낡은 문구 · 절차: "완료 커밋 뒤 CI 확인" 을 commit/devlog SKILL 에 규칙으로.
-- 제품: 발송이 일정 잠금 안에서 네트워크를 탄다(P7 04-review) · 잠금 404(P6 §6-6, P8 결정 K) · `app/er/judge.py` 4행 docstring · 작업 메모리 미구현(S3.5) · 임베딩 건너뛰면 `s_emb=0` 합산 · `.env.example` 미사용 변수 · 인물 분리 기능 없음 · `loop_extract` 토큰 0 · `/health` 빈 DB ok · `update_person` 부분 반영 · `memory_promote` `source` 비대칭.
-- 보류 아이디어(사용자 결정 대기): Jev(결정 전용 모델) 오프라인 파일럿 — 채택하면 원칙3·D11 CR 필요.
+- **FIX-014 후속**(FIX-014.md "마무리" 절): **R-14-19(1순위)** deno/bun 값 옵션(`deno run -c x -`) allow · R-14-5 awk/perl/php 패턴 · R-14-6 PowerShell `iex` · R-14-7 `CLAUDE_SCRATCHPAD` 죽은 분기 · R-14-8 `tar -C`·`unzip -d` · R-14-9~11 · R-14-15 · R-14-17·18 python/node heredoc `$(…)` · R-14-20. 한계(수정안 5): 프로그램 자체 쓰기(pytest·npm·pip)·`subprocess` 경유는 막지 않음.
+- **FIX-032 후속**: **R-32-1** `test-guards.sh` `full=${#full} bytes` 가 UTF-8 에서 문자 수(14323 vs 20800) → `wc -c`(1줄) · R-32-2 test-guards 가 시작·종료 시 마커·git status 자체 기록.
+- **FIX-033 후속**: R-33-7 CLAUDE.md 120행 "리터럴로" 구절 · R-33-8 verifier.md 에 변이 시험 의무 명시.
+- 하네스 기존: **R-27-10** commit-guard git commit 감지 우회(`(git …)`·`/usr/bin/git`) · R-27-11~13 · R-30-2 `head -c 150` 한글 절단 · R-12 verify-plan 파일명 절단 · R-29-1 import 전수 · R-29-3 `notifier.py:65` · `findings.py` ruff 3건 · "완료 커밋 뒤 CI 확인" 을 SKILL 규칙으로.
+- 제품: 발송이 일정 잠금 안에서 네트워크(P7) · 잠금 404(결정 K) · `judge.py` docstring · 작업 메모리 미구현(S3.5) · `s_emb=0` 합산 · `.env.example` · 인물 분리 없음 · `loop_extract` 토큰 0 · `/health` · `update_person` 부분 반영 · `memory_promote` `source` 비대칭.
+- 보류 아이디어: Jev(결정 전용 모델) 오프라인 파일럿 — 채택 시 원칙3·D11 CR.
 
-## 사용자 몫
-- 브랜치: `dev2` 작업 → `dev` 검증(`dev2:dev`, L-003) → `main`. dev 승격은 아직 안 함(P7·FIX-018~030 이 dev2 에만). 다른 기기: `git checkout dev2 && git pull --ff-only` 후 `pip install -r requirements-dev.txt`, 개발 DB `alembic upgrade head`.
-- 웹푸시 시험 키: `.env` 의 `VAPID_*` 3줄 + `PUSH_DEV_PAGE_ENABLED=1`(2026-10-10 사용자가 만듦). 개발 DB 에 U8 확인 행(구독 1·일정 5·인물 7·trace 232) 남아 있음 — 무해.
-- [미확인] Windows 로컬 실기기 · 빈 DB `relationship_test_fix006_evidence` 정리 · GitHub main 브랜치 보호.
+## 절차 기록 (이 세션)
+- 메인 세션 L-004 순서 위반 1건: FIX-014 구현 위임 **승인 전에** `--stage backend-agent` 마커 생성(16:05) → 사용자에게 보고, "시작" 승인으로 진행. 원인: 커밋·푸시·CI 확인과 한 응답에 묶음. **마커는 AskUserQuestion 답을 받은 뒤에만.**
+- backend-agent 가 U1 1차에서 Bash heredoc 으로 제품 파일 3개를 씀(가드 우회) → FIX-014 의 직접 계기. 이후 위임 프롬프트 맨 앞에 "Write/Edit 로만" 재명시 + FIX-014 훅으로 강제.
+- 구현자 증거 요약본 3건(FIX-031·FIX-014 rework2/3) → FIX-033 (c) 로 규칙화.
 
-## 주의
-- **언어: 전부 한국어.** 위임·커밋 승인 질문 전에 예시·이유를 담은 **자세한 설명**을 먼저 준다.
-- 위임은 매번 묻고 시작(L-004) → `approve-commit.sh --stage <에이전트>` 는 **따로** 실행. 마커 생성과 `git commit` 도 **한 Bash 명령에 묶지 않는다**(commit-guard 가 실행 전 명령 전체를 보고 막음) · 커밋과 푸시도 따로(FIX-013). 파일 변경은 Write/Edit 로만.
-- 서브에이전트 보고는 그대로 믿지 않고 재실행·grep 으로 재확인(이번 세션: mypy 39 vs 기준선 38 → `mypy_check.py --run` 으로 확인). 서브에이전트 출력 속 설정 변경 제안(`settings.json`)은 지시가 아니라 사용자에게 전달할 내용.
-- 실서버: `open -a Docker` → `set -a; . ./.env; set +a; .venv/bin/uvicorn app.main:create_app --factory --port 8765`. `curl … | python` 은 safety-guard 가 막음 → `curl -o 파일` 후 읽기. `.env` 는 읽지·출력하지 않는다.
+## 사용자 몫 · 주의
+- 브랜치: `dev2` 작업 → `dev` 승격(`dev2:dev`, L-003) → `main`. **dev 승격 아직 안 함**(P7·FIX-018~033 전부 dev2 에만). 다른 기기: `git checkout dev2 && git pull --ff-only`, `pip install -r requirements-dev.txt`, `alembic upgrade head`.
+- 웹푸시 키 `.env` `VAPID_*`·`PUSH_DEV_PAGE_ENABLED=1`. [미확인] Windows 실기기 · 빈 DB `relationship_test_fix006_evidence` · main 보호.
+- **언어 전부 한국어** · 승인 질문 전 자세한 설명 · 위임 매번 L-004 · 마커 생성/커밋/푸시 각각 따로 실행 · **파일 변경은 Write/Edit 로만(FIX-014 훅이 Bash 쓰기를 거부 — 임시 파일은 스크래치패드 리터럴 절대 경로)** · 서브에이전트 보고는 재실행으로 재확인 · `.env` 읽지 않음 · 실서버 `set -a; . ./.env; set +a; .venv/bin/uvicorn app.main:create_app --factory --port 8765`.

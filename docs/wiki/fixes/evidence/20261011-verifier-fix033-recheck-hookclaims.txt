@@ -1,0 +1,71 @@
+# FIX-033 재검증 — 훅 직접 판정 (verifier, 2026-10-11, HEAD 22a6822, dev2, Darwin)
+# 실행: bash <스크래치패드>/fix033-recheck/hookclaims.sh > <스크래치패드>/fix033-recheck/hookclaims.txt 2>&1 (rc=0). 아래는 그 출력 전체.
+# 방법: 훅 스크립트에 PreToolUse JSON({"tool_name":"Bash","tool_input":{"command":…}}) 을 stdin 으로 넘겨 판정만 받는다(실제 rm -rf 는 실행하지 않음). 출력 없음 + rc=0 = allow.
+# 목적: review-FIX-033.md R-33-1 완료 판정 — "새 절에서 작업 디렉터리를 가리키는 모든 문구가 스크래치패드(또는 그 하위)로 통일 + rm -rf <그 리터럴 경로> 를 safety-guard 에 직접 입력해 allow".
+#       verification.md 81행의 두 예시(`<스크래치패드>/mut-<단위>-<시각>/`, `mktemp -d <스크래치패드 리터럴>/mut.XXXXXX`)를 실제로 만들고 그 리터럴 경로로 판정했다.
+# 기대 ↔ 결과: A allow ✓ · B allow ✓ · C deny ✓ · D deny ✓ · E deny ✓ · F deny ✓ · G allow ✓ · H allow ✓ · I allow ✓ · J deny ✓ · K deny ✓ (11/11 일치)
+
+# FIX-033 재검증 — 훅 직접 판정 (verifier, 2026-10-11, HEAD 22a6822, dev2, Darwin)
+# 스크래치패드 = /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad
+# TMPDIR = /var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T/
+
+########## 1. 새 문구 예시 ①: <스크래치패드>/mut-<단위>-<시각>/ 를 mkdir -p 로 실제 생성
+mkdir -p 성공: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut-fix033-recheck-20261011
+drwxr-xr-x@ 2 sunwoo  wheel  64 10월 11 22:29 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut-fix033-recheck-20261011
+
+########## 2. 새 문구 예시 ②: mktemp -d <스크래치패드 리터럴>/mut.XXXXXX 를 실제 실행
+mktemp -d 출력: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut.GspWFG
+→ 스크래치패드 아래에 만들어짐 (접두 일치)
+
+########## 3. 대조군: mktemp -d 기본값(인자 없음) 이 실제로 어디를 만드는가
+mktemp -d 출력: /var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T/tmp.Y1jGEB38s2
+→ 스크래치패드 밖 (= 새 절 81행이 '쓰지 않는다' 고 한 경로)
+(빈 디렉터리라 rmdir 로 정리 — 재귀 삭제 아님)
+
+########## 4. safety-guard: 리터럴 경로 rm -rf 판정 (실행 아님)
+## safety-guard.sh  <- rm -rf /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut-fix033-recheck-20261011
+   [rc=0] (출력 없음 = allow)
+
+## safety-guard.sh  <- rm -rf /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut.GspWFG
+   [rc=0] (출력 없음 = allow)
+
+## safety-guard.sh  <- rm -rf /var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T/tmp.Y1jGEB38s2
+   {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 재귀 삭제(rm -r)는 scratchpad 밖에서 금지. 파일을 하나씩 지정하거나 사용자에게 요청하라 (근거: docs/wiki/security.md)"}}
+   [rc=0] (deny)
+
+## safety-guard.sh  <- rm -rf /tmp/tmp.fix033recheck
+   {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 재귀 삭제(rm -r)는 scratchpad 밖에서 금지. 파일을 하나씩 지정하거나 사용자에게 요청하라 (근거: docs/wiki/security.md)"}}
+   [rc=0] (deny)
+
+## safety-guard.sh  <- rm -rf "$VAR"
+   {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 재귀 삭제(rm -r)는 scratchpad 밖에서 금지. 파일을 하나씩 지정하거나 사용자에게 요청하라 (근거: docs/wiki/security.md)"}}
+   [rc=0] (deny)
+
+## safety-guard.sh  <- rm -rf "$(mktemp -d)"
+   {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 재귀 삭제(rm -r)는 scratchpad 밖에서 금지. 파일을 하나씩 지정하거나 사용자에게 요청하라 (근거: docs/wiki/security.md)"}}
+   [rc=0] (deny)
+
+########## 5. bash-write-guard: 새 절이 지시하는 쓰기 형태 판정 (실행 아님)
+## bash-write-guard.sh  <- pytest -q > /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut-fix033-recheck-20261011/out.txt 2>&1
+   [rc=0] (출력 없음 = allow)
+
+## bash-write-guard.sh  <- mktemp -d /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut.XXXXXX
+   [rc=0] (출력 없음 = allow)
+
+## bash-write-guard.sh  <- PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut-fix033-recheck-20261011 pytest -p mut_plugin -q tests/
+   [rc=0] (출력 없음 = allow)
+
+## bash-write-guard.sh  <- echo x > "$(mktemp -d)/out.txt"
+   {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[bash-write-guard] 리다이렉트 '>': 쓰기 대상 경로 '$(mktemp -d)/out.txt' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할 수 없으면 통과가 아니라 차단한다(security.md). 임시 파일이면 절대 경로(/tmp·$TMPDIR)로, 프로젝트 파일이면 Write/Edit 툴로 쓰라 (FIX-014)."}}
+   [rc=0] (deny)
+   → 해독: "[bash-write-guard] 리다이렉트 '>': 쓰기 대상 경로 '$(mktemp -d)/out.txt' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할 수 없으면 통과가 아니라 차단한다(security.md). 임시 파일이면 절대 경로(/tmp·$TMPDIR)로, 프로젝트 파일이면 Write/Edit 툴로 쓰라 (FIX-014)."
+
+## bash-write-guard.sh  <- bash .claude/scripts/verify-impl.sh P8 | tee docs/wiki/packages/P8/evidence/x.txt
+   {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[bash-write-guard] tee: 쓰기 대상 'docs/wiki/packages/P8/evidence/x.txt' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate(활성 작업·동결·L-003)와 secret-guard(비밀 검사)를 거치도록 (FIX-014, CLAUDE.md '파일 변경은 Write/Edit 툴로만'). 임시 파일은 /tmp·$TMPDIR·스크래치패드에 쓴다."}}
+   [rc=0] (deny)
+   → 해독: "[bash-write-guard] tee: 쓰기 대상 'docs/wiki/packages/P8/evidence/x.txt' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 Write/Edit 툴로 고쳐라 — stage-gate(활성 작업·동결·L-003)와 secret-guard(비밀 검사)를 거치도록 (FIX-014, CLAUDE.md '파일 변경은 Write/Edit 툴로만'). 임시 파일은 /tmp·$TMPDIR·스크래치패드에 쓴다." — SKILL.md 옛 60행이 지시하던 형태가 실제로 거부됨(R-33-6 수정의 근거).
+
+########## 6. 정리: 이 시험이 만든 디렉터리 목록 (스크래치패드 안, 세션과 함께 사라짐 — 삭제하지 않음)
+drwxr-xr-x@ 2 sunwoo  wheel  64 10월 11 22:29 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut-fix033-recheck-20261011
+drwx------@ 2 sunwoo  wheel  64 10월 11 22:29 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut.GspWFG
+[done rc=0]

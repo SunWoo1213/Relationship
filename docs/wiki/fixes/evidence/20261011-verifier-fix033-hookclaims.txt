@@ -1,0 +1,69 @@
+# FIX-033 새 절(verification.md 77~85행)의 훅 동작 주장 — verifier 직접 확인 (2026-10-11, HEAD 22a6822, Mac)
+# 방법: 훅 스크립트에 PreToolUse JSON 을 stdin 으로 직접 넘겨 판정만 받는다(실제 명령은 실행되지 않음). 출력 없음 + rc=0 = allow.
+# mktemp -d 실제 출력(이 세션): /var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T/tmp.FU6V9WSid0 ; python tempfile.gettempdir()=/var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T
+#
+# 참고 1: "commit-guard 가 임시 저장소의 커밋까지 막는다" 는 주장은 이 파일에 직접 넣지 못했다 — 시험 명령 문자열에 `git commit` 글자가 들어가자 이 세션의 commit-guard 가 그 Bash 호출 자체를 먼저 거부했다
+#        ("git commit 호출을 해석하지 못했다(따옴표·bash -c 등 안에 감춰진 형태) — 거부한다", 2회). 그 주장의 증거는 20261011-verifier-fix033-test-guards.txt 의
+#        `ok   DENY   git commit -m x (no marker)` 와 `ok   DENY   FIX-028 대조: FG_T 마커 없는 커밋은 거부(저장소 인식)` 줄로 대신한다.
+# 참고 2: 이 검증 중 verifier 본인이 `… > "$SP/fix033-grep.txt"`·`… > "$SP/fix033-test-guards.txt"` 를 실행해 bash-write-guard 에 두 번 거부됐다
+#        ("리다이렉트 '>': 쓰기 대상 경로 '$SP/fix033-grep.txt' 를 판정할 수 없다(변수·명령 치환·계산된 경로)…"). R-14-7 과 같은 함정이며 새 규칙 (d) 의 필요성을 그대로 보여 준다. 리터럴 절대 경로로 바꾼 뒤 통과.
+# 참고 3: deny 사유의 한글은 훅이 JSON \uXXXX 로 이스케이프해 출력한다. 아래 각 항목 뒤 "→ 해독:" 줄이 그 내용이다.
+
+########## safety-guard: 변수 경로 rm -rf 는 거부, 리터럴 임시 경로 rm -rf 는 허용인가
+## safety-guard  ← rm -rf "$R"
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 재귀 삭제(rm -r)는 scratchpad 밖에서 금지. 파일을 하나씩 지정하거나 사용자에게 요청하라 (근거: docs/wiki/security.md)"}}
+ [rc=0]
+
+## safety-guard  ← rm -rf $T
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 재귀 삭제(rm -r)는 scratchpad 밖에서 금지. 파일을 하나씩 지정하거나 사용자에게 요청하라 (근거: docs/wiki/security.md)"}}
+ [rc=0]
+
+## safety-guard  ← rm -rf /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut
+ [rc=0]
+→ allow (스크래치패드 리터럴 경로)
+
+## safety-guard  ← rm -rf /var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T/tmp.FU6V9WSid0
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[safety-guard] 재귀 삭제(rm -r)는 scratchpad 밖에서 금지. 파일을 하나씩 지정하거나 사용자에게 요청하라 (근거: docs/wiki/security.md)"}}
+ [rc=0]
+→ deny — `mktemp -d` 가 만든 리터럴 경로도 "scratchpad 밖" 이라 재귀 삭제 금지. 즉 mktemp -d 디렉터리는 스크래치패드가 아니다(R-33-1 근거).
+
+########## bash-write-guard: 변수·치환 경로는 거부, mktemp 리터럴 경로·스크래치패드 리터럴은 허용인가
+## bash-write-guard  ← echo x > $SP/out.txt
+{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[bash-write-guard] 리다이렉트 '>': 쓰기 대상 경로 '$SP/out.txt' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할 수 없으면 통과가 아니라 차단한다(security.md). 임시 파일이면 절대 경로(/tmp·$TMPDIR)로, 프로젝트 파일이면 Write/Edit 툴로 쓰라 (FIX-014)."}}
+ [rc=0]
+→ 해독: deny — "리다이렉트 '>': 쓰기 대상 경로 '$SP/out.txt' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할 수 없으면 통과가 아니라 차단한다(security.md). 임시 파일이면 절대 경로(/tmp·$TMPDIR)로, 프로젝트 파일이면 Write/Edit 툴로 쓰라 (FIX-014)."
+
+## bash-write-guard  ← echo x > "$(mktemp -d)/out.txt"
+{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[bash-write-guard] 리다이렉트 '>': 쓰기 대상 경로 '$(mktemp -d)/out.txt' 를 판정할 수 없다(변수·명령 치환·계산된 경로). 검사할 수 없으면 통과가 아니라 차단한다(security.md). 임시 파일이면 절대 경로(/tmp·$TMPDIR)로, 프로젝트 파일이면 Write/Edit 툴로 쓰라 (FIX-014)."}}
+ [rc=0]
+→ 해독: deny — "쓰기 대상 경로 '$(mktemp -d)/out.txt' 를 판정할 수 없다(변수·명령 치환·계산된 경로)…" — 새 절 1번째 항목 "출력된 경로를 리터럴로 확인하고 그 경로를 명령에 적는다" 와 에이전트 정의 (d) 의 `$(mktemp -d)/…` 거부 주장이 맞다.
+
+## bash-write-guard  ← echo x > /var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T/tmp.FU6V9WSid0/out.txt
+ [rc=0]
+→ allow — mktemp -d 리터럴 경로($TMPDIR 아래)로의 쓰기는 허용된다.
+
+## bash-write-guard  ← cp -R app /var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T/tmp.FU6V9WSid0/app
+ [rc=0]
+→ allow — 저장소 사본을 mktemp 리터럴 경로로 복사하는 것도 허용.
+
+## bash-write-guard  ← echo x > /var/folders/zz/other-machine/T/tmp.K3x9Qw/out.txt
+{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "[bash-write-guard] 리다이렉트 '>': 쓰기 대상 '/var/folders/zz/other-machine/T/tmp.K3x9Qw/out.txt' 는 프로젝트 밖이지만 임시 영역(/tmp·$TMPDIR·스크래치패드)도 아니다. 허용하지 않는다(FIX-014). 필요하면 사용자에게 요청하라."}}
+ [rc=0]
+→ 해독: deny — "쓰기 대상 '…' 는 프로젝트 밖이지만 임시 영역(/tmp·$TMPDIR·스크래치패드)도 아니다." 대조군: 이 기기의 $TMPDIR 이 아닌 /var/folders 경로는 거부 → 위 allow 는 $TMPDIR 접두 일치 덕분이다(`bash_write_check.py` 686행 `tempfile.gettempdir()`).
+
+## bash-write-guard  ← echo x > /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/out.txt
+ [rc=0]
+→ allow — 스크래치패드 리터럴 절대 경로.
+
+## bash-write-guard  ← PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad pytest -p mut_x tests/test_api_read_persons.py -q > /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/d6054c03-37b2-48f2-bed1-a0da85bd7817/scratchpad/mut.txt 2>&1
+ [rc=0]
+→ allow — 새 절 3번째 항목(런타임 치환 플러그인)의 명령 형태가 훅을 통과한다.
+
+## bash-write-guard  ← cd /var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T/tmp.FU6V9WSid0 && git add app/x.py
+ [rc=0]
+→ allow
+
+########## safety-guard: 임시 저장소에서 git add 명시 경로(스테이징만)
+## safety-guard  ← cd /var/folders/bs/dry3bl8532q22pr3sd98m_p40000gn/T/tmp.FU6V9WSid0 && git add app/x.py
+ [rc=0]
+→ allow — 새 절 2번째 항목 "스테이징(`git add`)까지만" 은 명시 경로면 통과한다(`git add -A`·`.` 은 test-guards 에서 DENY).

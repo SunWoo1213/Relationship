@@ -1,0 +1,165 @@
+# FIX-033 재검증 — 범위·grep·정합 확인 (verifier, 2026-10-11, HEAD 22a6822, dev2, Mac)
+# 아래 각 절은 verifier 가 Bash 로 직접 실행한 명령과 그 출력 전체다(잘라내기 없음). review-FIX-033.md "재검증 (2026-10-11)" 절의 근거.
+
+########## A. 범위 — 변경이 전부 .md 인가 (확인 6)
+$ git status --porcelain
+ M .claude/agents/backend-agent.md
+ M .claude/agents/eval-agent.md
+ M .claude/agents/frontend-agent.md
+ M .claude/skills/devlog/SKILL.md
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/fixes/FIX-032.md
+ M docs/wiki/fixes/FIX-033.md
+ M docs/wiki/journal.md
+ M docs/wiki/verification.md
+?? docs/wiki/fixes/evidence/20261011-2157-fix033-grep.txt
+?? docs/wiki/fixes/evidence/20261011-2157-fix033-test-guards.txt
+?? docs/wiki/fixes/evidence/20261011-2200-fix033-rework-test-guards.txt
+?? docs/wiki/fixes/evidence/20261011-2200-fix033-rework.txt
+?? docs/wiki/fixes/evidence/20261011-verifier-fix033-grep.txt
+?? docs/wiki/fixes/evidence/20261011-verifier-fix033-hookclaims.txt
+?? docs/wiki/fixes/evidence/20261011-verifier-fix033-scope.txt
+?? docs/wiki/fixes/evidence/20261011-verifier-fix033-test-guards.txt
+?? docs/wiki/fixes/review-FIX-033.md
+$ git diff --name-only 22a6822
+.claude/agents/backend-agent.md
+.claude/agents/eval-agent.md
+.claude/agents/frontend-agent.md
+.claude/skills/devlog/SKILL.md
+docs/wiki/HANDOFF.md
+docs/wiki/fixes/FIX-032.md
+docs/wiki/fixes/FIX-033.md
+docs/wiki/journal.md
+docs/wiki/verification.md
+→ 추적 파일 변경 9개 전부 .md. 비-.md 는 untracked 의 evidence/*.txt 8개만(증거 파일 — 코드·훅·스크립트 아님).
+$ git diff --stat 22a6822 -- docs/wiki/verification.md .claude/skills/devlog/SKILL.md docs/wiki/fixes/FIX-033.md .claude/agents/backend-agent.md .claude/agents/eval-agent.md .claude/agents/frontend-agent.md
+ .claude/agents/backend-agent.md  |  4 ++++
+ .claude/agents/eval-agent.md     |  4 ++++
+ .claude/agents/frontend-agent.md |  4 ++++
+ .claude/skills/devlog/SKILL.md   |  8 ++++----
+ docs/wiki/fixes/FIX-033.md       |  9 ++++++---
+ docs/wiki/verification.md        | 10 ++++++++++
+ 6 files changed, 32 insertions(+), 7 deletions(-)
+→ 1차 검증 시점(scope.txt) 은 대상 5파일 +25/-3(SKILL +3/-3). 재작업으로 SKILL.md 60행이 재작성되어 +4/-4 → 대상 5파일(FIX-033.md 제외) 은 지금 +26/-4. FIX-033.md 결과절 36행 "합계 5파일 +25/-3" 은 1차 시점 수치(R-33-9 참고, 권고).
+$ git rev-parse --short HEAD ; git branch --show-current
+22a6822
+dev2
+
+########## B. R-33-1 — verification.md 새 절 원문 (확인 1)
+$ sed -n '77,86p' docs/wiki/verification.md
+## 변이 시험 방법 (메인 세션·verifier, FIX-033)
+
+"테스트가 통과한다"는 그 테스트가 계약을 고정한다는 뜻이 아니다. 계약 코드를 일부러 바꿔(`max→min`, 조건 제거) 테스트가 **실패하는지** 본다. 저장소 파일은 고치지 않는다.
+
+- 작업 디렉터리는 **스크래치패드(세션 안내에 적힌 리터럴 절대 경로) 아래 고유한 새 하위 디렉터리**(예: `<스크래치패드>/mut-<단위>-<시각>/`)에 만든다. `mktemp -d` 를 쓰려면 `mktemp -d <스크래치패드 리터럴>/mut.XXXXXX` 처럼 스크래치패드 안을 지정하고, 출력된 경로를 리터럴로 확인해 이후 명령에 적는다. 저장소 밖이지만 스크래치패드 밖인 곳(`$TMPDIR`·`/tmp` 의 `mktemp -d` 기본값)은 쓰지 않는다 — `safety-guard` 가 그 경로의 `rm -rf` 를 거부하고(R-33-1 실측), 세션 종료 시 정리되지도 않는다. `rm -rf "$VAR"` 같은 변수 경로 삭제도 훅이 거부하므로 쓰지 않는다. 정리는 하지 않아도 된다(스크래치패드가 세션과 함께 사라진다).
+- 저장소 사본을 쓸 때 임시 git 저장소에서는 **커밋하지 않고 스테이징(`git add`)까지만** 한다. `commit-guard` 가 임시 저장소의 `git commit` 까지 막는다.
+- **런타임 치환이 가장 간단하다**: 스크래치패드에 pytest 플러그인 모듈을 쓰고(`PYTHONPATH=<스크래치패드 리터럴 경로> pytest -p <모듈> …`), import 시점에 대상 함수·상수를 monkeypatch 한다. 예시: `docs/wiki/packages/P8-frontend/review-u1-read-persons.md` §5 와 `evidence/20261011-verifier-u1-mutation.txt`(대조군 7 passed → 변이 4건).
+- FIX-014 이후 **스크래치패드 밖으로 Bash 쓰기를 하지 않는다.** 플러그인·스크립트는 스크래치패드 리터럴 절대 경로에 Write 로 만들고, 출력은 `>` 로 스크래치패드에 받은 뒤 Read → Write 로 evidence 에 전체를 옮긴다.
+- 보고: "변이 → 기대 → 결과(어떤 테스트가 FAIL)" 표와 대조군. 변이가 통과하면 테스트 공백이다(소견).
+
+→ 작업 디렉터리를 가리키는 문구: 81행 "스크래치패드 … 아래 고유한 새 하위 디렉터리" · "mktemp -d <스크래치패드 리터럴>/mut.XXXXXX" · "$TMPDIR·/tmp 기본값은 쓰지 않는다" · "(스크래치패드가 세션과 함께 사라진다)" / 83행 "스크래치패드에 pytest 플러그인" · "PYTHONPATH=<스크래치패드 리터럴 경로>" / 84행 "스크래치패드 밖으로 Bash 쓰기를 하지 않는다" · "스크래치패드 리터럴 절대 경로에 Write" · "> 로 스크래치패드에". 전부 스크래치패드(하위)로 통일. 84행과 모순 없음. 훅 동작 주장(rm -rf 거부·변수 경로 거부)은 …-recheck-hookclaims.txt C·D·E·F 로 실측.
+
+########## C. R-33-2 · R-33-6 — SKILL.md (확인 2)
+$ grep -c "통과하면 통과하면" .claude/skills/devlog/SKILL.md
+0
+rc=1
+$ grep -n "| tee" .claude/skills/devlog/SKILL.md
+rc=1   (0건 — 명령 형태의 tee 없음)
+$ grep -n "tee" .claude/skills/devlog/SKILL.md
+35:   (`tee`·`>` 는 프로젝트 안 쓰기라 bash-write-guard 가 거부한다. 긴 출력은 스크래치패드 리터럴 절대 경로로 `>` 한 뒤 Read → Write).
+60:1. `bash .claude/scripts/verify-impl.sh <id>` 를 실행해 출력을 스크래치패드 리터럴 절대 경로로 `>` 받은 뒤 Read → Write 로 `docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt` 에 전체 저장(`tee`·`>` 는 프로젝트 안 쓰기라 bash-write-guard 가 거부한다) → FAIL 은 루프로. 열린 [필수] 소견이 있으면 완료가 아니다.
+rc=0
+→ 두 건 모두 "tee 는 거부된다" 는 설명 문구. 명령 형태 0건.
+$ sed -n '33,35p;43p' .claude/skills/devlog/SKILL.md   (60행과 같은 취지인지 대조)
+5. **기계 검증**: `mkdir -p packages/<id>/evidence` 후
+   `bash .claude/scripts/verify-plan.sh <id>` 를 실행하고 출력을 **Write 툴로** `docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt` 에 저장한다
+   (`tee`·`>` 는 프로젝트 안 쓰기라 bash-write-guard 가 거부한다. 긴 출력은 스크래치패드 리터럴 절대 경로로 `>` 한 뒤 Read → Write).
+1. `bash .claude/scripts/verify-impl.sh <id>` 의 출력을 Write 툴로 `docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt` 에 저장 (pytest 출력도 같은 방식으로 파일에. 긴 출력은 스크래치패드 리터럴 절대 경로로 `>` 한 뒤 Read → Write)
+→ 34~35행(/devlog start 5단계)·43행(루프 1단계)·60행(/devlog done 1단계) 모두 "Write 툴로 evidence 저장 · tee/> 는 거부 · 긴 출력은 스크래치패드 리터럴 절대 경로 > → Read → Write". 같은 취지. 60행은 항상 스크래치패드를 거치게 써서 더 보수적이지만 어긋나지 않는다.
+$ sed -n '56p' .claude/skills/devlog/SKILL.md  (R-33-2 원위치 — "통과하면" 1회)
+6. **제품 코드(`app/`·`alembic/`·`web/`)를 바꾼 FIX/test 커밋은 verifier 리뷰가 먼저다.** 구현 에이전트 작업이 끝나면 `AskUserQuestion`으로 시작 승인 → `approve-commit.sh --stage verifier`(L-004, 5단계와 같은 절차) 뒤 `verifier`에게 커밋 전 코드 리뷰를 맡겨 `fixes/review-FIX-nnn.md`(`검토자: verifier (fable)`, 본 것·직접 실행한 검증 명령·판정 근거·소견)를 쓰게 한다. **단위마다 핵심 계약 변이 시험을 최소 1개 돌리게 고정한다**(저장소 밖 사본 또는 런타임 치환, 저장소 무수정 — 방법은 `verification.md` "변이 시험 방법"). 통과하면 verifier 가 `FIX-nnn.md`의 `검증:` 줄을 채운다(예: `검증: 통과 — verifier (fable) 2026-10-06, review-FIX-nnn.md`). `commit-guard.sh`가 이 두 가지(검증 줄에 `통과` 와 `verifier` 둘 다 + review 문서 존재·추적 여부)를 커밋 시점에 확인해, 없으면 거부한다(FIX-027). 훅·문서만 바꾸는 FIX(제품 코드 무변경)는 review 문서를 생략할 수 있지만 `검증:` 줄은 여전히 verifier 가 쓴다.
+
+########## D. R-33-3 · R-33-4 — FIX-033.md 판정 명령을 글자 그대로 (확인 3)
+$ grep -c "값으로 단언\|구현하기 전에 멈추\|출력 전체\|리터럴 절대 경로" .claude/agents/backend-agent.md .claude/agents/eval-agent.md .claude/agents/frontend-agent.md .claude/skills/devlog/SKILL.md
+.claude/agents/eval-agent.md:4
+.claude/agents/backend-agent.md:4
+.claude/agents/frontend-agent.md:4
+.claude/skills/devlog/SKILL.md:6
+rc=0
+→ 네 파일 모두 ≥1 (4·4·4·6). grep -c 는 매치 행 수다.
+$ grep -n -o "값으로 단언\|구현하기 전에 멈추\|출력 전체\|리터럴 절대 경로" .claude/skills/devlog/SKILL.md
+35:리터럴 절대 경로
+37:출력 전체
+43:리터럴 절대 경로
+55:값으로 단언
+55:구현하기 전에 멈추
+55:출력 전체
+55:리터럴 절대 경로
+60:리터럴 절대 경로
+61:출력 전체
+→ SKILL.md 매치 행 6 = 35·37·43(기존) + 55(신규 (a)~(d) 네 구절) + 60(재작업으로 "스크래치패드 리터럴 절대 경로" 추가 — 1차 5행에서 +1) + 61(기존 "출력 전체").
+$ grep -n "^## 변이 시험 방법" docs/wiki/verification.md
+77:## 변이 시험 방법 (메인 세션·verifier, FIX-033)
+rc=0
+→ 1건.
+$ sed -n '3p;18p' docs/wiki/fixes/FIX-033.md
+발견: 2026-10-11 · P8-frontend U0~U2 진행 중 사용자 요청 "약점 해결 프로세스 시작" | Refs: FIX-033 L-002 L-004 원칙8 R-U1-1 R-U1-3 R-31-3 R-14-7
+1. `.claude/agents/backend-agent.md`·`eval-agent.md`·`frontend-agent.md` 하네스 규칙(공통 절)에 네 줄((a)~(c) + FIX-014 검증 R-14-7 의 (d) "임시 경로는 스크래치패드 리터럴 절대 경로" — 사용자 2026-10-11 FIX-033 위임 승인 때 포함):
+$ grep -n "R-14-7" docs/wiki/fixes/FIX-033.md
+3:발견: … | Refs: FIX-033 L-002 L-004 원칙8 R-U1-1 R-U1-3 R-31-3 R-14-7
+18:1. … 네 줄((a)~(c) + FIX-014 검증 R-14-7 의 (d) …
+35:구현(backend-agent, 문서만, 2026-10-11): … (d) 임시 경로는 스크래치패드 리터럴 절대 경로(R-14-7) 네 줄씩 추가. …
+→ R-33-4: Refs 에 R-14-7 추가됨, 수정안 1 "세 줄"→"네 줄" + (d) 출처 명시. R-33-3: 수정안 4 가 실제 명령으로 정정되고 원안이 왜 판정 불가였는지(architect.md·verification.md 0건) 적혀 있음.
+$ sed -n '29,31p' docs/wiki/fixes/FIX-033.md   (재검증 전 상태)
+계획 점검: 통과 (메인 세션, 점검표 1~8 — …)
+검증: (verifier 가 쓴다 — 제품 코드를 바꾸면 커밋 전 review-FIX-nnn.md 와 함께)
+승인: 사용자 (2026-10-11, AskUserQuestion "세 FIX 범위 이대로 승인" — 구현 위임은 따로 승인)
+
+########## E. 재작업이 1차 통과분(에이전트 정의 3개)을 건드리지 않았는가 (확인 4)
+$ git diff 22a6822 -- .claude/agents/backend-agent.md .claude/agents/eval-agent.md .claude/agents/frontend-agent.md > <스크래치패드>/fix033-recheck/agents-diff-now.txt   (42행)
+$ sed -n '39,80p' docs/wiki/fixes/evidence/20261011-verifier-fix033-scope.txt > <스크래치패드>/fix033-recheck/agents-diff-first.txt   (1차 검증 때 저장한 같은 diff)
+$ diff agents-diff-first.txt agents-diff-now.txt ; echo rc=$?
+diff rc=0   (출력 없음 = 바이트 동일)
+$ shasum -a 256 두 파일
+e5145194624ca8954313bf759515850929147bdfa85ac9e0dc5115de7eab2812  agents-diff-first.txt
+e5145194624ca8954313bf759515850929147bdfa85ac9e0dc5115de7eab2812  agents-diff-now.txt
+$ git diff 22a6822 -- <에이전트 3개> | grep "^index"   ↔  1차 scope.txt 의 index 줄
+index 0987a61..efb19e1 100644   (backend)   ← 1차 동일
+index 1813d4c..fd2161a 100644   (eval)      ← 1차 동일
+index dbb2f6f..8e74b79 100644   (frontend)  ← 1차 동일
+(1차 scope.txt: SKILL 67c8836..11dd993 → 지금 67c8836..da94df7 / verification be2d5d7..17c6b4c → 지금 be2d5d7..2efc441 — 재작업 대상 두 파일만 blob 이 바뀜)
+$ stat -f '%Sm %N' …   (mtime)
+2026-10-11 21:57:42 .claude/agents/backend-agent.md
+2026-10-11 21:57:43 .claude/agents/eval-agent.md
+2026-10-11 21:57:43 .claude/agents/frontend-agent.md
+2026-10-11 22:22:57 .claude/skills/devlog/SKILL.md
+2026-10-11 22:22:56 docs/wiki/verification.md
+2026-10-11 22:22:46 docs/wiki/fixes/FIX-033.md
+2026-10-11 22:23:50 docs/wiki/fixes/evidence/20261011-2200-fix033-rework.txt
+2026-10-11 22:17:34 docs/wiki/fixes/review-FIX-033.md
+→ 에이전트 정의 3개는 1차 리뷰(22:17) 이전 21:57 이후 무수정. 재작업은 SKILL.md·verification.md·FIX-033.md(22:22) 만.
+
+########## F. R-33-5 · 7 · 8 상태 (확인 7 — 선택/후속, 기록만)
+$ grep -n "cut -c1-260\|이하 생략" docs/wiki/fixes/evidence/20261011-2157-fix033-grep.txt | head -5
+2:# 명령: for f in <5개 파일>; do echo "== $f"; grep -n "…" $f; done | cut -c1-260
+3:# 주의: SKILL.md 의 긴 줄(37·55·61행)은 원문이 매우 길어 아래에 "(이하 생략)" 으로 줄였다(손으로 요약 — 발췌 표시). 에이전트 3개·verification.md 는 grep 출력 그대로.
+22:37:6. … (이하 생략 — 기존 줄)
+24:55:5. … (이하 생략 — …)
+25:61:2. … (이하 생략 — …)
+→ R-33-5: 1차 구현 증거는 그대로 발췌본(수정 대상 아님). 재작업 증거 20261011-2200-fix033-rework.txt 는 머리말에 "아래는 그 출력 전체" 라 적고 test-guards 는 별도 파일(353행)로 나눔 — (c) 규칙에 맞음. 1차 verifier 전체본이 대신함. 상태: 열림(권고, 다음부터).
+$ git diff --quiet 22a6822 -- CLAUDE.md ; echo rc=$?   →  rc=0 (무변경)
+$ grep -c "리터럴 절대 경로" CLAUDE.md   →  0
+→ R-33-7: CLAUDE.md 120행 미반영 그대로. 상태: 열림(선택).
+$ git diff --quiet 22a6822 -- .claude/agents/verifier.md ; echo rc=$?   →  rc=0 (무변경)
+$ grep -n "변이\|verification.md" .claude/agents/verifier.md ; echo rc=$?   →  rc=1 (0건)
+→ R-33-8: verifier.md 에 변이 시험 의무·절 참조 없음 그대로. SKILL.md 56·61행이 위임 프롬프트로 전달. 상태: 열림(선택).
+
+########## G. 재작업 증거 2개 확인
+$ cat docs/wiki/fixes/evidence/20261011-2200-fix033-rework.txt   (판정1 sed 77~86 · 판정2 mkdir+safety-guard allow / $TMPDIR deny · 판정3 grep 0건·tee 설명 2줄 · 판정4 test-guards 결과 참조)
+→ 내용은 위 B·C 및 …-recheck-hookclaims.txt 와 일치(판정2 의 경로 mut-fix033-202610112200 ↔ 내 mut-fix033-recheck-20261011 — 다른 디렉터리로 같은 allow).
+$ head -1 / tail -2 / wc -l docs/wiki/fixes/evidence/20261011-2200-fix033-rework-test-guards.txt
+# bash .claude/scripts/test-guards.sh 출력 전체 (2026-10-11, dev2, FIX-033 재작업 후). 마지막 [rc=0].
+== 결과: 실패 0 ==
+[rc=0]
+     353 (행)
+→ 구현자 353행(머리말 1 + rc 줄 1) ↔ 내 재실행 351행(…-recheck-test-guards.txt) 본문 동일 구성, 실패 0.
