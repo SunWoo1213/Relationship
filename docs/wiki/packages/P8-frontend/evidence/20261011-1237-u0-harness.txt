@@ -44,6 +44,12 @@ CLAUDE.md:114:- **FIX 도 패키지와 같은 검증 분리를 따른다(L-002 �
 
 ## 3. stage-gate.sh 는 고치지 않음(R-2) — 면제 목록 방식이라 web/ 는 이미 활성 작업을 요구한다. 위 165행이 실증.
 ## 4. Windows: 커밋·푸시 뒤 CI windows job 의 훅 자가 점검 결과를 gh run view 로 확인해 이 파일 끝에 덧붙인다.
+##    → 결과(2026-10-11, 메인 세션 gh run view):
+##    - U0 `440a0e5` run 38111227562: pytest 3.13·3.14 success · windows 는 test-guards 의 기존 session-start 시험에서 멈춤
+##      (U0 새 시험 6줄은 Windows 로그에서 전부 ok) → 사용자 승인 취소(cancelled) → FIX-031
+##    - FIX-031 `6479c1d` run 38116488226: 세 job success (windows 05:57:48→06:01:20, 3분 32초)
+##    - U1 `6c2d0e7` run 38117011109: 세 job success (windows 06:07:09→06:09:31)
+##    ⇒ U0 판정 Mac·Windows 통과(R-U0-4 해소).
 
 ## 5. test-guards.sh 전체 출력 중 변경과 관련된 절(나머지 절은 전부 ok — 실패 0)
 == commit-guard: FIX-027 제품 코드 verifier 게이트 (격리된 임시 저장소) ==

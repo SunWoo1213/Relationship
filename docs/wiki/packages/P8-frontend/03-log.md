@@ -29,3 +29,12 @@
 - **절차 위반 기록(R-U1-2)**: 1차 구현에서 backend-agent 가 `read.py`·`schemas.py`·`routes.py` 를 Bash(heredoc·python 치환)로 썼다(자기 보고) → secret-guard·stage-gate 미경유. verifier·메인 세션 확인 결과 내용은 깨끗(비밀 0·삭제 0·범위 밖 0). 재작업과 FIX-031 은 위임 프롬프트 맨 앞에 "Write/Edit 로만" 을 재명시해 지켜졌다(자기 보고). 근본 대책은 하네스 FIX 후보 **FIX-014**(훅을 Bash 쓰기까지 넓히기)와 연결.
 - 남은 것 · 다음 단위: U2 원문 조회 API 2개(`GET /events/{id}/raw`, `GET /persons/{pid}/facts/{fid}/sources`, backend-agent). 위임 프롬프트에 "Write/Edit 로만" 을 계속 맨 앞에.
 - Refs: P8-frontend S3.1 S3.5 원칙9 FIX-031 FIX-014
+
+## 2026-10-11 15:45 · feat(P8-frontend): 타임라인·사실의 근거 원문을 펼쳐 보는 조회 API 를 더한다 · pending
+- (앞 항목 보충) U1 커밋 = `6c2d0e7`, CI run 38117011109 세 job success.
+- 변경: `app/api/read.py` `get_event_raw`·`get_fact_sources`·`FACT_SOURCES_LIMIT` · `schemas.py` `EventRawOut`·`FactBriefOut`·`FactSourceEventOut`·`FactSourcesOut`(`raw_utterance` 가 실리는 유일한 모델 둘) · `routes.py` 두 GET · `tests/test_api_read_raw.py` 18건.
+- 이유(기획서·카드 연결): 01-plan U2·결정 F, 부록 A "타임라인 항목을 펼치면 원문 발화가 나옵니다".
+- 정합성 확인: S3.1(저장 문자열 그대로 — 특수문자·줄바꿈·이모지·5000자 테스트) · R8 · 원칙9(쓰기·trace 0). 격리: `persons.user_id` 조인 조건 두 곳 + `person_facts.person_id = person_id`, 404 는 계획 4경우 + 3경우 모두 같은 본문. 확정 값(R-U2-1): `FACT_SOURCES_LIMIT=20`(승격 배치 상한 `MEMORY_PROMOTE_MAX_EVENTS`=20 과 맞춤 · 승격 누적·패턴 사실은 20건을 넘을 수 있고 전체 건수는 U1 카드의 `source_count` 로 구분) · 정렬 `occurred_at desc` → 2차 키 `id desc`. **계획 밖 방어 조건** 근거 쿼리 `Event.person_id == person_id` — verifier 가 `fact_sources` 쓰기 경로 셋(promote·patterns·direct_facts)을 읽고 정당하게 다른 인물 이벤트가 연결되는 경로 없음 확인 → 정상 데이터 영향 없음, 사용자 질의 불필요(R-U2-1). 이런 계획 밖 판단은 앞으로 구현 전에 보고하게 한다(FIX-033).
+- 검증: verifier `review-u2-read-raw.md` 통과([필수] 0) — 변이 8건(격리 3·정렬 2·상한·strip·방어 조건) 전부 FAIL, U1 변이 2건 여전히 FAIL. 30 passed · 전체 1912 passed skip 0 · ruff · mypy 38/38. 증거 `evidence/20261011-1520-u2-*`·`1529-verifier-u2-*`.
+- 남은 것 · 다음 단위: R-U2-2 `read.py` 모듈 docstring 갱신은 U3 위임에 포함(제품 코드라 메인 세션이 직접 고치지 않음) · R-U2-3 판정표 7행(`briefed_at`·`updated_at` 변화 0) 값 테스트는 U3 공통 픽스처에서 · R-U2-4(구현자가 저장소 파일로 변이) → FIX-033. 다음: 사용자 결정 "U2 끝내고 FIX 먼저" → FIX-014 → 032 → 033, 그 뒤 U3.
+- Refs: P8-frontend S3.1 R8 원칙9

@@ -1,0 +1,36 @@
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_api_read_raw.py -v
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 18 items
+
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [  5%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 11%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 16%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 22%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 27%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 33%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 38%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 44%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 50%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 55%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 61%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 66%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 72%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 77%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 83%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 88%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 94%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [100%]
+
+============================== 18 passed in 0.61s ==============================
+
+# 변이 확인(임시로 코드를 고쳐 실행한 뒤 원복)
+- person_facts.person_id 조건 제거 -> 4건 실패(없는_인물, 내_다른_인물의_사실, 남의_인물_경로에_내_사실, 세_404_동일)
+- get_event_raw 의 persons.user_id 조건 제거 -> 1건 실패(test_이벤트_404_타사용자_이벤트)
+- get_fact_sources 의 persons.user_id 조건 제거 -> 2건 실패(남의_인물_경로의_남의_사실, 세_404_동일)
+- 원복 후 18 passed (위 출력)

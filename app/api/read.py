@@ -20,6 +20,10 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.schemas import (
+    EventRawOut,
+    FactBriefOut,
+    FactSourceEventOut,
+    FactSourcesOut,
     PersonBasicOut,
     PersonCardOut,
     PersonFactOut,
@@ -31,6 +35,7 @@ from app.api.schemas import (
 from app.db.models import Event, FactSource, Person, PersonAlias, PersonFact, Schedule
 from app.settings import PATTERN_KEY_PREFIX
 from app.tools.persons import _owned_person
+from app.tools.types import PersonNotFound
 
 #: 카드 타임라인 최대 건수. 카드 화면은 "최근 무슨 일이 있었나"를 한눈에
 #: 보여 주는 용도이고 전체 이력 페이지가 아니다(화면 3개 고정, 원칙5).
@@ -41,6 +46,82 @@ TIMELINE_LIMIT = 20
 #: 카드에 보일 다가오는 일정 최대 건수. 카드 응답 크기를 묶기 위한 상한이며
 #: 가장 가까운 일정부터 채운다(과거 일정은 제외). 24시간 브리핑 범위와는 무관하다.
 UPCOMING_SCHEDULES_LIMIT = 10
+
+
+#: 사실 하나의 근거 원문 최대 건수. 승격은 인물의 미승격 이벤트
+#: `MEMORY_PROMOTE_MAX_EVENTS`(20)건 안에서 이뤄지므로 한 사실의 근거는
+#: 보통 그 안이다. 같은 20건이면 "근거 보기" 한 번에 원문 전체가 오가도
+#: 응답이 작고, 패턴 사실(1년 내 같은 type 반복)이 더 많은 근거를 가져도
+#: 가장 최근 20건이면 화면 목적(왜 그렇게 기록했나)에 충분하다.
+FACT_SOURCES_LIMIT = 20
+
+
+def get_event_raw(session: Session, user_id: str, event_id: int) -> EventRawOut:
+    """이벤트 원문. `events -> persons` 조인에 `persons.user_id` 를 건다.
+    없거나 남의 것이면 `PersonNotFound`(공통 404, 존재 누설 없음)."""
+    row = session.execute(
+        select(
+            Event.id,
+            Event.person_id,
+            Event.type,
+            Event.content,
+            Event.occurred_at,
+            Event.raw_utterance,
+        )
+        .join(Person, Person.id == Event.person_id)
+        .where(Event.id == event_id)
+        .where(Person.user_id == user_id)
+    ).one_or_none()
+    if row is None:
+        raise PersonNotFound("event_not_found")
+    return EventRawOut(
+        event_id=row[0],
+        person_id=row[1],
+        type=row[2],
+        content=row[3],
+        occurred_at=row[4],
+        raw_utterance=row[5],
+    )
+
+
+def get_fact_sources(
+    session: Session, user_id: str, person_id: int, fact_id: int
+) -> FactSourcesOut:
+    """사실의 근거 원문. 사실은 `person_facts.person_id = person_id` 이고
+    그 인물이 `user_id` 소유일 때만 조회된다(다른 인물의 사실 id 를 경로에
+    끼운 넘겨짚기 차단). 아니면 `PersonNotFound`(공통 404)."""
+    fact = session.execute(
+        select(PersonFact.id, PersonFact.key, PersonFact.value)
+        .join(Person, Person.id == PersonFact.person_id)
+        .where(PersonFact.id == fact_id)
+        .where(PersonFact.person_id == person_id)
+        .where(Person.user_id == user_id)
+    ).one_or_none()
+    if fact is None:
+        raise PersonNotFound("fact_not_found")
+    rows = session.execute(
+        select(
+            Event.id,
+            Event.type,
+            Event.content,
+            Event.occurred_at,
+            Event.raw_utterance,
+        )
+        .join(FactSource, FactSource.event_id == Event.id)
+        .where(FactSource.fact_id == fact.id)
+        .where(Event.person_id == person_id)  # 다른 인물 이벤트가 섞여도 나가지 않는다
+        .order_by(Event.occurred_at.desc(), Event.id.desc())
+        .limit(FACT_SOURCES_LIMIT)
+    ).all()
+    return FactSourcesOut(
+        fact=FactBriefOut(id=fact[0], key=fact[1], value=fact[2]),
+        sources=[
+            FactSourceEventOut(
+                event_id=i, type=t, content=c, occurred_at=o, raw_utterance=r
+            )
+            for i, t, c, o, r in rows
+        ],
+    )
 
 
 def list_persons(session: Session, user_id: str) -> list[PersonListItemOut]:

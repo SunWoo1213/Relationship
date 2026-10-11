@@ -1,0 +1,109 @@
+################ 대조군(변이 없음) (U2_MUT=)
+$ U2_MUT= POSTGRES_PORT=5433 PYTHONPATH=<scratchpad> .venv/bin/python -m pytest -p mut_u2 tests/test_api_read_raw.py -q -s
+[MUTATION] U2_MUT 비어 있음 — 치환 없음(대조군)
+18 passed in 0.38s
+
+################ M1 person_facts.person_id 조건 제거 (U2_MUT=fact_no_person)
+$ U2_MUT=fact_no_person POSTGRES_PORT=5433 PYTHONPATH=<scratchpad> .venv/bin/python -m pytest -p mut_u2 tests/test_api_read_raw.py -q -s
+[MUTATION] U2_MUT=fact_no_person — get_event_raw/get_fact_sources 치환(app.api.read·app.api.routes)
+E       assert 200 == 404
+E        +  where 200 = <Response [200 OK]>.status_code
+E       assert 200 == 404
+E        +  where 200 = <Response [200 OK]>.status_code
+E       assert 200 == 404
+E        +  where 200 = <Response [200 OK]>.status_code
+E       assert {200, 404} == {404}
+FAILED tests/test_api_read_raw.py::test_근거_404_없는_인물 - assert 200 == 404
+FAILED tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우
+FAILED tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우
+FAILED tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 - assert...
+4 failed, 14 passed in 0.42s
+
+################ M2 get_event_raw persons.user_id 조건 제거 (U2_MUT=event_no_user)
+$ U2_MUT=event_no_user POSTGRES_PORT=5433 PYTHONPATH=<scratchpad> .venv/bin/python -m pytest -p mut_u2 tests/test_api_read_raw.py -q -s
+[MUTATION] U2_MUT=event_no_user — get_event_raw/get_fact_sources 치환(app.api.read·app.api.routes)
+E       assert 200 == 404
+E        +  where 200 = <Response [200 OK]>.status_code
+FAILED tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 - assert 2...
+1 failed, 17 passed in 0.42s
+
+################ M3 get_fact_sources persons.user_id 조건 제거 (U2_MUT=fact_no_user)
+$ U2_MUT=fact_no_user POSTGRES_PORT=5433 PYTHONPATH=<scratchpad> .venv/bin/python -m pytest -p mut_u2 tests/test_api_read_raw.py -q -s
+[MUTATION] U2_MUT=fact_no_user — get_event_raw/get_fact_sources 치환(app.api.read·app.api.routes)
+E       assert 200 == 404
+E        +  where 200 = <Response [200 OK]>.status_code
+E       assert {200, 404} == {404}
+FAILED tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실
+FAILED tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 - assert...
+2 failed, 16 passed in 0.43s
+
+################ M4 정렬 occurred_at desc -> asc (U2_MUT=asc)
+$ U2_MUT=asc POSTGRES_PORT=5433 PYTHONPATH=<scratchpad> .venv/bin/python -m pytest -p mut_u2 tests/test_api_read_raw.py -q -s
+[MUTATION] U2_MUT=asc — get_event_raw/get_fact_sources 치환(app.api.read·app.api.routes)
+E       assert [11756, 11755, 11757] == [11757, 11755, 11756]
+E         At index 0 diff: 11756 != 11757
+E       assert [11758, 11759, 11760] == [11760, 11759, 11758]
+E         At index 0 diff: 11758 != 11760
+E       AssertionError: assert ['원문24', '원문2..., '원문19', ...] == ['원문0', '원문1'...', '원문5', ...]
+E         At index 0 diff: '원문24' != '원문0'
+FAILED tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 - assert...
+FAILED tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순
+FAILED tests/test_api_read_raw.py::test_근거_상한 - AssertionError: assert ['...
+3 failed, 15 passed in 0.41s
+
+################ M5 상한 FACT_SOURCES_LIMIT 제거 (U2_MUT=no_limit)
+$ U2_MUT=no_limit POSTGRES_PORT=5433 PYTHONPATH=<scratchpad> .venv/bin/python -m pytest -p mut_u2 tests/test_api_read_raw.py -q -s
+[MUTATION] U2_MUT=no_limit — get_event_raw/get_fact_sources 치환(app.api.read·app.api.routes)
+E       AssertionError: assert 25 == 20
+E        +  where 25 = len([{'content': '내용', 'event_id': 11805, 'occurred_at': '2026-03-01T09:00:00Z', 'raw_utterance': '원문0', ...}, {'content':...', ...}, {'content': '내용', 'event_id': 11810, 'occurred_at': '2026-02-24T09:00:00Z', 'raw_utterance': '원문5', ...}, ...])
+FAILED tests/test_api_read_raw.py::test_근거_상한 - AssertionError: assert 25...
+1 failed, 17 passed in 0.42s
+
+################ M6 raw_utterance strip() 가공 (U2_MUT=strip)
+$ U2_MUT=strip POSTGRES_PORT=5433 PYTHONPATH=<scratchpad> .venv/bin/python -m pytest -p mut_u2 tests/test_api_read_raw.py -q -s
+[MUTATION] U2_MUT=strip — get_event_raw/get_fact_sources 치환(app.api.read·app.api.routes)
+E       assert '"팀장님"이 <b>또<...리터럴 & \u200b끝' == '  "팀장님"이 <b>...럴 & \u200b끝  '
+E         -   "팀장님"이 <b>또</b> 그러셨어 😅
+E         + "팀장님"이 <b>또</b> 그러셨어 😅
+E         - 둘째 줄	탭 \n 리터럴 & ​끝  
+E         + 둘째 줄	탭 \n 리터럴 & ​끝
+E       assert ['원문-최신', '원문...터럴 & \u200b끝'] == ['원문-최신', '원문... & \u200b끝  ']
+E         At index 2 diff: '"팀장님"이 <b>또</b> 그러셨어 😅\n둘째 줄\t탭 \\n 리터럴 & \u200b끝' != '  "팀장님"이 <b>또</b> 그러셨어 😅\n둘째 줄\t탭 \\n 리터럴 & \u200b끝  '
+FAILED tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 - assert '"...
+FAILED tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 - assert...
+2 failed, 16 passed in 0.42s
+
+################ M7 방어 조건 Event.person_id == person_id 제거 (U2_MUT=no_event_person)
+$ U2_MUT=no_event_person POSTGRES_PORT=5433 PYTHONPATH=<scratchpad> .venv/bin/python -m pytest -p mut_u2 tests/test_api_read_raw.py -q -s
+[MUTATION] U2_MUT=no_event_person — get_event_raw/get_fact_sources 치환(app.api.read·app.api.routes)
+E       AssertionError: assert ['남의 비밀', '내 원문'] == ['내 원문']
+E         At index 0 diff: '남의 비밀' != '내 원문'
+E         Left contains one more item: '내 원문'
+FAILED tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다
+1 failed, 17 passed in 0.42s
+
+################ M8 2차 정렬 키 id desc -> asc (U2_MUT=id_asc)
+$ U2_MUT=id_asc POSTGRES_PORT=5433 PYTHONPATH=<scratchpad> .venv/bin/python -m pytest -p mut_u2 tests/test_api_read_raw.py -q -s
+[MUTATION] U2_MUT=id_asc — get_event_raw/get_fact_sources 치환(app.api.read·app.api.routes)
+E       assert [11934, 11935, 11936] == [11936, 11935, 11934]
+E         At index 0 diff: 11934 != 11936
+FAILED tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순
+1 failed, 17 passed in 0.41s
+
+################ U1 회귀 변이: func.max -> func.min (1차 플러그인 mut_last_contact_min.py 재사용)
+$ POSTGRES_PORT=5433 PYTHONPATH=<scratchpad> .venv/bin/python -m pytest -p mut_last_contact_min tests/test_api_read_persons.py -q
+[MUTATION] app.api.read.func.max replaced by func.min
+[MUTATION] func.max -> func.min (호출 시점)
+[MUTATION] func.max -> func.min (호출 시점)
+[MUTATION] func.max -> func.min (호출 시점)
+[MUTATION] func.max -> func.min (호출 시점)
+FAILED tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준
+FAILED tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at
+FAILED tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순
+FAILED tests/test_api_read_persons.py::test_카드_구성과_분리_집계 - Assertion...
+4 failed, 8 passed in 0.41s
+
+################ U1 회귀 변이: 카드 소유 조건 제거 (mut_card_no_owner.py)
+[MUTATION] _owned_person in app.api.read: user_id filter removed
+FAILED tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404
+1 failed, 11 passed in 0.38s

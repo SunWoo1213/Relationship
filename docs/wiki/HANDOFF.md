@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-11 12:40 (U0 적용 완료 · verifier 커밋 전 리뷰 진행 중)
+갱신: 2026-10-11 15:25 (U0·FIX-031·U1 커밋·CI 통과 · U2 진행 중 · 약점 해결 FIX 계획 착수)
 
 active: **P8-frontend**(계획 승인 2026-10-10 · 활성화 `ab29daa` 2026-10-11 · **U0~U10 전부 미착수**) | frozen: none | 브랜치 `dev2` = origin/dev2 `ab29daa`(CI run 38064243729 세 job success) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 포트폴리오 README — 그대로) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1882 passed skip 0** · test-guards ok 216 실패 0
 
@@ -24,8 +24,11 @@ active: **P8-frontend**(계획 승인 2026-10-10 · 활성화 `ab29daa` 2026-10-
 
 ## 바로 다음에 할 것 (순서대로)
 1. **FIX-031 진행 중**(사용자 승인 2026-10-11, backend-agent 위임) — U0 CI run 38111227562 windows job 이 test-guards `session-start` 시험(488행 `| head -n 1`)에서 33분 멈춤 → 사용자 승인으로 취소. U0 새 시험은 Windows 에서도 전부 ok. 수정: 출력 전체를 받은 뒤 첫 줄 + 워크플로 `timeout-minutes: 20`. 다음: 보고 재확인 → verifier `검증:` 줄(L-004) → U1 과 **별도** /commit → 푸시 → windows success 확인(= U0 Windows 확인 R-U0-4 겸함).
-   - **완료(15:05)**: FIX-031 `6479c1d` → CI run 38116488226 세 job success(windows 3분 32초 — 가설과 일치, U0 Windows 확인 겸함). U1 재검토 통과 → 사용자 승인 → U1 커밋(이 HANDOFF 포함). **다음 커밋에 넣을 것**: FIX-031.md 결과절에 해시·run id·소요 시간(R-31-1) · U0 증거 파일 끝에 Windows run id · 03-log U1 `pending` 해시 · journal 자동 줄.
-   - **다음 단위 U2**(backend-agent, L-004 승인 먼저): 원문 조회 API 2개 — 위임 프롬프트 맨 앞에 "Write/Edit 로만".
+   - **완료(15:05)**: FIX-031 `6479c1d` → CI run 38116488226 세 job success(windows 3분 32초 — 가설과 일치, U0 Windows 확인 겸함). U1 재검토 통과 → 사용자 승인 → U1 `6c2d0e7` → CI run 38117011109 세 job success. **미커밋(다음 커밋에 넣을 것)**: FIX-031.md 결과절(해시·run·소요 시간 기록됨) · U0 증거 파일 끝 Windows 결과(기록됨) · 이 HANDOFF · journal 자동 줄. 03-log 의 U0·U1 `pending` 은 journal 해시로 대신(고쳐 쓰지 않음).
+   - **U2 진행 중**(2026-10-11 15:20 사용자 "계속 진행" 승인 → backend-agent 위임, 마커 소비): 원문 조회 API 2개 — 작업 트리의 `app/api/read.py`·`routes.py`·`schemas.py` 변경과 새 `tests/test_api_read_raw.py` 는 U2 진행분. 끊겼으면 `git status` → 재실행 확인 → verifier 리뷰(L-004) → /commit.
+   - **U2 완료**: verifier 통과(변이 8건 검출) → 사용자 승인 → U2 커밋(이 HANDOFF 포함) → 이어서 FIX 계획 문서 커밋(사용자 승인 "둘 다 커밋 + 실험 푸시"). 다음: 푸시·CI 확인 → **FIX-014 구현 위임 승인**(backend-agent) → 032 → 033 → U3(R-U2-2 docstring·R-U2-3 값 테스트 포함).
+   - **약점 해결 결정(사용자 15:30)**: FIX-014 방식 "프로젝트 안 Bash 쓰기 거부" · 순서 "U2 끝내고 FIX 먼저(U3 전)" · 범위 승인. 계획 문서 작성 완료(미커밋): `fixes/FIX-014.md`(수정안 1~11 채움) · `FIX-032.md`(test-guards 저장소 의존·session-start 바이트·낡은 dev 문구·서명 고정값) · `FIX-033.md`(값 단언·계획 밖 값 사전 보고·전체 출력 증거·변이 시험 방법). 각 구현 위임은 따로 승인. 순서 FIX-014 → 032 → 033(같은 파일 겹침).
+   - 복기자료 `17-개발과정-해설.md` 에 U0·FIX-031·U1 절 미기록(문제점을 한계·교훈으로 넣을 예정).
    - **U1 verifier 리뷰 = 보류**(`review-u1-read-persons.md`): [필수] R-U1-1 `last_contact_at` max→min 변이를 테스트가 못 잡음 → backend-agent 재작업(테스트 단언) 뒤 재검토. 권고 R-U1-2(Bash 로 파일 씀 — 03-log 기록) · R-U1-3(`UPCOMING_SCHEDULES_LIMIT=10` 계획에 없음 — 사용자 결정) · R-U1-4(별칭 정렬 SQL vs Python) · R-U1-5(03-log 기록).
 2. **U1 진행 중**(2026-10-11 사용자 승인 → backend-agent 위임, 마커 소비) — 산출물 `tests/test_api_read_persons.py`·`evidence/*-u1-read-persons.txt`. 끊겼으면 `git status` 로 작업 트리 확인 후 재실행·재확인 → verifier 리뷰(L-004) → /commit. R-U0-3: 사용자 결정 "security.md 에는 추가하지 않는다"(단위별 verifier 점검만).
 2. ~~U0 하네스~~(적용 완료, 아래는 참고용 원래 계획)(메인 세션 담당, 01-plan U0 87~91행) — **훅을 고치기 전에 diff 계획을 사용자에게 먼저 보이고 AskUserQuestion 승인**(사용자 지시 plan-before-editing). 적용 순서: ② `delegate-guard.sh` `GATED` 에 `frontend-agent` · ③ `approve-commit.sh` `--stage` case·usage → ① `.claude/agents/frontend-agent.md`(01-plan 결정 A "초안 내용", `model: sonnet`) → ④ **`.claude/scripts/fix_guard_check.py` 180행** 에 `or p.startswith("web/")`(+203행 메시지·22행 docstring; `commit-guard.sh` 는 11·100행 주석 정합만) → ⑤ `test-guards.sh` 5경우(frontend-agent 위임 마커 없음 거부/있음 허용 · `web/` FIX 커밋 `검증:`·review 없음 거부/있음 허용 · 활성 작업 없음 → `web/x.ts` 쓰기 거부) → ⑥ CLAUDE.md 팀 표·FIX 문장 경로 ⑦ devlog SKILL 역할표 ⑧ INDEX P8 행. 같은 질문에서 **`.claude/settings.json` allow 에 npm/npx 를 넣을지** 사용자에게 묻는다(안 넣으면 매번 권한 프롬프트).

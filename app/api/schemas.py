@@ -337,3 +337,42 @@ class PersonCardOut(BaseModel):
     patterns: list[PersonPatternOut]
     timeline: list[TimelineEventOut]
     upcoming_schedules: list[UpcomingScheduleOut]
+
+
+# ---------------------------------------------------------------------------
+# P8-frontend U2 -- 원문 조회 응답 (GET /events/{id}/raw, 사실 근거 목록)
+# ---------------------------------------------------------------------------
+# `raw_utterance` 가 응답에 실리는 **유일한** 모델 두 개다. 저장된 문자열을
+# 가공 없이 그대로 담는다(S3.1 원문 보존).
+
+
+class EventRawOut(BaseModel):
+    """`GET /events/{event_id}/raw` 응답."""
+
+    event_id: int
+    person_id: int
+    type: str
+    content: str
+    occurred_at: datetime
+    raw_utterance: str
+
+
+class FactBriefOut(BaseModel):
+    id: int
+    key: str
+    value: str
+
+
+class FactSourceEventOut(BaseModel):
+    event_id: int
+    type: str
+    content: str
+    occurred_at: datetime
+    raw_utterance: str
+
+
+class FactSourcesOut(BaseModel):
+    """`GET /persons/{person_id}/facts/{fact_id}/sources` 응답."""
+
+    fact: FactBriefOut
+    sources: list[FactSourceEventOut]

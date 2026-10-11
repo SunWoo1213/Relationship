@@ -458,3 +458,5 @@
 - 2026-10-11 13:19 | PUSH-dev2 | origin dev2 440a0e5 (실험 푸시)
 - 2026-10-11 14:57 | COMMIT | 6479c1d fix(FIX-031): Windows CI 에서 훅 자가 시험이 멈추던 것을 고치고 시간 제한을 둔다
 - 2026-10-11 14:57 | PUSH-dev2 | origin dev2 6479c1d (실험 푸시)
+- 2026-10-11 15:07 | COMMIT | 6c2d0e7 feat(P8-frontend): 인물 목록과 인물 카드를 읽는 조회 API 를 더한다
+- 2026-10-11 15:07 | PUSH-dev2 | origin dev2 6c2d0e7 (실험 푸시)

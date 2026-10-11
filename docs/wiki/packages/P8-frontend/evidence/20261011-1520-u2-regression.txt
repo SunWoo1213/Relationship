@@ -1,0 +1,22 @@
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs   (끝 15줄)
+........................................................................ [ 75%]
+........................................................................ [ 79%]
+........................................................................ [ 82%]
+........................................................................ [ 86%]
+........................................................................ [ 90%]
+........................................................................ [ 94%]
+........................................................................ [ 97%]
+........................................                                 [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/google/genai/types.py:42
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1912 passed, 1 warning in 23.33s
+
+$ .venv/bin/ruff check app tests
+All checks passed!
+
+$ .venv/bin/python scripts/mypy_check.py --run
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)

@@ -136,6 +136,8 @@ from app.api.schemas import (
     ChatIn,
     ChatOut,
     ChatPendingQuestionOut,
+    EventRawOut,
+    FactSourcesOut,
     HealthOut,
     PersonCardOut,
     PersonListItemOut,
@@ -144,7 +146,7 @@ from app.api.schemas import (
     StoredOut,
     VapidPublicKeyOut,
 )
-from app.api.read import get_person_card, list_persons
+from app.api.read import get_event_raw, get_fact_sources, get_person_card, list_persons
 from app.briefing import BriefingComposer, Notifier, run_briefings
 from app.db.models import AgentTrace
 from app.embedding import EmbeddingProvider
@@ -441,3 +443,18 @@ def read_person_card(
     `PersonNotFound` -> 공통 404(`app/main.py`). "다가오는 일정"의 기준
     시각은 `get_now()`."""
     return get_person_card(session, app_user_id(), person_id, now())
+
+
+@router.get("/events/{event_id}/raw", response_model=EventRawOut)
+def read_event_raw(event_id: int, session: Session = Depends(get_session)) -> EventRawOut:
+    """P8-frontend U2 -- 이벤트 원문(읽기 전용, 쓰기·trace 0). 없는/타 사용자
+    이벤트는 `PersonNotFound` -> 공통 404."""
+    return get_event_raw(session, app_user_id(), event_id)
+
+
+@router.get("/persons/{person_id}/facts/{fact_id}/sources", response_model=FactSourcesOut)
+def read_fact_sources(
+    person_id: int, fact_id: int, session: Session = Depends(get_session)
+) -> FactSourcesOut:
+    """P8-frontend U2 -- 사실의 근거 원문 목록(읽기 전용, 쓰기·trace 0)."""
+    return get_fact_sources(session, app_user_id(), person_id, fact_id)
