@@ -456,3 +456,5 @@
 - 2026-10-11 00:56 | PUSH-dev2 | origin dev2 2341f9e (실험 푸시)
 - 2026-10-11 13:19 | COMMIT | 440a0e5 harness(P8-frontend): 프론트 담당 에이전트를 만들고 승인·검증 게이트에 넣는다
 - 2026-10-11 13:19 | PUSH-dev2 | origin dev2 440a0e5 (실험 푸시)
+- 2026-10-11 14:57 | COMMIT | 6479c1d fix(FIX-031): Windows CI 에서 훅 자가 시험이 멈추던 것을 고치고 시간 제한을 둔다
+- 2026-10-11 14:57 | PUSH-dev2 | origin dev2 6479c1d (실험 푸시)

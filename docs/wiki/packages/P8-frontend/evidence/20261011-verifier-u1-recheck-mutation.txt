@@ -1,0 +1,113 @@
+# U1 재검토 변이 시험(2026-10-11, verifier 새 컨텍스트) — 저장소 파일 무수정, pytest -p 플러그인(스크래치패드)으로 런타임 치환.
+# 대상 테스트 파일: tests/test_api_read_persons.py (12 tests). 각 변이에서 대응 테스트가 FAIL 하면 테스트가 실제 조건을 검사한다는 증거.
+
+=== 대조: 변이 없음
+............                                                             [100%]
+12 passed in 0.55s
+
+=== 변이: mut_last_contact_min
+# """변이 4 — last_contact_at 집계를 max → min 으로 바꾼다(목록·카드 모두).
+# 기대: 계약 "last_contact_at = events.occurred_at 최댓값" 이 테스트로 보호된다면 FAIL 이 나야 한다."""
+# 
+1 ..[MUTATION] func.max -> func.min (호출 시점)
+5 .[MUTATION] func.max -> func.min (호출 시점)
+1 [MUTATION] app.api.read.func.max replaced by func.min
+3 [MUTATION] func.max -> func.min (호출 시점)
+1 4 failed, 8 passed in 0.38s
+1 E         
+1 E         At index 0 diff: 17047 != 17046
+1 E         Use -v to get more diff
+1 E        +  and   datetime.timedelta(days=1) = timedelta(days=1)
+1 E        +  and   datetime.timedelta(days=2) = timedelta(days=2)
+1 E        +  and   datetime.timedelta(days=5) = timedelta(days=5)
+1 E        +  where datetime.datetime(2026, 1, 30, 9, 0, tzinfo=datetime.timezone.utc) = _dt('2026-01-30T09:00:00Z')
+1 E        +  where datetime.datetime(2026, 2, 20, 9, 0, tzinfo=datetime.timezone.utc) = _dt('2026-02-20T09:00:00Z')
+1 E        +  where datetime.datetime(2026, 2, 26, 9, 0, tzinfo=datetime.timezone.utc) = _dt('2026-02-26T09:00:00Z')
+1 E       assert [17047, 17046] == [17046, 17047]
+1 E       AssertionError: assert datetime.datetime(2026, 1, 30, 9, 0, tzinfo=datetime.timezone.utc) == (datetime.datetime(2026, 3, 1, 9, 0, tzinfo=datetime.timezone.utc) - datetime.timedelta(days=1))
+1 E       AssertionError: assert datetime.datetime(2026, 2, 20, 9, 0, tzinfo=datetime.timezone.utc) == (datetime.datetime(2026, 3, 1, 9, 0, tzinfo=datetime.timezone.utc) - datetime.timedelta(days=5))
+1 E       AssertionError: assert datetime.datetime(2026, 2, 26, 9, 0, tzinfo=datetime.timezone.utc) == (datetime.datetime(2026, 3, 1, 9, 0, tzinfo=datetime.timezone.utc) - datetime.timedelta(days=2))
+4 F[MUTATION] func.max -> func.min (호출 시점)
+1 FAILED tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준
+1 FAILED tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순
+1 FAILED tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at
+1 FAILED tests/test_api_read_persons.py::test_카드_구성과_분리_집계 - Assertion...
+
+=== 변이: mut_list_no_user_filter
+# """변이 1 — 목록 쿼리에서 user_id 필터를 제거한다(저장소 파일 무수정, 런타임 치환).
+# 기대: test_목록은_다른_사용자_인물을_뺀다 가 FAIL 해야 한다."""
+# 
+1 [MUTATION] list_persons: user_id filter removed
+1 1 failed, 11 passed in 0.37s
+1 E         
+1 E         Left contains one more item: 17076
+1 E         Use -v to get more diff
+1 E       assert [17075, 17076] == [17075]
+1 FAILED tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 - ...
+
+=== 변이: mut_card_no_owner
+# """변이 2 — 카드 조회의 소유 확인(_owned_person)에서 user_id 조건을 제거한다.
+# 기대: test_없는_인물과_타사용자_인물은_같은_404 가 FAIL 해야 한다(타 사용자 인물이 200)."""
+# 
+1 [MUTATION] _owned_person in app.api.read: user_id filter removed
+1 1 failed, 11 passed in 0.38s
+1 E        +  and   404 = <Response [404 Not Found]>.status_code
+1 E        +  where 200 = <Response [200 OK]>.status_code
+1 E       assert 200 == 404
+1 FAILED tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404
+
+=== 변이: mut_raw_leak
+# """변이 3 — 카드 응답의 타임라인 항목에 raw_utterance 를 끼워 넣는다(응답 모델 교체).
+# 기대: test_응답에_raw_utterance_가_없다 가 FAIL 해야 한다(키·감시 문자열 노출)."""
+# 
+1 [MUTATION] GET /persons/{id}: raw_utterance injected into timeline
+1 1 failed, 11 passed in 0.38s
+1 E             
+1 E               :00:00Z","raw_utterance":"절대노출금지"}],"upcoming_schedules":[]}
+1 E             ?           +++++++++++++
+1 E             'raw_utterance' is contained here:
+1 E           assert 'raw_utterance' not in '{"person":{...hedules":[]}'
+1 FAILED tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 - as...
+
+=== 변이: mut_upcoming_no_limit
+# """변이 5 — 다가오는 일정 상한(UPCOMING_SCHEDULES_LIMIT=10)을 사실상 제거한다(저장소 파일 무수정).
+# 기대: test_다가오는_일정_상한은_10건_가까운_순 이 FAIL 해야 한다(11건 반환)."""
+# 
+1 [MUTATION] UPCOMING_SCHEDULES_LIMIT 10 -> 10000 (상한 제거 효과)
+1 1 failed, 11 passed in 0.37s
+1 E         
+1 E         Left contains one more item: '일정11'
+1 E         Use -v to get more diff
+1 E       AssertionError: assert ['일정1', '일정2'...', '일정6', ...] == ['일정1', '일정2'...', '일정6', ...]
+1 FAILED tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순
+
+=== 변이: mut_upcoming_gt
+# """변이 6 — 다가오는 일정 조건 `scheduled_at >= now` 를 `>` 로 바꾼다(저장소 파일 무수정).
+# `app.api.read.Schedule` 을 프록시로 치환해 `scheduled_at.__ge__` 만 `>` 로 돌린다.
+# 기대: test_다가오는_일정_경계_지금은_포함_1초_전은_제외 가 FAIL 해야 한다("지금" 이 빠짐)."""
+1 ..[MUTATION] scheduled_at >= now  ->  scheduled_at > now (호출 시점)
+6 .[MUTATION] scheduled_at >= now  ->  scheduled_at > now (호출 시점)
+1 [MUTATION] app.api.read.Schedule replaced by proxy (>= -> >)
+1 1 failed, 11 passed in 0.37s
+1 E         
+1 E         Right contains one more item: '지금'
+1 E         Use -v to get more diff
+1 E       AssertionError: assert [] == ['지금']
+1 F..[MUTATION] scheduled_at >= now  ->  scheduled_at > now (호출 시점)
+1 FAILED tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외
+
+=== 변이: mut_alias_casefold
+# """변이 7 — 별칭 정렬을 코드포인트 `sorted()` 에서 대소문자 무시 정렬(콜레이션 비슷한 결과)로 바꾼다.
+# 모듈 전역 `sorted` 를 덮어 builtins 보다 먼저 잡히게 한다(저장소 파일 무수정).
+# 기대: test_카드_별칭은_파이썬_sorted_코드포인트순 이 FAIL 해야 한다(apple 이 Bob 앞)."""
+1 ...[MUTATION] sorted() -> sorted(key=str.casefold) (호출 시점)
+1 ..[MUTATION] sorted() -> sorted(key=str.casefold) (호출 시점)
+5 .[MUTATION] sorted() -> sorted(key=str.casefold) (호출 시점)
+1 [MUTATION] app.api.read.sorted replaced (casefold order)
+1 1 failed, 11 passed in 0.38s
+1 E         
+1 E         At index 0 diff: 'apple' != 'Bob'
+1 E         Use -v to get more diff
+1 E       AssertionError: assert ['apple', 'Bob', 'Zed', '가나'] == ['Bob', 'Zed', 'apple', '가나']
+1 F[MUTATION] sorted() -> sorted(key=str.casefold) (호출 시점)
+1 FAILED tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순

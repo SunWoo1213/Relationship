@@ -271,3 +271,69 @@ class PushSubscriptionOut(BaseModel):
 
     id: int
     created: bool
+
+
+# ---------------------------------------------------------------------------
+# P8-frontend U1 -- 읽기 전용 조회 응답 (GET /persons, GET /persons/{id})
+# ---------------------------------------------------------------------------
+# 이 응답 모델 어디에도 `raw_utterance` 필드가 없다(S3.1 원문 보존·원칙9) --
+# 원문은 U2 의 별도 엔드포인트로만 나간다. 필드 자체가 없으므로 직렬화
+# 결과에도 키가 나타날 수 없다.
+
+
+class PersonListItemOut(BaseModel):
+    """`GET /persons` 의 한 행."""
+
+    id: int
+    display_name: str
+    relation_tag: str
+    hierarchy: str
+    last_contact_at: datetime | None
+
+
+class PersonBasicOut(BaseModel):
+    id: int
+    display_name: str
+    relation_tag: str
+    hierarchy: str
+
+
+class PersonFactOut(BaseModel):
+    id: int
+    key: str
+    value: str
+    updated_at: datetime
+    source_count: int
+
+
+class PersonPatternOut(BaseModel):
+    id: int
+    key: str
+    value: str
+    source_count: int
+
+
+class TimelineEventOut(BaseModel):
+    id: int
+    type: str
+    content: str
+    occurred_at: datetime
+
+
+class UpcomingScheduleOut(BaseModel):
+    id: int
+    title: str
+    scheduled_at: datetime
+    briefed_at: datetime | None
+
+
+class PersonCardOut(BaseModel):
+    """`GET /persons/{person_id}` 인물 카드."""
+
+    person: PersonBasicOut
+    aliases: list[str]
+    last_contact_at: datetime | None
+    facts: list[PersonFactOut]
+    patterns: list[PersonPatternOut]
+    timeline: list[TimelineEventOut]
+    upcoming_schedules: list[UpcomingScheduleOut]

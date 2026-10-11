@@ -1,0 +1,46 @@
+# U1 변이 시험 — 저장소 파일 무수정, pytest -p 플러그인(스크래치패드)으로 런타임 치환. 각 변이에서 대응 테스트가 FAIL 하면 테스트가 실제 조건을 검사한다는 증거.
+
+=============================== 변이: mut_list_no_user_filter
+[MUTATION] list_persons: user_id filter removed
+E       assert [15719, 15720] == [15719]
+E         
+E         Left contains one more item: 15720
+E         Use -v to get more diff
+tests/test_api_read_persons.py:81: AssertionError
+FAILED tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 - ...
+1 failed, 6 passed in 0.35s
+exit=
+
+=============================== 변이: mut_card_no_owner
+[MUTATION] _owned_person in app.api.read: user_id filter removed
+E       assert 200 == 404
+E        +  where 200 = <Response [200 OK]>.status_code
+E        +  and   404 = <Response [404 Not Found]>.status_code
+tests/test_api_read_persons.py:150: AssertionError
+FAILED tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404
+1 failed, 6 passed in 0.34s
+exit=
+
+=============================== 변이: mut_raw_leak
+[MUTATION] GET /persons/{id}: raw_utterance injected into timeline
+E           assert 'raw_utterance' not in '{"person":{...hedules":[]}'
+E             
+E             'raw_utterance' is contained here:
+E               :00:00Z","raw_utterance":"절대노출금지"}],"upcoming_schedules":[]}
+E             ?           +++++++++++++
+tests/test_api_read_persons.py:141: AssertionError
+FAILED tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 - as...
+1 failed, 6 passed in 0.33s
+exit=
+
+=============================== 대조: 변이 없음
+7 passed in 0.50s
+
+=============================== 변이 4: mut_last_contact_min (last_contact_at 집계 max → min)
+[MUTATION] app.api.read.func.max replaced by func.min
+7 passed in 0.30s
+--- 변이 4 재실행(-s, 호출 시점 치환 확인) ---
+   1 [MUTATION] app.api.read.func.max replaced by func.min
+   3 [MUTATION] func.max -> func.min (호출 시점)
+   1 7 passed in 0.30s
+→ 호출 시점 치환이 일어났는데도 7 passed = 'last_contact_at = max(occurred_at)' 계약은 현재 테스트가 보호하지 않는다(목록 시험의 A 는 5·9일 전 → min 이어도 C·E 뒤, 카드 시험은 is not None 만).

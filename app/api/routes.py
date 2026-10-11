@@ -137,11 +137,14 @@ from app.api.schemas import (
     ChatOut,
     ChatPendingQuestionOut,
     HealthOut,
+    PersonCardOut,
+    PersonListItemOut,
     PushSubscriptionIn,
     PushSubscriptionOut,
     StoredOut,
     VapidPublicKeyOut,
 )
+from app.api.read import get_person_card, list_persons
 from app.briefing import BriefingComposer, Notifier, run_briefings
 from app.db.models import AgentTrace
 from app.embedding import EmbeddingProvider
@@ -419,3 +422,22 @@ def create_push_subscription(
         {"p256dh": body.keys.p256dh, "auth": body.keys.auth},
     )
     return PushSubscriptionOut(id=result.id, created=result.created)
+
+
+@router.get("/persons", response_model=list[PersonListItemOut])
+def read_persons(session: Session = Depends(get_session)) -> list[PersonListItemOut]:
+    """P8-frontend U1 -- 인물 목록(읽기 전용, 쓰기·trace 0). 단일 사용자
+    전제(`app_user_id()`, 결정 D)."""
+    return list_persons(session, app_user_id())
+
+
+@router.get("/persons/{person_id}", response_model=PersonCardOut)
+def read_person_card(
+    person_id: int,
+    session: Session = Depends(get_session),
+    now: Callable[[], datetime] = Depends(get_now),
+) -> PersonCardOut:
+    """P8-frontend U1 -- 인물 카드(읽기 전용). 없는/타 사용자 인물은
+    `PersonNotFound` -> 공통 404(`app/main.py`). "다가오는 일정"의 기준
+    시각은 `get_now()`."""
+    return get_person_card(session, app_user_id(), person_id, now())

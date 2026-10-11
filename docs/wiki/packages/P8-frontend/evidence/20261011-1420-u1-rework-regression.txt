@@ -1,0 +1,8 @@
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs
+1894 passed, 1 warning in 22.50s   (기준 1889 + 신규 5, skip 0)
+
+$ .venv/bin/ruff check app tests
+All checks passed!
+
+$ .venv/bin/python scripts/mypy_check.py --run
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)

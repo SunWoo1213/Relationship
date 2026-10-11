@@ -1,0 +1,18 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 7 items
+
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [ 14%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 28%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 42%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 57%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 71%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 85%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [100%]
+
+============================== 7 passed in 0.75s ===============================

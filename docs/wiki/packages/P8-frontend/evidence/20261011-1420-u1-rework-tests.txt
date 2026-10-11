@@ -1,0 +1,20 @@
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_api_read_persons.py -v
+12 passed in 0.54s
+  test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED
+  test_카드_last_contact_는_가장_늦은_occurred_at PASSED
+  test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED
+  test_다가오는_일정_상한은_10건_가까운_순 PASSED
+  test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED
+  test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED
+  test_목록은_다른_사용자_인물을_뺀다 PASSED
+  test_카드_구성과_분리_집계 PASSED
+  test_타임라인_상한 PASSED
+  test_응답에_raw_utterance_가_없다 PASSED
+  test_없는_인물과_타사용자_인물은_같은_404 PASSED
+  test_쓰기_0_trace_0 PASSED
+
+손계산 근거(max->min 변이 시 FAIL 해야 하는 이유):
+- 목록: A 이벤트 {1일 전, 30일 전}, B {10일 전}. max 면 A(1d)>B(10d) -> [A,B], A.last=NOW-1d.
+  min 으로 바뀌면 A=30d, B=10d -> [B,A], A.last=NOW-30d -> 순서·값 단언 모두 FAIL.
+- 카드: 이벤트 {30,1,10일 전} max=NOW-1d. min 이면 NOW-30d -> FAIL.
+- 변이 실행은 verifier 재검토 때 수행(read.py 는 변이하지 않음).
