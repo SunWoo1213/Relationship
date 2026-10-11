@@ -12,7 +12,7 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 - 기획서 정합성은 **계획 단계에서** 검증한다. 코드가 생긴 뒤 검증하면 늦다.
 - **검증은 증거로만** (`verification.md`). 기계 검증 스크립트 출력을 그대로 붙이고, FAIL/WARN 은 `findings.py`로 소견을 만들어 조치 계획을 쓴다. "확인했습니다"는 빈 칸으로 간주한다.
 - 승인은 `AskUserQuestion`으로 받고, 문서의 `승인:` 줄에 "사용자 (YYYY-MM-DD)"를 적는다. 훅은 이 줄이 있어야 코드 쓰기를 허용한다.
-- **단계는 자동으로 시작하지 않는다(L-004).** 계획(architect)·구현(backend-agent, eval-agent)·검증(verifier)을 띄우기 전에 **매번** `AskUserQuestion`으로 "무엇을 누구에게 위임해 시작할지"를 보이고 시작 승인을 받는다. 승인 직후 `bash .claude/hooks/approve-commit.sh --stage <에이전트>` → 그 에이전트를 1회 띄운다. `delegate-guard.sh`(PreToolUse Agent)가 마커 없는 위임을 거부한다. 재검증·개정 같은 반복도 매번 묻는다.
+- **단계는 자동으로 시작하지 않는다(L-004).** 계획(architect)·구현(backend-agent, eval-agent, frontend-agent)·검증(verifier)을 띄우기 전에 **매번** `AskUserQuestion`으로 "무엇을 누구에게 위임해 시작할지"를 보이고 시작 승인을 받는다. 승인 직후 `bash .claude/hooks/approve-commit.sh --stage <에이전트>` → 그 에이전트를 1회 띄운다. `delegate-guard.sh`(PreToolUse Agent)가 마커 없는 위임을 거부한다. 재검증·개정 같은 반복도 매번 묻는다.
 - 계획·검증·구현은 모두 위키에 남긴다. 만들기 전에 `registry.md`를 grep 한다(중복 방지). 날짜·마일스톤은 쓰지 않는다.
 
 ## 하위 명령
@@ -51,8 +51,8 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 2. **기획서 정합성**: 수정이 원칙·D·S를 바꾸면 FIX가 아니다 → D 카드 갱신 또는 `/devlog change`.
 3. 정합성 점검표 적용 → **메인 세션이** `계획 점검: 통과`(점검표 1~8, 근거 요약)를 쓴다. `AskUserQuestion` 승인 → `승인:` 기록. **`검증:` 줄은 메인 세션이 쓰지 않는다** — 빈 칸(`검증: (verifier 가 쓴다 — 제품 코드를 바꾸면 커밋 전 review-FIX-nnn.md 와 함께)`)으로 둔다. L-002 는 패키지뿐 아니라 FIX 에도 적용된다. `stage-gate.sh` 는 코드를 쓰기 전 이 `계획 점검:` 줄과 `승인:` 만 본다(F-27-1) — `검증:` 줄의 실제 판정은 6단계에서 커밋 시점에 본다.
 4. 활성 패키지가 있으면 그대로 두고 FIX를 진행한다. 없으면 `CURRENT.md active: FIX-nnn`.
-5. **구현은 구현 에이전트(`backend-agent`·`eval-agent` — 평가 산출물 `evaluation/`·`reports/` 를 바꾸는 FIX 는 eval-agent)에 위임한다(L-004)**: 띄우기 전 `AskUserQuestion`으로 시작 승인 → `approve-commit.sh --stage <에이전트>`. 메인 세션은 코드를 직접 고치지 않는다(조율·승인·커밋만, CLAUDE.md "팀 구성").
-6. **제품 코드(`app/`·`alembic/`)를 바꾼 FIX/test 커밋은 verifier 리뷰가 먼저다.** 구현 에이전트 작업이 끝나면 `AskUserQuestion`으로 시작 승인 → `approve-commit.sh --stage verifier`(L-004, 5단계와 같은 절차) 뒤 `verifier`에게 커밋 전 코드 리뷰를 맡겨 `fixes/review-FIX-nnn.md`(`검토자: verifier (fable)`, 본 것·직접 실행한 검증 명령·판정 근거·소견)를 쓰게 하고, 통과하면 verifier 가 `FIX-nnn.md`의 `검증:` 줄을 채운다(예: `검증: 통과 — verifier (fable) 2026-10-06, review-FIX-nnn.md`). `commit-guard.sh`가 이 두 가지(검증 줄에 `통과` 와 `verifier` 둘 다 + review 문서 존재·추적 여부)를 커밋 시점에 확인해, 없으면 거부한다(FIX-027). 훅·문서만 바꾸는 FIX(제품 코드 무변경)는 review 문서를 생략할 수 있지만 `검증:` 줄은 여전히 verifier 가 쓴다.
+5. **구현은 구현 에이전트(`backend-agent`·`eval-agent`·`frontend-agent` — 평가 산출물 `evaluation/`·`reports/` 를 바꾸는 FIX 는 eval-agent, 프론트 `web/` 을 바꾸는 FIX 는 frontend-agent)에 위임한다(L-004)**: 띄우기 전 `AskUserQuestion`으로 시작 승인 → `approve-commit.sh --stage <에이전트>`. 메인 세션은 코드를 직접 고치지 않는다(조율·승인·커밋만, CLAUDE.md "팀 구성").
+6. **제품 코드(`app/`·`alembic/`·`web/`)를 바꾼 FIX/test 커밋은 verifier 리뷰가 먼저다.** 구현 에이전트 작업이 끝나면 `AskUserQuestion`으로 시작 승인 → `approve-commit.sh --stage verifier`(L-004, 5단계와 같은 절차) 뒤 `verifier`에게 커밋 전 코드 리뷰를 맡겨 `fixes/review-FIX-nnn.md`(`검토자: verifier (fable)`, 본 것·직접 실행한 검증 명령·판정 근거·소견)를 쓰게 하고, 통과하면 verifier 가 `FIX-nnn.md`의 `검증:` 줄을 채운다(예: `검증: 통과 — verifier (fable) 2026-10-06, review-FIX-nnn.md`). `commit-guard.sh`가 이 두 가지(검증 줄에 `통과` 와 `verifier` 둘 다 + review 문서 존재·추적 여부)를 커밋 시점에 확인해, 없으면 거부한다(FIX-027). 훅·문서만 바꾸는 FIX(제품 코드 무변경)는 review 문서를 생략할 수 있지만 `검증:` 줄은 여전히 verifier 가 쓴다.
 7. 수정 후 `/commit` (`Refs: FIX-nnn`). `## 결과`에 해시·테스트 출력 경로, `journal.md`에 `FIX` 줄, active를 원래 값으로.
 
 ### `/devlog done`
@@ -99,6 +99,7 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 |------|---------|------|-----------|-------------|
 | 계획 | `architect` | opus | 01-plan 초안, backlog | 점검표 판정, 코드 |
 | 구현 | `backend-agent` | sonnet | 코드·테스트, 03-log 초안, 05 해결 단계 | 02-plan-verify·04-review 판정 |
+| 구현(프론트) | `frontend-agent` | sonnet | `web/` 코드·테스트, 03-log 초안 | 02-plan-verify·04-review 판정, `app/`·`alembic/` |
 | 평가 데이터·지표 | `eval-agent` | opus | 데이터셋·metrics·리포트 | 자기 데이터셋의 완료 검토 |
 | 검증 | `verifier` | fable | 02-plan-verify 점검표, 04-review, 05 원인 분석, 코드 리뷰 | 코드·계획·카드 수정 |
 | 조율 | 메인 세션 | (현재 모델) | 위임, AskUserQuestion 승인, /commit, HANDOFF | 점검표·완료 검토를 직접 채우기 |
@@ -107,5 +108,5 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 - verifier 는 새 컨텍스트로 띄운다(이전 대화를 잇지 않는다). 위임 프롬프트에 구현자의 자기 평가("잘 됐다")를 넣지 않고 파일 경로만 준다.
 - 모델을 바꾸려면 `.claude/agents/<name>.md` 의 `model:` 과 이 표·CLAUDE.md 팀 표를 같은 커밋에서 고친다.
 
-- architect/backend-agent/eval-agent/verifier 는 `AskUserQuestion`이 없다. **승인·우선순위 결정 단계는 메인 세션이 한다.** 서브에이전트는 계획 초안·검증표·코드·증거 파일을 만들고 돌아온다.
+- architect/backend-agent/eval-agent/frontend-agent/verifier 는 `AskUserQuestion`이 없다. **승인·우선순위 결정 단계는 메인 세션이 한다.** 서브에이전트는 계획 초안·검증표·코드·증거 파일을 만들고 돌아온다.
 - 위임 프롬프트에는 패키지 id, 읽을 카드 목록(전문 금지), 작업 단위 번호, 증거를 남길 경로(`packages/<id>/evidence/`)를 명시한다.

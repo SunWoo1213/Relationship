@@ -18,18 +18,19 @@
 
 이 문서와 `.claude/`는 **개발 하네스**다. 제품 속 에이전트는 이 팀이 작성하는 결과물이다.
 
-## 팀 구성 (현재 활성 4) — 역할별 모델 분리 (L-002)
+## 팀 구성 (현재 활성 5) — 역할별 모델 분리 (L-002)
 
 | 에이전트 | 역할 | 모델 | 이유 |
 |---------|------|------|------|
 | `.claude/agents/architect.md` | 계획. 기획서를 작업으로 분해, 01-plan 초안, backlog | opus | 문서·의존성 분해 |
 | `.claude/agents/backend-agent.md` | 구현. 툴 7종·에이전트 루프·엔티티 해석 4단계 | sonnet | 코드 생산, 비용 |
+| `.claude/agents/frontend-agent.md` | 구현. 프론트 3화면(채팅/인물 카드/브리핑)·PWA, `web/` 만 쓴다 (P8 U0 신설) | sonnet | 코드 생산, 비용. 검증은 verifier 가 따로 |
 | `.claude/agents/eval-agent.md` | 평가 데이터·지표. 한국어 대화 150건 데이터셋·베이스라인 | opus | 라벨 품질, 구현자와 다른 모델 |
 | `.claude/agents/verifier.md` | **검증 전담.** 02-plan-verify 점검표·04-review·코드 리뷰 | fable | 가장 강한 모델을 가장 비판적인 자리에. 구현자와 다른 모델·새 컨텍스트 |
 
 - **같은 컨텍스트·같은 모델이 계획→구현→검증을 다 하면 평가가 후해진다.** 그래서 점검표·완료 검토는 verifier 만 쓰고, `verify-plan.sh`/`verify-impl.sh` 가 `검증자:`/`검토자:` 줄에 `verifier` 가 없으면 FAIL 한다. 메인 세션은 조율·승인·커밋만 한다.
 
-> `db-agent`, `frontend-agent`, `infra-agent`는 아직 만들지 않았다. 필요해지면 architect가 청사진의 역할표를 근거로 추가한다.
+> `db-agent`, `infra-agent`는 아직 만들지 않았다. 필요해지면 architect가 청사진의 역할표를 근거로 추가한다.
 
 ## 불변 원칙 (범위 통제)
 
@@ -107,10 +108,10 @@ agent_traces(id, session_id, step, tool_name, input, output, tokens_in, tokens_o
 
 - **위키는 꺼내 보는 참고자료다.** 세션 시작 시 `docs/wiki/HANDOFF.md`(자동 주입)와 `docs/wiki/INDEX.md`·`CURRENT.md`만 읽고, 태그(P/D/R/S/원칙)가 가리키는 카드만 연다. 원문 전체를 읽지 않는다.
 - **재개 규칙**: 중단된 작업이나 커밋 안 된 변경이 있으면 **다른 어떤 일보다 먼저** 사용자에게 목록을 보이고 우선순위(이어서 완료 / 보류 / 폐기)를 묻는다 (`/devlog resume`).
-- **계획·구현·검증 단계는 자동 시작하지 않는다(L-004).** architect·backend-agent·eval-agent·verifier 를 띄우기 전에 매번 AskUserQuestion 으로 시작 승인을 받고 `approve-commit.sh --stage <에이전트>` 마커를 만든다. `delegate-guard.sh`(PreToolUse Agent)가 강제한다.
+- **계획·구현·검증 단계는 자동 시작하지 않는다(L-004).** architect·backend-agent·eval-agent·frontend-agent·verifier 를 띄우기 전에 매번 AskUserQuestion 으로 시작 승인을 받고 `approve-commit.sh --stage <에이전트>` 마커를 만든다. `delegate-guard.sh`(PreToolUse Agent)가 강제한다.
 - **제품 코드는 활성 작업이 있어야 쓸 수 있다.** `/devlog start <id>` → 01-plan → 02-plan-verify(기계 검증 `verify-plan.sh` + 점검표 8행 + 카드 인용) → 사용자 승인 → `CURRENT.md active`. `stage-gate.sh`가 막는다. 한 번에 활성 패키지 하나. P4 파일럿 평가 전에 P5 이후 시작 금지.
 - **작업 단위(사소한 수정 포함)마다 `/commit`.** LLM이 초안(변경·이유·정합성·검증·Refs)을 쓰고 사용자가 AskUserQuestion으로 승인한 뒤에만 커밋한다. `git add`는 명시 경로만. 푸시도 승인 필요. 서브에이전트는 커밋하지 않는다.
-- **FIX 도 패키지와 같은 검증 분리를 따른다(L-002 확장, FIX-027).** 메인 세션은 FIX 코드를 직접 고치지 않고 구현 에이전트(`backend-agent`·`eval-agent`)에 위임하며, 제품 코드(`app/`·`alembic/`)를 바꾸는 FIX/test 커밋은 `docs/wiki/fixes/FIX-nnn.md`의 `검증:` 줄에 "통과"와 verifier 판정이 모두 있고 `review-FIX-nnn.md`가 있어야 `commit-guard.sh`가 허용한다.
+- **FIX 도 패키지와 같은 검증 분리를 따른다(L-002 확장, FIX-027).** 메인 세션은 FIX 코드를 직접 고치지 않고 구현 에이전트(`backend-agent`·`eval-agent`·`frontend-agent`)에 위임하며, 제품 코드(`app/`·`alembic/`·`web/`)를 바꾸는 FIX/test 커밋은 `docs/wiki/fixes/FIX-nnn.md`의 `검증:` 줄에 "통과"와 verifier 판정이 모두 있고 `review-FIX-nnn.md`가 있어야 `commit-guard.sh`가 허용한다.
 - **계획·검증·구현은 모두 위키에 남긴다.** `packages/<id>/01~05`, `registry.md`(무엇이 있는가 — 단위 시작 전 grep, 중복 구현 금지), `journal.md`(시간순), `HANDOFF.md`(지금 어디·다음 무엇).
 - **검증은 가시적 증거로만.** "확인했습니다"는 검증이 아니다. `verify-plan.sh`/`verify-impl.sh` 출력 파일, 테스트 출력, 재현 명령 출력, 커밋 해시, 존재하는 파일 경로만 증거다(`docs/wiki/verification.md`). FAIL/WARN은 `findings.py`로 `05-remediation.md` 소견이 되고, 소견마다 원인·해결 단계·완료 판정 명령·재검증을 채워 닫는다. 같은 소견이 3회 재검증 후에도 열려 있으면 사용자에게 보고한다(재시도 남발 금지, 원칙8).
 - **기획서가 바뀌면 `/devlog change`.** CR 문서 → 태그로 영향 범위(R→D→S→P→`git log --grep`) → 사용자 결정 → `CURRENT.md frozen` 동결 → 카드·CLAUDE.md·backlog 갱신 → 코드 revert/FIX → 해제. 기획서 본문은 원본 유지, 상단 안내문에만 한 줄.

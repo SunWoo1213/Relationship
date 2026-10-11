@@ -73,7 +73,7 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | `P6-memory` | 승격 + 패턴 + fact_sources | backend-agent | R8 R11 |
 | `P6-briefing` | 브리핑 + 주기 작업 + 수동 트리거 | backend-agent | R12 R19 |
 | `P7-push` | 웹푸시 | backend-agent | R12 |
-| `P8-frontend` | 프론트 3화면 + PWA | frontend-agent(신설) | — |
+| `P8-frontend` | 프론트 3화면 + PWA | frontend-agent(U0 신설, `web/`) + backend-agent(조회 API U1~U3) | — |
 | `P9-infra` | Terraform + Actions + Caddy | infra-agent(신설) | R14 |
 | `P10-final-eval` | 150건 + 최종 평가 | eval-agent | — |
 | `P11-demo` | 데모 리허설 | 사용자 | R15 |

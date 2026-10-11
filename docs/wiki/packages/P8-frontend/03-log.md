@@ -10,3 +10,12 @@
 - 승인 조건(사용자, 2026-10-10): ① U1~U9 모든 작업 단위는 커밋 전에 verifier 코드 리뷰 ② 디자인 추가 수정은 추후 요청 시 별도 작업(P8 안에서는 수정 1회 상한). 활성화는 FIX-030(`c37c99a`, CI run 38062960426 세 job success) 뒤 — 활성화하면 test-guards 상태 의존 실패가 가려지기 때문.
 - 남은 것 · 다음 단위: U0 하네스 — 메인 세션이 훅 변경 diff 계획(②③ GATED·approve-commit → ① frontend-agent.md → ④ `fix_guard_check.py` 180행 `web/` → ⑤ test-guards 5경우 → ⑥~⑧ CLAUDE.md·SKILL.md·INDEX)을 사용자에게 먼저 보이고 승인, `settings.json` npm/npx allow 여부도 사용자 결정. verifier 권고 N-1~N-3 은 U9·04-review 에서.
 - Refs: P8-frontend R12 R19 R8 D1 D7 S3.1 S3.4 S3.6 원칙5 원칙7 원칙9 F-ce7d18
+
+## 2026-10-11 12:50 · harness(P8-frontend): 프론트 담당 에이전트를 만들고 승인·검증 게이트에 넣는다 · pending
+- 변경: U0 ①~⑧ — `.claude/agents/frontend-agent.md` 신설(sonnet, 규칙 ①~⑧) · `delegate-guard.sh` GATED·`approve-commit.sh --stage` 에 frontend-agent · `fix_guard_check.py` 182행 `web/`(+22행 docstring·206행 메시지, `commit-guard.sh` 주석 11·100행) · `test-guards.sh` 6줄(케이스 6·7, `web/x.ts` 거부, frontend-agent 위임 거부/허용·마커 소비) · CLAUDE.md·devlog SKILL·INDEX. 사용자 결정으로 `settings.json` allow 에 `npm run`·`npm test`·`npm ci`·`npm install`(npx 제외).
+- 이유(기획서·카드 연결): 01-plan U0, 결정 A, 사용자 확정 "FIX 게이트 web/ 까지". 적용 순서 ②③ → ① (R-3, 게이트 구멍 방지).
+- 정합성 확인: L-002 · L-004 · 원칙5 · 원칙7 — 위반 없음. **`stage-gate.sh` 는 고치지 않음** — 앞 초안의 "⑨ `web/` 추가" 는 불필요(R-2, 면제 목록 방식), `test-guards` 165행 `web/x.ts (active: none) 거부` 가 실증.
+- 검증: `evidence/20261011-1237-u0-harness.txt`(test-guards 실패 0·ok 222) · verifier `review-u0-harness.md` 결과 통과([필수] 0) · 변이 시험 `evidence/20261011-1241-verifier-u0-mutation.txt`(원본 exit 1 / web/ 조건 제거 exit 0). 권고 R-U0-1·2(CLAUDE.md 111행·SKILL 55행 문구)는 이 커밋에서 반영.
+- **R-3: test-guards PASS 전에는 frontend-agent 위임 금지** — Mac PASS 확인(위 증거). **Windows 는 대기(R-U0-4)** — 푸시 뒤 CI windows job 결과를 증거 파일 끝에 덧붙인 뒤 "U0 완료(Mac·Windows)" 로 본다.
+- 남은 것 · 다음 단위: R-U0-3 — U4 이후 단위별 verifier 리뷰에 `web/package.json` scripts 전부·의존성 변경·`package-lock.json` 동반 여부를 고정 점검 항목으로(npm allow 가 safety-guard 텍스트 매칭을 우회하는 간접 경로라서). security.md 한 줄 추가는 사용자 판단 대기. 다음: U1 인물 목록·카드 조회 API(backend-agent).
+- Refs: P8-frontend L-002 L-004 원칙5 원칙7 F-ce7d18

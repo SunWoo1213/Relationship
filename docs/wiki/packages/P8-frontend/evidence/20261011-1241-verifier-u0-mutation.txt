@@ -1,0 +1,36 @@
+# P8-frontend U0 — fix_guard_check.py `web/` 조건 변이 시험 (verifier, 2026-10-11 12:41)
+# 목적: 182행 `or p.startswith("web/")` 을 빼면 "web/ 만 스테이징한 fix(FIX-999) 커밋" 판정이 거부(exit 1) → 허용(exit 0) 으로 뒤집히는지.
+# 위치: scratchpad(저장소 밖) 임시 git 저장소. 커밋은 만들지 않았다(스테이징만 — `git diff --cached` 로 충분). git config 변경 없음.
+# 호출 형식: python3 <script> <repo_root> <draft_path>
+
+$ S=<scratchpad>/mut-u0-53668; mkdir -p "$S/repo/web/src" "$S/repo/docs/wiki/fixes"
+$ cd "$S/repo" && git init -q . && printf 'export {}\n' > web/src/a.ts && git add web/src/a.ts
+$ printf 'fix(FIX-999): t\n\n본문\n' > "$S/draft.txt"
+$ git diff --cached --name-only
+web/src/a.ts
+
+$ sed 's/ or p.startswith("web\/")//' .claude/scripts/fix_guard_check.py > "$S/mutant.py"
+$ diff .claude/scripts/fix_guard_check.py "$S/mutant.py"
+182c182
+<         p.startswith("app/") or p.startswith("alembic/") or p.startswith("web/") for p in staged
+---
+>         p.startswith("app/") or p.startswith("alembic/") for p in staged
+
+## 원본 (web/ 스테이징, FIX-999.md·review 없음)
+$ python3 .claude/scripts/fix_guard_check.py "$S/repo" "$S/draft.txt"
+[fix-guard] 제품 코드(app/·alembic/·web/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: docs/wiki/fixes/FIX-999.md 의 `검증:` 줄에 verifier 의 '통과' 판정이 없다(자리표만 있거나, '통과'·'verifier' 중 하나가 빠졌거나, 파일이 없다); docs/wiki/fixes/review-FIX-999.md (verifier 커밋 전 리뷰 문서)가 없거나 기준(0바이트 아님·검토자: verifier·git 추적)을 충족하지 않는다. .claude/skills/devlog/SKILL.md 의 `/devlog fix` 절차대로 구현 에이전트 작업 → verifier 리뷰(review-FIX-nnn.md) → 검증 줄을 받은 뒤 다시 커밋하라.
+orig exit=1
+
+## 변이본 (같은 상태)
+$ python3 "$S/mutant.py" "$S/repo" "$S/draft.txt"
+(출력 없음)
+mutant exit=0        ← 판정이 뒤집힘. web/ 조건이 실제 판정에 쓰인다.
+
+## 대조: 변이본 + app/ 만 스테이징 (기존 백엔드 조건은 변이본에서도 살아 있어야 한다)
+$ git reset -q web/src/a.ts && printf 'x\n' > app/a.py && git add app/a.py && git diff --cached --name-only
+app/a.py
+$ python3 "$S/mutant.py" "$S/repo" "$S/draft.txt"
+[fix-guard] 제품 코드(app/·alembic/·web/)를 바꾸는 FIX-999 커밋은 verifier 검증이 먼저다: … (원본과 같은 메시지)
+mutant(app/) exit=1
+
+# 결론: 원본 exit 1(거부) / 변이본 exit 0(허용) / 대조 exit 1. test-guards.sh 케이스 6 이 공허 통과가 아님을 뒷받침한다.

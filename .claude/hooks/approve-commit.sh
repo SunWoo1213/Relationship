@@ -21,10 +21,10 @@ AWAIT="$ROOT/.claude/.awaiting-decision"
 #        1회용 마커(.claude/.stage-approved = 에이전트 이름)를 만든다. delegate-guard.sh 가 Agent 호출 시 검사·소비한다.
 if [ "${1:-}" = "--stage" ]; then
   case "${2:-}" in
-    architect|backend-agent|eval-agent|verifier)
+    architect|backend-agent|eval-agent|verifier|frontend-agent)
       printf '%s\n' "$2" > "$ROOT/.claude/.stage-approved"
       echo "단계 승인 기록: $2 — 이제 Agent(subagent_type=$2) 를 1회 띄울 수 있다"; exit 0 ;;
-    *) echo "usage: approve-commit.sh --stage architect|backend-agent|eval-agent|verifier" >&2; exit 1 ;;
+    *) echo "usage: approve-commit.sh --stage architect|backend-agent|eval-agent|verifier|frontend-agent" >&2; exit 1 ;;
   esac
 fi
 

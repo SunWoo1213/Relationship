@@ -24,7 +24,11 @@
       "Bash(bash .claude/scripts/verify-plan.sh:*)",
       "Bash(bash .claude/scripts/verify-impl.sh:*)",
       "Bash(bash .claude/scripts/gitlog.sh:*)",
-      "Bash(bash .claude/scripts/findings.sh:*)"
+      "Bash(bash .claude/scripts/findings.sh:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test:*)",
+      "Bash(npm ci:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [
       "Write(.claude/.commit-approved)",

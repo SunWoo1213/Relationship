@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-11 00:50 (세션 종료 기록)
+갱신: 2026-10-11 12:40 (U0 적용 완료 · verifier 커밋 전 리뷰 진행 중)
 
 active: **P8-frontend**(계획 승인 2026-10-10 · 활성화 `ab29daa` 2026-10-11 · **U0~U10 전부 미착수**) | frozen: none | 브랜치 `dev2` = origin/dev2 `ab29daa`(CI run 38064243729 세 job success) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 포트폴리오 README — 그대로) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1882 passed skip 0** · test-guards ok 216 실패 0
 
@@ -19,11 +19,13 @@ active: **P8-frontend**(계획 승인 2026-10-10 · 활성화 `ab29daa` 2026-10-
 - **승인 조건**(02-plan-verify `승인:` 줄): ① **U1~U9 모든 작업 단위는 커밋 전에 verifier 코드 리뷰**(L-004 승인 → `--stage verifier` → 리뷰 문서) ② 디자인 추가 수정은 추후 사용자가 요청하면 별도 작업으로.
 
 ## 커밋 안 된 변경
-- 없음 — 세션 종료 기록 커밋(이 HANDOFF · journal `ab29daa` 자동 줄 · 03-log 첫 항목 hash `ab29daa`)에 넣었다(다른 기기에서도 이어가도록). 그 커밋의 journal COMMIT 줄만 다음 커밋에.
+- **U0 하네스 변경 전부(미커밋)** — 사용자 승인(2026-10-11 "이대로 적용" · settings.json "npm 스크립트만 허용": `npm run`·`npm test`·`npm ci`·`npm install`) 뒤 적용: delegate-guard·approve-commit(`frontend-agent`) · 신규 `.claude/agents/frontend-agent.md` · `fix_guard_check.py` 182행 `web/` · commit-guard 주석 · test-guards 새 6줄 · settings.json · CLAUDE.md · devlog SKILL · INDEX · 증거 `evidence/20261011-1237-u0-harness.txt`(test-guards **실패 0, ok 222**) · journal 자동 줄 2개(`2341f9e`).
+- verifier 리뷰 **통과**([필수] 0, 권고 R-U0-1~4 — 1·2 반영, 3·4 는 03-log) → 사용자 승인 "커밋 + 실험 푸시" → U0 커밋(이 HANDOFF 와 같은 커밋). 다음 커밋에 journal 자동 줄·03-log `pending` 해시.
 
 ## 바로 다음에 할 것 (순서대로)
-1. **세션 재개 확인**: `git status --short`(journal 자동 줄 1개뿐이어야 함) · `head -4 docs/wiki/CURRENT.md`(active P8-frontend) · Docker 가 꺼져 있으면 `open -a Docker`(DB 컨테이너 자동 기동).
-2. **U0 하네스**(메인 세션 담당, 01-plan U0 87~91행) — **훅을 고치기 전에 diff 계획을 사용자에게 먼저 보이고 AskUserQuestion 승인**(사용자 지시 plan-before-editing). 적용 순서: ② `delegate-guard.sh` `GATED` 에 `frontend-agent` · ③ `approve-commit.sh` `--stage` case·usage → ① `.claude/agents/frontend-agent.md`(01-plan 결정 A "초안 내용", `model: sonnet`) → ④ **`.claude/scripts/fix_guard_check.py` 180행** 에 `or p.startswith("web/")`(+203행 메시지·22행 docstring; `commit-guard.sh` 는 11·100행 주석 정합만) → ⑤ `test-guards.sh` 5경우(frontend-agent 위임 마커 없음 거부/있음 허용 · `web/` FIX 커밋 `검증:`·review 없음 거부/있음 허용 · 활성 작업 없음 → `web/x.ts` 쓰기 거부) → ⑥ CLAUDE.md 팀 표·FIX 문장 경로 ⑦ devlog SKILL 역할표 ⑧ INDEX P8 행. 같은 질문에서 **`.claude/settings.json` allow 에 npm/npx 를 넣을지** 사용자에게 묻는다(안 넣으면 매번 권한 프롬프트).
+1. **CI 확인**: U0 푸시 run 의 windows 포함 세 job → `gh run view` 결과를 `evidence/20261011-1237-u0-harness.txt` 끝에 덧붙임(다음 커밋). 실패면 FIX 로.
+2. **U1**(backend-agent, L-004 승인 먼저) 인물 목록·카드 조회 API → verifier 리뷰 → /commit. 사용자 판단 대기: R-U0-3 의 security.md 한 줄 추가 여부.
+2. ~~U0 하네스~~(적용 완료, 아래는 참고용 원래 계획)(메인 세션 담당, 01-plan U0 87~91행) — **훅을 고치기 전에 diff 계획을 사용자에게 먼저 보이고 AskUserQuestion 승인**(사용자 지시 plan-before-editing). 적용 순서: ② `delegate-guard.sh` `GATED` 에 `frontend-agent` · ③ `approve-commit.sh` `--stage` case·usage → ① `.claude/agents/frontend-agent.md`(01-plan 결정 A "초안 내용", `model: sonnet`) → ④ **`.claude/scripts/fix_guard_check.py` 180행** 에 `or p.startswith("web/")`(+203행 메시지·22행 docstring; `commit-guard.sh` 는 11·100행 주석 정합만) → ⑤ `test-guards.sh` 5경우(frontend-agent 위임 마커 없음 거부/있음 허용 · `web/` FIX 커밋 `검증:`·review 없음 거부/있음 허용 · 활성 작업 없음 → `web/x.ts` 쓰기 거부) → ⑥ CLAUDE.md 팀 표·FIX 문장 경로 ⑦ devlog SKILL 역할표 ⑧ INDEX P8 행. 같은 질문에서 **`.claude/settings.json` allow 에 npm/npx 를 넣을지** 사용자에게 묻는다(안 넣으면 매번 권한 프롬프트).
    - 적용 뒤 `bash .claude/scripts/test-guards.sh` PASS **전에는 frontend-agent 위임 금지**(R-3, 03-log 에 기록) → verifier 커밋 전 훅 diff 리뷰(L-004 승인 먼저) → `/commit` → 푸시 → **CI windows 포함 세 job 확인**. 판정 증거 `evidence/*-u0-harness.txt`. verifier 권고 N-1: `grep 'startswith("web/")'` 단독은 증거가 아니다 — test-guards 거부/허용 출력과 묶는다.
 3. **U1~U3**(backend-agent): 인물 목록·카드 조회 → 원문 조회 API 2개(사용자 격리 404, trace 없음) → 대기 질문·브리핑 조회(조인 `tool_name='briefing' AND step='briefing_compose'`). 단위마다 verifier 리뷰 → /commit.
 4. **U4~U9**(frontend-agent) → **U10 사람 점검**(체크리스트 20항, 수정 반영 횟수 기록) → verifier 04-review.

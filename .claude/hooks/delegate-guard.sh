@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PreToolUse(Agent) 훅 — 단계 위임 게이트 (L-004)
 #
-# 계획(architect)·구현(backend-agent, eval-agent)·검증(verifier) 단계는 자동으로 시작하지 않는다.
+# 계획(architect)·구현(backend-agent, eval-agent, frontend-agent)·검증(verifier) 단계는 자동으로 시작하지 않는다.
 # 메인 세션이 AskUserQuestion 으로 사용자에게 "시작할까요?"를 묻고, 승인 직후
 #   bash .claude/hooks/approve-commit.sh --stage <agent-name>
 # 로 1회용 마커(.claude/.stage-approved, 내용 = 에이전트 이름)를 만든 뒤에만 그 에이전트를 띄울 수 있다.
@@ -12,7 +12,7 @@ set -u
 export PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LC_ALL=C.UTF-8
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 MARK="$ROOT/.claude/.stage-approved"
-GATED="architect backend-agent eval-agent verifier"
+GATED="architect backend-agent eval-agent verifier frontend-agent"
 
 # 파이썬 인터프리터 탐지 (FIX-008). 못 찾으면 통과시키지 않고 차단한다.
 . "$(dirname "$0")/_py.sh"

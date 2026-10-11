@@ -193,6 +193,25 @@ fg_check "4) docs/ 만 스테이징 → allow" allow "$(fg_run)"
 fg_draft 'feat(P7-push): 테스트'
 fg_check "5) feat(...) + app/ → 새 규칙 미적용" allow "$(fg_run)"
 
+# 케이스 6·7 (P8-frontend U0): 프론트 web/ 도 제품 코드다 — app/ 은 빼고 web/ 만 스테이징해
+#   fix_guard_check.py 의 web/ 경로 조건이 실제로 판정에 쓰이는지 본다(조건을 빼면 6 이 allow 로 뒤집힌다).
+( cd "$FG_T" && git reset -q app/a.py ) 2>/dev/null
+mkdir -p "$FG_T/web/src"
+printf 'export {}\n' > "$FG_T/web/src/a.ts"
+( cd "$FG_T" && git add web/src/a.ts )
+rm -f "$FG_T/docs/wiki/fixes/FIX-999.md" "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+fg_draft 'fix(FIX-999): 테스트'
+fg_check "6) web/ 만 스테이징 + 검증 줄·review 문서 없음 → DENY" deny "$(fg_run)"
+printf '검증: 통과 — verifier (fable) 2026-10-11, review-FIX-999.md\n' > "$FG_T/docs/wiki/fixes/FIX-999.md"
+printf '검토자: verifier (fable)\n' > "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+( cd "$FG_T" && git add docs/wiki/fixes/review-FIX-999.md )
+fg_check "7) web/ 만 스테이징 + 검증 줄·review 문서 모두 있음 → allow" allow "$(fg_run)"
+# 정리: 아래 절은 케이스 5 상태(feat 초안 + app/ 스테이징)를 전제로 한다
+( cd "$FG_T" && git reset -q web/src/a.ts docs/wiki/fixes/review-FIX-999.md ) 2>/dev/null
+rm -f "$FG_T/docs/wiki/fixes/FIX-999.md" "$FG_T/docs/wiki/fixes/review-FIX-999.md"
+( cd "$FG_T" && git add app/a.py )
+fg_draft 'feat(P7-push): 테스트'
+
 # ── F-27-5: git commit 인자 허용 목록 (승인 마커·초안이 있는 격리 저장소에서 — 검사를 빼면
 #    아래 DENY 케이스가 allow 로 뒤집힌다; 변이 시험은 evidence 의 rework2-mutation 참조) ──
 fg_cmd() {  # fg_cmd <git commit 명령 문자열>
@@ -370,6 +389,8 @@ sg_gate() { printf '%s' "$(gate "$SG_T/$1")" | CLAUDE_PROJECT_DIR="$SG_T" bash "
 # "프로젝트 밖"으로 본 것이므로 아래 allow 시험들은 공허 통과다 → 실패로 센다.
 printf 'active: none\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
 if sg_gate app/x.py | grep -q '"deny"'; then echo "ok   DENY   FIX-028 대조: SG_T 안 app/x.py (active: none) 거부 — 경로가 프로젝트 안으로 인식됨"; else echo "XX   FIX-028 대조 실패: SG_T 가 프로젝트 밖으로 인식됨(공허 통과 위험)"; fails=$((fails+1)); fi
+# P8-frontend U0: 프론트 web/ 도 활성 작업 없이는 쓸 수 없다(stage-gate 는 면제 목록 방식이라 고치지 않음, R-2)
+if sg_gate web/x.ts | grep -q '"deny"'; then echo "ok   DENY   web/x.ts (active: none) 거부 — 프론트도 활성 작업 필요"; else echo "XX   web/x.ts 가 활성 작업 없이 allow 됐다"; fails=$((fails+1)); fi
 
 printf 'active: FIX-999\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
 printf '# FIX-999\n\n계획 점검: 통과(메인 세션, 점검표 1~8)\n검증: (verifier 가 쓴다 — 제품 코드를 바꾸면 커밋 전 review-FIX-nnn.md 와 함께)\n승인: 사용자 (2026-10-06)\n' \
@@ -438,6 +459,11 @@ if [ -f "$SA" ]; then echo "skip (실제 단계 승인 마커가 있음)"; else
   expect_deny  "$H/delegate-guard.sh" 'marker=architect but backend-agent' "$(ag backend-agent)"
   expect_allow "$H/delegate-guard.sh" 'marker=architect, architect allowed (consumed)' "$(ag architect)"
   [ ! -f "$SA" ] && echo "ok   marker consumed after allow" || { echo "XX   marker not consumed"; fails=$((fails+1)); rm -f "$SA"; }
+  # P8-frontend U0: frontend-agent 도 게이트 대상
+  expect_deny  "$H/delegate-guard.sh" 'frontend-agent without marker' "$(ag frontend-agent)"
+  echo frontend-agent > "$SA"
+  expect_allow "$H/delegate-guard.sh" 'marker=frontend-agent, frontend-agent allowed (consumed)' "$(ag frontend-agent)"
+  [ ! -f "$SA" ] && echo "ok   frontend-agent marker consumed after allow" || { echo "XX   frontend-agent marker not consumed"; fails=$((fails+1)); rm -f "$SA"; }
 fi
 
 echo "== findings.py 왕복 =="

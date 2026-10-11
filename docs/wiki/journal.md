@@ -452,3 +452,5 @@
 - 2026-10-11 00:40 | START | P8-frontend — 사용자 계획 승인(2026-10-10, 02-plan-verify 재검증 `통과`, 결정 A~N 확정·오프라인 제외, 조건: U1~U9 모든 단위 커밋 전 verifier 리뷰 · 디자인 추가 수정은 추후 별도 작업). FIX-030 `c37c99a`(CI run 38062960426 세 job success) 뒤 활성화. active: P8-frontend. 다음 U0 하네스(훅 diff 계획 먼저 승인) | P8-frontend R12 R19 R8 원칙5
 - 2026-10-11 00:35 | COMMIT | ab29daa docs(P8-frontend): 프론트 3화면 계획을 검증·승인까지 마치고 활성화한다
 - 2026-10-11 00:35 | PUSH-dev2 | origin dev2 ab29daa (실험 푸시)
+- 2026-10-11 00:56 | COMMIT | 2341f9e docs(wiki): 다음 세션이 P8 U0 부터 이어가도록 인수인계 문서를 새로 쓴다
+- 2026-10-11 00:56 | PUSH-dev2 | origin dev2 2341f9e (실험 푸시)

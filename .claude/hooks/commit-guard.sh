@@ -8,7 +8,7 @@
 #   4. --amend / --no-verify 금지
 #   5. 마커 파일을 직접 만들거나 지우는 명령 금지 (approve-commit.sh 만 허용)
 #   5b. git commit 인자는 `-F <초안>` 뿐 (허용 목록, F-27-5) · GIT_* 환경변수 접두 금지 (R-27-8)
-#   6. fix(FIX-nnn)/test(FIX-nnn) 초안이 app/·alembic/ 을 스테이징했으면
+#   6. fix(FIX-nnn)/test(FIX-nnn) 초안이 app/·alembic/·web/ 을 스테이징했으면
 #      verifier 검증 줄 + review-FIX-nnn.md 가 있어야 허용 (FIX-027)
 #
 # stdin: {"tool_name":"Bash","tool_input":{"command":"..."}}
@@ -97,7 +97,7 @@ if printf '%s' "$cmd" | grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-[^[:space:]
   have="$(sha256sum "$DRAFT" | cut -d' ' -f1)"
   [ "$want" = "$have" ] || deny "초안이 승인 이후에 바뀌었다. 초안을 다시 보여주고 재승인을 받아라."
 
-  # 6. FIX-027: 제품 코드(app/·alembic/)를 바꾸는 fix(FIX-nnn)/test(FIX-nnn) 커밋은
+  # 6. FIX-027: 제품 코드(app/·alembic/·web/)를 바꾸는 fix(FIX-nnn)/test(FIX-nnn) 커밋은
   #    verifier 검증(`검증:` 줄)·커밋 전 리뷰 문서(review-FIX-nnn.md)가 먼저다.
   #    판단 불가(파이썬·git 실패)도 거부 — 조용히 여는 것이 결함이다(fail-closed).
   # 스크립트 자신의 위치는 _py.sh 처럼 훅 디렉터리 기준(= $0)으로 찾는다 — $ROOT는

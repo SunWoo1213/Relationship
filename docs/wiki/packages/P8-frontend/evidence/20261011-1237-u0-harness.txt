@@ -1,0 +1,87 @@
+# P8-frontend U0 하네스 — 판정 증거
+# 작성: 메인 세션, 2026-10-11 12:37 (기준 HEAD 2341f9e + 작업 트리 변경)
+# 01-plan U0 판정 명령: test-guards.sh 전부 PASS(새 5경우 포함) + grep 4종 · Windows 는 커밋 뒤 CI windows job
+# 사용자 승인: 2026-10-11 AskUserQuestion "이대로 적용" (diff 계획 ②③→①→④→⑤→⑥~⑧) · settings.json "npm 스크립트만 허용"
+
+## 1. bash .claude/scripts/test-guards.sh → exit=0, "== 결과: 실패 0 ==", ok 222줄 (변경 전 216)
+## 새 경우(01-plan ⑤ 5경우 + 마커 소비 확인 1):
+71:ok   DENY   6) web/ 만 스테이징 + 검증 줄·review 문서 없음 → DENY
+72:ok   allow  7) web/ 만 스테이징 + 검증 줄·review 문서 모두 있음 → allow
+165:ok   DENY   web/x.ts (active: none) 거부 — 프론트도 활성 작업 필요
+193:ok   DENY   frontend-agent without marker
+194:ok   allow  marker=frontend-agent, frontend-agent allowed (consumed)
+195:ok   frontend-agent marker consumed after allow
+208:ok   agent frontmatter parses: .claude/agents/frontend-agent.md
+# 케이스 6 은 app/ 을 언스테이징하고 web/src/a.ts 만 스테이징한 격리 저장소(FG_T)에서 실제 commit-guard.sh →
+# fix_guard_check.py 를 거친다(verifier 권고 N-1: grep 단독이 아니라 이 거부/허용 출력과 묶는다).
+# 162행 "skip active=P8-frontend" 는 실제 저장소 의존 시험(R-30-1 후보) — 기존과 같음. web/ 쓰기 거부는 165행 격리 시험이 대신 본다.
+# 변이 시험(web/ 조건을 뺀 사본으로 케이스 6 이 allow 로 뒤집히는지)은 메인 세션에서 권한 거부로 실행하지 못함 → verifier 리뷰에서 확인 요청.
+
+## 2. grep 판정
+$ grep -n 'startswith("web/")' .claude/scripts/fix_guard_check.py
+182:        p.startswith("app/") or p.startswith("alembic/") or p.startswith("web/") for p in staged
+# (01-plan 은 "180행" 으로 적었으나 주석 1줄 + 여러 줄 형식으로 182행이 됨 — 경로 조건 자체에 1건)
+
+$ grep -n "web/" .claude/scripts/fix_guard_check.py .claude/hooks/commit-guard.sh
+.claude/scripts/fix_guard_check.py:22:    2. `git diff --cached --name-only` 에 `app/`·`alembic/`·`web/` 중 하나로 시작하는
+.claude/scripts/fix_guard_check.py:180:    # 제품 코드 = 백엔드(app/·alembic/) + 프론트(web/, P8-frontend U0)
+.claude/scripts/fix_guard_check.py:182:        p.startswith("app/") or p.startswith("alembic/") or p.startswith("web/") for p in staged
+.claude/scripts/fix_guard_check.py:206:            "[fix-guard] 제품 코드(app/·alembic/·web/)를 바꾸는 {0} 커밋은 verifier 검증이 "
+.claude/hooks/commit-guard.sh:11:#   6. fix(FIX-nnn)/test(FIX-nnn) 초안이 app/·alembic/·web/ 을 스테이징했으면
+.claude/hooks/commit-guard.sh:100:  # 6. FIX-027: 제품 코드(app/·alembic/·web/)를 바꾸는 fix(FIX-nnn)/test(FIX-nnn) 커밋은
+
+$ grep -n "frontend-agent" .claude/hooks/delegate-guard.sh .claude/hooks/approve-commit.sh CLAUDE.md .claude/skills/devlog/SKILL.md
+.claude/hooks/delegate-guard.sh:4:# 계획(architect)·구현(backend-agent, eval-agent, frontend-agent)·검증(verifier) 단계는 자동으로 시작하지 않는다.
+.claude/hooks/delegate-guard.sh:15:GATED="architect backend-agent eval-agent verifier frontend-agent"
+.claude/hooks/approve-commit.sh:24:    architect|backend-agent|eval-agent|verifier|frontend-agent)
+.claude/hooks/approve-commit.sh:27:    *) echo "usage: approve-commit.sh --stage architect|backend-agent|eval-agent|verifier|frontend-agent" >&2; exit 1 ;;
+CLAUDE.md:27:| `.claude/agents/frontend-agent.md` | 구현. 프론트 3화면(채팅/인물 카드/브리핑)·PWA, `web/` 만 쓴다 (P8 U0 신설) | sonnet | 코드 생산, 비용. 검증은 verifier 가 따로 |
+CLAUDE.md:114:- **FIX 도 패키지와 같은 검증 분리를 따른다(L-002 확장, FIX-027).** ... 구현 에이전트(`backend-agent`·`eval-agent`·`frontend-agent`)에 위임하며, 제품 코드(`app/`·`alembic/`·`web/`)를 바꾸는 ...
+.claude/skills/devlog/SKILL.md:15:- **단계는 자동으로 시작하지 않는다(L-004).** 계획(architect)·구현(backend-agent, eval-agent, frontend-agent)·검증(verifier)을 ...
+.claude/skills/devlog/SKILL.md:54:5. **구현은 구현 에이전트(`backend-agent`·`eval-agent`·`frontend-agent` — ... 프론트 `web/` 을 바꾸는 FIX 는 frontend-agent)에 위임한다(L-004)** ...
+.claude/skills/devlog/SKILL.md:102:| 구현(프론트) | `frontend-agent` | sonnet | `web/` 코드·테스트, 03-log 초안 | 02-plan-verify·04-review 판정, `app/`·`alembic/` |
+.claude/skills/devlog/SKILL.md:111:- architect/backend-agent/eval-agent/frontend-agent/verifier 는 `AskUserQuestion`이 없다. ...
+
+## 3. stage-gate.sh 는 고치지 않음(R-2) — 면제 목록 방식이라 web/ 는 이미 활성 작업을 요구한다. 위 165행이 실증.
+## 4. Windows: 커밋·푸시 뒤 CI windows job 의 훅 자가 점검 결과를 gh run view 로 확인해 이 파일 끝에 덧붙인다.
+
+## 5. test-guards.sh 전체 출력 중 변경과 관련된 절(나머지 절은 전부 ok — 실패 0)
+== commit-guard: FIX-027 제품 코드 verifier 게이트 (격리된 임시 저장소) ==
+ok   DENY   FIX-028 대조: FG_T 마커 없는 커밋은 거부(저장소 인식)
+ok   DENY   1) app/ + 검증 줄 없음
+ok   DENY   2) 검증 줄 있음 + review 문서 없음
+ok   DENY   2b) 검증 줄이 자리표뿐 → DENY
+ok   allow  3) 검증 줄 + review 문서 모두 있음(R-27-3 기준 충족)
+ok   allow  4) docs/ 만 스테이징 → allow
+ok   allow  5) feat(...) + app/ → 새 규칙 미적용
+ok   DENY   6) web/ 만 스테이징 + 검증 줄·review 문서 없음 → DENY
+ok   allow  7) web/ 만 스테이징 + 검증 줄·review 문서 모두 있음 → allow
+ok   allow  F-27-5) 허용 형태 → allow: git commit -F .claude/commit-draft.txt
+(… F-27-5·R-27-8·F-27-4·F-27-6·F-27-2·R-27-3·R-27-1·R-27-7 전부 ok — 케이스 6·7 뒤 정리로 기존 절 회귀 없음)
+== stage-gate ==
+ok   allow  docs path exempt
+ok   allow  .claude path exempt
+ok   allow  outside project
+ok   allow  windows path of another machine is outside
+skip active=P8-frontend (product code gate not tested)
+== stage-gate: F-27-1 새 FIX 템플릿 호환(계획 점검: 통과 + 검증: 자리표) ==
+ok   DENY   FIX-028 대조: SG_T 안 app/x.py (active: none) 거부 — 경로가 프로젝트 안으로 인식됨
+ok   DENY   web/x.ts (active: none) 거부 — 프론트도 활성 작업 필요
+ok   allow  새 템플릿(계획 점검: 통과 + 검증: 자리표) → app/ 쓰기 가능
+ok   allow  옛 템플릿(검증: 통과 한 줄) 도 그대로 호환
+== delegate-guard: 단계 위임 승인(L-004) ==
+ok   DENY   verifier without marker
+ok   allow  Explore not gated
+ok   DENY   marker=architect but backend-agent
+ok   allow  marker=architect, architect allowed (consumed)
+ok   marker consumed after allow
+ok   DENY   frontend-agent without marker
+ok   allow  marker=frontend-agent, frontend-agent allowed (consumed)
+ok   frontend-agent marker consumed after allow
+== 에이전트 frontmatter YAML 파싱 (FIX-003) ==
+ok   agent frontmatter parses: .claude/agents/architect.md
+ok   agent frontmatter parses: .claude/agents/backend-agent.md
+ok   agent frontmatter parses: .claude/agents/eval-agent.md
+ok   agent frontmatter parses: .claude/agents/frontend-agent.md
+ok   agent frontmatter parses: .claude/agents/verifier.md
+== 결과: 실패 0 ==

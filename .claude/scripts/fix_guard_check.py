@@ -19,7 +19,7 @@
        전부 대상이다. 없으면 이 규칙은 해당 없음(0).
        본문의 `Refs: FIX-nnn` 만 있고 제목에 없는 경우는 **대상 밖**으로 둔다(정책,
        아래 `_extract_fix_ids` docstring 참조).
-    2. `git diff --cached --name-only` 에 `app/` 또는 `alembic/` 로 시작하는
+    2. `git diff --cached --name-only` 에 `app/`·`alembic/`·`web/` 중 하나로 시작하는
        경로가 있는가. 없으면(문서·훅만 바꾼 FIX) 해당 없음(0).
     3. 있으면 제목에서 찾은 **모든** FIX 번호 각각에 대해:
        a. `docs/wiki/fixes/FIX-nnn.md` 에 `검증:` 줄이 **정확히 하나**이고 그 줄이
@@ -177,7 +177,10 @@ def _main(argv: list[str]) -> int:
     # git diff --name-only 는 OS 와 무관하게 슬래시(/)로 경로를 낸다.
     # 혹시 모를 역슬래시 혼입(예: 외부 도구가 끼어든 경우)까지 정규화한다.
     staged = [p.strip().replace("\\", "/") for p in result.stdout.splitlines() if p.strip()]
-    touches_product_code = any(p.startswith("app/") or p.startswith("alembic/") for p in staged)
+    # 제품 코드 = 백엔드(app/·alembic/) + 프론트(web/, P8-frontend U0)
+    touches_product_code = any(
+        p.startswith("app/") or p.startswith("alembic/") or p.startswith("web/") for p in staged
+    )
     if not touches_product_code:
         return 0  # 문서·훅만 바꾼 FIX 는 이 규칙 대상이 아니다
 
@@ -200,7 +203,7 @@ def _main(argv: list[str]) -> int:
     if missing:
         nnn_list = ", ".join(f"FIX-{n:03d}" for n in ids)
         print(
-            "[fix-guard] 제품 코드(app/·alembic/)를 바꾸는 {0} 커밋은 verifier 검증이 "
+            "[fix-guard] 제품 코드(app/·alembic/·web/)를 바꾸는 {0} 커밋은 verifier 검증이 "
             "먼저다: {1}. .claude/skills/devlog/SKILL.md 의 `/devlog fix` 절차대로 "
             "구현 에이전트 작업 → verifier 리뷰(review-FIX-nnn.md) → 검증 줄을 받은 뒤 "
             "다시 커밋하라.".format(nnn_list, "; ".join(missing))
