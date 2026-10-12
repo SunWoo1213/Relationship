@@ -1,0 +1,198 @@
+U3 변이 시험 — 줄 단위 원본 (메인 세션이 스크래치패드 `u3-mut.txt` 를 보존, 2026-10-12 17:35).
+주의(FIX-033 (c) 미달): 이 파일도 pytest 출력 "전체" 가 아니다. 변이 스크립트(`20261012-1800-u3-mutation-script.py.txt`
+66행)가 `FAILED`·` passed`·` failed`·`error` 를 포함한 줄만 골라 출력했다. 변이마다의 pytest 전체 출력은 남아 있지
+않다. 재현: 스크립트의 BASE 를 임시 경로로 바꿔 `python mut_u3.py` (저장소 무수정, 사본에서만 치환).
+`20261012-1800-u3-mutation.txt` 는 여기서 AssertionError 위치 줄을 한 번 더 뺀 발췌본이다.
+----------------------------------------------------------------------------------------------------
+대조군(변이 없음)
+    30 passed in 0.83s
+M1 최신 선택: created_at desc -> asc
+    tests/test_api_read_briefings.py:180: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_일정마다_최신_1행만 - assert 20...
+    1 failed, 29 passed in 0.84s
+M2 동률: id desc -> asc
+    tests/test_api_read_briefings.py:192: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행
+    1 failed, 29 passed in 0.84s
+M3 step 필터 제거
+    _________________________ test_run_과_error_행은_섞이지_않는다 __________________________
+        def test_run_과_error_행은_섞이지_않는다(client, db_session):
+            _trace(db_session, s, p, NOW - timedelta(minutes=5), step=STEP_BRIEFING_ERROR)
+    tests/test_api_read_briefings.py:204: AssertionError
+    ____________________________ test_error_만_있는_일정은_제외 ____________________________
+        def test_error_만_있는_일정은_제외(client, db_session):
+            _trace(db_session, s_err, p, NOW - timedelta(hours=1), step=STEP_BRIEFING_ERROR)
+    tests/test_api_read_briefings.py:220: AssertionError
+    ______________________ test_schedule_id_error_만_있어도_빈_목록 _______________________
+        def test_schedule_id_error_만_있어도_빈_목록(client, db_session):
+            _trace(db_session, s, p, NOW, step=STEP_BRIEFING_ERROR)
+    E       AssertionError: assert [{'composer':...했어요.'}], ...}] == []
+    tests/test_api_read_briefings.py:325: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다
+    FAILED tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 - ass...
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록
+    3 failed, 27 passed in 0.86s
+M4 tool_name 필터 제거
+    E       AssertionError: assert [{'composer':...했어요.'}], ...}] == []
+    tests/test_api_read_briefings.py:211: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외
+    1 failed, 29 passed in 0.87s
+M5 조회 쿼리 user_id 격리 제거
+    tests/test_api_read_briefings.py:234: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 - asser...
+    1 failed, 29 passed in 0.94s
+M6 기간 경계 >= -> >
+    tests/test_api_read_briefings.py:251: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함
+    1 failed, 29 passed in 0.88s
+M7 BRIEFINGS_LOOKBACK_DAYS 7 -> 8
+    tests/test_api_read_briefings.py:242: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함
+    1 failed, 29 passed in 0.92s
+M8 정렬 2차 키 id desc -> asc
+    tests/test_api_read_briefings.py:269: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순
+    1 failed, 29 passed in 0.88s
+M9 정렬 1차 키 scheduled_at desc -> asc
+    tests/test_api_read_briefings.py:253: AssertionError
+    tests/test_api_read_briefings.py:269: AssertionError
+    tests/test_api_read_briefings.py:286: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함
+    FAILED tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순
+    FAILED tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 - asser...
+    3 failed, 27 passed in 0.87s
+M10 BRIEFINGS_LIMIT 20 -> 21
+    tests/test_api_read_briefings.py:276: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 - asser...
+    1 failed, 29 passed in 0.85s
+M11 limit 제거
+    tests/test_api_read_briefings.py:284: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 - asser...
+    1 failed, 29 passed in 1.05s
+M12 schedule_id 모드에도 기간 적용
+    tests/test_api_read_briefings.py:308: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨
+    1 failed, 29 passed in 0.89s
+M13 schedule_id 소유 확인(404) 제거
+    tests/test_api_read_briefings.py:331: AssertionError
+    tests/test_api_read_briefings.py:340: AssertionError
+    tests/test_api_read_briefings.py:349: AssertionError
+    E       AssertionError: assert 200 == 404
+    tests/test_api_read_briefings.py:389: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 - a...
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 - a...
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다
+    FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변
+    4 failed, 26 passed in 0.91s
+M14 schedule_id 소유 확인 user 조건 제거
+    tests/test_api_read_briefings.py:340: AssertionError
+    tests/test_api_read_briefings.py:349: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 - a...
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다
+    2 failed, 28 passed in 0.90s
+M15 일정별 1행(rn==1) 제거
+    E       AssertionError: assert 3 == 1
+    tests/test_api_read_briefings.py:179: AssertionError
+    tests/test_api_read_briefings.py:192: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_일정마다_최신_1행만 - Assertion...
+    FAILED tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행
+    2 failed, 28 passed in 0.89s
+M16 schedule_id 필터 제거
+    tests/test_api_read_briefings.py:299: AssertionError
+    E       AssertionError: assert 2 == 1
+    tests/test_api_read_briefings.py:388: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_필터_1건 - assert [...
+    FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변
+    2 failed, 28 passed in 0.92s
+M17 generated_at 을 일정 시각으로 오매핑
+    E       AssertionError: assert datetime.datetime(2026, 3, 1, 14, 0, tzinfo=datetime.timezone.utc) == datetime.datetime(2026, 3, 1, 7, 0, tzinfo=datetime.timezone.utc)
+    tests/test_api_read_briefings.py:148: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 - Assert...
+    1 failed, 29 passed in 1.05s
+M18 trace_id 를 일정 id 로 오매핑
+    tests/test_api_read_briefings.py:149: AssertionError
+    tests/test_api_read_briefings.py:180: AssertionError
+    tests/test_api_read_briefings.py:192: AssertionError
+    _________________________ test_run_과_error_행은_섞이지_않는다 __________________________
+        def test_run_과_error_행은_섞이지_않는다(client, db_session):
+            _trace(db_session, s, p, NOW - timedelta(minutes=5), step=STEP_BRIEFING_ERROR)
+    tests/test_api_read_briefings.py:204: AssertionError
+    tests/test_api_read_briefings.py:300: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 - assert...
+    FAILED tests/test_api_read_briefings.py::test_일정마다_최신_1행만 - assert 45...
+    FAILED tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행
+    FAILED tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_필터_1건 - assert 4...
+    5 failed, 25 passed in 1.05s
+M19 push 를 고정값으로
+    E       AssertionError: assert 'not_configured' == 'sent:1'
+    tests/test_api_read_briefings.py:151: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 - Assert...
+    1 failed, 29 passed in 0.97s
+M20 pending: get_now 미반영(만료 기준 실시계)
+    E       AssertionError: assert [] == [{'kind': 'ne...': 3948, ...}]
+    tests/test_api_questions_pending.py:82: AssertionError
+    tests/test_api_questions_pending.py:99: AssertionError
+    tests/test_api_questions_pending.py:106: AssertionError
+    tests/test_api_questions_pending.py:113: AssertionError
+    tests/test_api_questions_pending.py:120: AssertionError
+    tests/test_api_questions_pending.py:128: AssertionError
+    FAILED tests/test_api_questions_pending.py::test_필드_5개_값_일치 - Assertion...
+    FAILED tests/test_api_questions_pending.py::test_created_at_오름차순 - assert...
+    FAILED tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 - asse...
+    FAILED tests/test_api_questions_pending.py::test_답변된_질문은_제외 - assert ...
+    FAILED tests/test_api_questions_pending.py::test_만료_경계_24시간 - assert []...
+    FAILED tests/test_api_questions_pending.py::test_쓰기_0_trace_0 - assert 0 == 1
+    6 failed, 24 passed in 0.97s
+M21 pending: 세션 격리 제거(다른 세션도)
+    E       AssertionError: assert [{'kind': 'id...': 3962, ...}] == []
+    tests/test_api_questions_pending.py:67: AssertionError
+    E       AssertionError: assert [{'kind': 'id...': 3974, ...}] == []
+    tests/test_api_questions_pending.py:129: AssertionError
+    FAILED tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0
+    FAILED tests/test_api_questions_pending.py::test_쓰기_0_trace_0 - AssertionEr...
+    2 failed, 28 passed in 0.96s
+M22 briefings 라우트가 now 대신 실시계
+    tests/test_api_read_briefings.py:136: AssertionError
+    E       IndexError: list index out of range
+    tests/test_api_read_briefings.py:161: IndexError
+    tests/test_api_read_briefings.py:179: AssertionError
+    tests/test_api_read_briefings.py:192: AssertionError
+    _________________________ test_run_과_error_행은_섞이지_않는다 __________________________
+        def test_run_과_error_행은_섞이지_않는다(client, db_session):
+            _trace(db_session, s, p, NOW - timedelta(minutes=5), step=STEP_BRIEFING_ERROR)
+    tests/test_api_read_briefings.py:204: AssertionError
+    ____________________________ test_error_만_있는_일정은_제외 ____________________________
+        def test_error_만_있는_일정은_제외(client, db_session):
+            _trace(db_session, s_err, p, NOW - timedelta(hours=1), step=STEP_BRIEFING_ERROR)
+    tests/test_api_read_briefings.py:220: AssertionError
+    tests/test_api_read_briefings.py:234: AssertionError
+    tests/test_api_read_briefings.py:250: AssertionError
+    tests/test_api_read_briefings.py:269: AssertionError
+    tests/test_api_read_briefings.py:284: AssertionError
+    tests/test_api_read_briefings.py:370: AssertionError
+    E       AssertionError: assert 0 == 2
+    tests/test_api_read_briefings.py:387: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 - assert...
+    FAILED tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 - In...
+    FAILED tests/test_api_read_briefings.py::test_일정마다_최신_1행만 - assert 0 ...
+    FAILED tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행
+    FAILED tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다
+    FAILED tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 - ass...
+    FAILED tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 - asser...
+    FAILED tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함
+    FAILED tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순
+    FAILED tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 - asser...
+    FAILED tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 - ass...
+    FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변
+    12 failed, 18 passed in 1.00s
+M23 briefed_at 쓰기 주입(조회가 UPDATE)
+    E       AssertionError: schedules.briefed_at 이 바뀌었다
+    tests/helpers_read_api.py:72: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변
+    1 failed, 29 passed in 1.00s
+M24 persons.updated_at 쓰기 주입
+    E       AssertionError: persons.updated_at 이 바뀌었다
+    tests/helpers_read_api.py:73: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변
+    1 failed, 29 passed in 0.96s

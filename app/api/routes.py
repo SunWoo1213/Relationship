@@ -130,6 +130,7 @@ from app.api.schemas import (
     AnswerIn,
     AnswerOut,
     BriefingItemOut,
+    BriefingRecordOut,
     BriefingRunIn,
     BriefingRunOut,
     BriefingSkippedOut,
@@ -146,7 +147,13 @@ from app.api.schemas import (
     StoredOut,
     VapidPublicKeyOut,
 )
-from app.api.read import get_event_raw, get_fact_sources, get_person_card, list_persons
+from app.api.read import (
+    get_event_raw,
+    get_fact_sources,
+    get_person_card,
+    list_briefings,
+    list_persons,
+)
 from app.briefing import BriefingComposer, Notifier, run_briefings
 from app.db.models import AgentTrace
 from app.embedding import EmbeddingProvider
@@ -155,7 +162,7 @@ from app.memory import FactExtractor
 from app.push import VAPID_PARTIAL, save_subscription
 from app.settings import app_user_id, vapid_config
 from app.tools.context import TRACE_MAX_STRING, ToolContext
-from app.tools.questions import answer_question
+from app.tools.questions import answer_question, list_pending
 from app.tools.types import ToolError
 
 router = APIRouter()
@@ -458,3 +465,31 @@ def read_fact_sources(
 ) -> FactSourcesOut:
     """P8-frontend U2 -- 사실의 근거 원문 목록(읽기 전용, 쓰기·trace 0)."""
     return get_fact_sources(session, app_user_id(), person_id, fact_id)
+
+
+@router.get("/questions/pending", response_model=list[ChatPendingQuestionOut])
+def read_pending_questions(
+    session_id: str = Depends(resolve_session_id),
+    session: Session = Depends(get_session),
+    now: Callable[[], datetime] = Depends(get_now),
+) -> list[ChatPendingQuestionOut]:
+    """P8-frontend U3 -- 이 세션의 미답변·미만료 대기 질문(읽기 전용, 쓰기·trace 0).
+    새 조회 로직 없이 `app.tools.questions.list_pending` 을 그대로 쓴다.
+    세션은 `X-Session-Id`(`/chat` 과 같은 `resolve_session_id`, 형식 위반 422).
+    헤더가 없으면 `resolve_session_id` 가 만든 임의 uuid 는 어디에도 저장되지
+    않으므로 결과는 항상 빈 목록이다(세션을 새로 만들지 않는다)."""
+    ctx = build_chat_ctx(session, session_id, None)
+    ctx.now = now  # 만료 판정 기준 시각을 get_now() 로 고정한다(테스트·운영 동일 경로)
+    return [ChatPendingQuestionOut(**q.to_dict()) for q in list_pending(ctx, session_id)]
+
+
+@router.get("/briefings", response_model=list[BriefingRecordOut])
+def read_briefings(
+    schedule_id: int | None = None,
+    session: Session = Depends(get_session),
+    now: Callable[[], datetime] = Depends(get_now),
+) -> list[BriefingRecordOut]:
+    """P8-frontend U3 -- 저장된 브리핑 목록(읽기 전용, 쓰기·trace 0,
+    `get_briefing` 툴을 부르지 않는다). `schedule_id` 가 없거나 남의 것이면
+    `ScheduleNotFound` -> 공통 404. 규칙은 `app.api.read.list_briefings`."""
+    return list_briefings(session, app_user_id(), now(), schedule_id)

@@ -183,6 +183,34 @@ class BriefingItemOut(BaseModel):
     push: str
 
 
+class BriefingScheduleOut(BaseModel):
+    id: int
+    title: str
+    scheduled_at: datetime
+
+
+class BriefingPersonOut(BaseModel):
+    id: int
+    display_name: str
+
+
+class BriefingRecordOut(BaseModel):
+    """`GET /briefings` 항목 하나 -- 저장된 `briefing_compose` trace 의
+    `output` 을 읽어 낸 것(P8-frontend U3, 결정 G). `generated_at`·`trace_id`
+    는 그 trace 행의 `created_at`·`id` 다. **원문(`raw_utterance`)을 담는 필드가
+    없다** -- 근거는 `basis{fact_keys, event_ids}` 뿐."""
+
+    schedule: BriefingScheduleOut
+    person: BriefingPersonOut
+    generated_at: datetime
+    composer: Literal["llm", "template"]
+    pattern_sentences: list[BriefingPatternSentenceOut] = Field(default_factory=list)
+    lines: list[BriefingLineOut] = Field(default_factory=list)
+    suggestion: BriefingSuggestionOut | None = None
+    push: str
+    trace_id: int
+
+
 class BriefingSkippedOut(BaseModel):
     """실패해 격리된 일정 하나(`run_briefings()` 의 `skipped[]` 항목 --
     `app/briefing/run.py` "SQLAlchemyError 처리 규약" 절). `reason` 은

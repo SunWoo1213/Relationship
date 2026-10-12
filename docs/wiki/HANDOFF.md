@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-12 00:10 (세션 종료 기록 — 사용자 지시 "검증 끝나면 기록하고 멈춰라". FIX-033 verifier 재검증 통과, 커밋 승인 대기 중)
+갱신: 2026-10-12 18:20 (**U3 완료 — 커밋 직전**. verifier `review-u3-read-questions-briefings.md` 통과([필수] 0·[권고] 6, 1차 실행 watchdog 중단 → SendMessage 재개로 산출물 완성). 사용자 결정: R-U3-1·2 는 U9 로, "커밋 + 실험 푸시". 커밋 뒤 `git push origin dev2` → CI 세 job 확인 → 03-log 에 해시·run 보충(다음 커밋). 서브에이전트 없음)
 
-active: **P8-frontend**(U0·U1·U2 완료 — **U3 부터**) | frozen: none | 브랜치 `dev2` = origin/dev2 `22a6822`(+ FIX-033 커밋 예정) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
+active: **P8-frontend**(U0·U1·U2·**U3** 완료 — **U4 부터**) | frozen: none | 브랜치 `dev2` = origin/dev2 `7031a19`(+ U3 커밋 예정) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
 
 ## 2026-10-11 세션에 끝낸 것 (커밋 순, 전부 origin/dev2·CI 세 job success)
 | 커밋 | 내용 | CI(windows) |
@@ -19,14 +19,15 @@ active: **P8-frontend**(U0·U1·U2 완료 — **U3 부터**) | frozen: none | �
 | `d16375e` | FIX-014·032·033 **계획** 문서 | (문서) |
 | `de35242` | **FIX-014** `bash-write-guard` — 프로젝트 안 Bash 쓰기 거부 + commit-cleanup 조각 판정 (verifier 4라운드) | 38136995433 4분14초 |
 | `22a6822` | **FIX-032** test-guards 저장소 의존 격리(skip 0) · session-start 바이트 · dev2 문구 · 서명 고정값 | 38141012624 3분59초 |
-| (대기) | **FIX-033** 에이전트 규칙 (a)~(d) · verifier 변이 시험 의무 · verification.md 변이 절 (verifier 재검증 통과 `FIX-033.md` 30행) | — |
+| `7031a19` | **FIX-033** 에이전트 규칙 (a)~(d) · verifier 변이 시험 의무 · verification.md 변이 절 (verifier 재검증 통과 `FIX-033.md` 30행) | 38144161304 3분48초 |
 
-## 커밋 안 된 변경 (FIX-033 커밋 하나로 들어갈 것 — 사용자 승인 대기)
-- FIX-033 문서 9 + `review-FIX-033.md` + evidence 11 · `FIX-032.md` 결과절 해시·run 줄 · 이 HANDOFF · journal 자동 줄. 초안 `.claude/commit-draft.txt`(docs(FIX-033): …). 승인 안 받고 세션이 끊겼으면 **다음 세션 첫 질문이 이 커밋 승인**.
+## 커밋 안 된 변경 (다음 세션 첫 커밋에 함께 — 기록만, 코드 아님)
+- 이 HANDOFF(종료 기록) · `FIX-033.md` 결과절 해시·run 1줄 · journal 자동 줄(`7031a19` COMMIT·PUSH-dev2). U3 첫 커밋에 같이 넣으면 된다(따로 커밋할 필요 없음).
 
 ## 바로 다음에 할 것 (순서대로)
-1. **FIX-033 커밋**(승인 → `approve-commit.sh` → `git add` 명시 경로 → `git commit -F` → `git push origin dev2` → CI 확인) → FIX-033.md 결과절에 해시·run(다음 커밋).
-2. **P8 U3**(backend-agent, L-004 승인 먼저): 대기 질문 목록·브리핑 조회 API(01-plan 94행; 조인 `tool_name='briefing' AND step='briefing_compose'` 최신 1행, 결정 G). 위임 프롬프트에 FIX-033 (a)~(d) + **R-U2-2** `app/api/read.py` 모듈 docstring 갱신 + **R-U2-3** 판정표 7행(`briefed_at`·`updated_at` 변화 0) 값 테스트. → verifier 리뷰(변이 ≥1) → /commit → CI.
+1. **U3 커밋·푸시·CI 확인**(이 HANDOFF 시점에 커밋 직전). 끊겼으면 `git log -1` 로 U3 커밋이 있는지, `git status` 로 미커밋이 남았는지, `gh run list --limit 3` 로 CI 확인. 03-log U3 항목 `pending` → 해시·run 은 다음 커밋(U4)에 보충. registry "(U3 미커밋)" 6칸도 그때 해시로.
+2. **U4 프론트 골격**(frontend-agent, L-004 승인 → `--stage frontend-agent`): 01-plan 95행. 위임 프롬프트에 FIX-033 (a)~(d) + **(c) 강화 "변이마다 pytest/vitest 출력 전체를 파일로"(R-U3-3)** + R-U0-3(verifier 가 `web/package.json` scripts·의존성·lock 점검) + `node v24.21.0`·`npm 11.19.0` 확인. U7 위임 전 사용자 결정 필요: `#/briefings?schedule_id=N` 강조를 목록+클라이언트 강조로 할지 `GET /briefings?schedule_id=` 호출로 할지(R-U3-6 ⑤).
+3. **U9 백엔드 몫에 넣을 것**: R-U3-1(`ctx.now = now` → `dataclasses.replace`) · R-U3-2(목록 조인 `Person.id == Schedule.person_id` 한 줄) · R-U3-5(U1·U2 쓰기 0 테스트를 `helpers_read_api` 로, `push_subscriptions` 스냅샷 추가) · 판정표 9·10행 끝에서 끝.
 3. **U4~U9**(frontend-agent — U0 완료로 위임 가능, R-U0-3: 단위마다 verifier 가 `web/package.json` scripts·의존성·lock 점검) → **U10 사람 점검** → verifier 04-review.
 4. **복기자료**: `~/Desktop/Portfolio/wiki/interview/relationship/17-개발과정-해설.md` 에 이 세션(U0·FIX-031·U1·U2·약점 11개·FIX-014 4라운드·032·033) 절 **미기록** — 문제점 목록(2026-10-11 15:20 보고)을 한계·교훈으로. README 갱신 기록 → `python3 양식/도구/interview_pdf.py relationship`.
 

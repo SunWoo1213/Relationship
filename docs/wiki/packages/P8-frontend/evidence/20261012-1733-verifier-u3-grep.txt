@@ -1,0 +1,165 @@
+verifier U3 — 쓰기·trace 0 · 범위 · 비밀 · 손상 근거 grep 모음 (스크립트 grep_u3.sh 를 스크래치패드에서 실행, 저장소 읽기만. 2026-10-12 17:33, 기준 HEAD 7031a19)
+
+$ grep -n "insert\|update\|delete\|\.add(\|commit(\|flush(\|traced\|AgentTrace(" app/api/read.py app/api/routes.py
+app/api/read.py:10:(툴이 아니라 화면용 조회이므로 `@traced` 를 쓰지 않는다 -- 01-plan U1).
+app/api/read.py:198:        .order_by(PersonFact.updated_at.desc(), PersonFact.id.asc())
+app/api/read.py:213:                    updated_at=fact.updated_at,
+app/api/routes.py:282:    (모듈 docstring "U6" 참고). `app/tools/context.py::traced()` 가 예외
+app/api/routes.py:284:    내부의 어느 `@traced` 단계가 실패했는지를 가리키고, 이 행은 라우트가
+app/api/routes.py:287:    세션에 `add()`+`flush()` 할 뿐이므로 라우트가 200 으로 끝나야
+app/api/routes.py:288:    `get_session()` 의 `commit()` 과 함께 이 행도 남는다).
+app/api/routes.py:294:    trace = AgentTrace(
+app/api/routes.py:303:    ctx.session.add(trace)
+app/api/routes.py:304:    ctx.session.flush()
+exit=0
+# 해석: read.py 10행은 docstring, 198·213행은 PersonFact.updated_at 컬럼 읽기(U1 기존). routes.py 282~304행은 기존 POST /chat 턴 trace(U3 라우트 470~495행 아님).
+
+$ sed -n "470,495p" app/api/routes.py | grep -n "add(\|commit(\|flush(\|traced\|AgentTrace(\|execute("
+exit=1
+
+$ grep -n "session\.\(add\|commit\|flush\|delete\|merge\|bulk\)" app/api/read.py tests/helpers_read_api.py
+tests/helpers_read_api.py:55:    session.flush()
+exit=0  (helpers 의 flush 는 테스트 쪽 스냅샷 전 flush)
+
+$ grep -n "get_briefing\|run_briefings\|build_briefing_input" app/api/read.py
+7:1건씩 읽을 뿐 `get_briefing` 툴을 부르지 않는다(결정 G).
+exit=0
+
+$ grep -n "BRIEFING_TRACE_TOOL_NAME\|STEP_BRIEFING_COMPOSE" app/api/read.py app/briefing/types.py
+app/api/read.py:44:from app.briefing.types import BRIEFING_TRACE_TOOL_NAME, STEP_BRIEFING_COMPOSE
+app/api/read.py:306:        .where(AgentTrace.tool_name == BRIEFING_TRACE_TOOL_NAME)
+app/api/read.py:307:        .where(AgentTrace.step == STEP_BRIEFING_COMPOSE)
+app/briefing/types.py:42:- `BRIEFING_TRACE_TOOL_NAME`("briefing")·step 3종(`briefing_run`/
+app/briefing/types.py:215:BRIEFING_TRACE_TOOL_NAME = "briefing"
+app/briefing/types.py:223:STEP_BRIEFING_COMPOSE = "briefing_compose"
+app/briefing/types.py:232:BRIEFING_TRACE_STEPS: tuple[str, ...] = (STEP_BRIEFING_RUN, STEP_BRIEFING_COMPOSE)
+
+$ grep -n "raw_utterance" app/api/read.py app/api/routes.py app/api/schemas.py
+app/api/read.py:90:            Event.raw_utterance,
+app/api/read.py:104:        raw_utterance=row[5],
+app/api/read.py:129:            Event.raw_utterance,
+app/api/read.py:141:                event_id=i, type=t, content=c, occurred_at=o, raw_utterance=r
+app/api/read.py:218:    # raw_utterance 는 컬럼 자체를 고르지 않는다.
+app/api/read.py:276:    응답에는 원문(`raw_utterance`)을 담는 필드가 없다 -- `output` 의 근거는
+app/api/schemas.py:39:필드에도 `raw_utterance` 원문을 담지 않는다(01-plan "지킬 불변식" --
+app/api/schemas.py:174:    `"not_configured"`). **원문(`raw_utterance`)을 담는 필드가 없다**
+app/api/schemas.py:200:    는 그 trace 행의 `created_at`·`id` 다. **원문(`raw_utterance`)을 담는 필드가
+app/api/schemas.py:307:# 이 응답 모델 어디에도 `raw_utterance` 필드가 없다(S3.1 원문 보존·원칙9) --
+app/api/schemas.py:373:# `raw_utterance` 가 응답에 실리는 **유일한** 모델 두 개다. 저장된 문자열을
+app/api/schemas.py:385:    raw_utterance: str
+app/api/schemas.py:399:    raw_utterance: str
+
+$ grep -n "person_id = schedule.person_id\|\"person_id\": person_id\|\"schedule_id\": schedule.id" app/briefing/run.py
+147:        "schedule_id": schedule_id,
+148:        "person_id": person_id,
+157:            input={"schedule_id": schedule_id, "person_id": person_id, "stage": stage},
+195:        person_id = schedule.person_id
+224:                    "schedule_id": schedule.id,
+225:                    "person_id": person_id,
+262:                        input={"schedule_id": schedule.id, "person_id": person_id},
+282:            skipped.append({"schedule_id": schedule.id, "reason": type(exc).__name__})
+289:            skipped.append({"schedule_id": schedule.id, "reason": type(exc).__name__})
+295:                "schedule_id": schedule.id,
+296:                "person_id": person_id,
+324:            input={"trigger": trigger, "schedule_id": schedule_id, "lead_hours": lead_hours},
+
+$ grep -n "^@dataclass\|^class ToolContext\|    now:" app/tools/context.py
+91:@dataclass
+92:class ToolContext:
+104:    now: Callable[[], datetime] = lambda: datetime.now(timezone.utc)
+
+$ grep -rn "ctx\.now = \|\.now = " app tests
+app/api/routes.py:482:    ctx.now = now  # 만료 판정 기준 시각을 get_now() 로 고정한다(테스트·운영 동일 경로)
+exit=0
+
+$ grep -n "def build_chat_ctx\|def build_briefing_ctx\|def build_ctx" -A 2 app/api/deps.py
+133:def build_ctx(
+134-    session: Session, question_id: int, embedder: EmbeddingProvider | None = None
+135-) -> ToolContext:
+--
+223:def build_chat_ctx(
+224-    session: Session, session_id: str, embedder: EmbeddingProvider | None
+225-) -> ToolContext:
+--
+335:def build_briefing_ctx(session: Session, now: Callable[[], datetime]) -> ToolContext:
+336-    """`POST /briefings/run`(U6) 용 `ToolContext` 조립. `session_id` 는
+337-    `run_briefings()`(U5)가 내부에서 자신만의 `"briefing:<uuid4>"` 로
+
+$ grep -n "onupdate\|server_default=func.now()" app/db/models.py
+108:        DateTime(timezone=True), nullable=False, server_default=func.now()
+113:        server_default=func.now(),
+114:        onupdate=func.now(),
+160:        server_default=func.now(),
+161:        onupdate=func.now(),
+202:        DateTime(timezone=True), nullable=False, server_default=func.now()
+242:        DateTime(timezone=True), nullable=False, server_default=func.now()
+260:        DateTime(timezone=True), nullable=False, server_default=func.now()
+277:        DateTime(timezone=True), nullable=False, server_default=func.now()
+$ grep -rln "TRIGGER" alembic app/db
+exit=1  (1 = DB 트리거 없음 -> updated_at 갱신은 SQLAlchemy onupdate 뿐)
+
+$ grep -n "P8-frontend" docs/wiki/registry.md | cut -c1-140
+219:| 엔드포인트 | GET /questions/pending · GET /briefings (읽기 전용) | app/api/routes.py | P8-frontend | (U3 미커밋) | **U3** — `/questions/pending`:
+220:| 모듈 | 브리핑 조회 `list_briefings()` · 상수 `BRIEFINGS_LOOKBACK_DAYS=7`·`BRIEFINGS_LIMIT=20` · docstring 갱신(R-U2-2) | app/api/read.py | P8-fro
+221:| 모듈 | 브리핑 조회 응답 `BriefingRecordOut`·`BriefingScheduleOut`·`BriefingPersonOut` | app/api/schemas.py | P8-frontend | (U3 미커밋) | **U3** —
+222:| 테스트 | "쓰기 0" 값 단언 공통 헬퍼 `snapshot_db`·`assert_no_writes` (R-U2-3) | tests/helpers_read_api.py | P8-frontend | (U3 미커밋) | 8테이블 행 수 + `s
+223:| 테스트 | `GET /questions/pending` | tests/test_api_questions_pending.py | P8-frontend | (U3 미커밋) | 8건 — 헤더 없음 `[]`+쓰기 0 · 422 · 필드 5개 값 ·
+224:| 테스트 | `GET /briefings` | tests/test_api_read_briefings.py | P8-frontend | (U3 미커밋) | 22건 — 필드 매핑 · 일정별 최신 1행 · 동률 id · run/error/타 too
+$ grep -n "list_persons\|get_person_card\|get_event_raw\|get_fact_sources\|test_api_read_persons\|test_api_read_raw" docs/wiki/registry.md
+exit=1  (1 = U1·U2 행 없음)
+
+$ git diff --numstat HEAD -- app tests docs/wiki/registry.md
+122	6	app/api/read.py
+37	2	app/api/routes.py
+28	0	app/api/schemas.py
+6	0	docs/wiki/registry.md
+$ git status --short
+ M app/api/read.py
+ M app/api/routes.py
+ M app/api/schemas.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/fixes/FIX-033.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8-frontend/01-plan.md
+ M docs/wiki/packages/P8-frontend/03-log.md
+ M docs/wiki/registry.md
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1800-u3-mutation-raw.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1800-u3-mutation-script.py.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1800-u3-mutation.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1800-u3-read-questions-briefings.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1800-u3-regression.txt
+?? tests/helpers_read_api.py
+?? tests/test_api_questions_pending.py
+?? tests/test_api_read_briefings.py
+
+$ POST/PUT/PATCH/DELETE 라우트 수: 작업 트리 / HEAD
+4
+4
+$ GET 라우트 수: 작업 트리 / HEAD
+8
+6
+
+$ 비밀 패턴 grep (6파일)
+exit=1
+$ 외부 네트워크 호출 grep
+exit=1
+$ py_compile
+compile-ok
+$ 인코딩·CRLF·끝 개행
+app/api/read.py lines 348 crlf 0 endnl True
+app/api/routes.py lines 495 crlf 0 endnl True
+app/api/schemas.py lines 406 crlf 0 endnl True
+tests/helpers_read_api.py lines 73 crlf 0 endnl True
+tests/test_api_questions_pending.py lines 133 crlf 0 endnl True
+tests/test_api_read_briefings.py lines 415 crlf 0 endnl True
+
+$ git diff HEAD -- app/api/read.py | grep "^-" | grep -v "^---"   (삭제 줄 -- U1·U2 본문 손상 여부)
+-"""Refs: P8-frontend U1 S3.1 S3.5 원칙9 -- 읽기 전용 조회 함수(인물 목록·카드).
+-from datetime import datetime
+-from typing import cast
+-from sqlalchemy import func, select
+-from app.db.models import Event, FactSource, Person, PersonAlias, PersonFact, Schedule
+-from app.tools.types import PersonNotFound
+$ git diff HEAD -- app/api/routes.py | grep "^-" | grep -v "^---"
+-from app.api.read import get_event_raw, get_fact_sources, get_person_card, list_persons
+-from app.tools.questions import answer_question

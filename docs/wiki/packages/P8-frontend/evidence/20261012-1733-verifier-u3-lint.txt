@@ -1,0 +1,9 @@
+(verifier 재실행, 작업 트리 기준 HEAD 7031a19, 2026-10-12 17:33)
+
+$ .venv/bin/ruff check app tests
+All checks passed!
+exit=0
+
+$ .venv/bin/python scripts/mypy_check.py --run
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)
+exit=0

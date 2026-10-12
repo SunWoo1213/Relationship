@@ -1,0 +1,117 @@
+# verifier U3 변이 시험 플러그인 — 스크래치패드 mutplug.py 의 보존본(2026-10-12 17:36 실행 시점 그대로).
+# 재현: 이 파일을 <스크래치패드>/mutplug.py 로 복사한 뒤
+#   PYTHONPATH=<스크래치패드> MUT=V1 POSTGRES_PORT=5433 .venv/bin/python -m pytest -p mutplug -p no:cacheprovider -q --tb=line \
+#     tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_persons.py tests/test_api_read_raw.py
+# 저장소 파일을 고치지 않는다 — read.py 소스를 읽어 문자열 치환 후 모듈 네임스페이스에 exec, routes 의 import 이름을 다시 묶는다.
+"""verifier U3 변이 시험 플러그인 -- 저장소 파일을 고치지 않고 런타임에서 치환한다.
+
+사용: PYTHONPATH=<이 디렉터리> MUT=<이름> pytest -p mutplug ...
+`app/api/read.py` 의 **소스 문자열을 읽어** 한 곳을 바꾼 뒤 그 모듈의 네임스페이스에
+다시 exec 하고, `app.api.routes` 가 import 해 둔 함수 이름 5개를 새 정의로 다시 묶는다.
+라우트 모듈 자체(데코레이터로 router 에 등록)는 재실행하지 않고 속성만 바꾼다.
+"""
+
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
+MUT = os.environ.get("MUT", "")
+
+# (설명, 원문, 치환문) -- read.py 소스 치환
+READ_MUTS = {
+    "V1": (
+        "step 필터 제거 (briefing_run·briefing_error 도 원천이 된다)",
+        ".where(AgentTrace.step == STEP_BRIEFING_COMPOSE)\n",
+        "\n",
+    ),
+    "V2": (
+        "목록 쿼리 user_id 격리 제거",
+        "        .where(ranked.c.rn == 1)\n        .where(Person.user_id == user_id)\n",
+        "        .where(ranked.c.rn == 1)\n",
+    ),
+    "V3": (
+        "기간 경계 >= -> > (정확히 7일 전 일정이 빠진다)",
+        "Schedule.scheduled_at >= now - timedelta",
+        "Schedule.scheduled_at > now - timedelta",
+    ),
+    "V4": (
+        "일정별 최신 1행(rn == 1) 제거",
+        "        .where(ranked.c.rn == 1)\n",
+        "",
+    ),
+    "V5": (
+        "[표에 없음] row_number 분할 키를 schedule_id 가 아니라 person_id 로 (인물당 1행)",
+        "partition_by=out_schedule_id,",
+        "partition_by=out_person_id,",
+    ),
+    "V6": (
+        "[표에 없음] schedule_id 모드에서만 목록 쿼리의 Person.user_id 조건 제거 (사전 소유 확인은 유지)",
+        "        .where(Person.user_id == user_id)\n    )\n    if schedule_id is not None:",
+        "        .where(true() if schedule_id is not None else Person.user_id == user_id)\n    )\n    if schedule_id is not None:",
+    ),
+    "V7": (
+        "[표에 없음] 응답 항목 dict 에 raw_utterance 키를 끼워 넣음 (response_model 이 걸러 내는지)",
+        "            trace_id=trace_id,\n        )\n        for trace_id",
+        "            trace_id=trace_id,\n            raw_utterance=\"비밀원문XYZ\",\n        )\n        for trace_id",
+    ),
+    "U1R": (
+        "[U1 회귀] last_contact max -> min",
+        "func.max(Event.occurred_at)",
+        "func.min(Event.occurred_at)",
+    ),
+    "U2R": (
+        "[U2 회귀] 근거 조회의 person_facts.person_id 조건 제거",
+        "        .where(PersonFact.person_id == person_id)\n",
+        "",
+    ),
+}
+
+ROUTE_NAMES = ("get_event_raw", "get_fact_sources", "get_person_card", "list_briefings", "list_persons")
+
+
+def _apply_read_mut(name: str) -> None:
+    import app.api.read as read
+    import app.api.routes as routes
+
+    desc, old, new = READ_MUTS[name]
+    src = Path(read.__file__).read_text(encoding="utf-8")
+    n = src.count(old)
+    expected = 2 if name == "U1R" else 1  # U1R: 목록·카드 두 곳의 max 를 모두 min 으로
+    if n != expected:
+        raise SystemExit(f"[mutplug] {name}: 원문 등장 횟수 {n} ({expected} 이어야 함)")
+    src = src.replace(old, new)
+    if name == "V6":
+        src = src.replace("from sqlalchemy import BigInteger, func, select", "from sqlalchemy import BigInteger, func, select, true")
+    code = compile(src, read.__file__ + f"#{name}", "exec")
+    exec(code, read.__dict__)
+    for attr in ROUTE_NAMES:
+        setattr(routes, attr, getattr(read, attr))
+    print(f"[mutplug] {name} 적용: {desc}")
+
+
+def _apply_pending_model_mut() -> None:
+    """V8 [표에 없음]: 대기 질문 응답 모델에서 `kind` 필드를 뺀다 (pydantic 이 모르는 키를 버림)."""
+    import app.api.routes as routes
+    from pydantic import BaseModel
+
+    class ChatPendingQuestionOutNoKind(BaseModel):
+        question_id: int
+        status: str
+        question: str
+        options: list[str]
+
+    routes.ChatPendingQuestionOut = ChatPendingQuestionOutNoKind  # type: ignore[attr-defined]
+    print("[mutplug] V8 적용: ChatPendingQuestionOut 에서 kind 필드 누락")
+
+
+def pytest_configure(config):  # noqa: D103
+    if not MUT:
+        print("[mutplug] 변이 없음(대조군)")
+        return
+    if MUT in READ_MUTS:
+        _apply_read_mut(MUT)
+    elif MUT == "V8":
+        _apply_pending_model_mut()
+    else:
+        raise SystemExit(f"[mutplug] 모르는 변이 {MUT}")

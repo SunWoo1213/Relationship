@@ -1,0 +1,74 @@
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_persons.py tests/test_api_read_raw.py -v
+(verifier 재실행, 작업 트리 기준 HEAD 7031a19, 2026-10-12 17:33. exit=0)
+
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 60 items
+
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [  1%]
+tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_422 PASSED [  3%]
+tests/test_api_questions_pending.py::test_필드_5개_값_일치 PASSED        [  5%]
+tests/test_api_questions_pending.py::test_created_at_오름차순 PASSED     [  6%]
+tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 PASSED   [  8%]
+tests/test_api_questions_pending.py::test_답변된_질문은_제외 PASSED      [ 10%]
+tests/test_api_questions_pending.py::test_만료_경계_24시간 PASSED        [ 11%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 PASSED          [ 13%]
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [ 15%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [ 16%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 18%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 20%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 21%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 23%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 25%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 26%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 28%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 30%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 31%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 33%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 35%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 36%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 38%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 40%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 41%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 43%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 45%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 46%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 48%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [ 50%]
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [ 51%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [ 53%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [ 55%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [ 56%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [ 58%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [ 60%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 61%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 63%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 65%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 66%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 68%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [ 70%]
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [ 71%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 73%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 75%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 76%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 78%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 80%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 81%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 83%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 85%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 86%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 88%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 90%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 91%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 93%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 95%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 96%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 98%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [100%]
+
+============================== 60 passed in 1.24s ==============================

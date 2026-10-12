@@ -1,0 +1,76 @@
+# U3 변이 시험 스크립트 — backend-agent 가 스크래치패드 `mut_u3.py` 로 작성, 메인 세션이 재현용으로 보존(2026-10-12).
+# 저장소 파일을 고치지 않고 BASE/work 사본에서만 한 줄씩 치환해 두 테스트 파일을 돌린다.
+# 재현: BASE 를 임시 경로로 바꾼 뒤 `python mut_u3.py`. 출력은 FAILED/passed/failed/error 줄만 고른다(66행) — 전체 출력이 아님.
+"""U3 변이 시험: 저장소 사본(스크래치패드)에서만 코드를 고쳐 두 테스트 파일을 돌린다."""
+import os
+import shutil
+import subprocess
+import sys
+
+REPO = "/Users/sunwoo/Desktop/Portfolio/Relationship"
+BASE = "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut-u3"
+PY = REPO + "/.venv/bin/python"
+TESTS = ["tests/test_api_questions_pending.py", "tests/test_api_read_briefings.py"]
+
+R = "app/api/read.py"
+Q = "app/api/routes.py"
+# (이름, 파일, 원문, 바꿀문, 몇 번째 등장(0 부터) 또는 None=전부)
+MUTS = [
+    ("M1 최신 선택: created_at desc -> asc", R, "order_by=(AgentTrace.created_at.desc(), AgentTrace.id.desc())", "order_by=(AgentTrace.created_at.asc(), AgentTrace.id.desc())", None),
+    ("M2 동률: id desc -> asc", R, "order_by=(AgentTrace.created_at.desc(), AgentTrace.id.desc())", "order_by=(AgentTrace.created_at.desc(), AgentTrace.id.asc())", None),
+    ("M3 step 필터 제거", R, ".where(AgentTrace.step == STEP_BRIEFING_COMPOSE)\n", "\n", None),
+    ("M4 tool_name 필터 제거", R, ".where(AgentTrace.tool_name == BRIEFING_TRACE_TOOL_NAME)\n", "\n", None),
+    ("M5 조회 쿼리 user_id 격리 제거", R, "        .where(ranked.c.rn == 1)\n        .where(Person.user_id == user_id)\n", "        .where(ranked.c.rn == 1)\n", None),
+    ("M6 기간 경계 >= -> >", R, "Schedule.scheduled_at >= now - timedelta", "Schedule.scheduled_at > now - timedelta", None),
+    ("M7 BRIEFINGS_LOOKBACK_DAYS 7 -> 8", R, "BRIEFINGS_LOOKBACK_DAYS = 7", "BRIEFINGS_LOOKBACK_DAYS = 8", None),
+    ("M8 정렬 2차 키 id desc -> asc", R, "query.order_by(Schedule.scheduled_at.desc(), Schedule.id.desc())", "query.order_by(Schedule.scheduled_at.desc(), Schedule.id.asc())", None),
+    ("M9 정렬 1차 키 scheduled_at desc -> asc", R, "query.order_by(Schedule.scheduled_at.desc(), Schedule.id.desc())", "query.order_by(Schedule.scheduled_at.asc(), Schedule.id.desc())", None),
+    ("M10 BRIEFINGS_LIMIT 20 -> 21", R, "BRIEFINGS_LIMIT = 20", "BRIEFINGS_LIMIT = 21", None),
+    ("M11 limit 제거", R, ".limit(BRIEFINGS_LIMIT)", "", None),
+    ("M12 schedule_id 모드에도 기간 적용", R, "    if schedule_id is not None:\n        query = query.where(Schedule.id == schedule_id)\n    else:\n        query", "    if schedule_id is not None:\n        query = query.where(Schedule.id == schedule_id)\n    if True:\n        query", None),
+    ("M13 schedule_id 소유 확인(404) 제거", R, "        if owned is None:\n            raise ScheduleNotFound", "        if False:\n            raise ScheduleNotFound", None),
+    ("M14 schedule_id 소유 확인 user 조건 제거", R, "            .where(Schedule.id == schedule_id)\n            .where(Person.user_id == user_id)\n        ).one_or_none()", "            .where(Schedule.id == schedule_id)\n        ).one_or_none()", None),
+    ("M15 일정별 1행(rn==1) 제거", R, "        .where(ranked.c.rn == 1)\n", "", None),
+    ("M16 schedule_id 필터 제거", R, "        query = query.where(Schedule.id == schedule_id)\n", "        pass\n", None),
+    ("M17 generated_at 을 일정 시각으로 오매핑", R, "generated_at=generated_at,", "generated_at=scheduled_at,", None),
+    ("M18 trace_id 를 일정 id 로 오매핑", R, "trace_id=trace_id,", "trace_id=s_id,", None),
+    ("M19 push 를 고정값으로", R, 'push=output["push"],', 'push="not_configured",', None),
+    ("M20 pending: get_now 미반영(만료 기준 실시계)", Q, "    ctx.now = now  # 만료 판정 기준 시각을 get_now() 로 고정한다(테스트·운영 동일 경로)\n", "", None),
+    ("M21 pending: 세션 격리 제거(다른 세션도)", Q, "list_pending(ctx, session_id)", "list_pending(ctx, 'sess-pending-1')", None),
+    ("M22 briefings 라우트가 now 대신 실시계", Q, "list_briefings(session, app_user_id(), now(), schedule_id)", "list_briefings(session, app_user_id(), __import__('datetime').datetime.now(__import__('datetime').timezone.utc), schedule_id)", None),
+    ("M23 briefed_at 쓰기 주입(조회가 UPDATE)", R, "    rows = session.execute(\n        query.order_by", "    session.execute(Schedule.__table__.update().values(briefed_at=now))\n    rows = session.execute(\n        query.order_by", None),
+    ("M24 persons.updated_at 쓰기 주입", R, "    rows = session.execute(\n        query.order_by", "    session.execute(Person.__table__.update().values(display_name=Person.display_name))\n    rows = session.execute(\n        query.order_by", None),
+]
+
+
+def run(name, rel, old, new):
+    d = os.path.join(BASE, "work")
+    if os.path.exists(d):
+        shutil.rmtree(d)
+    os.makedirs(d)
+    for item in ["app", "tests", "alembic", "alembic.ini", "pyproject.toml"]:
+        src = os.path.join(REPO, item)
+        dst = os.path.join(d, item)
+        if os.path.isdir(src):
+            shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
+        else:
+            shutil.copy(src, dst)
+    if rel:
+        p = os.path.join(d, rel)
+        text = open(p, encoding="utf-8").read()
+        if old not in text:
+            return f"{name}: !! 원문 못 찾음"
+        open(p, "w", encoding="utf-8").write(text.replace(old, new))
+    env = dict(os.environ, POSTGRES_PORT="5433")
+    out = subprocess.run(
+        [PY, "-m", "pytest", "-q", "-p", "no:cacheprovider", *TESTS],
+        cwd=d, env=env, capture_output=True, text=True,
+    ).stdout
+    lines = [l for l in out.splitlines() if l.startswith("FAILED") or " passed" in l or " failed" in l or "error" in l.lower()]
+    return f"{name}\n" + "\n".join("    " + l for l in lines)
+
+
+if __name__ == "__main__":
+    print(run("대조군(변이 없음)", None, None, None))
+    for m in MUTS:
+        print(run(*m[:4]))

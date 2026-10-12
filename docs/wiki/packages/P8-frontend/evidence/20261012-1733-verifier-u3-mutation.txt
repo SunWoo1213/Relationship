@@ -1,0 +1,319 @@
+verifier U3 변이 시험 — 런타임 치환(저장소 무수정). 플러그인 소스 보존: 같은 폴더 `20261012-1733-verifier-u3-mutplug.py.txt`.
+방법: 스크래치패드의 pytest 플러그인 `mutplug.py` 가 `app/api/read.py` 의 **소스 문자열**을 읽어 한 곳을 바꾼 뒤 그 모듈 네임스페이스에 다시 exec 하고,
+`app.api.routes` 가 import 해 둔 함수 5개(get_event_raw·get_fact_sources·get_person_card·list_briefings·list_persons)를 새 정의로 다시 묶는다.
+V8 만 `routes.ChatPendingQuestionOut` 속성을 `kind` 없는 모델로 바꾼다. 저장소 파일은 읽기만 한다(끝의 `git status --short`·`git diff --stat` 로 원복 확인).
+
+치환 목록 (MUT 이름 → 대상 → 원문 → 바꿀문):
+  V1  read.py  ".where(AgentTrace.step == STEP_BRIEFING_COMPOSE)\n"                       → "\n"                        (step 필터 제거)
+  V2  read.py  ".where(ranked.c.rn == 1)\n        .where(Person.user_id == user_id)\n"      → ".where(ranked.c.rn == 1)\n" (목록 쿼리 user_id 격리 제거)
+  V3  read.py  "Schedule.scheduled_at >= now - timedelta"                                  → "Schedule.scheduled_at > now - timedelta" (기간 경계)
+  V4  read.py  ".where(ranked.c.rn == 1)\n"                                                → ""                          (일정별 최신 1행 제거)
+  V5  read.py  "partition_by=out_schedule_id,"                                             → "partition_by=out_person_id," (구현자 표에 없음 — 분할 키 오류)
+  V6  read.py  ".where(Person.user_id == user_id)\n    )\n    if schedule_id is not None:"  → ".where(true() if schedule_id is not None else Person.user_id == user_id)\n    )\n    if schedule_id is not None:" (+ `true` import. 구현자 표에 없음 — schedule_id 모드에서만 목록 쿼리 격리 제거, 사전 소유 확인 유지)
+  V7  read.py  "            trace_id=trace_id,\n        )\n        for trace_id"           → "            trace_id=trace_id,\n            raw_utterance=\"비밀원문XYZ\",\n        )\n        for trace_id" (구현자 표에 없음 — 응답 dict 에 원문 키 주입)
+  V8  routes   `routes.ChatPendingQuestionOut` → `kind` 필드 없는 BaseModel (구현자 표에 없음 — 응답 모델 필드 누락)
+  U1R read.py  "func.max(Event.occurred_at)" ×2(목록·카드) → "func.min(Event.occurred_at)"  (U1 회귀 변이)
+  U2R read.py  "        .where(PersonFact.person_id == person_id)\n"                       → ""                          (U2 회귀 변이)
+
+1차 실행(--tb=short, 17:32)은 U1R 이 플러그인의 "원문 1회 등장" 검사에 걸려 INTERNALERROR 로 멈췄다(원문이 목록·카드 두 곳). 플러그인을 "U1R 은 2회" 로 고친 뒤
+17:35 에 U1R 만 재실행(4 failed, 56 passed), 17:36 에 11회 전부를 --tb=line 으로 다시 돌렸다. 아래가 그 17:36 실행의 **출력 전체**다(스크래치패드 v-u3-mutation3.txt).
+1차·U1R 단독 실행의 결과 수치(대조군 60 passed · V1 3f · V2 1f · V3 1f · V4 2f · V5 4f · V6 0f · V7 0f · V8 6f · U1R 4f · U2R 4f)는 아래와 같다.
+
+----------------------------------------------------------------------------------------------------
+# verifier U3 변이 시험 2026-10-12 17:36 -- 플러그인: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mutplug.py (런타임 치환, 저장소 무수정)
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad MUT=<이름> POSTGRES_PORT=5433 .venv/bin/python -m pytest -p mutplug -p no:cacheprovider -q --tb=line tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_persons.py tests/test_api_read_raw.py
+# (1차 실행은 --tb=short 였고 U1R 이 플러그인의 '원문 1회' 검사에 걸려 재실행했다. 이 파일은 플러그인을 고친 뒤 11회 전부를 --tb=line 으로 다시 돌린 출력 전체다.)
+# 기준 HEAD: 7031a19
+
+==================================================================
+### 대조군 (MUT 없음)
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] 변이 없음(대조군)
+60 passed in 1.06s
+exit=0
+
+==================================================================
+### MUT=V1
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] V1 적용: step 필터 제거 (briefing_run·briefing_error 도 원천이 된다)
+=================================== FAILURES ===================================
+E   assert [211423] == [211421]
+
+      At index 0 diff: 211423 != 211421
+      Use -v to get more diff
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:204: assert [211423] == [211421]
+E   assert [6842, 6843] == [6843]
+
+      At index 0 diff: 6842 != 6843
+      Left contains one more item: 6843
+      Use -v to get more diff
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:220: assert [6842, 6843] == [6843]
+E   AssertionError: assert [{'composer':...했어요.'}], ...}] == []
+
+      Left contains one more item: {'composer': 'llm', 'generated_at': '2026-03-01T09:00:00Z', 'lines': [{'basis': {'event_ids': [11], 'fact_keys': ['취미']}, 'text': '지난번에 등산 얘기를 했어요.'}], 'pattern_sentences': [{'key': 'pattern:meal', 'sentence': '자주 식사를 함께했어요.'}], ...}
+      Use -v to get more diff
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:325: AssertionError: assert [{'composer':...했어요.'}], ...}] == []
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다
+FAILED tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 - ass...
+FAILED tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록
+3 failed, 57 passed in 0.89s
+exit=1
+
+==================================================================
+### MUT=V2
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] V2 적용: 목록 쿼리 user_id 격리 제거
+=================================== FAILURES ===================================
+E   assert [6912, 6911] == [6911]
+
+      At index 0 diff: 6912 != 6911
+      Left contains one more item: 6911
+      Use -v to get more diff
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:234: assert [6912, 6911] == [6911]
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 - asser...
+1 failed, 59 passed in 0.85s
+exit=1
+
+==================================================================
+### MUT=V3
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] V3 적용: 기간 경계 >= -> > (정확히 7일 전 일정이 빠진다)
+=================================== FAILURES ===================================
+E   assert 6980 in [6982]
+     +  where 6980 = <app.db.models.Schedule object at 0x10c692f30>.id
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:251: assert 6980 in [6982]
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함
+1 failed, 59 passed in 0.87s
+exit=1
+
+==================================================================
+### MUT=V4
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] V4 적용: 일정별 최신 1행(rn == 1) 제거
+=================================== FAILURES ===================================
+E   AssertionError: assert 3 == 1
+     +  where 3 = len([{'composer': 'llm', 'generated_at': '2026-03-01T04:00:00Z', 'lines': [{'basis': {'event_ids': [], 'fact_keys': []}, '...], 'fact_keys': []}, 'text': '중간'}], 'pattern_sentences': [{'key': 'pattern:meal', 'sentence': '자주 식사를 함께했어요.'}], ...}])
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:179: AssertionError: assert 3 == 1
+E   assert [211575, 211576] == [211576]
+
+      At index 0 diff: 211575 != 211576
+      Left contains one more item: 211576
+      Use -v to get more diff
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:192: assert [211575, 211576] == [211576]
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_일정마다_최신_1행만 - Assertion...
+FAILED tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행
+2 failed, 58 passed in 0.90s
+exit=1
+
+==================================================================
+### MUT=V5
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] V5 적용: [표에 없음] row_number 분할 키를 schedule_id 가 아니라 person_id 로 (인물당 1행)
+=================================== FAILURES ===================================
+E   assert 7114 in [7116]
+     +  where 7114 = <app.db.models.Schedule object at 0x111095e50>.id
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:251: assert 7114 in [7116]
+E   assert [7119] == [7117, 7119, 7118, 7120]
+
+      At index 0 diff: 7119 != 7117
+      Right contains 3 more items, first extra item: 7119
+      Use -v to get more diff
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:269: assert [7119] == [7117, 7119, 7118, 7120]
+E   assert 1 == 20
+     +  where 1 = len([7141])
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:284: assert 1 == 20
+E   AssertionError: assert 1 == 2
+     +  where 1 = len([{'composer': 'llm', 'generated_at': '2026-03-01T08:00:00Z', 'lines': [{'basis': {'event_ids': [11], 'fact_keys': ['취미']}, 'text': '지난번에 등산 얘기를 했어요.'}], 'pattern_sentences': [{'key': 'pattern:meal', 'sentence': '자주 식사를 함께했어요.'}], ...}])
+     +    where [{'composer': 'llm', 'generated_at': '2026-03-01T08:00:00Z', 'lines': [{'basis': {'event_ids': [11], 'fact_keys': ['취미']}, 'text': '지난번에 등산 얘기를 했어요.'}], 'pattern_sentences': [{'key': 'pattern:meal', 'sentence': '자주 식사를 함께했어요.'}], ...}] = json()
+     +      where json = <Response [200 OK]>.json
+     +        where <Response [200 OK]> = get('/briefings')
+     +          where get = <starlette.testclient.TestClient object at 0x111359260>.get
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_briefings.py:387: AssertionError: assert 1 == 2
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함
+FAILED tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순
+FAILED tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 - asser...
+FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변
+4 failed, 56 passed in 0.87s
+exit=1
+
+==================================================================
+### MUT=V6
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] V6 적용: [표에 없음] schedule_id 모드에서만 목록 쿼리의 Person.user_id 조건 제거 (사전 소유 확인은 유지)
+60 passed in 0.87s
+exit=0
+
+==================================================================
+### MUT=V7
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] V7 적용: [표에 없음] 응답 항목 dict 에 raw_utterance 키를 끼워 넣음 (response_model 이 걸러 내는지)
+60 passed in 0.90s
+exit=0
+
+==================================================================
+### MUT=V8
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] V8 적용: ChatPendingQuestionOut 에서 kind 필드 누락
+..FFFFFF....................................................
+=================================== FAILURES ===================================
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+      {'type': 'missing', 'loc': ('response', 0, 'kind'), 'msg': 'Field required', 'input': ChatPendingQuestionOutNoKind(question_id=4685, status='pending', question='민수를 기억할까요?', options=['기억해줘', '아니'])}
+
+      File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/api/routes.py", line 470, in read_pending_questions
+        GET /questions/pending
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:296: fastapi.exceptions.ResponseValidationError: 1 validation error:
+E   fastapi.exceptions.ResponseValidationError: 3 validation errors:
+      {'type': 'missing', 'loc': ('response', 0, 'kind'), 'msg': 'Field required', 'input': ChatPendingQuestionOutNoKind(question_id=4687, status='pending', question='이름', options=['예', '아니오'])}
+      {'type': 'missing', 'loc': ('response', 1, 'kind'), 'msg': 'Field required', 'input': ChatPendingQuestionOutNoKind(question_id=4688, status='pending', question='중간', options=['예', '아니오'])}
+      {'type': 'missing', 'loc': ('response', 2, 'kind'), 'msg': 'Field required', 'input': ChatPendingQuestionOutNoKind(question_id=4686, status='pending', question='늦음', options=['예', '아니오'])}
+
+      File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/api/routes.py", line 470, in read_pending_questions
+        GET /questions/pending
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:296: fastapi.exceptions.ResponseValidationError: 3 validation errors:
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+      {'type': 'missing', 'loc': ('response', 0, 'kind'), 'msg': 'Field required', 'input': ChatPendingQuestionOutNoKind(question_id=4689, status='pending', question='내 것', options=['예', '아니오'])}
+
+      File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/api/routes.py", line 470, in read_pending_questions
+        GET /questions/pending
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:296: fastapi.exceptions.ResponseValidationError: 1 validation error:
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+      {'type': 'missing', 'loc': ('response', 0, 'kind'), 'msg': 'Field required', 'input': ChatPendingQuestionOutNoKind(question_id=4691, status='pending', question='열림', options=['예', '아니오'])}
+
+      File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/api/routes.py", line 470, in read_pending_questions
+        GET /questions/pending
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:296: fastapi.exceptions.ResponseValidationError: 1 validation error:
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+      {'type': 'missing', 'loc': ('response', 0, 'kind'), 'msg': 'Field required', 'input': ChatPendingQuestionOutNoKind(question_id=4693, status='pending', question='23시간59분59초', options=['예', '아니오'])}
+
+      File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/api/routes.py", line 470, in read_pending_questions
+        GET /questions/pending
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:296: fastapi.exceptions.ResponseValidationError: 1 validation error:
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+      {'type': 'missing', 'loc': ('response', 0, 'kind'), 'msg': 'Field required', 'input': ChatPendingQuestionOutNoKind(question_id=4696, status='pending', question='열림', options=['예', '아니오'])}
+
+      File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/api/routes.py", line 470, in read_pending_questions
+        GET /questions/pending
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:296: fastapi.exceptions.ResponseValidationError: 1 validation error:
+=========================== short test summary info ============================
+FAILED tests/test_api_questions_pending.py::test_필드_5개_값_일치 - fastapi.e...
+FAILED tests/test_api_questions_pending.py::test_created_at_오름차순 - fastap...
+FAILED tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 - fast...
+FAILED tests/test_api_questions_pending.py::test_답변된_질문은_제외 - fastapi...
+FAILED tests/test_api_questions_pending.py::test_만료_경계_24시간 - fastapi.e...
+FAILED tests/test_api_questions_pending.py::test_쓰기_0_trace_0 - fastapi.exc...
+6 failed, 54 passed in 0.87s
+exit=1
+
+==================================================================
+### MUT=U1R
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] U1R 적용: [U1 회귀] last_contact max -> min
+=================================== FAILURES ===================================
+E   assert [22952, 22951] == [22951, 22952]
+
+      At index 0 diff: 22952 != 22951
+      Use -v to get more diff
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_persons.py:74: assert [22952, 22951] == [22951, 22952]
+E   AssertionError: assert datetime.datetime(2026, 1, 30, 9, 0, tzinfo=datetime.timezone.utc) == (datetime.datetime(2026, 3, 1, 9, 0, tzinfo=datetime.timezone.utc) - datetime.timedelta(days=1))
+     +  where datetime.datetime(2026, 1, 30, 9, 0, tzinfo=datetime.timezone.utc) = _dt('2026-01-30T09:00:00Z')
+     +  and   datetime.timedelta(days=1) = timedelta(days=1)
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_persons.py:85: AssertionError: assert datetime.datetime(2026, 1, 30, 9, 0, tzinfo=datetime.timezone.utc) == (datetime.datetime(2026, 3, 1, 9, 0, tzinfo=datetime.timezone.utc) - datetime.timedelta(days=1))
+E   AssertionError: assert datetime.datetime(2026, 2, 20, 9, 0, tzinfo=datetime.timezone.utc) == (datetime.datetime(2026, 3, 1, 9, 0, tzinfo=datetime.timezone.utc) - datetime.timedelta(days=5))
+     +  where datetime.datetime(2026, 2, 20, 9, 0, tzinfo=datetime.timezone.utc) = _dt('2026-02-20T09:00:00Z')
+     +  and   datetime.timedelta(days=5) = timedelta(days=5)
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_persons.py:136: AssertionError: assert datetime.datetime(2026, 2, 20, 9, 0, tzinfo=datetime.timezone.utc) == (datetime.datetime(2026, 3, 1, 9, 0, tzinfo=datetime.timezone.utc) - datetime.timedelta(days=5))
+E   AssertionError: assert datetime.datetime(2026, 2, 26, 9, 0, tzinfo=datetime.timezone.utc) == (datetime.datetime(2026, 3, 1, 9, 0, tzinfo=datetime.timezone.utc) - datetime.timedelta(days=2))
+     +  where datetime.datetime(2026, 2, 26, 9, 0, tzinfo=datetime.timezone.utc) = _dt('2026-02-26T09:00:00Z')
+     +  and   datetime.timedelta(days=2) = timedelta(days=2)
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_persons.py:179: AssertionError: assert datetime.datetime(2026, 2, 26, 9, 0, tzinfo=datetime.timezone.utc) == (datetime.datetime(2026, 3, 1, 9, 0, tzinfo=datetime.timezone.utc) - datetime.timedelta(days=2))
+=========================== short test summary info ============================
+FAILED tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준
+FAILED tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at
+FAILED tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순
+FAILED tests/test_api_read_persons.py::test_카드_구성과_분리_집계 - Assertion...
+4 failed, 56 passed in 0.87s
+exit=1
+
+==================================================================
+### MUT=U2R
+==================================================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+[mutplug] U2R 적용: [U2 회귀] 근거 조회의 person_facts.person_id 조건 제거
+=================================== FAILURES ===================================
+E   assert 200 == 404
+     +  where 200 = <Response [200 OK]>.status_code
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_raw.py:215: assert 200 == 404
+E   assert 200 == 404
+     +  where 200 = <Response [200 OK]>.status_code
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_raw.py:237: assert 200 == 404
+E   assert 200 == 404
+     +  where 200 = <Response [200 OK]>.status_code
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_raw.py:248: assert 200 == 404
+E   assert {200, 404} == {404}
+
+      Extra items in the left set:
+      200
+      Use -v to get more diff
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_read_raw.py:263: assert {200, 404} == {404}
+=========================== short test summary info ============================
+FAILED tests/test_api_read_raw.py::test_근거_404_없는_인물 - assert 200 == 404
+FAILED tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우
+FAILED tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우
+FAILED tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 - assert...
+4 failed, 56 passed in 0.88s
+exit=1
+
+==================================================================
+### 원복 확인: git status --short (변이는 런타임 치환이라 저장소 변경 없음 -- 아래가 구현자 변경 그대로여야 한다)
+ M app/api/read.py
+ M app/api/routes.py
+ M app/api/schemas.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/fixes/FIX-033.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8-frontend/01-plan.md
+ M docs/wiki/packages/P8-frontend/03-log.md
+ M docs/wiki/registry.md
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1733-verifier-u3-full-regression.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1733-verifier-u3-grep.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1733-verifier-u3-lint.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1733-verifier-u3-tests.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1800-u3-mutation-raw.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1800-u3-mutation-script.py.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1800-u3-mutation.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1800-u3-read-questions-briefings.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261012-1800-u3-regression.txt
+?? tests/helpers_read_api.py
+?? tests/test_api_questions_pending.py
+?? tests/test_api_read_briefings.py
+### git diff --stat HEAD -- app tests
+ app/api/read.py    | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ app/api/routes.py  |  39 +++++++++++++++-
+ app/api/schemas.py |  28 ++++++++++++
+ 3 files changed, 187 insertions(+), 8 deletions(-)

@@ -1,0 +1,105 @@
+변이 시험 (FIX-033). 저장소 파일은 고치지 않는다 — 스크래치패드 사본(app/tests/alembic)에서만 한 줄씩 바꿔
+`tests/test_api_questions_pending.py tests/test_api_read_briefings.py` 를 돌린다.
+스크립트: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u3.py
+(스크립트가 pytest 출력에서 FAILED/AssertionError/요약 줄만 추려 출력한다. 아래는 그 출력에서
+`AssertionError` 위치 줄·코드 발췌 줄을 뺀 발췌본이다. 줄 단위 원본은 스크래치패드 u3-mut.txt 에 있다.)
+
+대조군(변이 없음)
+    30 passed in 0.83s
+M1 최신 선택: created_at desc -> asc
+    tests/test_api_read_briefings.py:180: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_일정마다_최신_1행만 - assert 20...
+    1 failed, 29 passed in 0.84s
+M2 동률: id desc -> asc
+    tests/test_api_read_briefings.py:192: AssertionError
+    FAILED tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행
+    1 failed, 29 passed in 0.84s
+M3 step 필터 제거
+    FAILED tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다
+    FAILED tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 - ass...
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록
+    3 failed, 27 passed in 0.86s
+M4 tool_name 필터 제거
+    FAILED tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외
+    1 failed, 29 passed in 0.87s
+M5 조회 쿼리 user_id 격리 제거
+    FAILED tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 - asser...
+    1 failed, 29 passed in 0.94s
+M6 기간 경계 >= -> >
+    FAILED tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함
+    1 failed, 29 passed in 0.88s
+M7 BRIEFINGS_LOOKBACK_DAYS 7 -> 8
+    FAILED tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함
+    1 failed, 29 passed in 0.92s
+M8 정렬 2차 키 id desc -> asc
+    FAILED tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순
+    1 failed, 29 passed in 0.88s
+M9 정렬 1차 키 scheduled_at desc -> asc
+    FAILED tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함
+    FAILED tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순
+    FAILED tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 - asser...
+    3 failed, 27 passed in 0.87s
+M10 BRIEFINGS_LIMIT 20 -> 21
+    FAILED tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 - asser...
+    1 failed, 29 passed in 0.85s
+M11 limit 제거
+    FAILED tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 - asser...
+    1 failed, 29 passed in 1.05s
+M12 schedule_id 모드에도 기간 적용
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨
+    1 failed, 29 passed in 0.89s
+M13 schedule_id 소유 확인(404) 제거
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 - a...
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 - a...
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다
+    FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변
+    4 failed, 26 passed in 0.91s
+M14 schedule_id 소유 확인 user 조건 제거
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 - a...
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다
+    2 failed, 28 passed in 0.90s
+M15 일정별 1행(rn==1) 제거
+    FAILED tests/test_api_read_briefings.py::test_일정마다_최신_1행만 - Assertion...
+    FAILED tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행
+    2 failed, 28 passed in 0.89s
+M16 schedule_id 필터 제거
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_필터_1건 - assert [...
+    FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변
+    2 failed, 28 passed in 0.92s
+M17 generated_at 을 일정 시각으로 오매핑
+    FAILED tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 - Assert...
+    1 failed, 29 passed in 1.05s
+M18 trace_id 를 일정 id 로 오매핑
+    FAILED tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 - assert...
+    FAILED tests/test_api_read_briefings.py::test_일정마다_최신_1행만 - assert 45...
+    FAILED tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행
+    FAILED tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_필터_1건 - assert 4...
+    5 failed, 25 passed in 1.05s
+M19 push 를 고정값으로
+    FAILED tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 - Assert...
+    1 failed, 29 passed in 0.97s
+M20 pending: get_now 미반영(만료 기준 실시계)
+    FAILED tests/test_api_questions_pending.py::test_필드_5개_값_일치 - Assertion...
+    FAILED tests/test_api_questions_pending.py::test_created_at_오름차순 - assert...
+    FAILED tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 - asse...
+    FAILED tests/test_api_questions_pending.py::test_답변된_질문은_제외 - assert ...
+    FAILED tests/test_api_questions_pending.py::test_만료_경계_24시간 - assert []...
+    FAILED tests/test_api_questions_pending.py::test_쓰기_0_trace_0 - assert 0 == 1
+    6 failed, 24 passed in 0.97s
+M21 pending: 세션 격리 제거(다른 세션도)
+    FAILED tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0
+    FAILED tests/test_api_questions_pending.py::test_쓰기_0_trace_0 - AssertionEr...
+    2 failed, 28 passed in 0.96s
+M22 briefings 라우트가 now 대신 실시계
+    12 failed, 18 passed in 1.00s
+M23 briefed_at 쓰기 주입(조회가 UPDATE)
+    E       AssertionError: schedules.briefed_at 이 바뀌었다
+    FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변
+    1 failed, 29 passed in 1.00s
+M24 persons.updated_at 쓰기 주입
+    E       AssertionError: persons.updated_at 이 바뀌었다
+    FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변
+    1 failed, 29 passed in 1.00s
+
+원복 확인: 변이는 전부 스크래치패드 사본에서만 수행. 저장소 app/ 은 변이 후 `git diff --stat` 로 U3 변경 3파일만 보인다(아래 별도 확인).
