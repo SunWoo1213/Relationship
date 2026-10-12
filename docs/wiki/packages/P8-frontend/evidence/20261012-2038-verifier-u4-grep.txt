@@ -1,0 +1,197 @@
+P8-frontend U4 grep·범위 점검 (verifier, 2026-10-12 20:38~20:39, cwd=저장소 루트). 두 번에 나눠 실행했다 — 첫 실행이 zsh 글롭(`--include=*.tsx`) 오류로 중간에 끊겨, 끊긴 항목은 따옴표를 붙여 다시 돌렸다(둘 다 원문 그대로).
+
+=============== 1차 실행 (20:38) ===============
+$ grep -rn 'push-dev' web/src web/public web/index.html ; echo "exit=$?"
+exit=1 (1 = 0건)
+
+$ grep -rnE 'https?://' web/src web/index.html web/public
+web/public/favicon.svg:1:<svg xmlns="http://www.w3.org/2000/svg" width="48" height="46" fill="none" viewBox="0 0 48 46"><path fill="#863bff" d="M25.946 44.938c-
+exit=0
+
+$ grep -rnE 'fonts\.googleapis|fonts\.gstatic|cdn\.|@fontsource|next-themes' web/src web/index.html web/package.json
+web/src/components/ui/sonner.tsx:4:// 어두운 모드는 OS 설정만 따른다(전환 토글 없음, 결정 L) — next-themes 를 쓰지 않는다.
+exit=0 (1 = 0건)
+
+$ grep -nE 'rm |rimraf|rd /|del |cp |mv |&&|\|\||\$[A-Z]|%[A-Z]|cross-env|NODE_ENV=' web/package.json
+12:    "build": "tsc -b && vite build",
+exit=0
+
+$ grep -nE '"[\^~]' web/package.json
+exit=1 (1 = ^·~ 버전 0건)
+
+$ grep -rnE 'getUserMedia|SpeechRecognition|webkitSpeech' web/src web/public
+exit=1 (1 = 0건)
+
+$ grep -rn raw_utterance web/src
+web/src/api/types.ts:115:  raw_utterance: string
+web/src/api/types.ts:129:  raw_utterance: string
+
+$ grep -rnE 'VITE_[A-Z_]*(KEY|SECRET|TOKEN)' web/ --exclude-dir=node_modules --exclude-dir=dist
+exit=1 (1 = 0건)
+
+$ ls web/src/components/ui
+badge.tsx
+button.tsx
+card.tsx
+collapsible.tsx
+skeleton.tsx
+sonner.tsx
+tabs.tsx
+
+$ ls web/src web/public web/e2e ; ls web/src/App.css web/src/assets web/README.md web/src/index.css web/.env 2>&1
+web/e2e:
+
+web/public:
+favicon.svg
+
+web/src:
+__tests__
+api
+App.tsx
+components
+hooks
+lib
+main.tsx
+routes.ts
+screens
+styles
+test-setup.ts
+ls: web/.env: No such file or directory
+ls: web/README.md: No such file or directory
+ls: web/src/App.css: No such file or directory
+ls: web/src/assets: No such file or directory
+ls: web/src/index.css: No such file or directory
+
+$ cat web/.env.example
+VITE_API_TARGET=http://localhost:8000
+
+$ git diff --stat
+ .github/workflows/tests.yml              | 25 +++++++++++++++++++++++++
+ docs/wiki/HANDOFF.md                     |  9 +++++----
+ docs/wiki/journal.md                     |  2 ++
+ docs/wiki/packages/P8-frontend/03-log.md |  9 +++++++++
+ docs/wiki/registry.md                    | 19 +++++++++++++------
+ 5 files changed, 54 insertions(+), 10 deletions(-)
+
+$ git diff -U0 .github/workflows/tests.yml | grep -c '^@@' ; git diff --numstat .github/workflows/tests.yml
+1
+25	0	.github/workflows/tests.yml
+
+$ git diff --stat -- app alembic tests .gitignore docs/RUNNING.md   (비면 무변경)
+(끝)
+
+$ git status --short | grep -E '^ ?D' ; echo "exit=$?"
+exit=1 (1 = 삭제된 추적 파일 0)
+
+$ git status --short --untracked-files=all | grep '^?? web/' | grep -vE 'node_modules|/dist/' | wc -l
+      37
+
+$ git status --short --untracked-files=all | grep '^?? web/' | grep -vE 'node_modules|/dist/'
+?? web/.env.example
+?? web/.gitignore
+?? web/.oxlintrc.json
+?? web/components.json
+?? web/e2e/.gitkeep
+?? web/index.html
+?? web/package-lock.json
+?? web/package.json
+?? web/playwright.config.ts
+?? web/public/favicon.svg
+?? web/src/App.tsx
+?? web/src/__tests__/api.test.ts
+?? web/src/__tests__/helpers.ts
+?? web/src/__tests__/routes.test.tsx
+?? web/src/api/client.ts
+?? web/src/api/types.ts
+?? web/src/components/Sidebar.tsx
+?? web/src/components/ui/badge.tsx
+?? web/src/components/ui/button.tsx
+?? web/src/components/ui/card.tsx
+?? web/src/components/ui/collapsible.tsx
+?? web/src/components/ui/skeleton.tsx
+?? web/src/components/ui/sonner.tsx
+?? web/src/components/ui/tabs.tsx
+?? web/src/hooks/useMediaQuery.ts
+?? web/src/lib/utils.ts
+?? web/src/main.tsx
+?? web/src/routes.ts
+?? web/src/screens/BriefingScreen.tsx
+?? web/src/screens/ChatScreen.tsx
+?? web/src/screens/PersonCardScreen.tsx
+?? web/src/styles/tokens.css
+?? web/src/test-setup.ts
+?? web/tsconfig.app.json
+?? web/tsconfig.json
+?? web/tsconfig.node.json
+?? web/vite.config.ts
+
+$ git status --short --untracked-files=all | grep -E '^\?\? web/(node_modules|dist)' | wc -l   (0 이면 web/.gitignore 가 막음)
+       0
+
+=============== 2차 실행 (20:39, 끊긴 항목) ===============
+$ grep -rlE 'Sheet|Dialog|Drawer' web/src --include='*.tsx' | grep -v '^web/src/components/ui/'   (01-plan 불변식 10, 대소문자 구분)
+exit=1 (1 = 0파일)
+
+$ grep -rliE 'sheet|dialog|drawer' web/src --include='*.tsx' | grep -v '^web/src/components/ui/'   (대소문자 무시)
+web/src/components/Sidebar.tsx
+web/src/__tests__/routes.test.tsx
+exit=0
+
+$ grep -rn 'AppShell' web/src --include='*.tsx' --include='*.ts'
+web/src/App.tsx:1:import AppShell from '@/components/Sidebar'
+web/src/App.tsx:12:    <AppShell route={route}>
+web/src/App.tsx:17:    </AppShell>
+web/src/components/Sidebar.tsx:45:export default function AppShell({ route, children }: { route: Route; children: ReactNode }) {
+
+$ grep -rnE 'localStorage|sessionStorage' web/src --include='*.ts' --include='*.tsx' | grep -v __tests__
+web/src/components/Sidebar.tsx:43: * 열림/닫힘은 이 컴포넌트의 상태일 뿐 라우트도 localStorage 도 아니다. 하단 탭바 없음.
+exit=0 (1 = 제품 코드 0건)
+
+$ grep -rn 'vite.svg\|react.svg\|App.css\|index.css' web/src web/index.html
+exit=1 (1 = 0건)
+
+$ head -c 120 web/public/favicon.svg
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="46" fill="none" viewBox="0 0 48 46"><path fill="#863bff" d="M
+$ grep -c 'fill="#863bff"' web/public/favicon.svg   (create-vite 템플릿 public/vite.svg 와 같은 보라 번개 — 템플릿 잔재 여부)
+1
+$ ls -la web/public
+total 24
+drwxr-xr-x@  3 sunwoo  staff    96 10월 12 20:19 .
+drwxr-xr-x@ 20 sunwoo  staff   640 10월 12 20:30 ..
+-rw-r--r--@  1 sunwoo  staff  9522 10월 12 20:19 favicon.svg
+
+$ cat web/dist/index.html
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>관계 메모리</title>
+    <script type="module" crossorigin src="/assets/index-ClEEdF8L.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Cdlu2p9I.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+
+$ grep -rnE 'lang=|<meta' web/index.html
+web/index.html:2:<html lang="ko">
+web/index.html:4:    <meta charset="UTF-8" />
+web/index.html:6:    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+$ grep -rn 'replaceState\|pushState' web/src --include='*.ts' --include='*.tsx' | grep -v __tests__
+web/src/routes.ts:49:  // 렌더 중 주소 갱신은 history.replaceState 로 — 뒤로 가기 기록을 늘리지 않는다.
+web/src/routes.ts:50:  window.history.replaceState(null, '', DEFAULT_HASH)
+
+$ grep -rn 'aria-modal\|focus' web/src/components/Sidebar.tsx
+exit=1 (1 = 0건 — 서랍에 포커스 가둠·aria-modal 없음)
+
+== verifier 해석 ==
+- `/push-dev/` 0 · 음성 API 0 · `VITE_*KEY|SECRET|TOKEN` 0 · `fonts.googleapis|gstatic|cdn.` 0(next-themes 는 주석 1건뿐, 패키지 아님) · 외부 URL 은 favicon.svg 의 `xmlns` 네임스페이스뿐(네트워크 요청 아님).
+- `web/.gitignore` 가 node_modules·dist·test-results·playwright-report 를 막는다(untracked 0). 최상위 `.gitignore` 는 무변경 — 01-plan 80행 표는 최상위 파일을 지목했으나 효과는 같다.
+- `app/`·`alembic/`·`tests/`·`docs/RUNNING.md` 무변경, 삭제된 추적 파일 0, `web/.env` 없음, `.env.example` 은 기본값 한 줄(비밀 아님).
+- CI diff 는 추가 25줄·삭제 0·hunk 1개 — 기존 두 job 무변경.
+- 01-plan 불변식 10(`Sheet|Dialog|Drawer` 대소문자 구분 grep)은 **0파일** — 서랍이 shadcn Sheet 가 아니라 직접 구현(`role="dialog"` 소문자)이라 계획의 "1파일뿐" 기대와 어긋난다(소견 참고).
+- 템플릿 잔재: `App.css`·`assets/`·`README.md`·`index.css`·`vite.svg`·`react.svg` 없음. `public/favicon.svg` 는 shadcn/Vite 템플릿이 넣은 보라·파랑 번개 아이콘(이 제품의 것이 아님, 9.5 kB) — 유일한 잔재.

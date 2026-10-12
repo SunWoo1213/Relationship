@@ -1,0 +1,135 @@
+P8-frontend U4 — verifier 변이 시험 (3/3: V4 · V5 · 원복 확인 · 종합). 같은 사본 vmut, ANSI 색 제어문자만 제거.
+
+==== V4 · 알 수 없는 해시일 때 주소를 #/chat 으로 바꾸지 않음 (routes.ts 50행 replaceState 삭제 — 화면은 chat 이지만 주소는 #/nope 로 남음) (20:42)
+변이 diff (저장소 원본 vs 사본):
+50d49
+<   window.history.replaceState(null, '', DEFAULT_HASH)
+$ npm test -- --run
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 2 failed) 222ms
+   ❯ 해시 라우팅 3경로 (결정 C) (7)
+     × 알 수 없는 해시는 #/chat 으로 보낸다 5ms
+     × 해시가 비어 있어도 #/chat 으로 보낸다 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+AssertionError: expected '#/nope' to be '#/chat' // Object.is equality
+
+Expected: "#/chat"
+Received: "#/nope"
+
+ ❯ src/__tests__/routes.test.tsx:47:34
+     45|     const { container } = render(<App />)
+     46|     expect(container.querySelector('[data-screen="chat"]')).not.toBeNu…
+     47|     expect(window.location.hash).toBe('#/chat')
+       |                                  ^
+     48|   })
+     49|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+AssertionError: expected '' to be '#/chat' // Object.is equality
+
+- Expected
++ Received
+
+- #/chat
+
+ ❯ src/__tests__/routes.test.tsx:54:34
+     52|     const { container } = render(<App />)
+     53|     expect(container.querySelector('[data-screen="chat"]')).not.toBeNu…
+     54|     expect(window.location.hash).toBe('#/chat')
+       |                                  ^
+     55|   })
+     56|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 18 passed (20)
+   Start at  20:42:29
+   Duration  757ms (environment 50%, tests 23%, import 13%, setup 9%, transform 4%, worker 1%)
+
+exit=1
+[원복] routes.ts
+
+→ V4 결과: 2 failed — 검출. "알 수 없는 해시 → chat" 계약을 화면(data-screen)과 주소(location.hash) 양쪽으로 단언한다(M1 은 목적지 상수만 바꿨고, 이 변이는 주소 갱신 자체를 없앤 것).
+
+==== V5 · 해시의 쿼리(?schedule_id=N)를 떼지 않음 (routes.ts pathOf — U7 의 #/briefings?schedule_id=N 이 알 수 없는 해시가 됨) (20:42)
+변이 diff (저장소 원본 vs 사본):
+21c21
+<   return q === -1 ? withoutHash : withoutHash.slice(0, q)
+---
+>   return withoutHash
+$ npm test -- --run
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 1 failed) 241ms
+   ❯ 해시 라우팅 3경로 (결정 C) (7)
+     × parseHash 경계: 숫자가 아닌 id·끝 슬래시·쿼리 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > parseHash 경계: 숫자가 아닌 id·끝 슬래시·쿼리
+AssertionError: expected null to deeply equal { name: 'briefings' }
+
+- Expected:
+{
+  "name": "briefings",
+}
+
++ Received:
+null
+
+ ❯ src/__tests__/routes.test.tsx:61:52
+     59|     expect(parseHash('#/persons/')).toBeNull()
+     60|     expect(parseHash('#/chat/extra')).toBeNull()
+     61|     expect(parseHash('#/briefings?schedule_id=3')).toEqual({ name: 'br…
+       |                                                    ^
+     62|     expect(parseHash('#/persons/7')).toEqual({ name: 'persons', person…
+     63|     expect(parseHash('#/persons')).toEqual({ name: 'persons', personId…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 19 passed (20)
+   Start at  20:42:45
+   Duration  801ms (environment 47%, tests 24%, import 16%, setup 9%, transform 4%, worker 1%)
+
+exit=1
+[원복] routes.ts
+--- 저장소 상태(변이 후)
+ M .github/workflows/tests.yml
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8-frontend/03-log.md
+ M docs/wiki/registry.md
+사본이 저장소와 다시 동일(원복 확인)
+
+→ V5 결과: 1 failed — 검출. U7 이 기대는 `#/briefings?schedule_id=N` 해석을 고정한다(단, 쿼리 값을 읽어 주는 API 는 없다 — U7 에서 `location.hash` 를 직접 파싱해야 한다, 소견 참고).
+
+== 종합 ==
+| 변이 | 바꾼 것 | 기대 | 결과 |
+|---|---|---|---|
+| V0 | 없음 | 20 passed | 20 passed |
+| V1 | vite.config.ts 프록시 `rewrite` 삭제 | 어떤 테스트가 잡아야 함 | **20 passed — 살아남음(테스트 공백)** |
+| V2 | client.ts `!response.ok` → `false` | api.test 오류 2건 FAIL | 2 failed |
+| V3 | test-setup.ts fetch 차단 삭제 | api.test 결정 J 1건 FAIL | 1 failed |
+| V4 | routes.ts replaceState 삭제 | routes.test 알 수 없는 해시·빈 해시 FAIL | 2 failed |
+| V5 | routes.ts 쿼리 제거 안 함 | routes.test parseHash 경계 FAIL | 1 failed |
+변이 5건 중 4건 검출, 1건(V1) 공백. 저장소 변경 0(`git status --short` 의 M 5건은 변이 전과 같은 메인 세션 문서·CI 변경).

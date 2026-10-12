@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-12 18:20 (**U3 완료 — 커밋 직전**. verifier `review-u3-read-questions-briefings.md` 통과([필수] 0·[권고] 6, 1차 실행 watchdog 중단 → SendMessage 재개로 산출물 완성). 사용자 결정: R-U3-1·2 는 U9 로, "커밋 + 실험 푸시". 커밋 뒤 `git push origin dev2` → CI 세 job 확인 → 03-log 에 해시·run 보충(다음 커밋). 서브에이전트 없음)
+갱신: 2026-10-13 00:05 (**U4 완료 — 커밋 직전**. verifier 재검증 통과([필수] 0 · [권고] 3 → R-U4-13 닫음, R-U4-11·12 는 U5 로). 사용자 "커밋 + 실험 푸시". 커밋 뒤 `git push origin dev2` → CI **다섯 job** 확인(web windows 첫 실행) → 03-log `pending` 보충은 U5 커밋에. 서브에이전트 없음)
 
-active: **P8-frontend**(U0·U1·U2·**U3** 완료 — **U4 부터**) | frozen: none | 브랜치 `dev2` = origin/dev2 `7031a19`(+ U3 커밋 예정) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
+active: **P8-frontend**(U0·U1·U2·U3·**U4** 완료 — **U5 부터**) | frozen: none | 브랜치 `dev2` = origin/dev2 `95ca2c0`(+ U4 커밋 예정) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
 
 ## 2026-10-11 세션에 끝낸 것 (커밋 순, 전부 origin/dev2·CI 세 job success)
 | 커밋 | 내용 | CI(windows) |
@@ -25,8 +25,9 @@ active: **P8-frontend**(U0·U1·U2·**U3** 완료 — **U4 부터**) | frozen: n
 - 이 HANDOFF(종료 기록) · `FIX-033.md` 결과절 해시·run 1줄 · journal 자동 줄(`7031a19` COMMIT·PUSH-dev2). U3 첫 커밋에 같이 넣으면 된다(따로 커밋할 필요 없음).
 
 ## 바로 다음에 할 것 (순서대로)
-1. **U3 커밋·푸시·CI 확인**(이 HANDOFF 시점에 커밋 직전). 끊겼으면 `git log -1` 로 U3 커밋이 있는지, `git status` 로 미커밋이 남았는지, `gh run list --limit 3` 로 CI 확인. 03-log U3 항목 `pending` → 해시·run 은 다음 커밋(U4)에 보충. registry "(U3 미커밋)" 6칸도 그때 해시로.
-2. **U4 프론트 골격**(frontend-agent, L-004 승인 → `--stage frontend-agent`): 01-plan 95행. 위임 프롬프트에 FIX-033 (a)~(d) + **(c) 강화 "변이마다 pytest/vitest 출력 전체를 파일로"(R-U3-3)** + R-U0-3(verifier 가 `web/package.json` scripts·의존성·lock 점검) + `node v24.21.0`·`npm 11.19.0` 확인. U7 위임 전 사용자 결정 필요: `#/briefings?schedule_id=N` 강조를 목록+클라이언트 강조로 할지 `GET /briefings?schedule_id=` 호출로 할지(R-U3-6 ⑤).
+1. **세션 재개 확인**: `git log -1`(U4 커밋 있어야 함) · `git status --short`(HANDOFF·journal 만) · `gh run list --limit 2`(**다섯 job** — web windows 첫 실행, 실패하면 FIX 후보로 사용자에게). U5 커밋에 03-log U4 `pending` → 해시·run, registry "(U4 미커밋)" 7칸 → 해시.
+2. **U5 채팅 화면 + 확인 칩**(frontend-agent, L-004): 01-plan 96행. 프롬프트에 **계획 원문 인용·임의 제한 금지**(U4 교훈: CI 두 OS·shadcn "등") + R-U4-10 규칙(도구 강제는 기록 후 진행 / 구현자 선택은 멈추고 보고) + (c) 출력 전체 + U4 이월 **R-U4-11**(`proxy.ts` `resolveApiTarget(env)` 순수 함수로 테스트 환경 독립) · **R-U4-12**(서랍 폭 `data-[side=left]:w-64`). verifier 고정 점검 R-U0-3.
+   U7 위임 전 사용자 결정 필요: `#/briefings?schedule_id=N` 강조를 목록+클라이언트 강조로 할지 `GET /briefings?schedule_id=` 호출로 할지(R-U3-6 ⑤).
 3. **U9 백엔드 몫에 넣을 것**: R-U3-1(`ctx.now = now` → `dataclasses.replace`) · R-U3-2(목록 조인 `Person.id == Schedule.person_id` 한 줄) · R-U3-5(U1·U2 쓰기 0 테스트를 `helpers_read_api` 로, `push_subscriptions` 스냅샷 추가) · 판정표 9·10행 끝에서 끝.
 3. **U4~U9**(frontend-agent — U0 완료로 위임 가능, R-U0-3: 단위마다 verifier 가 `web/package.json` scripts·의존성·lock 점검) → **U10 사람 점검** → verifier 04-review.
 4. **복기자료**: `~/Desktop/Portfolio/wiki/interview/relationship/17-개발과정-해설.md` 에 이 세션(U0·FIX-031·U1·U2·약점 11개·FIX-014 4라운드·032·033) 절 **미기록** — 문제점 목록(2026-10-11 15:20 보고)을 한계·교훈으로. README 갱신 기록 → `python3 양식/도구/interview_pdf.py relationship`.

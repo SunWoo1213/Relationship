@@ -1,0 +1,28 @@
+P8-frontend U4 재작업 1 — shadcn 을 dependencies → devDependencies 로 이동 (2026-10-12 20:30)
+
+$ cd web && npm install      (package.json 에서 shadcn 줄을 devDependencies 로 옮긴 뒤; 추가 패키지 없음)
+npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn install-scripts   fsevents@2.3.3 (install: (install scripts present))
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+
+$ grep -n '"node_modules/shadcn"' -A6 package-lock.json | head -12     (lock 이 따라 바뀜: "dev": true 가 붙음)
+7483:    "node_modules/shadcn": {
+7484-      "version": "4.21.4",
+7485-      "resolved": "https://registry.npmjs.org/shadcn/-/shadcn-4.21.4.tgz",
+7486-      "integrity": "sha512-YYfn/hsHbRH2mGwnKBx9tk+DjTQH+RUMS5iCxjKzwzuJ5uoHPqLOFUCJSeX0sXfrcBSfgQaXiOLGKNLjlIQxxw==",
+7487-      "dev": true,
+7488-      "license": "MIT",
+7489-      "dependencies": {
+
+$ npm audit --omit=dev
+found 0 vulnerabilities
+exit=0
+
+$ npm audit      (참고: dev 포함 전체 — 취약 경로는 shadcn CLI 내부로 여전히 보임)
+7 high severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+근거: 취약점은 shadcn CLI 내부 fast-glob → micromatch → braces(ReDoS) 와 ts-morph 경로이고 빌드 산출물(번들)과 무관하다.

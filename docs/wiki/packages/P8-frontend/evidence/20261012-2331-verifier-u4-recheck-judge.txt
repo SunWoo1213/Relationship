@@ -1,0 +1,62 @@
+P8-frontend U4 재검증(2차) — verifier 판정 명령 재실행 (verifier/fable, 2026-10-12 23:31, cwd=web). 네 명령을 하나씩 따로 실행. 출력 전체(vitest 출력의 ANSI 색 제어문자만 sed 로 제거).
+
+$ cd web && npm ci
+
+added 494 packages, and audited 495 packages in 3s
+
+131 packages are looking for funding
+  run `npm fund` for details
+
+7 high severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn install-scripts   fsevents@2.3.3 (install: (install scripts present))
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+exit=0
+
+$ npm run typecheck   (23:31)
+
+> web@0.0.0 typecheck
+> tsc -b
+
+exit=0
+
+$ npm test -- --run   (23:31)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  3 passed (3)
+      Tests  24 passed (24)
+   Start at  23:31:37
+   Duration  811ms (environment 50%, tests 23%, setup 10%, import 9%, transform 7%, worker 1%)
+
+exit=0
+
+$ npm run build   (23:31)
+
+> web@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 2023 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.46 kB │ gzip:   0.32 kB
+dist/assets/index-B9a6Arut.css   42.71 kB │ gzip:   7.73 kB
+dist/assets/index-D3qg0EPK.js   333.21 kB │ gzip: 106.20 kB
+
+✓ built in 124ms
+exit=0
+
+(비고) 구현자 증거 20261012-2055-u4-skeleton-rework2.txt 의 산출물은 `index-CUTMAm14.css 42.94 kB`·`index-BoMnzHRV.js 333.21 kB` 로 해시·CSS 크기가 다르다. 구현자 빌드(20:55) 뒤 메인 세션이 옛 `web/src/components/Sidebar.tsx` 를 삭제했고(03-log), Tailwind v4 는 import 여부와 무관하게 소스 파일의 클래스를 스캔하므로 그 파일의 클래스(`bg-black/50`·`inset-y-0` 등)가 CSS 에서 빠져 0.23 kB 줄었다. JS 는 크기 동일(333.21 kB)이고 해시만 다른데 Vite 의 청크 해시가 참조 CSS 자산 이름을 포함하기 때문이다 — 소스 차이가 아니라 삭제의 결과. 현재 트리 기준 산출물은 이 파일의 것이다.

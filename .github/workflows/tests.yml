@@ -149,3 +149,28 @@ jobs:
       # test-guards.sh 자체가 bash 스크립트이므로 Git Bash 로 돌린다.
       - shell: bash
         run: bash .claude/scripts/test-guards.sh
+
+  web:
+    # Refs: P8-frontend U4 결정 B -- 프론트 골격 검증. 타입 검사 · Vitest · 빌드.
+    # 자동 테스트는 실제 네트워크를 쓰지 않는다(결정 J). Playwright E2E 는 U9 에서 더한다.
+    # 사용자 결정 2026-10-12: 타입·Vitest·빌드는 ubuntu·windows 두 OS(결정 B).
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test -- --run
+      - run: npm run build

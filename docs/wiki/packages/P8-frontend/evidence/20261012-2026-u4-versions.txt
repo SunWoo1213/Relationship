@@ -1,0 +1,45 @@
+P8-frontend U4 — 쓴 도구·의존성 버전 (frontend-agent, 2026-10-12)
+
+== 실행한 생성 명령 (버전 고정) ==
+$ node --version        -> v24.21.0
+$ npm --version         -> 11.19.0
+$ npm create vite@9.2.1 web -- --template react-ts --no-interactive      (create-vite 9.2.1, 템플릿 react-ts)
+$ npm install --save-exact tailwindcss @tailwindcss/vite                 (4.3.3 / 4.3.3)
+$ npm install --save-exact -D vitest jsdom @testing-library/react @testing-library/dom @testing-library/jest-dom @testing-library/user-event @playwright/test
+$ npx shadcn@4.21.4 init -t vite -b radix -p vega -y -f --css-variables --no-reinstall   (shadcn 4.21.4, preset vega, base radix, style radix-vega)
+    (대화형 질문이 뜨는 플래그 조합 두 번은 질문에서 멈춰 중단했다 — "components.json 덮어쓰기?"·"preset?". 위 플래그로 비대화 완료.)
+$ npx shadcn@4.21.4 add card badge collapsible skeleton tabs sonner -y   (+ init 이 button 생성)
+$ npm uninstall @fontsource-variable/inter next-themes                   (계획: 시스템 글꼴·OS 어두운 모드만 — 외부 글꼴·토글 라이브러리 제거)
+Playwright: @playwright/test 1.64.0 (npm 의존성). 브라우저 설치(npx playwright@<버전> install)는 하지 않았다 — U9.
+
+== npm ls --depth=0 (전체) ==
+$ cd web && npm ls --depth=0
+web@0.0.0 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+├── @playwright/test@1.64.0
+├── @tailwindcss/vite@4.3.3
+├── @testing-library/dom@10.4.2
+├── @testing-library/jest-dom@7.0.1
+├── @testing-library/react@16.3.3
+├── @testing-library/user-event@14.6.7
+├── @types/node@24.19.2
+├── @types/react-dom@19.3.0
+├── @types/react@19.3.0
+├── @vitejs/plugin-react@6.1.2
+├── class-variance-authority@0.7.1
+├── cn@0.4.0
+├── jsdom@30.1.2
+├── lucide-react@1.55.0
+├── oxlint@1.87.0
+├── radix-ui@1.8.0
+├── react-dom@19.3.0
+├── react@19.3.0
+├── shadcn@4.21.4
+├── sonner@2.0.8
+├── tailwindcss@4.3.3
+├── tw-animate-css@1.4.0
+├── typescript@6.0.3
+├── vite@8.3.4
+└── vitest@5.0.4
+
+package.json 의 모든 의존성은 위 정확한 버전으로 고정했다(^·~ 없음).
+shadcn 이 가져온 `cn@0.4.0` 은 shadcn-ui/cn 저장소(github.com/shadcn-ui/cn)의 클래스 병합 패키지다 — clsx+tailwind-merge 대체이며 이번 shadcn 템플릿(src/lib/utils.ts)이 직접 import 한다.

@@ -1,0 +1,123 @@
+P8-frontend U4 — 프론트 골격 판정 (frontend-agent, 2026-10-12 20:23, node v24.21.0 / npm 11.19.0)
+
+== 0. 첫 명령 ==
+$ node --version
+v24.21.0
+$ npm --version
+11.19.0
+(기대값과 일치)
+
+== 1. 1차 실행 (실패 — 기록용) ==
+$ cd web && npm ci && npm run typecheck && npm test -- --run && npm run build
+npm ci 는 성공, `npm run typecheck`(tsc -b) 가 src/__tests__/api.test.ts 의 catch 결과 타입(unknown) 오류 6건으로 exit=2:
+  src/__tests__/api.test.ts(50,12): error TS18046: 'err' is of type 'unknown'.
+  src/__tests__/api.test.ts(51,12): error TS18046: 'err' is of type 'unknown'.
+  src/__tests__/api.test.ts(57,12): error TS18046: 'e422' is of type 'unknown'.
+  src/__tests__/api.test.ts(58,12): error TS18046: 'e422' is of type 'unknown'.
+  src/__tests__/api.test.ts(62,12): error TS18046: 'e500' is of type 'unknown'.
+  src/__tests__/api.test.ts(63,12): error TS18046: 'e500' is of type 'unknown'.
+(vitest 는 타입을 안 보므로 20 passed 였다 — 테스트에 failureOf 헬퍼를 두어 고침.)
+
+== 2. 2차 실행 (판정 명령 전체 출력, exit=0) ==
+$ cd web && npm ci && npm run typecheck && npm test -- --run && npm run build
+
+added 494 packages, and audited 495 packages in 3s
+
+131 packages are looking for funding
+  run `npm fund` for details
+
+7 high severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn install-scripts   fsevents@2.3.3 (install: (install scripts present))
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+
+> web@0.0.0 typecheck
+> tsc -b
+
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  2 passed (2)
+      Tests  20 passed (20)
+   Start at  20:23:45
+   Duration  732ms (environment 48%, tests 21%, import 14%, setup 9%, transform 7%, worker 1%)
+
+
+> web@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 2022 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.46 kB │ gzip:  0.31 kB
+dist/assets/index-Cdlu2p9I.css   34.80 kB │ gzip:  6.55 kB
+dist/assets/index-ClEEdF8L.js   295.23 kB │ gzip: 94.05 kB
+
+✓ built in 117ms
+exit=0
+
+== 3. 테스트 목록 (verbose, 같은 코드의 별도 실행 20:24:13 — 20 passed) ==
+$ npm test -- --run --reporter=verbose
+
+> web@0.0.0 test
+> vitest --run --reporter=verbose
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 기본 경로는 /api 이고 GET 은 본문·Content-Type 이 없다 2ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > POST 는 JSON 본문과 X-Session-Id 헤더를 보낸다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > sessionId 가 null 이면 헤더를 넣지 않는다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > P5 오류 규약 {"detail":{"code"}} 를 ApiError 로 올린다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 규약 밖 본문(422 검증 목록, 비-JSON 5xx)은 code 가 null 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 테스트 환경의 기본 fetch 는 실제 네트워크를 쓰지 않고 실패한다 (결정 J) 1ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다 42ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다 8ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다 7ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다 2ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다 4ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다 2ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > parseHash 경계: 숫자가 아닌 id·끝 슬래시·쿼리 0ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다 7ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다 14ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 기본은 접혀 있고 메뉴 버튼으로 열린다 24ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 항목을 고르면 서랍이 닫히고 그 화면이 보인다 38ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: Esc 와 바깥(배경) 클릭으로도 닫힌다 34ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 열림/닫힘은 라우트도 localStorage 도 바꾸지 않는다 11ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바 9ms
+
+ Test Files  2 passed (2)
+      Tests  20 passed (20)
+   Start at  20:24:13
+   Duration  712ms (environment 51%, tests 22%, import 14%, setup 9%, transform 3%, worker 1%)
+
+== 4. E2E 스크립트 (U9 용 — 테스트 0건) ==
+$ npm run e2e
+> web@0.0.0 e2e
+> playwright test --pass-with-no-tests
+
+exit=0
+
+== 5. 저장소 상태 ==
+$ git status --short
+ M .github/workflows/tests.yml
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8-frontend/03-log.md
+ M docs/wiki/registry.md
+?? web/
+
+== 6. npm audit (참고) ==
+7 high severity — 전부 `shadcn@4.21.4`(CLI, dependencies 에 들어옴) → @shadcn/registry → fast-glob → micromatch → braces (ReDoS, GHSA-vfj7-8cjw-p6xm) 와 ts-morph 계열. 런타임 번들 아님(빌드 산출물 295kB 에 미포함), 수정안 `audit fix --force` 는 shadcn@1.0.0 으로 강등(깨짐) → 적용하지 않음. 보고 항목.

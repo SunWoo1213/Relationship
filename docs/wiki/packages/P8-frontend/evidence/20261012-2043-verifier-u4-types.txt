@@ -1,0 +1,40 @@
+P8-frontend U4 — `web/src/api/types.ts` ↔ `app/api/schemas.py` 전수 대조 (verifier, 2026-10-12 20:43)
+방법: 두 파일을 통째로 읽고(schemas.py 406행 · types.ts 232행) 모델마다 필드 이름·타입·선택성·null 가능성을 손으로 맞췄다. 행 번호는 각 파일의 것. pydantic `datetime` 은 JSON 에서 ISO 8601 문자열이므로 TS `IsoDateTime = string` 과 대응시킨다. 응답(Out) 모델의 `= None`/`default_factory` 기본값은 직렬화 결과에 항상 키가 있으므로 TS 쪽 "필수 + null 허용" 이 맞고, 요청(In) 모델의 기본값만 TS `?:` 로 옮기는 것이 맞다.
+
+| schemas.py 모델(행) | 필드 → pydantic 타입 | types.ts(행) | TS 타입 | 일치 |
+|---|---|---|---|---|
+| AnswerIn(52) | answer: str | AnswerIn(37) | answer: string | ✓ |
+| HealthOut(60) | status Literal · db Literal · alembic_revision str\|None=None | — | **없음** | 화면이 쓰지 않는 모델 — 누락이 아니라 의도적 생략으로 봄(registry 비고 "Out/In 모델 전부" 문구만 부정확) |
+| ChatIn(68) | utterance: str (min_length=1) | ChatIn(10) | utterance: string | ✓ (길이 제약은 타입으로 표현 불가) |
+| StoredOut(75) | persons·events·schedules: int | StoredOut(14) | number ×3 | ✓ |
+| ChatPendingQuestionOut(85) | question_id int · status str · kind str · question str · options list[str] | ChatPendingQuestionOut(20) | number · string · string · string · string[] | ✓ (`GET /questions/pending` 도 `list[ChatPendingQuestionOut]`, routes.py 470행) |
+| AnswerOut(96) | question_id int · status str · reply str · stored StoredOut · pending_question ChatPendingQuestionOut\|None=None · stop_reason str\|None=None · trace_ids list[int]=[] | AnswerOut(41) | number · string · string · StoredOut · ChatPendingQuestionOut\|null · string\|null · number[] | ✓ |
+| ChatOut(111) | reply str · session_id str · stored · pending_question \|None · stop_reason \|None · trace_ids list[int] | ChatOut(28) | string · string · StoredOut · \|null · \|null · number[] | ✓ |
+| BriefingRunIn(130) | schedule_id: int\|None = None | BriefingRunIn(185) | schedule_id?: number\|null | ✓ (요청 모델의 기본값 → 선택) |
+| BriefingBasisOut(140) | fact_keys list[str]=[] · event_ids list[int]=[] | BriefingBasisOut(139) | string[] · number[] | ✓ |
+| BriefingLineOut(148) | text str · basis BriefingBasisOut | BriefingLineOut(144) | string · BriefingBasisOut | ✓ |
+| BriefingSuggestionOut(155) | text · basis | BriefingSuggestionOut(149) | string · BriefingBasisOut | ✓ |
+| BriefingPatternSentenceOut(163) | key str · sentence str | BriefingPatternSentenceOut(154) | string · string | ✓ |
+| BriefingItemOut(170) | schedule_id int · person_id int · composer Literal["llm","template"] · pattern_sentences list · lines list · suggestion \|None=None · push str | BriefingItemOut(190) | number · number · BriefingComposer('llm'\|'template', 159행) · [] · [] · \|null · string | ✓ |
+| BriefingScheduleOut(186) | id int · title str · scheduled_at datetime | BriefingScheduleOut(161) | number · string · IsoDateTime | ✓ |
+| BriefingPersonOut(192) | id int · display_name str | BriefingPersonOut(167) | number · string | ✓ |
+| BriefingRecordOut(197) | schedule · person · generated_at datetime · composer Literal · pattern_sentences · lines · suggestion \|None · push str · trace_id int | BriefingRecordOut(173) | BriefingScheduleOut · BriefingPersonOut · IsoDateTime · BriefingComposer · [] · [] · \|null · string · number | ✓ |
+| BriefingSkippedOut(214) | schedule_id int · reason str | BriefingSkippedOut(200) | number · string | ✓ |
+| BriefingRunOut(223) | run_id str · generated_at datetime · briefings list · skipped list | BriefingRunOut(205) | string · IsoDateTime · BriefingItemOut[] · BriefingSkippedOut[] | ✓ |
+| VapidPublicKeyOut(252) | public_key str | VapidPublicKeyOut(214) | string | ✓ |
+| PushSubscriptionKeysIn(259) | p256dh str · auth str (base64url 검증) | PushSubscriptionKeysIn(218) | string · string | ✓ (검증 규칙은 타입 밖) |
+| PushSubscriptionIn(276) | endpoint str(https 검증) · keys · expirationTime float\|None=None | PushSubscriptionIn(223) | string · PushSubscriptionKeysIn · expirationTime?: number\|null | ✓ |
+| PushSubscriptionOut(296) | id int · created bool | PushSubscriptionOut(229) | number · boolean | ✓ |
+| PersonListItemOut(312) | id int · display_name str · relation_tag str · hierarchy str · last_contact_at datetime\|None | PersonListItemOut(53) | number · string ×3 · IsoDateTime\|null | ✓ |
+| PersonBasicOut(322) | id · display_name · relation_tag · hierarchy | PersonBasicOut(61) | number · string ×3 | ✓ |
+| PersonFactOut(329) | id int · key str · value str · updated_at datetime · source_count int | PersonFactOut(68) | number · string · string · IsoDateTime · number | ✓ |
+| PersonPatternOut(337) | id · key · value · source_count | PersonPatternOut(76) | number · string · string · number | ✓ |
+| TimelineEventOut(344) | id int · type str · content str · occurred_at datetime | TimelineEventOut(83) | number · string · string · IsoDateTime | ✓ |
+| UpcomingScheduleOut(351) | id · title · scheduled_at datetime · briefed_at datetime\|None | UpcomingScheduleOut(90) | number · string · IsoDateTime · IsoDateTime\|null | ✓ |
+| PersonCardOut(358) | person · aliases list[str] · last_contact_at \|None · facts · patterns · timeline · upcoming_schedules | PersonCardOut(97) | PersonBasicOut · string[] · \|null · PersonFactOut[] · PersonPatternOut[] · TimelineEventOut[] · UpcomingScheduleOut[] | ✓ |
+| EventRawOut(377) | event_id int · person_id int · type · content · occurred_at datetime · raw_utterance str | EventRawOut(109) | number · number · string · string · IsoDateTime · string | ✓ |
+| FactBriefOut(388) | id · key · value | FactBriefOut(118) | number · string · string | ✓ |
+| FactSourceEventOut(394) | event_id · type · content · occurred_at · raw_utterance | FactSourceEventOut(124) | number · string · string · IsoDateTime · string | ✓ |
+| FactSourcesOut(402) | fact FactBriefOut · sources list[FactSourceEventOut] | FactSourcesOut(132) | FactBriefOut · FactSourceEventOut[] | ✓ |
+
+결과: schemas.py 의 모델 32개 중 31개가 types.ts 에 있고 필드 이름·타입·선택성·null 가능성 전부 일치. 어긋난 필드 0. 빠진 모델은 `HealthOut` 1개(화면 비사용). types.ts 에만 있는 이름은 `IsoDateTime`(별칭)·`BriefingComposer`(Literal 을 뽑아낸 별칭)뿐이고 둘 다 원본의 다른 표현이다. `events.type` 고정 집합(CLAUDE.md 7종)은 schemas.py 도 `str` 이라 TS 도 `string` — 원본과 같음.

@@ -1,0 +1,190 @@
+P8-frontend U4 재작업 3 — 변이 시험 출력 전체 (2/2: M8~M9 + 종합). 같은 실행(20:31:06~08)의 이어지는 부분.
+(M8 의 DOM 덤프는 ANSI 색 제어문자가 섞인 원본이다. 터미널 출력에서 ESC 바이트(0x1b)는 눈에 보이지 않아 "[36m" 등 잔여 표기만 보인다 — 그 바이트만 파일에 못 옮겼고 나머지는 원문 그대로다.)
+
+==================== M8 · 브리핑 경로 #/briefings → #/brief (사이드바 링크·라우팅 계약) ====================
+변이: src/routes.ts
+  - briefings: '#/briefings',
+  + briefings: '#/brief',
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 2 failed) 1284ms
+   ❯ 앱 틀 — 사이드바 (결정 N) (7)
+     × 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다 10ms
+     × 좁은 폭: 항목을 고르면 서랍이 닫히고 그 화면이 보인다 1047ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 18 passed (20)
+   Start at  20:31:06
+   Duration  1.91s (tests 59%, environment 26%, import 7%, setup 6%, transform 2%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+AssertionError: expected [ [ '채팅', '#/chat' ], …(2) ] to deeply equal [ [ '채팅', '#/chat' ], …(2) ]
+
+- Expected
++ Received
+
+@@ -7,8 +7,8 @@
+      "인물",
+      "#/persons",
+    ],
+    [
+      "브리핑",
+-     "#/briefings",
++     "#/brief",
+    ],
+  ]
+
+ ❯ src/__tests__/routes.test.tsx:73:19
+     71|     const nav = screen.getByRole('navigation', { name: '주 메뉴' })
+     72|     const links = Array.from(nav.querySelectorAll('a')).map((a) => [a.…
+     73|     expect(links).toEqual([
+       |                   ^
+     74|       ['채팅', '#/chat'],
+     75|       ['인물', '#/persons'],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 항목을 고르면 서랍이 닫히고 그 화면이 보인다
+AssertionError: expected null not to be null
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex h-dvh bg-background text-foreground"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"메뉴 열기"[39m
+          [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-9 fixed left-2 top-2 z-30"[39m
+          [33mdata-size[39m=[32m"icon"[39m
+          [33mdata-slot[39m=[32m"button"[39m
+          [33mdata-variant[39m=[32m"ghost"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-menu"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M4 5h16"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M4 12h16"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M4 19h16"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+        [36m</button>[39m
+        [36m<main[39m
+          [33mclass[39m=[32m"min-w-0 flex-1 overflow-y-auto p-6 pt-14 lg:pt-6"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"screen-title"[39m
+            [33mdata-screen[39m=[32m"chat"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"text-title font-semibold"[39m
+              [33mid[39m=[32m"screen-title"[39m
+            [36m>[39m
+              [0m채팅[0m
+            [36m</h1>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-atomic[39m=[32m"false"[39m
+            [33maria-label[39m=[32m"Notifications alt+T"[39m
+            [33maria-live[39m=[32m"polite"[39m
+            [33maria-relevant[39m=[32m"additions text"[39m
+            [33mdata-react-aria-top-layer[39m=[32m"true"[39m
+            [33mtabindex[39m=[32m"-1"[39m
+          [36m/>[39m
+        [36m</main>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m...
+ ❯ src/__tests__/routes.test.tsx:106:72
+    104|     expect(screen.queryByRole('navigation', { name: '주 메뉴' })).toBeNul…
+    105|     await waitFor(() => {
+    106|       expect(container.querySelector('[data-screen="briefings"]')).not…
+       |                                                                        ^
+    107|     })
+    108|   })
+ ❯ runWithExpensiveErrorDiagnosticsDisabled ../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback ../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback ../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+exit=1
+
+==================== M9 · 서랍 열림 상태를 localStorage 에 저장(결정 N 위반) ====================
+변이: src/components/Sidebar.tsx
+  - onClick={() => setOpen(true)}
+  + onClick={() => { window.localStorage.setItem('drawer', '1'); setOpen(true) }}
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 1 failed) 214ms
+   ❯ 앱 틀 — 사이드바 (결정 N) (7)
+     × 열림/닫힘은 라우트도 localStorage 도 바꾸지 않는다 14ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 19 passed (20)
+   Start at  20:31:08
+   Duration  727ms (environment 51%, tests 23%, import 14%, setup 9%, transform 3%, worker 1%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 열림/닫힘은 라우트도 localStorage 도 바꾸지 않는다
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/__tests__/routes.test.tsx:129:40
+    127|     await userEvent.click(screen.getByRole('button', { name: '메뉴 열기' }…
+    128|     expect(window.location.hash).toBe('#/persons')
+    129|     expect(window.localStorage.length).toBe(0)
+       |                                        ^
+    130|   })
+    131|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+exit=1
+
+모든 변이가 검출됨(M0 제외)

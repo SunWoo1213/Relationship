@@ -1,0 +1,657 @@
+P8-frontend U4 — 변이 시험 (frontend-agent, 2026-10-12 20:24~20:25)
+
+방법: 저장소 web/ 의 소스를 스크래치패드 사본
+  /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+에 복사(node_modules 는 심볼릭 링크)하고, 변이마다 사본의 한 줄을 치환한 뒤 `npm test -- --run` 을 돌렸다.
+스크립트: .../scratchpad/mutate.mjs (저장소 밖). 저장소 파일은 수정하지 않았다 — 끝에 `git status --short` 첨부.
+아래는 vitest 출력 전체이다. (M8 의 DOM 덤프에 섞인 ANSI 색 제어문자만 제거했다. 그 밖의 줄은 원문 그대로.)
+
+==================== M0 · 기준선(변이 없음) ====================
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+
+ Test Files  2 passed (2)
+      Tests  20 passed (20)
+   Start at  20:24:59
+   Duration  741ms (environment 49%, tests 21%, import 13%, setup 9%, transform 7%, worker 1%)
+
+
+exit=0
+
+==================== M1 · 알 수 없는 해시의 기본 목적지 #/chat → #/briefings ====================
+변이: src/routes.ts
+  - export const DEFAULT_HASH = HREF.chat
+  + export const DEFAULT_HASH = HREF.briefings
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 2 failed) 206ms
+   ❯ 해시 라우팅 3경로 (결정 C) (7)
+     × 알 수 없는 해시는 #/chat 으로 보낸다 6ms
+     × 해시가 비어 있어도 #/chat 으로 보낸다 3ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 18 passed (20)
+   Start at  20:25:00
+   Duration  717ms (environment 51%, tests 22%, import 14%, setup 9%, transform 3%, worker 1%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+AssertionError: expected null not to be null
+ ❯ src/__tests__/routes.test.tsx:46:65
+     44|     goto('#/nope')
+     45|     const { container } = render(<App />)
+     46|     expect(container.querySelector('[data-screen="chat"]')).not.toBeNu…
+       |                                                                 ^
+     47|     expect(window.location.hash).toBe('#/chat')
+     48|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+AssertionError: expected null not to be null
+ ❯ src/__tests__/routes.test.tsx:53:65
+     51|     goto('/')
+     52|     const { container } = render(<App />)
+     53|     expect(container.querySelector('[data-screen="chat"]')).not.toBeNu…
+       |                                                                 ^
+     54|     expect(window.location.hash).toBe('#/chat')
+     55|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+exit=1
+
+==================== M2 · 데스크톱 경계 1024px → 1025px ====================
+변이: src/components/Sidebar.tsx
+  - (min-width: 1024px)
+  + (min-width: 1025px)
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 1 failed) 207ms
+   ❯ 앱 틀 — 사이드바 (결정 N) (7)
+     × 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바 12ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 19 passed (20)
+   Start at  20:25:01
+   Duration  738ms (environment 50%, tests 22%, import 15%, setup 9%, transform 4%, worker 1%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+AssertionError: expected <button data-slot="button" …(5)>…(1)</button> to be null
+
+- Expected:
+null
+
++ Received:
+<button
+  aria-expanded="false"
+  aria-label="메뉴 열기"
+  class="group/button inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-9 fixed left-2 top-2 z-30"
+  data-size="icon"
+  data-slot="button"
+  data-variant="ghost"
+>
+  <svg
+    aria-hidden="true"
+    class="lucide lucide-menu"
+    fill="none"
+    height="24"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="2"
+    viewBox="0 0 24 24"
+    width="24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M4 5h16"
+    />
+    <path
+      d="M4 12h16"
+    />
+    <path
+      d="M4 19h16"
+    />
+  </svg>
+</button>
+
+ ❯ src/__tests__/routes.test.tsx:141:61
+    139|     installFakeMatchMedia(1024)
+    140|     render(<App />)
+    141|     expect(screen.queryByRole('button', { name: '메뉴 열기' })).toBeNull()
+       |                                                             ^
+    142|     expect(screen.getByRole('navigation', { name: '주 메뉴' })).toBeInThe…
+    143|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+exit=1
+
+==================== M3 · 서랍에서 항목 선택 시 닫지 않음(onNavigate={close} → 빈 함수) ====================
+변이: src/components/Sidebar.tsx
+  - <SidebarContent route={route} onNavigate={close} />
+  + <SidebarContent route={route} onNavigate={() => {}} />
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 1 failed) 206ms
+   ❯ 앱 틀 — 사이드바 (결정 N) (7)
+     × 좁은 폭: 항목을 고르면 서랍이 닫히고 그 화면이 보인다 41ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 19 passed (20)
+   Start at  20:25:02
+   Duration  733ms (environment 50%, tests 22%, import 14%, setup 9%, transform 4%, worker 1%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 항목을 고르면 서랍이 닫히고 그 화면이 보인다
+AssertionError: expected <nav aria-label="주 메뉴" …(1)>…(2)</nav> to be null
+
+- Expected:
+null
+
++ Received:
+<nav
+  aria-label="주 메뉴"
+  class="flex h-full flex-col gap-4 p-4"
+>
+  <ul
+    class="flex flex-col gap-1"
+  >
+    <li>
+      <a
+        class="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium"
+        href="#/chat"
+      >
+        채팅
+      </a>
+    </li>
+    <li>
+      <a
+        class="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium"
+        href="#/persons"
+      >
+        인물
+      </a>
+    </li>
+    <li>
+      <a
+        aria-current="page"
+        class="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium"
+        href="#/briefings"
+      >
+        브리핑
+      </a>
+    </li>
+  </ul>
+  <div
+    aria-label="인물 목록"
+    class="min-h-0 flex-1 overflow-y-auto"
+    data-testid="sidebar-persons"
+  />
+</nav>
+
+ ❯ src/__tests__/routes.test.tsx:104:64
+    102|     await userEvent.click(screen.getByRole('button', { name: '메뉴 열기' }…
+    103|     await userEvent.click(screen.getByRole('link', { name: '브리핑' }))
+    104|     expect(screen.queryByRole('navigation', { name: '주 메뉴' })).toBeNul…
+       |                                                                ^
+    105|     await waitFor(() => {
+    106|       expect(container.querySelector('[data-screen="briefings"]')).not…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+exit=1
+
+==================== M4 · API 기본 경로 /api → /v1 ====================
+변이: src/api/client.ts
+  - export const API_BASE = '/api'
+  + export const API_BASE = '/v1'
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/api.test.ts (6 tests | 2 failed) 8ms
+   ❯ API 클라이언트 래퍼 (결정 C (ii)) (6)
+     × 기본 경로는 /api 이고 GET 은 본문·Content-Type 이 없다 5ms
+     × POST 는 JSON 본문과 X-Session-Id 헤더를 보낸다 1ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 18 passed (20)
+   Start at  20:25:03
+   Duration  708ms (environment 51%, tests 22%, import 14%, setup 9%, transform 3%, worker 1%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 기본 경로는 /api 이고 GET 은 본문·Content-Type 이 없다
+AssertionError: expected '/v1/persons' to be '/api/persons' // Object.is equality
+
+Expected: "/api/persons"
+Received: "/v1/persons"
+
+ ❯ src/__tests__/api.test.ts:32:17
+     30|     expect(out).toEqual({ ok: 1 })
+     31|     const [url, init] = fetchMock.mock.calls[0]
+     32|     expect(url).toBe('/api/persons')
+       |                 ^
+     33|     expect(init.method).toBe('GET')
+     34|     expect(init.body).toBeUndefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > POST 는 JSON 본문과 X-Session-Id 헤더를 보낸다
+AssertionError: expected '/v1/chat' to be '/api/chat' // Object.is equality
+
+Expected: "/api/chat"
+Received: "/v1/chat"
+
+ ❯ src/__tests__/api.test.ts:43:17
+     41|     await apiFetch('/chat', { method: 'POST', body: { utterance: '안녕' …
+     42|     const [url, init] = fetchMock.mock.calls[0]
+     43|     expect(url).toBe('/api/chat')
+       |                 ^
+     44|     expect(init.method).toBe('POST')
+     45|     expect(init.body).toBe('{"utterance":"안녕"}')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+exit=1
+
+==================== M5 · #/persons/:id 의 id 를 숫자 한정(\d+) → 아무 문자열 ====================
+변이: src/routes.ts
+  - /^\/persons\/(\d+)$/
+  + /^\/persons\/([^/]+)$/
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 1 failed) 213ms
+   ❯ 해시 라우팅 3경로 (결정 C) (7)
+     × parseHash 경계: 숫자가 아닌 id·끝 슬래시·쿼리 2ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 19 passed (20)
+   Start at  20:25:04
+   Duration  749ms (environment 49%, tests 22%, import 15%, setup 9%, transform 4%, worker 1%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > parseHash 경계: 숫자가 아닌 id·끝 슬래시·쿼리
+AssertionError: expected { name: 'persons', personId: NaN } to be null
+
+- Expected:
+null
+
++ Received:
+{
+  "name": "persons",
+  "personId": NaN,
+}
+
+ ❯ src/__tests__/routes.test.tsx:58:40
+     56|
+     57|   it('parseHash 경계: 숫자가 아닌 id·끝 슬래시·쿼리', () => {
+     58|     expect(parseHash('#/persons/abc')).toBeNull()
+       |                                        ^
+     59|     expect(parseHash('#/persons/')).toBeNull()
+     60|     expect(parseHash('#/chat/extra')).toBeNull()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+exit=1
+
+==================== M6 · 세션 헤더 이름 X-Session-Id → X-Session ====================
+변이: src/api/client.ts
+  - export const SESSION_HEADER = 'X-Session-Id'
+  + export const SESSION_HEADER = 'X-Session'
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/api.test.ts (6 tests | 1 failed) 8ms
+   ❯ API 클라이언트 래퍼 (결정 C (ii)) (6)
+     × POST 는 JSON 본문과 X-Session-Id 헤더를 보낸다 3ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 19 passed (20)
+   Start at  20:25:05
+   Duration  718ms (environment 51%, tests 22%, import 14%, setup 9%, transform 3%, worker 1%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > POST 는 JSON 본문과 X-Session-Id 헤더를 보낸다
+AssertionError: expected { …(2) } to deeply equal { …(2) }
+
+- Expected
++ Received
+
+  {
+    "Content-Type": "application/json",
+-   "X-Session-Id": "abc-1",
++   "X-Session": "abc-1",
+  }
+
+ ❯ src/__tests__/api.test.ts:46:26
+     44|     expect(init.method).toBe('POST')
+     45|     expect(init.body).toBe('{"utterance":"안녕"}')
+     46|     expect(init.headers).toEqual({ 'Content-Type': 'application/json',…
+       |                          ^
+     47|   })
+     48|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+exit=1
+
+==================== M7 · Esc 로 서랍 닫기 제거 ====================
+변이: src/components/Sidebar.tsx
+  - if (e.key === 'Escape') setOpen(false)
+  + if (e.key === 'NoSuchKey') setOpen(false)
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 1 failed) 195ms
+   ❯ 앱 틀 — 사이드바 (결정 N) (7)
+     × 좁은 폭: Esc 와 바깥(배경) 클릭으로도 닫힌다 22ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 19 passed (20)
+   Start at  20:25:06
+   Duration  744ms (environment 54%, tests 20%, import 13%, setup 9%, transform 3%, worker 1%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: Esc 와 바깥(배경) 클릭으로도 닫힌다
+AssertionError: expected <nav aria-label="주 메뉴" …(1)>…(2)</nav> to be null
+
+- Expected:
+null
+
++ Received:
+<nav
+  aria-label="주 메뉴"
+  class="flex h-full flex-col gap-4 p-4"
+>
+  <ul
+    class="flex flex-col gap-1"
+  >
+    <li>
+      <a
+        aria-current="page"
+        class="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium"
+        href="#/chat"
+      >
+        채팅
+      </a>
+    </li>
+    <li>
+      <a
+        class="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium"
+        href="#/persons"
+      >
+        인물
+      </a>
+    </li>
+    <li>
+      <a
+        class="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium"
+        href="#/briefings"
+      >
+        브리핑
+      </a>
+    </li>
+  </ul>
+  <div
+    aria-label="인물 목록"
+    class="min-h-0 flex-1 overflow-y-auto"
+    data-testid="sidebar-persons"
+  />
+</nav>
+
+ ❯ src/__tests__/routes.test.tsx:116:64
+    114|     await userEvent.click(screen.getByRole('button', { name: '메뉴 열기' }…
+    115|     await userEvent.keyboard('{Escape}')
+    116|     expect(screen.queryByRole('navigation', { name: '주 메뉴' })).toBeNul…
+       |                                                                ^
+    117|
+    118|     await userEvent.click(screen.getByRole('button', { name: '메뉴 열기' }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+exit=1
+
+==================== M8 · 브리핑 경로 #/briefings → #/brief (사이드바 링크·라우팅 계약) ====================
+변이: src/routes.ts
+  - briefings: '#/briefings',
+  + briefings: '#/brief',
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 2 failed) 1241ms
+   ❯ 앱 틀 — 사이드바 (결정 N) (7)
+     × 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다 11ms
+     × 좁은 폭: 항목을 고르면 서랍이 닫히고 그 화면이 보인다 1043ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 18 passed (20)
+   Start at  20:25:07
+   Duration  1.78s (tests 62%, environment 24%, import 7%, setup 5%, transform 2%, worker 1%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+AssertionError: expected [ [ '채팅', '#/chat' ], …(2) ] to deeply equal [ [ '채팅', '#/chat' ], …(2) ]
+
+- Expected
++ Received
+
+@@ -7,8 +7,8 @@
+      "인물",
+      "#/persons",
+    ],
+    [
+      "브리핑",
+-     "#/briefings",
++     "#/brief",
+    ],
+  ]
+
+ ❯ src/__tests__/routes.test.tsx:73:19
+     71|     const nav = screen.getByRole('navigation', { name: '주 메뉴' })
+     72|     const links = Array.from(nav.querySelectorAll('a')).map((a) => [a.…
+     73|     expect(links).toEqual([
+       |                   ^
+     74|       ['채팅', '#/chat'],
+     75|       ['인물', '#/persons'],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 항목을 고르면 서랍이 닫히고 그 화면이 보인다
+AssertionError: expected null not to be null
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div>
+      <div
+        class="flex h-dvh bg-background text-foreground"
+      >
+        <button
+          aria-expanded="false"
+          aria-label="메뉴 열기"
+          class="(shadcn Button 클래스 문자열 — M2 의 출력과 동일, 길이상 생략하지 않고 같은 값이 찍혔다)"
+          data-size="icon"
+          data-slot="button"
+          data-variant="ghost"
+        >
+          <svg aria-hidden="true" class="lucide lucide-menu" ... (M2 출력과 같은 svg 3개 path)
+        </button>
+        <main
+          class="min-w-0 flex-1 overflow-y-auto p-6 pt-14 lg:pt-6"
+        >
+          <section
+            aria-labelledby="screen-title"
+            data-screen="chat"
+          >
+            <h1
+              class="text-title font-semibold"
+              id="screen-title"
+            >
+              채팅
+            </h1>
+          </section>
+          <section
+            aria-atomic="false"
+            aria-label="Notifications alt+T"
+            aria-live="polite"
+            aria-relevant="additions text"
+            data-react-aria-top-layer="true"
+            tabindex="-1"
+          />
+        </main>
+      </div>
+    </div>
+  </body>
+</html>...
+ ❯ src/__tests__/routes.test.tsx:106:72
+    104|     expect(screen.queryByRole('navigation', { name: '주 메뉴' })).toBeNul…
+    105|     await waitFor(() => {
+    106|       expect(container.querySelector('[data-screen="briefings"]')).not…
+       |                                                                        ^
+    107|     })
+    108|   })
+ ❯ runWithExpensiveErrorDiagnosticsDisabled ../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback ../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback ../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+exit=1
+
+==================== M9 · 서랍 열림 상태를 localStorage 에 저장(결정 N 위반) ====================
+변이: src/components/Sidebar.tsx
+  - onClick={() => setOpen(true)}
+  + onClick={() => { window.localStorage.setItem('drawer', '1'); setOpen(true) }}
+$ npm test -- --run   (cwd = 스크래치패드 사본)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 1 failed) 448ms
+   ❯ 앱 틀 — 사이드바 (결정 N) (7)
+     × 열림/닫힘은 라우트도 localStorage 도 바꾸지 않는다 35ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 19 passed (20)
+   Start at  20:25:09
+   Duration  1.09s (environment 51%, tests 22%, import 14%, setup 9%, transform 3%, worker 1%)
+
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 열림/닫힘은 라우트도 localStorage 도 바꾸지 않는다
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/__tests__/routes.test.tsx:129:40
+    127|     await userEvent.click(screen.getByRole('button', { name: '메뉴 열기' }…
+    128|     expect(window.location.hash).toBe('#/persons')
+    129|     expect(window.localStorage.length).toBe(0)
+       |                                        ^
+    130|   })
+    131|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+exit=1
+
+모든 변이가 검출됨(M0 제외)
+
+주의(정직 표기): 이 파일은 터미널 출력을 Write 로 옮긴 것이다. M8 의 두 번째 FAIL 에 찍힌 DOM 덤프 중 shadcn Button 의 class 문자열(M2 출력과 같은 값)과 svg path 부분은 지면상 괄호 설명으로 줄였다. 그 밖의 줄은 원본과 같다. 원본은 스크립트 재실행으로 그대로 재현된다:
+  node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mutate.mjs
+이 점은 보고서에도 적는다 — "출력 전부" 규칙에 대한 부분 미달(M8 DOM 덤프 한 곳) 이다.

@@ -1,0 +1,151 @@
+P8-frontend U4 재검증(2차) — verifier 탐침: 결정 N 서랍(shadcn Sheet = Radix Dialog)의 접근성 · useRoute 의 수동 hashchange 발행 (verifier/fable, 2026-10-12 23:34~23:35)
+방법: 저장소 web/ 를 스크래치패드 사본 vmut 에 rsync(--delete, node_modules 링크 유지, `diff -rq` 동일)하고, 사본에만 탐침 테스트 `src/__tests__/zz-verifier-probe.test.tsx` 를 두고 `npm test -- --run --reporter=verbose` 를 돌렸다. 저장소에는 아무것도 쓰지 않았다. 탐침 4건:
+  (1) 서랍 열림 뒤 role=dialog 이름 "사이드바" · aria-modal 값 기록 · 포커스가 서랍 안 · 트리거가 aria-hidden 조상 아래(hideOthers) · "Close" 버튼 없음(showCloseButton={false})
+  (2) Tab 6회 동안 포커스가 서랍 안에 머묾 · Esc 로 닫힘 · 포커스가 트리거로 복귀
+  (3) 알 수 없는 해시 → window.dispatchEvent(hashchange) 수동 발행 횟수와 주소, 두 번째 알 수 없는 해시 뒤 추가 발행 없음(무한 루프 없음)
+  (4) StrictMode 로 감싸도 주소 #/chat, 발행 ≤ 2, 이후 추가 발행 없음
+1차 실행(R0)에서 탐침 2건이 내 단언 모델 탓에 실패했고(아래 원문), 단언을 고쳐 다시 돌린 R0' 에서 28/28 통과. 두 실행 모두 원문 그대로(ANSI 색 제어문자만 제거).
+
+==== R0 · 기준선(변이 없음) + verifier 탐침 4건(zz-verifier-probe.test.tsx, 사본에만 있음) — cwd=vmut (23:34)
+$ npm test -- --run --reporter=verbose
+
+> web@0.0.0 test
+> vitest --run --reporter=verbose
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut
+
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 기본 경로는 /api 이고 GET 은 본문·Content-Type 이 없다 3ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > POST 는 JSON 본문과 X-Session-Id 헤더를 보낸다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > sessionId 가 null 이면 헤더를 넣지 않는다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > P5 오류 규약 {"detail":{"code"}} 를 ApiError 로 올린다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 규약 밖 본문(422 검증 목록, 비-JSON 5xx)은 code 가 null 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 테스트 환경의 기본 fetch 는 실제 네트워크를 쓰지 않고 실패한다 (결정 J) 1ms
+ ✓ src/__tests__/proxy.test.ts > vite.config.ts 프록시 연결 (결정 C (ii)) > /api 프록시가 stripApiPrefix 로 접두를 벗기고 대상 기본값은 http://localhost:8000 85ms
+ ✓ src/__tests__/proxy.test.ts > 개발 서버 프록시 경로 변환 (결정 C (ii)) > /api 접두를 벗긴다 0ms
+ ✓ src/__tests__/proxy.test.ts > 개발 서버 프록시 경로 변환 (결정 C (ii)) > /api 만 오면 루트 / 0ms
+ ✓ src/__tests__/proxy.test.ts > 개발 서버 프록시 경로 변환 (결정 C (ii)) > /api 로 시작하지 않는 경로는 그대로 (접두가 비슷한 /apix 포함) 0ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다 43ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다 9ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다 7ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다 3ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다 5ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다 3ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > parseHash 경계: 숫자가 아닌 id·끝 슬래시·쿼리 0ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다 7ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다 15ms
+ × src/__tests__/zz-verifier-probe.test.tsx > [탐침] 서랍 = Radix Dialog 접근성 > 열린 서랍은 role=dialog · aria-modal=true · 접근 가능한 이름 "사이드바" · 포커스가 안에 있다 83ms
+   → expect(element).toHaveAttribute("aria-modal", "true") // element.getAttribute("aria-modal") === "true"
+
+Expected the element to have attribute:
+  aria-modal="true"
+Received:
+  null
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 기본은 접혀 있고 메뉴 버튼으로 열린다 41ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 항목을 고르면 서랍이 닫히고 그 화면이 보인다 51ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: Esc 와 바깥(배경) 클릭으로도 닫힌다 65ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 열림/닫힘은 라우트도 localStorage 도 바꾸지 않는다 20ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바 9ms
+ ✓ src/__tests__/zz-verifier-probe.test.tsx > [탐침] 서랍 = Radix Dialog 접근성 > Tab 을 눌러도 포커스가 서랍 안에 머물고, Esc 로 닫으면 트리거로 돌아온다 138ms
+ × src/__tests__/zz-verifier-probe.test.tsx > [탐침] useRoute 의 수동 hashchange 발행 > 알 수 없는 해시: 발행 1회, 주소 #/chat, 재렌더 뒤 추가 발행 없음 50ms
+   → expected 2 to be 3 // Object.is equality
+ ✓ src/__tests__/zz-verifier-probe.test.tsx > [탐침] useRoute 의 수동 hashchange 발행 > StrictMode 에서도 주소는 #/chat 이고 발행은 2회를 넘지 않는다 27ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/zz-verifier-probe.test.tsx > [탐침] 서랍 = Radix Dialog 접근성 > 열린 서랍은 role=dialog · aria-modal=true · 접근 가능한 이름 "사이드바" · 포커스가 안에 있다
+Error: expect(element).toHaveAttribute("aria-modal", "true") // element.getAttribute("aria-modal") === "true"
+
+Expected the element to have attribute:
+  aria-modal="true"
+Received:
+  null
+ ❯ src/__tests__/zz-verifier-probe.test.tsx:29:20
+     27|     await userEvent.click(trigger)
+     28|     const dialog = screen.getByRole('dialog', { name: '사이드바' })
+     29|     expect(dialog).toHaveAttribute('aria-modal', 'true')
+       |                    ^
+     30|     expect(dialog.contains(document.activeElement)).toBe(true)
+     31|     // 바깥 요소(트리거)는 aria-hidden 처리된다(Radix hideOthers)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/zz-verifier-probe.test.tsx > [탐침] useRoute 의 수동 hashchange 발행 > 알 수 없는 해시: 발행 1회, 주소 #/chat, 재렌더 뒤 추가 발행 없음
+AssertionError: expected 2 to be 3 // Object.is equality
+
+- Expected
++ Received
+
+- 3
++ 2
+
+ ❯ src/__tests__/zz-verifier-probe.test.tsx:71:21
+     69|     expect(window.location.hash).toBe('#/chat')
+     70|     // 브라우저 자체 hashchange(location.hash 대입) 2회 + 수동 발행 1회 = 3
+     71|     expect(count()).toBe(3)
+       |                     ^
+     72|     spy.mockRestore()
+     73|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  2 failed | 26 passed (28)
+   Start at  23:34:40
+   Duration  912ms (environment 45%, tests 27%, import 12%, setup 8%, transform 7%)
+
+exit=1
+
+→ R0 해석: 두 실패는 구현이 아니라 내 탐침의 단언이 틀린 것이다. (a) Radix Dialog 는 `aria-modal` 속성을 쓰지 않고 바깥 요소를 `aria-hidden` 으로 가린다(hideOthers) — 그래서 null. (b) jsdom 에서 `location.hash =` 로 생기는 자체 hashchange 는 `window.dispatchEvent` 를 거치지 않아 spy 에 안 잡힌다 — 세어진 2는 useRoute 의 **수동 발행만**이고, 알 수 없는 해시 2번에 정확히 2번(각 1회)이라는 뜻이다. 단언을 고쳐 재실행:
+
+==== R0' · 기준선 + 탐침 재실행(탐침의 내 단언 2곳 수정: aria-modal 은 기록만 — Radix 는 aria-modal 대신 hideOthers / 수동 발행 수 2) — cwd=vmut (23:35)
+$ npm test -- --run --reporter=verbose
+
+> web@0.0.0 test
+> vitest --run --reporter=verbose
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut
+
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 기본 경로는 /api 이고 GET 은 본문·Content-Type 이 없다 2ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > POST 는 JSON 본문과 X-Session-Id 헤더를 보낸다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > sessionId 가 null 이면 헤더를 넣지 않는다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > P5 오류 규약 {"detail":{"code"}} 를 ApiError 로 올린다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 규약 밖 본문(422 검증 목록, 비-JSON 5xx)은 code 가 null 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 테스트 환경의 기본 fetch 는 실제 네트워크를 쓰지 않고 실패한다 (결정 J) 1ms
+ ✓ src/__tests__/proxy.test.ts > vite.config.ts 프록시 연결 (결정 C (ii)) > /api 프록시가 stripApiPrefix 로 접두를 벗기고 대상 기본값은 http://localhost:8000 81ms
+ ✓ src/__tests__/proxy.test.ts > 개발 서버 프록시 경로 변환 (결정 C (ii)) > /api 접두를 벗긴다 0ms
+ ✓ src/__tests__/proxy.test.ts > 개발 서버 프록시 경로 변환 (결정 C (ii)) > /api 만 오면 루트 / 0ms
+ ✓ src/__tests__/proxy.test.ts > 개발 서버 프록시 경로 변환 (결정 C (ii)) > /api 로 시작하지 않는 경로는 그대로 (접두가 비슷한 /apix 포함) 0ms
+stdout | src/__tests__/zz-verifier-probe.test.tsx > [탐침] 서랍 = Radix Dialog 접근성 > 열린 서랍은 role=dialog · aria-modal=true · 접근 가능한 이름 "사이드바" · 포커스가 안에 있다
+[탐침] aria-modal = null | data-state = open
+
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다 45ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다 10ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다 8ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다 2ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다 5ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다 3ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > parseHash 경계: 숫자가 아닌 id·끝 슬래시·쿼리 0ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다 7ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다 16ms
+ ✓ src/__tests__/zz-verifier-probe.test.tsx > [탐침] 서랍 = Radix Dialog 접근성 > 열린 서랍은 role=dialog · aria-modal=true · 접근 가능한 이름 "사이드바" · 포커스가 안에 있다 89ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 기본은 접혀 있고 메뉴 버튼으로 열린다 43ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 항목을 고르면 서랍이 닫히고 그 화면이 보인다 50ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: Esc 와 바깥(배경) 클릭으로도 닫힌다 65ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 열림/닫힘은 라우트도 localStorage 도 바꾸지 않는다 20ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바 9ms
+ ✓ src/__tests__/zz-verifier-probe.test.tsx > [탐침] 서랍 = Radix Dialog 접근성 > Tab 을 눌러도 포커스가 서랍 안에 머물고, Esc 로 닫으면 트리거로 돌아온다 134ms
+ ✓ src/__tests__/zz-verifier-probe.test.tsx > [탐침] useRoute 의 수동 hashchange 발행 > 알 수 없는 해시: 발행 1회, 주소 #/chat, 재렌더 뒤 추가 발행 없음 47ms
+ ✓ src/__tests__/zz-verifier-probe.test.tsx > [탐침] useRoute 의 수동 hashchange 발행 > StrictMode 에서도 주소는 #/chat 이고 발행은 2회를 넘지 않는다 26ms
+
+ Test Files  4 passed (4)
+ Tests  28 passed (28)
+   Start at  23:35:21
+   Duration  871ms (environment 47%, tests 28%, import 12%, setup 9%, transform 3%, worker 1%)
+
+exit=0
+
+→ R0' 결과(실측): role=dialog 이름 "사이드바"(SheetTitle sr-only) · 포커스가 서랍 안 · 트리거는 aria-hidden 조상 아래(Radix hideOthers — aria-modal 의 대체 기법) · Close 버튼 없음 · Tab 6회 동안 포커스 가둠 · Esc 로 닫힘 · 포커스 트리거 복귀 — 결정 L "접근성: Radix 기본" 충족. useRoute: 알 수 없는 해시마다 수동 hashchange 1회, 주소 #/chat, 추가 틱에서 발행 0(무한 루프 없음), StrictMode 에서도 ≤ 2 회 뒤 정지. 기준선 24/24(저장소 테스트) 통과.
+(탐침 파일 제목의 "aria-modal=true" 문구는 1차 단언 때 붙인 이름이라 그대로 남았다 — 실제 단언은 위에 적은 대로 기록만 한다.)

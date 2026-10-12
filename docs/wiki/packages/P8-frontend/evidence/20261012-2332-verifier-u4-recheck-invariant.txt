@@ -1,0 +1,126 @@
+P8-frontend U4 재검증(2차) — 불변식·의존성·잔재 점검 (verifier, 2026-10-12 23:32, cwd=저장소 루트). 출력 전체. `<1차 사본>` = 1차 리뷰 때 rsync 한 스크래치패드 사본(/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut, 갱신 전) — 1차 리뷰 시점의 web/ 과 같다.
+
+$ grep -rlE 'Sheet|Dialog|Drawer' web/src --include='*.tsx' | grep -v '^web/src/components/ui/'   (01-plan 367행 불변식 10)
+web/src/components/AppShell.tsx
+exit=0
+
+$ grep -rlE 'Sheet|Dialog|Drawer' web/src --include='*.tsx'   (ui 포함)
+web/src/components/AppShell.tsx
+web/src/components/ui/sheet.tsx
+
+$ grep -rn 'Sidebar' web/src --include='*.ts' --include='*.tsx'   (옛 파일 참조 잔재)
+web/src/components/AppShell.tsx:17:function SidebarContent({ route, onNavigate }: { route: Route; onNavigate: () => void }) {
+web/src/components/AppShell.tsx:55:          <SidebarContent route={route} onNavigate={() => {}} />
+web/src/components/AppShell.tsx:71:            <SidebarContent route={route} onNavigate={() => setOpen(false)} />
+exit=0
+
+$ ls web/src/components
+AppShell.tsx
+ui
+
+$ grep -rnE 'localStorage|sessionStorage' web/src --include='*.ts' --include='*.tsx' | grep -v __tests__
+web/src/components/AppShell.tsx:45: * 열림/닫힘은 이 컴포넌트의 상태일 뿐 라우트도 localStorage 도 아니다. 하단 탭바 없음.
+exit=0
+
+$ grep -n 'modal\|aria-\|SheetTitle\|showCloseButton\|side=' web/src/components/AppShell.tsx
+4:import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+19:    <nav aria-label="주 메뉴" className="flex h-full flex-col gap-4 p-4">
+26:              aria-current={route.name === item.key ? 'page' : undefined}
+27:              className="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium"
+35:      <div aria-label="인물 목록" data-testid="sidebar-persons" className="min-h-0 flex-1 overflow-y-auto" />
+43: * - 그 아래: 왼쪽 위 메뉴 버튼으로 여닫는 서랍 — shadcn/ui Sheet(Radix Dialog 기반, side="left").
+60:            <Button variant="ghost" size="icon" aria-label="메뉴 열기" className="fixed left-2 top-2 z-30">
+65:            side="left"
+66:            showCloseButton={false}
+67:            aria-describedby={undefined}
+70:            <SheetTitle className="sr-only">사이드바</SheetTitle>
+
+$ grep -n 'Dialog as SheetPrimitive\|Primitive.Root\|Primitive.Content\|Primitive.Overlay' web/src/components/ui/sheet.tsx
+3:import { Dialog as SheetPrimitive } from "radix-ui"
+8:function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
+9:  return <SheetPrimitive.Root data-slot="sheet" {...props} />
+33:}: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
+35:    <SheetPrimitive.Overlay
+52:}: React.ComponentProps<typeof SheetPrimitive.Content> & {
+59:      <SheetPrimitive.Content
+82:      </SheetPrimitive.Content>
+
+$ diff -q <1차 사본>/package.json web/package.json ; diff -q <1차 사본>/package-lock.json web/package-lock.json
+package.json 동일(1차 리뷰 시점과)
+package-lock.json 동일(1차 리뷰 시점과)
+
+$ grep -c '"node_modules/' web/package-lock.json ; grep -c hasInstallScript web/package-lock.json
+557
+1
+
+$ cd web && npm ls --depth=0
+web@0.0.0 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+├── @playwright/test@1.64.0
+├── @tailwindcss/vite@4.3.3
+├── @testing-library/dom@10.4.2
+├── @testing-library/jest-dom@7.0.1
+├── @testing-library/react@16.3.3
+├── @testing-library/user-event@14.6.7
+├── @types/node@24.19.2
+├── @types/react-dom@19.3.0
+├── @types/react@19.3.0
+├── @vitejs/plugin-react@6.1.2
+├── class-variance-authority@0.7.1
+├── cn@0.4.0
+├── jsdom@30.1.2
+├── lucide-react@1.55.0
+├── oxlint@1.87.0
+├── radix-ui@1.8.0
+├── react-dom@19.3.0
+├── react@19.3.0
+├── shadcn@4.21.4
+├── sonner@2.0.8
+├── tailwindcss@4.3.3
+├── tw-animate-css@1.4.0
+├── typescript@6.0.3
+├── vite@8.3.4
+└── vitest@5.0.4
+
+exit=0
+
+$ cd web && npm audit --omit=dev
+found 0 vulnerabilities
+exit=0
+
+$ git diff --stat -- app alembic tests .gitignore docs/RUNNING.md   (비면 무변경)
+(끝)
+
+$ git status --short | grep -E '^ ?D'
+exit=1 (1 = 삭제된 추적 파일 0)
+
+$ git status --short --untracked-files=all | grep '^?? web/' | grep -vE 'node_modules|/dist/' | wc -l
+      40
+
+$ diff -rq --exclude=node_modules --exclude=dist --exclude=test-results web <1차 사본>   (1차 리뷰 이후 바뀐 파일)
+Files web/src/App.tsx and <1차 사본>/src/App.tsx differ
+Only in web/src/__tests__: proxy.test.ts
+Files web/src/__tests__/routes.test.tsx and <1차 사본>/src/__tests__/routes.test.tsx differ
+Only in web/src/components: AppShell.tsx
+Only in <1차 사본>/src/components: Sidebar.tsx
+Only in web/src/components/ui: sheet.tsx
+Only in web/src: proxy.ts
+Files web/src/routes.ts and <1차 사본>/src/routes.ts differ
+Files web/tsconfig.node.json and <1차 사본>/tsconfig.node.json differ
+Files web/vite.config.ts and <1차 사본>/vite.config.ts differ
+
+$ grep -rn 'tw-animate\|animate-' web/src --include='*.tsx' --include='*.css' | grep -v 'ui/sheet.tsx' | cut -c1-120
+web/src/styles/tokens.css:2:@import "tw-animate-css";
+web/src/components/ui/sonner.tsx:24:          <Loader2Icon className="size-4 animate-spin" />
+web/src/components/ui/skeleton.tsx:7:      className={cn("animate-pulse rounded-md bg-muted", className)}
+
+$ ls web/.env ; echo VITE_API_TARGET=${VITE_API_TARGET:-<미설정>}   (내 환경에서 proxy.test 기본값 단언이 성립하는 조건)
+ls: web/.env: No such file or directory
+VITE_API_TARGET=<미설정>
+
+== verifier 해석 ==
+- 불변식 10: ui/ 밖 1파일 `web/src/components/AppShell.tsx` — 01-plan 367행 "1파일뿐" 충족. 구현자 증거 20261012-2056-u4-invariant10.txt(web/ 안에서 실행) 와 같은 결과.
+- 바뀐 파일은 9개(신규 4: AppShell.tsx·sheet.tsx·proxy.ts·proxy.test.ts / 수정 5: App.tsx·routes.ts·routes.test.tsx·tsconfig.node.json·vite.config.ts / 삭제 1: Sidebar.tsx). untracked 37 → 40(신규 4 − 삭제 1).
+- package.json·package-lock.json 은 1차 리뷰 시점과 바이트 단위로 같다(새 패키지 0 — sheet.tsx 는 기존 radix-ui@1.8.0 의 Dialog). `npm ls` 25개 동일, `npm audit --omit=dev` 0, install 스크립트 fsevents 1개.
+- 옛 `Sidebar.tsx` 참조 잔재 0(남은 `SidebarContent` 는 AppShell.tsx 내부 함수 이름). 제품 코드 localStorage 0(주석 1건).
+- `tw-animate-css` 사용처는 sheet.tsx 38·63행뿐(sonner 의 `animate-spin`·skeleton 의 `animate-pulse` 는 Tailwind 기본 유틸리티).
+- 내 환경은 `web/.env` 없음·`VITE_API_TARGET` 미설정 — proxy.test.ts 13행의 기본값 단언이 성립하는 조건이다(환경 의존 실험은 -recheck-mutation.txt 끝 E1 참고).

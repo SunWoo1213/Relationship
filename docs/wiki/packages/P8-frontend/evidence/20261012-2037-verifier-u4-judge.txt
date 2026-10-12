@@ -1,0 +1,63 @@
+P8-frontend U4 — verifier 판정 명령 재실행 (verifier/fable, 2026-10-12 20:37, 작업 트리 HEAD 95ca2c0, cwd=web)
+네 명령을 한 번에 하나씩 따로 실행했다(U3 리뷰에서 긴 명령 연속 실행으로 끊긴 선례). 출력은 전부 그대로다.
+
+$ cd web && npm ci   (verifier, 2026-10-12 20:37)
+
+added 494 packages, and audited 495 packages in 3s
+
+131 packages are looking for funding
+  run `npm fund` for details
+
+7 high severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn install-scripts   fsevents@2.3.3 (install: (install scripts present))
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+exit=0
+
+$ npm run typecheck   (verifier, 20:37)
+
+> web@0.0.0 typecheck
+> tsc -b
+
+exit=0
+
+$ npm test -- --run   (verifier, 20:37)
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  2 passed (2)
+      Tests  20 passed (20)
+   Start at  20:37:22
+   Duration  751ms (environment 48%, tests 21%, import 14%, setup 10%, transform 7%, worker 1%)
+
+exit=0
+
+$ npm run build   (verifier, 20:37)
+
+> web@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 2022 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.46 kB │ gzip:  0.31 kB
+dist/assets/index-Cdlu2p9I.css   34.80 kB │ gzip:  6.55 kB
+dist/assets/index-ClEEdF8L.js   295.23 kB │ gzip: 94.05 kB
+
+✓ built in 124ms
+exit=0
+
+(비고) 번들 파일명 해시 `index-ClEEdF8L.js`·`index-Cdlu2p9I.css` 와 크기가 구현자 증거 20261012-2030-u4-skeleton-rework.txt 와 같다 — 같은 소스에서 같은 산출물.
