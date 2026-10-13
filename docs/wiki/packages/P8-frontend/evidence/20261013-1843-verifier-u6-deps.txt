@@ -1,0 +1,39 @@
+# 명령: echo "## package.json/lock diff (HEAD vs worktree)"; git diff --stat -- web/package.json web/package-lock.json; git diff --quiet -- web/package.json web/package-lock.json; echo "diff-quiet exit=$?"; echo "## scripts (worktree)"; node -e "const p=require(\"./web/package.json\");console.log(JSON.stringify(p.scripts,null,1))"; echo "## scripts (HEAD)"; git show HEAD:web/package.json | node -e "let s=\"\";process.stdin.on(\"data\",d=>s+=d).on(\"end\",()=>console.log(JSON.stringify(JSON.parse(s).scripts,null,1)))"; echo "## npm audit --omit=dev"; cd web && npm audit --omit=dev; echo "audit exit=$?"; cd ..; echo "## ?raw imports in tests"; grep -rn "?raw" web/src; echo "## ?raw targets exist inside repo"; ls -la web/src/components/AppShell.tsx web/src/screens/PersonCardScreen.tsx; echo "## vite-env / raw type decl"; grep -rn "vite/client\|\\*?raw" web/src/vite-env.d.ts web/tsconfig*.json 2>/dev/null
+# 시각: 2026-10-13T18:43:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 2
+# ---
+## package.json/lock diff (HEAD vs worktree)
+diff-quiet exit=0
+## scripts (worktree)
+{
+ "dev": "vite",
+ "build": "tsc -b && vite build",
+ "typecheck": "tsc -b",
+ "test": "vitest",
+ "e2e": "playwright test --pass-with-no-tests",
+ "lint": "oxlint",
+ "preview": "vite preview"
+}
+## scripts (HEAD)
+{
+ "dev": "vite",
+ "build": "tsc -b && vite build",
+ "typecheck": "tsc -b",
+ "test": "vitest",
+ "e2e": "playwright test --pass-with-no-tests",
+ "lint": "oxlint",
+ "preview": "vite preview"
+}
+## npm audit --omit=dev
+found 0 vulnerabilities
+audit exit=0
+## ?raw imports in tests
+web/src/__tests__/card.test.tsx:9:import appShellSource from '@/components/AppShell.tsx?raw'
+web/src/__tests__/card.test.tsx:10:import cardScreenSource from '@/screens/PersonCardScreen.tsx?raw'
+## ?raw targets exist inside repo
+-rw-r--r--@ 1 sunwoo  staff   3488 10월 13 16:24 web/src/components/AppShell.tsx
+-rw-r--r--@ 1 sunwoo  staff  11710 10월 13 16:25 web/src/screens/PersonCardScreen.tsx
+## vite-env / raw type decl
+web/tsconfig.app.json:7:    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"],

@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-13 16:25 (**FIX-034 완료 — 커밋 직전**. verifier 재검증 2차 **통과**([필수] 0, 열린 [권고] 4 → FIX-034.md 결과절 후속 후보). `검증:` 줄 통과, `review-FIX-034.md` 있음. 사용자 커밋 승인 대기 → `/commit` → `git push origin dev2` → CI(windows job test-guards ①~⑬ 첫 실행) → U6. 서브에이전트 없음)
+갱신: 2026-10-13 19:05 (**U6 완료 — 커밋 직전**. verifier `review-u6-card.md` 통과([필수] 0 · [권고] 5). 사용자 결정 19:00: R-U6-1(펼치기 한 줄)·R-U6-2(사이드바 신선도 **(iii)** AppShell 단일 조회+재조회) 둘 다 **U7 에 포함**. 커밋 뒤 `git push origin dev2` → CI 다섯 job → U7 전 R-U3-6 ⑤ 결정 질문. 서브에이전트 없음)
 
-active: **P8-frontend**(U0~U5 완료 — **FIX-034 병행 중**, 그 뒤 U6) | frozen: none | 브랜치 `dev2` = origin/dev2 `977f2ee` | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
+active: **P8-frontend**(U0~U5·**U6** 완료 — **U7 부터**) | frozen: none | 브랜치 `dev2` = origin/dev2 `1944369`(+ U6 커밋 예정) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
 
 ## 2026-10-11 세션에 끝낸 것 (커밋 순, 전부 origin/dev2·CI 세 job success)
 | 커밋 | 내용 | CI(windows) |
@@ -25,8 +25,8 @@ active: **P8-frontend**(U0~U5 완료 — **FIX-034 병행 중**, 그 뒤 U6) | f
 - 이 HANDOFF(종료 기록) · `FIX-033.md` 결과절 해시·run 1줄 · journal 자동 줄(`7031a19` COMMIT·PUSH-dev2). U3 첫 커밋에 같이 넣으면 된다(따로 커밋할 필요 없음).
 
 ## 바로 다음에 할 것 (순서대로)
-1. **FIX-034 verifier 재검증 결과 받기**(실행 중, 16:05 시점). 끊겼으면 `review-FIX-034.md` "## 재검증(2차)" 절·`FIX-034.md` `검증:` 줄·`fixes/evidence/*verifier-fix034-recheck-*` 를 보고 같은 에이전트를 SendMessage 로 재개. 통과면 FIX-034.md 결과절 → `/commit`(`fix(FIX-034)`, `Refs: FIX-034`, registry U5 해시 교체 포함) → 푸시 → CI(windows job test-guards 가 ①~⑬ 을 돈다 — 첫 실행) → U6. 보류면 [필수] 를 사용자에게 보이고 backend-agent 재작업 2차(L-004).
-3. **U6 인물 카드 화면 + 원문 펼치기**(frontend-agent, L-004): 01-plan 97행 원문 인용. 포함: R-U5-1(원칙7 테스트 데이터) · R-U5-2(복원 실패 한 줄 안내 + 343행 테스트) · R-U5-4(`sending`·`isComposing` 테스트) · "카드 링크는 U5 에서 이미 붙임" · R-U4-10 규칙 · **(c) 는 `save_evidence.py` 로**. U6 커밋에 03-log U5 `pending` → `977f2ee`·CI 38351077718.
+1. **세션 재개 확인**: `git log -1`(U6 커밋 있어야 함) · `git status --short`(HANDOFF·journal 만) · `gh run list --limit 2`(다섯 job). U7 커밋에 03-log U6 `pending` → 해시·run, registry "(U6 미커밋)" 3칸 → 해시.
+2. **U7 전 사용자 결정(R-U3-6 ⑤)**: `#/briefings?schedule_id=N` 강조를 목록(`GET /briefings`)에서 클라이언트가 골라 강조할지, `GET /briefings?schedule_id=N` 호출(7일 창 무시, 푸시 클릭용)로 할지. 그 뒤 **U7 브리핑 화면 + 수동 브리핑 버튼**(frontend-agent, L-004): 01-plan 98행 원문 인용 + **R-U6-1**(`useLazyDetail.toggle` 한 줄 + 탐침 P3 테스트) + **R-U6-2 (iii)**(`AppShell` 단일 조회 → 두 곳에 props, 채팅 `stored.persons>0`·라우트 변경 때 재조회) + **R-U6-3 규칙**(변이 스크립트는 출력을 그대로 흘리고 스크립트 파일도 `save_evidence.py` 로 evidence 에) + R-U4-10 + 증거 통로.
    U7 위임 전 사용자 결정 필요: `#/briefings?schedule_id=N` 강조를 목록+클라이언트 강조로 할지 `GET /briefings?schedule_id=` 호출로 할지(R-U3-6 ⑤).
 3. **U9 백엔드 몫에 넣을 것**: R-U3-1(`ctx.now = now` → `dataclasses.replace`) · R-U3-2(목록 조인 `Person.id == Schedule.person_id` 한 줄) · R-U3-5(U1·U2 쓰기 0 테스트를 `helpers_read_api` 로, `push_subscriptions` 스냅샷 추가) · 판정표 9·10행 끝에서 끝.
 3. **U4~U9**(frontend-agent — U0 완료로 위임 가능, R-U0-3: 단위마다 verifier 가 `web/package.json` scripts·의존성·lock 점검) → **U10 사람 점검** → verifier 04-review.

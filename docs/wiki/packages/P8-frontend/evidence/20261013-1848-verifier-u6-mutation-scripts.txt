@@ -1,0 +1,376 @@
+# 명령: S=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad; for f in $S/mut_u6.py $S/vmut-u6-1845/vmut_u6.py $S/vmut-u6-1845/probes/zz_probe_p1.test.tsx $S/vmut-u6-1845/probes/zz_probe_p2.test.tsx $S/vmut-u6-1845/probes/zz_probe_p3.test.tsx; do echo "######## $f ($(wc -l < $f) lines, sha256 $(shasum -a 256 < $f | cut -c1-16))"; cat "$f"; echo; done
+# 시각: 2026-10-13T18:48:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# 메모: 구현자 변이 스크립트(mut_u6.py, 스크래치패드에만 있음)와 verifier 스크립트·탐침 원문 보존 — 세션이 끝나면 스크래치패드가 사라지므로 재현용으로 증거에 남긴다.
+# ---
+######## /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py (      69 lines, sha256 23c8bf2fe79b3948)
+"""U6 변이 시험: web/ 을 스크래치패드 사본으로 복사해 한 곳만 바꾸고 vitest 를 돌린다. 저장소 파일은 건드리지 않는다."""
+import os, re, shutil, subprocess, sys
+
+SRC = "/Users/sunwoo/Desktop/Portfolio/Relationship/web"
+DST = "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mutweb"
+
+def fresh():
+    if os.path.exists(DST):
+        shutil.rmtree(DST)
+    shutil.copytree(SRC, DST, ignore=shutil.ignore_patterns("node_modules", "dist", "test-results"))
+    os.symlink(os.path.join(SRC, "node_modules"), os.path.join(DST, "node_modules"))
+
+def sub(path, old, new, count=1):
+    p = os.path.join(DST, path)
+    s = open(p, encoding="utf-8").read()
+    assert old in s, f"치환 대상 없음: {old!r}"
+    open(p, "w", encoding="utf-8").write(s.replace(old, new, count))
+
+def move_patterns_before_facts():
+    p = os.path.join(DST, "src/screens/PersonCardScreen.tsx")
+    s = open(p, encoding="utf-8").read()
+    m_f = re.search(r'      <Section name="facts".*?</Section>\n\n', s, re.S)
+    m_p = re.search(r'      <Section\n        name="patterns".*?</Section>\n\n', s, re.S)
+    facts, pats = m_f.group(0), m_p.group(0)
+    s = s.replace(facts, "", 1).replace(pats, pats + facts, 1)
+    open(p, "w", encoding="utf-8").write(s)
+
+P = "src/screens/PersonCardScreen.tsx"
+L = "src/components/PersonList.tsx"
+C = "src/screens/ChatScreen.tsx"
+
+MUTS = {
+    "M1-목록 재정렬 주입": lambda: sub(L, "{persons.map((p) => (", "{[...persons].sort((a, b) => a.display_name.localeCompare(b.display_name)).map((p) => ("),
+    "M2-섹션 순서 바꿈(패턴을 사실 앞으로)": move_patterns_before_facts,
+    "M3-원문 trim": lambda: sub(P, "      {text}\n", "      {text.trim()}\n"),
+    "M4-재요청 캐시 제거": lambda: sub(P, "if (state.status === 'idle') run()", "run()"),
+    "M5-실패 안내를 항목 밖(body)으로": lambda: (
+        sub(P, "import { useCallback, useEffect, useState, type ReactNode } from 'react'", "import { useCallback, useEffect, useState, type ReactNode } from 'react'\nimport { createPortal } from 'react-dom'"),
+        sub(P, '''    return (
+      <p role="alert" className="mt-2 text-sm text-destructive">
+        {CARD_NOTICE.detailFailed}
+      </p>
+    )''', '''    return createPortal(<p role="alert">{CARD_NOTICE.detailFailed}</p>, document.body)'''),
+    ),
+    "M6-타임라인 정렬 뒤집기": lambda: sub(P, "card.timeline.map((e)", "[...card.timeline].reverse().map((e)"),
+    "M7-source_count 0 에도 근거 버튼": lambda: sub(P, "if (sourceCount <= 0) return null", "if (sourceCount < 0) return null"),
+    "M8-실패 시 재시도 대신 접기": lambda: sub(P, "if (state.status === 'error') return run()", "if (state.status === 'error') return setOpen(false)"),
+    "M9-칩 trim (R-U5-1)": lambda: sub(C, "              {option}\n", "              {option.trim()}\n"),
+    "M10-칩 정렬 (R-U5-1)": lambda: sub(C, "{question.options.map((option, i) => {", "{[...question.options].sort().map((option, i) => {"),
+    "M11-복원 실패 안내 제거 (R-U5-2)": lambda: sub(C, "if (alive) setNotice(NOTICE.restoreFailed)", ""),
+    "M12-sending 중 버튼 활성 (R-U5-4)": lambda: sub(C, "disabled={sending || draft.trim() === ''}", "disabled={draft.trim() === ''}"),
+    "M13-isComposing 무시 (R-U5-4)": lambda: sub(C, " && !e.nativeEvent.isComposing", ""),
+    "M14-마지막 접촉 없음 문구 제거": lambda: sub(L, "p.last_contact_at ? formatDate(p.last_contact_at) : PERSON_LIST_NOTICE.noContact", "p.last_contact_at ? formatDate(p.last_contact_at) : ''"),
+    "M15-사이드바에서 서랍 닫기 연결 끊기": lambda: sub("src/components/AppShell.tsx", "<PersonList onNavigate={onNavigate} />", "<PersonList />"),
+}
+
+name = sys.argv[1]
+fresh()
+MUTS[name]()
+r = subprocess.run(["npx", "vitest", "--run", "--reporter=default"], cwd=DST, capture_output=True, text=True)
+out = r.stdout + r.stderr
+failed = sorted(set(re.findall(r"^\s*(?:FAIL|×)\s+(.*)$", out, re.M)))
+print("변이:", name)
+print("결과:", "잡힘(KILLED)" if r.returncode != 0 else "살아남음(SURVIVED)")
+for f in failed:
+    print("  실패 테스트:", f[:160])
+tail = [l for l in out.splitlines() if l.strip().startswith(("Tests", "Test Files"))]
+print("\n".join(tail))
+sys.exit(0)
+
+######## /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut-u6-1845/vmut_u6.py (      98 lines, sha256 72a4d194109abf23)
+"""verifier U6 변이·탐침 시험 — web/ 을 스크래치패드 사본으로 복사해 한 곳만 바꾸고 vitest 출력 전체를 그대로 흘린다.
+저장소 파일은 건드리지 않는다. 사용: python3 vmut_u6.py <이름>   (이름은 MUTS 또는 PROBES 의 키)
+"""
+import os, shutil, subprocess, sys
+
+SRC = "/Users/sunwoo/Desktop/Portfolio/Relationship/web"
+BASE = "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut-u6-1845"
+DST = os.path.join(BASE, "mutweb")
+PROBE_DIR = os.path.join(BASE, "probes")
+
+P = "src/screens/PersonCardScreen.tsx"
+L = "src/components/PersonList.tsx"
+A = "src/components/AppShell.tsx"
+C = "src/screens/ChatScreen.tsx"
+
+
+def fresh():
+    if os.path.exists(DST):
+        shutil.rmtree(DST)
+    shutil.copytree(SRC, DST, ignore=shutil.ignore_patterns("node_modules", "dist", "test-results", "playwright-report"))
+    os.symlink(os.path.join(SRC, "node_modules"), os.path.join(DST, "node_modules"))
+
+
+def sub(path, old, new, count=1):
+    p = os.path.join(DST, path)
+    s = open(p, encoding="utf-8").read()
+    assert old in s, f"치환 대상 없음: {old!r}"
+    open(p, "w", encoding="utf-8").write(s.replace(old, new, count))
+
+
+def copy_component_as(new_name):
+    src = os.path.join(DST, L)
+    dst = os.path.join(DST, f"src/components/{new_name}.tsx")
+    shutil.copyfile(src, dst)
+
+
+MUTS = {
+    # V2: 별칭 섹션(부록 A ② 두 번째 줄) 통째로 누락
+    "V2-aliases-section-omitted": lambda: sub(
+        P,
+        """      <p data-section="aliases" className="text-sm">
+        {CARD_NOTICE.aliasesLabel}: {card.aliases.length ? card.aliases.join(', ') : CARD_NOTICE.aliasesNone}
+      </p>
+""",
+        "",
+    ),
+    # V3: 근거(sources) 순서 뒤집기 — 서버 occurred_at 내림차순을 프론트가 재정렬
+    "V3-sources-reversed": lambda: sub(P, "{sources.map((s) => (", "{[...sources].reverse().map((s) => ("),
+    # V4: 404 판정을 500 으로 — 없는 인물과 서버 오류 안내가 뒤바뀐다
+    "V4-404-as-500": lambda: sub(P, "e.status === 404 ? 'not_found' : 'failed'", "e.status === 500 ? 'not_found' : 'failed'"),
+    # V5: 사이드바가 본문과 다른 컴포넌트(바이트 동일 사본 PersonList2)를 쓴다 — 결정 N "같은 컴포넌트" 위반
+    "V5-sidebar-different-component": lambda: (
+        copy_component_as("PersonList2"),
+        sub(A, "import PersonList from '@/components/PersonList'", "import PersonList from '@/components/PersonList2'"),
+    ),
+    # 구현자 변이 재실행 (mut_u6.py 와 같은 치환)
+    "M1-rerun-list-resort": lambda: sub(L, "{persons.map((p) => (", "{[...persons].sort((a, b) => a.display_name.localeCompare(b.display_name)).map((p) => ("),
+    "M3-rerun-raw-trim": lambda: sub(P, "      {text}\n", "      {text.trim()}\n"),
+    "M6-rerun-timeline-reversed": lambda: sub(P, "card.timeline.map((e)", "[...card.timeline].reverse().map((e)"),
+    "M10-rerun-chip-sort": lambda: sub(C, "{question.options.map((option, i) => {", "{[...question.options].sort().map((option, i) => {"),
+    "V0-control": lambda: None,
+}
+
+# 탐침: 저장소 코드는 그대로 두고 테스트 파일 하나를 더해 그 파일만 돌린다
+PROBES = {
+    "P1-raw-hidden-in-card": "zz_probe_p1.test.tsx",
+    "P2-sidebar-stale": "zz_probe_p2.test.tsx",
+    "P3-collapse-while-loading": "zz_probe_p3.test.tsx",
+}
+
+
+def run(args, env_extra=None):
+    env = dict(os.environ, NO_COLOR="1", FORCE_COLOR="0", CI="1", DEBUG_PRINT_LIMIT="0")
+    if env_extra:
+        env.update(env_extra)
+    r = subprocess.run(args, cwd=DST, env=env)
+    return r.returncode
+
+
+name = sys.argv[1]
+fresh()
+if name in MUTS:
+    MUTS[name]()
+    print(f"### 변이: {name}  (사본 {DST}, 저장소 무수정)", flush=True)
+    rc = run(["npx", "vitest", "--run", "--reporter=default"])
+    print(f"### 변이 {name} → vitest exit {rc} → {'잡힘(KILLED)' if rc != 0 else '살아남음(SURVIVED)'}", flush=True)
+elif name in PROBES:
+    f = PROBES[name]
+    shutil.copyfile(os.path.join(PROBE_DIR, f), os.path.join(DST, "src/__tests__", f))
+    print(f"### 탐침: {name}  ({f}, 저장소 무수정)", flush=True)
+    rc = run(["npx", "vitest", "--run", "--reporter=default", f"src/__tests__/{f}"])
+    print(f"### 탐침 {name} → vitest exit {rc}", flush=True)
+else:
+    print("알 수 없는 이름:", name)
+    sys.exit(3)
+# 저장소 무수정 확인
+subprocess.run(["git", "status", "--short", "--", "web"], cwd="/Users/sunwoo/Desktop/Portfolio/Relationship")
+sys.exit(0)
+
+######## /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut-u6-1845/probes/zz_probe_p1.test.tsx (      64 lines, sha256 e9d6427692b67fd6)
+// 탐침 P1 (verifier, 결정 F 역방향): 서버가 카드·목록 응답에 raw_utterance 를 몰래 실어도 화면 어디에도 보이지 않아야 한다.
+import { render, screen, within } from '@testing-library/react'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import PersonCardScreen from '@/screens/PersonCardScreen'
+import { installFakeMatchMedia } from './helpers'
+
+const MARK = 'VERIFIER_SNEAKED_RAW_7f3c'
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+}
+
+const CARD_WITH_RAW = {
+  person: { id: 3, display_name: '김팀장', relation_tag: '직장', hierarchy: '상', raw_utterance: MARK + '-person' },
+  aliases: ['팀장'],
+  last_contact_at: '2026-09-03T12:00:00Z',
+  raw_utterance: MARK + '-top',
+  facts: [{ id: 11, key: 'child', value: '딸 대학 입시 중', updated_at: '2026-09-03T12:00:00Z', source_count: 2, raw_utterance: MARK + '-fact' }],
+  patterns: [{ id: 21, key: 'pattern:conflict', value: '공개 석상에서 지적 — 3회', source_count: 3, raw_utterance: MARK + '-pattern' }],
+  timeline: [
+    { id: 9, type: 'conflict', content: '회의에서 보고서 공개 지적', occurred_at: '2026-09-03T12:00:00Z', raw_utterance: MARK + '-event' },
+  ],
+  upcoming_schedules: [{ id: 1, title: '분기 회의', scheduled_at: '2026-09-10T12:00:00Z', briefed_at: null, raw_utterance: MARK + '-sched' }],
+}
+
+const PERSONS_WITH_RAW = [
+  { id: 7, display_name: '박대리', relation_tag: '직장', hierarchy: '하', last_contact_at: null, raw_utterance: MARK + '-list' },
+]
+
+beforeEach(() => {
+  window.localStorage.clear()
+  installFakeMatchMedia(1280)
+})
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
+
+it('P1: 카드 응답 6자리에 raw_utterance 가 섞여 와도 화면 텍스트·속성 어디에도 없고, 원문 요청도 없다', async () => {
+  const fetchFn = vi.fn((input: RequestInfo | URL) => {
+    const url = String(input)
+    if (url === '/api/persons/3') return Promise.resolve(json(CARD_WITH_RAW))
+    throw new Error('예상하지 못한 요청: ' + url)
+  })
+  vi.stubGlobal('fetch', fetchFn)
+  render(<PersonCardScreen personId={3} />)
+  await screen.findByTestId('person-card')
+  expect(document.body.textContent).not.toContain(MARK)
+  expect(document.body.innerHTML).not.toContain(MARK)
+  expect(screen.queryByTestId('raw-utterance')).toBeNull()
+  expect(fetchFn.mock.calls.map(([u]) => String(u))).toEqual(['/api/persons/3'])
+})
+
+it('P1: 목록 응답에 raw_utterance 가 섞여 와도 목록 어디에도 없다', async () => {
+  const fetchFn = vi.fn((input: RequestInfo | URL) => {
+    const url = String(input)
+    if (url === '/api/persons') return Promise.resolve(json(PERSONS_WITH_RAW))
+    throw new Error('예상하지 못한 요청: ' + url)
+  })
+  vi.stubGlobal('fetch', fetchFn)
+  render(<PersonCardScreen personId={null} />)
+  const list = await screen.findByTestId('person-list')
+  expect(within(list).getAllByRole('link')).toHaveLength(1)
+  expect(document.body.innerHTML).not.toContain(MARK)
+})
+
+######## /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut-u6-1845/probes/zz_probe_p2.test.tsx (      56 lines, sha256 e219114e06e04bfd)
+// 탐침 P2 (verifier, 결정 N 사이드바 목록 신선도): 데스크톱 사이드바의 PersonList 는 앱 마운트 때 한 번만 GET /persons 를 부른다.
+// 라우트가 바뀌어 본문 목록이 새 서버 목록을 받아도 사이드바는 옛 목록 그대로인지 본다.
+// 이 테스트는 "사이드바도 갱신된다" 를 바람직한 동작으로 단언한다 — 실패하면 사이드바가 stale 이라는 증거다.
+import { render, screen, waitFor, within } from '@testing-library/react'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import App from '@/App'
+import { installFakeMatchMedia } from './helpers'
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+}
+
+const FIRST = [{ id: 1, display_name: '첫째', relation_tag: '친구', hierarchy: '동', last_contact_at: null }]
+const SECOND = [
+  { id: 2, display_name: '둘째', relation_tag: '친구', hierarchy: '동', last_contact_at: '2026-10-01T12:00:00Z' },
+  ...FIRST,
+]
+
+beforeEach(() => {
+  window.localStorage.clear()
+  installFakeMatchMedia(1280)
+})
+afterEach(() => {
+  vi.unstubAllGlobals()
+  window.history.replaceState(null, '', '#/chat')
+})
+
+it('P2: #/chat → #/persons 로 옮기면 본문 목록은 새 서버 목록(둘째 포함)을 받는다 — 사이드바도 둘째를 보이는가', async () => {
+  let n = 0
+  const fetchFn = vi.fn((input: RequestInfo | URL) => {
+    const url = String(input)
+    if (url === '/api/persons') {
+      n++
+      return Promise.resolve(json(n === 1 ? FIRST : SECOND))
+    }
+    if (url === '/api/questions/pending') return Promise.resolve(json([]))
+    throw new Error('예상하지 못한 요청: ' + url)
+  })
+  vi.stubGlobal('fetch', fetchFn)
+  window.history.replaceState(null, '', '#/chat')
+  render(<App />)
+  const sidebar = screen.getByTestId('sidebar-persons')
+  await within(sidebar).findByText('첫째')
+
+  window.location.hash = '#/persons'
+  await waitFor(() => expect(document.querySelector('[data-screen="persons"]')).not.toBeNull())
+  const body = document.querySelector('[data-screen="persons"]') as HTMLElement
+  await within(body).findByText('둘째')
+
+  const calls = fetchFn.mock.calls.filter(([u]) => String(u) === '/api/persons').length
+  console.log('[P2] GET /persons 호출 수 =', calls)
+  console.log('[P2] 본문에 둘째 =', within(body).queryByText('둘째') !== null)
+  console.log('[P2] 사이드바에 둘째 =', within(sidebar).queryByText('둘째') !== null)
+  console.log('[P2] 사이드바 링크 =', within(sidebar).getAllByRole('link').map((l) => l.textContent))
+  expect(within(sidebar).queryByText('둘째')).not.toBeNull()
+})
+
+######## /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut-u6-1845/probes/zz_probe_p3.test.tsx (      72 lines, sha256 dff1791043e9d336)
+// 탐침 P3 (verifier, useLazyDetail 경계): 펼치기(로딩 중) → 접기 → 요청 실패 → 다시 펼치기.
+// 바람직한 동작: 다시 펼치기 한 번으로 재시도되고 열려서 원문(또는 실패 안내)이 보인다.
+// 코드 읽기 예측: toggle 이 error 상태면 open 을 켜지 않고 run() 만 하므로, 한 번 더 눌러야 열린다(요청 1회 낭비·무반응 클릭).
+import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import PersonCardScreen, { CARD_NOTICE } from '@/screens/PersonCardScreen'
+import { installFakeMatchMedia } from './helpers'
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+}
+
+const CARD = {
+  person: { id: 3, display_name: '김팀장', relation_tag: '직장', hierarchy: '상' },
+  aliases: [],
+  last_contact_at: null,
+  facts: [],
+  patterns: [],
+  timeline: [{ id: 9, type: 'conflict', content: '회의에서 보고서 공개 지적', occurred_at: '2026-09-03T12:00:00Z' }],
+  upcoming_schedules: [],
+}
+const RAW = { event_id: 9, person_id: 3, type: 'conflict', content: 'x', occurred_at: '2026-09-03T12:00:00Z', raw_utterance: '원문 그대로' }
+
+beforeEach(() => {
+  window.localStorage.clear()
+  installFakeMatchMedia(1280)
+})
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
+
+it('P3: 로딩 중 접었다가 실패한 뒤 다시 펼치면 한 번의 클릭으로 열린다', async () => {
+  let reject!: (e: unknown) => void
+  const firstCall = new Promise<Response>((_, rej) => {
+    reject = rej
+  })
+  let n = 0
+  const fetchFn = vi.fn((input: RequestInfo | URL) => {
+    const url = String(input)
+    if (url === '/api/persons/3') return Promise.resolve(json(CARD))
+    if (url === '/api/events/9/raw') {
+      n++
+      return n === 1 ? firstCall : Promise.resolve(json(RAW))
+    }
+    throw new Error('예상하지 못한 요청: ' + url)
+  })
+  vi.stubGlobal('fetch', fetchFn)
+  render(<PersonCardScreen personId={3} />)
+  await screen.findByTestId('person-card')
+  const item = screen.getByTestId('timeline-9')
+  const user = userEvent.setup()
+  const rawCalls = () => fetchFn.mock.calls.filter(([u]) => String(u) === '/api/events/9/raw').length
+
+  await user.click(within(item).getByRole('button', { name: CARD_NOTICE.showRaw })) // 1) 펼침 → 로딩
+  expect(rawCalls()).toBe(1)
+  await user.click(within(item).getByRole('button', { name: CARD_NOTICE.hideRaw })) // 2) 로딩 중 접기
+  reject(new TypeError('Failed to fetch')) // 3) 첫 요청 실패 (접힌 채 error 상태)
+  await waitFor(() => expect(within(item).getByRole('button', { name: CARD_NOTICE.showRaw })).toBeInTheDocument())
+  await new Promise((r) => setTimeout(r, 20))
+
+  console.log('[P3] 접힌 채 실패 뒤 — alert 보임 =', within(item).queryByRole('alert') !== null)
+
+  await user.click(within(item).getByRole('button', { name: CARD_NOTICE.showRaw })) // 4) 다시 펼치기
+  await waitFor(() => expect(rawCalls()).toBe(2))
+  await new Promise((r) => setTimeout(r, 50))
+  console.log('[P3] 4) 뒤 요청 수 =', rawCalls())
+  console.log('[P3] 4) 뒤 원문 보임 =', within(item).queryByTestId('raw-utterance') !== null)
+  console.log('[P3] 4) 뒤 버튼 이름 =', within(item).getByRole('button').getAttribute('aria-label'))
+
+  expect(within(item).queryByTestId('raw-utterance')).not.toBeNull()
+})
+

@@ -1,5 +1,5 @@
 // U5 채팅 화면 + 확인 칩. 실제 네트워크 없음 — fetch 는 테스트마다 vi.stubGlobal 로 가짜를 건다 (결정 J).
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ChatScreen, { NOTICE } from '@/screens/ChatScreen'
@@ -178,11 +178,23 @@ describe('입력창', () => {
       }),
     )
     render(<ChatScreen />)
-    await sendText('기다려')
+    const user = await sendText('기다려')
     expect(await screen.findByTestId('typing')).toBeInTheDocument()
+    // R-U5-4: 보내는 중에는 새 글자를 써 넣어도 보내기 버튼이 비활성이다.
+    await user.type(screen.getByRole('textbox', { name: '메시지 입력' }), '다음 말')
+    expect(screen.getByRole('button', { name: '보내기' })).toBeDisabled()
     release(json(chatOut()))
     await screen.findByText('응답입니다')
     expect(screen.queryByTestId('typing')).toBeNull()
+    expect(screen.getByRole('button', { name: '보내기' })).toBeEnabled()
+  })
+
+  it('한글 조합 중(isComposing) Enter 는 전송이 아니다 (R-U5-4)', async () => {
+    const fetchFn = install(routerWith({ '/api/chat': () => json(chatOut()) }))
+    render(<ChatScreen />)
+    await type('안녕')
+    fireEvent.keyDown(screen.getByRole('textbox', { name: '메시지 입력' }), { key: 'Enter', isComposing: true })
+    expect(callsTo(fetchFn, '/api/chat')).toHaveLength(0)
   })
 
   it('확인 칩이 떠 있어도 입력은 막히지 않는다 (결정 E)', async () => {
@@ -200,7 +212,8 @@ describe('입력창', () => {
 })
 
 describe('확인 칩 (결정 E)', () => {
-  const OPTIONS = ['네, 같은 사람이에요', '아니요, 다른 사람이에요', '잘 모르겠어요']
+  // R-U5-1: 일부러 가나다 순이 아니고 앞뒤·연속 공백을 가진 문자열 — 정렬·trim·공백 정리 변이를 잡는다 (원칙7).
+  const OPTIONS = ['  잘 모르겠어요', '아니요,   다른 사람이에요 ', '네, 같은 사람이에요  ']
 
   it('칩 글자와 순서가 options 와 같다 (reply 바로 아래)', async () => {
     install(routerWith({ '/api/chat': () => json(chatOut({ reply: '확인 부탁', pending_question: pq(7, OPTIONS) })) }))
@@ -225,17 +238,22 @@ describe('확인 칩 (결정 E)', () => {
     render(<ChatScreen />)
     await sendText('민수')
     const user = userEvent.setup()
-    await user.click(await screen.findByRole('button', { name: OPTIONS[1] }))
+    const group = await screen.findByTestId('chips-7')
+    // 접근 이름은 공백을 정리하므로 이름이 아니라 순서(서버가 준 순서)로 집는다.
+    const chips = () => within(group).getAllByRole('button')
+    await user.click(chips()[1])
 
     await waitFor(() => expect(callsTo(fetchFn, '/api/answers/7')).toHaveLength(1))
     const [call] = callsTo(fetchFn, '/api/answers/7')
     expect((call[1] as RequestInit).method).toBe('POST')
     expect(JSON.parse((call[1] as RequestInit).body as string)).toEqual({ answer: OPTIONS[1] })
 
-    const chosen = screen.getByRole('button', { name: OPTIONS[1] })
+    const chosen = chips()[1]
+    expect(chosen.textContent).toBe(OPTIONS[1])
     expect(chosen).toHaveAttribute('aria-pressed', 'true')
-    for (const other of [OPTIONS[0], OPTIONS[2]]) {
-      const b = screen.getByRole('button', { name: other })
+    for (const i of [0, 2]) {
+      const b = chips()[i]
+      expect(b.textContent).toBe(OPTIONS[i])
       expect(b).toHaveAttribute('aria-pressed', 'false')
       expect(b).toBeDisabled()
     }
@@ -340,13 +358,13 @@ describe('오류 안내', () => {
     expect(await screen.findByText(NOTICE.failed)).toBeInTheDocument()
   })
 
-  it('진입 시 복원 요청이 실패해도 화면은 빈 상태 안내로 남는다', async () => {
+  it('진입 시 복원 요청이 실패하면 한 줄 안내가 뜨고 빈 상태 안내도 남는다 (R-U5-2)', async () => {
     install(() => {
       throw new TypeError('Failed to fetch')
     })
     render(<ChatScreen />)
-    expect(await screen.findByText(NOTICE.empty)).toBeInTheDocument()
-    expect(screen.queryByRole('alert')).toBeNull()
+    expect(await screen.findByRole('alert')).toHaveTextContent(NOTICE.restoreFailed)
+    expect(screen.getByText(NOTICE.empty)).toBeInTheDocument()
   })
 })
 

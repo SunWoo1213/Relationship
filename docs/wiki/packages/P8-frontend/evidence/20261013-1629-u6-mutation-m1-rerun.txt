@@ -1,0 +1,16 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M1-목록 재정렬 주입'
+# 시각: 2026-10-13T16:29:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M1-목록 재정렬 주입
+결과: 잡힘(KILLED)
+  실패 테스트: #/persons 본문과 사이드바에 같은 목록이 같은 순서로 그려진다 21ms
+  실패 테스트: src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 본문과 사이드바에 같은 목록이 같은 순서로 그려진다
+  실패 테스트: src/__tests__/card.test.tsx > 인물 목록 > 서버 순서 그대로(재정렬 없음) 이름·태그·위계·마지막 접촉 4개 필드를 보여 준다
+  실패 테스트: src/__tests__/card.test.tsx > 인물 목록 > 항목 링크는 #/persons/:id 이고 누르면 해시가 바뀐다
+  실패 테스트: 서버 순서 그대로(재정렬 없음) 이름·태그·위계·마지막 접촉 4개 필드를 보여 준다 64ms
+  실패 테스트: 항목 링크는 #/persons/:id 이고 누르면 해시가 바뀐다 15ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  3 failed | 67 passed (70)

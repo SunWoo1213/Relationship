@@ -1,0 +1,222 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M1-목록 재정렬 주입'
+# 시각: 2026-10-13T16:27:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M1-목록 재정렬 주입
+결과: 살아남음(SURVIVED)
+ Test Files  5 passed (5)
+      Tests  70 passed (70)
+
+# ===== append 2026-10-13T16:27:56+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M2-섹션 순서 바꿈(패턴을 사실 앞으로)'
+# 시각: 2026-10-13T16:27:56+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M2-섹션 순서 바꿈(패턴을 사실 앞으로)
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 섹션 7개가 부록 A ② 순서로 놓인다
+  실패 테스트: 섹션 7개가 부록 A ② 순서로 놓인다 18ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 69 passed (70)
+
+# ===== append 2026-10-13T16:27:57+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M3-원문 trim'
+# 시각: 2026-10-13T16:27:57+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M3-원문 trim
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다
+  실패 테스트: src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 첫 펼침에 GET /events/{id}/raw 1회, 원문은 글자 그대로, 접었다 다시 펼쳐도 요청은 1회
+  실패 테스트: 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다 37ms
+  실패 테스트: 첫 펼침에 GET /events/{id}/raw 1회, 원문은 글자 그대로, 접었다 다시 펼쳐도 요청은 1회 28ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  2 failed | 68 passed (70)
+
+# ===== append 2026-10-13T16:27:59+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M4-재요청 캐시 제거'
+# 시각: 2026-10-13T16:27:59+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M4-재요청 캐시 제거
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 근거 보기: sources 요청 1회, 항목 수·날짜·content·원문이 그대로, 접기, 다시 펼쳐도 재요청 없음
+  실패 테스트: src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 첫 펼침에 GET /events/{id}/raw 1회, 원문은 글자 그대로, 접었다 다시 펼쳐도 요청은 1회
+  실패 테스트: 근거 보기: sources 요청 1회, 항목 수·날짜·content·원문이 그대로, 접기, 다시 펼쳐도 재요청 없음 48ms
+  실패 테스트: 첫 펼침에 GET /events/{id}/raw 1회, 원문은 글자 그대로, 접었다 다시 펼쳐도 요청은 1회 55ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  2 failed | 68 passed (70)
+
+# ===== append 2026-10-13T16:28:01+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M5-실패 안내를 항목 밖(body)으로'
+# 시각: 2026-10-13T16:28:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M5-실패 안내를 항목 밖(body)으로
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 근거 조회 실패는 그 사실 안에만 안내, 다시 누르면 재시도(요청 2회)
+  실패 테스트: src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다
+  실패 테스트: 근거 조회 실패는 그 사실 안에만 안내, 다시 누르면 재시도(요청 2회) 1029ms
+  실패 테스트: 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다 1037ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  2 failed | 68 passed (70)
+
+# ===== append 2026-10-13T16:28:05+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M6-타임라인 정렬 뒤집기'
+# 시각: 2026-10-13T16:28:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M6-타임라인 정렬 뒤집기
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 타임라인은 서버 순서 그대로, 항목마다 날짜·type·content
+  실패 테스트: 타임라인은 서버 순서 그대로, 항목마다 날짜·type·content 14ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 69 passed (70)
+
+# ===== append 2026-10-13T16:28:06+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M7-source_count 0 에도 근거 버튼'
+# 시각: 2026-10-13T16:28:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M7-source_count 0 에도 근거 버튼
+결과: 잡힘(KILLED)
+  실패 테스트: source_count 가 0 이면 근거 보기 버튼이 없고, 양수면 있다 26ms
+  실패 테스트: src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > source_count 가 0 이면 근거 보기 버튼이 없고, 양수면 있다
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 69 passed (70)
+
+# ===== append 2026-10-13T16:28:08+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M8-실패 시 재시도 대신 접기'
+# 시각: 2026-10-13T16:28:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M8-실패 시 재시도 대신 접기
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 근거 조회 실패는 그 사실 안에만 안내, 다시 누르면 재시도(요청 2회)
+  실패 테스트: src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다
+  실패 테스트: 근거 조회 실패는 그 사실 안에만 안내, 다시 누르면 재시도(요청 2회) 1044ms
+  실패 테스트: 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다 1042ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  2 failed | 68 passed (70)
+
+# ===== append 2026-10-13T16:28:12+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M9-칩 trim (R-U5-1)'
+# 시각: 2026-10-13T16:28:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M9-칩 trim (R-U5-1)
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩 글자와 순서가 options 와 같다 (reply 바로 아래)
+  실패 테스트: src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성
+  실패 테스트: 칩 글자와 순서가 options 와 같다 (reply 바로 아래) 26ms
+  실패 테스트: 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성 36ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  2 failed | 68 passed (70)
+
+# ===== append 2026-10-13T16:28:13+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M10-칩 정렬 (R-U5-1)'
+# 시각: 2026-10-13T16:28:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M10-칩 정렬 (R-U5-1)
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답 응답의 reply 가 이어 붙고, 새 pending_question 이면 그 아래 새 칩
+  실패 테스트: src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩 글자와 순서가 options 와 같다 (reply 바로 아래)
+  실패 테스트: src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성
+  실패 테스트: 답 응답의 reply 가 이어 붙고, 새 pending_question 이면 그 아래 새 칩 34ms
+  실패 테스트: 칩 글자와 순서가 options 와 같다 (reply 바로 아래) 31ms
+  실패 테스트: 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성 36ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  3 failed | 67 passed (70)
+
+# ===== append 2026-10-13T16:28:15+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M11-복원 실패 안내 제거 (R-U5-2)'
+# 시각: 2026-10-13T16:28:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M11-복원 실패 안내 제거 (R-U5-2)
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/chat.test.tsx > 오류 안내 > 진입 시 복원 요청이 실패하면 한 줄 안내가 뜨고 빈 상태 안내도 남는다 (R-U5-2)
+  실패 테스트: 진입 시 복원 요청이 실패하면 한 줄 안내가 뜨고 빈 상태 안내도 남는다 (R-U5-2) 1012ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 69 passed (70)
+
+# ===== append 2026-10-13T16:28:18+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M12-sending 중 버튼 활성 (R-U5-4)'
+# 시각: 2026-10-13T16:28:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M12-sending 중 버튼 활성 (R-U5-4)
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/chat.test.tsx > 입력창 > 응답을 기다리는 동안 타이핑 점이 보이고 끝나면 사라진다
+  실패 테스트: 응답을 기다리는 동안 타이핑 점이 보이고 끝나면 사라진다 49ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 69 passed (70)
+
+# ===== append 2026-10-13T16:28:20+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M13-isComposing 무시 (R-U5-4)'
+# 시각: 2026-10-13T16:28:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M13-isComposing 무시 (R-U5-4)
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/chat.test.tsx > 입력창 > 한글 조합 중(isComposing) Enter 는 전송이 아니다 (R-U5-4)
+  실패 테스트: 한글 조합 중(isComposing) Enter 는 전송이 아니다 (R-U5-4) 17ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 69 passed (70)
+
+# ===== append 2026-10-13T16:28:22+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M14-마지막 접촉 없음 문구 제거'
+# 시각: 2026-10-13T16:28:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M14-마지막 접촉 없음 문구 제거
+결과: 잡힘(KILLED)
+  실패 테스트: #/persons 본문과 사이드바에 같은 목록이 같은 순서로 그려진다 22ms
+  실패 테스트: src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 본문과 사이드바에 같은 목록이 같은 순서로 그려진다
+  실패 테스트: src/__tests__/card.test.tsx > 인물 목록 > 서버 순서 그대로(재정렬 없음) 이름·태그·위계·마지막 접촉 4개 필드를 보여 준다
+  실패 테스트: 서버 순서 그대로(재정렬 없음) 이름·태그·위계·마지막 접촉 4개 필드를 보여 준다 58ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  2 failed | 68 passed (70)
+
+# ===== append 2026-10-13T16:28:24+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u6.py 'M15-사이드바에서 서랍 닫기 연결 끊기'
+# 시각: 2026-10-13T16:28:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+변이: M15-사이드바에서 서랍 닫기 연결 끊기
+결과: 잡힘(KILLED)
+  실패 테스트: src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > 좁은 폭: 서랍에서 항목을 고르면 서랍이 닫힌다
+  실패 테스트: 좁은 폭: 서랍에서 항목을 고르면 서랍이 닫힌다 1118ms
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 69 passed (70)

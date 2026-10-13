@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { MenuIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import PersonList from '@/components/PersonList'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { HREF, type Route } from '@/routes'
 
@@ -31,8 +32,10 @@ function SidebarContent({ route, onNavigate }: { route: Route; onNavigate: () =>
           </li>
         ))}
       </ul>
-      {/* 인물 목록 자리 — U6 에서 채운다 (새 API·새 라우트 없음). */}
-      <div aria-label="인물 목록" data-testid="sidebar-persons" className="min-h-0 flex-1 overflow-y-auto" />
+      {/* 인물 목록 — `#/persons` 본문과 같은 컴포넌트 (새 API·새 라우트 없음). */}
+      <div aria-label="인물 목록" data-testid="sidebar-persons" className="min-h-0 flex-1 overflow-y-auto">
+        <PersonList onNavigate={onNavigate} />
+      </div>
     </nav>
   )
 }

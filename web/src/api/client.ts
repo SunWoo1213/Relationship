@@ -2,7 +2,17 @@
 // 호출 함수(채팅·카드·브리핑)는 U5~U8 이 이 래퍼 위에 만든다.
 
 import { clearSessionId, getSessionId, setSessionId } from '@/session'
-import type { AnswerIn, AnswerOut, ChatIn, ChatOut, ChatPendingQuestionOut } from '@/api/types'
+import type {
+  AnswerIn,
+  AnswerOut,
+  ChatIn,
+  ChatOut,
+  ChatPendingQuestionOut,
+  EventRawOut,
+  FactSourcesOut,
+  PersonCardOut,
+  PersonListItemOut,
+} from '@/api/types'
 
 export const API_BASE = '/api'
 export const SESSION_HEADER = 'X-Session-Id'
@@ -83,6 +93,26 @@ export async function postChat(utterance: string): Promise<ChatOut> {
 export function postAnswer(questionId: number, answer: string): Promise<AnswerOut> {
   const body: AnswerIn = { answer }
   return apiFetch<AnswerOut>(`/answers/${questionId}`, { method: 'POST', body })
+}
+
+// --- 인물 (GET /persons · /persons/{id} · /events/{id}/raw · /persons/{id}/facts/{fact_id}/sources) ---
+
+/** 서버가 마지막 접촉 내림차순으로 준다 — 호출 쪽은 재정렬하지 않는다. */
+export function getPersons(): Promise<PersonListItemOut[]> {
+  return apiFetch<PersonListItemOut[]>('/persons')
+}
+
+export function getPersonCard(personId: number): Promise<PersonCardOut> {
+  return apiFetch<PersonCardOut>(`/persons/${personId}`)
+}
+
+/** 결정 F: 원문은 펼칠 때만 한 건씩 가져온다. */
+export function getEventRaw(eventId: number): Promise<EventRawOut> {
+  return apiFetch<EventRawOut>(`/events/${eventId}/raw`)
+}
+
+export function getFactSources(personId: number, factId: number): Promise<FactSourcesOut> {
+  return apiFetch<FactSourcesOut>(`/persons/${personId}/facts/${factId}/sources`)
 }
 
 /** 이 세션의 미답변 질문 전부. 세션이 없으면 서버가 빈 목록을 준다. */

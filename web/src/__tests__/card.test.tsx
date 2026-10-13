@@ -1,0 +1,414 @@
+// U6 인물 목록·인물 카드·원문 펼치기. 실제 네트워크 없음 — fetch 는 테스트마다 vi.stubGlobal 로 가짜를 건다 (결정 J).
+// 날짜는 한낮(UTC 12:00)으로 골라 어느 시간대에서 돌아도 같은 날로 읽히게 한다.
+import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import App from '@/App'
+import PersonCardScreen, { CARD_NOTICE } from '@/screens/PersonCardScreen'
+import { PERSON_LIST_NOTICE } from '@/components/PersonList'
+import appShellSource from '@/components/AppShell.tsx?raw'
+import cardScreenSource from '@/screens/PersonCardScreen.tsx?raw'
+import type {
+  EventRawOut,
+  FactSourcesOut,
+  PersonCardOut,
+  PersonListItemOut,
+} from '@/api/types'
+import { installFakeMatchMedia } from './helpers'
+
+type Handler = (url: string, init: RequestInit) => Response | Promise<Response>
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+}
+
+function install(handler: Handler) {
+  const fn = vi.fn((input: RequestInfo | URL, init?: RequestInit) => Promise.resolve(handler(String(input), init ?? {})))
+  vi.stubGlobal('fetch', fn)
+  return fn
+}
+
+function callsTo(fn: ReturnType<typeof install>, path: string) {
+  return fn.mock.calls.filter(([url]) => String(url) === path)
+}
+
+function router(table: Record<string, Handler>): Handler {
+  return (url, init) => {
+    if (table[url]) return table[url](url, init)
+    throw new Error(`예상하지 못한 요청: ${url}`)
+  }
+}
+
+// 서버 순서가 날짜 순이 아니고 null 이 가운데 있다 — 프론트가 재정렬하면 순서가 바뀌어 잡힌다.
+const PERSONS: PersonListItemOut[] = [
+// 이름순·날짜순·id순 어느 쪽으로 다시 줄 세워도 이 순서와 달라지도록 골랐다.
+  { id: 7, display_name: '박대리', relation_tag: '직장', hierarchy: '하', last_contact_at: '2026-09-01T12:00:00Z' },
+  { id: 4, display_name: '철수', relation_tag: '친구', hierarchy: '동', last_contact_at: '2026-10-05T12:00:00Z' },
+  { id: 9, display_name: '엄마', relation_tag: '가족', hierarchy: '상', last_contact_at: null },
+]
+
+// 특수문자·꼬리 공백·연속 개행이 든 원문 — 가공(trim·개행 접기·이스케이프)이 있으면 달라진다.
+const RAW_A = '  팀장님이\n"전체회의"에서 <b>지적</b> & 했다 \t끝  \n\n'
+const RAW_B = '두번째\n\n\n  줄바꿈 셋 &amp; 그대로'
+const RAW_C = '점심 같이 함, 딸 얘기'
+
+const CARD: PersonCardOut = {
+  person: { id: 3, display_name: '김팀장', relation_tag: '직장', hierarchy: '상' },
+  aliases: ['팀장', '우리 팀장님', '부장님'],
+  last_contact_at: '2026-09-03T12:00:00Z',
+  facts: [
+    { id: 11, key: 'child', value: '딸 대학 입시 중', updated_at: '2026-09-03T12:00:00Z', source_count: 2 },
+    { id: 12, key: 'hobby', value: '골프 안 침', updated_at: '2026-08-01T12:00:00Z', source_count: 0 },
+  ],
+  patterns: [{ id: 21, key: 'pattern:conflict', value: '공개 석상에서 지적 — 3회', source_count: 3 }],
+  // 서버가 준 순서(날짜 순이 아님)를 그대로 보여야 한다.
+  timeline: [
+    { id: 5, type: 'meal', content: '점심 같이 함', occurred_at: '2026-08-21T12:00:00Z' },
+    { id: 9, type: 'conflict', content: '회의에서 보고서 공개 지적', occurred_at: '2026-09-03T12:00:00Z' },
+    { id: 2, type: 'conflict', content: '전체회의에서 지적당함', occurred_at: '2026-07-28T12:00:00Z' },
+  ],
+  upcoming_schedules: [{ id: 1, title: '분기 회의', scheduled_at: '2026-09-10T12:00:00Z', briefed_at: null }],
+}
+
+function rawOut(id: number, raw: string): EventRawOut {
+  return { event_id: id, person_id: 3, type: 'conflict', content: 'x', occurred_at: '2026-09-03T12:00:00Z', raw_utterance: raw }
+}
+
+const SOURCES_11: FactSourcesOut = {
+  fact: { id: 11, key: 'child', value: '딸 대학 입시 중' },
+  sources: [
+    { event_id: 5, type: 'meal', content: '점심 같이 함', occurred_at: '2026-08-21T12:00:00Z', raw_utterance: RAW_C },
+    { event_id: 9, type: 'conflict', content: '보고서 지적', occurred_at: '2026-09-03T12:00:00Z', raw_utterance: RAW_B },
+  ],
+}
+
+function cardRouter(extra: Record<string, Handler> = {}) {
+  return router({ '/api/persons/3': () => json(CARD), ...extra })
+}
+
+beforeEach(() => {
+  window.localStorage.clear()
+  installFakeMatchMedia(1280)
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+  window.history.replaceState(null, '', '#/chat')
+})
+
+describe('인물 목록', () => {
+  it('서버 순서 그대로(재정렬 없음) 이름·태그·위계·마지막 접촉 4개 필드를 보여 준다', async () => {
+    install(router({ '/api/persons': () => json(PERSONS) }))
+    render(<PersonCardScreen personId={null} />)
+    const list = await screen.findByTestId('person-list')
+    const rows = within(list).getAllByRole('link')
+    expect(rows.map((r) => r.querySelector('[data-field="name"]')?.textContent)).toEqual(['박대리', '철수', '엄마'])
+    expect(rows.map((r) => r.querySelector('[data-field="tag"]')?.textContent)).toEqual(['직장', '친구', '가족'])
+    expect(rows.map((r) => r.querySelector('[data-field="hierarchy"]')?.textContent)).toEqual(['하', '동', '상'])
+    expect(rows.map((r) => r.querySelector('[data-field="last-contact"]')?.textContent)).toEqual([
+      '2026. 9. 1.',
+      '2026. 10. 5.',
+      PERSON_LIST_NOTICE.noContact,
+    ])
+  })
+
+  it('필터·검색 컨트롤이 없다', async () => {
+    install(router({ '/api/persons': () => json(PERSONS) }))
+    render(<PersonCardScreen personId={null} />)
+    await screen.findByTestId('person-list')
+    expect(screen.queryByRole('textbox')).toBeNull()
+    expect(screen.queryByRole('searchbox')).toBeNull()
+    expect(screen.queryByRole('combobox')).toBeNull()
+  })
+
+  it('빈 목록이면 빈 상태 문구 하나', async () => {
+    install(router({ '/api/persons': () => json([]) }))
+    render(<PersonCardScreen personId={null} />)
+    expect(await screen.findByText(PERSON_LIST_NOTICE.empty)).toBeInTheDocument()
+    expect(screen.queryByTestId('person-list')).toBeNull()
+  })
+
+  it('목록 조회가 실패하면 한 줄 안내', async () => {
+    install(router({ '/api/persons': () => json({ detail: { code: 'x' } }, 500) }))
+    render(<PersonCardScreen personId={null} />)
+    expect(await screen.findByText(PERSON_LIST_NOTICE.failed)).toBeInTheDocument()
+  })
+
+  it('항목 링크는 #/persons/:id 이고 누르면 해시가 바뀐다', async () => {
+    install(router({ '/api/persons': () => json(PERSONS) }))
+    render(<PersonCardScreen personId={null} />)
+    const links = within(await screen.findByTestId('person-list')).getAllByRole('link')
+    expect(links.map((l) => l.getAttribute('href'))).toEqual(['#/persons/7', '#/persons/4', '#/persons/9'])
+    await userEvent.click(links[1])
+    expect(window.location.hash).toBe('#/persons/4')
+  })
+})
+
+describe('사이드바의 인물 목록 (결정 N)', () => {
+  it('#/persons 본문과 사이드바에 같은 목록이 같은 순서로 그려진다', async () => {
+    window.history.replaceState(null, '', '#/persons')
+    install(router({ '/api/persons': () => json(PERSONS) }))
+    render(<App />)
+    await waitFor(() => expect(screen.getAllByTestId('person-list')).toHaveLength(2))
+    const [a, b] = screen.getAllByTestId('person-list')
+    const inSidebar = screen.getByTestId('sidebar-persons').querySelectorAll('[data-testid="person-list"]')
+    const inScreen = document.querySelectorAll('[data-screen="persons"] [data-testid="person-list"]')
+    expect(inSidebar).toHaveLength(1)
+    expect(inScreen).toHaveLength(1)
+    expect(a.innerHTML).toBe(b.innerHTML)
+    expect(within(a).getAllByRole('link').map((l) => l.textContent)).toEqual([
+      '박대리직장 · 하2026. 9. 1.',
+      '철수친구 · 동2026. 10. 5.',
+      `엄마가족 · 상${PERSON_LIST_NOTICE.noContact}`,
+    ])
+  })
+
+  it('사이드바와 본문이 같은 컴포넌트(PersonList)를 import 한다', () => {
+    const imp = "import PersonList from '@/components/PersonList'"
+    expect(appShellSource).toContain(imp)
+    expect(cardScreenSource).toContain(imp)
+  })
+
+  it('좁은 폭: 서랍에서 항목을 고르면 서랍이 닫힌다', async () => {
+    installFakeMatchMedia(800)
+    window.history.replaceState(null, '', '#/chat')
+    install(
+      router({
+        '/api/persons': () => json(PERSONS),
+        '/api/questions/pending': () => json([]),
+      }),
+    )
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: '메뉴 열기' }))
+    const nav = screen.getByRole('navigation', { name: '주 메뉴' })
+    await userEvent.click(await within(nav).findByRole('link', { name: /철수/ }))
+    expect(window.location.hash).toBe('#/persons/4')
+    await waitFor(() => expect(screen.queryByRole('navigation', { name: '주 메뉴' })).toBeNull())
+  })
+})
+
+describe('인물 카드 — 섹션과 값', () => {
+  it('섹션 7개가 부록 A ② 순서로 놓인다', async () => {
+    install(cardRouter())
+    const { container } = render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const names = Array.from(container.querySelectorAll('[data-section]')).map((s) => s.getAttribute('data-section'))
+    expect(names).toEqual(['header', 'aliases', 'last-contact', 'facts', 'patterns', 'timeline', 'schedules'])
+    const headings = within(screen.getByTestId('person-card'))
+      .getAllByRole('heading', { level: 2 })
+      .map((h) => h.textContent)
+    expect(headings).toEqual([
+      '김팀장',
+      `▸${CARD_NOTICE.factsTitle}`,
+      `▸${CARD_NOTICE.patternsTitle}`,
+      `▸${CARD_NOTICE.timelineTitle}`,
+      `▸${CARD_NOTICE.schedulesTitle}`,
+    ])
+  })
+
+  it('각 섹션의 값이 서버가 준 그대로 나온다', async () => {
+    install(cardRouter())
+    const { container } = render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const sec = (n: string) => container.querySelector(`[data-section="${n}"]`) as HTMLElement
+    expect(sec('header')).toHaveTextContent('김팀장')
+    expect(sec('header')).toHaveTextContent('직장 · 상')
+    expect(sec('aliases').textContent).toBe('별칭: 팀장, 우리 팀장님, 부장님')
+    expect(sec('last-contact').textContent).toBe('마지막 접촉: 2026. 9. 3.')
+    expect(within(sec('facts')).getByText('딸 대학 입시 중')).toBeInTheDocument()
+    expect(within(sec('facts')).getByText('child')).toBeInTheDocument()
+    expect(within(sec('facts')).getByText('골프 안 침')).toBeInTheDocument()
+    expect(within(sec('patterns')).getByText('공개 석상에서 지적 — 3회')).toBeInTheDocument()
+    expect(within(sec('patterns')).getByText('pattern:conflict')).toBeInTheDocument()
+    expect(within(sec('schedules')).getByText('분기 회의')).toBeInTheDocument()
+    expect(sec('schedules').textContent).toMatch(/2026\. 9\. 10\./)
+  })
+
+  it('타임라인은 서버 순서 그대로, 항목마다 날짜·type·content', async () => {
+    install(cardRouter())
+    const { container } = render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const items = Array.from(container.querySelectorAll('[data-testid^="timeline-"]'))
+    expect(items.map((i) => i.getAttribute('data-testid'))).toEqual(['timeline-5', 'timeline-9', 'timeline-2'])
+    expect(items[0].textContent).toContain('2026. 8. 21.')
+    expect(items[0].textContent).toContain('meal')
+    expect(items[0].textContent).toContain('점심 같이 함')
+    expect(items[1].textContent).toContain('conflict')
+    expect(items[1].textContent).toContain('회의에서 보고서 공개 지적')
+  })
+
+  it('source_count 가 0 이면 근거 보기 버튼이 없고, 양수면 있다', async () => {
+    install(cardRouter())
+    render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    expect(within(screen.getByTestId('fact-11')).getByRole('button', { name: CARD_NOTICE.showSources })).toBeInTheDocument()
+    expect(within(screen.getByTestId('fact-12')).queryByRole('button')).toBeNull()
+    expect(within(screen.getByTestId('fact-21')).getByRole('button', { name: CARD_NOTICE.showSources })).toBeInTheDocument()
+  })
+
+  it('비어 있는 섹션은 짧은 빈 문구를 보여 준다', async () => {
+    install(
+      router({
+        '/api/persons/3': () =>
+          json({ ...CARD, aliases: [], last_contact_at: null, facts: [], patterns: [], timeline: [], upcoming_schedules: [] }),
+      }),
+    )
+    const { container } = render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const sec = (n: string) => container.querySelector(`[data-section="${n}"]`) as HTMLElement
+    expect(sec('aliases').textContent).toBe(`별칭: ${CARD_NOTICE.aliasesNone}`)
+    expect(sec('last-contact').textContent).toBe(`마지막 접촉: ${CARD_NOTICE.lastContactNone}`)
+    expect(sec('facts')).toHaveTextContent(CARD_NOTICE.factsEmpty)
+    expect(sec('patterns')).toHaveTextContent(CARD_NOTICE.patternsEmpty)
+    expect(sec('timeline')).toHaveTextContent(CARD_NOTICE.timelineEmpty)
+    expect(sec('schedules')).toHaveTextContent(CARD_NOTICE.schedulesEmpty)
+  })
+
+  it('404 면 안내 한 줄과 목록으로 가는 링크', async () => {
+    install(router({ '/api/persons/3': () => json({ detail: { code: 'not_found' } }, 404) }))
+    render(<PersonCardScreen personId={3} />)
+    expect(await screen.findByRole('alert')).toHaveTextContent(CARD_NOTICE.notFound)
+    expect(screen.getByRole('link', { name: CARD_NOTICE.backToList })).toHaveAttribute('href', '#/persons')
+    expect(screen.queryByTestId('person-card')).toBeNull()
+  })
+
+  it('404 가 아닌 실패는 다른 안내 문장', async () => {
+    install(router({ '/api/persons/3': () => json({ detail: { code: 'x' } }, 500) }))
+    render(<PersonCardScreen personId={3} />)
+    expect(await screen.findByRole('alert')).toHaveTextContent(CARD_NOTICE.loadFailed)
+  })
+})
+
+describe('원문 펼치기 (결정 F)', () => {
+  it('카드·목록 응답에 원문이 없으면 아무 데도 원문이 보이지 않고, 원문 요청도 없다', async () => {
+    const fetchFn = install(cardRouter())
+    render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    expect(screen.queryByTestId('raw-utterance')).toBeNull()
+    expect(document.body.textContent).not.toContain('팀장님이')
+    expect(fetchFn.mock.calls.map(([u]) => String(u))).toEqual(['/api/persons/3'])
+  })
+
+  it('첫 펼침에 GET /events/{id}/raw 1회, 원문은 글자 그대로, 접었다 다시 펼쳐도 요청은 1회', async () => {
+    const fetchFn = install(cardRouter({ '/api/events/9/raw': () => json(rawOut(9, RAW_A)) }))
+    render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const item = screen.getByTestId('timeline-9')
+    const user = userEvent.setup()
+
+    await user.click(within(item).getByRole('button', { name: CARD_NOTICE.showRaw }))
+    const raw = await within(item).findByTestId('raw-utterance')
+    expect(raw.textContent).toBe(RAW_A)
+    expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(1)
+    expect((callsTo(fetchFn, '/api/events/9/raw')[0][1] as RequestInit).method).toBe('GET')
+
+    await user.click(within(item).getByRole('button', { name: CARD_NOTICE.hideRaw }))
+    expect(within(item).queryByTestId('raw-utterance')).toBeNull()
+
+    await user.click(within(item).getByRole('button', { name: CARD_NOTICE.showRaw }))
+    expect((await within(item).findByTestId('raw-utterance')).textContent).toBe(RAW_A)
+    expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(1)
+  })
+
+  it('다른 항목은 각자 한 번씩 요청한다', async () => {
+    const fetchFn = install(
+      cardRouter({
+        '/api/events/9/raw': () => json(rawOut(9, RAW_A)),
+        '/api/events/2/raw': () => json(rawOut(2, RAW_B)),
+      }),
+    )
+    render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const user = userEvent.setup()
+    await user.click(within(screen.getByTestId('timeline-9')).getByRole('button', { name: CARD_NOTICE.showRaw }))
+    await user.click(within(screen.getByTestId('timeline-2')).getByRole('button', { name: CARD_NOTICE.showRaw }))
+    expect((await within(screen.getByTestId('timeline-2')).findByTestId('raw-utterance')).textContent).toBe(RAW_B)
+    expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(1)
+    expect(callsTo(fetchFn, '/api/events/2/raw')).toHaveLength(1)
+  })
+
+  it('조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다', async () => {
+    let n = 0
+    const fetchFn = install(
+      cardRouter({
+        '/api/events/9/raw': () => (n++ === 0 ? json({ detail: { code: 'x' } }, 500) : json(rawOut(9, RAW_A))),
+      }),
+    )
+    render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const item = screen.getByTestId('timeline-9')
+    const user = userEvent.setup()
+
+    await user.click(within(item).getByRole('button', { name: CARD_NOTICE.showRaw }))
+    expect(await within(item).findByRole('alert')).toHaveTextContent(CARD_NOTICE.detailFailed)
+    // 화면 전체 안내가 아니다: 알림은 이 항목 안의 하나뿐이고, 카드와 다른 항목은 그대로다.
+    expect(screen.getAllByRole('alert')).toHaveLength(1)
+    expect(screen.getByTestId('person-card')).toBeInTheDocument()
+    expect(within(screen.getByTestId('timeline-5')).queryByRole('alert')).toBeNull()
+    expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(1)
+
+    await user.click(within(item).getByRole('button'))
+    expect((await within(item).findByTestId('raw-utterance')).textContent).toBe(RAW_A)
+    expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(2)
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it('근거 보기: sources 요청 1회, 항목 수·날짜·content·원문이 그대로, 접기, 다시 펼쳐도 재요청 없음', async () => {
+    const fetchFn = install(cardRouter({ '/api/persons/3/facts/11/sources': () => json(SOURCES_11) }))
+    render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const fact = screen.getByTestId('fact-11')
+    const user = userEvent.setup()
+
+    await user.click(within(fact).getByRole('button', { name: CARD_NOTICE.showSources }))
+    const list = await within(fact).findByTestId('sources-11')
+    const items = within(list).getAllByRole('listitem')
+    expect(items).toHaveLength(2)
+    expect(items[0].textContent).toContain('2026. 8. 21. · 점심 같이 함')
+    expect(items[1].textContent).toContain('2026. 9. 3. · 보고서 지적')
+    expect(within(items[0]).getByTestId('raw-utterance').textContent).toBe(RAW_C)
+    expect(within(items[1]).getByTestId('raw-utterance').textContent).toBe(RAW_B)
+    expect(callsTo(fetchFn, '/api/persons/3/facts/11/sources')).toHaveLength(1)
+
+    await user.click(within(fact).getByRole('button', { name: CARD_NOTICE.hideSources }))
+    expect(within(fact).queryByTestId('sources-11')).toBeNull()
+    await user.click(within(fact).getByRole('button', { name: CARD_NOTICE.showSources }))
+    expect(await within(fact).findByTestId('sources-11')).toBeInTheDocument()
+    expect(callsTo(fetchFn, '/api/persons/3/facts/11/sources')).toHaveLength(1)
+  })
+
+  it('패턴의 근거 보기도 그 패턴 id 로 요청한다', async () => {
+    const fetchFn = install(
+      cardRouter({
+        '/api/persons/3/facts/21/sources': () =>
+          json({ fact: { id: 21, key: 'pattern:conflict', value: 'v' }, sources: SOURCES_11.sources.slice(1) }),
+      }),
+    )
+    render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    await userEvent.click(within(screen.getByTestId('fact-21')).getByRole('button', { name: CARD_NOTICE.showSources }))
+    expect((await screen.findByTestId('sources-21')).textContent).toContain(RAW_B.slice(0, 3))
+    expect(callsTo(fetchFn, '/api/persons/3/facts/21/sources')).toHaveLength(1)
+  })
+
+  it('근거 조회 실패는 그 사실 안에만 안내, 다시 누르면 재시도(요청 2회)', async () => {
+    let n = 0
+    const fetchFn = install(
+      cardRouter({
+        '/api/persons/3/facts/11/sources': () => (n++ === 0 ? json({ detail: { code: 'x' } }, 500) : json(SOURCES_11)),
+      }),
+    )
+    render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const fact = screen.getByTestId('fact-11')
+    const user = userEvent.setup()
+    await user.click(within(fact).getByRole('button', { name: CARD_NOTICE.showSources }))
+    expect(await within(fact).findByRole('alert')).toHaveTextContent(CARD_NOTICE.detailFailed)
+    expect(screen.getAllByRole('alert')).toHaveLength(1)
+    expect(within(screen.getByTestId('fact-21')).queryByRole('alert')).toBeNull()
+
+    await user.click(within(fact).getByRole('button'))
+    expect(await within(fact).findByTestId('sources-11')).toBeInTheDocument()
+    expect(callsTo(fetchFn, '/api/persons/3/facts/11/sources')).toHaveLength(2)
+  })
+})

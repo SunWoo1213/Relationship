@@ -96,3 +96,20 @@
 - 권고 처리: **R-U5-2** 복원 실패 → 사용자 결정 "한 줄 안내"(U6 에 포함, 343행 테스트 수정) · **R-U5-1**(원칙7 테스트 데이터 — `OPTIONS` 비정렬+공백 포함)·**R-U5-4**(`sending` 잠금·`isComposing` 테스트) → 사용자 결정 "U6 에 포함하고 지금 커밋" · R-U5-5 이 항목·registry 에 반영("(U5 미커밋)" 4칸은 다음 커밋에 해시).
 - 남은 것 · 다음 단위: U6 인물 카드 화면 + 원문 펼치기(frontend-agent) — 위임에 R-U5-1·2·4 + (나) 증거 절차 + "카드 링크는 U5 에서 이미 붙임(U6 행과 중복 금지)". U6 시작 전 FIX-034 순서 결정. U7 전 R-U3-6 ⑤ 결정.
 - Refs: P8-frontend U5 S3.4 D1 D2 원칙1 원칙7
+
+## 2026-10-13 16:22 · U6 시작 — 인물 카드 화면 + 원문 펼치기 · 진행 중
+- (앞 항목 보충) U5 커밋 = `977f2ee`, CI 38351077718 다섯 job success. 그 뒤 **FIX-034**(`1944369`, 사용자 결정 "U6 앞에") 완료 — `save_evidence.py` 증거 통로, verifier 1차 보류 → 재작업 → 재검증 통과, CI 38361696151 success(windows test-guards 13경우 첫 실행 통과). registry "(U5 미커밋)"·"(FIX-034 미커밋)" → 해시 교체(이 커밋).
+- 사용자 승인(AskUserQuestion "시작") → L-004 마커 `--stage frontend-agent` 승인 **뒤** 생성(16:22).
+- 위임 범위: 01-plan 97행 **원문 인용** + 기획서 부록 A ② 카드 순서(`docs/proposal.md` 318~343행) · 백엔드 계약 U1(`GET /persons`·`GET /persons/{id}`)·U2(`GET /events/{id}/raw`·`GET /persons/{id}/facts/{fid}/sources`) · 이월 R-U5-1(원칙7 테스트 데이터)·R-U5-2(복원 실패 한 줄 안내)·R-U5-4(`sending`·`isComposing` 테스트) · 카드 링크는 U5 에서 이미 붙임(중복 금지) · R-U4-10 규칙 · **증거는 `save_evidence.py` 로(FIX-034 첫 적용)**.
+- **구현 결과(frontend-agent, 16:29)**: `components/PersonList.tsx`(목록, 본문·사이드바 공용, `PERSON_LIST_NOTICE`) · `lib/format.ts`(`Intl` ko-KR 절대 날짜 — 상대 표기 "3일 전" 은 시계 의존이라 채택 안 함) · `PersonCardScreen.tsx`(부록 A ② 순서 7섹션, `useLazyDetail` 첫 펼침 1회 조회·캐시·항목 안 실패 안내·재시도, `CARD_NOTICE`) · `client.ts` 조회 4개 · `AppShell.tsx` 사이드바 아래 목록 · `ChatScreen.tsx` `NOTICE.restoreFailed`(R-U5-2) · `card.test.tsx` 22건 · `chat.test.tsx` R-U5-1·2·4 반영 · registry U6 행 3개. 새 부품·새 패키지 0. 변이 15종 전부 검출(M1 목록 재정렬은 1차 생존 → 테스트 데이터를 어느 정렬로도 달라지게 고쳐 재실행 검출). **증거 전부 `save_evidence.py` 통로**(`evidence/20261013-1627~1629-u6-*`, 중간 산출물 포함) — (c) 미달 0. 메인 세션 재실행 `20261013-1811-u6-main-recheck.txt`: 70 passed·빌드 통과. 고정 문구는 "구현 안"으로 보고(서버 `type`·`key` 는 그대로, 한글 매핑 없음 — 원칙7). 참고: `PersonList` 가 본문과 사이드바에 각각 마운트돼 `GET /persons` 가 2회 — 공유 캐시는 계획에 없어 미구현(verifier 판정).
+- Refs: P8-frontend U6 R8 S3.5 원칙7 FIX-034
+
+## 2026-10-13 19:00 · feat(P8-frontend): 인물 목록과 인물 카드 화면, 원문·근거 펼치기를 만든다 · pending
+- (앞 항목 보충) U5 커밋 `977f2ee` = CI 38351077718 success · FIX-034 커밋 `1944369` = CI 38361696151 success(이 커밋에서 FIX-034.md 결과절에도 기재).
+- 변경: `components/PersonList.tsx`(신규)·`lib/format.ts`(신규)·`screens/PersonCardScreen.tsx`·`api/client.ts`·`components/AppShell.tsx`·`screens/ChatScreen.tsx`(R-U5-2)·`__tests__/card.test.tsx`(신규 22건)·`__tests__/chat.test.tsx`(R-U5-1·4) · registry U6 행 3개 · 증거 7(구현자 6 + 메인 세션 재확인 1) + verifier 5 + 리뷰 1.
+- 이유(기획서·카드 연결): 01-plan U6·결정 F(원문은 펼칠 때만)·N(사이드바 아래 목록)·L. 기획서 부록 A ② "쌓인 것이 보이는 곳" — "타임라인 항목을 펼치면 원문 발화가 나옵니다. 요약이 틀렸을 때 근거를 확인하고 고칠 수 있습니다"(확인까지, 고치기 폼은 범위 밖).
+- 정합성 확인: verifier 97행·결정 F·N 계약 14항목 전부 코드·테스트·변이로 확인. 원칙7: 서버 문자열 변환 코드 0, 탐침 P1(카드·목록 응답 7자리에 `raw_utterance` 를 몰래 실어도 화면에 없음) 통과. 서버 순서 보존(재정렬·재절단 0). 구현자 판단: ① 고정 문구 24개 적합 ② 절대 날짜 표기 — 계약은 "순서"뿐, 날짜 규칙 없음 → U10 에서 사용자가 봄 ③ `GET /persons` 2회 — 기록, 단 탐침 P2 로 **데스크톱 사이드바가 마운트 때 1회만 조회돼 새 인물이 stale** 확인 → R-U6-2.
+- 검증: verifier `review-u6-card.md` **통과([필수] 0 · [권고] 5)**. 판정 70 passed·빌드(번들 해시 구현자·메인·verifier 동일). 변이: 구현자 15종 전부 검출(M1 은 1차 생존 → 테스트 데이터 수정), verifier V2~V5 검출, M1·M3·M6·M10 재실행 일치, 탐침 P1~P3. R-U0-3: package·lock 바이트 동일, audit 0, `?raw` 는 저장소 안 소스 2개만. 증거 `evidence/20261013-1627~1629-u6-*`·`1811-u6-main-recheck`·`1843~1848-verifier-u6-*`. **(c) 미달 0** — 단 R-U6-3: 구현자 변이 스크립트가 vitest 출력을 요약해 흘렸고 스크립트가 스크래치패드에만 있었음(verifier 가 `-1848-verifier-u6-mutation-scripts.txt` 로 원문 보존) → 다음 위임부터 "변이 스크립트는 출력을 그대로 흘리고 스크립트도 evidence 에".
+- 사용자 결정(19:00): **R-U6-1**(`useLazyDetail.toggle` — 로딩 중 접기 → 실패 → 재펼침 시 열리지 않음, 처방 1줄 + 탐침 P3 테스트)·**R-U6-2**(사이드바 신선도 — **(iii) `AppShell` 단일 조회 + 채팅 `stored.persons>0`·라우트 변경 때 재조회**, `GET /persons` 2회 → 1회) 둘 다 **U7 에 포함**. R-U6-4 테스트 틈 3개(별칭 trim·전송 중 Enter·`type`/`key` 소문자) 기록. 1628 중간 산출물 = 테스트 데이터 1차 수정이 137행 링크 테스트 인덱스를 안 맞춰 exit 1 한 기록.
+- 남은 것 · 다음 단위: U7 브리핑 화면 + 수동 브리핑 버튼(frontend-agent) — 위임 전 사용자 결정 R-U3-6 ⑤(`schedule_id` 강조 방식). 프롬프트에 R-U6-1·2(iii)·R-U6-3 규칙 포함.
+- Refs: P8-frontend U6 R8 S3.5 원칙7 FIX-034

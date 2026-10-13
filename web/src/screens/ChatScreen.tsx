@@ -16,6 +16,7 @@ export const NOTICE = {
   failed: '요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.',
   questionClosed: '이미 답했거나 만료된 질문이에요.',
   sessionReset: '세션이 초기화됐어요. 다시 보내 주세요.',
+  restoreFailed: '이전에 남은 질문을 불러오지 못했어요.',
   personsLink: '인물 카드 보기',
 } as const
 
@@ -135,7 +136,8 @@ export default function ChatScreen() {
         })
       })
       .catch(() => {
-        // 복원 실패는 조용히 둔다 — 대화는 새 발화로 계속할 수 있다.
+        // 복원 실패는 한 줄로 알린다(R-U5-2) — 대화는 새 발화로 계속할 수 있다.
+        if (alive) setNotice(NOTICE.restoreFailed)
       })
     return () => {
       alive = false

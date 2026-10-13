@@ -1,0 +1,115 @@
+# 명령: echo "## 원칙7 — 서버 문자열 변환 후보 grep (U6 파일)"; grep -nE "\.trim\(|\.replace\(|\.sort\(|\.reverse\(|normalize\(|toLowerCase\(|toUpperCase\(|\.slice\(|\.filter\(|\.substring\(|\.split\(|localeCompare|\.join\(" web/src/components/PersonList.tsx web/src/screens/PersonCardScreen.tsx web/src/lib/format.ts web/src/api/client.ts web/src/components/AppShell.tsx; echo "(exit $?)"; echo "## formatDate/formatDateTime 호출 인자"; grep -nE "formatDate(Time)?\(" web/src/components/PersonList.tsx web/src/screens/PersonCardScreen.tsx; echo "## raw_utterance 사용처 (불변식 4)"; grep -rn "raw_utterance" web/src; echo "## 불변식 10 — Sheet/Dialog/Drawer 파일"; grep -rlE "Sheet|Dialog|Drawer" web/src --include=*.tsx | grep -v "^web/src/components/ui/"; echo "## 불변식 9 — 외부 글꼴·CDN"; grep -rnE "fonts\.googleapis|fonts\.gstatic|cdn\." web/src web/index.html; echo "(exit $?)"; echo "## 외부 URL"; grep -rnE "https?://" web/src/components/PersonList.tsx web/src/screens/PersonCardScreen.tsx web/src/lib/format.ts web/src/__tests__/card.test.tsx web/src/api/client.ts; echo "(exit $?)"; echo "## /push-dev/"; grep -rn "push-dev" web/src; echo "(exit $?)"; echo "## routes.ts·App.tsx 무변경"; git diff --stat -- web/src/routes.ts web/src/App.tsx web/src/main.tsx web/index.html; echo "(diff-stat end)"; echo "## HREF 사용·라우트 목록"; grep -n "persons\|chat\|briefings" web/src/routes.ts; echo "## 범위 밖 변경 (app alembic tests .github)"; git status --short -- app alembic tests .github; echo "(status end)"; echo "## 삭제 파일"; git diff --name-only --diff-filter=D; git status --short | grep "^ D\|^D"; echo "(deleted end)"; echo "## test-setup.ts 무변경"; git diff --stat -- web/src/test-setup.ts; echo "(end)"; echo "## git status 전체"; git status --short; echo "## numstat web"; git diff --numstat -- web; echo "## 비밀 패턴"; grep -rnE "sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|-----BEGIN|xox[baprs]-|AIza[0-9A-Za-z_-]{35}" web/src/components/PersonList.tsx web/src/screens/PersonCardScreen.tsx web/src/lib/format.ts web/src/__tests__/card.test.tsx web/src/api/client.ts; echo "(exit $?)"; echo "## 고정 문구 전부"; grep -nE "^\s+[a-zA-Z]+: .+,$" web/src/components/PersonList.tsx web/src/screens/PersonCardScreen.tsx | grep -v "status\|className"; echo "## 상담·감정 어휘"; grep -nE "고민|상담|감정|위로|힘내|괜찮" web/src/components/PersonList.tsx web/src/screens/PersonCardScreen.tsx web/src/screens/ChatScreen.tsx; echo "(exit $?)"
+# 시각: 2026-10-13T18:43:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1944369 (dev2)
+# exit: 0
+# ---
+## 원칙7 — 서버 문자열 변환 후보 grep (U6 파일)
+web/src/screens/PersonCardScreen.tsx:255:        {CARD_NOTICE.aliasesLabel}: {card.aliases.length ? card.aliases.join(', ') : CARD_NOTICE.aliasesNone}
+(exit 0)
+## formatDate/formatDateTime 호출 인자
+web/src/components/PersonList.tsx:59:              {p.last_contact_at ? formatDate(p.last_contact_at) : PERSON_LIST_NOTICE.noContact}
+web/src/screens/PersonCardScreen.tsx:115:          <span className="w-28 shrink-0 text-sm text-muted-foreground">{formatDate(event.occurred_at)}</span>
+web/src/screens/PersonCardScreen.tsx:166:                    {formatDate(s.occurred_at)} · {s.content}
+web/src/screens/PersonCardScreen.tsx:260:        {card.last_contact_at ? formatDate(card.last_contact_at) : CARD_NOTICE.lastContactNone}
+web/src/screens/PersonCardScreen.tsx:308:                <span className="text-sm text-muted-foreground">{formatDateTime(s.scheduled_at)}</span> {s.title}
+## raw_utterance 사용처 (불변식 4)
+web/src/screens/PersonCardScreen.tsx:3:// 서버 문자열(key · value · content · raw_utterance · title)은 고치지 않고 그대로 보여 준다 (원칙7).
+web/src/screens/PersonCardScreen.tsx:4:// 원문(raw_utterance)은 펼칠 때만 가져오고(1회), 같은 항목을 다시 펼쳐도 다시 요청하지 않는다 — 항목 컴포넌트 상태에 캐시.
+web/src/screens/PersonCardScreen.tsx:131:          <DetailStatus state={state}>{(raw) => <RawText text={raw.raw_utterance} />}</DetailStatus>
+web/src/screens/PersonCardScreen.tsx:168:                  <RawText text={s.raw_utterance} />
+web/src/__tests__/card.test.tsx:74:  return { event_id: id, person_id: 3, type: 'conflict', content: 'x', occurred_at: '2026-09-03T12:00:00Z', raw_utterance: raw }
+web/src/__tests__/card.test.tsx:80:    { event_id: 5, type: 'meal', content: '점심 같이 함', occurred_at: '2026-08-21T12:00:00Z', raw_utterance: RAW_C },
+web/src/__tests__/card.test.tsx:81:    { event_id: 9, type: 'conflict', content: '보고서 지적', occurred_at: '2026-09-03T12:00:00Z', raw_utterance: RAW_B },
+web/src/api/types.ts:115:  raw_utterance: string
+web/src/api/types.ts:129:  raw_utterance: string
+## 불변식 10 — Sheet/Dialog/Drawer 파일
+web/src/components/AppShell.tsx
+## 불변식 9 — 외부 글꼴·CDN
+(exit 1)
+## 외부 URL
+(exit 1)
+## /push-dev/
+(exit 1)
+## routes.ts·App.tsx 무변경
+(diff-stat end)
+## HREF 사용·라우트 목록
+5:  | { name: 'chat' }
+6:  | { name: 'persons'; personId: number | null }
+7:  | { name: 'briefings' }
+10:  chat: '#/chat',
+11:  persons: '#/persons',
+12:  briefings: '#/briefings',
+15:export const DEFAULT_HASH = HREF.chat
+17:/** `#/persons/12?x=1` → `/persons/12` (쿼리·앞 `#` 제거). */
+24:/** 알 수 없는 해시는 null — 호출 쪽이 `#/chat` 으로 보낸다. */
+27:  if (path === '/chat') return { name: 'chat' }
+28:  if (path === '/briefings') return { name: 'briefings' }
+29:  if (path === '/persons') return { name: 'persons', personId: null }
+30:  const m = /^\/persons\/(\d+)$/.exec(path)
+31:  if (m) return { name: 'persons', personId: Number(m[1]) }
+44:/** 현재 해시를 구독한다. 알 수 없는 해시면 주소를 `#/chat` 으로 바꾸고 chat 을 돌려준다. */
+56:  return route ?? { name: 'chat' }
+## 범위 밖 변경 (app alembic tests .github)
+(status end)
+## 삭제 파일
+(deleted end)
+## test-setup.ts 무변경
+(end)
+## git status 전체
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8-frontend/03-log.md
+ M docs/wiki/registry.md
+ M web/src/__tests__/chat.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/screens/ChatScreen.tsx
+ M web/src/screens/PersonCardScreen.tsx
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1627-u6-card.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1627-u6-mutation.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1628-u6-card.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1628-u6-mutation-m1-rerun.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1629-u6-card.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1629-u6-mutation-m1-rerun.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1811-u6-main-recheck.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1843-verifier-u6-deps.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1843-verifier-u6-judge.txt
+?? web/src/__tests__/card.test.tsx
+?? web/src/components/PersonList.tsx
+?? web/src/lib/format.ts
+## numstat web
+28	10	web/src/__tests__/chat.test.tsx
+31	1	web/src/api/client.ts
+5	2	web/src/components/AppShell.tsx
+3	1	web/src/screens/ChatScreen.tsx
+330	2	web/src/screens/PersonCardScreen.tsx
+## 비밀 패턴
+(exit 1)
+## 고정 문구 전부
+web/src/components/PersonList.tsx:11:  empty: '아직 기록된 인물이 없어요.',
+web/src/components/PersonList.tsx:12:  failed: '인물 목록을 불러오지 못했어요.',
+web/src/components/PersonList.tsx:13:  noContact: '기록 없음',
+web/src/screens/PersonCardScreen.tsx:27:  notFound: '인물을 찾을 수 없어요.',
+web/src/screens/PersonCardScreen.tsx:28:  loadFailed: '인물 카드를 불러오지 못했어요.',
+web/src/screens/PersonCardScreen.tsx:29:  backToList: '인물 목록으로',
+web/src/screens/PersonCardScreen.tsx:30:  aliasesLabel: '별칭',
+web/src/screens/PersonCardScreen.tsx:31:  aliasesNone: '없음',
+web/src/screens/PersonCardScreen.tsx:32:  lastContactLabel: '마지막 접촉',
+web/src/screens/PersonCardScreen.tsx:33:  lastContactNone: '기록 없음',
+web/src/screens/PersonCardScreen.tsx:34:  factsTitle: '알고 있는 것',
+web/src/screens/PersonCardScreen.tsx:35:  factsEmpty: '아직 알고 있는 것이 없어요.',
+web/src/screens/PersonCardScreen.tsx:36:  patternsTitle: '반복 패턴',
+web/src/screens/PersonCardScreen.tsx:37:  patternsEmpty: '반복 패턴이 없어요.',
+web/src/screens/PersonCardScreen.tsx:38:  timelineTitle: '타임라인',
+web/src/screens/PersonCardScreen.tsx:39:  timelineEmpty: '기록이 없어요.',
+web/src/screens/PersonCardScreen.tsx:40:  schedulesTitle: '다가오는 일정',
+web/src/screens/PersonCardScreen.tsx:41:  schedulesEmpty: '다가오는 일정이 없어요.',
+web/src/screens/PersonCardScreen.tsx:42:  showSources: '근거 보기',
+web/src/screens/PersonCardScreen.tsx:43:  hideSources: '근거 접기',
+web/src/screens/PersonCardScreen.tsx:44:  showRaw: '원문 펼치기',
+web/src/screens/PersonCardScreen.tsx:45:  hideRaw: '원문 접기',
+web/src/screens/PersonCardScreen.tsx:46:  loading: '불러오는 중',
+web/src/screens/PersonCardScreen.tsx:47:  detailFailed: '원문을 불러오지 못했어요. 다시 눌러 주세요.',
+## 상담·감정 어휘
+(exit 1)
