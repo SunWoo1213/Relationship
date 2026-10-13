@@ -1,0 +1,216 @@
+
+# ===== append 2026-10-13T15:58:22+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/control/.claude/scripts/save_evidence.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/section.sh
+# 시각: 2026-10-13T15:58:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 0
+# 메모: 변이 control (스크래치패드 mut2 사본, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205040 bytes (절단 없음)
+== 결과: 실패 0 ==
+
+# ===== append 2026-10-13T15:58:23+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/mb/.claude/scripts/save_evidence.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/section.sh
+# 시각: 2026-10-13T15:58:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 mb (스크래치패드 mut2 사본, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+XX   save_evidence ⑫ 실패(rc=0)
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205035 bytes (절단 없음)
+== 결과: 실패 1 ==
+
+# ===== append 2026-10-13T15:58:25+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/md/.claude/scripts/save_evidence.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/section.sh
+# 시각: 2026-10-13T15:58:25+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 md (스크래치패드 mut2 사본, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+XX   save_evidence ⑪ 실패(본문 rc=0 파일 1, 머리줄 rc=2)
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205035 bytes (절단 없음)
+== 결과: 실패 1 ==
+
+# ===== append 2026-10-13T15:58:26+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/me/.claude/scripts/save_evidence.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/section.sh
+# 시각: 2026-10-13T15:58:26+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 me (스크래치패드 mut2 사본, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+XX   save_evidence ⑪ 실패(본문 rc=2 파일 0, 머리줄 rc=0)
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205035 bytes (절단 없음)
+== 결과: 실패 1 ==
+
+# ===== append 2026-10-13T15:58:28+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/mf/.claude/scripts/save_evidence.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/section.sh
+# 시각: 2026-10-13T15:58:28+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 mf (스크래치패드 mut2 사본, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+XX   save_evidence ⑬ 실패(rc=0, 크기      335)
+== 결과: 실패 1 ==
+
+# ===== append 2026-10-13T15:58:29+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/mg/.claude/scripts/save_evidence.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/section.sh
+# 시각: 2026-10-13T15:58:29+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 mg (스크래치패드 mut2 사본, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+XX   save_evidence ⑦ 실패(rc=0, 파일 1)
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205035 bytes (절단 없음)
+== 결과: 실패 1 ==
+
+# ===== append 2026-10-13T15:58:30+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/mh/.claude/scripts/save_evidence.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/section.sh
+# 시각: 2026-10-13T15:58:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 mh (스크래치패드 mut2 사본, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+XX   save_evidence ⑨ 실패(rc=0, 파일 1)
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205035 bytes (절단 없음)
+== 결과: 실패 1 ==
+
+# ===== append 2026-10-13T15:58:32+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/mi/.claude/scripts/save_evidence.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/section.sh
+# 시각: 2026-10-13T15:58:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 mi (스크래치패드 mut2 사본, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+XX   save_evidence ⑩ 실패(rc1=0 rc2=3)
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205035 bytes (절단 없음)
+== 결과: 실패 1 ==
+
+# ===== append 2026-10-13T15:58:33+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/mj/.claude/scripts/save_evidence.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut2/section.sh
+# 시각: 2026-10-13T15:58:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 mj (스크래치패드 mut2 사본, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+XX   save_evidence ⑩ 실패(rc1=3 rc2=0)
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205035 bytes (절단 없음)
+== 결과: 실패 1 ==

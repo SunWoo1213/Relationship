@@ -31,8 +31,8 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 3. `review-index.md`에서 이 패키지가 닫는 R → "다음 카드"(D, S)를 연다. 원문은 카드가 지시하는 절만. `registry.md`를 grep 해 이미 있는 산출물을 확인한다. **git log 를 본다(L-001)**: `bash .claude/scripts/gitlog.sh <id> <D/S 태그>` — 선행 패키지 완료 커밋, 같은 태그의 기존 커밋, 미커밋 변경을 확인하고 02-plan-verify 점검표 5·7 의 근거에 커밋 해시를 적는다. 현재 브랜치가 `dev2`(작업·실험 브랜치, L-001 개정 2026-09-29)인지 확인한다.
 4. `packages/<id>/01-plan.md`를 `templates/plan.md`로 작성. 작업 단위(U1, U2 …)마다 `Refs:`. 수용 기준은 backlog와 **글자 그대로**.
 5. **기계 검증**: `mkdir -p packages/<id>/evidence` 후
-   `bash .claude/scripts/verify-plan.sh <id>` 를 실행하고 출력을 **Write 툴로** `docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt` 에 저장한다
-   (`tee`·`>` 는 프로젝트 안 쓰기라 bash-write-guard 가 거부한다. 긴 출력은 스크래치패드 리터럴 절대 경로로 `>` 한 뒤 Read → Write).
+   `python3 .claude/scripts/save_evidence.py <id> verify-plan -- bash .claude/scripts/verify-plan.sh <id>` 를 실행해 `docs/wiki/packages/<id>/evidence/<ts>-verify-plan.txt` 에 출력 전체를 저장한다
+   (FIX-034 — `tee`·`>` 는 프로젝트 안 쓰기라 bash-write-guard 가 거부하고, Write 로 옮겨 적지 않는다).
    FAIL/WARN 이 있으면 `bash .claude/scripts/findings.sh <id> <그 파일> --source verify-plan` → `05-remediation.md` 소견을 채우고 계획을 고친 뒤 다시 실행(FAIL 0 까지, 3회 한도).
 6. **`verifier` 에이전트에 위임**(L-002: 계획을 쓴 쪽이 점검표를 채우지 않는다)하여 `02-plan-verify.md`를 `templates/plan-verify.md`로 작성: `검증자: verifier (fable)`, 1절에 기계 검증 출력 전체, 2절 점검표 8행은 각각 **카드 파일명 + 인용 문장**을 근거로 판정. 위임 프롬프트에는 패키지 id·읽을 카드 목록·evidence 경로를 적는다. `verify-plan.sh`는 검증자 줄에 `verifier`가 없으면 FAIL 한다. 보류가 하나라도 있으면 `결과: 보류`로 두고 사용자에게 보고하고 멈춘다.
 7. 통과면 `AskUserQuestion`으로 계획 요약(목표·작업 단위·수용 기준·기계 검증 결과·읽은 카드)을 보여주고 승인을 받는다. 선택지: 승인 / 수정 요청 / 보류.
@@ -40,7 +40,7 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 9. 이 시점부터 제품 코드를 쓸 수 있다. 작업 단위 하나가 끝날 때마다 `/commit`. 새 산출물은 `registry.md`에 행 추가.
 
 ### 검증 → 조치 루프 (구현 중 문제가 나왔을 때, `verification.md` "루프")
-1. `bash .claude/scripts/verify-impl.sh <id>` 의 출력을 Write 툴로 `docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt` 에 저장 (pytest 출력도 같은 방식으로 파일에. 긴 출력은 스크래치패드 리터럴 절대 경로로 `>` 한 뒤 Read → Write)
+1. `python3 .claude/scripts/save_evidence.py <id> verify-impl -- bash .claude/scripts/verify-impl.sh <id>` 로 `docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt` 에 출력 전체 저장 (pytest 출력도 같은 방식 `save_evidence.py <id> pytest -- …`. Write 로 옮겨 적지 않는다, FIX-034)
 2. `bash .claude/scripts/findings.sh <id> <그 파일> --source verify-impl` → `05-remediation.md`에 소견 블록.
 3. 소견마다 채운다: 원인 가설 → 확인 명령 실행·출력 인용 → **해결 단계 표**(단계 = 파일·방법 + 완료 판정 명령 + 기대 출력). 명령 없는 단계는 쓰지 않는다.
 4. 단계를 순서대로 실행하고 완료 판정 명령을 실제로 실행해 상태를 완료로. 결정·명세(D/S/원칙)를 바꿔야만 풀리는 소견은 멈추고 `/devlog fix` 또는 `/devlog change`로 올려 사용자에게 보고.
@@ -52,12 +52,12 @@ description: 개발 위키(docs/wiki) 운영 절차. 세션 재개(중단 작업
 2. **기획서 정합성**: 수정이 원칙·D·S를 바꾸면 FIX가 아니다 → D 카드 갱신 또는 `/devlog change`.
 3. 정합성 점검표 적용 → **메인 세션이** `계획 점검: 통과`(점검표 1~8, 근거 요약)를 쓴다. `AskUserQuestion` 승인 → `승인:` 기록. **`검증:` 줄은 메인 세션이 쓰지 않는다** — 빈 칸(`검증: (verifier 가 쓴다 — 제품 코드를 바꾸면 커밋 전 review-FIX-nnn.md 와 함께)`)으로 둔다. L-002 는 패키지뿐 아니라 FIX 에도 적용된다. `stage-gate.sh` 는 코드를 쓰기 전 이 `계획 점검:` 줄과 `승인:` 만 본다(F-27-1) — `검증:` 줄의 실제 판정은 6단계에서 커밋 시점에 본다.
 4. 활성 패키지가 있으면 그대로 두고 FIX를 진행한다. 없으면 `CURRENT.md active: FIX-nnn`.
-5. **구현은 구현 에이전트(`backend-agent`·`eval-agent`·`frontend-agent` — 평가 산출물 `evaluation/`·`reports/` 를 바꾸는 FIX 는 eval-agent, 프론트 `web/` 을 바꾸는 FIX 는 frontend-agent)에 위임한다(L-004)**: 띄우기 전 `AskUserQuestion`으로 시작 승인 → `approve-commit.sh --stage <에이전트>`. 메인 세션은 코드를 직접 고치지 않는다(조율·승인·커밋만, CLAUDE.md "팀 구성"). **위임 프롬프트에 FIX-033 의 네 규칙을 넣는다**: (a) 계약 값은 값으로 단언하고 "변이→잡는 테스트" 표를 보고 · (b) 계획에 없는 상수·정렬·상한·방어 조건은 구현하기 전에 멈추고 보고 · (c) 증거는 명령 출력 전체 · (d) 임시 파일은 스크래치패드 리터럴 절대 경로.
+5. **구현은 구현 에이전트(`backend-agent`·`eval-agent`·`frontend-agent` — 평가 산출물 `evaluation/`·`reports/` 를 바꾸는 FIX 는 eval-agent, 프론트 `web/` 을 바꾸는 FIX 는 frontend-agent)에 위임한다(L-004)**: 띄우기 전 `AskUserQuestion`으로 시작 승인 → `approve-commit.sh --stage <에이전트>`. 메인 세션은 코드를 직접 고치지 않는다(조율·승인·커밋만, CLAUDE.md "팀 구성"). **위임 프롬프트에 FIX-033 의 네 규칙을 넣는다**: (a) 계약 값은 값으로 단언하고 "변이→잡는 테스트" 표를 보고 · (b) 계획에 없는 상수·정렬·상한·방어 조건은 구현하기 전에 멈추고 보고 · (c) 증거는 `save_evidence.py <패키지|fixes> <이름> -- <명령>` 으로 명령 출력 전체(Write 로 옮겨 적지 않는다, FIX-034) · (d) 임시 파일은 스크래치패드 리터럴 절대 경로.
 6. **제품 코드(`app/`·`alembic/`·`web/`)를 바꾼 FIX/test 커밋은 verifier 리뷰가 먼저다.** 구현 에이전트 작업이 끝나면 `AskUserQuestion`으로 시작 승인 → `approve-commit.sh --stage verifier`(L-004, 5단계와 같은 절차) 뒤 `verifier`에게 커밋 전 코드 리뷰를 맡겨 `fixes/review-FIX-nnn.md`(`검토자: verifier (fable)`, 본 것·직접 실행한 검증 명령·판정 근거·소견)를 쓰게 한다. **단위마다 핵심 계약 변이 시험을 최소 1개 돌리게 고정한다**(저장소 밖 사본 또는 런타임 치환, 저장소 무수정 — 방법은 `verification.md` "변이 시험 방법"). 통과하면 verifier 가 `FIX-nnn.md`의 `검증:` 줄을 채운다(예: `검증: 통과 — verifier (fable) 2026-10-06, review-FIX-nnn.md`). `commit-guard.sh`가 이 두 가지(검증 줄에 `통과` 와 `verifier` 둘 다 + review 문서 존재·추적 여부)를 커밋 시점에 확인해, 없으면 거부한다(FIX-027). 훅·문서만 바꾸는 FIX(제품 코드 무변경)는 review 문서를 생략할 수 있지만 `검증:` 줄은 여전히 verifier 가 쓴다.
 7. 수정 후 `/commit` (`Refs: FIX-nnn`). `## 결과`에 해시·테스트 출력 경로, `journal.md`에 `FIX` 줄, active를 원래 값으로.
 
 ### `/devlog done`
-1. `bash .claude/scripts/verify-impl.sh <id>` 를 실행해 출력을 스크래치패드 리터럴 절대 경로로 `>` 받은 뒤 Read → Write 로 `docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt` 에 전체 저장(`tee`·`>` 는 프로젝트 안 쓰기라 bash-write-guard 가 거부한다) → FAIL 은 루프로. 열린 [필수] 소견이 있으면 완료가 아니다.
+1. `bash .claude/scripts/verify-impl.sh <id>` 를 `python3 .claude/scripts/save_evidence.py <id> verify-impl -- bash .claude/scripts/verify-impl.sh <id>` 로 실행해 `docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt` 에 전체 저장(FIX-034; `tee`·`>` 는 bash-write-guard 가 거부한다) → FAIL 은 루프로. 열린 [필수] 소견이 있으면 완료가 아니다.
 2. **`verifier` 에이전트에 위임**(L-002: 구현한 쪽이 완료 검토를 쓰지 않는다)하여 `04-review.md`를 `templates/package-review.md`로 작성: `검토자: verifier (fable)`, 1절 기계 검증 출력 전체, 2절 수용 기준마다 증거(evidence 파일·해시·경로 — 문장 금지), 3절 부정 케이스(verifier 가 직접 실행), 5절 registry 등록 목록. `verify-impl.sh`는 검토자 줄에 `verifier`가 없으면 FAIL 한다. 1단계의 verify-impl 실행도 verifier 가 한다. 3절에는 단위마다 핵심 계약 변이 시험 최소 1개(저장소 밖 사본 또는 런타임 치환, 저장소 무수정)를 포함한다.
 3. 닫힌 R의 `review-index.md` 상태를 "구현완료(해시)"로. `docs/backlog.md` 체크박스. 열린 문제는 FIX/L 로 이관.
 4. `AskUserQuestion` 완료 승인 → `승인:` → `CURRENT.md active: none` → `journal.md` `DONE` → `HANDOFF.md` → `/commit`.

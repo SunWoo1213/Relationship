@@ -1,0 +1,180 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/bypass.sh
+# 시각: 2026-10-13T15:02:29+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 0
+# ---
+== ① 비밀이 머리줄(명령 문자열)에만 있는 경우 — 명령은 비밀을 출력하지 않는다(# 명령: 줄에만 존재) ==
+--- ①-a  -- "true # <비밀>" (본문 없음, 명령 문자열에만)
+    rc=2  evidence 파일 수=0
+    stderr: save_evidence: 비밀로 보이는 문자열이 있어 파일을 쓰지 않았다(값은 출력하지 않는다):|  줄 1: openai-anthropic-key|
+    기대: rc=2, 파일 0 (구현자 판단 ⑥ 머리줄도 검사)
+== ② --note 에 비밀 ==
+--- ②  --note <비밀> -- echo hi
+    rc=2  evidence 파일 수=0
+    stderr: save_evidence: 비밀로 보이는 문자열이 있어 파일을 쓰지 않았다(값은 출력하지 않는다):|  줄 6: openai-anthropic-key|
+    기대: rc=2, 파일 0
+== ③ 패턴 경계 — 비밀은 명령 안에서 조합되어 본문에만 나타난다(# 명령: 줄에는 'sk-proj-%s' 뿐) ==
+--- ③  sk-proj- 뒤 영숫자 18자 (본문)
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20261013-1502-b3-18.txt|
+--- ③  sk-proj- 뒤 영숫자 19자 (본문)
+    rc=2  evidence 파일 수=0
+    stderr: save_evidence: 비밀로 보이는 문자열이 있어 파일을 쓰지 않았다(값은 출력하지 않는다):|  줄 7: openai-anthropic-key|
+--- ③  sk-proj- 뒤 영숫자 23자 (본문)
+    rc=2  evidence 파일 수=0
+    stderr: save_evidence: 비밀로 보이는 문자열이 있어 파일을 쓰지 않았다(값은 출력하지 않는다):|  줄 7: openai-anthropic-key|
+--- ③  sk-proj- 뒤 영숫자 24자 (본문)
+    rc=2  evidence 파일 수=0
+    stderr: save_evidence: 비밀로 보이는 문자열이 있어 파일을 쓰지 않았다(값은 출력하지 않는다):|  줄 7: openai-anthropic-key|
+    참고: 정규식 sk-(proj-|ant-)?[A-Za-z0-9_-]{24,} 은 'proj-' 자체가 클래스 문자라 선택 그룹을 건너뛰고도 맞는다 → 경계는 'sk-' 뒤 24자 = 'sk-proj-' 뒤 19자
+--- ③-grep  같은 문자열을 secret-guard.sh 의 패턴으로 grep -E (rc 0 = 걸림)
+    n=18 grep rc=1
+    n=19 grep rc=0
+    n=23 grep rc=0
+    n=24 grep rc=0
+--- ③-hook  같은 문자열을 secret-guard.sh 에 Write 입력(JSON)으로 — deny 여부
+    n=18 secret-guard: allow
+    n=19 secret-guard: deny
+    n=23 secret-guard: deny
+    n=24 secret-guard: deny
+== ④ ANSI 로 쪼갠 비밀 ==
+--- ④-a  본문: printf 'sk-\033[0mproj-<30자>' (ANSI 제거 뒤 검사해야 걸린다)
+    rc=2  evidence 파일 수=0
+    stderr: save_evidence: 비밀로 보이는 문자열이 있어 파일을 쓰지 않았다(값은 출력하지 않는다):|  줄 7: openai-anthropic-key|
+    기대: rc=2, 파일 0
+--- ④-b  --note 에 ANSI 로 쪼갠 비밀 (머리줄은 ANSI 제거를 거치지 않는다)
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20261013-1502-b4b.txt|
+    파일 생성됨: 20261013-1502-b4b.txt — ESC 바이트 수: 1 / 'proj-' 포함 줄: 1
+    기대(규칙상): rc=2, 파일 0
+--- ④-c  명령 문자열(주석)에 ANSI 로 쪼갠 비밀, 본문 없음
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20261013-1502-b4c.txt|
+    파일 생성됨: 20261013-1502-b4c.txt — ESC 바이트 수: 1
+    기대(규칙상): rc=2, 파일 0
+== ⑤ evidence 밖으로 쓰려는 시도 ==
+--- ⑤-a  이름 ../x
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 이름은 [A-Za-z0-9._-]+ 이고 '..' 이 없어야 한다: '../x'|
+--- ⑤-b  이름 /private/tmp/x
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 이름은 [A-Za-z0-9._-]+ 이고 '..' 이 없어야 한다: '/private/tmp/x'|
+--- ⑤-c  이름 a/b
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 이름은 [A-Za-z0-9._-]+ 이고 '..' 이 없어야 한다: 'a/b'|
+--- ⑤-d  이름 ..
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 이름은 [A-Za-z0-9._-]+ 이고 '..' 이 없어야 한다: '..'|
+--- ⑤-e  이름 'a..b' (NAME_RE 는 맞지만 .. 포함)
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 이름은 [A-Za-z0-9._-]+ 이고 '..' 이 없어야 한다: 'a..b'|
+--- ⑤-f  대상 ../fixes
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 대상이 올바르지 않다: '../fixes'|
+--- ⑤-g  대상 절대 경로
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 대상이 올바르지 않다: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034'|
+--- ⑤-h  대상 '.' (--root 와 함께) → <root>/evidence/ 에 쓰는가
+    rc=0  evidence 파일 수=0
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/evidence/20261013-1502-b5h.txt|
+    <root>/evidence 내용: 20261013-1502-b5h.txt 
+--- ⑤-i  대상이 심볼릭 링크(<root>/link → scratchpad/elsewhere)
+    rc=0  evidence 파일 수=0
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/link/evidence/20261013-1502-b5i.txt|
+    elsewhere/evidence 내용: 20261013-1502-b5i.txt 
+--- ⑤-j  --root 가 저장소 자체를 가리키면 app/evidence/ 에 쓴다 — 실제 저장소 대신 스크래치패드 가짜 저장소 사본으로 시연
+--- ⑤-j  python3 <fakerepo>/.claude/scripts/save_evidence.py app x --root <fakerepo> -- echo hi
+    rc=0  evidence 파일 수=0
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/fakerepo/app/evidence/20261013-1502-b5j.txt|
+    fakerepo/app 내용: app/evidence/20261013-1502-b5j.txt 
+--- ⑤-k  --root . (상대 경로, cwd=fakerepo) app
+    rc=0  evidence 파일 수=0
+    stderr: 저장: app/evidence/20261013-1502-b5k.txt|
+    fakerepo/app 내용: app/evidence/20261013-1502-b5k.txt app/evidence/20261013-1502-b5j.txt 
+    security.md §4b 주장 '쓰기 범위는 docs/wiki/**/evidence/ 로 한정' 과 대조
+== ⑥ --root 없이 존재하지 않는 패키지 ==
+--- ⑥  P99-nope
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 대상 'P99-nope' 을(를) 찾을 수 없다(패키지 id 또는 fixes)|
+    docs/wiki/packages/P99-nope 존재? no
+    git status --short -- docs/wiki/packages (비어 있어야 함):
+== ⑦ --append 의 glob '*-<이름>.txt' 가 다른 이름의 접미사와 겹친다 ==
+--- ⑦  fixes mutation --append (기존 파일 …-u5-mutation.txt 가 있을 때)
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20260101-0000-u5-mutation.txt|
+    evidence 파일 목록: 20260101-0000-u5-mutation.txt 
+    …-u5-mutation.txt 에 'appended' 포함? 1
+    기대: 새 파일 <ts>-mutation.txt 생성. 실측이 u5 파일에 덧붙였다면 다른 단위의 증거를 고치는 결함
+--- ⑦-참고  실제 P8-frontend evidence 에서 '*-mutation.txt' glob 이 고르는 파일(정렬 마지막):
+20261013-1354-verifier-u5-mutation.txt
+== ⑧ 같은 분 같은 이름 (구현자 판단 ②) — 두 번째 호출의 출력은 어디에도 남지 않는다 ==
+--- ⑧-1  dup 1회
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20261013-1502-dup.txt|
+--- ⑧-2  dup 2회(같은 분)
+    rc=3  evidence 파일 수=1
+    stderr: save_evidence: 이미 있다(덮어쓰지 않는다): /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20261013-1502-dup.txt — --append 를 쓰거나 이름을 바꿔라|
+    'second-output-lost' 를 담은 파일 수: 0
+== ⑨ stderr 수집·순서 ==
+--- ⑨  'echo out1; echo err1 >&2; echo out2'
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20261013-1502-b9.txt|
+    본문:
+      # 명령: echo out1; echo err1 >&2; echo out2
+      # 시각: 2026-10-13T15:02:31+09:00
+      # cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+      # HEAD: 977f2ee (dev2)
+      # exit: 0
+      # ---
+      out1
+      err1
+      out2
+== ⑩ 시그널 종료 (구현자 판단 ⑦) ==
+--- ⑩  'kill -TERM $$'
+    rc=143  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20261013-1502-b10.txt|
+    머리줄 exit: # exit: 143
+== ⑪ 8 MB 초과 — 자르지 않고 머리줄만 ==
+--- ⑪  head -c 9000000 /dev/zero | tr
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20261013-1502-b11.txt|
+    크기 줄: # 크기: 9000000 bytes (8 MB 초과)  파일 바이트: 9000213
+== ⑫ 출력이 비어도 파일 생성 ==
+--- ⑫  true
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20261013-1502-b12.txt|
+    줄 수: 6 (머리줄 5 + # --- = 6)
+== ⑬ 공백 결합: -- grep "a b" 처럼 따옴표 없이 넘기면 따옴표가 사라진다 ==
+--- ⑬  -- printf '%s|' 'a b' c
+    rc=127  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/root/fixes/evidence/20261013-1502-b13.txt|
+    # 명령: # 명령: printf %s| a b c
+    본문: /bin/bash: a: command not found
+== ⑭ 정리 ==
+ M .claude/agents/backend-agent.md
+ M .claude/agents/eval-agent.md
+ M .claude/agents/frontend-agent.md
+ M .claude/agents/verifier.md
+ M .claude/hooks/secret-guard.sh
+ M .claude/scripts/test-guards.sh
+ M .claude/skills/devlog/SKILL.md
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/registry.md
+ M docs/wiki/security.md
+ M docs/wiki/verification.md
+?? .claude/scripts/save_evidence.py
+?? docs/wiki/fixes/FIX-034.md
+?? docs/wiki/fixes/evidence/20261013-1440-fix034-selftest.txt
+?? docs/wiki/fixes/evidence/20261013-1440-fix034-test-guards.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-judge-git.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-judge-grep.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-judge-ruff.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-main-recheck.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-main-test-guards.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-mutation.txt
+?? docs/wiki/fixes/evidence/20261013-1451-verifier-fix034-judge.txt
+?? docs/wiki/fixes/evidence/20261013-1502-verifier-fix034-diff.txt
+?? docs/wiki/fixes/evidence/20261013-1502-verifier-fix034-guard.txt
+(위가 비어 있지 않으면 verifier 증거 파일(??)만이어야 한다)

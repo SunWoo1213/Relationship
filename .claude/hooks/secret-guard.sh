@@ -55,6 +55,7 @@ except Exception:
 [ -n "$content" ] || exit 0
 
 # 알려진 키 형식 (자리표시자는 걸리지 않도록 길이 조건을 둔다)
+# FIX-034: 이 9개 패턴은 .claude/scripts/save_evidence.py 의 SECRET_PATTERNS 에도 복제돼 있다 — 둘을 같이 고친다.
 PATTERNS=(
   'sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}'          # OpenAI / Anthropic
   'AKIA[0-9A-Z]{16}'                             # AWS access key id

@@ -15,6 +15,8 @@
 | 파일 경로 | 존재하는 파일 (스크린샷 `.png`, 리포트 `.md/.json`) | 증거 열 |
 | 카드 인용 | 계획 검증에서: 카드 파일명 + 해당 문장 | 02-plan-verify 근거 열 |
 
+명령 출력은 `python3 .claude/scripts/save_evidence.py <패키지|fixes> <이름> -- <명령>` 산출물(Windows 는 `python`; 머리줄 5개 `# 명령:`·`# 시각:`·`# cwd:`·`# HEAD:`·`# exit:` 가 있는 파일)을 기본으로 한다(FIX-034) — 출력 전체·exit 코드·비밀 검사가 자동이다.
+
 인정하지 않는 것: "정상 동작 확인", "문제 없음", "검토 완료", 출력 없이 붙인 명령, 요약만 있는 테스트 결과.
 
 ## 계획 검증 기법 (02-plan-verify)
@@ -57,8 +59,8 @@
 
 ```
 1. 검증 실행      bash .claude/scripts/verify-plan.sh <id>  또는  verify-impl.sh <id>
-                  → 출력을 Write 툴로 docs/wiki/packages/<id>/evidence/<ts>-verify-*.txt 에 저장
-                  (또는 스크래치패드 리터럴 절대 경로로 > 한 뒤 Read → Write. 프로젝트 안 tee·> 는 훅이 거부)
+                  → python3 .claude/scripts/save_evidence.py <id> verify-impl -- bash .claude/scripts/verify-impl.sh <id>
+                  로 docs/wiki/packages/<id>/evidence/<ts>-verify-impl.txt 에 출력 전체 저장 (FIX-034; Windows 는 python. 프로젝트 안 tee·> 는 훅이 거부)
 2. 소견 생성      bash .claude/scripts/findings.sh <id> evidence/<ts>-verify-*.txt --source verify-impl
                   → 05-remediation.md 에 FAIL/WARN 마다 F-xxxxxx 블록 (같은 문제 = 같은 ID)
 3. 소견 채우기    블록마다: 원인 가설 → 확인 명령 실행·출력 인용 → 해결 단계 표
@@ -81,7 +83,7 @@
 - 작업 디렉터리는 **스크래치패드(세션 안내에 적힌 리터럴 절대 경로) 아래 고유한 새 하위 디렉터리**(예: `<스크래치패드>/mut-<단위>-<시각>/`)에 만든다. `mktemp -d` 를 쓰려면 `mktemp -d <스크래치패드 리터럴>/mut.XXXXXX` 처럼 스크래치패드 안을 지정하고, 출력된 경로를 리터럴로 확인해 이후 명령에 적는다. 저장소 밖이지만 스크래치패드 밖인 곳(`$TMPDIR`·`/tmp` 의 `mktemp -d` 기본값)은 쓰지 않는다 — `safety-guard` 가 그 경로의 `rm -rf` 를 거부하고(R-33-1 실측), 세션 종료 시 정리되지도 않는다. `rm -rf "$VAR"` 같은 변수 경로 삭제도 훅이 거부하므로 쓰지 않는다. 정리는 하지 않아도 된다(스크래치패드가 세션과 함께 사라진다).
 - 저장소 사본을 쓸 때 임시 git 저장소에서는 **커밋하지 않고 스테이징(`git add`)까지만** 한다. `commit-guard` 가 임시 저장소의 `git commit` 까지 막는다.
 - **런타임 치환이 가장 간단하다**: 스크래치패드에 pytest 플러그인 모듈을 쓰고(`PYTHONPATH=<스크래치패드 리터럴 경로> pytest -p <모듈> …`), import 시점에 대상 함수·상수를 monkeypatch 한다. 예시: `docs/wiki/packages/P8-frontend/review-u1-read-persons.md` §5 와 `evidence/20261011-verifier-u1-mutation.txt`(대조군 7 passed → 변이 4건).
-- FIX-014 이후 **스크래치패드 밖으로 Bash 쓰기를 하지 않는다.** 플러그인·스크립트는 스크래치패드 리터럴 절대 경로에 Write 로 만들고, 출력은 `>` 로 스크래치패드에 받은 뒤 Read → Write 로 evidence 에 전체를 옮긴다.
+- FIX-014 이후 **스크래치패드 밖으로 Bash 쓰기를 하지 않는다.** 플러그인·스크립트는 스크래치패드 리터럴 절대 경로에 Write 로 만들고, 변이마다 `save_evidence.py <패키지|fixes> <이름> --append -- <명령>` 한 번으로 evidence 에 출력 전체를 남긴다(Write 로 옮겨 적지 않는다, FIX-034).
 - 보고: "변이 → 기대 → 결과(어떤 테스트가 FAIL)" 표와 대조군. 변이가 통과하면 테스트 공백이다(소견).
 
 ## 사람이 하는 마지막 판단

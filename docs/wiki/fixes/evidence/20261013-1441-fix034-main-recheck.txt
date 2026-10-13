@@ -1,0 +1,7 @@
+# 명령: echo main-ok
+# 시각: 2026-10-13T14:41:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 0
+# ---
+main-ok

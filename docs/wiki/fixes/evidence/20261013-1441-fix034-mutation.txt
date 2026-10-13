@@ -1,0 +1,68 @@
+
+# ===== append 2026-10-13T14:41:12+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/control.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/section.sh
+# 시각: 2026-10-13T14:41:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 0
+# 메모: 변이 control (스크래치패드 사본 실행, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+== 결과: 실패 0 ==
+
+# ===== append 2026-10-13T14:41:13+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/m1-empty-patterns.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/section.sh
+# 시각: 2026-10-13T14:41:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 m1-empty-patterns (스크래치패드 사본 실행, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+XX   save_evidence ③ 실패(rc=0, 파일 1)
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+== 결과: 실패 1 ==
+
+# ===== append 2026-10-13T14:41:13+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/m2-no-ansi-strip.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/section.sh
+# 시각: 2026-10-13T14:41:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 m2-no-ansi-strip (스크래치패드 사본 실행, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+XX   save_evidence ⑥ 실패(rc=0)
+== 결과: 실패 1 ==
+
+# ===== append 2026-10-13T14:41:14+09:00 =====
+# 명령: SE_UNDER_TEST=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/m3-no-exit-passthrough.py bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/section.sh
+# 시각: 2026-10-13T14:41:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 1
+# 메모: 변이 m3-no-exit-passthrough (스크래치패드 사본 실행, 저장소 무변경)
+# ---
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+XX   save_evidence ② 실패(rc=0, 파일 1)
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+== 결과: 실패 1 ==

@@ -1,0 +1,25 @@
+# 명령: git status --short; git diff --stat -- .claude/scripts/bash_write_check.py app alembic web
+# 시각: 2026-10-13T14:41:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 0
+# ---
+ M .claude/agents/backend-agent.md
+ M .claude/agents/eval-agent.md
+ M .claude/agents/frontend-agent.md
+ M .claude/agents/verifier.md
+ M .claude/hooks/secret-guard.sh
+ M .claude/scripts/test-guards.sh
+ M .claude/skills/devlog/SKILL.md
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/registry.md
+ M docs/wiki/security.md
+ M docs/wiki/verification.md
+?? .claude/scripts/save_evidence.py
+?? docs/wiki/fixes/FIX-034.md
+?? docs/wiki/fixes/evidence/20261013-1440-fix034-selftest.txt
+?? docs/wiki/fixes/evidence/20261013-1440-fix034-test-guards.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-judge-grep.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-judge-ruff.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-mutation.txt

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # test-guards.sh — 훅·스크립트 자가 점검. 훅을 고친 뒤 반드시 실행하고 출력을 evidence 로 남긴다.
-#   bash .claude/scripts/test-guards.sh > <스크래치패드>/out.txt   (그 뒤 Write 툴로 docs/wiki/.../evidence/ 에 저장)
-#   (FIX-014: 프로젝트 안 경로로 tee·> 하는 Bash 는 bash-write-guard 가 거부한다 — 증거 파일은 Write 툴로 쓴다)
+#   python3 .claude/scripts/save_evidence.py fixes <이름> -- bash .claude/scripts/test-guards.sh   (FIX-034: 출력 전체를 evidence 로 직접 저장)
+#   (FIX-014: 프로젝트 안 경로로 tee·> 하는 Bash 는 bash-write-guard 가 거부한다 — 증거는 save_evidence.py 로 남긴다)
 # 기대: 모든 줄이 "ok" 로 시작. "XX" 가 있으면 훅 회귀.
 # 주의: 가짜 비밀 문자열은 실행 시점에 조합한다 — 이 파일 자체가 secret-guard 에 걸리지 않도록.
 set -u
@@ -926,6 +926,140 @@ else
 fi
 
 rm -rf "$CC_T"
+
+echo "== save_evidence (FIX-034) =="
+# 임시 디렉터리에 <대상>/evidence 를 먼저 만들고 --root 로 돌린다 — 실제 저장소의 evidence 를 건드리지 않는다(FIX-032).
+SE="$ROOT/.claude/scripts/save_evidence.py"
+SE_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-se-$$")")"
+mkdir -p "$SE_T/fixes/evidence"
+se_files() { find "$SE_T/fixes/evidence" -type f -name '*.txt' | wc -l | tr -d ' '; }
+se_clear() { find "$SE_T/fixes/evidence" -type f -name '*.txt' -delete; }
+se_first() { find "$SE_T/fixes/evidence" -type f -name '*.txt' | head -n 1; }
+
+# ① echo hi → 파일 1개 · # exit: 0 · 본문 hi · 종료 0
+"$HOOK_PY" "$SE" fixes t1 --root "$SE_T" -- echo hi >/dev/null 2>&1; se_rc=$?
+f="$(se_first)"
+if [ "$se_rc" -eq 0 ] && [ "$(se_files)" = "1" ] && grep -qx '# exit: 0' "$f" && grep -qx 'hi' "$f" && grep -qx '# ---' "$f" && grep -q '^# HEAD: ' "$f"; then
+  echo "ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0"
+else
+  echo "XX   save_evidence ① 실패(rc=$se_rc, 파일 $(se_files))"; fails=$((fails+1))
+fi
+se_clear
+# ② exit 7 → 파일 생성 · # exit: 7 · 종료 7 (명령의 exit 코드를 그대로 전달)
+"$HOOK_PY" "$SE" fixes t2 --root "$SE_T" -- 'echo before; exit 7' >/dev/null 2>&1; se_rc=$?
+f="$(se_first)"
+if [ "$se_rc" -eq 7 ] && [ "$(se_files)" = "1" ] && grep -qx '# exit: 7' "$f" && grep -qx 'before' "$f"; then
+  echo "ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7"
+else
+  echo "XX   save_evidence ② 실패(rc=$se_rc, 파일 $(se_files))"; fails=$((fails+1))
+fi
+se_clear
+# ③ 출력에 sk-proj- + 영숫자 30자 → 파일 없음 · 종료 2 (가짜 비밀은 실행 시점에 조합)
+SE_FAKE="sk-proj-$(printf 'b%.0s' $(seq 1 30))"
+"$HOOK_PY" "$SE" fixes t3 --root "$SE_T" -- "echo $SE_FAKE" >/dev/null 2>&1; se_rc=$?
+if [ "$se_rc" -eq 2 ] && [ "$(se_files)" = "0" ]; then
+  echo "ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2"
+else
+  echo "XX   save_evidence ③ 실패(rc=$se_rc, 파일 $(se_files))"; fails=$((fails+1))
+fi
+se_clear
+# ④ 이름에 ../x → 파일 없음 · 종료 3
+"$HOOK_PY" "$SE" fixes '../x' --root "$SE_T" -- echo hi >/dev/null 2>&1; se_rc=$?
+if [ "$se_rc" -eq 3 ] && [ "$(se_files)" = "0" ] && [ ! -e "$SE_T/fixes/x.txt" ]; then
+  echo "ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3"
+else
+  echo "XX   save_evidence ④ 실패(rc=$se_rc, 파일 $(se_files))"; fails=$((fails+1))
+fi
+se_clear
+# ⑤ --append 두 번 → 파일 1개 · 구분선 2개
+"$HOOK_PY" "$SE" fixes t5 --append --root "$SE_T" -- echo one >/dev/null 2>&1
+"$HOOK_PY" "$SE" fixes t5 --append --root "$SE_T" -- echo two >/dev/null 2>&1
+f="$(se_first)"
+if [ "$(se_files)" = "1" ] && [ "$(grep -c '^# ===== append ' "$f")" = "2" ] && grep -qx 'one' "$f" && grep -qx 'two' "$f"; then
+  echo "ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존"
+else
+  echo "XX   save_evidence ⑤ 실패(파일 $(se_files), 구분선 $(grep -c '^# ===== append ' "$f" 2>/dev/null))"; fails=$((fails+1))
+fi
+se_clear
+# ⑥ (계획 밖 추가) ANSI 색 이스케이프는 지워지고 글자는 남는다 — 정규식을 빼면 이 시험이 실패한다
+"$HOOK_PY" "$SE" fixes t6 --root "$SE_T" -- "printf '\\033[31mRED\\033[0m\\n'" >/dev/null 2>&1; se_rc=$?
+f="$(se_first)"
+if [ "$se_rc" -eq 0 ] && grep -qx 'RED' "$f" && ! grep -q "$(printf '\033')" "$f"; then
+  echo "ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존"
+else
+  echo "XX   save_evidence ⑥ 실패(rc=$se_rc)"; fails=$((fails+1))
+fi
+se_clear
+
+# ── FIX-034 재작업 1차 (review-FIX-034.md R-34-1~4) ──
+# ⑦ (R-34-1) 안쪽 명령이 프로젝트 파일을 쓰면 가드가 거부 → 실행 안 됨 · 파일 없음 · exit 3
+"$HOOK_PY" "$SE" fixes t7 --root "$SE_T" -- 'echo x > app/y.py' >/dev/null 2>&1; se_rc=$?
+if [ "$se_rc" -eq 3 ] && [ "$(se_files)" = "0" ] && [ ! -e "$ROOT/app/y.py" ]; then
+  echo "ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3"
+else
+  echo "XX   save_evidence ⑦ 실패(rc=$se_rc, 파일 $(se_files))"; fails=$((fails+1))
+  rm -f "$ROOT/app/y.py"
+fi
+se_clear
+# ⑧ (R-34-1) 임시 영역으로의 > 는 가드와 같은 규칙으로 허용
+"$HOOK_PY" "$SE" fixes t8 --root "$SE_T" -- "echo x > $SE_T/ok.txt" >/dev/null 2>&1; se_rc=$?
+if [ "$se_rc" -eq 0 ] && [ "$(se_files)" = "1" ] && [ -f "$SE_T/ok.txt" ]; then
+  echo "ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0"
+else
+  echo "XX   save_evidence ⑧ 실패(rc=$se_rc, 파일 $(se_files))"; fails=$((fails+1))
+fi
+se_clear
+rm -f "$SE_T/ok.txt"
+# ⑨ (R-34-2) 접미사가 겹치는 다른 이름의 파일에는 덧붙이지 않고 새 파일을 만든다 · 기존 파일 바이트 불변
+printf 'orig\n' > "$SE_T/fixes/evidence/20260101-0000-u5-t9.txt"
+"$HOOK_PY" "$SE" fixes t9 --append --root "$SE_T" -- echo nine >/dev/null 2>&1; se_rc=$?
+if [ "$se_rc" -eq 0 ] && [ "$(se_files)" = "2" ] && [ "$(cat "$SE_T/fixes/evidence/20260101-0000-u5-t9.txt")" = "orig" ]; then
+  echo "ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변"
+else
+  echo "XX   save_evidence ⑨ 실패(rc=$se_rc, 파일 $(se_files))"; fails=$((fails+1))
+fi
+se_clear
+# ⑩ (R-34-3) --root 가 저장소 안이면 exit 3 · 대상 '.' 도 exit 3 · 파일 없음
+se_pre=0; [ -e "$ROOT/app/evidence" ] && se_pre=1
+"$HOOK_PY" "$SE" app t10 --root "$ROOT" -- echo hi >/dev/null 2>&1; se_rc1=$?
+"$HOOK_PY" "$SE" . t10 --root "$SE_T" -- echo hi >/dev/null 2>&1; se_rc2=$?
+if [ "$se_rc1" -eq 3 ] && [ "$se_rc2" -eq 3 ] && [ "$(se_files)" = "0" ] && [ ! -e "$SE_T/evidence" ] && [ ! -e "$ROOT/app/evidence" ]; then
+  echo "ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음"
+else
+  echo "XX   save_evidence ⑩ 실패(rc1=$se_rc1 rc2=$se_rc2)"; fails=$((fails+1))
+  [ "$se_pre" = "0" ] && rm -rf "$ROOT/app/evidence"
+fi
+se_clear
+# ⑪ (R-34-4) 비밀이 본문에만(명령 안에서 조합) · 머리줄(명령 문자열)에만 있어도 각각 exit 2 · 파일 없음
+se_cmd11='printf "sk-proj-%s\n" "$(printf "b%.0s" $(seq 1 30))"'
+"$HOOK_PY" "$SE" fixes t11 --root "$SE_T" -- "$se_cmd11" >/dev/null 2>&1; se_rc1=$?
+n1="$(se_files)"
+"$HOOK_PY" "$SE" fixes t11b --root "$SE_T" -- "true # $SE_FAKE" >/dev/null 2>&1; se_rc2=$?
+if [ "$se_rc1" -eq 2 ] && [ "$n1" = "0" ] && [ "$se_rc2" -eq 2 ] && [ "$(se_files)" = "0" ]; then
+  echo "ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음"
+else
+  echo "XX   save_evidence ⑪ 실패(본문 rc=$se_rc1 파일 $n1, 머리줄 rc=$se_rc2)"; fails=$((fails+1))
+fi
+se_clear
+# ⑫ (R-34-4) stdout·stderr 가 한 스트림으로 순서대로: a b c
+"$HOOK_PY" "$SE" fixes t12 --root "$SE_T" -- 'echo a; echo b >&2; echo c' >/dev/null 2>&1; se_rc=$?
+f="$(se_first)"
+if [ "$se_rc" -eq 0 ] && [ "$(sed -n '/^# ---$/,$p' "$f" | tail -n +2 | tr '\n' ',')" = "a,b,c," ]; then
+  echo "ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c"
+else
+  echo "XX   save_evidence ⑫ 실패(rc=$se_rc)"; fails=$((fails+1))
+fi
+se_clear
+# ⑬ (R-34-4) 자르지 않는다: 200 KB 출력 → 파일 ≥ 200 KB
+"$HOOK_PY" "$SE" fixes t13 --root "$SE_T" -- 'yes x | head -c 204800' >/dev/null 2>&1; se_rc=$?
+f="$(se_first)"
+if [ "$se_rc" -eq 0 ] && [ "$(wc -c < "$f" | tr -d ' ')" -ge 204800 ]; then
+  echo "ok   save_evidence ⑬ 200 KB 출력 → 파일 $(wc -c < "$f" | tr -d ' ') bytes (절단 없음)"
+else
+  echo "XX   save_evidence ⑬ 실패(rc=$se_rc, 크기 $(wc -c < "$f" 2>/dev/null))"; fails=$((fails+1))
+fi
+se_clear
+rm -rf "$SE_T"
 
 echo "== 결과: 실패 $fails =="
 [ "$fails" -eq 0 ] || exit 1

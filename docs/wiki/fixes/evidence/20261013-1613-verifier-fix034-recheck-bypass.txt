@@ -1,0 +1,79 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/re-bypass.sh
+# 시각: 2026-10-13T16:13:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 0
+# ---
+== ⑤-h 대상 '.' ==
+--- ⑤-h  '.' --root <scratch>
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 대상이 올바르지 않다: '.'|
+    <root>/evidence 존재? no
+--- ⑤-h2 '..' 대상
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 대상이 올바르지 않다: '..'|
+--- ⑤-h3 'a/b' 대상
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: 대상이 올바르지 않다: 'a/b'|
+== ⑤-j·k --root 가 저장소 안 (가짜 저장소 사본: 스크래치패드 아래라 임시 영역이지만 REPO_ROOT 아래) ==
+--- ⑤-j  --root <fakerepo> app
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: --root 는 저장소 밖 임시 영역(/tmp·/var/tmp·$TMPDIR 등)의 절대 경로만 허용한다: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/fakerepo2'|
+--- ⑤-k  --root . app (cwd=fakerepo)
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: --root 는 저장소 밖 임시 영역(/tmp·/var/tmp·$TMPDIR 등)의 절대 경로만 허용한다: '.'|
+    fakerepo/app 내용: '' (비어 있어야 한다)
+--- ⑤-l  실제 저장소: --root <저장소>/app (TMPDIR 도 저장소 안으로)
+    rc=3 stderr: save_evidence: --root 는 저장소 밖 임시 영역(/tmp·/var/tmp·$TMPDIR 등)의 절대 경로만 허용한다: '/Users/sunwoo/Desktop/Portfolio/Relationship/app'|
+    app/evidence 존재? no
+--- ⑤-m  심볼릭 링크로 저장소를 가리키는 --root (<scratch>/replink → 저장소)
+    rc=3 stderr: save_evidence: --root 는 저장소 밖 임시 영역(/tmp·/var/tmp·$TMPDIR 등)의 절대 경로만 허용한다: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/re
+    app/evidence 존재? no
+--- ⑤-n  심볼릭 링크가 저장소 밖 임시 영역을 가리킴 (<scratch>/oklink → <scratch>/v034/okdir) → 허용이 맞다
+--- ⑤-n
+    rc=0  evidence 파일 수=0
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/okdir/fixes/evidence/20261013-1613-n.txt|
+    okdir/fixes/evidence: 20261013-1613-n.txt 
+--- ⑤-o  --root 상대 경로 / 저장소 밖이지만 임시 영역 아님($HOME)
+--- ⑤-o1 --root v034/reroot2 (상대)
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: --root 는 저장소 밖 임시 영역(/tmp·/var/tmp·$TMPDIR 등)의 절대 경로만 허용한다: 'v034/reroot2'|
+--- ⑤-o2 --root $HOME/.cache/… (임시 영역 아님)
+    rc=3  evidence 파일 수=0
+    stderr: save_evidence: --root 는 저장소 밖 임시 영역(/tmp·/var/tmp·$TMPDIR 등)의 절대 경로만 허용한다: '/Users/sunwoo/.cache/fix034-verifier-tmp'|
+    생성? 0
+--- ⑤-o3 --root <scratchpad> (정상)
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/reroot2/fixes/evidence/20261013-1613-o.txt|
+== ⑦ --append 접미사 겹침 ==
+--- ⑦  fixes mutation --append
+    rc=0  evidence 파일 수=2
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/reroot2/fixes/evidence/20261013-1613-mutation.txt|
+    목록: 20260101-0000-u5-mutation.txt 20261013-1613-mutation.txt 
+    u5 파일 내용: 'ORIG|'
+--- ⑦-2 정확히 같은 이름의 옛 파일이 있으면 그 파일에 덧붙인다
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/reroot2/fixes/evidence/20260101-0000-mutation.txt|
+    목록: 20260101-0000-mutation.txt 
+    'appended2' 가 있는 파일: 20260101-0000-mutation.txt 
+== ④-b·c 머리줄 ANSI ==
+--- ④-b --note ANSI 쪼갬
+    rc=2  evidence 파일 수=0
+    stderr: save_evidence: 비밀로 보이는 문자열이 있어 파일을 쓰지 않았다(값은 출력하지 않는다):|  줄 6: openai-anthropic-key|
+--- ④-c 명령 문자열 ANSI 쪼갬
+    rc=2  evidence 파일 수=0
+    stderr: save_evidence: 비밀로 보이는 문자열이 있어 파일을 쓰지 않았다(값은 출력하지 않는다):|  줄 1: openai-anthropic-key|
+--- ④-d 머리줄에 무해한 ANSI (--note 에 색 코드) → 저장 파일에 ESC 없어야
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/reroot2/fixes/evidence/20261013-1613-ad.txt|
+    ESC 수: 0  메모 줄: # 메모: red
+== ⑧ 같은 분 충돌 — 2회째 명령이 실행되지 않아야(부작용 파일로 확인) ==
+--- ⑧-1
+    rc=0  evidence 파일 수=1
+    stderr: 저장: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/reroot2/fixes/evidence/20261013-1613-dup.txt|
+--- ⑧-2 -- touch <scratch>/ran-dup.txt
+    rc=3  evidence 파일 수=1
+    stderr: save_evidence: 이미 있다(덮어쓰지 않는다): /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/reroot2/fixes/evidence/20261013-1613-dup.txt — --append 를 쓰거나 이름을 
+    2회째 명령 실행됨? no
+== 정리 ==
+(비어 있어야 한다)

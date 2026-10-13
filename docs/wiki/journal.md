@@ -473,3 +473,5 @@
 - 2026-10-12 20:10 | PUSH-dev2 | origin dev2 95ca2c0 (실험 푸시)
 - 2026-10-13 00:08 | COMMIT | 975a8e5 feat(P8-frontend): React 프론트 골격·디자인 토큰·테스트 도구·CI 를 세운다
 - 2026-10-13 00:09 | PUSH-dev2 | origin dev2 975a8e5 (실험 푸시)
+- 2026-10-13 14:22 | COMMIT | 977f2ee feat(P8-frontend): 채팅 화면과 확인 칩을 만든다
+- 2026-10-13 14:22 | PUSH-dev2 | origin dev2 977f2ee (실험 푸시)

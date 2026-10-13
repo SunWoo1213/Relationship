@@ -1,0 +1,13 @@
+# 명령: grep -c "save_evidence.py" .claude/agents/backend-agent.md .claude/agents/eval-agent.md .claude/agents/frontend-agent.md .claude/agents/verifier.md .claude/skills/devlog/SKILL.md docs/wiki/security.md docs/wiki/verification.md
+# 시각: 2026-10-13T15:59:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 0
+# ---
+.claude/agents/backend-agent.md:1
+.claude/agents/eval-agent.md:1
+.claude/agents/frontend-agent.md:1
+.claude/agents/verifier.md:2
+.claude/skills/devlog/SKILL.md:4
+docs/wiki/security.md:1
+docs/wiki/verification.md:3

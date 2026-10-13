@@ -1,0 +1,7 @@
+# 명령: git diff --stat -- app alembic web .claude/scripts/bash_write_check.py; echo "(위가 비어 있으면 무변경)"; git status --short app
+# 시각: 2026-10-13T15:59:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 0
+# ---
+(위가 비어 있으면 무변경)

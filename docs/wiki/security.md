@@ -55,6 +55,8 @@
 | 쓰기 대상 경로를 판정할 수 없으면(`> "$X"`·명령 치환·계산된 경로) 통과가 아니라 차단 | 절대 임시 경로로 바꾸거나 Write/Edit 툴을 쓴다 |
 | 한계(의도): `pytest`·`pip install`·`npm install`·`alembic upgrade`·`python scripts/x.py`·`git` 하위 명령·`bash .claude/scripts/*.sh` 처럼 **프로그램이 스스로 파일을 쓰는 것**은 막지 않는다. npm scripts 간접 실행도 같다 | 운용 규칙(CLAUDE.md)과 verifier 리뷰가 맡는다 |
 
+증거 저장은 `python3 .claude/scripts/save_evidence.py <패키지|fixes> <이름> -- <명령>` 으로 한다(FIX-034) — 가드가 막지 않는 **유일한 의도된 Bash 경유 쓰기**이며, 쓰기 범위는 `docs/wiki/**/evidence/` 한정(자가 시험만 저장소 밖 임시 영역 `--root`)이며, 실행 전에 안쪽 명령을 `bash_write_check.py` 에 태워 가드가 거부할 명령은 실행하지 않고(exit 3), `secret-guard` 와 같은 패턴 9개의 비밀 검사가 내장돼 있다(걸리면 파일을 쓰지 않고 exit 2).
+
 같은 구조 분해(따옴표·`;`·`&&`·`||`·`|`·줄바꿈·heredoc·명령 치환)를 `commit-cleanup.sh` 도 쓴다 — 실행되는 첫 단어가 `git` 인 조각만 커밋·푸시로 본다(다른 명령의 인자 속 `git push origin dev2` 글자로 journal·마커가 오염되던 결함 ②).
 
 ## 5. 제품 코드가 지킬 것 (기획서 9장 "제3자 개인정보")

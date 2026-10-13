@@ -1,0 +1,195 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/diff.sh
+# 시각: 2026-10-13T15:02:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 0
+# ---
+== A. secret-guard.sh PATTERNS (원문) ==
+PATTERNS=(
+  'sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}'          # OpenAI / Anthropic
+  'AKIA[0-9A-Z]{16}'                             # AWS access key id
+  'aws_secret_access_key[[:space:]]*[=:][[:space:]]*[A-Za-z0-9/+]{40}'
+  'ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{40,}'
+  '-----BEGIN [A-Z ]*PRIVATE KEY-----'
+  'xox[baprs]-[A-Za-z0-9-]{20,}'                 # Slack
+  'AIza[0-9A-Za-z_-]{35}'                        # Google API
+  'eyJ[A-Za-z0-9_-]{20,}[.][A-Za-z0-9_-]{20,}[.][A-Za-z0-9_-]{20,}'  # JWT
+  'postgres(ql)?://[^:/[:space:]]+:[^@[:space:]]{8,}@'               # DB URL with password
+)
+== A-1. 셸 패턴 → POSIX 클래스를 \s 로 정규화한 목록 ==
+sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}
+AKIA[0-9A-Z]{16}
+aws_secret_access_key\s*[=:]\s*[A-Za-z0-9/+]{40}
+ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{40,}
+-----BEGIN [A-Z ]*PRIVATE KEY-----
+xox[baprs]-[A-Za-z0-9-]{20,}
+AIza[0-9A-Za-z_-]{35}
+eyJ[A-Za-z0-9_-]{20,}[.][A-Za-z0-9_-]{20,}[.][A-Za-z0-9_-]{20,}
+postgres(ql)?://[^:/\s]+:[^@\s]{8,}@
+== A-2. save_evidence.py SECRET_PATTERNS (import 해서 출력) ==
+count: 9
+sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}
+AKIA[0-9A-Z]{16}
+aws_secret_access_key\s*[=:]\s*[A-Za-z0-9/+]{40}
+ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{40,}
+-----BEGIN [A-Z ]*PRIVATE KEY-----
+xox[baprs]-[A-Za-z0-9-]{20,}
+AIza[0-9A-Za-z_-]{35}
+eyJ[A-Za-z0-9_-]{20,}[.][A-Za-z0-9_-]{20,}[.][A-Za-z0-9_-]{20,}
+postgres(ql)?://[^:/\s]+:[^@\s]{8,}@
+== A-3. diff (정규화한 셸 목록 vs 파이썬 목록) — 출력 없음 = 문자 단위 동일 ==
+diff rc=0
+== A-4. 셸 쪽 패턴 개수 ==
+       9
+== B. git diff -- .claude/hooks/secret-guard.sh (주석 한 줄만이어야 함) ==
+diff --git a/.claude/hooks/secret-guard.sh b/.claude/hooks/secret-guard.sh
+index e9e56f0..4c7468b 100644
+--- a/.claude/hooks/secret-guard.sh
++++ b/.claude/hooks/secret-guard.sh
+@@ -55,6 +55,7 @@ except Exception:
+ [ -n "$content" ] || exit 0
+ 
+ # 알려진 키 형식 (자리표시자는 걸리지 않도록 길이 조건을 둔다)
++# FIX-034: 이 9개 패턴은 .claude/scripts/save_evidence.py 의 SECRET_PATTERNS 에도 복제돼 있다 — 둘을 같이 고친다.
+ PATTERNS=(
+   'sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}'          # OpenAI / Anthropic
+   'AKIA[0-9A-Z]{16}'                             # AWS access key id
+== B-1. 가드 본체·제품 코드 무변경: git diff --quiet -- bash_write_check.py app alembic web tests (rc 0 = 무변경) ==
+rc=0
+(위가 비어 있으면 untracked 도 없음)
+== C. git diff --stat (HEAD 977f2ee 대비) ==
+ .claude/agents/backend-agent.md  |  2 +-
+ .claude/agents/eval-agent.md     |  2 +-
+ .claude/agents/frontend-agent.md |  2 +-
+ .claude/agents/verifier.md       |  4 +--
+ .claude/hooks/secret-guard.sh    |  1 +
+ .claude/scripts/test-guards.sh   | 68 ++++++++++++++++++++++++++++++++++++++--
+ .claude/skills/devlog/SKILL.md   | 10 +++---
+ docs/wiki/HANDOFF.md             |  9 +++---
+ docs/wiki/journal.md             |  2 ++
+ docs/wiki/registry.md            |  8 ++---
+ docs/wiki/security.md            |  2 ++
+ docs/wiki/verification.md        |  2 ++
+ 12 files changed, 91 insertions(+), 21 deletions(-)
+== C-1. git status --short ==
+ M .claude/agents/backend-agent.md
+ M .claude/agents/eval-agent.md
+ M .claude/agents/frontend-agent.md
+ M .claude/agents/verifier.md
+ M .claude/hooks/secret-guard.sh
+ M .claude/scripts/test-guards.sh
+ M .claude/skills/devlog/SKILL.md
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/registry.md
+ M docs/wiki/security.md
+ M docs/wiki/verification.md
+?? .claude/scripts/save_evidence.py
+?? docs/wiki/fixes/FIX-034.md
+?? docs/wiki/fixes/evidence/20261013-1440-fix034-selftest.txt
+?? docs/wiki/fixes/evidence/20261013-1440-fix034-test-guards.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-judge-git.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-judge-grep.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-judge-ruff.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-main-recheck.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-main-test-guards.txt
+?? docs/wiki/fixes/evidence/20261013-1441-fix034-mutation.txt
+?? docs/wiki/fixes/evidence/20261013-1451-verifier-fix034-judge.txt
+== D. 문서 7곳 grep -c save_evidence.py ==
+.claude/agents/backend-agent.md:1
+.claude/agents/eval-agent.md:1
+.claude/agents/frontend-agent.md:1
+.claude/agents/verifier.md:2
+.claude/skills/devlog/SKILL.md:4
+docs/wiki/security.md:1
+docs/wiki/verification.md:1
+== D-1. 옛 문구 잔존 검사: 'Write 툴로' + 'evidence' 같은 줄 / 'Read → Write' ==
+docs/wiki/verification.md:63:                  (또는 스크래치패드 리터럴 절대 경로로 > 한 뒤 Read → Write. 프로젝트 안 tee·> 는 훅이 거부)
+docs/wiki/verification.md:86:- FIX-014 이후 **스크래치패드 밖으로 Bash 쓰기를 하지 않는다.** 플러그인·스크립트는 스크래치패드 리터럴 절대 경로에 Write 로 만들고, 출력은 `>` 로 스크래치패드에 받은 뒤 Read → Write 로 evidence 에 전체를 옮긴다.
+grep rc=0 (1 = 잔존 없음)
+== D-2. 문서가 지시하는 인터프리터 이름 (python3 vs python) ==
+.claude/agents/backend-agent.md:74:python3 .claude/scripts/save_evidence.py
+.claude/agents/eval-agent.md:64:python3 .claude/scripts/save_evidence.py
+.claude/agents/frontend-agent.md:57:python3 .claude/scripts/save_evidence.py
+.claude/agents/verifier.md:24:python3 .claude/scripts/save_evidence.py
+.claude/agents/verifier.md:32:python3 .claude/scripts/save_evidence.py
+.claude/agents/verifier.md:32:python .claude/scripts/findings.py
+.claude/skills/devlog/SKILL.md:34:python3 .claude/scripts/save_evidence.py
+.claude/skills/devlog/SKILL.md:43:python3 .claude/scripts/save_evidence.py
+.claude/skills/devlog/SKILL.md:60:python3 .claude/scripts/save_evidence.py
+docs/wiki/security.md:58:python3 .claude/scripts/save_evidence.py
+docs/wiki/verification.md:18:python3 .claude/scripts/save_evidence.py
+.claude/scripts/test-guards.sh:3:python3 .claude/scripts/save_evidence.py
+== E. ruff ==
+All checks passed!
+rc=0
+== E-1. python3 -m ruff (수정안 4 글자 그대로) ==
+All checks passed!
+rc=0
+== F. 구현자 변이 본문(scratchpad/mut/body.sh) vs test-guards.sh 930~992행 ==
+3c3
+< SE="$ROOT/.claude/scripts/save_evidence.py"
+---
+> SE="$SE_UNDER_TEST"
+63a64
+> 
+diff rc=1
+== F-1. 구현자 변이 m1~m3 diff (control.py 대비) ==
+--- m1-empty-patterns.py
+58a59
+> SECRET_PATTERNS = []
+--- m2-no-ansi-strip.py
+162c162
+<     body = ANSI_RE.sub(b"", res.stdout)
+---
+>     body = res.stdout
+--- m3-no-exit-passthrough.py
+202c202
+<     return rc
+---
+>     return 0
+== F-2. control.py vs 저장소 save_evidence.py ==
+diff rc=0
+== G. 구현자 증거 두 test-guards 파일 본문 대조(머리줄 6줄 제외) ==
+307c307
+< ok   session-start prints header (full=8545 bytes)
+---
+> ok   session-start prints header (full=8867 bytes)
+diff rc=1
+== G-1. 구현자 증거 파일 목록·크기 ==
+     164 docs/wiki/fixes/evidence/20261013-1440-fix034-selftest.txt
+   22800 docs/wiki/fixes/evidence/20261013-1440-fix034-test-guards.txt
+     972 docs/wiki/fixes/evidence/20261013-1441-fix034-judge-git.txt
+     578 docs/wiki/fixes/evidence/20261013-1441-fix034-judge-grep.txt
+     210 docs/wiki/fixes/evidence/20261013-1441-fix034-judge-ruff.txt
+     158 docs/wiki/fixes/evidence/20261013-1441-fix034-main-recheck.txt
+   22800 docs/wiki/fixes/evidence/20261013-1441-fix034-main-test-guards.txt
+    4196 docs/wiki/fixes/evidence/20261013-1441-fix034-mutation.txt
+   51878 total
+== H. 가드 분기 인용: bash_write_check.py cmd_python (스크립트 파일 인자 → script=True → 검사 없음) ==
+1102:    def cmd_python(self, args, frag, stdin_args):
+    def cmd_python(self, args, frag, stdin_args):
+        codes = []
+        script = False
+        k = 0
+        while k < len(args):
+            t = args[k].text
+            if re.fullmatch(r"-[A-Za-z]*c", t) and k + 1 < len(args):
+                codes.extend(self._codes_of(args[k + 1], "python", stdin_args, frag))
+                k += 2
+                continue
+            if t == "-m":
+                script = True
+                break
+            if not t.startswith("-"):
+                script = True
+                break
+== H-1. 셸 -c 리터럴은 재귀 분석(_shell_codes) ==
+576:def _shell_codes(name: str, args: list, frag: Frag, xa=False) -> "list":
+1227:    def shell_dynamic(self, name, args, frag, xa=False):
+== I. CI: test-guards 를 돌리는 job ==
+114:      - run: bash .claude/scripts/test-guards.sh
+149:      # test-guards.sh 자체가 bash 스크립트이므로 Git Bash 로 돌린다.
+151:        run: bash .claude/scripts/test-guards.sh
+== J. registry.md 에 save_evidence 행 ==
+grep rc=1

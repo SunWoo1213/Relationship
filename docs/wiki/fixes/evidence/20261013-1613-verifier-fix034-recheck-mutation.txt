@@ -1,0 +1,314 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/v034/re-mutation.sh
+# 시각: 2026-10-13T16:13:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 977f2ee (dev2)
+# exit: 0
+# ---
+절 범위: 930~1062행
+== 절 본문 대조(SE= 한 줄만 달라야) ==
+3c3
+< SE="$ROOT/.claude/scripts/save_evidence.py"
+---
+> SE="$SE_UNDER_TEST"
+
+===== 변이 control =====
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205051 bytes (절단 없음)
+== 결과: 실패 0 ==
+section rc=0
+사본 app/ 잔여: ''
+
+===== 변이 mb-stderr-pipe =====
+--- diff
+234c234
+<         stderr=subprocess.STDOUT,
+---
+>         stderr=subprocess.PIPE,
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+XX   save_evidence ⑫ 실패(rc=0)
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205058 bytes (절단 없음)
+== 결과: 실패 1 ==
+section rc=1
+사본 app/ 잔여: ''
+
+===== 변이 md-scan-head-only =====
+--- diff
+256c256
+<     hits = _scan_secrets((head_bytes + body).decode("utf-8", errors="replace"))
+---
+>     hits = _scan_secrets(head_bytes.decode("utf-8", errors="replace"))
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+XX   save_evidence ⑪ 실패(본문 rc=0 파일 1, 머리줄 rc=2)
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205061 bytes (절단 없음)
+== 결과: 실패 1 ==
+section rc=1
+사본 app/ 잔여: ''
+
+===== 변이 me-scan-body-only =====
+--- diff
+256c256
+<     hits = _scan_secrets((head_bytes + body).decode("utf-8", errors="replace"))
+---
+>     hits = _scan_secrets(body.decode("utf-8", errors="replace"))
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+XX   save_evidence ⑪ 실패(본문 rc=2 파일 0, 머리줄 rc=0)
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205061 bytes (절단 없음)
+== 결과: 실패 1 ==
+section rc=1
+사본 app/ 잔여: ''
+
+===== 변이 mf-truncate =====
+--- diff
+239c239
+<     body = ANSI_RE.sub(b"", res.stdout)
+---
+>     body = ANSI_RE.sub(b"", res.stdout)[:100]
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+XX   save_evidence ⑬ 실패(rc=0, 크기      355)
+== 결과: 실패 1 ==
+section rc=1
+사본 app/ 잔여: ''
+
+===== 변이 mg-no-guard =====
+--- diff
+212c212
+<     denied = _guard_denial(command)
+---
+>     denied = None
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+XX   save_evidence ⑦ 실패(rc=0, 파일 1)
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205055 bytes (절단 없음)
+== 결과: 실패 1 ==
+section rc=1
+사본 app/ 잔여: ''
+
+===== 변이 mh-glob-suffix =====
+--- diff
+268c268
+<             (f for f in ev_dir.iterdir() if f.is_file() and name_re.fullmatch(f.name)),
+---
+>             (f for f in ev_dir.iterdir() if f.is_file() and f.name.endswith("-" + a.name + ".txt")),
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+XX   save_evidence ⑨ 실패(rc=0, 파일 1)
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205058 bytes (절단 없음)
+== 결과: 실패 1 ==
+section rc=1
+사본 app/ 잔여: ''
+
+===== 변이 mi-no-root-check =====
+--- diff
+193c193
+<         root_override = _checked_root(a.root)
+---
+>         root_override = Path(a.root)
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+XX   save_evidence ⑩ 실패(rc1=0 rc2=3)
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205060 bytes (절단 없음)
+== 결과: 실패 1 ==
+section rc=1
+사본 app/ 잔여: ''
+
+===== 변이 mj-allow-dot =====
+--- diff
+88c88
+<     return bool(NAME_RE.match(s)) and ".." not in s and s != "."
+---
+>     return bool(NAME_RE.match(s)) and ".." not in s
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+XX   save_evidence ⑩ 실패(rc1=3 rc2=0)
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205056 bytes (절단 없음)
+== 결과: 실패 1 ==
+section rc=1
+사본 app/ 잔여: ''
+
+===== 변이 mk-head-ansi-kept =====
+--- diff
+254c254
+<     head_bytes = ANSI_RE.sub(b"", ("\n".join(head) + "\n").encode("utf-8"))
+---
+>     head_bytes = ("\n".join(head) + "\n").encode("utf-8")
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205061 bytes (절단 없음)
+== 결과: 실패 0 ==
+section rc=0
+사본 app/ 잔여: ''
+
+===== 변이 ml-guard-rc-ignored =====
+--- diff
+134c134
+<     if r.returncode == 0:
+---
+>     if True:
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+XX   save_evidence ⑦ 실패(rc=0, 파일 1)
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205063 bytes (절단 없음)
+== 결과: 실패 1 ==
+section rc=1
+사본 app/ 잔여: ''
+
+===== 변이 mm-collision-after =====
+--- diff
+221c221
+<     if not a.append and (ev_dir / f"{stamp}-{a.name}.txt").exists():
+---
+>     if False:
+(diff rc=1 — 1 이어야 적용됨)
+== save_evidence (FIX-034) ==
+ok   save_evidence ① echo hi → 파일 1개·# exit: 0·본문 hi·머리줄·종료 0
+ok   save_evidence ② exit 7 → 파일·# exit: 7·종료 7
+ok   save_evidence ③ 비밀 문자열 → 파일 없음·종료 2
+ok   save_evidence ④ 이름 ../x → 파일 없음·종료 3
+ok   save_evidence ⑤ --append 두 번 → 파일 1개·구분선 2개·두 출력 모두 보존
+ok   save_evidence ⑥ ANSI 이스케이프 제거·글자 보존
+ok   save_evidence ⑦ 안쪽 명령 'echo x > app/y.py' → 가드 거부·실행 안 됨·종료 3
+ok   save_evidence ⑧ 임시 영역으로의 > → 허용·실행됨·종료 0
+ok   save_evidence ⑨ --append 접미사 겹침(u5-t9) → 새 파일·기존 파일 불변
+ok   save_evidence ⑩ --root 저장소 안(app) → 종료 3·app/evidence 없음 · 대상 '.' → 종료 3 · 파일 없음
+ok   save_evidence ⑪ 본문에만 있는 비밀 → 종료 2 · 머리줄에만 있는 비밀 → 종료 2 · 파일 없음
+ok   save_evidence ⑫ stderr 포함·순서 보존 → 본문 a,b,c
+ok   save_evidence ⑬ 200 KB 출력 → 파일 205062 bytes (절단 없음)
+== 결과: 실패 0 ==
+section rc=0
+사본 app/ 잔여: ''
+
+== mk(머리줄 ANSI 유지)·mm(충돌 검사 제거) 를 잡는 시험이 없으면 직접 확인 ==
+mk: --note ANSI 쪼갠 비밀 → rc=0 파일 수=1 (rc 0·파일 1 이면 변이 생존 = 시험 공백)
+mm: 2회째 rc=0 실행됨? YES — 덮어씀? 0
+== 저장소 무수정 확인 ==
+ M .claude/scripts/test-guards.sh
+?? .claude/scripts/save_evidence.py
+(save_evidence.py ?? · test-guards.sh M 만 정상)
