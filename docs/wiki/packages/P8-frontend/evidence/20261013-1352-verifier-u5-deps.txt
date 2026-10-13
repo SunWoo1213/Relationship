@@ -1,0 +1,18 @@
+verifier U5 의존성 점검 (R-U0-3, 2026-10-13 13:52, HEAD 975a8e5)
+$ git diff --stat -- web/package.json web/package-lock.json
+(빈 출력 = 변경 없음) EXIT=0
+$ git diff --quiet -- web/package.json web/package-lock.json; echo exit=$?
+exit=0
+$ git show HEAD:web/package.json | python3 -c "import json,sys; print(json.load(sys.stdin)[\"scripts\"])"
+{'dev': 'vite', 'build': 'tsc -b && vite build', 'typecheck': 'tsc -b', 'test': 'vitest', 'e2e': 'playwright test --pass-with-no-tests', 'lint': 'oxlint', 'preview': 'vite preview'}
+$ python3 -c ... web/package.json scripts (작업 트리)
+{'dev': 'vite', 'build': 'tsc -b && vite build', 'typecheck': 'tsc -b', 'test': 'vitest', 'e2e': 'playwright test --pass-with-no-tests', 'lint': 'oxlint', 'preview': 'vite preview'}
+$ (cd web && npm audit --omit=dev)
+found 0 vulnerabilities
+EXIT=0
+$ (cd web && npm ls --depth=0 2>&1 | wc -l)
+      27
+$ grep -c "node_modules/" web/package-lock.json
+557
+
+(verifier 주: package.json·package-lock.json 은 HEAD 975a8e5 와 동일(diff 비어 있음, exit 0) — 새 패키지 0. scripts 7개 HEAD 와 동일. lock 의 node_modules 항목 557 = U4 2차 리뷰 때와 같은 수. `npm audit --omit=dev` 0.)

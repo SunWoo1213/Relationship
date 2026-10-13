@@ -1,0 +1,40 @@
+verifier U5 판정 명령 (web/ 에서, 2026-10-13 13:49, HEAD 975a8e5, 작업 트리 미커밋 포함)
+$ npm run typecheck
+
+> web@0.0.0 typecheck
+> tsc -b
+
+EXIT=0
+$ npm test -- --run --no-color
+
+> web@0.0.0 test
+> vitest --run --no-color
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  4 passed (4)
+      Tests  47 passed (47)
+   Start at  13:49:58
+   Duration  1.11s (environment 41%, tests 38%, import 10%, setup 7%, transform 2%)
+
+EXIT=0
+$ npm run build
+
+> web@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 2026 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.46 kB │ gzip:   0.32 kB
+dist/assets/index-CAOaKUIt.css   44.44 kB │ gzip:   8.14 kB
+dist/assets/index-B0RGjTQd.js   339.30 kB │ gzip: 108.68 kB
+
+✓ built in 113ms
+EXIT=0
+
+(verifier 주: 구현자 `20261013-1325-u5-chat.txt` 와 번들 해시 동일 — index-CAOaKUIt.css · index-B0RGjTQd.js. 전체 47건 통과, 그중 chat.test.tsx 21건.)

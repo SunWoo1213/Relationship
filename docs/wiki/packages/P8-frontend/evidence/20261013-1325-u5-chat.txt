@@ -1,0 +1,80 @@
+U5 채팅 화면 + 확인 칩 — 판정 명령 출력 (web/ 에서 실행, 2026-10-13 13:21)
+
+$ npm test -- --run src/__tests__/chat.test.tsx    (01-plan 96행 판정 명령; 첫 실행, --no-color 추가)
+> web@0.0.0 test
+> vitest --run --no-color src/__tests__/chat.test.tsx
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  13:21:21
+   Duration  1.36s (tests 49%, environment 30%, import 10%, setup 6%, transform 4%)
+
+$ npm run typecheck && npm test -- --run --no-color && npm run build ; echo EXIT=$?
+> web@0.0.0 typecheck
+> tsc -b
+
+
+> web@0.0.0 test
+> vitest --run --no-color
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+ Test Files  4 passed (4)
+      Tests  47 passed (47)
+   Start at  13:21:27
+   Duration  1.17s (environment 45%, tests 35%, import 9%, setup 6%, transform 4%)
+
+
+> web@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 2026 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.46 kB │ gzip:   0.32 kB
+dist/assets/index-CAOaKUIt.css   44.44 kB │ gzip:   8.14 kB
+dist/assets/index-B0RGjTQd.js   339.30 kB │ gzip: 108.68 kB
+
+✓ built in 163ms
+EXIT=0
+
+$ npm test -- --run --no-color src/__tests__/chat.test.tsx --reporter=verbose
+> web@0.0.0 test
+> vitest --run --no-color src/__tests__/chat.test.tsx --reporter=verbose
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+ ✓ chat.test.tsx > 전송과 세션 (결정 D) > 발화를 POST /api/chat 으로 보내고 내 말풍선과 reply 를 보여 준다 108ms
+ ✓ chat.test.tsx > 전송과 세션 (결정 D) > 첫 요청에는 X-Session-Id 가 없고, 응답 session_id 를 저장해 두 번째 요청에 보낸다 46ms
+ ✓ chat.test.tsx > 전송과 세션 (결정 D) > 저장된 세션이 있으면 진입 시 복원 요청에도 헤더를 보낸다 3ms
+ ✓ chat.test.tsx > 전송과 세션 (결정 D) > 422 invalid_session_id 면 저장된 세션을 버리고 다음 요청은 헤더 없이 간다 44ms
+ ✓ chat.test.tsx > 입력창 > Enter 는 전송, Shift+Enter 는 줄바꿈 31ms
+ ✓ chat.test.tsx > 입력창 > 빈 입력은 보낼 수 없다 18ms
+ ✓ chat.test.tsx > 입력창 > 응답을 기다리는 동안 타이핑 점이 보이고 끝나면 사라진다 32ms
+ ✓ chat.test.tsx > 입력창 > 확인 칩이 떠 있어도 입력은 막히지 않는다 (결정 E) 54ms
+ ✓ chat.test.tsx > 확인 칩 (결정 E) > 칩 글자와 순서가 options 와 같다 (reply 바로 아래) 27ms
+ ✓ chat.test.tsx > 확인 칩 (결정 E) > 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성 41ms
+ ✓ chat.test.tsx > 확인 칩 (결정 E) > 답 응답의 reply 가 이어 붙고, 새 pending_question 이면 그 아래 새 칩 42ms
+ ✓ chat.test.tsx > 확인 칩 (결정 E) > 진입 시 GET /api/questions/pending 으로 미답변 전부를 질문별로 복원한다 12ms
+ ✓ chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 already_answered 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 22ms
+ ✓ chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 expired 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 24ms
+ ✓ chat.test.tsx > 확인 칩 (결정 E) > 답 전송이 5xx 로 실패하면 안내 한 줄을 띄우고 칩은 다시 누를 수 있다 17ms
+ ✓ chat.test.tsx > 오류 안내 > POST /api/chat 이 5xx 면 안내 한 줄 24ms
+ ✓ chat.test.tsx > 오류 안내 > 네트워크 실패(fetch 거부)면 안내 한 줄 22ms
+ ✓ chat.test.tsx > 오류 안내 > 진입 시 복원 요청이 실패해도 화면은 빈 상태 안내로 남는다 3ms
+ ✓ chat.test.tsx > 인물 카드 링크 > stored.persons > 0 이면 #/persons 링크가 붙는다 23ms
+ ✓ chat.test.tsx > 인물 카드 링크 > stored.events > 0 이어도 링크가 붙는다 24ms
+ ✓ chat.test.tsx > 인물 카드 링크 > 저장된 인물·사건이 없으면(일정만 있어도) 링크가 없다 21ms
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  13:21:30
+   Duration  1.08s (tests 62%, environment 22%, import 10%, setup 4%, transform 1%)
+
+(참고) 위 verbose 목록은 파일 경로 접두를 "chat.test.tsx >" 로 줄여 옮겼다. 테스트 이름·건수·시간은 원본 그대로.
+(참고) 실행 시 `git status --short` 변경: web/src/{__tests__/proxy.test.ts, api/client.ts, components/AppShell.tsx, proxy.ts, screens/ChatScreen.tsx}, web/vite.config.ts 수정 / web/src/{__tests__/chat.test.tsx, session.ts} 신규 (+ 기존 미커밋 docs).

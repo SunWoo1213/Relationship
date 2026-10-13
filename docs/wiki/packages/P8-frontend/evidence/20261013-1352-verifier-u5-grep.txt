@@ -1,0 +1,110 @@
+verifier U5 grep 점검 (2026-10-13 13:52, HEAD 975a8e5)
+## 원칙7 — options/reply/question 문자열 변환 여부
+$ grep -nE "\.trim\(|\.sort\(|\.reverse\(|toLowerCase|toUpperCase|\.replace\(|localeCompare|normalize\(" web/src/screens/ChatScreen.tsx web/src/api/client.ts web/src/session.ts
+web/src/screens/ChatScreen.tsx:166:    const text = draft.trim()
+web/src/screens/ChatScreen.tsx:292:            disabled={sending || draft.trim() === ''}
+exit=0
+(verifier 주: 두 건 모두 사용자 입력 `draft` 의 trim — 서버 문자열(options·reply·question)에는 변환 0.)
+$ grep -n "options" web/src/screens/ChatScreen.tsx
+2:// 서버가 준 문자열(reply · question · options)은 고치지 않고 그대로 보여 준다 (원칙7).
+27:  options: string[]
+28:  /** 누른 칩(= options 의 문자열). 없으면 아직 안 눌림. */
+49:  return { id: q.question_id, options: q.options, selected: null, closed: false, notice: null }
+77:        {question.options.map((option, i) => {
+$ grep -n "reply\|q.question\|\.question" web/src/screens/ChatScreen.tsx
+2:// 서버가 준 문자열(reply · question · options)은 고치지 않고 그대로 보여 준다 (원칙7).
+38:  text: string
+49:  return { id: q.question_id, options: q.options, selected: null, closed: false, notice: null }
+132:            .filter((q) => !have.has(q.question_id))
+133:            .map<Message>((q) => ({ key: newKey(), role: 'bot', text: q.question, question: toQuestion(q) }))
+181:          text: out.reply,
+205:          text: out.reply,
+## 프론트가 만드는 문장 (NOTICE 전부)
+8:15:  empty: '메시지를 입력해 대화를 시작하세요.',
+9:16:  failed: '요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.',
+10:17:  questionClosed: '이미 답했거나 만료된 질문이에요.',
+11:18:  sessionReset: '세션이 초기화됐어요. 다시 보내 주세요.',
+12:19:  personsLink: '인물 카드 보기',
+26:285:              'placeholder:text-muted-foreground',
+## push-dev / 외부 URL / 비밀
+$ grep -rn "push-dev" web/src web/index.html web/public
+exit=1
+$ grep -rnE "https?://" web/src (전체, localhost 제외)
+web/src/__tests__/proxy.test.ts:12:    expect(resolveApiTarget({ VITE_API_TARGET: 'http://x:9' })).toBe('http://x:9')
+exit=0
+$ grep -rnE "https?://" web/src (전체, localhost 포함)
+web/src/proxy.ts:5:export const DEFAULT_API_TARGET = 'http://localhost:8000'
+web/src/__tests__/proxy.test.ts:6:    expect(DEFAULT_API_TARGET).toBe('http://localhost:8000')
+web/src/__tests__/proxy.test.ts:7:    expect(resolveApiTarget({})).toBe('http://localhost:8000')
+web/src/__tests__/proxy.test.ts:8:    expect(resolveApiTarget({ VITE_API_TARGET: '' })).toBe('http://localhost:8000')
+web/src/__tests__/proxy.test.ts:12:    expect(resolveApiTarget({ VITE_API_TARGET: 'http://x:9' })).toBe('http://x:9')
+exit=0
+(verifier 주: 외부 호스트 URL 0 — `http://x:9` 는 테스트 안의 가짜 값, 실제 접속 없음. 첫 시도 `--include=*.ts` 는 zsh glob 오류로 무효라 전체 grep 으로 다시 돌렸다.)
+$ grep -rn "fetch(" web/src --exclude-dir=__tests__
+web/src/api/client.ts:51:  const response = await fetch(`${API_BASE}${path}`, {
+$ grep -rnE "https?://" web/src/session.ts web/src/screens/ChatScreen.tsx web/src/api/client.ts web/src/__tests__/chat.test.tsx
+exit=1
+$ grep -rniE "api[_-]?key|secret|password|token" web/src/session.ts web/src/screens/ChatScreen.tsx web/src/api/client.ts web/src/__tests__/chat.test.tsx
+exit=1
+$ grep -n "localStorage" web/src/session.ts web/src/screens/ChatScreen.tsx web/src/api/client.ts
+web/src/session.ts:1:// 세션 보관 (결정 D (i)): 서버가 발급한 session_id 를 localStorage 에 두고 요청마다 재전송한다.
+web/src/session.ts:8:    return window.localStorage.getItem(SESSION_STORAGE_KEY) || null
+web/src/session.ts:16:    window.localStorage.setItem(SESSION_STORAGE_KEY, sessionId)
+web/src/session.ts:24:    window.localStorage.removeItem(SESSION_STORAGE_KEY)
+web/src/api/client.ts:32:  /** 생략하면 보관된 세션(localStorage)을 `X-Session-Id` 로 보낸다 (결정 D). null 이면 헤더 없이 보낸다. */
+## 결정 J — 실 네트워크 차단 유지
+$ git diff --quiet -- web/src/test-setup.ts; echo exit=$?
+exit=0
+$ grep -n "stubGlobal\|globalThis.fetch\|msw\|nock" web/src/__tests__/chat.test.tsx web/src/test-setup.ts
+web/src/test-setup.ts:10:globalThis.fetch = (() => {
+web/src/__tests__/chat.test.tsx:1:// U5 채팅 화면 + 확인 칩. 실제 네트워크 없음 — fetch 는 테스트마다 vi.stubGlobal 로 가짜를 건다 (결정 J).
+web/src/__tests__/chat.test.tsx:19:  vi.stubGlobal('fetch', fn)
+## 범위 — 백엔드·CI 무변경, 삭제 0
+$ git status --short -- app alembic tests .github
+(빈 출력 = 변경 없음)
+$ git diff --diff-filter=D --name-only
+(빈 출력 = 삭제 0)
+$ git status --short
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8-frontend/03-log.md
+ M docs/wiki/registry.md
+ M web/src/__tests__/proxy.test.ts
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/proxy.ts
+ M web/src/screens/ChatScreen.tsx
+ M web/vite.config.ts
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1325-u5-chat.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1325-u5-mutation-raw.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1325-u5-mutation-script.mjs.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1325-u5-mutation.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1349-verifier-u5-judge.txt
+?? web/src/__tests__/chat.test.tsx
+?? web/src/session.ts
+$ git diff --numstat -- web
+14	3	web/src/__tests__/proxy.test.ts
+29	2	web/src/api/client.ts
+1	1	web/src/components/AppShell.tsx
+8	0	web/src/proxy.ts
+296	3	web/src/screens/ChatScreen.tsx
+2	2	web/vite.config.ts
+## 새 화면·라우트 없음
+$ git diff --quiet -- web/src/routes.ts web/src/App.tsx; echo exit=$?
+exit=0
+$ ls web/src/screens
+BriefingScreen.tsx
+ChatScreen.tsx
+PersonCardScreen.tsx
+## 서랍 폭 (R-U4-12)
+$ grep -n "data-\[side=left\]" web/src/components/AppShell.tsx web/src/components/ui/sheet.tsx
+web/src/components/ui/sheet.tsx:63:          "fixed z-50 flex flex-col gap-4 bg-popover bg-clip-padding text-sm text-popover-foreground shadow-lg transition duration-200 ease-in-out data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-3/4 data-[side=left]:border-r data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-3/4 data-[side=right]:border-l data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b data-[side=left]:sm:max-w-sm data-[side=right]:sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-[side=bottom]:data-open:slide-in-from-bottom-10 data-[side=left]:data-open:slide-in-from-left-10 data-[side=right]:data-open:slide-in-from-right-10 data-[side=top]:data-open:slide-in-from-top-10 data-closed:animate-out data-closed:fade-out-0 data-[side=bottom]:data-closed:slide-out-to-bottom-10 data-[side=left]:data-closed:slide-out-to-left-10 data-[side=right]:data-closed:slide-out-to-right-10 data-[side=top]:data-closed:slide-out-to-top-10",
+web/src/components/AppShell.tsx:68:            className="bg-sidebar p-0 text-sidebar-foreground data-[side=left]:w-64 data-[side=left]:sm:max-w-none"
+(verifier 주: 같은 변형 접두 `data-[side=left]:` 로 `w-64`·`sm:max-w-none` 을 줬으므로 특이도가 같고 `cn()`(tailwind-merge)이 뒤에 온 클래스를 남긴다 — R-U4-12 처방 그대로. jsdom 은 CSS 를 계산하지 않아 자동 테스트 없음(한계).)
+## 테스트 데이터에 공백 포함 option 이 있는가 (trim 변이 검출 가능성)
+$ grep -nE "\[.*' [^']*'|'[^']* '\]" web/src/__tests__/chat.test.tsx | head
+142:    await user.type(screen.getByRole('textbox', { name: '메시지 입력' }), '다시')
+169:    await type('   ')
+266:    expect(screen.getByRole('button', { name: '예' })).toHaveAttribute('aria-pressed', 'true')
+exit=0
+(verifier 주: 세 건 모두 options 배열이 아니다 — options 문자열에 앞뒤 공백을 둔 테스트 데이터가 없다. 변이 V1 로 실측한다.)

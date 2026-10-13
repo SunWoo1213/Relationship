@@ -3,13 +3,13 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { loadEnv } from 'vite'
 import { defineConfig } from 'vitest/config'
-import { stripApiPrefix } from './src/proxy.ts'
+import { resolveApiTarget, stripApiPrefix } from './src/proxy.ts'
 
 // 결정 C (ii): 같은 출처 `/api` 접두를 개발 서버 프록시가 벗겨 백엔드로 넘긴다.
 // 대상 주소는 VITE_API_TARGET (기본 http://localhost:8000, web/.env.example).
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const target = env.VITE_API_TARGET || 'http://localhost:8000'
+  const target = resolveApiTarget(env)
   return {
     plugins: [react(), tailwindcss()],
     resolve: {

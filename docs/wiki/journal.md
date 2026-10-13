@@ -471,3 +471,5 @@
 - 2026-10-11 22:41 | PUSH-dev2 | origin dev2 7031a19 (실험 푸시)
 - 2026-10-12 20:10 | COMMIT | 95ca2c0 feat(P8-frontend): 대기 질문 목록과 저장된 브리핑을 읽는 조회 API 를 더한다
 - 2026-10-12 20:10 | PUSH-dev2 | origin dev2 95ca2c0 (실험 푸시)
+- 2026-10-13 00:08 | COMMIT | 975a8e5 feat(P8-frontend): React 프론트 골격·디자인 토큰·테스트 도구·CI 를 세운다
+- 2026-10-13 00:09 | PUSH-dev2 | origin dev2 975a8e5 (실험 푸시)

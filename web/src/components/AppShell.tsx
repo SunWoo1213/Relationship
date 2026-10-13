@@ -65,7 +65,7 @@ export default function AppShell({ route, children }: { route: Route; children: 
             side="left"
             showCloseButton={false}
             aria-describedby={undefined}
-            className="w-64 bg-sidebar p-0 text-sidebar-foreground"
+            className="bg-sidebar p-0 text-sidebar-foreground data-[side=left]:w-64 data-[side=left]:sm:max-w-none"
           >
             <SheetTitle className="sr-only">사이드바</SheetTitle>
             <SidebarContent route={route} onNavigate={() => setOpen(false)} />

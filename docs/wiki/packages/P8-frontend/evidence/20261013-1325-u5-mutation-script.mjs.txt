@@ -1,0 +1,44 @@
+// U5 변이 시험 스크립트 — frontend-agent 가 스크래치패드 `mut.mjs` 로 작성, 메인 세션이 재현용으로 보존(2026-10-13).
+// 저장소 파일을 고치지 않고 스크래치패드 사본 W 에서만 한 줄씩 치환해 vitest 를 돌린다. 재현: SRC/W/OUT 을 맞춘 뒤
+// `DEBUG_PRINT_LIMIT=0 node mut.mjs` (DEBUG_PRINT_LIMIT=0 은 실패 시 DOM 덤프를 `...` 로 줄이는 testing-library 환경변수).
+// 변이 시험: web 사본(스크래치패드)에서 한 줄씩 바꾸고 vitest 를 돌린다. 저장소 파일은 건드리지 않는다.
+import { cpSync, rmSync, mkdirSync, symlinkSync, readFileSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+
+const SRC = '/Users/sunwoo/Desktop/Portfolio/Relationship/web'
+const W = '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w'
+const OUT = '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/out.txt'
+
+const muts = [
+  ['M1 칩 순서 반전', 'src/screens/ChatScreen.tsx', 'question.options.map(', '[...question.options].reverse().map('],
+  ['M2 답 문자열 변형', 'src/api/client.ts', 'const body: AnswerIn = { answer }', 'const body: AnswerIn = { answer: answer + " " }'],
+  ['M3 세션 헤더 미전송', 'src/api/client.ts', 'options.sessionId === undefined ? getSessionId() : options.sessionId', 'options.sessionId ?? null'],
+  ['M4 409 분기 상태코드', 'src/screens/ChatScreen.tsx', 'error.status === 409', 'error.status === 410'],
+  ['M5 링크 조건 > → >=', 'src/screens/ChatScreen.tsx', 'stored.persons > 0 || stored.events > 0', 'stored.persons >= 0 || stored.events > 0'],
+  ['M6 session_id 저장 제거', 'src/api/client.ts', 'if (out.session_id) setSessionId(out.session_id)', ''],
+  ['M7 Shift+Enter 도 전송', 'src/screens/ChatScreen.tsx', "e.key === 'Enter' && !e.shiftKey &&", "e.key === 'Enter' &&"],
+  ['M8 선택 뒤 칩 비활성 제거', 'src/screens/ChatScreen.tsx', 'disabled={locked}', 'disabled={question.closed}'],
+  ['M9 422 세션 버림 제거', 'src/api/client.ts', "if (response.status === 422 && code === 'invalid_session_id') clearSessionId()", ''],
+  ['M10 복원 질문 1개만', 'src/screens/ChatScreen.tsx', '.filter((q) => !have.has(q.question_id))', '.filter((q) => !have.has(q.question_id)).slice(0, 1)'],
+  ['M11 aria-pressed 제거', 'src/screens/ChatScreen.tsx', 'aria-pressed={pressed}', ''],
+  ['M12 프록시 기본값 변경', 'src/proxy.ts', "env.VITE_API_TARGET || DEFAULT_API_TARGET", 'DEFAULT_API_TARGET'],
+  ['M13 409 시 안내 제거', 'src/screens/ChatScreen.tsx', 'closed: true, notice: NOTICE.questionClosed', 'closed: true, notice: null'],
+]
+
+let log = ''
+for (const [name, file, from, to] of muts) {
+  rmSync(W, { recursive: true, force: true })
+  mkdirSync(W, { recursive: true })
+  for (const f of ['package.json', 'tsconfig.json', 'tsconfig.app.json', 'tsconfig.node.json', 'vite.config.ts', 'components.json', 'index.html', 'src']) {
+    cpSync(`${SRC}/${f}`, `${W}/${f}`, { recursive: true })
+  }
+  symlinkSync(`${SRC}/node_modules`, `${W}/node_modules`)
+  const p = `${W}/${file}`
+  const text = readFileSync(p, 'utf8')
+  if (!text.includes(from)) { log += `\n##### ${name}: 치환 대상 없음 — 시험 무효\n`; continue }
+  writeFileSync(p, text.replace(from, to))
+  const r = spawnSync('npx', ['vitest', '--run', '--no-color', 'src/__tests__/chat.test.tsx', 'src/__tests__/proxy.test.ts'], { cwd: W, encoding: 'utf8' })
+  log += `\n##### ${name}  (${file}: ${JSON.stringify(from)} -> ${JSON.stringify(to)})\n$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit ${r.status}]\n${r.stdout}${r.stderr}\n`
+}
+writeFileSync(OUT, log)
+console.log(log.length)

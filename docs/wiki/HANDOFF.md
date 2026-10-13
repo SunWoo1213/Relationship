@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-13 00:05 (**U4 완료 — 커밋 직전**. verifier 재검증 통과([필수] 0 · [권고] 3 → R-U4-13 닫음, R-U4-11·12 는 U5 로). 사용자 "커밋 + 실험 푸시". 커밋 뒤 `git push origin dev2` → CI **다섯 job** 확인(web windows 첫 실행) → 03-log `pending` 보충은 U5 커밋에. 서브에이전트 없음)
+갱신: 2026-10-13 14:25 (**U5 완료 — 커밋 직전**. verifier `review-u5-chat.md` 통과([필수] 0 · [권고] 5). 사용자 결정 14:15: R-U5-2 복원 실패 "한 줄 안내"(U6) · (c) 대책 **(라) 전용 저장 스크립트 = FIX-034 후보**(순서는 U6 시작 때) · R-U5-1·4 테스트 보강은 U6. 커밋 뒤 `git push origin dev2` → CI 다섯 job. 서브에이전트 없음)
 
-active: **P8-frontend**(U0·U1·U2·U3·**U4** 완료 — **U5 부터**) | frozen: none | 브랜치 `dev2` = origin/dev2 `95ca2c0`(+ U4 커밋 예정) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
+active: **P8-frontend**(U0~U4·**U5** 완료 — **U6 부터**) | frozen: none | 브랜치 `dev2` = origin/dev2 `975a8e5`(+ U5 커밋 예정) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
 
 ## 2026-10-11 세션에 끝낸 것 (커밋 순, 전부 origin/dev2·CI 세 job success)
 | 커밋 | 내용 | CI(windows) |
@@ -25,8 +25,9 @@ active: **P8-frontend**(U0·U1·U2·U3·**U4** 완료 — **U5 부터**) | froze
 - 이 HANDOFF(종료 기록) · `FIX-033.md` 결과절 해시·run 1줄 · journal 자동 줄(`7031a19` COMMIT·PUSH-dev2). U3 첫 커밋에 같이 넣으면 된다(따로 커밋할 필요 없음).
 
 ## 바로 다음에 할 것 (순서대로)
-1. **세션 재개 확인**: `git log -1`(U4 커밋 있어야 함) · `git status --short`(HANDOFF·journal 만) · `gh run list --limit 2`(**다섯 job** — web windows 첫 실행, 실패하면 FIX 후보로 사용자에게). U5 커밋에 03-log U4 `pending` → 해시·run, registry "(U4 미커밋)" 7칸 → 해시.
-2. **U5 채팅 화면 + 확인 칩**(frontend-agent, L-004): 01-plan 96행. 프롬프트에 **계획 원문 인용·임의 제한 금지**(U4 교훈: CI 두 OS·shadcn "등") + R-U4-10 규칙(도구 강제는 기록 후 진행 / 구현자 선택은 멈추고 보고) + (c) 출력 전체 + U4 이월 **R-U4-11**(`proxy.ts` `resolveApiTarget(env)` 순수 함수로 테스트 환경 독립) · **R-U4-12**(서랍 폭 `data-[side=left]:w-64`). verifier 고정 점검 R-U0-3.
+1. **세션 재개 확인**: `git log -1`(U5 커밋 있어야 함) · `git status --short`(HANDOFF·journal 만) · `gh run list --limit 2`(다섯 job). U6 커밋에 03-log U5 `pending` → 해시·run, registry "(U5 미커밋)" 4칸 → 해시.
+2. **FIX-034 순서 결정**(사용자에게 묻기): (라) `save-evidence.py` 를 U6 앞에 할지 P8 뒤에 할지. U6 앞이면 `/devlog fix` 로 FIX-034.md 계획 → backend-agent(스크립트는 파이썬·하네스) → verifier → 커밋. 그 전까지 위임에 (나) 절차(구현자는 스크래치패드 원본 보고, 메인 세션이 보존) 명시.
+3. **U6 인물 카드 화면 + 원문 펼치기**(frontend-agent, L-004): 01-plan 97행 원문 인용. 포함: R-U5-1(원칙7 테스트 데이터) · R-U5-2(복원 실패 한 줄 안내 + 343행 테스트) · R-U5-4(`sending`·`isComposing` 테스트) · "카드 링크는 U5 에서 이미 붙임" · R-U4-10 규칙 · (c) 출력 전체.
    U7 위임 전 사용자 결정 필요: `#/briefings?schedule_id=N` 강조를 목록+클라이언트 강조로 할지 `GET /briefings?schedule_id=` 호출로 할지(R-U3-6 ⑤).
 3. **U9 백엔드 몫에 넣을 것**: R-U3-1(`ctx.now = now` → `dataclasses.replace`) · R-U3-2(목록 조인 `Person.id == Schedule.person_id` 한 줄) · R-U3-5(U1·U2 쓰기 0 테스트를 `helpers_read_api` 로, `push_subscriptions` 스냅샷 추가) · 판정표 9·10행 끝에서 끝.
 3. **U4~U9**(frontend-agent — U0 완료로 위임 가능, R-U0-3: 단위마다 verifier 가 `web/package.json` scripts·의존성·lock 점검) → **U10 사람 점검** → verifier 04-review.
@@ -36,6 +37,7 @@ active: **P8-frontend**(U0·U1·U2·U3·**U4** 완료 — **U5 부터**) | froze
 - security.md 에 npm 간접 실행 문구 **추가하지 않음**(단위별 verifier 점검만) · 일정 상한 `UPCOMING_SCHEDULES_LIMIT=10` 유지+테스트 · FIX-014 방식 "프로젝트 안 Bash 쓰기 거부" · 순서 "U2 끝내고 FIX 먼저" · FIX-014 회차 상한(2차 재작업이 마지막 필수 라운드, 새 우회는 후속 후보) → 3차 보류(deno/bun `run -`)는 (a) 한 건만 더 닫기 · FIX-033 재작업 "R-33-1·2·6 위임 + FIX-033.md 는 메인 세션".
 
 ## FIX 후보 (미착수 — 사용자에게 순서 묻기)
+- **FIX-034 (사용자 결정 2026-10-13, 대책 (라))**: `.claude/scripts/save-evidence.py <패키지> <이름> -- <명령>` — 명령을 실행해 출력 전체·exit 코드·ANSI 제거·머리줄(명령·시각·HEAD)을 `docs/wiki/packages/<패키지>/evidence/<YYYYMMDD-HHMM>-<이름>.txt` 에 직접 쓴다. 비밀 문자열 검사를 스크립트 안에(secret-guard 와 같은 패턴). `security.md`·`verification.md` 한 줄, `test-guards.sh` 경우(정상 저장 / 비밀 포함 시 거부 / 프로젝트 밖 패키지 거부). 배경: U3·U5 에서 (c) 미달 재발 — bash-write-guard 때문에 스크래치패드 출력을 모델이 Write 로 옮기는 수작업이 요약 압력(review-u5-chat.md R-U5-3 §6).
 - **FIX-014 후속**(FIX-014.md "마무리" 절): **R-14-19(1순위)** deno/bun 값 옵션(`deno run -c x -`) allow · R-14-5 awk/perl/php 패턴 · R-14-6 PowerShell `iex` · R-14-7 `CLAUDE_SCRATCHPAD` 죽은 분기 · R-14-8 `tar -C`·`unzip -d` · R-14-9~11 · R-14-15 · R-14-17·18 python/node heredoc `$(…)` · R-14-20. 한계(수정안 5): 프로그램 자체 쓰기(pytest·npm·pip)·`subprocess` 경유는 막지 않음.
 - **FIX-032 후속**: **R-32-1** `test-guards.sh` `full=${#full} bytes` 가 UTF-8 에서 문자 수(14323 vs 20800) → `wc -c`(1줄) · R-32-2 test-guards 가 시작·종료 시 마커·git status 자체 기록.
 - **FIX-033 후속**: R-33-7 CLAUDE.md 120행 "리터럴로" 구절 · R-33-8 verifier.md 에 변이 시험 의무 명시.

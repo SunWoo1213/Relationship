@@ -1,0 +1,617 @@
+U5 변이 시험 — 저장소 파일은 건드리지 않고 스크래치패드 사본(web 복사 + node_modules 링크)에서 한 줄씩 바꿔 돌렸다.
+스크립트: 스크래치패드 mut.mjs (치환 대상 문자열이 없으면 "시험 무효"로 기록하게 해 뒀고, 13건 모두 치환 성공).
+명령: DEBUG_PRINT_LIMIT=0 node mut.mjs  -> 변이마다 `npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts`
+기록상 주의 2가지(자기 보고):
+ (1) DEBUG_PRINT_LIMIT=0 은 Testing Library 의 실패 시 DOM 덤프를 "..." 로 줄이는 환경 변수다. 처음에는 덤프를 켜고 한 번 돌렸고(같은 13건 전부 실패 검출, 86 KB), 증거에는 덤프만 빠진 이 판을 남겼다. 아래 "..." 가 그 자리.
+ (2) --no-color 를 줬지만 Testing Library 의 jest-dom 메시지(M8·M11)에는 ESC 색상 바이트가 남아 있었다. 이 파일에는 ESC 바이트를 옮기지 않았다(눈에 보이는 "[2m" 류 조각은 그 자리).
+ (3) 자기 보고 — 이 파일은 스크래치패드 출력을 사람이 다시 옮겨 적은 것이라 (c) "출력 전체"를 완전히 충족하지 못한다. 줄이거나 손질한 자리: M9 끝(테스트 소스 143행 이후 "이하 원본 그대로 이어짐" 표기), M10 두 번째 실패의 stack 줄·소스 발췌 일부(원본은 chat.test.tsx:303 의 같은 줄), M11 2~4번째 실패의 Error 메시지 한 줄 요약, M13 두 번째 실패의 헤더 요약. 각 변이의 판정 줄(exit 1, 실패한 테스트 이름, 실패 건수)은 원본 그대로다. 원본 전체는 스크래치패드 mut/out.txt (휘발성). 재현은 mut.mjs 한 번으로 다시 만들 수 있다 — verifier 가 재실행 권장.
+결과 요약: 13건 전부 exit 1 (= 변이 검출).
+
+##### M1 칩 순서 반전  (src/screens/ChatScreen.tsx: "question.options.map(" -> "[...question.options].reverse().map(")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 3 failed) 611ms
+   ❯ 확인 칩 (결정 E) (7)
+     × 칩 글자와 순서가 options 와 같다 (reply 바로 아래) 30ms
+     × 답 응답의 reply 가 이어 붙고, 새 pending_question 이면 그 아래 새 칩 34ms
+     × 진입 시 GET /api/questions/pending 으로 미답변 전부를 질문별로 복원한다 7ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  3 failed | 24 passed (27)
+   Start at  13:22:38
+   Duration  1.08s (tests 49%, environment 35%, import 7%, setup 7%, transform 2%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩 글자와 순서가 options 와 같다 (reply 바로 아래)
+AssertionError: expected [ '잘 모르겠어요', '아니요, 다른 사람이에요', …(1) ] to deeply equal [ Array(3) ]
+
+- Expected
++ Received
+
+  [
+-   "네, 같은 사람이에요",
+-   "아니요, 다른 사람이에요",
+    "잘 모르겠어요",
++   "아니요, 다른 사람이에요",
++   "네, 같은 사람이에요",
+  ]
+
+ ❯ src/__tests__/chat.test.tsx:213:20
+    211|       .getAllByRole('button')
+    212|       .map((b) => b.textContent)
+    213|     expect(labels).toEqual(OPTIONS)
+       |                    ^
+    214|     const bot = screen.getByText('확인 부탁').closest('[data-role="bot"]')…
+    215|     expect(bot).toContainElement(group)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답 응답의 reply 가 이어 붙고, 새 pending_question 이면 그 아래 새 칩
+AssertionError: expected [ '모레', '내일', '오늘' ] to deeply equal [ '오늘', '내일', '모레' ]
+
+- Expected
++ Received
+
+  [
+-   "오늘",
+-   "내일",
+    "모레",
++   "내일",
++   "오늘",
+  ]
+
+ ❯ src/__tests__/chat.test.tsx:263:7
+    261|         .getAllByRole('button')
+    262|         .map((b) => b.textContent),
+    263|     ).toEqual(['오늘', '내일', '모레'])
+       |       ^
+    264|     // 새 칩은 이어 붙은 reply 의 말풍선 안에 있고, 앞 질문 칩은 그대로 고정돼 있다.
+    265|     expect(next.closest('[data-role="bot"]')).toContainElement(group)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 진입 시 GET /api/questions/pending 으로 미답변 전부를 질문별로 복원한다
+AssertionError: expected [ '나', '가' ] to deeply equal [ '가', '나' ]
+
+- Expected
++ Received
+
+  [
+-   "가",
+    "나",
++   "가",
+  ]
+
+ ❯ src/__tests__/chat.test.tsx:279:73
+    277|     const g3 = await screen.findByTestId('chips-3')
+    278|     const g4 = await screen.findByTestId('chips-4')
+    279|     expect(within(g3).getAllByRole('button').map((b) => b.textContent)…
+       |                                                                         ^
+    280|     expect(within(g4).getAllByRole('button').map((b) => b.textContent)…
+    281|     expect(screen.getByText('첫째 질문')).toBeInTheDocument()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+
+##### M2 답 문자열 변형  (src/api/client.ts: "const body: AnswerIn = { answer }" -> "const body: AnswerIn = { answer: answer + \" \" }")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 1 failed) 626ms
+   ❯ 확인 칩 (결정 E) (7)
+     × 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성 60ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 26 passed (27)
+   Start at  13:22:39
+   Duration  1.10s (tests 50%, environment 34%, import 8%, setup 7%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성
+AssertionError: expected { answer: '아니요, 다른 사람이에요 ' } to deeply equal { answer: '아니요, 다른 사람이에요' }
+
+- Expected
++ Received
+
+  {
+-   "answer": "아니요, 다른 사람이에요",
++   "answer": "아니요, 다른 사람이에요 ",
+  }
+
+ ❯ src/__tests__/chat.test.tsx:233:65
+    231|     const [call] = callsTo(fetchFn, '/api/answers/7')
+    232|     expect((call[1] as RequestInit).method).toBe('POST')
+    233|     expect(JSON.parse((call[1] as RequestInit).body as string)).toEqua…
+       |                                                                 ^
+    234|
+    235|     const chosen = screen.getByRole('button', { name: OPTIONS[1] })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+
+##### M3 세션 헤더 미전송  (src/api/client.ts: "options.sessionId === undefined ? getSessionId() : options.sessionId" -> "options.sessionId ?? null")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 2 failed) 622ms
+   ❯ 전송과 세션 (결정 D) (4)
+     × 첫 요청에는 X-Session-Id 가 없고, 응답 session_id 를 저장해 두 번째 요청에 보낸다 50ms
+     × 저장된 세션이 있으면 진입 시 복원 요청에도 헤더를 보낸다 3ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 25 passed (27)
+   Start at  13:22:41
+   Duration  1.15s (tests 47%, environment 36%, import 8%, setup 7%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 전송과 세션 (결정 D) > 첫 요청에는 X-Session-Id 가 없고, 응답 session_id 를 저장해 두 번째 요청에 보낸다
+AssertionError: expected undefined to be 'sess-abc' // Object.is equality
+
+- Expected:
+"sess-abc"
+
++ Received:
+undefined
+
+ ❯ src/__tests__/chat.test.tsx:118:73
+    116|     await user.click(screen.getByRole('button', { name: '보내기' }))
+    117|     await waitFor(() => expect(callsTo(fetchFn, '/api/chat')).toHaveLe…
+    118|     expect(headersOf(callsTo(fetchFn, '/api/chat')[1])['X-Session-Id']…
+       |                                                                         ^
+    119|   })
+    120|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 전송과 세션 (결정 D) > 저장된 세션이 있으면 진입 시 복원 요청에도 헤더를 보낸다
+AssertionError: expected undefined to be 'sess-old' // Object.is equality
+
+- Expected:
+"sess-old"
+
++ Received:
+undefined
+
+ ❯ src/__tests__/chat.test.tsx:126:86
+    124|     render(<ChatScreen />)
+    125|     await waitFor(() => expect(callsTo(fetchFn, '/api/questions/pendin…
+    126|     expect(headersOf(callsTo(fetchFn, '/api/questions/pending')[0])['X…
+       |                                                                                      ^
+    127|   })
+    128|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+
+##### M4 409 분기 상태코드  (src/screens/ChatScreen.tsx: "error.status === 409" -> "error.status === 410")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 2 failed) 2694ms
+   ❯ 확인 칩 (결정 E) (7)
+     × 답할 때 409 already_answered 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 1029ms
+     × 답할 때 409 expired 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 1031ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 25 passed (27)
+   Start at  13:22:42
+   Duration  3.17s (tests 80%, environment 14%, import 3%, setup 3%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 already_answered 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 expired 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내
+TestingLibraryElementError: Unable to find an element with the text: 이미 답했거나 만료된 질문이에요.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+...
+
+Ignored nodes: comments, script, style
+...
+ ❯ waitForWrapper ../../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/__tests__/chat.test.tsx:295:25
+    293|     render(<ChatScreen />)
+    294|     await userEvent.setup().click(await screen.findByRole('button', { …
+    295|     expect(await screen.findByText(NOTICE.questionClosed)).toBeInTheDocument()
+       |                         ^
+    296|
+    297|     const g3 = screen.getByTestId('chips-3')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+
+##### M5 링크 조건 > → >=  (src/screens/ChatScreen.tsx: "stored.persons > 0 || stored.events > 0" -> "stored.persons >= 0 || stored.events > 0")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 1 failed) 624ms
+   ❯ 인물 카드 링크 (3)
+     × 저장된 인물·사건이 없으면(일정만 있어도) 링크가 없다 23ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 26 passed (27)
+   Start at  13:22:46
+   Duration  1.19s (tests 44%, environment 40%, import 7%, setup 7%, transform 1%, worker 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 인물 카드 링크 > 저장된 인물·사건이 없으면(일정만 있어도) 링크가 없다
+AssertionError: expected <a href="#/persons" …(1)></a> to be null
+
+- Expected:
+null
+
++ Received:
+<a
+  class="mt-1 inline-block text-sm text-primary underline"
+  href="#/persons"
+>
+  인물 카드 보기
+</a>
+
+ ❯ src/__tests__/chat.test.tsx:373:40
+    371|     await sendText('x')
+    372|     await screen.findByText('응답입니다')
+    373|     expect(screen.queryByRole('link')).toBeNull()
+       |                                        ^
+    374|   })
+    375| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+
+##### M6 session_id 저장 제거  (src/api/client.ts: "if (out.session_id) setSessionId(out.session_id)" -> "")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 1 failed) 577ms
+   ❯ 전송과 세션 (결정 D) (4)
+     × 첫 요청에는 X-Session-Id 가 없고, 응답 session_id 를 저장해 두 번째 요청에 보낸다 28ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 26 passed (27)
+   Start at  13:22:47
+   Duration  1.05s (tests 48%, environment 35%, import 8%, setup 7%, transform 2%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 전송과 세션 (결정 D) > 첫 요청에는 X-Session-Id 가 없고, 응답 session_id 를 저장해 두 번째 요청에 보낸다
+AssertionError: expected null to be 'sess-abc' // Object.is equality
+
+- Expected:
+"sess-abc"
+
++ Received:
+null
+
+ ❯ src/__tests__/chat.test.tsx:113:62
+    111|     const first = callsTo(fetchFn, '/api/chat')[0]
+    112|     expect(headersOf(first)['X-Session-Id']).toBeUndefined()
+    113|     expect(window.localStorage.getItem(SESSION_STORAGE_KEY)).toBe('sess-abc')
+       |                                                              ^
+    114|
+    115|     const user = await type('둘째')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+
+##### M7 Shift+Enter 도 전송  (src/screens/ChatScreen.tsx: "e.key === 'Enter' && !e.shiftKey &&" -> "e.key === 'Enter' &&")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 1 failed) 609ms
+   ❯ 입력창 (4)
+     × Enter 는 전송, Shift+Enter 는 줄바꿈 27ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 26 passed (27)
+   Start at  13:22:49
+   Duration  1.08s (tests 49%, environment 35%, import 8%, setup 7%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 입력창 > Enter 는 전송, Shift+Enter 는 줄바꿈
+AssertionError: expected [ [ '/api/chat', …(1) ] ] to have a length of +0 but got 1
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/__tests__/chat.test.tsx:156:43
+    154|     const box = screen.getByRole('textbox', { name: '메시지 입력' })
+    155|     await user.type(box, '한 줄{Shift>}{Enter}{/Shift}두 줄')
+    156|     expect(callsTo(fetchFn, '/api/chat')).toHaveLength(0)
+       |                                           ^
+    157|     expect(box).toHaveValue('한 줄\n두 줄')
+    158|     await user.keyboard('{Enter}')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+
+##### M8 선택 뒤 칩 비활성 제거  (src/screens/ChatScreen.tsx: "disabled={locked}" -> "disabled={question.closed}")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 1 failed) 593ms
+   ❯ 확인 칩 (결정 E) (7)
+     × 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성 42ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 26 passed (27)
+   Start at  13:22:50
+   Duration  1.06s (tests 49%, environment 35%, import 8%, setup 7%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성
+Error: [2mexpect([22m[31melement[39m[2m).toBeDisabled()[22m
+
+Received element is not disabled:
+  [31m<button
+  aria-pressed="false"
+  class="group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background shadow-xs hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1 rounded-[min(var(--radius-md),10px)] px-2.5 in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5"
+  data-size="sm"
+  data-slot="button"
+  data-variant="outline"
+  type="button"
+/>[39m
+ ❯ src/__tests__/chat.test.tsx:240:17
+    238|       const b = screen.getByRole('button', { name: other })
+    239|       expect(b).toHaveAttribute('aria-pressed', 'false')
+    240|       expect(b).toBeDisabled()
+       |                 ^
+    241|     }
+    242|     expect(chosen).toBeDisabled()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+
+##### M9 422 세션 버림 제거  (src/api/client.ts: "if (response.status === 422 && code === 'invalid_session_id') clearSessionId()" -> "")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 1 failed) 585ms
+   ❯ 전송과 세션 (결정 D) (4)
+     × 422 invalid_session_id 면 저장된 세션을 버리고 다음 요청은 헤더 없이 간다 25ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 26 passed (27)
+   Start at  13:22:51
+   Duration  1.05s (tests 48%, environment 35%, import 8%, setup 7%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 전송과 세션 (결정 D) > 422 invalid_session_id 면 저장된 세션을 버리고 다음 요청은 헤더 없이 간다
+AssertionError: expected 'sess-bad' to be null
+
+- Expected:
+null
+
++ Received:
+"sess-bad"
+
+ ❯ src/__tests__/chat.test.tsx:140:62
+    138|     const user = await sendText('안녕')
+    139|     expect(await screen.findByText(NOTICE.sessionReset)).toBeInTheDocument()
+    140|     expect(window.localStorage.getItem(SESSION_STORAGE_KEY)).toBeNull()
+       |                                                              ^
+    141|
+    142|     await user.type(screen.getByRole('textbox', { name: '메시지 입력' }), '…
+    ... (이하 원본 그대로 이어짐)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+
+##### M10 복원 질문 1개만  (src/screens/ChatScreen.tsx: ".filter((q) => !have.has(q.question_id))" -> ".filter((q) => !have.has(q.question_id)).slice(0, 1)")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 3 failed) 1649ms
+   ❯ 확인 칩 (결정 E) (7)
+     × 진입 시 GET /api/questions/pending 으로 미답변 전부를 질문별로 복원한다 1011ms
+     × 답할 때 409 already_answered 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 31ms
+     × 답할 때 409 expired 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 24ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  3 failed | 24 passed (27)
+   Start at  13:22:53
+   Duration  2.11s (tests 71%, environment 19%, import 4%, setup 4%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 진입 시 GET /api/questions/pending 으로 미답변 전부를 질문별로 복원한다
+TestingLibraryElementError: Unable to find an element by: [data-testid="chips-4"]
+
+Ignored nodes: comments, script, style
+...
+
+Ignored nodes: comments, script, style
+...
+ ❯ waitForWrapper ../../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/__tests__/chat.test.tsx:278:29
+    276|     render(<ChatScreen />)
+    277|     const g3 = await screen.findByTestId('chips-3')
+    278|     const g4 = await screen.findByTestId('chips-4')
+       |                             ^
+    279|     expect(within(g3).getAllByRole('button').map((b) => b.textContent)…
+    280|     expect(within(g4).getAllByRole('button').map((b) => b.textContent)…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 already_answered 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 expired 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내
+TestingLibraryElementError: Unable to find an element by: [data-testid="chips-4"]
+
+Ignored nodes: comments, script, style
+...
+ ❯ Object.getElementError ../../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ ../../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/__tests__/chat.test.tsx:303:35
+    302|     // 다른 질문의 칩은 영향이 없다. 재시도도 없다.
+    303|     for (const b of within(screen.getByTestId('chips-4')).getAllByRole('button')) expect(b).toBeEnabled()
+       |                                   ^
+    304|     expect(callsTo(fetchFn, '/api/chat')).toHaveLength(1)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+
+##### M11 aria-pressed 제거  (src/screens/ChatScreen.tsx: "aria-pressed={pressed}" -> "")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 4 failed) 591ms
+   ❯ 확인 칩 (결정 E) (7)
+     × 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성 42ms
+     × 답 응답의 reply 가 이어 붙고, 새 pending_question 이면 그 아래 새 칩 40ms
+     × 답할 때 409 already_answered 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 20ms
+     × 답할 때 409 expired 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 16ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  4 failed | 23 passed (27)
+   Start at  13:22:55
+   Duration  1.05s (tests 49%, environment 35%, import 8%, setup 6%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성
+Error: [2mexpect([22m[31melement[39m[2m).toHaveAttribute([22m[32m[32m"aria-pressed"[32m[39m[2m, [22m[32m[32m"true"[32m[39m[2m) // element.getAttribute("aria-pressed") === "true"[22m
+ ... (ESC 색상 바이트 생략)
+
+Expected the element to have attribute:
+  aria-pressed="true"
+Received:
+  null
+ ❯ src/__tests__/chat.test.tsx:236:20
+    234|
+    235|     const chosen = screen.getByRole('button', { name: OPTIONS[1] })
+    236|     expect(chosen).toHaveAttribute('aria-pressed', 'true')
+       |                    ^
+    237|     for (const other of [OPTIONS[0], OPTIONS[2]]) {
+    238|       const b = screen.getByRole('button', { name: other })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답 응답의 reply 가 이어 붙고, 새 pending_question 이면 그 아래 새 칩
+Error: expect(element).toHaveAttribute("aria-pressed", "true")
+Expected the element to have attribute: aria-pressed="true", Received: null
+ ❯ src/__tests__/chat.test.tsx:266:55
+    264|     // 새 칩은 이어 붙은 reply 의 말풍선 안에 있고, 앞 질문 칩은 그대로 고정돼 있다.
+    265|     expect(next.closest('[data-role="bot"]')).toContainElement(group)
+    266|     expect(screen.getByRole('button', { name: '예' })).toHaveAttribute('aria-pressed', 'true')
+    267|     expect(screen.getByText('첫 질문')).toBeInTheDocument()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 already_answered 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 expired 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내
+Error: expect(element).toHaveAttribute("aria-pressed", "false")
+Expected the element to have attribute: aria-pressed="false", Received: null
+ ❯ src/__tests__/chat.test.tsx:300:17
+    298|     for (const b of within(g3).getAllByRole('button')) {
+    299|       expect(b).toBeDisabled()
+    300|       expect(b).toHaveAttribute('aria-pressed', 'false')
+    301|     }
+    302|     expect(callsTo(fetchFn, '/api/answers/3')).toHaveLength(1)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+
+##### M12 프록시 기본값 변경  (src/proxy.ts: "env.VITE_API_TARGET || DEFAULT_API_TARGET" -> "DEFAULT_API_TARGET")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/proxy.test.ts (6 tests | 1 failed) 77ms
+   ❯ 프록시 대상 (R-U4-11 — 환경이 아니라 순수 함수에 대해 단언) (2)
+     × VITE_API_TARGET 이 있으면 그 값 3ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 26 passed (27)
+   Start at  13:22:57
+   Duration  1.09s (tests 48%, environment 36%, import 8%, setup 7%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/proxy.test.ts > 프록시 대상 (R-U4-11 — 환경이 아니라 순수 함수에 대해 단언) > VITE_API_TARGET 이 있으면 그 값
+AssertionError: expected 'http://localhost:8000' to be 'http://x:9' // Object.is equality
+
+Expected: "http://x:9"
+Received: "http://localhost:8000"
+
+ ❯ src/__tests__/proxy.test.ts:12:65
+     10|
+     11|   it('VITE_API_TARGET 이 있으면 그 값', () => {
+     12|     expect(resolveApiTarget({ VITE_API_TARGET: 'http://x:9' })).toBe('http://x:9')
+       |                    ^
+     13|   })
+     14| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+
+##### M13 409 시 안내 제거  (src/screens/ChatScreen.tsx: "closed: true, notice: NOTICE.questionClosed" -> "closed: true, notice: null")
+$ npx vitest --run --no-color src/__tests__/chat.test.tsx src/__tests__/proxy.test.ts   [exit 1]
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut/w
+
+ ❯ src/__tests__/chat.test.tsx (21 tests | 2 failed) 2789ms
+   ❯ 확인 칩 (결정 E) (7)
+     × 답할 때 409 already_answered 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 1025ms
+     × 답할 때 409 expired 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 1038ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 25 passed (27)
+   Start at  13:22:58
+   Duration  3.27s (tests 48%, environment 36%, import 8%, setup 7%, transform 1%)
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 expired 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내
+TestingLibraryElementError: Unable to find an element with the text: 이미 답했거나 만료된 질문이에요.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+ ... (원본에서 이 아래 stack 은 M4 와 같은 줄: chat.test.tsx:295)

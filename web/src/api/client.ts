@@ -1,6 +1,9 @@
 // fetch 래퍼. 기본 경로는 `/api` (결정 C (ii) — 개발 서버·운영 프록시가 접두를 벗긴다).
 // 호출 함수(채팅·카드·브리핑)는 U5~U8 이 이 래퍼 위에 만든다.
 
+import { clearSessionId, getSessionId, setSessionId } from '@/session'
+import type { AnswerIn, AnswerOut, ChatIn, ChatOut, ChatPendingQuestionOut } from '@/api/types'
+
 export const API_BASE = '/api'
 export const SESSION_HEADER = 'X-Session-Id'
 
@@ -26,7 +29,7 @@ export interface RequestOptions {
   method?: 'GET' | 'POST'
   /** JSON 으로 직렬화해 보낸다. */
   body?: unknown
-  /** 있으면 `X-Session-Id` 헤더로 보낸다 (결정 D — 세션 보관은 U5). */
+  /** 생략하면 보관된 세션(localStorage)을 `X-Session-Id` 로 보낸다 (결정 D). null 이면 헤더 없이 보낸다. */
   sessionId?: string | null
   signal?: AbortSignal
 }
@@ -42,7 +45,8 @@ function readErrorCode(body: unknown): string | null {
 export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const headers: Record<string, string> = {}
   if (options.body !== undefined) headers['Content-Type'] = 'application/json'
-  if (options.sessionId) headers[SESSION_HEADER] = options.sessionId
+  const sessionId = options.sessionId === undefined ? getSessionId() : options.sessionId
+  if (sessionId) headers[SESSION_HEADER] = sessionId
 
   const response = await fetch(`${API_BASE}${path}`, {
     method: options.method ?? 'GET',
@@ -58,7 +62,30 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     } catch {
       code = null
     }
+    // 서버가 세션을 알아보지 못하면(P5 422) 저장된 세션을 버린다 — 다음 요청은 헤더 없이 가서 새로 발급받는다.
+    if (response.status === 422 && code === 'invalid_session_id') clearSessionId()
     throw new ApiError(response.status, code)
   }
   return (await response.json()) as T
+}
+
+// --- 채팅 (POST /chat · POST /answers/{id} · GET /questions/pending) ---
+
+/** 발화를 보내고, 응답의 session_id 를 보관한다 (결정 D). */
+export async function postChat(utterance: string): Promise<ChatOut> {
+  const body: ChatIn = { utterance }
+  const out = await apiFetch<ChatOut>('/chat', { method: 'POST', body })
+  if (out.session_id) setSessionId(out.session_id)
+  return out
+}
+
+/** 칩의 글자(= options 의 문자열 그대로)를 답으로 보낸다. */
+export function postAnswer(questionId: number, answer: string): Promise<AnswerOut> {
+  const body: AnswerIn = { answer }
+  return apiFetch<AnswerOut>(`/answers/${questionId}`, { method: 'POST', body })
+}
+
+/** 이 세션의 미답변 질문 전부. 세션이 없으면 서버가 빈 목록을 준다. */
+export function getPendingQuestions(): Promise<ChatPendingQuestionOut[]> {
+  return apiFetch<ChatPendingQuestionOut[]>('/questions/pending')
 }
