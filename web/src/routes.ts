@@ -43,6 +43,11 @@ export function parseScheduleId(hash: string): number | null {
   return raw !== null && /^[1-9]\d*$/.test(raw) ? Number(raw) : null
 }
 
+/** 알림·배너가 가는 주소. 일정이 없으면 브리핑 화면 그대로. */
+export function briefingHref(scheduleId: number | null): string {
+  return scheduleId === null ? HREF.briefings : `${HREF.briefings}?schedule_id=${scheduleId}`
+}
+
 function subscribe(onChange: () => void): () => void {
   window.addEventListener('hashchange', onChange)
   return () => window.removeEventListener('hashchange', onChange)

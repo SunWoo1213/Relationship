@@ -65,7 +65,7 @@
 - `web/src/session.ts` — `session_id` 보관(결정 D)
 - `web/src/screens/ChatScreen.tsx` · `web/src/screens/PersonCardScreen.tsx` · `web/src/screens/BriefingScreen.tsx` — 화면 3개
 - `web/src/push.ts` — 서비스 워커 등록·푸시 구독(결정 H)
-- `web/public/sw.js` · `web/public/manifest.webmanifest` · `web/public/icon-192.png` · `web/public/icon-512.png` — PWA(결정 I)
+- `web/public/sw.js` · `web/public/manifest.webmanifest` · `web/public/icon-192.svg` · `web/public/icon-512.svg` — PWA(결정 I) (**사용자 확정 2026-10-14**: 외부 도구 없이 손으로 쓴 SVG 2종, 원안 `.png` 에서 변경. Chrome 설치 조건의 SVG 인식은 U10 개발자 도구 Application → Manifest 로 확인, 안 되면 그때 PNG. **방어 조건 추가(사용자 확정, U8 재작업)**: `POST /push/subscriptions` 실패 시 `subscription.unsubscribe()` 로 브라우저 구독을 되돌려 다음 클릭이 처음부터 다시 하게 한다 — 안 그러면 브라우저에만 구독이 남아 "알림 켜짐"으로 끝나고 알림이 오지 않는다)
 - `web/src/__tests__/chat.test.tsx` · `web/src/__tests__/card.test.tsx` · `web/src/__tests__/briefing.test.tsx` · `web/src/__tests__/routes.test.ts` · `web/src/__tests__/sw.test.ts` · `web/src/__tests__/push.test.ts` · `web/src/__tests__/network.test.ts` — 컴포넌트·서비스 워커 단위 테스트(결정 J), 마지막 것은 "가짜 표 밖 요청은 실패" 를 검사(판정 27b행, R-5)
 - `web/playwright.config.ts` · `web/e2e/chat.spec.ts` · `web/e2e/card.spec.ts` · `web/e2e/briefing.spec.ts` · `web/e2e/fixtures/api.ts` — E2E(가짜 API, 결정 J)
 

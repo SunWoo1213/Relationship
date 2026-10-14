@@ -1,0 +1,67 @@
+# 명령: echo "== 1. package.json / package-lock.json diff(HEAD 46532e7) =="; git diff --stat -- web/package.json web/package-lock.json; git diff --quiet -- web/package.json web/package-lock.json && echo "diff 0 (바이트 동일)"; echo "== 2. scripts(HEAD vs 작업 트리) =="; git show HEAD:web/package.json | python3 -c "import json,sys; print(json.load(sys.stdin)[\"scripts\"])"; python3 -c "import json; print(json.load(open(\"web/package.json\"))[\"scripts\"])"; echo "== 3. npm audit --omit=dev =="; cd web && npm audit --omit=dev; cd ..; echo "== 4. ?raw import 대상 =="; grep -rn "?raw" web/src --include=*.ts --include=*.tsx | grep import; echo "== 4b. 대상 파일 존재(저장소 안) =="; ls -l web/public/sw.js web/public/manifest.webmanifest web/index.html web/public/favicon.svg web/public/icon-192.svg web/public/icon-512.svg web/src/components/AppShell.tsx web/src/screens/PersonCardScreen.tsx; echo "== 5. 새 import(push.ts·AppShell·BriefingScreen·sw.test·push.test) =="; grep -hn "^import" web/src/push.ts web/src/components/AppShell.tsx web/src/screens/BriefingScreen.tsx web/src/__tests__/sw.test.ts web/src/__tests__/push.test.ts | sort -u
+# 시각: 2026-10-14T20:24:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+== 1. package.json / package-lock.json diff(HEAD 46532e7) ==
+diff 0 (바이트 동일)
+== 2. scripts(HEAD vs 작업 트리) ==
+{'dev': 'vite', 'build': 'tsc -b && vite build', 'typecheck': 'tsc -b', 'test': 'vitest', 'e2e': 'playwright test --pass-with-no-tests', 'lint': 'oxlint', 'preview': 'vite preview'}
+{'dev': 'vite', 'build': 'tsc -b && vite build', 'typecheck': 'tsc -b', 'test': 'vitest', 'e2e': 'playwright test --pass-with-no-tests', 'lint': 'oxlint', 'preview': 'vite preview'}
+== 3. npm audit --omit=dev ==
+found 0 vulnerabilities
+== 4. ?raw import 대상 ==
+web/src/__tests__/card.test.tsx:10:import appShellSource from '@/components/AppShell.tsx?raw'
+web/src/__tests__/card.test.tsx:11:import cardScreenSource from '@/screens/PersonCardScreen.tsx?raw'
+web/src/__tests__/sw.test.ts:4:import swSource from '../../public/sw.js?raw'
+web/src/__tests__/sw.test.ts:5:import manifestSource from '../../public/manifest.webmanifest?raw'
+web/src/__tests__/sw.test.ts:6:import indexHtml from '../../index.html?raw'
+web/src/__tests__/sw.test.ts:7:import favicon from '../../public/favicon.svg?raw'
+web/src/__tests__/sw.test.ts:8:import icon192 from '../../public/icon-192.svg?raw'
+web/src/__tests__/sw.test.ts:9:import icon512 from '../../public/icon-512.svg?raw'
+== 4b. 대상 파일 존재(저장소 안) ==
+-rw-r--r--@ 1 sunwoo  staff    475 10월 14 20:03 web/index.html
+-rw-r--r--@ 1 sunwoo  staff    340 10월 14 20:03 web/public/favicon.svg
+-rw-r--r--@ 1 sunwoo  staff    342 10월 14 20:03 web/public/icon-192.svg
+-rw-r--r--@ 1 sunwoo  staff    342 10월 14 20:03 web/public/icon-512.svg
+-rw-r--r--@ 1 sunwoo  staff    406 10월 14 20:03 web/public/manifest.webmanifest
+-rw-r--r--@ 1 sunwoo  staff   2740 10월 14 20:03 web/public/sw.js
+-rw-r--r--@ 1 sunwoo  staff   6187 10월 14 20:04 web/src/components/AppShell.tsx
+-rw-r--r--@ 1 sunwoo  staff  11816 10월 13 19:42 web/src/screens/PersonCardScreen.tsx
+== 5. 새 import(push.ts·AppShell·BriefingScreen·sw.test·push.test) ==
+1:import { useEffect, useState, type ReactNode } from 'react'
+10:import { Card } from '@/components/ui/card'
+10:import BriefingScreen, { BRIEFING_NOTICE } from '@/screens/BriefingScreen'
+11:import { formatDateTime } from '@/lib/format'
+11:import { installFakeMatchMedia } from './helpers'
+12:import { cn } from '@/lib/utils'
+13:import { getPushStatus, subscribeToPush, type SubscribeOutcome } from '@/push'
+14:import { useScheduleIdParam } from '@/routes'
+2:import { MenuIcon } from 'lucide-react'
+3:import { act, render, screen, waitFor } from '@testing-library/react'
+3:import { Button } from '@/components/ui/button'
+3:import { describe, expect, it, vi } from 'vitest'
+4:import { ApiError, getVapidPublicKey, postPushSubscription } from '@/api/client'
+4:import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+4:import swSource from '../../public/sw.js?raw'
+4:import userEvent from '@testing-library/user-event'
+5:import { createElement } from 'react'
+5:import manifestSource from '../../public/manifest.webmanifest?raw'
+5:import PersonList from '@/components/PersonList'
+5:import type { PushSubscriptionIn } from '@/api/types'
+6:import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+6:import { PersonsProvider } from '@/components/PersonsProvider'
+6:import { useCallback, useEffect, useRef, useState } from 'react'
+6:import indexHtml from '../../index.html?raw'
+7:import { ApiError, getBriefings, postBriefingRun } from '@/api/client'
+7:import { useMediaQuery } from '@/hooks/useMediaQuery'
+7:import App from '@/App'
+7:import favicon from '../../public/favicon.svg?raw'
+8:import { BANNER_NOTICE } from '@/components/AppShell'
+8:import { briefingHref, HREF, type Route } from '@/routes'
+8:import icon192 from '../../public/icon-192.svg?raw'
+8:import type { BriefingRecordOut } from '@/api/types'
+9:import { Button } from '@/components/ui/button'
+9:import { getPushStatus, subscribeToPush, urlBase64ToUint8Array } from '@/push'
+9:import icon512 from '../../public/icon-512.svg?raw'

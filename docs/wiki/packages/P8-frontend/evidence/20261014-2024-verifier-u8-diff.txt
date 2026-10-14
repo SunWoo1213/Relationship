@@ -1,0 +1,126 @@
+# 명령: echo "== 1. app/push/devpage/ 원본 무변경 =="; git diff --stat -- app/push/devpage/; git status --short -- app/push/devpage/; git diff --quiet -- app/push/devpage/ && echo "devpage diff 0"; git log -1 --format="%h %s" -- app/push/devpage/sw.js; echo "== 2. diff -u app/push/devpage/sw.js web/public/sw.js =="; diff -u app/push/devpage/sw.js web/public/sw.js; echo "diff exit $?"; echo "== 3. 복사된 페이로드 해석 줄 대조 =="; echo "-- 원본"; grep -n "event.data.json\|data.title\|data.body\|tag: data.tag\|schedule_id === undefined" app/push/devpage/sw.js; echo "-- 제품"; grep -n "event.data.json\|data.title\|data.body\|tag: data.tag\|schedule_id === undefined" web/public/sw.js; echo "== 4. devpage.js 구독 절차 순서 vs push.ts =="; grep -n "requestPermission\|serviceWorker.register\|vapid-public-key\|pushManager.subscribe\|push/subscriptions\|userVisibleOnly\|applicationServerKey" app/push/devpage/devpage.js web/src/push.ts
+# 시각: 2026-10-14T20:24:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+== 1. app/push/devpage/ 원본 무변경 ==
+devpage diff 0
+572045a feat(P7-push): 웹푸시 구독을 만들어 보는 개발·확인 전용 페이지 /push-dev/ 를 추가한다
+== 2. diff -u app/push/devpage/sw.js web/public/sw.js ==
+--- app/push/devpage/sw.js	2026-10-08 15:14:37
++++ web/public/sw.js	2026-10-14 20:03:51
+@@ -1,26 +1,51 @@
+-// Refs: P7-push U6 결정 A -- 개발·확인 전용 서비스 워커(범위 /push-dev/).
+-// push 이벤트에서 알림을 띄우고, 열린 페이지에는 수신 시각·schedule_id·tag 만 알린다.
+-// 인물 이름·제안 문구(title/body)는 페이지로 보내지 않는다.
+-self.addEventListener("push", function (event) {
+-  var data = {};
++// Refs: P8-frontend U8 결정 H·I -- 제품 서비스 워커(범위 /). 단일 파일이라 빌드에 그대로 복사된다.
++// 하는 일은 셋뿐이다: push 를 받아 알림을 띄우고, 알림을 누르면 그 일정의 브리핑으로 가고, 열린 창에 알린다.
++// 캐시를 쓰지 않고 요청 가로채기 리스너도 없다(결정 I) -- 화면·API 응답은 항상 네트워크에서 온다.
++// 페이로드 해석은 app/push/devpage/sw.js 에서 복사했다(원본은 고치지 않는다).
++// 알림 title·body 는 서버가 만든 문장 그대로 쓴다(원칙7). 열린 창에는 schedule_id 만 알린다.
++
++function readPayload(event) {
+   try {
+-    data = event.data ? event.data.json() : {};
++    return event.data ? event.data.json() : {};
+   } catch (e) {
+-    data = {};
++    return {};
+   }
+-  var title = data.title || "알림";
+-  var options = { body: data.body || "", tag: data.tag };
+-  var info = {
+-    received_at: new Date().toISOString(),
+-    schedule_id: data.schedule_id === undefined ? null : data.schedule_id,
+-    tag: data.tag === undefined ? null : data.tag
++}
++
++// 서버 페이로드({title, body, tag, schedule_id}) -> showNotification 인자.
++function notificationFor(data) {
++  var scheduleId = data.schedule_id === undefined ? null : data.schedule_id;
++  return {
++    title: data.title || "알림",
++    options: { body: data.body || "", tag: data.tag, data: { schedule_id: scheduleId } },
++    scheduleId: scheduleId
+   };
++}
++
++// 알림을 눌렀을 때 새 창이 열 주소. schedule_id 가 양의 정수가 아니면 일정 없이 브리핑 화면.
++function targetHashFor(scheduleId) {
++  if (typeof scheduleId === "number" && Number.isInteger(scheduleId) && scheduleId > 0) {
++    return "/#/briefings?schedule_id=" + scheduleId;
++  }
++  return "/#/briefings";
++}
++
++self.addEventListener("install", function () {
++  self.skipWaiting();
++});
++
++self.addEventListener("activate", function (event) {
++  event.waitUntil(self.clients.claim());
++});
++
++self.addEventListener("push", function (event) {
++  var shown = notificationFor(readPayload(event));
+   event.waitUntil(
+-    self.registration.showNotification(title, options).then(function () {
++    self.registration.showNotification(shown.title, shown.options).then(function () {
+       return self.clients.matchAll({ type: "window", includeUncontrolled: true });
+     }).then(function (list) {
+       list.forEach(function (client) {
+-        client.postMessage(info);
++        client.postMessage({ type: "briefing", schedule_id: shown.scheduleId });
+       });
+     })
+   );
+@@ -28,12 +53,17 @@
+ 
+ self.addEventListener("notificationclick", function (event) {
+   event.notification.close();
++  var info = event.notification.data;
++  var scheduleId = info && info.schedule_id !== undefined ? info.schedule_id : null;
+   event.waitUntil(
+     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (list) {
+       if (list.length > 0) {
+-        return list[0].focus();
++        var client = list[0];
++        return Promise.resolve(client.focus()).then(function () {
++          client.postMessage({ type: "open-briefing", schedule_id: scheduleId });
++        });
+       }
+-      return self.clients.openWindow("/push-dev/");
++      return self.clients.openWindow(targetHashFor(scheduleId));
+     })
+   );
+ });
+diff exit 1
+== 3. 복사된 페이로드 해석 줄 대조 ==
+-- 원본
+7:    data = event.data ? event.data.json() : {};
+11:  var title = data.title || "알림";
+12:  var options = { body: data.body || "", tag: data.tag };
+15:    schedule_id: data.schedule_id === undefined ? null : data.schedule_id,
+16:    tag: data.tag === undefined ? null : data.tag
+-- 제품
+9:    return event.data ? event.data.json() : {};
+17:  var scheduleId = data.schedule_id === undefined ? null : data.schedule_id;
+19:    title: data.title || "알림",
+20:    options: { body: data.body || "", tag: data.tag, data: { schedule_id: scheduleId } },
+== 4. devpage.js 구독 절차 순서 vs push.ts ==
+app/push/devpage/devpage.js:44:    var permission = await Notification.requestPermission();
+app/push/devpage/devpage.js:50:    var registration = await navigator.serviceWorker.register("/push-dev/sw.js", {
+app/push/devpage/devpage.js:56:    var keyResponse = await fetch("/push/vapid-public-key");
+app/push/devpage/devpage.js:64:    var subscription = await registration.pushManager.subscribe({
+app/push/devpage/devpage.js:65:      userVisibleOnly: true,
+app/push/devpage/devpage.js:66:      applicationServerKey: urlBase64ToUint8Array(keyBody.public_key)
+app/push/devpage/devpage.js:70:    var saveResponse = await fetch("/push/subscriptions", {
+web/src/push.ts:30:/** VAPID 공개키(base64url) → applicationServerKey. devpage.js 의 변환을 옮겼다. */
+web/src/push.ts:56:    const permission = await Notification.requestPermission()
+web/src/push.ts:60:    const registration = await navigator.serviceWorker.register(SERVICE_WORKER_URL)
+web/src/push.ts:78:    const subscription = await registration.pushManager.subscribe({
+web/src/push.ts:79:      userVisibleOnly: true,
+web/src/push.ts:80:      applicationServerKey: urlBase64ToUint8Array(publicKey),

@@ -1,0 +1,75 @@
+# 명령: cat /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs
+# 시각: 2026-10-14T20:25:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+// verifier U8 변이 시험: web/ 을 스크래치패드 사본으로 복사해 한 곳만 바꾸고 vitest 출력을 그대로 흘린다. 저장소 파일은 건드리지 않는다.
+// V0 = 대조군(변이 없음). V1~V5 = 구현자 M1~M31 에 없는 것. M1·M10·M11·M31 = 구현자 변이 재실행(표 신뢰성).
+import { cpSync, existsSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { join } from 'node:path'
+
+const SRC = '/Users/sunwoo/Desktop/Portfolio/Relationship/web'
+const DST = '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8'
+
+function fresh() {
+  if (existsSync(DST)) rmSync(DST, { recursive: true, force: true })
+  cpSync(SRC, DST, { recursive: true, filter: (p) => !/(node_modules|[\\/]dist|test-results)([\\/]|$)/.test(p.slice(SRC.length)) })
+  symlinkSync(join(SRC, 'node_modules'), join(DST, 'node_modules'))
+}
+
+function sub(path, oldText, newText) {
+  const p = join(DST, path)
+  const s = readFileSync(p, 'utf-8')
+  if (!s.includes(oldText)) throw new Error(`치환 대상 없음: ${JSON.stringify(oldText)}`)
+  writeFileSync(p, s.replace(oldText, newText))
+}
+
+const W = 'public/sw.js'
+const PU = 'src/push.ts'
+const A = 'src/components/AppShell.tsx'
+const MF = 'public/manifest.webmanifest'
+
+const MUTS = {
+  'V0-대조군(변이 없음)': () => {},
+  'V1-워커가 body 를 제목으로 쓴다': () => sub(W, 'title: data.title || "알림"', 'title: data.body || "알림"'),
+  'V2-schedule_id 없는 알림 클릭이 ?schedule_id=undefined 로 간다': () =>
+    sub(
+      W,
+      '  if (typeof scheduleId === "number" && Number.isInteger(scheduleId) && scheduleId > 0) {\n    return "/#/briefings?schedule_id=" + scheduleId;\n  }\n  return "/#/briefings";',
+      '  return "/#/briefings?schedule_id=" + scheduleId;',
+    ),
+  'V3-applicationServerKey 를 base64url 문자열 그대로 전달': () =>
+    sub(PU, 'applicationServerKey: urlBase64ToUint8Array(publicKey),', 'applicationServerKey: publicKey,'),
+  'V4-open-briefing 에 schedule_id 가 없으면 이동하지 않는다(경계)': () =>
+    sub(A, "      if (message.type === 'open-briefing') {\n        setBanner(null)\n", "      if (message.type === 'open-briefing') {\n        setBanner(null)\n        if (message.scheduleId === null) return\n"),
+  'V5-manifest icons 비우기': () =>
+    sub(
+      MF,
+      '    { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any" },\n    { "src": "/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any" }\n',
+      '',
+    ),
+  // 구현자 변이 재실행(mut_u8.mjs 정의 그대로)
+  'M1-워커에 fetch 리스너 주입': () => sub(W, 'self.addEventListener("install"', 'self.addEventListener("fetch", function () {});\nself.addEventListener("install"'),
+  'M10-기존 구독에도 구독·POST 진행': () => sub(PU, "if (await registration.pushManager.getSubscription()) return 'already'", 'await registration.pushManager.getSubscription()'),
+  'M11-404 push_not_configured 를 일반 실패로': () => sub(PU, "error.status === 404 && error.code === 'push_not_configured'", 'false'),
+  'M31-POST 실패 시 unsubscribe 호출 제거': () => sub(PU, 'await subscription.unsubscribe()', 'void subscription'),
+}
+
+const name = Object.keys(MUTS).find((k) => k.startsWith(`${process.argv[2]}-`)) ?? '(없음)'
+if (!(name in MUTS)) {
+  console.log('알 수 없는 이름:', name, '\n가능:', Object.keys(MUTS).join('\n  '))
+  process.exit(3)
+}
+fresh()
+MUTS[name]()
+console.log(`### 변이: ${name}  (사본 ${DST}, 저장소 무수정)`)
+const r = spawnSync('npx', ['vitest', '--run', '--reporter=default'], {
+  cwd: DST,
+  stdio: 'inherit',
+  env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0', CI: '1', DEBUG_PRINT_LIMIT: '0' },
+})
+console.log(`### 변이 ${name} → vitest exit ${r.status} → ${r.status !== 0 ? '잡힘(KILLED)' : '살아남음(SURVIVED)'}`)
+const st = spawnSync('git', ['status', '--short', '--', 'web'], { cwd: '/Users/sunwoo/Desktop/Portfolio/Relationship', encoding: 'utf-8' })
+console.log('### 저장소 web/ 상태(변이 뒤):\n' + st.stdout)

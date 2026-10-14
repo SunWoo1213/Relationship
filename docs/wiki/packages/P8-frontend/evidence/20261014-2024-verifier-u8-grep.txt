@@ -1,0 +1,165 @@
+# 명령: echo "== 1. 범위: app/ alembic/ tests/ .github/ 변경 0 =="; git diff --stat -- app alembic tests .github; git status --short --untracked-files=all -- app alembic tests .github; echo "(빈 출력이면 0)"; echo "== 1b. 변경·신규 파일 전체 =="; git status --short --untracked-files=all; echo "== 1c. 삭제 0 =="; git status --short | grep "^ D\|^D" ; echo "(빈 출력이면 삭제 0)"; echo "== 2. 결정 I: sw.js 캐시·fetch·importScripts·외부 URL =="; grep -nE "fetch|caches|Cache|importScripts|XMLHttpRequest|https?://" web/public/sw.js; echo "(빈 출력이면 0)"; echo "== 2b. sw.js addEventListener 목록 =="; grep -n "addEventListener" web/public/sw.js; echo "== 2c. API 응답 캐시(web/src 안 caches·Cache API·localStorage 에 응답 저장) =="; grep -rnE "caches\.|new Cache|CacheStorage|localStorage|sessionStorage|indexedDB" web/src --include=*.ts --include=*.tsx | grep -v __tests__; echo "(session.ts 의 session_id 보관 외 0 이어야)"; echo "== 3. 서버 페이로드 키(payload.py) vs 워커가 읽는 키(sw.js) =="; sed -n 100,106p app/push/payload.py; grep -nE "data\.(title|body|tag|schedule_id|ttl)" web/public/sw.js; echo "-- tag 형식"; grep -n "schedule-" app/push/payload.py; echo "-- 발송 본문 = json.dumps(payload)"; grep -n "json.dumps(payload)" app/push/sender.py; echo "== 3b. 열린 창으로 가는 것(postMessage 인자) =="; grep -n "postMessage" web/public/sw.js; echo "== 3c. 페이지가 워커 메시지에서 읽는 필드 =="; grep -n "schedule_id\|type" web/src/components/AppShell.tsx | grep -n "readWorkerMessage\|const {\|type !==\|typeof schedule_id"; echo "== 4. 비밀: VAPID 키·긴 base64·BEGIN KEY =="; grep -rnE "VAPID|BEGIN (EC )?PRIVATE|[A-Za-z0-9_-]{60,}" web/src web/public web/index.html | grep -v "node_modules"; echo "(빈 출력 또는 svg path/font 만이어야)"; echo "== 5. /push-dev/ · innerHTML · 외부 URL =="; grep -rnE "push-dev|innerHTML|dangerouslySetInnerHTML" web/src web/public web/index.html | grep -v __tests__; echo "(빈 출력이면 0)"; grep -rnE "https?://" web/src web/public web/index.html | grep -v "__tests__\|xmlns=\|proxy.ts"; echo "(빈 출력이면 0)"; echo "== 6. test-setup.ts 차단 유지 =="; git diff --stat -- web/src/test-setup.ts; grep -n "throw new Error" web/src/test-setup.ts; echo "== 7. 원칙5: 라우트·화면 수 =="; grep -n "chat:\|persons:\|briefings:" web/src/routes.ts; grep -c "data-screen=" web/src/screens/*.tsx; git diff --stat -- web/src/App.tsx; git diff -- web/src/routes.ts | grep "^[+-]" | grep -v "^+++\|^---"; echo "== 8. 구독 해제 버튼 0(unsubscribe 는 되돌리기 1곳만) =="; grep -rn "unsubscribe" web/src --include=*.ts --include=*.tsx | grep -v __tests__; echo "== 9. 고정 문구 =="; grep -n "^  [a-zA-Z]*: " web/src/screens/BriefingScreen.tsx | head -20; grep -c "^  [a-zA-Z]*: " web/src/screens/BriefingScreen.tsx; grep -n -A4 "BANNER_NOTICE = {" web/src/components/AppShell.tsx; echo "== 10. 이월: loadRef · scheduleFailed · ring-2 · favicon 템플릿 색 =="; grep -n "loadRef" web/src/screens/BriefingScreen.tsx; grep -n "scheduleFailed" web/src/screens/BriefingScreen.tsx; grep -n "ring-2" web/src/screens/BriefingScreen.tsx web/src/__tests__/briefing.test.tsx; grep -c "863bff" web/public/favicon.svg; grep -rn "863bff" web/public web/index.html web/src | grep -v __tests__; echo "(favicon 863bff 0)"; echo "== 11. registry U8 행 =="; grep -n "U8" docs/wiki/registry.md | cut -c1-160
+# 시각: 2026-10-14T20:24:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+== 1. 범위: app/ alembic/ tests/ .github/ 변경 0 ==
+(빈 출력이면 0)
+== 1b. 변경·신규 파일 전체 ==
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8-frontend/01-plan.md
+ M docs/wiki/packages/P8-frontend/03-log.md
+ M docs/wiki/registry.md
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2008-u8-mutation-script.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2008-u8-mutation.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2008-u8-pwa-push.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2010-u8-main-recheck.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2017-u8-main-recheck2.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2017-u8-mutation-rework.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2017-u8-mutation-script-rework.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2017-u8-pwa-push-rework.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2024-verifier-u8-deps.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2024-verifier-u8-diff.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-2024-verifier-u8-judge.txt
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+== 1c. 삭제 0 ==
+(빈 출력이면 삭제 0)
+== 2. 결정 I: sw.js 캐시·fetch·importScripts·외부 URL ==
+(빈 출력이면 0)
+== 2b. sw.js addEventListener 목록 ==
+33:self.addEventListener("install", function () {
+37:self.addEventListener("activate", function (event) {
+41:self.addEventListener("push", function (event) {
+54:self.addEventListener("notificationclick", function (event) {
+== 2c. API 응답 캐시(web/src 안 caches·Cache API·localStorage 에 응답 저장) ==
+web/src/components/AppShell.tsx:110: * 열림/닫힘은 이 컴포넌트의 상태일 뿐 라우트도 localStorage 도 아니다. 하단 탭바 없음.
+web/src/session.ts:1:// 세션 보관 (결정 D (i)): 서버가 발급한 session_id 를 localStorage 에 두고 요청마다 재전송한다.
+web/src/session.ts:8:    return window.localStorage.getItem(SESSION_STORAGE_KEY) || null
+web/src/session.ts:16:    window.localStorage.setItem(SESSION_STORAGE_KEY, sessionId)
+web/src/session.ts:24:    window.localStorage.removeItem(SESSION_STORAGE_KEY)
+web/src/api/client.ts:48:  /** 생략하면 보관된 세션(localStorage)을 `X-Session-Id` 로 보낸다 (결정 D). null 이면 헤더 없이 보낸다. */
+(session.ts 의 session_id 보관 외 0 이어야)
+== 3. 서버 페이로드 키(payload.py) vs 워커가 읽는 키(sw.js) ==
+        "title": title,
+        "body": body,
+        "tag": f"schedule-{schedule.id}",
+        "schedule_id": schedule.id,
+        "ttl": ttl,
+    }
+17:  var scheduleId = data.schedule_id === undefined ? null : data.schedule_id;
+19:    title: data.title || "알림",
+20:    options: { body: data.body || "", tag: data.tag, data: { schedule_id: scheduleId } },
+-- tag 형식
+51:  - `tag = "schedule-{schedule.id}"`(같은 일정 알림은 덮어쓴다, 01-plan
+102:        "tag": f"schedule-{schedule.id}",
+-- 발송 본문 = json.dumps(payload)
+89:                data=json.dumps(payload),
+== 3b. 열린 창으로 가는 것(postMessage 인자) ==
+48:        client.postMessage({ type: "briefing", schedule_id: shown.scheduleId });
+63:          client.postMessage({ type: "open-briefing", schedule_id: scheduleId });
+== 3c. 페이지가 워커 메시지에서 읽는 필드 ==
+3:52:function readWorkerMessage(data: unknown): { type: 'briefing' | 'open-briefing'; scheduleId: number | null } | undefined {
+5:54:  const { type, schedule_id } = data as { type?: unknown; schedule_id?: unknown }
+6:55:  if (type !== 'briefing' && type !== 'open-briefing') return undefined
+7:56:  const scheduleId = typeof schedule_id === 'number' && Number.isInteger(schedule_id) && schedule_id > 0 ? schedule_id : null
+== 4. 비밀: VAPID 키·긴 base64·BEGIN KEY ==
+web/src/push.ts:30:/** VAPID 공개키(base64url) → applicationServerKey. devpage.js 의 변환을 옮겼다. */
+web/src/__tests__/push.test.ts:33:const VAPID_KEY = 'AQID' // base64url → 바이트 [1, 2, 3]
+web/src/__tests__/push.test.ts:128:        return json({ public_key: VAPID_KEY })
+web/src/__tests__/push.test.ts:152:    const fetchFn = installFetch({ 'GET /api/push/vapid-public-key': () => json({ public_key: VAPID_KEY }) })
+web/src/__tests__/push.test.ts:189:    installFetch({ 'GET /api/push/vapid-public-key': () => json({ public_key: VAPID_KEY }) })
+web/src/__tests__/push.test.ts:195:      'GET /api/push/vapid-public-key': () => json({ public_key: VAPID_KEY }),
+web/src/__tests__/push.test.ts:205:        'GET /api/push/vapid-public-key': () => json({ public_key: VAPID_KEY }),
+web/src/__tests__/push.test.ts:218:      'GET /api/push/vapid-public-key': () => json({ public_key: VAPID_KEY }),
+web/src/__tests__/push.test.ts:230:      'GET /api/push/vapid-public-key': () => json({ public_key: VAPID_KEY }),
+web/src/__tests__/push.test.ts:267:      'GET /api/push/vapid-public-key': () => json({ public_key: VAPID_KEY }),
+(빈 출력 또는 svg path/font 만이어야)
+== 5. /push-dev/ · innerHTML · 외부 URL ==
+(빈 출력이면 0)
+(빈 출력이면 0)
+== 6. test-setup.ts 차단 유지 ==
+11:  throw new Error('테스트에서 실제 네트워크 요청은 허용되지 않는다 (결정 J)')
+== 7. 원칙5: 라우트·화면 수 ==
+10:  chat: '#/chat',
+11:  persons: '#/persons',
+12:  briefings: '#/briefings',
+web/src/screens/BriefingScreen.tsx:1
+web/src/screens/ChatScreen.tsx:1
+web/src/screens/PersonCardScreen.tsx:1
++/** 알림·배너가 가는 주소. 일정이 없으면 브리핑 화면 그대로. */
++export function briefingHref(scheduleId: number | null): string {
++  return scheduleId === null ? HREF.briefings : `${HREF.briefings}?schedule_id=${scheduleId}`
++}
++
+== 8. 구독 해제 버튼 0(unsubscribe 는 되돌리기 1곳만) ==
+web/src/push.ts:10:export type PushStatus = 'unsupported' | 'unsubscribed' | 'subscribed'
+web/src/push.ts:45:    if (!registration) return 'unsubscribed'
+web/src/push.ts:46:    return (await registration.pushManager.getSubscription()) ? 'subscribed' : 'unsubscribed'
+web/src/push.ts:48:    return 'unsubscribed'
+web/src/push.ts:94:        await subscription.unsubscribe()
+== 9. 고정 문구 ==
+18:  empty: '아직 만들어진 브리핑이 없어요.',
+19:  listFailed: '브리핑을 불러오지 못했어요.',
+20:  scheduleMissing: '그 일정의 브리핑이 아직 없어요.',
+21:  runNow: '지금 브리핑',
+22:  running: '브리핑 만드는 중',
+23:  runLocked: '잠시 뒤 다시 시도해 주세요.',
+24:  runFailed: '브리핑을 만들지 못했어요. 잠시 후 다시 시도해 주세요.',
+25:  suggestionTitle: '💡 제안',
+26:  scheduleFailed: '그 일정의 브리핑을 불러오지 못했어요.',
+27:  subscribe: '알림 받기',
+28:  subscribing: '알림 켜는 중',
+29:  subscribed: '알림 켜짐',
+30:  pushDenied: '알림 권한이 허용되지 않았어요.',
+31:  pushNotConfigured: '이 서버는 아직 알림을 준비하지 않았어요.',
+32:  pushUnsupported: '이 브라우저는 알림을 지원하지 않아요.',
+33:  pushFailed: '알림을 켜지 못했어요. 잠시 후 다시 시도해 주세요.',
+37:  denied: BRIEFING_NOTICE.pushDenied,
+39:  unsupported: BRIEFING_NOTICE.pushUnsupported,
+40:  failed: BRIEFING_NOTICE.pushFailed,
+95:  record: BriefingRecordOut
+23
+45:export const BANNER_NOTICE = {
+46-  text: '새 브리핑 알림이 도착했어요.',
+47-  open: '브리핑 보기',
+48-  close: '닫기',
+49-} as const
+== 10. 이월: loadRef · scheduleFailed · ring-2 · favicon 템플릿 색 ==
+197:  const loadRef = useRef(load)
+199:    loadRef.current = load
+217:      await loadRef.current()
+26:  scheduleFailed: '그 일정의 브리핑을 불러오지 못했어요.',
+258:          {BRIEFING_NOTICE.scheduleFailed}
+web/src/screens/BriefingScreen.tsx:103:      <Card className={cn('gap-3 p-4', highlighted && 'bg-accent ring-2 ring-primary')}>
+web/src/__tests__/briefing.test.tsx:178:    expect(card('briefing-9').className).toContain('ring-2')
+web/src/__tests__/briefing.test.tsx:179:    expect(card('briefing-5').className).not.toContain('ring-2')
+web/src/__tests__/briefing.test.tsx:180:    expect(card('briefing-2').className).not.toContain('ring-2')
+0
+(favicon 863bff 0)
+== 11. registry U8 행 ==
+34:| 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·실행법) | README.md | 하네스 | pending | 패키지 완료마다 진행 상태 표 갱신. P0-compose: 로컬 DB 절 추가(2026-09-04), pg16 태그는 P9-infra 에서 재확인. P
+75:| 테스트 | 후보 검색·D1 강제·D6 승진·별칭 누적·사실 upsert | tests/test_tools_persons.py | P2-tools | a9cb254 | **P6-memory U3(51b4d65)·U8 보완(4916db3)**: `-k pattern` 11건 — `
+149:| 리포트 | 실패 케이스 분석(오병합·미검출 전건, 강제 경로, ask_user 79건 구성, 함정·카테고리별, S3.3 단계 귀속) | reports/failure_cases.md | P4-pilot-eval | ea1bbb2 | U8. **해석 전용 — 게이트 판정은 `me
+237:| API 클라이언트·타입 | `web/src/api/client.ts`(`apiFetch`·`ApiError`·`API_BASE='/api'`·`SESSION_HEADER='X-Session-Id'`·`ApiErrorBody`) · `web/src/api/types.ts`(`a
+248:| 브리핑 화면 | `web/src/screens/BriefingScreen.tsx`(`BriefingScreen`·`BRIEFING_NOTICE` 고정 문장/버튼 글자 — 머리줄 `📌 일정 시각 · 이름 · 일정 제목`, 패턴 문장·요약 줄(`·`), `💡 제안`, `basis
+251:| 서비스 워커 | `web/public/sw.js`(범위 `/` 단일 파일 — `push` → `showNotification(title,{body,tag,data:{schedule_id}})` + 열린 창에 `{type:"briefing",schedule_id}`; `noti
+252:| PWA 껍데기 | `web/public/manifest.webmanifest`(이름 `관계 메모리`·`start_url` `/#/chat`·`display` `standalone`·색 `#171717`/`#ffffff`·아이콘 192/512 SVG) · `icon-192.sv
+253:| 푸시 구독 | `web/src/push.ts`(`subscribeToPush`·`getPushStatus`·`urlBase64ToUint8Array`·`isPushSupported` — 권한 → `register('/sw.js')` → `GET /push/vapid-publi
+254:| 브리핑 화면 알림 버튼·인앱 배너 | `BriefingScreen.tsx` `PushSubscribe`(미구독 "알림 받기"/진행 "알림 켜는 중"/"알림 켜짐" 비활성 + 안내 한 줄, `BRIEFING_NOTICE` 키 7개 추가 → 16개) · R-U7-1(`loadRe
+255:| 테스트 | `sw.test.ts` 14건(가짜 self 로 sw.js 평가 — push 인자·postMessage·잘못된 JSON·click 분기·리스너 4개뿐·캐시/fetch 코드 0·manifest/아이콘/index.html) + `push.test.ts` 20건(저장 실

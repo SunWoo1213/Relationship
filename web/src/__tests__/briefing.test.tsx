@@ -145,12 +145,12 @@ describe('브리핑 목록', () => {
     expect(screen.queryByText(BRIEFING_NOTICE.empty)).toBeNull()
   })
 
-  it('항목마다 "지금 브리핑" 버튼이 있고, 알림 받기는 자리만(비활성)이며 /push-dev/ 링크가 없다', async () => {
+  it('항목마다 "지금 브리핑" 버튼이 있고, 알림 받기 버튼이 활성이며 /push-dev/ 링크가 없다 (구독 동작은 push.test.ts)', async () => {
     install(router({ 'GET /api/briefings': () => json(LIST) }))
     render(<BriefingScreen />)
     await screen.findByTestId('briefing-list')
     expect(screen.getAllByRole('button', { name: BRIEFING_NOTICE.runNow })).toHaveLength(3)
-    expect(screen.getByRole('button', { name: BRIEFING_NOTICE.subscribe })).toBeDisabled()
+    expect(screen.getByRole('button', { name: BRIEFING_NOTICE.subscribe })).toBeEnabled()
     expect(document.querySelector('a[href*="push-dev"]')).toBeNull()
   })
 })
@@ -173,6 +173,11 @@ describe('?schedule_id= 강조 (사용자 결정 (가))', () => {
     expect(screen.getByTestId('briefing-9')).toHaveAttribute('data-highlight', 'true')
     expect(document.querySelectorAll('[data-highlight]')).toHaveLength(1)
     expect(fn.mock.calls.map(([u]) => String(u))).toEqual(['/api/briefings'])
+    // R-U7-2 (탐침 P6): 사용자가 보는 강조 스타일은 강조 항목 카드에만 있다(속성뿐 아니라 보이는 클래스까지)
+    const card = (id: string) => screen.getByTestId(id).querySelector('[data-slot="card"]')!
+    expect(card('briefing-9').className).toContain('ring-2')
+    expect(card('briefing-5').className).not.toContain('ring-2')
+    expect(card('briefing-2').className).not.toContain('ring-2')
   })
 
   it('목록에 없으면 GET /briefings?schedule_id=N 을 1회 더 불러 맨 위에 붙이고 강조한다', async () => {
@@ -208,6 +213,20 @@ describe('?schedule_id= 강조 (사용자 결정 (가))', () => {
       unmount()
       vi.unstubAllGlobals()
     }
+  })
+
+  it('R-U7-3: 단건 조회가 404 가 아닌 오류로 실패하면 목록 실패 문구가 아니라 "그 일정" 문구 — 목록은 그대로', async () => {
+    window.history.replaceState(null, '', '#/briefings?schedule_id=77')
+    install(
+      router({
+        'GET /api/briefings': () => json(LIST),
+        'GET /api/briefings?schedule_id=77': () => json({ detail: { code: 'x' } }, 500),
+      }),
+    )
+    render(<BriefingScreen />)
+    expect(await screen.findByTestId('schedule-failed')).toHaveTextContent(BRIEFING_NOTICE.scheduleFailed)
+    expect(screen.queryByText(BRIEFING_NOTICE.listFailed)).toBeNull()
+    expect(ids()).toEqual(['briefing-5', 'briefing-2', 'briefing-9'])
   })
 
   it('parseScheduleId: 양의 정수만 인정한다', () => {
@@ -302,5 +321,52 @@ describe('"지금 브리핑" (결정 K)', () => {
     await waitFor(() => expect(callsOf(fn, 'GET', '/api/briefings')).toHaveLength(2))
     expect(callsOf(fn, 'POST', '/api/briefings/run')).toHaveLength(2)
     await waitFor(() => expect(within(item).queryByRole('alert')).toBeNull())
+  })
+
+  it('R-U7-2 (탐침 P4): 수동 브리핑은 성공했는데 재조회가 실패하면 이전 목록 3건을 그대로 두고 실패 한 줄만 더한다', async () => {
+    let n = 0
+    install(
+      router({
+        'GET /api/briefings': () => (n++ === 0 ? json(LIST) : json({ detail: { code: 'x' } }, 500)),
+        'POST /api/briefings/run': () => json(emptyRun()),
+      }),
+    )
+    render(<BriefingScreen />)
+    const item = await screen.findByTestId('briefing-2')
+    await userEvent.click(within(item).getByRole('button', { name: BRIEFING_NOTICE.runNow }))
+    expect(await screen.findByText(BRIEFING_NOTICE.listFailed)).toBeInTheDocument()
+    expect(ids()).toEqual(['briefing-5', 'briefing-2', 'briefing-9'])
+    expect(screen.queryByText(BRIEFING_NOTICE.empty)).toBeNull()
+  })
+
+  it('R-U7-1: 수동 브리핑이 진행 중일 때 쿼리가 바뀌면, 끝난 뒤 재조회는 바뀐 일정(최신) 기준이다', async () => {
+    window.history.replaceState(null, '', '#/briefings?schedule_id=77')
+    const old77 = record(77, '엄마', '생신 식사', '2026-09-01T06:00:00Z')
+    const old88 = record(88, '아빠', '등산', '2026-09-02T06:00:00Z')
+    let finish: () => void = () => {}
+    install(
+      router({
+        'GET /api/briefings': () => json(LIST),
+        'GET /api/briefings?schedule_id=77': () => json([old77]),
+        'GET /api/briefings?schedule_id=88': () => json([old88]),
+        'POST /api/briefings/run': () =>
+          new Promise<Response>((resolve) => {
+            finish = () => resolve(json(emptyRun()))
+          }),
+      }),
+    )
+    render(<BriefingScreen />)
+    await screen.findByTestId('briefing-77')
+    const item = screen.getByTestId('briefing-5')
+    await userEvent.click(within(item).getByRole('button', { name: BRIEFING_NOTICE.runNow }))
+    await within(item).findByRole('button', { name: BRIEFING_NOTICE.running })
+
+    window.location.hash = '#/briefings?schedule_id=88' // 진행 중에 알림을 눌러 다른 일정으로 왔다
+    await screen.findByTestId('briefing-88')
+    finish()
+    await within(item).findByRole('button', { name: BRIEFING_NOTICE.runNow })
+    await waitFor(() => expect(ids()).toEqual(['briefing-88', 'briefing-5', 'briefing-2', 'briefing-9']))
+    expect(screen.queryByTestId('briefing-77')).toBeNull()
+    expect(screen.getByTestId('briefing-88')).toHaveAttribute('data-highlight', 'true')
   })
 })

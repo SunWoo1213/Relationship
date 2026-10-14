@@ -2,7 +2,7 @@
 // 항목 모양은 기획서 부록 A ③: 머리줄(일정 시각 · 이름 · 일정 제목) → 패턴 문장·요약 줄 → 💡 제안.
 // 서버 문자열(sentence · text · title · display_name)은 고치지 않고 그대로 보여 준다 (원칙7). `basis` 는 화면에 쓰지 않는다.
 // 이 파일이 만드는 문장은 아래 NOTICE 의 오류·빈 상태 안내와 버튼 글자·구획 제목뿐이다.
-// "알림 받기" 는 자리만 둔다 — 실제 구독은 U8.
+// "알림 받기"(U8, 결정 H) 는 PushSubscribe — 구독 절차는 `@/push` 에 있다.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ApiError, getBriefings, postBriefingRun } from '@/api/client'
 import type { BriefingRecordOut } from '@/api/types'
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { formatDateTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import { getPushStatus, subscribeToPush, type SubscribeOutcome } from '@/push'
 import { useScheduleIdParam } from '@/routes'
 
 /** 프론트가 만드는 고정 안내 문장(빈 상태·오류)과 버튼 글자. 서버 메시지가 아니다. */
@@ -22,8 +23,65 @@ export const BRIEFING_NOTICE = {
   runLocked: '잠시 뒤 다시 시도해 주세요.',
   runFailed: '브리핑을 만들지 못했어요. 잠시 후 다시 시도해 주세요.',
   suggestionTitle: '💡 제안',
+  scheduleFailed: '그 일정의 브리핑을 불러오지 못했어요.',
   subscribe: '알림 받기',
+  subscribing: '알림 켜는 중',
+  subscribed: '알림 켜짐',
+  pushDenied: '알림 권한이 허용되지 않았어요.',
+  pushNotConfigured: '이 서버는 아직 알림을 준비하지 않았어요.',
+  pushUnsupported: '이 브라우저는 알림을 지원하지 않아요.',
+  pushFailed: '알림을 켜지 못했어요. 잠시 후 다시 시도해 주세요.',
 } as const
+
+const PUSH_NOTE: Record<Exclude<SubscribeOutcome, 'subscribed' | 'already'>, string> = {
+  denied: BRIEFING_NOTICE.pushDenied,
+  not_configured: BRIEFING_NOTICE.pushNotConfigured,
+  unsupported: BRIEFING_NOTICE.pushUnsupported,
+  failed: BRIEFING_NOTICE.pushFailed,
+}
+
+type PushUi = 'idle' | 'running' | 'on'
+
+/** "알림 받기" (결정 H) — 상태 셋: 미구독 · 진행 중 · 켜짐(비활성). 구독 해제는 없다. */
+function PushSubscribe() {
+  const [state, setState] = useState<PushUi>('idle')
+  const [note, setNote] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    void getPushStatus().then((status) => {
+      if (!cancelled && status === 'subscribed') setState('on')
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const onClick = async () => {
+    setState('running')
+    setNote(null)
+    const outcome = await subscribeToPush()
+    if (outcome === 'subscribed' || outcome === 'already') {
+      setState('on')
+      return
+    }
+    setState('idle')
+    setNote(PUSH_NOTE[outcome])
+  }
+
+  return (
+    <div data-slot="push-subscribe" className="flex flex-col items-end gap-1">
+      <Button type="button" variant="outline" size="sm" disabled={state !== 'idle'} onClick={() => void onClick()}>
+        {state === 'on' ? BRIEFING_NOTICE.subscribed : state === 'running' ? BRIEFING_NOTICE.subscribing : BRIEFING_NOTICE.subscribe}
+      </Button>
+      {note !== null && (
+        <p role="status" className="text-sm text-muted-foreground" data-testid="push-note">
+          {note}
+        </p>
+      )}
+    </div>
+  )
+}
 
 type RunState = 'running' | 'locked' | 'failed'
 type Lookup = 'none' | 'missing' | 'failed'
@@ -135,7 +193,10 @@ export default function BriefingScreen() {
     }
   }, [scheduleId])
 
+  // R-U7-1: `run` 이 클릭 시점의 옛 `load` 가 아니라 항상 최신 `load`(최신 scheduleId)를 부르게 한다.
+  const loadRef = useRef(load)
   useEffect(() => {
+    loadRef.current = load
     void load()
     return () => {
       latest.current++ // 언마운트·쿼리 변경 뒤 늦은 응답 무시
@@ -153,13 +214,13 @@ export default function BriefingScreen() {
         setRunStates((s) => ({ ...s, [id]: state }))
         return
       }
-      await load()
+      await loadRef.current()
       setRunStates((s) => {
         const { [id]: _done, ...rest } = s
         return rest
       })
     },
-    [load],
+    [],
   )
 
   // 쿼리의 일정이 목록에 있으면 그것을 맨 위로(나머지는 서버 순서 그대로), 없으면 단건을 맨 위에 붙인다.
@@ -180,12 +241,7 @@ export default function BriefingScreen() {
     <section aria-labelledby="screen-title" data-screen="briefings" className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <h1 id="screen-title" className="text-title font-semibold">브리핑</h1>
-        {/* 푸시 구독 자리 — 동작은 U8 에서 붙인다. */}
-        <div data-slot="push-subscribe">
-          <Button type="button" variant="outline" size="sm" disabled>
-            {BRIEFING_NOTICE.subscribe}
-          </Button>
-        </div>
+        <PushSubscribe />
       </div>
       {failed && (
         <p role="status" className="text-sm text-muted-foreground">
@@ -198,8 +254,8 @@ export default function BriefingScreen() {
         </p>
       )}
       {lookup === 'failed' && (
-        <p role="status" className="text-sm text-muted-foreground">
-          {BRIEFING_NOTICE.listFailed}
+        <p role="status" className="text-sm text-muted-foreground" data-testid="schedule-failed">
+          {BRIEFING_NOTICE.scheduleFailed}
         </p>
       )}
       {list !== null && items.length === 0 && (

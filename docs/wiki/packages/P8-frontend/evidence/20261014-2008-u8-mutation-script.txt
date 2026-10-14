@@ -1,0 +1,85 @@
+# 명령: cat /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mut_u8.mjs
+# 시각: 2026-10-14T20:08:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+// U8 변이 시험: web/ 을 스크래치패드 사본으로 복사해 한 곳만 바꾸고 vitest 를 그대로(요약 없이) 흘린다. 저장소 파일은 건드리지 않는다.
+import { cpSync, existsSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { join } from 'node:path'
+
+const SRC = '/Users/sunwoo/Desktop/Portfolio/Relationship/web'
+const DST = '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/mutweb8'
+
+function fresh() {
+  if (existsSync(DST)) rmSync(DST, { recursive: true, force: true })
+  cpSync(SRC, DST, { recursive: true, filter: (p) => !/(node_modules|[\\/]dist|test-results)([\\/]|$)/.test(p.slice(SRC.length)) })
+  symlinkSync(join(SRC, 'node_modules'), join(DST, 'node_modules'))
+}
+
+function sub(path, oldText, newText) {
+  const p = join(DST, path)
+  const s = readFileSync(p, 'utf-8')
+  if (!s.includes(oldText)) throw new Error(`치환 대상 없음: ${JSON.stringify(oldText)}`)
+  writeFileSync(p, s.replace(oldText, newText))
+}
+
+const W = 'public/sw.js'
+const PU = 'src/push.ts'
+const B = 'src/screens/BriefingScreen.tsx'
+const A = 'src/components/AppShell.tsx'
+const R = 'src/routes.ts'
+const V = 'src/components/PersonsProvider.tsx'
+
+const MUTS = {
+  'M1-워커에 fetch 리스너 주입': () => sub(W, 'self.addEventListener("install"', 'self.addEventListener("fetch", function () {});\nself.addEventListener("install"'),
+  'M2-워커 install 에 캐시 호출 주입': () => sub(W, 'self.skipWaiting();', 'self.skipWaiting();\n  caches.open("v1");'),
+  'M3-알림 data 에서 schedule_id 누락': () => sub(W, 'data: { schedule_id: scheduleId } }', 'data: {} }'),
+  'M4-열린 창 postMessage 에서 schedule_id 누락': () => sub(W, '{ type: "briefing", schedule_id: shown.scheduleId }', '{ type: "briefing" }'),
+  'M5-새 창 주소 변경(/#/chat?…)': () => sub(W, '"/#/briefings?schedule_id=" + scheduleId', '"/#/chat?schedule_id=" + scheduleId'),
+  'M6-열린 창이 있어도 새 창을 연다': () => sub(W, 'if (list.length > 0) {', 'if (list.length > 99) {'),
+  'M7-열린 창 focus 제거': () => sub(W, 'Promise.resolve(client.focus())', 'Promise.resolve()'),
+  'M8-잘못된 JSON 처리 제거(예외 전파)': () => sub(W, '  } catch (e) {\n    return {};', '  } catch (e) {\n    throw e;'),
+  'M9-알림 title 가공(trim)': () => sub(W, 'title: data.title || "알림"', 'title: (data.title || "알림").trim()'),
+  'M10-기존 구독에도 구독·POST 진행': () => sub(PU, "if (await registration.pushManager.getSubscription()) return 'already'", 'await registration.pushManager.getSubscription()'),
+  'M11-404 push_not_configured 를 일반 실패로': () => sub(PU, "error.status === 404 && error.code === 'push_not_configured'", 'false'),
+  'M12-userVisibleOnly false': () => sub(PU, 'userVisibleOnly: true', 'userVisibleOnly: false'),
+  'M13-권한 거부를 무시하고 진행': () => sub(PU, "if (permission !== 'granted') return 'denied'", ''),
+  'M14-POST endpoint 변형': () => sub(PU, 'endpoint: json.endpoint,', "endpoint: json.endpoint + '/',"),
+  'M15-base64url - 치환 제거': () => sub(PU, ".replace(/-/g, '+')", ''),
+  'M16-등록 경로를 /push-dev/sw.js 로': () => sub(PU, "export const SERVICE_WORKER_URL = '/sw.js'", "export const SERVICE_WORKER_URL = '/push-dev/sw.js'"),
+  'M17-진입 시 구독 상태 무시': () => sub(B, "status === 'subscribed'", "status === 'never'"),
+  'M18-알림 켜짐 버튼을 활성으로': () => sub(B, "disabled={state !== 'idle'}", "disabled={state === 'running'}"),
+  'M19-R-U7-1 되돌리기(옛 load 붙잡기)': () => {
+    sub(B, 'await loadRef.current()', 'await load()')
+    sub(B, '    [],\n  )\n\n  // 쿼리의 일정', '    [load],\n  )\n\n  // 쿼리의 일정')
+  },
+  'M20-R-U7-3 되돌리기(단건 실패에 목록 실패 문구)': () => sub(B, 'data-testid="schedule-failed">\n          {BRIEFING_NOTICE.scheduleFailed}', 'data-testid="schedule-failed">\n          {BRIEFING_NOTICE.listFailed}'),
+  'M21-배너 주소에서 schedule_id 누락': () => sub(R, 'return scheduleId === null ? HREF.briefings : `${HREF.briefings}?schedule_id=${scheduleId}`', 'return HREF.briefings'),
+  'M22-open-briefing 이동 제거': () => sub(A, '        window.location.hash = briefingHref(message.scheduleId)\n', ''),
+  'M23-배너 닫기 제거': () => sub(A, '<button type="button" onClick={() => setBanner(null)} className="text-muted-foreground">', '<button type="button" className="text-muted-foreground">'),
+  'M24-R-U7-2 강조 스타일 제거(V3)': () => sub(B, "highlighted && 'bg-accent ring-2 ring-primary'", "highlighted && ''"),
+  'M25-R-U7-2 Provider 늦은 응답 카운터 제거(V4)': () => sub(V, 'if (mine !== latest.current) return\n        setPersons(list)', 'setPersons(list)'),
+  'M26-R-U7-2 재조회 실패 시 목록 비움(P4)': () => sub(B, 'if (!stale()) setFailed(true)', 'if (!stale()) { setFailed(true); setList([]) }'),
+  'M27-manifest start_url 변경': () => sub('public/manifest.webmanifest', '"start_url": "/#/chat"', '"start_url": "/"'),
+  'M28-manifest display 변경': () => sub('public/manifest.webmanifest', '"display": "standalone"', '"display": "browser"'),
+  'M29-favicon 을 템플릿 색으로': () => sub('public/favicon.svg', 'fill="#171717"', 'fill="#863bff"'),
+  'M30-index.html manifest 링크 제거': () => sub('index.html', '    <link rel="manifest" href="/manifest.webmanifest" />\n', ''),
+}
+
+// 인자는 변이 번호(M1 ... M30)만 받는다 — 셸 인용 문제를 피한다.
+const name = Object.keys(MUTS).find((k) => k.startsWith(`${process.argv[2]}-`)) ?? '(없음)'
+if (!(name in MUTS)) {
+  console.log('알 수 없는 이름:', name, '\n가능:', Object.keys(MUTS).join('\n  '))
+  process.exit(3)
+}
+fresh()
+MUTS[name]()
+console.log(`### 변이: ${name}  (사본 ${DST}, 저장소 무수정)`)
+const r = spawnSync('npx', ['vitest', '--run', '--reporter=default'], {
+  cwd: DST,
+  stdio: 'inherit',
+  env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0', CI: '1', DEBUG_PRINT_LIMIT: '0' },
+})
+console.log(`### 변이 ${name} → vitest exit ${r.status} → ${r.status !== 0 ? '잡힘(KILLED)' : '살아남음(SURVIVED)'}`)

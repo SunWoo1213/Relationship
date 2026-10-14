@@ -1,0 +1,70 @@
+# 명령: cd web && npm test -- --run src/__tests__/sw.test.ts src/__tests__/push.test.ts && npm run typecheck && npm test -- --run && npm run build && echo "--- ls dist ---" && ls dist dist/assets && echo "--- manifest/아이콘/워커 ---" && ls -l dist/sw.js dist/manifest.webmanifest dist/icon-192.svg dist/icon-512.svg dist/favicon.svg && grep -c "manifest" dist/index.html
+# 시각: 2026-10-14T20:08:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+
+> web@0.0.0 test
+> vitest --run src/__tests__/sw.test.ts src/__tests__/push.test.ts
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  2 passed (2)
+      Tests  31 passed (31)
+   Start at  20:08:03
+   Duration  781ms (environment 47%, tests 26%, import 14%, setup 9%, transform 3%, worker 1%)
+
+
+> web@0.0.0 typecheck
+> tsc -b
+
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  8 passed (8)
+      Tests  127 passed (127)
+   Start at  20:08:06
+   Duration  2.03s (environment 45%, tests 33%, import 12%, setup 6%, transform 4%)
+
+
+> web@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 2034 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.57 kB │ gzip:   0.35 kB
+dist/assets/index-BsQ5cRBT.css   44.43 kB │ gzip:   8.14 kB
+dist/assets/index-B4U3y0oT.js   360.90 kB │ gzip: 114.73 kB
+
+✓ built in 177ms
+--- ls dist ---
+dist:
+assets
+favicon.svg
+icon-192.svg
+icon-512.svg
+index.html
+manifest.webmanifest
+sw.js
+
+dist/assets:
+index-B4U3y0oT.js
+index-BsQ5cRBT.css
+--- manifest/아이콘/워커 ---
+-rw-r--r--@ 1 sunwoo  staff   340 10월 14 20:08 dist/favicon.svg
+-rw-r--r--@ 1 sunwoo  staff   342 10월 14 20:08 dist/icon-192.svg
+-rw-r--r--@ 1 sunwoo  staff   342 10월 14 20:08 dist/icon-512.svg
+-rw-r--r--@ 1 sunwoo  staff   406 10월 14 20:08 dist/manifest.webmanifest
+-rw-r--r--@ 1 sunwoo  staff  2740 10월 14 20:08 dist/sw.js
+1

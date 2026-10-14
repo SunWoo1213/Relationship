@@ -256,6 +256,33 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
     await waitFor(() => expect(callsTo(fetchFn, '/api/persons')).toHaveLength(2))
   })
 
+  it('R-U7-2 (탐침 P2c): 먼저 보낸 느린 조회가 나중 조회보다 늦게 도착해도 사이드바는 나중 조회 값이다', async () => {
+    window.history.replaceState(null, '', '#/persons')
+    const releases: (() => void)[] = []
+    let n = 0
+    install(
+      router({
+        '/api/persons': () => {
+          const mine = n++
+          if (mine === 0) {
+            // 첫째: 옛 값을 늦게 돌려준다
+            return new Promise<Response>((resolve) => releases.push(() => resolve(json([PERSONS[0]]))))
+          }
+          return json([PERSONS[1]]) // 둘째: 새 값을 바로
+        },
+      }),
+    )
+    render(<App />)
+    await waitFor(() => expect(n).toBe(1))
+    notifyPersonsChanged()
+    const side = screen.getByTestId('sidebar-persons')
+    await within(side).findByText('철수')
+    releases[0]() // 첫째가 뒤늦게 도착
+    await new Promise((r) => setTimeout(r, 50))
+    expect(within(side).getByText('철수')).toBeInTheDocument()
+    expect(within(side).queryByText('박대리')).toBeNull()
+  })
+
   it('사이드바와 본문이 같은 컴포넌트(PersonList)를 import 한다', () => {
     const imp = "import PersonList from '@/components/PersonList'"
     expect(appShellSource).toContain(imp)

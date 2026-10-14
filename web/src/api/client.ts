@@ -15,6 +15,9 @@ import type {
   FactSourcesOut,
   PersonCardOut,
   PersonListItemOut,
+  PushSubscriptionIn,
+  PushSubscriptionOut,
+  VapidPublicKeyOut,
 } from '@/api/types'
 
 export const API_BASE = '/api'
@@ -133,6 +136,17 @@ export function getBriefings(scheduleId?: number): Promise<BriefingRecordOut[]> 
 export function postBriefingRun(scheduleId: number): Promise<BriefingRunOut> {
   const body: BriefingRunIn = { schedule_id: scheduleId }
   return apiFetch<BriefingRunOut>('/briefings/run', { method: 'POST', body })
+}
+
+// --- 푸시 구독 (GET /push/vapid-public-key · POST /push/subscriptions) ---
+// 둘 다 미설정이면 404 `push_not_configured` (P7 결정 D·F).
+
+export function getVapidPublicKey(): Promise<VapidPublicKeyOut> {
+  return apiFetch<VapidPublicKeyOut>('/push/vapid-public-key')
+}
+
+export function postPushSubscription(body: PushSubscriptionIn): Promise<PushSubscriptionOut> {
+  return apiFetch<PushSubscriptionOut>('/push/subscriptions', { method: 'POST', body })
 }
 
 /** 이 세션의 미답변 질문 전부. 세션이 없으면 서버가 빈 목록을 준다. */

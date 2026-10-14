@@ -479,3 +479,5 @@
 - 2026-10-13 16:17 | PUSH-dev2 | origin dev2 1944369 (실험 푸시)
 - 2026-10-13 19:35 | COMMIT | 761cced feat(P8-frontend): 인물 목록과 인물 카드 화면, 원문·근거 펼치기를 만든다
 - 2026-10-13 19:35 | PUSH-dev2 | origin dev2 761cced (실험 푸시)
+- 2026-10-14 19:56 | COMMIT | 46532e7 feat(P8-frontend): 브리핑 화면과 수동 브리핑 버튼을 만든다
+- 2026-10-14 19:56 | PUSH-dev2 | origin dev2 46532e7 (실험 푸시)

@@ -1,0 +1,2855 @@
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs V0
+# 시각: 2026-10-14T20:24:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+### 변이: V0-대조군(변이 없음)  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8, 저장소 무수정)
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8
+
+ ✓ src/__tests__/api.test.ts (6 tests) 6ms
+ ✓ src/__tests__/proxy.test.ts (6 tests) 147ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/sw.test.ts (14 tests) 6ms
+ ✓ src/__tests__/briefing.test.tsx (19 tests) 508ms
+ ✓ src/__tests__/push.test.ts (20 tests) 392ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx (14 tests) 433ms
+ ✓ src/__tests__/chat.test.tsx (22 tests) 849ms
+ ✓ src/__tests__/card.test.tsx (29 tests) 917ms
+
+ Test Files  8 passed (8)
+      Tests  130 passed (130)
+   Start at  20:24:32
+   Duration  1.94s (environment 36%, tests 36%, import 13%, transform 9%, setup 6%)
+
+### 변이 V0-대조군(변이 없음) → vitest exit 0 → 살아남음(SURVIVED)
+### 저장소 web/ 상태(변이 뒤):
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+
+
+# ===== append 2026-10-14T20:24:45+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs V1
+# 시각: 2026-10-14T20:24:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+### 변이: V1-워커가 body 를 제목으로 쓴다  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8, 저장소 무수정)
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8
+
+ ✓ src/__tests__/api.test.ts (6 tests) 11ms
+ ✓ src/__tests__/proxy.test.ts (6 tests) 166ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ❯ src/__tests__/sw.test.ts (14 tests | 2 failed) 10ms
+   ❯ push 이벤트 (4)
+     × 페이로드를 showNotification(title, {body, tag, data:{schedule_id}}) 로 그대로 넘긴다 5ms
+     ✓ 열린 모든 창에 {type:"briefing", schedule_id} 만 보낸다(title·body 는 보내지 않는다) 1ms
+     × schedule_id 가 빠진 페이로드면 data.schedule_id 와 메시지 모두 null 1ms
+     ✓ JSON 을 못 읽거나 데이터가 없으면 기본 제목 "알림"·빈 본문으로 띄운다 0ms
+   ✓ notificationclick 이벤트 (3)
+     ✓ 열린 창이 있으면 알림을 닫고 첫 창을 focus 한 뒤 {type:"open-briefing", schedule_id} 를 보낸다(새 창 없음) 0ms
+     ✓ 열린 창이 없으면 openWindow("/#/briefings?schedule_id=N") 0ms
+     ✓ schedule_id 가 없거나 양의 정수가 아니면 일정 없는 브리핑 화면 주소 0ms
+   ✓ manifest · index.html · 아이콘 (4)
+     ✓ start_url 은 /#/chat, display 는 standalone 0ms
+     ✓ 이름은 index.html <title> 과 같고, 색은 tokens.css 의 primary(#171717)·background(#ffffff) 0ms
+     ✓ 아이콘은 192·512 두 개이고 각각 실제 파일이다(외부 주소 없음) 0ms
+     ✓ index.html 이 manifest 를 연결하고, favicon 은 같은 아이콘이다(템플릿 로고 아님) 0ms
+   ✓ 결정 I — 캐시 없음·fetch 리스너 없음 (3)
+     ✓ 등록되는 리스너는 install · activate · push · notificationclick 넷뿐이다 0ms
+     ✓ install 은 skipWaiting, activate 는 clients.claim 만 한다 0ms
+     ✓ 코드에 요청 가로채기 리스너·캐시 API 호출이 없다 0ms
+ ✓ src/__tests__/briefing.test.tsx (19 tests) 528ms
+ ✓ src/__tests__/push.test.ts (20 tests) 394ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx (14 tests) 416ms
+ ✓ src/__tests__/chat.test.tsx (22 tests) 814ms
+ ✓ src/__tests__/card.test.tsx (29 tests) 892ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/sw.test.ts > push 이벤트 > 페이로드를 showNotification(title, {body, tag, data:{schedule_id}}) 로 그대로 넘긴다
+AssertionError: expected "vi.fn()" to be called with arguments: [ '  김팀장 회의 30분 전 ', { …(3) } ]
+
+Received:
+
+  1st vi.fn() call:
+
+@@ -1,7 +1,7 @@
+  [
+-   "  김팀장 회의 30분 전 ",
++   " 지난번 지적 반복 & \"제안\" ",
+    {
+      "body": " 지난번 지적 반복 & \"제안\" ",
+      "data": {
+        "schedule_id": 12,
+      },
+
+
+Number of calls: 1
+
+ ❯ src/__tests__/sw.test.ts:69:50
+     67|     await w.fire('push', pushEvent({ title: '  김팀장 회의 30분 전 ', body: '…
+     68|     expect(w.self.registration.showNotification).toHaveBeenCalledTimes…
+     69|     expect(w.self.registration.showNotification).toHaveBeenCalledWith(…
+       |                                                  ^
+     70|       body: ' 지난번 지적 반복 & "제안" ',
+     71|       tag: 'schedule-12',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/sw.test.ts > push 이벤트 > schedule_id 가 빠진 페이로드면 data.schedule_id 와 메시지 모두 null
+AssertionError: expected "vi.fn()" to be called with arguments: [ Array(2) ]
+
+Received:
+
+  1st vi.fn() call:
+
+@@ -1,7 +1,7 @@
+  [
+-   "제목",
++   "본문",
+    {
+      "body": "본문",
+      "data": {
+        "schedule_id": null,
+      },
+
+
+Number of calls: 1
+
+ ❯ src/__tests__/sw.test.ts:92:50
+     90|     const w = loadWorker([c])
+     91|     await w.fire('push', pushEvent({ title: '제목', body: '본문', tag: 't'…
+     92|     expect(w.self.registration.showNotification).toHaveBeenCalledWith(…
+       |                                                  ^
+     93|     expect(c.postMessage).toHaveBeenCalledWith({ type: 'briefing', sch…
+     94|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  2 failed | 128 passed (130)
+   Start at  20:24:46
+   Duration  2.01s (environment 38%, tests 34%, import 12%, setup 11%, transform 5%, worker 1%)
+
+### 변이 V1-워커가 body 를 제목으로 쓴다 → vitest exit 1 → 잡힘(KILLED)
+### 저장소 web/ 상태(변이 뒤):
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+
+
+# ===== append 2026-10-14T20:24:48+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs V2
+# 시각: 2026-10-14T20:24:48+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+### 변이: V2-schedule_id 없는 알림 클릭이 ?schedule_id=undefined 로 간다  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8, 저장소 무수정)
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8
+
+ ❯ src/__tests__/sw.test.ts (14 tests | 1 failed) 9ms
+   ✓ push 이벤트 (4)
+     ✓ 페이로드를 showNotification(title, {body, tag, data:{schedule_id}}) 로 그대로 넘긴다 1ms
+     ✓ 열린 모든 창에 {type:"briefing", schedule_id} 만 보낸다(title·body 는 보내지 않는다) 0ms
+     ✓ schedule_id 가 빠진 페이로드면 data.schedule_id 와 메시지 모두 null 0ms
+     ✓ JSON 을 못 읽거나 데이터가 없으면 기본 제목 "알림"·빈 본문으로 띄운다 0ms
+   ❯ notificationclick 이벤트 (3)
+     ✓ 열린 창이 있으면 알림을 닫고 첫 창을 focus 한 뒤 {type:"open-briefing", schedule_id} 를 보낸다(새 창 없음) 0ms
+     ✓ 열린 창이 없으면 openWindow("/#/briefings?schedule_id=N") 0ms
+     × schedule_id 가 없거나 양의 정수가 아니면 일정 없는 브리핑 화면 주소 4ms
+   ✓ manifest · index.html · 아이콘 (4)
+     ✓ start_url 은 /#/chat, display 는 standalone 0ms
+     ✓ 이름은 index.html <title> 과 같고, 색은 tokens.css 의 primary(#171717)·background(#ffffff) 0ms
+     ✓ 아이콘은 192·512 두 개이고 각각 실제 파일이다(외부 주소 없음) 0ms
+     ✓ index.html 이 manifest 를 연결하고, favicon 은 같은 아이콘이다(템플릿 로고 아님) 0ms
+   ✓ 결정 I — 캐시 없음·fetch 리스너 없음 (3)
+     ✓ 등록되는 리스너는 install · activate · push · notificationclick 넷뿐이다 0ms
+     ✓ install 은 skipWaiting, activate 는 clients.claim 만 한다 0ms
+     ✓ 코드에 요청 가로채기 리스너·캐시 API 호출이 없다 0ms
+ ✓ src/__tests__/proxy.test.ts (6 tests) 126ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/api.test.ts (6 tests) 5ms
+ ✓ src/__tests__/briefing.test.tsx (19 tests) 535ms
+ ✓ src/__tests__/push.test.ts (20 tests) 343ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx (14 tests) 374ms
+ ✓ src/__tests__/chat.test.tsx (22 tests) 818ms
+ ✓ src/__tests__/card.test.tsx (29 tests) 882ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/sw.test.ts > notificationclick 이벤트 > schedule_id 가 없거나 양의 정수가 아니면 일정 없는 브리핑 화면 주소
+AssertionError: expected "vi.fn()" to be called with arguments: [ '/#/briefings' ]
+
+Received:
+
+  1st vi.fn() call:
+
+  [
+-   "/#/briefings",
++   "/#/briefings?schedule_id=null",
+  ]
+
+
+Number of calls: 1
+
+ ❯ src/__tests__/sw.test.ts:131:41
+    129|       const w = loadWorker([])
+    130|       await w.fire('notificationclick', clickEvent(data).event)
+    131|       expect(w.self.clients.openWindow).toHaveBeenCalledWith('/#/brief…
+       |                                         ^
+    132|     }
+    133|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  1 failed | 129 passed (130)
+   Start at  20:24:48
+   Duration  1.83s (environment 39%, tests 37%, import 14%, setup 6%, transform 5%)
+
+### 변이 V2-schedule_id 없는 알림 클릭이 ?schedule_id=undefined 로 간다 → vitest exit 1 → 잡힘(KILLED)
+### 저장소 web/ 상태(변이 뒤):
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+
+
+# ===== append 2026-10-14T20:24:50+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs V3
+# 시각: 2026-10-14T20:24:50+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+### 변이: V3-applicationServerKey 를 base64url 문자열 그대로 전달  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8, 저장소 무수정)
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8
+
+ ✓ src/__tests__/sw.test.ts (14 tests) 7ms
+ ✓ src/__tests__/proxy.test.ts (6 tests) 112ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/api.test.ts (6 tests) 6ms
+ ✓ src/__tests__/briefing.test.tsx (19 tests) 463ms
+ ❯ src/__tests__/push.test.ts (20 tests | 1 failed) 388ms
+   ✓ urlBase64ToUint8Array (1)
+     ✓ base64url(-, _, 패딩 없음)을 바이트로 바꾼다 2ms
+   ❯ subscribeToPush 절차 (10)
+     × 새 구독: 권한 → 등록(/sw.js) → 공개키 → 구독 → 서버 저장 순서이고, 본문은 PushSubscriptionIn 필드 그대로 6ms
+     ✓ 이미 구독돼 있으면 "already" — 구독도 서버 저장(POST)도 하지 않는다 1ms
+     ✓ 권한이 허용되지 않으면 "denied" — 등록·공개키·구독이 없다 0ms
+     ✓ 404 push_not_configured 면 "not_configured" — 구독·저장 없이 멈춘다 0ms
+     ✓ 다른 404(코드가 다름)나 5xx 는 "not_configured" 가 아니라 "failed" 0ms
+     ✓ 구독 실패·서버 저장 실패는 "failed" 1ms
+     ✓ 서버 저장(POST)이 실패하면 브라우저 구독을 unsubscribe 1회로 되돌리고 "failed" — 404 push_not_configured 도 같다 1ms
+     ✓ 저장 실패 뒤 다음 클릭은 처음부터 다시 — subscribe 재호출·POST 재시도(이번엔 성공) 0ms
+     ✓ unsubscribe 자체가 실패해도 예외 없이 "failed" 0ms
+     ✓ 미지원 브라우저(serviceWorker·PushManager·Notification 없음)면 "unsupported" — 네트워크 0 0ms
+   ✓ getPushStatus (1)
+     ✓ 미지원 · 구독 없음 · 구독 있음을 가른다(권한 창·네트워크 없음) 0ms
+   ✓ 브리핑 화면 "알림 받기" 버튼 (4)
+     ✓ 미구독 → 진행 중(비활성) → 켜짐(비활성) 세 상태 112ms
+     ✓ 들어올 때 이미 구독돼 있으면 곧바로 "알림 켜짐"(비활성) — 클릭 없이, 서버 저장 없이 27ms
+     ✓ 안내 한 줄: 권한 거부 · 서버 미설정 · 미지원 · 실패 — 버튼은 다시 "알림 받기"(활성) 119ms
+     ✓ /push-dev/ 링크가 없다 7ms
+   ✓ 인앱 배너 (결정 H) (4)
+     ✓ {type:"briefing", schedule_id} 를 받으면 한 줄 배너 — 누르면 #/briefings?schedule_id=N, 누른 뒤 사라진다 45ms
+     ✓ 닫기 버튼으로 닫는다(주소는 그대로) 29ms
+     ✓ schedule_id 가 없으면 일정 없는 브리핑 주소, 모양이 다른 메시지는 무시한다 24ms
+     ✓ 알림을 눌러 온 {type:"open-briefing"} 은 배너 없이 바로 그 일정 주소로 간다 10ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx (14 tests) 415ms
+ ✓ src/__tests__/chat.test.tsx (22 tests) 829ms
+ ✓ src/__tests__/card.test.tsx (29 tests) 919ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/push.test.ts > subscribeToPush 절차 > 새 구독: 권한 → 등록(/sw.js) → 공개키 → 구독 → 서버 저장 순서이고, 본문은 PushSubscriptionIn 필드 그대로
+AssertionError: expected [ 'A', 'Q', 'I', 'D' ] to deeply equal [ 1, 2, 3 ]
+
+- Expected
++ Received
+
+  [
+-   1,
+-   2,
+-   3,
++   "A",
++   "Q",
++   "I",
++   "D",
+  ]
+
+ ❯ src/__tests__/push.test.ts:140:50
+    138|     const arg = world.subscribe.mock.calls[0][0] as { userVisibleOnly:…
+    139|     expect(arg.userVisibleOnly).toBe(true)
+    140|     expect(Array.from(arg.applicationServerKey)).toEqual([1, 2, 3])
+       |                                                  ^
+    141|     const posts = callsTo(fetchFn, 'POST', '/api/push/subscriptions')
+    142|     expect(posts).toHaveLength(1)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  1 failed | 129 passed (130)
+   Start at  20:24:50
+   Duration  1.90s (environment 38%, tests 36%, import 12%, setup 7%, transform 7%)
+
+### 변이 V3-applicationServerKey 를 base64url 문자열 그대로 전달 → vitest exit 1 → 잡힘(KILLED)
+### 저장소 web/ 상태(변이 뒤):
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+
+
+# ===== append 2026-10-14T20:24:52+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs V4
+# 시각: 2026-10-14T20:24:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+### 변이: V4-open-briefing 에 schedule_id 가 없으면 이동하지 않는다(경계)  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8, 저장소 무수정)
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8
+
+ ✓ src/__tests__/sw.test.ts (14 tests) 11ms
+ ✓ src/__tests__/proxy.test.ts (6 tests) 128ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/api.test.ts (6 tests) 8ms
+ ✓ src/__tests__/briefing.test.tsx (19 tests) 526ms
+ ✓ src/__tests__/push.test.ts (20 tests) 371ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx (14 tests) 392ms
+ ✓ src/__tests__/chat.test.tsx (22 tests) 843ms
+ ✓ src/__tests__/card.test.tsx (29 tests) 874ms
+
+ Test Files  8 passed (8)
+      Tests  130 passed (130)
+   Start at  20:24:53
+   Duration  1.81s (environment 38%, tests 38%, import 12%, setup 6%, transform 5%, worker 1%)
+
+### 변이 V4-open-briefing 에 schedule_id 가 없으면 이동하지 않는다(경계) → vitest exit 0 → 살아남음(SURVIVED)
+### 저장소 web/ 상태(변이 뒤):
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+
+
+# ===== append 2026-10-14T20:24:55+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs V5
+# 시각: 2026-10-14T20:24:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+### 변이: V5-manifest icons 비우기  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8, 저장소 무수정)
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8
+
+ ❯ src/__tests__/sw.test.ts (14 tests | 1 failed) 9ms
+   ✓ push 이벤트 (4)
+     ✓ 페이로드를 showNotification(title, {body, tag, data:{schedule_id}}) 로 그대로 넘긴다 1ms
+     ✓ 열린 모든 창에 {type:"briefing", schedule_id} 만 보낸다(title·body 는 보내지 않는다) 0ms
+     ✓ schedule_id 가 빠진 페이로드면 data.schedule_id 와 메시지 모두 null 0ms
+     ✓ JSON 을 못 읽거나 데이터가 없으면 기본 제목 "알림"·빈 본문으로 띄운다 0ms
+   ✓ notificationclick 이벤트 (3)
+     ✓ 열린 창이 있으면 알림을 닫고 첫 창을 focus 한 뒤 {type:"open-briefing", schedule_id} 를 보낸다(새 창 없음) 0ms
+     ✓ 열린 창이 없으면 openWindow("/#/briefings?schedule_id=N") 0ms
+     ✓ schedule_id 가 없거나 양의 정수가 아니면 일정 없는 브리핑 화면 주소 0ms
+   ❯ manifest · index.html · 아이콘 (4)
+     ✓ start_url 은 /#/chat, display 는 standalone 0ms
+     ✓ 이름은 index.html <title> 과 같고, 색은 tokens.css 의 primary(#171717)·background(#ffffff) 0ms
+     × 아이콘은 192·512 두 개이고 각각 실제 파일이다(외부 주소 없음) 4ms
+     ✓ index.html 이 manifest 를 연결하고, favicon 은 같은 아이콘이다(템플릿 로고 아님) 0ms
+   ✓ 결정 I — 캐시 없음·fetch 리스너 없음 (3)
+     ✓ 등록되는 리스너는 install · activate · push · notificationclick 넷뿐이다 0ms
+     ✓ install 은 skipWaiting, activate 는 clients.claim 만 한다 0ms
+     ✓ 코드에 요청 가로채기 리스너·캐시 API 호출이 없다 0ms
+ ✓ src/__tests__/proxy.test.ts (6 tests) 133ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/briefing.test.tsx (19 tests) 567ms
+ ✓ src/__tests__/api.test.ts (6 tests) 7ms
+ ✓ src/__tests__/push.test.ts (20 tests) 533ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx (14 tests) 584ms
+ ✓ src/__tests__/chat.test.tsx (22 tests) 849ms
+ ✓ src/__tests__/card.test.tsx (29 tests) 1029ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/sw.test.ts > manifest · index.html · 아이콘 > 아이콘은 192·512 두 개이고 각각 실제 파일이다(외부 주소 없음)
+AssertionError: expected [] to deeply equal [ Array(2) ]
+
+- Expected
++ Received
+
+- [
+-   [
+-     "192x192",
+-     "/icon-192.svg",
+-   ],
+-   [
+-     "512x512",
+-     "/icon-512.svg",
+-   ],
+- ]
++ []
+
+ ❯ src/__tests__/sw.test.ts:162:57
+    160|
+    161|   it('아이콘은 192·512 두 개이고 각각 실제 파일이다(외부 주소 없음)', () => {
+    162|     expect(manifest.icons.map((i) => [i.sizes, i.src])).toEqual([
+       |                                                         ^
+    163|       ['192x192', '/icon-192.svg'],
+    164|       ['512x512', '/icon-512.svg'],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  1 failed | 129 passed (130)
+   Start at  20:24:55
+   Duration  1.98s (tests 40%, environment 37%, import 13%, setup 6%, transform 4%)
+
+### 변이 V5-manifest icons 비우기 → vitest exit 1 → 잡힘(KILLED)
+### 저장소 web/ 상태(변이 뒤):
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+
+
+# ===== append 2026-10-14T20:25:12+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs M1
+# 시각: 2026-10-14T20:25:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+### 변이: M1-워커에 fetch 리스너 주입  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8, 저장소 무수정)
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8
+
+ ❯ src/__tests__/sw.test.ts (14 tests | 2 failed) 11ms
+   ✓ push 이벤트 (4)
+     ✓ 페이로드를 showNotification(title, {body, tag, data:{schedule_id}}) 로 그대로 넘긴다 2ms
+     ✓ 열린 모든 창에 {type:"briefing", schedule_id} 만 보낸다(title·body 는 보내지 않는다) 0ms
+     ✓ schedule_id 가 빠진 페이로드면 data.schedule_id 와 메시지 모두 null 0ms
+     ✓ JSON 을 못 읽거나 데이터가 없으면 기본 제목 "알림"·빈 본문으로 띄운다 0ms
+   ✓ notificationclick 이벤트 (3)
+     ✓ 열린 창이 있으면 알림을 닫고 첫 창을 focus 한 뒤 {type:"open-briefing", schedule_id} 를 보낸다(새 창 없음) 0ms
+     ✓ 열린 창이 없으면 openWindow("/#/briefings?schedule_id=N") 0ms
+     ✓ schedule_id 가 없거나 양의 정수가 아니면 일정 없는 브리핑 화면 주소 0ms
+   ✓ manifest · index.html · 아이콘 (4)
+     ✓ start_url 은 /#/chat, display 는 standalone 0ms
+     ✓ 이름은 index.html <title> 과 같고, 색은 tokens.css 의 primary(#171717)·background(#ffffff) 0ms
+     ✓ 아이콘은 192·512 두 개이고 각각 실제 파일이다(외부 주소 없음) 0ms
+     ✓ index.html 이 manifest 를 연결하고, favicon 은 같은 아이콘이다(템플릿 로고 아님) 0ms
+   ❯ 결정 I — 캐시 없음·fetch 리스너 없음 (3)
+     × 등록되는 리스너는 install · activate · push · notificationclick 넷뿐이다 3ms
+     ✓ install 은 skipWaiting, activate 는 clients.claim 만 한다 1ms
+     × 코드에 요청 가로채기 리스너·캐시 API 호출이 없다 1ms
+ ✓ src/__tests__/proxy.test.ts (6 tests) 140ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/api.test.ts (6 tests) 10ms
+ ✓ src/__tests__/briefing.test.tsx (19 tests) 485ms
+ ✓ src/__tests__/push.test.ts (20 tests) 379ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx (14 tests) 424ms
+ ✓ src/__tests__/chat.test.tsx (22 tests) 814ms
+ ✓ src/__tests__/card.test.tsx (29 tests) 948ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/sw.test.ts > 결정 I — 캐시 없음·fetch 리스너 없음 > 등록되는 리스너는 install · activate · push · notificationclick 넷뿐이다
+AssertionError: expected [ Array(5) ] to deeply equal [ 'activate', 'install', …(2) ]
+
+- Expected
++ Received
+
+  [
+    "activate",
++   "fetch",
+    "install",
+    "notificationclick",
+    "push",
+  ]
+
+ ❯ src/__tests__/sw.test.ts:182:44
+    180|   it('등록되는 리스너는 install · activate · push · notificationclick 넷뿐이다', (…
+    181|     const w = loadWorker([])
+    182|     expect([...w.listeners.keys()].sort()).toEqual(['activate', 'insta…
+       |                                            ^
+    183|   })
+    184|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/sw.test.ts > 결정 I — 캐시 없음·fetch 리스너 없음 > 코드에 요청 가로채기 리스너·캐시 API 호출이 없다
+AssertionError: expected '// Refs: P8-frontend U8 결정 H·I -- 제품 …' not to match /addEventListener\(\s*["']fetch["']/
+
+- Expected:
+/addEventListener\(\s*["']fetch["']/
+
++ Received:
+"// Refs: P8-frontend U8 결정 H·I -- 제품 서비스 워커(범위 /). 단일 파일이라 빌드에 그대로 복사된다.
+// 하는 일은 셋뿐이다: push 를 받아 알림을 띄우고, 알림을 누르면 그 일정의 브리핑으로 가고, 열린 창에 알린다.
+// 캐시를 쓰지 않고 요청 가로채기 리스너도 없다(결정 I) -- 화면·API 응답은 항상 네트워크에서 온다.
+// 페이로드 해석은 app/push/devpage/sw.js 에서 복사했다(원본은 고치지 않는다).
+// 알림 title·body 는 서버가 만든 문장 그대로 쓴다(원칙7). 열린 창에는 schedule_id 만 알린다.
+
+function readPayload(event) {
+  try {
+    return event.data ? event.data.json() : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+// 서버 페이로드({title, body, tag, schedule_id}) -> showNotification 인자.
+function notificationFor(data) {
+  var scheduleId = data.schedule_id === undefined ? null : data.schedule_id;
+  return {
+    title: data.title || \"알림\",
+    options: { body: data.body || \"\", tag: data.tag, data: { schedule_id: scheduleId } },
+    scheduleId: scheduleId
+  };
+}
+
+// 알림을 눌렀을 때 새 창이 열 주소. schedule_id 가 양의 정수가 아니면 일정 없이 브리핑 화면.
+function targetHashFor(scheduleId) {
+  if (typeof scheduleId === \"number\" && Number.isInteger(scheduleId) && scheduleId > 0) {
+    return \"/#/briefings?schedule_id=\" + scheduleId;
+  }
+  return \"/#/briefings\";
+}
+
+self.addEventListener(\"fetch\", function () {});
+self.addEventListener(\"install\", function () {
+  self.skipWaiting();
+});
+
+self.addEventListener(\"activate\", function (event) {
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener(\"push\", function (event) {
+  var shown = notificationFor(readPayload(event));
+  event.waitUntil(
+    self.registration.showNotification(shown.title, shown.options).then(function () {
+      return self.clients.matchAll({ type: \"window\", includeUncontrolled: true });
+    }).then(function (list) {
+      list.forEach(function (client) {
+        client.postMessage({ type: \"briefing\", schedule_id: shown.scheduleId });
+      });
+    })
+  );
+});
+
+self.addEventListener(\"notificationclick\", function (event) {
+  event.notification.close();
+  var info = event.notification.data;
+  var scheduleId = info && info.schedule_id !== undefined ? info.schedule_id : null;
+  event.waitUntil(
+    self.clients.matchAll({ type: \"window\", includeUncontrolled: true }).then(function (list) {
+      if (list.length > 0) {
+        var client = list[0];
+        return Promise.resolve(client.focus()).then(function () {
+          client.postMessage({ type: \"open-briefing\", schedule_id: scheduleId });
+        });
+      }
+      return self.clients.openWindow(targetHashFor(scheduleId));
+    })
+  );
+});
+"
+
+ ❯ src/__tests__/sw.test.ts:194:26
+    192|
+    193|   it('코드에 요청 가로채기 리스너·캐시 API 호출이 없다', () => {
+    194|     expect(swSource).not.toMatch(/addEventListener\(\s*["']fetch["']/)
+       |                          ^
+    195|     expect(swSource).not.toMatch(/\bonfetch\b/)
+    196|     expect(swSource).not.toMatch(/\bcaches\b/)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  2 failed | 128 passed (130)
+   Start at  20:25:13
+   Duration  1.82s (tests 38%, environment 38%, import 12%, setup 7%, transform 5%)
+
+### 변이 M1-워커에 fetch 리스너 주입 → vitest exit 1 → 잡힘(KILLED)
+### 저장소 web/ 상태(변이 뒤):
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+
+
+# ===== append 2026-10-14T20:25:15+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs M10
+# 시각: 2026-10-14T20:25:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+### 변이: M10-기존 구독에도 구독·POST 진행  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8, 저장소 무수정)
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8
+
+ ✓ src/__tests__/sw.test.ts (14 tests) 10ms
+ ✓ src/__tests__/proxy.test.ts (6 tests) 153ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/api.test.ts (6 tests) 8ms
+ ✓ src/__tests__/briefing.test.tsx (19 tests) 526ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx (14 tests) 492ms
+ ❯ src/__tests__/push.test.ts (20 tests | 1 failed) 460ms
+   ✓ urlBase64ToUint8Array (1)
+     ✓ base64url(-, _, 패딩 없음)을 바이트로 바꾼다 2ms
+   ❯ subscribeToPush 절차 (10)
+     ✓ 새 구독: 권한 → 등록(/sw.js) → 공개키 → 구독 → 서버 저장 순서이고, 본문은 PushSubscriptionIn 필드 그대로 3ms
+     × 이미 구독돼 있으면 "already" — 구독도 서버 저장(POST)도 하지 않는다 3ms
+     ✓ 권한이 허용되지 않으면 "denied" — 등록·공개키·구독이 없다 0ms
+     ✓ 404 push_not_configured 면 "not_configured" — 구독·저장 없이 멈춘다 0ms
+     ✓ 다른 404(코드가 다름)나 5xx 는 "not_configured" 가 아니라 "failed" 0ms
+     ✓ 구독 실패·서버 저장 실패는 "failed" 3ms
+     ✓ 서버 저장(POST)이 실패하면 브라우저 구독을 unsubscribe 1회로 되돌리고 "failed" — 404 push_not_configured 도 같다 1ms
+     ✓ 저장 실패 뒤 다음 클릭은 처음부터 다시 — subscribe 재호출·POST 재시도(이번엔 성공) 0ms
+     ✓ unsubscribe 자체가 실패해도 예외 없이 "failed" 0ms
+     ✓ 미지원 브라우저(serviceWorker·PushManager·Notification 없음)면 "unsupported" — 네트워크 0 0ms
+   ✓ getPushStatus (1)
+     ✓ 미지원 · 구독 없음 · 구독 있음을 가른다(권한 창·네트워크 없음) 0ms
+   ✓ 브리핑 화면 "알림 받기" 버튼 (4)
+     ✓ 미구독 → 진행 중(비활성) → 켜짐(비활성) 세 상태 146ms
+     ✓ 들어올 때 이미 구독돼 있으면 곧바로 "알림 켜짐"(비활성) — 클릭 없이, 서버 저장 없이 39ms
+     ✓ 안내 한 줄: 권한 거부 · 서버 미설정 · 미지원 · 실패 — 버튼은 다시 "알림 받기"(활성) 152ms
+     ✓ /push-dev/ 링크가 없다 9ms
+   ✓ 인앱 배너 (결정 H) (4)
+     ✓ {type:"briefing", schedule_id} 를 받으면 한 줄 배너 — 누르면 #/briefings?schedule_id=N, 누른 뒤 사라진다 43ms
+     ✓ 닫기 버튼으로 닫는다(주소는 그대로) 25ms
+     ✓ schedule_id 가 없으면 일정 없는 브리핑 주소, 모양이 다른 메시지는 무시한다 24ms
+     ✓ 알림을 눌러 온 {type:"open-briefing"} 은 배너 없이 바로 그 일정 주소로 간다 7ms
+ ✓ src/__tests__/chat.test.tsx (22 tests) 856ms
+ ✓ src/__tests__/card.test.tsx (29 tests) 961ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/push.test.ts > subscribeToPush 절차 > 이미 구독돼 있으면 "already" — 구독도 서버 저장(POST)도 하지 않는다
+AssertionError: expected 'failed' to be 'already' // Object.is equality
+
+Expected: "already"
+Received: "failed"
+
+ ❯ src/__tests__/push.test.ts:153:37
+    151|     const world = installPushBrowser({ existing: true })
+    152|     const fetchFn = installFetch({ 'GET /api/push/vapid-public-key': (…
+    153|     expect(await subscribeToPush()).toBe('already')
+       |                                     ^
+    154|     expect(world.subscribe).not.toHaveBeenCalled()
+    155|     expect(callsTo(fetchFn, 'POST', '/api/push/subscriptions')).toHave…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  1 failed | 129 passed (130)
+   Start at  20:25:15
+   Duration  1.92s (tests 38%, environment 38%, import 12%, setup 7%, transform 4%, worker 1%)
+
+### 변이 M10-기존 구독에도 구독·POST 진행 → vitest exit 1 → 잡힘(KILLED)
+### 저장소 web/ 상태(변이 뒤):
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+
+
+# ===== append 2026-10-14T20:25:17+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs M11
+# 시각: 2026-10-14T20:25:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+### 변이: M11-404 push_not_configured 를 일반 실패로  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8, 저장소 무수정)
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8
+
+ ✓ src/__tests__/sw.test.ts (14 tests) 16ms
+ ✓ src/__tests__/proxy.test.ts (6 tests) 116ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/api.test.ts (6 tests) 6ms
+ ❯ src/__tests__/push.test.ts (20 tests | 2 failed) 342ms
+   ✓ urlBase64ToUint8Array (1)
+     ✓ base64url(-, _, 패딩 없음)을 바이트로 바꾼다 2ms
+   ❯ subscribeToPush 절차 (10)
+     ✓ 새 구독: 권한 → 등록(/sw.js) → 공개키 → 구독 → 서버 저장 순서이고, 본문은 PushSubscriptionIn 필드 그대로 3ms
+     ✓ 이미 구독돼 있으면 "already" — 구독도 서버 저장(POST)도 하지 않는다 1ms
+     ✓ 권한이 허용되지 않으면 "denied" — 등록·공개키·구독이 없다 0ms
+     × 404 push_not_configured 면 "not_configured" — 구독·저장 없이 멈춘다 3ms
+     ✓ 다른 404(코드가 다름)나 5xx 는 "not_configured" 가 아니라 "failed" 1ms
+     ✓ 구독 실패·서버 저장 실패는 "failed" 1ms
+     ✓ 서버 저장(POST)이 실패하면 브라우저 구독을 unsubscribe 1회로 되돌리고 "failed" — 404 push_not_configured 도 같다 1ms
+     ✓ 저장 실패 뒤 다음 클릭은 처음부터 다시 — subscribe 재호출·POST 재시도(이번엔 성공) 0ms
+     ✓ unsubscribe 자체가 실패해도 예외 없이 "failed" 0ms
+     ✓ 미지원 브라우저(serviceWorker·PushManager·Notification 없음)면 "unsupported" — 네트워크 0 0ms
+   ✓ getPushStatus (1)
+     ✓ 미지원 · 구독 없음 · 구독 있음을 가른다(권한 창·네트워크 없음) 0ms
+   ❯ 브리핑 화면 "알림 받기" 버튼 (4)
+     ✓ 미구독 → 진행 중(비활성) → 켜짐(비활성) 세 상태 124ms
+     ✓ 들어올 때 이미 구독돼 있으면 곧바로 "알림 켜짐"(비활성) — 클릭 없이, 서버 저장 없이 21ms
+     × 안내 한 줄: 권한 거부 · 서버 미설정 · 미지원 · 실패 — 버튼은 다시 "알림 받기"(활성) 59ms
+     ✓ /push-dev/ 링크가 없다 12ms
+   ✓ 인앱 배너 (결정 H) (4)
+     ✓ {type:"briefing", schedule_id} 를 받으면 한 줄 배너 — 누르면 #/briefings?schedule_id=N, 누른 뒤 사라진다 53ms
+     ✓ 닫기 버튼으로 닫는다(주소는 그대로) 29ms
+     ✓ schedule_id 가 없으면 일정 없는 브리핑 주소, 모양이 다른 메시지는 무시한다 24ms
+     ✓ 알림을 눌러 온 {type:"open-briefing"} 은 배너 없이 바로 그 일정 주소로 간다 7ms
+ ✓ src/__tests__/briefing.test.tsx (19 tests) 467ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx (14 tests) 444ms
+ ✓ src/__tests__/chat.test.tsx (22 tests) 824ms
+ ✓ src/__tests__/card.test.tsx (29 tests) 899ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/push.test.ts > subscribeToPush 절차 > 404 push_not_configured 면 "not_configured" — 구독·저장 없이 멈춘다
+AssertionError: expected 'failed' to be 'not_configured' // Object.is equality
+
+Expected: "not_configured"
+Received: "failed"
+
+ ❯ src/__tests__/push.test.ts:172:37
+    170|       'GET /api/push/vapid-public-key': () => json({ detail: { code: '…
+    171|     })
+    172|     expect(await subscribeToPush()).toBe('not_configured')
+       |                                     ^
+    173|     expect(world.getSubscription).not.toHaveBeenCalled()
+    174|     expect(world.subscribe).not.toHaveBeenCalled()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/push.test.ts > 브리핑 화면 "알림 받기" 버튼 > 안내 한 줄: 권한 거부 · 서버 미설정 · 미지원 · 실패 — 버튼은 다시 "알림 받기"(활성)
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  이 서버는 아직 알림을 준비하지 않았어요.
+Received:
+  알림을 켜지 못했어요. 잠시 후 다시 시도해 주세요.
+ ❯ src/__tests__/push.test.ts:319:54
+    317|       const { unmount } = render(createElement(BriefingScreen))
+    318|       await userEvent.click(await screen.findByRole('button', { name: …
+    319|       expect(await screen.findByTestId('push-note')).toHaveTextContent…
+       |                                                      ^
+    320|       expect(screen.getByRole('button', { name: BRIEFING_NOTICE.subscr…
+    321|       unmount()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  2 failed | 128 passed (130)
+   Start at  20:25:17
+   Duration  1.81s (environment 39%, tests 38%, import 12%, setup 7%, transform 5%)
+
+### 변이 M11-404 push_not_configured 를 일반 실패로 → vitest exit 1 → 잡힘(KILLED)
+### 저장소 web/ 상태(변이 뒤):
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+
+
+# ===== append 2026-10-14T20:25:19+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u8.mjs M31
+# 시각: 2026-10-14T20:25:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 46532e7 (dev2)
+# exit: 0
+# ---
+### 변이: M31-POST 실패 시 unsubscribe 호출 제거  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8, 저장소 무수정)
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmutweb8
+
+ ✓ src/__tests__/sw.test.ts (14 tests) 14ms
+ ✓ src/__tests__/proxy.test.ts (6 tests) 118ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/api.test.ts (6 tests) 7ms
+ ✓ src/__tests__/briefing.test.tsx (19 tests) 510ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx (14 tests) 417ms
+ ❯ src/__tests__/push.test.ts (20 tests | 3 failed) 357ms
+   ✓ urlBase64ToUint8Array (1)
+     ✓ base64url(-, _, 패딩 없음)을 바이트로 바꾼다 3ms
+   ❯ subscribeToPush 절차 (10)
+     ✓ 새 구독: 권한 → 등록(/sw.js) → 공개키 → 구독 → 서버 저장 순서이고, 본문은 PushSubscriptionIn 필드 그대로 6ms
+     ✓ 이미 구독돼 있으면 "already" — 구독도 서버 저장(POST)도 하지 않는다 5ms
+     ✓ 권한이 허용되지 않으면 "denied" — 등록·공개키·구독이 없다 2ms
+     ✓ 404 push_not_configured 면 "not_configured" — 구독·저장 없이 멈춘다 1ms
+     ✓ 다른 404(코드가 다름)나 5xx 는 "not_configured" 가 아니라 "failed" 0ms
+     ✓ 구독 실패·서버 저장 실패는 "failed" 1ms
+     × 서버 저장(POST)이 실패하면 브라우저 구독을 unsubscribe 1회로 되돌리고 "failed" — 404 push_not_configured 도 같다 2ms
+     × 저장 실패 뒤 다음 클릭은 처음부터 다시 — subscribe 재호출·POST 재시도(이번엔 성공) 2ms
+     × unsubscribe 자체가 실패해도 예외 없이 "failed" 0ms
+     ✓ 미지원 브라우저(serviceWorker·PushManager·Notification 없음)면 "unsupported" — 네트워크 0 0ms
+   ✓ getPushStatus (1)
+     ✓ 미지원 · 구독 없음 · 구독 있음을 가른다(권한 창·네트워크 없음) 0ms
+   ✓ 브리핑 화면 "알림 받기" 버튼 (4)
+     ✓ 미구독 → 진행 중(비활성) → 켜짐(비활성) 세 상태 103ms
+     ✓ 들어올 때 이미 구독돼 있으면 곧바로 "알림 켜짐"(비활성) — 클릭 없이, 서버 저장 없이 16ms
+     ✓ 안내 한 줄: 권한 거부 · 서버 미설정 · 미지원 · 실패 — 버튼은 다시 "알림 받기"(활성) 110ms
+     ✓ /push-dev/ 링크가 없다 6ms
+   ✓ 인앱 배너 (결정 H) (4)
+     ✓ {type:"briefing", schedule_id} 를 받으면 한 줄 배너 — 누르면 #/briefings?schedule_id=N, 누른 뒤 사라진다 40ms
+     ✓ 닫기 버튼으로 닫는다(주소는 그대로) 29ms
+     ✓ schedule_id 가 없으면 일정 없는 브리핑 주소, 모양이 다른 메시지는 무시한다 22ms
+     ✓ 알림을 눌러 온 {type:"open-briefing"} 은 배너 없이 바로 그 일정 주소로 간다 6ms
+ ✓ src/__tests__/chat.test.tsx (22 tests) 821ms
+ ✓ src/__tests__/card.test.tsx (29 tests) 866ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/push.test.ts > subscribeToPush 절차 > 서버 저장(POST)이 실패하면 브라우저 구독을 unsubscribe 1회로 되돌리고 "failed" — 404 push_not_configured 도 같다
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ src/__tests__/push.test.ts:209:33
+    207|       })
+    208|       expect(await subscribeToPush()).toBe('failed')
+    209|       expect(world.unsubscribe).toHaveBeenCalledTimes(1)
+       |                                 ^
+    210|       vi.unstubAllGlobals()
+    211|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/__tests__/push.test.ts > subscribeToPush 절차 > 저장 실패 뒤 다음 클릭은 처음부터 다시 — subscribe 재호출·POST 재시도(이번엔 성공)
+AssertionError: expected 'already' to be 'subscribed' // Object.is equality
+
+Expected: "subscribed"
+Received: "already"
+
+ ❯ src/__tests__/push.test.ts:222:37
+    220|     })
+    221|     expect(await subscribeToPush()).toBe('failed')
+    222|     expect(await subscribeToPush()).toBe('subscribed') // "already" 로 …
+       |                                     ^
+    223|     expect(world.subscribe).toHaveBeenCalledTimes(2)
+    224|     expect(callsTo(fetchFn, 'POST', '/api/push/subscriptions')).toHave…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/__tests__/push.test.ts > subscribeToPush 절차 > unsubscribe 자체가 실패해도 예외 없이 "failed"
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ src/__tests__/push.test.ts:234:31
+    232|     })
+    233|     expect(await subscribeToPush()).toBe('failed')
+    234|     expect(world.unsubscribe).toHaveBeenCalledTimes(1)
+       |                               ^
+    235|   })
+    236|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  3 failed | 127 passed (130)
+   Start at  20:25:20
+   Duration  1.86s (environment 41%, tests 35%, import 12%, setup 6%, transform 5%, worker 1%)
+
+### 변이 M31-POST 실패 시 unsubscribe 호출 제거 → vitest exit 1 → 잡힘(KILLED)
+### 저장소 web/ 상태(변이 뒤):
+ M web/index.html
+ M web/public/favicon.svg
+ M web/src/__tests__/briefing.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+?? web/public/icon-192.svg
+?? web/public/icon-512.svg
+?? web/public/manifest.webmanifest
+?? web/public/sw.js
+?? web/src/__tests__/push.test.ts
+?? web/src/__tests__/sw.test.ts
+?? web/src/push.ts
+
