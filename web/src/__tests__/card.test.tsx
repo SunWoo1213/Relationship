@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '@/App'
 import PersonCardScreen, { CARD_NOTICE } from '@/screens/PersonCardScreen'
 import { PERSON_LIST_NOTICE } from '@/components/PersonList'
+import { notifyPersonsChanged, PersonsProvider } from '@/components/PersonsProvider'
 import appShellSource from '@/components/AppShell.tsx?raw'
 import cardScreenSource from '@/screens/PersonCardScreen.tsx?raw'
 import type {
@@ -99,7 +100,7 @@ afterEach(() => {
 describe('인물 목록', () => {
   it('서버 순서 그대로(재정렬 없음) 이름·태그·위계·마지막 접촉 4개 필드를 보여 준다', async () => {
     install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<PersonCardScreen personId={null} />)
+    render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
     const list = await screen.findByTestId('person-list')
     const rows = within(list).getAllByRole('link')
     expect(rows.map((r) => r.querySelector('[data-field="name"]')?.textContent)).toEqual(['박대리', '철수', '엄마'])
@@ -114,7 +115,7 @@ describe('인물 목록', () => {
 
   it('필터·검색 컨트롤이 없다', async () => {
     install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<PersonCardScreen personId={null} />)
+    render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
     await screen.findByTestId('person-list')
     expect(screen.queryByRole('textbox')).toBeNull()
     expect(screen.queryByRole('searchbox')).toBeNull()
@@ -123,20 +124,20 @@ describe('인물 목록', () => {
 
   it('빈 목록이면 빈 상태 문구 하나', async () => {
     install(router({ '/api/persons': () => json([]) }))
-    render(<PersonCardScreen personId={null} />)
+    render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
     expect(await screen.findByText(PERSON_LIST_NOTICE.empty)).toBeInTheDocument()
     expect(screen.queryByTestId('person-list')).toBeNull()
   })
 
   it('목록 조회가 실패하면 한 줄 안내', async () => {
     install(router({ '/api/persons': () => json({ detail: { code: 'x' } }, 500) }))
-    render(<PersonCardScreen personId={null} />)
+    render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
     expect(await screen.findByText(PERSON_LIST_NOTICE.failed)).toBeInTheDocument()
   })
 
   it('항목 링크는 #/persons/:id 이고 누르면 해시가 바뀐다', async () => {
     install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<PersonCardScreen personId={null} />)
+    render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
     const links = within(await screen.findByTestId('person-list')).getAllByRole('link')
     expect(links.map((l) => l.getAttribute('href'))).toEqual(['#/persons/7', '#/persons/4', '#/persons/9'])
     await userEvent.click(links[1])
@@ -161,6 +162,98 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
       '철수친구 · 동2026. 10. 5.',
       `엄마가족 · 상${PERSON_LIST_NOTICE.noContact}`,
     ])
+  })
+
+  it('R-U6-2: 앱을 열면 GET /persons 는 1회(사이드바·본문이 한 번 받은 값을 같이 쓴다)', async () => {
+    window.history.replaceState(null, '', '#/persons')
+    const fetchFn = install(router({ '/api/persons': () => json(PERSONS) }))
+    render(<App />)
+    await waitFor(() => expect(screen.getAllByTestId('person-list')).toHaveLength(2))
+    expect(callsTo(fetchFn, '/api/persons')).toHaveLength(1)
+  })
+
+  it('R-U6-2: 해시 라우트가 바뀌면 다시 읽어 새 인물이 사이드바에 보인다', async () => {
+    window.history.replaceState(null, '', '#/chat')
+    let body: PersonListItemOut[] = [PERSONS[0]]
+    const fetchFn = install(
+      router({ '/api/persons': () => json(body), '/api/questions/pending': () => json([]) }),
+    )
+    render(<App />)
+    const side = screen.getByTestId('sidebar-persons')
+    await within(side).findByText('박대리')
+    expect(within(side).queryByText('철수')).toBeNull()
+
+    body = [PERSONS[1], PERSONS[0]]
+    window.location.hash = '#/persons'
+    expect(await within(side).findByText('철수')).toBeInTheDocument()
+    expect(callsTo(fetchFn, '/api/persons')).toHaveLength(2)
+  })
+
+  it('R-U6-2: 채팅 응답 stored.persons > 0 이면 다시 읽고, 0 이면 읽지 않는다', async () => {
+    window.history.replaceState(null, '', '#/chat')
+    let body: PersonListItemOut[] = [PERSONS[0]]
+    const fetchFn = install(
+      router({
+        '/api/persons': () => json(body),
+        '/api/questions/pending': () => json([]),
+        '/api/chat': () => {
+          body = [PERSONS[1], PERSONS[0]]
+          return json({
+            reply: 'ok',
+            session_id: 's1',
+            stored: { persons: 1, events: 0, schedules: 0 },
+            pending_question: null,
+            stop_reason: null,
+            trace_ids: [],
+          })
+        },
+      }),
+    )
+    render(<App />)
+    const side = screen.getByTestId('sidebar-persons')
+    await within(side).findByText('박대리')
+    const user = userEvent.setup()
+    await user.type(screen.getByRole('textbox'), '철수 만났어')
+    await user.keyboard('{Enter}')
+    expect(await within(side).findByText('철수')).toBeInTheDocument()
+    expect(callsTo(fetchFn, '/api/persons')).toHaveLength(2)
+  })
+
+  it('R-U6-2: 채팅 응답 stored.persons 가 0 이면(사건만 저장) 인물 목록을 다시 읽지 않는다', async () => {
+    window.history.replaceState(null, '', '#/chat')
+    const fetchFn = install(
+      router({
+        '/api/persons': () => json([PERSONS[0]]),
+        '/api/questions/pending': () => json([]),
+        '/api/chat': () =>
+          json({
+            reply: 'ok',
+            session_id: 's1',
+            stored: { persons: 0, events: 2, schedules: 0 },
+            pending_question: null,
+            stop_reason: null,
+            trace_ids: [],
+          }),
+      }),
+    )
+    render(<App />)
+    await within(screen.getByTestId('sidebar-persons')).findByText('박대리')
+    const user = userEvent.setup()
+    await user.type(screen.getByRole('textbox'), '점심 먹었어')
+    await user.keyboard('{Enter}')
+    await screen.findByText('ok')
+    await new Promise((r) => setTimeout(r, 50))
+    expect(callsTo(fetchFn, '/api/chat')).toHaveLength(1)
+    expect(callsTo(fetchFn, '/api/persons')).toHaveLength(1)
+  })
+
+  it('R-U6-2: 알림 이벤트(persons-changed)만으로도 다시 읽는다', async () => {
+    window.history.replaceState(null, '', '#/persons')
+    const fetchFn = install(router({ '/api/persons': () => json(PERSONS) }))
+    render(<App />)
+    await waitFor(() => expect(screen.getAllByTestId('person-list')).toHaveLength(2))
+    notifyPersonsChanged()
+    await waitFor(() => expect(callsTo(fetchFn, '/api/persons')).toHaveLength(2))
   })
 
   it('사이드바와 본문이 같은 컴포넌트(PersonList)를 import 한다', () => {
@@ -351,6 +444,37 @@ describe('원문 펼치기 (결정 F)', () => {
     expect((await within(item).findByTestId('raw-utterance')).textContent).toBe(RAW_A)
     expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(2)
     expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it('R-U6-1: 로딩 중 접기 → 요청 실패 → 다시 펼치면 열리고 재시도해 원문이 나온다', async () => {
+    let rejectFirst: () => void = () => {}
+    let n = 0
+    const fetchFn = install(
+      cardRouter({
+        '/api/events/9/raw': () => {
+          if (n++ === 0) {
+            return new Promise<Response>((resolve) => {
+              rejectFirst = () => resolve(json({ detail: { code: 'x' } }, 500))
+            })
+          }
+          return json(rawOut(9, RAW_A))
+        },
+      }),
+    )
+    render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const item = screen.getByTestId('timeline-9')
+    const user = userEvent.setup()
+
+    await user.click(within(item).getByRole('button', { name: CARD_NOTICE.showRaw })) // 1) 펼침(로딩)
+    await user.click(within(item).getByRole('button', { name: CARD_NOTICE.hideRaw })) // 2) 로딩 중 접음
+    rejectFirst() // 3) 요청 실패
+    await waitFor(() => expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(1))
+    await user.click(within(item).getByRole('button', { name: CARD_NOTICE.showRaw })) // 4) 다시 펼침
+
+    expect((await within(item).findByTestId('raw-utterance')).textContent).toBe(RAW_A)
+    expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(2)
+    expect(within(item).getByRole('button', { name: CARD_NOTICE.hideRaw })).toBeInTheDocument()
   })
 
   it('근거 보기: sources 요청 1회, 항목 수·날짜·content·원문이 그대로, 접기, 다시 펼쳐도 재요청 없음', async () => {

@@ -3,6 +3,7 @@ import { MenuIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import PersonList from '@/components/PersonList'
+import { PersonsProvider } from '@/components/PersonsProvider'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { HREF, type Route } from '@/routes'
 
@@ -52,6 +53,7 @@ export default function AppShell({ route, children }: { route: Route; children: 
   const [open, setOpen] = useState(false)
 
   return (
+    <PersonsProvider>
     <div className="flex h-dvh bg-background text-foreground">
       {isDesktop ? (
         <aside className="w-64 shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
@@ -77,5 +79,6 @@ export default function AppShell({ route, children }: { route: Route; children: 
       )}
       <main className="min-w-0 flex-1 overflow-y-auto p-6 pt-14 lg:pt-6">{children}</main>
     </div>
+    </PersonsProvider>
   )
 }

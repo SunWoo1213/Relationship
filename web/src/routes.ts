@@ -32,6 +32,17 @@ export function parseHash(hash: string): Route | null {
   return null
 }
 
+/**
+ * `#/briefings?schedule_id=12` → 12. 양의 정수 모양이 아니거나 없으면 null.
+ * 알림 클릭이 여는 주소다(결정 H) — 새 라우트가 아니라 `/briefings` 의 쿼리일 뿐이다.
+ */
+export function parseScheduleId(hash: string): number | null {
+  const q = hash.indexOf('?')
+  if (q === -1) return null
+  const raw = new URLSearchParams(hash.slice(q + 1)).get('schedule_id')
+  return raw !== null && /^[1-9]\d*$/.test(raw) ? Number(raw) : null
+}
+
 function subscribe(onChange: () => void): () => void {
   window.addEventListener('hashchange', onChange)
   return () => window.removeEventListener('hashchange', onChange)
@@ -39,6 +50,11 @@ function subscribe(onChange: () => void): () => void {
 
 function snapshot(): string {
   return window.location.hash
+}
+
+/** 현재 해시의 `schedule_id` 쿼리를 구독한다(브리핑 화면용). */
+export function useScheduleIdParam(): number | null {
+  return parseScheduleId(useSyncExternalStore(subscribe, snapshot))
 }
 
 /** 현재 해시를 구독한다. 알 수 없는 해시면 주소를 `#/chat` 으로 바꾸고 chat 을 돌려준다. */

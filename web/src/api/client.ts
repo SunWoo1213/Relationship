@@ -5,6 +5,9 @@ import { clearSessionId, getSessionId, setSessionId } from '@/session'
 import type {
   AnswerIn,
   AnswerOut,
+  BriefingRecordOut,
+  BriefingRunIn,
+  BriefingRunOut,
   ChatIn,
   ChatOut,
   ChatPendingQuestionOut,
@@ -113,6 +116,23 @@ export function getEventRaw(eventId: number): Promise<EventRawOut> {
 
 export function getFactSources(personId: number, factId: number): Promise<FactSourcesOut> {
   return apiFetch<FactSourcesOut>(`/persons/${personId}/facts/${factId}/sources`)
+}
+
+// --- 브리핑 (GET /briefings · POST /briefings/run) ---
+
+/**
+ * 저장된 브리핑. 서버가 일정 시각 내림차순(7일 창, 상한 20)으로 준다 — 호출 쪽은 재정렬하지 않는다.
+ * scheduleId 를 주면 그 일정 1건(기간 무시) 또는 `[]`, 없거나 남의 일정이면 404.
+ */
+export function getBriefings(scheduleId?: number): Promise<BriefingRecordOut[]> {
+  const query = scheduleId === undefined ? '' : `?schedule_id=${scheduleId}`
+  return apiFetch<BriefingRecordOut[]>(`/briefings${query}`)
+}
+
+/** 수동 브리핑. 404 는 잠금 중(결정 K) — 호출 쪽이 안내만 하고 다시 보내지 않는다. */
+export function postBriefingRun(scheduleId: number): Promise<BriefingRunOut> {
+  const body: BriefingRunIn = { schedule_id: scheduleId }
+  return apiFetch<BriefingRunOut>('/briefings/run', { method: 'POST', body })
 }
 
 /** 이 세션의 미답변 질문 전부. 세션이 없으면 서버가 빈 목록을 준다. */

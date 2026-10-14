@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 're
 import { SendIcon } from 'lucide-react'
 import { ApiError, getPendingQuestions, postAnswer, postChat } from '@/api/client'
 import type { ChatPendingQuestionOut, StoredOut } from '@/api/types'
+import { notifyPersonsChanged } from '@/components/PersonsProvider'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { HREF } from '@/routes'
@@ -175,6 +176,7 @@ export default function ChatScreen() {
     setWaiting((n) => n + 1)
     try {
       const out = await postChat(text)
+      if (out.stored.persons > 0) notifyPersonsChanged() // 사이드바 인물 목록 다시 읽기 (R-U6-2)
       setMessages((prev) => [
         ...prev,
         {
@@ -199,6 +201,7 @@ export default function ChatScreen() {
     setWaiting((n) => n + 1)
     try {
       const out = await postAnswer(questionId, option)
+      if (out.stored.persons > 0) notifyPersonsChanged()
       setMessages((prev) => [
         ...prev,
         {

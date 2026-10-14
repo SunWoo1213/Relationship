@@ -1,0 +1,83 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/deps_u7.sh
+# 시각: 2026-10-14T19:46:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 761cced (dev2)
+# exit: 0
+# ---
+## 1. package.json · package-lock.json 작업 트리 vs HEAD
+
+$ git diff --stat -- web/package.json web/package-lock.json
+[exit 0]
+
+$ git diff --quiet -- web/package.json web/package-lock.json; echo quiet-exit=$?
+quiet-exit=0
+[exit 0]
+
+## 2. scripts (HEAD 기준) — 셸 전용·삭제 명령 유무
+
+$ git show HEAD:web/package.json | python3 -c 'import json,sys; d=json.load(sys.stdin); print(json.dumps(d["scripts"], ensure_ascii=False, indent=1)); print("deps:", len(d.get("dependencies",{})), "devDeps:", len(d.get("devDependencies",{})))'
+{
+ "dev": "vite",
+ "build": "tsc -b && vite build",
+ "typecheck": "tsc -b",
+ "test": "vitest",
+ "e2e": "playwright test --pass-with-no-tests",
+ "lint": "oxlint",
+ "preview": "vite preview"
+}
+deps: 10 devDeps: 15
+[exit 0]
+
+## 3. npm audit --omit=dev
+
+$ cd web && npm audit --omit=dev
+found 0 vulnerabilities
+[exit 0]
+
+## 4. ?raw import (테스트) — 저장소 안 소스만
+
+$ grep -rn '?raw' web/src/__tests__ | cut -c1-140
+grep: web/src/__tests__: No such file or directory
+[exit 0]
+
+## 5. 새 shadcn 부품·새 패키지 사용 여부 — BriefingScreen import 목록
+
+$ grep -n '^import' web/src/screens/BriefingScreen.tsx web/src/components/PersonsProvider.tsx
+grep: web/src/screens/BriefingScreen.tsx: No such file or directory
+grep: web/src/components/PersonsProvider.tsx: No such file or directory
+[exit 2]
+
+$ ls web/src/components/ui
+ls: web/src/components/ui: No such file or directory
+[exit 1]
+
+# ===== append 2026-10-14T19:47:44+09:00 =====
+# 명령: cd /Users/sunwoo/Desktop/Portfolio/Relationship; echo "## 4·5 보충(절대 경로)"; grep -rn "?raw" web/src/__tests__ | cut -c1-140; echo "[exit $?]"; grep -n "^import" web/src/screens/BriefingScreen.tsx web/src/components/PersonsProvider.tsx; ls web/src/components/ui
+# 시각: 2026-10-14T19:47:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 761cced (dev2)
+# exit: 0
+# ---
+## 4·5 보충(절대 경로)
+web/src/__tests__/card.test.tsx:10:import appShellSource from '@/components/AppShell.tsx?raw'
+web/src/__tests__/card.test.tsx:11:import cardScreenSource from '@/screens/PersonCardScreen.tsx?raw'
+[exit 0]
+web/src/screens/BriefingScreen.tsx:6:import { useCallback, useEffect, useRef, useState } from 'react'
+web/src/screens/BriefingScreen.tsx:7:import { ApiError, getBriefings, postBriefingRun } from '@/api/client'
+web/src/screens/BriefingScreen.tsx:8:import type { BriefingRecordOut } from '@/api/types'
+web/src/screens/BriefingScreen.tsx:9:import { Button } from '@/components/ui/button'
+web/src/screens/BriefingScreen.tsx:10:import { Card } from '@/components/ui/card'
+web/src/screens/BriefingScreen.tsx:11:import { formatDateTime } from '@/lib/format'
+web/src/screens/BriefingScreen.tsx:12:import { cn } from '@/lib/utils'
+web/src/screens/BriefingScreen.tsx:13:import { useScheduleIdParam } from '@/routes'
+web/src/components/PersonsProvider.tsx:4:import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+web/src/components/PersonsProvider.tsx:5:import { getPersons } from '@/api/client'
+web/src/components/PersonsProvider.tsx:6:import type { PersonListItemOut } from '@/api/types'
+badge.tsx
+button.tsx
+card.tsx
+collapsible.tsx
+sheet.tsx
+skeleton.tsx
+sonner.tsx
+tabs.tsx

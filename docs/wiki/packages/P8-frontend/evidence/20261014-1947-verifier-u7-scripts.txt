@@ -1,0 +1,523 @@
+# 명령: for f in vmut_u7.mjs zz_probe_u7.test.tsx grep_u7.sh deps_u7.sh; do p=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/$f; echo "===== $f ($(wc -l < $p) 줄, sha256 $(shasum -a 256 $p | cut -c1-16))"; cat $p; echo; done
+# 시각: 2026-10-14T19:47:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 761cced (dev2)
+# exit: 0
+# ---
+===== vmut_u7.mjs (      70 줄, sha256 159dea3d5383ec58)
+// verifier U7 변이·탐침 러너 — web/ 을 스크래치패드 사본(vmutweb)으로 복사해 한 곳만 바꾸고,
+// ① 기존 테스트 묶음(탐침 제외) ② 탐침 zz_probe_u7.test.tsx 를 각각 vitest 로 그대로(요약 없이) 흘린다.
+// 저장소 파일은 건드리지 않는다. 끝에 `git status --short -- web` 으로 무수정을 보인다.
+import { cpSync, existsSync, readFileSync, rmSync, symlinkSync, writeFileSync, copyFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { join } from 'node:path'
+
+const REPO = '/Users/sunwoo/Desktop/Portfolio/Relationship'
+const SRC = join(REPO, 'web')
+const PAD = '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad'
+const DST = join(PAD, 'vmutweb')
+const PROBE = join(PAD, 'zz_probe_u7.test.tsx')
+
+function fresh() {
+  if (existsSync(DST)) rmSync(DST, { recursive: true, force: true })
+  cpSync(SRC, DST, { recursive: true, filter: (p) => !/(node_modules|[\\/]dist|test-results)([\\/]|$)/.test(p.slice(SRC.length)) })
+  symlinkSync(join(SRC, 'node_modules'), join(DST, 'node_modules'))
+  copyFileSync(PROBE, join(DST, 'src/__tests__/zz_probe_u7.test.tsx'))
+}
+
+function sub(path, oldText, newText) {
+  const p = join(DST, path)
+  const s = readFileSync(p, 'utf-8')
+  if (!s.includes(oldText)) throw new Error(`치환 대상 없음: ${JSON.stringify(oldText)}`)
+  writeFileSync(p, s.replace(oldText, newText))
+}
+
+const B = 'src/screens/BriefingScreen.tsx'
+const V = 'src/components/PersonsProvider.tsx'
+const C = 'src/screens/ChatScreen.tsx'
+
+const MUTS = {
+  'V0-대조군(무변이)': () => {},
+  // 내 변이 — 구현자 M1~M20 과 겹치지 않는 것
+  'V1-목록 재요청을 POST 전에': () => {
+    sub(B, "      setRunStates((s) => ({ ...s, [id]: 'running' }))\n      try {", "      setRunStates((s) => ({ ...s, [id]: 'running' }))\n      await load()\n      try {")
+    sub(B, '      await load()\n      setRunStates((s) => {', '      setRunStates((s) => {')
+  },
+  'V2-창 밖 단건을 강조 없이 붙임': () => sub(B, 'if (extra) items.push({ record: extra, highlighted: true })', 'if (extra) items.push({ record: extra, highlighted: false })'),
+  'V3-강조의 보이는 스타일만 제거(data-highlight 유지)': () => sub(B, "highlighted && 'bg-accent ring-2 ring-primary'", "false && 'bg-accent ring-2 ring-primary'"),
+  'V4-PersonsProvider 늦은 응답 카운터 제거': () => sub(V, '        if (mine !== latest.current) return\n        setPersons(list)', '        setPersons(list)'),
+  'V5-재조회 실패 시 목록 비움(이전 목록 유지 안 함)': () => sub(B, '      if (!stale()) setFailed(true)\n      return', '      if (!stale()) {\n        setFailed(true)\n        setList([])\n      }\n      return'),
+  // 구현자 변이 재실행 (mut_u7.mjs 와 같은 치환)
+  'M1-목록 재정렬 주입(id 오름차순)': () => sub(B, 'records = await getBriefings()', 'records = (await getBriefings()).sort((a, b) => a.schedule.id - b.schedule.id)'),
+  'M5-404 자동 재시도 주입': () =>
+    sub(B, "        setRunStates((s) => ({ ...s, [id]: state }))\n        return", "        if (state === 'locked') await postBriefingRun(id).catch(() => {})\n        setRunStates((s) => ({ ...s, [id]: state }))\n        return"),
+  'M13-목록 안 일정을 맨 위로 올리지 않음': () => sub(B, 'items.push({ record: top, highlighted: true })\n      list.forEach((r) => r !== top && items.push({ record: r, highlighted: false }))', 'list.forEach((r) => items.push({ record: r, highlighted: r === top }))'),
+  'M19-R-U6-2 알림 조건 > 0 → >= 0': () => sub(C, 'if (out.stored.persons > 0) notifyPersonsChanged() //', 'if (out.stored.persons >= 0) notifyPersonsChanged() //'),
+}
+
+const name = process.argv[2]
+if (!(name in MUTS)) {
+  console.log('알 수 없는 이름:', name, '\n가능:\n  ' + Object.keys(MUTS).join('\n  '))
+  process.exit(3)
+}
+fresh()
+MUTS[name]()
+const env = { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0', CI: '1', DEBUG_PRINT_LIMIT: '0' }
+function vitest(args) {
+  return spawnSync('npx', ['vitest', '--run', '--reporter=default', ...args], { cwd: DST, stdio: 'inherit', env }).status
+}
+console.log(`### 변이: ${name}  (사본 ${DST}, 저장소 무수정)`)
+console.log('### [1/2] 기존 테스트 묶음 (탐침 제외)')
+const e1 = vitest(['--exclude', '**/zz_probe_*'])
+console.log(`### [1/2] ${name} → 기존 묶음 vitest exit ${e1} → ${e1 !== 0 ? '잡힘(KILLED)' : '살아남음(SURVIVED)'}`)
+console.log('### [2/2] 탐침 zz_probe_u7.test.tsx')
+const e2 = vitest(['src/__tests__/zz_probe_u7.test.tsx'])
+console.log(`### [2/2] ${name} → 탐침 vitest exit ${e2} → ${e2 !== 0 ? '탐침이 가름(FAIL)' : '탐침 통과(PASS)'}`)
+const st = spawnSync('git', ['status', '--short', '--', 'web'], { cwd: REPO, encoding: 'utf-8' })
+console.log('### 저장소 web/ git status --short (U7 작업 트리 그대로여야 한다):\n' + st.stdout)
+
+===== zz_probe_u7.test.tsx (     254 줄, sha256 a38c6f07b417858c)
+// verifier 탐침 (U7) — 저장소에 넣지 않는다. vmut_u7.mjs 가 사본(vmutweb)에만 복사해 돌린다.
+// 목적: 구현자 테스트가 가르지 못하는 경계를 실측한다. 실패 = 결함 또는 테스트 틈(소견에서 구분).
+import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import App from '@/App'
+import BriefingScreen, { BRIEFING_NOTICE } from '@/screens/BriefingScreen'
+import { notifyPersonsChanged } from '@/components/PersonsProvider'
+import type { BriefingRecordOut, BriefingRunOut, PersonListItemOut } from '@/api/types'
+import { installFakeMatchMedia } from './helpers'
+
+type Handler = (url: string, init: RequestInit) => Response | Promise<Response>
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+}
+
+function install(handler: Handler) {
+  const fn = vi.fn((input: RequestInfo | URL, init?: RequestInit) => Promise.resolve(handler(String(input), init ?? {})))
+  vi.stubGlobal('fetch', fn)
+  return fn
+}
+
+function router(table: Record<string, Handler>): Handler {
+  return (url, init) => {
+    const key = `${init.method ?? 'GET'} ${url}`
+    if (table[key]) return table[key](url, init)
+    throw new Error(`예상하지 못한 요청: ${key}`)
+  }
+}
+
+function callsOf(fn: ReturnType<typeof install>, method: string, url: string) {
+  return fn.mock.calls.filter(([u, init]) => String(u) === url && ((init as RequestInit)?.method ?? 'GET') === method)
+}
+
+function order(fn: ReturnType<typeof install>): string[] {
+  return fn.mock.calls.map(([u, init]) => `${(init as RequestInit)?.method ?? 'GET'} ${String(u)}`)
+}
+
+const BASIS = { fact_keys: ['bk_zq'], event_ids: [424242] }
+
+function record(scheduleId: number, name: string, title: string, scheduledAt: string, extra: Partial<BriefingRecordOut> = {}): BriefingRecordOut {
+  return {
+    schedule: { id: scheduleId, title, scheduled_at: scheduledAt },
+    person: { id: scheduleId + 100, display_name: name },
+    generated_at: '2026-10-13T00:00:00Z',
+    composer: 'template',
+    pattern_sentences: [],
+    lines: [],
+    suggestion: null,
+    push: 'PUSHVAL_zq',
+    trace_id: 777001,
+    ...extra,
+  }
+}
+
+const R5 = record(5, '김팀장', '분기 회의', '2026-10-14T06:00:00Z', { lines: [{ text: '김팀장 줄', basis: BASIS }] })
+const R2 = record(2, '철수', '저녁 약속', '2026-10-13T06:00:00Z', { lines: [{ text: '철수 요약 줄', basis: BASIS }] })
+const R9 = record(9, '박대리', '1:1 면담', '2026-10-12T06:00:00Z')
+const LIST = [R5, R2, R9]
+
+const FIRST: PersonListItemOut = { id: 1, display_name: '첫째', relation_tag: '친구', hierarchy: '동', last_contact_at: null }
+const SECOND: PersonListItemOut = { id: 2, display_name: '둘째', relation_tag: '친구', hierarchy: '동', last_contact_at: null }
+
+function ids(): string[] {
+  const list = screen.getByTestId('briefing-list')
+  return Array.from(list.querySelectorAll(':scope > li')).map((li) => li.getAttribute('data-testid') ?? '')
+}
+
+function emptyRun(): BriefingRunOut {
+  return { run_id: 'r1', generated_at: '2026-10-13T01:00:00Z', briefings: [], skipped: [] }
+}
+
+beforeEach(() => {
+  window.localStorage.clear()
+  installFakeMatchMedia(1280)
+  window.history.replaceState(null, '', '#/briefings')
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+  window.history.replaceState(null, '', '#/chat')
+})
+
+describe('[P1] 원칙7 역방향 — 응답에 몰래 실은 필드는 화면에 없다', () => {
+  it('GET /briefings 의 raw_utterance(6자리)·basis·push·trace_id·composer 가 textContent·innerHTML 어디에도 없다', async () => {
+    const SM = 'SMUGGLED_RAW_zq'
+    const smuggled = {
+      ...record(5, '김팀장', '분기 회의', '2026-10-14T06:00:00Z'),
+      raw_utterance: SM,
+      schedule: { id: 5, title: '분기 회의', scheduled_at: '2026-10-14T06:00:00Z', raw_utterance: SM },
+      person: { id: 105, display_name: '김팀장', raw_utterance: SM },
+      pattern_sentences: [{ key: 'pattern:conflict', sentence: '패턴 문장', raw_utterance: SM }],
+      lines: [{ text: '요약 줄', basis: BASIS, raw_utterance: SM }],
+      suggestion: { text: '제안 줄', basis: BASIS, raw_utterance: SM },
+      composer: 'llm',
+    } as unknown as BriefingRecordOut
+    install(router({ 'GET /api/briefings': () => json([smuggled]) }))
+    render(<BriefingScreen />)
+    await screen.findByTestId('briefing-5')
+    const text = document.body.textContent ?? ''
+    const html = document.body.innerHTML
+    for (const marker of [SM, 'bk_zq', '424242', 'PUSHVAL_zq', '777001', 'llm', 'template']) {
+      expect(text, `textContent 에 ${marker}`).not.toContain(marker)
+      expect(html, `innerHTML 에 ${marker}`).not.toContain(marker)
+    }
+    // 보여야 할 것은 보인다
+    expect(text).toContain('패턴 문장')
+    expect(text).toContain('요약 줄')
+    expect(text).toContain('제안 줄')
+    console.log('[P1a] 몰래 실은 7개 마커 전부 미표시 = true')
+  })
+
+  it('POST /briefings/run 응답의 briefings[] 줄은 화면에 끼워 넣지 않는다 — 다시 읽은 GET 만 보인다', async () => {
+    const runOut = {
+      ...emptyRun(),
+      briefings: [
+        { schedule_id: 2, person_id: 102, composer: 'template', pattern_sentences: [], lines: [{ text: 'POST응답줄_zq', basis: BASIS }], suggestion: null, push: 'sent', raw_utterance: 'SMUGGLED_RAW_zq' },
+      ],
+    }
+    install(router({ 'GET /api/briefings': () => json(LIST), 'POST /api/briefings/run': () => json(runOut) }))
+    render(<BriefingScreen />)
+    const item = await screen.findByTestId('briefing-2')
+    await userEvent.click(within(item).getByRole('button', { name: BRIEFING_NOTICE.runNow }))
+    await waitFor(() => expect(within(item).getByRole('button', { name: BRIEFING_NOTICE.runNow })).toBeEnabled())
+    await new Promise((r) => setTimeout(r, 50))
+    expect(document.body.textContent).not.toContain('POST응답줄_zq')
+    expect(document.body.textContent).not.toContain('SMUGGLED_RAW_zq')
+    expect(document.body.textContent).toContain('철수 요약 줄')
+    console.log('[P1b] POST 응답 줄 미표시 = true')
+  })
+})
+
+describe('[P2] PersonsProvider — GET /persons 횟수·늦은 응답', () => {
+  it('[P2a] #/nope(알 수 없는 해시) 진입 — GET /persons 실제 횟수', async () => {
+    window.history.replaceState(null, '', '#/nope')
+    const fn = install(router({ 'GET /api/persons': () => json([FIRST]), 'GET /api/questions/pending': () => json([]) }))
+    render(<App />)
+    await within(screen.getByTestId('sidebar-persons')).findByText('첫째')
+    await new Promise((r) => setTimeout(r, 100))
+    const count = callsOf(fn, 'GET', '/api/persons').length
+    console.log(`[P2a] #/nope 진입 → GET /persons 횟수 = ${count}, 해시 = ${window.location.hash}`)
+    expect(window.location.hash).toBe('#/chat')
+    expect(count).toBeLessThanOrEqual(2)
+  })
+
+  it('[P2b] #/chat 정상 진입 — GET /persons 1회, 채팅 대기 질문 1회', async () => {
+    window.history.replaceState(null, '', '#/chat')
+    const fn = install(router({ 'GET /api/persons': () => json([FIRST]), 'GET /api/questions/pending': () => json([]) }))
+    render(<App />)
+    await within(screen.getByTestId('sidebar-persons')).findByText('첫째')
+    await new Promise((r) => setTimeout(r, 100))
+    const count = callsOf(fn, 'GET', '/api/persons').length
+    console.log(`[P2b] #/chat 진입 → GET /persons 횟수 = ${count}`)
+    expect(count).toBe(1)
+  })
+
+  it('[P2c] 느린 1차 응답이 빠른 2차 응답(알림 이벤트 재조회)을 덮지 않는다', async () => {
+    window.history.replaceState(null, '', '#/persons')
+    let resolveFirst: (r: Response) => void = () => {}
+    let n = 0
+    const fn = install(
+      router({
+        'GET /api/persons': () => {
+          if (n++ === 0) return new Promise<Response>((resolve) => { resolveFirst = resolve })
+          return json([SECOND])
+        },
+      }),
+    )
+    render(<App />)
+    await waitFor(() => expect(callsOf(fn, 'GET', '/api/persons')).toHaveLength(1))
+    notifyPersonsChanged()
+    const side = screen.getByTestId('sidebar-persons')
+    await within(side).findByText('둘째')
+    resolveFirst(json([FIRST]))
+    await new Promise((r) => setTimeout(r, 80))
+    const overwritten = within(side).queryByText('첫째') !== null
+    console.log(`[P2c] 늦은 1차 응답 뒤 사이드바 = ${overwritten ? '첫째(덮임)' : '둘째(유지)'}, GET /persons 횟수 = ${callsOf(fn, 'GET', '/api/persons').length}`)
+    expect(overwritten).toBe(false)
+    expect(within(side).getByText('둘째')).toBeInTheDocument()
+  })
+})
+
+describe('[P3] 앱 전체로 #/briefings?schedule_id=9 진입 (결정 H 주소)', () => {
+  it('브리핑 화면이 열리고 해시가 유지되며 9 가 맨 위·강조, 단건 요청 0, 사이드바 현재 항목 = 브리핑', async () => {
+    window.history.replaceState(null, '', '#/briefings?schedule_id=9')
+    const fn = install(router({ 'GET /api/persons': () => json([FIRST]), 'GET /api/briefings': () => json(LIST) }))
+    const { container } = render(<App />)
+    await screen.findByTestId('briefing-9')
+    expect(container.querySelector('[data-screen="briefings"]')).not.toBeNull()
+    expect(window.location.hash).toBe('#/briefings?schedule_id=9')
+    expect(ids()).toEqual(['briefing-9', 'briefing-5', 'briefing-2'])
+    expect(screen.getByTestId('briefing-9')).toHaveAttribute('data-highlight', 'true')
+    expect(screen.getByRole('link', { name: '브리핑' })).toHaveAttribute('aria-current', 'page')
+    await new Promise((r) => setTimeout(r, 50))
+    expect(callsOf(fn, 'GET', '/api/briefings?schedule_id=9')).toHaveLength(0)
+    console.log(`[P3] 호출 순서 = ${JSON.stringify(order(fn))}`)
+  })
+})
+
+describe('[P4] 구현자 판단 ④ — 재조회 실패 시 이전 목록 유지', () => {
+  it('지금 브리핑 성공 뒤 GET 이 500 이면 이전 목록 3건 그대로 + 실패 안내 한 줄, 빈 상태 문구 없음', async () => {
+    let n = 0
+    install(
+      router({
+        'GET /api/briefings': () => (n++ === 0 ? json(LIST) : json({ detail: { code: 'x' } }, 500)),
+        'POST /api/briefings/run': () => json(emptyRun()),
+      }),
+    )
+    render(<BriefingScreen />)
+    const item = await screen.findByTestId('briefing-2')
+    await userEvent.click(within(item).getByRole('button', { name: BRIEFING_NOTICE.runNow }))
+    expect(await screen.findByText(BRIEFING_NOTICE.listFailed)).toBeInTheDocument()
+    expect(ids()).toEqual(['briefing-5', 'briefing-2', 'briefing-9'])
+    expect(screen.queryByText(BRIEFING_NOTICE.empty)).toBeNull()
+    console.log('[P4] 재조회 실패 뒤 목록 유지 = true')
+  })
+})
+
+describe('[P6] 강조가 보이는 스타일로도 구분되는가', () => {
+  it('강조 항목의 Card 에 ring 클래스가 있고, 다른 항목에는 없다', async () => {
+    window.history.replaceState(null, '', '#/briefings?schedule_id=9')
+    install(router({ 'GET /api/briefings': () => json(LIST) }))
+    render(<BriefingScreen />)
+    await screen.findByTestId('briefing-9')
+    const hi = screen.getByTestId('briefing-9').firstElementChild
+    const lo = screen.getByTestId('briefing-5').firstElementChild
+    console.log(`[P6] 강조 항목 class = ${hi?.className} / 비강조 = ${lo?.className}`)
+    expect(hi?.className).toMatch(/ring-2/)
+    expect(lo?.className).not.toMatch(/ring-2/)
+  })
+})
+
+describe('[P7] 목록 재요청은 POST 가 끝난 뒤에 간다 (순서)', () => {
+  it('GET → POST → GET 순서이고, POST 뒤 서버 상태가 화면에 반영된다', async () => {
+    let posted = false
+    const NEW2 = record(2, '철수', '저녁 약속', '2026-10-13T06:00:00Z', { lines: [{ text: '새로 만든 줄', basis: BASIS }] })
+    const fn = install(
+      router({
+        'GET /api/briefings': () => json(posted ? [NEW2, R9] : LIST),
+        'POST /api/briefings/run': () => {
+          posted = true
+          return json(emptyRun())
+        },
+      }),
+    )
+    render(<BriefingScreen />)
+    const item = await screen.findByTestId('briefing-2')
+    await userEvent.click(within(item).getByRole('button', { name: BRIEFING_NOTICE.runNow }))
+    expect(await screen.findByText('새로 만든 줄')).toBeInTheDocument()
+    expect(order(fn)).toEqual(['GET /api/briefings', 'POST /api/briefings/run', 'GET /api/briefings'])
+    console.log(`[P7] 호출 순서 = ${JSON.stringify(order(fn))}`)
+  })
+})
+
+===== grep_u7.sh (      84 줄, sha256 fdbe7ddc0ab38d40)
+#!/bin/bash
+# verifier U7 grep 점검 — 읽기 전용. 각 명령을 `$ ...` 로 먼저 찍고 출력·exit 를 남긴다.
+cd /Users/sunwoo/Desktop/Portfolio/Relationship || exit 3
+run() { echo; echo "\$ $1"; eval "$1"; echo "[exit $?]"; }
+
+echo '## 0. HEAD · 작업 트리 · numstat · 삭제·신규'
+run "git rev-parse --short HEAD; git status --short"
+run "git diff --numstat -- web docs/wiki/registry.md"
+run "git diff --diff-filter=D --name-only"
+run "git ls-files --others --exclude-standard -- web docs/wiki/packages/P8-frontend/evidence"
+
+echo; echo '## 1. 범위: app/ alembic/ tests/ .github/ 무변경 (빈 출력 기대)'
+run "git status --short -- app alembic tests .github"
+
+echo; echo '## 2. 원칙7: 서버 문자열 변환 호출 (BriefingScreen·PersonsProvider·PersonList·routes·client)'
+run "grep -nE '\.(trim|trimStart|trimEnd|slice|replace|replaceAll|toLowerCase|toUpperCase|substring|substr|split|normalize|padStart|padEnd|repeat)\(' web/src/screens/BriefingScreen.tsx web/src/components/PersonsProvider.tsx web/src/components/PersonList.tsx web/src/routes.ts web/src/api/client.ts"
+
+echo; echo '## 3. 서버 순서 보존: sort/reverse/filter/slice/splice (BriefingScreen·Provider·PersonList)'
+run "grep -nE '\.(sort|reverse|filter|slice|splice)\(' web/src/screens/BriefingScreen.tsx web/src/components/PersonsProvider.tsx web/src/components/PersonList.tsx"
+
+echo; echo '## 4. basis·raw_utterance·push·trace_id·composer·generated_at 사용처 (BriefingScreen) — 표시 0 기대'
+run "grep -nE 'basis|raw_utterance|record\.push|trace_id|composer|generated_at' web/src/screens/BriefingScreen.tsx"
+
+echo; echo '## 5. 표시되는 서버 필드 (JSX 중괄호) · 날짜 포맷 호출 인자'
+run "grep -nE '\{(record|schedule|person|p|l)\.[a-zA-Z_.]+\}|formatDateTime\(' web/src/screens/BriefingScreen.tsx"
+
+echo; echo '## 6. innerHTML / dangerouslySetInnerHTML (제품 코드) — 0 기대'
+run "grep -rnE 'innerHTML|dangerouslySetInnerHTML' web/src --include='*.ts' --include='*.tsx' | grep -v __tests__"
+
+echo; echo '## 7. /push-dev/ · 외부 URL (제품 코드) — 0 기대'
+run "grep -rnE 'push-dev|https?://' web/src --include='*.ts' --include='*.tsx' | grep -v __tests__"
+
+echo; echo '## 8. 원칙5 불변식: HREF 3 · Route 3종 · data-screen 3 · App/main/index.html/test-setup/설정 diff 0 · routes.ts 변경 줄'
+run "grep -nE \"^  (chat|persons|briefings): '#/\" web/src/routes.ts"
+run "grep -nE \"name: '(chat|persons|briefings)'\" web/src/routes.ts"
+run "grep -rn 'data-screen=' web/src/screens web/src/App.tsx"
+run "git diff --stat -- web/src/App.tsx web/src/main.tsx web/index.html web/src/test-setup.ts web/vite.config.ts web/tsconfig.json web/tsconfig.app.json web/package.json web/package-lock.json web/public"
+run "git diff -U0 -- web/src/routes.ts | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)'"
+
+echo; echo '## 9. 상호 import: ChatScreen↔AppShell 0 · PersonsProvider/PersonList 가 화면을 import 하지 않음'
+run "grep -n \"@/components/AppShell\" web/src/screens/ChatScreen.tsx web/src/components/PersonsProvider.tsx"
+run "grep -n \"@/screens\" web/src/components/AppShell.tsx web/src/components/PersonsProvider.tsx web/src/components/PersonList.tsx"
+run "grep -n '^import' web/src/components/PersonsProvider.tsx web/src/components/PersonList.tsx"
+
+echo; echo '## 10. 사이드바·본문 같은 PersonList import (기존 테스트 card.test 유지)'
+run "grep -n \"import PersonList from '@/components/PersonList'\" web/src/components/AppShell.tsx web/src/screens/PersonCardScreen.tsx"
+run "grep -n 'PersonList2\|같은 컴포넌트(PersonList)' web/src/__tests__/card.test.tsx"
+
+echo; echo '## 11. 결정 H: 알림 받기 자리(비활성) · push.ts/sw.js 없음 · 구독 호출 0'
+run "grep -nE 'push-subscribe|subscribe|disabled' web/src/screens/BriefingScreen.tsx"
+run "ls web/src/push.ts web/public/sw.js web/public/manifest.webmanifest 2>&1"
+run "grep -rnE 'pushManager|vapid|serviceWorker' web/src --include='*.ts' --include='*.tsx' | grep -v __tests__"
+
+echo; echo '## 12. 고정 문구 BRIEFING_NOTICE (구현자 판단 ⑥)'
+run "sed -n '/export const BRIEFING_NOTICE/,/as const/p' web/src/screens/BriefingScreen.tsx"
+
+echo; echo '## 13. 상담·감정 어휘 (원칙7 경계) — 0 기대'
+run "grep -nE '상담|감정|위로|힘내|마음|고민' web/src/screens/BriefingScreen.tsx web/src/components/PersonsProvider.tsx"
+
+echo; echo '## 14. 비밀 패턴 (web diff + 신규 파일) — 0 기대'
+run "git diff -- web | grep -nE 'sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}|AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{36}|AIza[0-9A-Za-z_-]{35}|eyJ[A-Za-z0-9_-]{20,}[.]'"
+run "grep -nE 'sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}|AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{36}' web/src/__tests__/briefing.test.tsx web/src/components/PersonsProvider.tsx"
+
+echo; echo '## 15. 결정 J: test-setup 차단 유지 · briefing.test 가짜 fetch·unstub'
+run "grep -n 'globalThis.fetch' web/src/test-setup.ts"
+run "grep -c 'vi.stubGlobal' web/src/__tests__/briefing.test.tsx; grep -n 'unstubAllGlobals' web/src/__tests__/briefing.test.tsx"
+
+echo; echo '## 16. card.test.tsx 에서 빠진 줄(- 줄) — render 줄 5개뿐이어야 단언 약화 0'
+run "git diff -U0 -- web/src/__tests__/card.test.tsx | grep -E '^-[^-]'"
+
+echo; echo '## 17. registry U7 행 (앞 160자)'
+run "grep -n 'U7' docs/wiki/registry.md | cut -c1-160"
+
+echo; echo '## 18. 백엔드 계약: BriefingRecordOut (schemas.py 197~211) vs types.ts (172~183) · read.py 상수'
+run "sed -n '203,211p' app/api/schemas.py"
+run "sed -n '173,183p' web/src/api/types.ts"
+run "grep -nE 'BRIEFINGS_LOOKBACK_DAYS|BRIEFINGS_LIMIT' app/api/read.py | head -4"
+
+echo; echo '## 19. PersonsProvider 카운터·이벤트 · ChatScreen 알림 2곳'
+run "grep -nE 'latest|hashchange|PERSONS_CHANGED_EVENT' web/src/components/PersonsProvider.tsx"
+run "grep -n 'notifyPersonsChanged' web/src/screens/ChatScreen.tsx"
+
+echo; echo '## 20. BriefingScreen 의 schedule_id 입력 → POST 본문 · 404 분기 · 재시도 코드'
+run "grep -nE 'postBriefingRun|status === 404|setTimeout|setInterval|retry' web/src/screens/BriefingScreen.tsx web/src/api/client.ts"
+
+===== deps_u7.sh (      21 줄, sha256 efb7bdb355054662)
+#!/bin/bash
+# verifier U7 R-U0-3 고정 점검 — package.json·lock 무변경, scripts 무변경, npm audit --omit=dev
+cd /Users/sunwoo/Desktop/Portfolio/Relationship || exit 3
+run() { echo; echo "\$ $1"; eval "$1"; echo "[exit $?]"; }
+
+echo '## 1. package.json · package-lock.json 작업 트리 vs HEAD'
+run "git diff --stat -- web/package.json web/package-lock.json"
+run "git diff --quiet -- web/package.json web/package-lock.json; echo quiet-exit=\$?"
+
+echo; echo '## 2. scripts (HEAD 기준) — 셸 전용·삭제 명령 유무'
+run "git show HEAD:web/package.json | python3 -c 'import json,sys; d=json.load(sys.stdin); print(json.dumps(d[\"scripts\"], ensure_ascii=False, indent=1)); print(\"deps:\", len(d.get(\"dependencies\",{})), \"devDeps:\", len(d.get(\"devDependencies\",{})))'"
+
+echo; echo '## 3. npm audit --omit=dev'
+run "cd web && npm audit --omit=dev"
+
+echo; echo '## 4. ?raw import (테스트) — 저장소 안 소스만'
+run "grep -rn '?raw' web/src/__tests__ | cut -c1-140"
+
+echo; echo '## 5. 새 shadcn 부품·새 패키지 사용 여부 — BriefingScreen import 목록'
+run "grep -n '^import' web/src/screens/BriefingScreen.tsx web/src/components/PersonsProvider.tsx"
+run "ls web/src/components/ui"
+
+
+# ===== append 2026-10-14T19:49:24+09:00 =====
+# 명령: p=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/vmut_u7.mjs; echo "===== vmut_u7.mjs (M16 추가 뒤 최종, $(wc -l < $p) 줄, sha256 $(shasum -a 256 $p | cut -c1-16))"; cat $p
+# 시각: 2026-10-14T19:49:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 761cced (dev2)
+# exit: 0
+# ---
+===== vmut_u7.mjs (M16 추가 뒤 최종,       71 줄, sha256 5aa1d967416c4e72)
+// verifier U7 변이·탐침 러너 — web/ 을 스크래치패드 사본(vmutweb)으로 복사해 한 곳만 바꾸고,
+// ① 기존 테스트 묶음(탐침 제외) ② 탐침 zz_probe_u7.test.tsx 를 각각 vitest 로 그대로(요약 없이) 흘린다.
+// 저장소 파일은 건드리지 않는다. 끝에 `git status --short -- web` 으로 무수정을 보인다.
+import { cpSync, existsSync, readFileSync, rmSync, symlinkSync, writeFileSync, copyFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { join } from 'node:path'
+
+const REPO = '/Users/sunwoo/Desktop/Portfolio/Relationship'
+const SRC = join(REPO, 'web')
+const PAD = '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad'
+const DST = join(PAD, 'vmutweb')
+const PROBE = join(PAD, 'zz_probe_u7.test.tsx')
+
+function fresh() {
+  if (existsSync(DST)) rmSync(DST, { recursive: true, force: true })
+  cpSync(SRC, DST, { recursive: true, filter: (p) => !/(node_modules|[\\/]dist|test-results)([\\/]|$)/.test(p.slice(SRC.length)) })
+  symlinkSync(join(SRC, 'node_modules'), join(DST, 'node_modules'))
+  copyFileSync(PROBE, join(DST, 'src/__tests__/zz_probe_u7.test.tsx'))
+}
+
+function sub(path, oldText, newText) {
+  const p = join(DST, path)
+  const s = readFileSync(p, 'utf-8')
+  if (!s.includes(oldText)) throw new Error(`치환 대상 없음: ${JSON.stringify(oldText)}`)
+  writeFileSync(p, s.replace(oldText, newText))
+}
+
+const B = 'src/screens/BriefingScreen.tsx'
+const V = 'src/components/PersonsProvider.tsx'
+const C = 'src/screens/ChatScreen.tsx'
+
+const MUTS = {
+  'V0-대조군(무변이)': () => {},
+  // 내 변이 — 구현자 M1~M20 과 겹치지 않는 것
+  'V1-목록 재요청을 POST 전에': () => {
+    sub(B, "      setRunStates((s) => ({ ...s, [id]: 'running' }))\n      try {", "      setRunStates((s) => ({ ...s, [id]: 'running' }))\n      await load()\n      try {")
+    sub(B, '      await load()\n      setRunStates((s) => {', '      setRunStates((s) => {')
+  },
+  'V2-창 밖 단건을 강조 없이 붙임': () => sub(B, 'if (extra) items.push({ record: extra, highlighted: true })', 'if (extra) items.push({ record: extra, highlighted: false })'),
+  'V3-강조의 보이는 스타일만 제거(data-highlight 유지)': () => sub(B, "highlighted && 'bg-accent ring-2 ring-primary'", "false && 'bg-accent ring-2 ring-primary'"),
+  'V4-PersonsProvider 늦은 응답 카운터 제거': () => sub(V, '        if (mine !== latest.current) return\n        setPersons(list)', '        setPersons(list)'),
+  'V5-재조회 실패 시 목록 비움(이전 목록 유지 안 함)': () => sub(B, '      if (!stale()) setFailed(true)\n      return', '      if (!stale()) {\n        setFailed(true)\n        setList([])\n      }\n      return'),
+  // 구현자 변이 재실행 (mut_u7.mjs 와 같은 치환)
+  'M1-목록 재정렬 주입(id 오름차순)': () => sub(B, 'records = await getBriefings()', 'records = (await getBriefings()).sort((a, b) => a.schedule.id - b.schedule.id)'),
+  'M5-404 자동 재시도 주입': () =>
+    sub(B, "        setRunStates((s) => ({ ...s, [id]: state }))\n        return", "        if (state === 'locked') await postBriefingRun(id).catch(() => {})\n        setRunStates((s) => ({ ...s, [id]: state }))\n        return"),
+  'M13-목록 안 일정을 맨 위로 올리지 않음': () => sub(B, 'items.push({ record: top, highlighted: true })\n      list.forEach((r) => r !== top && items.push({ record: r, highlighted: false }))', 'list.forEach((r) => items.push({ record: r, highlighted: r === top }))'),
+  'M16-R-U6-1 처방 되돌리기(setOpen 제거)': () => sub('src/screens/PersonCardScreen.tsx', '      setOpen(true)\n      return run()', '      return run()'),
+  'M19-R-U6-2 알림 조건 > 0 → >= 0': () => sub(C, 'if (out.stored.persons > 0) notifyPersonsChanged() //', 'if (out.stored.persons >= 0) notifyPersonsChanged() //'),
+}
+
+const name = process.argv[2]
+if (!(name in MUTS)) {
+  console.log('알 수 없는 이름:', name, '\n가능:\n  ' + Object.keys(MUTS).join('\n  '))
+  process.exit(3)
+}
+fresh()
+MUTS[name]()
+const env = { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0', CI: '1', DEBUG_PRINT_LIMIT: '0' }
+function vitest(args) {
+  return spawnSync('npx', ['vitest', '--run', '--reporter=default', ...args], { cwd: DST, stdio: 'inherit', env }).status
+}
+console.log(`### 변이: ${name}  (사본 ${DST}, 저장소 무수정)`)
+console.log('### [1/2] 기존 테스트 묶음 (탐침 제외)')
+const e1 = vitest(['--exclude', '**/zz_probe_*'])
+console.log(`### [1/2] ${name} → 기존 묶음 vitest exit ${e1} → ${e1 !== 0 ? '잡힘(KILLED)' : '살아남음(SURVIVED)'}`)
+console.log('### [2/2] 탐침 zz_probe_u7.test.tsx')
+const e2 = vitest(['src/__tests__/zz_probe_u7.test.tsx'])
+console.log(`### [2/2] ${name} → 탐침 vitest exit ${e2} → ${e2 !== 0 ? '탐침이 가름(FAIL)' : '탐침 통과(PASS)'}`)
+const st = spawnSync('git', ['status', '--short', '--', 'web'], { cwd: REPO, encoding: 'utf-8' })
+console.log('### 저장소 web/ git status --short (U7 작업 트리 그대로여야 한다):\n' + st.stdout)

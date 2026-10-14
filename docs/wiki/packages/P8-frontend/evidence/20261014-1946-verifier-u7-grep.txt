@@ -1,0 +1,368 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/26227371-bd2e-4443-b52d-7efea685d3e5/scratchpad/grep_u7.sh
+# 시각: 2026-10-14T19:46:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 761cced (dev2)
+# exit: 0
+# ---
+## 0. HEAD · 작업 트리 · numstat · 삭제·신규
+
+$ git rev-parse --short HEAD; git status --short
+761cced
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8-frontend/03-log.md
+ M docs/wiki/registry.md
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/client.ts
+ M web/src/components/AppShell.tsx
+ M web/src/components/PersonList.tsx
+ M web/src/routes.ts
+ M web/src/screens/BriefingScreen.tsx
+ M web/src/screens/ChatScreen.tsx
+ M web/src/screens/PersonCardScreen.tsx
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1945-u7-briefing.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1945-u7-mutation.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1946-u7-briefing.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1946-u7-mutation-script.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261013-1947-u7-main-recheck.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-1946-verifier-u7-deps.txt
+?? docs/wiki/packages/P8-frontend/evidence/20261014-1946-verifier-u7-judge.txt
+?? web/src/__tests__/briefing.test.tsx
+?? web/src/components/PersonsProvider.tsx
+[exit 0]
+
+$ git diff --numstat -- web docs/wiki/registry.md
+6	3	docs/wiki/registry.md
+129	5	web/src/__tests__/card.test.tsx
+20	0	web/src/api/client.ts
+3	0	web/src/components/AppShell.tsx
+3	15	web/src/components/PersonList.tsx
+16	0	web/src/routes.ts
+218	3	web/src/screens/BriefingScreen.tsx
+3	0	web/src/screens/ChatScreen.tsx
+5	1	web/src/screens/PersonCardScreen.tsx
+[exit 0]
+
+$ git diff --diff-filter=D --name-only
+[exit 0]
+
+$ git ls-files --others --exclude-standard -- web docs/wiki/packages/P8-frontend/evidence
+docs/wiki/packages/P8-frontend/evidence/20261013-1945-u7-briefing.txt
+docs/wiki/packages/P8-frontend/evidence/20261013-1945-u7-mutation.txt
+docs/wiki/packages/P8-frontend/evidence/20261013-1946-u7-briefing.txt
+docs/wiki/packages/P8-frontend/evidence/20261013-1946-u7-mutation-script.txt
+docs/wiki/packages/P8-frontend/evidence/20261013-1947-u7-main-recheck.txt
+docs/wiki/packages/P8-frontend/evidence/20261014-1946-verifier-u7-deps.txt
+docs/wiki/packages/P8-frontend/evidence/20261014-1946-verifier-u7-judge.txt
+web/src/__tests__/briefing.test.tsx
+web/src/components/PersonsProvider.tsx
+[exit 0]
+
+## 1. 범위: app/ alembic/ tests/ .github/ 무변경 (빈 출력 기대)
+
+$ git status --short -- app alembic tests .github
+[exit 0]
+
+## 2. 원칙7: 서버 문자열 변환 호출 (BriefingScreen·PersonsProvider·PersonList·routes·client)
+
+$ grep -nE '\.(trim|trimStart|trimEnd|slice|replace|replaceAll|toLowerCase|toUpperCase|substring|substr|split|normalize|padStart|padEnd|repeat)\(' web/src/screens/BriefingScreen.tsx web/src/components/PersonsProvider.tsx web/src/components/PersonList.tsx web/src/routes.ts web/src/api/client.ts
+web/src/routes.ts:19:  const withoutHash = hash.startsWith('#') ? hash.slice(1) : hash
+web/src/routes.ts:21:  return q === -1 ? withoutHash : withoutHash.slice(0, q)
+web/src/routes.ts:42:  const raw = new URLSearchParams(hash.slice(q + 1)).get('schedule_id')
+[exit 0]
+
+## 3. 서버 순서 보존: sort/reverse/filter/slice/splice (BriefingScreen·Provider·PersonList)
+
+$ grep -nE '\.(sort|reverse|filter|slice|splice)\(' web/src/screens/BriefingScreen.tsx web/src/components/PersonsProvider.tsx web/src/components/PersonList.tsx
+[exit 1]
+
+## 4. basis·raw_utterance·push·trace_id·composer·generated_at 사용처 (BriefingScreen) — 표시 0 기대
+
+$ grep -nE 'basis|raw_utterance|record\.push|trace_id|composer|generated_at' web/src/screens/BriefingScreen.tsx
+3:// 서버 문자열(sentence · text · title · display_name)은 고치지 않고 그대로 보여 준다 (원칙7). `basis` 는 화면에 쓰지 않는다.
+[exit 0]
+
+## 5. 표시되는 서버 필드 (JSX 중괄호) · 날짜 포맷 호출 인자
+
+$ grep -nE '\{(record|schedule|person|p|l)\.[a-zA-Z_.]+\}|formatDateTime\(' web/src/screens/BriefingScreen.tsx
+44:    <li data-testid={`briefing-${schedule.id}`} data-highlight={highlighted ? 'true' : undefined}>
+48:          {formatDateTime(schedule.scheduled_at)} · {person.display_name} · {schedule.title}
+53:              <li key={p.key} className="flex gap-2">
+55:                <span data-field="pattern">{p.sentence}</span>
+61:                <span data-field="line">{l.text}</span>
+69:            <p data-field="suggestion">{record.suggestion.text}</p>
+212:              key={record.schedule.id}
+[exit 0]
+
+## 6. innerHTML / dangerouslySetInnerHTML (제품 코드) — 0 기대
+
+$ grep -rnE 'innerHTML|dangerouslySetInnerHTML' web/src --include='*.ts' --include='*.tsx' | grep -v __tests__
+[exit 1]
+
+## 7. /push-dev/ · 외부 URL (제품 코드) — 0 기대
+
+$ grep -rnE 'push-dev|https?://' web/src --include='*.ts' --include='*.tsx' | grep -v __tests__
+web/src/proxy.ts:5:export const DEFAULT_API_TARGET = 'http://localhost:8000'
+[exit 0]
+
+## 8. 원칙5 불변식: HREF 3 · Route 3종 · data-screen 3 · App/main/index.html/test-setup/설정 diff 0 · routes.ts 변경 줄
+
+$ grep -nE "^  (chat|persons|briefings): '#/" web/src/routes.ts
+10:  chat: '#/chat',
+11:  persons: '#/persons',
+12:  briefings: '#/briefings',
+[exit 0]
+
+$ grep -nE "name: '(chat|persons|briefings)'" web/src/routes.ts
+5:  | { name: 'chat' }
+6:  | { name: 'persons'; personId: number | null }
+7:  | { name: 'briefings' }
+27:  if (path === '/chat') return { name: 'chat' }
+28:  if (path === '/briefings') return { name: 'briefings' }
+29:  if (path === '/persons') return { name: 'persons', personId: null }
+31:  if (m) return { name: 'persons', personId: Number(m[1]) }
+72:  return route ?? { name: 'chat' }
+[exit 0]
+
+$ grep -rn 'data-screen=' web/src/screens web/src/App.tsx
+web/src/screens/BriefingScreen.tsx:180:    <section aria-labelledby="screen-title" data-screen="briefings" className="flex flex-col gap-4">
+web/src/screens/ChatScreen.tsx:237:    <section aria-labelledby="screen-title" data-screen="chat" className="mx-auto flex h-full max-w-3xl flex-col">
+web/src/screens/PersonCardScreen.tsx:328:      data-screen="persons"
+[exit 0]
+
+$ git diff --stat -- web/src/App.tsx web/src/main.tsx web/index.html web/src/test-setup.ts web/vite.config.ts web/tsconfig.json web/tsconfig.app.json web/package.json web/package-lock.json web/public
+[exit 0]
+
+$ git diff -U0 -- web/src/routes.ts | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)'
++/**
++ * `#/briefings?schedule_id=12` → 12. 양의 정수 모양이 아니거나 없으면 null.
++ * 알림 클릭이 여는 주소다(결정 H) — 새 라우트가 아니라 `/briefings` 의 쿼리일 뿐이다.
++ */
++export function parseScheduleId(hash: string): number | null {
++  const q = hash.indexOf('?')
++  if (q === -1) return null
++  const raw = new URLSearchParams(hash.slice(q + 1)).get('schedule_id')
++  return raw !== null && /^[1-9]\d*$/.test(raw) ? Number(raw) : null
++}
++
++/** 현재 해시의 `schedule_id` 쿼리를 구독한다(브리핑 화면용). */
++export function useScheduleIdParam(): number | null {
++  return parseScheduleId(useSyncExternalStore(subscribe, snapshot))
++}
++
+[exit 0]
+
+## 9. 상호 import: ChatScreen↔AppShell 0 · PersonsProvider/PersonList 가 화면을 import 하지 않음
+
+$ grep -n "@/components/AppShell" web/src/screens/ChatScreen.tsx web/src/components/PersonsProvider.tsx
+[exit 1]
+
+$ grep -n "@/screens" web/src/components/AppShell.tsx web/src/components/PersonsProvider.tsx web/src/components/PersonList.tsx
+[exit 1]
+
+$ grep -n '^import' web/src/components/PersonsProvider.tsx web/src/components/PersonList.tsx
+web/src/components/PersonsProvider.tsx:4:import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+web/src/components/PersonsProvider.tsx:5:import { getPersons } from '@/api/client'
+web/src/components/PersonsProvider.tsx:6:import type { PersonListItemOut } from '@/api/types'
+web/src/components/PersonList.tsx:3:import { usePersons } from '@/components/PersonsProvider'
+web/src/components/PersonList.tsx:4:import { formatDate } from '@/lib/format'
+web/src/components/PersonList.tsx:5:import { HREF } from '@/routes'
+[exit 0]
+
+## 10. 사이드바·본문 같은 PersonList import (기존 테스트 card.test 유지)
+
+$ grep -n "import PersonList from '@/components/PersonList'" web/src/components/AppShell.tsx web/src/screens/PersonCardScreen.tsx
+web/src/components/AppShell.tsx:5:import PersonList from '@/components/PersonList'
+web/src/screens/PersonCardScreen.tsx:15:import PersonList from '@/components/PersonList'
+[exit 0]
+
+$ grep -n 'PersonList2\|같은 컴포넌트(PersonList)' web/src/__tests__/card.test.tsx
+259:  it('사이드바와 본문이 같은 컴포넌트(PersonList)를 import 한다', () => {
+[exit 0]
+
+## 11. 결정 H: 알림 받기 자리(비활성) · push.ts/sw.js 없음 · 구독 호출 0
+
+$ grep -nE 'push-subscribe|subscribe|disabled' web/src/screens/BriefingScreen.tsx
+25:  subscribe: '알림 받기',
+77:            disabled={runState === 'running'}
+184:        <div data-slot="push-subscribe">
+185:          <Button type="button" variant="outline" size="sm" disabled>
+186:            {BRIEFING_NOTICE.subscribe}
+[exit 0]
+
+$ ls web/src/push.ts web/public/sw.js web/public/manifest.webmanifest 2>&1
+ls: web/public/manifest.webmanifest: No such file or directory
+ls: web/public/sw.js: No such file or directory
+ls: web/src/push.ts: No such file or directory
+[exit 1]
+
+$ grep -rnE 'pushManager|vapid|serviceWorker' web/src --include='*.ts' --include='*.tsx' | grep -v __tests__
+web/src/api/types.ts:212:// --- 푸시 (GET /push/vapid-public-key, POST /push/subscriptions) ---
+[exit 0]
+
+## 12. 고정 문구 BRIEFING_NOTICE (구현자 판단 ⑥)
+
+$ sed -n '/export const BRIEFING_NOTICE/,/as const/p' web/src/screens/BriefingScreen.tsx
+export const BRIEFING_NOTICE = {
+  empty: '아직 만들어진 브리핑이 없어요.',
+  listFailed: '브리핑을 불러오지 못했어요.',
+  scheduleMissing: '그 일정의 브리핑이 아직 없어요.',
+  runNow: '지금 브리핑',
+  running: '브리핑 만드는 중',
+  runLocked: '잠시 뒤 다시 시도해 주세요.',
+  runFailed: '브리핑을 만들지 못했어요. 잠시 후 다시 시도해 주세요.',
+  suggestionTitle: '💡 제안',
+  subscribe: '알림 받기',
+} as const
+[exit 0]
+
+## 13. 상담·감정 어휘 (원칙7 경계) — 0 기대
+
+$ grep -nE '상담|감정|위로|힘내|마음|고민' web/src/screens/BriefingScreen.tsx web/src/components/PersonsProvider.tsx
+web/src/screens/BriefingScreen.tsx:165:  // 쿼리의 일정이 목록에 있으면 그것을 맨 위로(나머지는 서버 순서 그대로), 없으면 단건을 맨 위에 붙인다.
+[exit 0]
+
+## 14. 비밀 패턴 (web diff + 신규 파일) — 0 기대
+
+$ git diff -- web | grep -nE 'sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}|AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{36}|AIza[0-9A-Za-z_-]{35}|eyJ[A-Za-z0-9_-]{20,}[.]'
+[exit 1]
+
+$ grep -nE 'sk-(proj-|ant-)?[A-Za-z0-9_-]{24,}|AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{36}' web/src/__tests__/briefing.test.tsx web/src/components/PersonsProvider.tsx
+[exit 1]
+
+## 15. 결정 J: test-setup 차단 유지 · briefing.test 가짜 fetch·unstub
+
+$ grep -n 'globalThis.fetch' web/src/test-setup.ts
+10:globalThis.fetch = (() => {
+[exit 0]
+
+$ grep -c 'vi.stubGlobal' web/src/__tests__/briefing.test.tsx; grep -n 'unstubAllGlobals' web/src/__tests__/briefing.test.tsx
+2
+90:  vi.unstubAllGlobals()
+209:      vi.unstubAllGlobals()
+[exit 0]
+
+## 16. card.test.tsx 에서 빠진 줄(- 줄) — render 줄 5개뿐이어야 단언 약화 0
+
+$ git diff -U0 -- web/src/__tests__/card.test.tsx | grep -E '^-[^-]'
+-    render(<PersonCardScreen personId={null} />)
+-    render(<PersonCardScreen personId={null} />)
+-    render(<PersonCardScreen personId={null} />)
+-    render(<PersonCardScreen personId={null} />)
+-    render(<PersonCardScreen personId={null} />)
+[exit 0]
+
+## 17. registry U7 행 (앞 160자)
+
+$ grep -n 'U7' docs/wiki/registry.md | cut -c1-160
+34:| 문서 | 프로젝트 README(전체 소개·스택·진행 상태·하네스·실행법) | README.md | 하네스 | pending | 패키지 완료마다 진행 상태 표 갱신. P0-compose: 로컬 DB 절 추가(2026-09-04), pg16 태그는 P9-infra 에서 재확인. P
+54:| 테스트 | 저장소 루트 `sys.path` 등록(공용 fixture) | tests/conftest.py | P1-schema | d7113e9 | `app` 패키지 임포트를 위한 `sys.path.insert` — `tests/test_db_check.py` 기존 방식은 그대
+65:| 엔드포인트 | FastAPI 앱 팩토리·예외 매핑 | app/main.py | P2-tools | 4d5817e | `create_app()`(라우터 등록 + 도메인 예외→HTTP 매핑 8종, import·기동 시 엔진 생성 없음), 모듈 레벨 `app` **P6-briefin
+67:| 엔드포인트 | 요청 단위 세션·ToolContext 조립 | app/api/deps.py | P2-tools | 4d5817e | `get_session()`(요청 단위 세션, commit/rollback/close), `build_ctx()`(답할 `pending_questi
+68:| 엔드포인트 | GET /health · POST /answers/{id} | app/api/routes.py | P2-tools | 4d5817e | `/health`: SELECT 1 + `alembic_version`, 실패 시 `main.py` 캐치올이 503; `/ans
+69:| 엔드포인트 | API 요청/응답 스키마 | app/api/schemas.py | P2-tools | 4d5817e | `AnswerIn`·`AnswerOut`·`HealthOut`(pydantic v2, 접속 정보·비밀 필드 없음) **P5-loop U6(d5c8ec9)·U7(
+79:| 테스트 | HTTP: /health·/answers 200/404/409/422 | tests/test_api.py | P2-tools | 4d5817e | `TestClient` + `dependency_overrides[get_session]`(결정13) **P5-loop 
+81:| 모듈 | ER 패키지 재export | app/er/__init__.py | P3-er | cc5d24f | `resolve`·`apply_resolution`·`Resolution`·`AppliedResolution`·`Judge`·`FakeJudge`·`judge_from_
+82:| 모듈 | ER 공용 타입 | app/er/types.py | P3-er | cc5d24f | `ScoredCandidate`·`Judgement`(자기보고 `s_llm`·`provider`, R4)·`Resolution`(`trace_id`·`confidence_breakdow
+88:| 모듈 | ER 오케스트레이션(resolve/apply_resolution) | app/er/pipeline.py | P3-er | cc5d24f | `resolve(ctx, mention, utterance, hints=None, *, judge=None, config=None
+97:| 테스트 | ER 파이프라인 회귀(승진·이모 배제·동명이인)·trace 계약 | tests/test_er_pipeline.py | P3-er | a807364 | 생성 d6e5949(U6, 10건: stages·no_side_effect·recompute 등) → 회귀 3종+ap
+132:| 모듈 | 파일럿 평가 지표 계산기(U1 JSONL → 방식 × `T_merge` 별 지표) | evaluation/metrics.py | P4-pilot-eval | a97521b | U2. 입력은 **JSONL 한 파일뿐**(DB·네트워크·LLM·`app/` 호출 0). `
+134:| 모듈 | 보정표 작성기(U1 JSONL → `s_llm` 구간별 실제 정답률 = 자기보고 점수의 신뢰 근거) | evaluation/calibration.py | P4-pilot-eval | ee124b7 | U3, R4·D3. 입력은 **JSONL 한 파일뿐**(DB·네트워
+136:| 모듈 | 곡선(`T_merge` 10점 × 3계열 × 5방식)·`metrics.json` 조립·게이트 판정(결정 K) | evaluation/curve.py | P4-pilot-eval | a59ecb4 | U4. 입력은 **U1 JSONL(또는 U2 `compute_metr
+138:| 모듈 | 리포트 생성기(`metrics.json` → `reports/eval.md` — 표·곡선 표·게이트·최적점 후보·한계) | evaluation/report.py | P4-pilot-eval | dd6a996 | U5. 입력은 **`metrics.json` 한 파일뿐*
+140:| 스크립트 | 파일럿 평가 실행 CLI(예상 비용 → 가드 → runner→metrics→calibration→curve→validate→report 사슬) | scripts/run_pilot_eval.py | P4-pilot-eval | 0283ac0 | U6. `--dry-
+141:| 테스트 | 실행 CLI 순수 층(지문·run_id·비용 추정·환경변수 이름·스텁 결정성)과 사슬 층(dry-run 산출물 5종·바이트 재현성·`meta.commit`·DB 무변경, 네트워크 0) | tests/test_run_pilot_eval.py | P4-pilot-eva
+142:| 리포트 | LLM 비용 실측·추정(backlog 15행 P0-cost 흡수, 결정 B) | reports/cost_estimate.md | P4-pilot-eval | 0283ac0 | U6. 호출 수는 확정(40건·mention 141·LLM 호출 상한 282·실제 277·
+143:| 데이터 | 원시 판정 JSONL(gzip, 실 실행 40건·7050행, 결정 E) | reports/pilot/raw-20260922-042440.jsonl.gz | P4-pilot-eval | ef18143 | U7. 177,043 bytes(평문 7,545,838 — 평문
+144:| 데이터 | er_resolve trace 전량 덤프(실 실행, 확신도 재계산 diff 0) | reports/pilot/traces-20260922-042440.jsonl | P4-pilot-eval | ef18143 | U7. 1,702,234 bytes. `run_pilo
+145:| 리포트 | 파일럿 지표(5방식 × 10임계치 · 게이트 판정) | reports/metrics.json | P4-pilot-eval | ef18143 | U7. `meta.run_mode=real`, provider openai · gpt-4o-mini-2024-07-18 ·
+146:| 리포트 | 보정표(`s_llm` 10구간 실제 정답률, 실 실행) | reports/calibration.json | P4-pilot-eval | ef18143 | U7. 10 구간, excluded_clamped 0 **P4b-er-redesign U5(855a26b)**:
+147:| 리포트 | 트레이드오프 곡선(T_merge 10점 × 3계열 × 5방식) | reports/curve.csv | P4-pilot-eval | ef18143 | U7. 150점, t_new 0.3 고정 **P4b-er-redesign U5(855a26b)**: P4b 재실행 결
+148:| 리포트 | 파일럿 평가 리포트(metrics.json 단일 입력, 멱등) | reports/eval.md | P4-pilot-eval | ef18143 | U7. 재생성 diff 0줄. 게이트 **미달** 을 그대로 옮김 **P4b-er-redesign U5(855a26b)*
+150:| 문서 | 사용자 카드 10 파일럿 평가 실 실행(환경변수 이름·명령·rc 표·기대 출력·비용 가드) | docs/user-setup/10-pilot-eval-run.md | P4-pilot-eval | 0283ac0 | U6. U7 을 사용자가 직접 돌리는 카드(결정 I 로 
+151:| 리포트 | P4 기준선 stamp 사본 4개(결정 I — 재실행이 `reports/` 최상위를 덮어쓰기 전에 남긴다) | reports/pilot/metrics-20260922-042440.json, reports/pilot/calibration-20260922-042440.
+152:| 데이터 | 원시 판정 JSONL(gzip, P4b 재실행 40건·7050행) | reports/pilot/raw-20260922-150931.jsonl.gz | P4b-er-redesign | 855a26b | U5 실 실행 **1회**(사용자 셸, `--commit f96d
+153:| 데이터 | er_resolve trace 전량 덤프(P4b 재실행) | reports/pilot/traces-20260922-150931.jsonl | P4b-er-redesign | 855a26b | U5. 1,848,663 bytes. `run_pilot_eval.py -
+154:| 문서 | U7 수용 기준 기계 검증 증거(01-plan 판정 표 21행 전부) | docs/wiki/packages/P4b-er-redesign/evidence/20260923-1214-u7-accept-1.txt, docs/wiki/packages/P4b-er-redesig
+165:| 모듈 | 루프 패키지 재export 진입점 | app/agent/__init__.py | P5-loop | 3e4db92 | `run_turn`·`resume_turn`·타입·상수 재export. U2(069bdc2)·U3(8ecf75c)·U4(7a2ec5c)·U5(18353
+168:| 모듈 | 에이전트 루프 오케스트레이션(해석·기록·응답, run_turn/resume_turn) | app/agent/loop.py | P5-loop | 7a2ec5c | U4: 해석 구간(`resolve_mentions`, ER `resolve`/`apply_resolutio
+170:| 엔드포인트 | POST /chat | app/api/routes.py | P5-loop | d5c8ec9 | 발화 1건 → 인식(LLM 1회)→게이트→해석→기록→응답 한 턴. `X-Session-Id` 없으면 서버가 uuid4 발급(결정 I). 공급자 오류·`ToolError
+179:| 모듈 | 메모리 설정 상수·결과 타입 골격 | app/memory/types.py | P6-memory | 7564c5d | `PatternChange`·`PatternResult`·`ExtractedFact`·`Extraction`·`PromotedFact`·`Rejecte
+183:| 모듈 | 루프-메모리 연결(after_record) | app/memory/hooks.py | P6-memory | 8d3967a | `after_record(ctx, person_ids, extractor, *, fact_keys_by_person=None, event_id
+184:| 모듈 | 루프 직접 사실 → 원문 링크(U7, 결정 G(ii)) | app/memory/direct_facts.py | P6-memory | 93c6d3f | `link_direct_facts(ctx, person_id, fact_keys, event_ids) -> Direc
+188:| 테스트 | 루프 연결(after_record, U6)·직접 사실 링크(U7) | tests/test_memory_loop.py | P6-memory | 8d3967a | U6 6건(8d3967a) — 판정 표 9·16·17·18행(패턴만 도는 턴 추출기 0회·실패 격리·재개 
+190:| 모듈 | 브리핑 패키지 진입점 재export | app/briefing/__init__.py | P6-briefing | e2155f9 | U1 골격 — `app/briefing/types.py` 의 결과 타입·trace 어휘·금지 표현 목록·`Notifier`/`NullNo
+201:| 모듈 | 브리핑 1분 주기 작업(스케줄러) | app/briefing/scheduler.py | P6-briefing | a67692e | U7 — `run_scheduler_loop(*, interval_seconds, run_once)`(`asyncio` 무한 루프, `i
+202:| 모듈 | FastAPI lifespan — 브리핑 주기 작업 진입점 | app/main.py | P6-briefing | a67692e | U7 — `_lifespan(app)`(`@asynccontextmanager`) 신설, `create_app()` 이 `FastAPI(
+203:| 테스트 | 1분 주기 작업 스위치·내구성·같은 함수 확인(U7) | tests/test_briefing_scheduler.py | P6-briefing | a67692e | 5건 — 판정 25행(스위치 비움 → `with TestClient(create_app())` 컨텍스트
+248:| 브리핑 화면 | `web/src/screens/BriefingScreen.tsx`(`BriefingScreen`·`BRIEFING_NOTICE` 고정 문장/버튼 글자 — 머리줄 `📌 일정 시각 · 이름 · 일정 제목`, 패턴 문장·요약 줄(`·`), `💡 제안`, `basis
+249:| 인물 목록 단일 조회 | `web/src/components/PersonsProvider.tsx`(`PersonsProvider`·`usePersons`·`notifyPersonsChanged` — `GET /persons` 마운트 직후 1회, 해시 변경·`stored.per
+250:| 테스트 | 브리핑 테스트 16건(`briefing.test.tsx` — 서버 순서·머리줄 3요소·문자열 동일(특수문자·공백)·basis 미표시·제안 없음·빈·실패·버튼·알림 받기 자리, `?schedule_id=` 목록 안/밖/404·[]/없음, `parseScheduleId
+[exit 0]
+
+## 18. 백엔드 계약: BriefingRecordOut (schemas.py 197~211) vs types.ts (172~183) · read.py 상수
+
+$ sed -n '203,211p' app/api/schemas.py
+    schedule: BriefingScheduleOut
+    person: BriefingPersonOut
+    generated_at: datetime
+    composer: Literal["llm", "template"]
+    pattern_sentences: list[BriefingPatternSentenceOut] = Field(default_factory=list)
+    lines: list[BriefingLineOut] = Field(default_factory=list)
+    suggestion: BriefingSuggestionOut | None = None
+    push: str
+    trace_id: int
+[exit 0]
+
+$ sed -n '173,183p' web/src/api/types.ts
+export interface BriefingRecordOut {
+  schedule: BriefingScheduleOut
+  person: BriefingPersonOut
+  generated_at: IsoDateTime
+  composer: BriefingComposer
+  pattern_sentences: BriefingPatternSentenceOut[]
+  lines: BriefingLineOut[]
+  suggestion: BriefingSuggestionOut | null
+  push: string
+  trace_id: number
+}
+[exit 0]
+
+$ grep -nE 'BRIEFINGS_LOOKBACK_DAYS|BRIEFINGS_LIMIT' app/api/read.py | head -4
+73:BRIEFINGS_LOOKBACK_DAYS = 7
+77:BRIEFINGS_LIMIT = 20
+269:    내림차순 -> `schedules.id` 내림차순, 상한 `BRIEFINGS_LIMIT`.
+271:    `schedule_id=None` 이면 `scheduled_at >= now - BRIEFINGS_LOOKBACK_DAYS` 인
+[exit 0]
+
+## 19. PersonsProvider 카운터·이벤트 · ChatScreen 알림 2곳
+
+$ grep -nE 'latest|hashchange|PERSONS_CHANGED_EVENT' web/src/components/PersonsProvider.tsx
+9:export const PERSONS_CHANGED_EVENT = 'relationship:persons-changed'
+12:  window.dispatchEvent(new CustomEvent(PERSONS_CHANGED_EVENT))
+33:  const latest = useRef(0)
+36:    const mine = ++latest.current
+39:        if (mine !== latest.current) return
+44:        if (mine === latest.current) setFailed(true)
+51:    window.addEventListener('hashchange', load)
+52:    window.addEventListener(PERSONS_CHANGED_EVENT, load)
+54:      latest.current++ // 언마운트 뒤 응답 무시
+55:      window.removeEventListener('hashchange', load)
+56:      window.removeEventListener(PERSONS_CHANGED_EVENT, load)
+[exit 0]
+
+$ grep -n 'notifyPersonsChanged' web/src/screens/ChatScreen.tsx
+9:import { notifyPersonsChanged } from '@/components/PersonsProvider'
+179:      if (out.stored.persons > 0) notifyPersonsChanged() // 사이드바 인물 목록 다시 읽기 (R-U6-2)
+204:      if (out.stored.persons > 0) notifyPersonsChanged()
+[exit 0]
+
+## 20. BriefingScreen 의 schedule_id 입력 → POST 본문 · 404 분기 · 재시도 코드
+
+$ grep -nE 'postBriefingRun|status === 404|setTimeout|setInterval|retry' web/src/screens/BriefingScreen.tsx web/src/api/client.ts
+web/src/screens/BriefingScreen.tsx:7:import { ApiError, getBriefings, postBriefingRun } from '@/api/client'
+web/src/screens/BriefingScreen.tsx:134:      setLookup(error instanceof ApiError && error.status === 404 ? 'missing' : 'failed')
+web/src/screens/BriefingScreen.tsx:149:        await postBriefingRun(id)
+web/src/screens/BriefingScreen.tsx:152:        const state: RunState = error instanceof ApiError && error.status === 404 ? 'locked' : 'failed'
+web/src/api/client.ts:133:export function postBriefingRun(scheduleId: number): Promise<BriefingRunOut> {
+[exit 0]

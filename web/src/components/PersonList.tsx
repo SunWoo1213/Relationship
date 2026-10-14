@@ -1,8 +1,6 @@
 // 인물 목록 — `#/persons` 본문과 사이드바 아래, 두 자리에 같은 컴포넌트를 쓴다 (결정 N).
 // 순서는 서버가 준 그대로(마지막 접촉 내림차순) — 재정렬·필터·검색 없음. 새 API 없음(GET /persons).
-import { useEffect, useState } from 'react'
-import { getPersons } from '@/api/client'
-import type { PersonListItemOut } from '@/api/types'
+import { usePersons } from '@/components/PersonsProvider'
 import { formatDate } from '@/lib/format'
 import { HREF } from '@/routes'
 
@@ -14,18 +12,8 @@ export const PERSON_LIST_NOTICE = {
 } as const
 
 export default function PersonList({ onNavigate }: { onNavigate?: () => void }) {
-  const [persons, setPersons] = useState<PersonListItemOut[] | null>(null)
-  const [failed, setFailed] = useState(false)
-
-  useEffect(() => {
-    let alive = true
-    getPersons()
-      .then((list) => alive && setPersons(list))
-      .catch(() => alive && setFailed(true))
-    return () => {
-      alive = false
-    }
-  }, [])
+  // 조회는 AppShell 의 PersonsProvider 가 한 번만 한다 — 여기서는 받은 값을 그릴 뿐이다.
+  const { persons, failed } = usePersons()
 
   if (failed) {
     return (

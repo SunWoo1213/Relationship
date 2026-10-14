@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-13 19:05 (**U6 완료 — 커밋 직전**. verifier `review-u6-card.md` 통과([필수] 0 · [권고] 5). 사용자 결정 19:00: R-U6-1(펼치기 한 줄)·R-U6-2(사이드바 신선도 **(iii)** AppShell 단일 조회+재조회) 둘 다 **U7 에 포함**. 커밋 뒤 `git push origin dev2` → CI 다섯 job → U7 전 R-U3-6 ⑤ 결정 질문. 서브에이전트 없음)
+갱신: 2026-10-14 20:00 (**U7 완료 — 커밋 직전**. verifier `review-u7-briefing.md` 통과([필수] 0 · [권고] 4: R-U7-1 진행 중 쿼리 변경 한 줄 · R-U7-2 테스트 틈 3 · R-U7-3 문구 1 · R-U7-4 기록). 사용자에게 권고 시점(U8 포함 권장)과 커밋 승인을 묻는 중. 커밋 뒤 `git push origin dev2` → CI 다섯 job → U8. 서브에이전트 없음)
 
-active: **P8-frontend**(U0~U5·**U6** 완료 — **U7 부터**) | frozen: none | 브랜치 `dev2` = origin/dev2 `1944369`(+ U6 커밋 예정) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
+active: **P8-frontend**(U0~U6·**U7** 완료 — **U8 부터**) | frozen: none | 브랜치 `dev2` = origin/dev2 `761cced`(+ U7 커밋 예정) | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
 
 ## 2026-10-11 세션에 끝낸 것 (커밋 순, 전부 origin/dev2·CI 세 job success)
 | 커밋 | 내용 | CI(windows) |
@@ -25,8 +25,8 @@ active: **P8-frontend**(U0~U5·**U6** 완료 — **U7 부터**) | frozen: none |
 - 이 HANDOFF(종료 기록) · `FIX-033.md` 결과절 해시·run 1줄 · journal 자동 줄(`7031a19` COMMIT·PUSH-dev2). U3 첫 커밋에 같이 넣으면 된다(따로 커밋할 필요 없음).
 
 ## 바로 다음에 할 것 (순서대로)
-1. **세션 재개 확인**: `git log -1`(U6 커밋 있어야 함) · `git status --short`(HANDOFF·journal 만) · `gh run list --limit 2`(다섯 job). U7 커밋에 03-log U6 `pending` → 해시·run, registry "(U6 미커밋)" 3칸 → 해시.
-2. **U7 전 사용자 결정(R-U3-6 ⑤)**: `#/briefings?schedule_id=N` 강조를 목록(`GET /briefings`)에서 클라이언트가 골라 강조할지, `GET /briefings?schedule_id=N` 호출(7일 창 무시, 푸시 클릭용)로 할지. 그 뒤 **U7 브리핑 화면 + 수동 브리핑 버튼**(frontend-agent, L-004): 01-plan 98행 원문 인용 + **R-U6-1**(`useLazyDetail.toggle` 한 줄 + 탐침 P3 테스트) + **R-U6-2 (iii)**(`AppShell` 단일 조회 → 두 곳에 props, 채팅 `stored.persons>0`·라우트 변경 때 재조회) + **R-U6-3 규칙**(변이 스크립트는 출력을 그대로 흘리고 스크립트 파일도 `save_evidence.py` 로 evidence 에) + R-U4-10 + 증거 통로.
+1. **세션 재개 확인**: `git log -1`(U7 커밋 있어야 함 — 없으면 커밋 승인부터) · `git status --short` · `gh run list --limit 2`. U8 커밋에 03-log U7 `pending` → 해시·run, registry "(U7 미커밋)" 3칸 → 해시.
+2. **U8 PWA·푸시 구독**(frontend-agent, L-004): 01-plan 99행 원문 인용 + 결정 H·I + `app/push/devpage/sw.js` 페이로드 해석 **복사** + 브리핑 화면 `data-slot="push-subscribe"` 자리 채우기 + U7 이월 R-U7-1(한 줄)·R-U7-2(테스트 3)·R-U7-3(문구 1)(사용자 결정에 따라) + R-U4-4 favicon → 아이콘 2종과 함께 교체 + R-U4-10·R-U6-3 규칙·증거 통로. 자동 테스트는 실제 푸시 서비스로 아무것도 보내지 않음(결정 J).
    U7 위임 전 사용자 결정 필요: `#/briefings?schedule_id=N` 강조를 목록+클라이언트 강조로 할지 `GET /briefings?schedule_id=` 호출로 할지(R-U3-6 ⑤).
 3. **U9 백엔드 몫에 넣을 것**: R-U3-1(`ctx.now = now` → `dataclasses.replace`) · R-U3-2(목록 조인 `Person.id == Schedule.person_id` 한 줄) · R-U3-5(U1·U2 쓰기 0 테스트를 `helpers_read_api` 로, `push_subscriptions` 스냅샷 추가) · 판정표 9·10행 끝에서 끝.
 3. **U4~U9**(frontend-agent — U0 완료로 위임 가능, R-U0-3: 단위마다 verifier 가 `web/package.json` scripts·의존성·lock 점검) → **U10 사람 점검** → verifier 04-review.

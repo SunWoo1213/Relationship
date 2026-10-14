@@ -72,7 +72,11 @@ function useLazyDetail<T>(load: () => Promise<T>) {
   }, [load])
 
   const toggle = () => {
-    if (state.status === 'error') return run() // 실패 안내가 떠 있으면 누르는 것이 재시도
+    // 실패 안내가 떠 있으면 누르는 것이 재시도. 로딩 중 접었다가 실패한 경우도 열어 준다(R-U6-1).
+    if (state.status === 'error') {
+      setOpen(true)
+      return run()
+    }
     if (open) return setOpen(false)
     setOpen(true)
     if (state.status === 'idle') run()
