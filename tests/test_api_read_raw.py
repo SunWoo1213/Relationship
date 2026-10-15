@@ -11,12 +11,10 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import func, select
 
 from app.api.deps import get_now, get_session
 from app.api.read import FACT_SOURCES_LIMIT
 from app.db.models import (
-    AgentTrace,
     Event,
     FactSource,
     Person,
@@ -25,6 +23,7 @@ from app.db.models import (
     Schedule,
 )
 from app.main import create_app
+from tests.helpers_read_api import assert_no_writes, snapshot_db
 
 pytestmark = pytest.mark.dbtest
 
@@ -281,24 +280,26 @@ def test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않�
 
 
 def test_쓰기_0_trace_0(client, db_session):
+    # R-U3-5 ① -- 행 수만이 아니라 `briefed_at`·`updated_at` 값까지 본다(공통 헬퍼).
+    # `updated_at` 을 과거로 못 박아야 UPDATE(`onupdate=now()`)가 값 변화로 드러난다.
     p = _person(db_session)
+    p.updated_at = NOW - timedelta(days=30)
     e = _event(db_session, p, raw="원문")
     f = _fact(db_session, p, events=[e])
+    briefed = NOW - timedelta(hours=7)
     db_session.add_all(
         [PersonAlias(person_id=p.id, alias="민수형", source="user_said"),
-         Schedule(person_id=p.id, title="약속", scheduled_at=NOW + timedelta(days=1))]
+         Schedule(person_id=p.id, title="약속", scheduled_at=NOW + timedelta(days=1), briefed_at=briefed)]
     )
     db_session.flush()
 
-    def counts():
-        return tuple(
-            db_session.execute(select(func.count()).select_from(m)).scalar_one()
-            for m in (AgentTrace, Person, PersonAlias, PersonFact, FactSource, Event, Schedule)
-        )
-
-    before = counts()
+    before = snapshot_db(db_session)
     assert client.get(f"/events/{e.id}/raw").status_code == 200
     assert client.get(f"/persons/{p.id}/facts/{f.id}/sources").status_code == 200
     assert client.get("/events/99999999/raw").status_code == 404
     assert client.get(f"/persons/{p.id}/facts/99999999/sources").status_code == 404
-    assert counts() == before
+    after = snapshot_db(db_session)
+    assert_no_writes(before, after)
+    # 값으로 한 번 더: 브리핑 시각과 인물 갱신 시각은 넣은 값 그대로.
+    assert sorted(b for _, b in after.briefed_at if b is not None) == [briefed]
+    assert dict(after.persons_updated_at)[p.id] == NOW - timedelta(days=30)

@@ -320,7 +320,9 @@ def list_briefings(
             Person.display_name,
         )
         .join(Schedule, Schedule.id == ranked.c.sid)
-        .join(Person, Person.id == ranked.c.pid)
+        # R-U3-2 -- trace 의 person_id 가 그 일정의 실제 인물과 같아야 한다(손으로 조작한
+        # trace 로 남의 일정 제목·시각이 내 목록에 섞이는 틈을 막는 방어 조건).
+        .join(Person, (Person.id == ranked.c.pid) & (Person.id == Schedule.person_id))
         .where(ranked.c.rn == 1)
         .where(Person.user_id == user_id)
     )

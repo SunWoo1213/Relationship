@@ -103,6 +103,7 @@ base64url)을 `app/api/schemas.py::PushSubscriptionIn` 의 pydantic
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import replace
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -478,8 +479,9 @@ def read_pending_questions(
     세션은 `X-Session-Id`(`/chat` 과 같은 `resolve_session_id`, 형식 위반 422).
     헤더가 없으면 `resolve_session_id` 가 만든 임의 uuid 는 어디에도 저장되지
     않으므로 결과는 항상 빈 목록이다(세션을 새로 만들지 않는다)."""
-    ctx = build_chat_ctx(session, session_id, None)
-    ctx.now = now  # 만료 판정 기준 시각을 get_now() 로 고정한다(테스트·운영 동일 경로)
+    # R-U3-1 -- 만료 판정 기준 시각을 get_now() 로 고정한다(테스트·운영 동일 경로).
+    # 조립된 ctx 의 속성을 덮어쓰지 않고 복사본을 만든다(`run.py` 의 `replace(ctx, ...)` 관례).
+    ctx = replace(build_chat_ctx(session, session_id, None), now=now)
     return [ChatPendingQuestionOut(**q.to_dict()) for q in list_pending(ctx, session_id)]
 
 

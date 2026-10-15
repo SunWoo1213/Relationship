@@ -1,0 +1,10 @@
+# 명령: echo 'U9b 작업본:'; /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m mypy app/api/read.py app/api/routes.py | tail -1; echo '원본 HEAD(07ec09a) 저장소 기준선:'; cd /Users/sunwoo/Desktop/Portfolio/Relationship && .venv/bin/python -m mypy app/api/read.py app/api/routes.py | tail -1
+# 시각: 2026-10-15T15:24:56+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# ---
+U9b 작업본:
+Found 34 errors in 14 files (checked 2 source files)
+원본 HEAD(07ec09a) 저장소 기준선:
+Found 34 errors in 14 files (checked 2 source files)

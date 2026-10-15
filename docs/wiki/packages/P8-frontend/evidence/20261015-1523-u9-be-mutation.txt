@@ -1,0 +1,2208 @@
+# 명령: python3 /tmp/u9b_mut.py /tmp/rel-u9b-mut control
+# 시각: 2026-10-15T15:23:19+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# ---
+=== 대조군(변이 없음) ===
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 64 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  1%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [  3%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [  4%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [  6%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [  7%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [  9%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 10%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 12%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 14%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 15%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 17%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [ 18%]
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [ 20%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 21%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 23%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 25%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 26%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 28%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 29%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 31%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 32%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 34%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 35%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 37%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 39%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 40%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 42%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 43%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 45%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [ 46%]
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [ 48%]
+tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_422 PASSED [ 50%]
+tests/test_api_questions_pending.py::test_필드_5개_값_일치 PASSED        [ 51%]
+tests/test_api_questions_pending.py::test_created_at_오름차순 PASSED     [ 53%]
+tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 PASSED   [ 54%]
+tests/test_api_questions_pending.py::test_답변된_질문은_제외 PASSED      [ 56%]
+tests/test_api_questions_pending.py::test_만료_경계_24시간 PASSED        [ 57%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 PASSED          [ 59%]
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [ 60%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [ 62%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 64%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 65%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 67%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 68%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 70%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 71%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 PASSED [ 73%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 75%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 76%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 78%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 79%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 81%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 82%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 84%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 85%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 87%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 89%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 90%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 92%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 93%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 PASSED [ 95%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [ 96%]
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 98%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+============================== 64 passed in 1.33s ==============================
+[pytest exit 0]
+
+# ===== append 2026-10-15T15:23:21+09:00 =====
+# 명령: python3 /tmp/u9b_mut.py /tmp/rel-u9b-mut new
+# 시각: 2026-10-15T15:23:21+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# ---
+
+=== M1: R-U3-1: replace(..., now=now) 에서 now 제거(실제 시계가 쓰임) ===
+파일: app/api/routes.py  old 출현 횟수: 1
+시험 파일: tests/test_api_questions_pending.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 8 items
+
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [ 12%]
+tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_422 PASSED [ 25%]
+tests/test_api_questions_pending.py::test_필드_5개_값_일치 FAILED        [ 37%]
+tests/test_api_questions_pending.py::test_created_at_오름차순 FAILED     [ 50%]
+tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 FAILED   [ 62%]
+tests/test_api_questions_pending.py::test_답변된_질문은_제외 FAILED      [ 75%]
+tests/test_api_questions_pending.py::test_만료_경계_24시간 FAILED        [ 87%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 FAILED          [100%]
+
+=================================== FAILURES ===================================
+_______________________________ test_필드_5개_값_일치 ________________________________
+
+client = <starlette.testclient.TestClient object at 0x110704a50>
+db_session = <sqlalchemy.orm.session.Session object at 0x110704cd0>
+
+    def test_필드_5개_값_일치(client, db_session):
+        q = _q(db_session, kind="new_person", question="민수를 기억할까요?", options=("기억해줘", "아니"))
+        r = _get(client)
+        assert r.status_code == 200
+>       assert r.json() == [
+            {
+                "question_id": q.id,
+                "status": "pending",
+                "kind": "new_person",
+                "question": "민수를 기억할까요?",
+                "options": ["기억해줘", "아니"],
+            }
+        ]
+E       AssertionError: assert [] == [{'kind': 'ne...': 4794, ...}]
+E         
+E         Right contains one more item: {'kind': 'new_person', 'options': ['기억해줘', '아니'], 'question': '민수를 기억할까요?', 'question_id': 4794, ...}
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     {
+E         -         'kind': 'new_person',
+E         -         'options': [
+E         -             '기억해줘',
+E         -             '아니',
+E         -         ],
+E         -         'question': '민수를 기억할까요?',
+E         -         'question_id': 4794,
+E         -         'status': 'pending',
+E         -     },
+E         - ]
+
+tests/test_api_questions_pending.py:82: AssertionError
+_____________________________ test_created_at_오름차순 _____________________________
+
+client = <starlette.testclient.TestClient object at 0x1107fc510>
+db_session = <sqlalchemy.orm.session.Session object at 0x11078e190>
+
+    def test_created_at_오름차순(client, db_session):
+        # 삽입 순서와 created_at 순서를 일부러 다르게 한다.
+        late = _q(db_session, question="늦음", created_at=NOW - timedelta(minutes=1))
+        early = _q(db_session, question="이름", created_at=NOW - timedelta(hours=3))
+        mid = _q(db_session, question="중간", created_at=NOW - timedelta(hours=1))
+        ids = [x["question_id"] for x in _get(client).json()]
+>       assert ids == [early.id, mid.id, late.id]
+E       assert [] == [4796, 4797, 4795]
+E         
+E         Right contains 3 more items, first extra item: 4796
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     4796,
+E         -     4797,
+E         -     4795,
+E         - ]
+
+tests/test_api_questions_pending.py:99: AssertionError
+______________________________ test_다른_세션_질문은_제외 _______________________________
+
+client = <starlette.testclient.TestClient object at 0x11081b5c0>
+db_session = <sqlalchemy.orm.session.Session object at 0x1107fd480>
+
+    def test_다른_세션_질문은_제외(client, db_session):
+        mine = _q(db_session, session_id=SID, question="내 것")
+        _q(db_session, session_id="sess-other", question="남의 세션")
+        body = _get(client).json()
+>       assert [x["question_id"] for x in body] == [mine.id]
+E       assert [] == [4798]
+E         
+E         Right contains one more item: 4798
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     4798,
+E         - ]
+
+tests/test_api_questions_pending.py:106: AssertionError
+_______________________________ test_답변된_질문은_제외 ________________________________
+
+client = <starlette.testclient.TestClient object at 0x11061bbf0>
+db_session = <sqlalchemy.orm.session.Session object at 0x11061bd10>
+
+    def test_답변된_질문은_제외(client, db_session):
+        open_q = _q(db_session, question="열림")
+        _q(db_session, question="답함", answered_at=NOW - timedelta(seconds=30))
+>       assert [x["question_id"] for x in _get(client).json()] == [open_q.id]
+E       assert [] == [4800]
+E         
+E         Right contains one more item: 4800
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     4800,
+E         - ]
+
+tests/test_api_questions_pending.py:113: AssertionError
+_______________________________ test_만료_경계_24시간 ________________________________
+
+client = <starlette.testclient.TestClient object at 0x1106fef10>
+db_session = <sqlalchemy.orm.session.Session object at 0x110664c00>
+
+    def test_만료_경계_24시간(client, db_session):
+        fresh = _q(db_session, question="23시간59분59초", created_at=NOW - timedelta(hours=24) + timedelta(seconds=1))
+        _q(db_session, question="정확히 24시간", created_at=NOW - timedelta(hours=24))
+        _q(db_session, question="25시간", created_at=NOW - timedelta(hours=25))
+>       assert [x["question_id"] for x in _get(client).json()] == [fresh.id]
+E       assert [] == [4802]
+E         
+E         Right contains one more item: 4802
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     4802,
+E         - ]
+
+tests/test_api_questions_pending.py:120: AssertionError
+______________________________ test_쓰기_0_trace_0 _______________________________
+
+client = <starlette.testclient.TestClient object at 0x11076d260>
+db_session = <sqlalchemy.orm.session.Session object at 0x1106ff460>
+
+    def test_쓰기_0_trace_0(client, db_session):
+        _q(db_session, question="열림")
+        _q(db_session, question="답함", answered_at=NOW)
+        _q(db_session, question="만료", created_at=NOW - timedelta(days=2))
+        before = snapshot_db(db_session)
+>       assert len(_get(client).json()) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+E        +    where [] = json()
+E        +      where json = <Response [200 OK]>.json
+E        +        where <Response [200 OK]> = _get(<starlette.testclient.TestClient object at 0x11076d260>)
+
+tests/test_api_questions_pending.py:128: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_questions_pending.py::test_필드_5개_값_일치 - AssertionError: assert [] == [{'kind': 'ne...': 4794, ...}]
+  
+  Right contains one more item: {'kind': 'new_person', 'options': ['기억해줘', '아니'], 'question': '민수를 기억할까요?', 'question_id': 4794, ...}
+  
+  Full diff:
+  + []
+  - [
+  -     {
+  -         'kind': 'new_person',
+  -         'options': [
+  -             '기억해줘',
+  -             '아니',
+  -         ],
+  -         'question': '민수를 기억할까요?',
+  -         'question_id': 4794,
+  -         'status': 'pending',
+  -     },
+  - ]
+FAILED tests/test_api_questions_pending.py::test_created_at_오름차순 - assert [] == [4796, 4797, 4795]
+  
+  Right contains 3 more items, first extra item: 4796
+  
+  Full diff:
+  + []
+  - [
+  -     4796,
+  -     4797,
+  -     4795,
+  - ]
+FAILED tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 - assert [] == [4798]
+  
+  Right contains one more item: 4798
+  
+  Full diff:
+  + []
+  - [
+  -     4798,
+  - ]
+FAILED tests/test_api_questions_pending.py::test_답변된_질문은_제외 - assert [] == [4800]
+  
+  Right contains one more item: 4800
+  
+  Full diff:
+  + []
+  - [
+  -     4800,
+  - ]
+FAILED tests/test_api_questions_pending.py::test_만료_경계_24시간 - assert [] == [4802]
+  
+  Right contains one more item: 4802
+  
+  Full diff:
+  + []
+  - [
+  -     4802,
+  - ]
+FAILED tests/test_api_questions_pending.py::test_쓰기_0_trace_0 - assert 0 == 1
+ +  where 0 = len([])
+ +    where [] = json()
+ +      where json = <Response [200 OK]>.json
+ +        where <Response [200 OK]> = _get(<starlette.testclient.TestClient object at 0x11076d260>)
+========================= 6 failed, 2 passed in 0.54s ==========================
+[pytest exit 1]
+[M1 결과: 검출(실패함)]
+[M1 원복 확인: 내용 일치=True]
+
+=== M2: R-U3-2: 목록 조인에서 Person.id == Schedule.person_id 제거 ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 26 items
+
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [  3%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [  7%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 11%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 15%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 19%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 23%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 26%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 30%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 FAILED [ 34%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 38%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 42%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 46%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 50%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 53%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 57%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 61%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 65%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 69%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 73%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 76%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 80%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 84%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 PASSED [ 88%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [ 92%]
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 96%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+=================================== FAILURES ===================================
+_______________ test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 ________________
+
+client = <starlette.testclient.TestClient object at 0x111242f10>
+db_session = <sqlalchemy.orm.session.Session object at 0x11119c850>
+
+    def test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다(client, db_session):
+        # R-U3-2 -- trace 의 person_id(나) 가 그 일정의 실제 인물(남)과 다르면 제외.
+        # `Person.id == Schedule.person_id` 방어 조건을 지우면 남의 일정 제목·시각이 섞여 실패한다.
+        mine = _person(db_session, "나의 사람")
+        other = _person(db_session, "남", user_id="other")
+        s_other = _schedule(db_session, other, NOW, "남의 비밀 일정")
+        s_mine = _schedule(db_session, mine, NOW - timedelta(hours=1), "내 일정")
+        _trace(db_session, s_other, mine, NOW - timedelta(hours=1))  # 조작: 남의 일정 + 내 인물
+        _trace(db_session, s_mine, mine, NOW - timedelta(hours=1))  # 정상
+        r = client.get("/briefings")
+>       assert _ids(r) == [s_mine.id]
+E       assert [7825, 7826] == [7826]
+E         
+E         At index 0 diff: 7825 != 7826
+E         Left contains one more item: 7826
+E         
+E         Full diff:
+E           [
+E         +     7825,
+E               7826,
+E           ]
+
+tests/test_api_read_briefings.py:248: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 - assert [7825, 7826] == [7826]
+  
+  At index 0 diff: 7825 != 7826
+  Left contains one more item: 7826
+  
+  Full diff:
+    [
+  +     7825,
+        7826,
+    ]
+========================= 1 failed, 25 passed in 0.84s =========================
+[pytest exit 1]
+[M2 결과: 검출(실패함)]
+[M2 원복 확인: 내용 일치=True]
+
+=== M3: R-U3-5 ②: _COUNTED_MODELS 에서 PushSubscription 제거 ===
+파일: tests/helpers_read_api.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 62 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  1%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [  3%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [  4%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [  6%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [  8%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [  9%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 11%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 12%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 14%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 16%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 17%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [ 19%]
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [ 20%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 22%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 24%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 25%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 27%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 29%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 30%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 32%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 33%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 35%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 37%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 38%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 40%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 41%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 43%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 45%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 46%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [ 48%]
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [ 50%]
+tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_422 PASSED [ 51%]
+tests/test_api_questions_pending.py::test_필드_5개_값_일치 PASSED        [ 53%]
+tests/test_api_questions_pending.py::test_created_at_오름차순 PASSED     [ 54%]
+tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 PASSED   [ 56%]
+tests/test_api_questions_pending.py::test_답변된_질문은_제외 PASSED      [ 58%]
+tests/test_api_questions_pending.py::test_만료_경계_24시간 PASSED        [ 59%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 PASSED          [ 61%]
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [ 62%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [ 64%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 66%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 67%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 69%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 70%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 72%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 74%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 PASSED [ 75%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 77%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 79%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 80%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 82%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 83%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 85%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 87%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 88%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 90%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 91%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 93%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 95%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 96%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 FAILED [ 98%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [100%]
+
+=================================== FAILURES ===================================
+____________________ test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 ____________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x111349950>
+
+    def test_헬퍼_자체_push_subscriptions_추가도_잡아낸다(db_session):
+        # R-U3-5 ② -- 행 수 스냅샷이 스키마 v2 의 9테이블 전부(push_subscriptions 포함)를 센다.
+        before = snapshot_db(db_session)
+>       assert len(before.counts) == 9
+E       assert 8 == 9
+E        +  where 8 = len((441, 0, 0, 0, 0, 0, ...))
+E        +    where (441, 0, 0, 0, 0, 0, ...) = DbSnapshot(counts=(441, 0, 0, 0, 0, 0, 0, 0), briefed_at=(), persons_updated_at=()).counts
+
+tests/test_api_read_briefings.py:428: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 - assert 8 == 9
+ +  where 8 = len((441, 0, 0, 0, 0, 0, ...))
+ +    where (441, 0, 0, 0, 0, 0, ...) = DbSnapshot(counts=(441, 0, 0, 0, 0, 0, 0, 0), briefed_at=(), persons_updated_at=()).counts
+========================= 1 failed, 61 passed in 1.19s =========================
+[pytest exit 1]
+[M3 결과: 검출(실패함)]
+[M3 원복 확인: 내용 일치=True]
+
+=== M4a: R-U3-5 ①: list_persons 가 Person 을 UPDATE(onupdate -> updated_at 변경) ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_persons.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 12 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  8%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [ 16%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [ 25%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [ 33%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [ 41%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [ 50%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 58%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 66%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 75%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 83%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 91%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 FAILED               [100%]
+
+=================================== FAILURES ===================================
+______________________________ test_쓰기_0_trace_0 _______________________________
+
+client = <starlette.testclient.TestClient object at 0x10cc1c270>
+db_session = <sqlalchemy.orm.session.Session object at 0x10ca92b50>
+
+    def test_쓰기_0_trace_0(client, db_session):
+        # R-U3-5 ① -- 행 수만이 아니라 `briefed_at`·`updated_at` 값까지 본다(공통 헬퍼).
+        # `updated_at` 을 과거로 못 박아야 UPDATE(`onupdate=now()`)가 값 변화로 드러난다.
+        p = _person(db_session)
+        p.updated_at = NOW - timedelta(days=30)
+        e = _event(db_session, p, 1)
+        f = PersonFact(person_id=p.id, key="k", value="v", confidence=1.0)
+        db_session.add(f)
+        db_session.flush()
+        briefed = NOW - timedelta(hours=7)
+        db_session.add_all(
+            [FactSource(fact_id=f.id, event_id=e.id),
+             Schedule(person_id=p.id, title="브리핑됨", scheduled_at=NOW + timedelta(hours=1), briefed_at=briefed),
+             Schedule(person_id=p.id, title="미브리핑", scheduled_at=NOW + timedelta(hours=2))]
+        )
+        db_session.flush()
+    
+        before = snapshot_db(db_session)
+        assert client.get("/persons").status_code == 200
+        assert client.get(f"/persons/{p.id}").status_code == 200
+        assert client.get("/persons/99999999").status_code == 404
+        after = snapshot_db(db_session)
+>       assert_no_writes(before, after)
+
+tests/test_api_read_persons.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+before = DbSnapshot(counts=(441, 1, 0, 1, 1, 1, 2, 0, 0), briefed_at=((7959, datetime.datetime(2026, 3, 1, 2, 0, tzinfo=zoneinf..., None)), persons_updated_at=((23446, datetime.datetime(2026, 1, 30, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))),))
+after = DbSnapshot(counts=(441, 1, 0, 1, 1, 1, 2, 0, 0), briefed_at=((7959, datetime.datetime(2026, 3, 1, 2, 0, tzinfo=zoneinf...ons_updated_at=((23446, datetime.datetime(2026, 10, 15, 6, 23, 26, 158465, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))),))
+
+    def assert_no_writes(before: DbSnapshot, after: DbSnapshot) -> None:
+        """행 수 9개·`briefed_at` 전체·`persons.updated_at` 전체가 모두 같아야 한다."""
+        assert after.counts == before.counts, "행 수가 달라졌다(쓰기 또는 trace 발생)"
+        assert after.briefed_at == before.briefed_at, "schedules.briefed_at 이 바뀌었다"
+>       assert after.persons_updated_at == before.persons_updated_at, "persons.updated_at 이 바뀌었다"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: persons.updated_at 이 바뀌었다
+
+tests/helpers_read_api.py:76: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_persons.py::test_쓰기_0_trace_0 - AssertionError: persons.updated_at 이 바뀌었다
+========================= 1 failed, 11 passed in 0.61s =========================
+[pytest exit 1]
+[M4a 결과: 검출(실패함)]
+[M4a 원복 확인: 내용 일치=True]
+
+=== M4b: R-U3-5 ①: get_person_card 가 Schedule.briefed_at 을 UPDATE ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_persons.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 12 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  8%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [ 16%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [ 25%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [ 33%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [ 41%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [ 50%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 58%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 66%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 75%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 83%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 91%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 FAILED               [100%]
+
+=================================== FAILURES ===================================
+______________________________ test_쓰기_0_trace_0 _______________________________
+
+client = <starlette.testclient.TestClient object at 0x10e9f05a0>
+db_session = <sqlalchemy.orm.session.Session object at 0x10ea96550>
+
+    def test_쓰기_0_trace_0(client, db_session):
+        # R-U3-5 ① -- 행 수만이 아니라 `briefed_at`·`updated_at` 값까지 본다(공통 헬퍼).
+        # `updated_at` 을 과거로 못 박아야 UPDATE(`onupdate=now()`)가 값 변화로 드러난다.
+        p = _person(db_session)
+        p.updated_at = NOW - timedelta(days=30)
+        e = _event(db_session, p, 1)
+        f = PersonFact(person_id=p.id, key="k", value="v", confidence=1.0)
+        db_session.add(f)
+        db_session.flush()
+        briefed = NOW - timedelta(hours=7)
+        db_session.add_all(
+            [FactSource(fact_id=f.id, event_id=e.id),
+             Schedule(person_id=p.id, title="브리핑됨", scheduled_at=NOW + timedelta(hours=1), briefed_at=briefed),
+             Schedule(person_id=p.id, title="미브리핑", scheduled_at=NOW + timedelta(hours=2))]
+        )
+        db_session.flush()
+    
+        before = snapshot_db(db_session)
+        assert client.get("/persons").status_code == 200
+        assert client.get(f"/persons/{p.id}").status_code == 200
+        assert client.get("/persons/99999999").status_code == 404
+        after = snapshot_db(db_session)
+>       assert_no_writes(before, after)
+
+tests/test_api_read_persons.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+before = DbSnapshot(counts=(441, 1, 0, 1, 1, 1, 2, 0, 0), briefed_at=((7977, datetime.datetime(2026, 3, 1, 2, 0, tzinfo=zoneinf..., None)), persons_updated_at=((23464, datetime.datetime(2026, 1, 30, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))),))
+after = DbSnapshot(counts=(441, 1, 0, 1, 1, 1, 2, 0, 0), briefed_at=((7977, datetime.datetime(2026, 10, 15, 6, 23, 27, 244639,...UTC')))), persons_updated_at=((23464, datetime.datetime(2026, 1, 30, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))),))
+
+    def assert_no_writes(before: DbSnapshot, after: DbSnapshot) -> None:
+        """행 수 9개·`briefed_at` 전체·`persons.updated_at` 전체가 모두 같아야 한다."""
+        assert after.counts == before.counts, "행 수가 달라졌다(쓰기 또는 trace 발생)"
+>       assert after.briefed_at == before.briefed_at, "schedules.briefed_at 이 바뀌었다"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: schedules.briefed_at 이 바뀌었다
+
+tests/helpers_read_api.py:75: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_persons.py::test_쓰기_0_trace_0 - AssertionError: schedules.briefed_at 이 바뀌었다
+========================= 1 failed, 11 passed in 0.62s =========================
+[pytest exit 1]
+[M4b 결과: 검출(실패함)]
+[M4b 원복 확인: 내용 일치=True]
+
+=== M4c: R-U3-5 ①: get_event_raw 가 Person 을 UPDATE ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_raw.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 18 items
+
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [  5%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 11%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 16%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 22%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 27%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 33%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 38%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 44%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 50%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 55%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 61%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 66%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 72%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 77%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 83%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 88%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 94%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 FAILED                   [100%]
+
+=================================== FAILURES ===================================
+______________________________ test_쓰기_0_trace_0 _______________________________
+
+client = <starlette.testclient.TestClient object at 0x10efb28b0>
+db_session = <sqlalchemy.orm.session.Session object at 0x10ed42950>
+
+    def test_쓰기_0_trace_0(client, db_session):
+        # R-U3-5 ① -- 행 수만이 아니라 `briefed_at`·`updated_at` 값까지 본다(공통 헬퍼).
+        # `updated_at` 을 과거로 못 박아야 UPDATE(`onupdate=now()`)가 값 변화로 드러난다.
+        p = _person(db_session)
+        p.updated_at = NOW - timedelta(days=30)
+        e = _event(db_session, p, raw="원문")
+        f = _fact(db_session, p, events=[e])
+        briefed = NOW - timedelta(hours=7)
+        db_session.add_all(
+            [PersonAlias(person_id=p.id, alias="민수형", source="user_said"),
+             Schedule(person_id=p.id, title="약속", scheduled_at=NOW + timedelta(days=1), briefed_at=briefed)]
+        )
+        db_session.flush()
+    
+        before = snapshot_db(db_session)
+        assert client.get(f"/events/{e.id}/raw").status_code == 200
+        assert client.get(f"/persons/{p.id}/facts/{f.id}/sources").status_code == 200
+        assert client.get("/events/99999999/raw").status_code == 404
+        assert client.get(f"/persons/{p.id}/facts/99999999/sources").status_code == 404
+        after = snapshot_db(db_session)
+>       assert_no_writes(before, after)
+
+tests/test_api_read_raw.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+before = DbSnapshot(counts=(441, 1, 1, 1, 1, 1, 1, 0, 0), briefed_at=((7979, datetime.datetime(2026, 3, 1, 2, 0, tzinfo=zoneinf...TC'))),), persons_updated_at=((23487, datetime.datetime(2026, 1, 30, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))),))
+after = DbSnapshot(counts=(441, 1, 1, 1, 1, 1, 1, 0, 0), briefed_at=((7979, datetime.datetime(2026, 3, 1, 2, 0, tzinfo=zoneinf...ons_updated_at=((23487, datetime.datetime(2026, 10, 15, 6, 23, 28, 390011, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))),))
+
+    def assert_no_writes(before: DbSnapshot, after: DbSnapshot) -> None:
+        """행 수 9개·`briefed_at` 전체·`persons.updated_at` 전체가 모두 같아야 한다."""
+        assert after.counts == before.counts, "행 수가 달라졌다(쓰기 또는 trace 발생)"
+        assert after.briefed_at == before.briefed_at, "schedules.briefed_at 이 바뀌었다"
+>       assert after.persons_updated_at == before.persons_updated_at, "persons.updated_at 이 바뀌었다"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: persons.updated_at 이 바뀌었다
+
+tests/helpers_read_api.py:76: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_raw.py::test_쓰기_0_trace_0 - AssertionError: persons.updated_at 이 바뀌었다
+========================= 1 failed, 17 passed in 0.65s =========================
+[pytest exit 1]
+[M4c 결과: 검출(실패함)]
+[M4c 원복 확인: 내용 일치=True]
+
+=== M4d: R-U3-5 ①: get_fact_sources 가 Schedule.briefed_at 을 UPDATE ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_raw.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 18 items
+
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [  5%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 11%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 16%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 22%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 27%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 33%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 38%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 44%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 50%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 55%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 61%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 66%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 72%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 77%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 83%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 88%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 94%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 FAILED                   [100%]
+
+=================================== FAILURES ===================================
+______________________________ test_쓰기_0_trace_0 _______________________________
+
+client = <starlette.testclient.TestClient object at 0x10f6c67a0>
+db_session = <sqlalchemy.orm.session.Session object at 0x10f44a950>
+
+    def test_쓰기_0_trace_0(client, db_session):
+        # R-U3-5 ① -- 행 수만이 아니라 `briefed_at`·`updated_at` 값까지 본다(공통 헬퍼).
+        # `updated_at` 을 과거로 못 박아야 UPDATE(`onupdate=now()`)가 값 변화로 드러난다.
+        p = _person(db_session)
+        p.updated_at = NOW - timedelta(days=30)
+        e = _event(db_session, p, raw="원문")
+        f = _fact(db_session, p, events=[e])
+        briefed = NOW - timedelta(hours=7)
+        db_session.add_all(
+            [PersonAlias(person_id=p.id, alias="민수형", source="user_said"),
+             Schedule(person_id=p.id, title="약속", scheduled_at=NOW + timedelta(days=1), briefed_at=briefed)]
+        )
+        db_session.flush()
+    
+        before = snapshot_db(db_session)
+        assert client.get(f"/events/{e.id}/raw").status_code == 200
+        assert client.get(f"/persons/{p.id}/facts/{f.id}/sources").status_code == 200
+        assert client.get("/events/99999999/raw").status_code == 404
+        assert client.get(f"/persons/{p.id}/facts/99999999/sources").status_code == 404
+        after = snapshot_db(db_session)
+>       assert_no_writes(before, after)
+
+tests/test_api_read_raw.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+before = DbSnapshot(counts=(441, 1, 1, 1, 1, 1, 1, 0, 0), briefed_at=((7980, datetime.datetime(2026, 3, 1, 2, 0, tzinfo=zoneinf...TC'))),), persons_updated_at=((23510, datetime.datetime(2026, 1, 30, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))),))
+after = DbSnapshot(counts=(441, 1, 1, 1, 1, 1, 1, 0, 0), briefed_at=((7980, datetime.datetime(2026, 10, 15, 6, 23, 29, 505469,...TC'))),), persons_updated_at=((23510, datetime.datetime(2026, 1, 30, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))),))
+
+    def assert_no_writes(before: DbSnapshot, after: DbSnapshot) -> None:
+        """행 수 9개·`briefed_at` 전체·`persons.updated_at` 전체가 모두 같아야 한다."""
+        assert after.counts == before.counts, "행 수가 달라졌다(쓰기 또는 trace 발생)"
+>       assert after.briefed_at == before.briefed_at, "schedules.briefed_at 이 바뀌었다"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: schedules.briefed_at 이 바뀌었다
+
+tests/helpers_read_api.py:75: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_raw.py::test_쓰기_0_trace_0 - AssertionError: schedules.briefed_at 이 바뀌었다
+========================= 1 failed, 17 passed in 0.66s =========================
+[pytest exit 1]
+[M4d 결과: 검출(실패함)]
+[M4d 원복 확인: 내용 일치=True]
+
+=== M4e: R-U3-5 ②: get_person_card 가 push_subscriptions 에 INSERT ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_persons.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 12 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  8%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [ 16%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [ 25%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [ 33%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [ 41%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [ 50%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 58%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 66%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 75%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 83%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 FAILED [ 91%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 FAILED               [100%]
+
+=================================== FAILURES ===================================
+_________________________ test_없는_인물과_타사용자_인물은_같은_404 __________________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x110e49a90>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x1108a4410>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x110e7f850>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x110eb9950>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [INERROR] (host=localhost port=5433 user=app database=relationship_test) at 0x110def410>
+query = "insert into push_subscriptions(user_id, endpoint, keys) values ('x', 'y', '{}'::jsonb)"
+params = {}
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UniqueViolation: duplicate key value violates unique constraint "uq_push_subscriptions_user_id_endpoint"
+E           DETAIL:  Key (user_id, endpoint)=(x, y) already exists.
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/psycopg/cursor.py:117: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x110fb56a0>
+db_session = <sqlalchemy.orm.session.Session object at 0x110e7ee50>
+
+    def test_없는_인물과_타사용자_인물은_같은_404(client, db_session):
+        other = _person(db_session, user_id="other")
+        r1 = client.get(f"/persons/{other.id}")
+>       r2 = client.get("/persons/99999999")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_api_read_persons.py:212: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1113: in get
+    return self.request(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/testclient.py:463: in request
+    return super().request(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:797: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:980: in send
+    response = self._send_handling_auth(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1008: in _send_handling_auth
+    response = self._send_handling_redirects(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1043: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1076: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/testclient.py:360: in handle_request
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/testclient.py:357: in handle_request
+    portal.call(self.app, scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/concurrent/futures/_base.py:454: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/concurrent/futures/_base.py:396: in __get_result
+    raise self._exception
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/applications.py:1160: in __call__
+    await super().__call__(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/routing.py:676: in __call__
+    await self.middleware_stack(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/routing.py:697: in app
+    await route.handle(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/routing.py:282: in handle
+    await self.app(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:130: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:116: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:670: in app
+    raw_response = await run_endpoint_function(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:326: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+app/api/routes.py:453: in read_person_card
+    return get_person_card(session, app_user_id(), person_id, now())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/api/read.py:173: in get_person_card
+    session.execute(__import__("sqlalchemy").text("insert into push_subscriptions(user_id, endpoint, keys) values ('x', 'y', '{}'::jsonb)"))
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py:2372: in execute
+    return self._execute_internal(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py:2279: in _execute_internal
+    result = conn.execute(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [INERROR] (host=localhost port=5433 user=app database=relationship_test) at 0x110def410>
+query = "insert into push_subscriptions(user_id, endpoint, keys) values ('x', 'y', '{}'::jsonb)"
+params = {}
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "uq_push_subscriptions_user_id_endpoint"
+E           DETAIL:  Key (user_id, endpoint)=(x, y) already exists.
+E           [SQL: insert into push_subscriptions(user_id, endpoint, keys) values ('x', 'y', '{}'::jsonb)]
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/psycopg/cursor.py:117: IntegrityError
+______________________________ test_쓰기_0_trace_0 _______________________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x110ee1f40>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x1108a4410>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x110e7c150>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x110eb9950>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [INERROR] (host=localhost port=5433 user=app database=relationship_test) at 0x11113f350>
+query = "insert into push_subscriptions(user_id, endpoint, keys) values ('x', 'y', '{}'::jsonb)"
+params = {}
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UniqueViolation: duplicate key value violates unique constraint "uq_push_subscriptions_user_id_endpoint"
+E           DETAIL:  Key (user_id, endpoint)=(x, y) already exists.
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/psycopg/cursor.py:117: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x110dd6250>
+db_session = <sqlalchemy.orm.session.Session object at 0x110e7f050>
+
+    def test_쓰기_0_trace_0(client, db_session):
+        # R-U3-5 ① -- 행 수만이 아니라 `briefed_at`·`updated_at` 값까지 본다(공통 헬퍼).
+        # `updated_at` 을 과거로 못 박아야 UPDATE(`onupdate=now()`)가 값 변화로 드러난다.
+        p = _person(db_session)
+        p.updated_at = NOW - timedelta(days=30)
+        e = _event(db_session, p, 1)
+        f = PersonFact(person_id=p.id, key="k", value="v", confidence=1.0)
+        db_session.add(f)
+        db_session.flush()
+        briefed = NOW - timedelta(hours=7)
+        db_session.add_all(
+            [FactSource(fact_id=f.id, event_id=e.id),
+             Schedule(person_id=p.id, title="브리핑됨", scheduled_at=NOW + timedelta(hours=1), briefed_at=briefed),
+             Schedule(person_id=p.id, title="미브리핑", scheduled_at=NOW + timedelta(hours=2))]
+        )
+        db_session.flush()
+    
+        before = snapshot_db(db_session)
+        assert client.get("/persons").status_code == 200
+        assert client.get(f"/persons/{p.id}").status_code == 200
+>       assert client.get("/persons/99999999").status_code == 404
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_api_read_persons.py:237: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1113: in get
+    return self.request(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/testclient.py:463: in request
+    return super().request(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:797: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:980: in send
+    response = self._send_handling_auth(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1008: in _send_handling_auth
+    response = self._send_handling_redirects(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1043: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1076: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/testclient.py:360: in handle_request
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/testclient.py:357: in handle_request
+    portal.call(self.app, scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/concurrent/futures/_base.py:454: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/concurrent/futures/_base.py:396: in __get_result
+    raise self._exception
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/applications.py:1160: in __call__
+    await super().__call__(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/routing.py:676: in __call__
+    await self.middleware_stack(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/routing.py:697: in app
+    await route.handle(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/routing.py:282: in handle
+    await self.app(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:130: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:116: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:670: in app
+    raw_response = await run_endpoint_function(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:326: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+app/api/routes.py:453: in read_person_card
+    return get_person_card(session, app_user_id(), person_id, now())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/api/read.py:173: in get_person_card
+    session.execute(__import__("sqlalchemy").text("insert into push_subscriptions(user_id, endpoint, keys) values ('x', 'y', '{}'::jsonb)"))
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py:2372: in execute
+    return self._execute_internal(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py:2279: in _execute_internal
+    result = conn.execute(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [INERROR] (host=localhost port=5433 user=app database=relationship_test) at 0x11113f350>
+query = "insert into push_subscriptions(user_id, endpoint, keys) values ('x', 'y', '{}'::jsonb)"
+params = {}
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "uq_push_subscriptions_user_id_endpoint"
+E           DETAIL:  Key (user_id, endpoint)=(x, y) already exists.
+E           [SQL: insert into push_subscriptions(user_id, endpoint, keys) values ('x', 'y', '{}'::jsonb)]
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/psycopg/cursor.py:117: IntegrityError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 - sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "uq_push_subscriptions_user_id_endpoint"
+DETAIL:  Key (user_id, endpoint)=(x, y) already exists.
+[SQL: insert into push_subscriptions(user_id, endpoint, keys) values ('x', 'y', '{}'::jsonb)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+FAILED tests/test_api_read_persons.py::test_쓰기_0_trace_0 - sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "uq_push_subscriptions_user_id_endpoint"
+DETAIL:  Key (user_id, endpoint)=(x, y) already exists.
+[SQL: insert into push_subscriptions(user_id, endpoint, keys) values ('x', 'y', '{}'::jsonb)]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+========================= 2 failed, 10 passed in 1.13s =========================
+[pytest exit 1]
+[M4e 결과: 검출(실패함)]
+[M4e 원복 확인: 내용 일치=True]
+
+=== M5: 9행: POST /briefings/run 이 trigger="scheduler" 로 실행(trigger 기록 변경) ===
+파일: app/api/routes.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 FAILED [ 50%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+=================================== FAILURES ===================================
+___________________ test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 ___________________
+
+env = (<starlette.testclient.TestClient object at 0x10c5570e0>, FakeBriefingComposer(table={7999: {'pattern_sentences': [], ...5]}}], 'suggestion': {'text': '주기 제안', 'basis': {'fact_keys': ['hobby'], 'event_ids': []}}}}, fail=None, call_count=2))
+db_session = <sqlalchemy.orm.session.Session object at 0x10c555160>
+
+    def test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다(env, db_session):
+        client, composer = env
+        p = _person(db_session)
+        e = _event(db_session, p)
+        _fact(db_session, p, e)
+        s1 = _schedule(db_session, p, 5, "주간 회의")
+        s2 = _schedule(db_session, p, 8, "저녁 약속")
+        composer.table[s1.id] = _raw("수동 실행 줄", "수동 제안", e.id)
+        composer.table[s2.id] = _raw("주기 실행 줄", "주기 제안", e.id)
+    
+        # 경로 1: 실제 POST /briefings/run (trigger="manual")
+        resp = client.post("/briefings/run", json={"schedule_id": s1.id})
+        assert resp.status_code == 200
+        assert [b["schedule_id"] for b in resp.json()["briefings"]] == [s1.id]
+        # 경로 2: 1분 주기 작업과 같은 함수 (trigger="scheduler") -- s1 은 briefed_at 이 찍혀 s2 만 대상
+        result = run_briefings(_ctx(db_session), composer=composer, notifier=NullNotifier(), trigger="scheduler")
+        assert [b["schedule_id"] for b in result.briefings] == [s2.id]
+    
+        r = client.get("/briefings")
+        assert r.status_code == 200
+        body = r.json()
+        assert [b["schedule"]["id"] for b in body] == [s2.id, s1.id]  # scheduled_at 내림차순
+        for item, sched, line, sugg in (
+            (body[0], s2, "주기 실행 줄", "주기 제안"),
+            (body[1], s1, "수동 실행 줄", "수동 제안"),
+        ):
+            rows = _compose_rows(db_session, sched.id)
+            assert len(rows) == 1  # 실제 실행이 compose 행을 정확히 1개 남겼다
+            out = rows[0].output
+            assert item["trace_id"] == rows[0].id
+            assert item["lines"] == out["lines"]
+            assert item["suggestion"] == out["suggestion"]
+            assert item["pattern_sentences"] == out["pattern_sentences"]
+            assert item["composer"] == out["composer"] == "llm"  # 검증을 통과한 생성기 출력
+            assert item["push"] == out["push"]
+            # 생성기가 낸 문장이 거부되지 않고 그대로 실렸다
+            assert [ln["text"] for ln in item["lines"]] == [line], out["rejected"]
+            assert item["suggestion"]["text"] == sugg
+            assert item["schedule"]["title"] == sched.title
+            assert item["person"] == {"id": p.id, "display_name": "김팀장"}
+            assert _dt(item["generated_at"]) == rows[0].created_at
+        # 두 실행의 trigger 가 각각 기록됐다(run trace 는 실행마다 1행)
+        triggers = sorted(
+            t.output["trigger"]
+            for t in db_session.execute(
+                select(AgentTrace).where(AgentTrace.step == STEP_BRIEFING_RUN)
+            ).scalars()
+        )
+>       assert triggers == ["manual", "scheduler"]
+E       AssertionError: assert ['scheduler', 'scheduler'] == ['manual', 'scheduler']
+E         
+E         At index 0 diff: 'scheduler' != 'manual'
+E         
+E         Full diff:
+E           [
+E         -     'manual',
+E         +     'scheduler',
+E               'scheduler',
+E           ]
+
+tests/test_api_read_briefings_e2e.py:162: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 - AssertionError: assert ['scheduler', 'scheduler'] == ['manual', 'scheduler']
+  
+  At index 0 diff: 'scheduler' != 'manual'
+  
+  Full diff:
+    [
+  -     'manual',
+  +     'scheduler',
+        'scheduler',
+    ]
+========================= 1 failed, 1 passed in 0.54s ==========================
+[pytest exit 1]
+[M5 결과: 검출(실패함)]
+[M5 원복 확인: 내용 일치=True]
+
+=== M6: 10행: briefing_compose step 필터 제거(run/error 행 혼입) ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 50%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 FAILED [100%]
+
+=================================== FAILURES ===================================
+______________________ test_10행_재실행_사용자_범위_원문_다른_step_혼입 _______________________
+
+env = (<starlette.testclient.TestClient object at 0x10c782e90>, FakeBriefingComposer(table={8006: {'pattern_sentences': [], ...9]}}], 'suggestion': {'text': '둘째 제안', 'basis': {'fact_keys': ['hobby'], 'event_ids': []}}}}, fail=None, call_count=3))
+db_session = <sqlalchemy.orm.session.Session object at 0x10c782850>
+
+    def test_10행_재실행_사용자_범위_원문_다른_step_혼입(env, db_session):
+        client, composer = env
+        p = _person(db_session)
+        e = _event(db_session, p)
+        _fact(db_session, p, e)
+        s1 = _schedule(db_session, p, 5, "주간 회의")
+        s3 = _schedule(db_session, p, 6, "오류만 있는 일정")
+        other = _person(db_session, "남", user_id="other")
+        s_b = _schedule(db_session, other, 3, "남의 일정")
+        e_b = _event(db_session, other, raw="남의 비밀")
+        _fact(db_session, other, e_b)
+    
+        # (a) 같은 일정을 지정해 2회 실행 -- 두 번째 응답을 다르게
+        composer.table[s1.id] = _raw("첫째 실행", "첫째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        composer.table[s1.id] = _raw("둘째 실행", "둘째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        rows = _compose_rows(db_session, s1.id)
+        assert len(rows) == 2 and rows[1].id > rows[0].id  # 실제 실행이 2행을 남겼다
+    
+        # (b) 사용자 B 의 브리핑도 실제 실행으로 만든다 (APP_USER_ID 는 "local" 이라 목록에 없어야 한다)
+        result_b = run_briefings(
+            _ctx(db_session, user_id="other"), composer=composer, notifier=NullNotifier(),
+            schedule_id=s_b.id, trigger="manual",
+        )
+        assert [b["schedule_id"] for b in result_b.briefings] == [s_b.id]
+        assert len(_compose_rows(db_session, s_b.id)) == 1
+    
+        # (c) 일정 1 의 compose 보다 **나중** 행: 실제 run 행(실행마다 compose 뒤에 남는다) + 직접 넣은 error 행.
+        #     일정 3 은 error 행만.
+        later = datetime.now(timezone.utc) + timedelta(hours=1)
+        for sid, step in ((s1.id, STEP_BRIEFING_ERROR), (s3.id, STEP_BRIEFING_ERROR)):
+            db_session.add(
+                AgentTrace(
+                    session_id="briefing:u9b", step=step, tool_name=BRIEFING_TRACE_TOOL_NAME,
+                    input={"schedule_id": sid, "person_id": p.id},
+                    output={"schedule_id": sid, "person_id": p.id, "error": "시험용 오류"},
+                    tokens_in=0, tokens_out=0, created_at=later,
+                )
+            )
+        db_session.flush()
+        run_rows = db_session.execute(
+            select(AgentTrace).where(AgentTrace.step == STEP_BRIEFING_RUN)
+        ).scalars().all()
+        assert len(run_rows) == 3  # 실제로 남은 run 행(s1 두 번 + s_b 한 번)이 compose 와 같은 tool_name 으로 섞여 있다
+    
+>       r = client.get("/briefings")
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_api_read_briefings_e2e.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1113: in get
+    return self.request(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/testclient.py:463: in request
+    return super().request(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:797: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:980: in send
+    response = self._send_handling_auth(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1008: in _send_handling_auth
+    response = self._send_handling_redirects(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1043: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/httpx2/_client.py:1076: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/testclient.py:360: in handle_request
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/testclient.py:357: in handle_request
+    portal.call(self.app, scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/concurrent/futures/_base.py:454: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/concurrent/futures/_base.py:396: in __get_result
+    raise self._exception
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/applications.py:1160: in __call__
+    await super().__call__(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/routing.py:676: in __call__
+    await self.middleware_stack(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/routing.py:697: in app
+    await route.handle(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/routing.py:282: in handle
+    await self.app(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:130: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:116: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:670: in app
+    raw_response = await run_endpoint_function(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/fastapi/routing.py:326: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+app/api/routes.py:497: in read_briefings
+    return list_briefings(session, app_user_id(), now(), schedule_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+session = <sqlalchemy.orm.session.Session object at 0x10c782850>
+user_id = 'local'
+now = datetime.datetime(2026, 3, 1, 9, 0, tzinfo=datetime.timezone.utc)
+schedule_id = None
+
+    def list_briefings(
+        session: Session,
+        user_id: str,
+        now: datetime,
+        schedule_id: int | None = None,
+    ) -> list[BriefingRecordOut]:
+        """저장된 브리핑 목록(결정 G). 원천은 `agent_traces` 중
+        `tool_name='briefing' AND step='briefing_compose'` 행이다 -- 같은
+        `tool_name` 의 `briefing_run`·`briefing_error` 행은 섞이지 않는다(R-9).
+    
+        일정마다 **가장 최근 1행**(`created_at` 내림차순, 동률이면 `id` 내림차순)만
+        쓴다. `output->>'schedule_id'`·`output->>'person_id'` 로 일정·인물을 잇고
+        `persons.user_id = user_id` 를 건다. 정렬은 `schedules.scheduled_at`
+        내림차순 -> `schedules.id` 내림차순, 상한 `BRIEFINGS_LIMIT`.
+    
+        `schedule_id=None` 이면 `scheduled_at >= now - BRIEFINGS_LOOKBACK_DAYS` 인
+        일정만(미래는 상한 없음). 지정하면 기간 상수를 적용하지 않고 그 일정만
+        조회한다 -- 일정이 없거나 다른 사용자 것이면 `ScheduleNotFound`(공통 404),
+        있는데 compose trace 가 없으면 빈 목록.
+    
+        응답에는 원문(`raw_utterance`)을 담는 필드가 없다 -- `output` 의 근거는
+        `basis{fact_keys, event_ids}` 로만 나간다."""
+        if schedule_id is not None:
+            owned = session.execute(
+                select(Schedule.id)
+                .join(Person, Person.id == Schedule.person_id)
+                .where(Schedule.id == schedule_id)
+                .where(Person.user_id == user_id)
+            ).one_or_none()
+            if owned is None:
+                raise ScheduleNotFound("schedule_not_found")
+    
+        # output 은 JSONB 라 키 접근(`->>`)이 가능하지만 모델 타입이 object 라 Any 로 푼다.
+        trace_output = cast("Any", AgentTrace.output)
+        out_schedule_id = trace_output["schedule_id"].astext.cast(BigInteger)
+        out_person_id = trace_output["person_id"].astext.cast(BigInteger)
+        ranked = (
+            select(
+                AgentTrace.id.label("trace_id"),
+                AgentTrace.created_at.label("generated_at"),
+                AgentTrace.output.label("output"),
+                out_schedule_id.label("sid"),
+                out_person_id.label("pid"),
+                func.row_number()
+                .over(
+                    partition_by=out_schedule_id,
+                    order_by=(AgentTrace.created_at.desc(), AgentTrace.id.desc()),
+                )
+                .label("rn"),
+            )
+            .where(AgentTrace.tool_name == BRIEFING_TRACE_TOOL_NAME)
+            .subquery()
+        )
+    
+        query = (
+            select(
+                ranked.c.trace_id,
+                ranked.c.generated_at,
+                ranked.c.output,
+                Schedule.id,
+                Schedule.title,
+                Schedule.scheduled_at,
+                Person.id,
+                Person.display_name,
+            )
+            .join(Schedule, Schedule.id == ranked.c.sid)
+            # R-U3-2 -- trace 의 person_id 가 그 일정의 실제 인물과 같아야 한다(손으로 조작한
+            # trace 로 남의 일정 제목·시각이 내 목록에 섞이는 틈을 막는 방어 조건).
+            .join(Person, (Person.id == ranked.c.pid) & (Person.id == Schedule.person_id))
+            .where(ranked.c.rn == 1)
+            .where(Person.user_id == user_id)
+        )
+        if schedule_id is not None:
+            query = query.where(Schedule.id == schedule_id)
+        else:
+            query = query.where(Schedule.scheduled_at >= now - timedelta(days=BRIEFINGS_LOOKBACK_DAYS))
+        rows = session.execute(
+            query.order_by(Schedule.scheduled_at.desc(), Schedule.id.desc()).limit(BRIEFINGS_LIMIT)
+        ).all()
+    
+        return [
+            BriefingRecordOut(
+                schedule=BriefingScheduleOut(id=s_id, title=title, scheduled_at=scheduled_at),
+                person=BriefingPersonOut(id=p_id, display_name=display_name),
+                generated_at=generated_at,
+>               composer=output["composer"],
+                         ^^^^^^^^^^^^^^^^^^
+                pattern_sentences=output.get("pattern_sentences") or [],
+                lines=output.get("lines") or [],
+                suggestion=output.get("suggestion"),
+                push=output["push"],
+                trace_id=trace_id,
+            )
+            for trace_id, generated_at, output, s_id, title, scheduled_at, p_id, display_name in rows
+        ]
+E       KeyError: 'composer'
+
+app/api/read.py:341: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 - KeyError: 'composer'
+========================= 1 failed, 1 passed in 0.67s ==========================
+[pytest exit 1]
+[M6 결과: 검출(실패함)]
+[M6 원복 확인: 내용 일치=True]
+
+=== M7: 10행: 일정마다 최근 1행(rn == 1) 제거 ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 50%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 FAILED [100%]
+
+=================================== FAILURES ===================================
+______________________ test_10행_재실행_사용자_범위_원문_다른_step_혼입 _______________________
+
+env = (<starlette.testclient.TestClient object at 0x10ce4ad50>, FakeBriefingComposer(table={8011: {'pattern_sentences': [], ...2]}}], 'suggestion': {'text': '둘째 제안', 'basis': {'fact_keys': ['hobby'], 'event_ids': []}}}}, fail=None, call_count=3))
+db_session = <sqlalchemy.orm.session.Session object at 0x10ce4a710>
+
+    def test_10행_재실행_사용자_범위_원문_다른_step_혼입(env, db_session):
+        client, composer = env
+        p = _person(db_session)
+        e = _event(db_session, p)
+        _fact(db_session, p, e)
+        s1 = _schedule(db_session, p, 5, "주간 회의")
+        s3 = _schedule(db_session, p, 6, "오류만 있는 일정")
+        other = _person(db_session, "남", user_id="other")
+        s_b = _schedule(db_session, other, 3, "남의 일정")
+        e_b = _event(db_session, other, raw="남의 비밀")
+        _fact(db_session, other, e_b)
+    
+        # (a) 같은 일정을 지정해 2회 실행 -- 두 번째 응답을 다르게
+        composer.table[s1.id] = _raw("첫째 실행", "첫째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        composer.table[s1.id] = _raw("둘째 실행", "둘째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        rows = _compose_rows(db_session, s1.id)
+        assert len(rows) == 2 and rows[1].id > rows[0].id  # 실제 실행이 2행을 남겼다
+    
+        # (b) 사용자 B 의 브리핑도 실제 실행으로 만든다 (APP_USER_ID 는 "local" 이라 목록에 없어야 한다)
+        result_b = run_briefings(
+            _ctx(db_session, user_id="other"), composer=composer, notifier=NullNotifier(),
+            schedule_id=s_b.id, trigger="manual",
+        )
+        assert [b["schedule_id"] for b in result_b.briefings] == [s_b.id]
+        assert len(_compose_rows(db_session, s_b.id)) == 1
+    
+        # (c) 일정 1 의 compose 보다 **나중** 행: 실제 run 행(실행마다 compose 뒤에 남는다) + 직접 넣은 error 행.
+        #     일정 3 은 error 행만.
+        later = datetime.now(timezone.utc) + timedelta(hours=1)
+        for sid, step in ((s1.id, STEP_BRIEFING_ERROR), (s3.id, STEP_BRIEFING_ERROR)):
+            db_session.add(
+                AgentTrace(
+                    session_id="briefing:u9b", step=step, tool_name=BRIEFING_TRACE_TOOL_NAME,
+                    input={"schedule_id": sid, "person_id": p.id},
+                    output={"schedule_id": sid, "person_id": p.id, "error": "시험용 오류"},
+                    tokens_in=0, tokens_out=0, created_at=later,
+                )
+            )
+        db_session.flush()
+        run_rows = db_session.execute(
+            select(AgentTrace).where(AgentTrace.step == STEP_BRIEFING_RUN)
+        ).scalars().all()
+        assert len(run_rows) == 3  # 실제로 남은 run 행(s1 두 번 + s_b 한 번)이 compose 와 같은 tool_name 으로 섞여 있다
+    
+        r = client.get("/briefings")
+        body = r.json()
+>       assert [b["schedule"]["id"] for b in body] == [s1.id]  # 내 것만 · 일정 3(error 만)·남의 일정 없음
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert [8011, 8011] == [8011]
+E         
+E         Left contains one more item: 8011
+E         
+E         Full diff:
+E           [
+E               8011,
+E         +     8011,
+E           ]
+
+tests/test_api_read_briefings_e2e.py:213: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 - assert [8011, 8011] == [8011]
+  
+  Left contains one more item: 8011
+  
+  Full diff:
+    [
+        8011,
+  +     8011,
+    ]
+========================= 1 failed, 1 passed in 0.53s ==========================
+[pytest exit 1]
+[M7 결과: 검출(실패함)]
+[M7 원복 확인: 내용 일치=True]
+
+=== M8: 10행: 목록 쿼리의 Person.user_id 격리 제거 ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 50%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 FAILED [100%]
+
+=================================== FAILURES ===================================
+______________________ test_10행_재실행_사용자_범위_원문_다른_step_혼입 _______________________
+
+env = (<starlette.testclient.TestClient object at 0x10d57ad50>, FakeBriefingComposer(table={8016: {'pattern_sentences': [], ...5]}}], 'suggestion': {'text': '둘째 제안', 'basis': {'fact_keys': ['hobby'], 'event_ids': []}}}}, fail=None, call_count=3))
+db_session = <sqlalchemy.orm.session.Session object at 0x10d57a710>
+
+    def test_10행_재실행_사용자_범위_원문_다른_step_혼입(env, db_session):
+        client, composer = env
+        p = _person(db_session)
+        e = _event(db_session, p)
+        _fact(db_session, p, e)
+        s1 = _schedule(db_session, p, 5, "주간 회의")
+        s3 = _schedule(db_session, p, 6, "오류만 있는 일정")
+        other = _person(db_session, "남", user_id="other")
+        s_b = _schedule(db_session, other, 3, "남의 일정")
+        e_b = _event(db_session, other, raw="남의 비밀")
+        _fact(db_session, other, e_b)
+    
+        # (a) 같은 일정을 지정해 2회 실행 -- 두 번째 응답을 다르게
+        composer.table[s1.id] = _raw("첫째 실행", "첫째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        composer.table[s1.id] = _raw("둘째 실행", "둘째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        rows = _compose_rows(db_session, s1.id)
+        assert len(rows) == 2 and rows[1].id > rows[0].id  # 실제 실행이 2행을 남겼다
+    
+        # (b) 사용자 B 의 브리핑도 실제 실행으로 만든다 (APP_USER_ID 는 "local" 이라 목록에 없어야 한다)
+        result_b = run_briefings(
+            _ctx(db_session, user_id="other"), composer=composer, notifier=NullNotifier(),
+            schedule_id=s_b.id, trigger="manual",
+        )
+        assert [b["schedule_id"] for b in result_b.briefings] == [s_b.id]
+        assert len(_compose_rows(db_session, s_b.id)) == 1
+    
+        # (c) 일정 1 의 compose 보다 **나중** 행: 실제 run 행(실행마다 compose 뒤에 남는다) + 직접 넣은 error 행.
+        #     일정 3 은 error 행만.
+        later = datetime.now(timezone.utc) + timedelta(hours=1)
+        for sid, step in ((s1.id, STEP_BRIEFING_ERROR), (s3.id, STEP_BRIEFING_ERROR)):
+            db_session.add(
+                AgentTrace(
+                    session_id="briefing:u9b", step=step, tool_name=BRIEFING_TRACE_TOOL_NAME,
+                    input={"schedule_id": sid, "person_id": p.id},
+                    output={"schedule_id": sid, "person_id": p.id, "error": "시험용 오류"},
+                    tokens_in=0, tokens_out=0, created_at=later,
+                )
+            )
+        db_session.flush()
+        run_rows = db_session.execute(
+            select(AgentTrace).where(AgentTrace.step == STEP_BRIEFING_RUN)
+        ).scalars().all()
+        assert len(run_rows) == 3  # 실제로 남은 run 행(s1 두 번 + s_b 한 번)이 compose 와 같은 tool_name 으로 섞여 있다
+    
+        r = client.get("/briefings")
+        body = r.json()
+>       assert [b["schedule"]["id"] for b in body] == [s1.id]  # 내 것만 · 일정 3(error 만)·남의 일정 없음
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert [8016, 8018] == [8016]
+E         
+E         Left contains one more item: 8018
+E         
+E         Full diff:
+E           [
+E               8016,
+E         +     8018,
+E           ]
+
+tests/test_api_read_briefings_e2e.py:213: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 - assert [8016, 8018] == [8016]
+  
+  Left contains one more item: 8018
+  
+  Full diff:
+    [
+        8016,
+  +     8018,
+    ]
+========================= 1 failed, 1 passed in 0.52s ==========================
+[pytest exit 1]
+[M8 결과: 검출(실패함)]
+[M8 원복 확인: 내용 일치=True]
+
+=== M9: 10행: 최근 1행 정렬의 2차 키 AgentTrace.id.desc() -> asc() ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 50%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 FAILED [100%]
+
+=================================== FAILURES ===================================
+______________________ test_10행_재실행_사용자_범위_원문_다른_step_혼입 _______________________
+
+env = (<starlette.testclient.TestClient object at 0x1108f2d50>, FakeBriefingComposer(table={8021: {'pattern_sentences': [], ...8]}}], 'suggestion': {'text': '둘째 제안', 'basis': {'fact_keys': ['hobby'], 'event_ids': []}}}}, fail=None, call_count=3))
+db_session = <sqlalchemy.orm.session.Session object at 0x1108f2710>
+
+    def test_10행_재실행_사용자_범위_원문_다른_step_혼입(env, db_session):
+        client, composer = env
+        p = _person(db_session)
+        e = _event(db_session, p)
+        _fact(db_session, p, e)
+        s1 = _schedule(db_session, p, 5, "주간 회의")
+        s3 = _schedule(db_session, p, 6, "오류만 있는 일정")
+        other = _person(db_session, "남", user_id="other")
+        s_b = _schedule(db_session, other, 3, "남의 일정")
+        e_b = _event(db_session, other, raw="남의 비밀")
+        _fact(db_session, other, e_b)
+    
+        # (a) 같은 일정을 지정해 2회 실행 -- 두 번째 응답을 다르게
+        composer.table[s1.id] = _raw("첫째 실행", "첫째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        composer.table[s1.id] = _raw("둘째 실행", "둘째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        rows = _compose_rows(db_session, s1.id)
+        assert len(rows) == 2 and rows[1].id > rows[0].id  # 실제 실행이 2행을 남겼다
+    
+        # (b) 사용자 B 의 브리핑도 실제 실행으로 만든다 (APP_USER_ID 는 "local" 이라 목록에 없어야 한다)
+        result_b = run_briefings(
+            _ctx(db_session, user_id="other"), composer=composer, notifier=NullNotifier(),
+            schedule_id=s_b.id, trigger="manual",
+        )
+        assert [b["schedule_id"] for b in result_b.briefings] == [s_b.id]
+        assert len(_compose_rows(db_session, s_b.id)) == 1
+    
+        # (c) 일정 1 의 compose 보다 **나중** 행: 실제 run 행(실행마다 compose 뒤에 남는다) + 직접 넣은 error 행.
+        #     일정 3 은 error 행만.
+        later = datetime.now(timezone.utc) + timedelta(hours=1)
+        for sid, step in ((s1.id, STEP_BRIEFING_ERROR), (s3.id, STEP_BRIEFING_ERROR)):
+            db_session.add(
+                AgentTrace(
+                    session_id="briefing:u9b", step=step, tool_name=BRIEFING_TRACE_TOOL_NAME,
+                    input={"schedule_id": sid, "person_id": p.id},
+                    output={"schedule_id": sid, "person_id": p.id, "error": "시험용 오류"},
+                    tokens_in=0, tokens_out=0, created_at=later,
+                )
+            )
+        db_session.flush()
+        run_rows = db_session.execute(
+            select(AgentTrace).where(AgentTrace.step == STEP_BRIEFING_RUN)
+        ).scalars().all()
+        assert len(run_rows) == 3  # 실제로 남은 run 행(s1 두 번 + s_b 한 번)이 compose 와 같은 tool_name 으로 섞여 있다
+    
+        r = client.get("/briefings")
+        body = r.json()
+        assert [b["schedule"]["id"] for b in body] == [s1.id]  # 내 것만 · 일정 3(error 만)·남의 일정 없음
+>       assert body[0]["trace_id"] == rows[1].id  # 두 번째 실행
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert 212462 == 212466
+E        +  where 212466 = <app.db.models.AgentTrace object at 0x110a50870>.id
+
+tests/test_api_read_briefings_e2e.py:214: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 - assert 212462 == 212466
+ +  where 212466 = <app.db.models.AgentTrace object at 0x110a50870>.id
+========================= 1 failed, 1 passed in 0.54s ==========================
+[pytest exit 1]
+[M9 결과: 검출(실패함)]
+[M9 원복 확인: 내용 일치=True]
+
+# ===== append 2026-10-15T15:23:50+09:00 =====
+# 명령: python3 /tmp/u9b_mut.py /tmp/rel-u9b-mut m4e
+# 시각: 2026-10-15T15:23:50+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# 메모: M4e 1차는 무효(unique 위반 IntegrityError) - 아래 재실행이 유효
+# ---
+
+=== M4e: R-U3-5 ②: get_person_card 가 push_subscriptions 에 INSERT ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_persons.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 12 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  8%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [ 16%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [ 25%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [ 33%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [ 41%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [ 50%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 58%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 66%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 75%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 83%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 91%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 FAILED               [100%]
+
+=================================== FAILURES ===================================
+______________________________ test_쓰기_0_trace_0 _______________________________
+
+client = <starlette.testclient.TestClient object at 0x110784050>
+db_session = <sqlalchemy.orm.session.Session object at 0x1105ea950>
+
+    def test_쓰기_0_trace_0(client, db_session):
+        # R-U3-5 ① -- 행 수만이 아니라 `briefed_at`·`updated_at` 값까지 본다(공통 헬퍼).
+        # `updated_at` 을 과거로 못 박아야 UPDATE(`onupdate=now()`)가 값 변화로 드러난다.
+        p = _person(db_session)
+        p.updated_at = NOW - timedelta(days=30)
+        e = _event(db_session, p, 1)
+        f = PersonFact(person_id=p.id, key="k", value="v", confidence=1.0)
+        db_session.add(f)
+        db_session.flush()
+        briefed = NOW - timedelta(hours=7)
+        db_session.add_all(
+            [FactSource(fact_id=f.id, event_id=e.id),
+             Schedule(person_id=p.id, title="브리핑됨", scheduled_at=NOW + timedelta(hours=1), briefed_at=briefed),
+             Schedule(person_id=p.id, title="미브리핑", scheduled_at=NOW + timedelta(hours=2))]
+        )
+        db_session.flush()
+    
+        before = snapshot_db(db_session)
+        assert client.get("/persons").status_code == 200
+        assert client.get(f"/persons/{p.id}").status_code == 200
+        assert client.get("/persons/99999999").status_code == 404
+        after = snapshot_db(db_session)
+>       assert_no_writes(before, after)
+
+tests/test_api_read_persons.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+before = DbSnapshot(counts=(441, 1, 0, 1, 1, 1, 2, 0, 0), briefed_at=((8040, datetime.datetime(2026, 3, 1, 2, 0, tzinfo=zoneinf..., None)), persons_updated_at=((23561, datetime.datetime(2026, 1, 30, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))),))
+after = DbSnapshot(counts=(441, 1, 0, 1, 1, 1, 2, 0, 2), briefed_at=((8040, datetime.datetime(2026, 3, 1, 2, 0, tzinfo=zoneinf..., None)), persons_updated_at=((23561, datetime.datetime(2026, 1, 30, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC'))),))
+
+    def assert_no_writes(before: DbSnapshot, after: DbSnapshot) -> None:
+        """행 수 9개·`briefed_at` 전체·`persons.updated_at` 전체가 모두 같아야 한다."""
+>       assert after.counts == before.counts, "행 수가 달라졌다(쓰기 또는 trace 발생)"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: 행 수가 달라졌다(쓰기 또는 trace 발생)
+
+tests/helpers_read_api.py:74: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_persons.py::test_쓰기_0_trace_0 - AssertionError: 행 수가 달라졌다(쓰기 또는 trace 발생)
+========================= 1 failed, 11 passed in 0.60s =========================
+[pytest exit 1]
+[M4e 결과: 검출(실패함)]
+[M4e 원복 확인: 내용 일치=True]

@@ -1,0 +1,25 @@
+# 명령: POSTGRES_PORT=5433 /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_api_questions_pending.py -v
+# 시각: 2026-10-15T15:22:05+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 8 items
+
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [ 12%]
+tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_422 PASSED [ 25%]
+tests/test_api_questions_pending.py::test_필드_5개_값_일치 PASSED        [ 37%]
+tests/test_api_questions_pending.py::test_created_at_오름차순 PASSED     [ 50%]
+tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 PASSED   [ 62%]
+tests/test_api_questions_pending.py::test_답변된_질문은_제외 PASSED      [ 75%]
+tests/test_api_questions_pending.py::test_만료_경계_24시간 PASSED        [ 87%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 PASSED          [100%]
+
+============================== 8 passed in 0.50s ===============================

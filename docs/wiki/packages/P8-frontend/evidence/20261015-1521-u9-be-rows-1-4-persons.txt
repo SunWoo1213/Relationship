@@ -1,0 +1,29 @@
+# 명령: POSTGRES_PORT=5433 /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_api_read_persons.py -v
+# 시각: 2026-10-15T15:21:56+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 12 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  8%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [ 16%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [ 25%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [ 33%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [ 41%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [ 50%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 58%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 66%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 75%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 83%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 91%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [100%]
+
+============================== 12 passed in 0.58s ==============================

@@ -1,0 +1,171 @@
+# 명령: python3 /tmp/u9b_mut.py /tmp/rel-u9b-mut r1
+# 시각: 2026-10-15T15:27:22+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# 메모: tests/test_api_read_briefings_e2e.py 를 처음 쓴 직후의 실제 첫 실행 실패(사실 키 '취미' 가 FACT_KEYS 밖)를 같은 원인으로 재현. 당시 실행 출력은 save_evidence 를 거치지 않아 남아 있지 않다.
+# ---
+
+=== R1: 개발 중 첫 실행 실패 재현(변이 아님): 시험 데이터의 사실 키가 승격 어휘 FACT_KEYS 밖('취미') -> 줄·제안이 unknown_basis 로 거부 ===
+파일: tests/test_api_read_briefings_e2e.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-mut
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 FAILED [ 50%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 FAILED [100%]
+
+=================================== FAILURES ===================================
+___________________ test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 ___________________
+
+env = (<starlette.testclient.TestClient object at 0x1114030e0>, FakeBriefingComposer(table={8234: {'pattern_sentences': [], ...7]}}], 'suggestion': {'text': '주기 제안', 'basis': {'fact_keys': ['hobby'], 'event_ids': []}}}}, fail=None, call_count=2))
+db_session = <sqlalchemy.orm.session.Session object at 0x111401160>
+
+    def test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다(env, db_session):
+        client, composer = env
+        p = _person(db_session)
+        e = _event(db_session, p)
+        _fact(db_session, p, e)
+        s1 = _schedule(db_session, p, 5, "주간 회의")
+        s2 = _schedule(db_session, p, 8, "저녁 약속")
+        composer.table[s1.id] = _raw("수동 실행 줄", "수동 제안", e.id)
+        composer.table[s2.id] = _raw("주기 실행 줄", "주기 제안", e.id)
+    
+        # 경로 1: 실제 POST /briefings/run (trigger="manual")
+        resp = client.post("/briefings/run", json={"schedule_id": s1.id})
+        assert resp.status_code == 200
+        assert [b["schedule_id"] for b in resp.json()["briefings"]] == [s1.id]
+        # 경로 2: 1분 주기 작업과 같은 함수 (trigger="scheduler") -- s1 은 briefed_at 이 찍혀 s2 만 대상
+        result = run_briefings(_ctx(db_session), composer=composer, notifier=NullNotifier(), trigger="scheduler")
+        assert [b["schedule_id"] for b in result.briefings] == [s2.id]
+    
+        r = client.get("/briefings")
+        assert r.status_code == 200
+        body = r.json()
+        assert [b["schedule"]["id"] for b in body] == [s2.id, s1.id]  # scheduled_at 내림차순
+        for item, sched, line, sugg in (
+            (body[0], s2, "주기 실행 줄", "주기 제안"),
+            (body[1], s1, "수동 실행 줄", "수동 제안"),
+        ):
+            rows = _compose_rows(db_session, sched.id)
+            assert len(rows) == 1  # 실제 실행이 compose 행을 정확히 1개 남겼다
+            out = rows[0].output
+            assert item["trace_id"] == rows[0].id
+            assert item["lines"] == out["lines"]
+            assert item["suggestion"] == out["suggestion"]
+            assert item["pattern_sentences"] == out["pattern_sentences"]
+            assert item["composer"] == out["composer"] == "llm"  # 검증을 통과한 생성기 출력
+            assert item["push"] == out["push"]
+            # 생성기가 낸 문장이 거부되지 않고 그대로 실렸다
+>           assert [ln["text"] for ln in item["lines"]] == [line], out["rejected"]
+E           AssertionError: [{'item': {'kind': 'line', 'text': '주기 실행 줄', 'unknown_event_ids': [], 'unknown_fact_keys': ['hobby']}, 'reason': 'unknown_basis'}, {'item': {'basis': {'event_ids': [], 'fact_keys': ['hobby']}, 'kind': 'suggestion', 'text': '주기 제안'}, 'reason': 'unknown_basis'}]
+E           assert [] == ['주기 실행 줄']
+E             
+E             Right contains one more item: '주기 실행 줄'
+E             
+E             Full diff:
+E             + []
+E             - [
+E             -     '주기 실행 줄',
+E             - ]
+
+tests/test_api_read_briefings_e2e.py:150: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+______________________ test_10행_재실행_사용자_범위_원문_다른_step_혼입 _______________________
+
+env = (<starlette.testclient.TestClient object at 0x11137b110>, FakeBriefingComposer(table={8236: {'pattern_sentences': [], ...8]}}], 'suggestion': {'text': '둘째 제안', 'basis': {'fact_keys': ['hobby'], 'event_ids': []}}}}, fail=None, call_count=3))
+db_session = <sqlalchemy.orm.session.Session object at 0x111378e10>
+
+    def test_10행_재실행_사용자_범위_원문_다른_step_혼입(env, db_session):
+        client, composer = env
+        p = _person(db_session)
+        e = _event(db_session, p)
+        _fact(db_session, p, e)
+        s1 = _schedule(db_session, p, 5, "주간 회의")
+        s3 = _schedule(db_session, p, 6, "오류만 있는 일정")
+        other = _person(db_session, "남", user_id="other")
+        s_b = _schedule(db_session, other, 3, "남의 일정")
+        e_b = _event(db_session, other, raw="남의 비밀")
+        _fact(db_session, other, e_b)
+    
+        # (a) 같은 일정을 지정해 2회 실행 -- 두 번째 응답을 다르게
+        composer.table[s1.id] = _raw("첫째 실행", "첫째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        composer.table[s1.id] = _raw("둘째 실행", "둘째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        rows = _compose_rows(db_session, s1.id)
+        assert len(rows) == 2 and rows[1].id > rows[0].id  # 실제 실행이 2행을 남겼다
+    
+        # (b) 사용자 B 의 브리핑도 실제 실행으로 만든다 (APP_USER_ID 는 "local" 이라 목록에 없어야 한다)
+        result_b = run_briefings(
+            _ctx(db_session, user_id="other"), composer=composer, notifier=NullNotifier(),
+            schedule_id=s_b.id, trigger="manual",
+        )
+        assert [b["schedule_id"] for b in result_b.briefings] == [s_b.id]
+        assert len(_compose_rows(db_session, s_b.id)) == 1
+    
+        # (c) 일정 1 의 compose 보다 **나중** 행: 실제 run 행(실행마다 compose 뒤에 남는다) + 직접 넣은 error 행.
+        #     일정 3 은 error 행만.
+        later = datetime.now(timezone.utc) + timedelta(hours=1)
+        for sid, step in ((s1.id, STEP_BRIEFING_ERROR), (s3.id, STEP_BRIEFING_ERROR)):
+            db_session.add(
+                AgentTrace(
+                    session_id="briefing:u9b", step=step, tool_name=BRIEFING_TRACE_TOOL_NAME,
+                    input={"schedule_id": sid, "person_id": p.id},
+                    output={"schedule_id": sid, "person_id": p.id, "error": "시험용 오류"},
+                    tokens_in=0, tokens_out=0, created_at=later,
+                )
+            )
+        db_session.flush()
+        run_rows = db_session.execute(
+            select(AgentTrace).where(AgentTrace.step == STEP_BRIEFING_RUN)
+        ).scalars().all()
+        assert len(run_rows) == 3  # 실제로 남은 run 행(s1 두 번 + s_b 한 번)이 compose 와 같은 tool_name 으로 섞여 있다
+    
+        r = client.get("/briefings")
+        body = r.json()
+        assert [b["schedule"]["id"] for b in body] == [s1.id]  # 내 것만 · 일정 3(error 만)·남의 일정 없음
+        assert body[0]["trace_id"] == rows[1].id  # 두 번째 실행
+>       assert [ln["text"] for ln in body[0]["lines"]] == ["둘째 실행"]
+E       AssertionError: assert [] == ['둘째 실행']
+E         
+E         Right contains one more item: '둘째 실행'
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     '둘째 실행',
+E         - ]
+
+tests/test_api_read_briefings_e2e.py:215: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 - AssertionError: [{'item': {'kind': 'line', 'text': '주기 실행 줄', 'unknown_event_ids': [], 'unknown_fact_keys': ['hobby']}, 'reason': 'unknown_basis'}, {'item': {'basis': {'event_ids': [], 'fact_keys': ['hobby']}, 'kind': 'suggestion', 'text': '주기 제안'}, 'reason': 'unknown_basis'}]
+assert [] == ['주기 실행 줄']
+  
+  Right contains one more item: '주기 실행 줄'
+  
+  Full diff:
+  + []
+  - [
+  -     '주기 실행 줄',
+  - ]
+FAILED tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 - AssertionError: assert [] == ['둘째 실행']
+  
+  Right contains one more item: '둘째 실행'
+  
+  Full diff:
+  + []
+  - [
+  -     '둘째 실행',
+  - ]
+============================== 2 failed in 0.53s ===============================
+[pytest exit 1]
+[R1 결과: 검출(실패함)]
+[R1 원복 확인: 내용 일치=True]

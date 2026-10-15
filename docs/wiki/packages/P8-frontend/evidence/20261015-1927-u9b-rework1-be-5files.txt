@@ -1,0 +1,8 @@
+# 명령: POSTGRES_PORT=5433 .venv/bin/python -m pytest -q tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+# 시각: 2026-10-15T19:27:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 07ec09a (dev2)
+# exit: 0
+# ---
+................................................................         [100%]
+64 passed in 1.30s

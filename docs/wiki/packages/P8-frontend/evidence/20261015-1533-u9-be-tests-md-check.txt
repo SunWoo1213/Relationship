@@ -1,0 +1,16 @@
+# 명령: grep -E '^\| test_api' docs/wiki/packages/P8-frontend/tests.md | awk -F'|' '{gsub(/^ +| +$/,"",$2); print $2}' | sed 's#^#tests/#' | sort > /tmp/u9b_rows.txt; grep '^tests/' docs/wiki/packages/P8-frontend/evidence/20261015-1525-u9-be-collect.txt | sort > /tmp/u9b_collect.txt; wc -l /tmp/u9b_rows.txt /tmp/u9b_collect.txt; diff /tmp/u9b_rows.txt /tmp/u9b_collect.txt && echo 'tests.md 백엔드 행 이름 = pytest 수집 이름 (64:64 일치)'; echo '--- 실패 이력 열 집계'; for k in '실제 실패' '검출 실패 → 보강' '보류·재작업' '동작 틈 → 보강'; do echo "$k: $(grep -c "^| .*| \*\*$k\*\*" docs/wiki/packages/P8-frontend/tests.md)"; done; echo "기록 없음: $(grep -c '^| .*| 기록 없음' docs/wiki/packages/P8-frontend/tests.md)"
+# 시각: 2026-10-15T15:33:47+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# ---
+      64 /tmp/u9b_rows.txt
+      64 /tmp/u9b_collect.txt
+     128 total
+tests.md 백엔드 행 이름 = pytest 수집 이름 (64:64 일치)
+--- 실패 이력 열 집계
+실제 실패: 5
+검출 실패 → 보강: 16
+보류·재작업: 4
+동작 틈 → 보강: 1
+기록 없음: 177

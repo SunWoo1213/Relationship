@@ -22,7 +22,7 @@ from app.briefing.types import (
     STEP_BRIEFING_ERROR,
     STEP_BRIEFING_RUN,
 )
-from app.db.models import AgentTrace, Event, Person, Schedule
+from app.db.models import AgentTrace, Event, Person, PushSubscription, Schedule
 from app.main import create_app
 from tests.helpers_read_api import assert_no_writes, snapshot_db
 
@@ -235,6 +235,25 @@ def test_다른_사용자_일정은_제외(client, db_session):
     assert "남" not in [b["person"]["display_name"] for b in r.json()]
 
 
+def test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다(client, db_session):
+    # R-U3-2 -- trace 의 person_id(나) 가 그 일정의 실제 인물(남)과 다르면 제외.
+    # `Person.id == Schedule.person_id` 방어 조건을 지우면 남의 일정 제목·시각이 섞여 실패한다.
+    mine = _person(db_session, "나의 사람")
+    other = _person(db_session, "남", user_id="other")
+    s_other = _schedule(db_session, other, NOW, "남의 비밀 일정")
+    s_mine = _schedule(db_session, mine, NOW - timedelta(hours=1), "내 일정")
+    _trace(db_session, s_other, mine, NOW - timedelta(hours=1))  # 조작: 남의 일정 + 내 인물
+    _trace(db_session, s_mine, mine, NOW - timedelta(hours=1))  # 정상
+    # R-U9b-1 -- 반대 방향: 내 일정 id + 남의 인물 id 로 조작한 trace 도 제외.
+    # 조인을 `Person.id == Schedule.person_id` 만으로 줄이면(trace 의 person_id 무시) 이 일정이 섞여 실패한다.
+    s_forged = _schedule(db_session, mine, NOW - timedelta(hours=2), "내 일정이지만 조작된 trace")
+    _trace(db_session, s_forged, other, NOW - timedelta(hours=1))  # 조작: 내 일정 + 남의 인물
+    r = client.get("/briefings")
+    assert _ids(r) == [s_mine.id]
+    assert "남의 비밀 일정" not in r.text
+    assert "조작된 trace" not in r.text
+
+
 # --------------------------------------------------------------- 기간 경계
 
 
@@ -406,6 +425,16 @@ def test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다(db_se
     db_session.flush()
     with pytest.raises(AssertionError, match="updated_at"):
         assert_no_writes(before2, snapshot_db(db_session))
+
+
+def test_헬퍼_자체_push_subscriptions_추가도_잡아낸다(db_session):
+    # R-U3-5 ② -- 행 수 스냅샷이 스키마 v2 의 9테이블 전부(push_subscriptions 포함)를 센다.
+    before = snapshot_db(db_session)
+    assert len(before.counts) == 9
+    db_session.add(PushSubscription(user_id="local", endpoint="https://push.invalid/x", keys={"p256dh": "a", "auth": "b"}))
+    db_session.flush()
+    with pytest.raises(AssertionError, match="행 수"):
+        assert_no_writes(before, snapshot_db(db_session))
 
 
 def test_응답은_JSON_직렬화_가능(client, db_session):

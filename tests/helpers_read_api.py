@@ -2,8 +2,9 @@
 
 판정표 7행 "DB 쓰기 0 · `agent_traces` 0 · `schedules.briefed_at`·
 `persons.updated_at` 변화 0" 을 행 수만이 아니라 **값**으로 비교한다.
-스냅샷은 (1) 8개 테이블(`agent_traces`·`persons`·`person_aliases`·
-`person_facts`·`fact_sources`·`events`·`schedules`·`pending_questions`)의 행 수,
+스냅샷은 (1) 스키마 v2 의 9개 테이블(`agent_traces`·`persons`·`person_aliases`·
+`person_facts`·`fact_sources`·`events`·`schedules`·`pending_questions`·
+`push_subscriptions` -- R-U3-5 ②)의 행 수,
 (2) `schedules.briefed_at` 전체 값(id 순), (3) `persons.updated_at` 전체 값(id 순)이다.
 행 수가 같아도 UPDATE 로 `briefed_at`·`updated_at` 이 바뀌면 달라진다.
 
@@ -28,6 +29,7 @@ from app.db.models import (
     Person,
     PersonAlias,
     PersonFact,
+    PushSubscription,
     Schedule,
 )
 
@@ -40,6 +42,7 @@ _COUNTED_MODELS = (
     Event,
     Schedule,
     PendingQuestion,
+    PushSubscription,
 )
 
 
@@ -67,7 +70,7 @@ def snapshot_db(session: Session) -> DbSnapshot:
 
 
 def assert_no_writes(before: DbSnapshot, after: DbSnapshot) -> None:
-    """행 수 8개·`briefed_at` 전체·`persons.updated_at` 전체가 모두 같아야 한다."""
+    """행 수 9개·`briefed_at` 전체·`persons.updated_at` 전체가 모두 같아야 한다."""
     assert after.counts == before.counts, "행 수가 달라졌다(쓰기 또는 trace 발생)"
     assert after.briefed_at == before.briefed_at, "schedules.briefed_at 이 바뀌었다"
     assert after.persons_updated_at == before.persons_updated_at, "persons.updated_at 이 바뀌었다"

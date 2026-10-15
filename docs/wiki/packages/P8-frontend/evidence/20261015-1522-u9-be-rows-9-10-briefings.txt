@@ -1,0 +1,43 @@
+# 명령: POSTGRES_PORT=5433 /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_api_read_briefings_e2e.py tests/test_api_read_briefings.py -v
+# 시각: 2026-10-15T15:22:07+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 26 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [  3%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [  7%]
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [ 11%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [ 15%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 19%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 23%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 26%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 30%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 34%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 38%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 PASSED [ 42%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 46%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 50%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 53%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 57%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 61%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 65%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 69%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 73%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 76%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 80%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 84%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 88%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 92%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 PASSED [ 96%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [100%]
+
+============================== 26 passed in 0.80s ==============================

@@ -1,0 +1,96 @@
+# 명령: echo "== 원본 사본 (/tmp/rel-u9b-rw2, 변이 없음): 새 단언 포함 조작된_trace 테스트 =="; cd /tmp/rel-u9b-rw2 && POSTGRES_PORT=5433 /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -k 조작된_trace tests/test_api_read_briefings.py 2>&1 | tail -15; POSTGRES_PORT=5433 /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -c "import app;print(\"app 경로:\",app.__file__)"; cmp /tmp/rel-u9b-rw2/app/api/read.py /Users/sunwoo/Desktop/Portfolio/Relationship/app/api/read.py && echo "사본 read.py == 저장소 read.py"
+# 시각: 2026-10-15T19:27:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 07ec09a (dev2)
+# exit: 0
+# ---
+== 원본 사본 (/tmp/rel-u9b-rw2, 변이 없음): 새 단언 포함 조작된_trace 테스트 ==
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-rw2
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 24 items / 23 deselected / 1 selected
+
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 PASSED [100%]
+
+======================= 1 passed, 23 deselected in 0.62s =======================
+app 경로: /private/tmp/rel-u9b-rw2/app/__init__.py
+사본 read.py == 저장소 read.py
+
+# ===== append 2026-10-15T19:27:35+09:00 =====
+# 명령: echo "== V2 변이 적용 diff (사본 vs 저장소) =="; diff /tmp/rel-u9b-rw2/app/api/read.py /Users/sunwoo/Desktop/Portfolio/Relationship/app/api/read.py; echo "== V2 변이: 새 단언 포함 테스트 =="; cd /tmp/rel-u9b-rw2 && POSTGRES_PORT=5433 /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -k 조작된_trace tests/test_api_read_briefings.py 2>&1 | tail -40; echo "== V2 변이: briefings 25 파일 전체 =="; POSTGRES_PORT=5433 /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -q tests/test_api_read_briefings.py 2>&1 | tail -8
+# 시각: 2026-10-15T19:27:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 07ec09a (dev2)
+# exit: 0
+# ---
+== V2 변이 적용 diff (사본 vs 저장소) ==
+325c325
+<         .join(Person, Person.id == Schedule.person_id)
+---
+>         .join(Person, (Person.id == ranked.c.pid) & (Person.id == Schedule.person_id))
+== V2 변이: 새 단언 포함 테스트 ==
+    def test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다(client, db_session):
+        # R-U3-2 -- trace 의 person_id(나) 가 그 일정의 실제 인물(남)과 다르면 제외.
+        # `Person.id == Schedule.person_id` 방어 조건을 지우면 남의 일정 제목·시각이 섞여 실패한다.
+        mine = _person(db_session, "나의 사람")
+        other = _person(db_session, "남", user_id="other")
+        s_other = _schedule(db_session, other, NOW, "남의 비밀 일정")
+        s_mine = _schedule(db_session, mine, NOW - timedelta(hours=1), "내 일정")
+        _trace(db_session, s_other, mine, NOW - timedelta(hours=1))  # 조작: 남의 일정 + 내 인물
+        _trace(db_session, s_mine, mine, NOW - timedelta(hours=1))  # 정상
+        # R-U9b-1 -- 반대 방향: 내 일정 id + 남의 인물 id 로 조작한 trace 도 제외.
+        # 조인을 `Person.id == Schedule.person_id` 만으로 줄이면(trace 의 person_id 무시) 이 일정이 섞여 실패한다.
+        s_forged = _schedule(db_session, mine, NOW - timedelta(hours=2), "내 일정이지만 조작된 trace")
+        _trace(db_session, s_forged, other, NOW - timedelta(hours=1))  # 조작: 내 일정 + 남의 인물
+        r = client.get("/briefings")
+>       assert _ids(r) == [s_mine.id]
+E       assert [9088, 9089] == [9088]
+E         
+E         Left contains one more item: 9089
+E         
+E         Full diff:
+E           [
+E               9088,
+E         +     9089,
+E           ]
+
+tests/test_api_read_briefings.py:252: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 - assert [9088, 9089] == [9088]
+  
+  Left contains one more item: 9089
+  
+  Full diff:
+    [
+        9088,
+  +     9089,
+    ]
+======================= 1 failed, 23 deselected in 0.79s =======================
+== V2 변이: briefings 25 파일 전체 ==
+  Left contains one more item: 9102
+  
+  Full diff:
+    [
+        9101,
+  +     9102,
+    ]
+1 failed, 23 passed in 0.85s
+
+# ===== append 2026-10-15T19:27:49+09:00 =====
+# 명령: cmp /tmp/rel-u9b-rw2/app/api/read.py /Users/sunwoo/Desktop/Portfolio/Relationship/app/api/read.py && echo "[원복 확인: 사본 read.py 바이트 일치=True]"; cd /Users/sunwoo/Desktop/Portfolio/Relationship && git diff --stat -- app | cat
+# 시각: 2026-10-15T19:27:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 07ec09a (dev2)
+# exit: 0
+# ---
+[원복 확인: 사본 read.py 바이트 일치=True]
+ app/api/read.py   | 4 +++-
+ app/api/routes.py | 6 ++++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)

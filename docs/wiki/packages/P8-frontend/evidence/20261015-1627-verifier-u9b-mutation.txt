@@ -1,0 +1,1137 @@
+# 명령: python3 /tmp/verifier_u9b_mut.py
+# 시각: 2026-10-15T16:27:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 07ec09a (dev2)
+# exit: 0
+# 메모: verifier 변이: 구현자 M1·M2·M3·M5·M8 재현 + V1(created_at asc)·V2(조인 반대 방향)·V3(tool_name 필터 제거), 사본 /tmp/rel-u9b-verifier
+# ---
+사본: /tmp/rel-u9b-verifier
+=== 대조군(변이 없음) 64건 ===
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 64 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  1%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [  3%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [  4%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [  6%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [  7%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [  9%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 10%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 12%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 14%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 15%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 17%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [ 18%]
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [ 20%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 21%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 23%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 25%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 26%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 28%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 29%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 31%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 32%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 34%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 35%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 37%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 39%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 40%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 42%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 43%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 45%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [ 46%]
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [ 48%]
+tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_422 PASSED [ 50%]
+tests/test_api_questions_pending.py::test_필드_5개_값_일치 PASSED        [ 51%]
+tests/test_api_questions_pending.py::test_created_at_오름차순 PASSED     [ 53%]
+tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 PASSED   [ 54%]
+tests/test_api_questions_pending.py::test_답변된_질문은_제외 PASSED      [ 56%]
+tests/test_api_questions_pending.py::test_만료_경계_24시간 PASSED        [ 57%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 PASSED          [ 59%]
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [ 60%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [ 62%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 64%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 65%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 67%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 68%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 70%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 71%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 PASSED [ 73%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 75%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 76%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 78%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 79%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 81%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 82%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 84%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 85%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 87%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 89%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 90%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 92%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 93%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 PASSED [ 95%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [ 96%]
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 98%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+============================== 64 passed in 1.36s ==============================
+[pytest exit 0]
+[대조군 exit 0]
+
+
+=== M1(재현): R-U3-1: /questions/pending 의 replace(..., now=now) 에서 now 제거 -> 실시계 ===
+파일: app/api/routes.py  old 출현 횟수: 1
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_questions_pending.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 8 items
+
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [ 12%]
+tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_422 PASSED [ 25%]
+tests/test_api_questions_pending.py::test_필드_5개_값_일치 FAILED        [ 37%]
+tests/test_api_questions_pending.py::test_created_at_오름차순 FAILED     [ 50%]
+tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 FAILED   [ 62%]
+tests/test_api_questions_pending.py::test_답변된_질문은_제외 FAILED      [ 75%]
+tests/test_api_questions_pending.py::test_만료_경계_24시간 FAILED        [ 87%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 FAILED          [100%]
+
+=================================== FAILURES ===================================
+_______________________________ test_필드_5개_값_일치 ________________________________
+
+client = <starlette.testclient.TestClient object at 0x10f0a8b90>
+db_session = <sqlalchemy.orm.session.Session object at 0x10f0a8e10>
+
+    def test_필드_5개_값_일치(client, db_session):
+        q = _q(db_session, kind="new_person", question="민수를 기억할까요?", options=("기억해줘", "아니"))
+        r = _get(client)
+        assert r.status_code == 200
+>       assert r.json() == [
+            {
+                "question_id": q.id,
+                "status": "pending",
+                "kind": "new_person",
+                "question": "민수를 기억할까요?",
+                "options": ["기억해줘", "아니"],
+            }
+        ]
+E       AssertionError: assert [] == [{'kind': 'ne...': 5127, ...}]
+E         
+E         Right contains one more item: {'kind': 'new_person', 'options': ['기억해줘', '아니'], 'question': '민수를 기억할까요?', 'question_id': 5127, ...}
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     {
+E         -         'kind': 'new_person',
+E         -         'options': [
+E         -             '기억해줘',
+E         -             '아니',
+E         -         ],
+E         -         'question': '민수를 기억할까요?',
+E         -         'question_id': 5127,
+E         -         'status': 'pending',
+E         -     },
+E         - ]
+
+tests/test_api_questions_pending.py:82: AssertionError
+_____________________________ test_created_at_오름차순 _____________________________
+
+client = <starlette.testclient.TestClient object at 0x10f198510>
+db_session = <sqlalchemy.orm.session.Session object at 0x10f12e190>
+
+    def test_created_at_오름차순(client, db_session):
+        # 삽입 순서와 created_at 순서를 일부러 다르게 한다.
+        late = _q(db_session, question="늦음", created_at=NOW - timedelta(minutes=1))
+        early = _q(db_session, question="이름", created_at=NOW - timedelta(hours=3))
+        mid = _q(db_session, question="중간", created_at=NOW - timedelta(hours=1))
+        ids = [x["question_id"] for x in _get(client).json()]
+>       assert ids == [early.id, mid.id, late.id]
+E       assert [] == [5129, 5130, 5128]
+E         
+E         Right contains 3 more items, first extra item: 5129
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     5129,
+E         -     5130,
+E         -     5128,
+E         - ]
+
+tests/test_api_questions_pending.py:99: AssertionError
+______________________________ test_다른_세션_질문은_제외 _______________________________
+
+client = <starlette.testclient.TestClient object at 0x10f1c35c0>
+db_session = <sqlalchemy.orm.session.Session object at 0x10f199480>
+
+    def test_다른_세션_질문은_제외(client, db_session):
+        mine = _q(db_session, session_id=SID, question="내 것")
+        _q(db_session, session_id="sess-other", question="남의 세션")
+        body = _get(client).json()
+>       assert [x["question_id"] for x in body] == [mine.id]
+E       assert [] == [5131]
+E         
+E         Right contains one more item: 5131
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     5131,
+E         - ]
+
+tests/test_api_questions_pending.py:106: AssertionError
+_______________________________ test_답변된_질문은_제외 ________________________________
+
+client = <starlette.testclient.TestClient object at 0x10efaf9b0>
+db_session = <sqlalchemy.orm.session.Session object at 0x10efafe30>
+
+    def test_답변된_질문은_제외(client, db_session):
+        open_q = _q(db_session, question="열림")
+        _q(db_session, question="답함", answered_at=NOW - timedelta(seconds=30))
+>       assert [x["question_id"] for x in _get(client).json()] == [open_q.id]
+E       assert [] == [5133]
+E         
+E         Right contains one more item: 5133
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     5133,
+E         - ]
+
+tests/test_api_questions_pending.py:113: AssertionError
+_______________________________ test_만료_경계_24시간 ________________________________
+
+client = <starlette.testclient.TestClient object at 0x10f0a2f10>
+db_session = <sqlalchemy.orm.session.Session object at 0x10f004c00>
+
+    def test_만료_경계_24시간(client, db_session):
+        fresh = _q(db_session, question="23시간59분59초", created_at=NOW - timedelta(hours=24) + timedelta(seconds=1))
+        _q(db_session, question="정확히 24시간", created_at=NOW - timedelta(hours=24))
+        _q(db_session, question="25시간", created_at=NOW - timedelta(hours=25))
+>       assert [x["question_id"] for x in _get(client).json()] == [fresh.id]
+E       assert [] == [5135]
+E         
+E         Right contains one more item: 5135
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     5135,
+E         - ]
+
+tests/test_api_questions_pending.py:120: AssertionError
+______________________________ test_쓰기_0_trace_0 _______________________________
+
+client = <starlette.testclient.TestClient object at 0x10f111260>
+db_session = <sqlalchemy.orm.session.Session object at 0x10f0a3460>
+
+    def test_쓰기_0_trace_0(client, db_session):
+        _q(db_session, question="열림")
+        _q(db_session, question="답함", answered_at=NOW)
+        _q(db_session, question="만료", created_at=NOW - timedelta(days=2))
+        before = snapshot_db(db_session)
+>       assert len(_get(client).json()) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+E        +    where [] = json()
+E        +      where json = <Response [200 OK]>.json
+E        +        where <Response [200 OK]> = _get(<starlette.testclient.TestClient object at 0x10f111260>)
+
+tests/test_api_questions_pending.py:128: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_questions_pending.py::test_필드_5개_값_일치 - AssertionError: assert [] == [{'kind': 'ne...': 5127, ...}]
+  
+  Right contains one more item: {'kind': 'new_person', 'options': ['기억해줘', '아니'], 'question': '민수를 기억할까요?', 'question_id': 5127, ...}
+  
+  Full diff:
+  + []
+  - [
+  -     {
+  -         'kind': 'new_person',
+  -         'options': [
+  -             '기억해줘',
+  -             '아니',
+  -         ],
+  -         'question': '민수를 기억할까요?',
+  -         'question_id': 5127,
+  -         'status': 'pending',
+  -     },
+  - ]
+FAILED tests/test_api_questions_pending.py::test_created_at_오름차순 - assert [] == [5129, 5130, 5128]
+  
+  Right contains 3 more items, first extra item: 5129
+  
+  Full diff:
+  + []
+  - [
+  -     5129,
+  -     5130,
+  -     5128,
+  - ]
+FAILED tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 - assert [] == [5131]
+  
+  Right contains one more item: 5131
+  
+  Full diff:
+  + []
+  - [
+  -     5131,
+  - ]
+FAILED tests/test_api_questions_pending.py::test_답변된_질문은_제외 - assert [] == [5133]
+  
+  Right contains one more item: 5133
+  
+  Full diff:
+  + []
+  - [
+  -     5133,
+  - ]
+FAILED tests/test_api_questions_pending.py::test_만료_경계_24시간 - assert [] == [5135]
+  
+  Right contains one more item: 5135
+  
+  Full diff:
+  + []
+  - [
+  -     5135,
+  - ]
+FAILED tests/test_api_questions_pending.py::test_쓰기_0_trace_0 - assert 0 == 1
+ +  where 0 = len([])
+ +    where [] = json()
+ +      where json = <Response [200 OK]>.json
+ +        where <Response [200 OK]> = _get(<starlette.testclient.TestClient object at 0x10f111260>)
+========================= 6 failed, 2 passed in 0.53s ==========================
+[pytest exit 1]
+[M1(재현) 원복 확인: 바이트 일치=True]
+
+=== M2(재현): R-U3-2: 인물 조인에서 Person.id == Schedule.person_id 방어 조건 제거 ===
+파일: app/api/read.py  old 출현 횟수: 1
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 26 items
+
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [  3%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [  7%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 11%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 15%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 19%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 23%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 26%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 30%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 FAILED [ 34%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 38%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 42%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 46%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 50%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 53%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 57%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 61%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 65%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 69%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 73%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 76%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 80%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 84%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 PASSED [ 88%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [ 92%]
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 96%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+=================================== FAILURES ===================================
+_______________ test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 ________________
+
+client = <starlette.testclient.TestClient object at 0x10ebcaf10>
+db_session = <sqlalchemy.orm.session.Session object at 0x10eb21250>
+
+    def test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다(client, db_session):
+        # R-U3-2 -- trace 의 person_id(나) 가 그 일정의 실제 인물(남)과 다르면 제외.
+        # `Person.id == Schedule.person_id` 방어 조건을 지우면 남의 일정 제목·시각이 섞여 실패한다.
+        mine = _person(db_session, "나의 사람")
+        other = _person(db_session, "남", user_id="other")
+        s_other = _schedule(db_session, other, NOW, "남의 비밀 일정")
+        s_mine = _schedule(db_session, mine, NOW - timedelta(hours=1), "내 일정")
+        _trace(db_session, s_other, mine, NOW - timedelta(hours=1))  # 조작: 남의 일정 + 내 인물
+        _trace(db_session, s_mine, mine, NOW - timedelta(hours=1))  # 정상
+        r = client.get("/briefings")
+>       assert _ids(r) == [s_mine.id]
+E       assert [8685, 8686] == [8686]
+E         
+E         At index 0 diff: 8685 != 8686
+E         Left contains one more item: 8686
+E         
+E         Full diff:
+E           [
+E         +     8685,
+E               8686,
+E           ]
+
+tests/test_api_read_briefings.py:248: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 - assert [8685, 8686] == [8686]
+  
+  At index 0 diff: 8685 != 8686
+  Left contains one more item: 8686
+  
+  Full diff:
+    [
+  +     8685,
+        8686,
+    ]
+========================= 1 failed, 25 passed in 0.83s =========================
+[pytest exit 1]
+[M2(재현) 원복 확인: 바이트 일치=True]
+
+=== M3(재현): R-U3-5 ②: _COUNTED_MODELS 에서 PushSubscription 제거(8테이블) ===
+파일: tests/helpers_read_api.py  old 출현 횟수: 1
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_read_briefings.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 24 items
+
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [  4%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [  8%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 12%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 16%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 20%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 25%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 29%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 33%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 PASSED [ 37%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 41%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 45%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 50%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 54%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 58%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 62%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 66%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 70%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 75%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 79%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 83%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 87%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 91%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 FAILED [ 95%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [100%]
+
+=================================== FAILURES ===================================
+____________________ test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 ____________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x10f251e50>
+
+    def test_헬퍼_자체_push_subscriptions_추가도_잡아낸다(db_session):
+        # R-U3-5 ② -- 행 수 스냅샷이 스키마 v2 의 9테이블 전부(push_subscriptions 포함)를 센다.
+        before = snapshot_db(db_session)
+>       assert len(before.counts) == 9
+E       assert 8 == 9
+E        +  where 8 = len((468, 0, 0, 0, 0, 0, ...))
+E        +    where (468, 0, 0, 0, 0, 0, ...) = DbSnapshot(counts=(468, 0, 0, 0, 0, 0, 0, 0), briefed_at=(), persons_updated_at=()).counts
+
+tests/test_api_read_briefings.py:428: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 - assert 8 == 9
+ +  where 8 = len((468, 0, 0, 0, 0, 0, ...))
+ +    where (468, 0, 0, 0, 0, 0, ...) = DbSnapshot(counts=(468, 0, 0, 0, 0, 0, 0, 0), briefed_at=(), persons_updated_at=()).counts
+========================= 1 failed, 23 passed in 0.73s =========================
+[pytest exit 1]
+[M3(재현) 원복 확인: 바이트 일치=True]
+
+=== M5(재현): 9행: POST /briefings/run 이 trigger="scheduler" 로 실행 ===
+파일: app/api/routes.py  old 출현 횟수: 1
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 FAILED [ 50%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+=================================== FAILURES ===================================
+___________________ test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 ___________________
+
+env = (<starlette.testclient.TestClient object at 0x1106eb230>, FakeBriefingComposer(table={8784: {'pattern_sentences': [], ...5]}}], 'suggestion': {'text': '주기 제안', 'basis': {'fact_keys': ['hobby'], 'event_ids': []}}}}, fail=None, call_count=2))
+db_session = <sqlalchemy.orm.session.Session object at 0x1106e92b0>
+
+    def test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다(env, db_session):
+        client, composer = env
+        p = _person(db_session)
+        e = _event(db_session, p)
+        _fact(db_session, p, e)
+        s1 = _schedule(db_session, p, 5, "주간 회의")
+        s2 = _schedule(db_session, p, 8, "저녁 약속")
+        composer.table[s1.id] = _raw("수동 실행 줄", "수동 제안", e.id)
+        composer.table[s2.id] = _raw("주기 실행 줄", "주기 제안", e.id)
+    
+        # 경로 1: 실제 POST /briefings/run (trigger="manual")
+        resp = client.post("/briefings/run", json={"schedule_id": s1.id})
+        assert resp.status_code == 200
+        assert [b["schedule_id"] for b in resp.json()["briefings"]] == [s1.id]
+        # 경로 2: 1분 주기 작업과 같은 함수 (trigger="scheduler") -- s1 은 briefed_at 이 찍혀 s2 만 대상
+        result = run_briefings(_ctx(db_session), composer=composer, notifier=NullNotifier(), trigger="scheduler")
+        assert [b["schedule_id"] for b in result.briefings] == [s2.id]
+    
+        r = client.get("/briefings")
+        assert r.status_code == 200
+        body = r.json()
+        assert [b["schedule"]["id"] for b in body] == [s2.id, s1.id]  # scheduled_at 내림차순
+        for item, sched, line, sugg in (
+            (body[0], s2, "주기 실행 줄", "주기 제안"),
+            (body[1], s1, "수동 실행 줄", "수동 제안"),
+        ):
+            rows = _compose_rows(db_session, sched.id)
+            assert len(rows) == 1  # 실제 실행이 compose 행을 정확히 1개 남겼다
+            out = rows[0].output
+            assert item["trace_id"] == rows[0].id
+            assert item["lines"] == out["lines"]
+            assert item["suggestion"] == out["suggestion"]
+            assert item["pattern_sentences"] == out["pattern_sentences"]
+            assert item["composer"] == out["composer"] == "llm"  # 검증을 통과한 생성기 출력
+            assert item["push"] == out["push"]
+            # 생성기가 낸 문장이 거부되지 않고 그대로 실렸다
+            assert [ln["text"] for ln in item["lines"]] == [line], out["rejected"]
+            assert item["suggestion"]["text"] == sugg
+            assert item["schedule"]["title"] == sched.title
+            assert item["person"] == {"id": p.id, "display_name": "김팀장"}
+            assert _dt(item["generated_at"]) == rows[0].created_at
+        # 두 실행의 trigger 가 각각 기록됐다(run trace 는 실행마다 1행)
+        triggers = sorted(
+            t.output["trigger"]
+            for t in db_session.execute(
+                select(AgentTrace).where(AgentTrace.step == STEP_BRIEFING_RUN)
+            ).scalars()
+        )
+>       assert triggers == ["manual", "scheduler"]
+E       AssertionError: assert ['scheduler', 'scheduler'] == ['manual', 'scheduler']
+E         
+E         At index 0 diff: 'scheduler' != 'manual'
+E         
+E         Full diff:
+E           [
+E         -     'manual',
+E         +     'scheduler',
+E               'scheduler',
+E           ]
+
+tests/test_api_read_briefings_e2e.py:162: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 - AssertionError: assert ['scheduler', 'scheduler'] == ['manual', 'scheduler']
+  
+  At index 0 diff: 'scheduler' != 'manual'
+  
+  Full diff:
+    [
+  -     'manual',
+  +     'scheduler',
+        'scheduler',
+    ]
+========================= 1 failed, 1 passed in 0.54s ==========================
+[pytest exit 1]
+[M5(재현) 원복 확인: 바이트 일치=True]
+
+=== M8(재현): 10행: 목록 쿼리의 Person.user_id 격리 제거 ===
+파일: app/api/read.py  old 출현 횟수: 1
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_read_briefings_e2e.py tests/test_api_read_briefings.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 26 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [  3%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 FAILED [  7%]
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [ 11%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [ 15%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 19%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 23%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 26%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 30%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 34%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 FAILED    [ 38%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 PASSED [ 42%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 46%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 50%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 53%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 57%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 61%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 65%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 69%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 73%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 76%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 80%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 84%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 88%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 92%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 PASSED [ 96%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [100%]
+
+=================================== FAILURES ===================================
+______________________ test_10행_재실행_사용자_범위_원문_다른_step_혼입 _______________________
+
+env = (<starlette.testclient.TestClient object at 0x110aaf9d0>, FakeBriefingComposer(table={8791: {'pattern_sentences': [], ...9]}}], 'suggestion': {'text': '둘째 제안', 'basis': {'fact_keys': ['hobby'], 'event_ids': []}}}}, fail=None, call_count=3))
+db_session = <sqlalchemy.orm.session.Session object at 0x110aaf390>
+
+    def test_10행_재실행_사용자_범위_원문_다른_step_혼입(env, db_session):
+        client, composer = env
+        p = _person(db_session)
+        e = _event(db_session, p)
+        _fact(db_session, p, e)
+        s1 = _schedule(db_session, p, 5, "주간 회의")
+        s3 = _schedule(db_session, p, 6, "오류만 있는 일정")
+        other = _person(db_session, "남", user_id="other")
+        s_b = _schedule(db_session, other, 3, "남의 일정")
+        e_b = _event(db_session, other, raw="남의 비밀")
+        _fact(db_session, other, e_b)
+    
+        # (a) 같은 일정을 지정해 2회 실행 -- 두 번째 응답을 다르게
+        composer.table[s1.id] = _raw("첫째 실행", "첫째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        composer.table[s1.id] = _raw("둘째 실행", "둘째 제안", e.id)
+        assert client.post("/briefings/run", json={"schedule_id": s1.id}).status_code == 200
+        rows = _compose_rows(db_session, s1.id)
+        assert len(rows) == 2 and rows[1].id > rows[0].id  # 실제 실행이 2행을 남겼다
+    
+        # (b) 사용자 B 의 브리핑도 실제 실행으로 만든다 (APP_USER_ID 는 "local" 이라 목록에 없어야 한다)
+        result_b = run_briefings(
+            _ctx(db_session, user_id="other"), composer=composer, notifier=NullNotifier(),
+            schedule_id=s_b.id, trigger="manual",
+        )
+        assert [b["schedule_id"] for b in result_b.briefings] == [s_b.id]
+        assert len(_compose_rows(db_session, s_b.id)) == 1
+    
+        # (c) 일정 1 의 compose 보다 **나중** 행: 실제 run 행(실행마다 compose 뒤에 남는다) + 직접 넣은 error 행.
+        #     일정 3 은 error 행만.
+        later = datetime.now(timezone.utc) + timedelta(hours=1)
+        for sid, step in ((s1.id, STEP_BRIEFING_ERROR), (s3.id, STEP_BRIEFING_ERROR)):
+            db_session.add(
+                AgentTrace(
+                    session_id="briefing:u9b", step=step, tool_name=BRIEFING_TRACE_TOOL_NAME,
+                    input={"schedule_id": sid, "person_id": p.id},
+                    output={"schedule_id": sid, "person_id": p.id, "error": "시험용 오류"},
+                    tokens_in=0, tokens_out=0, created_at=later,
+                )
+            )
+        db_session.flush()
+        run_rows = db_session.execute(
+            select(AgentTrace).where(AgentTrace.step == STEP_BRIEFING_RUN)
+        ).scalars().all()
+        assert len(run_rows) == 3  # 실제로 남은 run 행(s1 두 번 + s_b 한 번)이 compose 와 같은 tool_name 으로 섞여 있다
+    
+        r = client.get("/briefings")
+        body = r.json()
+>       assert [b["schedule"]["id"] for b in body] == [s1.id]  # 내 것만 · 일정 3(error 만)·남의 일정 없음
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert [8791, 8793] == [8791]
+E         
+E         Left contains one more item: 8793
+E         
+E         Full diff:
+E           [
+E               8791,
+E         +     8793,
+E           ]
+
+tests/test_api_read_briefings_e2e.py:213: AssertionError
+______________________________ test_다른_사용자_일정은_제외 ______________________________
+
+client = <starlette.testclient.TestClient object at 0x110d9aad0>
+db_session = <sqlalchemy.orm.session.Session object at 0x110c21950>
+
+    def test_다른_사용자_일정은_제외(client, db_session):
+        mine = _person(db_session, "나의 사람")
+        other = _person(db_session, "남", user_id="other")
+        s_mine = _schedule(db_session, mine, NOW)
+        s_other = _schedule(db_session, other, NOW)
+        _trace(db_session, s_mine, mine, NOW - timedelta(hours=1))
+        _trace(db_session, s_other, other, NOW - timedelta(hours=1))
+        r = client.get("/briefings")
+>       assert _ids(r) == [s_mine.id]
+E       assert [8803, 8802] == [8802]
+E         
+E         At index 0 diff: 8803 != 8802
+E         Left contains one more item: 8802
+E         
+E         Full diff:
+E           [
+E         +     8803,
+E               8802,
+E           ]
+
+tests/test_api_read_briefings.py:234: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 - assert [8791, 8793] == [8791]
+  
+  Left contains one more item: 8793
+  
+  Full diff:
+    [
+        8791,
+  +     8793,
+    ]
+FAILED tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 - assert [8803, 8802] == [8802]
+  
+  At index 0 diff: 8803 != 8802
+  Left contains one more item: 8802
+  
+  Full diff:
+    [
+  +     8803,
+        8802,
+    ]
+========================= 2 failed, 24 passed in 0.84s =========================
+[pytest exit 1]
+[M8(재현) 원복 확인: 바이트 일치=True]
+
+=== V1-e2e: 최근 1행 정렬의 1차 키 created_at desc -> asc (끝에서 끝 2건만으로 검출되는가) ===
+파일: app/api/read.py  old 출현 횟수: 1
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 50%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+============================== 2 passed in 0.52s ===============================
+[pytest exit 0]
+[V1-e2e 원복 확인: 바이트 일치=True]
+
+=== V1-all: 같은 변이를 64건 전체로 ===
+파일: app/api/read.py  old 출현 횟수: 1
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 64 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  1%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [  3%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [  4%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [  6%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [  7%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [  9%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 10%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 12%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 14%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 15%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 17%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [ 18%]
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [ 20%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 21%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 23%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 25%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 26%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 28%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 29%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 31%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 32%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 34%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 35%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 37%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 39%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 40%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 42%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 43%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 45%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [ 46%]
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [ 48%]
+tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_422 PASSED [ 50%]
+tests/test_api_questions_pending.py::test_필드_5개_값_일치 PASSED        [ 51%]
+tests/test_api_questions_pending.py::test_created_at_오름차순 PASSED     [ 53%]
+tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 PASSED   [ 54%]
+tests/test_api_questions_pending.py::test_답변된_질문은_제외 PASSED      [ 56%]
+tests/test_api_questions_pending.py::test_만료_경계_24시간 PASSED        [ 57%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 PASSED          [ 59%]
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [ 60%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [ 62%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 FAILED        [ 64%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 65%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 67%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 68%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 70%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 71%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 PASSED [ 73%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 75%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 76%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 78%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 79%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 81%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 82%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 84%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 85%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 87%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 89%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 90%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 92%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 93%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 PASSED [ 95%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [ 96%]
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 98%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+=================================== FAILURES ===================================
+_______________________________ test_일정마다_최신_1행만 _______________________________
+
+client = <starlette.testclient.TestClient object at 0x110e39370>
+db_session = <sqlalchemy.orm.session.Session object at 0x110d81950>
+
+    def test_일정마다_최신_1행만(client, db_session):
+        p = _person(db_session)
+        s = _schedule(db_session, p, NOW)
+        _trace(db_session, s, p, NOW - timedelta(hours=5), lines=[{"text": "오래됨", "basis": {}}])
+        new = _trace(db_session, s, p, NOW - timedelta(hours=1), lines=[{"text": "최신", "basis": {}}])
+        _trace(db_session, s, p, NOW - timedelta(hours=3), lines=[{"text": "중간", "basis": {}}])
+        body = client.get("/briefings").json()
+        assert len(body) == 1
+>       assert body[0]["trace_id"] == new.id
+E       assert 225884 == 225885
+E        +  where 225885 = <app.db.models.AgentTrace object at 0x11106e190>.id
+
+tests/test_api_read_briefings.py:180: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_일정마다_최신_1행만 - assert 225884 == 225885
+ +  where 225885 = <app.db.models.AgentTrace object at 0x11106e190>.id
+========================= 1 failed, 63 passed in 1.28s =========================
+[pytest exit 1]
+[V1-all 원복 확인: 바이트 일치=True]
+
+=== V2: R-U3-2 반대 방향: 조인을 Person.id == Schedule.person_id 만으로(trace 의 person_id 무시) -- 내 일정 + 남의 person_id 조작 trace 가 포함되는가 ===
+파일: app/api/read.py  old 출현 횟수: 1
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 64 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  1%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [  3%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [  4%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [  6%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [  7%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [  9%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 10%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 12%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 14%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 15%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 17%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [ 18%]
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [ 20%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 21%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 23%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 25%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 26%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 28%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 29%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 31%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 32%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 34%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 35%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 37%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 39%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 40%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 42%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 43%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 45%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [ 46%]
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [ 48%]
+tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_422 PASSED [ 50%]
+tests/test_api_questions_pending.py::test_필드_5개_값_일치 PASSED        [ 51%]
+tests/test_api_questions_pending.py::test_created_at_오름차순 PASSED     [ 53%]
+tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 PASSED   [ 54%]
+tests/test_api_questions_pending.py::test_답변된_질문은_제외 PASSED      [ 56%]
+tests/test_api_questions_pending.py::test_만료_경계_24시간 PASSED        [ 57%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 PASSED          [ 59%]
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [ 60%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [ 62%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 64%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 65%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 67%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 PASSED [ 68%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 70%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 71%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 PASSED [ 73%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 75%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 76%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 78%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 79%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 81%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 82%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 84%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 85%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 87%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 89%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 90%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 92%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 93%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 PASSED [ 95%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [ 96%]
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 98%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+============================== 64 passed in 1.47s ==============================
+[pytest exit 0]
+[V2 원복 확인: 바이트 일치=True]
+
+=== V3-e2e: tool_name == 'briefing' 필터 제거 (끝에서 끝 2건만으로 검출되는가) ===
+파일: app/api/read.py  old 출현 횟수: 1
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 50%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+============================== 2 passed in 0.54s ===============================
+[pytest exit 0]
+[V3-e2e 원복 확인: 바이트 일치=True]
+
+=== V3-all: 같은 변이를 64건 전체로 ===
+파일: app/api/read.py  old 출현 횟수: 1
+$ /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest -v -p no:cacheprovider tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-verifier
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 64 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  1%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [  3%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [  4%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [  6%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [  7%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [  9%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 10%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 12%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 14%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 15%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 17%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [ 18%]
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [ 20%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 21%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 23%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 25%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 26%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 28%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 29%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 31%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 32%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 34%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 35%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 37%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 39%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 40%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 42%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 43%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 45%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [ 46%]
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [ 48%]
+tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_422 PASSED [ 50%]
+tests/test_api_questions_pending.py::test_필드_5개_값_일치 PASSED        [ 51%]
+tests/test_api_questions_pending.py::test_created_at_오름차순 PASSED     [ 53%]
+tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 PASSED   [ 54%]
+tests/test_api_questions_pending.py::test_답변된_질문은_제외 PASSED      [ 56%]
+tests/test_api_questions_pending.py::test_만료_경계_24시간 PASSED        [ 57%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 PASSED          [ 59%]
+tests/test_api_read_briefings.py::test_응답_필드_매핑_전체_값 PASSED     [ 60%]
+tests/test_api_read_briefings.py::test_제안이_있으면_basis_그대로 PASSED [ 62%]
+tests/test_api_read_briefings.py::test_일정마다_최신_1행만 PASSED        [ 64%]
+tests/test_api_read_briefings.py::test_동률_created_at_이면_id_큰_행 PASSED [ 65%]
+tests/test_api_read_briefings.py::test_run_과_error_행은_섞이지_않는다 PASSED [ 67%]
+tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 FAILED [ 68%]
+tests/test_api_read_briefings.py::test_error_만_있는_일정은_제외 PASSED  [ 70%]
+tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 PASSED    [ 71%]
+tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 PASSED [ 73%]
+tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 PASSED [ 75%]
+tests/test_api_read_briefings.py::test_정렬_scheduled_at_내림차순과_2차키_id_내림차순 PASSED [ 76%]
+tests/test_api_read_briefings.py::test_상한_21개_일정이면_20개 PASSED    [ 78%]
+tests/test_api_read_briefings.py::test_schedule_id_필터_1건 PASSED       [ 79%]
+tests/test_api_read_briefings.py::test_schedule_id_지정_시_기간_밖도_조회됨 PASSED [ 81%]
+tests/test_api_read_briefings.py::test_schedule_id_일정은_있으나_trace_없으면_빈_목록 PASSED [ 82%]
+tests/test_api_read_briefings.py::test_schedule_id_error_만_있어도_빈_목록 PASSED [ 84%]
+tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 PASSED [ 85%]
+tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 PASSED [ 87%]
+tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 PASSED [ 89%]
+tests/test_api_read_briefings.py::test_응답에_raw_utterance_없음 PASSED  [ 90%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 92%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 93%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 PASSED [ 95%]
+tests/test_api_read_briefings.py::test_응답은_JSON_직렬화_가능 PASSED    [ 96%]
+tests/test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 PASSED [ 98%]
+tests/test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 PASSED [100%]
+
+=================================== FAILURES ===================================
+____________________ test_다른_tool_name_의_compose_step_은_제외 _____________________
+
+client = <starlette.testclient.TestClient object at 0x111566360>
+db_session = <sqlalchemy.orm.session.Session object at 0x11136e550>
+
+    def test_다른_tool_name_의_compose_step_은_제외(client, db_session):
+        p = _person(db_session)
+        s = _schedule(db_session, p, NOW)
+        _trace(db_session, s, p, NOW - timedelta(hours=1), tool_name="other_tool")
+>       assert client.get("/briefings").json() == []
+E       AssertionError: assert [{'composer':...했어요.'}], ...}] == []
+E         
+E         Left contains one more item: {'composer': 'llm', 'generated_at': '2026-03-01T08:00:00Z', 'lines': [{'basis': {'event_ids': [11], 'fact_keys': ['취미']}, 'text': '지난번에 등산 얘기를 했어요.'}], 'pattern_sentences': [{'key': 'pattern:meal', 'sentence': '자주 식사를 함께했어요.'}], ...}
+E         
+E         Full diff:
+E         - []
+E         + [
+E         +     {
+E         +         'composer': 'llm',
+E         +         'generated_at': '2026-03-01T08:00:00Z',
+E         +         'lines': [
+E         +             {
+E         +                 'basis': {
+E         +                     'event_ids': [
+E         +                         11,
+E         +                     ],
+E         +                     'fact_keys': [
+E         +                         '취미',
+E         +                     ],
+E         +                 },
+E         +                 'text': '지난번에 등산 얘기를 했어요.',
+E         +             },
+E         +         ],
+E         +         'pattern_sentences': [
+E         +             {
+E         +                 'key': 'pattern:meal',
+E         +                 'sentence': '자주 식사를 함께했어요.',
+E         +             },
+E         +         ],
+E         +         'person': {
+E         +             'display_name': '민수',
+E         +             'id': 25442,
+E         +         },
+E         +         'push': 'not_configured',
+E         +         'schedule': {
+E         +             'id': 9032,
+E         +             'scheduled_at': '2026-03-01T09:00:00Z',
+E         +             'title': '점심 약속',
+E         +         },
+E         +         'suggestion': {
+E         +             'basis': {
+E         +                 'event_ids': [],
+E         +                 'fact_keys': [
+E         +                     '취미',
+E         +                 ],
+E         +             },
+E         +             'text': '등산 안부를 물어보세요.',
+E         +         },
+E         +         'trace_id': 226066,
+E         +     },
+E         + ]
+
+tests/test_api_read_briefings.py:211: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_다른_tool_name_의_compose_step_은_제외 - AssertionError: assert [{'composer':...했어요.'}], ...}] == []
+  
+  Left contains one more item: {'composer': 'llm', 'generated_at': '2026-03-01T08:00:00Z', 'lines': [{'basis': {'event_ids': [11], 'fact_keys': ['취미']}, 'text': '지난번에 등산 얘기를 했어요.'}], 'pattern_sentences': [{'key': 'pattern:meal', 'sentence': '자주 식사를 함께했어요.'}], ...}
+  
+  Full diff:
+  - []
+  + [
+  +     {
+  +         'composer': 'llm',
+  +         'generated_at': '2026-03-01T08:00:00Z',
+  +         'lines': [
+  +             {
+  +                 'basis': {
+  +                     'event_ids': [
+  +                         11,
+  +                     ],
+  +                     'fact_keys': [
+  +                         '취미',
+  +                     ],
+  +                 },
+  +                 'text': '지난번에 등산 얘기를 했어요.',
+  +             },
+  +         ],
+  +         'pattern_sentences': [
+  +             {
+  +                 'key': 'pattern:meal',
+  +                 'sentence': '자주 식사를 함께했어요.',
+  +             },
+  +         ],
+  +         'person': {
+  +             'display_name': '민수',
+  +             'id': 25442,
+  +         },
+  +         'push': 'not_configured',
+  +         'schedule': {
+  +             'id': 9032,
+  +             'scheduled_at': '2026-03-01T09:00:00Z',
+  +             'title': '점심 약속',
+  +         },
+  +         'suggestion': {
+  +             'basis': {
+  +                 'event_ids': [],
+  +                 'fact_keys': [
+  +                     '취미',
+  +                 ],
+  +             },
+  +             'text': '등산 안부를 물어보세요.',
+  +         },
+  +         'trace_id': 226066,
+  +     },
+  + ]
+========================= 1 failed, 63 passed in 1.33s =========================
+[pytest exit 1]
+[V3-all 원복 확인: 바이트 일치=True]
+
+=== 요약 ===
+M1(재현): 검출(FAIL)
+M2(재현): 검출(FAIL)
+M3(재현): 검출(FAIL)
+M5(재현): 검출(FAIL)
+M8(재현): 검출(FAIL)
+V1-e2e: 생존(통과)
+V1-all: 검출(FAIL)
+V2: 생존(통과)
+V3-e2e: 생존(통과)
+V3-all: 검출(FAIL)

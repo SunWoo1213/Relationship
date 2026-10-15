@@ -1,0 +1,164 @@
+# 명령: python3 /tmp/u9b_mut.py /tmp/rel-u9b-old old
+# 시각: 2026-10-15T15:23:56+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# 메모: 원본 저장소 HEAD(07ec09a)의 옛 U1/U2 쓰기 0 테스트와 옛 helpers 로 같은 쓰기 변이를 돌린다 - 생존이면 R-U3-5 강화가 필요했다는 근거
+# ---
+
+=== M4a: R-U3-5 ①: list_persons 가 Person 을 UPDATE(onupdate -> updated_at 변경) ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_persons.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-old
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 12 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  8%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [ 16%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [ 25%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [ 33%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [ 41%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [ 50%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 58%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 66%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 75%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 83%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 91%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [100%]
+
+============================== 12 passed in 0.63s ==============================
+[pytest exit 0]
+[M4a 결과: 생존(전부 통과)]
+[M4a 원복 확인: 내용 일치=True]
+
+=== M4b: R-U3-5 ①: get_person_card 가 Schedule.briefed_at 을 UPDATE ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_persons.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-old
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 12 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  8%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [ 16%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [ 25%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [ 33%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [ 41%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [ 50%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 58%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 66%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 75%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 83%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 91%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [100%]
+
+============================== 12 passed in 0.57s ==============================
+[pytest exit 0]
+[M4b 결과: 생존(전부 통과)]
+[M4b 원복 확인: 내용 일치=True]
+
+=== M4c: R-U3-5 ①: get_event_raw 가 Person 을 UPDATE ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_raw.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-old
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 18 items
+
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [  5%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 11%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 16%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 22%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 27%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 33%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 38%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 44%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 50%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 55%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 61%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 66%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 72%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 77%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 83%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 88%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 94%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [100%]
+
+============================== 18 passed in 0.63s ==============================
+[pytest exit 0]
+[M4c 결과: 생존(전부 통과)]
+[M4c 원복 확인: 내용 일치=True]
+
+=== M4d: R-U3-5 ①: get_fact_sources 가 Schedule.briefed_at 을 UPDATE ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_raw.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-old
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 18 items
+
+tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 PASSED         [  5%]
+tests/test_api_read_raw.py::test_이벤트_원문은_두_이벤트를_섞지_않는다 PASSED [ 11%]
+tests/test_api_read_raw.py::test_이벤트_원문_긴_문자열도_자르지_않는다 PASSED [ 16%]
+tests/test_api_read_raw.py::test_이벤트_404_없는_이벤트 PASSED           [ 22%]
+tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 PASSED       [ 27%]
+tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 PASSED     [ 33%]
+tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 PASSED [ 38%]
+tests/test_api_read_raw.py::test_근거_상한 PASSED                        [ 44%]
+tests/test_api_read_raw.py::test_근거_없는_사실은_빈_목록 PASSED         [ 50%]
+tests/test_api_read_raw.py::test_근거는_다른_사실의_원문을_섞지_않는다 PASSED [ 55%]
+tests/test_api_read_raw.py::test_근거_404_없는_사실 PASSED               [ 61%]
+tests/test_api_read_raw.py::test_근거_404_없는_인물 PASSED               [ 66%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 PASSED [ 72%]
+tests/test_api_read_raw.py::test_근거_404_내_다른_인물의_사실을_경로_인물에_끼운_경우 PASSED [ 77%]
+tests/test_api_read_raw.py::test_근거_404_남의_인물_경로에_내_사실을_끼운_경우 PASSED [ 83%]
+tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 PASSED     [ 88%]
+tests/test_api_read_raw.py::test_근거에_다른_인물_이벤트가_연결돼_있어도_나가지_않는다 PASSED [ 94%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [100%]
+
+============================== 18 passed in 0.62s ==============================
+[pytest exit 0]
+[M4d 결과: 생존(전부 통과)]
+[M4d 원복 확인: 내용 일치=True]
+
+=== M4e: R-U3-5 ②: get_person_card 가 push_subscriptions 에 INSERT ===
+파일: app/api/read.py  old 출현 횟수: 1
+시험 파일: tests/test_api_read_persons.py
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b-old
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 12 items
+
+tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 PASSED [  8%]
+tests/test_api_read_persons.py::test_카드_last_contact_는_가장_늦은_occurred_at PASSED [ 16%]
+tests/test_api_read_persons.py::test_카드_별칭은_파이썬_sorted_코드포인트순 PASSED [ 25%]
+tests/test_api_read_persons.py::test_다가오는_일정_상한은_10건_가까운_순 PASSED [ 33%]
+tests/test_api_read_persons.py::test_다가오는_일정_경계_지금은_포함_1초_전은_제외 PASSED [ 41%]
+tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 PASSED [ 50%]
+tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 PASSED [ 58%]
+tests/test_api_read_persons.py::test_카드_구성과_분리_집계 PASSED        [ 66%]
+tests/test_api_read_persons.py::test_타임라인_상한 PASSED                [ 75%]
+tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 PASSED [ 83%]
+tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 PASSED [ 91%]
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [100%]
+
+============================== 12 passed in 0.57s ==============================
+[pytest exit 0]
+[M4e 결과: 생존(전부 통과)]
+[M4e 원복 확인: 내용 일치=True]

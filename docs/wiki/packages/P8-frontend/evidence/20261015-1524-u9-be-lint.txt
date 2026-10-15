@@ -1,0 +1,53 @@
+# 명령: /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m ruff check app/api/read.py app/api/routes.py tests/helpers_read_api.py tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py; echo '--- mypy'; /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m mypy app/api/read.py app/api/routes.py
+# 시각: 2026-10-15T15:24:37+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 1
+# ---
+All checks passed!
+--- mypy
+app/push/sender.py:56: error: Skipping analyzing "pywebpush": module is installed, but missing library stubs or py.typed marker  [import-untyped]
+app/push/sender.py:56: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
+app/push/subscriptions.py:60: error: Need type annotation for "stmt"  [var-annotated]
+app/push/notifier.py:163: error: Argument "keys" to "send" of "PushSender" has incompatible type "object"; expected "dict[str, str]"  [arg-type]
+app/push/notifier.py:269: error: Argument "vapid" to "WebPushNotifier" has incompatible type "VapidConfig | _VapidPartial"; expected "VapidConfig"  [arg-type]
+app/embedding.py:88: error: Incompatible return value type (got "EmbeddingProvider | Callable[[list[str]], list[list[float]]]", expected "EmbeddingProvider | None")  [return-value]
+app/embedding.py:90: error: Incompatible return value type (got "_CallableEmbeddingProvider", expected "EmbeddingProvider | None")  [return-value]
+app/tools/questions.py:119: error: Unsupported operand types for + ("object" and "timedelta")  [operator]
+app/tools/questions.py:119: error: Unsupported operand types for <= ("timedelta" and "datetime")  [operator]
+app/tools/questions.py:232: error: No overload variant of "list" matches argument type "object"  [call-overload]
+app/tools/questions.py:232: note: Possible overload variants:
+app/tools/questions.py:232: note:     def [_T] list() -> list[_T]
+app/tools/questions.py:232: note:     def [_T] list(Iterable[_T], /) -> list[_T]
+app/tools/questions.py:271: error: Unsupported right operand type for in ("object")  [operator]
+app/tools/questions.py:283: error: No overload variant of "list" matches argument type "object"  [call-overload]
+app/tools/questions.py:283: note: Possible overload variants:
+app/tools/questions.py:283: note:     def [_T] list() -> list[_T]
+app/tools/questions.py:283: note:     def [_T] list(Iterable[_T], /) -> list[_T]
+app/tools/questions.py:319: error: No overload variant of "list" matches argument type "object"  [call-overload]
+app/tools/questions.py:319: note: Possible overload variants:
+app/tools/questions.py:319: note:     def [_T] list() -> list[_T]
+app/tools/questions.py:319: note:     def [_T] list(Iterable[_T], /) -> list[_T]
+app/tools/records.py:111: error: Argument "occurred_at" to "EventOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/records.py:112: error: Argument "created_at" to "EventOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/records.py:148: error: Argument "scheduled_at" to "ScheduleOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/records.py:149: error: Argument "briefed_at" to "ScheduleOut" has incompatible type "object"; expected "datetime | None"  [arg-type]
+app/tools/briefing.py:93: error: "object" has no attribute "isoformat"  [attr-defined]
+app/tools/briefing.py:114: error: Argument "occurred_at" to "EventOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/briefing.py:115: error: Argument "created_at" to "EventOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/briefing.py:136: error: Argument "scheduled_at" to "ScheduleOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/briefing.py:137: error: Argument "briefed_at" to "ScheduleOut" has incompatible type "object"; expected "datetime | None"  [arg-type]
+app/tools/briefing.py:155: error: Argument "scheduled_at" to "ScheduleOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/memory/patterns.py:185: error: "object" has no attribute "astimezone"  [attr-defined]
+app/memory/patterns.py:196: error: Need type annotation for "stmt"  [var-annotated]
+app/briefing/inputs.py:134: error: "object" has no attribute "isoformat"  [attr-defined]
+app/briefing/inputs.py:143: error: Argument "scheduled_at" to "BriefingInput" has incompatible type "object"; expected "datetime"  [arg-type]
+app/agent/gate.py:369: error: Argument 1 to "add" of "set" has incompatible type "Any | None"; expected "str"  [arg-type]
+app/er/pipeline.py:444: error: Value of type "object" is not indexable  [index]
+app/er/pipeline.py:494: error: Argument "action" to "AppliedResolution" has incompatible type "Any | None"; expected "str"  [arg-type]
+app/memory/promote.py:165: error: Need type annotation for "stmt"  [var-annotated]
+app/memory/promote.py:320: error: Argument "occurred_at" to "ExtractEvent" has incompatible type "object"; expected "datetime"  [arg-type]
+app/agent/loop.py:846: error: Argument 4 to "add_schedule" has incompatible type "Any | None"; expected "datetime"  [arg-type]
+app/agent/loop.py:1106: error: Incompatible types in assignment (expression has type "str | None", variable has type "str")  [assignment]
+app/api/routes.py:418: error: Item "_VapidPartial" of "VapidConfig | _VapidPartial" has no attribute "public_key"  [union-attr]
+Found 34 errors in 14 files (checked 2 source files)

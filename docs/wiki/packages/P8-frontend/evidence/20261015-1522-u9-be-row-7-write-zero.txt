@@ -1,0 +1,24 @@
+# 명령: POSTGRES_PORT=5433 /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py -k '쓰기_0 or 헬퍼_자체' -v
+# 시각: 2026-10-15T15:22:04+09:00
+# cwd: /private/tmp/rel-u9b
+# HEAD: 07ec09a (HEAD)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /private/tmp/rel-u9b
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 62 items / 55 deselected / 7 selected
+
+tests/test_api_read_persons.py::test_쓰기_0_trace_0 PASSED               [ 14%]
+tests/test_api_read_raw.py::test_쓰기_0_trace_0 PASSED                   [ 28%]
+tests/test_api_questions_pending.py::test_헤더_없으면_빈_목록_이고_쓰기_0 PASSED [ 42%]
+tests/test_api_questions_pending.py::test_쓰기_0_trace_0 PASSED          [ 57%]
+tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 PASSED [ 71%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_briefed_at_또는_updated_at_변경은_잡아낸다 PASSED [ 85%]
+tests/test_api_read_briefings.py::test_헬퍼_자체_push_subscriptions_추가도_잡아낸다 PASSED [100%]
+
+======================= 7 passed, 55 deselected in 0.57s =======================

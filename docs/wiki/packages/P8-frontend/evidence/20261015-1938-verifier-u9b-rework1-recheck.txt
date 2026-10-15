@@ -1,0 +1,54 @@
+# verifier 재확인(U9b 재작업 1차) — 직접 실행 기록
+# 시각: 2026-10-15T19:30~19:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship (HEAD 07ec09a, dev2, 미커밋 작업 트리)
+# 변이 사본: /tmp/rel-u9b-verifier-rw1 (rsync, .git/.venv/node_modules 제외; cmp 로 read.py·test_api_read_briefings.py 저장소와 바이트 일치 확인 뒤 시작)
+# 저장소 app/ 은 건드리지 않았다 — 끝에 `git diff --stat -- app` 이 재작업 전과 같은 2파일(read.py 4줄·routes.py 6줄).
+# 이 파일은 Write 툴로 옮겨 적은 요약이다(원문 출력에서 ANSI 색 코드만 뺐다).
+
+== 1. 원본(변이 없음) — 사본 ==
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -k 조작된_trace tests/test_api_read_briefings.py
+1 passed, 23 deselected in 0.53s
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -q tests/test_api_read_briefings.py
+24 passed in 0.75s
+$ python -c "import app;print(app.__file__)"
+app 경로: /private/tmp/rel-u9b-verifier-rw1/app/__init__.py
+
+== 2. V2 변이 — 조인을 `Person.id == Schedule.person_id` 만으로(trace 의 person_id 무시) ==
+$ diff /tmp/rel-u9b-verifier-rw1/app/api/read.py <저장소>/app/api/read.py
+325c325
+<         .join(Person, Person.id == Schedule.person_id)
+---
+>         .join(Person, (Person.id == ranked.c.pid) & (Person.id == Schedule.person_id))
+
+$ pytest -p no:cacheprovider -q -k 조작된_trace tests/test_api_read_briefings.py
+>       assert _ids(r) == [s_mine.id]
+E       assert [9497, 9498] == [9497]
+E         Left contains one more item: 9498
+FAILED tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 - assert [9497, 9498] == [9497]
+1 failed, 23 deselected in 0.48s
+
+$ pytest -p no:cacheprovider -q tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+FAILED tests/test_api_read_briefings.py::test_조작된_trace_남의_일정_id_와_내_인물_id_는_목록에_섞이지_않는다 - assert [9529, 9530] == [9529]
+1 failed, 63 passed in 1.28s
+→ 1차 리뷰에서 64 passed(생존)였던 V2 가 이제 정확히 그 테스트 1건에서 검출된다. 새 단언(`_ids(r) == [s_mine.id]`)이 잡았고 추가 일정 id(s_forged)가 "Left contains one more item" 으로 드러난다.
+
+== 3. 원복 ==
+$ cp <orig> /tmp/rel-u9b-verifier-rw1/app/api/read.py && cmp … <저장소>/app/api/read.py
+[원복 확인: 바이트 일치=True]
+$ git diff --stat -- app   (저장소)
+ app/api/read.py   | 4 +++-
+ app/api/routes.py | 6 ++++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+== 4. 전체 회귀 — 저장소(메인 체크아웃) ==
+$ POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs -p no:cacheprovider
+1946 passed, 1 warning in 25.13s
+(skip 0 — `-rs` 에 skip 줄 없음. 경고 1 은 google/genai DeprecationWarning, 기존과 동일)
+
+== 5. tests.md 집계 재계산(파일 안 "세는 법" 명령 그대로) ==
+실제 실패: 5 / 검출 실패 → 보강: 17 / 보류·재작업: 4 / 동작 틈 → 보강: 1 / 기록 없음: 176  → 합 203
+`^| [^|]*::` 행 218 = 테스트 행 203 + 표 머리행 15("| 파일::테스트 이름 | …") — 테스트 행 203 전부 5열(7필드)·전부 5종 중 하나로 분류(미분류 0).
+reliability.md 161·200·229행 = 17/176/203, registry.md 258행 = 5/17/4/1/176 — 일치. 옛 수치(16·177) 잔존: reliability.md 0건, tests.md 0건(247행 "16 passed" 는 sw.test 건수로 무관).
+
+== 6. 비밀 문자열 ==
+`git diff` + 미추적 파일(evidence 제외) 전체에 sk-…/api_key/AKIA…/BEGIN PRIVATE/password=/token= grep → 실제 적중 0(유일한 적중은 review-u9b-backend.md 99행의 "grep 패턴을 설명한 문장").
