@@ -152,3 +152,9 @@
 - **사용자 지시(2026-10-14 20:30): 이 커밋·CI 까지 하고 구현 단계(U9·U10)는 멈춘다.** 그 뒤 발표 자료 작업(대본 `presentation/Relationship_progress_v2_script.md` · 슬라이드 `Relationship_progress_v2.pptx`).
 - 남은 것 · 다음 단위: (재개 시) U9 E2E·자동 판정·문서 — frontend 몫 + backend 몫(R-U3-1·2·5) · U8 후속 R-U8-1·3 · FIX-034 후속 [권고] 4 · R-U6-4 · R-U7 후속.
 - Refs: P8-frontend U8 S3.6 R12 원칙5 D7
+
+## 2026-10-15 · 구현 재개 — U8 기록 보충
+- (앞 항목 보충) U8 커밋 = `819cb2a`(35 파일), origin/dev2 푸시, CI 38558603645 다섯 job success. registry "(U8 미커밋)" 5칸 → `819cb2a`(이 커밋).
+- 사용자 결정(2026-10-15, AskUserQuestion): "기록 보충 후 U9 시작" — 2026-10-14 구현 멈춤 지시 해제. 다음 단위 U9(01-plan 100행), 위임은 단계마다 L-004 승인.
+- **사용자 지시(2026-10-15): "테스트마다 어떤 테스트를 했는지 기록해주세요."** 결정(AskUserQuestion): 범위 = **U9 부터 의무 + P8 기존 테스트 소급**(프론트 `web/src/__tests__/` 8파일 130건(U8 vitest 실행 기준) + 백엔드 U1~U3 `tests/test_api_read_persons.py`·`test_api_read_raw.py`·`test_api_questions_pending.py`·`test_api_read_briefings.py`), 위치 = **`packages/P8-frontend/tests.md` 누적 + 03-log 에는 요약·링크**. 형식: 테스트 1건 = 표 1줄 `파일::이름 | 무엇을 확인 | 입력 → 기대 | 결과(변이 검출 포함)`. 01-plan U9 산출물에 tests.md 추가(계획 확장 — 사용자 결정 근거) — U9a(frontend-agent) 가 프론트·E2E 절, U9b(backend-agent) 가 백엔드 절을 쓰고 verifier 가 실제 테스트 목록과 줄 수 대조.
+- Refs: P8-frontend U8 U9 원칙8 원칙9

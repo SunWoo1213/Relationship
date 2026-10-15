@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-14 20:45 (**U8 verifier 통과([필수] 0 · [권고] 3) — 커밋 승인 대기.** 03-log U8 완료 항목·registry 보정(R-U8-2)·커밋 초안 작성됨. **사용자 지시(20:30): 이 커밋 → CI 까지만 하고 구현 단계(U9 이후)는 멈춘다.** 병행 중: 발표 자료 — 대본 `~/Desktop/Portfolio/presentation/Relationship_progress_v2_script.md`(이야기 흐름 11절 + 부록 A 수치·Q&A) · 슬라이드 `Relationship_progress_v2.pptx`(pptxgenjs, 지난 덱 디자인 언어, 11장, 발표자 노트에 대본; 생성 스크립트 스크래치패드 `deck/build_v2.js`, QA 렌더 `presentation/_qa_v2/`) 시각 QA 마무리 중. 서브에이전트 없음) 1차 구현: 워커·manifest·아이콘 SVG·`push.ts`·배너·테스트 31건 + 이월 4건(R-U7-1·2·3·R-U4-4) 닫힘, 127 passed·빌드·`dist/` 확인(메인 재실행 `20261014-2010-u8-main-recheck.txt`), 변이 30 검출. 구현자가 멈춘 결정 2개 → 사용자 20:12: ① POST 실패 시 `unsubscribe()` 되돌리기 **추가**(재작업, 01-plan 68행 방어 조건 기록) ② 아이콘 **SVG 유지**(01-plan 68행 `.png`→`.svg`). 끝나면 재실행 확인 → verifier(L-004) → `/commit`. 미커밋: `web/` 15파일·01-plan·03-log·registry·증거 4·HANDOFF·journal — U8 커밋에)
+갱신: 2026-10-15 (**구현 재개 — 사용자 "기록 보충 후 U9 시작".** registry U8 5칸 → `819cb2a`, 03-log "구현 재개" 항목 추가 — 미커밋. **새 사용자 지시: 테스트마다 어떤 테스트를 했는지 기록** — 기록 형식·범위 확인 중, U9 위임 전.) (이전: 2026-10-14 20:50 **U8 완료·커밋·푸시·CI 확인 끝 → 사용자 지시로 구현 멈춤.** U8 = `819cb2a`(35 파일), origin/dev2 푸시, **CI 38558603645 다섯 job success**. verifier 통과([필수] 0 · [권고] 3 → 후속 후보). **구현 단계(U9·U10)는 사용자가 재개를 말할 때까지 시작하지 않는다.** 발표 자료 완료(**발표일 2026-10-15**): 대본 `~/Desktop/Portfolio/presentation/Relationship_progress_20261015_script.md` · 슬라이드 `Relationship_progress_20261015.pptx`(11장, 발표자 노트에 대본, validate PASS, 11장 시각 QA 완료, 요일 표현 제거, 표지 날짜 2026. 10. 15.) · `Relationship_progress_20261015.pdf`. 부록 A-2 수치는 2026-10-14 기준(커밋 241·CI 38558603645). 생성 스크립트는 스크래치패드 `deck/build_v2.js`(세션 종료 시 사라짐 — 다시 만들려면 pptx 를 템플릿으로), QA 렌더 `presentation/_qa_v2/`(지워도 됨). 서브에이전트 없음. 미커밋: 이 HANDOFF·journal 자동 줄 — 다음 커밋에)
 
-active: **P8-frontend**(U0~U7 완료 — **U8 재작업 중**) | frozen: none | 브랜치 `dev2` = origin/dev2 `46532e7` | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 전체 **1912 passed skip 0** · test-guards **ok 333 실패 0 skip 0**
+active: **P8-frontend**(U0~**U8** 완료 — **U9 재개 준비 중**(2026-10-15)) | frozen: none | 브랜치 `dev2` = origin/dev2 `819cb2a` | origin/dev = `f9500fe` · origin/main = `f05d017`(사용자 README) | DB `capstone2-postgres-1`(5433): 개발 `relationship`, 테스트 `relationship_test` | 백엔드 **1942 passed skip 0** · 프론트 **130 passed** · test-guards 13경우 추가(FIX-034) 실패 0
 
 ## 2026-10-11 세션에 끝낸 것 (커밋 순, 전부 origin/dev2·CI 세 job success)
 | 커밋 | 내용 | CI(windows) |
@@ -25,7 +25,8 @@ active: **P8-frontend**(U0~U7 완료 — **U8 재작업 중**) | frozen: none | 
 - 이 HANDOFF(종료 기록) · `FIX-033.md` 결과절 해시·run 1줄 · journal 자동 줄(`7031a19` COMMIT·PUSH-dev2). U3 첫 커밋에 같이 넣으면 된다(따로 커밋할 필요 없음).
 
 ## 바로 다음에 할 것 (순서대로)
-1. **U8 커밋**: 초안 `.claude/commit-draft.txt` 승인 → 마커 → 명시 경로 `git add`(web 15파일·01-plan·03-log·registry·review-u8·evidence·HANDOFF·journal) → 커밋 → `git push origin dev2` → CI 다섯 job 확인 → HANDOFF 해시·run 기록. 끊겼으면 `git log -1` 로 커밋 여부 확인.
+1. **구현 멈춤 상태(사용자 지시 2026-10-14).** 재개 지시가 오면: 03-log U8 `pending` → `819cb2a`·CI 38558603645 보충, registry "(U8 미커밋)" 5칸 → `819cb2a` → **U9**(frontend 몫 E2E 3편·판정표 + backend 몫 R-U3-1·2·5, 커밋 2개 가능, 01-plan 100행) → U10 사람 점검 → verifier 04-review → `/devlog done`. 후속 후보: R-U8-1·3, FIX-034 [권고] 4, R-U6-4, R-U7 후속, `client.ts` 142행 주석.
+1a. **발표 자료 후속**(사용자 피드백 대기): 발표일 확정 시 파일명·표지 날짜·부록 A-2 수치 갱신, 데모 스크린샷 4컷(U10 때).
 2. **커밋·CI 뒤 구현 멈춤(사용자 지시).** U9(E2E·자동 판정·문서, frontend+backend 두 몫, backend 몫에 R-U3-1·2·5)·U10 은 사용자가 재개를 말할 때까지 시작하지 않는다. FIX-034 후속 [권고] 4·R-U6-4·R-U7 후속도 보류.
 3. **발표 스크립트** `presentation/Relationship_progress_v2_script.md` 초안을 사용자에게 보이고 피드백 반영(발표일 미정 — 정해지면 파일명·표지 날짜, 부록 A-2 수치 갱신). 슬라이드(pptx) 수정은 사용자 요청 시.
    U7 위임 전 사용자 결정 필요: `#/briefings?schedule_id=N` 강조를 목록+클라이언트 강조로 할지 `GET /briefings?schedule_id=` 호출로 할지(R-U3-6 ⑤).

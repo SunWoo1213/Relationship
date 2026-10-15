@@ -481,3 +481,5 @@
 - 2026-10-13 19:35 | PUSH-dev2 | origin dev2 761cced (실험 푸시)
 - 2026-10-14 19:56 | COMMIT | 46532e7 feat(P8-frontend): 브리핑 화면과 수동 브리핑 버튼을 만든다
 - 2026-10-14 19:56 | PUSH-dev2 | origin dev2 46532e7 (실험 푸시)
+- 2026-10-14 20:43 | COMMIT | 819cb2a feat(P8-frontend): PWA 와 웹 푸시 구독을 붙인다
+- 2026-10-14 20:43 | PUSH-dev2 | origin dev2 819cb2a (실험 푸시)
