@@ -1,0 +1,114 @@
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/check_tests_md.mjs
+# 시각: 2026-10-15T14:14:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+verbose ✓ 줄 135건 / tests.md Vitest 행 135건
+행과 verbose 줄이 1:1 이 아닌 행: []
+어느 행에도 안 맞은 verbose 줄: []
+두 행에 맞은 verbose 줄: []
+중복 행: []
+ID 불일치 proxy.test.ts::/api 프록시가 stripApiPrefix 로 접두를 벗긴다
+   증거에는 있고 행에 없음: 
+   행에는 있고 증거에 없음: U4-R1
+ID 불일치 card.test.tsx::빈 목록이면 빈 상태 문구 하나
+   증거에는 있고 행에 없음: U7-M15
+   행에는 있고 증거에 없음: 
+변이 ID 불일치 행 2건
+
+# ===== append 2026-10-15T14:14:43+09:00 =====
+# 명령: cat /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/check_tests_md.mjs; echo; echo '=== 증거→테스트 매핑 스크립트 mutmap.mjs ==='; cat /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/mutmap.mjs
+# 시각: 2026-10-15T14:14:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+// tests.md 의 Vitest 표 행(파일::이름)이 verbose 출력의 135건과 이름까지 1:1 인지 대조하고, 변이 ID 를 증거 매핑과 대조한다 (읽기 전용).
+import { readFileSync } from 'node:fs'
+
+const ROOT = '/Users/sunwoo/Desktop/Portfolio/Relationship/docs/wiki/packages/P8-frontend'
+const verbose = readFileSync(`${ROOT}/evidence/20261015-1410-u9-vitest-verbose.txt`, 'utf-8').split('\n')
+const md = readFileSync(`${ROOT}/tests.md`, 'utf-8').split('\n')
+
+const actual = []
+for (const line of verbose) {
+  const m = /^ ✓ src\/__tests__\/(\S+?) > (.+?) \d+ms$/.exec(line)
+  if (m) actual.push(`${m[1]}::${m[2].split(' > ').pop()}`)
+}
+const rows = []
+const rowIds = {}
+for (const line of md) {
+  const m = /^\| ((?:\w+)\.test\.tsx?)::(.+?) \| /.exec(line)
+  if (m) {
+    const key = `${m[1]}::${m[2]}`
+    rows.push(key)
+    const cols = line.split(' | ')
+    const result = cols[cols.length - 1]
+    rowIds[key] = [...result.matchAll(/U\d-[MVRXP]\d+/g)].map((x) => x[0])
+  }
+}
+// 이름에 " > " 가 든 테스트가 있어 verbose 한 줄을 "파일 ... 이름 NNms" 로 행과 직접 맞춘다.
+const lines = verbose.filter((l) => /^ ✓ src\/__tests__\//.test(l))
+const used = new Map()
+const unmatchedRows = []
+for (const key of rows) {
+  const [file, name] = key.split('::')
+  const hits = lines.filter((l) => l.startsWith(` ✓ src/__tests__/${file} > `) && l.replace(/ \d+ms$/, '').endsWith(` > ${name}`))
+  if (hits.length !== 1) unmatchedRows.push([key, hits.length])
+  for (const h of hits) used.set(h, (used.get(h) ?? 0) + 1)
+}
+console.log(`verbose ✓ 줄 ${lines.length}건 / tests.md Vitest 행 ${rows.length}건`)
+console.log('행과 verbose 줄이 1:1 이 아닌 행:', unmatchedRows)
+console.log('어느 행에도 안 맞은 verbose 줄:', lines.filter((l) => !used.has(l)))
+console.log('두 행에 맞은 verbose 줄:', [...used].filter(([, n]) => n > 1).map(([l]) => l))
+console.log('중복 행:', rows.filter((k, i) => rows.indexOf(k) !== i))
+
+// 변이 ID 대조: mutmap 에 있는 (이름 -> ID) 가 행에 빠짐없이 들어 있는지, 행의 ID 가 mutmap 에 근거가 있는지
+const map = JSON.parse(readFileSync('/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/mutmap.json', 'utf-8')).out
+let bad = 0
+for (const key of rows) {
+  const name = key.split('::')[1]
+  const fromEvidence = (map[name] ?? []).filter((id) => !(id === 'U9-X4' && /routes/.test(key)))
+  const inRow = rowIds[key]
+  const missing = fromEvidence.filter((id) => !inRow.includes(id))
+  const extra = inRow.filter((id) => !fromEvidence.includes(id))
+  if (missing.length || extra.length) {
+    bad++
+    console.log(`ID 불일치 ${key}\n   증거에는 있고 행에 없음: ${missing}\n   행에는 있고 증거에 없음: ${extra}`)
+  }
+}
+console.log(`변이 ID 불일치 행 ${bad}건`)
+
+=== 증거→테스트 매핑 스크립트 mutmap.mjs ===
+// 기존 변이 증거에서 "어느 변이가 어느 테스트를 실패시켰나" 를 뽑는다 (읽기 전용). 출력: JSON { 테스트이름: ["U8-M3", ...] }
+import { readFileSync, readdirSync } from 'node:fs'
+import { join } from 'node:path'
+
+const DIR = '/Users/sunwoo/Desktop/Portfolio/Relationship/docs/wiki/packages/P8-frontend/evidence'
+const files = readdirSync(DIR).filter((f) => /(u[4-9])-.*mutation/.test(f) && !/script|raw/.test(f))
+const map = {}
+const survived = {}
+const detail = []
+
+for (const f of files.sort()) {
+  const unit = /-(?:verifier-)?(u\d)/.exec(f)[1].toUpperCase()
+  const verifier = f.includes('verifier')
+  const lines = readFileSync(join(DIR, f), 'utf-8').split('\n')
+  let id = null
+  for (const line of lines) {
+    let m
+    if ((m = /^#{3,5} (?:변이:? ?)?([A-Z]\d+)\b/.exec(line))) id = m[1]
+    else if ((m = /^={4,} ([A-Z]\d+)\b/.exec(line))) id = m[1]
+    else if ((m = /^# 명령: .*[ '"]([A-Z]\d+)-/.exec(line))) id = m[1]
+    else if ((m = /^# 명령: .*mut_u\d\.(?:py|mjs) ([A-Z]\d+)\s*$/.exec(line))) id = m[1]
+    const x = /^\s+× (.+?) \d+ms$/.exec(line)
+    if (x && id && !/^[A-Z]0$/.test(id) && !/^E\d/.test(id)) {
+      const tag = `${unit}-${id}`
+      ;(map[x[1]] ??= new Set()).add(tag)
+      detail.push([f, tag, x[1]])
+    }
+  }
+}
+const out = Object.fromEntries(Object.entries(map).map(([k, v]) => [k, [...v].sort()]))
+console.log(JSON.stringify({ files, out }, null, 1))

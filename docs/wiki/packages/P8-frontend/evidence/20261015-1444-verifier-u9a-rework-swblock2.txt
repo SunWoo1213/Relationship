@@ -1,0 +1,99 @@
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/swblock_u9a.mjs
+# 시각: 2026-10-15T14:44:53+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a (저장소 무수정), 확인용 스펙 e2e/sw-block.spec.ts 추가
+
+--- ① 현재 설정 serviceWorkers:'block' — 등록이 막혀야 통과(exit 0): npx playwright test e2e/sw-block.spec.ts
+--- 사본 playwright.config.ts 의 serviceWorkers 줄: serviceWorkers: 'block'
+
+Running 1 test using 1 worker
+
+(node:37518) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 오후 2:44:55 [vite] http proxy error: /questions/pending
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:44:55 [vite] http proxy error: /persons
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+  ✘  1 e2e/sw-block.spec.ts:4:1 › 서비스 워커 등록 시도 — serviceWorkers 설정 대조 (30.0s)
+
+
+  1) e2e/sw-block.spec.ts:4:1 › 서비스 워커 등록 시도 — serviceWorkers 설정 대조 ────────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.evaluate: Test timeout of 30000ms exceeded.
+
+       5 |   await page.goto('/#/chat')
+       6 |   // tsconfig.node.json 은 lib ES2023(DOM 없음)이라 콜백 안 navigator 가 tsc -b 에 걸린다 -- 문자열 평가로 타입 검사 밖에 둔다
+    >  7 |   const result: string = await page.evaluate(`(async () => {
+         |                                     ^
+       8 |     if (!('serviceWorker' in navigator) || !navigator.serviceWorker) return 'navigator.serviceWorker 없음'
+       9 |     try {
+      10 |       const reg = await navigator.serviceWorker.register('/sw.js')
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/sw-block.spec.ts:7:37
+
+    Error Context: test-results/sw-block-서비스-워커-등록-시도-—-serviceWorkers-설정-대조/error-context.md
+
+  1 failed
+    e2e/sw-block.spec.ts:4:1 › 서비스 워커 등록 시도 — serviceWorkers 설정 대조 ─────────────────────────────────
+### ① 현재 설정 serviceWorkers:'block' — 등록이 막혀야 통과(exit 0) 결과: exit 1
+
+--- ② 사본만 serviceWorkers:'allow' 로 — 등록이 되어 실패해야 함(exit 1): npx playwright test e2e/sw-block.spec.ts
+--- 사본 playwright.config.ts 의 serviceWorkers 줄: serviceWorkers: 'allow'
+
+Running 1 test using 1 worker
+
+(node:37634) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 오후 2:45:28 [vite] http proxy error: /questions/pending
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:45:28 [vite] http proxy error: /persons
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+SW_REGISTER_RESULT=registered:http://localhost:4173/
+  ✘  1 e2e/sw-block.spec.ts:4:1 › 서비스 워커 등록 시도 — serviceWorkers 설정 대조 (114ms)
+
+
+  1) e2e/sw-block.spec.ts:4:1 › 서비스 워커 등록 시도 — serviceWorkers 설정 대조 ────────────────────────────────
+
+    Error: expect(received).not.toMatch(expected)
+
+    Expected pattern: not /^registered:/
+    Received string:      "registered:http://localhost:4173/"
+
+      16 |   })()`)
+      17 |   console.log('SW_REGISTER_RESULT=' + result)
+    > 18 |   expect(result).not.toMatch(/^registered:/)
+         |                      ^
+      19 | })
+      20 |
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/sw-block.spec.ts:18:22
+
+    Error Context: test-results/sw-block-서비스-워커-등록-시도-—-serviceWorkers-설정-대조/error-context.md
+
+  1 failed
+    e2e/sw-block.spec.ts:4:1 › 서비스 워커 등록 시도 — serviceWorkers 설정 대조 ─────────────────────────────────
+### ② 사본만 serviceWorkers:'allow' 로 — 등록이 되어 실패해야 함(exit 1) 결과: exit 1
+### 저장소 web 상태(시험 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+

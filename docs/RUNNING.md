@@ -315,6 +315,59 @@ SELECT id, session_id, input, output FROM agent_traces
 
 **끄는 법** — `.env` 의 `PUSH_DEV_PAGE_ENABLED` 를 비우고 서버를 다시 띄우면 `/push-dev/` 경로가 사라진다(운영에서는 켜지 않는다). 푸시 자체를 끄려면 `VAPID_*` 세 이름을 비운다(응답 `push` 가 `not_configured`). 이미 만든 구독 행은 남아 있어도 무해하다. 구독 해제 API 는 아직 없다(P8).
 
+### 프론트 실행 (P8-frontend)
+
+화면은 `web/`(Vite + React + TypeScript)에 있고 세 개뿐이다 — 채팅(`#/chat`)·인물(`#/persons`, 카드는 `#/persons/<id>`)·브리핑(`#/briefings`). 프론트는 백엔드 API 를 읽고 보여 줄 뿐이라 **백엔드가 먼저 떠 있어야** 한다. Node 24 이상·npm 11 이상이 필요하다(`web/package.json` 의 `engines`).
+
+**① 백엔드를 띄운다** — 위 "백엔드 실행 (FastAPI)" 절 그대로(기본 주소 `http://localhost:8000`).
+
+**② 프론트를 띄운다** — 저장소 루트에서. `npm ci` 는 `package-lock.json` 대로 설치하므로 처음 한 번(의존성이 바뀌었을 때만 다시) 실행한다.
+
+```bash
+# macOS / Linux (bash·zsh)
+cd web
+npm ci
+npm run dev
+```
+
+```powershell
+# Windows (PowerShell) — Windows PowerShell 5.1 은 && 를 못 쓰므로 한 줄씩 실행한다
+cd web
+npm ci
+npm run dev
+```
+
+터미널에 나오는 주소(기본 **http://localhost:5173**)를 브라우저로 연다. 처음 열면 `#/chat` 으로 간다.
+
+**③ 프록시 규칙** — 브라우저는 항상 같은 주소의 `/api/...` 로 요청하고, 개발 서버(Vite)가 앞의 `/api` 를 떼어 백엔드로 넘긴다. 예: 브라우저 `GET /api/persons` → 백엔드 `GET http://localhost:8000/persons`. 그래서 CORS 설정이 필요 없다. 규칙의 코드는 `web/src/proxy.ts`(`stripApiPrefix`)·`web/vite.config.ts` 이다. 운영에서 정적 파일을 누가 내는지는 P9-infra 에서 정한다.
+
+**④ 포트 일치** — 백엔드를 8000 이 아닌 포트로 띄웠다면(예: `--port 8001`) 프론트가 같은 곳을 보게 `VITE_API_TARGET` 을 맞춘다. 두 쪽이 어긋나면 화면에 "불러오지 못했어요" 류 안내가 뜬다. 값은 주소뿐이며 비밀이 아니다(`web/.env.example` 참고, 기본값 `http://localhost:8000`). 바꾼 뒤에는 `npm run dev` 를 다시 시작한다.
+
+```bash
+# macOS / Linux
+VITE_API_TARGET=http://localhost:8001 npm run dev
+```
+
+```powershell
+# Windows (PowerShell)
+$env:VITE_API_TARGET="http://localhost:8001"; npm run dev
+```
+
+**⑤ "알림 받기"(웹푸시)** — 브리핑 화면의 버튼이다. 서버에 VAPID 키가 있어야 켜지고, 없으면 "이 서버는 아직 알림을 준비하지 않았어요" 한 줄이 뜬다. 키 만들기·`.env` 이름·확인 절차는 위 "웹푸시 켜기·확인하기 (P7-push)" 절을 따른다(브라우저가 키를 받는 경로는 `GET /api/push/vapid-public-key` 라 프론트에는 키를 넣지 않는다). 서비스 워커·푸시는 HTTPS 가 필요하지만 `localhost` 는 예외라 위 주소에서 그대로 된다.
+
+**⑥ 자동 테스트** — 실제 백엔드·LLM·푸시 서비스는 쓰지 않는다(API 는 가짜 응답으로 바꿔 끼운다).
+
+```bash
+cd web
+npm run typecheck          # 타입 검사
+npm test -- --run          # 단위 테스트(Vitest)
+npm run build              # 빌드 — web/dist 가 비워지고 새로 만들어진다(Vite emptyOutDir)
+npx playwright@1.64.0 install chromium   # E2E 용 브라우저 — 처음 한 번만
+npm run e2e                # E2E(Playwright). 빌드 후 vite preview(4173 포트)를 스스로 띄운다
+```
+
+PowerShell 도 같은 명령이다(`cd web` 뒤 한 줄씩). E2E 는 4173 포트가 비어 있어야 한다. 어떤 테스트가 무엇을 확인하는지는 `docs/wiki/packages/P8-frontend/tests.md` 에 있다.
+
 ### 평가 데이터셋(파일럿 40건)
 
 `data/scenarios/`는 엔티티 해석·이벤트 추출을 채점하기 위한 **한국어 대화 시나리오 40건**과 그 골드 라벨이다. 지표 계산(오병합률·미검출률·트레이드오프 곡선)은 여기서 하지 않는다 — P4-pilot-eval이 이 데이터를 읽어서 한다. 실명·연락처는 들어 있지 않다(가상 성명 목록 밖 이름은 검증기가 FAIL 한다).

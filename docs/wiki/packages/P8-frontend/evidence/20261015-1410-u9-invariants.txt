@@ -1,0 +1,62 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/invariants.sh
+# 시각: 2026-10-15T14:10:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 1. grep -rn "push-dev" web/src web/public web/index.html  (기대 0건)
+web/src/__tests__/push.test.ts:327:  it('/push-dev/ 링크가 없다', async () => {
+web/src/__tests__/push.test.ts:332:    expect(document.querySelector('a[href*="push-dev"]')).toBeNull()
+web/src/__tests__/briefing.test.tsx:148:  it('항목마다 "지금 브리핑" 버튼이 있고, 알림 받기 버튼이 활성이며 /push-dev/ 링크가 없다 (구독 동작은 push.test.ts)', async () => {
+web/src/__tests__/briefing.test.tsx:154:    expect(document.querySelector('a[href*="push-dev"]')).toBeNull()
+[exit 0]
+
+### 2. grep -rnE "getUserMedia|SpeechRecognition|webkitSpeech" web/src web/public  (기대 0건)
+[exit 1]
+
+### 3. grep -rnE "addEventListener\(['\"]fetch|caches\." web/public/sw.js  (기대 0건)
+[exit 1]
+
+### 4. grep -rn "raw_utterance" web/src  (기대: 원문 조회 두 응답 타입과 원문 표시 컴포넌트 외 0건)
+web/src/screens/PersonCardScreen.tsx:3:// 서버 문자열(key · value · content · raw_utterance · title)은 고치지 않고 그대로 보여 준다 (원칙7).
+web/src/screens/PersonCardScreen.tsx:4:// 원문(raw_utterance)은 펼칠 때만 가져오고(1회), 같은 항목을 다시 펼쳐도 다시 요청하지 않는다 — 항목 컴포넌트 상태에 캐시.
+web/src/screens/PersonCardScreen.tsx:135:          <DetailStatus state={state}>{(raw) => <RawText text={raw.raw_utterance} />}</DetailStatus>
+web/src/screens/PersonCardScreen.tsx:172:                  <RawText text={s.raw_utterance} />
+web/src/__tests__/card.test.tsx:75:  return { event_id: id, person_id: 3, type: 'conflict', content: 'x', occurred_at: '2026-09-03T12:00:00Z', raw_utterance: raw }
+web/src/__tests__/card.test.tsx:81:    { event_id: 5, type: 'meal', content: '점심 같이 함', occurred_at: '2026-08-21T12:00:00Z', raw_utterance: RAW_C },
+web/src/__tests__/card.test.tsx:82:    { event_id: 9, type: 'conflict', content: '보고서 지적', occurred_at: '2026-09-03T12:00:00Z', raw_utterance: RAW_B },
+web/src/api/types.ts:115:  raw_utterance: string
+web/src/api/types.ts:129:  raw_utterance: string
+[exit 0]
+--- 4b. 같은 grep 에서 테스트 폴더(__tests__)를 제외한 제품 코드만
+web/src/screens/PersonCardScreen.tsx:3:// 서버 문자열(key · value · content · raw_utterance · title)은 고치지 않고 그대로 보여 준다 (원칙7).
+web/src/screens/PersonCardScreen.tsx:4:// 원문(raw_utterance)은 펼칠 때만 가져오고(1회), 같은 항목을 다시 펼쳐도 다시 요청하지 않는다 — 항목 컴포넌트 상태에 캐시.
+web/src/screens/PersonCardScreen.tsx:135:          <DetailStatus state={state}>{(raw) => <RawText text={raw.raw_utterance} />}</DetailStatus>
+web/src/screens/PersonCardScreen.tsx:172:                  <RawText text={s.raw_utterance} />
+web/src/api/types.ts:115:  raw_utterance: string
+web/src/api/types.ts:129:  raw_utterance: string
+[exit 0]
+
+### 5. 쓰기 라우트 수 비교 (현재 vs 50fd7fc)
+현재=4  50fd7fc=4
+같다
+
+### 6. git diff --stat 50fd7fc -- app/push/devpage  (기대: 빈 출력)
+[exit 0]
+
+### 7. grep -rnE "VITE_[A-Z_]*(KEY|SECRET|TOKEN)" web/  (기대 0건; node_modules·dist·test-results 는 제외하지 않고 web/ 전체를 보되 아래 7b 로 제외판도 낸다)
+[exit 1]
+--- 7b. node_modules 를 포함한 web/ 전체
+[exit 1]
+
+### 8. git ls-files web | grep -E "node_modules|dist/|test-results|playwright-report"  (기대 0건)
+[exit 1]
+--- 8b. 아직 추적되지 않는 새 파일까지 포함(git status 기준)
+[exit 1]
+
+### 9. grep -rnE "fonts\.googleapis|fonts\.gstatic|cdn\." web/src web/index.html  (기대 0건)
+[exit 1]
+
+### 10. grep -rlE "Sheet|Dialog|Drawer" web/src --include=*.tsx | grep -v "^web/src/components/ui/"  (기대: 사이드바 서랍 1파일)
+web/src/components/AppShell.tsx
+[exit 0]

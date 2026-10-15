@@ -355,10 +355,10 @@ backlog 항목 본문 "프론트 3화면 + PWA" 가 이 수용 기준의 틀을 
 
 U9 에서 아래 명령을 그대로 실행해 출력 전체를 증거로 남긴다(판정 표 27행).
 
-1. `grep -rn "push-dev" web/src web/public web/index.html` → 0건(P7 결정 A 조건).
+1. `grep -rn "push-dev" web/src web/public web/index.html --exclude-dir=__tests__` → 0건(P7 결정 A 조건). (2026-10-15 정정, 사용자 결정: 제품 코드 기준 — "`/push-dev/` 링크가 없다" 를 단언하는 테스트는 그 문자열을 담는다.)
 2. `grep -rnE "getUserMedia|SpeechRecognition|webkitSpeech" web/src web/public` → 0건(원칙7 음성 입력 제외).
 3. `grep -rnE "addEventListener\(['\"]fetch|caches\." web/public/sw.js` → 0건(결정 I — 캐시 없음, 결정 M 오프라인 제외).
-4. `grep -rn "raw_utterance" web/src` → 원문 조회 두 응답 타입과 원문 표시 컴포넌트 외 0건.
+4. `grep -rn "raw_utterance" web/src --exclude-dir=__tests__` → 원문 조회 두 응답 타입과 원문 표시 컴포넌트 외 0건. (2026-10-15 정정, 사용자 결정: 제품 코드 기준 — 테스트의 가짜 데이터는 제외.)
 5. `grep -cE "@router\.(post|put|patch|delete)" app/api/routes.py` 가 `git show 50fd7fc:app/api/routes.py | grep -cE "@router\.(post|put|patch|delete)"` 와 같다(쓰기 라우트를 더하지 않는다 — U1~U10).
 6. `git diff --stat 50fd7fc -- app/push/devpage` → 빈 출력.
 7. `grep -rnE "VITE_[A-Z_]*(KEY|SECRET|TOKEN)" web/` → 0건(빌드에 비밀을 넣지 않는다 — VAPID 공개키도 `GET /api/push/vapid-public-key` 로 받는다).

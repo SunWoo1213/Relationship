@@ -1,0 +1,81 @@
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/swblock_u9a.mjs
+# 시각: 2026-10-15T14:46:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a (저장소 무수정), 확인용 스펙 e2e/sw-block.spec.ts 추가
+
+--- ① 현재 설정 serviceWorkers:'block' — 등록이 막혀야 통과(exit 0): npx playwright test e2e/sw-block.spec.ts
+--- 사본 playwright.config.ts 의 serviceWorkers 줄: serviceWorkers: 'block'
+
+Running 1 test using 1 worker
+
+(node:37963) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 오후 2:46:15 [vite] http proxy error: /questions/pending
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:46:15 [vite] http proxy error: /persons
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+SW_REGISTER_RESULT=pending-after-3s(등록 안 됨)
+  ✓  1 e2e/sw-block.spec.ts:4:1 › 서비스 워커 등록 시도 — serviceWorkers 설정 대조 (3.1s)
+
+  1 passed (5.3s)
+### ① 현재 설정 serviceWorkers:'block' — 등록이 막혀야 통과(exit 0) 결과: exit 0
+
+--- ② 사본만 serviceWorkers:'allow' 로 — 등록이 되어 실패해야 함(exit 1): npx playwright test e2e/sw-block.spec.ts
+--- 사본 playwright.config.ts 의 serviceWorkers 줄: serviceWorkers: 'allow'
+
+Running 1 test using 1 worker
+
+(node:38069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 오후 2:46:20 [vite] http proxy error: /questions/pending
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:46:20 [vite] http proxy error: /persons
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+SW_REGISTER_RESULT=registered:http://localhost:4173/
+  ✘  1 e2e/sw-block.spec.ts:4:1 › 서비스 워커 등록 시도 — serviceWorkers 설정 대조 (109ms)
+
+
+  1) e2e/sw-block.spec.ts:4:1 › 서비스 워커 등록 시도 — serviceWorkers 설정 대조 ────────────────────────────────
+
+    Error: expect(received).not.toMatch(expected)
+
+    Expected pattern: not /^registered:/
+    Received string:      "registered:http://localhost:4173/"
+
+      21 |   })()`)
+      22 |   console.log('SW_REGISTER_RESULT=' + result)
+    > 23 |   expect(result).not.toMatch(/^registered:/)
+         |                      ^
+      24 | })
+      25 |
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/sw-block.spec.ts:23:22
+
+    Error Context: test-results/sw-block-서비스-워커-등록-시도-—-serviceWorkers-설정-대조/error-context.md
+
+  1 failed
+    e2e/sw-block.spec.ts:4:1 › 서비스 워커 등록 시도 — serviceWorkers 설정 대조 ─────────────────────────────────
+### ② 사본만 serviceWorkers:'allow' 로 — 등록이 되어 실패해야 함(exit 1) 결과: exit 1
+### 저장소 web 상태(시험 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+

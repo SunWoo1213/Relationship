@@ -1,0 +1,39 @@
+# 명령: echo '### 1 (정정판)'; grep -rn 'push-dev' web/src web/public web/index.html --exclude-dir=__tests__; echo "[exit $?]"; echo '### 2'; grep -rnE 'getUserMedia|SpeechRecognition|webkitSpeech' web/src web/public; echo "[exit $?]"; echo '### 3'; grep -rnE "addEventListener\(['\"]fetch|caches\." web/public/sw.js; echo "[exit $?]"; echo '### 4 (정정판)'; grep -rn raw_utterance web/src --exclude-dir=__tests__; echo "[exit $?]"; echo '### 5'; a=$(grep -cE '@router\.(post|put|patch|delete)' app/api/routes.py); b=$(git show 50fd7fc:app/api/routes.py | grep -cE '@router\.(post|put|patch|delete)'); echo "현재=$a 50fd7fc=$b"; echo '### 6'; git diff --stat 50fd7fc -- app/push/devpage; echo '[end]'; echo '### 7'; grep -rnE 'VITE_[A-Z_]*(KEY|SECRET|TOKEN)' web/ --exclude-dir=node_modules --exclude-dir=dist; echo "[exit $?]"; echo '### 8'; git ls-files web | grep -E 'node_modules|dist/|test-results|playwright-report'; echo "[exit $?]"; echo '### 9'; grep -rnE 'fonts\.googleapis|fonts\.gstatic|cdn\.' web/src web/index.html web/e2e; echo "[exit $?]"; echo '### 10'; grep -rlE 'Sheet|Dialog|Drawer' web/src --include=*.tsx | grep -v '^web/src/components/ui/'; echo '### 추가: e2e 디렉터리 외부 URL·비밀·serviceWorkers 설정'; grep -nE 'https?://' web/e2e/*.ts web/playwright.config.ts; grep -n serviceWorkers web/playwright.config.ts; echo "[sw exit $?]"; echo '### 추가: 범위 — app/ alembic/ tests/ 변경'; git status --short -- app alembic tests scripts; echo '[end]'; echo '### 추가: verbose ✓ 수'; grep -c ' ✓ src/__tests__' docs/wiki/packages/P8-frontend/evidence/20261015-1410-u9-vitest-verbose.txt
+# 시각: 2026-10-15T14:28:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 1 (정정판)
+[exit 1]
+### 2
+[exit 1]
+### 3
+[exit 1]
+### 4 (정정판)
+web/src/screens/PersonCardScreen.tsx:3:// 서버 문자열(key · value · content · raw_utterance · title)은 고치지 않고 그대로 보여 준다 (원칙7).
+web/src/screens/PersonCardScreen.tsx:4:// 원문(raw_utterance)은 펼칠 때만 가져오고(1회), 같은 항목을 다시 펼쳐도 다시 요청하지 않는다 — 항목 컴포넌트 상태에 캐시.
+web/src/screens/PersonCardScreen.tsx:135:          <DetailStatus state={state}>{(raw) => <RawText text={raw.raw_utterance} />}</DetailStatus>
+web/src/screens/PersonCardScreen.tsx:172:                  <RawText text={s.raw_utterance} />
+web/src/api/types.ts:115:  raw_utterance: string
+web/src/api/types.ts:129:  raw_utterance: string
+[exit 0]
+### 5
+현재=4 50fd7fc=4
+### 6
+[end]
+### 7
+[exit 1]
+### 8
+[exit 1]
+### 9
+[exit 1]
+### 10
+web/src/components/AppShell.tsx
+### 추가: e2e 디렉터리 외부 URL·비밀·serviceWorkers 설정
+web/playwright.config.ts:7:const PREVIEW_URL = `http://localhost:${PREVIEW_PORT}`
+[sw exit 1]
+### 추가: 범위 — app/ alembic/ tests/ 변경
+[end]
+### 추가: verbose ✓ 수
+135

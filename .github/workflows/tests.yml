@@ -152,7 +152,7 @@ jobs:
 
   web:
     # Refs: P8-frontend U4 결정 B -- 프론트 골격 검증. 타입 검사 · Vitest · 빌드.
-    # 자동 테스트는 실제 네트워크를 쓰지 않는다(결정 J). Playwright E2E 는 U9 에서 더한다.
+    # 자동 테스트는 실제 네트워크를 쓰지 않는다(결정 J). Playwright E2E 는 U9 에서 ubuntu 에만 더했다.
     # 사용자 결정 2026-10-12: 타입·Vitest·빌드는 ubuntu·windows 두 OS(결정 B).
     runs-on: ${{ matrix.os }}
     strategy:
@@ -174,3 +174,11 @@ jobs:
       - run: npm run typecheck
       - run: npm test -- --run
       - run: npm run build
+      # E2E 는 ubuntu 만 (결정 B (i)) -- 브라우저 내려받기·실행 비용이 Windows 에서 크고 E2E 는 OS 차이가 작다.
+      # 브라우저 버전은 package.json 의 @playwright/test 와 같게 고정한다. API 는 가짜 응답, 실제 네트워크 0.
+      - name: Playwright 브라우저 설치 (ubuntu)
+        if: runner.os == 'Linux'
+        run: npx playwright@1.64.0 install --with-deps chromium
+      - name: E2E (ubuntu)
+        if: runner.os == 'Linux'
+        run: npm run e2e

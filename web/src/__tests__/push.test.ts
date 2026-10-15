@@ -399,4 +399,18 @@ describe('인앱 배너 (결정 H)', () => {
     await waitFor(() => expect(window.location.hash).toBe('#/briefings?schedule_id=12'))
     expect(screen.queryByTestId('push-banner')).toBeNull()
   })
+
+  it('알림을 눌러 온 {type:"open-briefing", schedule_id:null} 은 배너 없이 일정 없는 #/briefings 로 간다 (R-U8-1)', async () => {
+    const world = installPushBrowser()
+    window.history.replaceState(null, '', '#/chat')
+    installFetch({
+      'GET /api/briefings': () => json([]),
+      'GET /api/persons': () => json([]),
+      'GET /api/questions/pending': () => json([]),
+    })
+    render(createElement(App))
+    world.post({ type: 'open-briefing', schedule_id: null })
+    await waitFor(() => expect(window.location.hash).toBe('#/briefings'))
+    expect(screen.queryByTestId('push-banner')).toBeNull()
+  })
 })

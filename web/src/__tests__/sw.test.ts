@@ -11,6 +11,7 @@ import icon512 from '../../public/icon-512.svg?raw'
 type Listener = (event: FakeEvent) => void
 
 interface FakeClient {
+  url: string
   focus: ReturnType<typeof vi.fn>
   postMessage: ReturnType<typeof vi.fn>
 }
@@ -21,8 +22,9 @@ interface FakeEvent {
   waitUntil: (p: Promise<unknown>) => void
 }
 
-function makeClient(): FakeClient {
-  return { focus: vi.fn(() => Promise.resolve()), postMessage: vi.fn() }
+/** 기본 주소는 앱 창(경로 "/", 해시 라우팅) — 앱이 아닌 창을 흉내 낼 때만 url 을 준다. */
+function makeClient(url = 'http://localhost:4173/#/chat'): FakeClient {
+  return { url, focus: vi.fn(() => Promise.resolve()), postMessage: vi.fn() }
 }
 
 /** 워커 코드를 가짜 self 로 평가한다. matchAll 이 돌려줄 창 목록을 인자로 받는다. */
@@ -115,6 +117,34 @@ describe('notificationclick 이벤트', () => {
     expect(second.focus).not.toHaveBeenCalled()
     expect(second.postMessage).not.toHaveBeenCalled()
     expect(w.self.clients.openWindow).not.toHaveBeenCalled()
+  })
+
+  it('앱이 아닌 같은 출처 창이 앞에 있어도 앱 창(client.url 경로 "/")을 골라 focus 한다', async () => {
+    const devPage = makeClient('http://localhost:4173/dev-page/')
+    const apiDocs = makeClient('http://localhost:4173/api/docs')
+    const app = makeClient('http://localhost:4173/#/persons')
+    const w = loadWorker([devPage, apiDocs, app])
+    await w.fire('notificationclick', clickEvent({ schedule_id: 12 }).event)
+    expect(app.focus).toHaveBeenCalledTimes(1)
+    expect(app.postMessage).toHaveBeenCalledWith({ type: 'open-briefing', schedule_id: 12 })
+    for (const other of [devPage, apiDocs]) {
+      expect(other.focus).not.toHaveBeenCalled()
+      expect(other.postMessage).not.toHaveBeenCalled()
+    }
+    expect(w.self.clients.openWindow).not.toHaveBeenCalled()
+  })
+
+  it('열린 창이 전부 앱이 아니면 그 창들은 건드리지 않고 openWindow("/#/briefings?schedule_id=N")', async () => {
+    const devPage = makeClient('http://localhost:4173/dev-page/')
+    const apiDocs = makeClient('http://localhost:4173/api/docs')
+    const w = loadWorker([devPage, apiDocs])
+    await w.fire('notificationclick', clickEvent({ schedule_id: 12 }).event)
+    expect(w.self.clients.openWindow).toHaveBeenCalledTimes(1)
+    expect(w.self.clients.openWindow).toHaveBeenCalledWith('/#/briefings?schedule_id=12')
+    for (const other of [devPage, apiDocs]) {
+      expect(other.focus).not.toHaveBeenCalled()
+      expect(other.postMessage).not.toHaveBeenCalled()
+    }
   })
 
   it('열린 창이 없으면 openWindow("/#/briefings?schedule_id=N")', async () => {

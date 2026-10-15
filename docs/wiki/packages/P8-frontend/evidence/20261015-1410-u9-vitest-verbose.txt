@@ -1,0 +1,342 @@
+# 명령: cd web && npm test -- --run --reporter=verbose
+# 시각: 2026-10-15T14:10:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+
+> web@0.0.0 test
+> vitest --run --reporter=verbose
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 기본 경로는 /api 이고 GET 은 본문·Content-Type 이 없다 3ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > POST 는 JSON 본문과 X-Session-Id 헤더를 보낸다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > sessionId 가 null 이면 헤더를 넣지 않는다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > P5 오류 규약 {"detail":{"code"}} 를 ApiError 로 올린다 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 규약 밖 본문(422 검증 목록, 비-JSON 5xx)은 code 가 null 0ms
+ ✓ src/__tests__/api.test.ts > API 클라이언트 래퍼 (결정 C (ii)) > 테스트 환경의 기본 fetch 는 실제 네트워크를 쓰지 않고 실패한다 (결정 J) 1ms
+ ✓ src/__tests__/proxy.test.ts > 프록시 대상 (R-U4-11 — 환경이 아니라 순수 함수에 대해 단언) > 환경 변수가 없거나 비면 기본값 1ms
+ ✓ src/__tests__/proxy.test.ts > 프록시 대상 (R-U4-11 — 환경이 아니라 순수 함수에 대해 단언) > VITE_API_TARGET 이 있으면 그 값 0ms
+ ✓ src/__tests__/proxy.test.ts > vite.config.ts 프록시 연결 (결정 C (ii)) > /api 프록시가 stripApiPrefix 로 접두를 벗긴다 121ms
+ ✓ src/__tests__/proxy.test.ts > 개발 서버 프록시 경로 변환 (결정 C (ii)) > /api 접두를 벗긴다 0ms
+ ✓ src/__tests__/proxy.test.ts > 개발 서버 프록시 경로 변환 (결정 C (ii)) > /api 만 오면 루트 / 0ms
+ ✓ src/__tests__/proxy.test.ts > 개발 서버 프록시 경로 변환 (결정 C (ii)) > /api 로 시작하지 않는 경로는 그대로 (접두가 비슷한 /apix 포함) 0ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/briefing.test.tsx > 브리핑 목록 > 서버 순서 그대로(재정렬 없음), 머리줄은 일정 시각 · 이름 · 일정 제목 131ms
+ ✓ src/__tests__/briefing.test.tsx > 브리핑 목록 > 패턴 문장·요약 줄·제안이 서버 문자열 그대로이고 순서(패턴 → 줄 → 제안)를 지킨다 23ms
+ ✓ src/__tests__/briefing.test.tsx > 브리핑 목록 > basis 는 화면에 나오지 않는다 5ms
+ ✓ src/__tests__/briefing.test.tsx > 브리핑 목록 > 제안이 없으면 제안 구획이 없다 10ms
+ ✓ src/__tests__/briefing.test.tsx > 브리핑 목록 > 빈 목록이면 빈 상태 문구 하나 11ms
+ ✓ src/__tests__/briefing.test.tsx > 브리핑 목록 > 목록 조회가 실패하면 한 줄 안내(빈 상태 문구는 아님) 7ms
+ ✓ src/__tests__/briefing.test.tsx > 브리핑 목록 > 항목마다 "지금 브리핑" 버튼이 있고, 알림 받기 버튼이 활성이며 /push-dev/ 링크가 없다 (구독 동작은 push.test.ts) 39ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/chat 는 chat 빈 화면을 그린다 78ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons 는 persons 빈 화면을 그린다 12ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다
+An update to CardView inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/push.test.ts > urlBase64ToUint8Array > base64url(-, _, 패딩 없음)을 바이트로 바꾼다 4ms
+ ✓ src/__tests__/push.test.ts > subscribeToPush 절차 > 새 구독: 권한 → 등록(/sw.js) → 공개키 → 구독 → 서버 저장 순서이고, 본문은 PushSubscriptionIn 필드 그대로 4ms
+ ✓ src/__tests__/push.test.ts > subscribeToPush 절차 > 이미 구독돼 있으면 "already" — 구독도 서버 저장(POST)도 하지 않는다 1ms
+ ✓ src/__tests__/push.test.ts > subscribeToPush 절차 > 권한이 허용되지 않으면 "denied" — 등록·공개키·구독이 없다 0ms
+ ✓ src/__tests__/push.test.ts > subscribeToPush 절차 > 404 push_not_configured 면 "not_configured" — 구독·저장 없이 멈춘다 0ms
+ ✓ src/__tests__/push.test.ts > subscribeToPush 절차 > 다른 404(코드가 다름)나 5xx 는 "not_configured" 가 아니라 "failed" 0ms
+ ✓ src/__tests__/push.test.ts > subscribeToPush 절차 > 구독 실패·서버 저장 실패는 "failed" 1ms
+ ✓ src/__tests__/push.test.ts > subscribeToPush 절차 > 서버 저장(POST)이 실패하면 브라우저 구독을 unsubscribe 1회로 되돌리고 "failed" — 404 push_not_configured 도 같다 1ms
+ ✓ src/__tests__/push.test.ts > subscribeToPush 절차 > 저장 실패 뒤 다음 클릭은 처음부터 다시 — subscribe 재호출·POST 재시도(이번엔 성공) 1ms
+ ✓ src/__tests__/push.test.ts > subscribeToPush 절차 > unsubscribe 자체가 실패해도 예외 없이 "failed" 0ms
+ ✓ src/__tests__/push.test.ts > subscribeToPush 절차 > 미지원 브라우저(serviceWorker·PushManager·Notification 없음)면 "unsupported" — 네트워크 0 0ms
+ ✓ src/__tests__/push.test.ts > getPushStatus > 미지원 · 구독 없음 · 구독 있음을 가른다(권한 창·네트워크 없음) 0ms
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다
+An update to BriefingScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/chat.test.tsx > 전송과 세션 (결정 D) > 발화를 POST /api/chat 으로 보내고 내 말풍선과 reply 를 보여 준다 212ms
+ ✓ src/__tests__/chat.test.tsx > 전송과 세션 (결정 D) > 첫 요청에는 X-Session-Id 가 없고, 응답 session_id 를 저장해 두 번째 요청에 보낸다 82ms
+ ✓ src/__tests__/chat.test.tsx > 전송과 세션 (결정 D) > 저장된 세션이 있으면 진입 시 복원 요청에도 헤더를 보낸다 5ms
+ ✓ src/__tests__/briefing.test.tsx > ?schedule_id= 강조 (사용자 결정 (가)) > 쿼리가 없으면 서버 순서 그대로이고 단건 요청은 0 15ms
+ ✓ src/__tests__/briefing.test.tsx > ?schedule_id= 강조 (사용자 결정 (가)) > 목록 안에 있으면 맨 위로 올리고 강조하며(나머지는 서버 순서) 단건 요청은 0 10ms
+ ✓ src/__tests__/briefing.test.tsx > ?schedule_id= 강조 (사용자 결정 (가)) > 목록에 없으면 GET /briefings?schedule_id=N 을 1회 더 불러 맨 위에 붙이고 강조한다 40ms
+ ✓ src/__tests__/briefing.test.tsx > ?schedule_id= 강조 (사용자 결정 (가)) > 단건이 404 이거나 [] 이면 안내 한 줄 + 나머지 목록 그대로 19ms
+ ✓ src/__tests__/briefing.test.tsx > ?schedule_id= 강조 (사용자 결정 (가)) > R-U7-3: 단건 조회가 404 가 아닌 오류로 실패하면 목록 실패 문구가 아니라 "그 일정" 문구 — 목록은 그대로 13ms
+ ✓ src/__tests__/briefing.test.tsx > ?schedule_id= 강조 (사용자 결정 (가)) > parseScheduleId: 양의 정수만 인정한다 1ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/briefings 는 briefings 빈 화면을 그린다 19ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > #/persons/:id 는 인물 화면에 id 를 넘긴다 4ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 알 수 없는 해시는 #/chat 으로 보낸다 16ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > 해시가 비어 있어도 #/chat 으로 보낸다 13ms
+ ✓ src/__tests__/routes.test.tsx > 해시 라우팅 3경로 (결정 C) > parseHash 경계: 숫자가 아닌 id·끝 슬래시·쿼리 7ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다 15ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 지금 화면 항목에 aria-current 가 붙는다 23ms
+ ✓ src/__tests__/sw.test.ts > push 이벤트 > 페이로드를 showNotification(title, {body, tag, data:{schedule_id}}) 로 그대로 넘긴다 2ms
+ ✓ src/__tests__/sw.test.ts > push 이벤트 > 열린 모든 창에 {type:"briefing", schedule_id} 만 보낸다(title·body 는 보내지 않는다) 1ms
+ ✓ src/__tests__/sw.test.ts > push 이벤트 > schedule_id 가 빠진 페이로드면 data.schedule_id 와 메시지 모두 null 0ms
+ ✓ src/__tests__/sw.test.ts > push 이벤트 > JSON 을 못 읽거나 데이터가 없으면 기본 제목 "알림"·빈 본문으로 띄운다 0ms
+ ✓ src/__tests__/sw.test.ts > notificationclick 이벤트 > 열린 창이 있으면 알림을 닫고 첫 창을 focus 한 뒤 {type:"open-briefing", schedule_id} 를 보낸다(새 창 없음) 0ms
+ ✓ src/__tests__/sw.test.ts > notificationclick 이벤트 > 앱이 아닌 같은 출처 창이 앞에 있어도 앱 창(client.url 경로 "/")을 골라 focus 한다 0ms
+ ✓ src/__tests__/sw.test.ts > notificationclick 이벤트 > 열린 창이 전부 앱이 아니면 그 창들은 건드리지 않고 openWindow("/#/briefings?schedule_id=N") 0ms
+ ✓ src/__tests__/sw.test.ts > notificationclick 이벤트 > 열린 창이 없으면 openWindow("/#/briefings?schedule_id=N") 0ms
+ ✓ src/__tests__/sw.test.ts > notificationclick 이벤트 > schedule_id 가 없거나 양의 정수가 아니면 일정 없는 브리핑 화면 주소 0ms
+ ✓ src/__tests__/sw.test.ts > manifest · index.html · 아이콘 > start_url 은 /#/chat, display 는 standalone 0ms
+ ✓ src/__tests__/sw.test.ts > manifest · index.html · 아이콘 > 이름은 index.html <title> 과 같고, 색은 tokens.css 의 primary(#171717)·background(#ffffff) 0ms
+ ✓ src/__tests__/sw.test.ts > manifest · index.html · 아이콘 > 아이콘은 192·512 두 개이고 각각 실제 파일이다(외부 주소 없음) 0ms
+ ✓ src/__tests__/sw.test.ts > manifest · index.html · 아이콘 > index.html 이 manifest 를 연결하고, favicon 은 같은 아이콘이다(템플릿 로고 아님) 0ms
+ ✓ src/__tests__/sw.test.ts > 결정 I — 캐시 없음·fetch 리스너 없음 > 등록되는 리스너는 install · activate · push · notificationclick 넷뿐이다 0ms
+ ✓ src/__tests__/sw.test.ts > 결정 I — 캐시 없음·fetch 리스너 없음 > install 은 skipWaiting, activate 는 clients.claim 만 한다 0ms
+ ✓ src/__tests__/sw.test.ts > 결정 I — 캐시 없음·fetch 리스너 없음 > 코드에 요청 가로채기 리스너·캐시 API 호출이 없다 0ms
+ ✓ src/__tests__/card.test.tsx > 인물 목록 > 서버 순서 그대로(재정렬 없음) 이름·태그·위계·마지막 접촉 4개 필드를 보여 준다 129ms
+ ✓ src/__tests__/card.test.tsx > 인물 목록 > 필터·검색 컨트롤이 없다 12ms
+ ✓ src/__tests__/card.test.tsx > 인물 목록 > 빈 목록이면 빈 상태 문구 하나 6ms
+ ✓ src/__tests__/card.test.tsx > 인물 목록 > 목록 조회가 실패하면 한 줄 안내 5ms
+ ✓ src/__tests__/card.test.tsx > 인물 목록 > 항목 링크는 #/persons/:id 이고 누르면 해시가 바뀐다 47ms
+ ✓ src/__tests__/push.test.ts > 브리핑 화면 "알림 받기" 버튼 > 미구독 → 진행 중(비활성) → 켜짐(비활성) 세 상태 161ms
+ ✓ src/__tests__/push.test.ts > 브리핑 화면 "알림 받기" 버튼 > 들어올 때 이미 구독돼 있으면 곧바로 "알림 켜짐"(비활성) — 클릭 없이, 서버 저장 없이 19ms
+ ✓ src/__tests__/network.test.ts > 실 네트워크 0 (setup 의 가짜 fetch) > 표에 없는 바깥 주소 fetch("https://example.invalid") 는 실패한다 1ms
+ ✓ src/__tests__/network.test.ts > 실 네트워크 0 (setup 의 가짜 fetch) > 가짜 표 없이 앱 API 를 부르면(apiFetch → /api/persons) 응답 대신 실패한다 0ms
+ ✓ src/__tests__/chat.test.tsx > 전송과 세션 (결정 D) > 422 invalid_session_id 면 저장된 세션을 버리고 다음 요청은 헤더 없이 간다 109ms
+ ✓ src/__tests__/briefing.test.tsx > "지금 브리핑" (결정 K) > POST 본문은 {schedule_id} 이고, 성공하면 응답을 끼우지 않고 GET /briefings 를 다시 읽어 갱신한다 42ms
+ ✓ src/__tests__/briefing.test.tsx > "지금 브리핑" (결정 K) > 진행 중에는 그 버튼이 비활성(진행 표시)이고, 끝나면 다시 활성 28ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 기본은 접혀 있고 메뉴 버튼으로 열린다 79ms
+ ✓ src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 본문과 사이드바에 같은 목록이 같은 순서로 그려진다 50ms
+ ✓ src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > R-U6-2: 앱을 열면 GET /persons 는 1회(사이드바·본문이 한 번 받은 값을 같이 쓴다) 7ms
+ ✓ src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > R-U6-2: 해시 라우트가 바뀌면 다시 읽어 새 인물이 사이드바에 보인다 21ms
+ ✓ src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > R-U6-2: 채팅 응답 stored.persons > 0 이면 다시 읽고, 0 이면 읽지 않는다 60ms
+ ✓ src/__tests__/chat.test.tsx > 입력창 > Enter 는 전송, Shift+Enter 는 줄바꿈 42ms
+ ✓ src/__tests__/chat.test.tsx > 입력창 > 빈 입력은 보낼 수 없다 24ms
+ ✓ src/__tests__/chat.test.tsx > 입력창 > 응답을 기다리는 동안 타이핑 점이 보이고 끝나면 사라진다 66ms
+ ✓ src/__tests__/briefing.test.tsx > "지금 브리핑" (결정 K) > 404(잠금 중)이면 "잠시 뒤 다시 시도" 안내만 — 자동 재시도 없음(POST 1회), 목록 재요청도 없고 버튼은 다시 활성 79ms
+ ✓ src/__tests__/briefing.test.tsx > "지금 브리핑" (결정 K) > 5xx 이면 한 줄 실패 안내(잠금 문구가 아님), 버튼은 다시 활성이고 누르면 다시 보낸다 36ms
+ ✓ src/__tests__/briefing.test.tsx > "지금 브리핑" (결정 K) > R-U7-2 (탐침 P4): 수동 브리핑은 성공했는데 재조회가 실패하면 이전 목록 3건을 그대로 두고 실패 한 줄만 더한다 19ms
+ ✓ src/__tests__/briefing.test.tsx > "지금 브리핑" (결정 K) > R-U7-1: 수동 브리핑이 진행 중일 때 쿼리가 바뀌면, 끝난 뒤 재조회는 바뀐 일정(최신) 기준이다 33ms
+ ✓ src/__tests__/push.test.ts > 브리핑 화면 "알림 받기" 버튼 > 안내 한 줄: 권한 거부 · 서버 미설정 · 미지원 · 실패 — 버튼은 다시 "알림 받기"(활성) 128ms
+ ✓ src/__tests__/push.test.ts > 브리핑 화면 "알림 받기" 버튼 > /push-dev/ 링크가 없다 8ms
+ ✓ src/__tests__/push.test.ts > 인앱 배너 (결정 H) > {type:"briefing", schedule_id} 를 받으면 한 줄 배너 — 누르면 #/briefings?schedule_id=N, 누른 뒤 사라진다 46ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: 항목을 고르면 서랍이 닫히고 그 화면이 보인다 78ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 좁은 폭: Esc 와 바깥(배경) 클릭으로도 닫힌다 83ms
+ ✓ src/__tests__/push.test.ts > 인앱 배너 (결정 H) > 닫기 버튼으로 닫는다(주소는 그대로) 26ms
+ ✓ src/__tests__/push.test.ts > 인앱 배너 (결정 H) > schedule_id 가 없으면 일정 없는 브리핑 주소, 모양이 다른 메시지는 무시한다 27ms
+ ✓ src/__tests__/push.test.ts > 인앱 배너 (결정 H) > 알림을 눌러 온 {type:"open-briefing"} 은 배너 없이 바로 그 일정 주소로 간다 12ms
+ ✓ src/__tests__/push.test.ts > 인앱 배너 (결정 H) > 알림을 눌러 온 {type:"open-briefing", schedule_id:null} 은 배너 없이 일정 없는 #/briefings 로 간다 (R-U8-1) 6ms
+stderr | src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+An update to PersonsProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ChatScreen inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 열림/닫힘은 라우트도 localStorage 도 바꾸지 않는다 38ms
+ ✓ src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바 25ms
+ ✓ src/__tests__/chat.test.tsx > 입력창 > 한글 조합 중(isComposing) Enter 는 전송이 아니다 (R-U5-4) 16ms
+ ✓ src/__tests__/chat.test.tsx > 입력창 > 확인 칩이 떠 있어도 입력은 막히지 않는다 (결정 E) 79ms
+ ✓ src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > R-U6-2: 채팅 응답 stored.persons 가 0 이면(사건만 저장) 인물 목록을 다시 읽지 않는다 98ms
+ ✓ src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > R-U6-2: 알림 이벤트(persons-changed)만으로도 다시 읽는다 14ms
+ ✓ src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩 글자와 순서가 options 와 같다 (reply 바로 아래) 28ms
+ ✓ src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성 40ms
+ ✓ src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답 응답의 reply 가 이어 붙고, 새 pending_question 이면 그 아래 새 칩 46ms
+ ✓ src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > R-U7-2 (탐침 P2c): 먼저 보낸 느린 조회가 나중 조회보다 늦게 도착해도 사이드바는 나중 조회 값이다 65ms
+ ✓ src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > 사이드바와 본문이 같은 컴포넌트(PersonList)를 import 한다 0ms
+ ✓ src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 진입 시 GET /api/questions/pending 으로 미답변 전부를 질문별로 복원한다 10ms
+ ✓ src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 already_answered 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 23ms
+ ✓ src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답할 때 409 expired 면 그 질문 칩을 모두 비활성으로 두고 한 줄 안내 19ms
+ ✓ src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답 전송이 5xx 로 실패하면 안내 한 줄을 띄우고 칩은 다시 누를 수 있다 17ms
+ ✓ src/__tests__/chat.test.tsx > 오류 안내 > POST /api/chat 이 5xx 면 안내 한 줄 23ms
+ ✓ src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > 좁은 폭: 서랍에서 항목을 고르면 서랍이 닫힌다 104ms
+ ✓ src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 섹션 7개가 부록 A ② 순서로 놓인다 24ms
+ ✓ src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 각 섹션의 값이 서버가 준 그대로 나온다 12ms
+ ✓ src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 타임라인은 서버 순서 그대로, 항목마다 날짜·type·content 11ms
+ ✓ src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > source_count 가 0 이면 근거 보기 버튼이 없고, 양수면 있다 21ms
+ ✓ src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 비어 있는 섹션은 짧은 빈 문구를 보여 준다 4ms
+ ✓ src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 404 면 안내 한 줄과 목록으로 가는 링크 7ms
+ ✓ src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 404 가 아닌 실패는 다른 안내 문장 6ms
+ ✓ src/__tests__/chat.test.tsx > 오류 안내 > 네트워크 실패(fetch 거부)면 안내 한 줄 23ms
+ ✓ src/__tests__/chat.test.tsx > 오류 안내 > 진입 시 복원 요청이 실패하면 한 줄 안내가 뜨고 빈 상태 안내도 남는다 (R-U5-2) 6ms
+ ✓ src/__tests__/chat.test.tsx > 인물 카드 링크 > stored.persons > 0 이면 #/persons 링크가 붙는다 26ms
+ ✓ src/__tests__/chat.test.tsx > 인물 카드 링크 > stored.events > 0 이어도 링크가 붙는다 21ms
+ ✓ src/__tests__/chat.test.tsx > 인물 카드 링크 > 저장된 인물·사건이 없으면(일정만 있어도) 링크가 없다 20ms
+ ✓ src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 카드·목록 응답에 원문이 없으면 아무 데도 원문이 보이지 않고, 원문 요청도 없다 12ms
+ ✓ src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 첫 펼침에 GET /events/{id}/raw 1회, 원문은 글자 그대로, 접었다 다시 펼쳐도 요청은 1회 54ms
+ ✓ src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 다른 항목은 각자 한 번씩 요청한다 49ms
+ ✓ src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다 39ms
+ ✓ src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > R-U6-1: 로딩 중 접기 → 요청 실패 → 다시 펼치면 열리고 재시도해 원문이 나온다 54ms
+ ✓ src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 근거 보기: sources 요청 1회, 항목 수·날짜·content·원문이 그대로, 접기, 다시 펼쳐도 재요청 없음 46ms
+ ✓ src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 패턴의 근거 보기도 그 패턴 id 로 요청한다 21ms
+ ✓ src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 근거 조회 실패는 그 사실 안에만 안내, 다시 누르면 재시도(요청 2회) 36ms
+
+ Test Files  9 passed (9)
+      Tests  135 passed (135)
+   Start at  14:10:13
+   Duration  2.03s (environment 40%, tests 37%, import 12%, setup 6%, transform 5%, worker 1%)
+

@@ -57,8 +57,12 @@ self.addEventListener("notificationclick", function (event) {
   var scheduleId = info && info.schedule_id !== undefined ? info.schedule_id : null;
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (list) {
-      if (list.length > 0) {
-        var client = list[0];
+      // includeUncontrolled 는 같은 출처 창을 전부 준다 -- 앱이 아닌 창(개발용 확인 페이지 · /api/docs 등)은
+      // 건너뛰고 앱 창(경로가 "/" 인 창)만 고른다. 앱 창이 없으면 새 창을 연다(R-U8-3).
+      var client = list.find(function (c) {
+        return new URL(c.url).pathname === "/";
+      });
+      if (client) {
         return Promise.resolve(client.focus()).then(function () {
           client.postMessage({ type: "open-briefing", schedule_id: scheduleId });
         });

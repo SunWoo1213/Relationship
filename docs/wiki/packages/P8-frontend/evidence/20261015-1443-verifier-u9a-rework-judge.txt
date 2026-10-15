@@ -1,0 +1,68 @@
+# 명령: cd web && npm run typecheck && npm test -- --run && npm run e2e && cd .. && echo "--- PersonCardScreen.tsx diff vs HEAD (빈 출력 = 복원됨)" && git diff --stat -- web/src/screens/PersonCardScreen.tsx && echo "--- git status --short (web/src 제품 코드에 M 없어야 함)" && git status --short -- web && echo "--- card.spec.ts 59~63행" && sed -n 59,63p web/e2e/card.spec.ts && echo "--- playwright.config.ts serviceWorkers" && grep -n serviceWorkers web/playwright.config.ts && echo "--- playwright.config.ts diff --stat vs HEAD (재작업 전 17 → 19)" && git diff --stat -- web/playwright.config.ts
+# 시각: 2026-10-15T14:43:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+
+> web@0.0.0 typecheck
+> tsc -b
+
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  9 passed (9)
+      Tests  135 passed (135)
+   Start at  14:43:39
+   Duration  2.20s (environment 42%, tests 35%, import 13%, setup 7%, transform 3%, worker 1%)
+
+
+> web@0.0.0 e2e
+> playwright test
+
+
+Running 4 tests using 4 workers
+
+(node:36658) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:36661) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:36660) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:36659) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (387ms)
+  ✓  2 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (547ms)
+  ✓  3 e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (645ms)
+  ✓  4 e2e/card.spec.ts:85:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (1.8s)
+
+  4 passed (4.2s)
+--- PersonCardScreen.tsx diff vs HEAD (빈 출력 = 복원됨)
+--- git status --short (web/src 제품 코드에 M 없어야 함)
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+--- card.spec.ts 59~63행
+    await card.getByTestId('timeline-31').getByRole('button', { name: '원문 펼치기' }).click()
+    // toHaveText 는 공백을 정규화해 줄바꿈 훼손을 못 잡는다 -- textContent 완전 일치로 단언한다 (R-U9a-1)
+    await expect(card.getByTestId('raw-utterance')).toBeVisible()
+    expect(await card.getByTestId('raw-utterance').textContent()).toBe(RAW_31)
+    expect(api.callsTo('GET /api/events/31/raw')).toHaveLength(1)
+--- playwright.config.ts serviceWorkers
+17:    serviceWorkers: 'block',
+--- playwright.config.ts diff --stat vs HEAD (재작업 전 17 → 19)
+ web/playwright.config.ts | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)

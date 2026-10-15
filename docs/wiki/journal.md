@@ -483,3 +483,5 @@
 - 2026-10-14 19:56 | PUSH-dev2 | origin dev2 46532e7 (실험 푸시)
 - 2026-10-14 20:43 | COMMIT | 819cb2a feat(P8-frontend): PWA 와 웹 푸시 구독을 붙인다
 - 2026-10-14 20:43 | PUSH-dev2 | origin dev2 819cb2a (실험 푸시)
+- 2026-10-15 13:57 | COMMIT | 8fd5463 docs(P8-frontend): U8 커밋 해시를 기록에 채우고 테스트 기록 방식을 정한다
+- 2026-10-15 13:57 | PUSH-dev2 | origin dev2 8fd5463 (실험 푸시)

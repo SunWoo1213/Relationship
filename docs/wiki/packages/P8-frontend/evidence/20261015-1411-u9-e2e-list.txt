@@ -1,0 +1,12 @@
+# 명령: cd web && npx playwright test --list
+# 시각: 2026-10-15T14:11:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+Listing tests:
+  briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다
+  card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다
+  card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다
+  chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다
+Total: 4 tests in 3 files

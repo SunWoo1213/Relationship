@@ -1,0 +1,122 @@
+# 명령: cd web && echo "== 12행 빌드 산출물 =="; ls -l dist/index.html dist/sw.js dist/manifest.webmanifest; for f in routes.test.tsx chat.test.tsx card.test.tsx briefing.test.tsx sw.test.ts push.test.ts network.test.ts; do echo; echo "== npm test -- --run src/__tests__/$f =="; npm test -- --run src/__tests__/$f 2>&1; echo "[exit $?]"; done
+# 시각: 2026-10-15T14:10:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+== 12행 빌드 산출물 ==
+-rw-r--r--@ 1 sunwoo  staff   573 10월 15 14:09 dist/index.html
+-rw-r--r--@ 1 sunwoo  staff   406 10월 15 14:09 dist/manifest.webmanifest
+-rw-r--r--@ 1 sunwoo  staff  3055 10월 15 14:09 dist/sw.js
+
+== npm test -- --run src/__tests__/routes.test.tsx ==
+
+> web@0.0.0 test
+> vitest --run src/__tests__/routes.test.tsx
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  14:10:02
+   Duration  823ms (tests 41%, environment 30%, import 20%, setup 5%, transform 4%)
+
+[exit 0]
+
+== npm test -- --run src/__tests__/chat.test.tsx ==
+
+> web@0.0.0 test
+> vitest --run src/__tests__/chat.test.tsx
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  1 passed (1)
+      Tests  22 passed (22)
+   Start at  14:10:03
+   Duration  1.06s (tests 62%, environment 22%, import 10%, setup 4%, transform 2%)
+
+[exit 0]
+
+== npm test -- --run src/__tests__/card.test.tsx ==
+
+> web@0.0.0 test
+> vitest --run src/__tests__/card.test.tsx
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  1 passed (1)
+      Tests  29 passed (29)
+   Start at  14:10:04
+   Duration  1.30s (tests 65%, environment 17%, import 12%, setup 3%, transform 3%)
+
+[exit 0]
+
+== npm test -- --run src/__tests__/briefing.test.tsx ==
+
+> web@0.0.0 test
+> vitest --run src/__tests__/briefing.test.tsx
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  1 passed (1)
+      Tests  19 passed (19)
+   Start at  14:10:06
+   Duration  712ms (tests 49%, environment 33%, import 10%, setup 6%, transform 1%)
+
+[exit 0]
+
+== npm test -- --run src/__tests__/sw.test.ts ==
+
+> web@0.0.0 test
+> vitest --run src/__tests__/sw.test.ts
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  14:10:07
+   Duration  339ms (environment 78%, setup 15%, transform 3%, tests 2%, import 1%, worker 1%)
+
+[exit 0]
+
+== npm test -- --run src/__tests__/push.test.ts ==
+
+> web@0.0.0 test
+> vitest --run src/__tests__/push.test.ts
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  14:10:07
+   Duration  777ms (tests 39%, environment 31%, import 20%, setup 6%, transform 4%)
+
+[exit 0]
+
+== npm test -- --run src/__tests__/network.test.ts ==
+
+> web@0.0.0 test
+> vitest --run src/__tests__/network.test.ts
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  14:10:08
+   Duration  350ms (environment 79%, setup 13%, transform 5%, worker 1%, tests 1%, import 1%)
+
+[exit 0]

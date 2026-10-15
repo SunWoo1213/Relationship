@@ -1,0 +1,1129 @@
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs V0
+# 시각: 2026-10-15T14:25:46+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: V0-대조군(무변이, e2e)  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- e2e: npx playwright test
+
+Running 4 tests using 4 workers
+
+(node:30507) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30509) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30506) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30508) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (382ms)
+  ✓  4 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (506ms)
+  ✓  2 e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (573ms)
+  ✓  3 e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (1.7s)
+
+  4 passed (4.1s)
+### 변이 V0 e2e 결과: exit 0 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:25:50+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs V1
+# 시각: 2026-10-15T14:25:50+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: V1-채팅 칩 순서를 가나다순으로 정렬  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- e2e: npx playwright test
+
+Running 4 tests using 4 workers
+
+(node:30628) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30627) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30629) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30626) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (373ms)
+  ✓  1 e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (533ms)
+  ✓  3 e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (1.4s)
+  ✘  4 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (5.3s)
+
+
+  1) e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 ────────────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('chips-7').getByRole('button')
+    Timeout: 5000ms
+    - Expected  - 1
+    + Received  + 1
+
+      Array [
+    +   "아니요",
+        "직장",
+        "친구",
+    -   "아니요",
+      ]
+
+    Call log:
+      - Expect "toHaveText" getByTestId('chips-7').getByRole('button') with timeout 5000ms
+      - waiting for getByTestId('chips-7').getByRole('button')
+        14 × locator resolved to 3 elements
+
+
+      38 |   await expect(page.getByText('민지가 누구인지 확인할게요.')).toBeVisible()
+      39 |   const chips7 = page.getByTestId('chips-7')
+    > 40 |   await expect(chips7.getByRole('button')).toHaveText(['직장', '친구', '아니요'])
+         |                                            ^
+      41 |
+      42 |   // 칩 클릭 -> 눌린 칩은 선택 상태, 나머지는 비활성, 재개 reply 와 새 칩(8)
+      43 |   await chips7.getByRole('button', { name: '친구' }).click()
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/chat.spec.ts:40:44
+
+    Error Context: test-results/chat-발화를-보내면-칩이-뜨고-눌러-재개된-reply-가-보이며-새로고침하면-남은-질문-칩이-복원된다/error-context.md
+
+  1 failed
+    e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 ─────────────────
+  3 passed (7.6s)
+### 변이 V1 e2e 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:25:59+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs V2
+# 시각: 2026-10-15T14:25:59+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: V2-원문의 줄바꿈을 공백으로 치환  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- vitest: npx vitest --run
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a
+
+ ❯ src/__tests__/card.test.tsx (29 tests | 4 failed) 905ms
+   ❯ 원문 펼치기 (결정 F) (8)
+     × 첫 펼침에 GET /events/{id}/raw 1회, 원문은 글자 그대로, 접었다 다시 펼쳐도 요청은 1회 27ms
+     × 다른 항목은 각자 한 번씩 요청한다 44ms
+     × 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다 39ms
+     × R-U6-1: 로딩 중 접기 → 요청 실패 → 다시 펼치면 열리고 재시도해 원문이 나온다 48ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 첫 펼침에 GET /events/{id}/raw 1회, 원문은 글자 그대로, 접었다 다시 펼쳐도 요청은 1회
+AssertionError: expected '  팀장님이 "전체회의"에서 <b>지적</b> & 했다 \t끝    ' to be '  팀장님이\n"전체회의"에서 <b>지적</b> & 했다 \t끝  …' // Object.is equality
+
+- Expected
++ Received
+
+-   팀장님이
+- "전체회의"에서 <b>지적</b> & 했다 	끝  
+-
+-
++   팀장님이 "전체회의"에서 <b>지적</b> & 했다 	끝    
+
+ ❯ src/__tests__/card.test.tsx:421:29
+    419|     await user.click(within(item).getByRole('button', { name: CARD_NOT…
+    420|     const raw = await within(item).findByTestId('raw-utterance')
+    421|     expect(raw.textContent).toBe(RAW_A)
+       |                             ^
+    422|     expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(1)
+    423|     expect((callsTo(fetchFn, '/api/events/9/raw')[0][1] as RequestInit…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 다른 항목은 각자 한 번씩 요청한다
+AssertionError: expected '두번째     줄바꿈 셋 &amp; 그대로' to be '두번째\n\n\n  줄바꿈 셋 &amp; 그대로' // Object.is equality
+
+- Expected
++ Received
+
+- 두번째
+-
+-
+-   줄바꿈 셋 &amp; 그대로
++ 두번째     줄바꿈 셋 &amp; 그대로
+
+ ❯ src/__tests__/card.test.tsx:445:104
+    443|     await user.click(within(screen.getByTestId('timeline-9')).getByRol…
+    444|     await user.click(within(screen.getByTestId('timeline-2')).getByRol…
+    445|     expect((await within(screen.getByTestId('timeline-2')).findByTestI…
+       |                                                                                                        ^
+    446|     expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(1)
+    447|     expect(callsTo(fetchFn, '/api/events/2/raw')).toHaveLength(1)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다
+AssertionError: expected '  팀장님이 "전체회의"에서 <b>지적</b> & 했다 \t끝    ' to be '  팀장님이\n"전체회의"에서 <b>지적</b> & 했다 \t끝  …' // Object.is equality
+
+- Expected
++ Received
+
+-   팀장님이
+- "전체회의"에서 <b>지적</b> & 했다 	끝  
+-
+-
++   팀장님이 "전체회의"에서 <b>지적</b> & 했다 	끝    
+
+ ❯ src/__tests__/card.test.tsx:471:76
+    469|
+    470|     await user.click(within(item).getByRole('button'))
+    471|     expect((await within(item).findByTestId('raw-utterance')).textCont…
+       |                                                                            ^
+    472|     expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(2)
+    473|     expect(screen.queryByRole('alert')).toBeNull()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > R-U6-1: 로딩 중 접기 → 요청 실패 → 다시 펼치면 열리고 재시도해 원문이 나온다
+AssertionError: expected '  팀장님이 "전체회의"에서 <b>지적</b> & 했다 \t끝    ' to be '  팀장님이\n"전체회의"에서 <b>지적</b> & 했다 \t끝  …' // Object.is equality
+
+- Expected
++ Received
+
+-   팀장님이
+- "전체회의"에서 <b>지적</b> & 했다 	끝  
+-
+-
++   팀장님이 "전체회의"에서 <b>지적</b> & 했다 	끝    
+
+ ❯ src/__tests__/card.test.tsx:502:76
+    500|     await user.click(within(item).getByRole('button', { name: CARD_NOT…
+    501|
+    502|     expect((await within(item).findByTestId('raw-utterance')).textCont…
+       |                                                                            ^
+    503|     expect(callsTo(fetchFn, '/api/events/9/raw')).toHaveLength(2)
+    504|     expect(within(item).getByRole('button', { name: CARD_NOTICE.hideRa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed | 8 passed (9)
+      Tests  4 failed | 131 passed (135)
+   Start at  14:25:59
+   Duration  2.00s (environment 40%, tests 32%, import 11%, transform 9%, setup 8%)
+
+### 변이 V2 vitest 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+--- e2e: npx playwright test
+
+Running 4 tests using 4 workers
+
+(node:30778) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30776) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30779) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (339ms)
+  ✓  4 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (500ms)
+  ✓  3 e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (552ms)
+  ✓  1 e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (1.7s)
+
+  4 passed (4.1s)
+### 변이 V2 e2e 결과: exit 0 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:26:06+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs V3
+# 시각: 2026-10-15T14:26:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: V3-지금 브리핑 POST 본문의 schedule_id 를 다른 일정으로  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- e2e: npx playwright test
+
+Running 4 tests using 4 workers
+
+(node:30898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30897) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30899) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (323ms)
+  ✓  1 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (485ms)
+  ✓  4 e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (570ms)
+  ✓  2 e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (1.5s)
+
+
+  1) e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 ──────────────────────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "schedule_id": 7,
+    +   "schedule_id": 8,
+      }
+
+      58 |   const runs = api.callsTo('POST /api/briefings/run')
+      59 |   expect(runs).toHaveLength(1)
+    > 60 |   expect(runs[0].body).toEqual({ schedule_id: 7 })
+         |                        ^
+      61 |   expect(api.callsTo('GET /api/briefings')).toHaveLength(2) // 진입 1 + 실행 뒤 다시 읽기 1
+      62 |
+      63 |   expectNoStrayRequests(api, baseURL!)
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/briefing.spec.ts:60:24
+
+    Error Context: test-results/briefing-쿼리의-일정이-맨-위에-강조돼-열리고-지금-브리핑을-누르면-목록이-다시-읽힌다/error-context.md
+
+  1 failed
+    e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 ───────────────────────
+  3 passed (3.7s)
+### 변이 V3 e2e 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:26:10+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs V4
+# 시각: 2026-10-15T14:26:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: V4-API_BASE 를 /apiv2 로(가짜 표 가로채기 밖 경로)  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- e2e: npx playwright test
+
+Running 4 tests using 4 workers
+
+(node:31014) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31016) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31015) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31013) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 오후 2:26:13 [vite] http proxy error: /apiv2/questions/pending
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:26:13 [vite] http proxy error: /apiv2/questions/pending
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:26:13 [vite] http proxy error: /apiv2/persons
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:26:13 [vite] http proxy error: /apiv2/persons
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:26:13 [vite] http proxy error: /apiv2/briefings
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:26:13 [vite] http proxy error: /apiv2/persons
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:26:13 [vite] http proxy error: /apiv2/questions/pending
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:26:13 [vite] http proxy error: /apiv2/persons
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:26:13 [vite] http proxy error: /apiv2/chat
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+[WebServer] 오후 2:26:13 [vite] http proxy error: /apiv2/persons
+[WebServer] AggregateError [ECONNREFUSED]: 
+[WebServer]     at internalConnectMultiple (node:net:1430:18)
+[WebServer]     at afterConnectMultiple (node:net:2099:7)
+  ✘  4 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (5.2s)
+  ✘  1 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (5.2s)
+  ✘  2 e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (30.0s)
+  ✘  3 e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (30.0s)
+
+
+  1) e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 ──────────────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('briefing-list').locator(':scope > li')
+    Expected: 2
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('briefing-list').locator(':scope > li') with timeout 5000ms
+      - waiting for getByTestId('briefing-list').locator(':scope > li')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      42 |   // 서버 순서는 [9, 7] 이지만 쿼리의 7 이 맨 위·강조
+      43 |   const items = page.getByTestId('briefing-list').locator(':scope > li')
+    > 44 |   await expect(items).toHaveCount(2)
+         |                       ^
+      45 |   await expect(items.nth(0)).toHaveAttribute('data-testid', 'briefing-7')
+      46 |   await expect(items.nth(0)).toHaveAttribute('data-highlight', 'true')
+      47 |   await expect(items.nth(1)).toHaveAttribute('data-testid', 'briefing-9')
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/briefing.spec.ts:44:23
+
+    Error Context: test-results/briefing-쿼리의-일정이-맨-위에-강조돼-열리고-지금-브리핑을-누르면-목록이-다시-읽힌다/error-context.md
+
+  2) e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 ───────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByTestId('sidebar-persons').getByRole('link', { name: /김팀장/ })
+
+
+      51 |
+      52 |     // 인물 클릭 -> 본문에 그 인물 카드
+    > 53 |     await page.getByTestId('sidebar-persons').getByRole('link', { name: /김팀장/ }).click()
+         |                                                                                  ^
+      54 |     await expect(page).toHaveURL(/#\/persons\/3$/)
+      55 |     const card = page.getByTestId('person-card')
+      56 |     await expect(card.getByRole('heading', { name: '김팀장' })).toBeVisible()
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/card.spec.ts:53:82
+
+    Error Context: test-results/card-데스크톱-폭-1280px-사이드바-인물-목록에서-인물을-눌러-카드를-열고-타임라인-원문을-펼친다/error-context.md
+
+  3) e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('navigation', { name: '주 메뉴' }).getByTestId('sidebar-persons').getByRole('link', { name: /김팀장/ })
+
+
+      104 |     await menu.click()
+      105 |     await expect(drawer).toBeVisible()
+    > 106 |     await drawer.getByTestId('sidebar-persons').getByRole('link', { name: /김팀장/ }).click()
+          |                                                                                    ^
+      107 |     await expect(page.getByRole('navigation')).toHaveCount(0)
+      108 |     await expect(page).toHaveURL(/#\/persons\/3$/)
+      109 |     await expect(page.getByTestId('person-card').getByRole('heading', { name: '김팀장' })).toBeVisible()
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/card.spec.ts:106:84
+
+    Error Context: test-results/card-모바일-폭-390px-서랍은-처음엔-닫-62bdd-물---인물---카드-항목을-고르면-서랍이-닫힌다/error-context.md
+
+  4) e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 ────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('민지가 누구인지 확인할게요.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText('민지가 누구인지 확인할게요.') with timeout 5000ms
+      - waiting for getByText('민지가 누구인지 확인할게요.')
+
+
+      36 |   await page.getByRole('textbox', { name: '메시지 입력' }).fill('어제 민지랑 점심 먹었어')
+      37 |   await page.getByRole('textbox', { name: '메시지 입력' }).press('Enter')
+    > 38 |   await expect(page.getByText('민지가 누구인지 확인할게요.')).toBeVisible()
+         |                                                   ^
+      39 |   const chips7 = page.getByTestId('chips-7')
+      40 |   await expect(chips7.getByRole('button')).toHaveText(['직장', '친구', '아니요'])
+      41 |
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/chat.spec.ts:38:51
+
+    Error Context: test-results/chat-발화를-보내면-칩이-뜨고-눌러-재개된-reply-가-보이며-새로고침하면-남은-질문-칩이-복원된다/error-context.md
+
+  4 failed
+    e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 ───────────────────────
+    e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 ────────────────
+    e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 
+    e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 ─────────────────
+### 변이 V4 e2e 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:26:43+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs V5
+# 시각: 2026-10-15T14:26:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: V5-사이드바 aria-current 제거  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- e2e: npx playwright test
+Error: Process from config.webServer was not able to start. Exit code: 2
+
+### 변이 V5 e2e 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:26:45+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs X1
+# 시각: 2026-10-15T14:26:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: X1-R-U8-3 앱 창을 안 고르고 첫 창을 쓴다  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- vitest: npx vitest --run
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a
+
+ ❯ src/__tests__/sw.test.ts (16 tests | 2 failed) 12ms
+   ❯ notificationclick 이벤트 (5)
+     × 앱이 아닌 같은 출처 창이 앞에 있어도 앱 창(client.url 경로 "/")을 골라 focus 한다 4ms
+     × 열린 창이 전부 앱이 아니면 그 창들은 건드리지 않고 openWindow("/#/briefings?schedule_id=N") 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/sw.test.ts > notificationclick 이벤트 > 앱이 아닌 같은 출처 창이 앞에 있어도 앱 창(client.url 경로 "/")을 골라 focus 한다
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ src/__tests__/sw.test.ts:128:23
+    126|     const w = loadWorker([devPage, apiDocs, app])
+    127|     await w.fire('notificationclick', clickEvent({ schedule_id: 12 }).…
+    128|     expect(app.focus).toHaveBeenCalledTimes(1)
+       |                       ^
+    129|     expect(app.postMessage).toHaveBeenCalledWith({ type: 'open-briefin…
+    130|     for (const other of [devPage, apiDocs]) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/sw.test.ts > notificationclick 이벤트 > 열린 창이 전부 앱이 아니면 그 창들은 건드리지 않고 openWindow("/#/briefings?schedule_id=N")
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ src/__tests__/sw.test.ts:142:39
+    140|     const w = loadWorker([devPage, apiDocs])
+    141|     await w.fire('notificationclick', clickEvent({ schedule_id: 12 }).…
+    142|     expect(w.self.clients.openWindow).toHaveBeenCalledTimes(1)
+       |                                       ^
+    143|     expect(w.self.clients.openWindow).toHaveBeenCalledWith('/#/briefin…
+    144|     for (const other of [devPage, apiDocs]) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 8 passed (9)
+      Tests  2 failed | 133 passed (135)
+   Start at  14:26:45
+   Duration  1.87s (environment 39%, tests 35%, import 12%, transform 6%, setup 6%, worker 1%)
+
+### 변이 X1 vitest 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:26:47+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs X3
+# 시각: 2026-10-15T14:26:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: X3-R-U8-1 open-briefing 에서 schedule_id null 이면 이동 생략  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- vitest: npx vitest --run
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a
+
+ ❯ src/__tests__/push.test.ts (21 tests | 1 failed) 1440ms
+   ❯ 인앱 배너 (결정 H) (5)
+     × 알림을 눌러 온 {type:"open-briefing", schedule_id:null} 은 배너 없이 일정 없는 #/briefings 로 간다 (R-U8-1) 1022ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/push.test.ts > 인앱 배너 (결정 H) > 알림을 눌러 온 {type:"open-briefing", schedule_id:null} 은 배너 없이 일정 없는 #/briefings 로 간다 (R-U8-1)
+AssertionError: expected '#/chat' to be '#/briefings' // Object.is equality
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div>
+      <div
+        class="flex h-dvh bg-background text-foreground"
+      >
+        <aside
+          class="w-64 shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground"
+        >
+          <nav
+            aria-label="주 메뉴"
+            class="flex h-full flex-col gap-4 p-4"
+          >
+            <ul
+              class="flex flex-col gap-1"
+            >
+              <li>
+                <a
+                  aria-current="page"
+                  class="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium"
+                  href="#/chat"
+                >
+                  채팅
+                </a>
+              </li>
+              <li>
+                <a
+                  class="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium"
+                  href="#/persons"
+                >
+                  인물
+                </a>
+              </li>
+              <li>
+                <a
+                  class="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium"
+                  href="#/briefings"
+                >
+                  브리핑
+                </a>
+              </li>
+            </ul>
+            <div
+              aria-label="인물 목록"
+              class="min-h-0 flex-1 overflow-y-auto"
+              data-testid="sidebar-persons"
+            >
+              <p
+                class="px-3 py-2 text-sm text-muted-foreground"
+              >
+                아직 기록된 인물이 없어요.
+              </p>
+            </div>
+          </nav>
+        </aside>
+        <main
+          class="min-w-0 flex-1 overflow-y-auto p-6 pt-14 lg:pt-6"
+        >
+          <section
+            aria-labelledby="screen-title"
+            class="mx-auto flex h-full max-w-3xl flex-col"
+            data-screen="chat"
+          >
+            <h1
+              class="sr-only"
+              id="screen-title"
+            >
+              채팅
+            </h1>
+            <div
+              class="min-h-0 flex-1 space-y-4 overflow-y-auto pb-4"
+              data-testid="message-list"
+            >
+              <p
+                class="pt-8 text-center text-muted-foreground"
+              >
+                메시지를 입력해 대화를 시작하세요.
+              </p>
+            </div>
+            <div
+              class="shrink-0 pt-2"
+            >
+              <div
+                class="flex items-end gap-2 rounded-2xl border bg-card p-2"
+              >
+                <textarea
+                  aria-label="메시지 입력"
+                  class="max-h-40 min-h-9 flex-1 resize-none bg-transparent px-2 py-1.5 outline-none placeholder:text-muted-foreground"
+                  rows="1"
+                />
+                <button
+                  aria-label="보내기"
+                  class="group/button inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 size-9"
+                  data-size="icon"
+                  data-slot="button"
+                  data-variant="default"
+                  disabled=""
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-send"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
+                    />
+                    <path
+                      d="m21.854 2.147-10.94 10.939"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </section>
+          <section
+            aria-atomic="false"
+            aria-label="Notifications alt+T"
+            aria-live="polite"
+            aria-relevant="additions text"
+            data-react-aria-top-layer="true"
+            tabindex="-1"
+          />
+        </main>
+      </div>
+    </div>
+  </body>
+</html>...
+
+Expected: "#/briefings"
+Received: "#/chat"
+
+ ❯ src/__tests__/push.test.ts:413:54
+    411|     render(createElement(App))
+    412|     world.post({ type: 'open-briefing', schedule_id: null })
+    413|     await waitFor(() => expect(window.location.hash).toBe('#/briefings…
+       |                                                      ^
+    414|     expect(screen.queryByTestId('push-banner')).toBeNull()
+    415|   })
+ ❯ runWithExpensiveErrorDiagnosticsDisabled ../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback ../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback ../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 8 passed (9)
+      Tests  1 failed | 134 passed (135)
+   Start at  14:26:47
+   Duration  2.37s (tests 43%, environment 35%, import 11%, setup 6%, transform 4%)
+
+### 변이 X3 vitest 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:26:50+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs X6
+# 시각: 2026-10-15T14:26:50+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: X6-E2E 채팅 새로고침 뒤 대기 질문 복원 제거  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- e2e: npx playwright test
+
+Running 4 tests using 4 workers
+
+(node:31299) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31301) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31300) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (322ms)
+  ✓  2 e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (574ms)
+  ✓  3 e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (1.7s)
+  ✘  4 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (5.4s)
+
+
+  1) e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 ────────────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('chips-8').getByRole('button')
+    Timeout: 5000ms
+    - Expected  - 4
+    + Received  + 1
+
+    - Array [
+    -   "예",
+    -   "나중에",
+    - ]
+    + Array []
+
+    Call log:
+      - Expect "toHaveText" getByTestId('chips-8').getByRole('button') with timeout 5000ms
+      - waiting for getByTestId('chips-8').getByRole('button')
+        14 × locator resolved to 0 elements
+
+
+      51 |   const pendingBefore = api.callsTo('GET /api/questions/pending').length
+      52 |   await page.reload()
+    > 53 |   await expect(page.getByTestId('chips-8').getByRole('button')).toHaveText(['예', '나중에'])
+         |                                                                 ^
+      54 |   await expect(page.getByText('일정으로 저장할까요?')).toBeVisible()
+      55 |   await expect(page.getByText('친구로 기록했어요.')).toHaveCount(0)
+      56 |   expect(api.callsTo('GET /api/questions/pending').length).toBe(pendingBefore + 1)
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/chat.spec.ts:53:65
+
+    Error Context: test-results/chat-발화를-보내면-칩이-뜨고-눌러-재개된-reply-가-보이며-새로고침하면-남은-질문-칩이-복원된다/error-context.md
+
+  1 failed
+    e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 ─────────────────
+  3 passed (7.7s)
+### 변이 X6 e2e 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:26:58+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs X16
+# 시각: 2026-10-15T14:26:58+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: X16-27b E2E 가짜 표에 없는 /api 요청 추가(화면 영향 없음)  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- e2e: npx playwright test
+
+Running 4 tests using 4 workers
+
+(node:31418) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31419) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31417) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  4 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (361ms)
+  ✘  2 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (493ms)
+  ✘  1 e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (525ms)
+  ✘  3 e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (1.4s)
+
+
+  1) e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 ──────────────────────
+
+    Error: 가짜 표에 없는 /api/ 요청
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "GET /api/stray",
+    + ]
+
+       at fixtures.ts:98
+
+       96 |   })
+       97 |   expect(strays, '앱 파일·/api/ 밖으로 나간 요청').toEqual([])
+    >  98 |   expect(api.unexpected, '가짜 표에 없는 /api/ 요청').toEqual([])
+          |                                               ^
+       99 |   expect(api.requests.length, '요청을 하나도 모으지 못했다').toBeGreaterThan(0)
+      100 | }
+      101 |
+        at expectNoStrayRequests (/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/fixtures.ts:98:47)
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/briefing.spec.ts:63:3
+
+    Error Context: test-results/briefing-쿼리의-일정이-맨-위에-강조돼-열리고-지금-브리핑을-누르면-목록이-다시-읽힌다/error-context.md
+
+  2) e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 ───────────────
+
+    Error: 가짜 표에 없는 /api/ 요청
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "GET /api/stray",
+    + ]
+
+       at fixtures.ts:98
+
+       96 |   })
+       97 |   expect(strays, '앱 파일·/api/ 밖으로 나간 요청').toEqual([])
+    >  98 |   expect(api.unexpected, '가짜 표에 없는 /api/ 요청').toEqual([])
+          |                                               ^
+       99 |   expect(api.requests.length, '요청을 하나도 모으지 못했다').toBeGreaterThan(0)
+      100 | }
+      101 |
+        at expectNoStrayRequests (/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/fixtures.ts:98:47)
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/card.spec.ts:76:5
+
+    Error Context: test-results/card-데스크톱-폭-1280px-사이드바-인물-목록에서-인물을-눌러-카드를-열고-타임라인-원문을-펼친다/error-context.md
+
+  3) e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 
+
+    Error: 가짜 표에 없는 /api/ 요청
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "GET /api/stray",
+    + ]
+
+       at fixtures.ts:98
+
+       96 |   })
+       97 |   expect(strays, '앱 파일·/api/ 밖으로 나간 요청').toEqual([])
+    >  98 |   expect(api.unexpected, '가짜 표에 없는 /api/ 요청').toEqual([])
+          |                                               ^
+       99 |   expect(api.requests.length, '요청을 하나도 모으지 못했다').toBeGreaterThan(0)
+      100 | }
+      101 |
+        at expectNoStrayRequests (/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/fixtures.ts:98:47)
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/card.spec.ts:120:5
+
+    Error Context: test-results/card-모바일-폭-390px-서랍은-처음엔-닫-62bdd-물---인물---카드-항목을-고르면-서랍이-닫힌다/error-context.md
+
+  4) e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 ────────────────
+
+    Error: 가짜 표에 없는 /api/ 요청
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 4
+
+    - Array []
+    + Array [
+    +   "GET /api/stray",
+    +   "GET /api/stray",
+    + ]
+
+       at fixtures.ts:98
+
+       96 |   })
+       97 |   expect(strays, '앱 파일·/api/ 밖으로 나간 요청').toEqual([])
+    >  98 |   expect(api.unexpected, '가짜 표에 없는 /api/ 요청').toEqual([])
+          |                                               ^
+       99 |   expect(api.requests.length, '요청을 하나도 모으지 못했다').toBeGreaterThan(0)
+      100 | }
+      101 |
+        at expectNoStrayRequests (/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/fixtures.ts:98:47)
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/chat.spec.ts:79:3
+
+    Error Context: test-results/chat-발화를-보내면-칩이-뜨고-눌러-재개된-reply-가-보이며-새로고침하면-남은-질문-칩이-복원된다/error-context.md
+
+  4 failed
+    e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 ───────────────────────
+    e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 ────────────────
+    e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 
+    e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 ─────────────────
+### 변이 X16 e2e 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:28:40+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs V5b
+# 시각: 2026-10-15T14:28:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: V5b-사이드바 aria-current 를 절대 붙이지 않음(타입 유지)  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- e2e: npx playwright test
+Error: Process from config.webServer was not able to start. Exit code: 2
+
+### 변이 V5b e2e 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+
+
+# ===== append 2026-10-15T14:29:04+09:00 =====
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmut_u9a.mjs V5c
+# 시각: 2026-10-15T14:29:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 0
+# ---
+### 변이: V5c-사이드바 aria-current 를 현재가 아닌 항목에 붙임(뒤집기)  (사본 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a, 저장소 무수정)
+--- e2e: npx playwright test
+
+Running 4 tests using 4 workers
+
+(node:32272) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32270) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32271) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32273) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (441ms)
+  ✓  3 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (641ms)
+  ✓  1 e2e/card.spec.ts:83:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (1.9s)
+  ✘  4 e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (5.6s)
+
+
+  1) e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 ───────────────
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '채팅', exact: true })
+    Expected: "page"
+    Received: ""
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveAttribute" getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '채팅', exact: true }) with timeout 5000ms
+      - waiting for getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '채팅', exact: true })
+        14 × locator resolved to <a href="#/chat" class="block rounded-md px-3 py-2 text-body hover:bg-sidebar-accent aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium">채팅</a>
+           - unexpected value "null"
+
+
+      70 |       await expect(page.locator(SCREEN(screen))).toBeVisible()
+      71 |       await expect(page).toHaveURL(hash)
+    > 72 |       await expect(sidebar.getByRole('link', { name: label, exact: true })).toHaveAttribute('aria-current', 'page')
+         |                                                                             ^
+      73 |     }
+      74 |     await expect(sidebar.getByRole('link')).toHaveCount(3 + PERSONS.length) // 항목 3 + 인물 링크
+      75 |
+        at /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f7eb92f7-6e69-4f90-85b2-823dd7b9fcc8/scratchpad/vmutweb9a/e2e/card.spec.ts:72:77
+
+    Error Context: test-results/card-데스크톱-폭-1280px-사이드바-인물-목록에서-인물을-눌러-카드를-열고-타임라인-원문을-펼친다/error-context.md
+
+  1 failed
+    e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 ────────────────
+  3 passed (9.1s)
+### 변이 V5c e2e 결과: exit 1 (0 이면 변이가 살아남음, 0 이 아니면 검출)
+### 저장소 web 상태(변이 전후 동일해야 함):
+ M web/package.json
+ M web/playwright.config.ts
+ M web/public/sw.js
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/sw.test.ts
+ M web/tsconfig.node.json
+?? web/e2e/briefing.spec.ts
+?? web/e2e/card.spec.ts
+?? web/e2e/chat.spec.ts
+?? web/e2e/fixtures.ts
+?? web/src/__tests__/network.test.ts
+

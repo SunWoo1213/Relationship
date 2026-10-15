@@ -1,0 +1,14 @@
+# 명령: bash -c cd web && npm run typecheck && npm test -- --run && npm run e2e
+# 시각: 2026-10-15T14:16:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8fd5463 (dev2)
+# exit: 254
+# ---
+npm error code ENOENT
+npm error syscall open
+npm error path /Users/sunwoo/Desktop/Portfolio/Relationship/package.json
+npm error errno -2
+npm error enoent Could not read package.json: Error: ENOENT: no such file or directory, open '/Users/sunwoo/Desktop/Portfolio/Relationship/package.json'
+npm error enoent This is related to npm not being able to find a file.
+npm error enoent
+npm error A complete log of this run can be found in: /Users/sunwoo/.npm/_logs/2026-10-15T05_16_02_795Z-debug-0.log
