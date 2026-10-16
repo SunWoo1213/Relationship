@@ -1,0 +1,110 @@
+# 명령: npm --prefix web run test -- --run src/__tests__/card.test.tsx
+# 시각: 2026-10-16T19:34:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 1
+# ---
+
+> web@0.0.0 test
+> vitest --run src/__tests__/card.test.tsx
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+ ❯ src/__tests__/card.test.tsx (31 tests | 1 failed) 793ms
+   ❯ 인물 목록 (7)
+     × 상세 상태는 가운데 정렬이고 폭이 본문의 75%(md 이상), 모바일은 100% 이다 (U10 화면 점검) 21ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/card.test.tsx > 인물 목록 > 상세 상태는 가운데 정렬이고 폭이 본문의 75%(md 이상), 모바일은 100% 이다 (U10 화면 점검)
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/__tests__/card.test.tsx:136:91
+    134|     const wrap = screen.getByTestId('card-wrap')
+    135|     expect(wrap.contains(screen.getByTestId('person-card'))).toBe(true)
+    136|     for (const c of ['mx-auto', 'w-full', 'md:w-3/4']) expect(wrap.cla…
+       |                                                                                           ^
+    137|   })
+    138|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 30 passed (31)
+   Start at  19:34:01
+   Duration  1.28s (tests 65%, environment 17%, import 11%, transform 3%, setup 3%)
+
+
+# ===== append 2026-10-16T19:34:06+09:00 =====
+# 명령: npm --prefix web run test -- --run src/__tests__/card.test.tsx
+# 시각: 2026-10-16T19:34:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 1
+# ---
+
+> web@0.0.0 test
+> vitest --run src/__tests__/card.test.tsx
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+ ❯ src/__tests__/card.test.tsx (31 tests | 2 failed) 819ms
+   ❯ 인물 목록 (7)
+     × 목록 상태는 본문 폭 전체를 쓰고 가운데 정렬·폭 상한이 없다 (U10 화면 점검) 7ms
+     × 상세 상태는 가운데 정렬이고 폭이 본문의 75%(md 이상), 모바일은 100% 이다 (U10 화면 점검) 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/card.test.tsx > 인물 목록 > 목록 상태는 본문 폭 전체를 쓰고 가운데 정렬·폭 상한이 없다 (U10 화면 점검)
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/__tests__/card.test.tsx:123:37
+    121|     expect(section).not.toBeNull()
+    122|     const cls = Array.from(section!.classList)
+    123|     expect(cls.includes('mx-auto')).toBe(false)
+       |                                     ^
+    124|     expect(cls.some((c) => c.startsWith('max-w-') || c.startsWith('md:…
+    125|     expect(screen.queryByTestId('card-wrap')).toBeNull()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/card.test.tsx > 인물 목록 > 상세 상태는 가운데 정렬이고 폭이 본문의 75%(md 이상), 모바일은 100% 이다 (U10 화면 점검)
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/__tests__/card.test.tsx:133:63
+    131|     await screen.findByTestId('person-card')
+    132|     const section = container.querySelector('[data-screen="persons"]')!
+    133|     expect(Array.from(section.classList).includes('mx-auto')).toBe(fal…
+       |                                                               ^
+    134|     const wrap = screen.getByTestId('card-wrap')
+    135|     expect(wrap.contains(screen.getByTestId('person-card'))).toBe(true)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 29 passed (31)
+   Start at  19:34:06
+   Duration  1.33s (tests 64%, environment 18%, import 11%, transform 4%, setup 3%)
+

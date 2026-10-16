@@ -1,0 +1,84 @@
+# U10 사람 점검 — FIX-035 실서버 확인 (메인 세션이 Chrome 을 직접 조작)
+# 시각: 2026-10-16 19:07 ~ 19:11 (KST) | HEAD: 735f391 (dev2) | 작성: 메인 세션 (Write 툴)
+# 요청: 사용자 "너가 직접 테스트도 해봐 그 테스트는 어떤걸 했는지 상세하게 기록해줘" (2026-10-16)
+# DB 조회 원본 출력: evidence/20261016-1911-u10-fix035-db.txt (save_evidence.py, exit 0)
+#   ※ 같은 폴더의 20261016-1910-u10-check-chat-fix035-db.txt 는 첫 저장 시도 실패본이다(exit 2 —
+#     save_evidence 가 인자를 bash -c 로 이어 붙여 SQL 따옴표가 깨짐). 내용 없음, 위 1911 파일이 대체한다.
+
+## 0. 환경
+- 백엔드: `set -a; . ./.env; set +a; POSTGRES_PORT=5433 .venv/bin/uvicorn app.main:create_app --factory --port 8000`
+  (키 값은 보지 않음 — .env 를 셸이 source 만 함). `GET /health` → `{"status":"ok","db":"up","alembic_revision":"0002"}`
+- 프론트: `cd web && npm run dev -- --port 5173 --strictPort` (vite, `/api` → :8000 프록시). `GET /api/health` 200 확인.
+- 브라우저: Google Chrome 154.0.8037.99 (navigator.userAgentData 로 확인), 창 1710x806 데스크톱 폭.
+  Claude in Chrome 확장으로 새 탭을 열어 조작. 세션 id 는 브라우저 localStorage 의 기존 값
+  `1e3d6ea8-91f8-442b-a63e-4d39de19018e` (사용자 탭과 같은 세션 — 아래 A-3 참고).
+- LLM: 실제 호출 (ER 판정 gpt-4o-mini-2024-07-18, trace 363·390·407 의 `llm.model`).
+- 테스트 전 DB 기준값(19:06 조회): persons 9행(max id 9) · events 28 · pending_questions max id 11 · agent_traces max id 359.
+
+## 시나리오 A — 거절 → 후속 질문 → 태그 선택 → 인물·사건 생성 (FIX-035 (가) 정상 경로)
+A-1. 채팅에 입력: `오늘 박선영 과장님이랑 회의했는데 다음 달에 팀을 옮기신대`
+  - 화면: "이번 발화에서는 새로 기억한 것이 없어요." + `"박선영 과장님" -- 박선우 과장님/민수/박수 중 한 분이 맞으실까요?`
+    칩 4개 [박선우 과장님][민수][박수][아니요, 다른 사람이에요]
+  - DB: pending_questions 12 (kind identity, 위 문구·칩 그대로). er_resolve trace 363 band=identity.
+  - 판정: 통과 — 후보 3명이라 "A/B/C 중 한 분이" 문구(FIX-035 (나) 2명 이상 경로, 기존 문구 유지)가 맞다.
+A-2. [아니요, 다른 사람이에요] 클릭
+  - 서버 로그: `POST /answers/12 200` 다음 `POST /answers/12 409`.
+  - 제 탭 화면: "이미 답했거나 만료된 질문이에요." (409 안내)
+A-3. 원인 확인: 사용자가 같은 세션의 자기 탭에서 같은 칩을 거의 동시에 눌렀다(사용자 확인: "내가 실수로 눌렀어").
+  먼저 도착한 요청(사용자 탭)이 200 으로 처리돼 후속 질문 13 을 만들었고, 늦게 온 제 요청은 409 로 거부됐다.
+  - 판정: 결함 아님. 같은 질문 두 번 답하기 거부(409 재소비 거부, P5 R6·R7)가 실서버에서 의도대로 동작한 부수 확인.
+  - DB: pending_questions 12 answer=`아니요, 다른 사람이에요` 1회만 기록, answered_at 10:07:37.
+    loop_resume trace 374: `identity_rejected=true`, `followup_question_id=13` ← FIX-035 근거 기록(원칙9) 확인.
+    pending_questions 13: kind new_person, `"박선영 과장님"을(를) 새 인물로 기억해둘까요?`,
+    칩 6개 [가족/연인/친구/직장/지인으로 기억할게요][아니요]. 이 시점 persons·events 수 변화 0 (loop_turn 376 stored 전부 0).
+A-4. 제 탭 새로고침(F5) → 대기 질문 복원(U5)으로 후속 질문 13 과 칩 6개가 화면에 나타남. 판정: 통과.
+A-5. [직장으로 기억할게요] 클릭
+  - 화면: "기억했어요: 이벤트 1건." + "인물 카드 보기" 링크.
+  - DB: persons 10 생성 (`박선영 과장님`, relation_tag 직장, hierarchy 동). create_person trace 380 → add_event trace 382.
+    events 29 (person 10, type meeting, content `팀을 옮기신다`, raw_utterance = A-1 원문 그대로).
+    loop_turn 386 stored {persons 1, events 1}.
+  - 판정: 통과 — 사람이 두 번 답한 뒤에만 생성(D1), 원래 발화의 보류 제안(add_event)이 실행됨.
+  - 관찰(결함 아님, 후속 후보): 응답 문장이 "이벤트 1건" 만 말하고 새 인물 생성은 말하지 않는다(stored.persons=1 인데 문장에 없음).
+  - 관찰: hierarchy 가 `동`. 이 발화에서 추출기가 위계 힌트를 내지 않아(resume.hints = {}) 기본값이 들어간 것 — FIX-035 의 힌트 승계 문제가 아니다(승계는 자동 테스트 `…keeps_hierarchy_hint_fix035` 가 확인).
+A-6. `#/persons/10` 인물 카드 열기 → 이름 `박선영 과장님`, `직장 · 동`, 별칭, 마지막 접촉 2026. 10. 16., 타임라인 `meeting 팀을 옮기신다`.
+  타임라인 항목의 [원문 펼치기] 클릭 → `오늘 박선영 과장님이랑 회의했는데 다음 달에 팀을 옮기신대` 표시 = events 29 raw_utterance 와 같음.
+  왼쪽 사이드바 맨 위에 `박선영 과장님 직장·동` 이 새로 보임.
+  - 판정: 통과 (판정표 30행 "카드 원문 펼치기" 재료로도 쓸 수 있음).
+
+## 시나리오 B — 거절 → 후속 질문 → "아니요" → 아무것도 만들지 않음
+B-1. 입력: `어제 박선희 과장님이 커피를 사주셨어`
+  - 화면: `"박선희 과장님" -- 민수/박선영 과장님/박선우 과장님 중 한 분이 맞으실까요?` + 칩 4개. (A 에서 만든 박선영 과장님이 후보에 들어옴)
+  - DB: pending_questions 14 identity, er_resolve 390 band=identity.
+B-2. [아니요, 다른 사람이에요] 클릭 (이번엔 제 탭에서만 — 서버 로그 `POST /answers/14 200` 1회)
+  - 화면: 새로고침 없이 바로 `"박선희 과장님"을(를) 새 인물로 기억해둘까요?` + 칩 6개.
+  - DB: pending_questions 15 new_person. loop_resume 396 `identity_rejected=true`, `followup_question_id=15`.
+  - 판정: 통과.
+B-3. [아니요] 클릭 (`POST /answers/15 200`)
+  - 화면: "이번 발화에서는 새로 기억한 것이 없어요."
+  - DB: pending_questions 15 answer=`아니요`. loop_resume 400 (identity_rejected 없음 — new_person 거절은 기존 경로).
+    create_person·add_event 0회, loop_turn 403 stored 전부 0, persons 10행 그대로(박선희 없음), 커피 사건 없음.
+  - 판정: 통과.
+
+## 시나리오 C — 회귀: 새로 만든 인물이 다음 발화에서 다시 쓰이는가 (자동 병합 경로)
+C-1. 입력: `선영 과장님이 오늘 점심을 사주셨어`
+  - 화면: 질문 없이 "기억했어요: 이벤트 1건." + "인물 카드 보기".
+  - DB: er_resolve 407 band=merge, confidence 0.8654 (≥ T_merge 0.8; s_llm 0.9 · s_emb 0.8077 · s_rule 미측정이라 분모에서 제외),
+    matched_person_id 10 → 별칭 `선영 과장님` 누적(person_aliases 13), events 30 (person 10, meal, raw_utterance 원문).
+  - 판정: 통과 — 올바른 인물(박선영 과장님)로 병합됨, 오병합 아님. FIX-035 로 만든 인물이 이후 발화에서 정상적으로 찾아진다.
+  - 한계: 원래 의도는 identity 질문에서 기존 후보 칩을 고르는 회귀였으나, 확신도가 임계치를 넘어 질문 없이 병합됐다.
+    "후보 칩 선택" 경로는 지난 세션 q6(2026-10-15, FIX-035.md 증상 절)과 자동 테스트가 덮는다.
+
+## 이번에 확인하지 못한 것
+- 후보 1명일 때 문구 `"<언급>" -- <이름> 님이 맞으실까요?` (FIX-035 (나)): 개발 DB 에 인물이 10명이라 실 LLM 경로에서 후보가 늘 3명(top-K)이었다.
+  자동 테스트 `test_er_pipeline.py::test_resolve_identity_single_candidate_question_wording_fix035` 로만 확인됨.
+
+## 요약
+| 시나리오 | 결과 |
+|---|---|
+| A 거절 → 후속 질문 → 직장 | 통과 (인물 10·사건 29 생성, trace 374 identity_rejected/13) |
+| A-3 동시 두 번 답 | 409 로 한 번만 처리 — 의도된 동작 (사용자 실수 클릭) |
+| A-6 카드·원문 펼치기 | 통과 (원문 = DB raw_utterance) |
+| B 거절 → 후속 질문 → 아니요 | 통과 (생성 0, trace 396 identity_rejected/15) |
+| C 새 인물 재사용(자동 병합) | 통과 (confidence 0.8654 → person 10) |
+| 후보 1명 문구 | 실서버 미확인 — 자동 테스트만 |
+테스트 후 DB: persons 10 · events 30 (테스트 전 9 · 28). 테스트 데이터는 개발 DB 에 남겼다(원칙8).

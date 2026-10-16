@@ -491,3 +491,5 @@
 - 2026-10-15 19:43 | PUSH-dev2 | origin dev2 0b24bb6 (실험 푸시)
 - 2026-10-15 19:45 | COMMIT | c4fbd2f harness(settings): 백그라운드 세션도 저장소에서 바로 작업하게 한다
 - 2026-10-15 19:45 | PUSH-dev2 | origin dev2 c4fbd2f (실험 푸시)
+- 2026-10-16 18:02 | COMMIT | 735f391 fix(P8-frontend): "다른 사람이에요" 답 뒤 새 인물로 기억할지 이어서 묻는다
+- 2026-10-16 18:02 | PUSH-dev2 | origin dev2 735f391 (실험 푸시)

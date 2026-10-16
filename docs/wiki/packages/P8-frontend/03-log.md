@@ -200,3 +200,15 @@
 - 검증: verifier 1차 보류([필수] R-35-1 루프 ORM 직접 사용) → 사용자 결정 (a) 헬퍼 이동 + 권고 전부 → 재작업 1차 → verifier 재확인 통과([필수] 0, 권고 R-35-7·8 은 메인 세션이 문서로 처리). 전체 회귀 1953 passed skip 0 · ruff(app tests scripts evaluation) 통과 · 변이 12/12 검출. 증거 `fixes/evidence/20261016-17*-*FIX-035*`. review `fixes/review-FIX-035.md`.
 - 남은 것: dev2 푸시·CI · 서버 재기동 후 U10 에서 거절 → 후속 질문 실제 확인 · U10 2단계(카드 원문, 사용자).
 - Refs: P8-frontend P5-loop FIX-035 D1 D10 S3.3 S3.4 원칙1 원칙2 원칙9
+- **커밋 뒤(2026-10-16)**: 커밋 `735f391`, dev2 푸시, CI 38877700918 다섯 job success. 서버 재기동 후 **메인 세션이 Chrome 으로 직접 U10 FIX-035 실서버 확인**(사용자 지시 "너가 직접 테스트도 해봐 … 상세하게 기록") — 시나리오 A(거절→직장: 인물 10·사건 29)·A3(동시 두 번 답 → 409, 사용자 실수 클릭)·A4(새로고침 복원)·A6(카드 원문 펼치기)·B(거절→아니요: 생성 0)·C(새 인물 재사용, 자동 병합 0.8654) 전부 통과, 후보 1명 문구는 실서버 미확인. 기록 `tests.md` "U10 사람 점검 — FIX-035" 절, 상세 `evidence/20261016-1915-u10-check-chat-fix035.txt`, DB 원본 `evidence/20261016-1911-u10-fix035-db.txt`(1910 파일은 저장 실패본).
+
+## 2026-10-16 · fix(P8-frontend): 인물 화면 정렬을 고친다 — U10 32행 "수정 필요" 1회 · pending (frontend-agent)
+- 계기: U10 사람 점검에서 사용자 "인물 칸에서 칸이 너무 가운데로 쏠려있는데 이것도 디자인적으로 수정해줘"(PC 웹 기준). 원인 `web/src/screens/PersonCardScreen.tsx:330` `mx-auto max-w-3xl`(768px 가운데).
+- **수정 반영 횟수: 1 (에이전트 작업 2회 — 1차 결과를 사용자가 본 뒤 추가 지시, CR-003 §3 ⑥(a) 사용자 결정으로 같은 1회로 본다; 판정표 32행·리스크 7 출구를 실제로 거침)**
+  - 1차(19:18): 사용자 결정 (a) 왼쪽 정렬 + `max-w-4xl`, 채팅 그대로 → section `max-w-4xl`, `card.test.tsx` +1. 증거 `evidence/20261016-1918-u10-fix-card-align-{typecheck,vitest,build,e2e,mutation}.txt`(vitest 136, 변이 1 검출).
+  - 2차(19:33): 사용자 추가 지시 "인물 상세보기를 했을 때는 왼쪽으로 치우치지 않으면 좋겠어 · 창의 크기에 따라 비율을 맞춰야 해" → section 클래스 제거(목록 전체 폭), 상세는 `<div data-testid="card-wrap" className="mx-auto w-full md:w-3/4">`(PC 75%·모바일 100%). `card.test.tsx` 정렬 테스트 1→2건. 증거 `evidence/20261016-1933-u10-fix-card-align2-{typecheck,vitest,build,e2e}.txt`·`-1934-…-{mutation,revert-check}.txt`(vitest 137, 변이 2 검출).
+- 변경: `web/src/screens/PersonCardScreen.tsx`·`web/src/__tests__/card.test.tsx`·`tests.md` 소절·`registry.md` `PersonCardScreen.tsx` 행. `ChatScreen`(`mx-auto max-w-3xl`)·`BriefingScreen`(상한 없음) 무변경. 세 화면 규칙: 채팅 가운데 768 / 인물 목록 왼쪽 전체 폭·상세 가운데 75% / 브리핑 꽉 참.
+- 정합성: 원칙5(화면 3개) 유지, 원칙7(서버 문자열 변환 0) 유지, 체크리스트 2항(줄 폭) — 목록은 한 줄 행이라 충돌 없음, 상세는 상한 없음(광폭 긴 줄 가능) → 32행 점검 때 사용자가 판정, D15 에 "상한 없음" 명시(R-U10C-4).
+- 검증: 메인 재실행 vitest 137 passed·typecheck 0·Chrome(1556px) 시각 확인. verifier `review-u10-closeout.md`: 재실행 typecheck 0·vitest 137·build·E2E 4/4, 변이 M1~M3 검출, **M4(목록 안쪽 `mt-4` div 에 `mx-auto max-w-3xl`) 생존 → R-U10C-3 P8b 보강**. [필수] R-U10C-1(이 항목 누락)·-2(tests.md 집계 184→182) 메인 세션이 해소.
+- 남은 것: 이 커밋 뒤 `frozen: CR-003`(R-U10C-6 — journal CR 줄에 "동결은 P8 커밋 <해시> 뒤" 기록) · 루트 `test-results/`(Playwright `.last-run.json`)는 커밋 제외, 삭제/루트 `.gitignore` 추가는 사용자 결정(R-U10C-7) · 29·30행 ⑤·⑧ 사용자 확인 문장·⑥ "펼친 사실 id"는 미충족 — 사용자 절차로(R-U10C-5).
+- Refs: P8-frontend U10 CR-003 원칙5 원칙7 결정L 결정N

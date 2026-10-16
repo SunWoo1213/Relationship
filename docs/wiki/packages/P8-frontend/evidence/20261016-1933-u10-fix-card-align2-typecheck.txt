@@ -1,0 +1,10 @@
+# 명령: npm --prefix web run typecheck
+# 시각: 2026-10-16T19:33:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 0
+# ---
+
+> web@0.0.0 typecheck
+> tsc -b
+

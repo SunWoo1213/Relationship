@@ -113,6 +113,29 @@ describe('인물 목록', () => {
     ])
   })
 
+  it('목록 상태는 본문 폭 전체를 쓰고 가운데 정렬·폭 상한이 없다 (U10 화면 점검)', async () => {
+    install(router({ '/api/persons': () => json(PERSONS) }))
+    const { container } = render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
+    await screen.findByTestId('person-list')
+    const section = container.querySelector('[data-screen="persons"]')
+    expect(section).not.toBeNull()
+    const cls = Array.from(section!.classList)
+    expect(cls.includes('mx-auto')).toBe(false)
+    expect(cls.some((c) => c.startsWith('max-w-') || c.startsWith('md:w-'))).toBe(false)
+    expect(screen.queryByTestId('card-wrap')).toBeNull()
+  })
+
+  it('상세 상태는 가운데 정렬이고 폭이 본문의 75%(md 이상), 모바일은 100% 이다 (U10 화면 점검)', async () => {
+    install(cardRouter())
+    const { container } = render(<PersonCardScreen personId={3} />)
+    await screen.findByTestId('person-card')
+    const section = container.querySelector('[data-screen="persons"]')!
+    expect(Array.from(section.classList).includes('mx-auto')).toBe(false)
+    const wrap = screen.getByTestId('card-wrap')
+    expect(wrap.contains(screen.getByTestId('person-card'))).toBe(true)
+    for (const c of ['mx-auto', 'w-full', 'md:w-3/4']) expect(wrap.classList.contains(c)).toBe(true)
+  })
+
   it('필터·검색 컨트롤이 없다', async () => {
     install(router({ '/api/persons': () => json(PERSONS) }))
     render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })

@@ -1,0 +1,248 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/24a6d9b0-55d1-4dd6-91a9-43dd2428c3d8/scratchpad/survey.py
+# 시각: 2026-10-16T19:20:31+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 0
+# 메모: 앱이 읽는 환경변수 이름 · 프론트 단위/E2E 테스트의 가짜 대체 집계 · 머리말
+# ---
+=== (1) app/ alembic/ scripts/ 에서 읽는 환경변수 이름 (파일:행) ===
+ANTHROPIC_MODEL                    4  app/memory/extract.py:395
+APP_TIMEZONE                       1  app/settings.py:490
+APP_USER_ID                        1  app/settings.py:509
+BRIEFING_SCHEDULER_ENABLED         1  app/settings.py:349
+DATABASE_URL                       1  app/config.py:102
+GEMINI_MODEL                       5  app/memory/extract.py:548
+LLM_PROVIDER                       3  app/er/judge.py:810
+LLM_PROVIDERS_ENABLED              1  app/er/judge.py:768
+MEMORY_PROMOTE_MIN_EVENTS          1  app/settings.py:329
+OPENAI_API_KEY                     5  app/embedding.py:131
+OPENAI_MODEL                       5  app/memory/extract.py:467
+PATTERN_MIN_COUNT                  1  app/settings.py:320
+PATTERN_WINDOW_DAYS                1  app/settings.py:319
+POSTGRES_DB                        2  app/config.py:110
+POSTGRES_HOST                      1  app/config.py:143
+POSTGRES_PASSWORD                  2  app/config.py:109
+POSTGRES_PORT                      2  app/config.py:111
+POSTGRES_USER                      2  app/config.py:108
+PUSH_DEV_PAGE_ENABLED              1  app/settings.py:406
+VAPID_PRIVATE_KEY                  1  app/settings.py:381
+VAPID_PUBLIC_KEY                   1  app/settings.py:380
+VAPID_SUBJECT                      1  app/settings.py:382
+
+.env.example 에만 있고 코드가 읽지 않는 이름: ['ANTHROPIC_API_KEY', 'APP_ENV', 'EMBEDDING_MODEL', 'EMBEDDING_PROVIDER', 'ER_PENALIZED_MERGE_POLICY', 'GEMINI_API_KEY', 'T_MERGE', 'T_NEW', 'W_EMB', 'W_LLM', 'W_RULE']
+코드가 읽지만 .env.example 에 없는 이름: []
+
+=== (2) 프론트 단위 테스트 · E2E — 가짜 대체 집계 ===
+file                                     lines        vi.fn      vi.mock        fetch   stubGlobal   page.route serviceWorker Notification  pushManager localStorage   importmeta      it/test      it.each
+web/e2e/briefing.spec.ts                    64            0            0            0            0            0            0            0            0            0            0            1            0
+web/e2e/card.spec.ts                       124            0            0            0            0            0            0            0            0            0            0            2            0
+web/e2e/chat.spec.ts                        80            0            0            0            0            0            0            0            0            1            0            1            0
+web/e2e/fixtures.ts                        100            0            0            0            0            2            0            0            0            0            0            0            0
+web/src/__tests__/api.test.ts               79            6            0            7            6            0            0            0            0            0            0            6            0
+web/src/__tests__/briefing.test.tsx        372            1            0            2            2            0            0            0            0            0            0           19            0
+web/src/__tests__/card.test.tsx            575            1            0            2            2            0            0            0            0            1            0           30            0
+web/src/__tests__/chat.test.tsx            393            1            0            5            2            0            0            0            0            5            0           20            1
+web/src/__tests__/helpers.ts                31            0            0            0            1            0            0            0            0            0            0            0            0
+web/src/__tests__/network.test.ts           15            0            0            5            0            0            0            0            0            0            0            2            0
+web/src/__tests__/proxy.test.ts             45            0            0            0            0            0            0            0            0            0            0            6            0
+web/src/__tests__/push.test.ts             416           12            0            3            3            0            6            3            4            0            0           21            0
+web/src/__tests__/routes.test.tsx          145            0            0            0            0            0            0            0            0            3            0           11            1
+web/src/__tests__/sw.test.ts               230           11            0            2            0            0            0            7            0            0            0           16            0
+
+=== (3) 각 테스트 파일 머리말(주석) 10줄 ===
+
+--- web/e2e/briefing.spec.ts ---
+// 판정 26행 (ㄷ E2E 브리핑) + 27b행 요청 URL 단언 -- 가짜 API, 실제 Chromium, `vite preview` 빌드.
+// `#/briefings?schedule_id=N` 을 직접 열면 그 일정이 맨 위·강조, "지금 브리핑" 뒤 목록이 갱신된다.
+import { expect, test } from '@playwright/test'
+import { expectNoStrayRequests, freezeClock, installFakeApi } from './fixtures.ts'
+
+function record(scheduleId: number, name: string, title: string, scheduledAt: string, lineText: string) {
+  return {
+    schedule: { id: scheduleId, title, scheduled_at: scheduledAt },
+    person: { id: scheduleId, display_name: name },
+    generated_at: '2026-10-15T08:00:00+09:00',
+    composer: 'template',
+    pattern_sentences: [],
+
+--- web/e2e/card.spec.ts ---
+// 판정 25행 (ㄴ E2E 카드 원문·사이드바) + 27b행 요청 URL 단언 -- 가짜 API, 실제 Chromium, `vite preview` 빌드.
+// 데스크톱(1280px): 사이드바 인물 클릭 -> 카드 -> 타임라인 펼치기, 사이드바 3개 항목으로 화면 3개 전환.
+// 모바일(390px): 처음엔 서랍 닫힘·하단 탭바 없음 -> 메뉴 버튼 -> 서랍에서 "인물" -> 인물 -> 카드.
+import { expect, test, type Page } from '@playwright/test'
+import { expectNoStrayRequests, freezeClock, installFakeApi } from './fixtures.ts'
+
+const RAW_31 = '어제 김팀장님이\n내 보고서를 칭찬해 주셨다 😀'
+const PERSONS = [
+  { id: 3, display_name: '김팀장', relation_tag: '직장', hierarchy: '상', last_contact_at: '2026-10-14T09:00:00+09:00' },
+  { id: 4, display_name: '이서준', relation_tag: '친구', hierarchy: '동', last_contact_at: null },
+]
+const CARD_3 = {
+
+--- web/e2e/chat.spec.ts ---
+// 판정 24행 (ㄱ E2E 채팅 칩) + 27b행 요청 URL 단언 -- 가짜 API, 실제 Chromium, `vite preview` 빌드.
+// 발화 -> 칩 -> 클릭 -> 재개 응답(새 칩) -> 새로고침 -> 대기 질문 칩 복원.
+import { expect, test } from '@playwright/test'
+import { expectNoStrayRequests, freezeClock, installFakeApi, type ApiCall } from './fixtures.ts'
+
+const stored0 = { persons: 0, events: 0, schedules: 0 }
+
+test('발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다', async ({ page, baseURL }) => {
+  await freezeClock(page)
+  // 서버가 들고 있는 미답변 질문 -- 상태가 있는 가짜
+  let pending: unknown[] = []
+  const q7 = { question_id: 7, status: 'pending', kind: 'identity', question: '어떤 관계인가요?', options: ['직장', '친구', '아니요'] }
+
+--- web/e2e/fixtures.ts ---
+// E2E 공통 가짜 API (결정 J, 판정 27b행) -- 실제 백엔드·LLM·푸시 서비스로 아무것도 보내지 않는다.
+// - `/api/` 요청은 전부 아래 표가 대신 답한다. 표에 없는 요청은 중단시키고 unexpected 에 남긴다.
+// - preview 호스트 밖으로 나가는 요청(외부 CDN·글꼴 등)도 중단시킨다.
+// - 브라우저가 낸 요청 URL 을 전부 모아 두었다가, 각 spec 끝에서 "앱 파일 또는 /api/ 경로뿐" 인지 단언한다.
+import { expect, type Page } from '@playwright/test'
+
+export interface ApiCall {
+  method: string
+  /** 경로 + 쿼리 (예: `/api/briefings?schedule_id=7`) */
+  path: string
+  headers: Record<string, string>
+  body: unknown
+
+--- web/src/__tests__/api.test.ts ---
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { ApiError, apiFetch } from '@/api/client'
+
+function jsonResponse(status: number, body: unknown) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+/** 실패해야 하는 호출의 ApiError 를 돌려준다. 성공하면 테스트를 실패시킨다. */
+async function failureOf(call: Promise<unknown>): Promise<ApiError> {
+
+--- web/src/__tests__/briefing.test.tsx ---
+// U7 브리핑 화면 + 수동 브리핑 버튼. 실제 네트워크 없음 — fetch 는 테스트마다 vi.stubGlobal 로 가짜를 건다 (결정 J).
+import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import BriefingScreen, { BRIEFING_NOTICE } from '@/screens/BriefingScreen'
+import { parseScheduleId } from '@/routes'
+import { formatDateTime } from '@/lib/format'
+import type { BriefingRecordOut, BriefingRunOut } from '@/api/types'
+
+type Handler = (url: string, init: RequestInit) => Response | Promise<Response>
+
+function json(body: unknown, status = 200): Response {
+
+--- web/src/__tests__/card.test.tsx ---
+// U6 인물 목록·인물 카드·원문 펼치기. 실제 네트워크 없음 — fetch 는 테스트마다 vi.stubGlobal 로 가짜를 건다 (결정 J).
+// 날짜는 한낮(UTC 12:00)으로 골라 어느 시간대에서 돌아도 같은 날로 읽히게 한다.
+import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import App from '@/App'
+import PersonCardScreen, { CARD_NOTICE } from '@/screens/PersonCardScreen'
+import { PERSON_LIST_NOTICE } from '@/components/PersonList'
+import { notifyPersonsChanged, PersonsProvider } from '@/components/PersonsProvider'
+import appShellSource from '@/components/AppShell.tsx?raw'
+import cardScreenSource from '@/screens/PersonCardScreen.tsx?raw'
+import type {
+
+--- web/src/__tests__/chat.test.tsx ---
+// U5 채팅 화면 + 확인 칩. 실제 네트워크 없음 — fetch 는 테스트마다 vi.stubGlobal 로 가짜를 건다 (결정 J).
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import ChatScreen, { NOTICE } from '@/screens/ChatScreen'
+import { SESSION_STORAGE_KEY } from '@/session'
+import type { AnswerOut, ChatOut, ChatPendingQuestionOut } from '@/api/types'
+
+type Handler = (url: string, init: RequestInit) => Response | Promise<Response>
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+
+--- web/src/__tests__/helpers.ts ---
+import { vi } from 'vitest'
+
+/**
+ * 가짜 matchMedia. `(min-width: Npx)` 질의를 현재 가짜 창 너비로 판정하고,
+ * setWidth 로 너비를 바꾸면 change 리스너를 부른다.
+ */
+export function installFakeMatchMedia(initialWidth: number) {
+  let width = initialWidth
+  const listeners = new Set<() => void>()
+
+  const matchMedia = (query: string) => {
+    const m = /\(min-width:\s*(\d+)px\)/.exec(query)
+
+--- web/src/__tests__/network.test.ts ---
+// 판정 27b행 (R-5) — 자동 테스트의 실 네트워크 0 규칙 자체를 시험한다.
+// test-setup.ts 가 전역 fetch 를 "불리면 실패" 로 바꿔 두므로, 가짜 표 없이 부른 요청은 모두 실패해야 한다.
+// 이 안전망이 풀리면(예: setup 에서 fetch 교체가 빠지면) 다른 테스트가 모르는 새 실제 요청이 나가도 조용히 통과한다.
+import { describe, expect, it } from 'vitest'
+import { apiFetch } from '@/api/client'
+
+describe('실 네트워크 0 (setup 의 가짜 fetch)', () => {
+  it('표에 없는 바깥 주소 fetch("https://example.invalid") 는 실패한다', async () => {
+    await expect((async () => fetch('https://example.invalid'))()).rejects.toThrow('실제 네트워크 요청은 허용되지 않는다')
+  })
+
+  it('가짜 표 없이 앱 API 를 부르면(apiFetch → /api/persons) 응답 대신 실패한다', async () => {
+
+--- web/src/__tests__/proxy.test.ts ---
+import { describe, expect, it } from 'vitest'
+import { DEFAULT_API_TARGET, resolveApiTarget, stripApiPrefix } from '@/proxy'
+
+describe('프록시 대상 (R-U4-11 — 환경이 아니라 순수 함수에 대해 단언)', () => {
+  it('환경 변수가 없거나 비면 기본값', () => {
+    expect(DEFAULT_API_TARGET).toBe('http://localhost:8000')
+    expect(resolveApiTarget({})).toBe('http://localhost:8000')
+    expect(resolveApiTarget({ VITE_API_TARGET: '' })).toBe('http://localhost:8000')
+  })
+
+  it('VITE_API_TARGET 이 있으면 그 값', () => {
+    expect(resolveApiTarget({ VITE_API_TARGET: 'http://x:9' })).toBe('http://x:9')
+
+--- web/src/__tests__/push.test.ts ---
+// U8 푸시 구독(push.ts) · 브리핑 화면 "알림 받기" · 인앱 배너(AppShell).
+// 실제 푸시 서비스·네트워크 없음 — Notification·PushManager·navigator.serviceWorker·fetch 전부 가짜 (결정 J).
+import { act, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { createElement } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import App from '@/App'
+import { BANNER_NOTICE } from '@/components/AppShell'
+import { getPushStatus, subscribeToPush, urlBase64ToUint8Array } from '@/push'
+import BriefingScreen, { BRIEFING_NOTICE } from '@/screens/BriefingScreen'
+import { installFakeMatchMedia } from './helpers'
+
+
+--- web/src/__tests__/routes.test.tsx ---
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import App from '@/App'
+import { parseHash } from '@/routes'
+import { installFakeMatchMedia } from './helpers'
+
+function goto(hash: string) {
+  window.history.replaceState(null, '', hash)
+}
+
+beforeEach(() => {
+
+--- web/src/__tests__/sw.test.ts ---
+// U8 서비스 워커(web/public/sw.js). 워커 파일을 ?raw 로 읽어 가짜 self(listeners·registration·clients) 안에서 평가한다.
+// 실제 워커·푸시 서비스·네트워크는 쓰지 않는다 (결정 J).
+import { describe, expect, it, vi } from 'vitest'
+import swSource from '../../public/sw.js?raw'
+import manifestSource from '../../public/manifest.webmanifest?raw'
+import indexHtml from '../../index.html?raw'
+import favicon from '../../public/favicon.svg?raw'
+import icon192 from '../../public/icon-192.svg?raw'
+import icon512 from '../../public/icon-512.svg?raw'
+
+type Listener = (event: FakeEvent) => void
+

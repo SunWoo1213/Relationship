@@ -1,0 +1,14 @@
+# 명령: git diff --stat web/src/screens/PersonCardScreen.tsx web/src/__tests__/card.test.tsx; echo "--- diff sha:"; git diff web/src/screens/PersonCardScreen.tsx | shasum; echo "--- card tests after revert:"; npm --prefix web run test -- --run src/__tests__/card.test.tsx 2>&1 | grep -E "Tests  "
+# 시각: 2026-10-16T19:43:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 0
+# 메모: 변이 4종 원복 뒤 — 사전 해시 ddfa457a70d3dd2b35fe9946bc3ddfd8cfe9a788 과 같아야 한다
+# ---
+ web/src/__tests__/card.test.tsx      | 23 +++++++++++++++++++++++
+ web/src/screens/PersonCardScreen.tsx |  5 +++--
+ 2 files changed, 26 insertions(+), 2 deletions(-)
+--- diff sha:
+ddfa457a70d3dd2b35fe9946bc3ddfd8cfe9a788  -
+--- card tests after revert:
+      Tests  31 passed (31)

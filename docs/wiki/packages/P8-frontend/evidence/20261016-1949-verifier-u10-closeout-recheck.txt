@@ -1,0 +1,24 @@
+# 명령: echo "== [1] 03-log U10 정렬 항목"; grep -n "인물 화면 정렬\|수정 반영 횟수\|Refs:.*CR-003" docs/wiki/packages/P8-frontend/03-log.md; echo "== [2] tests.md 세는 법 grep (기대 182)"; grep -c "^| .*| 기록 없음" docs/wiki/packages/P8-frontend/tests.md; grep -c "^| .*| \*\*실제 실패\*\*" docs/wiki/packages/P8-frontend/tests.md; grep -c "^| .*| \*\*검출 실패 → 보강\*\*" docs/wiki/packages/P8-frontend/tests.md; grep -c "^| .*| \*\*보류·재작업\*\*" docs/wiki/packages/P8-frontend/tests.md; grep -c "^| .*| \*\*동작 틈 → 보강\*\*" docs/wiki/packages/P8-frontend/tests.md; echo "== [2b] 정렬 2행"; grep -n "U10 화면 점검)" docs/wiki/packages/P8-frontend/tests.md; echo "== [3] HANDOFF 182 유지 문장 (기대 0)"; grep -c "182 유지" docs/wiki/HANDOFF.md; echo "== [4] 제품 코드 무변경"; git status --short web/; git diff web/src/screens/PersonCardScreen.tsx | shasum
+# 시각: 2026-10-16T19:49:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 0
+# 메모: R-U10C-1·2·9 재확인 — 03-log U10 정렬 항목·수정 반영 횟수·Refs / tests.md 집계 grep / HANDOFF 182 문장
+# ---
+== [1] 03-log U10 정렬 항목
+205:## 2026-10-16 · fix(P8-frontend): 인물 화면 정렬을 고친다 — U10 32행 "수정 필요" 1회 · pending (frontend-agent)
+207:- **수정 반영 횟수: 1 (에이전트 작업 2회 — 1차 결과를 사용자가 본 뒤 추가 지시, CR-003 §3 ⑥(a) 사용자 결정으로 같은 1회로 본다; 판정표 32행·리스크 7 출구를 실제로 거침)**
+214:- Refs: P8-frontend U10 CR-003 원칙5 원칙7 결정L 결정N
+== [2] tests.md 세는 법 grep (기대 182)
+182
+5
+18
+4
+1
+== [2b] 정렬 2행
+== [3] HANDOFF 182 유지 문장 (기대 0)
+0
+== [4] 제품 코드 무변경
+ M web/src/__tests__/card.test.tsx
+ M web/src/screens/PersonCardScreen.tsx
+ddfa457a70d3dd2b35fe9946bc3ddfd8cfe9a788  -

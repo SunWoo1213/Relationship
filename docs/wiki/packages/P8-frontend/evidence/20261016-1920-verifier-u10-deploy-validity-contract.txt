@@ -1,0 +1,163 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/24a6d9b0-55d1-4dd6-91a9-43dd2428c3d8/scratchpad/contract_diff.py
+# 시각: 2026-10-16T19:20:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 0
+# 메모: app/api/schemas.py pydantic 모델 vs web/src/api/types.ts 필드 이름·null·선택성 기계 대조
+# ---
+pydantic 모델 33개 / TS interface 32개
+
+[TS 에 없는 pydantic 모델] ['HealthOut']
+[pydantic 에 없는 TS interface] []
+
+공통 모델 32개 대조, 불일치 0건
+
+[공통 모델 필드 전체 (이름:py타입 | ts타입)]
+- AnswerIn
+    answer: str | string
+- AnswerOut
+    question_id: int | number
+    status: str | string
+    reply: str | string
+    stored: StoredOut | StoredOut
+    pending_question: ChatPendingQuestionOut | None | ChatPendingQuestionOut | null
+    stop_reason: str | None | string | null
+    trace_ids: list[int] | number[]
+- BriefingBasisOut
+    fact_keys: list[str] | string[]
+    event_ids: list[int] | number[]
+- BriefingItemOut
+    schedule_id: int | number
+    person_id: int | number
+    composer: Literal["llm", "template"] | BriefingComposer
+    pattern_sentences: list[BriefingPatternSentenceOut] | BriefingPatternSentenceOut[]
+    lines: list[BriefingLineOut] | BriefingLineOut[]
+    suggestion: BriefingSuggestionOut | None | BriefingSuggestionOut | null
+    push: str | string
+- BriefingLineOut
+    text: str | string
+    basis: BriefingBasisOut | BriefingBasisOut
+- BriefingPatternSentenceOut
+    key: str | string
+    sentence: str | string
+- BriefingPersonOut
+    id: int | number
+    display_name: str | string
+- BriefingRecordOut
+    schedule: BriefingScheduleOut | BriefingScheduleOut
+    person: BriefingPersonOut | BriefingPersonOut
+    generated_at: datetime | IsoDateTime
+    composer: Literal["llm", "template"] | BriefingComposer
+    pattern_sentences: list[BriefingPatternSentenceOut] | BriefingPatternSentenceOut[]
+    lines: list[BriefingLineOut] | BriefingLineOut[]
+    suggestion: BriefingSuggestionOut | None | BriefingSuggestionOut | null
+    push: str | string
+    trace_id: int | number
+- BriefingRunIn
+    schedule_id: int | None | number | null (?)
+- BriefingRunOut
+    run_id: str | string
+    generated_at: datetime | IsoDateTime
+    briefings: list[BriefingItemOut] | BriefingItemOut[]
+    skipped: list[BriefingSkippedOut] | BriefingSkippedOut[]
+- BriefingScheduleOut
+    id: int | number
+    title: str | string
+    scheduled_at: datetime | IsoDateTime
+- BriefingSkippedOut
+    schedule_id: int | number
+    reason: str | string
+- BriefingSuggestionOut
+    text: str | string
+    basis: BriefingBasisOut | BriefingBasisOut
+- ChatIn
+    utterance: str | string
+- ChatOut
+    reply: str | string
+    session_id: str | string
+    stored: StoredOut | StoredOut
+    pending_question: ChatPendingQuestionOut | None | ChatPendingQuestionOut | null
+    stop_reason: str | None | string | null
+    trace_ids: list[int] | number[]
+- ChatPendingQuestionOut
+    question_id: int | number
+    status: str | string
+    kind: str | string
+    question: str | string
+    options: list[str] | string[]
+- EventRawOut
+    event_id: int | number
+    person_id: int | number
+    type: str | string
+    content: str | string
+    occurred_at: datetime | IsoDateTime
+    raw_utterance: str | string
+- FactBriefOut
+    id: int | number
+    key: str | string
+    value: str | string
+- FactSourceEventOut
+    event_id: int | number
+    type: str | string
+    content: str | string
+    occurred_at: datetime | IsoDateTime
+    raw_utterance: str | string
+- FactSourcesOut
+    fact: FactBriefOut | FactBriefOut
+    sources: list[FactSourceEventOut] | FactSourceEventOut[]
+- PersonBasicOut
+    id: int | number
+    display_name: str | string
+    relation_tag: str | string
+    hierarchy: str | string
+- PersonCardOut
+    person: PersonBasicOut | PersonBasicOut
+    aliases: list[str] | string[]
+    last_contact_at: datetime | None | IsoDateTime | null
+    facts: list[PersonFactOut] | PersonFactOut[]
+    patterns: list[PersonPatternOut] | PersonPatternOut[]
+    timeline: list[TimelineEventOut] | TimelineEventOut[]
+    upcoming_schedules: list[UpcomingScheduleOut] | UpcomingScheduleOut[]
+- PersonFactOut
+    id: int | number
+    key: str | string
+    value: str | string
+    updated_at: datetime | IsoDateTime
+    source_count: int | number
+- PersonListItemOut
+    id: int | number
+    display_name: str | string
+    relation_tag: str | string
+    hierarchy: str | string
+    last_contact_at: datetime | None | IsoDateTime | null
+- PersonPatternOut
+    id: int | number
+    key: str | string
+    value: str | string
+    source_count: int | number
+- PushSubscriptionIn
+    endpoint: str | string
+    keys: PushSubscriptionKeysIn | PushSubscriptionKeysIn
+    expirationTime: float | None | number | null (?)
+- PushSubscriptionKeysIn
+    p256dh: str | string
+    auth: str | string
+- PushSubscriptionOut
+    id: int | number
+    created: bool | boolean
+- StoredOut
+    persons: int | number
+    events: int | number
+    schedules: int | number
+- TimelineEventOut
+    id: int | number
+    type: str | string
+    content: str | string
+    occurred_at: datetime | IsoDateTime
+- UpcomingScheduleOut
+    id: int | number
+    title: str | string
+    scheduled_at: datetime | IsoDateTime
+    briefed_at: datetime | None | IsoDateTime | null
+- VapidPublicKeyOut
+    public_key: str | string

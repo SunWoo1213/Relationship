@@ -1,0 +1,27 @@
+# 명령: npm --prefix web run e2e
+# 시각: 2026-10-16T19:42:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 0
+# ---
+
+> web@0.0.0 e2e
+> playwright test
+
+
+Running 4 tests using 4 workers
+
+(node:32893) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32894) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32895) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  3 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (492ms)
+  ✓  1 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (656ms)
+  ✓  2 e2e/card.spec.ts:43:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (729ms)
+  ✓  4 e2e/card.spec.ts:85:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (1.9s)
+
+  4 passed (4.3s)

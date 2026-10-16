@@ -1,0 +1,44 @@
+# 명령: npm --prefix web run test -- --run src/__tests__/card.test.tsx
+# 시각: 2026-10-16T19:18:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 1
+# ---
+
+> web@0.0.0 test
+> vitest --run src/__tests__/card.test.tsx
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+ ❯ src/__tests__/card.test.tsx (30 tests | 1 failed) 781ms
+   ❯ 인물 목록 (6)
+     × 인물 화면은 가운데 정렬하지 않고 왼쪽에 붙으며 폭 상한은 max-w-4xl 이다 (U10 화면 점검) 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/card.test.tsx > 인물 목록 > 인물 화면은 가운데 정렬하지 않고 왼쪽에 붙으며 폭 상한은 max-w-4xl 이다 (U10 화면 점검)
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/__tests__/card.test.tsx:122:52
+    120|     const section = container.querySelector('[data-screen="persons"]')
+    121|     expect(section).not.toBeNull()
+    122|     expect(section!.classList.contains('mx-auto')).toBe(false)
+       |                                                    ^
+    123|     expect(section!.classList.contains('max-w-4xl')).toBe(true)
+    124|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 29 passed (30)
+   Start at  19:18:42
+   Duration  1.28s (tests 64%, environment 17%, import 12%, transform 4%, setup 3%)
+

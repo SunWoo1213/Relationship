@@ -1,0 +1,40 @@
+# 명령: echo "[Dockerfile 존재]"; ls Dockerfile Dockerfile.* 2>&1; echo "[docker-compose 서비스 목록]"; grep -nE "^  [a-z]+:" docker-compose.yml; echo "[tests.yml 에서 docker|health|caddy|cloudfront|terraform|uvicorn|curl 줄]"; grep -niE "docker|/health|caddy|cloudfront|terraform|uvicorn|curl|aws" .github/workflows/tests.yml || echo "(없음)"; echo "[tests.yml 의 run 단계 전부]"; grep -nE "^\s+- (run|name):|^\s+run: " .github/workflows/tests.yml; echo "[CORSMiddleware 사용]"; grep -rn "CORSMiddleware\|allow_origins" app --include=*.py || echo "(없음)"; echo "[sslmode / pool_pre_ping / connect_args in app/db]"; grep -rn "sslmode\|pool_pre_ping\|connect_args\|pool_size" app/db app/config.py || echo "(없음)"
+# 시각: 2026-10-16T19:20:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 0
+# 메모: CI 워크플로에 Docker 빌드·기동·/health·Caddy·CloudFront·Terraform 단계가 있는지 grep (0건이면 '(없음)')
+# ---
+[Dockerfile 존재]
+ls: Dockerfile: No such file or directory
+ls: Dockerfile.*: No such file or directory
+[docker-compose 서비스 목록]
+4:  postgres:
+22:  pgdata:
+[tests.yml 에서 docker|health|caddy|cloudfront|terraform|uvicorn|curl 줄]
+(없음)
+[tests.yml 의 run 단계 전부]
+65:      - run: pip install -r requirements-dev.txt
+68:      - run: python -m ruff check app tests scripts evaluation
+78:      - run: |
+93:      - name: Alembic downgrade/upgrade round trip (test DB)
+96:        run: |
+111:      - run: python scripts/mypy_check.py --run
+114:      - run: bash .claude/scripts/test-guards.sh
+136:      - run: pip install -r requirements-dev.txt
+137:      - run: python -m ruff check app tests scripts evaluation
+146:        run: |
+151:        run: bash .claude/scripts/test-guards.sh
+173:      - run: npm ci
+174:      - run: npm run typecheck
+175:      - run: npm test -- --run
+176:      - run: npm run build
+179:      - name: Playwright 브라우저 설치 (ubuntu)
+181:        run: npx playwright@1.64.0 install --with-deps chromium
+182:      - name: E2E (ubuntu)
+184:        run: npm run e2e
+[CORSMiddleware 사용]
+(없음)
+[sslmode / pool_pre_ping / connect_args in app/db]
+app/db/session.py:45:            sqlalchemy_url(), pool_pre_ping=True, connect_args={"connect_timeout": 5}
+Binary file app/db/__pycache__/session.cpython-314.pyc matches

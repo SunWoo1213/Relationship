@@ -1,0 +1,33 @@
+# 명령: echo "[pytest collect-only]"; .venv/bin/python -m pytest --collect-only -q tests/ 2>&1 | tail -3; echo "[pytest 파일 수]"; ls tests/test_*.py | wc -l; echo "[dbtest 마커가 있는 파일 수]"; grep -l "dbtest" tests/test_*.py | wc -l; echo "[TestClient 를 쓰는 파일 수]"; grep -l "TestClient" tests/test_*.py | wc -l; echo "[vitest list 요약]"; cd web && npx vitest list 2>&1 | tail -2; echo "[vitest 파일별 건수]"; npx vitest list 2>&1 | grep -oE "^src/__tests__/[a-z]+\.test\.tsx?" | sort | uniq -c; echo "[playwright --list]"; npx playwright test --list 2>&1 | tail -2
+# 시각: 2026-10-16T19:20:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 0
+# 메모: 테스트 수 집계: pytest collect-only(DB 불필요) · vitest list · playwright --list
+# ---
+[pytest collect-only]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1953 tests collected in 1.34s
+[pytest 파일 수]
+      74
+[dbtest 마커가 있는 파일 수]
+      46
+[TestClient 를 쓰는 파일 수]
+      16
+[vitest list 요약]
+src/__tests__/sw.test.ts > 결정 I — 캐시 없음·fetch 리스너 없음 > install 은 skipWaiting, activate 는 clients.claim 만 한다
+src/__tests__/sw.test.ts > 결정 I — 캐시 없음·fetch 리스너 없음 > 코드에 요청 가로채기 리스너·캐시 API 호출이 없다
+[vitest 파일별 건수]
+   6 src/__tests__/api.test.ts
+  19 src/__tests__/briefing.test.tsx
+  30 src/__tests__/card.test.tsx
+  21 src/__tests__/chat.test.tsx
+   2 src/__tests__/network.test.ts
+   6 src/__tests__/proxy.test.ts
+  21 src/__tests__/push.test.ts
+  12 src/__tests__/routes.test.tsx
+  16 src/__tests__/sw.test.ts
+[playwright --list]
+  chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다
+Total: 4 tests in 3 files

@@ -327,7 +327,6 @@ export default function PersonCardScreen({ personId }: { personId: number | null
       aria-labelledby="screen-title"
       data-screen="persons"
       data-person-id={personId ?? undefined}
-      className="mx-auto max-w-3xl"
     >
       <h1 id="screen-title" className={cn('text-title font-semibold', personId !== null && 'sr-only')}>
         인물
@@ -337,7 +336,9 @@ export default function PersonCardScreen({ personId }: { personId: number | null
           <PersonList />
         </div>
       ) : (
-        <CardView key={personId} personId={personId} />
+        <div data-testid="card-wrap" className="mx-auto w-full md:w-3/4">
+          <CardView key={personId} personId={personId} />
+        </div>
       )}
     </section>
   )

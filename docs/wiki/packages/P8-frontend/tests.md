@@ -430,6 +430,30 @@ P8 활성 중 들어간 FIX-035(`docs/wiki/fixes/FIX-035.md`)의 테스트다. �
 | test_er_pipeline.py::test_resolve_identity_single_candidate_question_wording_fix035 | 후보 1명이면 identity 질문 문구가 `<이름> 님이 맞으실까요?` | 후보 김민수 1명 → `"팀장" -- 김민수 님이 맞으실까요?` (옵션·`candidate_ids`·긍정 목록 불변) | 통과 · FIX-035-M4 | 기록 없음 |
 | test_tools_context.py::test_amend_trace_output_adds_keys_persists_and_refuses_overwrite_fix035 | (재작업 1차 R-35-1) trace 부분 갱신 헬퍼 `amend_trace_output` 의 계약 | `output={"a":1}` 행에 `{"b":True,"c":7}` → DB 재조회로 `{"a":1,"b":True,"c":7}`·`{"a":2}` 는 `ValueError` 이고 `a` 불변·`trace_id=None`/없는 id → `False` | 통과 · M6a · M6b · M6c | 기록 없음 (재작업 1차에서 신설) |
 
+### U10 사람 점검 — FIX-035 실서버 확인 (메인 세션이 Chrome 직접 조작, 2026-10-16, 수동 6건 — 위 총계·집계에 넣지 않는다)
+
+자동 테스트가 아니라 실서버(:8000)·실 LLM·Chrome 154.0.8037.99 에서 사람처럼 눌러 본 기록이다. 코드 `735f391`. 단계별 화면·DB·trace 상세는 `evidence/20261016-1915-u10-check-chat-fix035.txt`, DB 조회 원본은 `evidence/20261016-1911-u10-fix035-db.txt`.
+
+| 시나리오 | 무엇을 확인하나 | 입력 → 기대 | 결과 | 실패 이력 |
+|---|---|---|---|---|
+| U10-F35-A 거절 → 직장 | identity 거절 뒤 후속 new_person 질문, 태그 선택 시 인물·사건 생성(D1) | `오늘 박선영 과장님이랑 회의했는데 다음 달에 팀을 옮기신대` → q12 identity(후보 3명) → 거절 → q13 new_person 칩 6개 → `직장으로 기억할게요` → persons 10·events 29(raw 원문 그대로) | 통과 · trace 374 `identity_rejected=true`·`followup_question_id=13` · 380 create_person · 382 add_event | 없음 (수동 점검) |
+| U10-F35-A3 동시 두 번 답 | 같은 질문에 두 탭이 동시에 답하면 한 번만 처리 | 사용자 탭과 메인 세션 탭이 q12 거절을 거의 동시에 보냄 → 하나는 200, 하나는 409 "이미 답했거나 만료된 질문이에요." | 통과(의도된 409) · 서버 로그 `POST /answers/12` 200 → 409 | 사용자의 실수 클릭으로 우연히 확인됨 |
+| U10-F35-A4 새로고침 복원 | 다른 탭에서 생긴 대기 질문이 새로고침 뒤 복원되는가 | F5 → q13 질문·칩 6개 표시 | 통과 | 없음 (수동 점검) |
+| U10-F35-A6 카드·원문 | 새 인물 카드와 원문 펼치기 | `#/persons/10` → `직장 · 동`, 타임라인 `meeting 팀을 옮기신다` → [원문 펼치기] = events 29 raw_utterance | 통과 | 없음 (수동 점검) |
+| U10-F35-B 거절 → 아니요 | 후속 질문에서 "아니요" 면 생성 0 | `어제 박선희 과장님이 커피를 사주셨어` → q14 identity → 거절 → q15 new_person(새로고침 없이 표시) → `아니요` → 생성 0, persons 10 그대로 | 통과 · trace 396 `identity_rejected=true`·`followup_question_id=15` · 403 stored 전부 0 | 없음 (수동 점검) |
+| U10-F35-C 새 인물 재사용 | FIX-035 로 만든 인물이 다음 발화에서 찾아지는가 | `선영 과장님이 오늘 점심을 사주셨어` → 질문 없이 person 10 으로 병합, 별칭 `선영 과장님` 누적, events 30 | 통과 · er_resolve 407 merge confidence 0.8654 ≥ 0.8 | 없음 (수동 점검) — 원래 의도(후보 칩 선택 회귀)는 자동 병합돼 확인 못 함 |
+
+실서버에서 확인하지 못한 것: 후보 1명 문구(개발 DB 인물 10명이라 후보가 늘 3명) — 자동 테스트 `test_resolve_identity_single_candidate_question_wording_fix035` 로만 확인. 관찰(후속 후보): 인물을 새로 만든 턴의 응답이 "이벤트 1건" 만 말하고 인물 생성은 말하지 않는다.
+
+### U10 화면 점검 수정 1회 — 인물 화면 정렬 (자동 2건, 위 총계·집계에 넣지 않는다)
+
+사용자 지시(2026-10-16, CR-003 §3 ⑥)로 규칙을 정했다: 목록은 본문 폭 전체(왼쪽부터), 상세(`#/persons/:id`)는 가운데·폭 본문의 75%(`md:w-3/4`)·모바일 100%(`w-full`). 증거: `evidence/20261016-1933-u10-fix-card-align2-{typecheck,vitest,build,e2e}.txt`(vitest 137 passed), 변이 `20261016-1934-u10-fix-card-align2-mutation.txt`. 네트워크 0(가짜 fetch).
+
+| 테스트 | 무엇을 확인하나 | 입력 → 기대 | 결과 | 실패 이력 |
+|---|---|---|---|---|
+| card.test.tsx::목록 상태는 본문 폭 전체를 쓰고 가운데 정렬·폭 상한이 없다 | 목록 상태 section 클래스 | `[data-screen="persons"]` 에 `mx-auto`·`max-w-*`·`md:w-*` 없음, `card-wrap` 없음 | 통과 · 변이(section 에 `mx-auto` 추가) 검출 | 없음 (집계 제외) |
+| card.test.tsx::상세 상태는 가운데 정렬이고 폭이 본문의 75%(md 이상), 모바일은 100% 이다 | 상세 카드 래퍼 클래스 | `card-wrap` 에 `mx-auto`·`w-full`·`md:w-3/4` 있고 `person-card` 를 감쌈, section 에는 `mx-auto` 없음 | 통과 · 변이(래퍼에서 `mx-auto` 제거) 검출 `1 failed \| 30 passed` | 없음 (집계 제외) — verifier 공백 탐침 M4(목록 안쪽 `mt-4` div 에 `mx-auto max-w-3xl`)는 생존, R-U10C-3 → P8b 보강 |
+
 ### 실패 이력 집계
 
 | 구분 | 행 수 | 비고 |

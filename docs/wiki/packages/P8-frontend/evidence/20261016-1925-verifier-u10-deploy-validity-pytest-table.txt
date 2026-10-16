@@ -1,0 +1,96 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/24a6d9b0-55d1-4dd6-91a9-43dd2428c3d8/scratchpad/pytest_table.sh
+# 시각: 2026-10-16T19:25:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 735f391 (dev2)
+# exit: 1
+# 메모: pytest 74 파일별 특성 집계(grep -c): dbtest 마커·TestClient·monkeypatch·가짜 LLM·가짜 임베딩·환경변수 조작·고정 시계·줄 수 + 마커 집계
+# ---
+FILE                                 dbtst TClnt mkpat fakeLLM fakeEmb setenv clock lines
+test_agent_gate.py                       0     0    14       0       0      0     0   447
+test_agent_loop.py                       1     0     0      31      53      0     0   767
+test_agent_propose.py                    0     0    17      46       0     10     0   686
+test_agent_timezone.py                   6     0     0      10       9      0     3   253
+test_agent_types.py                      0     0     0       0       0      0     0   338
+test_answer_concurrency.py               4     2     3       0       0      0     0   326
+test_api_answers_resume.py               3     3     2      13      32      0     0   674
+test_api_briefings.py                    3     3     0       0       0      0     0   298
+test_api_chat.py                         3     4     3      13      11      0     0   446
+test_api_questions_pending.py            2     2     0       0       0      0     0   133
+test_api_read_briefings_e2e.py           2     2     0       0       0      0     0   227
+test_api_read_briefings.py               2     2     0       0       0      0     0   444
+test_api_read_persons.py                 2     3     0       0       0      0     0   242
+test_api_read_raw.py                     2     2     0       0       0      0     0   305
+test_api.py                             10    15     2       0       0      0     0   278
+test_backfill_embeddings.py              3     0     5       0       0      3     0   186
+test_baseline_base.py                    0     0     0       0       0      0     0   405
+test_baseline_embedding_only.py          8     0     0       0      27      0     0   636
+test_baseline_exact_match.py             6     0     0      13       2      0     0   561
+test_baseline_llm_single.py              4     0    30      35       0     17     0  1299
+test_baseline_parity.py                  4     0     0      16       8      0     0   529
+test_baseline_proposed.py                8     0     0      14      28      0     0   538
+test_briefing_compose.py                 1     0    10      22       0      6     0   818
+test_briefing_inputs.py                  2     0     0       0       0      0     0   394
+test_briefing_run.py                     2     0     2       0       0      0     0   527
+test_briefing_scheduler.py               2    10    18       0       0      4     0   206
+test_briefing_select.py                 13     0     2       0       0      1     0   449
+test_commit_boundaries.py                1     4     7       9       9      3     0   488
+test_config.py                           0     0     0       0       0      0     0   117
+test_conftest_test_db.py                 3     0     0       0       0      0     0    73
+test_db_check.py                         0     0     0       0       0      0     0    97
+test_db_session.py                       1     0     0       0       0      0     0    79
+test_embed_pilot.py                      0     0     3       0       0      1     0   130
+test_embedding_provider.py               0     0     4       7       2      2     0   182
+test_er_candidates.py                    1     0     0       0      21      0     0   150
+test_er_confidence.py                    0     0     2       0       0      1     0   682
+test_er_dictionary.py                    0     0     0       0       0      0     0   163
+test_er_judge.py                         0     0    42      71       0     23     0  1019
+test_er_pipeline.py                      1     0     0      23      72      0     0   864
+test_er_rules.py                         0     0     2       0       0      0     0   319
+test_er_smoke.py                         0     0    15       8       0      6     0   169
+test_er_types.py                         0     0     0       0       0      0     0   147
+test_eval_calibration.py                 0     0     0       0       0      0     0   980
+test_eval_curve.py                       0     0     0       0       0      0     0   785
+test_eval_metrics.py                     0     0     0       0       0      0     0   871
+test_eval_report.py                      0     0     2       0       0      1     1   648
+test_eval_runner.py                     14     0    16      13      32      4     0   731
+test_fact_updated_at.py                  2     0     0       0       0      0     0   218
+test_import_order.py                     0     0     0       0       0      0     0    56
+test_memory_extract.py                   1     0    17      34       0     10     0   742
+test_memory_loop.py                     14     2     2      12      15      0     0   711
+test_memory_patterns.py                 17     0     8       0       0      5     0   614
+test_memory_promote.py                  16     0     2       0       0      1     0   603
+test_properties.py                       0     0     0       0       0      0     0   733
+test_push_devpage.py                     0     3    17       0       0      3     0   138
+test_push_notifier.py                    3     0     5       0       0      0     0   677
+test_push_payload.py                     0     0    19       0       0     10     0   235
+test_push_settings.py                    0     0     6       0       0      4     0   232
+test_push_subscriptions.py               3     3    14       0       0     11     0   236
+test_push_wiring.py                      3     2    31       0       0      6     1   386
+test_run_pilot_eval.py                   9     0     6      46       0      2     1  1247
+test_scenario_state.py                  14     0     0       0      10      0     3   511
+test_schema_check.py                     0     0     0       0       0      0     0   115
+test_schema_models.py                    0     0     0       0       0      0     0   323
+test_settings.py                         0     0     0       0       0      0     0    13
+test_tool_signatures.py                  0     0     0       0       0      0     0   164
+test_tools_briefing.py                   1     0     0       0       0      0     0   289
+test_tools_context.py                    1     0     0       0       1      0     0   308
+test_tools_persons.py                    1     0     0       0      10      0     0   660
+test_tools_questions.py                  1     0     2       0       0      0     3   512
+test_tools_records.py                    1     0     0       0       0      0     0   317
+test_tools_types.py                      0     0     0       0       0      0     0   165
+test_upsert_concurrency.py               6     0     0       0       3      0     0   458
+test_validate_scenarios.py               1     0     0       0       0      0     0   908
+
+[pytest 파일 수]
+74
+[dbtest 를 언급하는 파일 수]
+46
+[그중 실제 마커(pytestmark 또는 @pytest.mark.dbtest)가 있는 파일 수]
+43
+[dbtest 를 언급만 하고 마커는 없는 파일]
+  tests/test_briefing_compose.py
+  tests/test_memory_extract.py
+  tests/test_validate_scenarios.py
+[TestClient 를 쓰는 파일 수]
+16
+[실 공급자 클래스를 가짜 전송(transport)으로 시험하는 파일]
