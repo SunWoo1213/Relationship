@@ -176,14 +176,14 @@
 - (처리된 권고) **R-U9a-1** `card.spec.ts` 원문 완전 일치 단언 · **R-U9a-2** `playwright.config.ts` `serviceWorkers: 'block'`(preview 가 `server.proxy` 를 물려받아 가로채기 밖 `/api*` 를 실제 백엔드로 넘길 수 있음).
 - Refs: P8-frontend U9 원칙5 원칙8 원칙9
 
-## 2026-10-15 · test(P8-frontend): 브라우저 끝에서 끝 테스트 3편과 테스트 기록표를 만든다 · pending
+## 2026-10-15 · test(P8-frontend): 브라우저 끝에서 끝 테스트 3편과 테스트 기록표를 만든다 · 07ec09a
 - 변경: `web/e2e/fixtures.ts`·`chat.spec.ts`·`card.spec.ts`·`briefing.spec.ts`(신규) · `src/__tests__/network.test.ts`(신규) · `push.test.ts`(R-U8-1)·`sw.test.ts`(R-U8-3) · `public/sw.js`(R-U8-3 앱 창 선택) · `playwright.config.ts`(R-U4-8·R-U9a-2) · `package.json` e2e 스크립트 · `tsconfig.node.json` · `.github/workflows/tests.yml`(ubuntu E2E) · `docs/RUNNING.md` 프론트 절 · `registry.md` · `01-plan.md` 불변식 1·4 정정 · **`tests.md`(신규, 139줄)** · `review-u9a-e2e.md` · 증거 27.
 - 이유: 01-plan U9(frontend 몫)·판정 12~27b·결정 J(자동 → 사람 점검 순서)·B (i). 사용자 지시·교수 피드백 — 테스트마다 무엇을 확인했고 통과·실패했는지 드러낸다.
 - 검증: Vitest 9파일 135 passed · E2E 4 passed · typecheck·build exit 0 · 불변식 1~10(정정판) 기대값 · 변이 구현자 X1~X16 검출(무효 회차 표시) + verifier V1·V3·V4·V5c 검출, V2 1차 생존 → R-U9a-1 로 검출. verifier `review-u9a-e2e.md` 통과(재확인 포함).
 - 남은 것: U9b(backend-agent — 백엔드 행 1~11·전체 회귀·R-U3-1·2·5·tests.md 백엔드 절·실패 이력 열·`docs/reliability.md` 초안) · registry "(pending)" → 이 커밋 해시(다음 커밋).
 - Refs: P8-frontend U9 원칙5 원칙7 원칙8 원칙9 R-U4-8 R-U8-1 R-U8-3 R-U0-3 R-U6-3 FIX-033 FIX-034
 
-## 2026-10-15 · test(P8-frontend): 백엔드 조회 API 끝에서 끝 테스트와 신뢰성 기록을 더한다 · pending (U9b, backend-agent)
+## 2026-10-15 · test(P8-frontend): 백엔드 조회 API 끝에서 끝 테스트와 신뢰성 기록을 더한다 · 0b24bb6 (U9b, backend-agent; 커밋 제목 "백엔드 판정을 끝내고 테스트 기록·신뢰성 보고서를 만든다", CI 38722477450 은 뒤 커밋 c4fbd2f 기준 다섯 job success. U9 해시 2개 = U9a 07ec09a · U9b 0b24bb6, R-13)
 - 환경 메모: 서브에이전트 쓰기가 공유 체크아웃에서 막혀("parent bg session hasn't isolated yet") 링크된 git worktree `/tmp/rel-u9b`(분리 HEAD `07ec09a`)에서 작업했다. 메인 `registry.md` 미커밋본을 먼저 복사해 이어 썼다. 결과물은 메인 체크아웃으로 옮겨 적용해야 한다(변경 파일 목록은 보고서).
 - 변경: `app/api/read.py`(R-U3-2: 인물 조인에 `Person.id == Schedule.person_id`) · `app/api/routes.py`(R-U3-1: `ctx.now = now` → `replace(build_chat_ctx(...), now=now)` + `from dataclasses import replace`; `deps.py` 무변경) · `tests/helpers_read_api.py`(R-U3-5 ②: `PushSubscription` 추가 → 9테이블) · `tests/test_api_read_persons.py`·`test_api_read_raw.py`(R-U3-5 ①: 쓰기 0 테스트를 공통 헬퍼로, `updated_at`·`briefed_at` 값 단언) · `tests/test_api_read_briefings.py`(+2: 조작된 trace · 헬퍼 `push_subscriptions`) · **`tests/test_api_read_briefings_e2e.py`(신규 2건, 판정표 9·10행 끝에서 끝)** · **`tests.md`**(백엔드 64행 + 모든 표 "실패 이력" 열, 203줄) · **`docs/reliability.md`**(신뢰성 보고서 초안) · `registry.md` · 증거 `evidence/20261015-1521~1533-u9-be-*`(14개).
 - 판정표 백엔드 1~11행 **전부 통과**: 1~4행 persons 12 passed · 5·6행 raw 18 passed · 7행 쓰기 0 5건 + 헬퍼 2건 7 passed · 8행 pending 8 passed · 9·10행 briefings 24 + e2e 2 = 26 passed · 11행 `alembic check` "No new upgrade operations detected." · `tools_check` "RESULT: 7/7 ok" · `git diff --stat 50fd7fc -- app alembic ':!app/api/routes.py' ':!app/api/schemas.py' ':!app/api/read.py'` 빈 출력. 28행 백엔드: `POSTGRES_PORT=5433 .venv/bin/python -m pytest -rs` → **1946 passed**(1942 + 신규 4), skip 0. ruff All checks passed · mypy 34건은 원본 HEAD 기준선과 같음(`evidence/20261015-1524-u9-be-mypy-baseline-compare.txt`).
@@ -193,3 +193,10 @@
 - **재작업 1차 (verifier `review-u9b-backend.md` 권고 R-U9b-1·2·3·4, 사용자 결정: 커밋 전 처리, backend-agent)**: 제품 코드(`app/`) 무변경. R-U9b-1 `tests/test_api_read_briefings.py::test_조작된_trace_…` 에 "내 일정 + 남의 인물 id" 조작 trace 1건과 단언 2줄(`_ids == [s_mine.id]`·"조작된 trace" 문자열 없음) 추가 — 테스트 수 불변(24). verifier V2(조인을 `Person.id == Schedule.person_id` 만으로) 저장소 밖 사본 `/tmp/rel-u9b-rw2` 결과: 원본 `1 passed, 23 deselected` / V2 `assert [9088, 9089] == [9088]` → `1 failed, 23 passed`, 원복 바이트 일치(`evidence/20261015-1927-u9b-rework1-v2-mutation.txt`). R-U9b-2 e2e 주석(193행·run_rows 단언 주석)·tests.md e2e 10행을 `run.py` 308~317행 확인 뒤 정정(run 행 output 에 최상위 `schedule_id` 없음, 혼입 재료는 직접 넣은 `briefing_error` 행). R-U9b-3 tests.md e2e 절 머리글에 한계 한 단락. R-U9b-4 `reliability.md` §D 괄호를 01-plan 41행 그대로("단일 사용자 전제는 P5-loop 결정 I, 격리 부채는 결정 D") · 상단과 §4 "대조 전" → "verifier 대조 완료(§6)". tests.md 조작된 trace 행 → "검출 실패 → 보강"(실패 이력 집계 16→17, 기록 없음 177→176, 합계 203 유지; reliability.md·registry 숫자 동기). 5파일 `64 passed`, 전체 회귀 `1946 passed, 1 warning`(`evidence/20261015-1927-u9b-rework1-be-5files.txt`·`-full-regression.txt`).
 - 남은 것: 메인 체크아웃으로 변경 옮기기 · verifier 리뷰(tests.md 백엔드 절 행 수·reliability.md 수치 대조) · 해시 칸 `pending` → 커밋 해시 · U9a/U9b 커밋 해시 2개를 이 항목에(R-13) · U10 사람 점검.
 - Refs: P8-frontend U9 S3.4 S3.6 R12 원칙8 원칙9 R-U3-1 R-U3-2 R-U3-5 R-U3-6 FIX-033 FIX-034
+
+## 2026-10-16 · fix(P8-frontend): "다른 사람이에요" 답 뒤 새 인물로 기억할지 이어서 묻는다 · pending (FIX-035, backend-agent)
+- 계기: U10 사람 점검(실서버·실 LLM) 중 identity 질문에 "아니요, 다른 사람이에요" 라고 답하면 인물·사건이 함께 사라짐(q5·q7). 상세 `docs/wiki/fixes/FIX-035.md`.
+- 변경: `app/agent/loop.py` identity 거절 → 같은 언급의 new_person 후속 질문 · `app/tools/context.py` `amend_trace_output()`(trace 키 추가 전용) · `app/er/pipeline.py` 후보 1명 문구 · `app/er/types.py`·`__init__.py` 공개 상수 2개 · 테스트 +7(answers_resume 11→16, er_pipeline +1, tools_context +1) · `tests.md` FIX-035 절·집계 203→210 · registry · P5-loop 03-log 한 줄.
+- 검증: verifier 1차 보류([필수] R-35-1 루프 ORM 직접 사용) → 사용자 결정 (a) 헬퍼 이동 + 권고 전부 → 재작업 1차 → verifier 재확인 통과([필수] 0, 권고 R-35-7·8 은 메인 세션이 문서로 처리). 전체 회귀 1953 passed skip 0 · ruff(app tests scripts evaluation) 통과 · 변이 12/12 검출. 증거 `fixes/evidence/20261016-17*-*FIX-035*`. review `fixes/review-FIX-035.md`.
+- 남은 것: dev2 푸시·CI · 서버 재기동 후 U10 에서 거절 → 후속 질문 실제 확인 · U10 2단계(카드 원문, 사용자).
+- Refs: P8-frontend P5-loop FIX-035 D1 D10 S3.3 S3.4 원칙1 원칙2 원칙9

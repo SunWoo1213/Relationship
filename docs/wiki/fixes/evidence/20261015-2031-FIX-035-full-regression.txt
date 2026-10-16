@@ -1,0 +1,443 @@
+# 명령: .venv/bin/python -m pytest -rs -q
+# 시각: 2026-10-15T20:31:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: c4fbd2f (dev2)
+# exit: 1
+# ---
+.....................................F.................................. [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 14%]
+........................................................................ [ 18%]
+........................................................................ [ 22%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 33%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+........................................................................ [ 47%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 62%]
+........................................................................ [ 66%]
+........................................................................ [ 70%]
+........................................................................ [ 73%]
+........................................................................ [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+........................................................................ [ 92%]
+........................................................................ [ 95%]
+........................................................................ [ 99%]
+.......                                                                  [100%]
+=================================== FAILURES ===================================
+___ test_loop_module_source_never_mentions_thresholds_or_confidence_literal ____
+
+    def test_loop_module_source_never_mentions_thresholds_or_confidence_literal():
+        source = Path(loop_module.__file__).read_text(encoding="utf-8")
+        for token in ("T_merge", "t_merge", "T_new", "t_new", "confidence"):
+>           assert token not in source, f"금지 토큰 발견: {token}"
+E           AssertionError: 금지 토큰 발견: confidence
+E           assert 'confidence' not in '"""Refs: P5...nce, turn)\n'
+E             
+E             'confidence' is contained here:
+E               text.get("confidence_breakdown")
+E             ?           ++++++++++
+E                   context = {
+E                       "mention": mention,
+E                       "utterance": utterance,
+E                       "candidate_ids": {},
+E                       "confidence_breakdown": dict(breakdown) if isinstance(breakdown, dict) else {},
+E                       AFFIRMATIVE_KEY: [_NEW_PERSON_CONFIRM_OPTION],
+E                   }
+E                   ask_payload = {
+E                       "kind": "new_person",
+E                       "question": f'"{mention}"을(를) 새 인물로 기억해둘까요?',
+E                       "options": [_NEW_PERSON_CONFIRM_OPTION, _NEW_PERSON_REJECT_OPTION],
+E                       "affirmative_options": [_NEW_PERSON_CONFIRM_OPTION],
+E                       "context": context,
+E                   }
+E                   hints = resume_raw.get("hints")
+E                   resolution = Resolution(
+E                       trace_id=None,
+E                       mention=mention,
+E                       band="new_person",
+E                       band_by_threshold="new_person",
+E                       ask_payload=ask_payload,
+E                   )
+E                   resolution = _extend_for_ask(
+E                       resolution,
+E                       mention=mention,
+E                       hints=hints if isinstance(hints, dict) else {},
+E                       pending_calls=pending_calls,
+E                       resume_byte_limit=LOOP_MAX_RESUME_BYTES,
+E                   )
+E                   payload = resolution.ask_payload
+E                   assert payload is not None
+E                   question = app_tools.ask_user(
+E                       ctx,
+E                       kind=payload["kind"],
+E                       question=payload["question"],
+E                       options=payload["options"],
+E                       context=payload["context"],
+E                   )
+E               
+E                   # 원칙9 -- 이 전환을 loop_resume 행에 남긴다(진입 때 쓴 행에 두 키만 더한다).
+E                   if resume_trace_id is not None:
+E                       row = ctx.session.get(AgentTrace, resume_trace_id)
+E                       if row is not None and isinstance(row.output, dict):
+E                           row.output["identity_rejected"] = True
+E                           row.output["followup_question_id"] = question.question_id
+E                           flag_modified(row, "output")
+E                           ctx.session.flush()
+E               
+E                   pending_question = PendingQuestionOut(
+E                       question_id=question.question_id,
+E                       status="pending",
+E                       kind=payload["kind"],
+E                       question=payload["question"],
+E                       options=list(payload["options"]),
+E                   )
+E                   turn = TurnResult(
+E                       reply=build_reply(
+E                           stored_events=0,
+E                           stored_schedules=0,
+E                           stored_facts=0,
+E                           failed_count=0,
+E                           limit_hit=False,
+E                           pending_question=pending_question,
+E                       ),
+E                       session_id=ctx.session_id,
+E                       stored=StoredSummary(persons=0, events=0, schedules=0),
+E                       pending_question=pending_question,
+E                       stop_reason="ask_user",
+E                       trace_ids=[resume_trace_id] if resume_trace_id is not None else [],
+E                   )
+E                   return _log_turn(ctx, utterance, turn)
+E               
+E               
+E               def _synthetic_proposal_and_verdict(
+E                   pending_calls: list[PendingCall],
+E               ) -> tuple[Proposal, GateVerdict]:
+E                   """재개(U7)가 보류 제안(`resume.pending_calls`)을 다시 `resolve_mentions()`
+E                   -> `_record()` 에 먹이기 위한 합성 `Proposal`/`GateVerdict`. 게이트를
+E                   다시 태우지 않는다 -- `pending_calls` 는 이미 첫 턴에서
+E                   `bucket="execute"` 로 통과한 제안들이다(R-12 "같은 검사를 두 자리에서
+E                   하지 않는다"). 인덱스는 이 합성 턴 안에서만 의미가 있는 새 `0..n-1`
+E                   번호를 쓴다 -- 원본 `loop_extract` 인덱스와는 무관하며(그 행은 첫 턴의
+E                   별도 trace 행에 이미 있다, 이중 출처 금지), 이 합성 턴이 다시 되물으면
+E                   `_pending_calls_from` 이 **이 인덱스 기준으로** 새 `pending_calls` 를
+E                   만들어 다음 재개가 또 일관되게 이어받는다."""
+E               
+E                   tool_calls = [ToolCallProposal(name=c.name, args=dict(c.args)) for c in pending_calls]
+E                   accepted = [
+E                       AcceptedProposal(index=index, name=c.name, bucket=BUCKET_EXECUTE)
+E                       for index, c in enumerate(pending_calls)
+E                   ]
+E                   proposal = Proposal(tool_calls=tool_calls, raw={})
+E                   verdict = GateVerdict(
+E                       accepted=accepted, rejected=[], limits=GateLimits(0, 0, 0, 0), stop_reason=None
+E                   )
+E                   return proposal, verdict
+E               
+E               
+E               #: M-1(d) -- `new_person` 재개 답이 태그를 확정할 때, LLM 힌트(`resume.hints
+E               #: .hierarchy`)가 없거나 `HIERARCHIES` 밖이면 이 값으로 둔다(01-plan 확정
+E               #: M-1(d) "위계는 브리핑 영향이 작고 3종뿐이다").
+E               _DEFAULT_HIERARCHY = "동"
+E               
+E               
+E               #: U7 -- 저장된 `resume.pending_calls[].args` 안에서 `datetime` 이었다가
+E               #: JSON 저장(`ask_user` 의 `to_jsonable`)을 거쳐 ISO 문자열로 바뀌는 키.
+E               #: `add_event.occurred_at`/`add_schedule.scheduled_at` 뿐이다(둘 다
+E               #: `_execute_call` 이 실제 `datetime` 을 기대한다).
+E               _DATETIME_ARG_KEYS: tuple[str, ...] = ("occurred_at", "scheduled_at")
+E               
+E               
+E               def _hydrate_pending_call_args(args: dict[str, Any]) -> dict[str, Any]:
+E                   """재개가 저장된 제안 인자를 다시 실행 가능한 값으로 되살린다 -- 원래
+E                   턴(`run_turn`)에서는 `occurred_at`/`scheduled_at` 이 인식 단계(U2)가
+E                   만든 실제 `datetime` 객체였지만, `pending_questions.context` 로
+E                   저장되며 ISO 문자열이 됐다(`ask_user` 의 `to_jsonable`). 문자열이
+E                   아니거나(`None` 등) 파싱에 실패하면 원래 값을 그대로 둔다 -- 그
+E                   경우는 `add_event`/`add_schedule` 자신의 검증(`ToolError`)이 막고
+E                   `loop_record.output.failed[]` 로 남는다(R-24)."""
+E               
+E                   hydrated = dict(args)
+E                   for key in _DATETIME_ARG_KEYS:
+E                       value = hydrated.get(key)
+E                       if isinstance(value, str):
+E                           try:
+E                               hydrated[key] = datetime.fromisoformat(value)
+E                           except ValueError:
+E                               pass
+E                   return hydrated
+E               
+E               
+E               def _drop_calls_for_mention(pending_calls: list[PendingCall], mention: str) -> list[PendingCall]:
+E                   """부정 답(identity 거절/`new_person` 태그 옵션 밖) -- 그 언급에 딸린
+E                   보류 제안을 버린다(그 인물이 확정되지 않았으므로 실행할 `person_id`
+E                   가 없다). 다른(아직 손대지 않은) 언급의 제안은 그대로 남는다."""
+E               
+E                   return [c for c in pending_calls if c.args.get("person") != mention]
+E               
+E               
+E               def resume_turn(
+E                   ctx: ToolContext,
+E                   resume_input: ResumeInput,
+E                   *,
+E                   question_id: int,
+E                   judge: Judge | None = None,
+E                   config: ERConfig | None = None,
+E                   extractor: FactExtractor | None = None,
+E               ) -> TurnResult:
+E                   """U7 -- `POST /answers/{question_id}` 뒤 절반. 답 저장(`answer_question`,
+E                   무수정 재사용) **뒤에** 저장된 `context` 로 해석 단계부터 다시 돈다
+E                   (결정 E -- 인식 LLM 을 다시 부르지 않는다). `resume_input` 은
+E                   `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아
+E                   만든 것이다 -- 이 함수도, `app/agent/` 어디도 그 ORM 을 직접 다루지
+E                   않는다(판정 표 23행).
+E               
+E                   `extractor`(U6 추가) -- `run_turn()` 과 같은 뜻으로 `_record()` 에
+E                   그대로 전달한다(모듈 docstring 대신 `run_turn` docstring "extractor"
+E                   절 참고 -- 지연 해소는 같은 `after_record()` 한 자리에서 일어난다).
+E               
+E                   ## `ResumeInput` 표기 정리 (01-plan 70행 vs U1 구현, 보고에 남긴다)
+E               
+E                   01-plan 70행은 `ResumeInput{kind, context, session_id}` 라 적었지만
+E                   U1(`app/agent/types.py`)이 실제로 만든 필드는 `kind`·`context`·`answer`
+E                   다 -- `session_id` 는 없다. 이 구현은 **U1 쪽(실제 타입)을 그대로
+E                   따른다**: `session_id` 는 이미 `ctx.session_id`(호출자 `build_ctx()` 가
+E                   답한 행의 세션으로 채운다, 결정 12)가 담당하므로 `ResumeInput` 에
+E                   다시 넣지 않는다. 대신 이 함수가 `create_person`(D1) 직전에 필요로
+E                   하는 **`question_id`**(어느 질문이 confirmed 인지)는 `ResumeInput`
+E                   안이 아니라 이 함수의 **별도 키워드 인자**로 받는다(`app.agent.types`
+E                   는 고치지 않는다) -- 라우트가 이미 경로 파라미터로 들고 있는 값이고,
+E                   `pending_questions.context`(저장되는 값)의 모양과는 무관한 "이 답이
+E                   어느 질문을 확정하는가"라는 호출 경로 정보이기 때문이다(같은 값을
+E                   두 자리에 중복해서 싣지 않는다).
+E               
+E                   ## 답 종류별 동작 (01-plan U7 확정 M-1(d)·M-2(i), 결정 J)
+E               
+E                   - **`identity`**: `context["candidate_ids"][answer]` 가 가리키는 그
+E                     인물에만 `update_person` 을 `new_alias=context["mention"]` 으로 부른다.
+E                     답이 후보 밖(ER 거절 옵션)이면 그 언급에 딸린 보류 제안을 버리고
+E                     아무것도 만들지 않는다(F-b97a06 긍정 답 규약과 같은 방향 -- 판단
+E                     근거가 없으면 확정하지 않는다).
+E                   - **`new_person`**(M-1(d)): 답이 `resume.tag_by_answer` 의 키이면
+E                     `relation_tag = tag_by_answer[answer]`(**답에서만** 온다),
+E                     `hierarchy` 는 `resume.hints.hierarchy` 가 `HIERARCHIES` 안이면 그
+E                     값, 아니면 `_DEFAULT_HIERARCHY`. `ctx.confirmed_question_id` 를
+E                     **이 함수 자신이** 세운 채(판정 표 5a -- 호출자가 미리 세워 뒀더라도
+E                     다시 명시적으로 확정한다) `context["mention"]` **하나만** 대상으로
+E                     `create_person` 을 부른다. 답이 태그 옵션 밖(ER 부정 옵션)이면
+E                     `create_person` 을 **0회** 부르고, 그 언급에 딸린 보류 제안도
+E                     버린다(판정 표 28행).
+E                   - **`schedule`**(M-2(i)): `resume.schedule_options[answer]` 로 시각을
+E                     **사전 조회**해(문자열을 다시 파싱하지 않는다) `add_schedule(
+E                     resume.schedule.person_id, resume.schedule.title, scheduled_at)`.
+E                     답이 `"모르겠어요"` 이거나 그 표 밖이면 0회. 이 질문을 일으킨
+E                     제안(`resume.schedule.call_index`)은 항상 `resume.pending_calls`
+E                     에서 제외하고 처리한다(중복 실행 금지) -- 스케줄링 여부와 무관하게
+E                     그 언급의 `person_id` 는 이미 알려져 있으므로(원래 턴에서 merge
+E                     됐던 값) 같은 언급에 딸린 **다른** 보류 제안이 있으면 재해석 없이
+E                     이어 실행한다.
+E               
+E                   ## 남은 보류 제안 (`resume.pending_calls`)
+E               
+E                   이번 답으로 버려지지 않은 나머지 제안은 합성 `Proposal`/`GateVerdict`
+E                   (`_synthetic_proposal_and_verdict` -- 게이트를 다시 태우지 않는다)로
+E                   `resolve_mentions()`/`_record()` 를 다시 타되, 이번 답이 확정한 언급은
+E                   `preresolved` 로 넘겨 `resolve()` 를 다시 부르지 않는다(결정 E, 원칙8).
+E                   그 결과 또 되묻거나(identity/new_person) `schedule` 질문이 새로
+E                   나오면 **그 자리에서 이 재개 턴을 끝낸다**(01-plan U7 "재개 중 남은
+E                   언급이 또 되물으면 그 자리에서 재개 턴을 끝내고") -- 방금 답한 첫
+E                   질문은 이미 `answer_question()` 이 `answered` 로 저장해 두었고, 이
+E                   함수는 그 행을 다시 건드리지 않는다(결정 J 의 1회 소비는 그 저장이
+E                   이미 지킨다).
+E               
+E                   `agent_traces` 에 `loop_resume`(재개 진입 자체) 행 1개를 남기고,
+E                   이어지는 `resolve_mentions()`/`_record()` 가 각자의 step 행을
+E                   남긴다(`loop_resolve_done`/`loop_record`) -- 진행할 보류 제안이
+E                   없어도(예: identity 답만 처리하고 끝나는 턴) 빈 목록으로 각 1행씩
+E                   남는다(U1 81행 "정확히 1행"과 같은 방향). `loop_extract`/`loop_gate`
+E                   행은 남기지 않는다 -- 인식 LLM 을 다시 부르지 않으므로(결정 E) 제안할
+E                   것도, 거를 것도 없다."""
+E               
+E                   kind = resume_input.kind
+E                   context = resume_input.context if isinstance(resume_input.context, dict) else {}
+E                   answer = resume_input.answer
+E                   utterance = context.get("utterance", "")
+E                   resume_raw = context.get("resume")
+E                   resume_raw = resume_raw if isinstance(resume_raw, dict) else {}
+E               
+E                   _log_resume_entry(ctx, resume_input)
+E                   resume_trace_id = ctx.last_trace_id
+E               
+E                   pending_calls = [
+E                       PendingCall(
+E                           index=call.get("index", position),
+E                           name=call["name"],
+E                           args=_hydrate_pending_call_args(call.get("args", {})),
+E                       )
+E                       for position, call in enumerate(resume_raw.get("pending_calls") or [])
+E                   ]
+E               
+E                   preresolved: dict[str, int] = {}
+E                   persons_created = 0
+E                   schedules_direct = 0
+E               
+E                   if kind == "identity":
+E                       mention = context.get("mention", "")
+E                       candidate_ids = context.get("candidate_ids")
+E                       candidate_ids = candidate_ids if isinstance(candidate_ids, dict) else {}
+E                       if answer in candidate_ids:
+E                           person_id = candidate_ids[answer]
+E                           app_tools.update_person(ctx, person_id, new_alias=mention)
+E                           preresolved[mention] = person_id
+E                       else:
+E                           # FIX-035 -- 거절(ER 옵션 밖)은 "이 후보가 아니다"일 뿐 "기억하지
+E                           # 마라"가 아니다. 보류 제안을 버리지 않고 같은 언급으로 new_person
+E                           # 질문을 새로 내고 이 재개 턴을 그 자리에서 끝낸다(ER 재실행 없음 --
+E                           # 사용자가 방금 "다른 사람"이라 했으므로 band 는 new_person 확정).
+E                           # 자동 생성은 없다: 후속 질문에 태그 칩으로 답해야만 create_person
+E                           # (D1).
+E                           return _followup_new_person_turn(
+E                               ctx,
+E                               resume_trace_id=resume_trace_id,
+E                               mention=mention,
+E                               utterance=utterance,
+E                               identity_context=context,
+E                               resume_raw=resume_raw,
+E                               pending_calls=pending_calls,
+E                           )
+E               
+E                   elif kind == "new_person":
+E                       mention = context.get("mention", "")
+E                       tag_by_answer = resume_raw.get("tag_by_answer")
+E                       tag_by_answer = tag_by_answer if isinstance(tag_by_answer, dict) else {}
+E                       if answer in tag_by_answer:
+E                           relation_tag = tag_by_answer[answer]
+E                           hints = resume_raw.get("hints")
+E                           hierarchy_hint = hints.get("hierarchy") if isinstance(hints, dict) else None
+E                           hierarchy = hierarchy_hint if hierarchy_hint in HIERARCHIES else _DEFAULT_HIERARCHY
+E                           # 판정 표 5a -- create_person 바로 앞줄에서 confirmed_question_id
+E                           # 를 세운다(D1, 이 함수가 스스로 확정한다).
+E                           ctx.confirmed_question_id = question_id
+E                           created = app_tools.create_person(
+E                               ctx,
+E                               display_name=mention,
+E                               aliases=[mention] if mention else [],
+E                               relation_tag=relation_tag,
+E                               hierarchy=hierarchy,
+E                           )
+E                           preresolved[mention] = created.id
+E                           persons_created = 1
+E                       else:
+E                           # 판정 표 28행 -- 답이 태그 옵션 밖(ER 부정 옵션)이면
+E                           # create_person 을 0회 부른다.
+E                           pending_calls = _drop_calls_for_mention(pending_calls, mention)
+E               
+E                   elif kind == "schedule":
+E                       schedule_ref = resume_raw.get("schedule")
+E                       schedule_ref = schedule_ref if isinstance(schedule_ref, dict) else None
+E                       schedule_options = resume_raw.get("schedule_options")
+E                       schedule_options = schedule_options if isinstance(schedule_options, dict) else {}
+E                       call_index = schedule_ref.get("call_index") if schedule_ref is not None else None
+E               
+E                       schedule_mention: str | None = None
+E                       if isinstance(call_index, int) and 0 <= call_index < len(pending_calls):
+E                           person_field = pending_calls[call_index].args.get("person")
+E                           if isinstance(person_field, str):
+E                               schedule_mention = person_field
+E               
+E                       if (
+E                           schedule_ref is not None
+E                           and answer != SCHEDULE_UNKNOWN_OPTION
+E                           and answer in schedule_options
+E                       ):
+E                           scheduled_at = datetime.fromisoformat(schedule_options[answer])
+E                           app_tools.add_schedule(ctx, schedule_ref["person_id"], schedule_ref["title"], scheduled_at)
+E                           schedules_direct = 1
+E                       # "모르겠어요"·표 밖 답 -- add_schedule 0회(M-2(i)).
+E               
+E                       if schedule_ref is not None and schedule_mention is not None:
+E                           # 스케줄링 여부와 무관하게 이 언급의 person_id 는 이미 알려져
+E                           # 있다(원래 턴의 merge) -- 같은 언급에 딸린 다른 보류 제안이
+E                           # 있으면 재해석 없이 이어 실행한다.
+E                           preresolved[schedule_mention] = schedule_ref["person_id"]
+E               
+E                       if isinstance(call_index, int) and 0 <= call_index < len(pending_calls):
+E                           # 이 질문을 일으킨 제안 자신은 위에서 이미 처리했다(성공이든
+E                           # "모르겠어요" 든) -- 중복 실행 금지.
+E                           pending_calls = [c for i, c in enumerate(pending_calls) if i != call_index]
+E               
+E                   proposal, verdict = _synthetic_proposal_and_verdict(pending_calls)
+E                   outcome = resolve_mentions(
+E                       ctx,
+E                       proposal,
+E                       verdict,
+E                       utterance,
+E                       judge=judge,
+E                       config=config,
+E                       preresolved=preresolved,
+E                   )
+E                   resolve_trace_id = ctx.last_trace_id
+E                   record = _record(
+E                       ctx,
+E                       proposal,
+E                       verdict,
+E                       outcome,
+E                       utterance,
+E                       resume_byte_limit=LOOP_MAX_RESUME_BYTES,
+E                       extractor=extractor,
+E                   )
+E                   record_trace_id = ctx.last_trace_id
+E               
+E                   if record.schedule_question is not None:
+E                       pending_question = record.schedule_question
+E                   elif outcome.stopped:
+E                       pending_question = _pending_question_from_resolve(outcome)
+E                   else:
+E                       pending_question = None
+E               
+E                   stop_reason = "ask_user" if pending_question is not None else None
+E               
+E                   reply = build_reply(
+E                       stored_events=record.events,
+E                       stored_schedules=record.schedules + schedules_direct,
+E                       stored_facts=record.facts,
+E                       failed_count=len(record.failed),
+E                       limit_hit=False,
+E                       pending_question=pending_question,
+E                   )
+E               
+E                   turn = TurnResult(
+E                       reply=reply,
+E                       session_id=ctx.session_id,
+E                       stored=StoredSummary(
+E                           persons=persons_created,
+E                           events=record.events,
+E                           schedules=record.schedules + schedules_direct,
+E                       ),
+E                       pending_question=pending_question,
+E                       stop_reason=stop_reason,
+E                       trace_ids=[
+E                           trace_id
+E                           for trace_id in (resume_trace_id, resolve_trace_id, record_trace_id)
+E                           if trace_id is not None
+E                       ],
+E                   )
+E               
+E                   return _log_turn(ctx, utterance, turn)
+
+tests/test_agent_loop.py:228: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/google/genai/types.py:42
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 failed, 1950 passed, 1 warning in 25.47s

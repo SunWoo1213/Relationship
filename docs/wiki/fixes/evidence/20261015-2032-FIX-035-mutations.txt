@@ -1,0 +1,14 @@
+# 명령: python3 /tmp/fix035/mut.py
+# 시각: 2026-10-15T20:32:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: c4fbd2f (dev2)
+# exit: 0
+# ---
+M1 거절 분기를 옛 drop 으로: exit=1 -> FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 - assert None is not None | 1 failed, 11 passed in 0.91s
+M2 후속 질문 kind 를 identity 로: exit=1 -> FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 - AssertionError: assert 'identity' == 'new_person' | 1 failed, 11 passed in 0.90s
+M3 trace identity_rejected 제거: exit=1 -> FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_writes_trace_fields_fix035 - KeyError: 'identity_rejected' | 1 failed, 12 passed in 0.99s
+M3b trace followup_question_id 제거: exit=1 -> FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_writes_trace_fields_fix035 - KeyError: 'followup_question_id' | 1 failed, 12 passed in 0.82s
+M4 1명 문구를 옛 문구로: exit=1 -> FAILED tests/test_er_pipeline.py::test_resolve_identity_single_candidate_question_wording_fix035 - assert '"팀장" -- 김민수 중 한 분이 맞으실까요?' == '"팀장" -- 김민수 님이 맞으실까요?' | 1 failed, 23 passed in 1.02s
+M5 후속 질문 문구 변경: exit=1 -> FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 - assert '"팀장"을(를) 기억할까요?' == '"팀장"을(를) 새 인물로 기억해둘까요?' | 1 failed, 11 passed in 0.82s
+M6 pending_calls 를 비워서 싣기(보류 제안 유실): exit=1 -> FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 - AssertionError: assert [] == ['add_event'] | 1 failed, 11 passed in 0.80s
+원복 완료(사본)

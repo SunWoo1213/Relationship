@@ -489,3 +489,5 @@
 - 2026-10-15 14:50 | PUSH-dev2 | origin dev2 07ec09a (실험 푸시)
 - 2026-10-15 19:43 | COMMIT | 0b24bb6 test(P8-frontend): 백엔드 판정을 끝내고 테스트 기록·신뢰성 보고서를 만든다
 - 2026-10-15 19:43 | PUSH-dev2 | origin dev2 0b24bb6 (실험 푸시)
+- 2026-10-15 19:45 | COMMIT | c4fbd2f harness(settings): 백그라운드 세션도 저장소에서 바로 작업하게 한다
+- 2026-10-15 19:45 | PUSH-dev2 | origin dev2 c4fbd2f (실험 푸시)

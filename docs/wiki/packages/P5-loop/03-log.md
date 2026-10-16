@@ -78,3 +78,5 @@
   - 7·22행 시드 행은 개발 DB 에 남겼다(원칙8).
 - 남은 것 · 다음 단위: 04-review 에서 판단할 것이 셋이다. (1) 01-plan 판정 표의 파일명·`-k` 표기를 정정할지, (2) README 진행 표가 사라진 것(`56ced8b`)과 01-plan·registry 표기의 차이, (3) 8행을 사용자가 실제 키로 재현하는 문제. F-e93529 는 `verify-plan.sh` 정규식 문제(R-19 와 같은 보류 묶음)다. 다음 = 04-review(verifier, L-004).
 - Refs: P5-loop R6 R7 원칙8 원칙9
+
+- FIX-035 가 U7 의 identity 거절 동작을 바꿨다: 01-plan U7 "부정 답 → 아무것도 만들지 않는다" 중 identity 거절은 이제 보류 제안을 버리지 않고 같은 언급의 new_person 질문으로 이어진다(new_person 거절은 그대로). 근거 `docs/wiki/fixes/FIX-035.md`. Refs: P5-loop FIX-035 D1

@@ -208,10 +208,18 @@ from app.agent.types import (
     TurnResult,
 )
 from app.db.models import HIERARCHIES, RELATION_TAGS
-from app.er import ERConfig, Judge, Resolution, apply_resolution, resolve
+from app.er import (
+    NEW_PERSON_CONFIRM_OPTION,
+    NEW_PERSON_REJECT_OPTION,
+    ERConfig,
+    Judge,
+    Resolution,
+    apply_resolution,
+    resolve,
+)
 from app.memory import FactExtractor, after_record
 from app.settings import LOOP_MAX_RESUME_BYTES, PATTERN_KEY_PREFIX, user_timezone
-from app.tools.context import ToolContext, to_jsonable, traced
+from app.tools.context import ToolContext, amend_trace_output, to_jsonable, traced
 from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
 
 # ---------------------------------------------------------------------------
@@ -1152,8 +1160,10 @@ def _log_turn(ctx: ToolContext, utterance: str, turn: TurnResult) -> TurnResult:
 
 def _log_resume_entry(ctx: ToolContext, resume_input: ResumeInput) -> ResumeInput:
     """`loop_resume` trace 행 1개(결정 F -- 재개 진입 자체를 기록한다).
-    `resume_input.to_dict()` 가 `input`/`output` 양쪽에 그대로 실린다
-    (`kind`·`context`·`answer`) -- `context` 는 이미 `pending_questions`
+    `resume_input.to_dict()` 가 `input`/`output` 양쪽에 처음 실린다
+    (`kind`·`context`·`answer`; identity 거절 → 후속 질문 경로에서는
+    FIX-035 가 `output` 에 `identity_rejected`·`followup_question_id` 두
+    키를 더한다 -- `amend_trace_output`) -- `context` 는 이미 `pending_questions`
     에 저장돼 있던 값이므로 새로 노출되는 비밀은 없다."""
 
     @traced(LOOP_TRACE_TOOL_NAME, step=STEP_LOOP_RESUME)
@@ -1161,6 +1171,92 @@ def _log_resume_entry(ctx: ToolContext, resume_input: ResumeInput) -> ResumeInpu
         return resume_input
 
     return _traced(ctx, resume_input)
+
+
+def _followup_new_person_turn(
+    ctx: ToolContext,
+    *,
+    resume_trace_id: int | None,
+    mention: str,
+    utterance: str,
+    resume_raw: dict[str, Any],
+    pending_calls: list[PendingCall],
+) -> TurnResult:
+    """FIX-035 -- identity 거절 뒤 같은 `mention` 의 new_person 질문을
+    새로 내고 재개 턴을 끝낸다. 질문 모양은 ER 이 내는 new_person 질문과
+    같고(`_extend_for_ask` -> `_extend_new_person_payload`), 재개 재료에는
+    원래 `pending_calls`·`hints` 를 그대로 싣는다. ER 은 다시 돌리지 않는다
+    (`apply_resolution` 대신 `ask_user` 를 직접 부른다 -- 쓸 `er_resolve`
+    행이 없다).
+
+    context 에 확신도 분해를 싣지 않는다 -- 그 근거는 원래 identity 질문
+    행과 `er_resolve` 행에 있고, 이 모듈은 확신도·임계치 토큰을 쓰지 않는다
+    (판정 표 6행, `tests/test_agent_loop.py` 금지 토큰 테스트)."""
+
+    context = {
+        "mention": mention,
+        "utterance": utterance,
+        "candidate_ids": {},
+        AFFIRMATIVE_KEY: [NEW_PERSON_CONFIRM_OPTION],
+    }
+    ask_payload = {
+        "kind": "new_person",
+        "question": f'"{mention}"을(를) 새 인물로 기억해둘까요?',
+        "options": [NEW_PERSON_CONFIRM_OPTION, NEW_PERSON_REJECT_OPTION],
+        "affirmative_options": [NEW_PERSON_CONFIRM_OPTION],
+        "context": context,
+    }
+    hints = resume_raw.get("hints")
+    resolution = Resolution(
+        trace_id=None,
+        mention=mention,
+        band="new_person",
+        band_by_threshold="new_person",
+        ask_payload=ask_payload,
+    )
+    resolution = _extend_for_ask(
+        resolution,
+        mention=mention,
+        hints=hints if isinstance(hints, dict) else {},
+        pending_calls=pending_calls,
+        resume_byte_limit=LOOP_MAX_RESUME_BYTES,
+    )
+    payload = resolution.ask_payload
+    assert payload is not None
+    question = app_tools.ask_user(
+        ctx,
+        kind=payload["kind"],
+        question=payload["question"],
+        options=payload["options"],
+        context=payload["context"],
+    )
+
+    # 원칙9 -- 이 전환을 loop_resume 행에 남긴다(진입 때 쓴 행에 두 키만 더한다).
+    amend_trace_output(
+        ctx,
+        resume_trace_id,
+        {"identity_rejected": True, "followup_question_id": question.question_id},
+    )
+
+    # `ask_user` 의 반환값이 이미 저장된 질문 그대로(status="pending")이므로
+    # 다시 만들지 않는다.
+    pending_question = question
+    turn = TurnResult(
+        reply=build_reply(
+            stored_events=0,
+            stored_schedules=0,
+            stored_facts=0,
+            failed_count=0,
+            limit_hit=False,
+            pending_question=pending_question,
+        ),
+        session_id=ctx.session_id,
+        stored=StoredSummary(persons=0, events=0, schedules=0),
+        pending_question=pending_question,
+        stop_reason="ask_user",
+        trace_ids=[resume_trace_id] if resume_trace_id is not None else [],
+    )
+    return _log_turn(ctx, utterance, turn)
 
 
 def _synthetic_proposal_and_verdict(
@@ -1222,7 +1318,8 @@ def _hydrate_pending_call_args(args: dict[str, Any]) -> dict[str, Any]:
 
 
 def _drop_calls_for_mention(pending_calls: list[PendingCall], mention: str) -> list[PendingCall]:
-    """부정 답(identity 거절/`new_person` 태그 옵션 밖) -- 그 언급에 딸린
+    """부정 답(`new_person` 태그 옵션 밖; identity 거절은 FIX-035 부터 이
+    함수를 부르지 않고 후속 new_person 질문으로 간다) -- 그 언급에 딸린
     보류 제안을 버린다(그 인물이 확정되지 않았으므로 실행할 `person_id`
     가 없다). 다른(아직 손대지 않은) 언급의 제안은 그대로 남는다."""
 
@@ -1268,9 +1365,10 @@ def resume_turn(
 
     - **`identity`**: `context["candidate_ids"][answer]` 가 가리키는 그
       인물에만 `update_person` 을 `new_alias=context["mention"]` 으로 부른다.
-      답이 후보 밖(ER 거절 옵션)이면 그 언급에 딸린 보류 제안을 버리고
-      아무것도 만들지 않는다(F-b97a06 긍정 답 규약과 같은 방향 -- 판단
-      근거가 없으면 확정하지 않는다).
+      답이 후보 밖(ER 거절 옵션)이면(FIX-035) 보류 제안을 버리지 않고 같은
+      언급으로 new_person 질문을 새로 낸 뒤 이 재개 턴을 그 자리에서 끝낸다
+      (`_followup_new_person_turn` -- ER 재실행 없음, 자동 생성 없음: 후속
+      질문에 태그 칩으로 답해야만 `create_person`, D1).
     - **`new_person`**(M-1(d)): 답이 `resume.tag_by_answer` 의 키이면
       `relation_tag = tag_by_answer[answer]`(**답에서만** 온다),
       `hierarchy` 는 `resume.hints.hierarchy` 가 `HIERARCHIES` 안이면 그
@@ -1307,7 +1405,9 @@ def resume_turn(
     이어지는 `resolve_mentions()`/`_record()` 가 각자의 step 행을
     남긴다(`loop_resolve_done`/`loop_record`) -- 진행할 보류 제안이
     없어도(예: identity 답만 처리하고 끝나는 턴) 빈 목록으로 각 1행씩
-    남는다(U1 81행 "정확히 1행"과 같은 방향). `loop_extract`/`loop_gate`
+    남는다(U1 81행 "정확히 1행"과 같은 방향). 단 identity 거절 → 후속
+    질문 경로(FIX-035)는 두 행을 남기지 않고 `loop_resume` 행 + `ask_user`
+    행 + `loop_turn` 행만 남긴다. `loop_extract`/`loop_gate`
     행은 남기지 않는다 -- 인식 LLM 을 다시 부르지 않으므로(결정 E) 제안할
     것도, 거를 것도 없다."""
 
@@ -1343,9 +1443,20 @@ def resume_turn(
             app_tools.update_person(ctx, person_id, new_alias=mention)
             preresolved[mention] = person_id
         else:
-            # 거절(ER 옵션 밖) -- 이 언급을 확정하지 않는다(D1 과 같은
-            # 비대칭: 판단 근거가 없으면 확정하지 않는다).
-            pending_calls = _drop_calls_for_mention(pending_calls, mention)
+            # FIX-035 -- 거절(ER 옵션 밖)은 "이 후보가 아니다"일 뿐 "기억하지
+            # 마라"가 아니다. 보류 제안을 버리지 않고 같은 언급으로 new_person
+            # 질문을 새로 내고 이 재개 턴을 그 자리에서 끝낸다(ER 재실행 없음 --
+            # 사용자가 방금 "다른 사람"이라 했으므로 band 는 new_person 확정).
+            # 자동 생성은 없다: 후속 질문에 태그 칩으로 답해야만 create_person
+            # (D1).
+            return _followup_new_person_turn(
+                ctx,
+                resume_trace_id=resume_trace_id,
+                mention=mention,
+                utterance=utterance,
+                resume_raw=resume_raw,
+                pending_calls=pending_calls,
+            )
 
     elif kind == "new_person":
         mention = context.get("mention", "")

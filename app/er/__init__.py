@@ -16,6 +16,8 @@ from app.er.types import (
     ER_TRACE_STEP,
     ER_TRACE_TOOL_NAME,
     ER_VERSION,
+    NEW_PERSON_CONFIRM_OPTION,
+    NEW_PERSON_REJECT_OPTION,
     AlreadyApplied,
     AppliedResolution,
     ERConfig,
@@ -37,4 +39,6 @@ __all__ = [
     "ER_TRACE_STEP",
     "ER_TRACE_TOOL_NAME",
     "ER_VERSION",
+    "NEW_PERSON_CONFIRM_OPTION",
+    "NEW_PERSON_REJECT_OPTION",
 ]

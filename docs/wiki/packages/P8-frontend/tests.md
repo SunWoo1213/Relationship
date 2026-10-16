@@ -416,15 +416,29 @@ U3 단위 테스트는 `briefing_compose` trace 행을 **직접 넣어** 조회 
 | test_api_read_briefings_e2e.py::test_9행_수동_실행과_주기_실행이_만든_trace_를_그대로_읽는다 | 판정표 9행 — 두 실행 경로의 trace 를 `GET /briefings` 가 그대로 보여 줌 | 인물 김팀장(사실 `hobby`=등산 + 근거 이벤트)·일정 s1(5시간 뒤)·s2(8시간 뒤), 생성기 표 s1 "수동 실행 줄"·s2 "주기 실행 줄" → `POST /briefings/run {schedule_id:s1}` 200·s1 1건, `run_briefings(trigger="scheduler")` 가 s2 만 브리핑(s1 은 `briefed_at` 찍힘) → `GET /briefings` 2건 `[s2, s1]`, 각 항목의 `lines`·`suggestion`·`pattern_sentences`·`composer`(`llm`)·`push`·`trace_id`·`generated_at` 가 그 일정의 compose trace(실제로 1행) 와 같음, 생성기 문장이 거부 없이 실림, `schedule.title`·`person.display_name` 채워짐, `briefing_run` trace 의 `trigger` = `[manual, scheduler]` | 통과 · U9b-M5 | **실제 실패**(1회): 처음 쓴 직후 첫 실행에서 실패 — 시험 데이터의 사실 키 `취미` 가 승격 어휘 `FACT_KEYS` 밖이라 브리핑 입력의 `used_facts` 에 들어가지 못해 생성기 줄·제안이 `unknown_basis` 로 거부되고 `lines == []`. 키를 `hobby` 로 고쳐 통과. 당시 출력은 `save_evidence` 를 거치지 않아 남아 있지 않아 같은 원인으로 재현한 것을 증거로 둔다 · `evidence/20261015-1527-u9-be-first-failure-repro.txt` |
 | test_api_read_briefings_e2e.py::test_10행_재실행_사용자_범위_원문_다른_step_혼입 | 판정표 10행 — 재실행·사용자 범위·원문·다른 step 혼입 | 같은 일정 s1 을 지정해 2회 실행(생성기 응답 다르게: "첫째 실행"→"둘째 실행") → compose 행 2개(두 번째 id 가 큼), 사용자 B 일정을 `run_briefings(user_id="other")` 로 실제 실행, s1·s3(오류만) 에 나중 시각 `briefing_error` 행을 직접 추가(`briefing_run` 행 3개는 실제 실행이 남긴 것으로 `output` 에 최상위 `schedule_id` 가 없어 — `run.py` 308~317행 — 혼입 검출 재료가 아니다. 재료는 직접 넣은 `briefing_error` 행이고, run 행 혼입은 U3 단위 `test_run_과_error_행은_섞이지_않는다` 가 맡는다) → `GET /briefings` 는 s1 하나뿐, `trace_id` = 두 번째 compose, 줄 "둘째 실행"·제안 "둘째 제안", `raw_utterance`·"비밀원문XYZ"·"남의 비밀"·"남의 일정" 0회, `?schedule_id=s1` 도 같은 행 | 통과 · U9b-M6 · U9b-M7 · U9b-M8 · U9b-M9 | 기록 없음 — 첫 실행은 `pytest -x` 로 위 테스트에서 멈춰 이 테스트의 결과가 남지 않았다. 같은 원인(사실 키 `취미`)을 재현하면 이 테스트도 `assert [] == ['둘째 실행']` 로 실패하지만, 당시 실제 실패 기록은 아니다(재현은 참고용) · `evidence/20261015-1527-u9-be-first-failure-repro.txt` |
 
+### FIX-035 — identity 거절 → new_person 후속 질문 · 후보 1명 문구 (7건, 아래 "실패 이력 집계"에 포함)
+
+P8 활성 중 들어간 FIX-035(`docs/wiki/fixes/FIX-035.md`)의 테스트다. 맨 위 "총계" 203건은 P8 단위가 만든 것만 센 값이고, 이 7건은 그와 따로 세되 "실패 이력 집계"에는 넣는다(사용자 결정 2026-10-16, R-35-7 — 집계 210건 = 203 + 7)(`tests/test_api_answers_resume.py` 5 · `tests/test_er_pipeline.py` 1 · `tests/test_tools_context.py` 1). 변이 ID 는 `review-FIX-035.md` §2 의 M1~M12 와, 재작업 1차의 `M6a/M6b/M6c`(헬퍼 변이) 이다. 증거: 재작업 변이 `fixes/evidence/20261016-1734-FIX-035-rework1-mutations.txt` · 전체 회귀 1953 passed(skip 0) `…1735-FIX-035-rework1-full-regression.txt` · verifier 변이 `…1722-verifier-FIX-035-mutations.txt`. 모두 `TestClient` + 롤백되는 실 PostgreSQL, LLM·외부 네트워크 0.
+
+| 파일::테스트 이름 | 무엇을 확인하나 | 입력 → 기대 | 결과 | 실패 이력 |
+|---|---|---|---|---|
+| test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 | identity 거절("아니요, 다른 사람이에요")이 발화를 버리지 않고 같은 언급의 new_person 후속 질문을 낸다 | 후보 1명(김민수, 별칭 `팀장`) identity 질문 → 거절 답 → 후속 질문 `kind=new_person`·문구 `"팀장"을(를) 새 인물로 기억해둘까요?`·칩 = 태그 5 + `아니요`·`stop_reason=ask_user`·`stored` 전부 0·인물/사건 행 수 불변, 첫 질문 answered, 후속 context 의 `resume.pending_calls == [add_event]`·`tag_by_answer` | 통과 · FIX-035-M1 · M2 · M3 · M12 | 기록 없음 |
+| test_api_answers_resume.py::test_answers_resume_identity_reject_writes_trace_fields_fix035 | 원칙9 — 거절 전환 사실이 `loop_resume` 행 `output` 에 영속된다 | 거절 답 후 DB 재조회 → `output.identity_rejected is True`·`followup_question_id == 후속 질문 id`·`kind=identity`·`answer=거절 문구` | 통과 · FIX-035-M1 · M6 · M7 · M9 · M6a · M6b | 기록 없음 |
+| test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_creates_person_and_event_fix035 | 후속 질문에 태그 칩으로 답하면 그때만 인물이 생기고 원래 보류 제안(`add_event`)이 저장된다(D1) | 거절 → `직장으로 기억할게요` → `stored = {persons 1, events 1}`·`relation_tag="직장"`·이벤트 `type=meal`·`raw_utterance` 원문 | 통과 · FIX-035-M1 · M2 · M3 · M11 · M12 | 기록 없음 |
+| test_api_answers_resume.py::test_answers_resume_identity_reject_then_no_creates_nothing_fix035 | 후속 질문에 `아니요` 면 아무것도 만들지 않는다 | 거절 → `아니요` → `stored` 전부 0·`pending_question=None`·인물/사건 행 수 불변 | 통과 · FIX-035-M1 · M2 · M12 | 기록 없음 |
+| test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_keeps_hierarchy_hint_fix035 | (재작업 1차 R-35-2) 원래 턴의 `create_person` 힌트 위계가 후속 질문을 거쳐 보존된다 | `create_person(hierarchy="상")` 힌트 제안을 함께 넣은 identity 질문 → 거절 → 태그 답 → 후속 context `resume.hints.hierarchy == "상"`·`person.hierarchy == "상"`(유실되면 기본 `동`) | 통과 · FIX-035-rework1-M8 | **검출 실패 → 보강**: verifier 변이 M8(`hints` 미전달)이 기존 36건을 모두 통과(`36 passed`)해 보류(R-35-2) → 재작업 1차에서 이 테스트 신설, M8 검출 · `review-FIX-035.md` §2 #3·4절 |
+| test_er_pipeline.py::test_resolve_identity_single_candidate_question_wording_fix035 | 후보 1명이면 identity 질문 문구가 `<이름> 님이 맞으실까요?` | 후보 김민수 1명 → `"팀장" -- 김민수 님이 맞으실까요?` (옵션·`candidate_ids`·긍정 목록 불변) | 통과 · FIX-035-M4 | 기록 없음 |
+| test_tools_context.py::test_amend_trace_output_adds_keys_persists_and_refuses_overwrite_fix035 | (재작업 1차 R-35-1) trace 부분 갱신 헬퍼 `amend_trace_output` 의 계약 | `output={"a":1}` 행에 `{"b":True,"c":7}` → DB 재조회로 `{"a":1,"b":True,"c":7}`·`{"a":2}` 는 `ValueError` 이고 `a` 불변·`trace_id=None`/없는 id → `False` | 통과 · M6a · M6b · M6c | 기록 없음 (재작업 1차에서 신설) |
+
 ### 실패 이력 집계
 
 | 구분 | 행 수 | 비고 |
 |------|------|------|
 | 실제 실패 | 5 | 프론트 4행: `card` 항목 링크(테스트 쪽 오류, 1회) · `card` R-U6-1 · `card` R-U6-2 두 건(셋은 verifier 탐침 P3·P2 가 전신) / 백엔드 1행: `briefings_e2e` 9행 테스트(처음 쓴 직후 첫 실행) |
-| 검출 실패 → 보강 | 17 | 프론트 10행: proxy 4 · chat 칩 1 · card P2c 1 · briefing 강조 1 · briefing P4 1 · push R-U8-1 1 · E2E card 데스크톱 1 / 백엔드 7행: U1 `last_contact` 관련 4 · 쓰기 0 U1·U2 2 · 조작된 trace(verifier V2, R-U9b-1) 1 |
+| 검출 실패 → 보강 | 18 | 프론트 10행: proxy 4 · chat 칩 1 · card P2c 1 · briefing 강조 1 · briefing P4 1 · push R-U8-1 1 · E2E card 데스크톱 1 / 백엔드 7행: U1 `last_contact` 관련 4 · 쓰기 0 U1·U2 2 · 조작된 trace(verifier V2, R-U9b-1) 1 / FIX-035 1행: 힌트 위계 보존(verifier M8, R-35-2) |
 | 보류·재작업 | 4 | 프론트 `routes.test` 서랍 4행(R-U4-1) |
 | 동작 틈 → 보강 | 1 | 프론트 `card` R-U6-2 "앱을 열면 1회" |
-| 기록 없음 | 176 | 나머지 |
-| 합계 | **203** | 5 + 17 + 4 + 1 + 176 = 203 = 프론트 135 + E2E 4 + 백엔드 64 |
+| 기록 없음 | 182 | 나머지 (P8 176 + FIX-035 6) |
+| 합계 | **210** | 5 + 18 + 4 + 1 + 182 = 210 = 프론트 135 + E2E 4 + 백엔드 64 + FIX-035 7 |
 
-세는 법: 이 파일에서 `grep -c "^| .*| \*\*실제 실패\*\*" tests.md` → 5, `… \*\*검출 실패 → 보강\*\*` → 17, `… \*\*보류·재작업\*\*` → 4, `… \*\*동작 틈 → 보강\*\*` → 1, `grep -c "^| .*| 기록 없음" tests.md` → 176. 이 숫자는 "CI·변이 검출 외에 개발 중 실제로 기록된 것"만 센 것이며, **기록에 남지 않은 실패는 센 수 없다** — 특히 FIX-034(2026-10-13) 이전의 증거 파일(U1~U4)은 사람이 옮겨 적은 것이라 중간 실패 실행이 빠져 있을 수 있다.
+세는 법: 이 파일에서 `grep -c "^| .*| \*\*실제 실패\*\*" tests.md` → 5, `… \*\*검출 실패 → 보강\*\*` → 18, `… \*\*보류·재작업\*\*` → 4, `… \*\*동작 틈 → 보강\*\*` → 1, `grep -c "^| .*| 기록 없음" tests.md` → 182. 이 숫자는 "CI·변이 검출 외에 개발 중 실제로 기록된 것"만 센 것이며, **기록에 남지 않은 실패는 센 수 없다** — 특히 FIX-034(2026-10-13) 이전의 증거 파일(U1~U4)은 사람이 옮겨 적은 것이라 중간 실패 실행이 빠져 있을 수 있다.

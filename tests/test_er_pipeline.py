@@ -319,6 +319,27 @@ def test_resolve_identity_band_ask_payload_lists_candidate_options_identity_payl
         "박철수": person2.id,
     }
     assert ask_payload["context"][AFFIRMATIVE_KEY] == ask_payload["affirmative_options"]
+    # FIX-035 -- 후보 2명 이상은 옛 문구 그대로("중 한 분이"). 이름은 유사도 순
+    # (동률이면 person_id 순)이라 두 인물이 같은 별칭이면 id 순서다.
+    assert ask_payload["question"] == '"팀장" -- 김민수/박철수 중 한 분이 맞으실까요?'
+
+
+def test_resolve_identity_single_candidate_question_wording_fix035(db_session, fake_embedder):
+    """FIX-035(나) -- 후보 1명이면 "중 한 분이"를 쓰지 않고 `<이름> 님이
+    맞으실까요?`. options·candidate_ids·affirmative_options 는 그대로다."""
+    person = _make_person(db_session, display_name="김민수", relation_tag="직장", hierarchy="동")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+
+    ctx = _ctx(db_session, session_id="er-pipeline-single-wording", embedder=fake_embedder)
+    result = resolve(ctx, "팀장", "발화", judge=FakeJudge(table={person.id: 0.5}), config=ERConfig())
+
+    assert result.band == "identity"
+    ask_payload = result.ask_payload
+    assert ask_payload is not None
+    assert ask_payload["question"] == '"팀장" -- 김민수 님이 맞으실까요?'
+    assert ask_payload["options"] == ["김민수", "아니요, 다른 사람이에요"]
+    assert ask_payload["affirmative_options"] == ["김민수"]
+    assert ask_payload["context"]["candidate_ids"] == {"김민수": person.id}
 
 
 def test_resolve_records_provider_and_self_reported_flag_provider_in_trace(

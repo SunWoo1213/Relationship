@@ -1,0 +1,85 @@
+# 명령: cd /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/24a6d9b0-55d1-4dd6-91a9-43dd2428c3d8/scratchpad/fix035v2 && /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python mut.py
+# 시각: 2026-10-16T17:53:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: c4fbd2f (dev2)
+# exit: 0
+# 메모: 재확인: 스크래치패드 사본 fix035v2/ 에서 변이 12종(1차 M1·M2·M4·M6·M7·M8·M9·M12 + 새 V1~V4), 저장소 무수정
+# ---
+사본 경로: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/24a6d9b0-55d1-4dd6-91a9-43dd2428c3d8/scratchpad/fix035v2
+import 경로(사본을 가리켜야 한다):
+/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/24a6d9b0-55d1-4dd6-91a9-43dd2428c3d8/scratchpad/fix035v2/app/agent/loop.py
+/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/24a6d9b0-55d1-4dd6-91a9-43dd2428c3d8/scratchpad/fix035v2/app/tools/context.py
+/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/24a6d9b0-55d1-4dd6-91a9-43dd2428c3d8/scratchpad/fix035v2/app/er/types.py
+
+CONTROL(무변이): exit=0
+48 passed in 1.15s
+
+M1 거절 분기를 옛 drop 으로 되돌린다(후속 질문 없음): exit=1 -> 검출
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 - assert None is not None
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_writes_trace_fields_fix035 - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_creates_person_and_event_fix035 - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_no_creates_nothing_fix035 - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_keeps_hierarchy_hint_fix035 - TypeError: 'NoneType' object is not subscriptable
+5 failed, 43 passed in 1.07s
+
+M2 후속 질문 kind 를 identity 로: exit=1 -> 검출
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 - AssertionError: assert 'identity' == 'new_person'
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_creates_person_and_event_fix035 - AssertionError: assert {'events': 0,...schedules': 0} == {'events': 1,...schedules': 0}
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_no_creates_nothing_fix035 - assert {'kind': 'identity', 'options': ['가족으로 기억할게요', '연인으로 기억할게요', '친구로 기억할게요', '직장으로 기억할게요', '지인으로 기억할게요', '아니요'], 'question': '"팀장"을(를) 새 인물로 기억해둘까요?', 'question_id': 7472, ...} is None
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_keeps_hierarchy_hint_fix035 - sqlalchemy.exc.NoResultFound: No row was found when one was required
+4 failed, 44 passed in 1.11s
+
+M4 후보 1명 문구를 옛 문구로 되돌린다: exit=1 -> 검출
+FAILED tests/test_er_pipeline.py::test_resolve_identity_single_candidate_question_wording_fix035 - assert '"팀장" -- 김민수 중 한 분이 맞으실까요?' == '"팀장" -- 김민수 님이 맞으실까요?'
+1 failed, 47 passed in 1.12s
+
+M6 헬퍼(amend_trace_output)에서 flag_modified 제거 -- UPDATE 가 안 나간다: exit=1 -> 검출
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_writes_trace_fields_fix035 - KeyError: 'identity_rejected'
+FAILED tests/test_tools_context.py::test_amend_trace_output_adds_keys_persists_and_refuses_overwrite_fix035 - AssertionError: assert {'a': 1} == {'a': 1, 'b': True, 'c': 7}
+2 failed, 46 passed in 1.11s
+
+M7 루프가 resume_trace_id=None 을 넘긴다(loop_resume 행 무수정): exit=1 -> 검출
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_writes_trace_fields_fix035 - KeyError: 'identity_rejected'
+1 failed, 47 passed in 1.11s
+
+M8 hints 를 싣지 않는다(hierarchy 힌트 유실) -- R-35-2: exit=1 -> 검출
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_keeps_hierarchy_hint_fix035 - KeyError: 'hierarchy'
+1 failed, 47 passed in 1.12s
+
+M9 followup_question_id 에 엉뚱한 값(resume_trace_id): exit=1 -> 검출
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_writes_trace_fields_fix035 - assert 288114 == 7609
+1 failed, 47 passed in 1.10s
+
+M12 거절 조건 뒤집기(후보 안 답이 후속 질문으로, 후보 밖 답이 update_person 으로): exit=1 -> 검출
+FAILED tests/test_api_answers_resume.py::test_answers_resume_second_mention_asks_new_question_first_stays_answered - assert 0 == 1
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_answer_leads_to_schedule_question - AssertionError: assert 'new_person' == 'schedule'
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 - assert None is not None
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_writes_trace_fields_fix035 - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_creates_person_and_event_fix035 - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_no_creates_nothing_fix035 - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_keeps_hierarchy_hint_fix035 - TypeError: 'NoneType' object is not subscriptable
+7 failed, 41 passed in 1.08s
+
+V1 헬퍼에서 ctx.session.flush() 제거(변경 추적은 되나 flush 를 호출자에 미룬다): exit=1 -> 검출
+FAILED tests/test_tools_context.py::test_amend_trace_output_adds_keys_persists_and_refuses_overwrite_fix035 - AssertionError: assert {'a': 1} == {'a': 1, 'b': True, 'c': 7}
+1 failed, 47 passed in 1.10s
+
+V2 ask_user 반환값을 그대로 쓰지 않고 status='answered' 로 다시 만든다: exit=1 -> 검출
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 - AssertionError: assert 'answered' == 'pending'
+1 failed, 47 passed in 1.12s
+
+V3 _extend_for_ask 결과 대신 확장 전 ask_payload 로 ask_user 를 부른다(태그 칩·resume 누락): exit=1 -> 검출
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 - AssertionError: assert ['네, 기억해둘게요', '아니요'] == ['가족으로 기억할게요'...기억할게요', '아니요']
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_creates_person_and_event_fix035 - assert 422 == 200
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_tag_keeps_hierarchy_hint_fix035 - KeyError: 'resume'
+3 failed, 45 passed in 1.09s
+
+V4 공개 상수 NEW_PERSON_REJECT_OPTION 값을 바꾼다(승격 시 값 불변이 테스트로 고정돼 있는가): exit=1 -> 검출
+FAILED tests/test_api_answers_resume.py::test_answers_resume_new_person_reject_creates_nothing - AssertionError: assert '아니요' in ['가족으로 기억할게요', '연인으로 기억할게요', '친구로 기억할게요', '직장으로 기억할게요', '지인으로 기억할게요', '아니오']
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_asks_new_person_followup_fix035 - AssertionError: assert ['가족으로 기억할게요'...기억할게요', '아니오'] == ['가족으로 기억할게요'...기억할게요', '아니요']
+FAILED tests/test_api_answers_resume.py::test_answers_resume_identity_reject_then_no_creates_nothing_fix035 - assert 422 == 200
+3 failed, 45 passed in 1.13s
+
+원복 확인: 사본 4파일 원문과 동일
+trace 테스트(test_answers_resume_identity_reject_writes_trace_fields_fix035)를 실패시킨 변이: ['M1', 'M6', 'M7', 'M9', 'M12']
+살아남은 변이: 없음

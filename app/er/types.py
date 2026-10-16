@@ -33,6 +33,12 @@ ER_TRACE_TOOL_NAME = "er"
 #: 구분할 수 있도록 올린다.
 ER_VERSION = "1"
 
+#: new_person 질문의 긍정/부정 칩 문구(FIX-035 R-35-5 -- `pipeline.py` 의
+#: 밑줄 상수를 공개로 승격, 값 불변). `app/agent/loop.py` 의 후속 질문이
+#: 문자열을 베끼지 않고 이 상수를 쓴다.
+NEW_PERSON_CONFIRM_OPTION = "네, 기억해둘게요"
+NEW_PERSON_REJECT_OPTION = "아니요"
+
 #: `ERConfig.__post_init__` 가 가중치 합 검증에 쓰는 허용 오차(결정8:
 #: "가중치 합 1.0(오차 1e-9)").
 _WEIGHT_SUM_TOLERANCE = 1e-9

@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest -rs tests/test_api_answers_resume.py tests/test_er_pipeline.py -q
+# 시각: 2026-10-15T20:31:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: c4fbd2f (dev2)
+# exit: 0
+# ---
+....................................                                     [100%]
+36 passed in 1.23s

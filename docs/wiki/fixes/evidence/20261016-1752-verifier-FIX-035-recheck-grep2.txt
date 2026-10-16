@@ -1,0 +1,143 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/24a6d9b0-55d1-4dd6-91a9-43dd2428c3d8/scratchpad/grep_invariant.sh
+# 시각: 2026-10-16T17:52:29+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: c4fbd2f (dev2)
+# exit: 0
+# 메모: 재확인: R-35-1 판정 표 23행 부정 grep(c4fbd2f 와 행번호 제외 대조) · R-35-3/4/5 grep · 범위(diff stat·untracked). 앞선 -1751-…-recheck-grep.txt 는 (3) 접두 제거가 안 돼 diff 가 거짓 차이를 보여 이 파일로 대체한다
+# ---
+== (1) P5-loop 판정 표 23행 부정 grep: grep -rnE --include=*.py 'PendingQuestion|flag_modified|\.context *=' app/agent/ (현재 작업 트리) ==
+app/agent/respond.py:26:  `new_person`/`schedule` 공통, `app.tools.types.PendingQuestionOut`) --
+app/agent/respond.py:33:from app.tools.types import PendingQuestionOut
+app/agent/respond.py:46:    pending_question: PendingQuestionOut | None = None,
+app/agent/respond.py:50:    숫자·불리언·`PendingQuestionOut.question` 문자열만 입력으로 받는다 --
+app/agent/types.py:38:from app.tools.types import InvalidValue, PendingQuestionOut
+app/agent/types.py:406:    .load_resume_input`(U6/U7)이 `PendingQuestion` 행에서 `kind`·`context`
+app/agent/types.py:409:    로 더해 이 타입을 만든다 -- `app/agent/` 는 `PendingQuestion` ORM 을
+app/agent/types.py:450:    .PendingQuestionOut` 재사용 -- 새 직렬화 방식을 만들지 않는다). 비어
+app/agent/types.py:457:    pending_question: PendingQuestionOut | None = None
+app/agent/loop.py:223:from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
+app/agent/loop.py:719:    schedule_question: PendingQuestionOut | None = None
+app/agent/loop.py:766:) -> PendingQuestionOut:
+app/agent/loop.py:882:    schedule_question: PendingQuestionOut | None = None
+app/agent/loop.py:1030:def _pending_question_from_resolve(outcome: ResolveOutcome) -> PendingQuestionOut:
+app/agent/loop.py:1031:    """해석 구간이 만든 identity/new_person 질문을 `PendingQuestionOut`
+app/agent/loop.py:1032:    으로 다시 만든다 -- `PendingQuestion` ORM 을 조회하지 않고, 이 루프가
+app/agent/loop.py:1042:    return PendingQuestionOut(
+app/agent/loop.py:1143:# (`app/api/deps.py::load_resume_input` 이 `PendingQuestion` 에서 값만 뽑아
+app/agent/loop.py:1341:    `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아
+== (2) 줄 수: 현재 / c4fbd2f ==
+      19
+      19
+== (3) 행번호·리비전 접두 제거 뒤 diff ==
+1,19c1,19
+< c4fbd2f:app/agent/loop.py:    """해석 구간이 만든 identity/new_person 질문을 `PendingQuestionOut`
+< c4fbd2f:app/agent/loop.py:    `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아
+< c4fbd2f:app/agent/loop.py:    return PendingQuestionOut(
+< c4fbd2f:app/agent/loop.py:    schedule_question: PendingQuestionOut | None = None
+< c4fbd2f:app/agent/loop.py:    schedule_question: PendingQuestionOut | None = None
+< c4fbd2f:app/agent/loop.py:    으로 다시 만든다 -- `PendingQuestion` ORM 을 조회하지 않고, 이 루프가
+< c4fbd2f:app/agent/loop.py:) -> PendingQuestionOut:
+< c4fbd2f:app/agent/loop.py:# (`app/api/deps.py::load_resume_input` 이 `PendingQuestion` 에서 값만 뽑아
+< c4fbd2f:app/agent/loop.py:def _pending_question_from_resolve(outcome: ResolveOutcome) -> PendingQuestionOut:
+< c4fbd2f:app/agent/loop.py:from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
+< c4fbd2f:app/agent/respond.py:    pending_question: PendingQuestionOut | None = None,
+< c4fbd2f:app/agent/respond.py:    숫자·불리언·`PendingQuestionOut.question` 문자열만 입력으로 받는다 --
+< c4fbd2f:app/agent/respond.py:  `new_person`/`schedule` 공통, `app.tools.types.PendingQuestionOut`) --
+< c4fbd2f:app/agent/respond.py:from app.tools.types import PendingQuestionOut
+< c4fbd2f:app/agent/types.py:    .load_resume_input`(U6/U7)이 `PendingQuestion` 행에서 `kind`·`context`
+< c4fbd2f:app/agent/types.py:    .PendingQuestionOut` 재사용 -- 새 직렬화 방식을 만들지 않는다). 비어
+< c4fbd2f:app/agent/types.py:    pending_question: PendingQuestionOut | None = None
+< c4fbd2f:app/agent/types.py:    로 더해 이 타입을 만든다 -- `app/agent/` 는 `PendingQuestion` ORM 을
+< c4fbd2f:app/agent/types.py:from app.tools.types import InvalidValue, PendingQuestionOut
+---
+> app/agent/loop.py:    """해석 구간이 만든 identity/new_person 질문을 `PendingQuestionOut`
+> app/agent/loop.py:    `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아
+> app/agent/loop.py:    return PendingQuestionOut(
+> app/agent/loop.py:    schedule_question: PendingQuestionOut | None = None
+> app/agent/loop.py:    schedule_question: PendingQuestionOut | None = None
+> app/agent/loop.py:    으로 다시 만든다 -- `PendingQuestion` ORM 을 조회하지 않고, 이 루프가
+> app/agent/loop.py:) -> PendingQuestionOut:
+> app/agent/loop.py:# (`app/api/deps.py::load_resume_input` 이 `PendingQuestion` 에서 값만 뽑아
+> app/agent/loop.py:def _pending_question_from_resolve(outcome: ResolveOutcome) -> PendingQuestionOut:
+> app/agent/loop.py:from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
+> app/agent/respond.py:    pending_question: PendingQuestionOut | None = None,
+> app/agent/respond.py:    숫자·불리언·`PendingQuestionOut.question` 문자열만 입력으로 받는다 --
+> app/agent/respond.py:  `new_person`/`schedule` 공통, `app.tools.types.PendingQuestionOut`) --
+> app/agent/respond.py:from app.tools.types import PendingQuestionOut
+> app/agent/types.py:    .load_resume_input`(U6/U7)이 `PendingQuestion` 행에서 `kind`·`context`
+> app/agent/types.py:    .PendingQuestionOut` 재사용 -- 새 직렬화 방식을 만들지 않는다). 비어
+> app/agent/types.py:    pending_question: PendingQuestionOut | None = None
+> app/agent/types.py:    로 더해 이 타입을 만든다 -- `app/agent/` 는 `PendingQuestion` ORM 을
+> app/agent/types.py:from app.tools.types import InvalidValue, PendingQuestionOut
+== (4) grep -rnE --include=*.py 'flag_modified|AgentTrace' app/agent/ ==
+0건
+== (5) R-35-5 옛 밑줄 상수 잔존: grep -rnE '_NEW_PERSON_(CONFIRM|REJECT)_OPTION' app tests scripts evaluation ==
+0건
+== (6) 공개 상수 정의·사용: grep -rnE --include=*.py 'NEW_PERSON_(CONFIRM|REJECT)_OPTION' app ==
+app/agent/loop.py:212:    NEW_PERSON_CONFIRM_OPTION,
+app/agent/loop.py:213:    NEW_PERSON_REJECT_OPTION,
+app/agent/loop.py:1200:        AFFIRMATIVE_KEY: [NEW_PERSON_CONFIRM_OPTION],
+app/agent/loop.py:1205:        "options": [NEW_PERSON_CONFIRM_OPTION, NEW_PERSON_REJECT_OPTION],
+app/agent/loop.py:1206:        "affirmative_options": [NEW_PERSON_CONFIRM_OPTION],
+app/er/__init__.py:19:    NEW_PERSON_CONFIRM_OPTION,
+app/er/__init__.py:20:    NEW_PERSON_REJECT_OPTION,
+app/er/__init__.py:42:    "NEW_PERSON_CONFIRM_OPTION",
+app/er/__init__.py:43:    "NEW_PERSON_REJECT_OPTION",
+app/er/types.py:39:NEW_PERSON_CONFIRM_OPTION = "네, 기억해둘게요"
+app/er/types.py:40:NEW_PERSON_REJECT_OPTION = "아니요"
+app/er/pipeline.py:92:    NEW_PERSON_CONFIRM_OPTION,
+app/er/pipeline.py:93:    NEW_PERSON_REJECT_OPTION,
+app/er/pipeline.py:230:        AFFIRMATIVE_KEY: [NEW_PERSON_CONFIRM_OPTION],
+app/er/pipeline.py:235:        "options": [NEW_PERSON_CONFIRM_OPTION, NEW_PERSON_REJECT_OPTION],
+app/er/pipeline.py:236:        "affirmative_options": [NEW_PERSON_CONFIRM_OPTION],
+== (7) 범위: git diff --stat ==
+ app/agent/loop.py                       | 135 ++++++++++++++++++++---
+ app/er/__init__.py                      |   4 +
+ app/er/pipeline.py                      |  16 +--
+ app/er/types.py                         |   6 ++
+ app/tools/context.py                    |  24 +++++
+ docs/wiki/HANDOFF.md                    |   2 +-
+ docs/wiki/journal.md                    |   2 +
+ docs/wiki/packages/P5-loop/03-log.md    |   2 +
+ docs/wiki/packages/P8-frontend/tests.md |  14 +++
+ docs/wiki/registry.md                   |  10 +-
+ tests/test_api_answers_resume.py        | 184 ++++++++++++++++++++++++++++++++
+ tests/test_er_pipeline.py               |  21 ++++
+ tests/test_tools_context.py             |  31 ++++++
+ 13 files changed, 427 insertions(+), 24 deletions(-)
+== (8) untracked ==
+?? docs/wiki/fixes/FIX-035.md
+?? docs/wiki/fixes/evidence/20261015-2031-FIX-035-full-regression.txt
+?? docs/wiki/fixes/evidence/20261015-2031-FIX-035-new-tests.txt
+?? docs/wiki/fixes/evidence/20261015-2031-FIX-035-ruff.txt
+?? docs/wiki/fixes/evidence/20261015-2032-FIX-035-full-regression.txt
+?? docs/wiki/fixes/evidence/20261015-2032-FIX-035-mutations.txt
+?? docs/wiki/fixes/evidence/20261015-2032-FIX-035-ruff.txt
+?? docs/wiki/fixes/evidence/20261016-1719-verifier-FIX-035-regression.txt
+?? docs/wiki/fixes/evidence/20261016-1720-verifier-FIX-035-ruff.txt
+?? docs/wiki/fixes/evidence/20261016-1722-verifier-FIX-035-mutations.txt
+?? docs/wiki/fixes/evidence/20261016-1734-FIX-035-rework1-mutations.txt
+?? docs/wiki/fixes/evidence/20261016-1735-FIX-035-rework1-full-regression.txt
+?? docs/wiki/fixes/evidence/20261016-1736-FIX-035-rework1-grep-invariant.txt
+?? docs/wiki/fixes/evidence/20261016-1736-FIX-035-rework1-ruff.txt
+?? docs/wiki/fixes/evidence/20261016-1750-verifier-FIX-035-recheck-regression.txt
+?? docs/wiki/fixes/evidence/20261016-1750-verifier-FIX-035-recheck-ruff.txt
+?? docs/wiki/fixes/evidence/20261016-1751-verifier-FIX-035-recheck-grep.txt
+?? docs/wiki/fixes/review-FIX-035.md
+== (9) R-35-3 docstring 4곳 (수정 뒤 본문) ==
+1165:    FIX-035 가 `output` 에 `identity_rejected`·`followup_question_id` 두
+1321:    """부정 답(`new_person` 태그 옵션 밖; identity 거절은 FIX-035 부터 이
+1368:      답이 후보 밖(ER 거절 옵션)이면(FIX-035) 보류 제안을 버리지 않고 같은
+1408:    남는다(U1 81행 "정확히 1행"과 같은 방향). 단 identity 거절 → 후속
+== (10) R-35-4 confidence_breakdown 생략 이유 ==
+1192:    context 에 확신도 분해를 싣지 않는다 -- 그 근거는 원래 identity 질문
+
+# ===== append 2026-10-16T17:53:21+09:00 =====
+# 명령: diff <(grep -rhE --include="*.py" "PendingQuestion|flag_modified|\.context *=" app/agent/ | sort) <(git grep -hE "PendingQuestion|flag_modified|\.context *=" c4fbd2f -- app/agent/ | sort) && echo "동일: 파일명·행번호 제외 내용 19줄 일치(현재 작업 트리 == c4fbd2f)"
+# 시각: 2026-10-16T17:53:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: c4fbd2f (dev2)
+# exit: 0
+# 메모: (3) 정정: git grep 쪽은 -n 없이 'rev:path:content' 형식이라 앞 명령의 sed 가 접두를 못 벗겼다. 접두 제거를 고쳐 다시 대조한다
+# ---
+동일: 파일명·행번호 제외 내용 19줄 일치(현재 작업 트리 == c4fbd2f)

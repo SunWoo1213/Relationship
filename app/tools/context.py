@@ -76,6 +76,7 @@ from decimal import Decimal
 from typing import Any, TypeVar
 
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
 
 from app.db.models import AgentTrace
 from app.embedding import EmbedderCallable, EmbeddingProvider
@@ -238,3 +239,26 @@ def traced(tool_name: str, step: str = "tool_call") -> Callable[[F], F]:
         return wrapper  # type: ignore[return-value]
 
     return decorator
+
+
+def amend_trace_output(ctx: ToolContext, trace_id: int | None, extra: dict[str, Any]) -> bool:
+    """FIX-035 R-35-1 -- 이미 쓴 `agent_traces` 행의 `output` 에 키를 **더한다**
+    (부분 갱신, `apply_resolution` 의 F-93f063 규약과 같은 수단: `flag_modified`
+    + `flush`). 기존 키는 덮어쓰지 않고(이미 있으면 `ValueError`) 전체 재기록도
+    하지 않는다. 루프(`app/agent/`)가 ORM 을 직접 만지지 않도록 이 자리에 둔다
+    (P5-loop 판정 표 23행). 행이 없거나 `output` 이 dict 가 아니면 아무것도
+    하지 않고 `False` 를 돌려준다."""
+
+    if trace_id is None:
+        return False
+    row = ctx.session.get(AgentTrace, trace_id)
+    if row is None or not isinstance(row.output, dict):
+        return False
+    clash = [key for key in extra if key in row.output]
+    if clash:
+        raise ValueError(f"이미 있는 trace output 키는 덮어쓰지 않는다: {clash}")
+    for key, value in extra.items():
+        row.output[key] = to_jsonable(value)
+    flag_modified(row, "output")
+    ctx.session.flush()
+    return True

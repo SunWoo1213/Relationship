@@ -275,3 +275,34 @@ def test_tool_context_repr_excludes_session_object_repr():
 def test_to_jsonable_handles_nested_structures_without_ctx():
     payload = {"a": [1, "x", {"b": None}], "c": (1, 2)}
     assert to_jsonable(payload) == {"a": [1, "x", {"b": None}], "c": [1, 2]}
+
+
+def test_amend_trace_output_adds_keys_persists_and_refuses_overwrite_fix035(db_session):
+    """FIX-035 R-35-1 -- 부분 갱신 헬퍼: 키를 더하고(DB 재조회로 영속 확인),
+    기존 키 덮어쓰기는 거부하고, 행이 없거나 id 가 None 이면 False."""
+    from app.tools.context import amend_trace_output
+
+    ctx = ToolContext(session=db_session, session_id="amend-fix035")
+    row = AgentTrace(
+        session_id="amend-fix035",
+        step="loop_resume",
+        tool_name="loop",
+        input={},
+        output={"a": 1},
+        tokens_in=0,
+        tokens_out=0,
+    )
+    db_session.add(row)
+    db_session.flush()
+
+    assert amend_trace_output(ctx, row.id, {"b": True, "c": 7}) is True
+    db_session.expire_all()
+    assert db_session.get(AgentTrace, row.id).output == {"a": 1, "b": True, "c": 7}
+
+    with pytest.raises(ValueError):
+        amend_trace_output(ctx, row.id, {"a": 2})
+    db_session.expire_all()
+    assert db_session.get(AgentTrace, row.id).output["a"] == 1
+
+    assert amend_trace_output(ctx, None, {"z": 1}) is False
+    assert amend_trace_output(ctx, 99999999, {"z": 1}) is False

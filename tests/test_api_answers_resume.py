@@ -488,3 +488,187 @@ def test_answers_resume_new_person_alias_embedding(app_and_client, db_session, f
     )
     assert aliases
     assert all(alias.embedding is not None for alias in aliases)
+
+
+# ---------------------------------------------------------------------------
+# FIX-035 -- identity 거절("다른 사람이에요")은 발화를 버리지 않고 new_person 으로 잇는다
+# ---------------------------------------------------------------------------
+
+_IDENTITY_REJECT = "아니요, 다른 사람이에요"
+
+
+def _start_identity_question(
+    app, client, db_session, fake_embedder, *, session_id: str, extra_calls=None
+):
+    """후보 1명(김민수, 별칭 '팀장')인 identity 되묻기를 `POST /chat` 으로 실제로
+    만든다(빈 FakeJudge 표 -> `no_matched` 강등, 개발 DB 재현과 같은 경로).
+    원하는 경로를 탔는지 이 함수가 먼저 단언한다(헛돎 방지)."""
+    person = _make_person(db_session, display_name="김민수")
+    _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
+    utterance = "팀장이랑 점심 먹었어"
+    calls = [
+        {
+            "name": "add_event",
+            "args": {
+                "person": "팀장",
+                "type": "meal",
+                "content": "점심",
+                "occurred_at": NOW.isoformat(),
+            },
+        }
+    ] + list(extra_calls or [])
+    app.dependency_overrides[get_proposer] = lambda: FakeProposer(table={utterance: calls})
+    app.dependency_overrides[get_judge] = lambda: FakeJudge(table={})
+    resp = client.post("/chat", json={"utterance": utterance}, headers={"X-Session-Id": session_id})
+    assert resp.status_code == 200
+    pq = resp.json()["pending_question"]
+    assert pq["kind"] == "identity"
+    assert pq["options"] == ["김민수", _IDENTITY_REJECT]
+    return pq["question_id"]
+
+
+def _reject_identity(app_and_client, db_session, fake_embedder, session_id: str):
+    app, client = app_and_client
+    q1 = _start_identity_question(app, client, db_session, fake_embedder, session_id=session_id)
+    persons_before = _count(db_session, Person)
+    events_before = _count(db_session, Event)
+    resp = client.post(f"/answers/{q1}", json={"answer": _IDENTITY_REJECT})
+    return client, q1, resp, persons_before, events_before
+
+
+def test_answers_resume_identity_reject_asks_new_person_followup_fix035(
+    app_and_client, db_session, fake_embedder
+):
+    client, q1, resp, persons_before, events_before = _reject_identity(
+        app_and_client, db_session, fake_embedder, "resume-fix035-reject"
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    pq = body["pending_question"]
+    assert pq is not None
+    assert pq["kind"] == "new_person"
+    assert pq["status"] == "pending"
+    assert pq["question_id"] != q1
+    assert pq["question"] == '"팀장"을(를) 새 인물로 기억해둘까요?'
+    assert pq["options"] == list(NEW_PERSON_TAG_OPTIONS) + ["아니요"]
+    assert len(NEW_PERSON_TAG_OPTIONS) == 5
+    assert body["stop_reason"] == "ask_user"
+    assert body["stored"] == {"persons": 0, "events": 0, "schedules": 0}
+    # 인물·사건 행 수 변화 0
+    assert _count(db_session, Person) == persons_before
+    assert _count(db_session, Event) == events_before
+
+    # 첫 질문은 answered, 후속 질문은 대기 중이며 재개 재료에 원래 보류 제안이 실려 있다.
+    row1 = db_session.get(PendingQuestion, q1)
+    assert row1.answered_at is not None
+    assert row1.answer == _IDENTITY_REJECT
+    row2 = db_session.get(PendingQuestion, pq["question_id"])
+    assert row2.answered_at is None
+    assert row2.kind == "new_person"
+    assert row2.context["mention"] == "팀장"
+    resume = row2.context["resume"]
+    assert [c["name"] for c in resume["pending_calls"]] == ["add_event"]
+    assert resume["tag_by_answer"]["직장으로 기억할게요"] == "직장"
+
+
+def test_answers_resume_identity_reject_writes_trace_fields_fix035(
+    app_and_client, db_session, fake_embedder
+):
+    from app.agent.types import STEP_LOOP_RESUME
+    from app.db.models import AgentTrace
+
+    client, q1, resp, _, _ = _reject_identity(
+        app_and_client, db_session, fake_embedder, "resume-fix035-trace"
+    )
+    followup_id = resp.json()["pending_question"]["question_id"]
+
+    row = db_session.execute(
+        select(AgentTrace)
+        .where(AgentTrace.session_id == "resume-fix035-trace", AgentTrace.step == STEP_LOOP_RESUME)
+        .order_by(AgentTrace.id.desc())
+    ).scalars().first()
+    assert row is not None
+    assert row.output["identity_rejected"] is True
+    assert row.output["followup_question_id"] == followup_id
+    assert row.output["kind"] == "identity"
+    assert row.output["answer"] == _IDENTITY_REJECT
+
+
+def test_answers_resume_identity_reject_then_tag_creates_person_and_event_fix035(
+    app_and_client, db_session, fake_embedder
+):
+    client, q1, resp, persons_before, events_before = _reject_identity(
+        app_and_client, db_session, fake_embedder, "resume-fix035-tag"
+    )
+    q2 = resp.json()["pending_question"]["question_id"]
+
+    resp2 = client.post(f"/answers/{q2}", json={"answer": "직장으로 기억할게요"})
+
+    assert resp2.status_code == 200
+    body2 = resp2.json()
+    assert body2["stored"] == {"persons": 1, "events": 1, "schedules": 0}
+    assert body2["pending_question"] is None
+    assert _count(db_session, Person) == persons_before + 1
+    assert _count(db_session, Event) == events_before + 1
+
+    person = db_session.execute(select(Person).where(Person.display_name == "팀장")).scalar_one()
+    assert person.relation_tag == "직장"
+    event = db_session.execute(select(Event).where(Event.person_id == person.id)).scalar_one()
+    assert event.type == "meal"
+    assert event.raw_utterance == "팀장이랑 점심 먹었어"
+
+
+def test_answers_resume_identity_reject_then_no_creates_nothing_fix035(
+    app_and_client, db_session, fake_embedder
+):
+    client, q1, resp, persons_before, events_before = _reject_identity(
+        app_and_client, db_session, fake_embedder, "resume-fix035-no"
+    )
+    q2 = resp.json()["pending_question"]["question_id"]
+
+    resp2 = client.post(f"/answers/{q2}", json={"answer": "아니요"})
+
+    assert resp2.status_code == 200
+    body2 = resp2.json()
+    assert body2["stored"] == {"persons": 0, "events": 0, "schedules": 0}
+    assert body2["pending_question"] is None
+    assert _count(db_session, Person) == persons_before
+    assert _count(db_session, Event) == events_before
+
+
+def test_answers_resume_identity_reject_then_tag_keeps_hierarchy_hint_fix035(
+    app_and_client, db_session, fake_embedder
+):
+    """R-35-2 -- 원래 턴의 `create_person` 힌트(hierarchy="상")가 거절 -> 후속
+    질문 -> 태그 답까지 이어져 `person.hierarchy == "상"` 이 된다(힌트가 유실되면
+    기본값 `_DEFAULT_HIERARCHY="동"` 이 된다 -- 변이 M8 을 잡는다)."""
+    app, client = app_and_client
+    hint_call = {
+        "name": "create_person",
+        "args": {
+            "display_name": "팀장",
+            "aliases": ["팀장"],
+            "relation_tag": "직장",
+            "hierarchy": "상",
+        },
+    }
+    q1 = _start_identity_question(
+        app,
+        client,
+        db_session,
+        fake_embedder,
+        session_id="resume-fix035-hint",
+        extra_calls=[hint_call],
+    )
+    resp = client.post(f"/answers/{q1}", json={"answer": _IDENTITY_REJECT})
+    assert resp.status_code == 200
+    q2 = resp.json()["pending_question"]["question_id"]
+    assert db_session.get(PendingQuestion, q2).context["resume"]["hints"]["hierarchy"] == "상"
+
+    resp2 = client.post(f"/answers/{q2}", json={"answer": "직장으로 기억할게요"})
+
+    assert resp2.status_code == 200
+    person = db_session.execute(select(Person).where(Person.display_name == "팀장")).scalar_one()
+    assert person.relation_tag == "직장"
+    assert person.hierarchy == "상"

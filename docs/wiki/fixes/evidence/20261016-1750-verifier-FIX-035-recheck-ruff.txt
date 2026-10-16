@@ -1,0 +1,8 @@
+# 명령: .venv/bin/ruff check app tests scripts evaluation
+# 시각: 2026-10-16T17:50:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: c4fbd2f (dev2)
+# exit: 0
+# 메모: 재확인: CI 범위 ruff
+# ---
+All checks passed!

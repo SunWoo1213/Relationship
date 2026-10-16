@@ -89,6 +89,8 @@ from app.er.rules import run_rule_stage
 from app.er.types import (
     ER_TRACE_STEP,
     ER_TRACE_TOOL_NAME,
+    NEW_PERSON_CONFIRM_OPTION,
+    NEW_PERSON_REJECT_OPTION,
     AlreadyApplied,
     AppliedResolution,
     ERConfig,
@@ -105,8 +107,6 @@ from app.tools.types import AFFIRMATIVE_KEY, InvalidValue
 _MAX_IDENTITY_OPTIONS = 3
 
 _IDENTITY_REJECT_OPTION = "아니요, 다른 사람이에요"
-_NEW_PERSON_CONFIRM_OPTION = "네, 기억해둘게요"
-_NEW_PERSON_REJECT_OPTION = "아니요"
 
 #: D13 보수 분기(결정 A·B)의 `forced_reason` 값 -- `app/er/confidence.py`
 #: 의 `no_candidates`/`llm_failed`/`no_matched`/`out_of_range_id` 와 같은
@@ -207,7 +207,11 @@ def _build_ask_payload(
             AFFIRMATIVE_KEY: list(names),
         }
         names_text = "/".join(names) if names else mention
-        question = f'"{mention}" -- {names_text} 중 한 분이 맞으실까요?'
+        if len(names) == 1:
+            # FIX-035 -- 후보 1명이면 "중 한 분"이 어색하다.
+            question = f'"{mention}" -- {names_text} 님이 맞으실까요?'
+        else:
+            question = f'"{mention}" -- {names_text} 중 한 분이 맞으실까요?'
         ask_payload = {
             "kind": "identity",
             "question": question,
@@ -223,13 +227,13 @@ def _build_ask_payload(
         "utterance": utterance,
         "candidate_ids": {},
         "confidence_breakdown": dict(confidence_breakdown),
-        AFFIRMATIVE_KEY: [_NEW_PERSON_CONFIRM_OPTION],
+        AFFIRMATIVE_KEY: [NEW_PERSON_CONFIRM_OPTION],
     }
     ask_payload = {
         "kind": "new_person",
         "question": f'"{mention}"을(를) 새 인물로 기억해둘까요?',
-        "options": [_NEW_PERSON_CONFIRM_OPTION, _NEW_PERSON_REJECT_OPTION],
-        "affirmative_options": [_NEW_PERSON_CONFIRM_OPTION],
+        "options": [NEW_PERSON_CONFIRM_OPTION, NEW_PERSON_REJECT_OPTION],
+        "affirmative_options": [NEW_PERSON_CONFIRM_OPTION],
         "context": context,
     }
     return ask_payload, None
