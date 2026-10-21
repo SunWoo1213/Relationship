@@ -1,0 +1,76 @@
+# 명령: npm --prefix /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04/web-mut test -- --run 2>&1 | tail -8
+# 시각: 2026-10-21T21:36:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# 메모: 대조군 (저장소 밖 사본, node_modules 심링크)
+# ---
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04/web-mut
+
+
+ Test Files  9 passed (9)
+      Tests  137 passed (137)
+   Start at  21:36:03
+   Duration  2.08s (environment 39%, tests 33%, import 13%, transform 9%, setup 6%)
+
+
+# ===== append 2026-10-21T21:36:05+09:00 =====
+# 명령: npm --prefix /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04/web-mut test -- --run 2>&1 | grep -E '✓|✗|×|FAIL|Test Files|Tests ' | tail -12
+# 시각: 2026-10-21T21:36:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# 메모: FM1 sw.js targetHashFor: schedule_id 있을 때 /#/chat 으로 (판정표 22행 알림 클릭 → 브리핑 화면)
+# ---
+     × 열린 창이 전부 앱이 아니면 그 창들은 건드리지 않고 openWindow("/#/briefings?schedule_id=N") 4ms
+     × 열린 창이 없으면 openWindow("/#/briefings?schedule_id=N") 0ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/sw.test.ts > notificationclick 이벤트 > 열린 창이 전부 앱이 아니면 그 창들은 건드리지 않고 openWindow("/#/briefings?schedule_id=N")
+ FAIL  src/__tests__/sw.test.ts > notificationclick 이벤트 > 열린 창이 없으면 openWindow("/#/briefings?schedule_id=N")
+ Test Files  1 failed | 8 passed (9)
+      Tests  2 failed | 135 passed (137)
+
+# ===== append 2026-10-21T21:36:08+09:00 =====
+# 명령: npm --prefix /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04/web-mut test -- --run 2>&1 | grep -E '✓|✗|×|FAIL|Test Files|Tests ' | tail -12
+# 시각: 2026-10-21T21:36:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# 메모: FM2 ChatScreen 칩 aria-pressed 항상 false (판정표 15행 누른 칩 선택 상태)
+# ---
+     × 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성 41ms
+     × 답 응답의 reply 가 이어 붙고, 새 pending_question 이면 그 아래 새 칩 41ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 칩을 누르면 POST /api/answers/{id} 에 그 문자열이 {answer} 로 가고, 선택 고정·나머지 비활성
+ FAIL  src/__tests__/chat.test.tsx > 확인 칩 (결정 E) > 답 응답의 reply 가 이어 붙고, 새 pending_question 이면 그 아래 새 칩
+ Test Files  1 failed | 8 passed (9)
+      Tests  2 failed | 135 passed (137)
+
+# ===== append 2026-10-21T21:36:10+09:00 =====
+# 명령: npm --prefix /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04/web-mut test -- --run 2>&1 | grep -E '✓|✗|×|FAIL|Test Files|Tests ' | tail -12
+# 시각: 2026-10-21T21:36:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# 메모: FM3 PersonCardScreen 타임라인 원문 trim() (판정표 18행 원문이 응답 문자열 그대로)
+# ---
+     × 첫 펼침에 GET /events/{id}/raw 1회, 원문은 글자 그대로, 접었다 다시 펼쳐도 요청은 1회 29ms
+     × 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다 40ms
+     × R-U6-1: 로딩 중 접기 → 요청 실패 → 다시 펼치면 열리고 재시도해 원문이 나온다 51ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 첫 펼침에 GET /events/{id}/raw 1회, 원문은 글자 그대로, 접었다 다시 펼쳐도 요청은 1회
+ FAIL  src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > 조회 실패는 그 항목 안에만 안내가 뜨고, 다시 누르면 재시도(요청 2회)해 원문이 나온다
+ FAIL  src/__tests__/card.test.tsx > 원문 펼치기 (결정 F) > R-U6-1: 로딩 중 접기 → 요청 실패 → 다시 펼치면 열리고 재시도해 원문이 나온다
+ Test Files  1 failed | 8 passed (9)
+      Tests  3 failed | 134 passed (137)
+
+# ===== append 2026-10-21T21:36:12+09:00 =====
+# 명령: git status --short web; echo status_rc=$?; diff -rq /Users/sunwoo/Desktop/Portfolio/Relationship/web/src /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04/web-mut/src; diff -q /Users/sunwoo/Desktop/Portfolio/Relationship/web/public/sw.js /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04/web-mut/public/sw.js; echo diff_rc=$?
+# 시각: 2026-10-21T21:36:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# 메모: 저장소 무수정 확인 + 사본 원복 뒤 diff
+# ---
+status_rc=0
+diff_rc=0

@@ -1,0 +1,64 @@
+# 명령: echo "[1]"; grep -rn "push-dev" web/src web/public web/index.html --exclude-dir=__tests__; echo "rc=$?"; echo "[2]"; grep -rnE "getUserMedia|SpeechRecognition|webkitSpeech" web/src web/public; echo "rc=$?"; echo "[3]"; grep -rnE "addEventListener\([\x27\"]fetch|caches\." web/public/sw.js; echo "rc=$?"; echo "[4]"; grep -rn "raw_utterance" web/src --exclude-dir=__tests__; echo "[5]"; grep -cE "@router\.(post|put|patch|delete)" app/api/routes.py; git show 50fd7fc:app/api/routes.py | grep -cE "@router\.(post|put|patch|delete)"; echo "[6]"; git diff --stat 50fd7fc -- app/push/devpage; echo "rc=$?"; echo "[7]"; grep -rnE "VITE_[A-Z_]*(KEY|SECRET|TOKEN)" web/ --exclude-dir=node_modules --exclude-dir=dist; echo "rc=$?"; echo "[8]"; git ls-files web | grep -E "node_modules|dist/|test-results|playwright-report"; echo "rc=$?"; echo "[9]"; grep -rnE "fonts\.googleapis|fonts\.gstatic|cdn\." web/src web/index.html; echo "rc=$?"; echo "[10]"; grep -rlE "Sheet|Dialog|Drawer" web/src --include=*.tsx | grep -v "^web/src/components/ui/"; echo "[11 무변경 diff]"; git diff --stat 50fd7fc -- app alembic ":!app/api/routes.py" ":!app/api/schemas.py" ":!app/api/read.py"; echo "[13 routes]"; grep -nE "chat|persons|briefings" web/src/routes.ts | head -20; echo "[write routes list]"; grep -nE "@router\.(post|put|patch|delete)" app/api/routes.py
+# 시각: 2026-10-21T21:32:56+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# ---
+[1]
+rc=1
+[2]
+rc=1
+[3]
+rc=1
+[4]
+web/src/screens/PersonCardScreen.tsx:3:// 서버 문자열(key · value · content · raw_utterance · title)은 고치지 않고 그대로 보여 준다 (원칙7).
+web/src/screens/PersonCardScreen.tsx:4:// 원문(raw_utterance)은 펼칠 때만 가져오고(1회), 같은 항목을 다시 펼쳐도 다시 요청하지 않는다 — 항목 컴포넌트 상태에 캐시.
+web/src/screens/PersonCardScreen.tsx:135:          <DetailStatus state={state}>{(raw) => <RawText text={raw.raw_utterance} />}</DetailStatus>
+web/src/screens/PersonCardScreen.tsx:172:                  <RawText text={s.raw_utterance} />
+web/src/api/types.ts:115:  raw_utterance: string
+web/src/api/types.ts:129:  raw_utterance: string
+[5]
+4
+4
+[6]
+rc=0
+[7]
+rc=1
+[8]
+rc=1
+[9]
+rc=1
+[10]
+web/src/components/AppShell.tsx
+[11 무변경 diff]
+ app/agent/loop.py    | 135 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ app/er/__init__.py   |   4 ++
+ app/er/pipeline.py   |  16 +++---
+ app/er/types.py      |   6 +++
+ app/tools/context.py |  24 +++++++++
+ 5 files changed, 167 insertions(+), 18 deletions(-)
+[13 routes]
+5:  | { name: 'chat' }
+6:  | { name: 'persons'; personId: number | null }
+7:  | { name: 'briefings' }
+10:  chat: '#/chat',
+11:  persons: '#/persons',
+12:  briefings: '#/briefings',
+15:export const DEFAULT_HASH = HREF.chat
+17:/** `#/persons/12?x=1` → `/persons/12` (쿼리·앞 `#` 제거). */
+24:/** 알 수 없는 해시는 null — 호출 쪽이 `#/chat` 으로 보낸다. */
+27:  if (path === '/chat') return { name: 'chat' }
+28:  if (path === '/briefings') return { name: 'briefings' }
+29:  if (path === '/persons') return { name: 'persons', personId: null }
+30:  const m = /^\/persons\/(\d+)$/.exec(path)
+31:  if (m) return { name: 'persons', personId: Number(m[1]) }
+36: * `#/briefings?schedule_id=12` → 12. 양의 정수 모양이 아니거나 없으면 null.
+37: * 알림 클릭이 여는 주소다(결정 H) — 새 라우트가 아니라 `/briefings` 의 쿼리일 뿐이다.
+48:  return scheduleId === null ? HREF.briefings : `${HREF.briefings}?schedule_id=${scheduleId}`
+65:/** 현재 해시를 구독한다. 알 수 없는 해시면 주소를 `#/chat` 으로 바꾸고 chat 을 돌려준다. */
+77:  return route ?? { name: 'chat' }
+[write routes list]
+206:@router.post("/answers/{question_id}", response_model=AnswerOut)
+309:@router.post("/chat", response_model=ChatOut)
+381:@router.post("/briefings/run", response_model=BriefingRunOut)
+421:@router.post("/push/subscriptions", response_model=PushSubscriptionOut)

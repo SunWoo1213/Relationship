@@ -1,0 +1,39 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04/negative_live.sh
+# 시각: 2026-10-21T21:37:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# ---
+[before] traces|questions|persons|events|max_updated_at|max_briefed_at
+459|17|11|32|2026-10-21 11:33:18.29283+00|2026-10-21 11:28:34.882412+00
+[1] GET /persons/999999 (없는 인물) → 기대 404 not_found
+{"detail":{"code":"not_found"}} http=404
+[2] GET /events/999999/raw (없는 이벤트) → 기대 404
+{"detail":{"code":"not_found"}} http=404
+[3] GET /persons/9/facts/999999/sources (없는 사실) → 기대 404
+{"detail":{"code":"not_found"}} http=404
+[3b] GET /persons/5/facts/24/sources (다른 사용자 brief-u5-check 의 인물 5 경로에 내 사실 24) → 기대 404
+{"detail":{"code":"not_found"}} http=404
+[3c] GET /persons/5 (다른 사용자 소유 인물) → 기대 404 (목록·카드 소유 확인)
+{"detail":{"code":"not_found"}} http=404
+[4] GET /briefings?schedule_id=999999 → 기대 404
+{"detail":{"code":"not_found"}} http=404
+[5] GET /questions/pending with X-Session-Id 형식 위반 → 기대 422
+{"detail":{"code":"invalid_session_id"}} http=422
+[6] GET /questions/pending 헤더 없음 → 기대 [] (서버 uuid 세션, 저장 0)
+[] http=200
+[7] GET /persons 목록에 raw_utterance 키 → 기대 0
+0
+[8] GET /persons/9 카드에 raw_utterance 키 → 기대 0
+0
+[9] GET /events/28/raw 응답 vs DB raw_utterance (30행 ⑦ 재확인)
+{"event_id":28,"person_id":9,"type":"meal","content":"점심 먹음","occurred_at":"2026-10-16T03:00:00Z","raw_utterance":"오늘 회사에서 박선우 과장님이랑 점심 먹었는데 다음 주에 이사 간대"}
+오늘 회사에서 박선우 과장님이랑 점심 먹었는데 다음 주에 이사 간대
+[10] GET /briefings?schedule_id=6 (31행 ⑩ — trace 427 과 대조용 원본)
+[{"schedule":{"id":6,"title":"저녁 약속","scheduled_at":"2026-10-22T10:00:00Z"},"person":{"id":9,"display_name":"박선우 과장님"},"generated_at":"2026-10-21T11:28:34.869539Z","composer":"llm","pattern_sentences":[],"lines":[{"text":"박선우 과장님이 다음 주에 이사 간다.","basis":{"fact_keys":["life_event"],"event_ids":[27,28]}}],"suggestion":{"text":"이사에 대한 이야기를 나누어 보세요.","basis":{"fact_keys":["life_event"],"event_ids":[27,28]}},"push":"sent","trace_id":427}]
+[11] GET /push-dev/ 는 P7 개발용 페이지(제품 화면에서 링크 금지 — 불변식 1 은 별도 evidence) — 상태 코드만
+http=200
+[12] 프론트 dev 서버 /api/persons 프록시 → 백엔드 /persons 와 같은 바이트인지
+proxy_same_bytes=yes
+[after] 위 before 와 전부 같아야 한다 (조회는 쓰지 않는다 — 판정표 7행)
+459|17|11|32|2026-10-21 11:33:18.29283+00|2026-10-21 11:28:34.882412+00

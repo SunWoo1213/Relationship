@@ -1,0 +1,30 @@
+# U10 사람 점검 — 31행 ㄷ 브리핑 화면·알림 (2026-10-21)
+# 조작 주체: 메인 세션이 이 Mac 의 Chrome 을 직접 조작(사용자 지시 "너가 직접 해줘"). ⑫ 은 아래 한계 참조.
+# 코드 dev2 75cb4ad · VAPID 설정됨(GET /push/vapid-public-key 200) · 구독 2행(id 1 · 3, 호스트 https://fcm.googleapis.com — 10-10 U8 · 10-16 U10 에 제품 화면 "알림 받기" 로 만든 것, 화면 버튼은 "알림 켜짐" 상태)
+
+일정 만들기 (01-plan 절차 6)
+  채팅 발화 "내일 저녁 7시에 박선우 과장님이랑 저녁 약속 있어" → "기억했어요: 일정 1건." → schedules 6 | person 9 | 저녁 약속 | 2026-10-22 10:00:00+00 (= 10-22 19:00 KST, 24시간 창 안) | briefed_at NULL
+  브리핑 화면(#/briefings): "아직 만들어진 브리핑이 없어요." — 저장된 브리핑이 0 이라 "지금 브리핑" 버튼이 없다(버튼은 브리핑 카드 안에만 있음, BriefingScreen.tsx 134~139행). 주기 작업 스위치는 꺼져 있음(BRIEFING_SCHEDULER_ENABLED 미설정 — briefing_run trace 가 1분마다 생기지 않음).
+  → 첫 브리핑은 docs/RUNNING.md 220행의 수동 경로로: curl -s -X POST http://localhost:8000/briefings/run (evidence/20261021-2028-u10-check-briefing-run.txt)
+    응답: run_id briefing:2137c734-11a6-45c4-8cb2-4a0bc2a49ed1, briefings[0] = {schedule_id 6, person_id 9, composer "llm", lines [{"박선우 과장님이 다음 주에 이사 간다.", basis fact_keys [life_event] event_ids [27,28]}], suggestion {"이사에 대한 이야기를 나누어 보세요.", 같은 basis}, push "sent"}, skipped []
+
+⑨ briefing_compose trace id (evidence/20261021-2029-u10-check-briefing-db.txt)
+  427 (session briefing:2137c734-…, created 2026-10-21 11:28:34.869539+00), briefing_run 428 (trigger "manual", selected [6], briefed [6], errors 0, lead_hours 24), schedules.briefed_at = 2026-10-21 11:28:34.882412+00
+  trace 427 output: llm {openai, gpt-4o-mini-2024-07-18}, push "sent", lines 1, suggestion 1, used_facts [{life_event, fact_id 24, eligible true}], excluded_facts [], pattern_sentences [], pattern_trace_id 424
+
+⑩ 화면 머리줄·제안 ↔ trace output 대조
+  화면(#/briefings?schedule_id=6, get_page_text 그대로):
+    📌 2026. 10. 22. 오후 7:00 · 박선우 과장님 · 저녁 약속
+    · 박선우 과장님이 다음 주에 이사 간다.
+    💡 제안
+    이사에 대한 이야기를 나누어 보세요.
+    [지금 브리핑]
+  대조: 머리줄 = formatDateTime(scheduled_at 10-22 10:00Z → KST 오후 7:00) · persons.display_name · schedules.title (프론트 조립, 결정 G) / 사실 줄 = trace lines[0].text 글자 그대로 / 제안 = trace suggestion.text 글자 그대로 / 패턴 문장 0 = pattern_sentences []. 불일치 0.
+  관찰: run 전에 열어 둔 브리핑 화면은 자동 갱신되지 않았다(목록은 진입 시 1회 GET /briefings). 푸시 수신으로 뜬 앱 안 배너 "새 브리핑 알림이 도착했어요. [브리핑 보기] [닫기]" 의 "브리핑 보기" 를 누르니 #/briefings?schedule_id=6 으로 가며 재조회돼 카드가 강조(ring)된 채 나타났다. 설계상 자동 갱신 없음(결정 I 캐시 없음·주기 조회 없음) — 결함 아님, 04-review 에 기록.
+
+⑪ 구독 행(호스트만) · push 값
+  push_subscriptions: 1 | local | https://fcm.googleapis.com | 2026-10-10 … / 3 | local | https://fcm.googleapis.com | 2026-10-16 …
+  POST /briefings/run 응답 briefings[0].push = "sent", trace 427 push = "sent". 수신 증거: 같은 Chrome 탭(서비스 워커 등록 출처 localhost:5173)에 앱 안 배너 "새 브리핑 알림이 도착했어요." 가 떴다(sw.js push → 페이지 메시지 경로).
+
+⑫ 알림 클릭 → 그 일정 열림 — **미확인(에이전트 한계)**
+  OS(macOS) 알림 센터의 알림은 Claude in Chrome 확장이 누를 수 없다. 대신 (1) 앱 안 배너 "브리핑 보기" 클릭 → #/briefings?schedule_id=6 → 그 일정 카드 강조, (2) sw.js notificationclick 경로는 U9 자동 테스트 22행과 P7 U8(10-10, 사용자 실수신·클릭)로 닫혀 있다. OS 알림을 직접 눌러 보는 것은 사용자 몫으로 남긴다 — 사용자가 하려면 브리핑 카드의 "지금 브리핑" 을 눌러 재발송(briefed_at 이 있어도 schedule_id 지정 수동 실행은 다시 보냄, RUNNING.md 303행) 뒤 OS 알림을 누르면 된다.

@@ -1,0 +1,38 @@
+# 명령: echo "[11a] git diff --stat 50fd7fc 735f391^ -- app alembic (3파일 제외) → 기대 빈 출력 (FIX-035 이전 P8 단위 커밋의 app/ 변경은 세 파일뿐)"; git diff --stat 50fd7fc 735f391^ -- app alembic ":!app/api/routes.py" ":!app/api/schemas.py" ":!app/api/read.py"; echo "rc=$?"; echo "[11b] git diff --stat 735f391 -- app alembic (3파일 제외) → 기대 빈 출력 (FIX-035 뒤 app/ 변경 0)"; git diff --stat 735f391 -- app alembic ":!app/api/routes.py" ":!app/api/schemas.py" ":!app/api/read.py"; echo "rc=$?"; echo "[11c] FIX-035 커밋 735f391 의 app/ 변경 파일"; git show --stat --oneline 735f391 -- app | grep -E "app/"; echo "[11d] git status --porcelain app alembic → 기대 빈 (N-3)"; git status --porcelain app alembic; echo "rc=$?"; echo "[11e] alembic check"; POSTGRES_PORT=5433 .venv/bin/alembic check 2>&1 | tail -3; echo "[11f] tools_check"; POSTGRES_PORT=5433 .venv/bin/python scripts/tools_check.py 2>&1 | tail -3; echo "[28 CI run 39587449611 (HEAD 75cb4ad)]"; gh run view 39587449611 --json status,conclusion,headSha,jobs --jq "{status,conclusion,headSha,jobs:[.jobs[]|{name,conclusion}]}"; echo "[tests.md 세는 법 grep]"; grep -c "^| .*| 기록 없음" docs/wiki/packages/P8-frontend/tests.md; echo "[registry P8-frontend 행 수 / pending 행]"; grep -c "| P8-frontend |" docs/wiki/registry.md; grep -n "| P8-frontend | pending |" docs/wiki/registry.md | cut -c1-90; echo "[PersonList/AppShell 필터·검색·slice 0]"; grep -n "slice\|<input\|filter\|search" web/src/components/PersonList.tsx web/src/components/AppShell.tsx; echo "rc=$?"; echo "[root test-results ignored]"; git check-ignore -v test-results/.last-run.json
+# 시각: 2026-10-21T21:44:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# ---
+[11a] git diff --stat 50fd7fc 735f391^ -- app alembic (3파일 제외) → 기대 빈 출력 (FIX-035 이전 P8 단위 커밋의 app/ 변경은 세 파일뿐)
+rc=0
+[11b] git diff --stat 735f391 -- app alembic (3파일 제외) → 기대 빈 출력 (FIX-035 뒤 app/ 변경 0)
+rc=0
+[11c] FIX-035 커밋 735f391 의 app/ 변경 파일
+ app/agent/loop.py    | 135 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ app/er/__init__.py   |   4 ++
+ app/er/pipeline.py   |  16 +++---
+ app/er/types.py      |   6 +++
+ app/tools/context.py |  24 +++++++++
+[11d] git status --porcelain app alembic → 기대 빈 (N-3)
+rc=0
+[11e] alembic check
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+No new upgrade operations detected.
+[11f] tools_check
+[ok] get_briefing: CLAUDE.md (person_id, schedule_id?) == actual (ctx, person_id, schedule_id=None)
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+[28 CI run 39587449611 (HEAD 75cb4ad)]
+{"conclusion":"success","headSha":"75cb4ad031e1f8d5c4c3a80e0d6cea6741565632","jobs":[{"conclusion":"success","name":"pytest (3.14)"},{"conclusion":"success","name":"web (windows-latest)"},{"conclusion":"success","name":"windows"},{"conclusion":"success","name":"pytest (3.13)"},{"conclusion":"success","name":"web (ubuntu-latest)"}],"status":"completed"}
+[tests.md 세는 법 grep]
+182
+[registry P8-frontend 행 수 / pending 행]
+42
+259:| 테스트 | 판정표 9·10행 끝에서 끝 — 실제 `POST /briefings/run` 과 `run_briefings(trigger="scheduler
+260:| 문서 | 신뢰성 보고서 초안 — 위험 → 테스트 → 통과·실패·미검증(교수 피드백). 새 수치 없음, 전부 `reports/`·증거에서 옮기고 출처 병
+[PersonList/AppShell 필터·검색·slice 0]
+rc=1
+[root test-results ignored]
+.gitignore:59:test-results/	test-results/.last-run.json

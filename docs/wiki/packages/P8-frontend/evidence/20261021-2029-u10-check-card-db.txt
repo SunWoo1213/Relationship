@@ -1,0 +1,37 @@
+# 명령: docker exec -i capstone2-postgres-1 psql -U app -d relationship < /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u10_card.sql
+# 시각: 2026-10-21T20:29:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# ---
+== persons 9
+ id | user_id | display_name  | relation_tag | hierarchy 
+----+---------+---------------+--------------+-----------
+  9 | local   | 박선우 과장님 | 직장         | 동
+(1 row)
+
+== event 28 raw_utterance
+ id | person_id | type |  content  |      occurred_at       |                           raw_utterance                           
+----+-----------+------+-----------+------------------------+-------------------------------------------------------------------
+ 28 |         9 | meal | 점심 먹음 | 2026-10-16 03:00:00+00 | 오늘 회사에서 박선우 과장님이랑 점심 먹었는데 다음 주에 이사 간대
+(1 row)
+
+== fact 24 + sources
+ id | person_id |    key     |   value   | confidence 
+----+-----------+------------+-----------+------------
+ 24 |         9 | life_event | 이사 간다 |          1
+(1 row)
+
+ fact_id | event_id | type |  content  |      occurred_at       |                           raw_utterance                           
+---------+----------+------+-----------+------------------------+-------------------------------------------------------------------
+      24 |       28 | meal | 점심 먹음 | 2026-10-16 03:00:00+00 | 오늘 회사에서 박선우 과장님이랑 점심 먹었는데 다음 주에 이사 간대
+      24 |       27 | meal | 점심 먹음 | 2026-10-16 03:00:00+00 | 오늘 회사에서 박선우 과장님이랑 점심 먹었는데 다음 주에 이사 간대
+(2 rows)
+
+== events of person 9 (timeline)
+ id | type |  content  |      occurred_at       
+----+------+-----------+------------------------
+ 28 | meal | 점심 먹음 | 2026-10-16 03:00:00+00
+ 27 | meal | 점심 먹음 | 2026-10-16 03:00:00+00
+(2 rows)
+

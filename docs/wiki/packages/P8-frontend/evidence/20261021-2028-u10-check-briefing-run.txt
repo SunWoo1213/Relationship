@@ -1,0 +1,7 @@
+# 명령: curl -s -X POST http://localhost:8000/briefings/run
+# 시각: 2026-10-21T20:28:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# ---
+{"run_id":"briefing:2137c734-11a6-45c4-8cb2-4a0bc2a49ed1","generated_at":"2026-10-21T11:28:34.867577Z","briefings":[{"schedule_id":6,"person_id":9,"composer":"llm","pattern_sentences":[],"lines":[{"text":"박선우 과장님이 다음 주에 이사 간다.","basis":{"fact_keys":["life_event"],"event_ids":[27,28]}}],"suggestion":{"text":"이사에 대한 이야기를 나누어 보세요.","basis":{"fact_keys":["life_event"],"event_ids":[27,28]}},"push":"sent"}],"skipped":[]}

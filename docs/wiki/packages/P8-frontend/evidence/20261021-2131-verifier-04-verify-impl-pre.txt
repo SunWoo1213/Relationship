@@ -1,0 +1,36 @@
+# 명령: POSTGRES_PORT=5433 bash .claude/scripts/verify-impl.sh P8-frontend
+# 시각: 2026-10-21T21:31:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# ---
+== verify-impl P8-frontend  (20261021-2131) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1953 passed, 1 warning in 26.28s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261021-2131-pytest.txt
+WARN  ruff 경고/오류 → evidence/20261021-2131-lint.txt
+PASS  태그 P8-frontend 커밋 22 건 → evidence/20261021-2131-commits.txt
+PASS  커밋에 태그 존재: CR-003
+PASS  커밋에 태그 존재: D1
+PASS  커밋에 태그 존재: D10
+PASS  커밋에 태그 존재: D15
+PASS  커밋에 태그 존재: D2
+PASS  커밋에 태그 존재: D7
+PASS  커밋에 태그 존재: FIX-014
+PASS  커밋에 태그 존재: FIX-031
+PASS  커밋에 태그 존재: FIX-033
+PASS  커밋에 태그 존재: FIX-034
+PASS  커밋에 태그 존재: FIX-035
+PASS  커밋에 태그 존재: R12
+PASS  커밋에 태그 존재: R19
+PASS  커밋에 태그 존재: R8
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.3
+PASS  커밋에 태그 존재: S3.4
+PASS  커밋에 태그 존재: S3.5
+PASS  커밋에 태그 존재: S3.6
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P8-frontend 행 있음
+WARN  미완료 작업 단위 11 개
+== 결과: FAIL=0 WARN=3 → evidence/20261021-2131-summary.txt ==

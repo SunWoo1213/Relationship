@@ -1,0 +1,81 @@
+# 명령: docker exec -i capstone2-postgres-1 psql -U app -d relationship < /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04/u10_verify.sql
+# 시각: 2026-10-21T21:32:57+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# ---
+== persons 9,10,11 + aliases
+ id | user_id | display_name  | relation_tag | hierarchy |           aliases           
+----+---------+---------------+--------------+-----------+-----------------------------
+  9 | local   | 박선우 과장님 | 직장         | 동        | 박선우 과장님 | 과장님
+ 10 | local   | 박선영 과장님 | 직장         | 동        | 박선영 과장님 | 선영 과장님
+ 11 | local   | 지수          | 지인         | 동        | 지수
+(3 rows)
+
+== alias "과장님" owners (원칙1 관찰)
+ id | person_id | display_name  |     alias     |  source   |         confirmed_at          
+----+-----------+---------------+---------------+-----------+-------------------------------
+  7 |         7 | 민수          | 박지훈 과장님 | user_said | 
+ 10 |         9 | 박선우 과장님 | 박선우 과장님 | system    | 2026-10-16 10:05:17.363059+00
+ 11 |         9 | 박선우 과장님 | 과장님        | user_said | 
+ 12 |        10 | 박선영 과장님 | 박선영 과장님 | system    | 2026-10-16 10:08:25.737862+00
+ 13 |        10 | 박선영 과장님 | 선영 과장님   | user_said | 
+(5 rows)
+
+== events 28,31,32
+ id | person_id |  type   |    content    |         occurred_at          |                           raw_utterance                           
+----+-----------+---------+---------------+------------------------------+-------------------------------------------------------------------
+ 27 |         9 | meal    | 점심 먹음     | 2026-10-16 03:00:00+00       | 오늘 회사에서 박선우 과장님이랑 점심 먹었는데 다음 주에 이사 간대
+ 28 |         9 | meal    | 점심 먹음     | 2026-10-16 03:00:00+00       | 오늘 회사에서 박선우 과장님이랑 점심 먹었는데 다음 주에 이사 간대
+ 31 |         9 | meeting | 커피 마심     | 2026-10-21 06:00:00+00       | 오늘 과장님이랑 오후에 커피 마셨어
+ 32 |        11 | meeting | 처음 인사했어 | 2026-10-21 11:32:41.62172+00 | 오늘 동호회에서 지수랑 처음 인사했어
+(4 rows)
+
+== schedule 6
+ id | person_id |   title   |      scheduled_at      |          briefed_at           
+----+-----------+-----------+------------------------+-------------------------------
+  6 |         9 | 저녁 약속 | 2026-10-22 10:00:00+00 | 2026-10-21 11:28:34.882412+00
+(1 row)
+
+== pending_questions 16,17
+ id |    kind    |                          q                          |                                                           options                                                           |         answer          |          answered_at          
+----+------------+-----------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------+-------------------------+-------------------------------
+ 16 | identity   | "지수" -- 박수/박선영 과장님 중 한 분이 맞으실까요? | ["박수", "박선영 과장님", "아니요, 다른 사람이에요"]                                                                        | 아니요, 다른 사람이에요 | 2026-10-21 11:33:05.512072+00
+ 17 | new_person | "지수"을(를) 새 인물로 기억해둘까요?                | ["가족으로 기억할게요", "연인으로 기억할게요", "친구로 기억할게요", "직장으로 기억할게요", "지인으로 기억할게요", "아니요"] | 지인으로 기억할게요     | 2026-10-21 11:33:18.298172+00
+(2 rows)
+
+== traces 427,428,432,449,453
+ id  |       step       | tool_name |                                                                                                                 out                                                                                                                  
+-----+------------------+-----------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 427 | briefing_compose | briefing  | {"llm": {"model": "gpt-4o-mini-2024-07-18", "provider": "openai"}, "push": "sent", "lines": [{"text": "박선우 과장님이 다음 주에 이사 간다.", "basis": {"event_ids": [27, 28], "fact_keys": ["life_event"]}}], "compose
+ 428 | briefing_run     | briefing  | {"now": "2026-10-21T11:28:34.867577+00:00", "errors": 0, "window": {"to": "2026-10-22T11:28:34.867577+00:00", "from": "2026-10-21T11:28:34.867577+00:00"}, "briefed": [6], "skipped": [], "trigger": "ma
+ 432 | er_resolve       | er        | {"llm": {"error": null, "model": "gpt-4o-mini-2024-07-18", "s_llm": 0.9, "reason": "'과장님'이라는 별명이 박선우 과장님과 정확히 일치하여 확신합니다.", "skipped": false, "attempts": 1, "provider": "openai", "tokens_in": 688, "to
+ 449 | loop_resume      | agent     | {"kind": "identity", "answer": "아니요, 다른 사람이에요", "context": {"resume": {"hints": {"hierarchy": "동", "relation_tag": "지인"}, "dropped": 0, "mention": "지수", "version": "1", "held_drafts": [{"name": "add_e
+ 453 | loop_resume      | agent     | {"kind": "new_person", "answer": "지인으로 기억할게요", "context": {"resume": {"hints": {"hierarchy": "동", "relation_tag": "지인"}, "dropped": 0, "mention": "지수", "version": "1", "held_drafts": [{"name": "add_ev
+(5 rows)
+
+== er_resolve 432 breakdown
+ id  |                                                                                                                                                 decision                                                                                                                                                  |                                                                                                                 breakdown                                                                                                                  
+-----+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 432 | {"band": "merge", "T_new": 0.3, "action": "merge", "T_merge": 0.8, "applied": true, "applied_at": "2026-10-21T11:32:14.991901+00:00", "forced_reason": null, "relaxed_retry": false, "band_by_threshold": "merge", "matched_person_id": 9, "pending_question_id": null, "hierarchy_relaxed_retry": false} | {"s_emb": 1.0, "s_llm": 0.9, "s_rule": 1.0, "weights": {"emb": 0.3, "llm": 0.5, "rule": 0.2}, "confidence": 0.95, "rule_passed": 3, "rule_checked": 3, "matched_person_id": 9, "weights_effective": {"emb": 0.3, "llm": 0.5, "rule": 0.2}}
+(1 row)
+
+== fact 24 sources
+ fact_id | event_id 
+---------+----------
+      24 |       27
+      24 |       28
+(2 rows)
+
+== counts
+ persons | events | max_q | subs 
+---------+--------+-------+------
+      11 |     32 |    17 |    2
+(1 row)
+
+== briefing_compose rows for schedule 6 (count)
+ count 
+-------
+     1
+(1 row)
+

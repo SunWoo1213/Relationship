@@ -1,0 +1,32 @@
+# 명령: docker exec -i capstone2-postgres-1 psql -U app -d relationship < /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u10_briefing.sql
+# 시각: 2026-10-21T20:29:53+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# ---
+== schedule 6
+ id | person_id |   title   |      scheduled_at      |          briefed_at           
+----+-----------+-----------+------------------------+-------------------------------
+  6 |         9 | 저녁 약속 | 2026-10-22 10:00:00+00 | 2026-10-21 11:28:34.882412+00
+(1 row)
+
+== briefing_compose trace (schedule 6)
+ id  |                  session_id                   |       step       | tool_name |          created_at           |                                                                                                                                                                                                                                                                                          output                                                                                                                                                                                                                                                                                          
+-----+-----------------------------------------------+------------------+-----------+-------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 427 | briefing:2137c734-11a6-45c4-8cb2-4a0bc2a49ed1 | briefing_compose | briefing  | 2026-10-21 11:28:34.869539+00 | {"llm": {"model": "gpt-4o-mini-2024-07-18", "provider": "openai"}, "push": "sent", "lines": [{"text": "박선우 과장님이 다음 주에 이사 간다.", "basis": {"event_ids": [27, 28], "fact_keys": ["life_event"]}}], "composer": "llm", "rejected": [], "event_ids": [27, 28], "person_id": 9, "suggestion": {"text": "이사에 대한 이야기를 나누어 보세요.", "basis": {"event_ids": [27, 28], "fact_keys": ["life_event"]}}, "used_facts": [{"key": "life_event", "fact_id": 24, "eligible": true}], "schedule_id": 6, "excluded_facts": [], "pattern_trace_id": 424, "pattern_sentences": []}
+(1 row)
+
+== briefing_run trace (latest)
+ id  |     step     | tool_name |          created_at           |                                                                                                                                   output                                                                                                                                   
+-----+--------------+-----------+-------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 428 | briefing_run | briefing  | 2026-10-21 11:28:34.869539+00 | {"now": "2026-10-21T11:28:34.867577+00:00", "errors": 0, "window": {"to": "2026-10-22T11:28:34.867577+00:00", "from": "2026-10-21T11:28:34.867577+00:00"}, "briefed": [6], "skipped": [], "trigger": "manual", "selected": [6], "lead_hours": 24, "schedule_id_arg": null}
+ 234 | briefing_run | briefing  | 2026-10-10 10:49:53.931964+00 | {"now": "2026-10-10T10:49:53.931602+00:00", "errors": 0, "window": {"to": "2026-10-11T10:49:53.931602+00:00", "from": "2026-10-10T10:49:53.931602+00:00"}, "briefed": [5], "skipped": [], "trigger": "manual", "selected": [5], "lead_hours": 24, "schedule_id_arg": 5}
+(2 rows)
+
+== push subscriptions (host only)
+ id | user_id |            host            |          created_at           
+----+---------+----------------------------+-------------------------------
+  1 | local   | https://fcm.googleapis.com | 2026-10-10 10:49:18.888874+00
+  3 | local   | https://fcm.googleapis.com | 2026-10-16 10:17:19.340441+00
+(2 rows)
+

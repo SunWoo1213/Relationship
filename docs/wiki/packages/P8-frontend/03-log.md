@@ -213,9 +213,18 @@
 - 남은 것: 이 커밋 뒤 `frozen: CR-003`(R-U10C-6 — journal CR 줄에 "동결은 P8 커밋 <해시> 뒤" 기록) · 루트 `test-results/`(Playwright `.last-run.json`)는 커밋 제외, 삭제/루트 `.gitignore` 추가는 사용자 결정(R-U10C-7) · 29·30행 ⑤·⑧ 사용자 확인 문장·⑥ "펼친 사실 id"는 미충족 — 사용자 절차로(R-U10C-5).
 - Refs: P8-frontend U10 CR-003 원칙5 원칙7 결정L 결정N
 
-## 2026-10-21 · cr(CR-003): 인물 화면을 카드 그리드·검색·사이드바 5명으로 바꾸는 결정을 문서에 옮긴다 · pending (메인 세션, 문서만)
+## 2026-10-21 · cr(CR-003): 인물 화면을 카드 그리드·검색·사이드바 5명으로 바꾸는 결정을 문서에 옮긴다 · 75cb4ad (메인 세션, 문서만)
 - 변경: 신규 `decisions/D15-persons-screen-layout.md`(그리드·이름/별칭 검색 프론트·태그 필터 없음·사이드바 최근 5명 `last_contact_at`·상세 가운데 75% 상한 없음·"코드에서 지켜야 할 것" grep 문장) · 01-plan 결정 N 인용문·U6·체크리스트 19·20 "CR-003·D15 대체" · `docs/backlog.md` P8b-persons-grid 항목 + P9 배포 유효성 요구(R-U10D-1~4·S1~S15) · `INDEX.md` 47행·패키지 표 · `docs/proposal.md` 상단 한 줄 · `changes/CR-003.md` 이행완료 · 지난 커밋 해시 기록(이 로그 FIX-035 `735f391`·정렬 `3bd5025`, registry 8곳).
 - 동결 창: `frozen: CR-003` 을 2026-10-21 에 걸고 문서 이행 뒤 `none`(R-U10C-6 사유는 CR-003 머리글). 제품 코드 변경 0.
 - 검증: 없음(문서). D15 사실 확인 — `getPersons()` 인자 없음(`client.ts:107`), 서버 정렬 `last_contact.desc().nulls_last()`(`read.py:157`). "해시 pending" 잔존 0.
 - 남은 것: P8 닫기(U10 사용자 화면 점검 → 04-review → done) → P8b `/devlog start`(D15 그대로).
 - Refs: CR-003 D15 P8-frontend P8b-persons-grid FIX-035 결정N 결정L 원칙5 원칙7
+- **커밋 뒤(2026-10-21)**: `75cb4ad`, dev2 푸시, CI run 39587449611.
+
+## 2026-10-21 · test(P8-frontend): U10 사람 점검 29~32행을 메인 세션이 Chrome 으로 끝낸다 · pending (메인 세션, 문서·증거만)
+- 계기: 사용자 "P8b-persons-grid 시작" → active 가 P8 이라 "P8 먼저 닫고 P8b" 결정 → 남은 U10(29행 ⑤ · 30행 ⑥⑧ · 31행 ⑨~⑫ · 32행 20항)을 **사용자 지시 "너가 직접 해줘"(2026-10-21)** 로 메인 세션이 이 Mac 의 Chrome(156.0.0.0)을 Claude in Chrome 으로 직접 조작해 끝냈다. 01-plan 의 "사용자 확인 문장" 은 **메인 세션 확인 문장** 으로 대신했고, 증거 머리글마다 그 사실을 적었다.
+- 한 것: 29행 — 발화 3건(일정 생성 · "과장님" 자동 병합 · "지수" identity 질문 16 → 거절 → FIX-035 후속 17 → 지인 → 인물 11·사건 32), 칩 선택 상태·타이핑 점 확인 / 30행 — 인물 9 카드, 사건 28 원문 펼치기 = DB raw, 사실 24 근거 2건(28·27) / 31행 — 일정 6(10-22 19:00) → `POST /briefings/run`(첫 브리핑은 화면에 "지금 브리핑" 버튼이 없음 — 버튼은 카드 안에만) → trace 427 compose · 428 run · push "sent" · 화면 머리줄·사실 줄·제안 = trace 글자 그대로 · 앱 안 배너 "브리핑 보기" 로 schedule_id=6 강조 / 32행 — 데스크톱 1710×862 dark · 모바일 폭 500×667(Chrome 창 최소 폭, 390 불가) dark, 20항 중 통과 17 · 부분(손으로 미재현) 7항 로딩·오류 안내/12항 모바일 키보드/15항 "새 메시지" 표시 · 밝은 모드는 OS 설정을 바꿀 수 없어 **미확인** · ⑫ OS 알림 클릭 **미확인**(확장이 OS 알림을 누를 수 없음, 앱 안 배너 경로로 대신). **수정 반영 횟수: 1**(10-16 정렬, 그대로) — "수정 필요" 0.
+- 증거: `evidence/20261021-2040-u10-check-{chat,card,briefing,screens}.txt`(서술) · `-2033-u10-check-chat-db.txt` · `-2029-u10-check-card-db.txt` · `-2028-u10-check-briefing-run.txt` · `-2029-u10-check-briefing-db.txt`(DB·API 원본, `save_evidence.py`). psql `-f` 는 컨테이너 안 경로라 실패 → `'<'` 리다이렉션으로 재저장(실패본 2개 삭제). 처음 20분은 확장이 Windows 쪽 Chrome 에 연결돼 있어 localhost 오류 — `select_browser` 로 이 Mac 의 Chrome 선택.
+- 관찰(04-review·FIX 후보): ① "과장님" 단독 언급이 확정 별칭 정확 일치로 인물 9 에 자동 병합(er_resolve 432, 0.95) — DB 에 "박선영 과장님" 도 있어 일반 호칭 별칭의 단독 귀속은 오병합 위험(원칙1), P8 범위 밖 ② 브리핑 화면은 열린 채로는 자동 갱신 없음(설계) ③ 저장된 브리핑 0 이면 수동 실행 버튼이 없어 첫 브리핑은 API/주기 작업으로만 — UI/UX 후보 ④ 개발 DB 에 확인 행(인물 11 지수, 사건 31·32, 일정 6, 질문 16·17) 남김(원칙8).
+- 남은 것: verifier 04-review(L-004) → `/devlog done` → P8b.
+- Refs: P8-frontend U10 S3.4 S3.6 R12 원칙1 원칙8 FIX-035 결정L 결정N

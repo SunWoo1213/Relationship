@@ -1,0 +1,307 @@
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -p mutplug tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+# 시각: 2026-10-21T21:35:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# 메모: 대조군 (MUT 없음)
+# ---
+[mutplug] MUT=control
+................................................................         [100%]
+64 passed in 1.03s
+
+# ===== append 2026-10-21T21:35:57+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04 MUT=BM1 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -p mutplug tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+# 시각: 2026-10-21T21:35:57+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 1
+# 메모: 변이 BM1
+# ---
+[mutplug] MUT=BM1
+............F...................................................         [100%]
+=================================== FAILURES ===================================
+_____________________________ test_이벤트_원문_응답_전체_값 ______________________________
+
+client = <starlette.testclient.TestClient object at 0x10e82e690>
+db_session = <sqlalchemy.orm.session.Session object at 0x10e6abe50>
+
+    def test_이벤트_원문_응답_전체_값(client, db_session):
+        p = _person(db_session)
+        when = NOW - timedelta(days=3)
+        e = _event(db_session, p, when, type_="conflict", content="말다툼", raw=TRICKY_RAW)
+        r = client.get(f"/events/{e.id}/raw")
+        assert r.status_code == 200
+        body = r.json()
+        assert set(body) == {"event_id", "person_id", "type", "content", "occurred_at", "raw_utterance"}
+        assert body["event_id"] == e.id
+        assert body["person_id"] == p.id
+        assert body["type"] == "conflict"
+        assert body["content"] == "말다툼"
+        assert _dt(body["occurred_at"]) == when
+>       assert body["raw_utterance"] == TRICKY_RAW  # 한 글자도 가공되지 않는다
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert '"팀장님"이 <b>또<...리터럴 & \u200b끝' == '  "팀장님"이 <b>...럴 & \u200b끝  '
+E         
+E         -   "팀장님"이 <b>또</b> 그러셨어 😅
+E         ? --
+E         + "팀장님"이 <b>또</b> 그러셨어 😅
+E         - 둘째 줄	탭 \n 리터럴 & ​끝  
+E         ?     	             --
+E         + 둘째 줄	탭 \n 리터럴 & ​끝
+
+tests/test_api_read_raw.py:95: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_raw.py::test_이벤트_원문_응답_전체_값 - assert '"팀장님"이 <b>또<...리터럴 & \u200b끝' == '  "팀장님"이 <b>...럴 & \u200b끝  '
+  
+  -   "팀장님"이 <b>또</b> 그러셨어 😅
+  ? --
+  + "팀장님"이 <b>또</b> 그러셨어 😅
+  - 둘째 줄	탭 \n 리터럴 & ​끝  
+  ?     	             --
+  + 둘째 줄	탭 \n 리터럴 & ​끝
+1 failed, 63 passed in 1.03s
+
+# ===== append 2026-10-21T21:35:59+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04 MUT=BM2 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -p mutplug tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+# 시각: 2026-10-21T21:35:59+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 1
+# 메모: 변이 BM2
+# ---
+[mutplug] MUT=BM2
+.................FFF............................................         [100%]
+=================================== FAILURES ===================================
+____________________________ test_근거_응답_전체_값과_내림차순 _____________________________
+
+client = <starlette.testclient.TestClient object at 0x110c3b8a0>
+db_session = <sqlalchemy.orm.session.Session object at 0x110bc2850>
+
+    def test_근거_응답_전체_값과_내림차순(client, db_session):
+        p = _person(db_session)
+        # 삽입은 오래된 -> 최신 순이 아니게 섞는다(순서가 뒤집히면 실패).
+        e_mid = _event(db_session, p, NOW - timedelta(days=5), "meal", "중간", "원문-중간")
+        e_old = _event(db_session, p, NOW - timedelta(days=9), "conflict", "오래됨", TRICKY_RAW)
+        e_new = _event(db_session, p, NOW - timedelta(days=1), "praise", "최신", "원문-최신")
+        f = _fact(db_session, p, "취미", "등산", [e_mid, e_old, e_new])
+        r = client.get(f"/persons/{p.id}/facts/{f.id}/sources")
+        assert r.status_code == 200
+        body = r.json()
+        assert set(body) == {"fact", "sources"}
+        assert body["fact"] == {"id": f.id, "key": "취미", "value": "등산"}
+>       assert [s["event_id"] for s in body["sources"]] == [e_new.id, e_mid.id, e_old.id]
+E       assert [22456, 22455, 22457] == [22457, 22455, 22456]
+E         
+E         At index 0 diff: 22456 != 22457
+E         
+E         Full diff:
+E           [
+E         +     22456,
+E         +     22455,
+E               22457,
+E         -     22455,
+E         -     22456,
+E           ]
+
+tests/test_api_read_raw.py:145: AssertionError
+_______________________ test_근거_동률_occurred_at_은_id_내림차순 _______________________
+
+client = <starlette.testclient.TestClient object at 0x110c39260>
+db_session = <sqlalchemy.orm.session.Session object at 0x110bc3050>
+
+    def test_근거_동률_occurred_at_은_id_내림차순(client, db_session):
+        p = _person(db_session)
+        a = _event(db_session, p, NOW, raw="a")
+        b = _event(db_session, p, NOW, raw="b")
+        c = _event(db_session, p, NOW, raw="c")
+        f = _fact(db_session, p, events=[a, b, c])  # id 오름차순 a<b<c
+        ids = [s["event_id"] for s in client.get(f"/persons/{p.id}/facts/{f.id}/sources").json()["sources"]]
+>       assert ids == [c.id, b.id, a.id]
+E       assert [22458, 22459, 22460] == [22460, 22459, 22458]
+E         
+E         At index 0 diff: 22458 != 22460
+E         
+E         Full diff:
+E           [
+E         +     22458,
+E         +     22459,
+E               22460,
+E         -     22459,
+E         -     22458,
+E           ]
+
+tests/test_api_read_raw.py:166: AssertionError
+__________________________________ test_근거_상한 __________________________________
+
+client = <starlette.testclient.TestClient object at 0x110be2580>
+db_session = <sqlalchemy.orm.session.Session object at 0x110bc1e50>
+
+    def test_근거_상한(client, db_session):
+        p = _person(db_session)
+        events = [
+            _event(db_session, p, NOW - timedelta(days=d), raw=f"원문{d}")
+            for d in range(FACT_SOURCES_LIMIT + 5)
+        ]
+        f = _fact(db_session, p, events=events)
+        body = client.get(f"/persons/{p.id}/facts/{f.id}/sources").json()
+        assert FACT_SOURCES_LIMIT == 20
+        assert len(body["sources"]) == FACT_SOURCES_LIMIT
+        # 최신 20건만 남고 가장 오래된 5건이 잘린다.
+>       assert [s["raw_utterance"] for s in body["sources"]] == [
+            f"원문{d}" for d in range(FACT_SOURCES_LIMIT)
+        ]
+E       AssertionError: assert ['원문19', '원문1..., '원문14', ...] == ['원문0', '원문1'...', '원문5', ...]
+E         
+E         At index 0 diff: '원문19' != '원문0'
+E         
+E         Full diff:
+E           [
+E         +     '원문19',
+E         +     '원문18',
+E         +     '원문17',
+E         +     '원문16',
+E         +     '원문15',
+E         +     '원문14',
+E         +     '원문13',
+E         +     '원문12',
+E         +     '원문11',
+E         +     '원문10',
+E         +     '원문9',
+E         +     '원문8',
+E         +     '원문7',
+E         +     '원문6',
+E         +     '원문5',
+E         +     '원문4',
+E         +     '원문3',
+E         +     '원문2',
+E         +     '원문1',
+E               '원문0',
+E         -     '원문1',
+E         -     '원문2',
+E         -     '원문3',
+E         -     '원문4',
+E         -     '원문5',
+E         -     '원문6',
+E         -     '원문7',
+E         -     '원문8',
+E         -     '원문9',
+E         -     '원문10',
+E         -     '원문11',
+E         -     '원문12',
+E         -     '원문13',
+E         -     '원문14',
+E         -     '원문15',
+E         -     '원문16',
+E         -     '원문17',
+E         -     '원문18',
+E         -     '원문19',
+E           ]
+
+tests/test_api_read_raw.py:180: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_raw.py::test_근거_응답_전체_값과_내림차순 - assert [22456, 22455, 22457] == [22457, 22455, 22456]
+  
+  At index 0 diff: 22456 != 22457
+  
+  Full diff:
+    [
+  +     22456,
+  +     22455,
+        22457,
+  -     22455,
+  -     22456,
+    ]
+FAILED tests/test_api_read_raw.py::test_근거_동률_occurred_at_은_id_내림차순 - assert [22458, 22459, 22460] == [22460, 22459, 22458]
+  
+  At index 0 diff: 22458 != 22460
+  
+  Full diff:
+    [
+  +     22458,
+  +     22459,
+        22460,
+  -     22459,
+  -     22458,
+    ]
+FAILED tests/test_api_read_raw.py::test_근거_상한 - AssertionError: assert ['원문19', '원문1..., '원문14', ...] == ['원문0', '원문1'...', '원문5', ...]
+  
+  At index 0 diff: '원문19' != '원문0'
+  
+  Full diff:
+    [
+  +     '원문19',
+  +     '원문18',
+  +     '원문17',
+  +     '원문16',
+  +     '원문15',
+  +     '원문14',
+  +     '원문13',
+  +     '원문12',
+  +     '원문11',
+  +     '원문10',
+  +     '원문9',
+  +     '원문8',
+  +     '원문7',
+  +     '원문6',
+  +     '원문5',
+  +     '원문4',
+  +     '원문3',
+  +     '원문2',
+  +     '원문1',
+        '원문0',
+  -     '원문1',
+  -     '원문2',
+  -     '원문3',
+  -     '원문4',
+  -     '원문5',
+  -     '원문6',
+  -     '원문7',
+  -     '원문8',
+  -     '원문9',
+  -     '원문10',
+  -     '원문11',
+  -     '원문12',
+  -     '원문13',
+  -     '원문14',
+  -     '원문15',
+  -     '원문16',
+  -     '원문17',
+  -     '원문18',
+  -     '원문19',
+    ]
+3 failed, 61 passed in 1.03s
+
+# ===== append 2026-10-21T21:36:00+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/v04 MUT=BM3 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -p mutplug tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_questions_pending.py tests/test_api_read_briefings.py tests/test_api_read_briefings_e2e.py
+# 시각: 2026-10-21T21:36:00+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 1
+# 메모: 변이 BM3
+# ---
+[mutplug] MUT=BM3
+...............................................F................         [100%]
+=================================== FAILURES ===================================
+____________________ test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 _____________________
+
+client = <starlette.testclient.TestClient object at 0x1106ef9b0>
+db_session = <sqlalchemy.orm.session.Session object at 0x1106cdf50>
+
+    def test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함(client, db_session):
+>       assert BRIEFINGS_LOOKBACK_DAYS == 7
+E       assert 6 == 7
+
+tests/test_api_read_briefings.py:261: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_api_read_briefings.py::test_기간_경계_정확히_7일전_포함_7일_1초전_제외_미래_포함 - assert 6 == 7
+1 failed, 63 passed in 1.03s
+
+# ===== append 2026-10-21T21:36:02+09:00 =====
+# 명령: git status --short app tests alembic; echo status_rc=$?; git diff --stat app tests
+# 시각: 2026-10-21T21:36:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75cb4ad (dev2)
+# exit: 0
+# 메모: 저장소 무수정 확인
+# ---
+status_rc=0

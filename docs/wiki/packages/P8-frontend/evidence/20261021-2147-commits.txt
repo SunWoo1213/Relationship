@@ -1,0 +1,22 @@
+75cb4ad cr(CR-003): 인물 화면을 카드 그리드·검색·사이드바 5명으로 바꾸는 결정을 문서에 옮긴다
+3bd5025 fix(P8-frontend): 인물 화면 정렬을 고치고 U10 확인·배포 점검·CR-003 을 기록한다
+735f391 fix(P8-frontend): "다른 사람이에요" 답 뒤 새 인물로 기억할지 이어서 묻는다
+c4fbd2f harness(settings): 백그라운드 세션도 저장소에서 바로 작업하게 한다
+0b24bb6 test(P8-frontend): 백엔드 판정을 끝내고 테스트 기록·신뢰성 보고서를 만든다
+07ec09a test(P8-frontend): 브라우저 끝에서 끝 테스트 3편과 테스트 기록표를 만든다
+8fd5463 docs(P8-frontend): U8 커밋 해시를 기록에 채우고 테스트 기록 방식을 정한다
+819cb2a feat(P8-frontend): PWA 와 웹 푸시 구독을 붙인다
+46532e7 feat(P8-frontend): 브리핑 화면과 수동 브리핑 버튼을 만든다
+761cced feat(P8-frontend): 인물 목록과 인물 카드 화면, 원문·근거 펼치기를 만든다
+977f2ee feat(P8-frontend): 채팅 화면과 확인 칩을 만든다
+975a8e5 feat(P8-frontend): React 프론트 골격·디자인 토큰·테스트 도구·CI 를 세운다
+95ca2c0 feat(P8-frontend): 대기 질문 목록과 저장된 브리핑을 읽는 조회 API 를 더한다
+22a6822 fix(FIX-032): 훅 자가 시험이 저장소 상태를 건드리지 않게 격리하고 낡은 브랜치 문구를 고친다
+de35242 fix(FIX-014): Bash 로 프로젝트 파일을 쓰는 명령을 훅이 거부하게 하고, 푸시 기록 오탐을 고친다
+d16375e docs(wiki): 하네스 약점 세 가지를 고치는 FIX-014·032·033 계획을 쓴다
+2c902f0 feat(P8-frontend): 타임라인·사실의 근거 원문을 펼쳐 보는 조회 API 를 더한다
+6c2d0e7 feat(P8-frontend): 인물 목록과 인물 카드를 읽는 조회 API 를 더한다
+6479c1d fix(FIX-031): Windows CI 에서 훅 자가 시험이 멈추던 것을 고치고 시간 제한을 둔다
+440a0e5 harness(P8-frontend): 프론트 담당 에이전트를 만들고 승인·검증 게이트에 넣는다
+2341f9e docs(wiki): 다음 세션이 P8 U0 부터 이어가도록 인수인계 문서를 새로 쓴다
+ab29daa docs(P8-frontend): 프론트 3화면 계획을 검증·승인까지 마치고 활성화한다

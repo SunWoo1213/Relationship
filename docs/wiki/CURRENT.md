@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: P8-frontend
+active: none
 frozen: none
 
 <!--
