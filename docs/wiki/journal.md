@@ -493,3 +493,6 @@
 - 2026-10-15 19:45 | PUSH-dev2 | origin dev2 c4fbd2f (실험 푸시)
 - 2026-10-16 18:02 | COMMIT | 735f391 fix(P8-frontend): "다른 사람이에요" 답 뒤 새 인물로 기억할지 이어서 묻는다
 - 2026-10-16 18:02 | PUSH-dev2 | origin dev2 735f391 (실험 푸시)
+- 2026-10-16 19:57 | COMMIT | 3bd5025 fix(P8-frontend): 인물 화면 정렬을 고치고 U10 확인·배포 점검·CR-003 을 기록한다
+- 2026-10-16 19:57 | PUSH-dev2 | origin dev2 3bd5025 (실험 푸시)
+- 2026-10-21 19:50 | CR | CR-003 이행완료(문서): D15 인물 화면 배치(그리드·이름/별칭 검색·사이드바 최근 5명 `last_contact_at`·상세 가운데 75% 상한 없음·태그 필터 없음) 신설 — 대체 D 없음, P8 01-plan 결정 N·U6·체크리스트 19·20 일부 대체 · backlog P8b-persons-grid 항목 + P9 에 배포 유효성 요구(R-U10D-1~4·스모크 S1~S15) · INDEX 태그·패키지 표 · proposal 상단 한 줄. 승인 2026-10-16 → 동결은 P8 커밋 3bd5025 뒤(R-U10C-6, 창 안 제품 코드 변경은 CR 명시 2파일뿐) → 2026-10-21 frozen CR-003 → 문서 이행 → none. 코드는 P8b(P8 04-review 뒤). 같은 커밋에 03-log·registry 의 FIX-035 `735f391`·정렬 `3bd5025` 해시 기록 | CR-003 D15 P8-frontend P8b-persons-grid FIX-035

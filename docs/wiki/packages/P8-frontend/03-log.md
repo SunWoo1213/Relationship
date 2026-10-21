@@ -194,7 +194,7 @@
 - 남은 것: 메인 체크아웃으로 변경 옮기기 · verifier 리뷰(tests.md 백엔드 절 행 수·reliability.md 수치 대조) · 해시 칸 `pending` → 커밋 해시 · U9a/U9b 커밋 해시 2개를 이 항목에(R-13) · U10 사람 점검.
 - Refs: P8-frontend U9 S3.4 S3.6 R12 원칙8 원칙9 R-U3-1 R-U3-2 R-U3-5 R-U3-6 FIX-033 FIX-034
 
-## 2026-10-16 · fix(P8-frontend): "다른 사람이에요" 답 뒤 새 인물로 기억할지 이어서 묻는다 · pending (FIX-035, backend-agent)
+## 2026-10-16 · fix(P8-frontend): "다른 사람이에요" 답 뒤 새 인물로 기억할지 이어서 묻는다 · 735f391 (FIX-035, backend-agent)
 - 계기: U10 사람 점검(실서버·실 LLM) 중 identity 질문에 "아니요, 다른 사람이에요" 라고 답하면 인물·사건이 함께 사라짐(q5·q7). 상세 `docs/wiki/fixes/FIX-035.md`.
 - 변경: `app/agent/loop.py` identity 거절 → 같은 언급의 new_person 후속 질문 · `app/tools/context.py` `amend_trace_output()`(trace 키 추가 전용) · `app/er/pipeline.py` 후보 1명 문구 · `app/er/types.py`·`__init__.py` 공개 상수 2개 · 테스트 +7(answers_resume 11→16, er_pipeline +1, tools_context +1) · `tests.md` FIX-035 절·집계 203→210 · registry · P5-loop 03-log 한 줄.
 - 검증: verifier 1차 보류([필수] R-35-1 루프 ORM 직접 사용) → 사용자 결정 (a) 헬퍼 이동 + 권고 전부 → 재작업 1차 → verifier 재확인 통과([필수] 0, 권고 R-35-7·8 은 메인 세션이 문서로 처리). 전체 회귀 1953 passed skip 0 · ruff(app tests scripts evaluation) 통과 · 변이 12/12 검출. 증거 `fixes/evidence/20261016-17*-*FIX-035*`. review `fixes/review-FIX-035.md`.
@@ -202,7 +202,7 @@
 - Refs: P8-frontend P5-loop FIX-035 D1 D10 S3.3 S3.4 원칙1 원칙2 원칙9
 - **커밋 뒤(2026-10-16)**: 커밋 `735f391`, dev2 푸시, CI 38877700918 다섯 job success. 서버 재기동 후 **메인 세션이 Chrome 으로 직접 U10 FIX-035 실서버 확인**(사용자 지시 "너가 직접 테스트도 해봐 … 상세하게 기록") — 시나리오 A(거절→직장: 인물 10·사건 29)·A3(동시 두 번 답 → 409, 사용자 실수 클릭)·A4(새로고침 복원)·A6(카드 원문 펼치기)·B(거절→아니요: 생성 0)·C(새 인물 재사용, 자동 병합 0.8654) 전부 통과, 후보 1명 문구는 실서버 미확인. 기록 `tests.md` "U10 사람 점검 — FIX-035" 절, 상세 `evidence/20261016-1915-u10-check-chat-fix035.txt`, DB 원본 `evidence/20261016-1911-u10-fix035-db.txt`(1910 파일은 저장 실패본).
 
-## 2026-10-16 · fix(P8-frontend): 인물 화면 정렬을 고친다 — U10 32행 "수정 필요" 1회 · pending (frontend-agent)
+## 2026-10-16 · fix(P8-frontend): 인물 화면 정렬을 고친다 — U10 32행 "수정 필요" 1회 · 3bd5025 (frontend-agent)
 - 계기: U10 사람 점검에서 사용자 "인물 칸에서 칸이 너무 가운데로 쏠려있는데 이것도 디자인적으로 수정해줘"(PC 웹 기준). 원인 `web/src/screens/PersonCardScreen.tsx:330` `mx-auto max-w-3xl`(768px 가운데).
 - **수정 반영 횟수: 1 (에이전트 작업 2회 — 1차 결과를 사용자가 본 뒤 추가 지시, CR-003 §3 ⑥(a) 사용자 결정으로 같은 1회로 본다; 판정표 32행·리스크 7 출구를 실제로 거침)**
   - 1차(19:18): 사용자 결정 (a) 왼쪽 정렬 + `max-w-4xl`, 채팅 그대로 → section `max-w-4xl`, `card.test.tsx` +1. 증거 `evidence/20261016-1918-u10-fix-card-align-{typecheck,vitest,build,e2e,mutation}.txt`(vitest 136, 변이 1 검출).
@@ -212,3 +212,10 @@
 - 검증: 메인 재실행 vitest 137 passed·typecheck 0·Chrome(1556px) 시각 확인. verifier `review-u10-closeout.md`: 재실행 typecheck 0·vitest 137·build·E2E 4/4, 변이 M1~M3 검출, **M4(목록 안쪽 `mt-4` div 에 `mx-auto max-w-3xl`) 생존 → R-U10C-3 P8b 보강**. [필수] R-U10C-1(이 항목 누락)·-2(tests.md 집계 184→182) 메인 세션이 해소.
 - 남은 것: 이 커밋 뒤 `frozen: CR-003`(R-U10C-6 — journal CR 줄에 "동결은 P8 커밋 <해시> 뒤" 기록) · 루트 `test-results/`(Playwright `.last-run.json`)는 커밋 제외, 삭제/루트 `.gitignore` 추가는 사용자 결정(R-U10C-7) · 29·30행 ⑤·⑧ 사용자 확인 문장·⑥ "펼친 사실 id"는 미충족 — 사용자 절차로(R-U10C-5).
 - Refs: P8-frontend U10 CR-003 원칙5 원칙7 결정L 결정N
+
+## 2026-10-21 · cr(CR-003): 인물 화면을 카드 그리드·검색·사이드바 5명으로 바꾸는 결정을 문서에 옮긴다 · pending (메인 세션, 문서만)
+- 변경: 신규 `decisions/D15-persons-screen-layout.md`(그리드·이름/별칭 검색 프론트·태그 필터 없음·사이드바 최근 5명 `last_contact_at`·상세 가운데 75% 상한 없음·"코드에서 지켜야 할 것" grep 문장) · 01-plan 결정 N 인용문·U6·체크리스트 19·20 "CR-003·D15 대체" · `docs/backlog.md` P8b-persons-grid 항목 + P9 배포 유효성 요구(R-U10D-1~4·S1~S15) · `INDEX.md` 47행·패키지 표 · `docs/proposal.md` 상단 한 줄 · `changes/CR-003.md` 이행완료 · 지난 커밋 해시 기록(이 로그 FIX-035 `735f391`·정렬 `3bd5025`, registry 8곳).
+- 동결 창: `frozen: CR-003` 을 2026-10-21 에 걸고 문서 이행 뒤 `none`(R-U10C-6 사유는 CR-003 머리글). 제품 코드 변경 0.
+- 검증: 없음(문서). D15 사실 확인 — `getPersons()` 인자 없음(`client.ts:107`), 서버 정렬 `last_contact.desc().nulls_last()`(`read.py:157`). "해시 pending" 잔존 0.
+- 남은 것: P8 닫기(U10 사용자 화면 점검 → 04-review → done) → P8b `/devlog start`(D15 그대로).
+- Refs: CR-003 D15 P8-frontend P8b-persons-grid FIX-035 결정N 결정L 원칙5 원칙7
