@@ -156,6 +156,16 @@ def list_persons(session: Session, user_id: str) -> list[PersonListItemOut]:
         .group_by(Person.id)
         .order_by(last_contact.desc().nulls_last(), Person.id.asc())
     ).all()
+    # 별칭은 인물 수와 무관한 질의 1회로 모아(N+1 금지) 인물별로 나눈다. 정렬은
+    # 카드(`get_person_card`)와 같은 Python `sorted()` 코드포인트 순 -- DB 콜레이션 아님.
+    alias_rows = session.execute(
+        select(PersonAlias.person_id, PersonAlias.alias)
+        .join(Person, Person.id == PersonAlias.person_id)
+        .where(Person.user_id == user_id)
+    ).all()
+    by_person: dict[int, list[str]] = {}
+    for pid, alias in alias_rows:
+        by_person.setdefault(pid, []).append(alias)
     return [
         PersonListItemOut(
             id=p.id,
@@ -163,6 +173,7 @@ def list_persons(session: Session, user_id: str) -> list[PersonListItemOut]:
             relation_tag=p.relation_tag,
             hierarchy=p.hierarchy,
             last_contact_at=lc,
+            aliases=sorted(by_person.get(p.id, [])),
         )
         for p, lc in rows
     ]

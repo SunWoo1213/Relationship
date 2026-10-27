@@ -1,0 +1,33 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u0/mutate.sh
+# 시각: 2026-10-27T14:37:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0973858 (dev2)
+# exit: 0
+# ---
+=== M1-n-plus-1 ===
+FAILED tests/test_api_read_persons.py::test_목록_SELECT_수는_인물_수와_무관한_상수 - assert 5 == 12
+1 failed, 16 passed in 0.74s
+=== M2-no-sorted ===
+FAILED tests/test_api_read_persons.py::test_목록_별칭은_카드_별칭과_같은_값_같은_순서 - AssertionError: assert ['Zed', '가나', 'apple', 'Bob'] == ['Bob', 'Zed', 'apple', '가나']
+1 failed, 16 passed in 0.72s
+=== M3-no-user-filter ===
+17 passed in 0.69s
+
+# ===== append 2026-10-27T14:37:44+09:00 =====
+# 명령: git status --short
+# 시각: 2026-10-27T14:37:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0973858 (dev2)
+# exit: 0
+# ---
+ M app/api/read.py
+ M app/api/schemas.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8b-persons-grid/01-plan.md
+ M docs/wiki/packages/P8b-persons-grid/02-plan-verify.md
+ M tests/test_api_read_persons.py
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1435-u0-ruff.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1436-u0-pytest-all.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1436-u0-read-persons-aliases.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1437-u0-mutation.txt

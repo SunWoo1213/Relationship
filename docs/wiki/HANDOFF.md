@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-27 13:30 (P8b 계획 승인 — 계획 문서 커밋 승인 대기)
+갱신: 2026-10-27 15:50 (U0 verifier 리뷰 **통과**([필수] 0 · [권고] R-U0-1~3 기록 처리) — `feat(P8b-persons-grid)` U0 커밋 승인 대기: 제품 3파일 + registry·tests.md(신규)·03-log·01-plan(행 번호)·02-plan-verify(표기)·review-u0·증거 8 + HANDOFF·journal. 커밋 뒤 U1 frontend-agent(L-004))
 
-active: **P8b-persons-grid**(계획 승인 2026-10-27, 구현 단위 미착수) | frozen: none | 브랜치 `dev2` = origin/dev2 **`fe76931`**(P8 완료, CI 39607202714 success) + **미커밋: P8b 계획 묶음(아래)** | origin/dev `f9500fe` · origin/main `f05d017` | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 11·일정 6 — U10 확인 행), 테스트 `relationship_test` | 기준선(HEAD, 코드 `3bd5025`): 백엔드 **1953 passed** · 프론트 **137 passed** · typecheck 0 · E2E 4
+active: **P8b-persons-grid**(계획 승인·커밋 2026-10-27, 구현 단위 미착수) | frozen: none | 브랜치 `dev2` = origin/dev2 **`0973858`**(P8b 계획; CI 40454539352 success) | origin/dev `f9500fe` · origin/main `f05d017` | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 11·일정 6 — U10 확인 행), 테스트 `relationship_test` | 기준선(HEAD, 코드 `3bd5025`): 백엔드 **1953 passed** · 프론트 **137 passed** · typecheck 0 · E2E 4
 
 ## 최근 끝낸 것
 | 무엇 | 결과 | 기록 |
@@ -16,7 +16,8 @@ active: **P8b-persons-grid**(계획 승인 2026-10-27, 구현 단위 미착수) 
 | P8b `/devlog start` 1~7단계(2026-10-21~27) | architect 01-plan → **D15 전제 오류 발견**(목록 응답에 별칭 없음) → 사용자 **결정 K (나)** `GET /persons` 응답에 `aliases` 1필드 + A~J 추천안 전부 → D15·CR-003 §2·backlog 89행·INDEX 77행 보정(새 CR 아님) → verify-plan FAIL 0/WARN 3 → verifier 02-plan-verify **통과**(1차 10-22 Fable 한도 429 로 중단 → 10-27 재시도; [권고] R-1~R-9 반영 = 개정 2) → **사용자 승인** → `CURRENT active: P8b-persons-grid` · 03-log · journal START | `packages/P8b-persons-grid/01-plan.md`·`02-plan-verify.md`·`03-log.md` |
 
 ## 진행 중 (이 턴에서 멈춘 자리)
-- **`docs(P8b-persons-grid)` 계획 커밋 승인 대기** — 포함: `packages/P8b-persons-grid/{01-plan,02-plan-verify,03-log}.md` + `evidence/` 5개(untracked 폴더 통째) · `decisions/D15-persons-screen-layout.md` · `changes/CR-003.md` · `docs/backlog.md` · `docs/wiki/INDEX.md` · `CURRENT.md` · `journal.md` · 이 HANDOFF. 제품 코드 변경 0.
+- **계획 커밋 `0973858`**(15파일, 사용자 승인 "커밋 + 실험 푸시") → `origin dev2` 끝. 03-log 첫 항목 `pending` → `0973858` 은 다음 커밋에. 미커밋은 journal 자동 줄·이 HANDOFF 뿐.
+- **U0 backend-agent 진행 중(1차 13:45 는 `stage-gate.sh` 가 `결과: **통과**` 굵게 표기를 못 읽어 코드 쓰기 거부·변경 0 → 02-plan-verify 120행 표기만 고치고(판정 무변경, 하네스 FIX 후보) 14:00 마커 재생성·재시도; 사전 결정: 137행 키 집합 단언에 `"aliases"` 추가 1줄 허용. 2차는 코드·테스트 5건 작성 뒤 **Docker 데몬 꺼짐**으로 pytest 전부 skip → 메인 세션이 `open -a Docker` + `docker start capstone2-postgres-1` 로 DB 복구(14:40), skip 증거 삭제, 같은 에이전트에 SendMessage 로 미실행 항목(pytest·전체 회귀·변이 2·registry·tests.md) 이어서)** — 바꿀 수 있는 파일 `app/api/read.py`·`schemas.py`·`tests/test_api_read_persons.py` 셋뿐(판정 8행). 끝나면 보고 수치 재실행 → verifier 리뷰(L-004) → `/commit`(feat(P8b-persons-grid) U0).
 - 백그라운드 서버: 백엔드 :8000·프론트 :5173 이 10-21 세션에서 띄운 채 아직 떠 있음(세션 종료 시 꺼짐). U0 pytest 는 `relationship_test` DB 라 무관.
 
 ## 바로 다음에 할 것 (순서대로)
@@ -32,7 +33,7 @@ active: **P8b-persons-grid**(계획 승인 2026-10-27, 구현 단위 미착수) 
 - 2026-10-16: CR-003 A 수용 · "P8 마무리 먼저" · 음성 입력 제외 · 인물 화면은 기존 `#/persons` 수정.
 
 ## FIX 후보 (미착수 — 순서는 사용자에게)
-- **하네스**: 서브에이전트가 API 한도(429)로 중단되면 L-004 마커만 소비되고 산출물 없음 — 재시도 규칙(마커 재생성 근거)을 SKILL/훅에 · `save_evidence.py` psql `-f`(컨테이너 경로)·`cd web &&`·같은 분 이름 충돌 · `approve-commit.sh --stage` 마커 덮어쓰기 · 03-log U0~U3 머리줄 `pending` 잔존(P8) · ruff 하네스 4건(R-U10R-8) · FIX-014 후속 R-14-19 · FIX-032 R-32-1·2 · FIX-033 R-33-7·8 · R-27-10~13 · R-30-2 · R-12 · R-29-1·3 · "완료 커밋 뒤 CI 확인" SKILL 규칙.
+- **하네스**: `stage-gate.sh` 121행 정규식 `^결과:[[:space:]]*통과` 가 verifier 의 `결과: **통과**`(굵게) 를 못 읽음 → 정규식에 `\*{0,2}` 허용 또는 plan-verify 템플릿에 "굵게 금지" 명시 · 서브에이전트가 API 한도(429)로 중단되면 L-004 마커만 소비되고 산출물 없음 — 재시도 규칙(마커 재생성 근거)을 SKILL/훅에 · `save_evidence.py` psql `-f`(컨테이너 경로)·`cd web &&`·같은 분 이름 충돌 · `approve-commit.sh --stage` 마커 덮어쓰기 · 03-log U0~U3 머리줄 `pending` 잔존(P8) · ruff 하네스 4건(R-U10R-8) · FIX-014 후속 R-14-19 · FIX-032 R-32-1·2 · FIX-033 R-33-7·8 · R-27-10~13 · R-30-2 · R-12 · R-29-1·3 · "완료 커밋 뒤 CI 확인" SKILL 규칙.
 - **제품**: R-U10R-4 · R-U10R-5 · 1-4 자동 병합 표시 · 응답 문장 1-1·1-2 · R-U10D-5(`.env.example` 죽은 이름 3개) · R-U10D-9(스케줄러 워커 수) · 발송 네트워크(P7) · 잠금 404(결정 K/P6) · `judge.py` docstring · 작업 메모리 미구현(S3.5) · `s_emb=0` 합산 · 인물 분리 없음 · `loop_extract` 토큰 0 · `update_person` 부분 반영 · `memory_promote` `source` 비대칭 · FIX-035 후속: 후보 1명 문구 실서버 확인 · P8 tests.md 갱신 여부(P8b 리스크 8, 사용자 결정).
 
 ## 사용자 몫 · 주의

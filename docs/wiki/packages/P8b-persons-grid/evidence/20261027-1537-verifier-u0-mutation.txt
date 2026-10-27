@@ -1,0 +1,91 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u0/mutate.sh
+# 시각: 2026-10-27T15:37:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0973858 (dev2)
+# exit: 0
+# ---
+=== C0-control ===
+17 passed in 0.66s
+=== M1-n-plus-1 ===
+tests/test_api_read_persons.py:271: AssertionError
+FAILED tests/test_api_read_persons.py::test_목록_SELECT_수는_인물_수와_무관한_상수 - assert 5 == 12
+1 failed, 16 passed in 0.70s
+=== M2-no-sorted ===
+E       AssertionError: assert ['Zed', '가나', 'apple', 'Bob'] == ['Bob', 'Zed', 'apple', '가나']
+tests/test_api_read_persons.py:231: AssertionError
+FAILED tests/test_api_read_persons.py::test_목록_별칭은_카드_별칭과_같은_값_같은_순서 - AssertionError: assert ['Zed', '가나', 'apple', 'Bob'] == ['Bob', 'Zed', 'apple', '가나']
+1 failed, 16 passed in 0.70s
+=== M3-no-user-filter ===
+17 passed in 0.68s
+=== M4-display-name ===
+E       AssertionError: assert ['A'] == ['Bob', 'Zed', 'apple', '가나']
+tests/test_api_read_persons.py:231: AssertionError
+E       AssertionError: assert ['A'] == []
+tests/test_api_read_persons.py:242: AssertionError
+E       AssertionError: assert [(36860, ['내사람'])] == [(36860, ['내별칭'])]
+tests/test_api_read_persons.py:280: AssertionError
+FAILED tests/test_api_read_persons.py::test_목록_별칭은_카드_별칭과_같은_값_같은_순서 - AssertionError: assert ['A'] == ['Bob', 'Zed', 'apple', '가나']
+FAILED tests/test_api_read_persons.py::test_목록_별칭_없는_인물은_빈_배열 - AssertionError: assert ['A'] == []
+FAILED tests/test_api_read_persons.py::test_목록_별칭에_다른_사용자_별칭이_섞이지_않는다 - AssertionError: assert [(36860, ['내사람'])] == [(36860, ['내별칭'])]
+3 failed, 14 passed in 0.72s
+Traceback (most recent call last):
+  File "<stdin>", line 4, in <module>
+AssertionError: 치환 대상이 정확히 1개가 아님: 2
+=== M5-none-when-empty ===
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+app/api/read.py:170: ValidationError
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+app/api/read.py:170: ValidationError
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+app/api/read.py:170: ValidationError
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+app/api/read.py:170: ValidationError
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+app/api/read.py:170: ValidationError
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+app/api/read.py:170: ValidationError
+FAILED tests/test_api_read_persons.py::test_목록_last_contact_는_max_이고_정렬은_max_기준 - pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+FAILED tests/test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 - pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+FAILED tests/test_api_read_persons.py::test_목록은_다른_사용자_인물을_뺀다 - pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+FAILED tests/test_api_read_persons.py::test_응답에_raw_utterance_가_없다 - pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+FAILED tests/test_api_read_persons.py::test_목록_별칭_없는_인물은_빈_배열 - pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+FAILED tests/test_api_read_persons.py::test_쓰기_0_trace_0 - pydantic_core._pydantic_core.ValidationError: 1 validation error for PersonListItemOut
+6 failed, 11 passed in 1.57s
+=== M6-sort-lower ===
+E       AssertionError: assert ['apple', 'Bob', 'Zed', '가나'] == ['Bob', 'Zed', 'apple', '가나']
+tests/test_api_read_persons.py:231: AssertionError
+FAILED tests/test_api_read_persons.py::test_목록_별칭은_카드_별칭과_같은_값_같은_순서 - AssertionError: assert ['apple', 'Bob', 'Zed', '가나'] == ['Bob', 'Zed', 'apple', '가나']
+1 failed, 16 passed in 0.71s
+=== M7-wrong-key ===
+E       AssertionError: assert ['Bob', 'Cat'...t', '가나', ...] == ['Bob', 'Zed', 'apple', '가나']
+tests/test_api_read_persons.py:231: AssertionError
+E       AssertionError: assert ['비'] == []
+tests/test_api_read_persons.py:242: AssertionError
+FAILED tests/test_api_read_persons.py::test_목록_별칭은_카드_별칭과_같은_값_같은_순서 - AssertionError: assert ['Bob', 'Cat'...t', '가나', ...] == ['Bob', 'Zed', 'apple', '가나']
+FAILED tests/test_api_read_persons.py::test_목록_별칭_없는_인물은_빈_배열 - AssertionError: assert ['비'] == []
+2 failed, 15 passed in 0.72s
+=== D1-print-selects ===
+[SQL] SELECT persons.id, persons.user_id, persons.display_name, persons.relation_tag, persons.hierarchy, persons.created_at, persons.updated_at, max(events.occurred_a
+[SQL] SELECT person_aliases.person_id, person_aliases.alias FROM person_aliases JOIN persons ON persons.id = person_aliases.person_id WHERE persons.user_id = %(user_i
+[SQL] SELECT persons.id, persons.user_id, persons.display_name, persons.relation_tag, persons.hierarchy, persons.created_at, persons.updated_at, max(events.occurred_a
+[SQL] SELECT person_aliases.person_id, person_aliases.alias FROM person_aliases JOIN persons ON persons.id = person_aliases.person_id WHERE persons.user_id = %(user_i
+1 passed, 16 deselected in 0.49s
+=== D2-count-all ===
+1 passed, 16 deselected in 0.56s
+=== 저장소 상태 (변이 뒤) ===
+ M app/api/read.py
+ M app/api/schemas.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8b-persons-grid/01-plan.md
+ M docs/wiki/packages/P8b-persons-grid/02-plan-verify.md
+ M docs/wiki/registry.md
+ M tests/test_api_read_persons.py
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1435-u0-ruff.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1436-u0-pytest-all.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1436-u0-read-persons-aliases.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1437-u0-mutation.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1535-verifier-u0-full-regression.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1535-verifier-u0-lint.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261027-1535-verifier-u0-tests.txt
+?? docs/wiki/packages/P8b-persons-grid/tests.md

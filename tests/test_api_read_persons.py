@@ -134,7 +134,9 @@ def test_목록_정렬_최근순_null_뒤_동률은_id순(client, db_session):
     assert _dt(body[0]["last_contact_at"]) == NOW - timedelta(days=1)
     assert _dt(body[2]["last_contact_at"]) == NOW - timedelta(days=5)  # A: max(5, 9)
     assert body[3]["last_contact_at"] is None
-    assert set(body[0]) == {"id", "display_name", "relation_tag", "hierarchy", "last_contact_at"}
+    assert set(body[0]) == {
+        "id", "display_name", "relation_tag", "hierarchy", "last_contact_at", "aliases"
+    }
 
 
 def test_목록은_다른_사용자_인물을_뺀다(client, db_session):
@@ -212,6 +214,80 @@ def test_없는_인물과_타사용자_인물은_같은_404(client, db_session):
     r2 = client.get("/persons/99999999")
     assert r1.status_code == r2.status_code == 404
     assert r1.json() == r2.json() == {"detail": {"code": "not_found"}}
+
+
+def _alias(db, person, *names) -> None:
+    db.add_all([PersonAlias(person_id=person.id, alias=n, source="user_said") for n in names])
+    db.flush()
+
+
+def test_목록_별칭은_카드_별칭과_같은_값_같은_순서(client, db_session):
+    # 입력 순(Zed, 가나, apple, Bob)과 코드포인트 순(Bob, Zed, apple, 가나)이 다르다.
+    p = _person(db_session, "A")
+    q = _person(db_session, "B")
+    _alias(db_session, p, "Zed", "가나", "apple", "Bob")
+    _alias(db_session, q, "민수형", "Cat", "bat")
+    rows = {r["id"]: r for r in client.get("/persons").json()}
+    assert rows[p.id]["aliases"] == ["Bob", "Zed", "apple", "가나"]
+    assert rows[q.id]["aliases"] == ["Cat", "bat", "민수형"]
+    for pid in (p.id, q.id):
+        assert rows[pid]["aliases"] == client.get(f"/persons/{pid}").json()["aliases"]
+
+
+def test_목록_별칭_없는_인물은_빈_배열(client, db_session):
+    p = _person(db_session, "A")
+    q = _person(db_session, "B")
+    _alias(db_session, q, "비")
+    rows = {r["id"]: r for r in client.get("/persons").json()}
+    assert rows[p.id]["aliases"] == []
+    assert rows[q.id]["aliases"] == ["비"]
+
+
+def _count_selects(db_session, client) -> int:
+    from sqlalchemy import event
+
+    conn = db_session.get_bind()
+    stmts: list[str] = []
+
+    def before(_conn, _cursor, statement, *_a):
+        if statement.lstrip().upper().startswith("SELECT"):
+            stmts.append(statement)
+
+    event.listen(conn, "before_cursor_execute", before)
+    try:
+        assert client.get("/persons").status_code == 200
+    finally:
+        event.remove(conn, "before_cursor_execute", before)
+    return len(stmts)
+
+
+def test_목록_SELECT_수는_인물_수와_무관한_상수(client, db_session):
+    for i in range(3):
+        _alias(db_session, _person(db_session, f"P{i}"), f"a{i}", f"b{i}")
+    n3 = _count_selects(db_session, client)
+    for i in range(3, 10):
+        _alias(db_session, _person(db_session, f"P{i}"), f"a{i}", f"b{i}")
+    n10 = _count_selects(db_session, client)
+    assert n3 == n10 == 2  # 목록 1 + 별칭 1
+
+
+def test_목록_별칭에_다른_사용자_별칭이_섞이지_않는다(client, db_session):
+    mine = _person(db_session, "내사람")
+    other = _person(db_session, "남의사람", user_id="other")
+    _alias(db_session, mine, "내별칭")
+    _alias(db_session, other, "남별칭")
+    body = client.get("/persons").json()
+    assert [(r["id"], r["aliases"]) for r in body] == [(mine.id, ["내별칭"])]
+    assert "남별칭" not in client.get("/persons").text
+
+
+def test_목록_응답에_원문_키가_없다(client, db_session):
+    p = _person(db_session)
+    _event(db_session, p, 1, raw="절대노출금지")
+    _alias(db_session, p, "별칭")
+    body = client.get("/persons").json()
+    assert set(body[0]).isdisjoint({"raw_utterance", "content"})
+    assert "절대노출금지" not in json.dumps(body, ensure_ascii=False)
 
 
 def test_쓰기_0_trace_0(client, db_session):

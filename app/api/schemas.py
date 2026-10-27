@@ -310,13 +310,14 @@ class PushSubscriptionOut(BaseModel):
 
 
 class PersonListItemOut(BaseModel):
-    """`GET /persons` 의 한 행."""
+    """`GET /persons` 의 한 행. `aliases` 는 카드 응답과 같은 값·같은 순서(P8b U0)."""
 
     id: int
     display_name: str
     relation_tag: str
     hierarchy: str
     last_contact_at: datetime | None
+    aliases: list[str]
 
 
 class PersonBasicOut(BaseModel):
