@@ -16,3 +16,33 @@
 | test_api_read_persons.py::test_목록_정렬_최근순_null_뒤_동률은_id순 (변경) | 기대 키 집합 | 137행 집합에 `"aliases"` 추가(응답 필드 추가에 따른 갱신, 그 외 무수정) | 통과 · — | 기록 없음 |
 
 쓰기 0: 기존 `test_쓰기_0_trace_0` 가 `GET /persons` 를 호출하고 `assert_no_writes` 를 건다(무수정, 통과).
+
+## web/src/__tests__/card.test.tsx — U1 인물 화면 카드 그리드 (신규 12 · 변경 6 · 사이드바 최소 수정 4 · 삭제 0)
+
+실행: `npm --prefix web test -- --run src/__tests__/card.test.tsx` → 43 passed (기준선 31 → +12). 전체 `npm --prefix web test -- --run` → 149 passed (9 files, 기준선 137 → +12). 증거 `evidence/20261027-1623-u1-grid-vitest.txt`·`…-u1-vitest-all.txt`·`…-u1-grid.txt`(typecheck)·`…-u1-build.txt`·`…-u1-grep2.txt`, 변이 `evidence/20261027-1623-u1-mutation.txt`(대조군 43 passed + 변이 12건 전부 FAIL, 저장소 무수정 `git status`). describe: "인물 목록 — 카드 그리드 (D15, P8b U1)". 실패 이력은 전부 "기록 없음".
+
+| 테스트 이름(요지) | 구분 | 무엇을 확인하나 · 검출 변이 |
+|---|---|---|
+| #/persons 진입 시 GET /api/persons 1회, 타일 필드가 서버 값·순서 그대로 | 변경(P8 "서버 순서 그대로… 4개 필드" 재작성) | `<App />` 에서 fetch URL 목록 == `['/api/persons']`, 이름·태그·위계·마지막 접촉 값·`['7','4','9']` · V1-5(간접) |
+| 데스크톱 열·간격 클래스(결정 A), 7명 전원 | 신규 | `grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4` 클래스 · 7명 전원(5명 자르기와 무관) |
+| 타일 별칭(결정 B) | 신규 | 같은 별칭 제외·최대 2개·"+n"·0개면 칸 없음·정확히 2개면 "+n" 없음 · V1-9a, V1-9b |
+| 목록 상태는 본문 폭 전체 — 조상 검사 (R-U10C-3) | 변경(P8 "본문 폭 전체… 폭 상한이 없다" 재작성: section 한 요소 → 그리드부터 main 까지 모든 조상+자신+section 안 감싼 요소) | `mx-auto`·`max-w-*`·`md:w-*` 0 · V1-6, V1-7 |
+| 컨트롤은 검색창 1개뿐 — 결정 D 문구·aria-label | 변경(P8 "필터·검색 컨트롤이 없다" 의미 반전) | searchbox 1, combobox·listbox·radio·checkbox·switch 0, type=search · V1-10 |
+| 검색: 이름 일부 → 그 타일만, 서버 순서 유지 | 신규 | `선영` → `['30','25']`(이름순이면 뒤바뀜) · V1-1, V1-4 |
+| 검색: 별칭 일부 | 신규 | `엄마친` → `['12']` · V1-2 |
+| 검색: 태그·위계 글자로는 안 찾음 | 신규 | `직장` → 0건(태그만 일치), `친구` → 별칭 일치 인물만 · V1-1, V1-2 |
+| 검색 정규화(결정 C) | 신규 | 앞뒤 공백·안쪽 공백(양쪽)·영문 대소문자(양쪽) 6가지 · V1-3 (V1-4 도 FAIL) |
+| 빈·공백뿐 검색어는 전원, 지우면 복귀 | 신규 | `'   '` → 4명, 지우면 4명 · V1-1, V1-3 |
+| 0건이면 결정 D 문구 1줄, 그리드 사라짐 | 신규 | `person-grid-empty` 1개, 텍스트 `찾는 인물이 없어요.` · V1-8 |
+| 검색어는 컴포넌트 상태뿐 (결정 G) | 신규 | 해시 불변·localStorage 0 |
+| 서버 문자열 무가공 (원칙7) | 신규 | 특수문자·앞뒤 공백·대소문자 이름/별칭 `textContent` 완전 일치, 검색 중에도 이름 칸 자식 0 · V1-1~V1-3 |
+| PersonGrid 소스: 가공 함수는 한 곳 | 신규 | toUpperCase 0·toLowerCase 1·trim 1·replace( 1·`.sort(` 0, 비교 함수 안 포함 · V1-3, V1-4 |
+| 빈 목록 → 빈 상태 문구(검색창 없음) | 변경(P8 "빈 목록이면 빈 상태 문구 하나" 의 대상이 그리드로) | `PERSON_LIST_NOTICE.empty`, `person-grid`·`person-search` 없음 |
+| 목록 조회 실패 → 한 줄 안내 | 변경(+그리드 없음 단언) | `PERSON_LIST_NOTICE.failed` |
+| 타일 href·클릭 해시 | 변경(P8 "항목 링크는 #/persons/:id" 의 대상이 타일로) | href 배열 `['#/persons/7','#/persons/4','#/persons/9']`, 전부 `<a>`, 클릭 → `#/persons/4` · V1-5 |
+| 키보드: Tab → 검색창 → 첫 타일, Enter 이동 | 신규 | 포커스 순서·Enter 해시 · V1-5, V1-10(검색창 뒤 select 로 순서 깨짐) |
+| 상세 상태 가운데·75% (무수정) | 유지 | `card-wrap` `mx-auto w-full md:w-3/4` · V1-11 |
+| 사이드바: #/persons 에서 사이드바 목록 + 본문 그리드가 같은 순서 | 변경(최소: 본문이 그리드가 되어 `person-list` 2개 기대 제거) | 사이드바 `person-list` 1개·본문 안 0개·링크 href 순서·링크 텍스트 불변 |
+| R-U6-2 앱을 열면 GET /persons 1회 | 변경(최소: 대기 대상 `person-list` 2개 → `person-grid`+`person-list`) | 호출 1회 불변 |
+| R-U6-2 알림 이벤트만으로도 다시 읽음 | 변경(최소: 같은 이유) | 호출 2회 불변 |
+| 본문은 PersonGrid, 사이드바는 PersonList 를 import | 변경(P8 "같은 컴포넌트(PersonList)를 import" 교체) | import 문자열·`<PersonGrid />` · 본문에 PersonList import 없음 |

@@ -12,7 +12,7 @@ import type {
   PersonPatternOut,
   TimelineEventOut,
 } from '@/api/types'
-import PersonList from '@/components/PersonList'
+import PersonGrid from '@/components/PersonGrid'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -333,7 +333,7 @@ export default function PersonCardScreen({ personId }: { personId: number | null
       </h1>
       {personId === null ? (
         <div className="mt-4">
-          <PersonList />
+          <PersonGrid />
         </div>
       ) : (
         <div data-testid="card-wrap" className="mx-auto w-full md:w-3/4">

@@ -1,0 +1,207 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py CONTROL
+# 시각: 2026-10-27T16:23:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 대조군(무변이)
+Test Files  1 passed (1)
+Tests  43 passed (43)
+exit: 0 → 생존(통과) ← 테스트 공백
+
+# ===== append 2026-10-27T16:23:35+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-1
+# 시각: 2026-10-27T16:23:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-1 검색어 무시
+Test Files  1 failed (1)
+Tests  7 failed | 36 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 0건이면 결정 D 문구 한 줄만 보이고 그리드는 사라진다
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 별칭 일부만 맞아도 그 인물이 나온다(이름에는 없는 글자)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7)
+
+# ===== append 2026-10-27T16:23:37+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-2
+# 시각: 2026-10-27T16:23:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-2 별칭을 검색 대상에서 뺌
+Test Files  1 failed (1)
+Tests  4 failed | 39 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 별칭 일부만 맞아도 그 인물이 나온다(이름에는 없는 글자)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7)
+
+# ===== append 2026-10-27T16:23:39+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-3
+# 시각: 2026-10-27T16:23:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-3 대소문자·공백 정규화 제거
+Test Files  1 failed (1)
+Tests  4 failed | 39 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > PersonGrid 소스: 대소문자·공백 가공은 비교 함수 한 곳에만 있다 (toUpperCase 0 · toLowerCase 1 · trim 1)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7)
+
+# ===== append 2026-10-27T16:23:41+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-4
+# 시각: 2026-10-27T16:23:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-4 거른 결과를 이름순 sort
+Test Files  1 failed (1)
+Tests  3 failed | 40 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > PersonGrid 소스: 대소문자·공백 가공은 비교 함수 한 곳에만 있다 (toUpperCase 0 · toLowerCase 1 · trim 1)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음)
+
+# ===== append 2026-10-27T16:23:43+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-5
+# 시각: 2026-10-27T16:23:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-5 타일 href 를 #/persons?id= 로
+Test Files  1 failed (1)
+Tests  2 failed | 41 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 href 는 서버 순서의 #/persons/:id, 누르면 해시가 바뀐다
+
+# ===== append 2026-10-27T16:23:45+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-6
+# 시각: 2026-10-27T16:23:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-6 그리드 안쪽 래퍼에 mx-auto max-w-3xl
+Test Files  1 failed (1)
+Tests  1 failed | 42 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 목록 상태는 본문 폭 전체를 쓴다 — 그리드부터 main 까지 모든 조상과 그리드 자신, section 안 그리드를 감싼 요소에 mx-auto·max-w-*·md:w-* 가 없다 (R-U10C-3)
+
+# ===== append 2026-10-27T16:23:47+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-7
+# 시각: 2026-10-27T16:23:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-7 section 에 max-w-4xl
+Test Files  1 failed (1)
+Tests  1 failed | 42 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 목록 상태는 본문 폭 전체를 쓴다 — 그리드부터 main 까지 모든 조상과 그리드 자신, section 안 그리드를 감싼 요소에 mx-auto·max-w-*·md:w-* 가 없다 (R-U10C-3)
+
+# ===== append 2026-10-27T16:23:49+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-8
+# 시각: 2026-10-27T16:23:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-8 0건 문구 미표시
+Test Files  1 failed (1)
+Tests  1 failed | 42 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 0건이면 결정 D 문구 한 줄만 보이고 그리드는 사라진다
+
+# ===== append 2026-10-27T16:23:51+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-9a
+# 시각: 2026-10-27T16:23:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-9a 별칭 상한 2 → 3
+Test Files  1 failed (1)
+Tests  1 failed | 42 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음
+
+# ===== append 2026-10-27T16:23:53+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-9b
+# 시각: 2026-10-27T16:23:53+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-9b display_name 과 같은 별칭 제외 제거
+Test Files  1 failed (1)
+Tests  1 failed | 42 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음
+
+# ===== append 2026-10-27T16:23:55+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-10
+# 시각: 2026-10-27T16:23:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-10 태그 select 추가
+Test Files  1 failed (1)
+Tests  2 failed | 41 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 컨트롤은 검색창 1개뿐이다(태그·위계 필터 없음) — 문구·aria-label 은 결정 D
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동
+
+# ===== append 2026-10-27T16:23:57+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u1/mut.py V1-11
+# 시각: 2026-10-27T16:23:57+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 변이: V1-11 상세 card-wrap md:w-3/4 → md:w-1/2
+Test Files  1 failed (1)
+Tests  1 failed | 42 passed (43)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+exit: 1 → 검출(FAIL)
+  실패 테스트: 인물 목록 — 카드 그리드 (D15, P8b U1) > 상세 상태는 가운데 정렬이고 폭이 본문의 75%(md 이상), 모바일은 100% 이다 (U10 화면 점검)
+
+# ===== append 2026-10-27T16:23:59+09:00 =====
+# 명령: git status --short web
+# 시각: 2026-10-27T16:23:59+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/types.ts
+ M web/src/components/PersonList.tsx
+ M web/src/screens/PersonCardScreen.tsx
+?? web/src/components/PersonGrid.tsx

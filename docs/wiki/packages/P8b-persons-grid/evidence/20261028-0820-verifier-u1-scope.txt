@@ -1,0 +1,58 @@
+# 명령: 
+set +e
+echo "## 1 git diff --stat 3bd5025 -- app alembic (U0 두 파일 제외) — 기대 빈 출력"; git diff --stat 3bd5025 -- app alembic ":!app/api/read.py" ":!app/api/schemas.py"; echo "[end]"
+echo "## 2 git diff --stat HEAD -- routes.ts ChatScreen BriefingScreen AppShell — 기대 빈 출력"; git diff --stat HEAD -- web/src/routes.ts web/src/screens/ChatScreen.tsx web/src/screens/BriefingScreen.tsx web/src/components/AppShell.tsx; echo "[end]"
+echo "## 2b git diff --stat 3bd5025 -- 같은 4파일 (HEAD 까지 포함) — 기대 빈 출력"; git diff --stat 3bd5025 -- web/src/routes.ts web/src/screens/ChatScreen.tsx web/src/screens/BriefingScreen.tsx web/src/components/AppShell.tsx; echo "[end]"
+echo "## 3 Sheet|Dialog|Drawer 를 쓰는 비-ui 파일 — 기대 AppShell.tsx 1개"; grep -rlE "Sheet|Dialog|Drawer" web/src --include=*.tsx | grep -v "^web/src/components/ui/"; echo "[end]"
+echo "## 4 ls web/src/components/ui — 기대 8개"; ls web/src/components/ui; ls web/src/components/ui | wc -l; echo "## 4b git status --short web/src/components/ui — 기대 빈 출력"; git status --short web/src/components/ui; echo "[end]"
+echo "## 5 persons?|q=|limit= — 기대 0건"; grep -rnE "persons\?|[?&](q|limit)=" web/src --exclude-dir=__tests__; echo "exit=$?"
+echo "## 6 getPersons() 인자 없음 — 기대 1건"; grep -n "export function getPersons()" web/src/api/client.ts
+echo "## 7 git diff --stat HEAD -- web (U1 변경 파일 4 + 신규 1)"; git diff --stat HEAD -- web; git status --short web
+echo "## 8 package.json / package-lock.json 변경 — 기대 빈 출력"; git diff --stat HEAD -- web/package.json web/package-lock.json; echo "[end]"
+echo "## 9 비밀 문자열 (diff + 신규 파일) — 기대 0건"; (git diff HEAD -- web docs/wiki/registry.md docs/wiki/packages/P8b-persons-grid/tests.md; cat web/src/components/PersonGrid.tsx) | grep -nEi "sk-[A-Za-z0-9]{10,}|AKIA[0-9A-Z]{12,}|BEGIN .*PRIVATE KEY|api[_-]?key\s*[=:]|secret\s*[=:]|password\s*[=:]|token\s*[=:]"; echo "exit=$?"
+
+# 시각: 2026-10-28T08:20:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## 1 git diff --stat 3bd5025 -- app alembic (U0 두 파일 제외) — 기대 빈 출력
+[end]
+## 2 git diff --stat HEAD -- routes.ts ChatScreen BriefingScreen AppShell — 기대 빈 출력
+[end]
+## 2b git diff --stat 3bd5025 -- 같은 4파일 (HEAD 까지 포함) — 기대 빈 출력
+[end]
+## 3 Sheet|Dialog|Drawer 를 쓰는 비-ui 파일 — 기대 AppShell.tsx 1개
+web/src/components/AppShell.tsx
+[end]
+## 4 ls web/src/components/ui — 기대 8개
+badge.tsx
+button.tsx
+card.tsx
+collapsible.tsx
+sheet.tsx
+skeleton.tsx
+sonner.tsx
+tabs.tsx
+       8
+## 4b git status --short web/src/components/ui — 기대 빈 출력
+[end]
+## 5 persons?|q=|limit= — 기대 0건
+exit=1
+## 6 getPersons() 인자 없음 — 기대 1건
+107:export function getPersons(): Promise<PersonListItemOut[]> {
+## 7 git diff --stat HEAD -- web (U1 변경 파일 4 + 신규 1)
+ web/src/__tests__/card.test.tsx      | 326 +++++++++++++++++++++++++++++------
+ web/src/api/types.ts                 |   2 +
+ web/src/components/PersonList.tsx    |   4 +
+ web/src/screens/PersonCardScreen.tsx |   4 +-
+ 4 files changed, 281 insertions(+), 55 deletions(-)
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/types.ts
+ M web/src/components/PersonList.tsx
+ M web/src/screens/PersonCardScreen.tsx
+?? web/src/components/PersonGrid.tsx
+## 8 package.json / package-lock.json 변경 — 기대 빈 출력
+[end]
+## 9 비밀 문자열 (diff + 신규 파일) — 기대 0건
+exit=1

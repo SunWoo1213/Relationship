@@ -1,0 +1,86 @@
+# 명령: 
+set +e
+F=web/src/components/PersonGrid.tsx; S=web/src/screens/PersonCardScreen.tsx
+echo "## a <select | role=combobox|switch in PersonGrid — 기대 0"; grep -nE "<select|role=\"(combobox|switch)\"" $F; echo "exit=$?"
+echo "## b <input 개수 — 기대 1 (type=search)"; grep -n "<input" $F; grep -c "<input" $F; grep -n "type=\"search\"" $F
+echo "## c href=\"#/persons/ 타일 — HREF.persons 사용"; grep -n "href=" $F; grep -n "persons:" web/src/routes.ts
+echo "## d sort( — 기대 0"; grep -nE "\.sort\(|toSorted\(|reverse\(" $F; echo "exit=$?"
+echo "## e 정규화 호출 위치 (toUpperCase|toLowerCase|replace(|trim( ) — 비교 함수 안에만"; grep -nE "toUpperCase|toLowerCase|replace\(|trim\(" $F
+echo "## f normalizeForMatch 호출 — 비교(40·42행)에만, JSX 표시 줄에는 없음"; grep -n "normalizeForMatch" $F
+echo "## g 이름 칸 — 자식 요소 없이 {p.display_name} 그대로"; grep -n -A2 "data-field=\"name\"" $F
+echo "## h card-wrap 줄 무변경 — 기대 1건 + diff 0"; grep -n "data-testid=\"card-wrap\" className=\"mx-auto w-full md:w-3/4\"" $S; git diff 3bd5025 -- $S | grep -n "card-wrap"; echo "card-wrap diff exit=$?"
+echo "## i 목록 분기 조상(mt-4 div·section) 에 max-w|mx-auto — 기대 0"; sed -n "325,345p" $S | grep -nE "max-w-|mx-auto"; echo "exit=$?"
+echo "## j PersonGrid 안 max-w|mx-auto|md:w- — 기대 0"; grep -nE "max-w-|mx-auto|md:w-" $F; echo "exit=$?"
+echo "## k testid 4종"; grep -noE "data-testid=\"[a-z-]+\"" $F
+echo "## l isComposing|compositionend|normalize( — 기대 0 (R-6 (a))"; grep -nE "isComposing|compositionend|\.normalize\(" $F; echo "exit=$?"
+echo "## m localStorage|sessionStorage|location.hash 사용 — 기대 0 (결정 G)"; grep -nE "localStorage|sessionStorage|location\.hash|history\." $F; echo "exit=$?"
+echo "## n Card size=sm · 토큰 클래스"; grep -nE "Card size|className=" $F
+echo "## o PersonList.tsx 본문 diff — 상수 3키만"; git diff HEAD -- web/src/components/PersonList.tsx | grep -E "^[-+][^-+]"
+echo "## p types.ts diff"; git diff HEAD -- web/src/api/types.ts | grep -E "^[-+][^-+]"
+
+# 시각: 2026-10-28T08:20:57+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+## a <select | role=combobox|switch in PersonGrid — 기대 0
+exit=1
+## b <input 개수 — 기대 1 (type=search)
+47:      <input
+1
+48:        type="search"
+## c href="#/persons/ 타일 — HREF.persons 사용
+67:                href={`${HREF.persons}/${p.id}`}
+11:  persons: '#/persons',
+## d sort( — 기대 0
+exit=1
+## e 정규화 호출 위치 (toUpperCase|toLowerCase|replace(|trim( ) — 비교 함수 안에만
+15:  return s.trim().toLowerCase().replace(/\s+/g, '')
+## f normalizeForMatch 호출 — 비교(40·42행)에만, JSX 표시 줄에는 없음
+14:function normalizeForMatch(s: string): string {
+40:  const q = normalizeForMatch(query)
+42:    ? persons.filter((p) => [p.display_name, ...p.aliases].some((t) => normalizeForMatch(t).includes(q)))
+## g 이름 칸 — 자식 요소 없이 {p.display_name} 그대로
+74:                    <span className="block font-medium" data-field="name">
+75-                      {p.display_name}
+76-                    </span>
+## h card-wrap 줄 무변경 — 기대 1건 + diff 0
+339:        <div data-testid="card-wrap" className="mx-auto w-full md:w-3/4">
+22:         <div data-testid="card-wrap" className="mx-auto w-full md:w-3/4">
+card-wrap diff exit=0
+## i 목록 분기 조상(mt-4 div·section) 에 max-w|mx-auto — 기대 0
+15:        <div data-testid="card-wrap" className="mx-auto w-full md:w-3/4">
+exit=0
+## j PersonGrid 안 max-w|mx-auto|md:w- — 기대 0
+exit=1
+## k testid 4종
+49:data-testid="person-search"
+57:data-testid="person-grid-empty"
+61:data-testid="person-grid"
+68:data-testid="person-tile"
+## l isComposing|compositionend|normalize( — 기대 0 (R-6 (a))
+exit=1
+## m localStorage|sessionStorage|location.hash 사용 — 기대 0 (결정 G)
+exit=1
+## n Card size=sm · 토큰 클래스
+30:      <p role="status" className="px-3 py-2 text-sm text-muted-foreground">
+37:    return <p className="px-3 py-2 text-sm text-muted-foreground">{PERSON_LIST_NOTICE.empty}</p>
+46:    <div className="flex flex-col gap-4">
+54:        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+57:        <p data-testid="person-grid-empty" className="px-3 py-2 text-sm text-muted-foreground">
+61:        <div data-testid="person-grid" className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+70:                className="block rounded-xl focus-visible:outline-2 focus-visible:outline-ring"
+72:                <Card size="sm" className="h-full hover:bg-accent">
+73:                  <div className="flex flex-col gap-1 px-(--card-spacing)">
+74:                    <span className="block font-medium" data-field="name">
+77:                    <span className="block text-sm text-muted-foreground">
+82:                    <span className="block text-sm text-muted-foreground" data-field="last-contact">
+86:                      <span className="block text-sm text-muted-foreground" data-field="aliases">
+## o PersonList.tsx 본문 diff — 상수 3키만
++  // 인물 화면 그리드 검색 (P8b 결정 D)
++  searchEmpty: '찾는 인물이 없어요.',
++  searchPlaceholder: '이름이나 별칭으로 찾기',
++  searchLabel: '인물 검색',
+## p types.ts diff
++  // 카드 응답 aliases 와 같은 값·순서(읽기 전용, P8b U0)
++  aliases: string[]

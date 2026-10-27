@@ -1,0 +1,7 @@
+# 명령: grep -n -e toUpperCase -e toLowerCase -e replace. -e trim. web/src/components/PersonGrid.tsx
+# 시각: 2026-10-27T16:23:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+15:  return s.trim().toLowerCase().replace(/\s+/g, '')

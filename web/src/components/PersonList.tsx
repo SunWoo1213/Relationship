@@ -9,6 +9,10 @@ export const PERSON_LIST_NOTICE = {
   empty: '아직 기록된 인물이 없어요.',
   failed: '인물 목록을 불러오지 못했어요.',
   noContact: '기록 없음',
+  // 인물 화면 그리드 검색 (P8b 결정 D)
+  searchEmpty: '찾는 인물이 없어요.',
+  searchPlaceholder: '이름이나 별칭으로 찾기',
+  searchLabel: '인물 검색',
 } as const
 
 export default function PersonList({ onNavigate }: { onNavigate?: () => void }) {

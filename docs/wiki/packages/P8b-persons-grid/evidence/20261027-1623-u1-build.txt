@@ -1,0 +1,20 @@
+# 명령: npm --prefix web run build
+# 시각: 2026-10-27T16:23:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+
+> web@0.0.0 build
+> tsc -b && vite build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 2035 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.57 kB │ gzip:   0.36 kB
+dist/assets/index-SUxzZwmI.css   44.90 kB │ gzip:   8.22 kB
+dist/assets/index-CU34w3TP.js   363.32 kB │ gzip: 115.34 kB
+
+✓ built in 196ms

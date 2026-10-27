@@ -9,6 +9,7 @@ import { PERSON_LIST_NOTICE } from '@/components/PersonList'
 import { notifyPersonsChanged, PersonsProvider } from '@/components/PersonsProvider'
 import appShellSource from '@/components/AppShell.tsx?raw'
 import cardScreenSource from '@/screens/PersonCardScreen.tsx?raw'
+import personGridSource from '@/components/PersonGrid.tsx?raw'
 import type {
   EventRawOut,
   FactSourcesOut,
@@ -43,10 +44,46 @@ function router(table: Record<string, Handler>): Handler {
 // 서버 순서가 날짜 순이 아니고 null 이 가운데 있다 — 프론트가 재정렬하면 순서가 바뀌어 잡힌다.
 const PERSONS: PersonListItemOut[] = [
 // 이름순·날짜순·id순 어느 쪽으로 다시 줄 세워도 이 순서와 달라지도록 골랐다.
-  { id: 7, display_name: '박대리', relation_tag: '직장', hierarchy: '하', last_contact_at: '2026-09-01T12:00:00Z' },
-  { id: 4, display_name: '철수', relation_tag: '친구', hierarchy: '동', last_contact_at: '2026-10-05T12:00:00Z' },
-  { id: 9, display_name: '엄마', relation_tag: '가족', hierarchy: '상', last_contact_at: null },
+  // 별칭: 박대리 = display_name 과 같은 것 1개 + 다른 것 3개(상한 2 → "+1"), 철수 = 같은 것뿐, 엄마 = 없음 (결정 B)
+  {
+    id: 7, display_name: '박대리', relation_tag: '직장', hierarchy: '하', last_contact_at: '2026-09-01T12:00:00Z',
+    aliases: ['대리님', '박대리', '박 대리', 'Park'],
+  },
+  {
+    id: 4, display_name: '철수', relation_tag: '친구', hierarchy: '동', last_contact_at: '2026-10-05T12:00:00Z',
+    aliases: ['철수'],
+  },
+  { id: 9, display_name: '엄마', relation_tag: '가족', hierarchy: '상', last_contact_at: null, aliases: [] },
 ]
+
+// 검색 시험용 — 서버 순서가 이름순이 아니다('선영 과장님' < '최선영' 이므로 이름순으로 줄 세우면 뒤바뀐다).
+const SEARCH_PERSONS: PersonListItemOut[] = [
+  { id: 30, display_name: '최선영', relation_tag: '친구', hierarchy: '동', last_contact_at: null, aliases: [] },
+  {
+    id: 21, display_name: '박팀장', relation_tag: '직장', hierarchy: '상', last_contact_at: '2026-10-01T12:00:00Z',
+    aliases: ['Boss Kim', '팀장님'],
+  },
+  {
+    id: 25, display_name: '선영 과장님', relation_tag: '직장', hierarchy: '상', last_contact_at: '2026-09-20T12:00:00Z',
+    aliases: ['KIM'],
+  },
+  {
+    id: 12, display_name: '가나', relation_tag: '가족', hierarchy: '하', last_contact_at: null,
+    aliases: ['엄마친구'],
+  },
+]
+
+// 특수문자·앞뒤 공백·대소문자가 섞인 값 — 화면이 가공하면 textContent 가 달라진다 (원칙7).
+const ODD_NAME = ' <b>Ab&C</b> "q" '
+const ODD_ALIAS = ' ΩX  yZ '
+const ODD_PERSONS: PersonListItemOut[] = [
+  { id: 40, display_name: ODD_NAME, relation_tag: '지인', hierarchy: '동', last_contact_at: null, aliases: [ODD_ALIAS] },
+  { id: 41, display_name: '다른이', relation_tag: '지인', hierarchy: '동', last_contact_at: null, aliases: [] },
+]
+
+function tileIds(): string[] {
+  return screen.queryAllByTestId('person-tile').map((t) => t.getAttribute('data-person-id') ?? '')
+}
 
 // 특수문자·꼬리 공백·연속 개행이 든 원문 — 가공(trim·개행 접기·이스케이프)이 있으면 달라진다.
 const RAW_A = '  팀장님이\n"전체회의"에서 <b>지적</b> & 했다 \t끝  \n\n'
@@ -97,31 +134,77 @@ afterEach(() => {
   window.history.replaceState(null, '', '#/chat')
 })
 
-describe('인물 목록', () => {
-  it('서버 순서 그대로(재정렬 없음) 이름·태그·위계·마지막 접촉 4개 필드를 보여 준다', async () => {
-    install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
-    const list = await screen.findByTestId('person-list')
-    const rows = within(list).getAllByRole('link')
-    expect(rows.map((r) => r.querySelector('[data-field="name"]')?.textContent)).toEqual(['박대리', '철수', '엄마'])
-    expect(rows.map((r) => r.querySelector('[data-field="tag"]')?.textContent)).toEqual(['직장', '친구', '가족'])
-    expect(rows.map((r) => r.querySelector('[data-field="hierarchy"]')?.textContent)).toEqual(['하', '동', '상'])
-    expect(rows.map((r) => r.querySelector('[data-field="last-contact"]')?.textContent)).toEqual([
-      '2026. 9. 1.',
-      '2026. 10. 5.',
-      PERSON_LIST_NOTICE.noContact,
-    ])
+function renderGrid(list: PersonListItemOut[] = PERSONS) {
+  const fetchFn = install(router({ '/api/persons': () => json(list) }))
+  const view = render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
+  return { fetchFn, ...view }
+}
+
+function hasWidthClass(el: Element): boolean {
+  return Array.from(el.classList).some((c) => c === 'mx-auto' || c.startsWith('max-w-') || c.startsWith('md:w-'))
+}
+
+describe('인물 목록 — 카드 그리드 (D15, P8b U1)', () => {
+  it('#/persons 진입 시 GET /api/persons 1회, 타일 필드(이름·태그·위계·마지막 접촉)가 서버 값·서버 순서 그대로', async () => {
+    window.history.replaceState(null, '', '#/persons')
+    const fetchFn = install(router({ '/api/persons': () => json(PERSONS) }))
+    render(<App />)
+    await screen.findByTestId('person-grid')
+    expect(callsTo(fetchFn, '/api/persons')).toHaveLength(1)
+    expect(fetchFn.mock.calls.map(([u]) => String(u))).toEqual(['/api/persons'])
+    const tiles = screen.getAllByTestId('person-tile')
+    const f = (name: string) => tiles.map((t) => t.querySelector(`[data-field="${name}"]`)?.textContent)
+    expect(f('name')).toEqual(['박대리', '철수', '엄마'])
+    expect(f('tag')).toEqual(['직장', '친구', '가족'])
+    expect(f('hierarchy')).toEqual(['하', '동', '상'])
+    expect(f('last-contact')).toEqual(['2026. 9. 1.', '2026. 10. 5.', PERSON_LIST_NOTICE.noContact])
+    expect(tileIds()).toEqual(['7', '4', '9'])
   })
 
-  it('목록 상태는 본문 폭 전체를 쓰고 가운데 정렬·폭 상한이 없다 (U10 화면 점검)', async () => {
+  it('데스크톱 열·간격 클래스(결정 A)이고 사이드바 5명 자르기와 무관하게 7명 전원이 그려진다', async () => {
+    const seven = Array.from({ length: 7 }, (_, i) => ({
+      id: 100 + i, display_name: `사람${i}`, relation_tag: '지인', hierarchy: '동', last_contact_at: null, aliases: [],
+    }))
+    renderGrid(seven)
+    const grid = await screen.findByTestId('person-grid')
+    for (const c of ['grid', 'grid-cols-1', 'md:grid-cols-2', 'xl:grid-cols-3', 'gap-4']) {
+      expect(grid.classList.contains(c)).toBe(true)
+    }
+    expect(tileIds()).toEqual(seven.map((p) => String(p.id)))
+  })
+
+  it('타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음', async () => {
+    const two = { id: 50, display_name: '둘', relation_tag: '지인', hierarchy: '동', last_contact_at: null, aliases: ['가', '나'] }
+    renderGrid([...PERSONS, two])
+    await screen.findByTestId('person-grid')
+    const alias = (id: string) =>
+      document.querySelector(`[data-testid="person-tile"][data-person-id="${id}"] [data-field="aliases"]`)
+    // 박대리: ['대리님','박대리'(제외),'박 대리','Park'] → 앞 2개 + 남은 1개
+    expect(alias('7')?.textContent).toBe('대리님 · 박 대리 +1')
+    expect(alias('4')).toBeNull() // 같은 별칭뿐 → 칸 없음
+    expect(alias('9')).toBeNull()
+    expect(alias('50')?.textContent).toBe('가 · 나') // 정확히 2개면 "+n" 없음
+  })
+
+  it('목록 상태는 본문 폭 전체를 쓴다 — 그리드부터 main 까지 모든 조상과 그리드 자신, section 안 그리드를 감싼 요소에 mx-auto·max-w-*·md:w-* 가 없다 (R-U10C-3)', async () => {
+    window.history.replaceState(null, '', '#/persons')
     install(router({ '/api/persons': () => json(PERSONS) }))
-    const { container } = render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
-    await screen.findByTestId('person-list')
-    const section = container.querySelector('[data-screen="persons"]')
-    expect(section).not.toBeNull()
-    const cls = Array.from(section!.classList)
-    expect(cls.includes('mx-auto')).toBe(false)
-    expect(cls.some((c) => c.startsWith('max-w-') || c.startsWith('md:w-'))).toBe(false)
+    render(<App />)
+    const grid = await screen.findByTestId('person-grid')
+    const main = document.querySelector('main')!
+    const section = document.querySelector('[data-screen="persons"]')!
+    expect(main.contains(grid)).toBe(true)
+    const chain: Element[] = [grid]
+    for (let el: Element | null = grid.parentElement; el; el = el.parentElement) {
+      chain.push(el)
+      if (el === main) break
+    }
+    expect(chain[chain.length - 1]).toBe(main)
+    const wrappers = Array.from(section.querySelectorAll('*')).filter((el) => el.contains(grid))
+    expect(wrappers.length).toBeGreaterThanOrEqual(2) // 바깥 div.mt-4 + PersonGrid 안쪽 래퍼
+    for (const el of new Set([...chain, ...wrappers, section])) {
+      expect(hasWidthClass(el)).toBe(false)
+    }
     expect(screen.queryByTestId('card-wrap')).toBeNull()
   })
 
@@ -136,50 +219,185 @@ describe('인물 목록', () => {
     for (const c of ['mx-auto', 'w-full', 'md:w-3/4']) expect(wrap.classList.contains(c)).toBe(true)
   })
 
-  it('필터·검색 컨트롤이 없다', async () => {
-    install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
-    await screen.findByTestId('person-list')
-    expect(screen.queryByRole('textbox')).toBeNull()
-    expect(screen.queryByRole('searchbox')).toBeNull()
-    expect(screen.queryByRole('combobox')).toBeNull()
+  it('컨트롤은 검색창 1개뿐이다(태그·위계 필터 없음) — 문구·aria-label 은 결정 D', async () => {
+    renderGrid()
+    await screen.findByTestId('person-grid')
+    expect(screen.getAllByRole('searchbox')).toHaveLength(1)
+    for (const role of ['combobox', 'listbox', 'radio', 'checkbox', 'switch']) {
+      expect(screen.queryAllByRole(role)).toHaveLength(0)
+    }
+    const box = screen.getByTestId('person-search')
+    expect(box).toHaveAttribute('type', 'search')
+    expect(box).toHaveAttribute('aria-label', '인물 검색')
+    expect(box).toHaveAttribute('placeholder', '이름이나 별칭으로 찾기')
+    expect(box).toBe(screen.getByRole('searchbox'))
   })
 
-  it('빈 목록이면 빈 상태 문구 하나', async () => {
-    install(router({ '/api/persons': () => json([]) }))
-    render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
+  it('검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음)', async () => {
+    renderGrid(SEARCH_PERSONS)
+    await screen.findByTestId('person-grid')
+    expect(tileIds()).toEqual(['30', '21', '25', '12'])
+    await userEvent.type(screen.getByTestId('person-search'), '선영')
+    // 최선영(30)이 선영 과장님(25)보다 서버에서 앞이다 — 이름순이면 25 가 먼저 온다.
+    expect(tileIds()).toEqual(['30', '25'])
+  })
+
+  it('검색: 별칭 일부만 맞아도 그 인물이 나온다(이름에는 없는 글자)', async () => {
+    renderGrid(SEARCH_PERSONS)
+    await screen.findByTestId('person-grid')
+    await userEvent.type(screen.getByTestId('person-search'), '엄마친')
+    expect(tileIds()).toEqual(['12'])
+  })
+
+  it('검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만)', async () => {
+    renderGrid(SEARCH_PERSONS)
+    await screen.findByTestId('person-grid')
+    const box = screen.getByTestId('person-search')
+    await userEvent.type(box, '직장')
+    expect(tileIds()).toEqual([])
+    await userEvent.clear(box)
+    await userEvent.type(box, '친구') // 최선영의 태그 — 별칭 '엄마친구' 에는 '친구' 가 들어 있어 12 만 남는다
+    expect(tileIds()).toEqual(['12'])
+  })
+
+  it('검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다', async () => {
+    renderGrid(SEARCH_PERSONS)
+    await screen.findByTestId('person-grid')
+    const box = screen.getByTestId('person-search')
+    const search = async (q: string) => {
+      await userEvent.clear(box)
+      await userEvent.type(box, q)
+      return tileIds()
+    }
+    expect(await search('  선영 ')).toEqual(['30', '25']) // 앞뒤 공백
+    expect(await search('선영과장님')).toEqual(['25']) // 이름 '선영 과장님' 의 안쪽 공백
+    expect(await search('선영 과장')).toEqual(['25']) // 질의의 안쪽 공백
+    expect(await search('BOSS')).toEqual(['21']) // 질의 대문자 ↔ 별칭 'Boss Kim'
+    expect(await search('bosskim')).toEqual(['21']) // 별칭 안쪽 공백
+    expect(await search('kim')).toEqual(['21', '25']) // 별칭 'KIM' 대문자 ↔ 질의 소문자
+  })
+
+  it('빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다', async () => {
+    renderGrid(SEARCH_PERSONS)
+    await screen.findByTestId('person-grid')
+    const box = screen.getByTestId('person-search')
+    await userEvent.type(box, '   ')
+    expect(tileIds()).toEqual(['30', '21', '25', '12'])
+    await userEvent.clear(box)
+    await userEvent.type(box, '선영')
+    expect(tileIds()).toHaveLength(2)
+    await userEvent.clear(box)
+    expect(tileIds()).toEqual(['30', '21', '25', '12'])
+  })
+
+  it('0건이면 결정 D 문구 한 줄만 보이고 그리드는 사라진다', async () => {
+    renderGrid(SEARCH_PERSONS)
+    await screen.findByTestId('person-grid')
+    expect(screen.queryByTestId('person-grid-empty')).toBeNull()
+    await userEvent.type(screen.getByTestId('person-search'), '없는사람')
+    expect(screen.getAllByTestId('person-grid-empty')).toHaveLength(1)
+    expect(screen.getByTestId('person-grid-empty').textContent).toBe('찾는 인물이 없어요.')
+    expect(screen.queryByTestId('person-grid')).toBeNull()
+    expect(screen.getByTestId('person-search')).toBeInTheDocument() // 검색창은 남는다
+  })
+
+  it('검색어는 컴포넌트 상태뿐이다 — localStorage·해시에 남지 않는다 (결정 G)', async () => {
+    renderGrid(SEARCH_PERSONS)
+    await screen.findByTestId('person-grid')
+    const before = window.location.hash
+    await userEvent.type(screen.getByTestId('person-search'), '선영')
+    expect(window.location.hash).toBe(before)
+    expect(window.localStorage.length).toBe(0)
+  })
+
+  it('서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7)', async () => {
+    renderGrid(ODD_PERSONS)
+    await screen.findByTestId('person-grid')
+    const check = () => {
+      const tile = document.querySelector('[data-testid="person-tile"][data-person-id="40"]')!
+      const name = tile.querySelector('[data-field="name"]')!
+      expect(name.textContent).toBe(ODD_NAME)
+      expect(name.children).toHaveLength(0)
+      expect(tile.querySelector('[data-field="aliases"]')!.textContent).toBe(ODD_ALIAS)
+    }
+    check()
+    await userEvent.type(screen.getByTestId('person-search'), 'ab')
+    expect(tileIds()).toEqual(['40'])
+    check()
+    await userEvent.clear(screen.getByTestId('person-search'))
+    await userEvent.type(screen.getByTestId('person-search'), 'ωx')
+    expect(tileIds()).toEqual(['40'])
+    check()
+  })
+
+  it('PersonGrid 소스: 대소문자·공백 가공은 비교 함수 한 곳에만 있다 (toUpperCase 0 · toLowerCase 1 · trim 1)', () => {
+    expect(personGridSource.match(/toUpperCase/g)).toBeNull()
+    expect(personGridSource.match(/toLowerCase/g)).toHaveLength(1)
+    expect(personGridSource.match(/\.trim\(/g)).toHaveLength(1)
+    expect(personGridSource.match(/replace\(/g)).toHaveLength(1)
+    const fn = personGridSource.slice(
+      personGridSource.indexOf('function normalizeForMatch'),
+      personGridSource.indexOf('/** 결정 B'),
+    )
+    for (const t of ['toLowerCase', '.trim(', 'replace(']) expect(fn).toContain(t)
+    expect(personGridSource).not.toMatch(/\.sort\(/)
+  })
+
+  it('빈 목록이면 빈 상태 문구 하나(검색창 없음)', async () => {
+    renderGrid([])
     expect(await screen.findByText(PERSON_LIST_NOTICE.empty)).toBeInTheDocument()
-    expect(screen.queryByTestId('person-list')).toBeNull()
+    expect(screen.queryByTestId('person-grid')).toBeNull()
+    expect(screen.queryByTestId('person-search')).toBeNull()
   })
 
   it('목록 조회가 실패하면 한 줄 안내', async () => {
     install(router({ '/api/persons': () => json({ detail: { code: 'x' } }, 500) }))
     render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
     expect(await screen.findByText(PERSON_LIST_NOTICE.failed)).toBeInTheDocument()
+    expect(screen.queryByTestId('person-grid')).toBeNull()
   })
 
-  it('항목 링크는 #/persons/:id 이고 누르면 해시가 바뀐다', async () => {
-    install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
-    const links = within(await screen.findByTestId('person-list')).getAllByRole('link')
-    expect(links.map((l) => l.getAttribute('href'))).toEqual(['#/persons/7', '#/persons/4', '#/persons/9'])
-    await userEvent.click(links[1])
+  it('타일 href 는 서버 순서의 #/persons/:id, 누르면 해시가 바뀐다', async () => {
+    renderGrid()
+    const tiles = await screen.findAllByTestId('person-tile')
+    expect(tiles.map((t) => t.getAttribute('href'))).toEqual(['#/persons/7', '#/persons/4', '#/persons/9'])
+    expect(tiles.every((t) => t.tagName === 'A')).toBe(true)
+    await userEvent.click(tiles[1])
+    expect(window.location.hash).toBe('#/persons/4')
+  })
+
+  it('키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동', async () => {
+    renderGrid()
+    const tiles = await screen.findAllByTestId('person-tile')
+    const user = userEvent.setup()
+    await user.tab()
+    expect(document.activeElement).toBe(screen.getByTestId('person-search'))
+    await user.tab()
+    expect(document.activeElement).toBe(tiles[0])
+    await user.tab()
+    expect(document.activeElement).toBe(tiles[1])
+    await user.keyboard('{Enter}')
     expect(window.location.hash).toBe('#/persons/4')
   })
 })
 
 describe('사이드바의 인물 목록 (결정 N)', () => {
-  it('#/persons 본문과 사이드바에 같은 목록이 같은 순서로 그려진다', async () => {
+  it('#/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)', async () => {
     window.history.replaceState(null, '', '#/persons')
     install(router({ '/api/persons': () => json(PERSONS) }))
     render(<App />)
-    await waitFor(() => expect(screen.getAllByTestId('person-list')).toHaveLength(2))
-    const [a, b] = screen.getAllByTestId('person-list')
+    await screen.findByTestId('person-grid')
+    const a = screen.getByTestId('person-list')
     const inSidebar = screen.getByTestId('sidebar-persons').querySelectorAll('[data-testid="person-list"]')
     const inScreen = document.querySelectorAll('[data-screen="persons"] [data-testid="person-list"]')
     expect(inSidebar).toHaveLength(1)
-    expect(inScreen).toHaveLength(1)
-    expect(a.innerHTML).toBe(b.innerHTML)
+    expect(inScreen).toHaveLength(0)
+    expect(tileIds()).toEqual(['7', '4', '9'])
+    expect(within(a).getAllByRole('link').map((l) => l.getAttribute('href'))).toEqual([
+      '#/persons/7',
+      '#/persons/4',
+      '#/persons/9',
+    ])
     expect(within(a).getAllByRole('link').map((l) => l.textContent)).toEqual([
       '박대리직장 · 하2026. 9. 1.',
       '철수친구 · 동2026. 10. 5.',
@@ -191,7 +409,8 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
     window.history.replaceState(null, '', '#/persons')
     const fetchFn = install(router({ '/api/persons': () => json(PERSONS) }))
     render(<App />)
-    await waitFor(() => expect(screen.getAllByTestId('person-list')).toHaveLength(2))
+    await screen.findByTestId('person-grid')
+    await screen.findByTestId('person-list')
     expect(callsTo(fetchFn, '/api/persons')).toHaveLength(1)
   })
 
@@ -274,7 +493,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
     window.history.replaceState(null, '', '#/persons')
     const fetchFn = install(router({ '/api/persons': () => json(PERSONS) }))
     render(<App />)
-    await waitFor(() => expect(screen.getAllByTestId('person-list')).toHaveLength(2))
+    await screen.findByTestId('person-grid')
     notifyPersonsChanged()
     await waitFor(() => expect(callsTo(fetchFn, '/api/persons')).toHaveLength(2))
   })
@@ -306,10 +525,11 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
     expect(within(side).queryByText('박대리')).toBeNull()
   })
 
-  it('사이드바와 본문이 같은 컴포넌트(PersonList)를 import 한다', () => {
-    const imp = "import PersonList from '@/components/PersonList'"
-    expect(appShellSource).toContain(imp)
-    expect(cardScreenSource).toContain(imp)
+  it('본문은 PersonGrid, 사이드바는 PersonList 를 import 한다 (P8b U1)', () => {
+    expect(appShellSource).toContain("import PersonList from '@/components/PersonList'")
+    expect(cardScreenSource).toContain("import PersonGrid from '@/components/PersonGrid'")
+    expect(cardScreenSource).not.toContain("import PersonList from")
+    expect(cardScreenSource).toContain('<PersonGrid />')
   })
 
   it('좁은 폭: 서랍에서 항목을 고르면 서랍이 닫힌다', async () => {

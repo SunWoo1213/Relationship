@@ -1,0 +1,19 @@
+# 명령: npm --prefix web test -- --run src/__tests__/card.test.tsx
+# 시각: 2026-10-27T16:23:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+
+> web@0.0.0 test
+> vitest --run src/__tests__/card.test.tsx
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  1 passed (1)
+      Tests  43 passed (43)
+   Start at  16:23:05
+   Duration  1.57s (tests 73%, environment 13%, import 9%, setup 2%, transform 2%)
+

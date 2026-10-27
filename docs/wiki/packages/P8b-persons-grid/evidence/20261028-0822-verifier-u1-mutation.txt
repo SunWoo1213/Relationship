@@ -1,0 +1,266 @@
+# 명령: python3 -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u1/mutate.py
+# 시각: 2026-10-28T08:22:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: adc650e (dev2)
+# exit: 0
+# ---
+사본: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u1/web (node_modules → 심볼릭 링크)
+
+=== 변이 루프 ===
+
+--- C0 대조군
+exit=0 | Test Files  1 passed (1) | Tests  43 passed (43)
+
+--- V1-1 검색어 무시(필터 제거)
+exit=1 | Test Files  1 failed (1) | Tests  7 failed | 36 passed (43)
+  × 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음) 27ms
+  × 검색: 별칭 일부만 맞아도 그 인물이 나온다(이름에는 없는 글자) 21ms
+  × 검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만) 19ms
+  × 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다 31ms
+  × 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다 35ms
+  × 0건이면 결정 D 문구 한 줄만 보이고 그리드는 사라진다 21ms
+  × 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7) 16ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 별칭 일부만 맞아도 그 인물이 나온다(이름에는 없는 글자)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 0건이면 결정 D 문구 한 줄만 보이고 그리드는 사라진다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7)
+  err: AssertionError: expected [ '30', '21', '25', '12' ] to deeply equal [ '30', '25' ]
+  err: AssertionError: expected [ '30', '21', '25', '12' ] to deeply equal [ '12' ]
+  err: AssertionError: expected [ '30', '21', '25', '12' ] to deeply equal []
+  err: AssertionError: expected [ '30', '21', '25', '12' ] to deeply equal [ '30', '25' ]
+
+--- V1-2 별칭을 검색 대상에서 뺌
+exit=1 | Test Files  1 failed (1) | Tests  4 failed | 39 passed (43)
+  × 검색: 별칭 일부만 맞아도 그 인물이 나온다(이름에는 없는 글자) 25ms
+  × 검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만) 39ms
+  × 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다 92ms
+  × 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7) 35ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 별칭 일부만 맞아도 그 인물이 나온다(이름에는 없는 글자)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7)
+  err: AssertionError: expected [] to deeply equal [ '12' ]
+  err: AssertionError: expected [] to deeply equal [ '12' ]
+  err: AssertionError: expected [] to deeply equal [ '21' ]
+  err: AssertionError: expected [] to deeply equal [ '40' ]
+
+--- V1-3a 정규화 본문 제거(return s)
+exit=1 | Test Files  1 failed (1) | Tests  4 failed | 39 passed (43)
+  × 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다 31ms
+  × 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다 17ms
+  × 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7) 16ms
+  × PersonGrid 소스: 대소문자·공백 가공은 비교 함수 한 곳에만 있다 (toUpperCase 0 · toLowerCase 1 · trim 1) 1ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > PersonGrid 소스: 대소문자·공백 가공은 비교 함수 한 곳에만 있다 (toUpperCase 0 · toLowerCase 1 · trim 1)
+  err: AssertionError: expected [] to deeply equal [ '30', '25' ]
+  err: AssertionError: expected [] to deeply equal [ '30', '21', '25', '12' ]
+  err: AssertionError: expected [] to deeply equal [ '40' ]
+  err: AssertionError: Target cannot be null or undefined.
+
+--- V1-3b 안쪽 공백 제거만 무력화(토큰 수 유지 — 소스 검사 우회)
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다 51ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  err: AssertionError: expected [] to deeply equal [ '25' ]
+
+--- V1-4 렌더 직전 이름순 정렬 — toSorted (소스 검사 `.sort(` 우회)
+exit=1 | Test Files  1 failed (1) | Tests  7 failed | 36 passed (43)
+  × #/persons 진입 시 GET /api/persons 1회, 타일 필드(이름·태그·위계·마지막 접촉)가 서버 값·서버 순서 그대로 46ms
+  × 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음) 4ms
+  × 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다 31ms
+  × 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다 19ms
+  × 타일 href 는 서버 순서의 #/persons/:id, 누르면 해시가 바뀐다 3ms
+  × 키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동 47ms
+  × #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid) 4ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > #/persons 진입 시 GET /api/persons 1회, 타일 필드(이름·태그·위계·마지막 접촉)가 서버 값·서버 순서 그대로
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 href 는 서버 순서의 #/persons/:id, 누르면 해시가 바뀐다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)
+  err: AssertionError: expected [ '박대리', '엄마', '철수' ] to deeply equal [ '박대리', '철수', '엄마' ]
+  err: AssertionError: expected [ '12', '21', '25', '30' ] to deeply equal [ '30', '21', '25', '12' ]
+  err: AssertionError: expected [ '25', '30' ] to deeply equal [ '30', '25' ]
+  err: AssertionError: expected [ '12', '21', '25', '30' ] to deeply equal [ '30', '21', '25', '12' ]
+
+--- V1-4b 렌더 직전 이름순 `.sort(`
+exit=1 | Test Files  1 failed (1) | Tests  8 failed | 35 passed (43)
+  × #/persons 진입 시 GET /api/persons 1회, 타일 필드(이름·태그·위계·마지막 접촉)가 서버 값·서버 순서 그대로 47ms
+  × 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음) 4ms
+  × 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다 30ms
+  × 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다 18ms
+  × PersonGrid 소스: 대소문자·공백 가공은 비교 함수 한 곳에만 있다 (toUpperCase 0 · toLowerCase 1 · trim 1) 1ms
+  × 타일 href 는 서버 순서의 #/persons/:id, 누르면 해시가 바뀐다 3ms
+  × 키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동 47ms
+  × #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid) 5ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > #/persons 진입 시 GET /api/persons 1회, 타일 필드(이름·태그·위계·마지막 접촉)가 서버 값·서버 순서 그대로
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > PersonGrid 소스: 대소문자·공백 가공은 비교 함수 한 곳에만 있다 (toUpperCase 0 · toLowerCase 1 · trim 1)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 href 는 서버 순서의 #/persons/:id, 누르면 해시가 바뀐다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)
+  err: AssertionError: expected [ '박대리', '엄마', '철수' ] to deeply equal [ '박대리', '철수', '엄마' ]
+  err: AssertionError: expected [ '12', '21', '25', '30' ] to deeply equal [ '30', '21', '25', '12' ]
+  err: AssertionError: expected [ '25', '30' ] to deeply equal [ '30', '25' ]
+  err: AssertionError: expected [ '12', '21', '25', '30' ] to deeply equal [ '30', '21', '25', '12' ]
+
+--- V1-5 타일 href 를 #/persons?id= 로
+exit=1 | Test Files  1 failed (1) | Tests  2 failed | 41 passed (43)
+  × 타일 href 는 서버 순서의 #/persons/:id, 누르면 해시가 바뀐다 6ms
+  × 키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동 45ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 href 는 서버 순서의 #/persons/:id, 누르면 해시가 바뀐다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동
+  err: AssertionError: expected [ '#/persons?id=7', …(2) ] to deeply equal [ '#/persons/7', '#/persons/4', …(1) ]
+  err: AssertionError: expected '#/persons?id=4' to be '#/persons/4' // Object.is equality
+
+--- V1-6 목록 안쪽 래퍼 div.mt-4 에 mx-auto max-w-3xl (P8 M4)
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 목록 상태는 본문 폭 전체를 쓴다 — 그리드부터 main 까지 모든 조상과 그리드 자신, section 안 그리드를 감싼 요소에 mx-auto·max-w-*·md:w-* 가 없다 (R-U10C-3) 9ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 목록 상태는 본문 폭 전체를 쓴다 — 그리드부터 main 까지 모든 조상과 그리드 자신, section 안 그리드를 감싼 요소에 mx-auto·max-w-*·md:w-* 가 없다 (R-U10C-3)
+  err: AssertionError: expected true to be false // Object.is equality
+
+--- V1-6b PersonGrid 바깥 div 에 mx-auto max-w-3xl
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 목록 상태는 본문 폭 전체를 쓴다 — 그리드부터 main 까지 모든 조상과 그리드 자신, section 안 그리드를 감싼 요소에 mx-auto·max-w-*·md:w-* 가 없다 (R-U10C-3) 9ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 목록 상태는 본문 폭 전체를 쓴다 — 그리드부터 main 까지 모든 조상과 그리드 자신, section 안 그리드를 감싼 요소에 mx-auto·max-w-*·md:w-* 가 없다 (R-U10C-3)
+  err: AssertionError: expected true to be false // Object.is equality
+
+--- V1-7 section 에 max-w-4xl
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 목록 상태는 본문 폭 전체를 쓴다 — 그리드부터 main 까지 모든 조상과 그리드 자신, section 안 그리드를 감싼 요소에 mx-auto·max-w-*·md:w-* 가 없다 (R-U10C-3) 10ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 목록 상태는 본문 폭 전체를 쓴다 — 그리드부터 main 까지 모든 조상과 그리드 자신, section 안 그리드를 감싼 요소에 mx-auto·max-w-*·md:w-* 가 없다 (R-U10C-3)
+  err: AssertionError: expected true to be false // Object.is equality
+
+--- V1-8 0건 문구 미표시(항상 그리드)
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 0건이면 결정 D 문구 한 줄만 보이고 그리드는 사라진다 21ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 0건이면 결정 D 문구 한 줄만 보이고 그리드는 사라진다
+  err: TestingLibraryElementError: Unable to find an element by: [data-testid="person-grid-empty"]
+
+--- V1-9a ALIAS_LIMIT 2 → 3
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음 6ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음
+  err: AssertionError: expected '대리님 · 박 대리 · Park' to be '대리님 · 박 대리 +1' // Object.is equality
+
+--- V1-9b display_name 과 같은 별칭 제외 제거
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음 7ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음
+  err: AssertionError: expected '대리님 · 박대리 +2' to be '대리님 · 박 대리 +1' // Object.is equality
+
+--- V1-10 태그 <select> 추가
+exit=1 | Test Files  1 failed (1) | Tests  2 failed | 41 passed (43)
+  × 컨트롤은 검색창 1개뿐이다(태그·위계 필터 없음) — 문구·aria-label 은 결정 D 16ms
+  × 키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동 27ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 컨트롤은 검색창 1개뿐이다(태그·위계 필터 없음) — 문구·aria-label 은 결정 D
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 키보드: Tab 으로 검색창 → 첫 타일 포커스, Enter 로 그 인물로 이동
+  err: AssertionError: expected [ …(1) ] to have a length of +0 but got 1
+  err: AssertionError: expected <select aria-label="태그">…(1)</select> to be <a href="#/persons/7" …(3)>…(1)</a> // Object.is equality
+
+--- V1-11 상세 card-wrap md:w-3/4 → md:w-1/2
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 상세 상태는 가운데 정렬이고 폭이 본문의 75%(md 이상), 모바일은 100% 이다 (U10 화면 점검) 22ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 상세 상태는 가운데 정렬이고 폭이 본문의 75%(md 이상), 모바일은 100% 이다 (U10 화면 점검)
+  err: AssertionError: expected false to be true // Object.is equality
+
+--- X1 includes → startsWith
+exit=1 | Test Files  1 failed (1) | Tests  5 failed | 38 passed (43)
+  × 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음) 26ms
+  × 검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만) 34ms
+  × 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다 28ms
+  × 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다 34ms
+  × 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7) 17ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7)
+  err: AssertionError: expected [ '25' ] to deeply equal [ '30', '25' ]
+  err: AssertionError: expected [] to deeply equal [ '12' ]
+  err: AssertionError: expected [ '25' ] to deeply equal [ '30', '25' ]
+  err: AssertionError: expected [ '25' ] to have a length of 2 but got 1
+
+--- X2 +n 오프바이원(+1)
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음 6ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음
+  err: AssertionError: expected '대리님 · 박 대리 +2' to be '대리님 · 박 대리 +1' // Object.is equality
+
+--- X3 data-person-id 를 index 로
+exit=1 | Test Files  1 failed (1) | Tests  10 failed | 33 passed (43)
+  × #/persons 진입 시 GET /api/persons 1회, 타일 필드(이름·태그·위계·마지막 접촉)가 서버 값·서버 순서 그대로 45ms
+  × 데스크톱 열·간격 클래스(결정 A)이고 사이드바 5명 자르기와 무관하게 7명 전원이 그려진다 5ms
+  × 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음 4ms
+  × 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음) 4ms
+  × 검색: 별칭 일부만 맞아도 그 인물이 나온다(이름에는 없는 글자) 26ms
+  × 검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만) 33ms
+  × 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다 30ms
+  × 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다 18ms
+  × 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7) 4ms
+  × #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid) 5ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > #/persons 진입 시 GET /api/persons 1회, 타일 필드(이름·태그·위계·마지막 접촉)가 서버 값·서버 순서 그대로
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 데스크톱 열·간격 클래스(결정 A)이고 사이드바 5명 자르기와 무관하게 7명 전원이 그려진다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 이름 일부 → 그 타일만, 서버 순서 유지(이름순 재정렬 없음)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 별칭 일부만 맞아도 그 인물이 나온다(이름에는 없는 글자)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색: 태그·위계 글자로는 찾지 않는다(이름·별칭만)
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 서버 문자열은 가공 없이 보인다 — 특수문자·앞뒤 공백·대소문자 textContent 일치, 검색 중에도 이름 칸 자식 요소 0 (원칙7)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)
+  err: AssertionError: expected [ '0', '1', '2' ] to deeply equal [ '7', '4', '9' ]
+  err: AssertionError: expected [ '0', '1', '2', '3', '4', '5', '6' ] to deeply equal [ '100', '101', '102', '103', …(3) ]
+  err: AssertionError: expected undefined to be '대리님 · 박 대리 +1' // Object.is equality
+  err: AssertionError: expected [ '0', '1', '2', '3' ] to deeply equal [ '30', '21', '25', '12' ]
+
+--- X4 질의 정규화 생략(공백뿐 질의가 0건이 됨)
+exit=1 | Test Files  1 failed (1) | Tests  2 failed | 41 passed (43)
+  × 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다 30ms
+  × 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다 17ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 검색 정규화(결정 C): 앞뒤 공백·영문 대소문자·안쪽 공백을 무시하고 비교한다
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 빈 검색어·공백뿐인 검색어는 전원, 지우면 원래 목록으로 돌아온다
+  err: AssertionError: expected [] to deeply equal [ '30', '25' ]
+  err: AssertionError: expected [] to deeply equal [ '30', '21', '25', '12' ]
+
+--- X5 input type=search → text
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 컨트롤은 검색창 1개뿐이다(태그·위계 필터 없음) — 문구·aria-label 은 결정 D 50ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 컨트롤은 검색창 1개뿐이다(태그·위계 필터 없음) — 문구·aria-label 은 결정 D
+  err: TestingLibraryElementError: Unable to find an accessible element with the role "searchbox"
+
+--- X6 조회 실패 상태에서도 검색창을 그림(결정 D U1 해석 위반)
+exit=0 | Test Files  1 passed (1) | Tests  43 passed (43)
+  ** 생존 (테스트 전부 통과) **
+
+--- X9 +n 을 more >= 0 에서 표시(' +0')
+exit=1 | Test Files  1 failed (1) | Tests  1 failed | 42 passed (43)
+  × 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음 7ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 타일 별칭(결정 B): display_name 과 같은 별칭 제외 · 서버 순서 · 최대 2개 · 넘치면 "+n" · 없으면 칸 없음
+  err: AssertionError: expected '가 · 나 +0' to be '가 · 나' // Object.is equality
+
+--- X10 Card size=sm → default
+exit=0 | Test Files  1 passed (1) | Tests  43 passed (43)
+  ** 생존 (테스트 전부 통과) **
+
+--- X7 탐침: aliases 키 없는 응답 (제품 무변경)
+  Test Files  1 passed (1)
+  Tests  1 passed (1)
+  TypeError: Cannot read properties of undefined (reading 'filter')
+  The last test to run before this error was "X7 탐침: aliases 키가 없는 응답이면 그리드가 그려지는가". This means either:
+
+=== 저장소 무수정 확인: git status --short web ===
+ M web/src/__tests__/card.test.tsx
+ M web/src/api/types.ts
+ M web/src/components/PersonList.tsx
+ M web/src/screens/PersonCardScreen.tsx
+?? web/src/components/PersonGrid.tsx
+

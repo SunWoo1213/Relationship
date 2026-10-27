@@ -504,7 +504,11 @@
 - 2026-10-21 23:55 | DECISION | 사용자: **결정 K = (나)** `GET /persons` 응답에 `aliases` 1필드 추가(읽기 전용, backend-agent U0) · 결정 A~J architect 추천안 전부 확정(그리드 1/2/3열 · 별칭 최대 2+n · 검색 trim/소문자/안쪽 공백 제거 includes · 0건 "찾는 인물이 없어요." · `SIDEBAR_RECENT_LIMIT=5` AppShell · "전체 보기 →" 항상 · 검색어 컴포넌트 상태 · 타일 `<a>` · `PersonGrid` 신설+`<input type=search>` · 폭 단언 Vitest+E2E). 메인 세션이 D15 결정 2·코드 규칙 1줄·갱신 이력, CR-003 §2, backlog 89행, 01-plan 을 보정(새 CR 아님 — CR-003 §2 예고 갈래) | P8b-persons-grid D15 CR-003
 - 2026-10-27 13:25 | START | P8b-persons-grid 계획 승인 — verify-plan FAIL 0/WARN 3(의도) · verifier 02-plan-verify **통과**(1차 10-22 시도는 Fable 한도 429 로 중단, 10-27 재시도; 점검표 8/8, [필수] 0, [권고] R-1~R-9 → 01-plan 개정 2 반영) · 사용자 승인. U0(backend-agent, aliases)·U1~U4(frontend-agent)·U5(사람 점검). 무변경 diff 기준 `3bd5025` | P8b-persons-grid D15 CR-003 R-U10C-3 R-U10R-10
 - 2026-10-27 13:40 | DECISION | 사용자: U0 backend-agent 시작 승인(L-004) · N+1 판정 (i) 질의 횟수 단언 테스트(인물 3명/10명 SELECT 수 동일) | P8b-persons-grid U0
+- 2026-10-27 15:50 | DECISION | 사용자: U0 verifier 리뷰 시작(L-004) → 통과([필수] 0 · [권고] R-U0-1~3) → U0 커밋 `adc650e` + dev2 푸시 승인 · U1 frontend-agent 시작 승인(L-004, Vitest 기준선 137) | P8b-persons-grid U0 U1
+- 2026-10-28 09:00 | DECISION | 사용자: U1 구현자 해석 6가지 **전부 수용**(+n 표기 `별칭 · 별칭 +n` · 빈/실패 상태 검색창 없음 · 사이드바 테스트 4건 최소 수정 · Card size=sm · 토큰 클래스) → 01-plan 결정 B·D 비고에 기록 · U1 verifier 리뷰 시작 승인(L-004) | P8b-persons-grid U1
 - 2026-10-21 22:20 | COMMIT | fe76931 docs(P8-frontend): 사람 점검을 끝내고 프론트 3화면 패키지를 완료로 닫는다
 - 2026-10-21 22:20 | PUSH-dev2 | origin dev2 fe76931 (실험 푸시)
 - 2026-10-27 14:17 | COMMIT | 0973858 docs(P8b-persons-grid): 인물 화면 그리드·검색·사이드바 5명 계획을 검증·승인까지 마치고 활성화한다
 - 2026-10-27 14:18 | PUSH-dev2 | origin dev2 0973858 (실험 푸시)
+- 2026-10-27 15:50 | COMMIT | adc650e feat(P8b-persons-grid): 인물 목록 조회 응답에 별칭 목록을 더한다
+- 2026-10-27 15:50 | PUSH-dev2 | origin dev2 adc650e (실험 푸시)

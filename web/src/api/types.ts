@@ -56,6 +56,8 @@ export interface PersonListItemOut {
   relation_tag: string
   hierarchy: string
   last_contact_at: IsoDateTime | null
+  // 카드 응답 aliases 와 같은 값·순서(읽기 전용, P8b U0)
+  aliases: string[]
 }
 
 export interface PersonBasicOut {

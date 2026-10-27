@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-27 15:50 (U0 verifier 리뷰 **통과**([필수] 0 · [권고] R-U0-1~3 기록 처리) — `feat(P8b-persons-grid)` U0 커밋 승인 대기: 제품 3파일 + registry·tests.md(신규)·03-log·01-plan(행 번호)·02-plan-verify(표기)·review-u0·증거 8 + HANDOFF·journal. 커밋 뒤 U1 frontend-agent(L-004))
+갱신: 2026-10-28 09:35 (U1 verifier 리뷰 **통과**([필수] 0 · [권고] R-U1-1~5) — `feat(P8b-persons-grid)` U1 커밋 승인 대기: 제품 5파일(`PersonGrid.tsx` 신규·`types.ts`·`PersonList.tsx`·`PersonCardScreen.tsx`·`card.test.tsx`) + registry·tests.md·03-log·01-plan·review-u1·증거 12 + HANDOFF·journal. 커밋 뒤 U2(frontend-agent, L-004 — 위임문에 R-U1-1 실패 상태 검색창 null 단언 1줄 · R-U1-5 `PersonList.tsx` 머리 주석 포함). **배포 순서 메모(R-U1-2): main 승격 시 백엔드 U0 먼저**)
 
-active: **P8b-persons-grid**(계획 승인·커밋 2026-10-27, 구현 단위 미착수) | frozen: none | 브랜치 `dev2` = origin/dev2 **`0973858`**(P8b 계획; CI 40454539352 success) | origin/dev `f9500fe` · origin/main `f05d017` | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 11·일정 6 — U10 확인 행), 테스트 `relationship_test` | 기준선(HEAD, 코드 `3bd5025`): 백엔드 **1953 passed** · 프론트 **137 passed** · typecheck 0 · E2E 4
+active: **P8b-persons-grid**(U0 완료 `adc650e`, U1~U5 남음) | frozen: none | 브랜치 `dev2` = origin/dev2 **`adc650e`**(U0; CI 40463493062 success) | origin/dev `f9500fe` · origin/main `f05d017` | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 11·일정 6 — U10 확인 행), 테스트 `relationship_test` | 기준선(HEAD, 코드 `3bd5025`): 백엔드 **1953 passed** · 프론트 **137 passed** · typecheck 0 · E2E 4
 
 ## 최근 끝낸 것
 | 무엇 | 결과 | 기록 |
@@ -16,8 +16,8 @@ active: **P8b-persons-grid**(계획 승인·커밋 2026-10-27, 구현 단위 미
 | P8b `/devlog start` 1~7단계(2026-10-21~27) | architect 01-plan → **D15 전제 오류 발견**(목록 응답에 별칭 없음) → 사용자 **결정 K (나)** `GET /persons` 응답에 `aliases` 1필드 + A~J 추천안 전부 → D15·CR-003 §2·backlog 89행·INDEX 77행 보정(새 CR 아님) → verify-plan FAIL 0/WARN 3 → verifier 02-plan-verify **통과**(1차 10-22 Fable 한도 429 로 중단 → 10-27 재시도; [권고] R-1~R-9 반영 = 개정 2) → **사용자 승인** → `CURRENT active: P8b-persons-grid` · 03-log · journal START | `packages/P8b-persons-grid/01-plan.md`·`02-plan-verify.md`·`03-log.md` |
 
 ## 진행 중 (이 턴에서 멈춘 자리)
-- **계획 커밋 `0973858`**(15파일, 사용자 승인 "커밋 + 실험 푸시") → `origin dev2` 끝. 03-log 첫 항목 `pending` → `0973858` 은 다음 커밋에. 미커밋은 journal 자동 줄·이 HANDOFF 뿐.
-- **U0 backend-agent 진행 중(1차 13:45 는 `stage-gate.sh` 가 `결과: **통과**` 굵게 표기를 못 읽어 코드 쓰기 거부·변경 0 → 02-plan-verify 120행 표기만 고치고(판정 무변경, 하네스 FIX 후보) 14:00 마커 재생성·재시도; 사전 결정: 137행 키 집합 단언에 `"aliases"` 추가 1줄 허용. 2차는 코드·테스트 5건 작성 뒤 **Docker 데몬 꺼짐**으로 pytest 전부 skip → 메인 세션이 `open -a Docker` + `docker start capstone2-postgres-1` 로 DB 복구(14:40), skip 증거 삭제, 같은 에이전트에 SendMessage 로 미실행 항목(pytest·전체 회귀·변이 2·registry·tests.md) 이어서)** — 바꿀 수 있는 파일 `app/api/read.py`·`schemas.py`·`tests/test_api_read_persons.py` 셋뿐(판정 8행). 끝나면 보고 수치 재실행 → verifier 리뷰(L-004) → `/commit`(feat(P8b-persons-grid) U0).
+- **계획 커밋 `0973858`** → **U0 커밋 `adc650e`**(19파일: `read.py`·`schemas.py`·`test_api_read_persons.py` + registry·tests.md·03-log·01-plan·02-plan-verify·review-u0·증거 8, 사용자 승인 "커밋 + 실험 푸시") → `origin dev2` 끝. 03-log U0 항목 `pending` → `adc650e` 은 다음 커밋에. 기준선 이제 백엔드 **1958 passed**. 미커밋은 journal 자동 줄·이 HANDOFF 뿐.
+- **U1 구현 끝(10-27 16:23, frontend-agent)**: `PersonGrid.tsx` 신설·`types.ts` aliases·`PersonList.tsx` 문구 키 3개·`PersonCardScreen` 목록 분기·`card.test.tsx` 재작성(+12, 사이드바 4건 최소 수정)·registry·tests.md 24행. 변이 12/12 검출(P8 M4 = V1-6 포함). 증거 `evidence/20261027-1623-u1-*`. **verifier 리뷰 진행 중(10-28 09:05)** → 통과 시 커밋 초안(제품 5파일 + registry·tests.md·03-log·01-plan·review-u1·증거). (아래 U0 경과는 기록용) U0 backend-agent 경과(1차 13:45 는 `stage-gate.sh` 가 `결과: **통과**` 굵게 표기를 못 읽어 코드 쓰기 거부·변경 0 → 02-plan-verify 120행 표기만 고치고(판정 무변경, 하네스 FIX 후보) 14:00 마커 재생성·재시도; 사전 결정: 137행 키 집합 단언에 `"aliases"` 추가 1줄 허용. 2차는 코드·테스트 5건 작성 뒤 **Docker 데몬 꺼짐**으로 pytest 전부 skip → 메인 세션이 `open -a Docker` + `docker start capstone2-postgres-1` 로 DB 복구(14:40), skip 증거 삭제, 같은 에이전트에 SendMessage 로 미실행 항목(pytest·전체 회귀·변이 2·registry·tests.md) 이어서)** — 바꿀 수 있는 파일 `app/api/read.py`·`schemas.py`·`tests/test_api_read_persons.py` 셋뿐(판정 8행). 끝나면 보고 수치 재실행 → verifier 리뷰(L-004) → `/commit`(feat(P8b-persons-grid) U0).
 - 백그라운드 서버: 백엔드 :8000·프론트 :5173 이 10-21 세션에서 띄운 채 아직 떠 있음(세션 종료 시 꺼짐). U0 pytest 는 `relationship_test` DB 라 무관.
 
 ## 바로 다음에 할 것 (순서대로)
