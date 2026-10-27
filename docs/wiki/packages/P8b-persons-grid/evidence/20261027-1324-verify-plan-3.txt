@@ -1,0 +1,31 @@
+# 명령: bash .claude/scripts/verify-plan.sh P8b-persons-grid
+# 시각: 2026-10-27T13:24:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe76931 (dev2)
+# exit: 0
+# ---
+== verify-plan P8b-persons-grid  (2026-10-27 13:24) ==
+PASS  존재: docs/wiki/packages/P8b-persons-grid/01-plan.md
+PASS  존재: docs/wiki/packages/P8b-persons-grid/02-plan-verify.md
+PASS  카드 존재: D15
+PASS  패키지 id 등록됨: P8-frontend
+PASS  Refs 있음: - [ ] U0 `GET /persons` 응답에 `aliases: list[str]` — [backend-
+PASS  Refs 있음: - [ ] U1 인물 화면 카드 그리드 + 이름·별칭 검색 + 목록 폭 단언 보강(Vitest) — [fro
+PASS  Refs 있음: - [ ] U2 사이드바 최근 5명 + "전체 보기 →" — [frontend-agent] `AppShell
+PASS  Refs 있음: - [ ] U3 E2E 갱신 + 목록 폭 `boundingBox()` 단언 — [frontend-agent]
+PASS  Refs 있음: - [ ] U4 자동 판정 전체 + 문서 — [frontend-agent: 판정 실행·`tests.md`·`
+PASS  Refs 있음: - [ ] U5 사람 점검 — [사용자·메인 세션] 판정 표 14행(데스크톱·모바일 폭에서 그리드·검색·사이
+PASS  backlog 일치: D15 "코드에서 지켜야 할 것" 전부 · 백엔드 변경은 `GET /persons` 응답에 `aliases`
+PASS  의존 완료: P8-frontend
+PASS  검증자 = verifier (L-002)
+PASS  점검표 8행 존재
+PASS  점검표 모든 행에 판정(통과/보류) 있음
+PASS  보류 0건
+PASS  결과: 줄 존재
+PASS  점검표 모든 행에 근거 있음
+PASS  registry 중복 없음: web/src/components/PersonGrid.tsx
+WARN  registry 에 다른 패키지로 이미 있음: registry.md → | 문서 | 결정 카드 D11 LLM 판정기 공급자 등록표·활성 스위치·기본 openai | docs/wiki/decisions/D11-llm-
+PASS  registry 중복 없음: docs/wiki/packages/P8b-persons-grid/tests.md
+WARN  registry 에 다른 패키지로 이미 있음: tests.md → | 문서 | 테스트 기록 — 프론트 Vitest 135건·E2E 4건을 표 1줄씩(무엇을 확인·입력 → 기대·결과·검출한 변이 ID), 총계와 
+WARN  registry 에 다른 패키지로 이미 있음: save_evidence.py → | 스크립트 | 증거 저장 전용 통로 — 명령을 가드 검사 후 실행해 출력 전체·머리줄 5개·exit 를 evidence 에 직접 저장(비밀 검
+== 결과: FAIL=0 WARN=3 ==

@@ -74,7 +74,7 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | `P6-briefing` | 브리핑 + 주기 작업 + 수동 트리거 | backend-agent | R12 R19 |
 | `P7-push` | 웹푸시 | backend-agent | R12 |
 | `P8-frontend` | 프론트 3화면 + PWA | frontend-agent(U0 신설, `web/`) + backend-agent(조회 API U1~U3) | — |
-| `P8b-persons-grid` | 인물 화면 카드 그리드 + 이름·별칭 검색 + 사이드바 최근 5명 (CR-003 · D15) — P8 04-review 뒤 | frontend-agent(`web/` 만, 백엔드 0) | — |
+| `P8b-persons-grid` | 인물 화면 카드 그리드 + 이름·별칭 검색 + 사이드바 최근 5명 (CR-003 · D15) — P8 04-review 뒤 | frontend-agent(`web/`) + backend-agent(U0 — `GET /persons` 응답 `aliases` 필드만, 결정 K (나)) | — |
 | `P9-infra` | Terraform + Actions + Caddy | infra-agent(신설) | R14 |
 | `P10-final-eval` | 150건 + 최종 평가 | eval-agent | — |
 | `P11-demo` | 데모 리허설 | 사용자 | R15 |

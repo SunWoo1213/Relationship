@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: none
+active: P8b-persons-grid
 frozen: none
 
 <!--
