@@ -1,0 +1,41 @@
+# 명령: echo "[1] git diff --stat HEAD -- web/src (빈 출력 기대)"; git diff --stat HEAD -- web/src; echo "[2] git diff --stat 3bd5025 -- app alembic :!app/api/read.py :!app/api/schemas.py (빈 출력 기대)"; git diff --stat 3bd5025 -- app alembic ":!app/api/read.py" ":!app/api/schemas.py"; echo "[3] git diff --stat HEAD -- web"; git diff --stat HEAD -- web; echo "[4] git status --short web"; git status --short web; echo "[5] grep aliases in e2e"; grep -n "aliases" web/e2e/card.spec.ts web/e2e/chat.spec.ts web/e2e/briefing.spec.ts web/e2e/fixtures.ts; echo "[6] GET /api/persons in other specs"; grep -n "GET /api/persons" web/e2e/chat.spec.ts web/e2e/briefing.spec.ts; echo "[7] expectNoStrayRequests in card.spec"; grep -n "expectNoStrayRequests" web/e2e/card.spec.ts; echo "[8] 비밀 패턴 grep in diff (0건 기대)"; git diff HEAD -- web | grep -nEi "sk-[a-z0-9]{10,}|AKIA[0-9A-Z]{12,}|api[_-]?key\s*[:=]|password\s*[:=]|BEGIN (RSA|EC|OPENSSH) PRIVATE" || echo "(0건, exit $?)"; echo "[9] 픽스처 PERSONS id 순서·이름 순서"; grep -oE "id: [0-9]+, display_name: .[^,]+" web/e2e/card.spec.ts | head -6; echo "[10] tsconfig.node.json include e2e"; grep -n "e2e" web/tsconfig.node.json; echo "[11] registry 257 P8b U3 비고 존재"; grep -c "P8b U3(해시 pending)" docs/wiki/registry.md
+# 시각: 2026-10-28T09:17:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 529922f (dev2)
+# exit: 0
+# ---
+[1] git diff --stat HEAD -- web/src (빈 출력 기대)
+[2] git diff --stat 3bd5025 -- app alembic :!app/api/read.py :!app/api/schemas.py (빈 출력 기대)
+[3] git diff --stat HEAD -- web
+ web/e2e/card.spec.ts | 75 +++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 62 insertions(+), 13 deletions(-)
+[4] git status --short web
+ M web/e2e/card.spec.ts
+[5] grep aliases in e2e
+web/e2e/card.spec.ts:11:  { id: 8, display_name: '최지우', relation_tag: '친구', hierarchy: '동', last_contact_at: '2026-10-20T09:00:00+09:00', aliases: [] },
+web/e2e/card.spec.ts:12:  { id: 3, display_name: '김팀장', relation_tag: '직장', hierarchy: '상', last_contact_at: '2026-10-14T09:00:00+09:00', aliases: ['팀장님', '김 부장'] },
+web/e2e/card.spec.ts:13:  { id: 4, display_name: '이서준', relation_tag: '친구', hierarchy: '동', last_contact_at: null, aliases: ['서준이'] },
+web/e2e/card.spec.ts:14:  { id: 12, display_name: '박민수', relation_tag: '지인', hierarchy: '동', last_contact_at: '2026-09-01T09:00:00+09:00', aliases: [] },
+web/e2e/card.spec.ts:15:  { id: 6, display_name: '정하늘', relation_tag: '가족', hierarchy: '하', last_contact_at: null, aliases: ['하늘이'] },
+web/e2e/card.spec.ts:16:  { id: 9, display_name: '강다온', relation_tag: '직장', hierarchy: '하', last_contact_at: '2026-08-01T09:00:00+09:00', aliases: ['막내'] },
+web/e2e/card.spec.ts:21:  aliases: ['팀장님', '김 부장'],
+[6] GET /api/persons in other specs
+web/e2e/chat.spec.ts:16:    'GET /api/persons': { json: [] },
+web/e2e/briefing.spec.ts:29:    'GET /api/persons': { json: [] },
+[7] expectNoStrayRequests in card.spec
+5:import { expectNoStrayRequests, freezeClock, installFakeApi } from './fixtures.ts'
+112:    expectNoStrayRequests(api, baseURL!)
+171:    expectNoStrayRequests(api, baseURL!)
+[8] 비밀 패턴 grep in diff (0건 기대)
+(0건, exit 1)
+[9] 픽스처 PERSONS id 순서·이름 순서
+id: 8, display_name: '최지우'
+id: 3, display_name: '김팀장'
+id: 4, display_name: '이서준'
+id: 12, display_name: '박민수'
+id: 6, display_name: '정하늘'
+id: 9, display_name: '강다온'
+[10] tsconfig.node.json include e2e
+23:  "include": ["vite.config.ts", "playwright.config.ts", "src/proxy.ts", "e2e"]
+[11] registry 257 P8b U3 비고 존재
+1

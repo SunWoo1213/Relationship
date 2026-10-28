@@ -1,0 +1,85 @@
+# 명령: npm --prefix web run e2e
+# 시각: 2026-10-28T09:05:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 529922f (dev2)
+# exit: 1
+# ---
+
+> web@0.0.0 e2e
+> playwright test
+
+
+Running 4 tests using 4 workers
+
+(node:64777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:64775) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:64776) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:64778) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 e2e/briefing.spec.ts:20:1 › 쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다 (1.3s)
+  ✓  1 e2e/chat.spec.ts:8:1 › 발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다 (1.5s)
+  ✘  3 e2e/card.spec.ts:50:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 (6.6s)
+  ✘  4 e2e/card.spec.ts:119:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 (7.2s)
+
+
+  1) e2e/card.spec.ts:50:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 ───────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('navigation', { name: '주 메뉴' }).getByTestId('sidebar-persons').getByRole('link')
+    Expected: 5
+    Received: 6
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('navigation', { name: '주 메뉴' }).getByTestId('sidebar-persons').getByRole('link') with timeout 5000ms
+      - waiting for getByRole('navigation', { name: '주 메뉴' }).getByTestId('sidebar-persons').getByRole('link')
+        14 × locator resolved to 6 elements
+           - unexpected value "6"
+
+
+      76 |     // 항목 3 + 인물 링크 5(서버 순서 앞 5명) + 전체 보기 1 = 9 (R-U2-2)
+      77 |     await expect(sidebar.getByRole('link')).toHaveCount(3 + SIDEBAR_COUNT + 1)
+    > 78 |     await expect(sidebar.getByTestId('sidebar-persons').getByRole('link')).toHaveCount(SIDEBAR_COUNT)
+         |                                                                            ^
+      79 |     await expect(sidebar.getByTestId('sidebar-persons').getByRole('link', { name: /강다온/ })).toHaveCount(0)
+      80 |
+      81 |     // 전체 보기 -> #/persons 그리드: 6명 전원, 서버 순서 그대로
+        at /Users/sunwoo/Desktop/Portfolio/Relationship/web/e2e/card.spec.ts:78:76
+
+    Error Context: test-results/card-데스크톱-폭-1280px-사이드바-인물-목록에서-인물을-눌러-카드를-열고-타임라인-원문을-펼친다/error-context.md
+
+  2) e2e/card.spec.ts:119:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('navigation', { name: '주 메뉴' }).getByTestId('sidebar-persons').getByRole('link')
+    Expected: 5
+    Received: 6
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('navigation', { name: '주 메뉴' }).getByTestId('sidebar-persons').getByRole('link') with timeout 5000ms
+      - waiting for getByRole('navigation', { name: '주 메뉴' }).getByTestId('sidebar-persons').getByRole('link')
+        14 × locator resolved to 6 elements
+           - unexpected value "6"
+
+
+      149 |     await menu.click()
+      150 |     await expect(drawer).toBeVisible()
+    > 151 |     await expect(drawer.getByTestId('sidebar-persons').getByRole('link')).toHaveCount(SIDEBAR_COUNT)
+          |                                                                           ^
+      152 |     await expect(drawer.getByTestId('sidebar-see-all')).toHaveCount(1)
+      153 |     await drawer.getByTestId('sidebar-see-all').click()
+      154 |     await expect(page.getByRole('navigation')).toHaveCount(0)
+        at /Users/sunwoo/Desktop/Portfolio/Relationship/web/e2e/card.spec.ts:151:75
+
+    Error Context: test-results/card-모바일-폭-390px-서랍은-처음엔-닫-62bdd-물---인물---카드-항목을-고르면-서랍이-닫힌다/error-context.md
+
+  2 failed
+    e2e/card.spec.ts:50:3 › 데스크톱 폭 1280px › 사이드바 인물 목록에서 인물을 눌러 카드를 열고 타임라인 원문을 펼친다 ────────────────
+    e2e/card.spec.ts:119:3 › 모바일 폭 390px › 서랍은 처음엔 닫혀 있고 하단 탭바가 없다. 메뉴 버튼 -> 인물 -> 인물 -> 카드, 항목을 고르면 서랍이 닫힌다 
+  2 passed (9.7s)

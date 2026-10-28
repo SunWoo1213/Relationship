@@ -61,3 +61,13 @@
 | #/persons 본문 그리드는 7명 전원 | 신규 | `tileIds()` 7개 서버 순서 + 사이드바 링크 6개 · V2-1a, 1b, 3b, 5 (U1 "7명 전원" 테스트도 V2-5 를 잡음) |
 | 좁은 폭 서랍에서 전체 보기 클릭 → `#/persons`·서랍 닫힘 | 신규 | 해시·`주 메뉴` 사라짐 · V2-3a, 3b, 4 |
 | P8b U1 그리드 describe "목록 조회가 실패하면 한 줄 안내" | 변경(R-U1-1: `person-search` 없음 1줄 추가) | 실패 상태에서 검색창 그림 · X6 |
+
+## web/e2e/card.spec.ts — U3 E2E 갱신 + 목록 폭 boundingBox (변경 2편 · 신규 0 · 삭제 0)
+
+실행: `npm --prefix web run e2e` → 4 passed (chat 1 · card 2 · briefing 1). Vitest 156 유지, typecheck exit 0. 증거 `evidence/20261028-0906-u3-e2e.txt`·`…-u3-vitest-all.txt`·`…-u3-typecheck.txt`, 변이 `evidence/20261028-0907-u3-mutation.txt`(대조군 4 passed · V3-1·2·3 각각 해당 테스트만 FAIL). 픽스처 `PERSONS` 6명(서버 순서 최지우 8·김팀장 3·이서준 4·박민수 12·정하늘 6·강다온 9 — 이름·id 순과 다름, 모두 `aliases` 필드, CI 빨강 원인 해소). 실측: 그리드 폭 976 / main 폭 1024 / 차 0(허용 2).
+
+| 테스트 이름(요지) | 구분 | 무엇을 확인하나 · 검출 변이 |
+|---|---|---|
+| 데스크톱 1280px 사이드바 인물 → 카드 → 원문 펼치기 | 변경 | 사이드바 링크 9(3+5+1), 인물 링크 5·강다온 없음 · V3-2 / `sidebar-see-all` → `#/persons` 타일 6개 id 서버 순서 `[8,3,4,12,6,9]` / `abs(grid.width − (main.width − 48)) ≤ 2` · V3-1 / 별칭 `팀장님` 검색 1회 → 타일 1(id 3) → 클릭 → `#/persons/3` 카드 → 기존 원문 단언(`textContent` = `RAW_31`, `GET /api/events/31/raw` 1회) / `expectNoStrayRequests` 유지 |
+| 모바일 390px 서랍 열림·닫힘·탭바 없음 | 변경 | 서랍 안 인물 링크 5(`a[href^="#/persons/"]`)·`sidebar-see-all` 1개 · V3-2 / 전체 보기 클릭 → 서랍 닫힘·`#/persons` / 타일 6개 `getBoundingClientRect().x` 집합 크기 1(실측 24) · V3-3 / 이후 서랍 열기·Esc 단언은 URL `#/persons` 로 갱신 / `expectNoStrayRequests` 유지 |
+| chat.spec.ts · briefing.spec.ts | 무변경 | `GET /api/persons` 가 `[]` 라 `aliases` 영향 없음 |
