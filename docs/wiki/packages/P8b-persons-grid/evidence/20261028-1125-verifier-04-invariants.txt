@@ -1,0 +1,59 @@
+# 명령: echo "== r8a app(excl read/schemas)"; git diff --stat 3bd5025..HEAD -- app alembic ":!app/api/read.py" ":!app/api/schemas.py"; echo "== r8b alembic"; git diff --stat 3bd5025..HEAD -- alembic; echo "== r8c tests(excl read_persons)"; git diff --stat 3bd5025..HEAD -- tests ":!tests/test_api_read_persons.py"; echo "== r12a routes.ts"; git diff --stat 3bd5025..HEAD -- web/src/routes.ts; echo "== r12b dialog files"; grep -rlE "Sheet|Dialog|Drawer" web/src --include=*.tsx | grep -v "^web/src/components/ui/"; echo "== r6 chat/briefing"; git diff --stat 3bd5025..HEAD -- web/src/screens/ChatScreen.tsx web/src/screens/BriefingScreen.tsx; echo "== r1a getPersons"; grep -n "export function getPersons()" web/src/api/client.ts; echo "== r1b query"; grep -rnE "persons\?|[?&](q|limit)=" web/src --exclude-dir=__tests__; echo "(count=$(grep -rnE "persons\?|[?&](q|limit)=" web/src --exclude-dir=__tests__ | wc -l | tr -d " "))"; echo "== r2 select in PersonGrid"; grep -rnE "<select|role=\"(combobox|switch)\"" web/src/components/PersonGrid.tsx; echo "(count=$(grep -rnE "<select|role=\"(combobox|switch)\"" web/src/components/PersonGrid.tsx | wc -l | tr -d " "))"; echo "== r5a card-wrap"; grep -n "data-testid=\"card-wrap\" className=\"mx-auto w-full md:w-3/4\"" web/src/screens/PersonCardScreen.tsx; echo "== r5b card-wrap diff"; git diff 3bd5025..HEAD -- web/src/screens/PersonCardScreen.tsx; echo "== r7 PersonGrid transforms"; grep -nE "toUpperCase|toLowerCase|replace\(|trim\(|\.sort\(|toSorted" web/src/components/PersonGrid.tsx; echo "== P8 inv1 push-dev"; grep -rn "push-dev" web/src --include=*.ts --include=*.tsx | grep -v __tests__; echo "== P8 inv2 voice"; grep -rniE "SpeechRecognition|getUserMedia|webkitSpeech" web/src | grep -v __tests__; echo "== P8 inv7 raw_utterance"; grep -rn "raw_utterance" web/src | grep -v __tests__; echo "== P8 inv4 external font"; grep -rnE "fonts\.googleapis|fonts\.gstatic|@import url\(http" web/src web/index.html; echo "== git status product"; git status --short app alembic web; echo "== HEAD"; git rev-parse --short HEAD
+# 시각: 2026-10-28T11:25:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fff6e8c (dev2)
+# exit: 0
+# ---
+== r8a app(excl read/schemas)
+== r8b alembic
+== r8c tests(excl read_persons)
+== r12a routes.ts
+== r12b dialog files
+web/src/components/AppShell.tsx
+== r6 chat/briefing
+== r1a getPersons
+107:export function getPersons(): Promise<PersonListItemOut[]> {
+== r1b query
+(count=0)
+== r2 select in PersonGrid
+(count=0)
+== r5a card-wrap
+339:        <div data-testid="card-wrap" className="mx-auto w-full md:w-3/4">
+== r5b card-wrap diff
+diff --git a/web/src/screens/PersonCardScreen.tsx b/web/src/screens/PersonCardScreen.tsx
+index 7a14804..d81ba0d 100644
+--- a/web/src/screens/PersonCardScreen.tsx
++++ b/web/src/screens/PersonCardScreen.tsx
+@@ -12,7 +12,7 @@ import type {
+   PersonPatternOut,
+   TimelineEventOut,
+ } from '@/api/types'
+-import PersonList from '@/components/PersonList'
++import PersonGrid from '@/components/PersonGrid'
+ import { Badge } from '@/components/ui/badge'
+ import { Button } from '@/components/ui/button'
+ import { Card } from '@/components/ui/card'
+@@ -333,7 +333,7 @@ export default function PersonCardScreen({ personId }: { personId: number | null
+       </h1>
+       {personId === null ? (
+         <div className="mt-4">
+-          <PersonList />
++          <PersonGrid />
+         </div>
+       ) : (
+         <div data-testid="card-wrap" className="mx-auto w-full md:w-3/4">
+== r7 PersonGrid transforms
+15:  return s.trim().toLowerCase().replace(/\s+/g, '')
+== P8 inv1 push-dev
+== P8 inv2 voice
+== P8 inv7 raw_utterance
+web/src/screens/PersonCardScreen.tsx:3:// 서버 문자열(key · value · content · raw_utterance · title)은 고치지 않고 그대로 보여 준다 (원칙7).
+web/src/screens/PersonCardScreen.tsx:4:// 원문(raw_utterance)은 펼칠 때만 가져오고(1회), 같은 항목을 다시 펼쳐도 다시 요청하지 않는다 — 항목 컴포넌트 상태에 캐시.
+web/src/screens/PersonCardScreen.tsx:135:          <DetailStatus state={state}>{(raw) => <RawText text={raw.raw_utterance} />}</DetailStatus>
+web/src/screens/PersonCardScreen.tsx:172:                  <RawText text={s.raw_utterance} />
+web/src/api/types.ts:117:  raw_utterance: string
+web/src/api/types.ts:131:  raw_utterance: string
+== P8 inv4 external font
+== git status product
+== HEAD
+fff6e8c

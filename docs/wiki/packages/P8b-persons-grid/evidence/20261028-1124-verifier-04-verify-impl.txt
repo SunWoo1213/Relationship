@@ -1,0 +1,19 @@
+# 명령: bash .claude/scripts/verify-impl.sh P8b-persons-grid
+# 시각: 2026-10-28T11:24:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fff6e8c (dev2)
+# exit: 0
+# ---
+== verify-impl P8b-persons-grid  (20261028-1124) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1958 passed, 1 warning in 24.12s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261028-1124-pytest.txt
+WARN  ruff 경고/오류 → evidence/20261028-1124-lint.txt
+PASS  태그 P8b-persons-grid 커밋 7 건 → evidence/20261028-1124-commits.txt
+PASS  커밋에 태그 존재: CR-003
+PASS  커밋에 태그 존재: D15
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P8b-persons-grid 행 있음
+WARN  미완료 작업 단위 6 개
+== 결과: FAIL=0 WARN=3 → evidence/20261028-1124-summary.txt ==

@@ -47,7 +47,7 @@
 - Refs: P8b-persons-grid U3 D15 CR-003 결정L 결정N 원칙5 R-U10C-3 R-U2-2 R-U3-1 R-U3-2 R-U3-3
 - **커밋 뒤(2026-10-28)**: `a0f4bc3`, dev2 푸시, **CI 40609192773 5 job success** — U1 `2112a2a`·U2 `529922f` 에서 빨강이던 `web (ubuntu)` E2E 복구.
 
-## 2026-10-28 12:30 · docs(P8b-persons-grid): 자동 판정 13행을 전부 돌려 증거로 남긴다 · pending (U4, frontend-agent)
+## 2026-10-28 12:30 · docs(P8b-persons-grid): 자동 판정 13행을 전부 돌려 증거로 남긴다 · fff6e8c (U4, frontend-agent)
 - 변경: 제품 코드 0. 증거 23개 `evidence/20261028-1026-u4-final-judge-{typecheck,build,dist,vitest,e2e}.txt`·`-1026-u4-invariants-r{1a,1b,1c,3,5a,5b,6,7,8a,8b,8c,12a,12-p8inv1,2,4,7,9}-*.txt`·`-1027-u4-tests-md-check.txt` · `registry.md` 해시 치환 4곳(U2 `529922f` ×3 · U3 `a0f4bc3` ×1 — P8b `pending` 잔존 0) · `tests.md` "집계(U4)" 절.
 - 판정 표 1~13행 **전부 PASS**(HEAD `a0f4bc3`): 1 `getPersons()` 1건·쿼리 0건·`read.py`/`schemas.py` diff 는 `aliases` 뿐 · 2·3·7 U1 Vitest 테스트 실재(검색창 1개·이름/별칭/태그 제외/정규화/빈/0건·href·Tab/Enter·무가공) + `routes.ts` diff 빈 · 4 U2 7건 + E2E(9링크·서랍 5) · 5 `card-wrap` grep 1·`card-wrap` 줄 diff 0·조상 검사·boundingBox · 6 Chat/Briefing diff 빈 · 8 세 diff 빈(메인 재확인) · 9 typecheck 0·build 0·dist 3파일 · 10 Vitest **156** = 137 + 12(U1) + 7(U2) + 0(U3) − 0 · 11 E2E 4 · 12 `routes.ts` 빈·서랍 1파일(메인 재확인)·P8 불변식 1·2·7·9 grep 0, 4 는 `3bd5025` 와 같은 6줄 · 13 **명령 보정** — 계획의 `grep -c "^| .*\.\(tsx\|ts\)::"` 는 웹 절 표가 `파일::이름` 형식이 아니라 0 이 나옴(형식 불일치, 누락 아님) → 절별 표 행 수 34(U1 23·U2 8·U3 3) = 신규 19 + 변경 13 + 유지 2, 삭제 0; 요지 문장 ↔ verbose 이름 대조 34/34(자동 대조 어긋난 3행은 수동 대조). 01-plan 13행 문구는 "절별 표 행 수" 가 맞다(04-review 에서 verifier 가 다시 봄).
 - 이유(기획서·카드 연결): 01-plan U4 — 수용 기준 전 항목을 기계적으로 한 번에 확인해 04-review 의 입력을 만든다(원칙8 재현 가능).
@@ -55,3 +55,18 @@
 - 검증: frontend-agent 실행 → 메인 세션 재확인(판정 8행 두 diff 빈 출력 · 12행 서랍 1파일 · registry pending 0). 백엔드 1958 은 U0 값 유지(재실행 안 함 — 백엔드 diff 0).
 - 남은 것 · 다음 단위: U5 사람 점검(판정 14행 ①~⑧, 수정 반영 1회 상한 — 실서버 인물 수 확인: 개발 DB 사용자 `local` 인물이 6명 이상이어야 5명 자르기가 보임) → verifier 04-review → `/devlog done` → D15 갱신 이력 해시.
 - Refs: P8b-persons-grid U4 D15 CR-003 원칙5 원칙7 원칙8 R-U10C-3 R-U10R-10 R-U3-1
+
+## 2026-10-28 13:20 · test(P8b-persons-grid): 사람 점검 14행 ①~⑧을 끝낸다 · pending (U5, 메인 세션 Chrome 직접 조작)
+- 변경: 제품 코드 0. 증거 `evidence/20261028-1120-u5-check-screens.txt`(판정 14행 표, **수정 반영 횟수: 0**, "수정 필요" 0). 백엔드 :8000 재시작(옛 프로세스가 `aliases` 없는 코드였음 — 안 했으면 그리드가 X7 로 깨짐).
+- 한 것: 사용자 결정 "제가 Chrome 직접 조작". OS 가 밝은 모드라 데스크톱 1710 밝음은 Chrome 으로, 모바일 390·어두운 모드는 창 폭·OS 테마를 못 바꿔 Playwright(저장소 밖 스크립트)로 같은 실서버를 열어 스크린샷·DOM 측정(R-U10R-3 와 같은 한계). 실서버 인물 5명이라 발화로 6명째(김윤서, 인물 12·사건 33·질문 18·19) 만들고 5명 자르기 확인. ①3열/1열·폭 1406 = 1454−48 ②scrollWidth = clientWidth ③이름·별칭·공백 없는 별칭·태그 제외·전원 복귀 ④0건 문구 ⑤상세 1054.5 = 1406×0.75 가운데, 모바일 100% ⑥사이드바 5 + 전체 보기, 서랍 닫힘 ⑦디자인 언어 ⑧밝은 모드(이번에 확인, U10 때 미확인분) — **8항 전부 통과**.
+- 관찰(인계): 발화 "윤서랑 처음 인사했어" 추출 0(P5·P10 표본 후보) · 서랍 닫힘 애니메이션(정상) · 일정 6 은 지난 일정.
+- 남은 것: verifier 04-review(L-004) → `/devlog done` → D15 갱신 이력에 완료 해시 → backlog 체크 → P8 체크리스트 19·20 "5명 기준" 메모.
+- Refs: P8b-persons-grid U5 D15 CR-003 결정L 결정N 원칙5 원칙8 R-U10R-2 R-U10R-3
+
+## 2026-10-28 13:50 · docs(P8b-persons-grid): 인물 그리드·검색·사이드바 5명 패키지를 완료로 닫는다 · pending (메인 세션)
+- 변경: 신규 `04-review.md`(verifier, 결과 완료, [필수] 0 · [권고] R-U5R-1~11, 사용자 승인 — R-U5R-2 면제) · verifier 증거 15개(`evidence/20261028-1124~1305-verifier-04-*`, verify-impl 1·2·3차 — 2차 FAIL 14 는 04-review 2.2 표 열 순서 문제라 표를 고쳐 3차 FAIL 0) · U5 증거·03-log·tests.md(위 항목) · `01-plan.md` 체크박스 U0~U5 `[x]` · `decisions/D15` 갱신 이력에 단위 해시 · `docs/backlog.md` P8b `[x]` · `CURRENT.md active: none` · journal DONE.
+- 이유(기획서·카드 연결): backlog 89행 수용 기준 6구절·판정 14행 전부 증거로 통과 — CR-003(사용자 승인 2026-10-16)·D15 가 코드로 끝났다. 닫는 R 없음(INDEX 77행).
+- 정합성 확인: 원칙5·7·8 / D15 7문장 / 백엔드 변경 U0 두 파일뿐 / S 카드 무변경 — 위반 없음. 제품 코드 변경 0.
+- 검증: verifier 직접 pytest 1958 skip 0 · typecheck 0 · Vitest 156 · build · E2E 4 · 변이 7건 중 6 검출(MC 생존 → R-U5R-1) · 실서버 API 대조 · verify-impl 3차 FAIL 0/WARN 2 → 메인 재확인 verify-impl FAIL 0 · Vitest 156.
+- 남은 것 · 인계: FIX 후보 R-U5R-1(`card-wrap` 폭 상한 Vitest 공백)·-3(E2E 픽스처 별칭 순서)·-4(별칭 질의 `user_id` `rowcount` 단언)·-5(tests.md P8 행 번호) · L 후보 R-U5R-6(FIX-033 (b) 사후 보고)·-11(프론트 단위 커밋 전 E2E) · P9 인계 R-U5R-10(배포 순서 백엔드 먼저, 데모 5단계에 그리드·검색) · P10 인계 R-U5R-9(추출 0 사례) · ruff 하네스 R-U5R-8(P8 R-U10R-8 이관). 다음 후보는 HANDOFF(③ 채팅으로 인물 조회 CR · ① 로그인+격리 CR · R-U10R-4 호칭 별칭 자동 병합).
+- Refs: P8b-persons-grid D15 CR-003 원칙5 원칙7 원칙8 R-U5R-1 R-U5R-2 R-U5R-10 R-U5R-11

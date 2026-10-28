@@ -1,0 +1,40 @@
+# 명령: bash .claude/scripts/verify-impl.sh P8b-persons-grid
+# 시각: 2026-10-28T13:03:59+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fff6e8c (dev2)
+# exit: 1
+# ---
+== verify-impl P8b-persons-grid  (20261028-1303) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1958 passed, 1 warning in 25.10s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261028-1303-pytest.txt
+WARN  ruff 경고/오류 → evidence/20261028-1303-lint.txt
+PASS  태그 P8b-persons-grid 커밋 7 건 → evidence/20261028-1303-commits.txt
+PASS  커밋에 태그 존재: CR-003
+PASS  커밋에 태그 존재: D15
+PASS  검토자 = verifier (L-002)
+PASS  증거 확인:  D15 "코드에서 지켜야 할 것" 전부  ← 판정 1~7행(아래 2.2) · evidence/20261028-1125
+PASS  증거 확인:  백엔드 변경은 `GET /persons` 응답에 `aliases` 필드를 더하는 것뿐(결 ← evidence/20261028-1125-verifier-04-invar
+PASS  증거 확인:  `card.test.tsx`·`routes.test.tsx`·E2E `card.spec. ← 529922f(card.test U2 7건 — verbose 이름 "7명
+PASS  증거 확인:  목록 폭 단언 보강(R-U10C-3, 조상 전부 + `boundingBox()`)  ← 2112a2a(`card.test.tsx` 157·202행 조상·자신·s
+PASS  증거 확인:  typecheck·Vitest·build·E2E 통과  ← evidence/20261028-1125-verifier-04-typec
+PASS  증거 확인:  상세 가운데 75% 는 `3bd5025` 유지  ← evidence/20261028-1125-verifier-04-invar
+FAIL  증거가 파일·커밋·경로가 아니다:  #  ← 무엇을
+FAIL  증거가 파일·커밋·경로가 아니다:  1  ← D15 코드 규칙 1 — `getPersons()` 인자 없음, 쿼리 파
+FAIL  증거가 파일·커밋·경로가 아니다:  2  ← D15 코드 규칙 2 — 필터 컨트롤 0, 검색 `<input>` 1, 
+FAIL  증거가 파일·커밋·경로가 아니다:  3  ← D15 코드 규칙 3 — 타일 `href="#/persons/<id>"`
+FAIL  증거가 파일·커밋·경로가 아니다:  4  ← D15 코드 규칙 4 — 사이드바 앞 5명 + `#/persons` 링크
+FAIL  증거가 파일·커밋·경로가 아니다:  5  ← D15 코드 규칙 5 — 목록 모드 조상·자신에 `max-w-*`·`mx
+FAIL  증거가 파일·커밋·경로가 아니다:  6  ← D15 코드 규칙 6 — `ChatScreen`·`BriefingScre
+FAIL  증거가 파일·커밋·경로가 아니다:  7  ← D15 코드 규칙 7 — 서버 문자열 가공 0, 하이라이트 0
+PASS  증거 확인:  8  ← 백엔드 변경은 `aliases` 뿐(R-U10R-10 기준 `3bd502
+FAIL  증거가 파일·커밋·경로가 아니다:  9  ← typecheck · build
+FAIL  증거가 파일·커밋·경로가 아니다:  10  ← Vitest 전체 = 기준선 137 + 신규 − 삭제
+FAIL  증거가 파일·커밋·경로가 아니다:  11  ← E2E 전체
+FAIL  증거가 파일·커밋·경로가 아니다:  12  ← 불변식 — 라우트 3·서랍 1파일·P8 불변식 1·2·4·7·9
+FAIL  증거가 파일·커밋·경로가 아니다:  13  ← `tests.md` 행 수 = 테스트 수
+FAIL  증거가 파일·커밋·경로가 아니다:  14  ← 사람 점검 ①~⑧(데스크톱·모바일, 밝음·어두움, 수정 반영 n ≤ 1)
+PASS  registry 에 P8b-persons-grid 행 있음
+WARN  미완료 작업 단위 6 개
+== 결과: FAIL=14 WARN=2 → evidence/20261028-1303-summary.txt ==

@@ -511,6 +511,10 @@
 - 2026-10-28 10:45 | DECISION | 사용자: U2 verifier 통과([필수] 0 · [권고] R-U2-1~4) → U2 커밋 `529922f` + dev2 푸시 승인 · U3 frontend-agent 시작 승인(L-004) | P8b-persons-grid U2 U3
 - 2026-10-28 11:20 | DECISION | 사용자: U3 verifier 리뷰 시작 승인(L-004) — 메인 재실행 E2E 4·Vitest 156, 폭 실측 976/1024 | P8b-persons-grid U3
 - 2026-10-28 11:50 | DECISION | 사용자: U3 verifier 통과([필수] 0 · [권고] R-U3-1~3) → U3 커밋 `a0f4bc3` + dev2 푸시 승인 → **CI 40609192773 5 job success(U1 부터 빨강이던 E2E 복구)** · U4 frontend-agent 시작 승인(L-004) | P8b-persons-grid U3 U4
+- 2026-10-28 12:45 | DECISION | 사용자: U4 커밋 `fff6e8c` + dev2 푸시 승인(판정 1~13행 PASS, 13행 세는 명령 보정) · U5 는 "제가 Chrome 직접 조작" | P8b-persons-grid U4 U5
+- 2026-10-28 13:20 | TEST | U5 사람 점검 14행 ①~⑧ 전부 통과, 수정 반영 0 — 메인 세션 Chrome(데스크톱 1710 밝음) + Playwright(390 밝음/어두움, 저장소 밖). 6명째 김윤서(인물 12) 생성으로 5명 자르기 확인. 백엔드 :8000 재시작(옛 코드 aliases 없음). 관찰: "윤서랑 처음 인사했어" 추출 0 | P8b-persons-grid U5 원칙8
+- 2026-10-28 13:30 | DECISION | 사용자: P8b-persons-grid verifier 04-review 시작 승인(L-004) | P8b-persons-grid
+- 2026-10-28 13:45 | DONE | P8b-persons-grid 완료 — verifier 04-review `완료`([필수] 0 · [권고] R-U5R-1~11), 직접 재실행 pytest 1958 skip 0 · Vitest 156 · build · E2E 4 · 변이 7/6 검출(MC `card-wrap` 폭 상한 테스트 공백 → FIX 후보) · 실서버 GET /persons 대조 · verify-impl FAIL 0/WARN 2. 메인 재확인 verify-impl FAIL 0 · Vitest 156. 사용자 승인(R-U5R-2 사람 점검 대체·에뮬레이션 **면제**). active none. 인계: P9(배포 순서 백엔드 U0 먼저 · 데모에 그리드·검색) · P10(추출 0 사례) · FIX 후보 R-U5R-1·3·4 · L 후보(프론트 단위 커밋 전 E2E · FIX-033 (b) 사후 보고) | P8b-persons-grid D15 CR-003 R-U5R-1 R-U5R-2
 - 2026-10-21 22:20 | COMMIT | fe76931 docs(P8-frontend): 사람 점검을 끝내고 프론트 3화면 패키지를 완료로 닫는다
 - 2026-10-21 22:20 | PUSH-dev2 | origin dev2 fe76931 (실험 푸시)
 - 2026-10-27 14:17 | COMMIT | 0973858 docs(P8b-persons-grid): 인물 화면 그리드·검색·사이드바 5명 계획을 검증·승인까지 마치고 활성화한다
@@ -523,3 +527,5 @@
 - 2026-10-28 09:01 | PUSH-dev2 | origin dev2 529922f (실험 푸시)
 - 2026-10-28 09:30 | COMMIT | a0f4bc3 test(P8b-persons-grid): E2E 를 그리드·사이드바 5명에 맞추고 목록 폭을 잰다
 - 2026-10-28 09:30 | PUSH-dev2 | origin dev2 a0f4bc3 (실험 푸시)
+- 2026-10-28 10:33 | COMMIT | fff6e8c docs(P8b-persons-grid): 자동 판정 13행을 전부 돌려 증거로 남긴다
+- 2026-10-28 10:33 | PUSH-dev2 | origin dev2 fff6e8c (실험 푸시)

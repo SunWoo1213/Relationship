@@ -1,0 +1,34 @@
+# 명령: echo "=== P0 대조군 (무변이) ==="; .venv/bin/python -m pytest tests/test_api_read_persons.py -q 2>&1 | tail -3; echo; echo "=== MG (U0·01-plan 75행 N+1 금지) routes.list_persons 를 인물마다 별칭 SELECT 1회 더하는 N+1 로 런타임 치환 ==="; PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-04 .venv/bin/python -m pytest tests/test_api_read_persons.py -q -p mut_nplus1 2>&1 | grep -E "mut_nplus1|assert|FAILED|passed|failed" | head -12; echo; echo "=== git status --short (저장소 무수정) ==="; git status --short
+# 시각: 2026-10-28T11:28:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fff6e8c (dev2)
+# exit: 0
+# ---
+=== P0 대조군 (무변이) ===
+.................                                                        [100%]
+17 passed in 0.63s
+
+=== MG (U0·01-plan 75행 N+1 금지) routes.list_persons 를 인물마다 별칭 SELECT 1회 더하는 N+1 로 런타임 치환 ===
+[mut_nplus1] routes.list_persons → N+1 변이 적용
+>       assert n3 == n10 == 2  # 목록 1 + 별칭 1
+E       assert 5 == 12
+FAILED tests/test_api_read_persons.py::test_목록_SELECT_수는_인물_수와_무관한_상수 - assert 5 == 12
+1 failed, 16 passed in 0.46s
+
+=== git status --short (저장소 무수정) ===
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P8b-persons-grid/03-log.md
+ M docs/wiki/packages/P8b-persons-grid/tests.md
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1120-u5-check-screens.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1124-commits.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1124-lint.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1124-pytest.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1124-summary.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1124-verifier-04-verify-impl.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1125-verifier-04-build.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1125-verifier-04-invariants.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1125-verifier-04-pytest-all.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1125-verifier-04-typecheck.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1125-verifier-04-vitest-all.txt
+?? docs/wiki/packages/P8b-persons-grid/evidence/20261028-1126-verifier-04-e2e.txt

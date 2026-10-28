@@ -1,0 +1,7 @@
+fff6e8c docs(P8b-persons-grid): 자동 판정 13행을 전부 돌려 증거로 남긴다
+a0f4bc3 test(P8b-persons-grid): E2E 를 그리드·사이드바 5명에 맞추고 목록 폭을 잰다
+529922f feat(P8b-persons-grid): 사이드바에 최근 5명만 보이고 전체 보기 링크를 둔다
+2112a2a feat(P8b-persons-grid): 인물 화면을 카드 그리드와 이름·별칭 검색으로 바꾼다
+adc650e feat(P8b-persons-grid): 인물 목록 조회 응답에 별칭 목록을 더한다
+0973858 docs(P8b-persons-grid): 인물 화면 그리드·검색·사이드바 5명 계획을 검증·승인까지 마치고 활성화한다
+75cb4ad cr(CR-003): 인물 화면을 카드 그리드·검색·사이드바 5명으로 바꾸는 결정을 문서에 옮긴다

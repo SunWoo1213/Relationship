@@ -1,0 +1,16 @@
+# 명령: python3 -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-04/live_api.py
+# 시각: 2026-10-28T11:30:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fff6e8c (dev2)
+# exit: 0
+# ---
+인물 수: 6
+12 김윤서 친구 동 2026-10-28T10:00:00Z ['김윤서']
+11 지수 지인 동 2026-10-21T11:32:41.621720Z ['지수']
+9 박선우 과장님 직장 동 2026-10-21T06:00:00Z ['과장님', '박선우 과장님']
+10 박선영 과장님 직장 동 2026-10-16T10:07:20.561650Z ['박선영 과장님', '선영 과장님']
+8 박수 친구 동 2026-10-15T15:00:00Z ['박수']
+7 민수 친구 동 2026-10-15T03:00:00Z ['민수', '박 과장', '박지훈 과장님']
+키: ['aliases', 'display_name', 'hierarchy', 'id', 'last_contact_at', 'relation_tag']
+앞 5명 id: [12, 11, 9, 10, 8] | 잘리는 6번째부터: [7]
+별칭 코드포인트 순 확인: True
