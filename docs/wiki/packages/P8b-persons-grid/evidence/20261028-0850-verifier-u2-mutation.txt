@@ -1,0 +1,208 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u2/mutate.py
+# 시각: 2026-10-28T08:50:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2112a2a (dev2)
+# exit: 0
+# ---
+사본: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u2/web (node_modules → 심볼릭 링크)
+
+=== 변이 루프 (card.test + routes.test, 대조군 기대 64) ===
+
+--- C0 대조군
+exit=0 | Test Files  2 passed (2) | Tests  64 passed (64)
+
+--- V2-1a SIDEBAR_RECENT_LIMIT 5 → 6
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  2 failed | 62 passed (64)
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 5ms
+  × P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다) 19ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)
+  err: AssertionError: expected 6 to be 5 // Object.is equality
+  err: AssertionError: expected [ …(7) ] to have a length of 6 but got 7
+
+--- V2-1b 자르기 제거(전원)
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  2 failed | 62 passed (64)
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 32ms
+  × P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다) 22ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)
+  err: AssertionError: expected [ Array(8) ] to deeply equal [ Array(6) ]
+  err: AssertionError: expected [ …(8) ] to have a length of 6 but got 8
+
+--- V2-2a slice(-limit) 뒤 5명
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  1 failed | 63 passed (64)
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 1021ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  err: TestingLibraryElementError: Unable to find an element with the text: 아린. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your match
+
+--- V2-2b 이름순 정렬 후 자르기
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  3 failed | 61 passed (64)
+  × #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid) 19ms
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 1011ms
+  × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 44ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+  err: AssertionError: expected [ '#/persons/7', '#/persons/9', …(1) ] to deeply equal [ '#/persons/7', '#/persons/4', …(1) ]
+  err: TestingLibraryElementError: Unable to find an element with the text: 아린. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your match
+  err: AssertionError: expected [ '#/persons/7', '#/persons/9', …(2) ] to deeply equal [ '#/persons/7', '#/persons/4', …(2) ]
+
+--- V2-2c 날짜 최신순 정렬 후 자르기
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  3 failed | 61 passed (64)
+  × #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid) 18ms
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 26ms
+  × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 16ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+  err: AssertionError: expected [ '#/persons/4', '#/persons/7', …(1) ] to deeply equal [ '#/persons/7', '#/persons/4', …(1) ]
+  err: AssertionError: expected [ Array(6) ] to deeply equal [ Array(6) ]
+  err: AssertionError: expected [ '#/persons/4', '#/persons/7', …(2) ] to deeply equal [ '#/persons/7', '#/persons/4', …(2) ]
+
+--- V2-2d(verifier) slice(1, limit + 1) — 첫 사람 빠짐
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  8 failed | 56 passed (64)
+  × #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid) 16ms
+  × R-U6-2: 해시 라우트가 바뀌면 다시 읽어 새 인물이 사이드바에 보인다 1008ms
+  × R-U6-2: 채팅 응답 stored.persons > 0 이면 다시 읽고, 0 이면 읽지 않는다 1023ms
+  × R-U6-2: 채팅 응답 stored.persons 가 0 이면(사건만 저장) 인물 목록을 다시 읽지 않는다 1016ms
+  × R-U7-2 (탐침 P2c): 먼저 보낸 느린 조회가 나중 조회보다 늦게 도착해도 사이드바는 나중 조회 값이다 1011ms
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 1017ms
+  × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 1016ms
+  × P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계) 51ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > R-U6-2: 해시 라우트가 바뀌면 다시 읽어 새 인물이 사이드바에 보인다
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > R-U6-2: 채팅 응답 stored.persons > 0 이면 다시 읽고, 0 이면 읽지 않는다
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > R-U6-2: 채팅 응답 stored.persons 가 0 이면(사건만 저장) 인물 목록을 다시 읽지 않는다
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > R-U7-2 (탐침 P2c): 먼저 보낸 느린 조회가 나중 조회보다 늦게 도착해도 사이드바는 나중 조회 값이다
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계)
+  err: AssertionError: expected [ '#/persons/4', '#/persons/9' ] to deeply equal [ '#/persons/7', '#/persons/4', …(1) ]
+  err: TestingLibraryElementError: Unable to find an element with the text: 박대리. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matc
+  err: TestingLibraryElementError: Unable to find an element with the text: 박대리. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matc
+  err: TestingLibraryElementError: Unable to find an element with the text: 박대리. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matc
+
+--- V2-3a 전체 보기 href → #/chat
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  3 failed | 61 passed (64)
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 28ms
+  × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 15ms
+  × P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다 46ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다
+  err: AssertionError: expected [ Array(6) ] to deeply equal [ Array(6) ]
+  err: AssertionError: expected [ '#/persons/7', '#/persons/4', …(2) ] to deeply equal [ '#/persons/7', '#/persons/4', …(2) ]
+  err: AssertionError: expected '#/chat' to be '#/persons' // Object.is equality
+
+--- V2-3b 전체 보기 링크 제거
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  5 failed | 59 passed (64)
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 28ms
+  × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 14ms
+  × P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계) 19ms
+  × P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다) 20ms
+  × P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다 1036ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다
+  err: AssertionError: expected [ Array(5) ] to deeply equal [ Array(6) ]
+  err: AssertionError: expected [ '#/persons/7', '#/persons/4', …(1) ] to deeply equal [ '#/persons/7', '#/persons/4', …(2) ]
+  err: AssertionError: expected [ …(5) ] to have a length of 6 but got 5
+  err: AssertionError: expected [ …(5) ] to have a length of 6 but got 5
+
+--- V2-4 전체 보기 onNavigate 미연결
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  1 failed | 63 passed (64)
+  × P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다 1071ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다
+  err: AssertionError: expected <nav aria-label="주 메뉴" …(1)>…(2)</nav> to be null
+
+--- V2-5 그리드에도 5명 자르기
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  2 failed | 62 passed (64)
+  × 데스크톱 열·간격 클래스(결정 A)이고 사이드바 5명 자르기와 무관하게 7명 전원이 그려진다 8ms
+  × P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다) 5ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 데스크톱 열·간격 클래스(결정 A)이고 사이드바 5명 자르기와 무관하게 7명 전원이 그려진다
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)
+  err: AssertionError: expected [ '100', '101', '102', '103', '104' ] to deeply equal [ '100', '101', '102', '103', …(3) ]
+  err: AssertionError: expected [ '51', '48', '55', '50', '53' ] to deeply equal [ '51', '48', '55', '50', '53', …(2) ]
+
+--- X6 (R-U1-1) 조회 실패 상태에서도 그리드가 검색창을 그림
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  1 failed | 63 passed (64)
+  × 목록 조회가 실패하면 한 줄 안내 5ms
+  FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 목록 조회가 실패하면 한 줄 안내
+  err: AssertionError: expected <input …(3)></input> to be null
+
+--- XA(verifier) 전체 보기 링크를 <ul> 안 <li> 로 옮김 (person-list 안 링크 수 변동)
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  1 failed | 63 passed (64)
+  × #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid) 21ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)
+  err: AssertionError: expected [ '#/persons/7', '#/persons/4', …(2) ] to deeply equal [ '#/persons/7', '#/persons/4', …(1) ]
+
+--- XB(verifier) 0명일 때도 전체 보기 링크를 그림
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  1 failed | 63 passed (64)
+  × P8b U2: 인물 0명이면 전체 보기 없음 6ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물 0명이면 전체 보기 없음
+  err: AssertionError: expected <a href="#/persons" …(2)></a> to be null
+
+--- XC(verifier) AppShell 이 상수 대신 4 를 넘김
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  3 failed | 61 passed (64)
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 27ms
+  × P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계) 1009ms
+  × P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다) 35ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)
+  err: AssertionError: expected [ Array(5) ] to deeply equal [ Array(6) ]
+  err: TestingLibraryElementError: Unable to find an element with the text: 마루. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your match
+  err: AssertionError: expected [ …(5) ] to have a length of 6 but got 5
+
+--- XD(verifier) 글자 '전체 보기 →' → '전체 보기'
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  2 failed | 62 passed (64)
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 28ms
+  × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 15ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+  err: AssertionError: expected '전체 보기' to be '전체 보기 →' // Object.is equality
+  err: AssertionError: expected '전체 보기' to be '전체 보기 →' // Object.is equality
+
+--- XE(verifier) 조회 실패 상태에서도 전체 보기 링크를 그림
+exit=1 | Test Files  1 failed | 1 passed (2) | Tests  1 failed | 63 passed (64)
+  × P8b U2: 조회 실패면 전체 보기 없음 6ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 조회 실패면 전체 보기 없음
+  err: AssertionError: expected <a href="#/persons" …(2)></a> to be null
+
+--- XF(verifier) limit 미지정이면 전원 → 0명 (기본 경로 — 제품에서 호출자 없음)
+exit=0 | Test Files  2 passed (2) | Tests  64 passed (64)
+  ** 생존 (테스트 전부 통과) **
+
+--- XG(verifier) 전체 보기 링크를 sidebar-persons 밖(nav 끝)으로 옮김
+exit=1 | Test Files  2 failed (2) | Tests  7 failed | 57 passed (64)
+  × 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다 10ms
+  × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 29ms
+  × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 15ms
+  × P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계) 17ms
+  × P8b U2: 인물 0명이면 전체 보기 없음 2ms
+  × P8b U2: 조회 실패면 전체 보기 없음 3ms
+  × P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다) 18ms
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계)
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물 0명이면 전체 보기 없음
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 조회 실패면 전체 보기 없음
+  FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)
+  FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 데스크톱 폭에서는 사이드바가 항상 보이고 메뉴 버튼이 없다
+  err: AssertionError: expected [ Array(5) ] to deeply equal [ Array(6) ]
+  err: AssertionError: expected [ '#/persons/7', '#/persons/4', …(1) ] to deeply equal [ '#/persons/7', '#/persons/4', …(2) ]
+  err: AssertionError: expected [ …(5) ] to have a length of 6 but got 5
+  err: AssertionError: expected <a href="#/persons" …(1)></a> to be null
+
+=== 생존 변이: XF(verifier) limit 미지정이면 전원 → 0명 (기본 경로 — 제품에서 호출자 없음)
+
+--- 탐침 PROBE-1(nav 링크 3+5+1)·PROBE-2(Tab 순서·Enter) — 제품 무변경
+exit=0 | Test Files  1 passed (1) | Tests  2 passed (2)
+
+=== 저장소 무수정 확인: git status --short web ===
+ M web/src/__tests__/card.test.tsx
+ M web/src/components/AppShell.tsx
+ M web/src/components/PersonList.tsx
+

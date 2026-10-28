@@ -10,6 +10,9 @@ import { briefingHref, HREF, type Route } from '@/routes'
 /** 결정 N: 데스크톱은 이 너비부터 사이드바가 항상 보인다. */
 export const DESKTOP_QUERY = '(min-width: 1024px)'
 
+/** 사이드바에 보이는 인물 수(결정 E). 서버 정렬(마지막 접촉 내림차순)의 앞에서부터 자른다. */
+export const SIDEBAR_RECENT_LIMIT = 5
+
 const NAV_ITEMS: { key: Route['name']; label: string; href: string }[] = [
   { key: 'chat', label: '채팅', href: HREF.chat },
   { key: 'persons', label: '인물', href: HREF.persons },
@@ -33,9 +36,9 @@ function SidebarContent({ route, onNavigate }: { route: Route; onNavigate: () =>
           </li>
         ))}
       </ul>
-      {/* 인물 목록 — `#/persons` 본문과 같은 컴포넌트 (새 API·새 라우트 없음). */}
+      {/* 최근 접촉 인물 앞 5명 + "전체 보기 →"(#/persons). 서버 순서 그대로 (D15 결정 4, 새 API·새 라우트 없음). */}
       <div aria-label="인물 목록" data-testid="sidebar-persons" className="min-h-0 flex-1 overflow-y-auto">
-        <PersonList onNavigate={onNavigate} />
+        <PersonList onNavigate={onNavigate} limit={SIDEBAR_RECENT_LIMIT} />
       </div>
     </nav>
   )

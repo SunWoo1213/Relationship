@@ -1,0 +1,19 @@
+# 명령: npm --prefix web test -- --run src/__tests__/card.test.tsx src/__tests__/routes.test.tsx
+# 시각: 2026-10-28T08:38:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2112a2a (dev2)
+# exit: 0
+# ---
+
+> web@0.0.0 test
+> vitest --run src/__tests__/card.test.tsx src/__tests__/routes.test.tsx
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  2 passed (2)
+      Tests  64 passed (64)
+   Start at  08:38:05
+   Duration  1.83s (tests 62%, environment 18%, import 12%, transform 4%, setup 3%)
+

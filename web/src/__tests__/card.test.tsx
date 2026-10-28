@@ -7,6 +7,7 @@ import App from '@/App'
 import PersonCardScreen, { CARD_NOTICE } from '@/screens/PersonCardScreen'
 import { PERSON_LIST_NOTICE } from '@/components/PersonList'
 import { notifyPersonsChanged, PersonsProvider } from '@/components/PersonsProvider'
+import { SIDEBAR_RECENT_LIMIT } from '@/components/AppShell'
 import appShellSource from '@/components/AppShell.tsx?raw'
 import cardScreenSource from '@/screens/PersonCardScreen.tsx?raw'
 import personGridSource from '@/components/PersonGrid.tsx?raw'
@@ -71,6 +72,18 @@ const SEARCH_PERSONS: PersonListItemOut[] = [
     id: 12, display_name: '가나', relation_tag: '가족', hierarchy: '하', last_contact_at: null,
     aliases: ['엄마친구'],
   },
+]
+
+// 사이드바 5명 자르기 시험용 7명 — 서버 순서가 이름순·id순·날짜순 어느 쪽과도 다르다.
+// 뒤 두 명(가을·가람)은 이름순으로도 날짜 최신순으로도 앞 5명에 들어가므로, 재정렬 후 자르면 잡힌다.
+const SEVEN: PersonListItemOut[] = [
+  { id: 51, display_name: '아린', relation_tag: '친구', hierarchy: '동', last_contact_at: '2026-09-10T12:00:00Z', aliases: [] },
+  { id: 48, display_name: '다온', relation_tag: '직장', hierarchy: '상', last_contact_at: '2026-10-01T12:00:00Z', aliases: [] },
+  { id: 55, display_name: '하준', relation_tag: '지인', hierarchy: '하', last_contact_at: null, aliases: [] },
+  { id: 50, display_name: '나래', relation_tag: '가족', hierarchy: '상', last_contact_at: '2026-08-01T12:00:00Z', aliases: [] },
+  { id: 53, display_name: '마루', relation_tag: '친구', hierarchy: '동', last_contact_at: '2026-09-30T12:00:00Z', aliases: [] },
+  { id: 49, display_name: '가을', relation_tag: '연인', hierarchy: '동', last_contact_at: '2026-10-20T12:00:00Z', aliases: [] },
+  { id: 52, display_name: '가람', relation_tag: '직장', hierarchy: '동', last_contact_at: '2026-10-25T12:00:00Z', aliases: [] },
 ]
 
 // 특수문자·앞뒤 공백·대소문자가 섞인 값 — 화면이 가공하면 textContent 가 달라진다 (원칙7).
@@ -355,6 +368,7 @@ describe('인물 목록 — 카드 그리드 (D15, P8b U1)', () => {
     render(<PersonCardScreen personId={null} />, { wrapper: PersonsProvider })
     expect(await screen.findByText(PERSON_LIST_NOTICE.failed)).toBeInTheDocument()
     expect(screen.queryByTestId('person-grid')).toBeNull()
+    expect(screen.queryByTestId('person-search')).toBeNull()
   })
 
   it('타일 href 는 서버 순서의 #/persons/:id, 누르면 해시가 바뀐다', async () => {
@@ -530,6 +544,97 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
     expect(cardScreenSource).toContain("import PersonGrid from '@/components/PersonGrid'")
     expect(cardScreenSource).not.toContain("import PersonList from")
     expect(cardScreenSource).toContain('<PersonGrid />')
+  })
+
+  it('P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)', async () => {
+    expect(SIDEBAR_RECENT_LIMIT).toBe(5)
+    window.history.replaceState(null, '', '#/chat')
+    install(router({ '/api/persons': () => json(SEVEN), '/api/questions/pending': () => json([]) }))
+    render(<App />)
+    const side = screen.getByTestId('sidebar-persons')
+    await within(side).findByText('아린')
+    const links = within(side).getAllByRole('link')
+    expect(links.map((l) => l.getAttribute('href'))).toEqual([
+      '#/persons/51',
+      '#/persons/48',
+      '#/persons/55',
+      '#/persons/50',
+      '#/persons/53',
+      '#/persons',
+    ])
+    expect(links[5].textContent).toBe('전체 보기 →')
+    expect(links[5]).toBe(screen.getByTestId('sidebar-see-all'))
+    expect(within(side).queryByText('가을')).toBeNull()
+    expect(within(side).queryByText('가람')).toBeNull()
+  })
+
+  it('P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →', async () => {
+    window.history.replaceState(null, '', '#/chat')
+    install(router({ '/api/persons': () => json(PERSONS), '/api/questions/pending': () => json([]) }))
+    render(<App />)
+    const side = screen.getByTestId('sidebar-persons')
+    await within(side).findByText('박대리')
+    expect(within(side).getAllByRole('link').map((l) => l.getAttribute('href'))).toEqual([
+      '#/persons/7',
+      '#/persons/4',
+      '#/persons/9',
+      '#/persons',
+    ])
+    expect(screen.getByTestId('sidebar-see-all').textContent).toBe('전체 보기 →')
+  })
+
+  it('P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계)', async () => {
+    window.history.replaceState(null, '', '#/chat')
+    install(router({ '/api/persons': () => json(SEVEN.slice(0, 5)), '/api/questions/pending': () => json([]) }))
+    render(<App />)
+    const side = screen.getByTestId('sidebar-persons')
+    await within(side).findByText('마루')
+    expect(within(side).getAllByRole('link')).toHaveLength(6)
+  })
+
+  it('P8b U2: 인물 0명이면 전체 보기 없음', async () => {
+    window.history.replaceState(null, '', '#/chat')
+    install(router({ '/api/persons': () => json([]), '/api/questions/pending': () => json([]) }))
+    render(<App />)
+    const side = screen.getByTestId('sidebar-persons')
+    await within(side).findByText(PERSON_LIST_NOTICE.empty)
+    expect(screen.queryByTestId('sidebar-see-all')).toBeNull()
+    expect(within(side).queryByText('전체 보기 →')).toBeNull()
+  })
+
+  it('P8b U2: 조회 실패면 전체 보기 없음', async () => {
+    window.history.replaceState(null, '', '#/chat')
+    install(
+      router({
+        '/api/persons': () => json({ detail: { code: 'x' } }, 500),
+        '/api/questions/pending': () => json([]),
+      }),
+    )
+    render(<App />)
+    const side = screen.getByTestId('sidebar-persons')
+    await within(side).findByText(PERSON_LIST_NOTICE.failed)
+    expect(screen.queryByTestId('sidebar-see-all')).toBeNull()
+  })
+
+  it('P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)', async () => {
+    window.history.replaceState(null, '', '#/persons')
+    install(router({ '/api/persons': () => json(SEVEN) }))
+    render(<App />)
+    await screen.findByTestId('person-grid')
+    expect(tileIds()).toEqual(['51', '48', '55', '50', '53', '49', '52'])
+    expect(within(screen.getByTestId('sidebar-persons')).getAllByRole('link')).toHaveLength(6)
+  })
+
+  it('P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다', async () => {
+    installFakeMatchMedia(800)
+    window.history.replaceState(null, '', '#/chat')
+    install(router({ '/api/persons': () => json(SEVEN), '/api/questions/pending': () => json([]) }))
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: '메뉴 열기' }))
+    const nav = screen.getByRole('navigation', { name: '주 메뉴' })
+    await userEvent.click(await within(nav).findByTestId('sidebar-see-all'))
+    expect(window.location.hash).toBe('#/persons')
+    await waitFor(() => expect(screen.queryByRole('navigation', { name: '주 메뉴' })).toBeNull())
   })
 
   it('좁은 폭: 서랍에서 항목을 고르면 서랍이 닫힌다', async () => {

@@ -46,3 +46,18 @@
 | R-U6-2 앱을 열면 GET /persons 1회 | 변경(최소: 대기 대상 `person-list` 2개 → `person-grid`+`person-list`) | 호출 1회 불변 |
 | R-U6-2 알림 이벤트만으로도 다시 읽음 | 변경(최소: 같은 이유) | 호출 2회 불변 |
 | 본문은 PersonGrid, 사이드바는 PersonList 를 import | 변경(P8 "같은 컴포넌트(PersonList)를 import" 교체) | import 문자열·`<PersonGrid />` · 본문에 PersonList import 없음 |
+
+## web/src/__tests__/card.test.tsx — U2 사이드바 최근 5명 + 전체 보기 (신규 7 · 변경 1 · 삭제 0)
+
+실행: `npm --prefix web test -- --run src/__tests__/card.test.tsx src/__tests__/routes.test.tsx` → 64 passed. 전체 → 156 passed (9 files, 기준선 149 → +7). 증거 `evidence/20261028-0838-u2-sidebar-vitest.txt`·`…-u2-vitest-all.txt`·`…-u2-sidebar.txt`(typecheck)·`…-u2-build.txt`, 변이 `evidence/20261028-0839-u2-mutation.txt`(V2-1a·1b·2a·2b·2c·3a·3b·4·5 + X6 전부 FAIL, 저장소 무수정). 픽스처 `SEVEN`: 서버 순서가 이름·id·날짜 어느 순과도 다르고 뒤 2명은 이름순·날짜 최신순 모두 앞 5명에 든다. `routes.test.tsx` 72~79행은 무수정 통과(인물 조회 전 시점 단언이라 "전체 보기" 링크 없음).
+
+| 테스트 이름(요지) | 구분 | 무엇을 확인하나 · 검출 변이 |
+|---|---|---|
+| P8b U2 (결정 E): 7명이면 앞 5명 + 전체 보기 → | 신규 | `SIDEBAR_RECENT_LIMIT` 값 5 · 링크 href `['#/persons/51','48','55','50','53','#/persons']`·마지막 텍스트 `전체 보기 →`·`sidebar-see-all` · V2-1a, 1b, 2a, 2b, 2c, 3a, 3b |
+| 5명 이하(3명)이면 3명 + 전체 보기 → | 신규 | href `['#/persons/7','4','9','#/persons']` · V2-2b, 2c, 3a, 3b |
+| 정확히 5명이면 5명 + 전체 보기 (경계) | 신규 | 링크 6개 · V2-3b |
+| 인물 0명이면 전체 보기 없음 | 신규 | `sidebar-see-all` 없음·글자 없음 |
+| 조회 실패면 전체 보기 없음 | 신규 | `sidebar-see-all` 없음 |
+| #/persons 본문 그리드는 7명 전원 | 신규 | `tileIds()` 7개 서버 순서 + 사이드바 링크 6개 · V2-1a, 1b, 3b, 5 (U1 "7명 전원" 테스트도 V2-5 를 잡음) |
+| 좁은 폭 서랍에서 전체 보기 클릭 → `#/persons`·서랍 닫힘 | 신규 | 해시·`주 메뉴` 사라짐 · V2-3a, 3b, 4 |
+| P8b U1 그리드 describe "목록 조회가 실패하면 한 줄 안내" | 변경(R-U1-1: `person-search` 없음 1줄 추가) | 실패 상태에서 검색창 그림 · X6 |

@@ -1,0 +1,89 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u2/run.sh
+# 시각: 2026-10-28T08:39:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2112a2a (dev2)
+# exit: 0
+# ---
+=== V2-1a 상수 5 -> 6
+     × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 6ms
+     × P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다) 22ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)
+      Tests  2 failed | 62 passed (64)
+-> 잡힘
+=== V2-1b 자르기 제거(전원)
+     × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 31ms
+     × P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다) 21ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)
+      Tests  2 failed | 62 passed (64)
+-> 잡힘
+=== V2-2a 뒤 5명 slice(-limit)
+     × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 1018ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+      Tests  1 failed | 63 passed (64)
+-> 잡힘
+=== V2-2b 이름순 정렬 후 자르기
+     × #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid) 18ms
+     × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 1009ms
+     × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 37ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+      Tests  3 failed | 61 passed (64)
+-> 잡힘
+=== V2-2c 날짜순 정렬 후 자르기
+     × #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid) 18ms
+     × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 24ms
+     × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 15ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > #/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+      Tests  3 failed | 61 passed (64)
+-> 잡힘
+=== V2-3a 전체 보기 href -> #/chat
+     × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 29ms
+     × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 16ms
+     × P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다 46ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다
+      Tests  3 failed | 61 passed (64)
+-> 잡힘
+=== V2-3b 전체 보기 링크 제거
+     × P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons) 27ms
+     × P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 → 15ms
+     × P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계) 16ms
+     × P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다) 17ms
+     × P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다 1042ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2 (결정 E): 7명이면 사이드바는 서버 순서의 앞 5명만, 마지막 링크는 전체 보기 → (href #/persons)
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →
+-> 잡힘
+=== V2-4 전체 보기 onNavigate 미연결
+     × P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다 1067ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: 좁은 폭 서랍에서 전체 보기 → 를 누르면 #/persons 로 가고 서랍이 닫힌다
+      Tests  1 failed | 63 passed (64)
+-> 잡힘
+=== V2-5 그리드에도 5명 자르기
+     × 데스크톱 열·간격 클래스(결정 A)이고 사이드바 5명 자르기와 무관하게 7명 전원이 그려진다 7ms
+     × P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다) 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 데스크톱 열·간격 클래스(결정 A)이고 사이드바 5명 자르기와 무관하게 7명 전원이 그려진다
+ FAIL  src/__tests__/card.test.tsx > 사이드바의 인물 목록 (결정 N) > P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)
+      Tests  2 failed | 62 passed (64)
+-> 잡힘
+변이 적용 확인: 2
+=== X6 실패 상태에서도 검색창
+     × 목록 조회가 실패하면 한 줄 안내 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > 목록 조회가 실패하면 한 줄 안내
+      Tests  1 failed | 63 passed (64)
+-> 잡힘

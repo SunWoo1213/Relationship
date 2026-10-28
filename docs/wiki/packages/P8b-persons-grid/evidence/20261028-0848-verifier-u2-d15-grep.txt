@@ -1,0 +1,92 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u2/d15.sh
+# 시각: 2026-10-28T08:48:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2112a2a (dev2)
+# exit: 0
+# ---
+## a. AppShell: export const SIDEBAR_RECENT_LIMIT = 5 (기대 1건)
+14:export const SIDEBAR_RECENT_LIMIT = 5
+## b. AppShell: PersonList 호출에 limit={SIDEBAR_RECENT_LIMIT} (기대 1건)
+41:        <PersonList onNavigate={onNavigate} limit={SIDEBAR_RECENT_LIMIT} />
+## c. PersonList: slice(0, limit) (기대 1건)
+34:  const shown = limit === undefined ? persons : persons.slice(0, limit)
+## d. PersonList: sort(/toSorted(/filter(/reverse( (기대 0건)
+[exit=1]
+## e. PersonList: href={HREF.persons} 단독 (기대 1건)
+61:      href={HREF.persons}
+## f. PersonList: data-testid="sidebar-see-all" (기대 1건)
+63:      data-testid="sidebar-see-all"
+## g. PersonList: 글자 전체 보기 → (기대 1건)
+66:      전체 보기 →
+## h. PersonList: 실패·0명 분기가 링크 앞에서 return (줄 번호 대조)
+23:  if (failed) {
+24:    return (
+30:  if (persons === null) return null
+31:  if (persons.length === 0) {
+32:    return <p className="px-3 py-2 text-sm text-muted-foreground">{PERSON_LIST_NOTICE.empty}</p>
+35:  return (
+40:          <a
+41:            href={`${HREF.persons}/${p.id}`}
+60:    <a
+61:      href={HREF.persons}
+## i. PersonGrid 무변경: git diff --stat HEAD -- web/src/components/PersonGrid.tsx (기대 빈 출력)
+[exit=0]
+## j. PersonGrid 에 slice(0, / SIDEBAR_RECENT_LIMIT (기대 0건)
+21:  return { shown: rest.slice(0, ALIAS_LIMIT), more: rest.length - ALIAS_LIMIT }
+[exit=0]
+## k. SIDEBAR_RECENT_LIMIT 사용처 전체 (web/src)
+web/src/components/PersonList.tsx:18:/** `limit` 이 없으면 전원. 사이드바는 항상 `SIDEBAR_RECENT_LIMIT` 를 넘긴다. */
+web/src/components/AppShell.tsx:14:export const SIDEBAR_RECENT_LIMIT = 5
+web/src/components/AppShell.tsx:41:        <PersonList onNavigate={onNavigate} limit={SIDEBAR_RECENT_LIMIT} />
+web/src/__tests__/card.test.tsx:10:import { SIDEBAR_RECENT_LIMIT } from '@/components/AppShell'
+web/src/__tests__/card.test.tsx:550:    expect(SIDEBAR_RECENT_LIMIT).toBe(5)
+## l. PersonList 표시 경로 가공 함수 (기대: formatDate 만)
+4:import { formatDate } from '@/lib/format'
+54:              {p.last_contact_at ? formatDate(p.last_contact_at) : PERSON_LIST_NOTICE.noContact}
+## m. AppShell diff 가 상수·주석·limit 인자뿐인지: git diff HEAD -- web/src/components/AppShell.tsx
+diff --git a/web/src/components/AppShell.tsx b/web/src/components/AppShell.tsx
+index de5fc7e..7322445 100644
+--- a/web/src/components/AppShell.tsx
++++ b/web/src/components/AppShell.tsx
+@@ -10,6 +10,9 @@ import { briefingHref, HREF, type Route } from '@/routes'
+ /** 결정 N: 데스크톱은 이 너비부터 사이드바가 항상 보인다. */
+ export const DESKTOP_QUERY = '(min-width: 1024px)'
+ 
++/** 사이드바에 보이는 인물 수(결정 E). 서버 정렬(마지막 접촉 내림차순)의 앞에서부터 자른다. */
++export const SIDEBAR_RECENT_LIMIT = 5
++
+ const NAV_ITEMS: { key: Route['name']; label: string; href: string }[] = [
+   { key: 'chat', label: '채팅', href: HREF.chat },
+   { key: 'persons', label: '인물', href: HREF.persons },
+@@ -33,9 +36,9 @@ function SidebarContent({ route, onNavigate }: { route: Route; onNavigate: () =>
+           </li>
+         ))}
+       </ul>
+-      {/* 인물 목록 — `#/persons` 본문과 같은 컴포넌트 (새 API·새 라우트 없음). */}
++      {/* 최근 접촉 인물 앞 5명 + "전체 보기 →"(#/persons). 서버 순서 그대로 (D15 결정 4, 새 API·새 라우트 없음). */}
+       <div aria-label="인물 목록" data-testid="sidebar-persons" className="min-h-0 flex-1 overflow-y-auto">
+-        <PersonList onNavigate={onNavigate} />
++        <PersonList onNavigate={onNavigate} limit={SIDEBAR_RECENT_LIMIT} />
+       </div>
+     </nav>
+   )
+## n. routes.ts HREF.persons 값
+6:  | { name: 'persons'; personId: number | null }
+11:  persons: '#/persons',
+17:/** `#/persons/12?x=1` → `/persons/12` (쿼리·앞 `#` 제거). */
+29:  if (path === '/persons') return { name: 'persons', personId: null }
+30:  const m = /^\/persons\/(\d+)$/.exec(path)
+## o. 서랍 구조 불변: AppShell Sheet side=left·showCloseButton·SheetTitle (기대 각 1건)
+111: * - 그 아래: 왼쪽 위 메뉴 버튼으로 여닫는 서랍 — shadcn/ui Sheet(Radix Dialog 기반, side="left").
+134:            side="left"
+135:            showCloseButton={false}
+139:            <SheetTitle className="sr-only">사이드바</SheetTitle>
+## p. test-setup fetch 기본 동작 (routes.test 에서 persons 조회가 어떻게 끝나는지)
+grep: web/src/__tests__/test-setup.ts: No such file or directory
+## q. sidebar-see-all 이 sidebar-persons 영역 안인지 — AppShell 36~40행
+          </li>
+        ))}
+      </ul>
+      {/* 최근 접촉 인물 앞 5명 + "전체 보기 →"(#/persons). 서버 순서 그대로 (D15 결정 4, 새 API·새 라우트 없음). */}
+      <div aria-label="인물 목록" data-testid="sidebar-persons" className="min-h-0 flex-1 overflow-y-auto">
+        <PersonList onNavigate={onNavigate} limit={SIDEBAR_RECENT_LIMIT} />

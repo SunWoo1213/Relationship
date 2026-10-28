@@ -1,5 +1,5 @@
-// 인물 목록 — `#/persons` 본문과 사이드바 아래, 두 자리에 같은 컴포넌트를 쓴다 (결정 N).
-// 순서는 서버가 준 그대로(마지막 접촉 내림차순) — 재정렬·필터·검색 없음. 새 API 없음(GET /persons).
+// 사이드바 전용 인물 목록(결정 N·D15 결정 4): `#/persons` 본문은 `PersonGrid` 가 맡는다.
+// 서버 순서 그대로 앞 `limit` 명 — 재정렬·필터·검색 없음. 새 API 없음(GET /persons).
 import { usePersons } from '@/components/PersonsProvider'
 import { formatDate } from '@/lib/format'
 import { HREF } from '@/routes'
@@ -15,7 +15,8 @@ export const PERSON_LIST_NOTICE = {
   searchLabel: '인물 검색',
 } as const
 
-export default function PersonList({ onNavigate }: { onNavigate?: () => void }) {
+/** `limit` 이 없으면 전원. 사이드바는 항상 `SIDEBAR_RECENT_LIMIT` 를 넘긴다. */
+export default function PersonList({ onNavigate, limit }: { onNavigate?: () => void; limit?: number }) {
   // 조회는 AppShell 의 PersonsProvider 가 한 번만 한다 — 여기서는 받은 값을 그릴 뿐이다.
   const { persons, failed } = usePersons()
 
@@ -30,9 +31,11 @@ export default function PersonList({ onNavigate }: { onNavigate?: () => void }) 
   if (persons.length === 0) {
     return <p className="px-3 py-2 text-sm text-muted-foreground">{PERSON_LIST_NOTICE.empty}</p>
   }
+  const shown = limit === undefined ? persons : persons.slice(0, limit)
   return (
+    <>
     <ul className="flex flex-col gap-1" data-testid="person-list">
-      {persons.map((p) => (
+      {shown.map((p) => (
         <li key={p.id}>
           <a
             href={`${HREF.persons}/${p.id}`}
@@ -54,5 +57,14 @@ export default function PersonList({ onNavigate }: { onNavigate?: () => void }) 
         </li>
       ))}
     </ul>
+    <a
+      href={HREF.persons}
+      onClick={onNavigate}
+      data-testid="sidebar-see-all"
+      className="mt-1 block rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent"
+    >
+      전체 보기 →
+    </a>
+    </>
   )
 }

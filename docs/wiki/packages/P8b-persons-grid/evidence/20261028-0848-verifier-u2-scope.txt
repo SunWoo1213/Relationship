@@ -1,0 +1,43 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u2/scope.sh
+# 시각: 2026-10-28T08:48:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2112a2a (dev2)
+# exit: 0
+# ---
+## 1. 백엔드 범위: git diff --stat 3bd5025 -- app alembic ':!app/api/read.py' ':!app/api/schemas.py' (기대: 빈 출력)
+[exit=0]
+## 2. 프론트 범위: git diff --stat HEAD -- web/src/routes.ts web/src/screens web/src/components/PersonGrid.tsx web/src/api (기대: 빈 출력)
+[exit=0]
+## 2b. 작업 트리 web 변경 파일 전체: git diff --stat HEAD -- web
+ web/src/__tests__/card.test.tsx   | 105 ++++++++++++++++++++++++++++++++++++++
+ web/src/components/AppShell.tsx   |   7 ++-
+ web/src/components/PersonList.tsx |  20 ++++++--
+ 3 files changed, 126 insertions(+), 6 deletions(-)
+## 2c. 미추적 파일(web): git status --short web
+ M web/src/__tests__/card.test.tsx
+ M web/src/components/AppShell.tsx
+ M web/src/components/PersonList.tsx
+[end]
+## 3. Sheet|Dialog|Drawer 사용 파일 (기대: AppShell.tsx 1파일)
+web/src/components/AppShell.tsx
+## 4. ls web/src/components/ui (기대 8개)
+badge.tsx
+button.tsx
+card.tsx
+collapsible.tsx
+sheet.tsx
+skeleton.tsx
+sonner.tsx
+tabs.tsx
+count=8
+## 5. 새 쿼리 파라미터 (기대 0건)
+[exit=1]
+## 6. getPersons 무인자 (기대 1건)
+107:export function getPersons(): Promise<PersonListItemOut[]> {
+## 7. 의존성 변경 (기대: 빈 출력)
+[exit=0]
+## 8. 비밀 문자열 (diff 안, 기대 0건)
+[exit=1]
+## 9. HEAD·브랜치
+2112a2a
+dev2
