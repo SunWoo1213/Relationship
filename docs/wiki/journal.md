@@ -529,3 +529,10 @@
 - 2026-10-28 09:30 | PUSH-dev2 | origin dev2 a0f4bc3 (실험 푸시)
 - 2026-10-28 10:33 | COMMIT | fff6e8c docs(P8b-persons-grid): 자동 판정 13행을 전부 돌려 증거로 남긴다
 - 2026-10-28 10:33 | PUSH-dev2 | origin dev2 fff6e8c (실험 푸시)
+- 2026-10-28 13:27 | COMMIT | 678bca7 docs(P8b-persons-grid): 인물 그리드·검색·사이드바 5명 패키지를 완료로 닫는다
+- 2026-10-28 13:27 | PUSH-dev2 | origin dev2 678bca7 (실험 푸시)
+- 2026-10-28 13:48 | PUSH | origin dev ← dev2 678bca7 — 사용자 결정 대기(승격/수정) L-003
+- 2026-10-28 14:25 | DECISION | 사용자: 다음 = B(CR ③ 채팅으로 인물 정보 조회) · dev 승격 지금(66커밋 `dev2:dev` = 678bca7) · L-003 결정 "수정 필요 없음 — 잠금만 해제하고 CR ③ 시작"(main 승격은 나중에). 잔존 `.claude/.commit-approved`(--push 가 만든 커밋 마커, 커밋 없이 남음)는 사용자가 삭제 | P8b-persons-grid L-003
+- 2026-10-28 14:40 | CR | CR-004 제기(열림): 조회 발화 — 의도 분류 + ER 재사용 + `get_person_card` 근거 답 + R19 검증기. 열린 결정 ①~⑦ 사용자에게 | CR-004 P5-loop R19 원칙7
+- 2026-10-28 14:50 | DECISION | 사용자: **CR-004 A 수용** · ①(a) intent 필드+게이트 · ②(a) LLM 답+템플릿 폴백 · ③-2 identity 만 되묻고 new_person 은 "기록이 없어요" · ④(a) 조회 우선 · ⑤(a) "나" 제외 · ⑥ 타임라인 5 · ⑦ P5b-query-turn · CLAUDE.md 원칙7 경계 구절 추가. frozen CR-004 | CR-004 D16
+- 2026-10-28 15:00 | CR | CR-004 이행완료(문서): D16 조회 발화 신설 · S3.4 재개 재료 `intent` 한 줄 · review-index R19 비고(검증기 재사용) · CLAUDE.md 원칙7 경계 구절 · backlog P5b-query-turn 행(수용 기준) · INDEX 태그·패키지 표 · proposal 상단 한 줄. frozen CR-004 → none. 코드는 P5b-query-turn | CR-004 D16 P5b-query-turn

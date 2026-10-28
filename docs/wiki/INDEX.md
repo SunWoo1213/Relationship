@@ -44,7 +44,7 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | 태그 | 뜻 | 카드 위치 |
 |------|----|-----------|
 | `P0`~`P11` | 작업 패키지 (P0 = 착수 준비) | `packages/<id>/` |
-| `D1`~`D10`, `D11+` | 설계 결정 (D3 는 D12 로 대체됨 — CR-001; D13 규칙 필터 감점; D9 는 D14 로 대체됨 — CR-002 패턴 기간 설정값; D15 인물 화면 배치 그리드·검색·사이드바 5명 — CR-003, P8 01-plan 결정 N·U6 일부 대체) | `decisions/Dnn-*.md` |
+| `D1`~`D10`, `D11+` | 설계 결정 (D3 는 D12 로 대체됨 — CR-001; D13 규칙 필터 감점; D9 는 D14 로 대체됨 — CR-002 패턴 기간 설정값; D15 인물 화면 배치 그리드·검색·사이드바 5명 — CR-003, P8 01-plan 결정 N·U6 일부 대체; D16 조회 발화 — CR-004, 의도 분류·읽기 전용 조회·답 경계) | `decisions/Dnn-*.md` |
 | `R1`~`R20` | 기획서 검증 항목 | `review-index.md` → 원문 `docs/proposal-review.md` |
 | `S3.1`~`S3.7` | 설계 명세 | `specs/S3.x-*.md` |
 | `원칙1`~`원칙9` | 불변 원칙 | `CLAUDE.md` |
@@ -70,6 +70,7 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | `P4-pilot-eval` | **게이트** 파일럿 평가 · 보정표 · 곡선 — **부분완료(미달, adf9f1b)** | eval-agent | R3 R4 |
 | `P4b-er-redesign` | **게이트 재도전** — CR-001 D12·D13 구현 + 새 stamp 재실행 + 결정 K 재판정 | backend-agent(app/er) + eval-agent(재실행) | R3 R4(재검증) |
 | `P5-loop` | 에이전트 루프 + ask_user 재개 | backend-agent | R6 R7 |
+| `P5b-query-turn` | 채팅 조회 발화 — 의도 분류·ER 재사용·카드 근거 답 (CR-004 · D16) — P8b 뒤 | backend-agent | — (R19 검증기 재사용) |
 | `P6-memory` | 승격 + 패턴 + fact_sources | backend-agent | R8 R11 |
 | `P6-briefing` | 브리핑 + 주기 작업 + 수동 트리거 | backend-agent | R12 R19 |
 | `P7-push` | 웹푸시 | backend-agent | R12 |

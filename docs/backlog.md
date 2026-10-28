@@ -72,6 +72,7 @@
 
 - [x] [backend-agent] 에이전트 루프(인식→해석→기록→응답) + ask_user 재개 / 의존: P3, **P4b 게이트 통과**(P4 는 부분완료·미달, CR-001) / 수용기준: 발화 → 툴 선택 → 저장 → 응답이 API 한 흐름으로 동작, `POST /answers/{question_id}`로 루프 재개 — **완료(2026-09-25, P5-loop, verifier 04-review `완료`; 판정 표 8행 실 공급자 curl 은 사용자 실행 후 보강)**
   - 세분화는 `docs/wiki/packages/P5-loop/01-plan.md` (U1~U8). 위 항목의 문장·수용 기준은 바꾸지 않는다.
+- [ ] [backend-agent] **P5b-query-turn** — 채팅 조회 발화: 인식 단계 `intent`(record/query) 필드 + 게이트가 조회 턴의 기록 제안 거부 + 같은 ER 4단계로 해석(identity 되묻기 유지, new_person 은 "기록이 없어요") + `get_person_card` 근거(사실 전부·타임라인 최근 5·일정) LLM 답 + R19 금지 표현 검증기(실패 시 템플릿) (CR-004 · D16) / 의존: P5-loop, P6-briefing(검증기), P8 U1(`get_person_card`) / 수용기준: D16 "코드에서 지켜야 할 것" 전부 · 조회 턴 저장 0(`events`·`schedules`·`person_facts`·`persons` 행 수 불변, 기록 툴 `tool_call` 0) · 툴 7종 불변(`tools_check` 7/7) · 프론트 diff 0 · trace 에 의도·해석·조회 근거 건수·답 · pytest 통과 · 실 LLM 왕복 1회(trace 368 류 질문에 카드 근거 답) — 사용자 승인 2026-10-28
   - 01-plan 결정 항목(사용자 확정 2026-09-23~24, 계획 승인 2026-09-24): 툴 선택은 **L(iii) 하이브리드 — LLM 제안 + 코드 게이트** / 새 인물 확인 질문에서 태그까지 받는다(M-1(d)) — 힌트가 있어도 항상 묻는다(M-3 안 A) / 일정 시각 되묻기는 옵션→시각 사전 조회(M-2(i)) / 총 제안 수 상한 `LOOP_MAX_PROPOSALS = 13` / 응답은 템플릿 / 재개는 해석 단계부터 / 되묻기로 끝나도 되돌리지 않는다 / 순차 처리·첫 되묻기에서 턴 종료 / 추출 개수 상한 / `loop_` trace 어휘 / 오류는 200 으로 삼켜 같은 트랜잭션에 커밋 / 세션 id 는 서버 발급·격리 부재 명시 / 확인 질문은 409 + `context` 바인딩 / 일정 시각 미확정은 `ask_user(kind="schedule")`
 
 ### P6
