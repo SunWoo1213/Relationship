@@ -510,6 +510,7 @@
 - 2026-10-28 10:10 | DECISION | 사용자: U2 verifier 리뷰 지금 시작(단위 하나 = 커밋 하나 유지, U3 는 그 뒤) | P8b-persons-grid U2
 - 2026-10-28 10:45 | DECISION | 사용자: U2 verifier 통과([필수] 0 · [권고] R-U2-1~4) → U2 커밋 `529922f` + dev2 푸시 승인 · U3 frontend-agent 시작 승인(L-004) | P8b-persons-grid U2 U3
 - 2026-10-28 11:20 | DECISION | 사용자: U3 verifier 리뷰 시작 승인(L-004) — 메인 재실행 E2E 4·Vitest 156, 폭 실측 976/1024 | P8b-persons-grid U3
+- 2026-10-28 11:50 | DECISION | 사용자: U3 verifier 통과([필수] 0 · [권고] R-U3-1~3) → U3 커밋 `a0f4bc3` + dev2 푸시 승인 → **CI 40609192773 5 job success(U1 부터 빨강이던 E2E 복구)** · U4 frontend-agent 시작 승인(L-004) | P8b-persons-grid U3 U4
 - 2026-10-21 22:20 | COMMIT | fe76931 docs(P8-frontend): 사람 점검을 끝내고 프론트 3화면 패키지를 완료로 닫는다
 - 2026-10-21 22:20 | PUSH-dev2 | origin dev2 fe76931 (실험 푸시)
 - 2026-10-27 14:17 | COMMIT | 0973858 docs(P8b-persons-grid): 인물 화면 그리드·검색·사이드바 5명 계획을 검증·승인까지 마치고 활성화한다
@@ -520,3 +521,5 @@
 - 2026-10-28 08:32 | PUSH-dev2 | origin dev2 2112a2a (실험 푸시)
 - 2026-10-28 09:01 | COMMIT | 529922f feat(P8b-persons-grid): 사이드바에 최근 5명만 보이고 전체 보기 링크를 둔다
 - 2026-10-28 09:01 | PUSH-dev2 | origin dev2 529922f (실험 푸시)
+- 2026-10-28 09:30 | COMMIT | a0f4bc3 test(P8b-persons-grid): E2E 를 그리드·사이드바 5명에 맞추고 목록 폭을 잰다
+- 2026-10-28 09:30 | PUSH-dev2 | origin dev2 a0f4bc3 (실험 푸시)

@@ -37,7 +37,7 @@
 - 남은 것 · 다음 단위: U3 E2E(frontend-agent) — **첫 줄: 픽스처 `PERSONS` 에 `aliases` 추가로 CI 빨강 해소** · 6명+ 픽스처 · `card.spec.ts` 76행 `3 + PERSONS.length` → `3 + 5 + 1`(R-U2-2) · 53·108행 사이드바 클릭 인물이 앞 5명 안 · `sidebar-see-all` → 그리드 → 검색 → 타일 → 카드 · `boundingBox` 폭(허용치 2px 실측 보고) · 모바일 1열. 이 커밋도 CI E2E 빨강 예정(U3 까지).
 - Refs: P8b-persons-grid U2 D15 CR-003 결정L 결정N 원칙5 R-U10C-3 R-U1-1 R-U1-5 R-U2-1 R-U2-2 R-U2-3 R-U2-4
 
-## 2026-10-28 · test(P8b-persons-grid): E2E 를 그리드·사이드바 5명에 맞추고 목록 폭을 잰다 · pending (U3, frontend-agent)
+## 2026-10-28 · test(P8b-persons-grid): E2E 를 그리드·사이드바 5명에 맞추고 목록 폭을 잰다 · a0f4bc3 (U3, frontend-agent)
 - 변경: `web/e2e/card.spec.ts` 만(제품 코드 무수정). 픽스처 `PERSONS` 6명(서버 순서 ≠ 이름·id 순, `aliases` 필수 필드 추가로 CI 빨강 해소, `CARD_3.aliases` 와 목록 값·순서 동일). 데스크톱: 사이드바 링크 3+5+1=9 → 전체 보기 → 그리드 6타일 서버 순서 → 폭 boundingBox → 별칭 검색 1회 → 타일 → 카드 → 원문 펼치기(기존 단언). 모바일: 서랍 안 5명+전체 보기 → 그리드 1열(타일 x 동일).
 - 결정 J 실측: 1280px 에서 `grid.width=976`, `main.width=1024`, `main.width−48=976` → 차 0 (허용 2px 그대로, 변경 없음). 모바일 390px 타일 x = 24×6.
 - 검증: E2E 4 passed · Vitest 156 · typecheck 0. 변이(스크래치패드 사본, 저장소 `git status --short web` = `M web/e2e/card.spec.ts` 뿐): V3-1 폭 차 208 FAIL(데스크톱만) · V3-2 링크 10/인물 6 FAIL(데스크톱·모바일) · V3-3 x 집합 2 FAIL(모바일만) · 대조군 4 passed.
@@ -45,3 +45,13 @@
 - **verifier 리뷰 통과**(`review-u3-e2e.md`, [필수] 0 · [권고] R-U3-1~3): 직접 E2E 4 passed(실측 976/1024/0, 모바일 x 24×6 동일) · Vitest 156 · typecheck 0 · 변이 12건 중 11 검출(V3-1 데스크톱만 차 208 · V3-2 nav 10/인물 6 · V3-3 x 집합 2 · XA~XH), **생존 XC2 검색 정규화 제거** — 검색어 `팀장님` 이 별칭과 글자 그대로 같아 E2E 가 정규화를 안 봄(계획 102행 "검색 1회" 만 요구, 정규화는 Vitest 판정 2행이 덮음 — R-U3-2, 의도대로) · 탐침 `main` `p-6`→`p-8` 이면 차 16(결정 J 의 48 은 `p-6` 에 묶임, 관찰) · chat·briefing spec 13회 전부 통과(변이 번짐 0). 첫 시도 링크 6 ↔ `a[href^="#/persons/"]` 수정은 D15 규칙 4 와 모순 없음. **R-U3-1**: 픽스처 별칭 `['팀장님','김 부장']` 은 U0 `sorted()` 코드포인트 순(`['김 부장','팀장님']`)과 다름 — 단언 영향 0, 다음에 spec 만질 때 교정(U4 또는 FIX). 메인 재실행 E2E 4·Vitest 156. 증거 `evidence/20261028-0913-verifier-u3-{e2e,vitest-all,typecheck}.txt`·`-0915-verifier-u3-mutation.txt`·`-0917-verifier-u3-scope.txt`.
 - 남은 것 · 다음 단위: 커밋 뒤 **CI `web (ubuntu)` E2E 초록 확인**(U1 부터 빨강) → U4 자동 판정 13행 전체·tests.md 대조·registry(해시 치환 R-U3-3 포함) → U5 사람 점검.
 - Refs: P8b-persons-grid U3 D15 CR-003 결정L 결정N 원칙5 R-U10C-3 R-U2-2 R-U3-1 R-U3-2 R-U3-3
+- **커밋 뒤(2026-10-28)**: `a0f4bc3`, dev2 푸시, **CI 40609192773 5 job success** — U1 `2112a2a`·U2 `529922f` 에서 빨강이던 `web (ubuntu)` E2E 복구.
+
+## 2026-10-28 12:30 · docs(P8b-persons-grid): 자동 판정 13행을 전부 돌려 증거로 남긴다 · pending (U4, frontend-agent)
+- 변경: 제품 코드 0. 증거 23개 `evidence/20261028-1026-u4-final-judge-{typecheck,build,dist,vitest,e2e}.txt`·`-1026-u4-invariants-r{1a,1b,1c,3,5a,5b,6,7,8a,8b,8c,12a,12-p8inv1,2,4,7,9}-*.txt`·`-1027-u4-tests-md-check.txt` · `registry.md` 해시 치환 4곳(U2 `529922f` ×3 · U3 `a0f4bc3` ×1 — P8b `pending` 잔존 0) · `tests.md` "집계(U4)" 절.
+- 판정 표 1~13행 **전부 PASS**(HEAD `a0f4bc3`): 1 `getPersons()` 1건·쿼리 0건·`read.py`/`schemas.py` diff 는 `aliases` 뿐 · 2·3·7 U1 Vitest 테스트 실재(검색창 1개·이름/별칭/태그 제외/정규화/빈/0건·href·Tab/Enter·무가공) + `routes.ts` diff 빈 · 4 U2 7건 + E2E(9링크·서랍 5) · 5 `card-wrap` grep 1·`card-wrap` 줄 diff 0·조상 검사·boundingBox · 6 Chat/Briefing diff 빈 · 8 세 diff 빈(메인 재확인) · 9 typecheck 0·build 0·dist 3파일 · 10 Vitest **156** = 137 + 12(U1) + 7(U2) + 0(U3) − 0 · 11 E2E 4 · 12 `routes.ts` 빈·서랍 1파일(메인 재확인)·P8 불변식 1·2·7·9 grep 0, 4 는 `3bd5025` 와 같은 6줄 · 13 **명령 보정** — 계획의 `grep -c "^| .*\.\(tsx\|ts\)::"` 는 웹 절 표가 `파일::이름` 형식이 아니라 0 이 나옴(형식 불일치, 누락 아님) → 절별 표 행 수 34(U1 23·U2 8·U3 3) = 신규 19 + 변경 13 + 유지 2, 삭제 0; 요지 문장 ↔ verbose 이름 대조 34/34(자동 대조 어긋난 3행은 수동 대조). 01-plan 13행 문구는 "절별 표 행 수" 가 맞다(04-review 에서 verifier 가 다시 봄).
+- 이유(기획서·카드 연결): 01-plan U4 — 수용 기준 전 항목을 기계적으로 한 번에 확인해 04-review 의 입력을 만든다(원칙8 재현 가능).
+- 정합성 확인: 원칙5·7·8 / D15 7문장 = 판정 1~7행 PASS / 백엔드 무변경(U0 외) — 위반 없음.
+- 검증: frontend-agent 실행 → 메인 세션 재확인(판정 8행 두 diff 빈 출력 · 12행 서랍 1파일 · registry pending 0). 백엔드 1958 은 U0 값 유지(재실행 안 함 — 백엔드 diff 0).
+- 남은 것 · 다음 단위: U5 사람 점검(판정 14행 ①~⑧, 수정 반영 1회 상한 — 실서버 인물 수 확인: 개발 DB 사용자 `local` 인물이 6명 이상이어야 5명 자르기가 보임) → verifier 04-review → `/devlog done` → D15 갱신 이력 해시.
+- Refs: P8b-persons-grid U4 D15 CR-003 원칙5 원칙7 원칙8 R-U10C-3 R-U10R-10 R-U3-1

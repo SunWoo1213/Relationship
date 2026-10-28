@@ -1,0 +1,55 @@
+# 명령: git diff 3bd5025..HEAD -- app/api/read.py app/api/schemas.py
+# 시각: 2026-10-28T10:26:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a0f4bc3 (dev2)
+# exit: 0
+# ---
+diff --git a/app/api/read.py b/app/api/read.py
+index 46f3f21..1b171e5 100644
+--- a/app/api/read.py
++++ b/app/api/read.py
+@@ -156,6 +156,16 @@ def list_persons(session: Session, user_id: str) -> list[PersonListItemOut]:
+         .group_by(Person.id)
+         .order_by(last_contact.desc().nulls_last(), Person.id.asc())
+     ).all()
++    # 별칭은 인물 수와 무관한 질의 1회로 모아(N+1 금지) 인물별로 나눈다. 정렬은
++    # 카드(`get_person_card`)와 같은 Python `sorted()` 코드포인트 순 -- DB 콜레이션 아님.
++    alias_rows = session.execute(
++        select(PersonAlias.person_id, PersonAlias.alias)
++        .join(Person, Person.id == PersonAlias.person_id)
++        .where(Person.user_id == user_id)
++    ).all()
++    by_person: dict[int, list[str]] = {}
++    for pid, alias in alias_rows:
++        by_person.setdefault(pid, []).append(alias)
+     return [
+         PersonListItemOut(
+             id=p.id,
+@@ -163,6 +173,7 @@ def list_persons(session: Session, user_id: str) -> list[PersonListItemOut]:
+             relation_tag=p.relation_tag,
+             hierarchy=p.hierarchy,
+             last_contact_at=lc,
++            aliases=sorted(by_person.get(p.id, [])),
+         )
+         for p, lc in rows
+     ]
+diff --git a/app/api/schemas.py b/app/api/schemas.py
+index bddb129..c24bc95 100644
+--- a/app/api/schemas.py
++++ b/app/api/schemas.py
+@@ -310,13 +310,14 @@ class PushSubscriptionOut(BaseModel):
+ 
+ 
+ class PersonListItemOut(BaseModel):
+-    """`GET /persons` 의 한 행."""
++    """`GET /persons` 의 한 행. `aliases` 는 카드 응답과 같은 값·같은 순서(P8b U0)."""
+ 
+     id: int
+     display_name: str
+     relation_tag: str
+     hierarchy: str
+     last_contact_at: datetime | None
++    aliases: list[str]
+ 
+ 
+ class PersonBasicOut(BaseModel):

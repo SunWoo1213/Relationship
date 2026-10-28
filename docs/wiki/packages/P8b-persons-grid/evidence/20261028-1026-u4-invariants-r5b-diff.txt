@@ -1,0 +1,28 @@
+# 명령: git diff 3bd5025..HEAD -- web/src/screens/PersonCardScreen.tsx
+# 시각: 2026-10-28T10:26:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a0f4bc3 (dev2)
+# exit: 0
+# ---
+diff --git a/web/src/screens/PersonCardScreen.tsx b/web/src/screens/PersonCardScreen.tsx
+index 7a14804..d81ba0d 100644
+--- a/web/src/screens/PersonCardScreen.tsx
++++ b/web/src/screens/PersonCardScreen.tsx
+@@ -12,7 +12,7 @@ import type {
+   PersonPatternOut,
+   TimelineEventOut,
+ } from '@/api/types'
+-import PersonList from '@/components/PersonList'
++import PersonGrid from '@/components/PersonGrid'
+ import { Badge } from '@/components/ui/badge'
+ import { Button } from '@/components/ui/button'
+ import { Card } from '@/components/ui/card'
+@@ -333,7 +333,7 @@ export default function PersonCardScreen({ personId }: { personId: number | null
+       </h1>
+       {personId === null ? (
+         <div className="mt-4">
+-          <PersonList />
++          <PersonGrid />
+         </div>
+       ) : (
+         <div data-testid="card-wrap" className="mx-auto w-full md:w-3/4">

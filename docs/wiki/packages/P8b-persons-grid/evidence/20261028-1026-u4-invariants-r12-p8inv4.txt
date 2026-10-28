@@ -1,0 +1,12 @@
+# 명령: grep -rn "raw_utterance" web/src --exclude-dir=__tests__
+# 시각: 2026-10-28T10:26:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a0f4bc3 (dev2)
+# exit: 0
+# ---
+web/src/screens/PersonCardScreen.tsx:3:// 서버 문자열(key · value · content · raw_utterance · title)은 고치지 않고 그대로 보여 준다 (원칙7).
+web/src/screens/PersonCardScreen.tsx:4:// 원문(raw_utterance)은 펼칠 때만 가져오고(1회), 같은 항목을 다시 펼쳐도 다시 요청하지 않는다 — 항목 컴포넌트 상태에 캐시.
+web/src/screens/PersonCardScreen.tsx:135:          <DetailStatus state={state}>{(raw) => <RawText text={raw.raw_utterance} />}</DetailStatus>
+web/src/screens/PersonCardScreen.tsx:172:                  <RawText text={s.raw_utterance} />
+web/src/api/types.ts:117:  raw_utterance: string
+web/src/api/types.ts:131:  raw_utterance: string

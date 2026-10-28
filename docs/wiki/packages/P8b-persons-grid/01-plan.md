@@ -145,7 +145,7 @@ CR-003(사용자 승인 2026-10-16)과 그것을 고정한 결정 카드 D15 를
 | 10 | Vitest 전체 | `npm --prefix web test -- --run --reporter=verbose` → 실패 0, 총 건수 = 기준선(**U0 시작 전 = 지금 HEAD `fe76931`, 137 passed** — P8 04-review 재실행 값; U1 시작 전에 같은 명령으로 한 번 더 재어 03-log 에 기록, R-9) + 신규 − 삭제 | `*-u4-final-judge.txt` |
 | 11 | E2E 전체 | `npm --prefix web run e2e` → 실패 0(chat·card·briefing 3편), `expectNoStrayRequests` 통과 | `*-u4-final-judge.txt` |
 | 12 | 불변식 — 화면 3개·라우트 밖 패널 1개(원칙5, P8 불변식 10·판정 13행) | `git diff --stat 3bd5025..HEAD -- web/src/routes.ts` 빈 출력 · `grep -rlE "Sheet|Dialog|Drawer" web/src --include=*.tsx \| grep -v "^web/src/components/ui/"` → `web/src/components/AppShell.tsx` **1파일뿐** · P8 불변식 1·2·4·7·9 명령 재실행(`push-dev`·음성·`raw_utterance`·`VITE_*KEY`·외부 글꼴) → P8 과 같은 기대값 | `*-u4-invariants.txt` |
-| 13 | `tests.md` 행 수 = 테스트 수 | 이 패키지 `tests.md` 의 표 행 수(`grep -c "^| .*\.\(tsx\|ts\)::" tests.md`) = U1~U3 에서 신규 + 변경 + 삭제한 테스트 수(각 단위 보고의 목록 합) · 표의 테스트 이름이 `--reporter=verbose` 출력 이름과 1:1(삭제 행 제외) | `*-u4-tests-md-check.txt` |
+| 13 | `tests.md` 행 수 = 테스트 수 | 이 패키지 `tests.md` 의 표 행 수(`grep -c "^| .*\.\(tsx\|ts\)::" tests.md` — **U4 보정 2026-10-28**: 웹 절 표는 `파일::이름` 이 아니라 요지 문장 형식이라 이 grep 은 0 이 나온다 → **절별 표 행 수**로 센다) = U1~U3 에서 신규 + 변경 + 삭제한 테스트 수(각 단위 보고의 목록 합) · 표의 테스트 이름이 `--reporter=verbose` 출력 이름과 1:1(삭제 행 제외) | `*-u4-tests-md-check.txt` |
 
 ### 사람 점검 (자동 1~13행 통과 뒤)
 

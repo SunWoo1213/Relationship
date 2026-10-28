@@ -1,0 +1,6 @@
+# 명령: grep -rnE "getUserMedia|SpeechRecognition|webkitSpeech" web/src web/public
+# 시각: 2026-10-28T10:26:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a0f4bc3 (dev2)
+# exit: 1
+# ---

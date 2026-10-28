@@ -1,0 +1,6 @@
+# 명령: git diff --stat 3bd5025..HEAD -- alembic
+# 시각: 2026-10-28T10:26:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a0f4bc3 (dev2)
+# exit: 0
+# ---

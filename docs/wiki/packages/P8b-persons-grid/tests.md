@@ -71,3 +71,18 @@
 | 데스크톱 1280px 사이드바 인물 → 카드 → 원문 펼치기 | 변경 | 사이드바 링크 9(3+5+1), 인물 링크 5·강다온 없음 · V3-2 / `sidebar-see-all` → `#/persons` 타일 6개 id 서버 순서 `[8,3,4,12,6,9]` / `abs(grid.width − (main.width − 48)) ≤ 2` · V3-1 / 별칭 `팀장님` 검색 1회 → 타일 1(id 3) → 클릭 → `#/persons/3` 카드 → 기존 원문 단언(`textContent` = `RAW_31`, `GET /api/events/31/raw` 1회) / `expectNoStrayRequests` 유지 |
 | 모바일 390px 서랍 열림·닫힘·탭바 없음 | 변경 | 서랍 안 인물 링크 5(`a[href^="#/persons/"]`)·`sidebar-see-all` 1개 · V3-2 / 전체 보기 클릭 → 서랍 닫힘·`#/persons` / 타일 6개 `getBoundingClientRect().x` 집합 크기 1(실측 24) · V3-3 / 이후 서랍 열기·Esc 단언은 URL `#/persons` 로 갱신 / `expectNoStrayRequests` 유지 |
 | chat.spec.ts · briefing.spec.ts | 무변경 | `GET /api/persons` 가 `[]` 라 `aliases` 영향 없음 |
+
+## 집계 (U4, 판정 10·11·13행)
+
+증거: `evidence/20261028-1026-u4-final-judge-vitest.txt`(156 passed, 9 files) · `…-e2e.txt`(4 passed) · `evidence/20261028-1027-u4-tests-md-check.txt`(13행 대조).
+
+| 단위 | 대상 | 신규 | 변경 | 삭제 | 합계 건수 변화 |
+|---|---|---|---|---|---|
+| U0 | 백엔드 `tests/test_api_read_persons.py` | 5 | 1 | 0 | pytest 1953 → 1958 (+5) |
+| U1 | Vitest `card.test.tsx` | 12 | 6 + 사이드바 최소 수정 4 | 0 | +12 |
+| U2 | Vitest `card.test.tsx` | 7 | 1 | 0 | +7 |
+| U3 | E2E `card.spec.ts` | 0 | 2 | 0 | 0 (4편 유지) |
+
+- Vitest 산식: 137(기준선 `fe76931`) + 12 + 7 + 0 − 0 = **156** (verbose 출력의 ✓ 줄도 156). E2E: 4 − 0 + 0 = **4**. 백엔드: 1953 + 5 = **1958**.
+- 13행: 계획 글자 그대로의 명령 `grep -c "^| .*\.\(tsx\|ts\)::"` 는 **0** 이다 — 웹 절 표는 `파일::이름` 형식이 아니라 "테스트 이름(요지)" 형식이라서(`.py::` 형식은 U0 절 6행). 그래서 절별 표 행을 센다: U1 23 · U2 8 · U3 3 = 34행 = 신규 19 + 변경 13(U1 6+4, U2 1, U3 2) + 변경 아닌 "유지·무변경" 2행(상세 75% 유지 1, chat/briefing spec 무변경 1) = 계획식(신규+변경+삭제) 32 + 2. 삭제 0. 34행 전부 verbose 출력의 실제 테스트 이름에 대응한다(`evidence/…-u4-tests-md-check.txt`).
+- **R-U3-1** (메모, 제품 무변경): E2E 픽스처의 별칭 순서 `['팀장님','김 부장']` 이 U0 의 `sorted()` 코드포인트 순(`김 부장` < `팀장님`)과 다르다. 단언은 별칭 순서에 기대지 않아 영향 0 이고 제품 코드는 그대로다. 교정은 다음에 `card.spec.ts` 를 만질 때 한다.

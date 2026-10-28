@@ -1,0 +1,7 @@
+# 명령: grep -rlE "Sheet|Dialog|Drawer" web/src --include=*.tsx | grep -v "^web/src/components/ui/"
+# 시각: 2026-10-28T10:26:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a0f4bc3 (dev2)
+# exit: 0
+# ---
+web/src/components/AppShell.tsx

@@ -1,0 +1,7 @@
+# 명령: grep -n 'data-testid="card-wrap" className="mx-auto w-full md:w-3/4"' web/src/screens/PersonCardScreen.tsx
+# 시각: 2026-10-28T10:26:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a0f4bc3 (dev2)
+# exit: 0
+# ---
+339:        <div data-testid="card-wrap" className="mx-auto w-full md:w-3/4">

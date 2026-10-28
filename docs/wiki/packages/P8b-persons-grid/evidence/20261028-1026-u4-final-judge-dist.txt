@@ -1,0 +1,9 @@
+# 명령: ls -l web/dist/index.html web/dist/sw.js web/dist/manifest.webmanifest
+# 시각: 2026-10-28T10:26:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a0f4bc3 (dev2)
+# exit: 0
+# ---
+-rw-r--r--@ 1 sunwoo  staff   573 10월 28 10:26 web/dist/index.html
+-rw-r--r--@ 1 sunwoo  staff   406 10월 28 10:26 web/dist/manifest.webmanifest
+-rw-r--r--@ 1 sunwoo  staff  3055 10월 28 10:26 web/dist/sw.js
