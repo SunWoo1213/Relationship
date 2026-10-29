@@ -1,0 +1,97 @@
+# 명령: echo "== diff-filter=M tests"; git diff --diff-filter=M --stat 8a8767b -- tests; echo "== stat er tools api briefing db memory main alembic web"; git diff --stat 8a8767b -- app/er app/tools app/api app/briefing app/db app/memory app/main.py alembic web; echo "== name-only app"; git diff --name-only 8a8767b -- app; echo "== numstat app"; git diff --numstat 8a8767b -- app; echo "== D-1 (2) arg schema lines in propose diff"; git diff 8a8767b -- app/agent/propose.py | grep -E "^[-+]" | grep -E "PROPOSAL_ARG_SCHEMA|\"(person|type|content|occurred_at|title|scheduled_at|display_name|aliases|relation_tag|hierarchy|new_alias|facts)\""; echo "exit=$?"; echo "== propose.py full diff"; git diff 8a8767b -- app/agent/propose.py
+# 시각: 2026-10-29T12:30:26+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe4a99e (dev2)
+# exit: 0
+# ---
+== diff-filter=M tests
+== stat er tools api briefing db memory main alembic web
+== name-only app
+app/agent/__init__.py
+app/agent/propose.py
+app/agent/types.py
+app/settings.py
+== numstat app
+8	0	app/agent/__init__.py
+25	7	app/agent/propose.py
+17	0	app/agent/types.py
+9	0	app/settings.py
+== D-1 (2) arg schema lines in propose diff
++        "intent": {"type": "string", "enum": list(INTENTS)},
+exit=0
+== propose.py full diff
+diff --git a/app/agent/propose.py b/app/agent/propose.py
+index e1dd5eb..c431946 100644
+--- a/app/agent/propose.py
++++ b/app/agent/propose.py
+@@ -85,7 +85,7 @@ from datetime import datetime, timezone, tzinfo
+ from typing import Any, Callable, Protocol
+ 
+ from app import tools as app_tools
+-from app.agent.types import Proposal, ToolCallProposal
++from app.agent.types import INTENT_RECORD, INTENTS, Proposal, ToolCallProposal
+ from app.db.models import EVENT_TYPES, HIERARCHIES, RELATION_TAGS
+ from app.er.judge import (
+     call_with_error_mapping,
+@@ -179,7 +179,10 @@ PROPOSAL_SCHEMA: dict[str, Any] = {
+                 "required": ["name", "args"],
+                 "additionalProperties": False,
+             },
+-        }
++        },
++        # 발화 의도 -- 선택 키다(`required` 에 넣지 않는다). 없음/null 이면
++        # "record" (P5b-query-turn 결정 A).
++        "intent": {"type": "string", "enum": list(INTENTS)},
+     },
+     "required": ["tool_calls"],
+     "additionalProperties": False,
+@@ -313,11 +316,22 @@ def validate_proposal(raw: dict[str, Any], tz: tzinfo = timezone.utc) -> Proposa
+     검사하는 것: `raw` 가 dict 이고 `tool_calls` 가 list 이며, 각 원소가
+     `{name: str, args: dict}` 모양인가. 검사하지 않는 것: `name` 이
+     툴 7종 안인가, `args` 가 그 툴의 시그니처와 맞는가, `person_id` 를
+-    직접 줬는가(전부 게이트, U3)."""
++    직접 줬는가(전부 게이트, U3).
++
++    `intent`(최상위 선택 키): 없음/`None` → `"record"`, 문자열이고 `INTENTS`
++    안 → 그 값, 그 밖(빈 문자열·다른 타입·enum 밖) → `JudgeUnavailable("schema")`."""
+ 
+     if not isinstance(raw, dict):
+         raise JudgeUnavailable("schema")
+ 
++    intent_raw = raw.get("intent")
++    if intent_raw is None:
++        intent = INTENT_RECORD
++    elif isinstance(intent_raw, str) and intent_raw in INTENTS:
++        intent = intent_raw
++    else:
++        raise JudgeUnavailable("schema")
++
+     tool_calls_raw = raw.get("tool_calls")
+     if not isinstance(tool_calls_raw, list):
+         raise JudgeUnavailable("schema")
+@@ -334,7 +348,7 @@ def validate_proposal(raw: dict[str, Any], tz: tzinfo = timezone.utc) -> Proposa
+             raise JudgeUnavailable("schema")
+         parsed.append(ToolCallProposal(name=name, args=_convert_datetime_args(name, args, tz)))
+ 
+-    return Proposal(tool_calls=parsed, raw=raw)
++    return Proposal(tool_calls=parsed, raw=raw, intent=intent)
+ 
+ 
+ def _tz_from_now(now: datetime) -> tzinfo:
+@@ -571,9 +585,13 @@ class FakeProposer:
+     다르게 취급하지 않게 한다."""
+ 
+     table: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
++    #: `{발화: 의도}` -- 표에 있는 발화만 `raw["intent"]` 로 넘긴다. 없는
++    #: 발화는 `intent` 키 없이 가서 기록 턴이 된다.
++    intents: dict[str, str] = field(default_factory=dict)
+ 
+     def propose(self, utterance: str, now: datetime) -> Proposal:
+         calls = self.table.get(utterance, [])
+-        return validate_proposal(
+-            {"tool_calls": [dict(c) for c in calls]}, tz=_tz_from_now(now)
+-        )
++        raw: dict[str, Any] = {"tool_calls": [dict(c) for c in calls]}
++        if utterance in self.intents:
++            raw["intent"] = self.intents[utterance]
++        return validate_proposal(raw, tz=_tz_from_now(now))

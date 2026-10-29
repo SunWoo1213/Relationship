@@ -1,0 +1,69 @@
+# 명령: PYTHONUTF8=1 .venv/bin/python - <<'EOF'
+from app.agent.propose import PROPOSAL_SCHEMA as S, PROPOSAL_ARG_SCHEMA as A, validate_proposal, FakeProposer
+from app.agent.types import Proposal, PendingResume, STEP_LOOP_QUERY, LOOP_TRACE_STEPS, LOOP_RESUME_VERSION
+from app.er.types import JudgeUnavailable
+from app import settings
+import app.agent as ag
+print("required:", S["required"])
+print("intent:", S["properties"]["intent"])
+print("additionalProperties:", S["additionalProperties"])
+print("top-level props:", sorted(S["properties"]))
+print("args is A:", S["properties"]["tool_calls"]["items"]["properties"]["args"] is A)
+print("missing ->", validate_proposal({"tool_calls": []}).intent)
+print("null ->", validate_proposal({"tool_calls": [], "intent": None}).intent)
+print("query ->", validate_proposal({"tool_calls": [], "intent": "query"}).intent)
+for bad in ["", "ask", 1, "QUERY", True]:
+    try:
+        validate_proposal({"tool_calls": [], "intent": bad}); print(repr(bad), "-> NO ERROR (bad)")
+    except JudgeUnavailable as e:
+        print(repr(bad), "-> JudgeUnavailable", repr(str(e)), "args=", e.args)
+print("Proposal().to_dict():", Proposal().to_dict())
+print("PendingResume().to_dict() keys:", sorted(PendingResume().to_dict()))
+print("PendingResume(intent=query).to_dict():", PendingResume(intent="query").to_dict())
+print("STEP_LOOP_QUERY:", STEP_LOOP_QUERY, "in LOOP_TRACE_STEPS:", STEP_LOOP_QUERY in LOOP_TRACE_STEPS, "len:", len(LOOP_TRACE_STEPS))
+print("LOOP_RESUME_VERSION:", LOOP_RESUME_VERSION)
+print("reexport:", ag.INTENT_RECORD, ag.INTENT_QUERY, ag.INTENTS, ag.STEP_LOOP_QUERY, all(n in ag.__all__ for n in ["INTENT_RECORD","INTENT_QUERY","INTENTS","STEP_LOOP_QUERY"]))
+print("consts:", settings.QUERY_TIMELINE_LIMIT, settings.QUERY_MAX_PERSONS, settings.QUERY_ANSWER_MAX_LINES, settings.QUERY_ANSWER_MAX_CHARS, settings.BRIEFING_SUGGESTION_MAX_CHARS)
+import os; print("env override names present in settings.py:", [l.strip() for l in open("app/settings.py") if "QUERY_" in l and "environ" in l])
+from datetime import datetime, timezone
+now = datetime(2026,10,29,9,0,tzinfo=timezone.utc)
+print("fake intents:", FakeProposer(table={"u": []}, intents={"u": "query"}).propose("u", now).intent, FakeProposer(table={"u": []}).propose("u", now).intent)
+try:
+    FakeProposer(table={"u": []}, intents={"u": "ask"}).propose("u", now); print("fake bad intent -> NO ERROR")
+except JudgeUnavailable as e:
+    print("fake bad intent -> JudgeUnavailable", str(e))
+import dataclasses
+print("Proposal frozen:", Proposal.__dataclass_params__.frozen, "PendingResume frozen:", PendingResume.__dataclass_params__.frozen)
+print("import order ok:"); import app.api, app.main; print("ok")
+EOF
+# 시각: 2026-10-29T12:30:28+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe4a99e (dev2)
+# exit: 0
+# ---
+required: ['tool_calls']
+intent: {'type': 'string', 'enum': ['record', 'query']}
+additionalProperties: False
+top-level props: ['intent', 'tool_calls']
+args is A: True
+missing -> record
+null -> record
+query -> query
+'' -> JudgeUnavailable 'schema' args= ('schema',)
+'ask' -> JudgeUnavailable 'schema' args= ('schema',)
+1 -> JudgeUnavailable 'schema' args= ('schema',)
+'QUERY' -> JudgeUnavailable 'schema' args= ('schema',)
+True -> JudgeUnavailable 'schema' args= ('schema',)
+Proposal().to_dict(): {'tool_calls': [], 'raw': {}, 'intent': 'record'}
+PendingResume().to_dict() keys: ['dropped', 'held_drafts', 'hints', 'mention', 'pending_calls', 'version']
+PendingResume(intent=query).to_dict(): {'version': '1', 'mention': '', 'hints': {}, 'pending_calls': [], 'held_drafts': [], 'dropped': 0, 'intent': 'query'}
+STEP_LOOP_QUERY: loop_query in LOOP_TRACE_STEPS: False len: 6
+LOOP_RESUME_VERSION: 1
+reexport: record query ('record', 'query') loop_query True
+consts: 5 1 3 240 80
+env override names present in settings.py: []
+fake intents: query record
+fake bad intent -> JudgeUnavailable schema
+Proposal frozen: True PendingResume frozen: True
+import order ok:
+ok

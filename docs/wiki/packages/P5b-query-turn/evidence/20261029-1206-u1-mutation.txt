@@ -1,0 +1,22 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u1/mut.sh
+# 시각: 2026-10-29T12:06:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe4a99e (dev2)
+# exit: 0
+# ---
+== control
+108 passed, 1 warning in 0.74s
+== M1 Proposal.intent default query
+FAILED tests/test_agent_query_types.py::test_proposal_default_intent_is_record - AssertionError: assert 'query' == 'record'
+FAILED tests/test_agent_query_types.py::test_proposal_to_dict_always_has_intent - AssertionError: assert 'query' == 'record'
+2 failed, 106 passed, 1 warning in 0.82s
+== M2 enum without query
+FAILED tests/test_agent_query_types.py::test_schema_intent_enum - AssertionError: assert {'enum': ['re...pe': 'string'} == {'enum': ['re...pe': 'string'}
+1 failed, 107 passed, 1 warning in 0.81s
+== M3 PendingResume.to_dict always intent
+FAILED tests/test_agent_query_types.py::test_pending_resume_default_omits_intent - AssertionError: assert 'intent' not in {'dropped': 0, 'held_drafts': [], 'hints': {}, 'intent': 'record', ...}
+1 failed, 107 passed, 1 warning in 0.82s
+== M4 STEP_LOOP_QUERY in LOOP_TRACE_STEPS
+FAILED tests/test_agent_query_types.py::test_step_loop_query_outside_trace_steps - AssertionError: assert 'loop_query' not in ('loop_extract', 'loop_gate', 'loop_resolve_done', 'loop_record', 'loop_turn', 'loop_resume', ...)
+FAILED tests/test_agent_types.py::test_loop_trace_steps_are_fixed_six_in_order - AssertionError: assert ('loop_extrac..._resume', ...) == ('loop_extrac...'loop_resume')
+2 failed, 106 passed, 1 warning in 0.83s

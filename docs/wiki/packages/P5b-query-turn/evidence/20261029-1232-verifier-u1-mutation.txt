@@ -1,0 +1,141 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u1/mutate.sh
+# 시각: 2026-10-29T12:32:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe4a99e (dev2)
+# exit: 0
+# ---
+== C0 control (3파일)
+108 passed, 1 warning in 0.73s
+== C0b control (기록 턴 루프·API·게이트)
+76 passed in 1.31s
+== M1 Proposal.intent 기본값 -> query (구현자 재현)
+[mut] app/agent/types.py: 'raw: dict[str, Any] = field(default_factory=dict)\n    intent: str = INTENT_RECORD' -> 'raw: dict[str, Any] = field(default_factory=dict)\n    intent: str = INTENT_QUERY'
+FAILED tests/test_agent_query_types.py::test_proposal_default_intent_is_record - AssertionError: assert 'query' == 'record'
+FAILED tests/test_agent_query_types.py::test_proposal_to_dict_always_has_intent - AssertionError: assert 'query' == 'record'
+2 failed, 106 passed, 1 warning in 0.80s
+-- M1 기록 턴 루프·API·게이트 (01-plan 변이 표 '기존 기록 턴 테스트 다수 FAIL' 주장)
+76 passed in 1.33s
+== M2 스키마 enum 에서 query 제거 (구현자 재현)
+[mut] app/agent/propose.py: '"enum": list(INTENTS)}' -> '"enum": [INTENT_RECORD]}'
+FAILED tests/test_agent_query_types.py::test_schema_intent_enum - AssertionError: assert {'enum': ['re...pe': 'string'} == {'enum': ['re...pe': 'string'}
+1 failed, 107 passed, 1 warning in 0.81s
+== M3 PendingResume.to_dict 가 intent 를 항상 싣게 (구현자 재현)
+[mut] app/agent/types.py: 'if self.intent == INTENT_QUERY:\n            payload["intent"] = self.intent' -> 'payload["intent"] = self.intent'
+FAILED tests/test_agent_query_types.py::test_pending_resume_default_omits_intent - AssertionError: assert 'intent' not in {'dropped': 0, 'held_drafts': [], 'hints': {}, 'intent': 'record', ...}
+1 failed, 107 passed, 1 warning in 0.81s
+== M4 STEP_LOOP_QUERY 를 LOOP_TRACE_STEPS 에 추가 (구현자 재현)
+[mut] app/agent/types.py: 'STEP_LOOP_RESUME,\n)' -> 'STEP_LOOP_RESUME,\n    STEP_LOOP_QUERY,\n)'
+FAILED tests/test_agent_query_types.py::test_step_loop_query_outside_trace_steps - AssertionError: assert 'loop_query' not in ('loop_extract', 'loop_gate', 'loop_resolve_done', 'loop_record', 'loop_turn', 'loop_resume', ...)
+FAILED tests/test_agent_types.py::test_loop_trace_steps_are_fixed_six_in_order - AssertionError: assert ('loop_extrac..._resume', ...) == ('loop_extrac...'loop_resume')
+2 failed, 106 passed, 1 warning in 0.82s
+== V1 validate_proposal 이 enum 밖 값을 record 로 삼킴 (결정 A (a\x27) 비추천안)
+[mut] app/agent/propose.py: 'else:\n        raise JudgeUnavailable("schema")\n\n    tool_calls_raw' -> 'else:\n        intent = INTENT_RECORD\n\n    tool_calls_raw'
+____________ test_validate_proposal_bad_intent_is_schema_error[ask] ____________
+    def test_validate_proposal_bad_intent_is_schema_error(bad):
+_____________ test_validate_proposal_bad_intent_is_schema_error[] ______________
+    def test_validate_proposal_bad_intent_is_schema_error(bad):
+___________ test_validate_proposal_bad_intent_is_schema_error[QUERY] ___________
+    def test_validate_proposal_bad_intent_is_schema_error(bad):
+_____________ test_validate_proposal_bad_intent_is_schema_error[1] _____________
+    def test_validate_proposal_bad_intent_is_schema_error(bad):
+___________ test_validate_proposal_bad_intent_is_schema_error[True] ____________
+    def test_validate_proposal_bad_intent_is_schema_error(bad):
+___________ test_validate_proposal_bad_intent_is_schema_error[bad5] ____________
+    def test_validate_proposal_bad_intent_is_schema_error(bad):
+___________ test_validate_proposal_bad_intent_is_schema_error[bad6] ____________
+    def test_validate_proposal_bad_intent_is_schema_error(bad):
+== V2 Proposal.to_dict 에서 intent 누락 (D16 결정 9 trace 관측 위반)
+[mut] app/agent/types.py: '"raw": dict(self.raw),\n            "intent": self.intent,' -> '"raw": dict(self.raw),'
+FAILED tests/test_agent_query_types.py::test_proposal_to_dict_always_has_intent - KeyError: 'intent'
+1 failed, 107 passed, 1 warning in 0.85s
+== V3 INTENTS 순서 뒤집기
+[mut] app/agent/types.py: 'INTENTS: tuple[str, ...] = (INTENT_RECORD, INTENT_QUERY)' -> 'INTENTS: tuple[str, ...] = (INTENT_QUERY, INTENT_RECORD)'
+FAILED tests/test_agent_query_types.py::test_intents_values - AssertionError: assert ('query', 'record') == ('record', 'query')
+FAILED tests/test_agent_query_types.py::test_schema_intent_enum - AssertionError: assert {'enum': ['qu...pe': 'string'} == {'enum': ['re...pe': 'string'}
+2 failed, 106 passed, 1 warning in 0.82s
+== V4 QUERY_ANSWER_MAX_CHARS 240 -> 241
+[mut] app/settings.py: 'QUERY_ANSWER_MAX_CHARS = 240' -> 'QUERY_ANSWER_MAX_CHARS = 241'
+FAILED tests/test_agent_query_types.py::test_query_constants_values - assert 241 == 240
+1 failed, 107 passed, 1 warning in 0.82s
+== V5 빈 문자열 intent 를 record 로 (None 과 같이 취급)
+[mut] app/agent/propose.py: 'if intent_raw is None:' -> 'if intent_raw is None or intent_raw == "":'
+_____________ test_validate_proposal_bad_intent_is_schema_error[] ______________
+    def test_validate_proposal_bad_intent_is_schema_error(bad):
+FAILED tests/test_agent_query_types.py::test_validate_proposal_bad_intent_is_schema_error[] - Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+1 failed, 107 passed, 1 warning in 0.82s
+== V6 대소문자 무시 ("QUERY" 허용)
+[mut] app/agent/propose.py: 'elif isinstance(intent_raw, str) and intent_raw in INTENTS:' -> 'elif isinstance(intent_raw, str) and intent_raw.lower() in INTENTS:\n        intent_raw = intent_raw.lower()'
+___________ test_validate_proposal_bad_intent_is_schema_error[QUERY] ___________
+    def test_validate_proposal_bad_intent_is_schema_error(bad):
+FAILED tests/test_agent_query_types.py::test_validate_proposal_bad_intent_is_schema_error[QUERY] - Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+1 failed, 107 passed, 1 warning in 0.83s
+== V7 validate_proposal 이 intent 를 Proposal 에 넘기지 않음
+[mut] app/agent/propose.py: 'return Proposal(tool_calls=parsed, raw=raw, intent=intent)' -> 'return Proposal(tool_calls=parsed, raw=raw)'
+FAILED tests/test_agent_query_types.py::test_validate_proposal_query_intent - AssertionError: assert 'record' == 'query'
+FAILED tests/test_agent_query_types.py::test_fake_proposer_intents_table - AssertionError: assert 'record' == 'query'
+2 failed, 106 passed, 1 warning in 0.84s
+== V8 FakeProposer 가 intents 표를 무시
+[mut] app/agent/propose.py: 'if utterance in self.intents:' -> 'if False and utterance in self.intents:'
+FAILED tests/test_agent_query_types.py::test_fake_proposer_intents_table - AssertionError: assert 'record' == 'query'
+1 failed, 107 passed, 1 warning in 0.83s
+== V9 PendingResume.intent 기본값 -> query
+[mut] app/agent/types.py: 'schedule_options: dict[str, str] | None = None\n    #: 재개할 턴의 의도.' -> 'schedule_options: dict[str, str] | None = None\n    intent: str = INTENT_QUERY\n    #: (변이) 아래 기본값은 dataclass 가 거부하므로 이름을 바꾼다 --'
+[mut] app/agent/types.py: 'intent: str = INTENT_RECORD\n\n    def to_dict(self) -> dict[str, Any]:\n        payload: dict[str, Any] = {' -> 'intent_unused: str = INTENT_RECORD\n\n    def to_dict(self) -> dict[str, Any]:\n        payload: dict[str, Any] = {'
+FAILED tests/test_agent_query_types.py::test_pending_resume_default_omits_intent - AssertionError: assert 'query' == 'record'
+1 failed, 107 passed, 1 warning in 0.83s
+== V10 STEP_LOOP_QUERY 값 오타 (loop_queries)
+[mut] app/agent/types.py: 'STEP_LOOP_QUERY = "loop_query"' -> 'STEP_LOOP_QUERY = "loop_queries"'
+FAILED tests/test_agent_query_types.py::test_step_loop_query_outside_trace_steps - AssertionError: assert 'loop_queries' == 'loop_query'
+1 failed, 107 passed, 1 warning in 0.82s
+== V11 __init__ 재export 누락 (STEP_LOOP_QUERY)
+[mut] app/agent/__init__.py: 'STEP_LOOP_GATE,\n    STEP_LOOP_QUERY,\n    STEP_LOOP_RECORD,' -> 'STEP_LOOP_GATE,\n    STEP_LOOP_RECORD,'
+[mut] app/agent/__init__.py: '"INTENTS",\n    "STEP_LOOP_QUERY",' -> '"INTENTS",'
+ERROR tests/test_agent_query_types.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.65s
+== 끝: 저장소 상태 (리뷰 전과 같아야 한다 — 사본만 고쳤다)
+ M app/agent/__init__.py
+ M app/agent/propose.py
+ M app/agent/types.py
+ M app/settings.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/registry.md
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1206-u1-diff-filter.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1206-u1-mutation.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1206-u1-pytest-all.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1206-u1-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1206-u1-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1206-u1-types.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1229-verifier-u1-full-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1229-verifier-u1-lint.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1229-verifier-u1-tests.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1229-verifier-u1-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1230-verifier-u1-contract-values.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1230-verifier-u1-grep-constraints.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261029-1230-verifier-u1-scope.txt
+?? docs/wiki/packages/P5b-query-turn/tests.md
+?? tests/test_agent_query_types.py
+
+# ===== append 2026-10-29T12:33:16+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u1/mutate-v1-rerun.sh
+# 시각: 2026-10-29T12:33:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe4a99e (dev2)
+# exit: 0
+# ---
+[mut] V1 applied
+== V1 (재실행) validate_proposal 이 enum 밖 값을 record 로 삼킴
+FAILED tests/test_agent_query_types.py::test_validate_proposal_bad_intent_is_schema_error[ask] - Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+FAILED tests/test_agent_query_types.py::test_validate_proposal_bad_intent_is_schema_error[] - Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+FAILED tests/test_agent_query_types.py::test_validate_proposal_bad_intent_is_schema_error[QUERY] - Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+FAILED tests/test_agent_query_types.py::test_validate_proposal_bad_intent_is_schema_error[1] - Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+FAILED tests/test_agent_query_types.py::test_validate_proposal_bad_intent_is_schema_error[True] - Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+FAILED tests/test_agent_query_types.py::test_validate_proposal_bad_intent_is_schema_error[bad5] - Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+FAILED tests/test_agent_query_types.py::test_validate_proposal_bad_intent_is_schema_error[bad6] - Failed: DID NOT RAISE <class 'app.er.types.JudgeUnavailable'>
+7 failed, 101 passed, 1 warning in 0.79s
+ M app/agent/__init__.py
+ M app/agent/propose.py
+ M app/agent/types.py
+ M app/settings.py
+?? tests/test_agent_query_types.py

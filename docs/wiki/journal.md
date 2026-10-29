@@ -542,6 +542,10 @@
 - 2026-10-28 16:20 | DECISION | verifier 1차 **보류**([필수] H-1 `intent` required ↔ 기존 테스트 충돌 · H-2 결정 F 문장 붙이는 규칙 미정, [권고] R-1~R-7) → 사용자: **H-1 (a) `intent` 선택 키·required 무변경 · H-2 추천 규칙 확정**(코드가 붙임·검증은 본문에만·순서·rejected_answer 원문·"기록 없음"/템플릿에는 안 붙임) → 메인 세션 01-plan 개정 2(R-1·2·4·5·7 반영, R-6 리스크 메모, `env` 접두 제거) | P5b-query-turn
 - 2026-10-29 10:45 | DECISION | 사용자: verifier 재검증 시작 승인(L-004) → 2차 **통과**([필수] 0, 새 [권고] R-8·R-9 → 01-plan 개정 3) | P5b-query-turn
 - 2026-10-29 10:55 | START | P5b-query-turn 계획 승인 — verify-plan FAIL 0/WARN 8(의도) · verifier 02-plan-verify 통과(1차 보류 → 2차 통과) · 사용자 승인. U1~U6 backend-agent(L-004 매번, 단위마다 verifier 리뷰) · U7 실 LLM 사람 점검. 무변경 diff 기준 `8a8767b` | P5b-query-turn CR-004 D16
+- 2026-10-29 11:05 | DECISION | 사용자: 계획 커밋 `fe4a99e` + dev2 푸시 승인 · U1 backend-agent 시작 승인(L-004) | P5b-query-turn U1
+- 2026-10-29 12:15 | DECISION | 사용자: U1 verifier 리뷰 시작 승인(L-004) — 메인 재실행 24 passed·ruff·tools_check 7/7·`--diff-filter=M` 빈 출력 | P5b-query-turn U1
 - 2026-10-28 14:23 | COMMIT | 8a8767b cr(CR-004): 채팅에서 인물을 물으면 기억에서 답하는 조회 발화를 결정으로 옮긴다
 - 2026-10-28 14:23 | PUSH-dev2 | origin dev2 8a8767b (실험 푸시)
 - 2026-10-29 10:54 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
+- 2026-10-29 10:58 | COMMIT | fe4a99e docs(P5b-query-turn): 채팅 조회 발화 계획을 검증·승인까지 마치고 활성화한다
+- 2026-10-29 10:59 | PUSH-dev2 | origin dev2 fe4a99e (실험 푸시)

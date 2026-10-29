@@ -1,0 +1,39 @@
+# 명령: D=$(git diff 8a8767b -- app | grep -E "^\+" | grep -vE "^\+\+\+"); echo "== added lines count"; echo "$D" | wc -l; for p in "create_person\(" "update_person\(" "confidence|T_merge|t_merge|T_new|t_new" "time\.sleep|asyncio\.sleep|while True" "PendingQuestion|flag_modified|\.context *=" "sk-[A-Za-z0-9]{10,}|AKIA[0-9A-Z]{12,}|BEGIN .*PRIVATE KEY|api[_-]?key *=|secret *=|password *=|token *="; do echo "== pattern: $p"; echo "$D" | grep -nEi "$p"; echo "exit=$?"; done; echo "== R-4 whole app/agent (current tree)"; grep -rnE -B1 "create_person\(" app/agent/ | wc -l; grep -rnE "update_person\(" app/agent/ ; grep -rn "T_merge\|t_merge\|T_new\|t_new\|confidence" app/agent/ | wc -l; grep -rnE "time\.sleep|asyncio\.sleep|while True" app/agent/ | wc -l; grep -rnE "PendingQuestion|flag_modified|\.context *=" app/agent/ | wc -l; echo "== R-4 base 8a8767b"; git show 8a8767b:app/agent/loop.py | grep -cE "create_person\("; git show 8a8767b:app/agent/loop.py | grep -nE "update_person\("; git show 8a8767b:app/agent/pipeline.py 2>/dev/null | head -0
+# 시각: 2026-10-29T12:30:27+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe4a99e (dev2)
+# exit: 1
+# ---
+== added lines count
+      59
+== pattern: create_person\(
+exit=1
+== pattern: update_person\(
+exit=1
+== pattern: confidence|T_merge|t_merge|T_new|t_new
+exit=1
+== pattern: time\.sleep|asyncio\.sleep|while True
+exit=1
+== pattern: PendingQuestion|flag_modified|\.context *=
+exit=1
+== pattern: sk-[A-Za-z0-9]{10,}|AKIA[0-9A-Z]{12,}|BEGIN .*PRIVATE KEY|api[_-]?key *=|secret *=|password *=|token *=
+exit=1
+== R-4 whole app/agent (current tree)
+       2
+app/agent/respond.py:18:- `stored_facts`(FIX-016): 그 턴에 실행에 성공한 `update_person(facts=…)`
+Binary file app/agent/__pycache__/loop.cpython-314.pyc matches
+Binary file app/agent/__pycache__/respond.cpython-314.pyc matches
+app/agent/loop.py:706:    턴에 **실행에 성공한** `update_person(facts=…)` 호출의 키를
+app/agent/loop.py:805:    """U7 -- 실행에 성공한 `update_person(facts=…)` 호출 하나에서 직접 쓴
+app/agent/loop.py:856:        return app_tools.update_person(
+app/agent/loop.py:1443:            app_tools.update_person(ctx, person_id, new_alias=mention)
+       0
+       0
+      22
+== R-4 base 8a8767b
+1
+706:    턴에 **실행에 성공한** `update_person(facts=…)` 호출의 키를
+805:    """U7 -- 실행에 성공한 `update_person(facts=…)` 호출 하나에서 직접 쓴
+856:        return app_tools.update_person(
+1443:            app_tools.update_person(ctx, person_id, new_alias=mention)
+head: illegal line count -- 0

@@ -194,6 +194,15 @@ LOOP_MAX_EVENTS = 5
 LOOP_MAX_SCHEDULES = 3
 LOOP_MAX_PROPOSALS = LOOP_MAX_MENTIONS + LOOP_MAX_EVENTS + LOOP_MAX_SCHEDULES
 
+#: P5b-query-turn 조회 발화 상수(결정 D·E·J). 환경변수 오버라이드 없음.
+#: 조회 답에 싣는 최근 사건 수.
+QUERY_TIMELINE_LIMIT = 5
+#: 조회 한 턴이 다루는 인물 수 상한(언급 상한 `LOOP_MAX_MENTIONS` 는 재사용).
+QUERY_MAX_PERSONS = 1
+#: 조회 답 줄 수·글자 수 상한 -- 240 은 3 × `BRIEFING_SUGGESTION_MAX_CHARS`(80).
+QUERY_ANSWER_MAX_LINES = 3
+QUERY_ANSWER_MAX_CHARS = 240
+
 #: `pending_questions.context["resume"]`(`app.agent.types.PendingResume`)
 #: 직렬화 바이트 상한 -- 결정 A(i) 의 항목 수 상한이 1차 방어, 이것이
 #: 이중 안전장치다(01-plan M-0 "크기 통제" 절, 판정 표 24행). 초과 시

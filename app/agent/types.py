@@ -63,6 +63,16 @@ STEP_LOOP_RESUME = "loop_resume"
 #: (결정 G·H). 아래 `LOOP_TRACE_STEPS`(6종) 에는 포함하지 않는다 -- 정상
 #: 진행 단계가 아니기 때문이다.
 STEP_LOOP_ERROR = "loop_error"
+#: 조회 발화 전용 -- 조회 분기가 읽은 인물·사실·사건 요약을 남기는 step
+#: (P5b-query-turn 결정 C). `STEP_LOOP_ERROR` 와 같이 `LOOP_TRACE_STEPS`
+#: 밖에 둔다 -- 기록 턴이 지나는 정상 진행 6단계가 아니기 때문이다.
+STEP_LOOP_QUERY = "loop_query"
+
+#: 발화 의도 어휘(P5b-query-turn D16 결정 1·9). 인식 단계가 제안 최상위
+#: `intent` 로 분류한다. 키가 없으면 `INTENT_RECORD` 다.
+INTENT_RECORD = "record"
+INTENT_QUERY = "query"
+INTENTS: tuple[str, ...] = (INTENT_RECORD, INTENT_QUERY)
 
 #: 결정 F 의 정상 진행 step 6종(고정 순서 -- 한 턴이 지나는 순서와 같다).
 LOOP_TRACE_STEPS: tuple[str, ...] = (
@@ -172,11 +182,13 @@ class Proposal:
 
     tool_calls: list[ToolCallProposal] = field(default_factory=list)
     raw: dict[str, Any] = field(default_factory=dict)
+    intent: str = INTENT_RECORD
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "tool_calls": [c.to_dict() for c in self.tool_calls],
             "raw": dict(self.raw),
+            "intent": self.intent,
         }
 
 
@@ -381,6 +393,9 @@ class PendingResume:
     tag_by_answer: dict[str, str] | None = None
     schedule: ScheduleResumeRef | None = None
     schedule_options: dict[str, str] | None = None
+    #: 재개할 턴의 의도. `"query"` 일 때만 `to_dict()` 에 싣는다(읽는 쪽은
+    #: 키가 없으면 `"record"`) -- 기존 저장 context 와 호환된다.
+    intent: str = INTENT_RECORD
 
     def to_dict(self) -> dict[str, Any]:
         payload: dict[str, Any] = {
@@ -397,6 +412,8 @@ class PendingResume:
             payload["schedule"] = self.schedule.to_dict()
         if self.schedule_options is not None:
             payload["schedule_options"] = dict(self.schedule_options)
+        if self.intent == INTENT_QUERY:
+            payload["intent"] = self.intent
         return payload
 
 

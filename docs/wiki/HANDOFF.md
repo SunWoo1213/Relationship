@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-29 10:55 (**P5b-query-turn 계획 승인**(verifier 1차 보류 → 2차 통과, 개정 3) → `CURRENT active: P5b-query-turn` · 03-log 생성 · journal START — **`docs(P5b-query-turn)` 계획 커밋 승인 대기**(01·02·03·증거 7·D16 갱신 이력·HANDOFF·journal). 다음 = U1 backend-agent(L-004))
+갱신: 2026-10-29 11:10 (P5b-query-turn 계획 커밋 **`fe4a99e`** dev2 푸시 끝 → U1 구현 끝(12:06 — 24 passed·전체 1982·ruff·tools_check 7/7·기존 테스트 수정 0·변이 4/4; 계획 불일치 1: 변이 M1 을 잡는 테스트 이름이 표와 다름, tests.md 기록) → verifier U1 리뷰 **통과**(12:32, [필수] 0 · [권고] R-U1-1~3 → 01-plan 94·159행 문구 수정, 03-log U1) → **`feat(P5b-query-turn)` U1 커밋 승인 대기**(제품 4파일 + 신규 테스트 1 + registry·tests.md·03-log·01-plan·review-u1·증거 14 + HANDOFF·journal))
 
-active: **none**(P8b-persons-grid 완료 2026-10-28) | frozen: none | 브랜치 `dev2` = origin/dev2 **`678bca7`**(CI 40632437966 success) | **origin/dev `678bca7`(승격 2026-10-28, 직전 `8b192c6`)** · origin/main `f05d017` | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 12 — U10·U5 확인 행, 원칙8), 테스트 `relationship_test` | 기준선(코드 `a0f4bc3`): 백엔드 **1958 passed skip 0** · 프론트 **156 passed** · typecheck 0 · E2E 4
+active: **P5b-query-turn**(계획 승인·커밋 2026-10-29, U1~U7 미착수) | frozen: none | 브랜치 `dev2` = origin/dev2 **`fe4a99e`**(계획; CI 결과 다음에 확인. 직전 `8a8767b` CI 40637726016 success) | **origin/dev `678bca7`(승격 2026-10-28)** · origin/main `f05d017` | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 12 — U10·U5 확인 행, 원칙8), 테스트 `relationship_test` | 기준선(코드 `a0f4bc3`): 백엔드 **1958 passed skip 0** · 프론트 **156 passed** · typecheck 0 · E2E 4
 
 ## 최근 끝낸 것
 | 무엇 | 결과 | 기록 |
@@ -16,7 +16,8 @@ active: **none**(P8b-persons-grid 완료 2026-10-28) | frozen: none | 브랜치 
 | **P8b-persons-grid 완료(10-28)** | 계획 `0973858` → U0 `adc650e`(`GET /persons` `aliases`) → U1 `2112a2a`(`PersonGrid` 그리드+검색) → U2 `529922f`(사이드바 5명+전체 보기) → U3 `a0f4bc3`(E2E, CI 복구) → U4 `fff6e8c`(판정 13행) → U5 사람 점검(메인 세션 Chrome+Playwright, 8항 통과, 수정 0) → verifier 04-review `완료`([필수] 0 · [권고] R-U5R-1~11) → **사용자 승인(R-U5R-2 면제)** → `CURRENT active: none` | `packages/P8b-persons-grid/04-review.md`·`03-log.md`·`tests.md` |
 
 ## 진행 중 (이 턴에서 멈춘 자리)
-- **완료 커밋 `678bca7`**(38파일, 사용자 승인 "커밋 + 실험 푸시") → `origin dev2` 끝. 03-log U5·완료 항목 `pending` → `678bca7` 은 다음 커밋에. 미커밋은 journal 자동 줄·이 HANDOFF 뿐. 열린 작업 없음.
+- **P5b-query-turn U1 backend-agent 진행 중**(11:10). 계획 커밋 `fe4a99e`. 이 패키지의 단위마다: 보고 재실행(pytest·ruff·tools_check·`--diff-filter=M` 빈 출력) → verifier 커밋 전 리뷰(L-004) → `/commit`(feat/test(P5b-query-turn)) → dev2 푸시. U7 실 LLM 왕복은 메인 세션·사용자(발화 6개, 결정 H).
+- 2026-10-28 처리: P8b 완료 `678bca7` → dev 승격 `678bca7`(L-003 잠금 해제, main 은 나중) → CR-004 `8a8767b` → P5b 계획 `fe4a99e`. P8b 03-log U5·완료 항목 `pending` → `678bca7` 은 다음에 P8b 문서 만질 때.
 - 백그라운드 서버: 백엔드 :8000(10-28 재시작, U0 코드) · 프론트 :5173. 세션 끝나면 꺼진다.
 - Claude in Chrome: 이 세션은 Mac Chrome 만 연결돼 있었음. 창 폭 조절은 전체 화면 창에서 무시됨 → 모바일은 Playwright 스크립트(스크래치패드)로.
 
