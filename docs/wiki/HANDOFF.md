@@ -5,7 +5,7 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-10-28 15:00 (dev 승격 `678bca7` 끝 → L-003 "잠금 해제, 수정 없음"(main 나중) → **CR-004 조회 발화 승인(A 수용, ①~⑦ 확정) → 문서 이행 끝(D16·S3.4·R19·CLAUDE.md 원칙7·backlog·INDEX·proposal) → frozen none** — `cr(CR-004)` 문서 커밋 승인 대기. 다음 = `/devlog start P5b-query-turn`(architect, L-004))
+갱신: 2026-10-29 10:55 (**P5b-query-turn 계획 승인**(verifier 1차 보류 → 2차 통과, 개정 3) → `CURRENT active: P5b-query-turn` · 03-log 생성 · journal START — **`docs(P5b-query-turn)` 계획 커밋 승인 대기**(01·02·03·증거 7·D16 갱신 이력·HANDOFF·journal). 다음 = U1 backend-agent(L-004))
 
 active: **none**(P8b-persons-grid 완료 2026-10-28) | frozen: none | 브랜치 `dev2` = origin/dev2 **`678bca7`**(CI 40632437966 success) | **origin/dev `678bca7`(승격 2026-10-28, 직전 `8b192c6`)** · origin/main `f05d017` | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 12 — U10·U5 확인 행, 원칙8), 테스트 `relationship_test` | 기준선(코드 `a0f4bc3`): 백엔드 **1958 passed skip 0** · 프론트 **156 passed** · typecheck 0 · E2E 4
 

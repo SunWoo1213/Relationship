@@ -34,3 +34,4 @@ U10(2026-10-16)에서 사용자가 "박선우 과장님이랑 나는 관계가 �
 
 **갱신 이력**
 - 2026-10-28 신설(CR-004 문서 이행). 구현은 P5b-query-turn — 완료 해시는 그때 적는다.
+- 2026-10-28 **보정 2건(P5b 01-plan 결정 F·I, 사용자 수용)**: ① 결정 2 의 "`resolve()` → `apply_resolution()`" — 조회 턴은 **`resolve()` 만** 부르고 `apply_resolution()` 은 `identity` 되묻기 때만 부른다(merge 경로의 `apply_resolution` 이 `update_person(new_alias)` 로 별칭을 쌓아 "조회 턴 저장 0·`update_person` tool_call 0" 과 동시에 성립하지 않았음 — 저장 0 을 우선). ② 결정 10 의 "'인물 카드 보기' 링크 재사용" — 프론트는 `stored > 0` 일 때만 링크를 붙이므로 조회 턴(저장 0)에는 링크가 없다. 프론트 0 을 지키고 답 끝에 "자세한 건 인물 화면에서 볼 수 있어요." 문장만 둔다. 코드 규칙 "조회 턴에 … `update_person` … `tool_call` trace 0" 은 그대로다.
