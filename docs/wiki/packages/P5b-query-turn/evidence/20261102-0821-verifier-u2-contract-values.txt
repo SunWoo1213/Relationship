@@ -1,0 +1,112 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u2/contract.py
+# 시각: 2026-11-02T08:21:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1dccb95 (dev2)
+# exit: 1
+# ---
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u2/contract.py", line 17, in <module>
+    import app.agent as ag  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'app'
+
+# ===== append 2026-11-02T08:21:58+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u2/contract.py
+# 시각: 2026-11-02T08:21:58+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1dccb95 (dev2)
+# exit: 1
+# ---
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u2/contract.py", line 38, in <module>
+    base_gate = load_base("app/agent/gate.py", "base_gate_8a8767b")
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u2/contract.py", line 34, in load_base
+    spec.loader.exec_module(mod)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u2/base_gate_8a8767b.py", line 151, in <module>
+    @dataclass(frozen=True)
+     ~~~~~~~~~^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/dataclasses.py", line 1441, in wrap
+    return _process_class(cls, init, repr, eq, order, unsafe_hash,
+                          frozen, match_args, kw_only, slots,
+                          weakref_slot)
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/dataclasses.py", line 1055, in _process_class
+    and _is_type(type, cls, dataclasses, dataclasses.KW_ONLY,
+        ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                 _is_kw_only))):
+                 ^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/dataclasses.py", line 814, in _is_type
+    ns = sys.modules.get(cls.__module__).__dict__
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute '__dict__'. Did you mean: '__dir__'?
+
+# ===== append 2026-11-02T08:22:11+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u2/contract.py
+# 시각: 2026-11-02T08:22:11+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1dccb95 (dev2)
+# exit: 0
+# ---
+## 1. 사유 상수·어휘
+REASON_QUERY_TURN_NO_WRITE == 'query_turn_no_write'
+GATE_REJECTION_REASONS(현재) = ('unknown_tool', 'not_callable_by_llm', 'bad_args', 'person_id_from_llm', 'needs_confirmation', 'limit', 'query_turn_no_write')
+GATE_REJECTION_REASONS(기준) = ('unknown_tool', 'not_callable_by_llm', 'bad_args', 'person_id_from_llm', 'needs_confirmation', 'limit')
+기존 6개 순서 불변: True
+7번째가 새 사유: True len = 7
+NOT_CALLABLE_BY_LLM 불변: True ['ask_user', 'get_briefing', 'search_person']
+INJECTED_ARGS 불변: True
+
+## 2. WRITE_TOOLS
+WRITE_TOOLS = ['add_event', 'add_schedule', 'create_person', 'update_person'] frozenset
+== frozenset(TOOL_NAMES) - NOT_CALLABLE_BY_LLM: True
+TOOL_NAMES = ('search_person', 'create_person', 'update_person', 'add_event', 'add_schedule', 'get_briefing', 'ask_user') len 7
+
+## 3. check() 시그니처 (기준 8a8767b 대조)
+현재: (proposal: 'Proposal', *, config: 'GateConfig | None' = None) -> 'GateVerdict'
+기준: (proposal: 'Proposal', *, config: 'GateConfig | None' = None) -> 'GateVerdict'
+동일: True
+
+## 4. check() 판정
+add_event+query -> rejected[0].reason = 'query_turn_no_write' accepted = []
+add_schedule+query -> ['query_turn_no_write'] accepted = []
+update_person+query -> ['query_turn_no_write'] accepted = []
+create_person+query -> ['query_turn_no_write'] accepted = []
+update_person(person_id=3)+query -> ['query_turn_no_write'] (④ 보다 Q 가 먼저인가: True )
+search_person+query -> ['not_callable_by_llm']
+ask_user+query -> ['not_callable_by_llm']
+get_briefing+query -> ['not_callable_by_llm']
+delete_person+query -> ['unknown_tool']
+조회 턴 8건 -> accepted = [] rejected n = 8 stop_reason = None
+  rejected = [(0, 'add_event', 'query_turn_no_write'), (1, 'add_schedule', 'query_turn_no_write'), (2, 'update_person', 'query_turn_no_write'), (3, 'create_person', 'query_turn_no_write'), (4, 'search_person', 'not_callable_by_llm'), (5, 'ask_user', 'not_callable_by_llm'), (6, 'get_briefing', 'not_callable_by_llm'), (7, 'nope', 'unknown_tool')]
+
+## 5. 기록 턴(intent 기본값) 기존 판정 그대로 + 기준 모듈과 동일
+add_event+record -> accepted [('add_event', 'execute')] rejected [] | 기준과 동일(accepted/rejected/stop): True
+add_schedule+record -> accepted [('add_schedule', 'execute')] rejected [] | 기준과 동일(accepted/rejected/stop): True
+update_person+record -> accepted [('update_person', 'execute')] rejected [] | 기준과 동일(accepted/rejected/stop): True
+create_person+record -> accepted [('create_person', 'hint_only')] rejected [] | 기준과 동일(accepted/rejected/stop): True
+update_person(person_id=3)+record -> ['person_id_from_llm']
+update_person(display_name)+record -> ['needs_confirmation']
+update_person(display_name)+query -> ['query_turn_no_write']
+기록 턴 혼합 10건 기준 모듈과 동일: True
+
+## 6. 프롬프트 (i)(ii)(iii)
+old 등장 횟수: 1 | (ii) 등장 횟수: 1
+(ii) 가 old 바로 뒤(인접, 사이 문자 0): True | index old = 218 ii = 230
+old~(ii) 구간 원문: 'erson, ask_user, get_briefing 은 네가 직접 제안할 수 없는 내부 전용 툴이다 -- 절대 제안하지 마라. 단, intent 가 query 일 때만 예외로, 물어본 인물마다 search_person 을 그 언급(query)으로 하나씩 제안하라. 이 제안은 실행되지 않고 대상 표시로만 쓰인다. 발'
+(i) 계획 문구 글자 그대로 포함: False
+(i) 구현 문장: '발화가 이미 기록된 인물 정보를 묻는 질문이면 intent 를 query, 새 사실·사건·일정을 알려주는 말이면 record 로 답하라. 둘이 섞이면 query 다.'
+(i) 핵심 구 포함: True
+(iii) 글자 그대로 포함: True
+(ii) 가 '{PROPOSAL_TOOL_NAME} 도구로만 답하라' 보다 앞: True
+기준 system 문장 수: 5 | 현재에 없는 기준 문장: []
+user 프롬프트 기준과 동일: True
+system 길이 기준 → 현재: 258 → 507 (증가분 249 )
+프롬프트 비밀·환경변수 흔적: []
+
+## 7. app.agent 재export
+ag.REASON_QUERY_TURN_NO_WRITE is gate.REASON_QUERY_TURN_NO_WRITE: True
+ag.WRITE_TOOLS is gate.WRITE_TOOLS: True
+__all__ 포함: [True, True]
+import 순환 없음(app.agent→app.api→app.main): ok

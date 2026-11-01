@@ -1,0 +1,73 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u2/mutate.sh
+# 시각: 2026-11-02T08:11:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1dccb95 (dev2)
+# exit: 0
+# ---
+=== M1-remove-Q
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[add_event]
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[add_schedule]
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[update_person]
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[create_person]
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_create_person
+FAILED tests/test_agent_query_gate.py::test_query_turn_update_person_with_person_id_is_query_reason
+FAILED tests/test_agent_query_gate.py::test_query_turn_never_accepts_anything
+FAILED tests/test_agent_query_gate.py::test_query_turn_has_no_limit_rejection_and_no_limit_stop
+FAILED tests/test_agent_query_gate.py::test_query_turn_via_fake_proposer
+9 failed, 19 passed in 0.17s
+=== M2-Q-before-2
+28 passed in 0.14s
+=== M3-drop-create_person
+FAILED tests/test_agent_query_gate.py::test_write_tools_equals_tool_names_minus_not_callable
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[create_person]
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_create_person
+FAILED tests/test_agent_query_gate.py::test_query_turn_never_accepts_anything
+4 failed, 24 passed in 0.16s
+=== M4-neq-record
+28 passed in 0.14s
+=== U1-M1-default-query
+        # FakeJudge(fail=...) -> llm_failed -> identity 로 강제 확정(규칙 통과
+        # tests/test_er_pipeline.py::test_resolve_llm_failed_forces_identity_band_llm_failed
+FAILED tests/test_agent_gate.py::test_person_id_from_llm_rejects_and_does_not_call_update_person
+FAILED tests/test_agent_gate.py::test_person_id_from_llm_applies_regardless_of_tool
+FAILED tests/test_agent_gate.py::test_bad_args_missing_required
+FAILED tests/test_agent_gate.py::test_bad_args_unknown_key
+FAILED tests/test_agent_gate.py::test_bad_args_type_violation_event_type_not_in_fixed_set
+FAILED tests/test_agent_gate.py::test_bad_args_type_violation_wrong_python_type
+FAILED tests/test_agent_gate.py::test_bad_args_raw_utterance_rejected_no_overwrite
+FAILED tests/test_agent_gate.py::test_needs_confirmation_update_person_display_name
+FAILED tests/test_agent_gate.py::test_update_person_valid_facts_accepted
+FAILED tests/test_agent_gate.py::test_create_person_hint_only_bucket_not_rejected_not_called
+FAILED tests/test_agent_gate.py::test_create_person_bad_args_still_rejected
+FAILED tests/test_agent_gate.py::test_execute_bucket_for_non_create_person_tools
+FAILED tests/test_agent_gate.py::test_schedule_scheduled_at_none_is_not_rejected
+FAILED tests/test_agent_gate.py::test_schedule_scheduled_at_missing_is_not_rejected
+FAILED tests/test_agent_gate.py::test_schedule_scheduled_at_unparsed_string_is_bad_args
+FAILED tests/test_agent_gate.py::test_event_occurred_at_none_is_not_rejected
+FAILED tests/test_agent_gate.py::test_event_occurred_at_unparsed_string_is_bad_args
+FAILED tests/test_agent_gate.py::test_limit_mentions_exceeded_rejects_excess_and_sets_stop_reason
+FAILED tests/test_agent_gate.py::test_limit_mentions_repeated_mention_does_not_count_twice
+FAILED tests/test_agent_gate.py::test_limit_events_exceeded
+FAILED tests/test_agent_gate.py::test_limit_schedules_exceeded
+FAILED tests/test_agent_gate.py::test_limit_total_proposals_exceeded
+FAILED tests/test_agent_gate.py::test_limit_does_not_count_already_rejected_proposals
+FAILED tests/test_agent_gate.py::test_rejected_reason_appears_in_verdict_to_dict
+FAILED tests/test_agent_gate.py::test_all_rejection_reasons_are_in_vocabulary
+FAILED tests/test_agent_loop.py::test_merge_connects_to_existing_person_and_returns_person_id
+FAILED tests/test_agent_loop.py::test_identity_ends_turn_with_er_original_options
+FAILED tests/test_agent_loop.py::test_new_person_uses_tag_options_without_hint
+FAILED tests/test_agent_loop.py::test_new_person_uses_tag_options_even_with_hint_present
+FAILED tests/test_agent_loop.py::test_already_applied_rejects_second_apply_resolution_call
+FAILED tests/test_agent_loop.py::test_extended_context_resume_round_trips_from_stored_row
+FAILED tests/test_agent_loop.py::test_pending_calls_excludes_already_merged_mentions
+FAILED tests/test_agent_loop.py::test_resume_byte_limit_drops_held_drafts_but_keeps_pending_calls
+FAILED tests/test_agent_loop.py::test_resume_within_byte_limit_keeps_held_drafts
+FAILED tests/test_agent_query_types.py::test_proposal_default_intent_is_record
+FAILED tests/test_agent_query_types.py::test_proposal_to_dict_always_has_intent
+FAILED tests/test_agent_query_gate.py::test_record_turn_default_intent_is_record
+FAILED tests/test_agent_query_gate.py::test_record_turn_write_tools_keep_old_verdict[add_event]
+FAILED tests/test_agent_query_gate.py::test_record_turn_write_tools_keep_old_verdict[add_schedule]
+FAILED tests/test_agent_query_gate.py::test_record_turn_write_tools_keep_old_verdict[update_person]
+FAILED tests/test_agent_query_gate.py::test_record_turn_write_tools_keep_old_verdict[create_person]
+FAILED tests/test_agent_query_gate.py::test_record_turn_explicit_record_intent_same_as_default
+42 failed, 170 passed, 4 warnings in 2.20s

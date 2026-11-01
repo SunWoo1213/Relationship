@@ -26,3 +26,28 @@
 | test_agent_query_types.py::test_fake_proposer_intents_table | 표에 있는 발화만 intent 전달 | `FakeProposer(table={"u":[]}, intents={"u":"query"})` → `u` 는 query, 다른 발화는 record | 통과 · — | 기록 없음 |
 | test_agent_query_types.py::test_fake_proposer_without_intents_is_record | 기존 호출 호환 | `FakeProposer(table={"u":[]})` → record | 통과 · — | 기록 없음 |
 | test_agent_query_types.py::test_query_constants_values | 상수 값 | 5 · 1 · 3 · 240, 240 == 3 × `BRIEFING_SUGGESTION_MAX_CHARS`, `QUERY_MORE_HINT` 는 settings 에 없음(U3 몫) | 통과 · — | 기록 없음 |
+
+## tests/test_agent_query_gate.py — U2 게이트 Q 관문·프롬프트 (신규 28건 = 함수 18개, 파라미터 포함)
+
+증거: `evidence/20261102-0810-u2-gate-rerun.txt`(28 passed), `evidence/20261102-0810-u2-pytest-all.txt`(전체 2010 passed, skip 0), 변이 `evidence/20261102-0811-u2-mutation.txt`·`evidence/20261102-0811-u2-mutation-extra.txt`. `u2-gate.txt` 는 첫 실행(1 failed — 테스트 작성 실수: `FakeProposer.table` 값이 dict 인데 `ToolCallProposal` 을 넣음)이며 테스트를 고친 뒤 rerun 으로 28 passed.
+
+| 파일::테스트 이름 | 무엇을 확인하나 | 입력 → 기대 | 결과 · 검출 변이 | 실패 이력 |
+|---|---|---|---|---|
+| test_agent_query_gate.py::test_reason_value_and_vocabulary_order | 사유 값·어휘 끝자리 | `"query_turn_no_write"`, `GATE_REJECTION_REASONS` 7개 끝이 새 사유 | 통과 · — | 기록 없음 |
+| test_agent_query_gate.py::test_write_tools_equals_tool_names_minus_not_callable | 기록 툴 집합 등식 | `WRITE_TOOLS == TOOL_NAMES - NOT_CALLABLE_BY_LLM` == 4종 | 통과 · U2-M3 | 기록 없음 |
+| test_agent_query_gate.py::test_query_turn_rejects_write_tools (4건: add_event·add_schedule·update_person·create_person) | 조회 턴 기록 툴 거부 | 각각 → rejected 1건 사유 새 사유, accepted 비어 있음, 툴 호출 0 | 통과 · U2-M1(4건 모두)·U2-M3(create_person) | 기록 없음 |
+| test_agent_query_gate.py::test_query_turn_rejects_create_person | 변이 표 지정 이름 | create_person 제안 → 새 사유 | 통과 · U2-M1·U2-M3 | 기록 없음 |
+| test_agent_query_gate.py::test_query_turn_not_callable_tools_keep_reason (3건: search_person·ask_user·get_briefing) | ② 사유 유지 | 조회 턴 → `not_callable_by_llm`, 호출 0 | 통과 · U2-M2b | 기록 없음 |
+| test_agent_query_gate.py::test_query_turn_search_person_stays_not_callable | 변이 표 지정 이름 | search_person → `not_callable_by_llm` ≠ 새 사유 | 통과 · U2-M2b | 기록 없음 |
+| test_agent_query_gate.py::test_query_turn_unknown_tool_stays_unknown | ① 사유 유지 | 7종 밖 이름 → `unknown_tool`, 호출 0 | 통과 · — | 기록 없음 |
+| test_agent_query_gate.py::test_query_turn_update_person_with_person_id_is_query_reason | Q 가 ④ 앞 | person_id 낀 update_person → 새 사유 | 통과 · U2-M1·U2-M2c | 기록 없음 |
+| test_agent_query_gate.py::test_query_turn_never_accepts_anything | 조회 턴 accepted 항상 [] | 8종 섞어 → accepted [], rejected 8 | 통과 · U2-M1·U2-M3 | 기록 없음 |
+| test_agent_query_gate.py::test_query_turn_has_no_limit_rejection_and_no_limit_stop | ⑤ 상한 영향 없음 | 상한 1 인 GateConfig 에서 `limit` 사유 0, `stop_reason is None` | 통과 · U2-M1 | 기록 없음 |
+| test_agent_query_gate.py::test_query_turn_via_fake_proposer | FakeProposer 경유 | intents query → `Proposal.intent=="query"`, add_event → 새 사유 | 통과 · U2-M1 | 첫 실행 실패(테스트 작성 실수, 수정) |
+| test_agent_query_gate.py::test_record_turn_default_intent_is_record | 기본값 record | `Proposal(...).intent=="record"` | 통과 · U1-M1 | 기록 없음 |
+| test_agent_query_gate.py::test_record_turn_write_tools_keep_old_verdict (4건) | 기록 턴 대조군 | add_event·add_schedule·update_person → execute, create_person → hint_only, 거부 0 | 통과 · U1-M1 | 기록 없음 |
+| test_agent_query_gate.py::test_record_turn_not_callable_tools_keep_reason (3건) | 기록 턴 ② 그대로 | → `not_callable_by_llm` | 통과 · — | 기록 없음 |
+| test_agent_query_gate.py::test_record_turn_explicit_record_intent_same_as_default | 명시 record = 기본 | `check()` 결과 동일 | 통과 · U1-M1 | 기록 없음 |
+| test_agent_query_gate.py::test_prompt_has_intent_classification_sentence | (i) 의도 분류 문장 | system 에 "intent 를 query"·"record"·"둘이 섞이면 query" | 통과 · — | 기록 없음 |
+| test_agent_query_gate.py::test_prompt_has_query_mention_exception_sentences_after_old_sentence | (ii) 예외 두 문장 글자 그대로·바로 뒤 | 기존 "절대 제안하지 마라." 뒤 한 칸 띄고 바로 이어짐 | 통과 · — | 기록 없음 |
+| test_agent_query_gate.py::test_prompt_excludes_self_reference | (iii) 사용자 자신 지칭 제외 | "'나'·'저'·'내'·'제'", "사용자 자신을 가리키는 말은 인물로 제안하지 마라" | 통과 · — | 기록 없음 |

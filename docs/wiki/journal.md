@@ -544,8 +544,14 @@
 - 2026-10-29 10:55 | START | P5b-query-turn 계획 승인 — verify-plan FAIL 0/WARN 8(의도) · verifier 02-plan-verify 통과(1차 보류 → 2차 통과) · 사용자 승인. U1~U6 backend-agent(L-004 매번, 단위마다 verifier 리뷰) · U7 실 LLM 사람 점검. 무변경 diff 기준 `8a8767b` | P5b-query-turn CR-004 D16
 - 2026-10-29 11:05 | DECISION | 사용자: 계획 커밋 `fe4a99e` + dev2 푸시 승인 · U1 backend-agent 시작 승인(L-004) | P5b-query-turn U1
 - 2026-10-29 12:15 | DECISION | 사용자: U1 verifier 리뷰 시작 승인(L-004) — 메인 재실행 24 passed·ruff·tools_check 7/7·`--diff-filter=M` 빈 출력 | P5b-query-turn U1
+- 2026-10-29 15:04 | DECISION | 사용자: U1 커밋 `1dccb95` + dev2 푸시 승인(verifier 통과 [필수] 0 · [권고] R-U1-1~3 → 01-plan 94·159행 문구·03-log) | P5b-query-turn U1
+- 2026-11-02 | DECISION | 사용자: U2 backend-agent 시작 승인(L-004) — 프롬프트 (i)(ii)(iii) + 게이트 Q(`query_turn_no_write`·①②Q④③⑤·B-3 (b)) | P5b-query-turn U2
+- 2026-11-02 | DECISION | 사용자: U2 verifier 리뷰 시작 승인(L-004) — 메인 재실행 122 passed(query_gate·gate·propose)·ruff·tools_check 7/7·`--diff-filter=M` 빈 출력. 구현자 보고: 전체 2010, 계획 변이 "Q 를 ② 앞" 은 동등 변이, U1-M1 재실행 42 FAIL(이제 성립) | P5b-query-turn U2
+- 2026-11-02 | DECISION | 사용자: verifier U2 통과([필수] 0 · [권고] R-U2-1~5) → "주석 2줄(R-U2-2, `gate.py` 284·293행) 지금 고치고 커밋 + 실험 푸시" — U2 backend-agent 재개(같은 단위, L-004 승인 포함), 메인 grep·pytest 확인 뒤 커밋 | P5b-query-turn U2
 - 2026-10-28 14:23 | COMMIT | 8a8767b cr(CR-004): 채팅에서 인물을 물으면 기억에서 답하는 조회 발화를 결정으로 옮긴다
 - 2026-10-28 14:23 | PUSH-dev2 | origin dev2 8a8767b (실험 푸시)
 - 2026-10-29 10:54 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
 - 2026-10-29 10:58 | COMMIT | fe4a99e docs(P5b-query-turn): 채팅 조회 발화 계획을 검증·승인까지 마치고 활성화한다
 - 2026-10-29 10:59 | PUSH-dev2 | origin dev2 fe4a99e (실험 푸시)
+- 2026-10-29 15:04 | COMMIT | 1dccb95 feat(P5b-query-turn): 발화 의도 필드와 조회 턴 상수·재개 재료를 계약으로 더한다
+- 2026-10-29 15:04 | PUSH-dev2 | origin dev2 1dccb95 (실험 푸시)

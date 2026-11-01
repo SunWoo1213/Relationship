@@ -1,0 +1,45 @@
+# 명령: .venv/bin/python -m pytest tests/test_agent_query_gate.py -v
+# 시각: 2026-11-02T08:12:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1dccb95 (dev2)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 28 items
+
+tests/test_agent_query_gate.py::test_reason_value_and_vocabulary_order PASSED [  3%]
+tests/test_agent_query_gate.py::test_write_tools_equals_tool_names_minus_not_callable PASSED [  7%]
+tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[add_event] PASSED [ 10%]
+tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[add_schedule] PASSED [ 14%]
+tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[update_person] PASSED [ 17%]
+tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[create_person] PASSED [ 21%]
+tests/test_agent_query_gate.py::test_query_turn_rejects_create_person PASSED [ 25%]
+tests/test_agent_query_gate.py::test_query_turn_not_callable_tools_keep_reason[search_person] PASSED [ 28%]
+tests/test_agent_query_gate.py::test_query_turn_not_callable_tools_keep_reason[ask_user] PASSED [ 32%]
+tests/test_agent_query_gate.py::test_query_turn_not_callable_tools_keep_reason[get_briefing] PASSED [ 35%]
+tests/test_agent_query_gate.py::test_query_turn_search_person_stays_not_callable PASSED [ 39%]
+tests/test_agent_query_gate.py::test_query_turn_unknown_tool_stays_unknown PASSED [ 42%]
+tests/test_agent_query_gate.py::test_query_turn_update_person_with_person_id_is_query_reason PASSED [ 46%]
+tests/test_agent_query_gate.py::test_query_turn_never_accepts_anything PASSED [ 50%]
+tests/test_agent_query_gate.py::test_query_turn_has_no_limit_rejection_and_no_limit_stop PASSED [ 53%]
+tests/test_agent_query_gate.py::test_query_turn_via_fake_proposer PASSED [ 57%]
+tests/test_agent_query_gate.py::test_record_turn_default_intent_is_record PASSED [ 60%]
+tests/test_agent_query_gate.py::test_record_turn_write_tools_keep_old_verdict[add_event] PASSED [ 64%]
+tests/test_agent_query_gate.py::test_record_turn_write_tools_keep_old_verdict[add_schedule] PASSED [ 67%]
+tests/test_agent_query_gate.py::test_record_turn_write_tools_keep_old_verdict[update_person] PASSED [ 71%]
+tests/test_agent_query_gate.py::test_record_turn_write_tools_keep_old_verdict[create_person] PASSED [ 75%]
+tests/test_agent_query_gate.py::test_record_turn_not_callable_tools_keep_reason[search_person] PASSED [ 78%]
+tests/test_agent_query_gate.py::test_record_turn_not_callable_tools_keep_reason[ask_user] PASSED [ 82%]
+tests/test_agent_query_gate.py::test_record_turn_not_callable_tools_keep_reason[get_briefing] PASSED [ 85%]
+tests/test_agent_query_gate.py::test_record_turn_explicit_record_intent_same_as_default PASSED [ 89%]
+tests/test_agent_query_gate.py::test_prompt_has_intent_classification_sentence PASSED [ 92%]
+tests/test_agent_query_gate.py::test_prompt_has_query_mention_exception_sentences_after_old_sentence PASSED [ 96%]
+tests/test_agent_query_gate.py::test_prompt_excludes_self_reference PASSED [100%]
+
+============================== 28 passed in 0.11s ==============================

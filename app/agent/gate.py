@@ -17,7 +17,13 @@ L(iii) 의 안전장치).
 - 툴을 직접 부르지 않는다(`app.tools.*` 함수를 호출하는 코드가 이 모듈
   안에 없다) -- 통과한 제안을 실제로 실행하는 것은 U5(`loop.py`)의 일이다.
 
-## 적용 순서 (①②④③⑤ -- ④가 ③보다 먼저)
+## 적용 순서 (①②Q④③⑤ -- ④가 ③보다 먼저, Q 는 ② 다음 ④ 앞)
+
+P5b U2: Q = 조회 턴(`proposal.intent == query`)이고 `name` 이 기록 툴
+(`WRITE_TOOLS`)이면 `query_turn_no_write`. `search_person` 제안은 ② 에서
+먼저 걸려 `not_callable_by_llm` 그대로다(D16). 조회 턴은 통과분이 0 이다.
+아래 번호 목록은 U3 당시 ①②④③⑤ 설명이며 Q 는 ② 와 ④ 사이에 끼는 한 칸이다.
+
 
 01-plan 범위 절 28행: "④ 를 먼저 둬야 판정 표 19행의 `person_id_from_llm`
 사유가 따로 남는다" -- `person_id` 를 먼저 걸러내지 않고 인자 스키마(③)를
@@ -78,6 +84,7 @@ from app import tools as app_tools
 from app.agent.types import (
     BUCKET_EXECUTE,
     BUCKET_HINT_ONLY,
+    INTENT_QUERY,
     AcceptedProposal,
     GateLimits,
     GateVerdict,
@@ -102,6 +109,8 @@ REASON_BAD_ARGS = "bad_args"
 REASON_PERSON_ID_FROM_LLM = "person_id_from_llm"
 REASON_NEEDS_CONFIRMATION = "needs_confirmation"
 REASON_LIMIT = "limit"
+#: P5b U2 -- 조회 턴(`intent == query`)에서 기록 툴을 제안하면 거부한다(D16).
+REASON_QUERY_TURN_NO_WRITE = "query_turn_no_write"
 
 #: 거부 사유 어휘 전체(테스트·trace 검증이 이 튜플로 어휘를 고정한다).
 GATE_REJECTION_REASONS: tuple[str, ...] = (
@@ -111,6 +120,7 @@ GATE_REJECTION_REASONS: tuple[str, ...] = (
     REASON_PERSON_ID_FROM_LLM,
     REASON_NEEDS_CONFIRMATION,
     REASON_LIMIT,
+    REASON_QUERY_TURN_NO_WRITE,
 )
 
 #: 루프가 주입하는 인자 셋의 단일 출처(01-plan 60행 "주입 인자: `ctx`·
@@ -123,6 +133,12 @@ INJECTED_ARGS: frozenset[str] = frozenset({"ctx", "person_id", "raw_utterance"})
 #: 의 `_LLM_NOT_CALLABLE` 은 프롬프트 안내용 사본일 뿐이고, 실제 강제의
 #: 단일 출처는 이 상수다(모듈 docstring "① 적용 순서").
 NOT_CALLABLE_BY_LLM: frozenset[str] = frozenset({"search_person", "ask_user", "get_briefing"})
+
+#: Q -- 조회 턴에서 거부하는 기록 툴(P5b U2, D16 결정 2). 조회 턴은 아무것도
+#: 기록하지 않는다.
+WRITE_TOOLS: frozenset[str] = frozenset(
+    {"add_event", "add_schedule", "update_person", "create_person"}
+)
 
 #: `occurred_at`/`scheduled_at` -- 값이 없어도(`None`) ③ 에서 "필수 누락"
 #: 으로 걸지 않는다(R-23, 위 모듈 docstring). `datetime` 이 아닌 **값이
@@ -265,7 +281,7 @@ def _classify_args(name: str, args: dict[str, Any]) -> str | None:
 
 
 # ---------------------------------------------------------------------------
-# check() -- ①②④③⑤ 를 순서대로 적용하는 게이트 본체
+# check() -- ①②Q④③⑤ 를 순서대로 적용하는 게이트 본체
 # ---------------------------------------------------------------------------
 
 
@@ -274,7 +290,7 @@ def check(proposal: Proposal, *, config: GateConfig | None = None) -> GateVerdic
     LLM·DB 를 건드리지 않는 순수 함수 -- 제안을 실행하지 않는다(U5 의
     일).
 
-    적용 순서는 모듈 docstring 의 ①②④③⑤ 그대로다. `config` 를 생략하면
+    적용 순서는 모듈 docstring 의 ①②Q④③⑤ 그대로다. `config` 를 생략하면
     `app.settings.LOOP_MAX_*` 기본값을 쓴다(테스트는 작은 상한을 주입해
     `limit` 사유를 재현한다)."""
 
@@ -294,6 +310,12 @@ def check(proposal: Proposal, *, config: GateConfig | None = None) -> GateVerdic
         if name in NOT_CALLABLE_BY_LLM:  # ② 호출 가능 집합
             rejected.append(
                 RejectedProposal(index=index, name=name, reason=REASON_NOT_CALLABLE_BY_LLM)
+            )
+            continue
+
+        if proposal.intent == INTENT_QUERY and name in WRITE_TOOLS:  # Q 조회 턴 기록 금지
+            rejected.append(
+                RejectedProposal(index=index, name=name, reason=REASON_QUERY_TURN_NO_WRITE)
             )
             continue
 

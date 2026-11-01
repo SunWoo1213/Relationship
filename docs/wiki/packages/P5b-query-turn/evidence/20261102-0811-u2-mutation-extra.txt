@@ -1,0 +1,15 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u2/mutate2.sh
+# 시각: 2026-11-02T08:11:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1dccb95 (dev2)
+# exit: 0
+# ---
+=== M2b-Q-before-2-and-all-tools
+FAILED tests/test_agent_query_gate.py::test_query_turn_not_callable_tools_keep_reason[search_person]
+FAILED tests/test_agent_query_gate.py::test_query_turn_not_callable_tools_keep_reason[ask_user]
+FAILED tests/test_agent_query_gate.py::test_query_turn_not_callable_tools_keep_reason[get_briefing]
+FAILED tests/test_agent_query_gate.py::test_query_turn_search_person_stays_not_callable
+4 failed, 24 passed in 0.16s
+=== M2c-Q-after-4
+FAILED tests/test_agent_query_gate.py::test_query_turn_update_person_with_person_id_is_query_reason
+1 failed, 27 passed in 0.16s

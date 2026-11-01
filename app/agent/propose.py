@@ -237,7 +237,16 @@ def build_propose_prompt(utterance: str, now: datetime) -> tuple[str, str]:
         "골라라. 사람을 가리킬 때는 person_id 를 쓰지 말고 언급 문자열을 "
         "person 필드에 그대로 써라(예: '민수', '팀장님'). "
         f"{not_callable} 은 네가 직접 제안할 수 없는 내부 전용 툴이다 -- "
-        f"절대 제안하지 마라. {PROPOSAL_TOOL_NAME} 도구로만 답하라."
+        "절대 제안하지 마라. "
+        "단, intent 가 query 일 때만 예외로, 물어본 인물마다 search_person 을 "
+        "그 언급(query)으로 하나씩 제안하라. 이 제안은 실행되지 않고 대상 "
+        "표시로만 쓰인다. "
+        "발화가 이미 기록된 인물 정보를 묻는 질문이면 intent 를 query, 새 "
+        "사실·사건·일정을 알려주는 말이면 record 로 답하라. 둘이 섞이면 "
+        "query 다. "
+        "'나'·'저'·'내'·'제' 처럼 말하는 사용자 자신을 가리키는 말은 인물로 "
+        "제안하지 마라. "
+        f"{PROPOSAL_TOOL_NAME} 도구로만 답하라."
     )
     user_text = (
         f'현재 시각(now): "{now.isoformat()}"\n'

@@ -1,0 +1,130 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u2/grep.sh
+# 시각: 2026-11-02T08:21:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1dccb95 (dev2)
+# exit: 0
+# ---
+## 대상: U2 app 추가 줄 37 / 누적(8a8767b~) app 추가 줄 96 / 신규 테스트 파일 279줄
+### 패턴 1: create_person\(
+-- U2 app 추가 줄:
+   exit 1
+-- 누적 app 추가 줄:
+   exit 1
+-- 신규 테스트 파일:
+129:def test_query_turn_rejects_create_person(monkeypatch):
+   exit 0
+### 패턴 2: update_person\(
+-- U2 app 추가 줄:
+   exit 1
+-- 누적 app 추가 줄:
+   exit 1
+-- 신규 테스트 파일:
+   exit 1
+### 패턴 3: confidence|T_merge|t_merge|T_new|t_new
+-- U2 app 추가 줄:
+   exit 1
+-- 누적 app 추가 줄:
+   exit 1
+-- 신규 테스트 파일:
+   exit 1
+### 패턴 4: time\.sleep|asyncio\.sleep|while True
+-- U2 app 추가 줄:
+   exit 1
+-- 누적 app 추가 줄:
+   exit 1
+-- 신규 테스트 파일:
+   exit 1
+### 패턴 5: PendingQuestion|flag_modified|\.context *=
+-- U2 app 추가 줄:
+   exit 1
+-- 누적 app 추가 줄:
+   exit 1
+-- 신규 테스트 파일:
+   exit 1
+### 패턴 6: sk-[A-Za-z0-9]{8}|AKIA[0-9A-Z]{12}|api_key|API_KEY|SECRET|secret=|password|TOKEN|environ|getenv
+-- U2 app 추가 줄:
+   exit 1
+-- 누적 app 추가 줄:
+   exit 1
+-- 신규 테스트 파일:
+   exit 1
+## R-4 ① grep -rnE -B1 'create_person\(' app/agent/ (현재)
+app/agent/loop.py-1472-            ctx.confirmed_question_id = question_id
+app/agent/loop.py:1473:            created = app_tools.create_person(
+## R-4 ① 기준 8a8767b loop.py
+1473:            created = app_tools.create_person(
+## R-4 ② grep -rnE 'update_person\(' app/agent/ (현재)
+app/agent/respond.py:18:- `stored_facts`(FIX-016): 그 턴에 실행에 성공한 `update_person(facts=…)`
+Binary file app/agent/__pycache__/loop.cpython-314.pyc matches
+Binary file app/agent/__pycache__/respond.cpython-314.pyc matches
+app/agent/loop.py:706:    턴에 **실행에 성공한** `update_person(facts=…)` 호출의 키를
+app/agent/loop.py:805:    """U7 -- 실행에 성공한 `update_person(facts=…)` 호출 하나에서 직접 쓴
+app/agent/loop.py:856:        return app_tools.update_person(
+app/agent/loop.py:1443:            app_tools.update_person(ctx, person_id, new_alias=mention)
+## R-4 ② 기준 8a8767b (loop.py / respond.py)
+706:    턴에 **실행에 성공한** `update_person(facts=…)` 호출의 키를
+805:    """U7 -- 실행에 성공한 `update_person(facts=…)` 호출 하나에서 직접 쓴
+856:        return app_tools.update_person(
+1443:            app_tools.update_person(ctx, person_id, new_alias=mention)
+18:- `stored_facts`(FIX-016): 그 턴에 실행에 성공한 `update_person(facts=…)`
+## R-4 ③ (기대 0건)
+   exit 1
+## R-4 ④ (기대 0건)
+   exit 1
+## R-4 ⑤ 현재 건수 / 기준 건수 (동일성, R-U1-2)
+현재: 22
+기준: 19
+## 테스트 파일의 app.tools 스파이·호출 0 단언
+77:def _spy_all(monkeypatch: pytest.MonkeyPatch) -> list[str]:
+91:        monkeypatch.setattr(app_tools, name, make(name, real_fn))
+119:    called = _spy_all(monkeypatch)
+126:    assert called == []
+130:    called = _spy_all(monkeypatch)
+134:    assert called == []
+142:    called = _spy_all(monkeypatch)
+146:    assert called == []
+156:    called = _spy_all(monkeypatch)
+159:    assert called == []
+## 테스트 파일에서 스파이 없이 check() 를 부르는 함수
+98:def test_reason_value_and_vocabulary_order():
+105:def test_write_tools_equals_tool_names_minus_not_callable():
+118:def test_query_turn_rejects_write_tools(make, monkeypatch):
+119:    called = _spy_all(monkeypatch)
+129:def test_query_turn_rejects_create_person(monkeypatch):
+130:    called = _spy_all(monkeypatch)
+141:def test_query_turn_not_callable_tools_keep_reason(name, monkeypatch):
+142:    called = _spy_all(monkeypatch)
+149:def test_query_turn_search_person_stays_not_callable():
+155:def test_query_turn_unknown_tool_stays_unknown(monkeypatch):
+156:    called = _spy_all(monkeypatch)
+162:def test_query_turn_update_person_with_person_id_is_query_reason():
+168:def test_query_turn_never_accepts_anything():
+185:def test_query_turn_has_no_limit_rejection_and_no_limit_stop():
+192:def test_query_turn_via_fake_proposer():
+219:def test_record_turn_default_intent_is_record():
+233:def test_record_turn_write_tools_keep_old_verdict(make, bucket):
+241:def test_record_turn_not_callable_tools_keep_reason(name):
+246:def test_record_turn_explicit_record_intent_same_as_default():
+254:def test_prompt_has_intent_classification_sentence():
+261:def test_prompt_has_query_mention_exception_sentences_after_old_sentence():
+276:def test_prompt_excludes_self_reference():
+
+# ===== append 2026-11-02T08:23:32+09:00 =====
+# 명령: bash -c echo '## R-4 ⑤ 재집계 -- *.py 만(앞 실행의 22 는 __pycache__/*.pyc 3건 포함)'; grep -rnE --include='*.py' 'PendingQuestion|flag_modified|\.context *=' app/agent/ | wc -l; grep -rcE --include='*.py' 'PendingQuestion|flag_modified|\.context *=' app/agent/ | grep -v ':0$'; echo '## 기준 8a8767b'; for f in types loop respond gate propose __init__; do echo "$f: $(git show 8a8767b:app/agent/$f.py | grep -cE 'PendingQuestion|flag_modified|\.context *=')"; done
+# 시각: 2026-11-02T08:23:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1dccb95 (dev2)
+# exit: 0
+# ---
+
+      19
+app/agent/respond.py:4
+app/agent/types.py:5
+app/agent/loop.py:10
+## 기준 8a8767b
+types: 5
+loop: 10
+respond: 4
+gate: 0
+propose: 0
+__init__: 0
