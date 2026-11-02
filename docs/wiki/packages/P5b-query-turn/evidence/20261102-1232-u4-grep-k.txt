@@ -1,0 +1,16 @@
+# 명령: grep -n answerer_from_env app/agent/loop.py
+# 시각: 2026-11-02T12:32:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 0
+# ---
+1368:                    answerer = _respond.answerer_from_env()
+
+# ===== append 2026-11-02T12:32:17+09:00 =====
+# 명령: grep -nE from.app.api app/agent/loop.py
+# 시각: 2026-11-02T12:32:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 0
+# ---
+1255:    from app.api.read import get_person_card  # 순환 import 회피 -- 지연 import

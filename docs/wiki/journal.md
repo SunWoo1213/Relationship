@@ -551,6 +551,9 @@
 - 2026-11-02 | DECISION | 사용자: U3 backend-agent 시작 승인(L-004) — `respond.py` 확장(답 생성기·공급자 3종·검증기·템플릿 5종), evidence 타입 = `PersonCardOut` 그대로(메인 판단 수용) | P5b-query-turn U3
 - 2026-11-02 | DECISION | 사용자: U3 구현자 사후 판단 5건 전부 수용(TYPE_CHECKING import · 날짜 형식(now ISO 사용자 시간대, 일정 `M월 D일`) · user_text 배치 · `JudgeUnavailable` 위치 인자 · 템플릿 `now` 미사용) · U3 verifier 리뷰 시작 승인(L-004) — 메인 재실행 71 passed·ruff·7/7·diff-filter 0·루프/API/브리핑/ER diff 0 | P5b-query-turn U3
 - 2026-11-02 | DECISION | 사용자: verifier U3 통과([필수] 0 · [권고] R-U3-1~5) → U3 커밋 + 실험 푸시 승인 · R-U3-4(E-6 system 문장 경계 마침표)는 "그대로 두고 U7 에서 판단" | P5b-query-turn U3
+- 2026-11-02 | DECISION | 사용자: U4 backend-agent 시작 승인(L-004) — `run_turn` `answerer=None` + `_run_query_turn`(결정 B·C·D·E·G·I·J·K·L), 테스트 (a)~(k) + R-U3-1·R-U3-2 | P5b-query-turn U4
+- 2026-11-02 | DECISION | 사용자: U4 구현자 사후 판단 7건 전부 수용(`_QueryTrace` · `evidence_counts` 0 dict · `strip()` · `mentions_dropped` = 언급 − resolve 호출 · `PersonNotFound` 종료 · 인라인 `PendingQuestionOut` · `QUERY_MAX_PERSONS` 미import) · U4 verifier 리뷰 시작 승인(L-004) — 메인 재실행 67 passed(query_loop·loop·api_chat·answers_resume)·ruff·7/7·diff-filter 0·범위 diff 0·`-` 줄 import 3 뿐·결정 K 호출 형태 1곳 | P5b-query-turn U4
+- 2026-11-02 | DECISION | 사용자: verifier U4 통과([필수] 0 · [권고] R-U4-1~4, 계약 값 99 PASS, 변이 31/26/5 생존은 테스트 공백) → U4 커밋 + 실험 푸시 승인. R-U4-2 테스트 4건은 U5 위임문 | P5b-query-turn U4
 - 2026-10-28 14:23 | COMMIT | 8a8767b cr(CR-004): 채팅에서 인물을 물으면 기억에서 답하는 조회 발화를 결정으로 옮긴다
 - 2026-10-28 14:23 | PUSH-dev2 | origin dev2 8a8767b (실험 푸시)
 - 2026-10-29 10:54 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
@@ -560,3 +563,5 @@
 - 2026-10-29 15:04 | PUSH-dev2 | origin dev2 1dccb95 (실험 푸시)
 - 2026-11-02 08:48 | COMMIT | 06b7bb5 feat(P5b-query-turn): 조회 발화에서는 기록 제안을 거부하고 인식 프롬프트에 의도 분류를 넣는다
 - 2026-11-02 08:48 | PUSH-dev2 | origin dev2 06b7bb5 (실험 푸시)
+- 2026-11-02 12:16 | COMMIT | a002706 feat(P5b-query-turn): 조회 답을 만들고 검증하고 템플릿으로 대체하는 순수 층을 더한다
+- 2026-11-02 12:16 | PUSH-dev2 | origin dev2 a002706 (실험 푸시)

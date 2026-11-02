@@ -1,0 +1,45 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u4/constraints.sh
+# 시각: 2026-11-02T12:59:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 0
+# ---
+### 추가 줄 수:      276
+### (1) create_person( / update_person( (기대 0건)
+(exit 1 — 1 이면 0건)
+### (2) 확신도 영어 어휘 (기대 0건)
+(exit 1 — 1 이면 0건)
+### (3) sleep / while True (기대 0건)
+(exit 1 — 1 이면 0건)
+### (4) PendingQuestion(Out 제외) / flag_modified / .context = (기대 0건)
+(exit 1 — 1 이면 0건)
+### (4b) PendingQuestion 전체 출현(Out 포함 — 참고) (기대 0건)
+35:from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, PersonNotFound, ToolError
+155:    pending_question: PendingQuestionOut | None = None
+192:        pending_question = PendingQuestionOut(
+(exit 0 — 1 이면 0건)
+### (5) 키 문자열 패턴 (기대 0건)
+(exit 1 — 1 이면 0건)
+### (6) 조회 분기 안 금지 호출 — resolve_mentions( / _record( / _record_impl( / after_record( (기대 0건)
+(exit 1 — 1 이면 0건)
+### (6b) 금지 이름 출현 전체(주석·docstring 포함 — 참고) (기대 0건)
+5:빠진다 -- 기록 단계(`resolve_mentions`·`_record`·`after_record`)와 기록 툴
+55:_SRC_NO_RECORD = "no_record"
+148:    이다. `resolve_mentions`·`_record`·`after_record`·기록 툴은 부르지 않는다."""
+(exit 0 — 1 이면 0건)
+### (7) app_tools 기록 툴 호출 (기대 0건)
+(exit 1 — 1 이면 0건)
+### (8) os.environ / getenv (기대 0건)
+(exit 1 — 1 이면 0건)
+### R-4 집계 — app/agent/ 전체 현재 vs 8a8767b
+-- create_person\( 현재:        1  기준: 1
+-- update_person\( 현재:        7  기준: 5
+-- 확신도 어휘 app/agent/ 현재:
+(exit 1)
+-- sleep/while True app/agent/ 현재:
+(exit 1)
+-- PendingQuestion|flag_modified|.context = app/agent/loop.py 현재 건수: 12  기준 8a8767b: 10  HEAD: 10
+### 신규 테스트 파일 — 키 패턴·비밀 (기대 0)
+(exit 1)
+### 신규 테스트 파일 — 네트워크/실 공급자 import (기대 0)
+(exit 1)

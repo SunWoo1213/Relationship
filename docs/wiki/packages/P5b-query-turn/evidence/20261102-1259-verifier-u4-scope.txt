@@ -1,0 +1,96 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u4/scope.sh
+# 시각: 2026-11-02T12:59:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 0
+# ---
+### (A) git diff --diff-filter=M --stat 8a8767b -- tests (기대: 빈 출력)
+### (A2) 신규 테스트 파일 (--diff-filter=A, HEAD..작업트리는 untracked 라 status 로)
+?? tests/test_agent_query_loop.py
+### (B) 범위 밖 diff --stat HEAD (기대: 빈 출력)
+### (C) git diff --numstat HEAD -- app
+276	3	app/agent/loop.py
+### (D) '-' 줄 전수 (loop.py)
+-from app.agent.respond import build_reply
+-from app.settings import LOOP_MAX_RESUME_BYTES, PATTERN_KEY_PREFIX, user_timezone
+-from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
+### (D2) '-' 줄 수
+       3
+### (D3) HEAD 의 loop.py 줄이 작업 트리에 전부 남아 있는가 (diff '<' 줄 = HEAD 에만 있는 줄)
+< from app.agent.respond import build_reply
+< from app.settings import LOOP_MAX_RESUME_BYTES, PATTERN_KEY_PREFIX, user_timezone
+< from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
+### (D4) run_turn 본문 diff -- hunk 단위
+@@ -172,0 +173,13 @@ user_timezone())` 로 사용자 시간대(`APP_TIMEZONE`, 기본 `Asia/Seoul`)
+@@ -185 +198,11 @@ from app.agent.propose import Proposer, proposer_from_env
+@@ -188,0 +212,2 @@ from app.agent.types import (
+@@ -215,0 +241 @@ from app.er import (
+@@ -221 +247,7 @@ from app.memory import FactExtractor, after_record
+@@ -223 +255 @@ from app.tools.context import ToolContext, amend_trace_output, to_jsonable, trac
+@@ -1058,0 +1091 @@ def run_turn(
+@@ -1090,0 +1124,11 @@ def run_turn(
+@@ -1140,0 +1185,229 @@ def run_turn(
+### (E) answerer_from_env 출현 (기대 1곳, 속성 호출)
+1368:                    answerer = _respond.answerer_from_env()
+### (F) from app.api 출현 (기대: 함수 안 1곳, 최상단 0)
+1255:    from app.api.read import get_person_card  # 순환 import 회피 -- 지연 import
+### (F2) 최상단 import 블록(1~260행)에 app.api 가 있는가 (기대 0)
+### (G) 순환 import 양쪽
+agent-first ok
+api-first ok
+loop-only ok
+### (H) confidence/band_by_threshold/임계치 grep -- 기준 8a8767b vs 현재 (동일해야)
+-- 8a8767b:
+1214:        band_by_threshold="new_person",
+-- 현재:
+1487:        band_by_threshold="new_person",
+-- 추가 줄('+')에서:
+(exit 1)
+### (I) 수집 ↔ tests.md U4 절 이름 대조
+collected:       23 / tests.md:       23
+SAME
+### (J) registry.md U4 비고·새 행
+168:| 모듈 | 에이전트 루프 오케스트레이션(해석·기록·응답, run_turn/resume_turn) | app/agent/loop.py | P5-loop | 7a2ec5c | U4: 해석 구간(`resolve_
+175:| 테스트 | 루프 조회 분기 — merge/new_person/identity·폴백·근거 0건·혼합 발화·trace 368 재현·언급 상한·원문 비노출·`loop_query` 스키마·지연 해소·저장 0 | tests/test_agent_query_loop.py | P5b-query-turn | pending | 23건(U4). 네트워크 0(`Fak
+### (K) 03-log 에 U4 항목이 있는가
+10:- 남은 것 · 다음 단위: U1 계약(`Proposal.intent`·`PendingResume.intent`·스키마 enum(선택 키)·`STEP_LOOP_QUERY`·상수 `QUERY_TIMELINE_LIMIT=5`·`QUERY_MAX_PERSONS=1`·`QUERY_ANSW
+36:- 이유(기획서·카드 연결): D16 결정 4·5·10 — 답은 카드 자료의 재진술로 한정하고(원칙7 경계 구절을 프롬프트 원문에), R19 금지 표현 검증기를 재사용해 걸리면 템플릿으로 대체한다. 루프·DB 와 무관한 순수 층으로 먼저 두어 U4 가 조립만 하게 한다. 01-pl
+39:- 계획과 다른 점: 구현자 사후 판단 5건(① `TYPE_CHECKING` import ② 프롬프트 `now` ISO 사용자 시간대·일정 `M월 D일` ③ user_text 배치 ④ `JudgeUnavailable(fail)` 위치 인자 ⑤ 템플릿 `now` 미사용) — **사용
+40:- 남은 것 · 다음 단위: U4 루프 조회 분기(`run_turn` `answerer=None` + `_run_query_turn`, ER 재사용·`get_person_card` 지연 import·`loop_query` trace·저장 0, 테스트 (a)~(k)) — backen
+### (L) 구현 증거 파일
+20261102-1231-u4-diff-filter.txt
+20261102-1231-u4-loop.txt
+20261102-1231-u4-pytest-all.txt
+20261102-1231-u4-regression.txt
+20261102-1231-u4-ruff.txt
+20261102-1231-u4-scope.txt
+20261102-1231-u4-tools-check.txt
+20261102-1232-u4-grep-k.txt
+20261102-1233-u4-mutation.txt
+20261102-1258-verifier-u4-full-regression.txt
+20261102-1258-verifier-u4-regression9.txt
+20261102-1258-verifier-u4-tests.txt
+20261102-1259-verifier-u4-lint.txt
+20261102-1259-verifier-u4-tools-check.txt
+### (M) git status --short
+ M app/agent/loop.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P5b-query-turn/03-log.md
+ M docs/wiki/packages/P5b-query-turn/tests.md
+ M docs/wiki/registry.md
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-diff-filter.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-loop.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-pytest-all.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1232-u4-grep-k.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1233-u4-mutation.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1258-verifier-u4-full-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1258-verifier-u4-regression9.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1258-verifier-u4-tests.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1259-verifier-u4-lint.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1259-verifier-u4-tools-check.txt
+?? tests/test_agent_query_loop.py

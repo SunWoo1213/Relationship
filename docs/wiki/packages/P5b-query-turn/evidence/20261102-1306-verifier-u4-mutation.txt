@@ -1,0 +1,198 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u4/mutate.py
+# 시각: 2026-11-02T13:06:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 0
+# ---
+### C0 대조군(무변이): exit 0 — 23 passed in 0.77s
+### P1 계획1 merge 에서 apply_resolution() 호출 [app/agent/loop.py] → 검출 — 3 failed, 20 passed in 0.86s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+    FAILED tests/test_agent_query_loop.py::test_g_mixed_utterance_does_not_execute_write
+### P2 계획2 new_person 에서 apply_resolution() 호출 [app/agent/loop.py] → 검출 — 2 failed, 21 passed in 0.84s
+    FAILED tests/test_agent_query_loop.py::test_b_new_person_asks_nothing_and_says_no_record
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap
+### P3a 계획3 변형 — loop evidence_counts.timeline 의 min 제거(len 그대로) [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.82s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+### P3b 계획3 — U3 프롬프트 타임라인 슬라이스 5→6(respond.py 사본) [app/agent/respond.py] → 검출 — 1 failed, 22 passed in 0.80s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+### P4a 계획4 폴백 분기 제거 — 공급자 오류 전파 [app/agent/loop.py] → 검출 — 2 failed, 21 passed in 0.83s
+    FAILED tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising
+    FAILED tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm
+### P4b 계획4 폴백 분기 제거 — 검증 실패해도 원문 채택 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.81s
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+### P5 계획5 조회 분기 뒤 기록 경로 — return 제거(폴스루: resolve_mentions→_record 가 돈다) [app/agent/loop.py] → 검출 — 16 failed, 7 passed in 0.92s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_b_new_person_asks_nothing_and_says_no_record
+    FAILED tests/test_agent_query_loop.py::test_c_identity_asks_with_query_resume
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+    FAILED tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising
+    FAILED tests/test_agent_query_loop.py::test_f_no_evidence_skips_llm
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+    FAILED tests/test_agent_query_loop.py::test_h2_me_first_asks_identity_and_stops
+    FAILED tests/test_agent_query_loop.py::test_h_trace368_title_then_me_resolves_first_only
+    FAILED tests/test_agent_query_loop.py::test_i_m_no_mention
+    FAILED tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm
+    FAILED tests/test_agent_query_loop.py::test_o_remaining_mentions_after_merge_are_not_resolved
+    FAILED tests/test_agent_query_loop.py::test_other_user_person_is_not_visible
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap
+    FAILED tests/test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence
+    FAILED tests/test_agent_query_loop.py::test_s_lazy_resolution_uses_module_attribute
+### V1 identity 에서도 apply_resolution 생략(질문 행 0, question_id None): 패턴 일치 3건 -- 중단(변이 미적용)
+### V2 trace_ids 에서 gate 누락 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.82s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+### V3 fallback_reason 접두 answerer_error: 누락 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.82s
+    FAILED tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising
+### V4 QUERY_ONE_AT_A_TIME_HINT 를 identity(ask) 에도 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.82s
+    FAILED tests/test_agent_query_loop.py::test_h2_me_first_asks_identity_and_stops
+### V5 _log_turn 생략(loop_turn 0행) [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.79s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+### V6 stop_reason='ask_user' 를 답한 턴에도 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.82s
+    FAILED tests/test_agent_query_loop.py::test_q_answered_turn_stop_reason_is_none
+### V7 _query_mentions 중복 제거 제거 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.84s
+    FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule
+### V8 _query_mentions strip 제거 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.82s
+    FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule
+### V9 new_person 을 '기록 없음' 목록에 넣지 않음 [app/agent/loop.py] → 검출 — 3 failed, 20 passed in 0.84s
+    FAILED tests/test_agent_query_loop.py::test_b_new_person_asks_nothing_and_says_no_record
+    FAILED tests/test_agent_query_loop.py::test_other_user_person_is_not_visible
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap
+### V10 rejected_answer 를 strip 본문으로(③ 원문 보존 위반) [app/agent/loop.py] → 생존 — 23 passed in 0.80s
+### V11 LLM 본문 strip 생략(③) [app/agent/loop.py] → 생존 — 23 passed in 0.78s
+### V12 _read_card 가 PersonNotFound 를 흡수하지 않음(⑤) [app/agent/loop.py] → 생존 — 23 passed in 0.79s
+### V13 resolutions[].person_id 를 항상 None [app/agent/loop.py] → 생존 — 23 passed in 0.82s
+### V14 resolutions[].er_trace_id 를 None [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.82s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+### V15 evidence_counts facts↔patterns 바꿈 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.82s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+### V16 언급 상한 +1 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.83s
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap
+### V17 identity PendingQuestionOut.options 를 빈 목록 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.83s
+    FAILED tests/test_agent_query_loop.py::test_c_identity_asks_with_query_resume
+### V18 identity entry.applied 를 True 로 올리지 않음 [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.83s
+    FAILED tests/test_agent_query_loop.py::test_c_identity_asks_with_query_resume
+### V19 loop_query.output.intent 를 'record' [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.82s
+    FAILED tests/test_agent_query_loop.py::test_k_loop_query_output_schema
+### V20 답 생성기 예외를 Exception 전부 삼킴(E-4 SQLAlchemyError 규약 위반) [app/agent/loop.py] → 생존 — 23 passed in 0.79s
+### V21 근거 0건이어도 LLM 호출 [app/agent/loop.py] → 검출 — 2 failed, 21 passed in 0.85s
+    FAILED tests/test_agent_query_loop.py::test_f_no_evidence_skips_llm
+    FAILED tests/test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence
+### V22 merge 뒤 break 제거(둘째 인물까지 해석·카드 덮어씀) [app/agent/loop.py] → 검출 — 15 failed, 8 passed in 1.11s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+    FAILED tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising
+    FAILED tests/test_agent_query_loop.py::test_f_no_evidence_skips_llm
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+    FAILED tests/test_agent_query_loop.py::test_g_mixed_utterance_does_not_execute_write
+    FAILED tests/test_agent_query_loop.py::test_h_trace368_title_then_me_resolves_first_only
+    FAILED tests/test_agent_query_loop.py::test_k2_tokens_come_from_answer
+    FAILED tests/test_agent_query_loop.py::test_k_loop_query_output_schema
+    FAILED tests/test_agent_query_loop.py::test_l_raw_utterance_never_exposed
+    FAILED tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm
+    FAILED tests/test_agent_query_loop.py::test_o_remaining_mentions_after_merge_are_not_resolved
+    FAILED tests/test_agent_query_loop.py::test_q_answered_turn_stop_reason_is_none
+    FAILED tests/test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence
+    FAILED tests/test_agent_query_loop.py::test_s_lazy_resolution_uses_module_attribute
+### V23 search_person 언급을 person 키에서 읽음(B-3 출처 규칙 위반) [app/agent/loop.py] → 검출 — 19 failed, 4 passed in 0.81s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_b_new_person_asks_nothing_and_says_no_record
+    FAILED tests/test_agent_query_loop.py::test_c_identity_asks_with_query_resume
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+    FAILED tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising
+    FAILED tests/test_agent_query_loop.py::test_f_no_evidence_skips_llm
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+    FAILED tests/test_agent_query_loop.py::test_h2_me_first_asks_identity_and_stops
+    FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule
+    FAILED tests/test_agent_query_loop.py::test_h_trace368_title_then_me_resolves_first_only
+    FAILED tests/test_agent_query_loop.py::test_k2_tokens_come_from_answer
+    FAILED tests/test_agent_query_loop.py::test_k_loop_query_output_schema
+    FAILED tests/test_agent_query_loop.py::test_l_raw_utterance_never_exposed
+    FAILED tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm
+    FAILED tests/test_agent_query_loop.py::test_o_remaining_mentions_after_merge_are_not_resolved
+    FAILED tests/test_agent_query_loop.py::test_other_user_person_is_not_visible
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap
+    FAILED tests/test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence
+    FAILED tests/test_agent_query_loop.py::test_s_lazy_resolution_uses_module_attribute
+### V24 검증 실패 시 템플릿 대신 빈 reply [app/agent/loop.py] → 검출 — 1 failed, 22 passed in 0.83s
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+
+### 생존 변이: 6
+    V1 패턴 불일치
+    V10 rejected_answer 를 strip 본문으로(③ 원문 보존 위반)
+    V11 LLM 본문 strip 생략(③)
+    V12 _read_card 가 PersonNotFound 를 흡수하지 않음(⑤)
+    V13 resolutions[].person_id 를 항상 None
+    V20 답 생성기 예외를 Exception 전부 삼킴(E-4 SQLAlchemyError 규약 위반)
+### git status --short (저장소 무수정 확인)
+ M app/agent/loop.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P5b-query-turn/03-log.md
+ M docs/wiki/packages/P5b-query-turn/tests.md
+ M docs/wiki/registry.md
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-diff-filter.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-loop.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-pytest-all.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1232-u4-grep-k.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1233-u4-mutation.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1258-verifier-u4-full-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1258-verifier-u4-regression9.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1258-verifier-u4-tests.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1259-verifier-u4-grep-constraints.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1259-verifier-u4-lint.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1259-verifier-u4-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1259-verifier-u4-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1305-verifier-u4-contract-values.txt
+?? tests/test_agent_query_loop.py
+
+### 사본 ↔ 저장소 loop.py/respond.py 동일 확인(원복)
+    app/agent/loop.py: SAME
+    app/agent/respond.py: SAME
+
+# ===== append 2026-11-02T13:07:21+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u4/mutate.py V1
+# 시각: 2026-11-02T13:07:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 0
+# ---
+### C0 대조군(무변이): exit 0 — 23 passed in 0.79s
+### V1 identity 에서도 apply_resolution 생략(질문 행 0, question_id None) [app/agent/loop.py] → 검출 — 2 failed, 21 passed in 0.83s
+    FAILED tests/test_agent_query_loop.py::test_c_identity_asks_with_query_resume
+    FAILED tests/test_agent_query_loop.py::test_h2_me_first_asks_identity_and_stops
+
+### 생존 변이: 0
+### git status --short (저장소 무수정 확인)
+ M app/agent/loop.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P5b-query-turn/03-log.md
+ M docs/wiki/packages/P5b-query-turn/tests.md
+ M docs/wiki/registry.md
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-diff-filter.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-loop.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-pytest-all.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1231-u4-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1232-u4-grep-k.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1233-u4-mutation.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1258-verifier-u4-full-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1258-verifier-u4-regression9.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1258-verifier-u4-tests.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1259-verifier-u4-grep-constraints.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1259-verifier-u4-lint.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1259-verifier-u4-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1259-verifier-u4-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1305-verifier-u4-contract-values.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1306-verifier-u4-mutation.txt
+?? tests/test_agent_query_loop.py
+
+### 사본 ↔ 저장소 loop.py/respond.py 동일 확인(원복)
+    app/agent/loop.py: SAME
+    app/agent/respond.py: SAME

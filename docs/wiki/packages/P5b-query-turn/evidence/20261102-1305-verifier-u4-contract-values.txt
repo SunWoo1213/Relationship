@@ -1,0 +1,276 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u4/contract.py
+# 시각: 2026-11-02T13:05:56+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 1
+# ---
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u4/contract.py", line 49, in <module>
+    from tests.conftest import _deterministic_vector  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/tests/conftest.py", line 70, in <module>
+    _DEV_DB_NAME, _TEST_DB_NAME = apply_test_database_env()
+                                  ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/tests/db_bootstrap.py", line 70, in apply_test_database_env
+    test_db_name = resolve_test_db_name(dev_conn.dbname, dict(target))
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/tests/db_bootstrap.py", line 41, in resolve_test_db_name
+    raise DBNameCollisionError(
+    ...<5 lines>...
+    )
+tests.db_bootstrap.DBNameCollisionError: FIX-006: 테스트 DB 이름이 개발 DB 이름과 같습니다 ('relationship_test'). TEST_POSTGRES_DB 를 개발 DB(POSTGRES_DB='relationship_test' 또는 DATABASE_URL 의 DB 이름)와 다른 값으로 설정하세요 -- 이 확인은 테스트가 개발 DB 를 건드리는 사고를 막기 위한 안전장치입니다.
+
+# ===== append 2026-11-02T13:07:20+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u4/contract.py
+# 시각: 2026-11-02T13:07:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 1
+# ---
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+=== (i)+(xiii) merge 조회 턴: 저장 0 · trace · 스키마 · 원문 비노출 ===
+PASS  (i) 7개 테이블 행 수 불변  -- {'persons': 1, 'person_aliases': 1, 'events': 8, 'schedules': 2, 'person_facts': 3, 'fact_sources': 0, 'pending_questions': 0}
+PASS  (i) 기록 툴 tool_call 0행
+PASS  (i) er_resolve 1행, decision.applied == False
+PASS  (i) loop_query 1 · loop_turn 1 · loop_resolve_done 0 · loop_record 0
+PASS  (i) loop_query.output 키 집합 == 결정 C 10개 정확히  -- ['answer_source', 'evidence_counts', 'fallback_reason', 'intent', 'mentions', 'mentions_dropped', 'person_id', 'rejected_answer', 'reply', 'resolutions']
+PASS  (i) resolutions[0] 키 6개
+PASS  (i) resolutions[0] 값: band merge · person_id · er_trace_id · applied False · question_id None  -- {'band': 'merge', 'applied': False, 'mention': '팀장', 'person_id': 45330, 'er_trace_id': 395757, 'question_id': None}
+PASS  (i) intent == 'query' · mentions == ['팀장'] · mentions_dropped 0 · person_id
+PASS  (i) evidence_counts == {facts 3, patterns 0, timeline min(8,5)=5, schedules 2}  -- {'facts': 3, 'patterns': 0, 'timeline': 5, 'schedules': 2}
+PASS  (i) answer_source == 'llm' · fallback None · rejected None
+PASS  (i) reply == 본문 + '\n' + QUERY_MORE_HINT  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  (i) loop_query.output.reply == result.reply == loop_turn.output.reply
+PASS  (i) stop_reason is None
+PASS  (i) stored 전부 0
+PASS  (i) pending_question None
+PASS  (i) trace_ids == [extract, gate, query] id  -- [395754, 395755, 395758] vs [395754, 395755, 395758]
+PASS  (i) loop_query tool_name == 'agent' · tokens (0,0) Fake
+PASS  (i) loop_extract.output.intent == 'query'
+PASS  (i) loop_gate.output.rejected 에 search_person not_callable_by_llm (결정 B-3 (b) 설계)  -- [{'name': 'search_person', 'index': 0, 'reason': 'not_callable_by_llm'}]
+PASS  (i) answerer 1회 · 받은 question == 발화 원문 · 카드 타임라인 8건 통째(슬라이스는 U3 프롬프트 층)
+PASS  (i) U3 프롬프트 user_text 타임라인 == QUERY_TIMELINE_LIMIT 줄 · 사실 3 · 일정 2
+PASS  (xiii) RAW_SECRET not in reply
+PASS  (xiii) RAW_SECRET not in loop_query.output JSON
+PASS  (xiii) RAW_SECRET not in answerer user_text
+PASS  (xiii) RAW_SECRET not in 세션 agent_traces 전체(input+output)  -- traces=6
+PASS  (xiii) 시드가 실제로 DB 에 있다(단언이 공허하지 않음)
+PASS  (i) loop_query.input 키 == {'utterance','record'} (loop_turn 의 {'utterance','turn'} 과 같은 관례)  -- ['record', 'utterance']
+PASS  (i) loop_query.input.record 에 tokens 키 없음(to_dict 관례)
+  loop_query.output = {"reply": "민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.", "intent": "query", "mentions": ["팀장"], "person_id": 45330, "resolutions": [{"band": "merge", "applied": false, "mention": "팀장", "person_id": 45330, "er_trace_id": 395757, "question_id": null}], "answer_source": "llm", "evidence_counts": {"facts": 3, "patterns": 0, "timeline": 5, "schedules": 2}, "fallback_reason": null, "rejected_answer": null, "mentions_dropped": 0}
+=== (ii) identity 되묻기 + 기존 identity 기록 턴 context 모양 대조 ===
+PASS  (ii) 사전: resolve() 단독 band == identity
+PASS  (ii) pending_questions +1, 나머지 6개 불변
+PASS  (ii) 기록 툴 tool_call 0 · ask_user tool_call 1
+PASS  (ii) stop_reason == 'ask_user' · pending_question.kind identity
+PASS  (ii) context['resume'] == PendingResume(mention, intent=query, pending_calls=[]).to_dict() 정확히  -- {'hints': {}, 'intent': 'query', 'dropped': 0, 'mention': '팀장', 'version': '1', 'held_drafts': [], 'pending_calls': []}
+PASS  (ii) options == ER 원본 · question == ER 원본
+PASS  (ii) context 의 resume 밖 키 == ER 원본 context 키 그대로  -- ['affirmative_options', 'candidate_ids', 'confidence_breakdown', 'mention', 'resume', 'utterance']
+PASS  (ii) reply == 질문 문구 · QUERY_MORE_HINT 미부착 · ONE_AT_A_TIME 미부착
+PASS  (ii) loop_query: answer_source ask · person_id None · reply == 질문 · evidence_counts 전부 0 dict · fallback None
+PASS  (ii) resolutions[0]: band identity · applied True · question_id == 행 id · person_id None
+PASS  (ii) er_resolve.decision.applied True · pending_question_id == 행 id (apply_resolution 경유)
+PASS  (ii) answerer 0회 · trace_ids 3개 [extract, gate, query]
+PASS  (ii) loop_resolve_done 0 · loop_record 0 · loop_turn 1
+PASS  (ii) 대조군 기록 턴도 identity 로 끝남
+PASS  (ii) 기록 턴 resume 에는 intent 키 없음 · 조회 턴 키 == 기록 턴 키 ∪ {intent}  -- record=['dropped', 'held_drafts', 'hints', 'mention', 'pending_calls', 'version'] query=['dropped', 'held_drafts', 'hints', 'intent', 'mention', 'pending_calls', 'version']
+FAIL  (ii) 빈 값 직렬화 모양 동일(hints {} · held_drafts [] · dropped 0 · version '1')  -- {'hints': {}, 'held_drafts': [{'name': 'add_event', 'content': '저녁'}], 'dropped': 0, 'version': '1'}
+PASS  (ii) 기록 턴 pending_calls 1개(add_event) vs 조회 턴 [] (같은 리스트 모양)
+PASS  (ii) context 최상위 키 집합 동일(조회 vs 기록)  -- ['affirmative_options', 'candidate_ids', 'confidence_breakdown', 'mention', 'resume', 'utterance']
+  query resume = {"hints": {}, "intent": "query", "dropped": 0, "mention": "팀장", "version": "1", "held_drafts": [], "pending_calls": []}
+  record resume = {"hints": {}, "dropped": 0, "mention": "팀장", "version": "1", "held_drafts": [{"name": "add_event", "content": "저녁"}], "pending_calls": [{"args": {"type": "meal", "person": "팀장", "content": "저녁", "occurred_at": "2026-09-23T19:00:00+00:00"}, "name": "add_event", "index": 0}]}
+  context keys = ['affirmative_options', 'candidate_ids', 'confidence_breakdown', 'mention', 'resume', 'utterance']
+=== (iii) new_person 만 ===
+PASS  (iii) 행 수 불변(pending_questions +0 포함)
+PASS  (iii) ask_user tool_call 0 · 기록 툴 0
+PASS  (iii) reply == no_record_reply(['김철수']) · pending None · stop None  -- '"김철수"에 대한 기록이 없어요.'
+PASS  (iii) answer_source no_record · fallback None · person_id None · applied False · QUERY_MORE_HINT 없음
+PASS  (iii) er_resolve.decision.applied False(apply_resolution 미호출)
+PASS  (iii) answerer 0회
+=== (iv) 언급 0 ===
+PASS  (iv) reply == no_mention_reply() · resolve 0회 · no_record_reply 0회(R-U3-2) · answerer 0 · 저장 0  -- '누구에 대해 물어보셨는지 알아듣지 못했어요. 이름을 넣어 다시 물어봐 주세요.'
+PASS  (iv) loop_query: no_mention · mentions [] · dropped 0 · resolutions [] · evidence_counts 0 dict
+PASS  (iv) er_resolve 0행 · loop_query 1 · loop_turn 1
+PASS  (iv) 공백·비문자열 언급 → no_mention
+=== (v) 금지 표현 → 템플릿 · ③ strip/원문 ===
+PASS  (v) reply == 템플릿 · source template · fallback forbidden_expression · rejected_answer == 원문(공백 포함)  -- '  요즘 많이 힘들어 보여요  \n'
+PASS  (v) 템플릿에 QUERY_MORE_HINT 가 정확히 1번(루프가 더 붙이지 않음)
+PASS  (v) 저장 0 · loop_error 0
+PASS  (v) ③ LLM 본문 strip 뒤 힌트  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  (v) 241자 → too_long · 템플릿
+PASS  (v) 빈 답 → empty · rejected_answer '' · 템플릿
+=== (vi) 공급자 오류 → 템플릿, 예외 안 나감 ===
+PASS  (vi) 예외가 run_turn 밖으로 나가지 않음  -- None
+PASS  (vi) reply == 템플릿 · fallback 'answerer_error:timeout' · rejected None · source template
+PASS  (vi) loop_error 0 · tool_error 0 · loop_turn 1
+PASS  (vi) 다른 어휘도 접두 그대로: answerer_error:rate_limit
+=== (vii) 근거 0건 ===
+PASS  (vii) call_count 0 · fallback no_evidence · source template · reply == 근거 0건 템플릿  -- '김민수 — 직장·동로 기억하고 있어요. 그 밖의 기록은 아직 없어요.'
+PASS  (vii) evidence_counts 전부 0 · tokens (0,0) · QUERY_MORE_HINT 없음
+=== (viii)(ix) 언급 2개 merge 가능 / 언급 6개 ===
+PASS  (viii) resolve 1회(['팀장']) · mentions_dropped 1 · person_id == p1 · resolutions 1개  -- ['팀장']
+PASS  (viii) reply 줄 == [본문, QUERY_ONE_AT_A_TIME_HINT, QUERY_MORE_HINT] (결정 F ③ 순서)  -- '민수 팀장님과 최근에 식사를 했어요.\n한 번에 한 사람씩 물어봐 주세요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  (viii) er_resolve 1행 · search_person tool_call 1행(둘째 언급 ER 0)
+FAIL  (viii)⑦ new_person → merge → 중단: resolve ['김철수','팀장'] · dropped 1 · person_id p1 · resolutions 2 · 답은 p1 카드(둘째 인물 경로 없음)  -- ['김철수'] [{'band': 'identity', 'applied': True, 'mention': '김철수', 'person_id': None, 'er_trace_id': 395842, 'question_id': 10483}]
+PASS  (viii)⑦ QUERY_MAX_PERSONS == 1 이고 loop.py 는 import 하지 않음(값 1 은 break 로 보장)
+FAIL  (viii)⑦ merge 뒤 new_person 언급은 '기록 없음' 에 안 섞임(reply 본문은 LLM 답)
+FAIL  (ix) resolve 정확히 앞 5개 · dropped 1 · mentions 6 · 저장 0  -- 1
+FAIL  (ix) reply == no_record_reply(앞 5개) + '\n' + ONE_AT_A_TIME (MORE_HINT 없음)  -- '"낯선0" -- 김민수/이영희 중 한 분이 맞으실까요?'
+FAIL  (ix) ask_user 0 · pending +0
+FAIL  (ix) new_person·new_person·identity·(안 봄): resolve 3회 · dropped 1 · ask · 안내 없음 · reply == 질문  -- ['x'] '"x" -- 김민수/박A/박B 중 한 분이 맞으실까요?'
+=== (x)(xi) answerer=None 지연 해소 (결정 K R-1) ===
+PASS  (x) answerer=None + 근거 있음 → app.agent.respond.answerer_from_env 모듈 속성 호출 1회 · llm 답
+PASS  (x) loop 모듈 전역에 answerer_from_env 이름 없음
+PASS  (xi) answerer=None + 근거 0건 → answerer_from_env 0회 · 템플릿
+PASS  (xi) new_person·언급 0 에서도 answerer_from_env 0회(키 없는 운영에서 조회가 안 터짐)
+=== (xii) 기록 턴은 조회 분기를 타지 않는다 ===
+PASS  (xii) intent 기본값·'record' 모두 _run_query_turn 0회 · events 1 · loop_query 0 · loop_record 1
+FAIL  (xii) merge·new_person·언급0 조회 턴에서 resolve_mentions/_record/_record_impl/after_record/apply_resolution/기록 툴 4종 호출 0(스파이 예외 없음)  -- AssertionError('금지 호출')
+=== (xiv) 루프가 확신도·임계치를 읽지 않는다 ===
+PASS  (xiv) 추가 줄에 confidence/band_by_threshold/임계치/신호 이름 0  -- []
+PASS  (xiv) 추가 줄에서 Resolution 의 속성은 band·matched_person_id·trace_id·ask_payload 만  -- {'band', 'matched_person_id', 'ask_payload', 'trace_id'}
+PASS  (xiv) 추가 줄에 config./judge. 속성 접근 0(통과만 시킴)
+=== (xv) SQLAlchemyError 를 삼키지 않는다 ===
+PASS  (xv) get_person_card 의 SQLAlchemyError 가 run_turn 밖으로 그대로  -- SQLAlchemyError('verifier db boom')
+PASS  (xv) 답 생성기의 SQLAlchemyError 도 삼키지 않음(except 는 JudgeUnavailable 만)  -- SQLAlchemyError('verifier answerer db boom')
+PASS  (xv)⑤ merge 카드 PersonNotFound → reply == no_record_reply(['팀장']) · source no_record · person_id None · resolutions[0].person_id == merge id · answerer 0  -- {'reply': '"팀장"에 대한 기록이 없어요.', 'intent': 'query', 'mentions': ['팀장'], 'person_id': None, 'resolutions': [{'band': 'merge', 'applied': False, 'mention': '팀장', 'person_id': 45345, 'er_trace_id': 395926, 'question_id': None}], 'answer_source': 'no_record', 'evidence_counts': {'facts': 0, 'patterns': 0, 'timeline': 0, 'schedules': 0}, 'fallback_reason': None, 'rejected_answer': None, 'mentions_dropped': 0}
+=== (xvi) 다른 사용자의 인물은 보이지 않는다 ===
+PASS  (xvi) 다른 user_id 의 같은 별칭 → new_person → no_record · answerer 0 · person_id None
+PASS  (xvi) er_resolve.candidates 에 다른 사용자 인물 id 없음  -- []
+PASS  (xvi) _read_card(ctx(local), other.id) → None(PersonNotFound 흡수)
+=== 추가: 토큰 전달 · tokens 는 검증 실패에도 기록 · 혼합 발화 ===
+PASS  (추가) 유효 답 토큰 (11,7) → loop_query tokens_in/out
+PASS  (추가) 검증 실패 답도 LLM 을 불렀으니 토큰 (11,7) 기록(비용 관측, 원칙9)  -- (11, 7)
+PASS  (g) 혼합 발화: 저장 0 · add_event tool_call 0 · loop_gate.rejected 에 query_turn_no_write · 언급은 중복 제거로 1개  -- [{'name': 'search_person', 'index': 0, 'reason': 'not_callable_by_llm'}, {'name': 'add_event', 'index': 1, 'reason': 'query_turn_no_write'}]
+PASS  (g) 혼합 발화의 gate.accepted == []
+
+RESULT: 89 PASS / 8 FAIL
+
+# ===== append 2026-11-02T13:09:02+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u4/contract.py
+# 시각: 2026-11-02T13:09:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 0
+# ---
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+=== (i)+(xiii) merge 조회 턴: 저장 0 · trace · 스키마 · 원문 비노출 ===
+PASS  (i) 7개 테이블 행 수 불변  -- {'persons': 1, 'person_aliases': 1, 'events': 8, 'schedules': 2, 'person_facts': 3, 'fact_sources': 0, 'pending_questions': 0}
+PASS  (i) 기록 툴 tool_call 0행
+PASS  (i) er_resolve 1행, decision.applied == False
+PASS  (i) loop_query 1 · loop_turn 1 · loop_resolve_done 0 · loop_record 0
+PASS  (i) loop_query.output 키 집합 == 결정 C 10개 정확히  -- ['answer_source', 'evidence_counts', 'fallback_reason', 'intent', 'mentions', 'mentions_dropped', 'person_id', 'rejected_answer', 'reply', 'resolutions']
+PASS  (i) resolutions[0] 키 6개
+PASS  (i) resolutions[0] 값: band merge · person_id · er_trace_id · applied False · question_id None  -- {'band': 'merge', 'applied': False, 'mention': '팀장', 'person_id': 45390, 'er_trace_id': 396273, 'question_id': None}
+PASS  (i) intent == 'query' · mentions == ['팀장'] · mentions_dropped 0 · person_id
+PASS  (i) evidence_counts == {facts 3, patterns 0, timeline min(8,5)=5, schedules 2}  -- {'facts': 3, 'patterns': 0, 'timeline': 5, 'schedules': 2}
+PASS  (i) answer_source == 'llm' · fallback None · rejected None
+PASS  (i) reply == 본문 + '\n' + QUERY_MORE_HINT  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  (i) loop_query.output.reply == result.reply == loop_turn.output.reply
+PASS  (i) stop_reason is None
+PASS  (i) stored 전부 0
+PASS  (i) pending_question None
+PASS  (i) trace_ids == [extract, gate, query] id  -- [396270, 396271, 396274] vs [396270, 396271, 396274]
+PASS  (i) loop_query tool_name == 'agent' · tokens (0,0) Fake
+PASS  (i) loop_extract.output.intent == 'query'
+PASS  (i) loop_gate.output.rejected 에 search_person not_callable_by_llm (결정 B-3 (b) 설계)  -- [{'name': 'search_person', 'index': 0, 'reason': 'not_callable_by_llm'}]
+PASS  (i) answerer 1회 · 받은 question == 발화 원문 · 카드 타임라인 8건 통째(슬라이스는 U3 프롬프트 층)
+PASS  (i) U3 프롬프트 user_text 타임라인 == QUERY_TIMELINE_LIMIT 줄 · 사실 3 · 일정 2
+PASS  (xiii) RAW_SECRET not in reply
+PASS  (xiii) RAW_SECRET not in loop_query.output JSON
+PASS  (xiii) RAW_SECRET not in answerer user_text
+PASS  (xiii) RAW_SECRET not in 세션 agent_traces 전체(input+output)  -- traces=6
+PASS  (xiii) 시드가 실제로 DB 에 있다(단언이 공허하지 않음)
+PASS  (i) loop_query.input 키 == {'utterance','record'} (loop_turn 의 {'utterance','turn'} 과 같은 관례)  -- ['record', 'utterance']
+PASS  (i) loop_query.input.record 에 tokens 키 없음(to_dict 관례)
+  loop_query.output = {"reply": "민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.", "intent": "query", "mentions": ["팀장"], "person_id": 45390, "resolutions": [{"band": "merge", "applied": false, "mention": "팀장", "person_id": 45390, "er_trace_id": 396273, "question_id": null}], "answer_source": "llm", "evidence_counts": {"facts": 3, "patterns": 0, "timeline": 5, "schedules": 2}, "fallback_reason": null, "rejected_answer": null, "mentions_dropped": 0}
+=== (ii) identity 되묻기 + 기존 identity 기록 턴 context 모양 대조 ===
+PASS  (ii) 사전: resolve() 단독 band == identity
+PASS  (ii) pending_questions +1, 나머지 6개 불변
+PASS  (ii) 기록 툴 tool_call 0 · ask_user tool_call 1
+PASS  (ii) stop_reason == 'ask_user' · pending_question.kind identity
+PASS  (ii) context['resume'] == PendingResume(mention, intent=query, pending_calls=[]).to_dict() 정확히  -- {'hints': {}, 'intent': 'query', 'dropped': 0, 'mention': '팀장', 'version': '1', 'held_drafts': [], 'pending_calls': []}
+PASS  (ii) options == ER 원본 · question == ER 원본
+PASS  (ii) context 의 resume 밖 키 == ER 원본 context 키 그대로  -- ['affirmative_options', 'candidate_ids', 'confidence_breakdown', 'mention', 'resume', 'utterance']
+PASS  (ii) reply == 질문 문구 · QUERY_MORE_HINT 미부착 · ONE_AT_A_TIME 미부착
+PASS  (ii) loop_query: answer_source ask · person_id None · reply == 질문 · evidence_counts 전부 0 dict · fallback None
+PASS  (ii) resolutions[0]: band identity · applied True · question_id == 행 id · person_id None
+PASS  (ii) er_resolve.decision.applied True · pending_question_id == 행 id (apply_resolution 경유)
+PASS  (ii) answerer 0회 · trace_ids 3개 [extract, gate, query]
+PASS  (ii) loop_resolve_done 0 · loop_record 0 · loop_turn 1
+PASS  (ii) 대조군 기록 턴도 identity 로 끝남
+PASS  (ii) 기록 턴 resume 에는 intent 키 없음 · 조회 턴 키 == 기록 턴 키 ∪ {intent}  -- record=['dropped', 'held_drafts', 'hints', 'mention', 'pending_calls', 'version'] query=['dropped', 'held_drafts', 'hints', 'intent', 'mention', 'pending_calls', 'version']
+PASS  (ii) 직렬화 모양 동일(hints dict · held_drafts list · dropped int · version '1' 양쪽 같음; 기록 턴은 draft 1개를 실제로 든다)  -- record={'hints': {}, 'held_drafts': [{'name': 'add_event', 'content': '저녁'}], 'dropped': 0, 'version': '1'}
+PASS  (ii) 기록 턴 pending_calls 1개(add_event) vs 조회 턴 [] (같은 리스트 모양)
+PASS  (ii) context 최상위 키 집합 동일(조회 vs 기록)  -- ['affirmative_options', 'candidate_ids', 'confidence_breakdown', 'mention', 'resume', 'utterance']
+  query resume = {"hints": {}, "intent": "query", "dropped": 0, "mention": "팀장", "version": "1", "held_drafts": [], "pending_calls": []}
+  record resume = {"hints": {}, "dropped": 0, "mention": "팀장", "version": "1", "held_drafts": [{"name": "add_event", "content": "저녁"}], "pending_calls": [{"args": {"type": "meal", "person": "팀장", "content": "저녁", "occurred_at": "2026-09-23T19:00:00+00:00"}, "name": "add_event", "index": 0}]}
+  context keys = ['affirmative_options', 'candidate_ids', 'confidence_breakdown', 'mention', 'resume', 'utterance']
+=== (iii) new_person 만 ===
+PASS  (iii) 행 수 불변(pending_questions +0 포함)
+PASS  (iii) ask_user tool_call 0 · 기록 툴 0
+PASS  (iii) reply == no_record_reply(['김철수']) · pending None · stop None  -- '"김철수"에 대한 기록이 없어요.'
+PASS  (iii) answer_source no_record · fallback None · person_id None · applied False · QUERY_MORE_HINT 없음
+PASS  (iii) er_resolve.decision.applied False(apply_resolution 미호출)
+PASS  (iii) answerer 0회
+=== (iv) 언급 0 ===
+PASS  (iv) reply == no_mention_reply() · resolve 0회 · no_record_reply 0회(R-U3-2) · answerer 0 · 저장 0  -- '누구에 대해 물어보셨는지 알아듣지 못했어요. 이름을 넣어 다시 물어봐 주세요.'
+PASS  (iv) loop_query: no_mention · mentions [] · dropped 0 · resolutions [] · evidence_counts 0 dict
+PASS  (iv) er_resolve 0행 · loop_query 1 · loop_turn 1
+PASS  (iv) 공백·비문자열 언급 → no_mention
+=== (v) 금지 표현 → 템플릿 · ③ strip/원문 ===
+PASS  (v) reply == 템플릿 · source template · fallback forbidden_expression · rejected_answer == 원문(공백 포함)  -- '  요즘 많이 힘들어 보여요  \n'
+PASS  (v) 템플릿에 QUERY_MORE_HINT 가 정확히 1번(루프가 더 붙이지 않음)
+PASS  (v) 저장 0 · loop_error 0
+PASS  (v) ③ LLM 본문 strip 뒤 힌트  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  (v) 241자 → too_long · 템플릿
+PASS  (v) 빈 답 → empty · rejected_answer '' · 템플릿
+=== (vi) 공급자 오류 → 템플릿, 예외 안 나감 ===
+PASS  (vi) 예외가 run_turn 밖으로 나가지 않음  -- None
+PASS  (vi) reply == 템플릿 · fallback 'answerer_error:timeout' · rejected None · source template
+PASS  (vi) loop_error 0 · tool_error 0 · loop_turn 1
+PASS  (vi) 다른 어휘도 접두 그대로: answerer_error:rate_limit
+=== (vii) 근거 0건 ===
+PASS  (vii) call_count 0 · fallback no_evidence · source template · reply == 근거 0건 템플릿  -- '김민수 — 직장·동로 기억하고 있어요. 그 밖의 기록은 아직 없어요.'
+PASS  (vii) evidence_counts 전부 0 · tokens (0,0) · QUERY_MORE_HINT 없음
+=== (viii)(ix) 언급 2개 merge 가능 / 언급 6개 ===
+PASS  (viii) resolve 1회(['팀장']) · mentions_dropped 1 · person_id == p1 · resolutions 1개  -- ['팀장']
+PASS  (viii) reply 줄 == [본문, QUERY_ONE_AT_A_TIME_HINT, QUERY_MORE_HINT] (결정 F ③ 순서)  -- '민수 팀장님과 최근에 식사를 했어요.\n한 번에 한 사람씩 물어봐 주세요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  (viii) er_resolve 1행 · search_person tool_call 1행(둘째 언급 ER 0)
+PASS  (viii)⑦ new_person → merge → 중단: resolve ['김철수','팀장'] · dropped 1 · person_id p1 · resolutions 2 · 답은 p1 카드(둘째 인물 경로 없음)  -- ['김철수', '팀장'] [{'band': 'new_person', 'applied': False, 'mention': '김철수', 'person_id': None, 'er_trace_id': None, 'question_id': None}, {'band': 'merge', 'applied': False, 'mention': '팀장', 'person_id': 45396, 'er_trace_id': 396358, 'question_id': None}]
+PASS  (viii)⑦ QUERY_MAX_PERSONS == 1 이고 loop.py 는 import 하지 않음(값 1 은 break 로 보장)
+PASS  (viii)⑦ merge 뒤 new_person 언급은 '기록 없음' 에 안 섞임(reply 본문은 LLM 답)
+PASS  (ix) new_person·new_person·identity·(안 봄): resolve 3회 · dropped 1 · ask · 안내 없음 · reply == 질문 · 앞 '기록 없음' 은 답에 없음  -- ['x', 'y', '부장'] '"부장" -- 박A/박B/김민수 중 한 분이 맞으실까요?'
+PASS  (ix) identity 셋째: resolutions 3개 band == [new_person,new_person,identity] · 셋째 applied True  -- [{'band': 'new_person', 'applied': False, 'mention': 'x', 'person_id': None, 'er_trace_id': None, 'question_id': None}, {'band': 'new_person', 'applied': False, 'mention': 'y', 'person_id': None, 'er_trace_id': None, 'question_id': None}, {'band': 'identity', 'applied': True, 'mention': '부장', 'person_id': None, 'er_trace_id': 396364, 'question_id': 10492}]
+PASS  (ix) resolve 정확히 앞 5개 · dropped 1 · mentions 6 · 저장 0 · 전부 new_person  -- 5 ['new_person', 'new_person', 'new_person', 'new_person', 'new_person']
+PASS  (ix) reply == no_record_reply(앞 5개) + '\n' + ONE_AT_A_TIME (MORE_HINT 없음)  -- '"낯선0", "낯선1", "낯선2", "낯선3", "낯선4"에 대한 기록이 없어요.\n한 번에 한 사람씩 물어봐 주세요.'
+PASS  (ix) ask_user 0 · er_resolve 5행
+=== (x)(xi) answerer=None 지연 해소 (결정 K R-1) ===
+PASS  (x) answerer=None + 근거 있음 → app.agent.respond.answerer_from_env 모듈 속성 호출 1회 · llm 답
+PASS  (x) loop 모듈 전역에 answerer_from_env 이름 없음
+PASS  (xi) answerer=None + 근거 0건 → answerer_from_env 0회 · 템플릿
+PASS  (xi) new_person·언급 0 에서도 answerer_from_env 0회(키 없는 운영에서 조회가 안 터짐)
+=== (xii) 기록 턴은 조회 분기를 타지 않는다 ===
+PASS  (xii) intent 기본값·'record' 모두 _run_query_turn 0회 · events 1 · loop_query 0 · loop_record 1
+PASS  (xii) merge·언급0 조회 턴에서 resolve_mentions/_record/_record_impl/after_record/apply_resolution/기록 툴 4종 호출 0(스파이 예외 없음)  -- None
+PASS  (xii) new_person 조회 턴(빈 DB)에서 위 금지 호출 0 · apply_resolution 0  -- None
+=== (xiv) 루프가 확신도·임계치를 읽지 않는다 ===
+PASS  (xiv) 추가 줄에 confidence/band_by_threshold/임계치/신호 이름 0  -- []
+PASS  (xiv) 추가 줄에서 Resolution 의 속성은 band·matched_person_id·trace_id·ask_payload 만  -- {'ask_payload', 'trace_id', 'matched_person_id', 'band'}
+PASS  (xiv) 추가 줄에 config./judge. 속성 접근 0(통과만 시킴)
+=== (xv) SQLAlchemyError 를 삼키지 않는다 ===
+PASS  (xv) get_person_card 의 SQLAlchemyError 가 run_turn 밖으로 그대로  -- SQLAlchemyError('verifier db boom')
+PASS  (xv) 답 생성기의 SQLAlchemyError 도 삼키지 않음(except 는 JudgeUnavailable 만)  -- SQLAlchemyError('verifier answerer db boom')
+PASS  (xv)⑤ merge 카드 PersonNotFound → reply == no_record_reply(['팀장']) · source no_record · person_id None · resolutions[0].person_id == merge id · answerer 0  -- {'reply': '"팀장"에 대한 기록이 없어요.', 'intent': 'query', 'mentions': ['팀장'], 'person_id': None, 'resolutions': [{'band': 'merge', 'applied': False, 'mention': '팀장', 'person_id': 45405, 'er_trace_id': 396454, 'question_id': None}], 'answer_source': 'no_record', 'evidence_counts': {'facts': 0, 'patterns': 0, 'timeline': 0, 'schedules': 0}, 'fallback_reason': None, 'rejected_answer': None, 'mentions_dropped': 0}
+=== (xvi) 다른 사용자의 인물은 보이지 않는다 ===
+PASS  (xvi) 다른 user_id 의 같은 별칭 → new_person → no_record · answerer 0 · person_id None
+PASS  (xvi) er_resolve.candidates 에 다른 사용자 인물 id 없음  -- []
+PASS  (xvi) _read_card(ctx(local), other.id) → None(PersonNotFound 흡수)
+=== 추가: 토큰 전달 · tokens 는 검증 실패에도 기록 · 혼합 발화 ===
+PASS  (추가) 유효 답 토큰 (11,7) → loop_query tokens_in/out
+PASS  (추가) 검증 실패 답도 LLM 을 불렀으니 토큰 (11,7) 기록(비용 관측, 원칙9)  -- (11, 7)
+PASS  (g) 혼합 발화: 저장 0 · add_event tool_call 0 · loop_gate.rejected 에 query_turn_no_write · 언급은 중복 제거로 1개  -- [{'name': 'search_person', 'index': 0, 'reason': 'not_callable_by_llm'}, {'name': 'add_event', 'index': 1, 'reason': 'query_turn_no_write'}]
+PASS  (g) 혼합 발화의 gate.accepted == []
+
+RESULT: 99 PASS / 0 FAIL

@@ -1,0 +1,102 @@
+# 명령: /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u4/mutate.py
+# 시각: 2026-11-02T12:33:11+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 0
+# ---
+### M1 merge 에서 apply_resolution 호출 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_g_mixed_utterance_does_not_execute_write
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+### M2 new_person 에서 apply_resolution 호출 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap - AssertionError: a...
+    FAILED tests/test_agent_query_loop.py::test_b_new_person_asks_nothing_and_says_no_record
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap
+### M3a evidence_counts timeline min 제거 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+### M3b U3 프롬프트 타임라인 슬라이스 5->6 (app/agent/respond.py)
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+### M4a 공급자 오류 폴백 제거(예외 전파) (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm - app.er....
+    FAILED tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising
+    FAILED tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm
+### M4b 검증 실패 폴백 제거(원문 채택) (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+### M5 조회 분기 뒤에 _record 를 부름 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+### M6 QUERY_MORE_HINT 를 항상 붙임 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_other_user_person_is_not_visible
+    FAILED tests/test_agent_query_loop.py::test_b_new_person_asks_nothing_and_says_no_record
+    FAILED tests/test_agent_query_loop.py::test_c_identity_asks_with_query_resume
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+    FAILED tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising
+    FAILED tests/test_agent_query_loop.py::test_f_no_evidence_skips_llm
+    FAILED tests/test_agent_query_loop.py::test_i_m_no_mention
+    FAILED tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap
+    FAILED tests/test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence
+    FAILED tests/test_agent_query_loop.py::test_other_user_person_is_not_visible
+### M7 언급 0 판정 제거 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_i_m_no_mention - AssertionError: ...
+    FAILED tests/test_agent_query_loop.py::test_i_m_no_mention
+### M8 stop_reason=limit (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_q_answered_turn_stop_reason_is_none
+    FAILED tests/test_agent_query_loop.py::test_q_answered_turn_stop_reason_is_none
+### M9 분기 조건 제거 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_other_user_person_is_not_visible
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_b_new_person_asks_nothing_and_says_no_record
+    FAILED tests/test_agent_query_loop.py::test_c_identity_asks_with_query_resume
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+    FAILED tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising
+    FAILED tests/test_agent_query_loop.py::test_f_no_evidence_skips_llm
+    FAILED tests/test_agent_query_loop.py::test_h_trace368_title_then_me_resolves_first_only
+    FAILED tests/test_agent_query_loop.py::test_h2_me_first_asks_identity_and_stops
+    FAILED tests/test_agent_query_loop.py::test_i_m_no_mention
+    FAILED tests/test_agent_query_loop.py::test_k_loop_query_output_schema
+    FAILED tests/test_agent_query_loop.py::test_k2_tokens_come_from_answer
+    FAILED tests/test_agent_query_loop.py::test_l_raw_utterance_never_exposed
+    FAILED tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm
+    FAILED tests/test_agent_query_loop.py::test_o_remaining_mentions_after_merge_are_not_resolved
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap
+    FAILED tests/test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence
+    FAILED tests/test_agent_query_loop.py::test_s_lazy_resolution_uses_module_attribute
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+    FAILED tests/test_agent_query_loop.py::test_other_user_person_is_not_visible
+### M10 merge 뒤 break 제거 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+    FAILED tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising
+    FAILED tests/test_agent_query_loop.py::test_f_no_evidence_skips_llm
+    FAILED tests/test_agent_query_loop.py::test_g_mixed_utterance_does_not_execute_write
+    FAILED tests/test_agent_query_loop.py::test_h_trace368_title_then_me_resolves_first_only
+    FAILED tests/test_agent_query_loop.py::test_k_loop_query_output_schema
+    FAILED tests/test_agent_query_loop.py::test_k2_tokens_come_from_answer
+    FAILED tests/test_agent_query_loop.py::test_l_raw_utterance_never_exposed
+    FAILED tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm
+    FAILED tests/test_agent_query_loop.py::test_o_remaining_mentions_after_merge_are_not_resolved
+    FAILED tests/test_agent_query_loop.py::test_q_answered_turn_stop_reason_is_none
+    FAILED tests/test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence
+    FAILED tests/test_agent_query_loop.py::test_s_lazy_resolution_uses_module_attribute
+    FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called
+### M11 identity 재개 재료 intent 누락 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_c_identity_asks_with_query_resume
+    FAILED tests/test_agent_query_loop.py::test_c_identity_asks_with_query_resume
+### M12 토큰 미전달 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_k2_tokens_come_from_answer - asse...
+    FAILED tests/test_agent_query_loop.py::test_k2_tokens_come_from_answer
+### M13 한 번에 한 사람 안내 누락 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap - assert '"낯선0", ...
+    FAILED tests/test_agent_query_loop.py::test_h_trace368_title_then_me_resolves_first_only
+    FAILED tests/test_agent_query_loop.py::test_o_remaining_mentions_after_merge_are_not_resolved
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap
+### M14 identity 에도 안내 붙임 (app/agent/loop.py)
+    FAILED tests/test_agent_query_loop.py::test_h2_me_first_asks_identity_and_stops
+    FAILED tests/test_agent_query_loop.py::test_h2_me_first_asks_identity_and_stops

@@ -170,6 +170,19 @@ user_timezone())` 로 사용자 시간대(`APP_TIMEZONE`, 기본 `Asia/Seoul`)�
 - 게이트·인식 결과를 다시 검증하지 않는다 -- `GateVerdict.accepted` 를
   그대로 신뢰하고, 인자 스키마·화이트리스트를 다시 확인하지 않는다
   (R-12 "같은 검사를 두 자리에서 하지 않는다").
+
+## 조회 분기 (P5b-query-turn U4, CR-004·D16)
+
+인식 제안의 `intent` 가 `"query"` 이면 게이트 직후 `_run_query_turn()` 하나로
+빠진다 -- 기록 단계(`resolve_mentions`·`_record`·`after_record`)와 기록 툴
+4종은 이 경로에서 부르지 않고, 저장되는 행이 0 이다(`TurnResult.stored` 전부 0).
+언급은 제안의 `search_person.query`/그 밖 툴의 `person` 에서 읽고(게이트 판정과
+무관), 언급마다 `resolve()` 만 부른다. merge 는 `apply_resolution()` 없이 그
+인물로 확정하고 남은 언급은 해석하지 않으며, new_person 은 질문 없이 "기록
+없음" 목록에 넣고, identity 만 `apply_resolution()`(되묻기)으로 턴을 끝낸다.
+확정된 인물의 카드(`get_person_card`)를 근거로 답을 만들고 -- 검증 실패·공급자
+오류·근거 0건이면 LLM 없이 템플릿 -- `loop_query` trace 1행을 남긴다. 루프는
+이번에도 확신도 값을 읽지 않는다(`band` 만).
 """
 
 from __future__ import annotations
@@ -182,10 +195,22 @@ from typing import Any
 from app import tools as app_tools
 from app.agent.gate import check as gate_check
 from app.agent.propose import Proposer, proposer_from_env
-from app.agent.respond import build_reply
+from app.agent.respond import (
+    QUERY_MORE_HINT,
+    QUERY_ONE_AT_A_TIME_HINT,
+    QueryAnswerer,
+    build_reply,
+    has_evidence,
+    no_mention_reply,
+    no_record_reply,
+    template_query_answer,
+    validate_query_answer,
+)
 from app.agent.types import (
     BUCKET_EXECUTE,
     BUCKET_HINT_ONLY,
+    INTENT_QUERY,
+    STEP_LOOP_QUERY,
     NEW_PERSON_TAG_OPTIONS,
     SCHEDULE_UNKNOWN_OPTION,
     STEP_LOOP_EXTRACT,
@@ -213,14 +238,21 @@ from app.er import (
     NEW_PERSON_REJECT_OPTION,
     ERConfig,
     Judge,
+    JudgeUnavailable,
     Resolution,
     apply_resolution,
     resolve,
 )
 from app.memory import FactExtractor, after_record
-from app.settings import LOOP_MAX_RESUME_BYTES, PATTERN_KEY_PREFIX, user_timezone
+from app.settings import (
+    LOOP_MAX_MENTIONS,
+    LOOP_MAX_RESUME_BYTES,
+    PATTERN_KEY_PREFIX,
+    QUERY_TIMELINE_LIMIT,
+    user_timezone,
+)
 from app.tools.context import ToolContext, amend_trace_output, to_jsonable, traced
-from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
+from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, PersonNotFound, ToolError
 
 # ---------------------------------------------------------------------------
 # 해석 구간 산출물 -- `run_turn`(U5)이 기록 단계를 이어가는 재료
@@ -1056,6 +1088,7 @@ def run_turn(
     judge: Judge | None = None,
     config: ERConfig | None = None,
     extractor: FactExtractor | None = None,
+    answerer: QueryAnswerer | None = None,
 ) -> TurnResult:
     """U5 오케스트레이션 진입점(01-plan U5 "게이트를 통과하고 person_id
     가 확정된 제안만 실행 ... respond.py 가 결과를 문장으로 만든다").
@@ -1088,6 +1121,17 @@ def run_turn(
     extract_trace_id = ctx.last_trace_id
     verdict = _gate(ctx, proposal)
     gate_trace_id = ctx.last_trace_id
+    if proposal.intent == INTENT_QUERY:
+        return _run_query_turn(
+            ctx,
+            utterance,
+            proposal,
+            now,
+            answerer=answerer,
+            judge=judge,
+            config=config,
+            trace_ids=[extract_trace_id, gate_trace_id],
+        )
     outcome = resolve_mentions(ctx, proposal, verdict, utterance, judge=judge, config=config)
     resolve_trace_id = ctx.last_trace_id
     record = _record(
@@ -1135,6 +1179,235 @@ def run_turn(
         ],
     )
 
+    return _log_turn(ctx, utterance, turn)
+
+
+# ---------------------------------------------------------------------------
+# P5b U4 -- 조회 분기: 해석 재사용 -> 카드 조회 -> 답 -> trace (저장 0)
+# ---------------------------------------------------------------------------
+
+#: `loop_query.output.answer_source` 어휘(결정 C).
+_SRC_LLM = "llm"
+_SRC_TEMPLATE = "template"
+_SRC_NO_RECORD = "no_record"
+_SRC_NO_MENTION = "no_mention"
+_SRC_ASK = "ask"
+
+
+@dataclass(frozen=True)
+class _QueryTrace:
+    """`loop_query.output` 스키마(결정 C) + `traced` 가 읽는 토큰.
+    `trace_tokens()` 는 `app.tools.context.traced` 의 관례(반환값이 이 메서드를
+    가지면 `tokens_in`/`tokens_out` 으로 기록)를 따른다. 토큰은 `to_dict()`
+    에 싣지 않는다 -- 같은 값이 `agent_traces` 의 전용 컬럼에 있다."""
+
+    mentions: list[str]
+    mentions_dropped: int
+    resolutions: list[dict[str, Any]]
+    person_id: int | None
+    evidence_counts: dict[str, int]
+    answer_source: str
+    fallback_reason: str | None
+    rejected_answer: str | None
+    reply: str
+    tokens: tuple[int, int] = field(default=(0, 0), repr=False)
+
+    def trace_tokens(self) -> tuple[int, int]:
+        return self.tokens
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "intent": INTENT_QUERY,
+            "mentions": list(self.mentions),
+            "mentions_dropped": self.mentions_dropped,
+            "resolutions": [dict(r) for r in self.resolutions],
+            "person_id": self.person_id,
+            "evidence_counts": dict(self.evidence_counts),
+            "answer_source": self.answer_source,
+            "fallback_reason": self.fallback_reason,
+            "rejected_answer": self.rejected_answer,
+            "reply": self.reply,
+        }
+
+
+def _query_mentions(proposal: Proposal) -> list[str]:
+    """결정 B-3 (b) -- 제안을 인덱스 순으로 훑어 `search_person` 은 `query`,
+    그 밖의 툴은 `person` 의 문자열을 모은다(`strip()`, 빈 값 제외, 첫 등장
+    순 중복 제거). 게이트 판정과 무관하게 제안에서 읽는다(조회 턴에서는
+    기록 툴이 전부 거부돼 있다). 코드로 "나" 를 거르지 않는다(결정 J)."""
+
+    mentions: list[str] = []
+    for call in proposal.tool_calls:
+        value = call.args.get("query" if call.name == "search_person" else "person")
+        if not isinstance(value, str):
+            continue
+        text = value.strip()
+        if text and text not in mentions:
+            mentions.append(text)
+    return mentions
+
+
+def _read_card(ctx: ToolContext, person_id: int) -> Any | None:
+    """확정 인물의 카드를 읽는다(결정 L (a)). `app.api.read` 는 `app.agent` 를
+    거쳐 import 되는 라우트 층과 순환할 수 있어 모듈 최상단이 아니라 여기서
+    지연 import 한다. 없거나 남의 소유면 `None`("기록 없음")."""
+
+    from app.api.read import get_person_card  # 순환 import 회피 -- 지연 import
+
+    try:
+        return get_person_card(ctx.session, ctx.user_id, person_id, ctx.now())
+    except PersonNotFound:
+        return None
+
+
+def _log_query(ctx: ToolContext, utterance: str, record: _QueryTrace) -> _QueryTrace:
+    """`loop_query` trace 행 1개(결정 C)."""
+
+    @traced(LOOP_TRACE_TOOL_NAME, step=STEP_LOOP_QUERY)
+    def _traced(ctx: ToolContext, utterance: str, record: _QueryTrace) -> _QueryTrace:
+        return record
+
+    return _traced(ctx, utterance, record)
+
+
+def _run_query_turn(
+    ctx: ToolContext,
+    utterance: str,
+    proposal: Proposal,
+    now: datetime,
+    *,
+    answerer: QueryAnswerer | None,
+    judge: Judge | None,
+    config: ERConfig | None,
+    trace_ids: list[int | None],
+) -> TurnResult:
+    """조회 턴 본체(결정 B·C·D·E·F·I·J·K·L). 저장은 identity 되묻기 질문 1행뿐
+    이다. `resolve_mentions`·`_record`·`after_record`·기록 툴은 부르지 않는다."""
+
+    mentions = _query_mentions(proposal)
+    resolutions: list[dict[str, Any]] = []
+    unrecorded: list[str] = []
+    card: Any | None = None
+    person_id: int | None = None
+    pending_question: PendingQuestionOut | None = None
+    resolved = 0
+
+    for mention in mentions[:LOOP_MAX_MENTIONS]:
+        resolution = resolve(ctx, mention, utterance, None, judge=judge, config=config)
+        resolved += 1
+        entry: dict[str, Any] = {
+            "mention": mention,
+            "band": resolution.band,
+            "person_id": resolution.matched_person_id if resolution.band == "merge" else None,
+            "er_trace_id": resolution.trace_id,
+            "applied": False,
+            "question_id": None,
+        }
+        resolutions.append(entry)
+
+        if resolution.band == "merge":
+            # 결정 I (a) -- apply_resolution() 을 부르지 않는다(별칭 누적 0).
+            assert resolution.matched_person_id is not None
+            card = _read_card(ctx, resolution.matched_person_id)
+            if card is None:
+                unrecorded.append(mention)
+            else:
+                person_id = resolution.matched_person_id
+            break  # 답하는 인물은 1명(QUERY_MAX_PERSONS) -- 남은 언급은 해석하지 않는다.
+
+        if resolution.band == "new_person":
+            # 질문 행 0 -- 조회 발화로 인물을 만들지 않는다(D16 결정 3).
+            unrecorded.append(mention)
+            continue
+
+        # identity -- 그 자리에서 되묻고 턴을 끝낸다(결정 J, 결정 G).
+        resume = PendingResume(mention=mention, intent=INTENT_QUERY, pending_calls=[])
+        resolution = _extend_identity_payload(resolution, resume)
+        applied = apply_resolution(ctx, resolution)
+        payload = resolution.ask_payload
+        assert payload is not None
+        pending_question = PendingQuestionOut(
+            question_id=applied.pending_question_id,
+            status="pending",
+            kind=payload["kind"],
+            question=payload["question"],
+            options=list(payload["options"]),
+        )
+        entry["applied"] = True
+        entry["question_id"] = applied.pending_question_id
+        break
+
+    dropped = len(mentions) - resolved
+    counts = {"facts": 0, "patterns": 0, "timeline": 0, "schedules": 0}
+    fallback_reason: str | None = None
+    rejected_answer: str | None = None
+    tokens = (0, 0)
+
+    if not mentions:
+        reply, source = no_mention_reply(), _SRC_NO_MENTION
+    elif pending_question is not None:
+        reply, source = pending_question.question, _SRC_ASK
+    elif card is None:
+        reply, source = no_record_reply(unrecorded), _SRC_NO_RECORD
+    else:
+        counts = {
+            "facts": len(card.facts),
+            "patterns": len(card.patterns),
+            "timeline": min(len(card.timeline), QUERY_TIMELINE_LIMIT),
+            "schedules": len(card.upcoming_schedules),
+        }
+        reply, source = template_query_answer(card, now), _SRC_TEMPLATE
+        if not has_evidence(card):
+            fallback_reason = "no_evidence"  # LLM 호출 0 (결정 E)
+        else:
+            try:
+                if answerer is None:
+                    # 결정 K R-1 -- 모듈 속성 호출(테스트가 바꿔 끼울 수 있게).
+                    from app.agent import respond as _respond
+
+                    answerer = _respond.answerer_from_env()
+                answer = answerer.answer(utterance, card, now)
+            except JudgeUnavailable as exc:
+                fallback_reason = f"answerer_error:{exc}"
+            else:
+                tokens = answer.trace_tokens()
+                invalid = validate_query_answer(answer.text)
+                if invalid is None:
+                    reply, source = answer.text.strip(), _SRC_LLM
+                else:
+                    fallback_reason, rejected_answer = invalid, answer.text
+
+    if dropped > 0 and source != _SRC_ASK:
+        reply = f"{reply}\n{QUERY_ONE_AT_A_TIME_HINT}"
+    if source == _SRC_LLM:
+        reply = f"{reply}\n{QUERY_MORE_HINT}"
+
+    record = _log_query(
+        ctx,
+        utterance,
+        _QueryTrace(
+            mentions=mentions,
+            mentions_dropped=dropped,
+            resolutions=resolutions,
+            person_id=person_id,
+            evidence_counts=counts,
+            answer_source=source,
+            fallback_reason=fallback_reason,
+            rejected_answer=rejected_answer,
+            reply=reply,
+            tokens=tokens,
+        ),
+    )
+    query_trace_id = ctx.last_trace_id
+
+    turn = TurnResult(
+        reply=record.reply,
+        session_id=ctx.session_id,
+        stored=StoredSummary(),
+        pending_question=pending_question,
+        stop_reason="ask_user" if pending_question is not None else None,
+        trace_ids=[t for t in (*trace_ids, query_trace_id) if t is not None],
+    )
     return _log_turn(ctx, utterance, turn)
 
 

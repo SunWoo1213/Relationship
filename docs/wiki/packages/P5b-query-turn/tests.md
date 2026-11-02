@@ -106,3 +106,33 @@
 | test_agent_query_answer.py::test_query_answerers_registry_has_three_providers | 등록표 | 키 집합 3종 | 통과 · — | 기록 없음 |
 | test_agent_query_answer.py::test_answerer_from_env_follows_llm_provider (3건) | `LLM_PROVIDER` 선택 | anthropic/openai/gemini → 해당 클래스 | 통과 · — | 기록 없음 |
 | test_agent_query_answer.py::test_answerer_from_env_unknown_and_disabled_rejected | 미지·비활성 거부 | → `InvalidValue` | 통과 · — | 기록 없음 |
+
+## tests/test_agent_query_loop.py — U4 루프 조회 분기 (신규 23건)
+
+증거: `evidence/20261102-1231-u4-loop.txt`(23 passed), `evidence/20261102-1231-u4-pytest-all.txt`(전체 2104 passed, skip 0; 기준선 2081 → +23), 변이 `evidence/20261102-1233-u4-mutation.txt`(M1~M14, 16건 전부 검출). 변이 번호는 U4-M1~M14(M3 = a·b, M4 = a·b).
+
+| 파일::테스트 이름 | 무엇을 확인하나 | 입력 → 기대 | 결과 · 검출 변이 | 실패 이력 |
+|---|---|---|---|---|
+| test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing | (a) merge → 카드 근거 답, 저장 0 | 시드 인물(타임라인 8·사실 3·일정 2) → 7개 테이블 행 수 불변, 기록 툴 `tool_call` 0, `get_person_card` 1회, evidence_counts `{3,0,5,2}`, user_text 타임라인 5줄·사실 3·일정 2, `er_resolve.decision.applied=false`, trace_ids 3개 | 통과 · U4-M1·M3a·M3b·M5·M9·M10 | 기록 없음 |
+| test_agent_query_loop.py::test_b_new_person_asks_nothing_and_says_no_record | (b) 빈 DB new_person → 질문 0 | 행 수 불변, `ask_user` 행 0, reply == `no_record_reply(["김철수"])`, answerer 0회 | 통과 · U4-M2·M6·M9 | 기록 없음 |
+| test_agent_query_loop.py::test_c_identity_asks_with_query_resume | (c) 후보 2명 identity | `pending_questions` +1(나머지 불변), `context.resume.intent=="query"`, `options` == ER `resolve()` 원본, stop_reason `ask_user`, answer_source `ask` | 통과 · U4-M11·M9 | 기록 없음 |
+| test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template | (d) 금지 표현 → 템플릿 | "힘들어 보여요" → reply == 템플릿, `fallback_reason=="forbidden_expression"`, `rejected_answer` == 원문 | 통과 · U4-M4b | 기록 없음 |
+| test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising | (e) `JudgeUnavailable("timeout")` | reply == 템플릿, `answerer_error:timeout`, `loop_error`·`tool_error` 행 0 | 통과 · U4-M4a | 기록 없음 |
+| test_agent_query_loop.py::test_f_no_evidence_skips_llm | (f) 근거 0건 | `call_count==0`, `no_evidence`, evidence_counts 전부 0, 토큰 `(0,0)` | 통과 · — | 기록 없음 |
+| test_agent_query_loop.py::test_g_mixed_utterance_does_not_execute_write | (g) 혼합 발화 | `add_event` 실행 0, 행 수 불변, `loop_gate.output.rejected` 에 `{index:1,name:add_event,reason:query_turn_no_write}` | 통과 · U4-M1 (※ 게이트가 이미 거부해 `_record` 호출 변이는 이 케이스가 아니라 `test_forbidden_callees_are_never_called` 가 잡는다) | 기록 없음 |
+| test_agent_query_loop.py::test_h_trace368_title_then_me_resolves_first_only | (h) trace 368 — "박선우 과장님"+"나" | `resolve` 호출 `["박선우 과장님"]`, `mentions_dropped==1`, 저장 0, reply 끝 두 줄 = 한 사람씩 안내·`QUERY_MORE_HINT` | 통과 · U4-M9·M10·M13 | 기록 없음 |
+| test_agent_query_loop.py::test_h2_me_first_asks_identity_and_stops | (h) 순서 반대 — "나" 가 먼저 | 후보가 있고 판정이 못 고르면 identity → 그 자리에서 되묻기, `resolve` `["나"]`, `ask` 에는 한 사람씩 안내 없음 | 통과 · U4-M14 | 첫 실행 실패: new_person 으로 가정했으나 후보가 있으면 `no_matched` 강제 identity(ER 정상 동작). 기대를 identity 로 고침(테스트 쪽 가정 오류) |
+| test_agent_query_loop.py::test_h3_mention_source_rule | 언급 출처 규칙(결정 B-3 (b)) | `search_person.query`·그 밖 `person`, strip·빈 값 제외·중복 제거·순서 → `["가","나","다"]` | 통과 · — | 기록 없음 |
+| test_agent_query_loop.py::test_i_m_no_mention | (i)(m) 언급 0 | reply == `no_mention_reply()`, `no_record_reply` 호출 0, `resolve` 0, answerer 0, `answer_source=="no_mention"` | 통과 · U4-M7 | 기록 없음 |
+| test_agent_query_loop.py::test_j_record_turn_does_not_enter_query_branch | (j) 기록 턴 대조군 | `intent` 기본값 → `_run_query_turn` 스파이 0회, `stored.events==1`, `loop_query` 0행·`loop_record` 1행 | 통과 · U4-M9 대조 | 첫 실행 실패: 테스트 시드 별칭 `source="user"` 가 `ALIAS_SOURCES` 밖(`KeyError`) → `ALIAS_SOURCES[0]` 로 수정(테스트 쪽 오류) |
+| test_agent_query_loop.py::test_k_loop_query_output_schema | (k) `loop_query.output` 키 집합 | 10키 정확히, `resolutions[]` 6키, `evidence_counts` 4키, `answer_source` 어휘, `tool_name=="agent"` | 통과 · U4-M9·M10 | 기록 없음 |
+| test_agent_query_loop.py::test_k2_tokens_come_from_answer | `trace_tokens()` → tokens_in/out | 답 토큰 `(11,7)` → 행 `tokens_in==11, tokens_out==7` | 통과 · U4-M12 | 기록 없음 |
+| test_agent_query_loop.py::test_l_raw_utterance_never_exposed | (l) R-U3-1 원문 비노출 | `raw_utterance="절대노출금지원문"` → reply·`loop_query.output` JSON·answerer 입력 user_text 어디에도 없음 | 통과 · — | 기록 없음 |
+| test_agent_query_loop.py::test_n_more_hint_only_on_llm | (n) 결정 F 힌트 부착 | llm 답만 `QUERY_MORE_HINT` 1회로 끝남, 템플릿 reply == 템플릿(루프가 더 붙이지 않음), no_record 에는 없음 | 통과 · U4-M6·M4a | 기록 없음 |
+| test_agent_query_loop.py::test_o_remaining_mentions_after_merge_are_not_resolved | (o) merge 뒤 남은 언급 | 언급 2개 → `resolve` `["팀장"]` 1회, `mentions_dropped==1`, reply 끝 두 줄 = 안내·`QUERY_MORE_HINT` | 통과 · U4-M10·M13 | 기록 없음 |
+| test_agent_query_loop.py::test_p_mention_cap | (p) 언급 상한 | 언급 6개(전부 new_person) → `resolve` 정확히 앞 5개, `mentions_dropped==1`, 저장 0, reply == `no_record_reply(앞 5개)` + 안내 | 통과 · U4-M2·M6·M13 | 기록 없음 |
+| test_agent_query_loop.py::test_q_answered_turn_stop_reason_is_none | (q) stop_reason | 답한 턴 `None`(`"limit"` 아님), reply 비지 않음 | 통과 · U4-M8·M10 | 기록 없음 |
+| test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence | (r) `answerer=None` + 근거 0건 | `answerer_from_env` 스파이 0회(키 없이 통과), reply == 템플릿 | 통과 · U4-M6·M9 | 기록 없음 |
+| test_agent_query_loop.py::test_s_lazy_resolution_uses_module_attribute | (s) `answerer=None` + 근거 있음 | `monkeypatch("app.agent.respond.answerer_from_env")` 가 효과 → llm 답 | 통과 · U4-M9 | 기록 없음 |
+| test_agent_query_loop.py::test_forbidden_callees_are_never_called | 부정 — 조회 턴에서 부르지 않는 것 | `resolve_mentions`·`_record`·`_record_impl`·`after_record`·`apply_resolution`(merge)·`app_tools` 기록 툴 4종을 호출 시 예외로 치환 → 답이 정상 | 통과 · U4-M1·M5 | 기록 없음 |
+| test_agent_query_loop.py::test_other_user_person_is_not_visible | 격리 | 다른 `user_id` 인물의 같은 별칭 → no_record, answerer 0 | 통과 · U4-M6·M9 | 기록 없음 |

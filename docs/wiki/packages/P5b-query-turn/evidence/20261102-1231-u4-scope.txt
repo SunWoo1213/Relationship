@@ -1,0 +1,6 @@
+# 명령: git diff --stat HEAD -- app/api app/er app/tools app/briefing app/agent/respond.py app/agent/gate.py app/agent/propose.py app/agent/types.py app/settings.py alembic web
+# 시각: 2026-11-02T12:31:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a002706 (dev2)
+# exit: 0
+# ---
