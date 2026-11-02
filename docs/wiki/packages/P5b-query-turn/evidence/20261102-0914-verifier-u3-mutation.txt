@@ -1,0 +1,142 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u3/mutate.py
+# 시각: 2026-11-02T09:14:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 06b7bb5 (dev2)
+# exit: 0
+# ---
+=== C0 대조군(치환 없음): exit=0 71 passed, 1 warning in 0.85s -> 대조군
+=== M1 계획 1: 금지 표현 검사 제거: exit=1 14 failed, 57 passed, 1 warning in 0.98s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uac10\uc815]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uace0\ubbfc]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uae30\ubd84]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ub9c8\uc74c\uc744]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ub9c8\uc74c\uc774]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ubc30\ub824]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc0c1\ub2f4]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc11c\uc6b4]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc18d\uc0c1]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc2a4\ud2b8\ub808\uc2a4]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc6b0\uc6b8]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc704\ub85c]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ud798\ub4dc]
+    FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ud798\ub4e4]
+=== M2 계획 2: 글자 상한 > -> >=: exit=1 2 failed, 69 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_validate_char_count_uses_stripped_text
+    FAILED tests/test_agent_query_answer.py::test_validate_char_limit_boundary_240_pass_241_rejected
+=== M3a 계획 3: settings QUERY_ANSWER_MAX_LINES 3 -> 4: exit=1 3 failed, 68 passed, 1 warning in 0.91s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_prompt_system_exact_sentences
+    FAILED tests/test_agent_query_answer.py::test_validate_line_limit_boundary_three_lines_pass_four_rejected
+    FAILED tests/test_agent_query_answer.py::test_validate_order_lines_before_length_before_forbidden
+=== M3b 계획 3 변형: 상수는 3 그대로, 비교만 +1 (4줄 허용): exit=1 2 failed, 69 passed, 1 warning in 0.91s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_validate_line_limit_boundary_three_lines_pass_four_rejected
+    FAILED tests/test_agent_query_answer.py::test_validate_order_lines_before_length_before_forbidden
+=== M4 계획 4: 타임라인 자르지 않음: exit=1 1 failed, 70 passed, 1 warning in 0.89s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_prompt_timeline_limit_keeps_only_first_five
+=== M5 계획 5: 날짜를 UTC(사용자 시간대 변환 제거): exit=1 3 failed, 68 passed, 1 warning in 0.91s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_prompt_last_contact_date_in_user_timezone_not_utc
+    FAILED tests/test_agent_query_answer.py::test_prompt_user_text_has_question_now_and_evidence_values
+    FAILED tests/test_agent_query_answer.py::test_template_with_evidence_exact_string_and_last_contact_in_user_timezone
+=== V6 검사 순서: 금지 표현 먼저: exit=1 1 failed, 70 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_validate_order_lines_before_length_before_forbidden
+=== V7 no_record_reply 구분자 ', ' -> ',': exit=1 2 failed, 69 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_no_record_reply_exact_strings
+    FAILED tests/test_agent_query_answer.py::test_no_record_reply_keeps_input_order
+=== V8 근거 0건 판별에서 일정 제외: exit=1 1 failed, 70 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_has_evidence_true_for_each_source[card3]
+=== V9 템플릿 n 에서 패턴 제외: exit=1 1 failed, 70 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_template_count_is_facts_plus_patterns
+=== V10 E-6 '다른 인물과의 관계는 말하지 마라.' 삭제: exit=1 1 failed, 70 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_prompt_system_exact_sentences
+=== V11 QUERY_ANSWERERS 에서 gemini 제거: exit=1 2 failed, 69 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_answerer_from_env_follows_llm_provider[gemini-GEMINI_API_KEY-GeminiQueryAnswerer-extra_env2]
+    FAILED tests/test_agent_query_answer.py::test_query_answerers_registry_has_three_providers
+=== V12 trace_tokens 가 (0, 0) 반환: exit=1 4 failed, 67 passed, 1 warning in 0.91s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_claude_answerer_parses_text_and_usage
+    FAILED tests/test_agent_query_answer.py::test_gemini_answerer_request_uses_schema_and_parses
+    FAILED tests/test_agent_query_answer.py::test_openai_answerer_request_and_parse
+    FAILED tests/test_agent_query_answer.py::test_query_answer_trace_tokens_shape
+=== V13 empty 검사 제거: exit=1 4 failed, 67 passed, 1 warning in 0.91s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_claude_answerer_empty_string_answer_passes_through_for_validator
+    FAILED tests/test_agent_query_answer.py::test_validate_empty_or_blank_is_empty[   ]
+    FAILED tests/test_agent_query_answer.py::test_validate_empty_or_blank_is_empty[\n \n]
+    FAILED tests/test_agent_query_answer.py::test_validate_empty_or_blank_is_empty[]
+=== V14 프롬프트 now 를 UTC 그대로: exit=1 1 failed, 70 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_prompt_user_text_has_question_now_and_evidence_values
+=== V15 answerer_from_env 가 select_provider 를 우회: exit=1 1 failed, 70 passed, 1 warning in 0.91s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_answerer_from_env_unknown_and_disabled_rejected
+=== V16 Claude 토큰 in/out 뒤바뀜: exit=1 1 failed, 70 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_claude_answerer_parses_text_and_usage
+=== V17 프롬프트에서 별칭 누락: exit=1 1 failed, 70 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_prompt_user_text_has_question_now_and_evidence_values
+=== V18 Gemini response_schema 에 변환 없이 원 스키마: exit=1 1 failed, 70 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_gemini_answerer_request_uses_schema_and_parses
+=== V19 템플릿 끝 문장을 '인물 카드에서' 로(결정 F 이전 문구): exit=1 2 failed, 69 passed, 1 warning in 0.91s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_template_with_evidence_exact_string_and_last_contact_in_user_timezone
+    FAILED tests/test_agent_query_answer.py::test_template_without_last_contact_exact_string
+=== V20 원칙7 구절 뒤에 마침표 추가(글자 그대로 깨짐): exit=1 1 failed, 70 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_prompt_system_exact_sentences
+=== V21 Claude provider 문자열 'claude': exit=1 1 failed, 70 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_claude_answerer_parses_text_and_usage
+=== V22 Fake call_count 미증가: exit=1 2 failed, 69 passed, 1 warning in 0.90s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_fake_answerer_fail_raises_judge_unavailable_and_counts
+    FAILED tests/test_agent_query_answer.py::test_fake_answerer_table_and_default_and_call_count
+=== V23 스키마 additionalProperties True: exit=1 1 failed, 70 passed, 1 warning in 0.93s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_schema_and_tool_name_exact_values
+=== V24 _parse_answer 가 비문자열을 str() 로 받아들임: exit=1 3 failed, 68 passed, 1 warning in 0.91s -> 검출
+    FAILED tests/test_agent_query_answer.py::test_claude_answerer_non_string_answer_is_schema_error_not_empty[bad_output0]
+    FAILED tests/test_agent_query_answer.py::test_gemini_answerer_bad_json_and_non_string_are_schema_errors
+    FAILED tests/test_agent_query_answer.py::test_openai_answerer_non_string_answer_is_schema_error
+
+=== 요약 ===
+C0   대조군        FAIL  0  대조군(치환 없음)
+M1   검출         FAIL 14  계획 1: 금지 표현 검사 제거
+M2   검출         FAIL  2  계획 2: 글자 상한 > -> >=
+M3a  검출         FAIL  3  계획 3: settings QUERY_ANSWER_MAX_LINES 3 -> 4
+M3b  검출         FAIL  2  계획 3 변형: 상수는 3 그대로, 비교만 +1 (4줄 허용)
+M4   검출         FAIL  1  계획 4: 타임라인 자르지 않음
+M5   검출         FAIL  3  계획 5: 날짜를 UTC(사용자 시간대 변환 제거)
+V6   검출         FAIL  1  검사 순서: 금지 표현 먼저
+V7   검출         FAIL  2  no_record_reply 구분자 ', ' -> ','
+V8   검출         FAIL  1  근거 0건 판별에서 일정 제외
+V9   검출         FAIL  1  템플릿 n 에서 패턴 제외
+V10  검출         FAIL  1  E-6 '다른 인물과의 관계는 말하지 마라.' 삭제
+V11  검출         FAIL  2  QUERY_ANSWERERS 에서 gemini 제거
+V12  검출         FAIL  4  trace_tokens 가 (0, 0) 반환
+V13  검출         FAIL  4  empty 검사 제거
+V14  검출         FAIL  1  프롬프트 now 를 UTC 그대로
+V15  검출         FAIL  1  answerer_from_env 가 select_provider 를 우회
+V16  검출         FAIL  1  Claude 토큰 in/out 뒤바뀜
+V17  검출         FAIL  1  프롬프트에서 별칭 누락
+V18  검출         FAIL  1  Gemini response_schema 에 변환 없이 원 스키마
+V19  검출         FAIL  2  템플릿 끝 문장을 '인물 카드에서' 로(결정 F 이전 문구)
+V20  검출         FAIL  1  원칙7 구절 뒤에 마침표 추가(글자 그대로 깨짐)
+V21  검출         FAIL  1  Claude provider 문자열 'claude'
+V22  검출         FAIL  2  Fake call_count 미증가
+V23  검출         FAIL  1  스키마 additionalProperties True
+V24  검출         FAIL  3  _parse_answer 가 비문자열을 str() 로 받아들임
+생존 변이: 없음
+
+=== 실제 저장소 git status --short ===
+ M app/agent/__init__.py
+ M app/agent/respond.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P5b-query-turn/03-log.md
+ M docs/wiki/packages/P5b-query-turn/tests.md
+ M docs/wiki/registry.md
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0856-u3-answer.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0856-u3-pytest-all.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0857-u3-diff-filter.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0857-u3-mutation.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0857-u3-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0857-u3-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0857-u3-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0908-verifier-u3-full-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0908-verifier-u3-lint.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0908-verifier-u3-tests.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0908-verifier-u3-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0913-verifier-u3-contract-values.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0913-verifier-u3-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0914-verifier-u3-grep-constraints.txt
+?? tests/test_agent_query_answer.py
+

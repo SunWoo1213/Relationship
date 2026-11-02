@@ -1,0 +1,95 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u3/constraints.sh
+# 시각: 2026-11-02T09:14:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 06b7bb5 (dev2)
+# exit: 0
+# ---
+추가 줄 수(app): 401
+신규 테스트 줄 수: 594
+--- (1) create_person(/update_person(  /create_person\(|update_person\(/
+[app 추가 줄]
+  exit=1  (1 = 0건)
+[신규 테스트]
+  exit=1  (1 = 0건)
+--- (2) confidence/T_merge/t_merge/T_new/t_new  /confidence|T_merge|t_merge|T_new|t_new/
+[app 추가 줄]
+  exit=1  (1 = 0건)
+[신규 테스트]
+  exit=1  (1 = 0건)
+--- (3) sleep/while True  /time\.sleep|asyncio\.sleep|while True/
+[app 추가 줄]
+  exit=1  (1 = 0건)
+[신규 테스트]
+  exit=1  (1 = 0건)
+--- (4) PendingQuestion(Out 제외)/flag_modified/.context =  /PendingQuestion([^O]|$)|flag_modified|\.context =/
+[app 추가 줄]
+  exit=1  (1 = 0건)
+[신규 테스트]
+  exit=1  (1 = 0건)
+--- (4b) PendingQuestion 모든 표기  /PendingQuestion/
+[app 추가 줄]
+  exit=1  (1 = 0건)
+[신규 테스트]
+  exit=1  (1 = 0건)
+--- (5) 키 패턴  /sk-[A-Za-z0-9]{8}|AKIA[0-9A-Z]{8}|api_key *=|API_KEY *=|secret *=|password *=/
+[app 추가 줄]
+  exit=1  (1 = 0건)
+[신규 테스트]
+  exit=1  (1 = 0건)
+--- (5b) 환경변수 이름 등장(코드 vs 프롬프트 구분은 아래)  /ANTHROPIC_|OPENAI_|GEMINI_|LLM_PROVIDER|API_KEY/
+[app 추가 줄]
+230:            self.model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5")
+277:            self.model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+325:    """`google-genai` 구조화 출력. `GEMINI_MODEL` 기본값 없음(브리핑
+332:            model = os.environ.get("GEMINI_MODEL")
+336:                    "GeminiQueryAnswerer: GEMINI_MODEL 환경변수가 필요하다(기본값 "
+338:                    "콘솔에서 확인한 모델 이름을 .env 의 GEMINI_MODEL 에 넣는다"
+  exit=0  (1 = 0건)
+[신규 테스트]
+268:    for banned in ("API_KEY", "ANTHROPIC", "OPENAI", "GEMINI", "LLM_PROVIDER"):
+401:    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+469:    monkeypatch.setenv("ANTHROPIC_MODEL", "claude-custom-1")
+521:    monkeypatch.delenv("GEMINI_MODEL", raising=False)
+576:        ("anthropic", "ANTHROPIC_API_KEY", ClaudeQueryAnswerer, {}),
+577:        ("openai", "OPENAI_API_KEY", OpenAIQueryAnswerer, {}),
+578:        ("gemini", "GEMINI_API_KEY", GeminiQueryAnswerer, {"GEMINI_MODEL": "gemini-test-model"}),
+585:    assert isinstance(answerer_from_env(env={"LLM_PROVIDER": provider}), cls)
+592:        answerer_from_env(env={"LLM_PROVIDER": "llama"})
+594:        answerer_from_env(env={"LLM_PROVIDER": "gemini", "LLM_PROVIDERS_ENABLED": "anthropic"})
+  exit=0  (1 = 0건)
+--- (5c) 환경변수 이름이 등장하는 app 추가 줄의 맥락 (os.environ.get / 오류 메시지 뿐이어야)
+325:    """`google-genai` 구조화 출력. `GEMINI_MODEL` 기본값 없음(브리핑
+336:                    "GeminiQueryAnswerer: GEMINI_MODEL 환경변수가 필요하다(기본값 "
+338:                    "콘솔에서 확인한 모델 이름을 .env 의 GEMINI_MODEL 에 넣는다"
+  (os.environ.get 아닌 줄 exit=0)
+--- (5d) 프롬프트 문자열 상수·조립 줄(_QUERY_SYSTEM_PROMPT·build_query_answer_prompt)에 환경변수·키 이름 0 인가 — contract.py §5 가 실제 문자열로 확인
+--- (6) 기준 8a8767b respond.py 18행 docstring 'update_person(facts=…)' (예외 기록용)
+- `stored_facts`(FIX-016): 그 턴에 실행에 성공한 `update_person(facts=…)`
+--- (7) R-4 류 누적 집계 — app/agent/ 전체 *.py
+5a create_person\(:
+app/agent/loop.py:1473:            created = app_tools.create_person(
+5b update_person\(:
+app/agent/respond.py:18:- `stored_facts`(FIX-016): 그 턴에 실행에 성공한 `update_person(facts=…)`
+app/agent/loop.py:706:    턴에 **실행에 성공한** `update_person(facts=…)` 호출의 키를
+app/agent/loop.py:805:    """U7 -- 실행에 성공한 `update_person(facts=…)` 호출 하나에서 직접 쓴
+app/agent/loop.py:856:        return app_tools.update_person(
+app/agent/loop.py:1443:            app_tools.update_person(ctx, person_id, new_alias=mention)
+6 confidence 어휘:
+0
+9 sleep/while True:
+0
+23 PendingQuestion(Out 제외)/flag_modified/.context =:
+5
+--- 같은 집계 기준 8a8767b
+1
+5
+--- (8) respond.py 에서 app.api 런타임 import 여부
+73:if TYPE_CHECKING:  # 타입 힌트 전용 -- `app.api` 초기화가 `app.agent` 를 다시 import 해 생기는 순환을 피한다.
+74:    from app.api.schemas import PersonCardOut
+--- (9) 새 상수·새 환경변수 오버라이드(계획 밖) 여부 — respond.py 의 os.environ 사용 전수
+336:            self.model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5")
+392:            self.model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+456:            model = os.environ.get("GEMINI_MODEL")
+--- (10) 03-log U3 항목 유무
+10:- 남은 것 · 다음 단위: U1 계약(`Proposal.intent`·`PendingResume.intent`·스키마 enum(선택 키)·`STEP_LOOP_QUERY`·상수 `QUERY_TIMELINE_LI
+30:- 남은 것 · 다음 단위: U3 답 생성기·검증기·템플릿(`respond.py` 확장, 순수 층) — backend-agent(L-004).

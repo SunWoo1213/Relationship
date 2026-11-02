@@ -1,0 +1,94 @@
+# 명령: .venv/bin/python -m pytest tests/test_agent_query_answer.py -v
+# 시각: 2026-11-02T08:56:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 06b7bb5 (dev2)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 71 items
+
+tests/test_agent_query_answer.py::test_forbidden_expression_list_has_fourteen PASSED [  1%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uae30\ubd84] PASSED [  2%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uac10\uc815] PASSED [  4%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc704\ub85c] PASSED [  5%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uace0\ubbfc] PASSED [  7%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc0c1\ub2f4] PASSED [  8%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc2a4\ud2b8\ub808\uc2a4] PASSED [  9%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ub9c8\uc74c\uc774] PASSED [ 11%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ub9c8\uc74c\uc744] PASSED [ 12%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ubc30\ub824] PASSED [ 14%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ud798\ub4dc] PASSED [ 15%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ud798\ub4e4] PASSED [ 16%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc6b0\uc6b8] PASSED [ 18%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc18d\uc0c1] PASSED [ 19%]
+tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc11c\uc6b4] PASSED [ 21%]
+tests/test_agent_query_answer.py::test_validate_normal_answer_passes PASSED [ 22%]
+tests/test_agent_query_answer.py::test_validate_line_limit_boundary_three_lines_pass_four_rejected PASSED [ 23%]
+tests/test_agent_query_answer.py::test_validate_blank_lines_do_not_count PASSED [ 25%]
+tests/test_agent_query_answer.py::test_validate_char_limit_boundary_240_pass_241_rejected PASSED [ 26%]
+tests/test_agent_query_answer.py::test_validate_char_count_uses_stripped_text PASSED [ 28%]
+tests/test_agent_query_answer.py::test_validate_empty_or_blank_is_empty[] PASSED [ 29%]
+tests/test_agent_query_answer.py::test_validate_empty_or_blank_is_empty[   ] PASSED [ 30%]
+tests/test_agent_query_answer.py::test_validate_empty_or_blank_is_empty[\n \n] PASSED [ 32%]
+tests/test_agent_query_answer.py::test_validate_order_lines_before_length_before_forbidden PASSED [ 33%]
+tests/test_agent_query_answer.py::test_template_with_evidence_exact_string_and_last_contact_in_user_timezone PASSED [ 35%]
+tests/test_agent_query_answer.py::test_template_count_is_facts_plus_patterns PASSED [ 36%]
+tests/test_agent_query_answer.py::test_template_without_last_contact_exact_string PASSED [ 38%]
+tests/test_agent_query_answer.py::test_template_no_evidence_exact_string_even_with_last_contact PASSED [ 39%]
+tests/test_agent_query_answer.py::test_has_evidence_true_for_each_source[card0] PASSED [ 40%]
+tests/test_agent_query_answer.py::test_has_evidence_true_for_each_source[card1] PASSED [ 42%]
+tests/test_agent_query_answer.py::test_has_evidence_true_for_each_source[card2] PASSED [ 43%]
+tests/test_agent_query_answer.py::test_has_evidence_true_for_each_source[card3] PASSED [ 45%]
+tests/test_agent_query_answer.py::test_template_outputs_pass_validator PASSED [ 46%]
+tests/test_agent_query_answer.py::test_no_record_reply_exact_strings PASSED [ 47%]
+tests/test_agent_query_answer.py::test_no_record_reply_keeps_input_order PASSED [ 49%]
+tests/test_agent_query_answer.py::test_no_mention_reply_exact_string PASSED [ 50%]
+tests/test_agent_query_answer.py::test_hint_constants_exact_values PASSED [ 52%]
+tests/test_agent_query_answer.py::test_prompt_system_exact_sentences PASSED [ 53%]
+tests/test_agent_query_answer.py::test_prompt_user_text_has_question_now_and_evidence_values PASSED [ 54%]
+tests/test_agent_query_answer.py::test_prompt_excludes_raw_ids_and_secrets PASSED [ 56%]
+tests/test_agent_query_answer.py::test_prompt_timeline_limit_keeps_only_first_five PASSED [ 57%]
+tests/test_agent_query_answer.py::test_prompt_last_contact_date_in_user_timezone_not_utc PASSED [ 59%]
+tests/test_agent_query_answer.py::test_query_answer_trace_tokens_shape PASSED [ 60%]
+tests/test_agent_query_answer.py::test_fake_answerer_table_and_default_and_call_count PASSED [ 61%]
+tests/test_agent_query_answer.py::test_fake_answerer_fail_raises_judge_unavailable_and_counts PASSED [ 63%]
+tests/test_agent_query_answer.py::test_schema_and_tool_name_exact_values PASSED [ 64%]
+tests/test_agent_query_answer.py::test_claude_answerer_request_forces_tool_choice_and_schema PASSED [ 66%]
+tests/test_agent_query_answer.py::test_claude_answerer_parses_text_and_usage PASSED [ 67%]
+tests/test_agent_query_answer.py::test_claude_answerer_no_tool_use_is_schema_error PASSED [ 69%]
+tests/test_agent_query_answer.py::test_claude_answerer_non_string_answer_is_schema_error_not_empty[bad_output0] PASSED [ 70%]
+tests/test_agent_query_answer.py::test_claude_answerer_non_string_answer_is_schema_error_not_empty[bad_output1] PASSED [ 71%]
+tests/test_agent_query_answer.py::test_claude_answerer_non_string_answer_is_schema_error_not_empty[bad_output2] PASSED [ 73%]
+tests/test_agent_query_answer.py::test_claude_answerer_non_string_answer_is_schema_error_not_empty[bad_output3] PASSED [ 74%]
+tests/test_agent_query_answer.py::test_claude_answerer_empty_string_answer_passes_through_for_validator PASSED [ 76%]
+tests/test_agent_query_answer.py::test_claude_answerer_maps_timeout_error PASSED [ 77%]
+tests/test_agent_query_answer.py::test_claude_answerer_maps_rate_limit_error PASSED [ 78%]
+tests/test_agent_query_answer.py::test_claude_answerer_default_model_follows_env_and_reuses_judge_timeout PASSED [ 80%]
+tests/test_agent_query_answer.py::test_openai_answerer_request_and_parse PASSED [ 81%]
+tests/test_agent_query_answer.py::test_openai_answerer_no_tool_calls_is_schema_error PASSED [ 83%]
+tests/test_agent_query_answer.py::test_openai_answerer_non_string_answer_is_schema_error PASSED [ 84%]
+tests/test_agent_query_answer.py::test_openai_answerer_maps_timeout_and_connection_errors PASSED [ 85%]
+tests/test_agent_query_answer.py::test_openai_answerer_maps_rate_limit_error PASSED [ 87%]
+tests/test_agent_query_answer.py::test_gemini_answerer_requires_model_env PASSED [ 88%]
+tests/test_agent_query_answer.py::test_gemini_answerer_request_uses_schema_and_parses PASSED [ 90%]
+tests/test_agent_query_answer.py::test_gemini_answerer_bad_json_and_non_string_are_schema_errors PASSED [ 91%]
+tests/test_agent_query_answer.py::test_gemini_answerer_maps_rate_limit_and_timeout_errors PASSED [ 92%]
+tests/test_agent_query_answer.py::test_query_answerers_registry_has_three_providers PASSED [ 94%]
+tests/test_agent_query_answer.py::test_answerer_from_env_follows_llm_provider[anthropic-ANTHROPIC_API_KEY-ClaudeQueryAnswerer-extra_env0] PASSED [ 95%]
+tests/test_agent_query_answer.py::test_answerer_from_env_follows_llm_provider[openai-OPENAI_API_KEY-OpenAIQueryAnswerer-extra_env1] PASSED [ 97%]
+tests/test_agent_query_answer.py::test_answerer_from_env_follows_llm_provider[gemini-GEMINI_API_KEY-GeminiQueryAnswerer-extra_env2] PASSED [ 98%]
+tests/test_agent_query_answer.py::test_answerer_from_env_unknown_and_disabled_rejected PASSED [100%]
+
+=============================== warnings summary ===============================
+tests/test_agent_query_answer.py::test_gemini_answerer_request_uses_schema_and_parses
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 71 passed, 1 warning in 0.78s =========================

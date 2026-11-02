@@ -1,0 +1,8 @@
+# 명령: git diff --stat 8a8767b -- app/briefing app/er app/api app/agent/loop.py app/agent/gate.py alembic web
+# 시각: 2026-11-02T08:57:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 06b7bb5 (dev2)
+# exit: 0
+# ---
+ app/agent/gate.py | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)

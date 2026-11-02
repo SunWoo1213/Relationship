@@ -51,3 +51,58 @@
 | test_agent_query_gate.py::test_prompt_has_intent_classification_sentence | (i) 의도 분류 문장 | system 에 "intent 를 query"·"record"·"둘이 섞이면 query" | 통과 · — | 기록 없음 |
 | test_agent_query_gate.py::test_prompt_has_query_mention_exception_sentences_after_old_sentence | (ii) 예외 두 문장 글자 그대로·바로 뒤 | 기존 "절대 제안하지 마라." 뒤 한 칸 띄고 바로 이어짐 | 통과 · — | 기록 없음 |
 | test_agent_query_gate.py::test_prompt_excludes_self_reference | (iii) 사용자 자신 지칭 제외 | "'나'·'저'·'내'·'제'", "사용자 자신을 가리키는 말은 인물로 제안하지 마라" | 통과 · — | 기록 없음 |
+
+## tests/test_agent_query_answer.py — U3 조회 답 생성기·검증기·템플릿 (신규 71건 = 함수 48개, 파라미터 포함)
+
+증거: `evidence/20261102-0856-u3-answer.txt`(71 passed), `evidence/20261102-0856-u3-pytest-all.txt`(전체 2081 passed, skip 0; 기준선 2010 → +71), 변이 `evidence/20261102-0857-u3-mutation.txt`(M1~M7). 첫 실행에서 전부 통과(실패 이력 없음). 변이 번호는 U3-M1~M7.
+
+| 파일::테스트 이름 | 무엇을 확인하나 | 입력 → 기대 | 결과 · 검출 변이 | 실패 이력 |
+|---|---|---|---|---|
+| test_agent_query_answer.py::test_forbidden_expression_list_has_fourteen | 금지 표현 목록 크기 | `len(BRIEFING_FORBIDDEN_EXPRESSIONS)==14` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression (14건) | 금지 표현 14개 각각 | `"그분은 {bad} 같아요."` → `"forbidden_expression"` | 통과 · U3-M1(14건 모두) | 기록 없음 |
+| test_agent_query_answer.py::test_validate_normal_answer_passes | 정상 답 | → `None` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_validate_line_limit_boundary_three_lines_pass_four_rejected | 줄 수 경계 | 3줄 `None`, 4줄 `"too_many_lines"` | 통과 · U3-M3 | 기록 없음 |
+| test_agent_query_answer.py::test_validate_blank_lines_do_not_count | 공백 줄 불산입 | 빈 줄 섞인 3줄 → `None` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_validate_char_limit_boundary_240_pass_241_rejected | 글자 수 경계 | 240자 `None`, 241자 `"too_long"` | 통과 · U3-M2 | 기록 없음 |
+| test_agent_query_answer.py::test_validate_char_count_uses_stripped_text | strip 후 글자 수 | 앞뒤 공백 붙은 240자 → `None` | 통과 · U3-M2 | 기록 없음 |
+| test_agent_query_answer.py::test_validate_empty_or_blank_is_empty (3건) | 빈/공백 | `""`·`"   "`·`"\n \n"` → `"empty"` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_validate_order_lines_before_length_before_forbidden | 검사 순서 | 금지어+4줄 → `too_many_lines`, 금지어+241자 → `too_long` | 통과 · U3-M3 | 기록 없음 |
+| test_agent_query_answer.py::test_template_with_evidence_exact_string_and_last_contact_in_user_timezone | 템플릿 근거 있음 정확한 문자열 | UTC 10-20 16:30 → 서울 `10월 21일`, 1건 | 통과 · U3-M5 | 기록 없음 |
+| test_agent_query_answer.py::test_template_count_is_facts_plus_patterns | n = 사실+패턴 | 사실 2+패턴 1 → `알고 있는 것 3건` | 통과 · U3-M6 | 기록 없음 |
+| test_agent_query_answer.py::test_template_without_last_contact_exact_string | `last_contact_at` 없음 정확한 문자열 | 타임라인만 → `마지막 접촉 기록 없음, 알고 있는 것 0건` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_template_no_evidence_exact_string_even_with_last_contact | 근거 0건 정확한 문자열 | → `…동로 기억하고 있어요. 그 밖의 기록은 아직 없어요.` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_has_evidence_true_for_each_source (4건) | 사실·패턴·타임라인·일정 각각 근거 | → `True` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_template_outputs_pass_validator | 폴백이 다시 걸리지 않음 | 템플릿 3종 → `validate_query_answer` `None` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_no_record_reply_exact_strings | 기록 없음 문구 | 1개/2개 정확한 문자열 | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_no_record_reply_keeps_input_order | 입력 순서 유지 | `["나","가","다"]` 그대로 | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_no_mention_reply_exact_string | 언급 0개 문구 | 정확한 문자열 | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_hint_constants_exact_values | 힌트 상수 | `QUERY_ONE_AT_A_TIME_HINT`·`QUERY_MORE_HINT` 값 | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_prompt_system_exact_sentences | E-6 system 글자 그대로 | 원칙7 구절 포함 전문 일치 | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_prompt_user_text_has_question_now_and_evidence_values | user_text 근거 값 | 질문 1건·`now` 서울 오프셋·이름·관계·별칭·날짜·사실·패턴·타임라인·일정 | 통과 · U3-M5 | 기록 없음 |
+| test_agent_query_answer.py::test_prompt_excludes_raw_ids_and_secrets | 원문·id·키 미포함 | `절대노출금지`·`raw_utterance`·id 3종·`source_count`·`briefed_at`·환경변수명 없음 | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_prompt_timeline_limit_keeps_only_first_five | 타임라인 5건 상한 | 6건 입력 → 1~5 있음·6 없음 | 통과 · U3-M4 | 기록 없음 |
+| test_agent_query_answer.py::test_prompt_last_contact_date_in_user_timezone_not_utc | 프롬프트 날짜 사용자 시간대 | `10월 21일` 있고 `10월 20일` 없음 | 통과 · U3-M5 | 기록 없음 |
+| test_agent_query_answer.py::test_query_answer_trace_tokens_shape | `trace_tokens()` 모양 | `(3, 4)` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_fake_answerer_table_and_default_and_call_count | Fake 표·기본값·호출 수 | 표 키 → 답, 없으면 `""`, `fake`, 토큰 0, `call_count==2` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_fake_answerer_fail_raises_judge_unavailable_and_counts | Fake `fail` | `JudgeUnavailable("timeout")`, `call_count==1` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_schema_and_tool_name_exact_values | 스키마·도구 이름 값 | `report_query_answer`, `{answer}`·`required`·`additionalProperties False` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_claude_answerer_request_forces_tool_choice_and_schema | Claude 요청 본문 | `tool_choice`·`tools` 값, 질문 포함, 키·환경변수명 없음 | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_claude_answerer_parses_text_and_usage | Claude 응답 파싱 | 텍스트·`(5,7)`·`anthropic` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_claude_answerer_no_tool_use_is_schema_error | tool_use 없음 | `JudgeUnavailable("schema")` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_claude_answerer_non_string_answer_is_schema_error_not_empty (4건) | answer 비문자열 | 123·None·키 없음·다른 키 → `"schema"` | 통과 · U3-M7 | 기록 없음 |
+| test_agent_query_answer.py::test_claude_answerer_empty_string_answer_passes_through_for_validator | 빈 문자열은 검증기 몫 | `text==""`, 검증기 `"empty"` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_claude_answerer_maps_timeout_error | Claude timeout 매핑 | → `"timeout"` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_claude_answerer_maps_rate_limit_error | Claude rate_limit 매핑 | → `"rate_limit"` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_claude_answerer_default_model_follows_env_and_reuses_judge_timeout | 모델 env·타임아웃 재사용 | `ANTHROPIC_MODEL`, `ER_JUDGE_TIMEOUT`/`ER_JUDGE_MAX_RETRIES` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_openai_answerer_request_and_parse | OpenAI 요청·파싱 | `tool_choice`·`parameters`, 텍스트·`(5,6)`·`openai` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_openai_answerer_no_tool_calls_is_schema_error | tool_calls 없음 | → `"schema"` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_openai_answerer_non_string_answer_is_schema_error | answer 비문자열 | → `"schema"` | 통과 · U3-M7 | 기록 없음 |
+| test_agent_query_answer.py::test_openai_answerer_maps_timeout_and_connection_errors | OpenAI 오류 매핑 | → `"timeout"`·`"connection"` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_openai_answerer_maps_rate_limit_error | OpenAI rate_limit | → `"rate_limit"` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_gemini_answerer_requires_model_env | `GEMINI_MODEL` 필수 | → `InvalidValue` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_gemini_answerer_request_uses_schema_and_parses | Gemini 스키마·파싱 | `_to_gemini_schema` 일치, 텍스트·`(7,8)`·`gemini` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_gemini_answerer_bad_json_and_non_string_are_schema_errors | Gemini 스키마 위반 | JSON 아님·text 없음·answer 숫자 → `"schema"` | 통과 · U3-M7 | 기록 없음 |
+| test_agent_query_answer.py::test_gemini_answerer_maps_rate_limit_and_timeout_errors | Gemini 오류 매핑 | 429 → `"rate_limit"`, ReadTimeout → `"timeout"` | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_query_answerers_registry_has_three_providers | 등록표 | 키 집합 3종 | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_answerer_from_env_follows_llm_provider (3건) | `LLM_PROVIDER` 선택 | anthropic/openai/gemini → 해당 클래스 | 통과 · — | 기록 없음 |
+| test_agent_query_answer.py::test_answerer_from_env_unknown_and_disabled_rejected | 미지·비활성 거부 | → `InvalidValue` | 통과 · — | 기록 없음 |

@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-11-02 (P5b-query-turn U1 커밋 `1dccb95` dev2 푸시 끝(CI 40827034873 success) → U2 구현 끝(28 passed·회귀 184·전체 2010·ruff·tools_check 7/7·기존 테스트 수정 0; 계획 변이 "Q 를 ② 앞" 은 **동등 변이**(`search_person` ∉ `WRITE_TOOLS`) → 대체 변이 M2b/M2c 로 의도 검증; U1-M1 재실행 42 FAIL — R-U1-1 문장 성립) → verifier U2 리뷰 **통과**([필수] 0 · [권고] R-U2-1~5 → 01-plan 94·99행·tests.md·03-log 반영) → 사용자 "주석 2줄 지금 고치고 커밋 + 실험 푸시" → **U2 backend-agent 재개 중(R-U2-2 `gate.py` 284·293행 주석만 — `gate.py` 가 그 작업으로 바뀌는 중, 03-log 에 처리 방식 기록)** → 메인 grep·pytest 확인 → `feat(P5b-query-turn)` U2 커밋(초안 `.claude/commit-draft.txt` 준비됨) → dev2 푸시 → U3 위임(L-004))
+갱신: 2026-11-02 (P5b-query-turn **U2 커밋 `06b7bb5`** dev2 푸시 끝(verifier 통과 [필수] 0 · [권고] R-U2-1~5 반영, R-U2-2 주석 2줄은 backend-agent 재개로 고침) → U3 구현 끝(71 passed·전체 2081·ruff·7/7·기존 테스트 수정 0·변이 7/7; 사후 판단 5건 → **사용자 전부 수용**) → verifier U3 리뷰 **통과**([필수] 0 · [권고] R-U3-1~5 → 03-log; R-U3-1·2 는 U4 위임문 항목) → **U3 커밋 승인 대기 + R-U3-4(E-6 system 문장 경계 마침표) 결정 대기** → U4 위임. 작업 트리의 `app/agent/respond.py`·`__init__.py` 미커밋 변경은 U3 작업분)
 
-active: **P5b-query-turn**(U1 끝 `1dccb95`, U2~U7 남음) | frozen: none | 브랜치 `dev2` = origin/dev2 **`1dccb95`**(CI 결과 다음에 확인. 계획 `fe4a99e` CI 40803643037 success) | **origin/dev `678bca7`(승격 2026-10-28)** · origin/main `f05d017` | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 12 — U10·U5 확인 행, 원칙8), 테스트 `relationship_test` | 기준선(코드 `a0f4bc3`): 백엔드 **1958 passed skip 0** · 프론트 **156 passed** · typecheck 0 · E2E 4
+active: **P5b-query-turn**(U1 `1dccb95` · U2 `06b7bb5`, U3~U7 남음) | frozen: none | 브랜치 `dev2` = origin/dev2 **`06b7bb5`**(CI 결과 다음에 확인. U1 `1dccb95` CI 40827034873 success) | **origin/dev `678bca7`(승격 2026-10-28)** · origin/main `f05d017` | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 12 — U10·U5 확인 행, 원칙8), 테스트 `relationship_test` | 기준선(코드 `a0f4bc3`): 백엔드 **1958 passed skip 0** · 프론트 **156 passed** · typecheck 0 · E2E 4
 
 ## 최근 끝낸 것
 | 무엇 | 결과 | 기록 |
@@ -16,7 +16,7 @@ active: **P5b-query-turn**(U1 끝 `1dccb95`, U2~U7 남음) | frozen: none | 브�
 | **P8b-persons-grid 완료(10-28)** | 계획 `0973858` → U0 `adc650e`(`GET /persons` `aliases`) → U1 `2112a2a`(`PersonGrid` 그리드+검색) → U2 `529922f`(사이드바 5명+전체 보기) → U3 `a0f4bc3`(E2E, CI 복구) → U4 `fff6e8c`(판정 13행) → U5 사람 점검(메인 세션 Chrome+Playwright, 8항 통과, 수정 0) → verifier 04-review `완료`([필수] 0 · [권고] R-U5R-1~11) → **사용자 승인(R-U5R-2 면제)** → `CURRENT active: none` | `packages/P8b-persons-grid/04-review.md`·`03-log.md`·`tests.md` |
 
 ## 진행 중 (이 턴에서 멈춘 자리)
-- **P5b-query-turn U2 backend-agent 진행 중**(11-02). 계획 `fe4a99e` → U1 `1dccb95`(계약: `intent`·`PendingResume.intent`·`loop_query`·상수 4·테스트 24, 전체 1982). 03-log U1 항목 `pending` → `1dccb95` 는 다음 커밋에. U2 뒤 변이 M1 재실행(01-plan 94행 메모). 이 패키지의 단위마다: 보고 재실행(pytest·ruff·tools_check·`--diff-filter=M` 빈 출력) → verifier 커밋 전 리뷰(L-004) → `/commit`(feat/test(P5b-query-turn)) → dev2 푸시. U7 실 LLM 왕복은 메인 세션·사용자(발화 6개, 결정 H).
+- **P5b-query-turn U3 위임 대기**(11-02). 계획 `fe4a99e` → U1 `1dccb95`(계약) → U2 `06b7bb5`(게이트 Q + 프롬프트, 전체 2010). 03-log U2 항목 `pending` → `06b7bb5` 는 다음 커밋에. 01-plan 94행 R-U1-1 메모 닫힘(42 FAIL). 이 패키지의 단위마다: 보고 재실행(pytest·ruff·tools_check·`--diff-filter=M` 빈 출력) → verifier 커밋 전 리뷰(L-004) → `/commit`(feat/test(P5b-query-turn)) → dev2 푸시. U7 실 LLM 왕복은 메인 세션·사용자(발화 6개, 결정 H).
 - 2026-10-28 처리: P8b 완료 `678bca7` → dev 승격 `678bca7`(L-003 잠금 해제, main 은 나중) → CR-004 `8a8767b` → P5b 계획 `fe4a99e`. P8b 03-log U5·완료 항목 `pending` → `678bca7` 은 다음에 P8b 문서 만질 때.
 - 백그라운드 서버: 백엔드 :8000(10-28 재시작, U0 코드) · 프론트 :5173. 세션 끝나면 꺼진다.
 - Claude in Chrome: 이 세션은 Mac Chrome 만 연결돼 있었음. 창 폭 조절은 전체 화면 창에서 무시됨 → 모바일은 Playwright 스크립트(스크래치패드)로.

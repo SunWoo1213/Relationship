@@ -1,0 +1,270 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u3/contract.py
+# 시각: 2026-11-02T09:13:58+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 06b7bb5 (dev2)
+# exit: 1
+# ---
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u3/contract.py", line 28, in <module>
+    import app.agent as ag  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'app'
+
+# ===== append 2026-11-02T09:18:00+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u3/contract.py
+# 시각: 2026-11-02T09:18:00+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 06b7bb5 (dev2)
+# exit: 0
+# ---
+=== 1. 스키마·도구 이름 ===
+[PASS] QUERY_ANSWER_SCHEMA 동치 -- {'type': 'object', 'properties': {'answer': {'type': 'string'}}, 'required': ['answer'], 'additionalProperties': False}
+[PASS] QUERY_ANSWER_TOOL_NAME -- report_query_answer
+=== 2. validate_query_answer ===
+[PASS] '' -> empty -- 'empty'
+[PASS] '  \n ' -> empty -- 'empty'
+[PASS] 3줄 통과 -- None
+[PASS] 4줄 -> too_many_lines -- 'too_many_lines'
+[PASS] 공백 줄 불산입(3 비공백 + 2 공백 줄 통과)
+[PASS] 240자 통과 -- None
+[PASS] 241자 -> too_long -- 'too_long'
+[PASS] strip 뒤 240자 통과
+[PASS] 금지 표현 목록 14개 -- 14
+[PASS] 금지 표현 '기분' -> forbidden_expression
+[PASS] 금지 표현 '감정' -> forbidden_expression
+[PASS] 금지 표현 '위로' -> forbidden_expression
+[PASS] 금지 표현 '고민' -> forbidden_expression
+[PASS] 금지 표현 '상담' -> forbidden_expression
+[PASS] 금지 표현 '스트레스' -> forbidden_expression
+[PASS] 금지 표현 '마음이' -> forbidden_expression
+[PASS] 금지 표현 '마음을' -> forbidden_expression
+[PASS] 금지 표현 '배려' -> forbidden_expression
+[PASS] 금지 표현 '힘드' -> forbidden_expression
+[PASS] 금지 표현 '힘들' -> forbidden_expression
+[PASS] 금지 표현 '우울' -> forbidden_expression
+[PASS] 금지 표현 '속상' -> forbidden_expression
+[PASS] 금지 표현 '서운' -> forbidden_expression
+[PASS] 순서: 4줄 + 금지 -> too_many_lines -- 'too_many_lines'
+[PASS] 순서: 241자 + 금지 -> too_long -- 'too_long'
+[PASS] 순서: 3줄+240자+금지 -> forbidden_expression
+[PASS] 사유 상수 재사용 — REASON_TOO_LONG is compose.REASON_TOO_LONG
+[PASS] 사유 상수 재사용 — REASON_FORBIDDEN_EXPRESSION is compose.REASON_FORBIDDEN_EXPRESSION
+[PASS] REASON_EMPTY/REASON_TOO_MANY_LINES 값
+[PASS] 금지 목록 import 가 같은 객체
+=== 3. 템플릿 5종 (결정 E-5) ===
+[PASS] 근거 있음(사실 1, LC=10-20T16:30Z) -- '박선우 과장님 — 직장·동, 마지막 접촉 10월 21일, 알고 있는 것 1건. 자세한 건 인물 화면에서 볼 수 있어요.'
+[PASS] last_contact_at=None -- '박선우 과장님 — 직장·동, 마지막 접촉 기록 없음, 알고 있는 것 0건. 자세한 건 인물 화면에서 볼 수 있어요.'
+[PASS] 근거 0건(LC 있어도) -- '박선우 과장님 — 직장·동로 기억하고 있어요. 그 밖의 기록은 아직 없어요.'
+[PASS] 근거 0건 + LC None + 별칭 0 -- '박선우 과장님 — 직장·동로 기억하고 있어요. 그 밖의 기록은 아직 없어요.'
+[PASS] n = facts+patterns = 4 (타임라인·일정 제외) -- 박선우 과장님 — 직장·동, 마지막 접촉 10월 21일, 알고 있는 것 4건. 자세한 건 인물 화면에서 볼 수 있어요.
+[PASS] 0 패딩 없음 — 1월 6일 -- 박선우 과장님 — 직장·동, 마지막 접촉 1월 6일, 알고 있는 것 1건. 자세한 건 인물 화면에서 볼 수 있어요.
+[PASS] no_record_reply(["김철수"]) -- "김철수"에 대한 기록이 없어요.
+[PASS] no_record_reply(["김철수","이영희"]) -- "김철수", "이영희"에 대한 기록이 없어요.
+[PASS] no_record_reply 순서 유지
+    no_record_reply([]) = '에 대한 기록이 없어요.' (계획에 정의 없음 — 호출자 U4 가 언급 0 을 먼저 거른다)
+[PASS] no_mention_reply() -- 누구에 대해 물어보셨는지 알아듣지 못했어요. 이름을 넣어 다시 물어봐 주세요.
+[PASS] QUERY_MORE_HINT -- 자세한 건 인물 화면에서 볼 수 있어요.
+[PASS] QUERY_ONE_AT_A_TIME_HINT -- 한 번에 한 사람씩 물어봐 주세요.
+[PASS] QUERY_MORE_HINT 가 settings 에 없음(결정 F ① respond.py 상수)
+[PASS] 템플릿 출력이 검증기 통과 — 근거 있음 -- None
+[PASS] 템플릿 출력이 검증기 통과 — 근거 0 -- None
+[PASS] 템플릿 출력이 검증기 통과 — LC None -- None
+[PASS] 템플릿 출력이 검증기 통과 — 가득 -- None
+[PASS] 템플릿 근거 있음 1줄·길이 <= 240 -- 66
+[PASS] 고정 응답이 검증기 통과 — no_record 1
+[PASS] 고정 응답이 검증기 통과 — no_record 2
+[PASS] 고정 응답이 검증기 통과 — no_mention
+=== 4. has_evidence ===
+[PASS] facts 만 -> True
+[PASS] patterns 만 -> True
+[PASS] timeline 만 -> True
+[PASS] schedules 만 -> True
+[PASS] 모두 0 (LC 있음) -> False
+[PASS] 모두 0 (별칭 있음) -> False
+=== 5. build_query_answer_prompt ===
+[PASS] CLAUDE.md 원칙7 조회 구절을 찾음
+    원칙7 구절(굵게 제거): 채팅의 조회 답(CR-004 · D16)도 기록된 사실의 재진술로 한정한다 — 평가·조언·감정 대화는 하지 않는다
+[PASS] system 에 원칙7 구절 원문 포함
+[PASS] system == E-6 문장 글자 그대로(01-plan 243행 조립) -- len 255 vs 255
+[PASS] system 에 'report_query_answer 도구로만 답하라' 포함
+[PASS] system 에 '다른 인물과의 관계는 말하지 마라' 포함
+[PASS] system 에 '1~3줄' 포함
+[PASS] user 에 질문 원문 정확히 1회 -- 1
+[PASS] user 에 now 사용자 시간대 ISO
+[PASS] user 에 now UTC 표기 없음
+[PASS] user 에 이름·관계
+[PASS] user 에 별칭
+[PASS] user 에 마지막 접촉 사용자 시간대
+[PASS] user 에 사실 전부(2)
+[PASS] user 에 패턴 전부(2)
+[PASS] user 에 타임라인 1~5 만
+[PASS] user 타임라인 줄 형식
+[PASS] user 에 일정 전부(3)
+[PASS] 없어야 함: 424242
+[PASS] 없어야 함: 535353
+[PASS] 없어야 함: 535354
+[PASS] 없어야 함: 646464
+[PASS] 없어야 함: 646465
+[PASS] 없어야 함: 757501
+[PASS] 없어야 함: 757505
+[PASS] 없어야 함: 868601
+[PASS] 없어야 함: raw_utterance
+[PASS] 없어야 함: source_count
+[PASS] 없어야 함: briefed_at
+[PASS] 없어야 함: 절대노출금지
+[PASS] 없어야 함(환경변수·비밀): ANTHROPIC
+[PASS] 없어야 함(환경변수·비밀): OPENAI
+[PASS] 없어야 함(환경변수·비밀): GEMINI
+[PASS] 없어야 함(환경변수·비밀): LLM_PROVIDER
+[PASS] 없어야 함(환경변수·비밀): API_KEY
+[PASS] 없어야 함(환경변수·비밀): environ
+[PASS] 없어야 함(환경변수·비밀): sk-
+[PASS] 없어야 함(환경변수·비밀): .env
+[PASS] 없어야 함(환경변수·비밀): SECRET
+[PASS] 없어야 함(환경변수·비밀): TOKEN
+[PASS] user 에 person id 필드명 'id' 줄 없음
+    [참고] PersonCardOut 필드 집합: ['aliases', 'facts', 'last_contact_at', 'patterns', 'person', 'timeline', 'upcoming_schedules'] / TimelineEventOut: ['content', 'id', 'occurred_at', 'type'] -- raw_utterance 필드 자체가 없다(구조적 보장, '절대노출금지' 단언은 공허)
+[PASS] 빈 카드: 빈 절 '- 없음' 4회·별칭 없음·마지막 접촉 기록 없음 -- 질문: 박선우 과장님이랑 나는 관계가 뭐야?
+현재 시각: 2026-10-25T12:00:00+09:00
+
+[인물 카드]
+이름: 박선우 과장님
+관계: 직장·동
+별칭: 없음
+마지막 접촉: 기록 없음
+알고 있는 사실:
+- 없음
+반복 패턴:
+- 없음
+최근 타임라인(최대 5건):
+- 없음
+예정된 일정:
+- 없음
+---- user_text(가득) ----
+질문: 박선우 과장님이랑 나는 관계가 뭐야?
+현재 시각: 2026-10-25T12:00:00+09:00
+
+[인물 카드]
+이름: 박선우 과장님
+관계: 직장·동
+별칭: 과장님
+마지막 접촉: 10월 21일
+알고 있는 사실:
+- hobby=등산 (10월 21일)
+- team=플랫폼팀 (10월 19일)
+반복 패턴:
+- 점심 3회 (2026-01-01, 2026-02-01, 2026-03-01)
+- 칭찬 4회 (…)
+최근 타임라인(최대 5건):
+- [meal] 타임라인검증1 (10월 19일)
+- [meal] 타임라인검증2 (10월 19일)
+- [meal] 타임라인검증3 (10월 19일)
+- [meal] 타임라인검증4 (10월 19일)
+- [meal] 타임라인검증5 (10월 19일)
+예정된 일정:
+- 일정검증1 (11월 3일)
+- 일정검증2 (11월 3일)
+- 일정검증3 (11월 3일)
+---- user_text(빈 카드) ----
+질문: 박선우 과장님이랑 나는 관계가 뭐야?
+현재 시각: 2026-10-25T12:00:00+09:00
+
+[인물 카드]
+이름: 박선우 과장님
+관계: 직장·동
+별칭: 없음
+마지막 접촉: 기록 없음
+알고 있는 사실:
+- 없음
+반복 패턴:
+- 없음
+최근 타임라인(최대 5건):
+- 없음
+예정된 일정:
+- 없음
+---- system ----
+너는 사용자가 기록해 둔 한 인물의 정보를 묻는 질문에 답하는 보조 도구다. 채팅의 조회 답(CR-004 · D16)도 기록된 사실의 재진술로 한정한다 — 평가·조언·감정 대화는 하지 않는다 아래 인물 카드 자료만 근거로 1~3줄 한국어로 답하고, 자료에 없는 것은 '기록이 없어요'라고 답하라. 추측하거나 새 사실을 만들지 마라. 다른 인물과의 관계는 말하지 마라. 위로·조언·감정 표현을 쓰지 마라. report_query_answer 도구로만 답하라.
+-------------------------
+=== 6. QueryAnswer·Fake·JudgeUnavailable ===
+[PASS] QueryAnswer frozen
+[PASS] trace_tokens() 모양 == ComposedBriefing.trace_tokens() -- (3, 4) (3, 4)
+[PASS] trace_tokens 반환 타입 tuple
+[PASS] QueryAnswer 필드 5종 -- ['text', 'tokens_in', 'tokens_out', 'provider', 'model']
+[PASS] QueryAnswerer.answer(question, evidence, now) -- (self, question: 'str', evidence: "'PersonCardOut'", now: 'datetime') -> 'QueryAnswer'
+[PASS] Fake table/기본값/call_count
+[PASS] Fake fail -> JudgeUnavailable, str(e)==fail, call_count 1 -- api_error
+[PASS] JudgeUnavailable 은 Exception 직계(위치 인자 str(e) 가 그 값)
+[PASS] Fake 는 QueryAnswerer Protocol 모양
+=== 7. 공급자 3종 — compose.py 작성기와 같은 오류 어휘 ===
+[PASS] Claude timeout: answerer == composer == 기대 -- answerer=timeout composer=timeout
+[PASS] Claude rate_limit: answerer == composer == 기대 -- answerer=rate_limit composer=rate_limit
+[PASS] Claude api_error: answerer == composer == 기대 -- answerer=api_error composer=api_error
+[PASS] Claude connection: answerer == composer == 기대 -- answerer=connection composer=connection
+[PASS] OpenAI timeout: answerer == composer == 기대 -- answerer=timeout composer=timeout
+[PASS] OpenAI rate_limit: answerer == composer == 기대 -- answerer=rate_limit composer=rate_limit
+[PASS] OpenAI api_error: answerer == composer == 기대 -- answerer=api_error composer=api_error
+[PASS] OpenAI connection: answerer == composer == 기대 -- answerer=connection composer=connection
+[PASS] Gemini rate_limit: answerer == composer == 기대 -- answerer=rate_limit composer=rate_limit
+[PASS] Gemini api_error: answerer == composer == 기대 -- answerer=api_error composer=api_error
+[PASS] Gemini timeout: answerer == composer == 기대 -- answerer=timeout composer=timeout
+[PASS] Gemini connection: answerer == composer == 기대 -- answerer=connection composer=connection
+[PASS] Claude 정상: text·tokens·provider·model -- QueryAnswer(text='등산을 좋아해요.', tokens_in=11, tokens_out=22, provider='anthropic', model='claude-x')
+[PASS] Claude provider 문자열 == compose.py 작성기 provider
+[PASS] Claude 요청 tool_choice 강제
+[PASS] Claude 요청 max_tokens == compose.py 와 같은 1024
+[PASS] Claude 요청 본문에 환경변수·키 없음
+[PASS] Claude tool_use 없음 -> schema
+[PASS] Claude answer 비문자열 -> schema
+[PASS] Claude input 이 dict 아님 -> schema
+[PASS] Claude usage None -> 토큰 0
+[PASS] OpenAI 정상: text·tokens·provider·model -- QueryAnswer(text='등산을 좋아해요.', tokens_in=3, tokens_out=4, provider='openai', model='gpt-x')
+[PASS] OpenAI provider 문자열 == compose.py
+[PASS] OpenAI tool_choice 강제·parameters 스키마
+[PASS] OpenAI tool_calls 없음 -> schema
+[PASS] OpenAI choices 빈 목록 -> schema
+[PASS] OpenAI arguments JSON 아님 -> schema
+[PASS] OpenAI answer null -> schema
+[PASS] Gemini 정상: text·tokens·provider·model_version -- QueryAnswer(text='등산을 좋아해요.', tokens_in=5, tokens_out=6, provider='gemini', model='gem-x')
+[PASS] Gemini provider 문자열 == compose.py
+[PASS] Gemini config: system_instruction·temperature 0·json·_to_gemini_schema
+[PASS] Gemini contents == user_text(질문 포함)
+[PASS] Gemini text 없음 -> schema
+[PASS] Gemini JSON 아님 -> schema
+[PASS] Gemini answer 비문자열 -> schema
+[PASS] Gemini usage None 토큰 -> 0
+[PASS] Gemini GEMINI_MODEL 없음 -> InvalidValue
+=== 8. 등록표·answerer_from_env ===
+[PASS] QUERY_ANSWERERS 키 == BRIEFING_COMPOSERS 키 -- ['anthropic', 'gemini', 'openai'] vs ['anthropic', 'gemini', 'openai']
+[PASS] QUERY_ANSWERERS 값이 3 클래스
+[PASS] Fake 는 등록표에 없음
+[PASS] answerer_from_env 가 select_provider 재사용 -- return QUERY_ANSWERERS[select_provider(env)]()
+[PASS] answerer_from_env 본문 == composer_from_env 본문(이름만 다름)
+[PASS] answerer_from_env(LLM_PROVIDER=anthropic)
+[PASS] answerer_from_env(LLM_PROVIDER=openai)
+[PASS] answerer_from_env(LLM_PROVIDER=gemini)
+[PASS] 활성 집합 밖 -> InvalidValue
+[PASS] 미지 공급자 -> InvalidValue
+[PASS] Claude 기본 model env·timeout·retries 상수 재사용
+=== 9. 재export 12종 ===
+[PASS] app.agent.QUERY_MORE_HINT is respond.QUERY_MORE_HINT and in __all__
+[PASS] app.agent.QUERY_ONE_AT_A_TIME_HINT is respond.QUERY_ONE_AT_A_TIME_HINT and in __all__
+[PASS] app.agent.FakeQueryAnswerer is respond.FakeQueryAnswerer and in __all__
+[PASS] app.agent.QueryAnswer is respond.QueryAnswer and in __all__
+[PASS] app.agent.QueryAnswerer is respond.QueryAnswerer and in __all__
+[PASS] app.agent.answerer_from_env is respond.answerer_from_env and in __all__
+[PASS] app.agent.build_query_answer_prompt is respond.build_query_answer_prompt and in __all__
+[PASS] app.agent.has_evidence is respond.has_evidence and in __all__
+[PASS] app.agent.no_mention_reply is respond.no_mention_reply and in __all__
+[PASS] app.agent.no_record_reply is respond.no_record_reply and in __all__
+[PASS] app.agent.template_query_answer is respond.template_query_answer and in __all__
+[PASS] app.agent.validate_query_answer is respond.validate_query_answer and in __all__
+[PASS] build_reply 재export 유지
+[PASS] __all__ 중복 없음
+    [참고] 재export 안 된 respond 공개 이름: ['ClaudeQueryAnswerer', 'GeminiQueryAnswerer', 'OpenAIQueryAnswerer', 'QUERY_ANSWERERS', 'QUERY_ANSWER_SCHEMA', 'QUERY_ANSWER_TOOL_NAME', 'REASON_EMPTY', 'REASON_TOO_MANY_LINES']
+    [참고] propose 쪽 비교 — PROPOSERS·PROPOSAL_SCHEMA·Claude/OpenAI/GeminiProposer 는 __all__ 에 있음: True
+=== 10. TYPE_CHECKING·모듈 전역 ===
+[PASS] PersonCardOut 이 런타임 모듈 전역에 없음(TYPE_CHECKING)
+[PASS] respond.py 가 app.api 를 런타임 import 하지 않음
+[PASS] respond 모듈 전역에 user_timezone() 결과 캐시 없음
+
+FAILS: []

@@ -1,0 +1,76 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u3/scope.sh
+# 시각: 2026-11-02T09:13:46+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 06b7bb5 (dev2)
+# exit: 0
+# ---
+(A) git diff --diff-filter=M --stat 8a8767b -- tests
+(A) lines: 0
+(B) git diff --stat HEAD -- app/briefing app/er app/api app/agent/loop.py app/agent/gate.py app/agent/propose.py app/agent/types.py app/settings.py alembic web
+(B) lines: 0
+(B2) git diff --stat HEAD -- app/tools app/db app/memory app/main.py scripts
+(B2) lines: 0
+(C) git diff --name-only HEAD -- app
+app/agent/__init__.py
+app/agent/respond.py
+(D) git diff --numstat HEAD -- app
+27	1	app/agent/__init__.py
+465	0	app/agent/respond.py
+(E) '-' 줄 전수 — app/agent/respond.py
+(E) count: 0
+(F) '-' 줄 전수 — app/agent/__init__.py
+-from app.agent.respond import build_reply
+(F) count: 1
+(G) HEAD respond.py 의 모든 줄이 현재 파일에 남아 있는가 (diff '<' 줄 = 제거된 줄)
+(G) removed-line count: 0
+(G2) HEAD vs 8a8767b respond.py 동일? (U1·U2 가 respond.py 를 안 건드렸는지)
+(G2) lines: 0
+(G3) build_reply def 줄 — HEAD vs 현재
+39:def build_reply(
+80:def build_reply(
+(H) 순환 import 판정
+respond-alone ok
+agent-first ok
+api-first ok
+main ok
+compose-first ok
+(I) collect-only
+(I) collected items: 71
+(I) distinct functions: 48
+(I) parametrized function counts:
+   3 test_agent_query_answer.py::test_answerer_from_env_follows_llm_provider
+   4 test_agent_query_answer.py::test_claude_answerer_non_string_answer_is_schema_error_not_empty
+   4 test_agent_query_answer.py::test_has_evidence_true_for_each_source
+   3 test_agent_query_answer.py::test_validate_empty_or_blank_is_empty
+  14 test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression
+(J) tests.md U3 절 표의 이름 ↔ 수집 함수 이름
+(J) tests.md rows: 48
+(J) SAME
+(J2) tests.md 머리글 숫자
+## tests/test_agent_query_answer.py — U3 조회 답 생성기·검증기·템플릿 (신규 71건 = 함수 48개, 파라미터 포함)
+(J3) tests.md 표 행 수(파라미터 포함 건수 표기 합)
+28
+(K) registry 새 행·비고
+165:| 모듈 | 루프 패키지 재export 진입점 | app/agent/__init__.py | P5-loop | 3e4db92 | `run_turn`·`resume_turn`·타입·상수 재export. U2(069bdc2)·U3(8ecf75c)·U4(7a2ec5c)·U5(18353
+169:| 모듈 | 응답 단계 — 결정적 템플릿 응답 문장 | app/agent/respond.py | P5-loop | 1835355 | `build_reply()` — 저장 요약 + 되묻기 선택지만 조립(결정 B(i)), 감정·고민 문장 생성 없음(원칙7, 판정 표 18행). **P
+174:| 테스트 | 조회 답 생성기·검증기·템플릿·프롬프트·공급자 3종 오류 매핑·`answerer_from_env` | tests/test_agent_query_answer.py | P5b-query-turn | pending | 71건(U3). DB·네트워크 0, 스텁 클라이언트.
+(L) git status --short
+ M app/agent/__init__.py
+ M app/agent/respond.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P5b-query-turn/03-log.md
+ M docs/wiki/packages/P5b-query-turn/tests.md
+ M docs/wiki/registry.md
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0856-u3-answer.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0856-u3-pytest-all.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0857-u3-diff-filter.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0857-u3-mutation.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0857-u3-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0857-u3-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0857-u3-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0908-verifier-u3-full-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0908-verifier-u3-lint.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0908-verifier-u3-tests.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-0908-verifier-u3-tools-check.txt
+?? tests/test_agent_query_answer.py

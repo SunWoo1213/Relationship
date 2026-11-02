@@ -548,6 +548,9 @@
 - 2026-11-02 | DECISION | 사용자: U2 backend-agent 시작 승인(L-004) — 프롬프트 (i)(ii)(iii) + 게이트 Q(`query_turn_no_write`·①②Q④③⑤·B-3 (b)) | P5b-query-turn U2
 - 2026-11-02 | DECISION | 사용자: U2 verifier 리뷰 시작 승인(L-004) — 메인 재실행 122 passed(query_gate·gate·propose)·ruff·tools_check 7/7·`--diff-filter=M` 빈 출력. 구현자 보고: 전체 2010, 계획 변이 "Q 를 ② 앞" 은 동등 변이, U1-M1 재실행 42 FAIL(이제 성립) | P5b-query-turn U2
 - 2026-11-02 | DECISION | 사용자: verifier U2 통과([필수] 0 · [권고] R-U2-1~5) → "주석 2줄(R-U2-2, `gate.py` 284·293행) 지금 고치고 커밋 + 실험 푸시" — U2 backend-agent 재개(같은 단위, L-004 승인 포함), 메인 grep·pytest 확인 뒤 커밋 | P5b-query-turn U2
+- 2026-11-02 | DECISION | 사용자: U3 backend-agent 시작 승인(L-004) — `respond.py` 확장(답 생성기·공급자 3종·검증기·템플릿 5종), evidence 타입 = `PersonCardOut` 그대로(메인 판단 수용) | P5b-query-turn U3
+- 2026-11-02 | DECISION | 사용자: U3 구현자 사후 판단 5건 전부 수용(TYPE_CHECKING import · 날짜 형식(now ISO 사용자 시간대, 일정 `M월 D일`) · user_text 배치 · `JudgeUnavailable` 위치 인자 · 템플릿 `now` 미사용) · U3 verifier 리뷰 시작 승인(L-004) — 메인 재실행 71 passed·ruff·7/7·diff-filter 0·루프/API/브리핑/ER diff 0 | P5b-query-turn U3
+- 2026-11-02 | DECISION | 사용자: verifier U3 통과([필수] 0 · [권고] R-U3-1~5) → U3 커밋 + 실험 푸시 승인 · R-U3-4(E-6 system 문장 경계 마침표)는 "그대로 두고 U7 에서 판단" | P5b-query-turn U3
 - 2026-10-28 14:23 | COMMIT | 8a8767b cr(CR-004): 채팅에서 인물을 물으면 기억에서 답하는 조회 발화를 결정으로 옮긴다
 - 2026-10-28 14:23 | PUSH-dev2 | origin dev2 8a8767b (실험 푸시)
 - 2026-10-29 10:54 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
@@ -555,3 +558,5 @@
 - 2026-10-29 10:59 | PUSH-dev2 | origin dev2 fe4a99e (실험 푸시)
 - 2026-10-29 15:04 | COMMIT | 1dccb95 feat(P5b-query-turn): 발화 의도 필드와 조회 턴 상수·재개 재료를 계약으로 더한다
 - 2026-10-29 15:04 | PUSH-dev2 | origin dev2 1dccb95 (실험 푸시)
+- 2026-11-02 08:48 | COMMIT | 06b7bb5 feat(P5b-query-turn): 조회 발화에서는 기록 제안을 거부하고 인식 프롬프트에 의도 분류를 넣는다
+- 2026-11-02 08:48 | PUSH-dev2 | origin dev2 06b7bb5 (실험 푸시)
