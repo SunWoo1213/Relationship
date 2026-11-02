@@ -1,0 +1,6 @@
+# 명령: git diff --diff-filter=M --stat 8a8767b -- tests
+# 시각: 2026-11-02T13:28:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 18219ba (dev2)
+# exit: 0
+# ---

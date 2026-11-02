@@ -1,0 +1,121 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u5/mutate.py
+# 시각: 2026-11-02T13:44:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 18219ba (dev2)
+# exit: 0
+# ---
+### 사본 최상위 항목: ['alembic', 'alembic.ini', 'app', 'pyproject.toml', 'tests']
+### C0 대조군(무변이): exit 0 — 33 passed in 0.98s
+### P1 계획1 resume_raw.get('intent') 분기 제거 [app/agent/loop.py] → 검출 — 3 failed, 30 passed in 1.02s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+### P2 계획2 거절 답에 FIX-035 new_person 후속 질문 [app/agent/loop.py] → 검출 — 1 failed, 32 passed in 1.02s
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+### P3 계획3 intent 기본값을 'query' 로 [app/agent/loop.py] → 검출 — 1 failed, 32 passed in 1.01s
+    FAILED tests/test_agent_query_loop.py::test_v_resume_without_intent_key_keeps_record_path
+### V1 재개 후보 답에서 update_person(new_alias) 호출(결정 G (b) 로 되돌림) [app/agent/loop.py] → 검출 — 2 failed, 31 passed in 1.03s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+### V2 trace_ids 에서 loop_resume 누락 [app/agent/loop.py] → 검출 — 3 failed, 30 passed in 1.03s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+### V3 resolutions[].question_id 를 None [app/agent/loop.py] → 검출 — 3 failed, 30 passed in 1.05s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+### V4 _query_finish 힌트 순서 뒤집기(MORE 먼저, 한 사람씩 나중) [app/agent/loop.py] → 검출 — 2 failed, 31 passed in 1.03s
+    FAILED tests/test_agent_query_loop.py::test_h_trace368_title_then_me_resolves_first_only
+    FAILED tests/test_agent_query_loop.py::test_o_remaining_mentions_after_merge_are_not_resolved
+### V5 _query_finish stop_reason='ask_user' 를 답한 턴(재개 포함)에도 [app/agent/loop.py] → 검출 — 4 failed, 29 passed in 1.06s
+    FAILED tests/test_agent_query_loop.py::test_q_answered_turn_stop_reason_is_none
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+### V6 _resume_query_turn 이 mentions_dropped=1 [app/agent/loop.py] → 검출 — 3 failed, 30 passed in 1.03s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+### V7 재개 후보 답 카드 None(PersonNotFound) 처리 제거 — person_id 를 그대로 답한 인물로 [app/agent/loop.py] → 생존 — 33 passed in 0.99s
+### V7b _read_card 가 PersonNotFound 를 흡수하지 않음(재개·merge 둘 다 전파) [app/agent/loop.py] → 검출 — 1 failed, 32 passed in 1.06s
+    FAILED tests/test_agent_query_loop.py::test_y_person_not_found_on_card_read_says_no_record
+### V8 재개 턴 question 을 context.utterance 대신 mention 으로 [app/agent/loop.py] → 검출 — 2 failed, 31 passed in 1.03s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+### V9 재개 후보 답 entry.applied 를 True 로 올리지 않음 [app/agent/loop.py] → 검출 — 2 failed, 31 passed in 1.02s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+### V10 재개 후보 답 entry.person_id 를 None 으로 둠 [app/agent/loop.py] → 검출 — 2 failed, 31 passed in 1.02s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+### V11 재개 entry.band 를 'merge' [app/agent/loop.py] → 검출 — 3 failed, 30 passed in 1.02s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+### V12 kind == 'identity' 조건 제거(new_person·schedule 도 intent 만 보고 조회 재개로) [app/agent/loop.py] → 검출 — 2 failed, 31 passed in 1.01s
+    FAILED tests/test_agent_query_loop.py::test_w_other_kinds_ignore_intent[new_person]
+    FAILED tests/test_agent_query_loop.py::test_w_other_kinds_ignore_intent[schedule]
+### V13 답이 후보 밖이어도 후보가 있으면 첫 후보로 답(거절 무시) [app/agent/loop.py] → 검출 — 1 failed, 32 passed in 1.00s
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+### V14 재개 거절 답을 unrecorded 에 넣지 않음(빈 '기록 없음') [app/agent/loop.py] → 검출 — 1 failed, 32 passed in 1.00s
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+### V15 _query_finish 가 _log_turn 생략(loop_turn 0행) — 공용 꼬리를 U4·U5 테스트가 함께 지키는지 [app/agent/loop.py] → 검출 — 3 failed, 30 passed in 1.01s
+    FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+### V16 _query_finish MORE 힌트를 llm 외(템플릿·no_record)에도 [app/agent/loop.py] → 검출 — 12 failed, 21 passed in 1.10s
+    FAILED tests/test_agent_query_loop.py::test_b_new_person_asks_nothing_and_says_no_record
+    FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template
+    FAILED tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising
+    FAILED tests/test_agent_query_loop.py::test_f_no_evidence_skips_llm
+    FAILED tests/test_agent_query_loop.py::test_i_m_no_mention
+    FAILED tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm
+    FAILED tests/test_agent_query_loop.py::test_other_user_person_is_not_visible
+    FAILED tests/test_agent_query_loop.py::test_p_mention_cap
+    FAILED tests/test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+    FAILED tests/test_agent_query_loop.py::test_x_answer_is_stripped_but_rejected_answer_is_verbatim
+    FAILED tests/test_agent_query_loop.py::test_y_person_not_found_on_card_read_says_no_record
+### V17 resume_turn 이 answerer 를 _resume_query_turn 에 넘기지 않음(None → 지연 해소) [app/agent/loop.py] → 검출 — 2 failed, 31 passed in 1.24s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+### V18 _resume_query_turn 이 resume_trace_id 대신 None 을 실어 trace_ids == [query] 만 [app/agent/loop.py] → 검출 — 3 failed, 30 passed in 1.05s
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218]
+    FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638]
+    FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+### V19 _query_finish 재개 경로에서 근거 0건 판정 제거(근거 없어도 LLM) [app/agent/loop.py] → 검출 — 2 failed, 31 passed in 1.05s
+    FAILED tests/test_agent_query_loop.py::test_f_no_evidence_skips_llm
+    FAILED tests/test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence
+
+### 생존 변이: 1
+    V7 재개 후보 답 카드 None(PersonNotFound) 처리 제거 — person_id 를 그대로 답한 인물로
+### git status --short (저장소 무수정 확인)
+ M app/agent/loop.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P5b-query-turn/03-log.md
+ M docs/wiki/packages/P5b-query-turn/tests.md
+ M docs/wiki/registry.md
+ M tests/test_agent_query_loop.py
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1327-u5-mutation.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-diff-filter.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-loop.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-pytest-all.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-u4-tests-untouched.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1334-verifier-u5-full-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1334-verifier-u5-regression9.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1334-verifier-u5-tests.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1336-verifier-u5-lint.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1336-verifier-u5-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1336-verifier-u5-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1337-verifier-u5-grep-constraints.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1344-verifier-u5-contract-values.txt
+
+### 사본 ↔ 저장소 loop.py 동일 확인(원복)
+    app/agent/loop.py: SAME
+### 사본에 비밀 파일 없음: True

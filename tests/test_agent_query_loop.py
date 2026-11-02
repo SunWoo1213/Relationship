@@ -43,6 +43,13 @@ from app.db.models import (
 from app.er.judge import FakeJudge
 from app.settings import LOOP_MAX_MENTIONS, QUERY_TIMELINE_LIMIT
 from app.tools.context import ToolContext
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.agent.loop import resume_turn
+from app.agent.types import ResumeInput
+from app.api.deps import load_resume_input
+from app.tools.questions import answer_question
+from app.tools.types import PersonNotFound
 
 pytestmark = pytest.mark.dbtest
 
@@ -920,3 +927,318 @@ def test_other_user_person_is_not_visible(db_session, fake_embedder):
 
     assert result.reply == no_record_reply(["팀장"])
     assert answerer.call_count == 0
+
+
+# ===========================================================================
+# U5 -- 재개(`resume_turn`): 조회 턴 identity 되묻기 뒤 답하기 (결정 G (a))
+# ===========================================================================
+
+
+def _ask_identity(db_session, fake_embedder, utt: str, session_id: str, *, alias: str = "팀장"):
+    """후보 2명(같은 별칭) + 판정 실패 -> 조회 턴이 identity 질문을 저장한다.
+    반환: (두 인물, 저장된 질문 행, 질문을 낸 ctx)."""
+
+    a = _seed_person(db_session, fake_embedder, name="김민수", alias=alias)
+    b = _seed_person(db_session, fake_embedder, name="김민호", alias=alias)
+    result, ctx = _run(
+        db_session, fake_embedder, utt, _queries("팀장"),
+        judge=FakeJudge(fail="timeout"), answerer=FakeQueryAnswerer(), session_id=session_id,
+    )
+    assert result.pending_question is not None and result.pending_question.kind == "identity"
+    row = db_session.get(PendingQuestion, result.pending_question.question_id)
+    return a, b, row, ctx
+
+
+def _answer_and_load(ctx, row, answer: str) -> ResumeInput:
+    answer_question(ctx, row.id, answer)
+    return load_resume_input(ctx.session, row.id)
+
+
+def _reject_option(row) -> str:
+    rejects = [o for o in row.options if o not in row.context["candidate_ids"]]
+    assert len(rejects) == 1
+    return rejects[0]
+
+
+def _count_step(db_session, session_id: str, step: str) -> int:
+    return len(_rows(db_session, session_id, step))
+
+
+@pytest.mark.parametrize("pick", ["김민수", "김민호"])
+def test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing(
+    db_session, fake_embedder, monkeypatch, pick
+):
+    sid = f"q-t-{pick}"
+    utt = "팀장님 어떤 분이었지?"
+    a, b, row, ctx = _ask_identity(db_session, fake_embedder, utt, sid)
+    chosen, other = (a, b) if pick == "김민수" else (b, a)
+    assert row.context["candidate_ids"][pick] == chosen.id
+    assert row.context["utterance"] == utt
+    resume_input = _answer_and_load(ctx, row, pick)
+
+    answerer = _RecordingAnswerer(table={utt: ANSWER_TEXT})
+    calls: dict[str, int] = {"apply": 0, "resolve": 0, "followup": 0, "update_person": 0}
+    monkeypatch.setattr(
+        loop_module, "apply_resolution", lambda *a_, **k: calls.__setitem__("apply", calls["apply"] + 1)
+    )
+    monkeypatch.setattr(
+        loop_module, "resolve", lambda *a_, **k: calls.__setitem__("resolve", calls["resolve"] + 1)
+    )
+    monkeypatch.setattr(
+        loop_module,
+        "_followup_new_person_turn",
+        lambda *a_, **k: calls.__setitem__("followup", calls["followup"] + 1),
+    )
+    real_update = loop_module.app_tools.update_person
+    monkeypatch.setattr(
+        loop_module.app_tools,
+        "update_person",
+        lambda *a_, **k: (calls.__setitem__("update_person", calls["update_person"] + 1), real_update(*a_, **k))[1],
+    )
+    before = _counts(db_session, "local")
+    q_before = _count_step(db_session, sid, "loop_query")
+    t_before = _count_step(db_session, sid, "loop_turn")
+
+    result = resume_turn(ctx, resume_input, question_id=row.id, answerer=answerer)
+
+    assert_no_writes(before, _counts(db_session, "local"))  # person_aliases 포함 불변
+    assert _write_tool_rows(db_session, sid) == 0
+    assert calls == {"apply": 0, "resolve": 0, "followup": 0, "update_person": 0}
+    assert result.reply == f"{ANSWER_TEXT}\n{QUERY_MORE_HINT}"
+    assert answerer.call_count == 1
+    seen = answerer.seen[0]
+    assert chosen.display_name in seen and other.display_name not in seen
+    assert result.stop_reason is None
+    assert result.pending_question is None
+    assert result.stored.to_dict() == {"persons": 0, "events": 0, "schedules": 0}
+    assert _count_step(db_session, sid, "loop_query") == q_before + 1
+    assert _count_step(db_session, sid, "loop_turn") == t_before + 1
+    assert _rows(db_session, sid, "loop_resolve_done") == []
+    assert _rows(db_session, sid, "loop_record") == []
+    resume_rows = _rows(db_session, sid, "loop_resume")
+    assert len(resume_rows) == 1
+    query_row = _rows(db_session, sid, "loop_query")[-1]
+    assert result.trace_ids == [resume_rows[0].id, query_row.id]
+    out = query_row.output
+    assert out["mentions"] == ["팀장"]
+    assert out["mentions_dropped"] == 0
+    assert out["person_id"] == chosen.id
+    assert out["answer_source"] == "llm"
+    assert out["resolutions"] == [
+        {
+            "mention": "팀장",
+            "band": "identity",
+            "person_id": chosen.id,
+            "er_trace_id": None,
+            "applied": True,
+            "question_id": row.id,
+        }
+    ]
+
+
+def test_u_resume_reject_answer_says_no_record_and_asks_nothing(db_session, fake_embedder, monkeypatch):
+    sid = "q-u"
+    utt = "팀장님 어떤 분이었지?"
+    a, b, row, ctx = _ask_identity(db_session, fake_embedder, utt, sid)
+    reject = _reject_option(row)
+    resume_input = _answer_and_load(ctx, row, reject)
+    followup: list[int] = []
+    monkeypatch.setattr(
+        loop_module, "_followup_new_person_turn", lambda *a_, **k: followup.append(1)
+    )
+    answerer = FakeQueryAnswerer(table={utt: ANSWER_TEXT})
+    before = _counts(db_session, "local")
+
+    result = resume_turn(ctx, resume_input, question_id=row.id, answerer=answerer)
+
+    assert_no_writes(before, _counts(db_session, "local"))  # pending_questions +0 포함
+    assert followup == []
+    assert _write_tool_rows(db_session, sid) == 0
+    assert result.reply == no_record_reply(["팀장"])
+    assert result.pending_question is None
+    assert result.stop_reason is None
+    assert answerer.call_count == 0
+    resume_rows = _rows(db_session, sid, "loop_resume")
+    query_row = _rows(db_session, sid, "loop_query")[-1]
+    assert result.trace_ids == [resume_rows[0].id, query_row.id]
+    out = query_row.output
+    assert out["answer_source"] == "no_record"
+    assert out["person_id"] is None
+    assert out["resolutions"] == [
+        {
+            "mention": "팀장",
+            "band": "identity",
+            "person_id": None,
+            "er_trace_id": None,
+            "applied": False,
+            "question_id": row.id,
+        }
+    ]
+    assert _rows(db_session, sid, "loop_resolve_done") == []
+    assert _rows(db_session, sid, "loop_record") == []
+
+
+def test_v_resume_without_intent_key_keeps_record_path(db_session, fake_embedder):
+    """하위 호환 -- P5-loop 형식(기록 턴이 만든 identity 행: `resume.intent` 키 없음)."""
+
+    sid = "q-v"
+    utt = "팀장이랑 저녁 먹었어"
+    person = _make_person(db_session, "김민수")
+    _add_alias(db_session, person, "팀장님", fake_embedder)
+    ctx = ToolContext(session=db_session, session_id=sid, embedder=fake_embedder)
+    call = {
+        "name": "add_event",
+        "args": {
+            "person": "팀장", "type": "meal", "content": "저녁",
+            "occurred_at": datetime(2026, 3, 1, tzinfo=timezone.utc).isoformat(),
+        },
+    }
+    first = run_turn(
+        ctx, utt, proposer=FakeProposer(table={utt: [call]}), judge=FakeJudge(fail="timeout")
+    )
+    assert first.pending_question is not None and first.pending_question.kind == "identity"
+    row = db_session.get(PendingQuestion, first.pending_question.question_id)
+    assert "intent" not in row.context["resume"]
+    resume_input = _answer_and_load(ctx, row, "김민수")
+    before = _counts(db_session, "local")
+    q_before = _count_step(db_session, sid, "loop_query")
+    r_before = _count_step(db_session, sid, "loop_record")
+
+    result = resume_turn(ctx, resume_input, question_id=row.id)
+
+    after = _counts(db_session, "local")
+    rows = db_session.execute(
+        text(
+            "SELECT count(*) FROM agent_traces WHERE session_id = :s AND step = 'tool_call' "
+            "AND tool_name = 'update_person'"
+        ),
+        {"s": sid},
+    ).scalar_one()
+    assert rows == 1
+    assert after["person_aliases"] == before["person_aliases"] + 1
+    assert after["events"] == before["events"] + 1
+    assert result.stored.events == 1
+    assert _count_step(db_session, sid, "loop_query") == q_before  # 조회 경로 아님
+    assert _count_step(db_session, sid, "loop_record") == r_before + 1
+
+
+@pytest.mark.parametrize("kind", ["new_person", "schedule"])
+def test_w_other_kinds_ignore_intent(db_session, fake_embedder, monkeypatch, kind):
+    called: list[int] = []
+    monkeypatch.setattr(
+        loop_module, "_resume_query_turn", lambda *a_, **k: called.append(1)
+    )
+    ctx = ToolContext(session=db_session, session_id=f"q-w-{kind}", embedder=fake_embedder)
+    resume_input = ResumeInput(
+        kind=kind,
+        context={
+            "utterance": "발화",
+            "mention": "이모",
+            "resume": {"intent": "query", "pending_calls": []},
+        },
+        answer="아니요",
+    )
+
+    result = resume_turn(ctx, resume_input, question_id=1)
+
+    assert called == []
+    assert result.pending_question is None
+    assert _rows(db_session, f"q-w-{kind}", "loop_query") == []
+    assert len(_rows(db_session, f"q-w-{kind}", "loop_record")) == 1
+
+
+# ---------------------------------------------------------------------------
+# R-U4-2 -- 생존 변이를 닫는 테스트(코드는 맞고 테스트 공백이었다)
+# ---------------------------------------------------------------------------
+
+
+def test_x_answer_is_stripped_but_rejected_answer_is_verbatim(db_session, fake_embedder):
+    person = _seed_person(db_session, fake_embedder)
+    utt = "팀장님 어떤 분?"
+    judge = FakeJudge(table={person.id: 0.95})
+
+    padded = f"  {ANSWER_TEXT}  \n"
+    ok, _ = _run(
+        db_session, fake_embedder, utt, _queries("팀장"), judge=judge,
+        answerer=FakeQueryAnswerer(table={utt: padded}), session_id="q-x1",
+    )
+    assert ok.reply == f"{ANSWER_TEXT}\n{QUERY_MORE_HINT}"
+    out_ok = _query_out(db_session, "q-x1")
+    assert out_ok["answer_source"] == "llm"
+    assert out_ok["rejected_answer"] is None
+
+    bad_padded = "  요즘 많이 힘들어 보여요  \n"
+    bad, _ = _run(
+        db_session, fake_embedder, utt, _queries("팀장"), judge=judge,
+        answerer=FakeQueryAnswerer(table={utt: bad_padded}), session_id="q-x2",
+    )
+    out_bad = _query_out(db_session, "q-x2")
+    assert out_bad["answer_source"] == "template"
+    assert out_bad["rejected_answer"] == bad_padded  # strip 안 한 원문 그대로
+    assert bad.reply == _template_for(db_session, person)
+
+
+def test_y_person_not_found_on_card_read_says_no_record(db_session, fake_embedder, monkeypatch):
+    person = _seed_person(db_session, fake_embedder)
+    utt = "팀장님 어떤 분?"
+    answerer = FakeQueryAnswerer(table={utt: ANSWER_TEXT})
+    import app.api.read as read_module
+
+    def _raise(*a_, **k):
+        raise PersonNotFound("gone")
+
+    monkeypatch.setattr(read_module, "get_person_card", _raise)
+
+    result, _ = _run(
+        db_session, fake_embedder, utt, _queries("팀장"),
+        judge=FakeJudge(table={person.id: 0.95}), answerer=answerer, session_id="q-y",
+    )
+
+    assert result.reply == no_record_reply(["팀장"])
+    out = _query_out(db_session, "q-y")
+    assert out["person_id"] is None
+    assert out["answer_source"] == "no_record"
+    assert answerer.call_count == 0
+
+
+def test_z_merge_resolution_entry_carries_person_id(db_session, fake_embedder):
+    person = _seed_person(db_session, fake_embedder)
+    utt = "팀장님 어떤 분이었지?"
+    _run(
+        db_session, fake_embedder, utt, _queries("팀장"),
+        judge=FakeJudge(table={person.id: 0.95}),
+        answerer=FakeQueryAnswerer(table={utt: ANSWER_TEXT}), session_id="q-z",
+    )
+
+    out = _query_out(db_session, "q-z")
+    assert out["resolutions"][0]["band"] == "merge"
+    assert out["resolutions"][0]["person_id"] == person.id
+
+
+class _DbErrorAnswerer:
+    def answer(self, question, evidence, now):
+        raise SQLAlchemyError("db down")
+
+
+def test_aa_db_errors_propagate_out_of_run_turn(db_session, fake_embedder, monkeypatch):
+    person = _seed_person(db_session, fake_embedder)
+    utt = "팀장님 어떤 분?"
+    judge = FakeJudge(table={person.id: 0.95})
+
+    with pytest.raises(SQLAlchemyError):
+        _run(
+            db_session, fake_embedder, utt, _queries("팀장"), judge=judge,
+            answerer=_DbErrorAnswerer(), session_id="q-aa1",
+        )
+
+    import app.api.read as read_module
+
+    def _raise(*a_, **k):
+        raise SQLAlchemyError("db down")
+
+    monkeypatch.setattr(read_module, "get_person_card", _raise)
+    with pytest.raises(SQLAlchemyError):
+        _run(
+            db_session, fake_embedder, utt, _queries("팀장"), judge=judge,
+            answerer=FakeQueryAnswerer(table={utt: ANSWER_TEXT}), session_id="q-aa2",
+        )

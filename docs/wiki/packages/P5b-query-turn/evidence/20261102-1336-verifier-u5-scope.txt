@@ -1,0 +1,130 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u5/scope.sh
+# 시각: 2026-11-02T13:36:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 18219ba (dev2)
+# exit: 0
+# ---
+## (A) 기존 테스트 파일 수정 0: git diff --diff-filter=M --stat 8a8767b -- tests
+[A lines=0]
+
+## (A2) U4 테스트 무수정: git diff 18219ba -- tests/test_agent_query_loop.py 의 '-' 줄
+[A2 minus=0]
+[A2 numstat] 322	0	tests/test_agent_query_loop.py
+
+## (B) 범위 밖 경로 diff
+[B lines=0]
+
+## (C) git diff --numstat HEAD -- app
+108	1	app/agent/loop.py
+
+## (D) loop.py '-' 줄 전수
+-    dropped = len(mentions) - resolved
+[D minus=1]
+
+## (D2) hunk 헤더
+@@ -210,6 +210,7 @@ from app.agent.types import (
+@@ -1337,7 +1338,41 @@ def _run_query_turn(
+@@ -1599,6 +1634,66 @@ def _drop_calls_for_mention(pending_calls: list[PendingCall], mention: str) -> l
+@@ -1607,6 +1702,7 @@ def resume_turn(
+@@ -1694,6 +1790,17 @@ def resume_turn(
+
+## (D3) resume_turn hunk 내용 (시그니처 1줄 + 분기 블록만인지)
+
+## (D4) 18219ba 의 resume_turn 본문 vs 현재 — 추가된 분기(+)·시그니처(+) 외 동일한지 (diff <(git show) 현재, 함수 범위)
+--- 18219ba resume_turn
++++ now resume_turn
+@@ -8,0 +9 @@
++    answerer: QueryAnswerer | None = None,
+@@ -94,0 +96,11 @@
++
++    if kind == "identity" and resume_raw.get("intent", INTENT_RECORD) == INTENT_QUERY:
++        # P5b U5 -- 조회 턴이 낸 identity 질문의 답: 별칭 누적 없이 카드로 답한다.
++        return _resume_query_turn(
++            ctx,
++            resume_trace_id=resume_trace_id,
++            question_id=question_id,
++            context=context,
++            answer=answer,
++            answerer=answerer,
++        )
+[resume_turn minus=0 plus=12]
+기존 본문 '-' 줄 0: YES
+resume_turn docstring 에 'query'/'조회'/'U5'/'_resume_query_turn' 언급: True
+
+## (E) answerer_from_env 출현
+1403:                    answerer = _respond.answerer_from_env()
+[E count=1]
+
+## (F) from app.api / import app.api 출현
+1256:    from app.api.read import get_person_card  # 순환 import 회피 -- 지연 import
+[F count=1]
+[F2 1~260행 app.api 출현=0]
+
+## (G) 순환 import 3순서
+agent-first ok
+api-first ok
+loop-only ok
+
+## (H) 확신도·임계치 grep 기준 대조 (loop.py 전체)
+[8a8767b] 0
+[now]     0
+
+## (I) --collect-only -q ↔ tests.md U5 절
+[collected total=      33]
+U5 수집(함수 이름 기준, 파라미터 제거 후 유일화):
+tests/test_agent_query_loop.py::test_aa_db_errors_propagate_out_of_run_turn
+tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing
+tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing
+tests/test_agent_query_loop.py::test_v_resume_without_intent_key_keeps_record_path
+tests/test_agent_query_loop.py::test_w_other_kinds_ignore_intent
+tests/test_agent_query_loop.py::test_x_answer_is_stripped_but_rejected_answer_is_verbatim
+tests/test_agent_query_loop.py::test_y_person_not_found_on_card_read_says_no_record
+tests/test_agent_query_loop.py::test_z_merge_resolution_entry_carries_person_id
+[U5 수집 함수=       8 파라미터 포함=10]
+tests.md U5 절 이름:
+SAME (collect ↔ tests.md U5)
+[tests.md U5 행=       8]
+
+## (J) registry 비고 'P5b U5' 출현
+168:| 모듈 | 에이전트 루프 오케스트레이션(해석·기록·응답, run_turn/resume_turn) | app/agent/loop.py | P5-loop | 7a2ec5c | U4: 해석 구간(`resolve_
+
+## (K) 03-log 에 U5 항목?
+10:- 남은 것 · 다음 단위: U1 계약(`Proposal.intent`·`PendingResume.intent`·스키마 enum(선택 키)·`STEP_LOOP_QUERY`·상수 `QUERY_TIMELINE_LIMIT=5`·`QUERY_MAX_PERSONS=1`·`QUERY_ANSW
+16:- 이유(기획서·카드 연결): D16 결정 1·9·코드 규칙 1 — 분기가 돌기 전에 계약(필드·어휘·상수)을 먼저 고정해 U2~U5 가 같은 이름·값을 쓰게 한다. 01-plan U1 줄 그대로.
+49:- 계획과 다른 점: 구현자 사후 판단 7건(① `_QueryTrace` ② 카드 안 읽은 턴 `evidence_counts` 0 dict ③ 본문 `strip()`, `rejected_answer` 원문 ④ `mentions_dropped` = 언급 − resolve 호출 ⑤ m
+50:- 남은 것 · 다음 단위: U5 `resume_turn` 조회 재개(③~⑥ 을 공용 헬퍼로 분리, U4 테스트 23건 무수정 통과) + R-U4-2 테스트 4건 — backend-agent(L-004).
+
+## (L) 구현 증거 u5
+20261102-1327-u5-mutation.txt
+20261102-1328-u5-diff-filter.txt
+20261102-1328-u5-loop.txt
+20261102-1328-u5-pytest-all.txt
+20261102-1328-u5-regression.txt
+20261102-1328-u5-ruff.txt
+20261102-1328-u5-scope.txt
+20261102-1328-u5-tools-check.txt
+20261102-1328-u5-u4-tests-untouched.txt
+20261102-1334-verifier-u5-full-regression.txt
+20261102-1334-verifier-u5-regression9.txt
+20261102-1334-verifier-u5-tests.txt
+
+## (M) git status --short
+ M app/agent/loop.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P5b-query-turn/03-log.md
+ M docs/wiki/packages/P5b-query-turn/tests.md
+ M docs/wiki/registry.md
+ M tests/test_agent_query_loop.py
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1327-u5-mutation.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-diff-filter.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-loop.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-pytest-all.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1328-u5-u4-tests-untouched.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1334-verifier-u5-full-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1334-verifier-u5-regression9.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1334-verifier-u5-tests.txt

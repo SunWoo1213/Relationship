@@ -1,0 +1,8 @@
+# 명령: git diff --stat 18219ba -- tests/test_agent_query_loop.py
+# 시각: 2026-11-02T13:28:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 18219ba (dev2)
+# exit: 0
+# ---
+ tests/test_agent_query_loop.py | 322 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 322 insertions(+)

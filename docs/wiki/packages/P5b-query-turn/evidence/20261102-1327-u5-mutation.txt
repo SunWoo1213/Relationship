@@ -1,0 +1,22 @@
+# 명령: /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u5/mutate.py
+# 시각: 2026-11-02T13:27:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 18219ba (dev2)
+# exit: 0
+# ---
+M1 intent 분기 제거: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218] - AssertionError: assert 1 == 0 ; 1 failed, 23 passed in 0.88s
+M2 intent 기본값 query: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_v_resume_without_intent_key_keeps_record_path - assert 0 == 1 ; 1 failed, 26 passed in 0.88s
+M3 거절 답에 FIX-035 후속 질문: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing - assert [1] == [] ; 1 failed, 25 passed in 0.89s
+M4 재개에서 별칭 누적: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218] - AssertionError: assert 1 == 0 ; 1 failed, 23 passed in 0.84s
+M5 applied False: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218] - AssertionError: assert [{'applied': ...': '팀장', ...}] == [{'applied': ...': '팀장', ...}] ; 1 failed, 23 passed in 0.83s
+M6 trace_ids 에서 resume 누락: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218] - assert [398301] == [398300, 398301] ; 1 failed, 23 passed in 0.83s
+M7 kind 조건 제거: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_w_other_kinds_ignore_intent[new_person] - assert [1] == [] ; 1 failed, 27 passed in 0.92s
+M8 힌트 순서 뒤집기: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_h_trace368_title_then_me_resolves_first_only - AssertionError: assert ['민수 팀장님과 최근에...면에서 볼 수 있어요.'] == ['한 번에 한 사람씩 ...면에서 볼 수 있어요.'] ; 1 failed, 7 passed in 0.59s
+M9 답 strip 제거: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_x_answer_is_stripped_but_rejected_answer_is_verbatim - AssertionError: assert '  민수 팀장님과 최근...화면에서 볼 수 있어요.' == '민수 팀장님과 최근에 ...화면에서 볼 수 있어요.' ; 1 failed, 29 passed in 0.93s
+M10 rejected_answer strip: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_x_answer_is_stripped_but_rejected_answer_is_verbatim - AssertionError: assert '요즘 많이 힘들어 보여요' == '  요즘 많이 힘들어 보여요  \n' ; 1 failed, 29 passed in 0.94s
+M11 PersonNotFound 삼킴 제거: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_y_person_not_found_on_card_read_says_no_record - app.tools.types.PersonNotFound: gone ; 1 failed, 30 passed in 0.97s
+M12 merge resolutions person_id None: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_z_merge_resolution_entry_carries_person_id - assert None == 45806 ; 1 failed, 31 passed in 0.94s
+M13 SQLAlchemyError 삼킴: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_aa_db_errors_propagate_out_of_run_turn - Failed: DID NOT RAISE <class 'sqlalchemy.exc.SQLAlchemyError'> ; 1 failed, 32 passed in 0.98s
+M14 항상 첫 후보: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638] - AssertionError: assert ('김민호' in '질문: 팀장님 어떤 분이었지?\n현재 시각: 2026-11-02T13:28:02.042120+09:00\n\n[인물 카드]\n이름: 김민수\n관계: 직장·동\n별칭: 팀장\n마지막 접촉: 1월 8일\n알고 있는...식사6 (1월 7일)\n- [meal] 식사5 (1월 6일)\n- [meal] 식사4 (1월 5일)\n- [meal] 식사3 (1월 4일)\n예정된 일정:\n- 일정0 (11월 5일)\n- 일정1 (11월 6일)') ; 1 failed, 24 passed in 0.86s
+M15 resolutions question_id None: exit=1 검출 | FAILED tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218] - AssertionError: assert [{'applied': ...': '팀장', ...}] == [{'applied': ...': '팀장', ...}] ; 1 failed, 23 passed in 0.82s
+사본 loop.py 원복 완료

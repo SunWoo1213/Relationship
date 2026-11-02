@@ -210,6 +210,7 @@ from app.agent.types import (
     BUCKET_EXECUTE,
     BUCKET_HINT_ONLY,
     INTENT_QUERY,
+    INTENT_RECORD,
     STEP_LOOP_QUERY,
     NEW_PERSON_TAG_OPTIONS,
     SCHEDULE_UNKNOWN_OPTION,
@@ -1337,7 +1338,41 @@ def _run_query_turn(
         entry["question_id"] = applied.pending_question_id
         break
 
-    dropped = len(mentions) - resolved
+    return _query_finish(
+        ctx,
+        utterance,
+        now,
+        mentions=mentions,
+        dropped=len(mentions) - resolved,
+        resolutions=resolutions,
+        card=card,
+        person_id=person_id,
+        unrecorded=unrecorded,
+        pending_question=pending_question,
+        answerer=answerer,
+        trace_ids=trace_ids,
+    )
+
+
+def _query_finish(
+    ctx: ToolContext,
+    utterance: str,
+    now: datetime,
+    *,
+    mentions: list[str],
+    dropped: int,
+    resolutions: list[dict[str, Any]],
+    card: Any | None,
+    person_id: int | None,
+    unrecorded: list[str],
+    pending_question: PendingQuestionOut | None,
+    answerer: QueryAnswerer | None,
+    trace_ids: list[int | None],
+) -> TurnResult:
+    """조회 턴 ③~⑥ 공용 꼬리(P5b U5 -- `_run_query_turn` 과 `_resume_query_turn`
+    이 함께 부른다): 카드 근거 → 템플릿/답 생성기 → 검증·폴백 → 힌트 →
+    `loop_query` trace → `TurnResult` → `loop_turn`."""
+
     counts = {"facts": 0, "patterns": 0, "timeline": 0, "schedules": 0}
     fallback_reason: str | None = None
     rejected_answer: str | None = None
@@ -1599,6 +1634,66 @@ def _drop_calls_for_mention(pending_calls: list[PendingCall], mention: str) -> l
     return [c for c in pending_calls if c.args.get("person") != mention]
 
 
+def _resume_query_turn(
+    ctx: ToolContext,
+    *,
+    resume_trace_id: int | None,
+    question_id: int,
+    context: dict[str, Any],
+    answer: str,
+    answerer: QueryAnswerer | None,
+) -> TurnResult:
+    """P5b U5 -- 조회 턴 identity 되묻기에 대한 답을 받아 그 인물 카드로 답한다
+    (결정 G (a): 별칭 누적 0, 저장 0). 답이 `candidate_ids` 안이면 그 인물로
+    조회 턴 ③~⑥(`_query_finish`)을 재사용하고, 후보 밖(ER 거절 옵션)이면
+    FIX-035 의 new_person 후속 질문을 내지 않고 "기록 없음" 답으로 끝낸다.
+    이 재개 턴에는 새 ER 행이 없어 `resolutions[0]["er_trace_id"]` 는 None 이다."""
+
+    utterance = context.get("utterance", "")
+    mention = context.get("mention", "")
+    candidate_ids = context.get("candidate_ids")
+    candidate_ids = candidate_ids if isinstance(candidate_ids, dict) else {}
+    now = ctx.now().astimezone(user_timezone())
+
+    card: Any | None = None
+    person_id: int | None = None
+    unrecorded: list[str] = []
+    entry: dict[str, Any] = {
+        "mention": mention,
+        "band": "identity",
+        "person_id": None,
+        "er_trace_id": None,
+        "applied": False,
+        "question_id": question_id,
+    }
+    if answer in candidate_ids:
+        chosen = candidate_ids[answer]
+        entry["person_id"] = chosen
+        entry["applied"] = True
+        card = _read_card(ctx, chosen)
+        if card is None:
+            unrecorded.append(mention)
+        else:
+            person_id = chosen
+    else:
+        unrecorded.append(mention)
+
+    return _query_finish(
+        ctx,
+        utterance,
+        now,
+        mentions=[mention],
+        dropped=0,
+        resolutions=[entry],
+        card=card,
+        person_id=person_id,
+        unrecorded=unrecorded,
+        pending_question=None,
+        answerer=answerer,
+        trace_ids=[resume_trace_id],
+    )
+
+
 def resume_turn(
     ctx: ToolContext,
     resume_input: ResumeInput,
@@ -1607,6 +1702,7 @@ def resume_turn(
     judge: Judge | None = None,
     config: ERConfig | None = None,
     extractor: FactExtractor | None = None,
+    answerer: QueryAnswerer | None = None,
 ) -> TurnResult:
     """U7 -- `POST /answers/{question_id}` 뒤 절반. 답 저장(`answer_question`,
     무수정 재사용) **뒤에** 저장된 `context` 로 해석 단계부터 다시 돈다
@@ -1693,6 +1789,17 @@ def resume_turn(
 
     _log_resume_entry(ctx, resume_input)
     resume_trace_id = ctx.last_trace_id
+
+    if kind == "identity" and resume_raw.get("intent", INTENT_RECORD) == INTENT_QUERY:
+        # P5b U5 -- 조회 턴이 낸 identity 질문의 답: 별칭 누적 없이 카드로 답한다.
+        return _resume_query_turn(
+            ctx,
+            resume_trace_id=resume_trace_id,
+            question_id=question_id,
+            context=context,
+            answer=answer,
+            answerer=answerer,
+        )
 
     pending_calls = [
         PendingCall(

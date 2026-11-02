@@ -1,0 +1,33 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/u5/constraints.sh
+# 시각: 2026-11-02T13:37:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 18219ba (dev2)
+# exit: 0
+# ---
+[추가 줄 수=      99]
+## (1) create_person( / update_person( 표기
+[1] count=0
+## (2) 확신도·임계치 영어 어휘
+[2] count=0
+## (3) sleep / while True
+[3] count=0
+## (4) PendingQuestion(Out 제외) / flag_modified / .context =
+[4 PendingQuestion(Out 제외)] count=0
+[4b] count=0
+## (5) 키 문자열 패턴
+[5] count=0
+## (6) 재개 분기·_resume_query_turn·_query_finish 가 부르지 않는 것
+[6] count=0
+## (7) 환경변수 직접 접근
+[7] count=0
+## (8) R-4 집계: app/agent 전체(기준 대조)
+create_person\( app/agent: now=1 base(8a8767b)=1
+update_person\( app/agent: now=5 base(8a8767b)=5
+PendingQuestion|flag_modified|.context = loop.py: now=13 HEAD=12
+## (9) 신규 테스트 줄: 키 패턴·실 공급자 import
+[tests 추가 줄=     269]
+[tests 키 패턴] 0
+[tests 실 공급자/네트워크 import] 0
+## (10) resume_turn docstring 에 조회 재개 분기 언급 여부(정확 grep)
+(없음 — docstring 은 identity 답을 update_person 경로로만 설명)
+55:      **사전 조회**해(문자열을 다시 파싱하지 않는다) `add_schedule(

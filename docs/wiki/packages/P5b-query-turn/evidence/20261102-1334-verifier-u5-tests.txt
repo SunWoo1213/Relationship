@@ -1,0 +1,50 @@
+# 명령: .venv/bin/python -m pytest tests/test_agent_query_loop.py -v
+# 시각: 2026-11-02T13:34:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 18219ba (dev2)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 33 items
+
+tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing PASSED [  3%]
+tests/test_agent_query_loop.py::test_b_new_person_asks_nothing_and_says_no_record PASSED [  6%]
+tests/test_agent_query_loop.py::test_c_identity_asks_with_query_resume PASSED [  9%]
+tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template PASSED [ 12%]
+tests/test_agent_query_loop.py::test_e_answerer_unavailable_falls_back_without_raising PASSED [ 15%]
+tests/test_agent_query_loop.py::test_f_no_evidence_skips_llm PASSED      [ 18%]
+tests/test_agent_query_loop.py::test_g_mixed_utterance_does_not_execute_write PASSED [ 21%]
+tests/test_agent_query_loop.py::test_h_trace368_title_then_me_resolves_first_only PASSED [ 24%]
+tests/test_agent_query_loop.py::test_h2_me_first_asks_identity_and_stops PASSED [ 27%]
+tests/test_agent_query_loop.py::test_h3_mention_source_rule PASSED       [ 30%]
+tests/test_agent_query_loop.py::test_i_m_no_mention PASSED               [ 33%]
+tests/test_agent_query_loop.py::test_j_record_turn_does_not_enter_query_branch PASSED [ 36%]
+tests/test_agent_query_loop.py::test_k_loop_query_output_schema PASSED   [ 39%]
+tests/test_agent_query_loop.py::test_k2_tokens_come_from_answer PASSED   [ 42%]
+tests/test_agent_query_loop.py::test_l_raw_utterance_never_exposed PASSED [ 45%]
+tests/test_agent_query_loop.py::test_n_more_hint_only_on_llm PASSED      [ 48%]
+tests/test_agent_query_loop.py::test_o_remaining_mentions_after_merge_are_not_resolved PASSED [ 51%]
+tests/test_agent_query_loop.py::test_p_mention_cap PASSED                [ 54%]
+tests/test_agent_query_loop.py::test_q_answered_turn_stop_reason_is_none PASSED [ 57%]
+tests/test_agent_query_loop.py::test_r_lazy_resolution_not_called_without_evidence PASSED [ 60%]
+tests/test_agent_query_loop.py::test_s_lazy_resolution_uses_module_attribute PASSED [ 63%]
+tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called PASSED [ 66%]
+tests/test_agent_query_loop.py::test_other_user_person_is_not_visible PASSED [ 69%]
+tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\uc218] PASSED [ 72%]
+tests/test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing[\uae40\ubbfc\ud638] PASSED [ 75%]
+tests/test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing PASSED [ 78%]
+tests/test_agent_query_loop.py::test_v_resume_without_intent_key_keeps_record_path PASSED [ 81%]
+tests/test_agent_query_loop.py::test_w_other_kinds_ignore_intent[new_person] PASSED [ 84%]
+tests/test_agent_query_loop.py::test_w_other_kinds_ignore_intent[schedule] PASSED [ 87%]
+tests/test_agent_query_loop.py::test_x_answer_is_stripped_but_rejected_answer_is_verbatim PASSED [ 90%]
+tests/test_agent_query_loop.py::test_y_person_not_found_on_card_read_says_no_record PASSED [ 93%]
+tests/test_agent_query_loop.py::test_z_merge_resolution_entry_carries_person_id PASSED [ 96%]
+tests/test_agent_query_loop.py::test_aa_db_errors_propagate_out_of_run_turn PASSED [100%]
+
+============================== 33 passed in 0.92s ==============================

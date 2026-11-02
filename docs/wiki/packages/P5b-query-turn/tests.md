@@ -136,3 +136,18 @@
 | test_agent_query_loop.py::test_s_lazy_resolution_uses_module_attribute | (s) `answerer=None` + 근거 있음 | `monkeypatch("app.agent.respond.answerer_from_env")` 가 효과 → llm 답 | 통과 · U4-M9 | 기록 없음 |
 | test_agent_query_loop.py::test_forbidden_callees_are_never_called | 부정 — 조회 턴에서 부르지 않는 것 | `resolve_mentions`·`_record`·`_record_impl`·`after_record`·`apply_resolution`(merge)·`app_tools` 기록 툴 4종을 호출 시 예외로 치환 → 답이 정상 | 통과 · U4-M1·M5 | 기록 없음 |
 | test_agent_query_loop.py::test_other_user_person_is_not_visible | 격리 | 다른 `user_id` 인물의 같은 별칭 → no_record, answerer 0 | 통과 · U4-M6·M9 | 기록 없음 |
+
+## tests/test_agent_query_loop.py — U5 재개(조회 identity 되묻기 뒤 답하기) (추가 10건 = 함수 8개, 그중 2개가 파라미터 2건)
+
+증거: `evidence/20261102-1328-u5-loop.txt`(33 passed = 23 + 10), `evidence/20261102-1328-u5-pytest-all.txt`(전체 2114 passed, skip 0; 기준선 2104 → +10), 변이 `evidence/20261102-1327-u5-mutation.txt`(M1~M15 전부 검출). 변이 번호는 U5-M1~M15.
+
+| 파일::테스트 이름 | 무엇을 확인하나 | 입력 → 기대 | 결과 · 검출 변이 | 실패 이력 |
+|---|---|---|---|---|
+| test_agent_query_loop.py::test_t_resume_candidate_answer_replies_from_that_card_and_writes_nothing (2건: 김민수·김민호) | (t) 후보 답 → 그 인물 카드로 답, 저장 0 | 실제 조회 턴이 저장한 identity 행 → `answer_question`+`load_resume_input`+`resume_turn(answerer=)` → 7개 테이블 불변(`person_aliases` 포함), `update_person` `tool_call` 0·`apply_resolution`/`resolve`/`_followup_new_person_turn` 호출 0, reply == 답+`QUERY_MORE_HINT`, 답 생성기 입력에 고른 인물 이름만, `trace_ids==[resume,query]`, `loop_query`·`loop_turn` 각 +1, `loop_resolve_done`/`loop_record` 0, `resolutions[0]` 전체 값(`er_trace_id None`·`applied True`·`question_id`) | 통과 · U5-M1·M4·M5·M6·M14·M15 | 첫 실행 통과 |
+| test_agent_query_loop.py::test_u_resume_reject_answer_says_no_record_and_asks_nothing | (u) 거절 답 → 후속 질문 0 | ER 부정 옵션 → `pending_questions` +0·행 수 불변·`_followup_new_person_turn` 0·reply == `no_record_reply(["팀장"])`·answerer 0·`answer_source=="no_record"`·`resolutions[0]` 전체 값(`person_id None`·`applied False`) | 통과 · U5-M3·M6·M15 | 기록 없음 |
+| test_agent_query_loop.py::test_v_resume_without_intent_key_keeps_record_path | (v) 하위 호환 | 기록 턴이 만든 identity 행(`resume.intent` 키 없음) → `update_person` `tool_call` 1·`person_aliases` +1·`events` +1·`loop_query` +0·`loop_record` +1 | 통과 · U5-M2 | 첫 실행 실패: `loop_record` 총수 1 단언이 첫 턴 행을 못 셈 → 전후 차이 단언으로 수정 |
+| test_agent_query_loop.py::test_w_other_kinds_ignore_intent (2건: new_person·schedule) | (w) 다른 kind 는 `intent` 무시 | context 에 `resume.intent="query"` 를 넣어도 `_resume_query_turn` 호출 0·`loop_query` 0·`loop_record` 1 | 통과 · U5-M7 | 기록 없음 |
+| test_agent_query_loop.py::test_x_answer_is_stripped_but_rejected_answer_is_verbatim | R-U4-2 (x) | 앞뒤 공백 답 → reply 본문 strip+힌트·`rejected_answer None`; 금지 표현 답(앞뒤 공백) → `rejected_answer` 원문 그대로 | 통과 · U5-M9·M10 | 기록 없음 |
+| test_agent_query_loop.py::test_y_person_not_found_on_card_read_says_no_record | R-U4-2 (y) | `get_person_card` → `PersonNotFound` → reply == `no_record_reply(["팀장"])`·`person_id None`·answerer 0 | 통과 · U5-M11 | 기록 없음 |
+| test_agent_query_loop.py::test_z_merge_resolution_entry_carries_person_id | R-U4-2 (z) | merge 턴 `loop_query.resolutions[0]` `band=="merge"`·`person_id == person.id` | 통과 · U5-M12 | 기록 없음 |
+| test_agent_query_loop.py::test_aa_db_errors_propagate_out_of_run_turn | R-U4-2 (aa) | 답 생성기·`get_person_card` 가 `SQLAlchemyError` → `run_turn` 밖으로 전파 | 통과 · U5-M13 | 기록 없음 |

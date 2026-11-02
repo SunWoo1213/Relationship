@@ -1,0 +1,118 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u5/contract.py
+# 시각: 2026-11-02T13:45:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 18219ba (dev2)
+# exit: 0
+# ---
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+
+## (i) 후보 답(A/B) → 그 인물 카드, 7개 테이블 불변, 금지 호출 0, trace 모양
+PASS  (i)[김민수] 조회 턴 identity 행 context.resume.intent == 'query'  -- {"hints": {}, "intent": "query", "dropped": 0, "mention": "팀장", "version": "1", "held_drafts": [], "pending_calls": []}
+PASS  (i)[김민수] context.utterance == 원 발화
+PASS  (i)[김민수] candidate_ids[김민수] == chosen.id  -- {'김민수': 47898, '김민호': 47899}
+PASS  (i)[김민수] load_resume_input: kind identity · answer == pick
+PASS  (i)[김민수] 7개 테이블 불변(person_aliases 포함)  -- {'persons': 2, 'person_aliases': 2, 'events': 16, 'schedules': 4, 'person_facts': 6, 'fact_sources': 0, 'pending_questions': 1} -> {'persons': 2, 'person_aliases': 2, 'events': 16, 'schedules': 4, 'person_facts': 6, 'fact_sources': 0, 'pending_questions': 1}
+PASS  (i)[김민수] 기록 툴 tool_call 0(재개 뒤)
+PASS  (i)[김민수] 금지 호출 0 {'apply': 0, 'resolve': 0, 'followup': 0, 'update_person': 0, 'resolve_mentions': 0, '_record': 0, 'after_record': 0}
+PASS  (i)[김민수] reply == ANSWER + MORE  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  (i)[김민수] answerer 1회 · question == 원 발화(context.utterance)  -- ['팀장님 어떤 분이었지?']
+PASS  (i)[김민수] evidence.display_name == chosen  -- ['김민수']
+PASS  (i)[김민수] stop_reason None · pending_question None · stored 0
+PASS  (i)[김민수] 재개 뒤 loop_resume 1 · loop_query 1 · loop_turn 1  -- 1,1,1
+PASS  (i)[김민수] loop_resolve_done 0 · loop_record 0 · er_resolve 0 · loop_extract 0 · loop_gate 0 (재개 뒤)
+PASS  (i)[김민수] 재개 뒤 tool_call 행 0(ask_user 포함)
+PASS  (i)[김민수] loop_query.output 키 == 10개 정확히  -- ['answer_source', 'evidence_counts', 'fallback_reason', 'intent', 'mentions', 'mentions_dropped', 'person_id', 'rejected_answer', 'reply', 'resolutions']
+PASS  (i)[김민수] intent query · mentions ['팀장'] · mentions_dropped 0
+PASS  (i)[김민수] resolutions == 위임문 모양 정확히  -- [{"band": "identity", "applied": true, "mention": "팀장", "person_id": 47898, "er_trace_id": null, "question_id": 11128}]
+PASS  (i)[김민수] person_id == chosen.id · answer_source llm · fallback None · rejected None
+PASS  (i)[김민수] evidence_counts == facts 3/patterns 0/timeline 5/schedules 2  -- {'facts': 3, 'patterns': 0, 'timeline': 5, 'schedules': 2}
+PASS  (i)[김민수] tokens_in/out == (7,3) (QueryAnswer.trace_tokens)  -- 7,3
+PASS  (i)[김민수] loop_query.tool_name == 'agent'  -- agent
+PASS  (i)[김민수] trace_ids == [loop_resume.id, loop_query.id]  -- [417470, 417471] vs [417470, 417471]
+PASS  (i)[김민수] loop_turn.output.reply == result.reply == loop_query.output.reply
+PASS  (i)[김민수] loop_resume.output 에 identity_rejected 키 없음  -- ['answer', 'context', 'kind']
+PASS  (i)[김민수] 질문 행은 answered 그대로(answer == pick, answered_at not null)
+PASS  (i)[김민수] 원문(raw_utterance) 비노출(reply·loop_query·loop_turn)
+PASS  (vi) answer_question 재호출 → QuestionNotAnswerable  -- already_answered
+PASS  (i)[김민호] 조회 턴 identity 행 context.resume.intent == 'query'  -- {"hints": {}, "intent": "query", "dropped": 0, "mention": "팀장", "version": "1", "held_drafts": [], "pending_calls": []}
+PASS  (i)[김민호] context.utterance == 원 발화
+PASS  (i)[김민호] candidate_ids[김민호] == chosen.id  -- {'김민수': 47900, '김민호': 47901}
+PASS  (i)[김민호] load_resume_input: kind identity · answer == pick
+PASS  (i)[김민호] 7개 테이블 불변(person_aliases 포함)  -- {'persons': 2, 'person_aliases': 2, 'events': 16, 'schedules': 4, 'person_facts': 6, 'fact_sources': 0, 'pending_questions': 1} -> {'persons': 2, 'person_aliases': 2, 'events': 16, 'schedules': 4, 'person_facts': 6, 'fact_sources': 0, 'pending_questions': 1}
+PASS  (i)[김민호] 기록 툴 tool_call 0(재개 뒤)
+PASS  (i)[김민호] 금지 호출 0 {'apply': 0, 'resolve': 0, 'followup': 0, 'update_person': 0, 'resolve_mentions': 0, '_record': 0, 'after_record': 0}
+PASS  (i)[김민호] reply == ANSWER + MORE  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  (i)[김민호] answerer 1회 · question == 원 발화(context.utterance)  -- ['팀장님 어떤 분이었지?']
+PASS  (i)[김민호] evidence.display_name == chosen  -- ['김민호']
+PASS  (i)[김민호] stop_reason None · pending_question None · stored 0
+PASS  (i)[김민호] 재개 뒤 loop_resume 1 · loop_query 1 · loop_turn 1  -- 1,1,1
+PASS  (i)[김민호] loop_resolve_done 0 · loop_record 0 · er_resolve 0 · loop_extract 0 · loop_gate 0 (재개 뒤)
+PASS  (i)[김민호] 재개 뒤 tool_call 행 0(ask_user 포함)
+PASS  (i)[김민호] loop_query.output 키 == 10개 정확히  -- ['answer_source', 'evidence_counts', 'fallback_reason', 'intent', 'mentions', 'mentions_dropped', 'person_id', 'rejected_answer', 'reply', 'resolutions']
+PASS  (i)[김민호] intent query · mentions ['팀장'] · mentions_dropped 0
+PASS  (i)[김민호] resolutions == 위임문 모양 정확히  -- [{"band": "identity", "applied": true, "mention": "팀장", "person_id": 47901, "er_trace_id": null, "question_id": 11129}]
+PASS  (i)[김민호] person_id == chosen.id · answer_source llm · fallback None · rejected None
+PASS  (i)[김민호] evidence_counts == facts 3/patterns 0/timeline 5/schedules 2  -- {'facts': 3, 'patterns': 0, 'timeline': 5, 'schedules': 2}
+PASS  (i)[김민호] tokens_in/out == (7,3) (QueryAnswer.trace_tokens)  -- 7,3
+PASS  (i)[김민호] loop_query.tool_name == 'agent'  -- agent
+PASS  (i)[김민호] trace_ids == [loop_resume.id, loop_query.id]  -- [417482, 417483] vs [417482, 417483]
+PASS  (i)[김민호] loop_turn.output.reply == result.reply == loop_query.output.reply
+PASS  (i)[김민호] loop_resume.output 에 identity_rejected 키 없음  -- ['answer', 'context', 'kind']
+PASS  (i)[김민호] 질문 행은 answered 그대로(answer == pick, answered_at not null)
+PASS  (i)[김민호] 원문(raw_utterance) 비노출(reply·loop_query·loop_turn)
+PASS  (vi) answer_question 재호출 → QuestionNotAnswerable  -- already_answered
+PASS  (i-t) 판정 실패(timeout) 로 낸 identity 도 같은 모양(후보 답 → 카드)
+PASS  (i-t) 빈 답 → 템플릿 · fallback empty · rejected ''  -- template empty ''
+PASS  (i-t) 템플릿 reply 에 MORE 1회(루프가 더 붙이지 않음)
+PASS  (xvi) 재개 경로 금지 표현 → template · forbidden_expression · rejected_answer 원문 그대로  -- forbidden_expression '  요즘 많이 힘들어 보여요  \n'
+PASS  (xvi) 재개 경로 금지 표현 답은 reply 에 없음
+PASS  (xv) 재개 경로 JudgeUnavailable → 템플릿 · answerer_error:timeout · 예외 없음 · loop_error 0  -- answerer_error:timeout
+
+## (ii) 거절 답(ER 부정 옵션) → 기록 없음, 후속 질문 0, FIX-035 키 없음
+    options=['김민수', '김민호', '아니요, 다른 사람이에요'] reject='아니요, 다른 사람이에요' candidate_ids={'김민수': 47908, '김민호': 47909}
+PASS  (ii) 7개 테이블 불변(pending_questions +0)  -- {'persons': 2, 'person_aliases': 2, 'events': 16, 'schedules': 4, 'person_facts': 6, 'fact_sources': 0, 'pending_questions': 1} -> {'persons': 2, 'person_aliases': 2, 'events': 16, 'schedules': 4, 'person_facts': 6, 'fact_sources': 0, 'pending_questions': 1}
+PASS  (ii) 금지 호출 0(FIX-035 후속·ask_user 포함)  -- {'apply': 0, 'resolve': 0, 'followup': 0, 'update_person': 0, 'resolve_mentions': 0, '_record': 0, 'after_record': 0}
+PASS  (ii) reply == no_record_reply(['팀장'])  -- '"팀장"에 대한 기록이 없어요.'
+PASS  (ii) answerer 0회
+PASS  (ii) pending_question None · stop_reason None · stored 0
+PASS  (ii) loop_resume 1 · loop_query 1 · loop_turn 1 · loop_resolve_done/loop_record 0 · tool_call 0
+PASS  (ii) answer_source no_record · person_id None · fallback None  -- no_record None
+PASS  (ii) resolutions == [{팀장, identity, None, None, False, question_id}]  -- [{"band": "identity", "applied": false, "mention": "팀장", "person_id": null, "er_trace_id": null, "question_id": 11133}]
+PASS  (ii) evidence_counts 전부 0 · reply 에 MORE 없음
+PASS  (ii) trace_ids == [resume, query]
+PASS  (ii) loop_resume.output 에 identity_rejected·followup_question_id 키 없음(FIX-035 경로만의 키)  -- ['answer', 'context', 'kind']
+PASS  (ii-대조) 기록 턴 identity 거절(FIX-035) 은 loop_resume.output 에 identity_rejected True + followup_question_id · 후속 new_person 질문  -- ['answer', 'context', 'followup_question_id', 'identity_rejected', 'kind']
+PASS  (ii-직접) candidate_ids 밖 임의 답 → no_record · 저장 0
+
+## (iii) 하위 호환 — 기록 턴이 만든 identity 질문(resume.intent 없음) → 기록 재개 경로
+PASS  (iii) 기록 턴이 identity 질문을 냄
+PASS  (iii) 저장 context.resume 에 intent 키 없음(P5-loop 형식)  -- ['dropped', 'held_drafts', 'hints', 'mention', 'pending_calls', 'version']
+PASS  (iii) _resume_query_turn 호출 0
+PASS  (iii) update_person tool_call 1 · person_aliases +1 · events +1 · stored.events 1  -- {'persons': 1, 'person_aliases': 1, 'events': 0, 'schedules': 0, 'person_facts': 0, 'fact_sources': 0, 'pending_questions': 1} -> {'persons': 1, 'person_aliases': 2, 'events': 1, 'schedules': 0, 'person_facts': 0, 'fact_sources': 0, 'pending_questions': 1}
+PASS  (iii) loop_query 0 · loop_record 1 · loop_resolve_done 1 (재개 뒤)
+PASS  (iii-b) intent='record' 명시 identity → 기록 경로(update_person 1 · loop_query 0)
+
+## (iv) new_person·schedule kind 의 context 에 resume.intent='query' 를 넣어도 기존 경로
+PASS  (iv)[new_person] _resume_query_turn 0 · loop_query 0 · loop_record 1 · loop_resolve_done 1
+PASS  (iv)[new_person] pending_question None
+PASS  (iv)[schedule] _resume_query_turn 0 · loop_query 0 · loop_record 1 · loop_resolve_done 1
+PASS  (iv)[schedule] pending_question None
+
+## (v) R-U4-2 — strip/원문 · PersonNotFound(merge·재개 둘 다) · merge person_id · SQLAlchemyError 전파
+PASS  (v-a) 앞뒤 공백 유효 답 → 본문 strip + MORE · rejected None · llm  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  (v-b) 금지 표현 앞뒤 공백 → template · rejected_answer 원문 그대로  -- '  요즘 많이 힘들어 보여요  \n'
+PASS  (v-c) U4 (a) merge 턴 resolutions[0].person_id == person.id · band merge
+PASS  (v-d) merge 카드 PersonNotFound → no_record_reply(['팀장']) · person_id None · answerer 0 · resolutions[0].person_id == merge id
+PASS  (v-e) 재개 후보 답 카드 PersonNotFound → no_record_reply(['팀장']) · answerer 0 · person_id None · applied True/person_id=후보 · 저장 0 · 예외 없음  -- [{"band": "identity", "applied": true, "mention": "팀장", "person_id": 47917, "er_trace_id": null, "question_id": 11139}] '"팀장"에 대한 기록이 없어요.'
+PASS  (v-f) 다른 user 소유 후보 → 카드 None → no_record · answerer 0
+PASS  (v-g) 답 생성기 SQLAlchemyError → run_turn 밖 전파
+PASS  (v-h) 답 생성기 SQLAlchemyError → resume_turn 밖 전파
+PASS  (v-i) get_person_card SQLAlchemyError → resume_turn 밖 전파(삼키지 않음)
+
+## (vii) 재개 턴 question == context['utterance'](ER 원 발화) — PendingResume 에 새 발화 없음
+PASS  (vii) context.resume 키 == {version,mention,hints,pending_calls,held_drafts,dropped,intent} (발화 중복 없음)  -- ['dropped', 'held_drafts', 'hints', 'intent', 'mention', 'pending_calls', 'version']
+PASS  (vii) answerer.question == 원 발화  -- ['팀장님 어떤 분이었지?']
+PASS  (vii-b) question 의 출처는 context['utterance'] (사본 변경이 그대로 반영)  -- ['다른 발화?']
+
+### RESULT: 95 PASS / 0 FAIL

@@ -1,0 +1,132 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u5/contract.py
+# 시각: 2026-11-02T13:44:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 18219ba (dev2)
+# exit: 1
+# ---
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+
+## (i) 후보 답(A/B) → 그 인물 카드, 7개 테이블 불변, 금지 호출 0, trace 모양
+PASS  (i)[김민수] 조회 턴 identity 행 context.resume.intent == 'query'  -- {"hints": {}, "intent": "query", "dropped": 0, "mention": "팀장", "version": "1", "held_drafts": [], "pending_calls": []}
+PASS  (i)[김민수] context.utterance == 원 발화
+PASS  (i)[김민수] candidate_ids[김민수] == chosen.id  -- {'김민수': 47109, '김민호': 47110}
+PASS  (i)[김민수] load_resume_input: kind identity · answer == pick
+FAIL  section_i 실행  -- AttributeError("'PersonCardOut' object has no attribute 'display_name'")
+nship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u5/contract.py", line 624, in main
+    fn()
+    ~~^^
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u5/contract.py", line 268, in section_i
+    result = resume_turn(ctx, ri, question_id=row.id, answerer=answerer)
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/agent/loop.py", line 1795, in resume_turn
+    return _resume_query_turn(
+        ctx,
+    ...<4 lines>...
+        answerer=answerer,
+    )
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/agent/loop.py", line 1681, in _resume_query_turn
+    return _query_finish(
+        ctx,
+    ...<10 lines>...
+        trace_ids=[resume_trace_id],
+    )
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/agent/loop.py", line 1404, in _query_finish
+    answer = answerer.answer(utterance, card, now)
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u5/contract.py", line 204, in answer
+    self.evidence_names.append(evidence.display_name)
+                               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/pydantic/main.py", line 1042, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'PersonCardOut' object has no attribute 'display_name'
+
+
+## (ii) 거절 답(ER 부정 옵션) → 기록 없음, 후속 질문 0, FIX-035 키 없음
+    options=['김민수', '김민호', '아니요, 다른 사람이에요'] reject='아니요, 다른 사람이에요' candidate_ids={'김민수': 47111, '김민호': 47112}
+PASS  (ii) 7개 테이블 불변(pending_questions +0)  -- {'persons': 2, 'person_aliases': 2, 'events': 16, 'schedules': 4, 'person_facts': 6, 'fact_sources': 0, 'pending_questions': 1} -> {'persons': 2, 'person_aliases': 2, 'events': 16, 'schedules': 4, 'person_facts': 6, 'fact_sources': 0, 'pending_questions': 1}
+PASS  (ii) 금지 호출 0(FIX-035 후속·ask_user 포함)  -- {'apply': 0, 'resolve': 0, 'followup': 0, 'update_person': 0, 'resolve_mentions': 0, '_record': 0, 'after_record': 0}
+PASS  (ii) reply == no_record_reply(['팀장'])  -- '"팀장"에 대한 기록이 없어요.'
+PASS  (ii) answerer 0회
+PASS  (ii) pending_question None · stop_reason None · stored 0
+PASS  (ii) loop_resume 1 · loop_query 1 · loop_turn 1 · loop_resolve_done/loop_record 0 · tool_call 0
+PASS  (ii) answer_source no_record · person_id None · fallback None  -- no_record None
+PASS  (ii) resolutions == [{팀장, identity, None, None, False, question_id}]  -- [{"band": "identity", "applied": false, "mention": "팀장", "person_id": null, "er_trace_id": null, "question_id": 10949}]
+PASS  (ii) evidence_counts 전부 0 · reply 에 MORE 없음
+PASS  (ii) trace_ids == [resume, query]
+PASS  (ii) loop_resume.output 에 identity_rejected·followup_question_id 키 없음(FIX-035 경로만의 키)  -- ['answer', 'context', 'kind']
+PASS  (ii-대조) 기록 턴 identity 거절(FIX-035) 은 loop_resume.output 에 identity_rejected True + followup_question_id · 후속 new_person 질문  -- ['answer', 'context', 'followup_question_id', 'identity_rejected', 'kind']
+PASS  (ii-직접) candidate_ids 밖 임의 답 → no_record · 저장 0
+
+## (iii) 하위 호환 — 기록 턴이 만든 identity 질문(resume.intent 없음) → 기록 재개 경로
+PASS  (iii) 기록 턴이 identity 질문을 냄
+PASS  (iii) 저장 context.resume 에 intent 키 없음(P5-loop 형식)  -- ['dropped', 'held_drafts', 'hints', 'mention', 'pending_calls', 'version']
+PASS  (iii) _resume_query_turn 호출 0
+PASS  (iii) update_person tool_call 1 · person_aliases +1 · events +1 · stored.events 1  -- {'persons': 1, 'person_aliases': 1, 'events': 0, 'schedules': 0, 'person_facts': 0, 'fact_sources': 0, 'pending_questions': 1} -> {'persons': 1, 'person_aliases': 2, 'events': 1, 'schedules': 0, 'person_facts': 0, 'fact_sources': 0, 'pending_questions': 1}
+PASS  (iii) loop_query 0 · loop_record 1 · loop_resolve_done 1 (재개 뒤)
+PASS  (iii-b) intent='record' 명시 identity → 기록 경로(update_person 1 · loop_query 0)
+
+## (iv) new_person·schedule kind 의 context 에 resume.intent='query' 를 넣어도 기존 경로
+PASS  (iv)[new_person] _resume_query_turn 0 · loop_query 0 · loop_record 1 · loop_resolve_done 1
+PASS  (iv)[new_person] pending_question None
+PASS  (iv)[schedule] _resume_query_turn 0 · loop_query 0 · loop_record 1 · loop_resolve_done 1
+PASS  (iv)[schedule] pending_question None
+FAIL  (iv-np) new_person 태그 답 경로 실행  -- ConfirmationRequired('not_affirmative')
+_turn(ctx, ri, question_id=q.id)
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/agent/loop.py", line 1853, in resume_turn
+    created = app_tools.create_person(
+        ctx,
+    ...<3 lines>...
+        hierarchy=hierarchy,
+    )
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/tools/context.py", line 193, in wrapper
+    result = fn(ctx, *args, **kwargs)
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/tools/persons.py", line 470, in create_person
+    _require_confirmation(ctx, kinds=("new_person",))
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/tools/persons.py", line 322, in _require_confirmation
+    raise ConfirmationRequired("not_affirmative")
+app.tools.types.ConfirmationRequired: not_affirmative
+
+
+## (v) R-U4-2 — strip/원문 · PersonNotFound(merge·재개 둘 다) · merge person_id · SQLAlchemyError 전파
+PASS  (v-a) 앞뒤 공백 유효 답 → 본문 strip + MORE · rejected None · llm  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  (v-b) 금지 표현 앞뒤 공백 → template · rejected_answer 원문 그대로  -- '  요즘 많이 힘들어 보여요  \n'
+PASS  (v-c) U4 (a) merge 턴 resolutions[0].person_id == person.id · band merge
+PASS  (v-d) merge 카드 PersonNotFound → no_record_reply(['팀장']) · person_id None · answerer 0 · resolutions[0].person_id == merge id
+PASS  (v-e) 재개 후보 답 카드 PersonNotFound → no_record_reply(['팀장']) · answerer 0 · person_id None · applied True/person_id=후보 · 저장 0 · 예외 없음  -- [{"band": "identity", "applied": true, "mention": "팀장", "person_id": 47120, "er_trace_id": null, "question_id": 10956}] '"팀장"에 대한 기록이 없어요.'
+PASS  (v-f) 다른 user 소유 후보 → 카드 None → no_record · answerer 0
+PASS  (v-g) 답 생성기 SQLAlchemyError → run_turn 밖 전파
+PASS  (v-h) 답 생성기 SQLAlchemyError → resume_turn 밖 전파
+PASS  (v-i) get_person_card SQLAlchemyError → resume_turn 밖 전파(삼키지 않음)
+
+## (vii) 재개 턴 question == context['utterance'](ER 원 발화) — PendingResume 에 새 발화 없음
+PASS  (vii) context.resume 키 == {version,mention,hints,pending_calls,held_drafts,dropped,intent} (발화 중복 없음)  -- ['dropped', 'held_drafts', 'hints', 'intent', 'mention', 'pending_calls', 'version']
+FAIL  section_vii 실행  -- AttributeError("'PersonCardOut' object has no attribute 'display_name'")
+ifier-p5b-u5/contract.py", line 624, in main
+    fn()
+    ~~^^
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u5/contract.py", line 610, in section_vii
+    resume_turn(ctx, ri, question_id=row.id, answerer=answerer)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/agent/loop.py", line 1795, in resume_turn
+    return _resume_query_turn(
+        ctx,
+    ...<4 lines>...
+        answerer=answerer,
+    )
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/agent/loop.py", line 1681, in _resume_query_turn
+    return _query_finish(
+        ctx,
+    ...<10 lines>...
+        trace_ids=[resume_trace_id],
+    )
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/agent/loop.py", line 1404, in _query_finish
+    answer = answerer.answer(utterance, card, now)
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-p5b-u5/contract.py", line 204, in answer
+    self.evidence_names.append(evidence.display_name)
+                               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/pydantic/main.py", line 1042, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'PersonCardOut' object has no attribute 'display_name'
+
+
+### RESULT: 37 PASS / 3 FAIL
