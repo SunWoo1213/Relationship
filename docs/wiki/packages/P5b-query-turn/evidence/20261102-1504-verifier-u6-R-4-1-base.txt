@@ -1,0 +1,8 @@
+# 명령: git grep -nE -B1 'create_person\(' 8a8767b -- app/agent/
+# 시각: 2026-11-02T15:04:00+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+8a8767b:app/agent/loop.py-1472-            ctx.confirmed_question_id = question_id
+8a8767b:app/agent/loop.py:1473:            created = app_tools.create_person(

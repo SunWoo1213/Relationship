@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_agent_query_loop.py tests/test_api_chat_query.py -q -k 'new_person_no_question or identity_asks'
+# 시각: 2026-11-02T14:51:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+...                                                                      [100%]
+3 passed, 38 deselected in 0.50s

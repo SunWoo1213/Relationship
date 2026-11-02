@@ -1,0 +1,16 @@
+# 명령: .venv/bin/python -m pytest tests/test_agent_query_types.py tests/test_agent_query_gate.py tests/test_agent_query_answer.py tests/test_agent_query_loop.py tests/test_api_chat_query.py -q
+# 시각: 2026-11-02T14:52:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+........................................................................ [ 43%]
+........................................................................ [ 87%]
+....................                                                     [100%]
+=============================== warnings summary ===============================
+tests/test_agent_query_answer.py::test_gemini_answerer_request_uses_schema_and_parses
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+164 passed, 1 warning in 1.76s

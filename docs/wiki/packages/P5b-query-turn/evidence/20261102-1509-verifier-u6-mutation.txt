@@ -1,0 +1,194 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u6/mutate.py
+# 시각: 2026-11-02T15:09:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+### 사본 최상위 항목: ['alembic', 'alembic.ini', 'app', 'pyproject.toml', 'scripts', 'tests']
+### 사본에 .env 없음: True
+### C0 대조군(무변이): exit 0 — 8 passed in 0.69s
+### C0 mypy_check --run(무변이): exit 0
+    [ok] 새 오류 없음 (현재 38건, 기준선 38건)
+### P1 계획1 run_turn 조회 분기 진입 조건 'Query' 오타 [app/agent/loop.py] → 검출 — 6 failed, 2 passed in 0.66s
+    FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes
+    FAILED tests/test_api_chat_query.py::test_chat_query_identity_second_answer_returns_409
+    FAILED tests/test_api_chat_query.py::test_chat_query_issues_session_id_when_header_missing
+    FAILED tests/test_api_chat_query.py::test_chat_query_merge_stored_zero_no_writes_and_trace
+    FAILED tests/test_api_chat_query.py::test_chat_query_new_person_no_question_no_writes
+    FAILED tests/test_api_chat_query.py::test_chat_query_resume_person_deleted_says_no_record_stored_zero
+### P2 계획2 stored 를 근거 건수(timeline)로 채움 [app/agent/loop.py] → 검출 — 4 failed, 4 passed in 0.73s
+    FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes
+    FAILED tests/test_api_chat_query.py::test_chat_query_issues_session_id_when_header_missing
+    FAILED tests/test_api_chat_query.py::test_chat_query_merge_stored_zero_no_writes_and_trace
+    FAILED tests/test_api_chat_query.py::test_chat_query_turn_mixed_utterance_no_writes_loop_gate_rejects
+### P3 assert applied.pending_question_id is not None 제거 → mypy 새 오류 [app/agent/loop.py] → 검출(mypy 새 오류) — exit 1
+    [new] 기준선에 없는 새 오류:
+      + app/agent/loop.py: [arg-type] Argument "question_id" to "PendingQuestionOut" has incompatible type "int | None"; expected "int" (x1)
+    
+    [FAIL] 새 오류 1건 -- scripts/mypy_baseline.txt 와 비교해 결함이면 고치고,
+    기준선에 넣을 것이면 --update-baseline 로 재생성 후 사람이 검토하고 커밋한다.
+### V1 409 조건 제거(already_answered 를 올리지 않음) [app/tools/questions.py] → 검출 — 1 failed, 7 passed in 0.73s
+    FAILED tests/test_api_chat_query.py::test_chat_query_identity_second_answer_returns_409
+### V2 answerer_from_env 를 import 시점에 바인딩(모듈 속성 호출 아님) → monkeypatch 무효 [app/agent/loop.py] → 검출 — 5 failed, 3 passed in 1.73s
+    FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes
+    FAILED tests/test_api_chat_query.py::test_chat_query_identity_second_answer_returns_409
+    FAILED tests/test_api_chat_query.py::test_chat_query_issues_session_id_when_header_missing
+    FAILED tests/test_api_chat_query.py::test_chat_query_merge_stored_zero_no_writes_and_trace
+    FAILED tests/test_api_chat_query.py::test_chat_query_turn_mixed_utterance_no_writes_loop_gate_rejects
+### V3 resume_turn 조회 재개 분기 진입 조건 'Query' 오타 [app/agent/loop.py] → 검출 — 2 failed, 6 passed in 0.72s
+    FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes
+    FAILED tests/test_api_chat_query.py::test_chat_query_resume_person_deleted_says_no_record_stored_zero
+### V4 재개 후보 답 카드 None(PersonNotFound) 처리 제거(U5 생존 V7 — R-U5-1) [app/agent/loop.py] → 검출 — 1 failed, 7 passed in 0.73s
+    FAILED tests/test_api_chat_query.py::test_chat_query_resume_person_deleted_says_no_record_stored_zero
+### V5 new_person 언급을 '기록 없음' 목록에 넣지 않음 [app/agent/loop.py] → 검출 — 1 failed, 7 passed in 0.73s
+    FAILED tests/test_api_chat_query.py::test_chat_query_new_person_no_question_no_writes
+### V6 게이트 거부 사유 문자열 변경 [app/agent/gate.py] → 검출 — 1 failed, 7 passed in 0.73s
+    FAILED tests/test_api_chat_query.py::test_chat_query_turn_mixed_utterance_no_writes_loop_gate_rejects
+### V7 _query_finish stop_reason 을 항상 None [app/agent/loop.py] → 검출 — 1 failed, 7 passed in 0.71s
+    FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes
+### V8 merge 경로에서 apply_resolution 호출(별칭 누적, 결정 I (a) 위반) [app/agent/loop.py] → 검출 — 2 failed, 6 passed in 0.74s
+    FAILED tests/test_api_chat_query.py::test_chat_query_merge_stored_zero_no_writes_and_trace
+    FAILED tests/test_api_chat_query.py::test_chat_query_turn_mixed_utterance_no_writes_loop_gate_rejects
+### V9 재개 후보 답에서 update_person(new_alias) 호출(결정 G (b)) [app/agent/loop.py] → 검출 — 2 failed, 6 passed in 0.73s
+    FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes
+    FAILED tests/test_api_chat_query.py::test_chat_query_resume_person_deleted_says_no_record_stored_zero
+
+### 생존 변이: 0
+### git status --short (저장소 무수정 확인)
+ M app/agent/loop.py
+ M docs/RUNNING.md
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P5b-query-turn/01-plan.md
+ M docs/wiki/packages/P5b-query-turn/03-log.md
+ M docs/wiki/packages/P5b-query-turn/tests.md
+ M docs/wiki/registry.md
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1449-u6-mypy-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1449-u6-mypy.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-A-1a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-A-1b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-A-2.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-A-3.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-A-5.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-1a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-1b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-1c.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-2.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-3a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-3b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-3c.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-3d.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-4.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-5.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-6a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-6b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-6c.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-D-7.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-R-1.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-R-2a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-R-2b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-R-3.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1451-u6-R-5.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-4-1.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-4-2-added.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-4-2.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-4-3.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-4-4.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-4-5-added.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-4-5-base.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-4-5.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-6.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-7a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-7b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-R-8.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-api.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-diff-filter.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-pytest-all.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-scope.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1452-u6-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1453-u6-mutation.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1455-u6-final-pytest.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1459-u6-D-3d-rerun.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1459-u6-R-4-5-rerun.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1500-verifier-u6-api-tests.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1500-verifier-u6-lint.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1500-verifier-u6-mypy.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1500-verifier-u6-tools-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1501-verifier-u6-full-regression.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1501-verifier-u6-mypy-check.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1502-verifier-u6-D-1a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1502-verifier-u6-D-1b-wt.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1502-verifier-u6-D-1b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1502-verifier-u6-D-1c.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1502-verifier-u6-D-2.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1502-verifier-u6-D-3a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1502-verifier-u6-D-3b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1502-verifier-u6-D-3c-wt.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1502-verifier-u6-D-3c.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-A-1.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-A-2.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-A-3.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-A-5.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-1a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-2.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-3a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-3d.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-4.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-5.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-6a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-6b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-6c-wt.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-6c.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-7-wt.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-D-7.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-1-wt.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-1.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-2a-wt.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-2a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-2b-wt.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-2b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-3.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-4-1-added.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-4-1-base.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-4-1.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-4-2-base.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-4-2.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-4-3.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-4-4.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-4-5-added.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-4-5-base.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-4-5.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-5.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-6.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-7a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-7b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1503-verifier-u6-R-8.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-D-6b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-1-base.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-1.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-2-base.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-2-cmp.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-2.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-3-base.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-3.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-4-base.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-4.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-5-added.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-5-base.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-5-cmp.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-4-5.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-7a.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-7b.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1504-verifier-u6-R-8.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1505-verifier-u6-R-4-2-cmp-py.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1505-verifier-u6-R-4-5-base-P.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1505-verifier-u6-R-4-5-cmp-P.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261102-1508-verifier-u6-contract-values.txt
+?? tests/test_api_chat_query.py
+
+### 사본 ↔ 저장소 대상 파일 동일 확인(원복)
+    app/agent/loop.py: SAME
+    app/tools/questions.py: SAME
+    app/agent/gate.py: SAME
+### 사본에 비밀 파일 없음: True

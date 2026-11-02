@@ -182,7 +182,9 @@ user_timezone())` 로 사용자 시간대(`APP_TIMEZONE`, 기본 `Asia/Seoul`)�
 없음" 목록에 넣고, identity 만 `apply_resolution()`(되묻기)으로 턴을 끝낸다.
 확정된 인물의 카드(`get_person_card`)를 근거로 답을 만들고 -- 검증 실패·공급자
 오류·근거 0건이면 LLM 없이 템플릿 -- `loop_query` trace 1행을 남긴다. 루프는
-이번에도 확신도 값을 읽지 않는다(`band` 만).
+이번에도 확신도 값을 읽지 않는다(`band` 만). 조회 턴이 낸 identity 되묻기의
+답은 `resume_turn()` 이 `_resume_query_turn()` 으로 받아 같은 꼬리
+(`_query_finish`)로 답한다 -- 재개도 별칭 누적 없이 저장 0 이다.
 """
 
 from __future__ import annotations
@@ -1327,6 +1329,7 @@ def _run_query_turn(
         applied = apply_resolution(ctx, resolution)
         payload = resolution.ask_payload
         assert payload is not None
+        assert applied.pending_question_id is not None
         pending_question = PendingQuestionOut(
             question_id=applied.pending_question_id,
             status="pending",
@@ -1756,6 +1759,17 @@ def resume_turn(
       그 언급의 `person_id` 는 이미 알려져 있으므로(원래 턴에서 merge
       됐던 값) 같은 언급에 딸린 **다른** 보류 제안이 있으면 재해석 없이
       이어 실행한다.
+
+    ## 조회 재개 분기 (P5b-query-turn U5, CR-004·D16)
+
+    `kind == "identity"` 이고 `resume.intent == "query"` 이면 위 기록 경로를
+    타지 않고 `_resume_query_turn()` 으로 가서 끝낸다. 답이 `candidate_ids`
+    안이면 그 인물 카드로 답하고(질문 = `context["utterance"]`), 후보 밖
+    (ER 거절 옵션)이면 후속 new_person 질문을 내지 않고 `no_record_reply` 로
+    끝낸다. 별칭은 쌓지 않고 `update_person` 도 부르지 않는다 -- 저장 0.
+    trace 는 `loop_resume`·`loop_query`·`loop_turn` 3행(`loop_resolve_done`/
+    `loop_record` 없음). `resume.intent` 키가 없는 옛 context(P5-loop 형식)는
+    기본값 `"record"` 로 읽혀 기존 기록 경로를 그대로 탄다.
 
     ## 남은 보류 제안 (`resume.pending_calls`)
 

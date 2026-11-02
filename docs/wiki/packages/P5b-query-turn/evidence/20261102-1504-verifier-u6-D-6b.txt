@@ -1,0 +1,11 @@
+# 명령: grep -nE 'BRIEFING_FORBIDDEN_EXPRESSIONS|REASON_FORBIDDEN_EXPRESSION' app/agent/respond.py
+# 시각: 2026-11-02T15:04:00+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+54:from app.briefing.compose import REASON_FORBIDDEN_EXPRESSION, REASON_TOO_LONG
+55:from app.briefing.types import BRIEFING_FORBIDDEN_EXPRESSIONS
+125:# REASON_TOO_LONG·REASON_FORBIDDEN_EXPRESSION 은 compose.py 의 것을 재사용한다.
+274:    if any(bad in text for bad in BRIEFING_FORBIDDEN_EXPRESSIONS):
+275:        return REASON_FORBIDDEN_EXPRESSION

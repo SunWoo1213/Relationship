@@ -1,0 +1,14 @@
+# 명령: diff <(grep -rnE 'PendingQuestion\b|flag_modified|\.context *=' app/agent/ | sed -E 's/^([^:]+):[0-9]+:/\1:/' | sort) <(git grep -nE 'PendingQuestion\b|flag_modified|\.context *=' 8a8767b -- app/agent/ | sed -E 's/^8a8767b:([^:]+):[0-9]+:/\1:/' | sort) && echo SAME-as-base
+# 시각: 2026-11-02T15:04:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 1
+# ---
+1,7d0
+< app/agent/loop.py:    `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아
+< app/agent/loop.py:    으로 다시 만든다 -- `PendingQuestion` ORM 을 조회하지 않고, 이 루프가
+< app/agent/loop.py:# (`app/api/deps.py::load_resume_input` 이 `PendingQuestion` 에서 값만 뽑아
+< app/agent/types.py:    .load_resume_input`(U6/U7)이 `PendingQuestion` 행에서 `kind`·`context`
+< app/agent/types.py:    로 더해 이 타입을 만든다 -- `app/agent/` 는 `PendingQuestion` ORM 을
+< Binary file app/agent/__pycache__/loop.cpython-314.pyc matches
+< Binary file app/agent/__pycache__/types.cpython-314.pyc matches

@@ -1,0 +1,6 @@
+# 명령: grep -rn 'T_merge\|t_merge\|T_new\|t_new\|confidence' app/agent/
+# 시각: 2026-11-02T14:52:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 1
+# ---

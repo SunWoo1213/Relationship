@@ -1,0 +1,56 @@
+# 명령: .venv/bin/mypy app
+# 시각: 2026-11-02T14:49:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 1
+# ---
+app/push/sender.py:56: error: Skipping analyzing "pywebpush": module is installed, but missing library stubs or py.typed marker  [import-untyped]
+app/push/sender.py:56: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
+app/push/subscriptions.py:60: error: Need type annotation for "stmt"  [var-annotated]
+app/push/notifier.py:163: error: Argument "keys" to "send" of "PushSender" has incompatible type "object"; expected "dict[str, str]"  [arg-type]
+app/push/notifier.py:269: error: Argument "vapid" to "WebPushNotifier" has incompatible type "VapidConfig | _VapidPartial"; expected "VapidConfig"  [arg-type]
+app/embedding.py:88: error: Incompatible return value type (got "EmbeddingProvider | Callable[[list[str]], list[list[float]]]", expected "EmbeddingProvider | None")  [return-value]
+app/embedding.py:90: error: Incompatible return value type (got "_CallableEmbeddingProvider", expected "EmbeddingProvider | None")  [return-value]
+app/tools/questions.py:119: error: Unsupported operand types for + ("object" and "timedelta")  [operator]
+app/tools/questions.py:119: error: Unsupported operand types for <= ("timedelta" and "datetime")  [operator]
+app/tools/questions.py:232: error: No overload variant of "list" matches argument type "object"  [call-overload]
+app/tools/questions.py:232: note: Possible overload variants:
+app/tools/questions.py:232: note:     def [_T] list() -> list[_T]
+app/tools/questions.py:232: note:     def [_T] list(Iterable[_T], /) -> list[_T]
+app/tools/questions.py:271: error: Unsupported right operand type for in ("object")  [operator]
+app/tools/questions.py:283: error: No overload variant of "list" matches argument type "object"  [call-overload]
+app/tools/questions.py:283: note: Possible overload variants:
+app/tools/questions.py:283: note:     def [_T] list() -> list[_T]
+app/tools/questions.py:283: note:     def [_T] list(Iterable[_T], /) -> list[_T]
+app/tools/questions.py:319: error: No overload variant of "list" matches argument type "object"  [call-overload]
+app/tools/questions.py:319: note: Possible overload variants:
+app/tools/questions.py:319: note:     def [_T] list() -> list[_T]
+app/tools/questions.py:319: note:     def [_T] list(Iterable[_T], /) -> list[_T]
+app/tools/records.py:111: error: Argument "occurred_at" to "EventOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/records.py:112: error: Argument "created_at" to "EventOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/records.py:148: error: Argument "scheduled_at" to "ScheduleOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/records.py:149: error: Argument "briefed_at" to "ScheduleOut" has incompatible type "object"; expected "datetime | None"  [arg-type]
+app/tools/briefing.py:93: error: "object" has no attribute "isoformat"  [attr-defined]
+app/tools/briefing.py:114: error: Argument "occurred_at" to "EventOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/briefing.py:115: error: Argument "created_at" to "EventOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/briefing.py:136: error: Argument "scheduled_at" to "ScheduleOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/tools/briefing.py:137: error: Argument "briefed_at" to "ScheduleOut" has incompatible type "object"; expected "datetime | None"  [arg-type]
+app/tools/briefing.py:155: error: Argument "scheduled_at" to "ScheduleOut" has incompatible type "object"; expected "datetime"  [arg-type]
+app/memory/patterns.py:185: error: "object" has no attribute "astimezone"  [attr-defined]
+app/memory/patterns.py:196: error: Need type annotation for "stmt"  [var-annotated]
+app/briefing/inputs.py:134: error: "object" has no attribute "isoformat"  [attr-defined]
+app/briefing/inputs.py:143: error: Argument "scheduled_at" to "BriefingInput" has incompatible type "object"; expected "datetime"  [arg-type]
+app/agent/gate.py:391: error: Argument 1 to "add" of "set" has incompatible type "Any | None"; expected "str"  [arg-type]
+app/er/pipeline.py:448: error: Value of type "object" is not indexable  [index]
+app/er/pipeline.py:498: error: Argument "action" to "AppliedResolution" has incompatible type "Any | None"; expected "str"  [arg-type]
+app/memory/promote.py:165: error: Need type annotation for "stmt"  [var-annotated]
+app/memory/promote.py:320: error: Argument "occurred_at" to "ExtractEvent" has incompatible type "object"; expected "datetime"  [arg-type]
+app/agent/loop.py:889: error: Argument 4 to "add_schedule" has incompatible type "Any | None"; expected "datetime"  [arg-type]
+app/agent/loop.py:1161: error: Incompatible types in assignment (expression has type "str | None", variable has type "str")  [assignment]
+app/api/routes.py:418: error: Item "_VapidPartial" of "VapidConfig | _VapidPartial" has no attribute "public_key"  [union-attr]
+app/main.py:120: error: Argument 1 to "int" has incompatible type "Any | None"; expected "str | Buffer | SupportsInt | SupportsIndex | SupportsTrunc"  [arg-type]
+app/main.py:187: error: Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], QuestionNotAnswerable], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"  [arg-type]
+app/main.py:188: error: Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], InvalidValue], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"  [arg-type]
+app/main.py:189: error: Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], ConfirmationRequired], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"  [arg-type]
+app/main.py:190: error: Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], ToolError], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]"  [arg-type]
+Found 39 errors in 15 files (checked 55 source files)

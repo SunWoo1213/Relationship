@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_agent_query_loop.py tests/test_api_chat_query.py -q -k 'no_writes'
+# 시각: 2026-11-02T14:51:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+....                                                                     [100%]
+4 passed, 37 deselected in 0.54s

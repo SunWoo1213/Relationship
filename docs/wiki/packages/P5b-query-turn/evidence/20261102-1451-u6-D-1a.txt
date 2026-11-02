@@ -1,0 +1,9 @@
+# 명령: .venv/bin/python -c "from app.agent.propose import PROPOSAL_SCHEMA as S, PROPOSAL_ARG_SCHEMA as A; print(sorted(S['properties'])); print(S['properties']['intent']['enum']); print(S['properties']['tool_calls']['items']['properties']['args'] is A)"
+# 시각: 2026-11-02T14:51:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+['intent', 'tool_calls']
+['record', 'query']
+True

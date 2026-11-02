@@ -1,0 +1,11 @@
+# 명령: git grep -nP 'PendingQuestion\b|flag_modified|\.context *=' 8a8767b -- app/agent/
+# 시각: 2026-11-02T15:05:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+8a8767b:app/agent/loop.py:1032:    으로 다시 만든다 -- `PendingQuestion` ORM 을 조회하지 않고, 이 루프가
+8a8767b:app/agent/loop.py:1143:# (`app/api/deps.py::load_resume_input` 이 `PendingQuestion` 에서 값만 뽑아
+8a8767b:app/agent/loop.py:1341:    `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아
+8a8767b:app/agent/types.py:406:    .load_resume_input`(U6/U7)이 `PendingQuestion` 행에서 `kind`·`context`
+8a8767b:app/agent/types.py:409:    로 더해 이 타입을 만든다 -- `app/agent/` 는 `PendingQuestion` ORM 을

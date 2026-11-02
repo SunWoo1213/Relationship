@@ -1,0 +1,7 @@
+# 명령: grep -rnE -B1 create_person\( app/agent/
+# 시각: 2026-11-02T15:03:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 2
+# ---
+grep: parentheses not balanced

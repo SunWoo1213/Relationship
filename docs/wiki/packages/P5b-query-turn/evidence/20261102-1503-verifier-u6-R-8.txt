@@ -1,0 +1,10 @@
+# 명령: .venv/bin/python -m pytest tests/test_agent_query_answer.py tests/test_agent_query_loop.py -q -k forbidden or no_counseling
+# 시각: 2026-11-02T15:03:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 4
+# ---
+ERROR: file or directory not found: or
+
+
+no tests ran in 0.05s

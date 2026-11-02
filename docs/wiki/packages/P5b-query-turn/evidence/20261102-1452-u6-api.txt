@@ -1,0 +1,25 @@
+# 명령: .venv/bin/python -m pytest tests/test_api_chat_query.py -v
+# 시각: 2026-11-02T14:52:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 8 items
+
+tests/test_api_chat_query.py::test_chat_query_merge_stored_zero_no_writes_and_trace PASSED [ 12%]
+tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes PASSED [ 25%]
+tests/test_api_chat_query.py::test_chat_query_identity_second_answer_returns_409 PASSED [ 37%]
+tests/test_api_chat_query.py::test_chat_query_new_person_no_question_no_writes PASSED [ 50%]
+tests/test_api_chat_query.py::test_chat_query_turn_mixed_utterance_no_writes_loop_gate_rejects PASSED [ 62%]
+tests/test_api_chat_query.py::test_chat_record_turn_control_still_adds_event PASSED [ 75%]
+tests/test_api_chat_query.py::test_chat_query_resume_person_deleted_says_no_record_stored_zero PASSED [ 87%]
+tests/test_api_chat_query.py::test_chat_query_issues_session_id_when_header_missing PASSED [100%]
+
+============================== 8 passed in 0.65s ===============================

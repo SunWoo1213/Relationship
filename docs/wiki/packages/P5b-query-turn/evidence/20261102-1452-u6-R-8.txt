@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_agent_query_answer.py tests/test_agent_query_loop.py -q -k 'forbidden or no_counseling'
+# 시각: 2026-11-02T14:52:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+..................                                                       [100%]
+18 passed, 86 deselected in 0.78s

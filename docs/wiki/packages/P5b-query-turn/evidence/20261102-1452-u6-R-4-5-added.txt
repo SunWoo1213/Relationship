@@ -1,0 +1,10 @@
+# 명령: git diff 8a8767b -- app/agent | grep '^+' | grep -E 'PendingQuestion|flag_modified|\.context *='
+# 시각: 2026-11-02T14:52:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
++from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, PersonNotFound, ToolError
++    pending_question: PendingQuestionOut | None = None
++        pending_question = PendingQuestionOut(
++    pending_question: PendingQuestionOut | None,

@@ -129,7 +129,15 @@ curl -X POST http://localhost:8000/chat \
   -d '{"utterance": "어제 민수랑 저녁 먹었어"}'
 ```
 
-기대 출력(요약): `{"session_id": "...", "reply": "...", "stored": {"persons": [...], "events": [...], "schedules": [...]}, "pending_question": null, "stop_reason": null}` — 인물이 처음 언급됐거나 동일 인물 여부가 애매하면 `pending_question`에 `question_id`·`options`가 함께 온다(확신도가 `T_merge` 미만이면 자동으로 합치지 않고 되묻는다).
+기대 출력(요약): `{"session_id": "...", "reply": "...", "stored": {"persons": 0, "events": 1, "schedules": 0}, "pending_question": null, "stop_reason": null}`(`stored` 는 그 턴에 실제로 늘어난 행 수 — 정수 3개) — 인물이 처음 언급됐거나 동일 인물 여부가 애매하면 `pending_question`에 `question_id`·`options`가 함께 온다(확신도가 `T_merge` 미만이면 자동으로 합치지 않고 되묻는다).
+
+기록이 아니라 **인물을 묻는 발화**(조회, CR-004 · D16)도 같은 엔드포인트로 보낸다 — 인식 단계가 `intent="query"` 로 분류하면 아무것도 저장하지 않고 인물 카드의 기록된 사실로만 답한다:
+
+```bash
+curl -X POST http://localhost:8000/chat -H "Content-Type: application/json" -d '{"utterance": "박선우 과장님 어떤 분이었지?"}'
+```
+
+기대 출력(요약): `{"session_id": "...", "reply": "기록된 사실을 재진술한 답 + 자세한 건 인물 화면에서 볼 수 있어요.", "stored": {"persons": 0, "events": 0, "schedules": 0}, "pending_question": null, "stop_reason": null}` — 기록에 없는 인물이면 `reply` 가 `"박선우"에 대한 기록이 없어요.` 이고 새 인물을 만들지 않는다. 후보가 애매하면 `pending_question`(identity)이 오고, `POST /answers/{id}` 로 고르면 그 인물 카드로 답한다(이때도 `stored` 는 전부 0).
 
 되묻기로 끝난 턴은 `POST /answers/{question_id}`로 이어받는다 — 답 저장(P2) 뒤 **같은 요청 안에서** 저장된 `context`로 해석 · 기록 · 응답을 재개한다(P2 시점에는 답 저장까지만 했다):
 

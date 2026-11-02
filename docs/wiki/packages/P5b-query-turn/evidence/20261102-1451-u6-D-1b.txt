@@ -1,0 +1,7 @@
+# 명령: bash -c git diff 8a8767b..HEAD -- app/agent/propose.py | grep -E '^[-+]' | grep -E 'PROPOSAL_ARG_SCHEMA|"(person|type|content|occurred_at|title|scheduled_at|display_name|aliases|relation_tag|hierarchy|new_alias|facts)"' | wc -l
+# 시각: 2026-11-02T14:51:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+       0

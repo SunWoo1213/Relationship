@@ -1,0 +1,13 @@
+# 명령: git diff --name-only 8a8767b -- app/
+# 시각: 2026-11-02T15:03:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+app/agent/__init__.py
+app/agent/gate.py
+app/agent/loop.py
+app/agent/propose.py
+app/agent/respond.py
+app/agent/types.py
+app/settings.py

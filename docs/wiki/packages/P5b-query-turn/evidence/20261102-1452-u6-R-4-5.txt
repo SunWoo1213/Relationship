@@ -1,0 +1,31 @@
+# 명령: grep -rnE 'PendingQuestion|flag_modified|\.context *=' app/agent/
+# 시각: 2026-11-02T14:52:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+app/agent/respond.py:26:  `new_person`/`schedule` 공통, `app.tools.types.PendingQuestionOut`) --
+app/agent/respond.py:71:from app.tools.types import PendingQuestionOut
+app/agent/respond.py:87:    pending_question: PendingQuestionOut | None = None,
+app/agent/respond.py:91:    숫자·불리언·`PendingQuestionOut.question` 문자열만 입력으로 받는다 --
+app/agent/types.py:38:from app.tools.types import InvalidValue, PendingQuestionOut
+app/agent/types.py:423:    .load_resume_input`(U6/U7)이 `PendingQuestion` 행에서 `kind`·`context`
+app/agent/types.py:426:    로 더해 이 타입을 만든다 -- `app/agent/` 는 `PendingQuestion` ORM 을
+app/agent/types.py:467:    .PendingQuestionOut` 재사용 -- 새 직렬화 방식을 만들지 않는다). 비어
+app/agent/types.py:474:    pending_question: PendingQuestionOut | None = None
+Binary file app/agent/__pycache__/loop.cpython-314.pyc matches
+Binary file app/agent/__pycache__/respond.cpython-314.pyc matches
+Binary file app/agent/__pycache__/types.cpython-314.pyc matches
+app/agent/loop.py:258:from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, PersonNotFound, ToolError
+app/agent/loop.py:754:    schedule_question: PendingQuestionOut | None = None
+app/agent/loop.py:801:) -> PendingQuestionOut:
+app/agent/loop.py:917:    schedule_question: PendingQuestionOut | None = None
+app/agent/loop.py:1065:def _pending_question_from_resolve(outcome: ResolveOutcome) -> PendingQuestionOut:
+app/agent/loop.py:1066:    """해석 구간이 만든 identity/new_person 질문을 `PendingQuestionOut`
+app/agent/loop.py:1067:    으로 다시 만든다 -- `PendingQuestion` ORM 을 조회하지 않고, 이 루프가
+app/agent/loop.py:1077:    return PendingQuestionOut(
+app/agent/loop.py:1295:    pending_question: PendingQuestionOut | None = None
+app/agent/loop.py:1333:        pending_question = PendingQuestionOut(
+app/agent/loop.py:1371:    pending_question: PendingQuestionOut | None,
+app/agent/loop.py:1454:# (`app/api/deps.py::load_resume_input` 이 `PendingQuestion` 에서 값만 뽑아
+app/agent/loop.py:1713:    `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아

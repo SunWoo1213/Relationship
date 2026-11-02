@@ -1,0 +1,82 @@
+# 명령: cd /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u6 && /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_api_chat_query.py -q -p no:cacheprovider; /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -c 'import app;print(app.__file__)'
+# 시각: 2026-11-02T14:53:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+........                                                                 [100%]
+8 passed in 0.71s
+/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u6/app/__init__.py
+
+# ===== append 2026-11-02T14:53:25+09:00 =====
+# 명령: echo '### M1 run_turn 진입 조건 Query 오타'; cd /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u6 && /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_api_chat_query.py -q -p no:cacheprovider 2>&1 | tail -12
+# 시각: 2026-11-02T14:53:25+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+### M1 run_turn 진입 조건 Query 오타
+FAILED tests/test_api_chat_query.py::test_chat_query_identity_second_answer_returns_409 - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_api_chat_query.py::test_chat_query_new_person_no_question_no_writes - assert '이번 발화에서는 새로 기억한 것이 없어요.' == '"박선우"에 대한 기록이 없어요.'
+  
+  - "박선우"에 대한 기록이 없어요.
+  + 이번 발화에서는 새로 기억한 것이 없어요.
+FAILED tests/test_api_chat_query.py::test_chat_query_resume_person_deleted_says_no_record_stored_zero - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_api_chat_query.py::test_chat_query_issues_session_id_when_header_missing - AssertionError: assert '이번 발화에서는 새로 기억한 것이 없어요.' == '민수 팀장님과 최근에 ...화면에서 볼 수 있어요.'
+  
+  + 이번 발화에서는 새로 기억한 것이 없어요.
+  - 민수 팀장님과 최근에 식사를 했어요.
+  - 자세한 건 인물 화면에서 볼 수 있어요.
+6 failed, 2 passed in 0.61s
+
+# ===== append 2026-11-02T14:53:45+09:00 =====
+# 명령: echo '### M2 stored 를 근거 건수(timeline)로 채움'; cd /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u6 && /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_api_chat_query.py -q -p no:cacheprovider -rf 2>&1 | grep -E '^FAILED|passed|failed' | cut -c1-140
+# 시각: 2026-11-02T14:53:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+### M2 stored 를 근거 건수(timeline)로 채움
+FAILED tests/test_api_chat_query.py::test_chat_query_merge_stored_zero_no_writes_and_trace - AssertionError: assert {'events': 5,...schedule
+FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes - AssertionError: assert {'events': 5,.
+FAILED tests/test_api_chat_query.py::test_chat_query_turn_mixed_utterance_no_writes_loop_gate_rejects - AssertionError: assert {'events': 5,
+FAILED tests/test_api_chat_query.py::test_chat_query_issues_session_id_when_header_missing - AssertionError: assert {'events': 5,...schedule
+4 failed, 4 passed in 0.67s
+
+# ===== append 2026-11-02T14:54:01+09:00 =====
+# 명령: echo '### M3 answerer_from_env 를 최상단 import 로 바인딩(monkeypatch 무효)'; cd /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u6 && /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_api_chat_query.py -q -p no:cacheprovider -rf 2>&1 | grep -E '^FAILED|passed|failed' | cut -c1-140
+# 시각: 2026-11-02T14:54:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+### M3 answerer_from_env 를 최상단 import 로 바인딩(monkeypatch 무효)
+FAILED tests/test_api_chat_query.py::test_chat_query_merge_stored_zero_no_writes_and_trace - openai.OpenAIError: The api_key client option m
+FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes - openai.OpenAIError: The api_key clien
+FAILED tests/test_api_chat_query.py::test_chat_query_identity_second_answer_returns_409 - openai.OpenAIError: The api_key client option must
+FAILED tests/test_api_chat_query.py::test_chat_query_turn_mixed_utterance_no_writes_loop_gate_rejects - openai.OpenAIError: The api_key clie
+FAILED tests/test_api_chat_query.py::test_chat_query_issues_session_id_when_header_missing - openai.OpenAIError: The api_key client option m
+5 failed, 3 passed in 1.62s
+
+# ===== append 2026-11-02T14:54:17+09:00 =====
+# 명령: echo '### M4 answer_question 의 already_answered 409 조건 제거'; cd /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u6 && /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_api_chat_query.py -q -p no:cacheprovider -rf 2>&1 | grep -E '^FAILED|passed|failed' | cut -c1-140
+# 시각: 2026-11-02T14:54:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+### M4 answer_question 의 already_answered 409 조건 제거
+FAILED tests/test_api_chat_query.py::test_chat_query_identity_second_answer_returns_409 - assert 200 == 409
+1 failed, 7 passed in 0.68s
+
+# ===== append 2026-11-02T14:54:27+09:00 =====
+# 명령: echo '### M5 resume_turn 조회 재개 분기 진입 조건 Query 오타'; cd /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/p5b-u6 && /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_api_chat_query.py -q -p no:cacheprovider -rf 2>&1 | grep -E '^FAILED|passed|failed' | cut -c1-140
+# 시각: 2026-11-02T14:54:27+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+### M5 resume_turn 조회 재개 분기 진입 조건 Query 오타
+FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes - AssertionError: assert '이번 발화에서는 새로 기
+FAILED tests/test_api_chat_query.py::test_chat_query_resume_person_deleted_says_no_record_stored_zero - assert '지금은 기억하지 못했어...뒤 다시 말씀해 주세요.
+2 failed, 6 passed in 0.67s

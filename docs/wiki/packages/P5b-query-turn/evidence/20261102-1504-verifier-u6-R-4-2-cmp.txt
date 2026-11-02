@@ -1,0 +1,9 @@
+# 명령: diff <(grep -rnE 'update_person\(' app/agent/ | sed -E 's/^([^:]+):[0-9]+:/\1:/' | sort) <(git grep -nE 'update_person\(' 8a8767b -- app/agent/ | sed -E 's/^8a8767b:([^:]+):[0-9]+:/\1:/' | sort) && echo SAME-as-base
+# 시각: 2026-11-02T15:04:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 1
+# ---
+6,7d5
+< Binary file app/agent/__pycache__/loop.cpython-314.pyc matches
+< Binary file app/agent/__pycache__/respond.cpython-314.pyc matches

@@ -1,0 +1,7 @@
+# 명령: grep -nE BRIEFING_FORBIDDEN_EXPRESSIONS|REASON_FORBIDDEN_EXPRESSION app/agent/respond.py
+# 시각: 2026-11-02T15:03:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 127
+# ---
+/bin/bash: REASON_FORBIDDEN_EXPRESSION: command not found

@@ -1,0 +1,6 @@
+# 명령: git diff --stat 8a8767b -- app/briefing/
+# 시각: 2026-11-02T15:03:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---

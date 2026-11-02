@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_api_chat_query.py -q -k 'stored_zero'
+# 시각: 2026-11-02T14:51:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+...                                                                      [100%]
+3 passed, 5 deselected in 0.54s

@@ -1,0 +1,9 @@
+# 명령: grep -nE resolve\(|apply_resolution\(|get_person_card app/agent/loop.py
+# 시각: 2026-11-02T15:02:59+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 127
+# ---
+/bin/bash: apply_resolution(: command not found
+/bin/bash: get_person_card: command not found
+grep: parentheses not balanced

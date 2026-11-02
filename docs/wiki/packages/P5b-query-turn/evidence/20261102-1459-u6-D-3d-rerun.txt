@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_agent_query_loop.py -q -k merge_answers_from_card
+# 시각: 2026-11-02T14:59:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+.                                                                        [100%]
+1 passed, 32 deselected in 0.43s

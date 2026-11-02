@@ -557,6 +557,10 @@
 - 2026-11-02 | DECISION | 사용자: U5 backend-agent 시작 승인(L-004) — `resume_turn` 조회 재개 분기(결정 G·I·K), U4 ③~⑥ 공용 헬퍼 분리(U4 테스트 23건 무수정), 테스트 계획 4 + R-U4-2 4 | P5b-query-turn U5
 - 2026-11-02 | DECISION | 사용자: U5 구현자 사후 판단 1건 수용(재개 후보 답의 카드 `PersonNotFound` → `no_record`) · U5 verifier 리뷰 시작 승인(L-004) — 메인 재실행 77 passed(query_loop·loop·answers_resume·api_chat)·ruff·7/7·diff-filter 0·U4 테스트 `-` 0·범위 0·`loop.py` `-` 1줄(이동). 변이 러너가 스크래치패드에 복사한 `.env` 사본 삭제는 훅이 막아 사용자에게 명령 전달 | P5b-query-turn U5
 - 2026-11-02 | DECISION | 사용자: verifier U5 통과([필수] 0 · [권고] R-U5-1~3, 분리 동일성 IDENTICAL, 계약 값 95 PASS, 변이 22/21) → U5 커밋 + 실험 푸시 승인. R-U5-1·2 는 U6 위임문 | P5b-query-turn U5
+- 2026-11-02 | NOTE | U4 `18219ba` CI 41388038128 **failure** — pytest 2104 passed, `mypy_check.py --run` 새 오류 1건: `loop.py` `PendingQuestionOut(question_id=applied.pending_question_id)` `int | None` → `int`. 로컬 단위 판정에 mypy 가 없어 놓침 → 01-plan 84행 공통 판정에 `u<n>-mypy` 추가, 수정은 U6 에 포함(backend-agent + verifier). 하네스 L 후보 | P5b-query-turn U4 FIX-021
+- 2026-11-02 | DECISION | 사용자: U6 backend-agent 시작 승인(L-004) — mypy 수정 1줄(`loop.py` 1331행) + `tests/test_api_chat_query.py` + R-U5-1·2 + 판정 표 전 행 evidence + registry 해시·tests.md·RUNNING.md | P5b-query-turn U6
+- 2026-11-02 | DECISION | 사용자: U6 판정 표 불일치 2건은 계획 문구 수정 — D-3d `-k` 토큰 `card_called_once` → `merge_answers_from_card`(테스트 무수정) · R-4 ⑤ 정규식 `PendingQuestion\b`(응답 타입명 `PendingQuestionOut` 제외) · U6 verifier 리뷰 시작 승인(L-004) — 메인 재실행 66 passed(api_chat_query·query_loop·api_chat·answers_resume)·ruff·7/7·mypy `loop.py` 1331행 소멸·diff-filter 0·`assert` 1줄 | P5b-query-turn U6
+- 2026-11-02 | DECISION | 사용자: verifier U6 통과([필수] 0 · [권고] R-U6-1~3, `mypy_check.py --run` 38=38, 판정 표 전 행 불일치 0, HTTP 계약 값 80 PASS, 변이 12/12) → U6 커밋 + 실험 푸시 승인. R-U6-2 RUNNING.md 132행 정정 포함 | P5b-query-turn U6
 - 2026-10-28 14:23 | COMMIT | 8a8767b cr(CR-004): 채팅에서 인물을 물으면 기억에서 답하는 조회 발화를 결정으로 옮긴다
 - 2026-10-28 14:23 | PUSH-dev2 | origin dev2 8a8767b (실험 푸시)
 - 2026-10-29 10:54 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
@@ -570,3 +574,5 @@
 - 2026-11-02 12:16 | PUSH-dev2 | origin dev2 a002706 (실험 푸시)
 - 2026-11-02 13:21 | COMMIT | 18219ba feat(P5b-query-turn): 채팅에서 인물을 물으면 기억에서 답하는 조회 턴을 루프에 잇는다
 - 2026-11-02 13:21 | PUSH-dev2 | origin dev2 18219ba (실험 푸시)
+- 2026-11-02 14:42 | COMMIT | 49c1c67 feat(P5b-query-turn): 조회 되묻기에 답하면 별칭을 쌓지 않고 그 인물 카드로 답한다
+- 2026-11-02 14:42 | PUSH-dev2 | origin dev2 49c1c67 (실험 푸시)

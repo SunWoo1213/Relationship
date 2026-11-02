@@ -1,0 +1,31 @@
+# 명령: for f in loop gate propose respond types __init__; do echo "-- $f"; git show 8a8767b:app/agent/$f.py 2>&1 | grep -nE 'PendingQuestion|flag_modified|\.context *=' ; done
+# 시각: 2026-11-02T14:52:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 1
+# ---
+-- loop
+223:from app.tools.types import AFFIRMATIVE_KEY, PendingQuestionOut, ToolError
+719:    schedule_question: PendingQuestionOut | None = None
+766:) -> PendingQuestionOut:
+882:    schedule_question: PendingQuestionOut | None = None
+1030:def _pending_question_from_resolve(outcome: ResolveOutcome) -> PendingQuestionOut:
+1031:    """해석 구간이 만든 identity/new_person 질문을 `PendingQuestionOut`
+1032:    으로 다시 만든다 -- `PendingQuestion` ORM 을 조회하지 않고, 이 루프가
+1042:    return PendingQuestionOut(
+1143:# (`app/api/deps.py::load_resume_input` 이 `PendingQuestion` 에서 값만 뽑아
+1341:    `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아
+-- gate
+-- propose
+-- respond
+26:  `new_person`/`schedule` 공통, `app.tools.types.PendingQuestionOut`) --
+33:from app.tools.types import PendingQuestionOut
+46:    pending_question: PendingQuestionOut | None = None,
+50:    숫자·불리언·`PendingQuestionOut.question` 문자열만 입력으로 받는다 --
+-- types
+38:from app.tools.types import InvalidValue, PendingQuestionOut
+406:    .load_resume_input`(U6/U7)이 `PendingQuestion` 행에서 `kind`·`context`
+409:    로 더해 이 타입을 만든다 -- `app/agent/` 는 `PendingQuestion` ORM 을
+450:    .PendingQuestionOut` 재사용 -- 새 직렬화 방식을 만들지 않는다). 비어
+457:    pending_question: PendingQuestionOut | None = None
+-- __init__

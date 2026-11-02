@@ -1,0 +1,8 @@
+# 명령: grep -rnE -B1 'create_person\(' app/agent/
+# 시각: 2026-11-02T14:52:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+app/agent/loop.py-1866-            ctx.confirmed_question_id = question_id
+app/agent/loop.py:1867:            created = app_tools.create_person(

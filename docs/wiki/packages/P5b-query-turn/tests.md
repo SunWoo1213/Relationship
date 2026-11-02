@@ -2,6 +2,8 @@
 
 테스트 1건 = 표 1줄. 증거: `evidence/20261029-1206-u1-types.txt`(파일 24 passed), `evidence/20261029-1206-u1-pytest-all.txt`(전체 1982 passed, skip 0; 기준선 1958 → +24), 변이 `evidence/20261029-1206-u1-mutation.txt`.
 
+**단위별 건수 합계 (U6 완성)**: U1 24 + U2 28 + U3 71 + U4 23 + U5 10 + U6 8 = **164건**(신규 테스트 파일 5개). 전체 `pytest tests/ -q -rs`: 기준선 1958 → **2122 passed, skip 0**(`evidence/20261102-1452-u6-pytest-all.txt`).
+
 ## tests/test_agent_query_types.py — U1 계약 (신규 24건 = 함수 18개, 그중 1개가 파라미터 7건)
 
 실행: `POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_agent_query_types.py -v` → 24 passed.
@@ -151,3 +153,28 @@
 | test_agent_query_loop.py::test_y_person_not_found_on_card_read_says_no_record | R-U4-2 (y) | `get_person_card` → `PersonNotFound` → reply == `no_record_reply(["팀장"])`·`person_id None`·answerer 0 | 통과 · U5-M11 | 기록 없음 |
 | test_agent_query_loop.py::test_z_merge_resolution_entry_carries_person_id | R-U4-2 (z) | merge 턴 `loop_query.resolutions[0]` `band=="merge"`·`person_id == person.id` | 통과 · U5-M12 | 기록 없음 |
 | test_agent_query_loop.py::test_aa_db_errors_propagate_out_of_run_turn | R-U4-2 (aa) | 답 생성기·`get_person_card` 가 `SQLAlchemyError` → `run_turn` 밖으로 전파 | 통과 · U5-M13 | 기록 없음 |
+
+## tests/test_api_chat_query.py — U6 HTTP 끝에서 끝 (신규 8건)
+
+실행: `POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_api_chat_query.py -v` → 8 passed (`evidence/20261102-1452-u6-api.txt`). 변이: `evidence/20261102-1453-u6-mutation.txt`(저장소 밖 사본에서 M1~M5). 네트워크 0 — `get_proposer`→`FakeProposer(intents)`, `get_judge`→`FakeJudge`, 답 생성기는 `monkeypatch.setattr("app.agent.respond.answerer_from_env", …)`(결정 K, 라우트 무수정).
+
+| 파일::테스트 이름 | 무엇을 확인하나 | 입력 → 기대 | 결과 · 검출 변이 | 실패 이력 |
+|---|---|---|---|---|
+| test_api_chat_query.py::test_chat_query_merge_stored_zero_no_writes_and_trace | merge 조회 `POST /chat` 계약 전부 | 시드 인물(사실 3·이벤트 8·일정 2) + 조회 발화 → 200·`reply == 답 + "\n" + QUERY_MORE_HINT`·`stored=={0,0,0}`·`pending_question None`·7개 테이블 행 수 불변·기록 툴 `tool_call` 0·`loop_extract.intent=="query"`·`loop_gate`·`er_resolve`·`loop_query`·`loop_turn` 각 1행·`loop_record` 0·`evidence_counts=={facts:3,patterns:0,timeline:5,schedules:2}`·`er_resolve.decision.applied is False` | 통과 · U6-M1(진입 조건 `"Query"`)·U6-M2(stored 를 근거 건수로)·U6-M3(`answerer_from_env` 최상단 바인딩) | 첫 실행: `er["decision"]["decision"]` 키 없음(테스트 오타) → `q["resolutions"][0]["band"]` 로 수정 |
+| test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes | identity 조회 → `POST /answers` 1요청 | 같은 별칭 인물 2명 + 판정 실패 → `stop_reason=="ask_user"`·kind identity·저장 0·answerer 0회 → 후보 답 → 200·reply 카드 기반·`stored` 0·`pending_question None`·행 수 불변(별칭 누적 없음)·`loop_query` 2행(ask·llm)·`person_id`==고른 인물·`loop_resume` 1·`loop_resolve_done`/`loop_record` 0 | 통과 · U6-M2·M3·M5 | 첫 실행: `loop_query` 가 되묻기 턴 + 재개 턴 2행인데 `[0]` 을 읽음 → `[1]` 로 수정 |
+| test_api_chat_query.py::test_chat_query_identity_second_answer_returns_409 | 같은 질문 두 번째 답 | 첫 답 200, 둘째 답 **409**(결정 J) | 통과 · U6-M4(409 조건 제거) | 기록 없음 |
+| test_api_chat_query.py::test_chat_query_new_person_no_question_no_writes | new_person 조회 | 빈 DB → `pending_question None`·reply == `no_record_reply(["박선우"])`·행 수 불변·`pending_questions` 0·`ask_user` 행 0·answerer 0회 | 통과 · U6-M1 | 기록 없음 |
+| test_api_chat_query.py::test_chat_query_turn_mixed_utterance_no_writes_loop_gate_rejects | 혼합 발화 | 조회 의도 + `add_event` 제안 → `stored` 0·행 수 불변·기록 툴 0·`loop_gate.rejected` 에 `{index:1,name:add_event,reason:query_turn_no_write}` | 통과 · U6-M2·M3 (U6-M1 은 못 잡는다 — 게이트가 `intent` 로 독립 거부, 계획 R-U4-1) | 기록 없음 |
+| test_api_chat_query.py::test_chat_record_turn_control_still_adds_event | 기록 턴 대조군 | `intents` 없음 → `stored.events==1`·`events` +1·`loop_query` 0·`loop_record` 1 | 통과 · (조회 분기가 기록 턴을 가로채는 변이를 잡는 대조군; M1 에서도 통과해야 정상) | 기록 없음 |
+| test_api_chat_query.py::test_chat_query_resume_person_deleted_says_no_record_stored_zero | R-U5-1 — 되묻기 뒤 후보 인물 삭제 | 질문 후 `DELETE FROM persons`(실 `get_person_card` 가 `PersonNotFound`) → 답 200·reply == `no_record_reply(["팀장"])`·저장 0·`loop_query` answer_source `["ask","no_record"]`·`person_id None`·answerer 0회 | 통과 · U6-M5(재개 분기 진입 조건 오타) | 첫 실행: `loop_query` `[0]` 이 되묻기 턴 행(ask) → `[1]` 로 수정 |
+| test_api_chat_query.py::test_chat_query_issues_session_id_when_header_missing | `X-Session-Id` 없이 조회 | 200·`session_id` uuid4 형식·reply 답+힌트·`stored` 0·그 세션에 `loop_query` 1행 | 통과 · U6-M1·M2·M3 | 기록 없음 |
+
+### U6 변이 → 잡는 테스트 (저장소 밖 사본, `evidence/20261102-1453-u6-mutation.txt`)
+
+| 변이 | 결과 |
+|---|---|
+| M1 `run_turn` 조회 분기 진입 조건 `"Query"` | 8건 중 6 FAIL(merge·identity·409·new_person·resume 삭제·세션 헤더) — 혼합 발화·대조군 2건은 통과(게이트가 독립 거부 / 기록 턴 대조군) |
+| M2 `stored` 를 근거 건수(`events=timeline`)로 | 4 FAIL(merge·identity·혼합·세션 헤더 — `stored == {0,0,0}`) |
+| M3 `answerer_from_env` 를 최상단 import 로 바인딩 | 5 FAIL(monkeypatch 무효 → 실 공급자 경로 `OpenAIError`) |
+| M4 `answer_question` 의 `already_answered` 조건 제거 | 1 FAIL(`assert 200 == 409`) |
+| M5 `resume_turn` 조회 재개 분기 진입 조건 `"Query"` | 2 FAIL(identity 재개·인물 삭제 재개) |

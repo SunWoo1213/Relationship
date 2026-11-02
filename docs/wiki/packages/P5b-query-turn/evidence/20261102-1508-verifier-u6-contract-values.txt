@@ -1,0 +1,104 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/a7afde0a-6405-4057-9b27-4a79108b6a11/scratchpad/verifier-u6/contract.py
+# 시각: 2026-11-02T15:08:53+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+
+### (i) merge 조회
+PASS  i status 200  -- 200
+PASS  i reply 비어 있지 않음  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  i reply 끝 QUERY_MORE_HINT  -- '팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  i reply == ANSWER + \n + MORE
+PASS  i stored == 0  -- {"persons": 0, "events": 0, "schedules": 0}
+PASS  i pending_question None
+PASS  i stop_reason None  -- None
+PASS  i 7개 테이블 불변  -- {'persons': 1, 'person_aliases': 1, 'events': 8, 'schedules': 2, 'person_facts': 3, 'fact_sources': 0, 'pending_questions': 0} -> {'persons': 1, 'person_aliases': 1, 'events': 8, 'schedules': 2, 'person_facts': 3, 'fact_sources': 0, 'pending_questions': 0}
+PASS  i 기록 툴 tool_call 0
+PASS  i loop_extract 1행  -- 1
+PASS  i loop_gate 1행  -- 1
+PASS  i er_resolve 1행  -- 1
+PASS  i loop_query 1행  -- 1
+PASS  i loop_turn 1행  -- 1
+PASS  i loop_record 0행
+PASS  i loop_resolve_done 0행
+PASS  i loop_extract.output.intent == query  -- "query"
+PASS  i loop_gate rejected 에 not_callable_by_llm(search_person)  -- [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+PASS  i loop_query.person_id == 시드
+PASS  i loop_query.evidence_counts  -- {"facts": 3, "patterns": 0, "timeline": 5, "schedules": 2}
+PASS  i loop_query.reply == 응답 reply
+PASS  i loop_turn.reply == 응답 reply
+PASS  i er_resolve.decision.applied False(결정 I (a))
+PASS  i answerer 1회  -- 1
+PASS  i 원문(raw_utterance) 이 reply·loop_query·loop_turn 에 없음
+
+### (ii) identity 조회 -> 답 -> 재개 -> 409
+PASS  ii status 200
+PASS  ii pending_question 있음(kind identity)  -- {"question_id": 11644, "status": "pending", "kind": "identity", "question": "\"팀장\" -- 김민수/김민호 중 한 분이 맞으실까요?", "options": ["김민수", "김민호", "아니요, 다른 사람이에요"]}
+PASS  ii stop_reason ask_user  -- 'ask_user'
+PASS  ii stored 0(되묻기 턴)
+PASS  ii 되묻기 턴 answerer 0회
+PASS  ii pending_questions 1행  -- 1
+PASS  ii options 에 김민수  -- ["김민수", "김민호", "아니요, 다른 사람이에요"]
+PASS  ii answers status 200  -- 200
+PASS  ii 재개 reply 카드 기반(ANSWER + MORE)  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  ii 재개 stored 0
+PASS  ii 재개 pending_question None·stop_reason None
+PASS  ii person_aliases 불변(별칭 누적 0)  -- 2 -> 2
+PASS  ii 7개 테이블 불변  -- {'persons': 2, 'person_aliases': 2, 'events': 16, 'schedules': 4, 'person_facts': 6, 'fact_sources': 0, 'pending_questions': 1} -> {'persons': 2, 'person_aliases': 2, 'events': 16, 'schedules': 4, 'person_facts': 6, 'fact_sources': 0, 'pending_questions': 1}
+PASS  ii 기록 툴 tool_call 0
+PASS  ii loop_query 2행(되묻기 + 재개)  -- 2
+PASS  ii loop_query[0].answer_source ask / [1] llm  -- ['ask', 'llm']
+PASS  ii 재개 person_id == 고른 인물(김민수)
+PASS  ii answerer 가 받은 질문 == 원 발화  -- '(no attr)'
+PASS  ii loop_resume 1 · loop_resolve_done 0 · loop_record 0
+PASS  ii 같은 id 재제출 409  -- 409 {"detail":{"code":"already_answered","question_id":11644}}
+PASS  ii 409 뒤 answerer 여전히 1회  -- 1
+PASS  ii 409 뒤 행 수 불변
+
+### (iii) new_person 조회
+PASS  iii status 200
+PASS  iii pending_question None
+PASS  iii pending_questions 0행
+PASS  iii reply == no_record_reply(['박선우'])  -- '"박선우"에 대한 기록이 없어요.'
+PASS  iii stored 0 · 행 수 불변
+PASS  iii answerer 0회
+PASS  iii ask_user tool_call 0
+PASS  iii persons 0(인물 생성 없음)
+
+### (iv) 혼합 발화 / (v) 기록 턴 대조군
+PASS  iv status 200 · stored 0  -- {"persons": 0, "events": 0, "schedules": 0}
+PASS  iv events +0
+PASS  iv 7개 테이블 불변
+PASS  iv loop_gate.rejected 에 query_turn_no_write(add_event)  -- [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}, {"name": "add_event", "index": 1, "reason": "query_turn_no_write"}]
+PASS  iv 기록 툴 tool_call 0
+PASS  v status 200 · stored.events 1  -- {"persons": 0, "events": 1, "schedules": 0}
+PASS  v events +1
+PASS  v loop_query 0 · loop_record 1
+PASS  v 기록 턴에서 조회 answerer 0회
+
+### (vi) R-U5-1 -- 되묻기 뒤 후보 인물 삭제
+PASS  vi status 200  -- 200 {"question_id":11645,"status":"answered","reply":"\"팀장\"에 대한 기록이 없어요.","stored":{"persons":0,"events":0,"schedules":0},"pending_question":null,"stop_reason":nul
+PASS  vi reply == no_record_reply(['팀장'])  -- '"팀장"에 대한 기록이 없어요.'
+PASS  vi stored 0 · 행 수 불변
+PASS  vi answerer 0회
+PASS  vi loop_query answer_source [ask, no_record]  -- ['ask', 'no_record']
+PASS  vi 재개 person_id None
+PASS  vi 후속 질문 없음(pending_question None)
+
+### (vii) 헤더 없이 session_id 발급
+PASS  vii status 200 · session_id uuid4  -- 'f7bc721b-25b6-4ee4-b1e3-2b0aaa2e020b'
+PASS  vii 그 세션 loop_query 1행
+PASS  vii stored 0
+
+### (viii) answerer_from_env monkeypatch 가 라우트 경로에서 효과(결정 K R-1)
+PASS  viii 패치 A → reply 가 A 의 답  -- '민수 팀장님과 최근에 식사를 했어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  viii 패치 B → reply 가 B 의 답(모듈 속성 호출이 매 턴 해소됨)  -- '두 번째 답 생성기의 답입니다.\n자세한 건 인물 화면에서 볼 수 있어요.'
+PASS  viii 각 answerer 1회씩
+PASS  viii 라우트 → 루프가 respond.answerer_from_env 를 호출(스파이 1회)  -- 1
+PASS  viii 패치 해제 후 원래 함수 복원
+PASS  viii identity 되묻기 턴은 answerer_from_env 0회  -- 0
+
+### 결과: 80 PASS / 0 FAIL

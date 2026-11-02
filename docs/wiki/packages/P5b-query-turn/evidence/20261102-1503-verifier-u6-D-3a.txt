@@ -1,0 +1,38 @@
+# 명령: grep -nE 'resolve\(|apply_resolution\(|get_person_card' app/agent/loop.py
+# 시각: 2026-11-02T15:03:57+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 49c1c67 (dev2)
+# exit: 0
+# ---
+18:- 확신도·두 임계치를 읽지도 비교하지도 않는다 -- `app.er.resolve()` 가
+21:  한국어 "확신도"로 쓴다). `resolve()` 가 만든 판정 근거(`ask_payload
+26:  별칭 누적은 `apply_resolution()` 안에서 `update_person` 이 대신
+33:  `apply_resolution()` -> `ask_user` 뿐이다(판정 표 23행). 이 파일은 대기
+48:`resolve()` 가 스스로 사전 기반으로 힌트를 유도한다(`hints=None`).
+71:턴을 끝낸다(결정 C(i)) -- 이후 언급은 아예 `resolve()` 를 부르지도
+90:확정되지 않은 제안(해석 구간이 되묻기로 멈춰 아예 `resolve()` 를 타지
+134:질문**을 띄운다 -- 01-plan U7 "재개 중 남은 언급의 `resolve()` 가 다시
+180:무관), 언급마다 `resolve()` 만 부른다. merge 는 `apply_resolution()` 없이 그
+182:없음" 목록에 넣고, identity 만 `apply_resolution()`(되묻기)으로 턴을 끝낸다.
+183:확정된 인물의 카드(`get_person_card`)를 근거로 답을 만들고 -- 검증 실패·공급자
+270:    `app.er.apply_resolution()` 을 다시 부를 수 있게 남겨 두는 참조용
+300:    채워지고, 아직 손대지 않은 언급은 아예 `resolve()` 를 타지 않았다.
+414:    "재개 중 남은 언급의 resolve() 가 다시 되묻거나 schedule 질문이 나오면
+512:    새 `Resolution` 을 만든다. `apply_resolution()` 을 부르기 전에
+562:            # U7 -- 이미 확정된 언급(재개 답이 가리키는 인물)은 resolve()
+579:        resolution = resolve(ctx, mention, utterance, hints, judge=judge, config=config)
+582:            applied = apply_resolution(ctx, resolution)
+606:        applied = apply_resolution(ctx, resolution)
+639:    언급마다 `app.er.resolve()` -> `app.er.apply_resolution()` 을 부른다
+642:    `judge`/`config` 는 `app.er.resolve()` 에 그대로 전달만 한다 -- 이
+652:    `resolve()` 하지 않기 위해서만 쓴다(결정 E).
+656:    `config` 는 JSON 으로 의미 있게 직렬화되지 않으므로(`app.er.resolve()`
+1065:def _pending_question_from_resolve(outcome: ResolveOutcome) -> PendingQuestionOut:
+1154:        pending_question = _pending_question_from_resolve(outcome)
+1258:    from app.api.read import get_person_card  # 순환 import 회피 -- 지연 import
+1261:        return get_person_card(ctx.session, ctx.user_id, person_id, ctx.now())
+1299:        resolution = resolve(ctx, mention, utterance, None, judge=judge, config=config)
+1312:            # 결정 I (a) -- apply_resolution() 을 부르지 않는다(별칭 누적 0).
+1329:        applied = apply_resolution(ctx, resolution)
+1779:    `preresolved` 로 넘겨 `resolve()` 를 다시 부르지 않는다(결정 E, 원칙8).
+1940:        pending_question = _pending_question_from_resolve(outcome)
