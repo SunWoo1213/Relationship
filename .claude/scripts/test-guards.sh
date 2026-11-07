@@ -56,9 +56,7 @@ for c in \
   'git push origin main' \
   'git push -u origin main' \
   'git push origin HEAD:main' \
-  'git push origin dev:main' \
   'git push origin dev' \
-  'git push origin dev2:dev' \
   'git push origin feature-x' \
   'git push origin dev2:main' \
   'git push --force origin dev2' \
@@ -240,13 +238,13 @@ out="$(printf '%s' "$(mk 'echo hi')" | PATH="" /bin/bash "$BW" 2>/dev/null)"
 if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   FIX-014 파이썬 탐지 실패 시 차단(FIX-008)"; else echo "XX   FIX-014 파이썬 탐지 실패인데 통과함: $(printf '%s' "$out" | head -c 100)"; fails=$((fails+1)); fi
 rm -rf "$BW_T"
 
-# (F-27-3/F-27-5 의 스테이징 우회 케이스는 승인 마커·초안이 있는 격리 저장소가 필요해서 아래
-#  FG_T 절로 옮겼다 — 마커 없는 실제 저장소에서는 규칙 1 로 먼저 DENY 돼 검사와 무관하게
-#  항상 통과하는 무의미한 테스트였다.)
+# (F-27-3/F-27-5 의 스테이징 우회 케이스는 초안이 있는 격리 저장소가 필요해서 아래 FG_T 절에 둔다 —
+#  초안 없는 실제 저장소에서는 초안 부재로 먼저 DENY 돼 검사와 무관하게 항상 통과하는 무의미한 테스트다.)
 
 echo "== commit-guard: FIX-027 제품 코드 verifier 게이트 (격리된 임시 저장소) =="
 # 이 절은 실제 commit-guard.sh 를 CLAUDE_PROJECT_DIR 를 임시 저장소로 돌려 그대로 호출한다
-# (fix_guard_check.py 를 직접 부르는 우회 없이, 실제 훅 경로 — 마커·초안·해시 일치까지 — 를 탄다).
+# (fix_guard_check.py 를 직접 부르는 우회 없이, 실제 훅 경로 — 인자 허용 목록·초안 존재까지 — 를 탄다).
+# L-006(2026-11-07): 승인 마커(.commit-approved)·해시 비교는 폐지됐다. 초안 파일만 있으면 커밋할 수 있다.
 FG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-fg-$$")")"
 mkdir -p "$FG_T/.claude" "$FG_T/app" "$FG_T/docs/wiki/fixes"
 (
@@ -257,16 +255,14 @@ mkdir -p "$FG_T/.claude" "$FG_T/app" "$FG_T/docs/wiki/fixes"
   git commit -qm "테스트용 첫 커밋" 2>/dev/null
 ) >/dev/null 2>&1
 
-fg_ctl() {  # 대조(FIX-028 C): 마커 없는 커밋은 이 임시 저장소에서도 DENY 여야 한다 — 훅이 FG_T 를 자기 프로젝트로 인식한다는 증거
+fg_ctl() {  # 대조(FIX-028 C): 초안 없는 커밋은 이 임시 저장소에서도 DENY 여야 한다 — 훅이 FG_T 를 자기 프로젝트로 인식한다는 증거
   out="$(printf '%s' "$(mk 'git commit -F .claude/commit-draft.txt')" | CLAUDE_PROJECT_DIR="$FG_T" bash "$H/commit-guard.sh")"
-  if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   FIX-028 대조: FG_T 마커 없는 커밋은 거부(저장소 인식)"; else echo "XX   FIX-028 대조 실패: FG_T 에서 마커 없는 커밋이 allow 됨(공허 통과 위험)"; fails=$((fails+1)); fi
+  if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   FIX-028 대조: FG_T 초안 없는 커밋은 거부(저장소 인식)"; else echo "XX   FIX-028 대조 실패: FG_T 에서 초안 없는 커밋이 allow 됨(공허 통과 위험)"; fails=$((fails+1)); fi
 }
 fg_ctl
 
 fg_draft() {  # fg_draft <초안 첫 줄>
   printf '%s\n\n본문\n' "$1" > "$FG_T/.claude/commit-draft.txt"
-  "$HOOK_PY" -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" \
-    "$FG_T/.claude/commit-draft.txt" > "$FG_T/.claude/.commit-approved"
 }
 fg_run() {
   printf '%s' "$(mk 'git commit -F .claude/commit-draft.txt')" \
@@ -336,7 +332,7 @@ rm -f "$FG_T/docs/wiki/fixes/FIX-999.md" "$FG_T/docs/wiki/fixes/review-FIX-999.m
 ( cd "$FG_T" && git add app/a.py )
 fg_draft 'feat(P7-push): 테스트'
 
-# ── F-27-5: git commit 인자 허용 목록 (승인 마커·초안이 있는 격리 저장소에서 — 검사를 빼면
+# ── F-27-5: git commit 인자 허용 목록 (초안이 있는 격리 저장소에서 — 검사를 빼면
 #    아래 DENY 케이스가 allow 로 뒤집힌다; 변이 시험은 evidence 의 rework2-mutation 참조) ──
 fg_cmd() {  # fg_cmd <git commit 명령 문자열>
   printf '%s' "$(mk "$1")" | CLAUDE_PROJECT_DIR="$FG_T" bash "$H/commit-guard.sh"
@@ -426,8 +422,6 @@ fg_check "R-27-3) review 문서 스테이징됨 → allow(회귀)" allow "$(fg_r
 # ── R-27-1: 제목 유형 제한 해제·형식 정규화 ──────────────────────────────────────
 fg_draft_raw() {  # fg_draft_raw <첫 줄 그대로(개행·BOM 포함 가능)>
   printf '%s' "$1" > "$FG_T/.claude/commit-draft.txt"
-  "$HOOK_PY" -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" \
-    "$FG_T/.claude/commit-draft.txt" > "$FG_T/.claude/.commit-approved"
 }
 rm -f "$FG_T/docs/wiki/fixes/FIX-999.md" "$FG_T/docs/wiki/fixes/review-FIX-999.md"
 ( cd "$FG_T" && git reset -q docs/wiki/fixes/review-FIX-999.md ) 2>/dev/null
@@ -569,47 +563,40 @@ for p in '.claude/hooks/x.sh' '.claude/scripts/x.py' '.claude/settings.json' '.g
 done
 rm -rf "$SG_T"
 
-echo "== stage-gate: dev 푸시 후 결정 대기(L-003) =="
-# FIX-032(R-30-1): 예전에는 실제 .claude/.awaiting-decision 을 만들고 지웠고(있으면 절 전체 skip), 이제는
-# CLAUDE_PROJECT_DIR=<격리 저장소> 로 훅을 돌려 실제 마커를 건드리지 않는다. skip 분기 없음.
-SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-aw-$$")")"
-mkdir -p "$SG_T/.claude" "$SG_T/docs/wiki"
-AW="$SG_T/.claude/.awaiting-decision"
-aw_gate()  { printf '%s' "$(gate "$SG_T/$1")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh"; }
-aw_commit() { printf '%s' "$(mk 'git commit -F .claude/commit-draft.txt')" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/commit-guard.sh"; }
-# FIX-028 C 대조: 마커가 없으면 docs 경로는 면제 → allow. 아래 DENY 가 "마커 때문" 임을 분리하고 SG_T 가 프로젝트 안으로 인식됨을 보인다.
-out="$(aw_gate docs/wiki/packages/x/01-plan.md)"
-if [ -z "$out" ]; then echo "ok   allow  FIX-028 대조: 마커 없음 → 계획 문서 쓰기 가능 (격리 저장소)"; else echo "XX   FIX-028 대조 실패: 마커 없는데 거부됨: $(printf '%s' "$out" | head -c 100)"; fails=$((fails+1)); fi
-echo testhash > "$AW"
-out="$(aw_gate docs/wiki/packages/x/01-plan.md)"
-if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   awaiting: plan doc denied (격리 저장소 마커)"; else echo "XX   should DENY but allowed: awaiting: plan doc denied"; fails=$((fails+1)); fi
-out="$(aw_gate docs/wiki/HANDOFF.md)"
-if [ -z "$out" ]; then echo "ok   allow  awaiting: HANDOFF allowed"; else echo "XX   should ALLOW but denied: awaiting: HANDOFF allowed -> $(printf '%s' "$out" | head -c 100)"; fails=$((fails+1)); fi
-out="$(aw_commit)"
-if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   awaiting: commit denied (격리 저장소 마커)"; else echo "XX   should DENY but allowed: awaiting: commit denied"; fails=$((fails+1)); fi
+echo "== L-006: 폐지된 승인 관문이 되살아나지 않았는지 =="
+# 2026-11-07 사용자 결정으로 사용자 승인 관문(L-003 dev 푸시 뒤 대기 · L-004 위임 승인 · 커밋/푸시 승인 마커 ·
+# 계획 문서 `승인:` 줄)을 폐지했다. 훅 파일·마커 검사가 다시 들어오면 여기서 잡는다.
+[ ! -f "$H/delegate-guard.sh" ] && echo "ok   L-006 delegate-guard.sh 없음(L-004 폐지)" || { echo "XX   L-006 delegate-guard.sh 가 다시 생겼다"; fails=$((fails+1)); }
+[ ! -f "$H/approve-commit.sh" ] && echo "ok   L-006 approve-commit.sh 없음(승인 마커 폐지)" || { echo "XX   L-006 approve-commit.sh 가 다시 생겼다"; fails=$((fails+1)); }
+if cat "$H/commit-guard.sh" "$H/safety-guard.sh" "$H/stage-gate.sh" "$H/commit-cleanup.sh" "$H/handoff-check.sh" "$ROOT/.claude/settings.json" \
+   | grep -Ev '^[[:space:]]*#' | grep -Eq 'commit-approved|push-approved|release-approved|awaiting-decision|stage-approved'; then
+  echo "XX   L-006 훅·설정에 승인 마커 이름이 남아 있다(주석 제외)"; fails=$((fails+1))
+else
+  echo "ok   L-006 훅·설정에 승인 마커 이름 없음"
+fi
+# 격리 저장소: 계획 검증 `결과: 통과` 만 있고 `승인:` 줄이 없어도 제품 코드를 쓸 수 있어야 한다
+SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-l6-$$")")"
+mkdir -p "$SG_T/docs/wiki/packages/P9-x" "$SG_T/app"
+printf 'active: P9-x\nfrozen: none\n' > "$SG_T/docs/wiki/CURRENT.md"
+printf '# plan\n' > "$SG_T/docs/wiki/packages/P9-x/01-plan.md"
+printf '검증자: verifier (fable)\n결과: 통과\n' > "$SG_T/docs/wiki/packages/P9-x/02-plan-verify.md"
+out="$(printf '%s' "$(gate "$SG_T/app/x.py")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
+if [ -z "$out" ]; then echo "ok   allow  L-006 02-plan-verify 결과: 통과 + 승인: 줄 없음 → app/ 쓰기 가능"; else echo "XX   L-006 승인: 줄이 없다고 거부됨: $(printf '%s' "$out" | head -c 150)"; fails=$((fails+1)); fi
+printf '검증자: verifier (fable)\n결과: 보류\n' > "$SG_T/docs/wiki/packages/P9-x/02-plan-verify.md"
+out="$(printf '%s' "$(gate "$SG_T/app/x.py")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/stage-gate.sh")"
+if printf '%s' "$out" | grep -q '"deny"'; then echo "ok   DENY   L-006 대조: 결과: 보류면 여전히 거부(verifier 게이트 유지)"; else echo "XX   L-006 대조 실패: 결과: 보류인데 allow"; fails=$((fails+1)); fi
 rm -rf "$SG_T"
-
-echo "== delegate-guard: 단계 위임 승인(L-004) =="
-ag() { "$HOOK_PY" -c "import json,sys;print(json.dumps({'tool_name':'Agent','tool_input':{'subagent_type':sys.argv[1],'description':'x','prompt':'y'}}))" "$1"; }
-# FIX-032(R-30-1): 실제 .claude/.stage-approved 를 만들거나 지우지 않는다 — 격리 저장소를 CLAUDE_PROJECT_DIR 로 준다. skip 분기 없음.
-SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-dg-$$")")"
+# 격리 저장소: 초안만 있으면(마커 없이) 커밋 허용, dev2:dev·dev:main 푸시도 마커 없이 허용
+SG_T="$(native_path "$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/tg-l6b-$$")")"
 mkdir -p "$SG_T/.claude"
-SA="$SG_T/.claude/.stage-approved"
-dg() { printf '%s' "$1" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/delegate-guard.sh"; }   # 인자: ag 의 JSON
-dg_deny()  { if dg "$2" | grep -q '"deny"'; then echo "ok   DENY   $1"; else echo "XX   should DENY but allowed: $1"; fails=$((fails+1)); fi; }
-dg_allow() { out="$(dg "$2")"; if [ -z "$out" ]; then echo "ok   allow  $1"; else echo "XX   should ALLOW but denied: $1 -> $(printf '%s' "$out" | head -c 100)"; fails=$((fails+1)); fi; }
-dg_deny  'verifier without marker (격리 저장소)' "$(ag verifier)"
-dg_allow 'Explore not gated' "$(ag Explore)"
-echo architect > "$SA"
-dg_deny  'marker=architect but backend-agent' "$(ag backend-agent)"
-dg_allow 'marker=architect, architect allowed (consumed)' "$(ag architect)"
-# FIX-028 C 대조: 격리 저장소의 마커가 소비(삭제)됐다 = 훅이 SG_T 를 자기 프로젝트로 읽었다(실제 저장소 마커를 본 것이 아님).
-[ ! -f "$SA" ] && echo "ok   marker consumed after allow — FIX-028 대조: 훅이 SG_T 를 자기 프로젝트로 인식" || { echo "XX   marker not consumed (훅이 SG_T 를 안 봤을 수 있음)"; fails=$((fails+1)); rm -f "$SA"; }
-# P8-frontend U0: frontend-agent 도 게이트 대상
-dg_deny  'frontend-agent without marker' "$(ag frontend-agent)"
-echo frontend-agent > "$SA"
-dg_allow 'marker=frontend-agent, frontend-agent allowed (consumed)' "$(ag frontend-agent)"
-[ ! -f "$SA" ] && echo "ok   frontend-agent marker consumed after allow" || { echo "XX   frontend-agent marker not consumed"; fails=$((fails+1)); rm -f "$SA"; }
+( cd "$SG_T" && git init -q . && git config user.email t@example.com && git config user.name tester ) >/dev/null 2>&1
+printf 'docs(wiki): 테스트\n\n본문\n' > "$SG_T/.claude/commit-draft.txt"
+out="$(printf '%s' "$(mk 'git commit -F .claude/commit-draft.txt')" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/commit-guard.sh")"
+if [ -z "$out" ]; then echo "ok   allow  L-006 초안만 있는 커밋(승인 마커 없음) → allow"; else echo "XX   L-006 초안만 있는 커밋이 거부됨: $(printf '%s' "$out" | head -c 150)"; fails=$((fails+1)); fi
+for c in 'git push origin dev2:dev' 'git push origin dev:main'; do
+  out="$(printf '%s' "$(mk "$c")" | CLAUDE_PROJECT_DIR="$SG_T" bash "$H/safety-guard.sh")"
+  if [ -z "$out" ]; then echo "ok   allow  L-006 마커 없이 승격 푸시 허용: $c"; else echo "XX   L-006 승격 푸시가 거부됨: $c -> $(printf '%s' "$out" | head -c 150)"; fails=$((fails+1)); fi
+done
 rm -rf "$SG_T"
 
 echo "== findings.py 왕복 =="
@@ -725,52 +712,34 @@ cc_check() {  # cc_check <라벨> <기대수> <실제수>
 cc_run "git status --short"
 cc_check "commit-cleanup: 무관한 명령은 기록 없음" 0 "$(cc_count '| COMMIT |')"
 
-# 2) 초안 제목이 HEAD 제목과 같고 마커가 있으면 → 마커 삭제 + COMMIT 한 줄
+# L-006(2026-11-07): 승인 마커·L-003 대기 마커는 폐지됐다. 이 절은 journal 기록 건수만 본다.
+# 2) 초안 제목이 HEAD 제목과 같으면 → COMMIT 한 줄
 printf '테스트용 첫 커밋\n\n본문\n' > "$CC_T/.claude/commit-draft.txt"
-printf 'x\n' > "$CC_T/.claude/.commit-approved"
 cc_run "git commit -F .claude/commit-draft.txt"
 cc_check "commit-cleanup: 커밋 성공 시 COMMIT 기록" 1 "$(cc_count '| COMMIT |')"
-if [ -f "$CC_T/.claude/.commit-approved" ]; then
-  echo "XX   commit-cleanup: 1회용 승인 마커가 지워지지 않았다"; fails=$((fails+1))
-else
-  echo "ok   commit-cleanup: 승인 마커 소비됨"
-fi
 
-# 3) 초안 제목이 HEAD 와 다르면(=커밋이 실제로 안 된 것) 마커를 남기고 기록도 안 한다
+# 3) 초안 제목이 HEAD 와 다르면(=커밋이 실제로 안 된 것) 기록하지 않는다
 printf '다른 제목\n' > "$CC_T/.claude/commit-draft.txt"
-printf 'x\n' > "$CC_T/.claude/.commit-approved"
 cc_run "git commit -F .claude/commit-draft.txt"
 cc_check "commit-cleanup: 제목 불일치면 기록 없음" 1 "$(cc_count '| COMMIT |')"
-if [ -f "$CC_T/.claude/.commit-approved" ]; then
-  echo "ok   commit-cleanup: 제목 불일치면 마커 유지"
-else
-  echo "XX   commit-cleanup: 커밋되지 않았는데 마커를 지웠다"; fails=$((fails+1))
-fi
-rm -f "$CC_T/.claude/.commit-approved"
 
 # 4) 실험 푸시가 실패했으면(원격 추적 ref 가 HEAD 와 다르면) 기록하지 않는다 — FIX-009 회귀
 cc_run "git push origin dev2"
 cc_check "commit-cleanup: 실패한 dev2 푸시는 기록 없음" 0 "$(cc_count 'PUSH-dev2')"
 
-# 5) 실험 푸시가 성공했으면 한 줄 남기고, 작업을 잠그지 않는다
+# 5) 실험 푸시가 성공했으면 한 줄 남긴다
 ( cd "$CC_T" && git update-ref refs/remotes/origin/dev2 "$(git rev-parse HEAD)" ) 2>/dev/null
 cc_run "git push origin dev2"
 cc_check "commit-cleanup: 성공한 dev2 푸시는 기록" 1 "$(cc_count 'PUSH-dev2')"
-if [ -f "$CC_T/.claude/.awaiting-decision" ]; then
-  echo "XX   commit-cleanup: 실험 푸시가 L-003 대기를 걸었다(작업이 잠긴다)"; fails=$((fails+1))
-else
-  echo "ok   commit-cleanup: 실험 푸시는 작업을 잠그지 않음"
-fi
 
-# 6) 검증 승격(dev2:dev)이 반영되면 푸시 마커를 지우고 L-003 대기를 건다
+# 6) 검증 승격(dev2:dev)이 반영되면 PUSH 한 줄. 마커를 만들지 않는다(L-006)
 ( cd "$CC_T" && git update-ref refs/remotes/origin/dev "$(git rev-parse HEAD)" ) 2>/dev/null
-printf 'x\n' > "$CC_T/.claude/.push-approved"
 cc_run "git push origin dev2:dev"
 cc_check "commit-cleanup: 승격 시 PUSH 기록" 1 "$(cc_count '| PUSH |')"
-if [ -f "$CC_T/.claude/.awaiting-decision" ] && [ ! -f "$CC_T/.claude/.push-approved" ]; then
-  echo "ok   commit-cleanup: 승격 뒤 L-003 대기 + 푸시 마커 소비"
+if ls -a "$CC_T/.claude" | grep -Eq '^\.(awaiting-decision|commit-approved|push-approved|release-approved)$'; then
+  echo "XX   commit-cleanup: 폐지된 마커 파일이 생겼다(L-006 회귀)"; fails=$((fails+1))
 else
-  echo "XX   commit-cleanup: 승격 뒤 대기 마커 또는 푸시 마커 처리가 틀렸다"; fails=$((fails+1))
+  echo "ok   commit-cleanup: 마커 파일을 만들지 않음(L-006)"
 fi
 
 # ── 복합 명령 6건 (FIX-013) ────────────────────────────────────────────────────
@@ -792,89 +761,50 @@ cc_delta() {  # cc_delta <라벨> <기대증분> <이전> <패턴>
 cc_head_subject() { ( cd "$CC_T" && git log -1 --format=%s 2>/dev/null ); }
 cc_sync_ref() { ( cd "$CC_T" && git update-ref "refs/remotes/origin/$1" "$(git rev-parse HEAD)" ) 2>/dev/null; }
 
-# N1) 커밋 + 실험 푸시가 한 명령에 — 둘 다 기록되고 커밋 마커가 소비돼야 한다
+# N1) 커밋 + 실험 푸시가 한 명령에 — 둘 다 기록돼야 한다
 cc_head_subject > "$CC_T/.claude/commit-draft.txt"
-printf 'x\n' > "$CC_T/.claude/.commit-approved"
 cc_sync_ref dev2
 cc_snap
 cc_run "git commit -F .claude/commit-draft.txt && git push origin dev2"
 cc_delta "commit-cleanup N1 복합(커밋+dev2): COMMIT +1" 1 "$cc_b_commit" '| COMMIT |'
 cc_delta "commit-cleanup N1 복합(커밋+dev2): PUSH-dev2 +1" 1 "$cc_b_p2" 'PUSH-dev2'
-if [ -f "$CC_T/.claude/.commit-approved" ]; then
-  echo "XX   commit-cleanup N1: 커밋 마커가 남았다(커밋 후처리가 건너뛰어졌다)"; fails=$((fails+1))
-else
-  echo "ok   commit-cleanup N1: 커밋 마커 소비됨"
-fi
 
-# N2) 커밋 + 검증 승격이 한 명령에 — 45행 exit 잔존을 잡는 유일한 케이스
-#     .awaiting-decision 을 먼저 지운다. 위 시험 6 이 만들어 두었기 때문에,
-#     지우지 않으면 "생성됐다" 판정이 훅이 아무 일도 안 해도 통과한다.
-rm -f "$CC_T/.claude/.awaiting-decision"
+# N2) 커밋 + 검증 승격이 한 명령에 — 커밋 처리가 건너뛰어지지 않아야 한다
 cc_head_subject > "$CC_T/.claude/commit-draft.txt"
-printf 'x\n' > "$CC_T/.claude/.commit-approved"
-printf 'x\n' > "$CC_T/.claude/.push-approved"
 cc_sync_ref dev
 cc_snap
 cc_run "git commit -F .claude/commit-draft.txt && git push origin dev2:dev"
 cc_delta "commit-cleanup N2 복합(커밋+승격): COMMIT +1" 1 "$cc_b_commit" '| COMMIT |'
 cc_delta "commit-cleanup N2 복합(커밋+승격): PUSH +1" 1 "$cc_b_push" '| PUSH |'
-if [ ! -f "$CC_T/.claude/.commit-approved" ] && [ ! -f "$CC_T/.claude/.push-approved" ] \
-   && [ -f "$CC_T/.claude/.awaiting-decision" ]; then
-  echo "ok   commit-cleanup N2: 두 마커 소비 + L-003 대기 생성"
-else
-  echo "XX   commit-cleanup N2: 마커 소비 또는 L-003 대기 처리가 틀렸다"; fails=$((fails+1))
-fi
 
 # N3) 복합 명령인데 푸시만 실패 — 커밋만 기록돼야 한다
 ( cd "$CC_T" && printf 'y\n' > g.txt && git add g.txt && git commit -qm "세 번째 커밋" ) >/dev/null 2>&1
 printf '세 번째 커밋\n' > "$CC_T/.claude/commit-draft.txt"   # HEAD 가 옮겨졌으니 초안도 맞춘다
-printf 'x\n' > "$CC_T/.claude/.commit-approved"
 # origin/dev2 는 옛 커밋을 가리킨 채로 둔다 → 푸시 실패로 판정돼야 한다
 cc_snap
 cc_run "git commit -F .claude/commit-draft.txt && git push origin dev2"
 cc_delta "commit-cleanup N3 푸시만 실패: COMMIT +1" 1 "$cc_b_commit" '| COMMIT |'
 cc_delta "commit-cleanup N3 푸시만 실패: PUSH-dev2 +0" 0 "$cc_b_p2" 'PUSH-dev2'
-if [ -f "$CC_T/.claude/.commit-approved" ]; then
-  echo "XX   commit-cleanup N3: 커밋은 됐는데 마커가 남았다"; fails=$((fails+1))
-else
-  echo "ok   commit-cleanup N3: 커밋 마커 소비됨"
-fi
 
-# N4) 푸시 단독 — 커밋 마커를 과잉 소비하지 않아야 한다.
-#     전제가 핵심이다: 초안 제목 = HEAD 제목 + 커밋 마커 있음. 그래야 마커가 남은 이유가
-#     "명령에 commit 이 없어서" 임이 확정된다(제목이 달라서가 아니다).
+# N4) 푸시 단독 — 커밋 줄이 늘지 않아야 한다(초안 제목 = HEAD 제목인 상태에서).
 #     N3 이 HEAD 를 옮겼으므로 origin/dev2 를 다시 맞춘다 — 안 하면 거짓 실패가 난다.
 cc_head_subject > "$CC_T/.claude/commit-draft.txt"
-printf 'x\n' > "$CC_T/.claude/.commit-approved"
 cc_sync_ref dev2
 cc_snap
 cc_run "git push origin dev2"
 cc_delta "commit-cleanup N4 푸시 단독: PUSH-dev2 +1" 1 "$cc_b_p2" 'PUSH-dev2'
 cc_delta "commit-cleanup N4 푸시 단독: COMMIT +0" 0 "$cc_b_commit" '| COMMIT |'
-if [ -f "$CC_T/.claude/.commit-approved" ]; then
-  echo "ok   commit-cleanup N4: 커밋 마커 과잉 소비 없음"
-else
-  echo "XX   commit-cleanup N4: 커밋 명령이 없는데 커밋 마커를 소비했다"; fails=$((fails+1))
-fi
 
 # N5) 커밋은 실패하고 푸시만 성공 (';' 로 이은 명령) — 각자의 성공 판정이 독립이어야 한다
 printf '다른 제목\n' > "$CC_T/.claude/commit-draft.txt"
-printf 'x\n' > "$CC_T/.claude/.commit-approved"
 cc_snap
 cc_run "git commit -F .claude/commit-draft.txt ; git push origin dev2"
 cc_delta "commit-cleanup N5 커밋만 실패: PUSH-dev2 +1" 1 "$cc_b_p2" 'PUSH-dev2'
 cc_delta "commit-cleanup N5 커밋만 실패: COMMIT +0" 0 "$cc_b_commit" '| COMMIT |'
-if [ -f "$CC_T/.claude/.commit-approved" ]; then
-  echo "ok   commit-cleanup N5: 커밋 실패 시 마커 유지"
-else
-  echo "XX   commit-cleanup N5: 커밋되지 않았는데 마커를 지웠다"; fails=$((fails+1))
-fi
 
 # N6) 푸시가 둘 있는 명령 — 배타가 유지돼 더 구체적인 갈래 하나만 타야 한다.
 #     '| PUSH |' 건수만 보면 배타가 깨진 상태에서도 +1 이라 구분이 안 된다.
 #     PUSH-dev2 가 늘지 않았다는 것을 함께 봐야 잡힌다.
-rm -f "$CC_T/.claude/.awaiting-decision"
-printf 'x\n' > "$CC_T/.claude/.push-approved"
 cc_sync_ref dev2
 cc_sync_ref dev
 cc_snap
@@ -883,14 +813,11 @@ cc_delta "commit-cleanup N6 푸시 둘: PUSH +1" 1 "$cc_b_push" '| PUSH |'
 cc_delta "commit-cleanup N6 푸시 둘: PUSH-dev2 +0 (배타)" 0 "$cc_b_p2" 'PUSH-dev2'
 
 # ── 결함 ② (FIX-014): 명령 문자열이 아니라 실행되는 git 조각만 본다 ──────────────
-# 다른 명령의 인자 속 `git push origin dev2` 글자 때문에 journal 에 가짜 PUSH 줄이 남고
-# 마커가 소비되던 결함(2026-09-29 실제 발생). `echo …` 는 git 을 실행하지 않는다.
-rm -f "$CC_T/.claude/.awaiting-decision" "$CC_T/.claude/.commit-approved" "$CC_T/.claude/.push-approved"
+# 다른 명령의 인자 속 `git push origin dev2` 글자 때문에 journal 에 가짜 PUSH 줄이 남던
+# 결함(2026-09-29 실제 발생). `echo …` 는 git 을 실행하지 않는다.
 cc_sync_ref dev2      # 성공 판정(origin/dev2 == HEAD)이 우연히 맞아떨어지는 상태 — 옛 훅은 여기서 가짜 줄을 남겼다
 cc_sync_ref dev
 cc_head_subject > "$CC_T/.claude/commit-draft.txt"
-printf 'x\n' > "$CC_T/.claude/.commit-approved"
-printf 'x\n' > "$CC_T/.claude/.push-approved"
 cc_snap
 cc_run "echo git push origin dev2"
 cc_delta "FIX-014 ② 인자 속 'git push origin dev2' 글자: PUSH-dev2 +0 (가짜 줄 없음)" 0 "$cc_b_p2" 'PUSH-dev2'
@@ -898,18 +825,10 @@ cc_run "echo git push origin dev2:dev"
 cc_delta "FIX-014 ② 인자 속 'git push origin dev2:dev' 글자: PUSH +0" 0 "$cc_b_push" '| PUSH |'
 cc_run "echo git commit -F .claude/commit-draft.txt"
 cc_delta "FIX-014 ② 인자 속 'git commit' 글자: COMMIT +0" 0 "$cc_b_commit" '| COMMIT |'
-if [ -f "$CC_T/.claude/.push-approved" ] && [ -f "$CC_T/.claude/.commit-approved" ] && [ ! -f "$CC_T/.claude/.awaiting-decision" ]; then
-  echo "ok   FIX-014 ② 인자 속 글자로는 승인 마커가 소비되지 않고 L-003 잠금도 걸리지 않음"
-else
-  echo "XX   FIX-014 ② 실행되지 않은 git 글자 때문에 마커가 소비됐거나 L-003 잠금이 걸렸다"; fails=$((fails+1))
-fi
 # 실제 git 조각은 기존처럼 기록된다 (`;` 앞의 echo 는 무관)
 cc_snap
 cc_run "echo hi ; git push origin dev2"
 cc_delta "FIX-014 ② 실제 'git push origin dev2' 조각: PUSH-dev2 +1 (기존 동작 유지)" 1 "$cc_b_p2" 'PUSH-dev2'
-
-# 뒤에 붙는 시험이 이 절의 전제를 다시 읽지 않아도 되게 마커를 정리한다
-rm -f "$CC_T/.claude/.commit-approved" "$CC_T/.claude/.push-approved" "$CC_T/.claude/.awaiting-decision"
 
 # 7) precompact 는 압축 사유를 그대로 적는다
 printf '{"trigger":"auto"}' | CLAUDE_PROJECT_DIR="$CC_T" bash "$CC_T/.claude/hooks/precompact.sh" >/dev/null 2>&1

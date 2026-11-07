@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-# PostToolUse(Bash) 훅 — git commit 이 실제로 일어났으면 승인 마커를 지운다 (승인은 1회용).
-# 커밋 기록을 docs/wiki/journal.md 에 한 줄 남긴다.
+# PostToolUse(Bash) 훅 — git commit·push 가 실제로 일어났으면 docs/wiki/journal.md 에 한 줄 남기고
+# git log 스냅샷(.claude/gitlog.md)을 갱신한다.
+#
+# L-006(2026-11-07): 승인 마커(.commit-approved·.push-approved·.release-approved)와 L-003 대기 마커
+# (.awaiting-decision)는 폐지됐다. 이 훅은 더는 마커를 만들거나 지우지 않는다 — 기록만 한다.
 set -u
 export PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LC_ALL=C.UTF-8
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 DRAFT="$ROOT/.claude/commit-draft.txt"
-MARK="$ROOT/.claude/.commit-approved"
 JOURNAL="$ROOT/docs/wiki/journal.md"
 
 # 파이썬 인터프리터 탐지 (FIX-008). PostToolUse 라 차단 권한이 없으므로 경고만 하고 통과한다.
@@ -13,43 +15,21 @@ JOURNAL="$ROOT/docs/wiki/journal.md"
 [ -n "$HOOK_PY" ] || printf '%s\n' "[commit-cleanup] $HOOK_PY_MISSING_MSG" >&2
 
 input="$(cat)"
-cmd="$(printf '%s' "$input" | ${HOOK_PY:-false} -c 'import sys,json
-try:
-    d=json.load(sys.stdin); print(d.get("tool_input",{}).get("command",""))
-except Exception:
-    print("")' 2>/dev/null)"
 
 # 결함 ② (FIX-014): 명령 문자열이 아니라 **실제로 실행되는 git 조각**만 본다.
-#   전에는 명령 문자열에 `git push origin dev2` 글자가 있기만 하면 푸시 갈래로 들어갔다.
-#   그 글자가 다른 명령의 인자(예: python -c "…", echo "…")여도 마찬가지였고, 2026-09-29 에 실제로
-#   푸시가 없었는데 journal 에 PUSH-dev2 줄이 남았다. 지금은 따옴표·;·&&·||·|·줄바꿈·heredoc·치환
-#   단위로 쪼갠 뒤 첫 단어가 git 인 조각만 모아(gitcmd, 한 줄에 조각 하나) 아래 판정에 쓴다.
+#   따옴표·;·&&·||·|·줄바꿈·heredoc·치환 단위로 쪼갠 뒤 첫 단어가 git 인 조각만 모은다(gitcmd, 한 줄에 조각 하나).
 #   판정 스크립트가 없거나 해석에 실패하면 gitcmd 가 비어 아무 일도 하지 않는다(가짜 기록보다 기록 누락이 안전).
 gitcmd="$(printf '%s' "$input" | ${HOOK_PY:-false} "$(dirname "$0")/../scripts/bash_write_check.py" --git-fragments 2>/dev/null)"
 
-PUSH_MARK="$ROOT/.claude/.push-approved"
-RELEASE_MARK="$ROOT/.claude/.release-approved"
-AWAIT="$ROOT/.claude/.awaiting-decision"
+# 한 명령이 두 가지 일을 할 수 있다 (FIX-013) — 해당되는 처리를 **전부** 한다. 커밋을 먼저 처리해
+# journal 줄이 실제 순서(커밋 → 푸시)대로 남게 한다.
 
-# 한 명령이 두 가지 일을 할 수 있다 (FIX-013).
-#   전에는 "이 명령이 무엇인가" 를 하나만 골랐다. 푸시가 보이면 푸시 갈래에서 exit 0 했고,
-#   커밋 처리는 그 아래에 있어 도달하지 못했다. 그래서 `commit && push` 한 줄에서
-#   승인 마커가 소비되지 않고 남고, journal 의 COMMIT 줄과 gitlog 갱신이 통째로 빠졌다
-#   (커밋 0c46913 에서 실제 발생). 지금은 해당되는 처리를 **전부** 한다.
-#   커밋을 먼저 처리하는 것은 journal 줄이 실제로 일어난 순서(커밋 → 푸시)대로 남게 하려는
-#   것뿐이다. 이 훅은 PostToolUse 라 명령 전체가 끝난 뒤 한 번 돌고, 어느 블록을 먼저
-#   돌리든 rev-parse 는 같은 시점을 본다 — 순서는 판정의 정확성에 영향이 없다.
-
-# ── 커밋 처리 ── 승인 마커는 1회용이므로 실제로 커밋됐을 때만 소비한다.
-#   세 조건을 블록으로 묶는다. 전에는 `|| exit 0` 세 줄이었는데, 커밋 처리를 앞으로
-#   옮기면서 그대로 두면 커밋 조건이 안 맞는 명령에서 아래 푸시 처리까지 끊긴다.
+# ── 커밋 처리 ── HEAD 커밋 제목이 초안 첫 줄과 같으면 커밋 성공으로 본다
 if printf '%s' "$gitcmd" | grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-[^[:space:]]+([[:space:]]+[^[:space:]]+)?)*[[:space:]]+commit([[:space:]]|$)' \
-   && [ -f "$MARK" ] && [ -f "$DRAFT" ]; then
-  # HEAD 커밋 제목이 초안 첫 줄과 같으면 커밋 성공으로 본다
+   && [ -f "$DRAFT" ]; then
   head_subject="$(git -C "$ROOT" log -1 --format=%s 2>/dev/null || true)"
   draft_subject="$(head -n1 "$DRAFT" | tr -d '\r')"
   if [ -n "$head_subject" ] && [ "$head_subject" = "$draft_subject" ]; then
-    rm -f "$MARK"
     hash="$(git -C "$ROOT" log -1 --format=%h 2>/dev/null || true)"
     if [ -f "$JOURNAL" ]; then
       printf -- '- %s | COMMIT | %s %s\n' "$(date +%Y-%m-%d\ %H:%M)" "$hash" "$draft_subject" >> "$JOURNAL"
@@ -59,30 +39,18 @@ if printf '%s' "$gitcmd" | grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-[^[:spac
   fi
 fi
 
-# ── 푸시 처리 ── 푸시가 일어났으면 푸시 마커를 지운다 (1회용)
+# ── 푸시 처리 ── 성공 판정: 원격 추적 ref 가 HEAD(또는 dev)와 같아졌는가. 실패한 푸시는 기록하지 않는다(FIX-009).
 if printf '%s' "$gitcmd" | grep -Eq '(^|[;&|[:space:]])git([[:space:]]+-[^[:space:]]+([[:space:]]+[^[:space:]]+)?)*[[:space:]]+push([[:space:]]|$)'; then
-  # 하위 갈래는 if/elif 사슬이다 — 한 명령에 푸시가 둘이면 더 구체적인 갈래 하나만 탄다.
-  # 전에는 각 갈래 끝의 exit 0 이 이 배타를 만들고 있었다. 그 exit 들을 지우면서
-  # elif 로 잇지 않으면 한 명령이 여러 갈래를 타서 journal 에 두 줄이 남는다.
-  #
-  # main 승격(dev:main)이 실제로 반영됐으면 승격 마커를 지우고 RELEASE 를 기록한다 (L-001)
-  if printf '%s' "$gitcmd" | grep -Eq 'origin[[:space:]]+dev:main([[:space:]]|$)' && [ -f "$RELEASE_MARK" ]; then
+  # if/elif 사슬 — 한 명령에 푸시가 둘이면 더 구체적인 갈래 하나만 탄다(배타).
+  if printf '%s' "$gitcmd" | grep -Eq 'origin[[:space:]]+dev:main([[:space:]]|$)'; then
     git -C "$ROOT" fetch -q origin main 2>/dev/null || true
     if [ "$(git -C "$ROOT" rev-parse origin/main 2>/dev/null)" = "$(git -C "$ROOT" rev-parse dev 2>/dev/null)" ]; then
-      rm -f "$RELEASE_MARK" "$AWAIT"
       [ -f "$JOURNAL" ] && printf -- '- %s | RELEASE | origin main ← dev %s\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short dev 2>/dev/null || true)" >> "$JOURNAL"
     fi
-  # 검증 승격(dev2:dev)이 실제로 반영됐으면 푸시 마커를 지우고 L-003 대기를 건다.
-  # 성공 판정: 푸시가 되면 원격 추적 ref(origin/dev)가 HEAD 로 갱신되고, 실패하면 그대로 남는다.
   elif printf '%s' "$gitcmd" | grep -Eq 'origin[[:space:]]+dev2:dev([[:space:]]|$)'; then
     if [ "$(git -C "$ROOT" rev-parse origin/dev 2>/dev/null)" = "$(git -C "$ROOT" rev-parse HEAD 2>/dev/null)" ]; then
-      rm -f "$PUSH_MARK"
-      [ -f "$JOURNAL" ] && printf -- '- %s | PUSH | origin dev ← dev2 %s — 사용자 결정 대기(승격/수정) L-003\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)" >> "$JOURNAL"
-      # L-003: dev 로 올린 뒤에는 사용자가 승격/수정을 정할 때까지 다음 작업을 막는다
-      git -C "$ROOT" rev-parse --short HEAD 2>/dev/null > "$AWAIT" || date +%s > "$AWAIT"
+      [ -f "$JOURNAL" ] && printf -- '- %s | PUSH | origin dev ← dev2 %s\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)" >> "$JOURNAL"
     fi
-  # 실험 푸시(dev2)는 승인 판단이 없다. 마커를 쓰지 않고 L-003 대기도 걸지 않는다 —
-  # 걸면 실험할 때마다 작업이 잠겨서 "아무때나 민다"는 목적이 사라진다.
   elif printf '%s' "$gitcmd" | grep -Eq 'origin[[:space:]]+dev2([[:space:]]|$)'; then
     if [ "$(git -C "$ROOT" rev-parse origin/dev2 2>/dev/null)" = "$(git -C "$ROOT" rev-parse HEAD 2>/dev/null)" ]; then
       [ -f "$JOURNAL" ] && printf -- '- %s | PUSH-dev2 | origin dev2 %s (실험 푸시)\n' "$(date +%Y-%m-%d\ %H:%M)" "$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)" >> "$JOURNAL"

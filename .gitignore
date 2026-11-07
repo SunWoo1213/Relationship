@@ -1,9 +1,4 @@
-# 커밋·푸시 승인 절차의 임시 파일 (절대 커밋하지 않음)
-.claude/.commit-approved
-.claude/.push-approved
-.claude/.release-approved
-.claude/.awaiting-decision
-.claude/.stage-approved
+# 커밋 절차의 임시 파일 (절대 커밋하지 않음). 옛 승인 마커 5종은 L-006(2026-11-07)으로 폐지됐다.
 .claude/commit-draft.txt
 # 훅이 자동 생성하는 git log 스냅샷 (에이전트 참고용, 커밋하지 않음)
 .claude/gitlog.md

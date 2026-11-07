@@ -36,7 +36,7 @@ count=0
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   case "$f" in
-    docs/wiki/HANDOFF.md|docs/wiki/journal.md|.claude/commit-draft.txt|.claude/.commit-approved|.claude/.push-approved) continue ;;
+    docs/wiki/HANDOFF.md|docs/wiki/journal.md|.claude/commit-draft.txt|.claude/gitlog.md) continue ;;
   esac
   # rename 표기 "a -> b" 처리
   f="${f##* -> }"

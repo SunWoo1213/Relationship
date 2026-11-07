@@ -723,7 +723,7 @@ class PathJudge:
         if _inside(real, self.root_real):
             raise Deny(
                 f"[bash-write-guard] {form}: 쓰기 대상 '{t}' 는 프로젝트 안이다. 프로젝트 파일은 Bash 로 쓰지 말고 "
-                "Write/Edit 툴로 고쳐라 — stage-gate(활성 작업·동결·L-003)와 secret-guard(비밀 검사)를 거치도록 "
+                "Write/Edit 툴로 고쳐라 — stage-gate(활성 작업·동결)와 secret-guard(비밀 검사)를 거치도록 "
                 "(FIX-014, CLAUDE.md '파일 변경은 Write/Edit 툴로만'). 임시 파일은 /tmp·$TMPDIR·스크래치패드에 쓴다."
             )
         text = norm.replace("\\", "/")

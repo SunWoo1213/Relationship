@@ -33,4 +33,4 @@ FAIL 은 `findings.py … --source verify-impl` 로 05-remediation.md 에 올리
 -
 
 결과: 완료 | 부분완료
-승인:
+확인: (L-006 — 완성 확인 질문에 사용자가 "확인"하면 "사용자 (YYYY-MM-DD)". 유일하게 남은 사용자 확인 지점)

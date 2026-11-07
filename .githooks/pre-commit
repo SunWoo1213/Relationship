@@ -19,8 +19,8 @@ while IFS= read -r f; do
       say "비밀·상태 파일 스테이징: $f" ;;
   esac
   case "$f" in
-    .claude/.commit-approved|.claude/.push-approved|.claude/commit-draft.txt|.claude/settings.local.json)
-      say "승인 절차 임시 파일은 커밋하지 않는다: $f" ;;
+    .claude/commit-draft.txt|.claude/settings.local.json|.claude/gitlog.md)
+      say "하네스 임시 파일은 커밋하지 않는다: $f" ;;
   esac
   if [ -f "$f" ]; then
     size="$(wc -c < "$f" | tr -d '[:space:]')"

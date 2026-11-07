@@ -561,6 +561,8 @@
 - 2026-11-02 | DECISION | 사용자: U6 backend-agent 시작 승인(L-004) — mypy 수정 1줄(`loop.py` 1331행) + `tests/test_api_chat_query.py` + R-U5-1·2 + 판정 표 전 행 evidence + registry 해시·tests.md·RUNNING.md | P5b-query-turn U6
 - 2026-11-02 | DECISION | 사용자: U6 판정 표 불일치 2건은 계획 문구 수정 — D-3d `-k` 토큰 `card_called_once` → `merge_answers_from_card`(테스트 무수정) · R-4 ⑤ 정규식 `PendingQuestion\b`(응답 타입명 `PendingQuestionOut` 제외) · U6 verifier 리뷰 시작 승인(L-004) — 메인 재실행 66 passed(api_chat_query·query_loop·api_chat·answers_resume)·ruff·7/7·mypy `loop.py` 1331행 소멸·diff-filter 0·`assert` 1줄 | P5b-query-turn U6
 - 2026-11-02 | DECISION | 사용자: verifier U6 통과([필수] 0 · [권고] R-U6-1~3, `mypy_check.py --run` 38=38, 판정 표 전 행 불일치 0, HTTP 계약 값 80 PASS, 변이 12/12) → U6 커밋 + 실험 푸시 승인. R-U6-2 RUNNING.md 132행 정정 포함 | P5b-query-turn U6
+- 2026-11-02 | DECISION | 사용자: U7 실 LLM 왕복 시작 승인 — 메인 세션이 :8000(U6 코드 `a004cdd` 재시작) 에 결정 H 발화 6개 + "박 과장님" identity 보너스를 curl, 발화마다 전후 행 수·응답·trace 를 evidence(`u7-<n>-*`)로. 카드 기준 `u7-card-9/7-before` | P5b-query-turn U7
+- 2026-11-02 | NOTE | U7 1차: 발화 ①~④ 전부 `loop_error`(`JudgeUnavailable api_error`) — 탐침으로 원인 확정 **OpenAI 키 만료(401 expired_secret_key)**, 코드 결함 아님·저장 0. 사용자에게 키 갱신 또는 다른 공급자 선택 요청. 교훈: 증거 래퍼가 인자 따옴표를 보존하지 않음(FIX 후보 — 발화는 환경변수로) | P5b-query-turn U7
 - 2026-10-28 14:23 | COMMIT | 8a8767b cr(CR-004): 채팅에서 인물을 물으면 기억에서 답하는 조회 발화를 결정으로 옮긴다
 - 2026-10-28 14:23 | PUSH-dev2 | origin dev2 8a8767b (실험 푸시)
 - 2026-10-29 10:54 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
@@ -576,3 +578,7 @@
 - 2026-11-02 13:21 | PUSH-dev2 | origin dev2 18219ba (실험 푸시)
 - 2026-11-02 14:42 | COMMIT | 49c1c67 feat(P5b-query-turn): 조회 되묻기에 답하면 별칭을 쌓지 않고 그 인물 카드로 답한다
 - 2026-11-02 14:42 | PUSH-dev2 | origin dev2 49c1c67 (실험 푸시)
+- 2026-11-02 15:17 | COMMIT | a004cdd feat(P5b-query-turn): 조회 발화를 API 끝에서 끝까지 검증하고 CI 의 mypy 오류를 고친다
+- 2026-11-02 15:17 | PUSH-dev2 | origin dev2 a004cdd (실험 푸시)
+- 2026-11-04 23:36 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
+- 2026-11-07 | LESSON | L-006 사용자 승인 관문 폐지 — 요청→완성까지 자동, 완성 확인 1회(사용자 지시). delegate-guard·approve-commit 삭제, 마커 5종 폐지, test-guards 실패 0 |

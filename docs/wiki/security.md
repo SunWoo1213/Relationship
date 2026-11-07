@@ -18,11 +18,10 @@
 | 규칙 | 대신 |
 |------|------|
 | 강제 푸시(`--force`, `-f`, `+ref`, `--mirror`, `--delete`) 금지 | 새 커밋으로 고친다. 잘못된 커밋은 `git revert` |
-| 푸시는 세 가지만 (L-001 개정 2026-09-29). 그 밖은 전부 거부 | 실험 `git push origin dev2`(마커 없음) · 검증 승격 `git push origin dev2:dev`(승인 마커) · 최종 승격 `git push origin dev:main`(승격 마커) |
-| `origin dev` **직접** 푸시 금지 | dev 는 검증을 통과한 것만 들어오는 곳이다. 직접 밀면 검증 단계를 건너뛴다 → `/commit` 승인 뒤 `dev2:dev` 로 올린다 |
-| dev 로 올린 뒤에는 사용자가 승격/수정을 정할 때까지 다음 작업·커밋 금지 (L-003, `.claude/.awaiting-decision`) | 푸시 직후 `AskUserQuestion`. 수정이면 `approve-commit.sh --decision fix`, 승격이면 `/commit release` |
-| `main` 직접 푸시 금지 (dev2 → 검증 → dev → 실서버 확인 → main) | `/commit release` — 사용자 승인 → `approve-commit.sh --release` → `git push origin dev:main` (fast-forward 만, 강제 옵션은 별도 차단) |
-| 커밋은 승인된 초안 파일로만, `--amend`·`--no-verify` 금지 | `/commit` |
+| 푸시는 세 가지만 (L-001 개정 2026-09-29 · L-006 2026-11-07 승인 마커 폐지). 그 밖은 전부 거부 | 실험 `git push origin dev2` · 검증 승격 `git push origin dev2:dev` · 최종 승격 `git push origin dev:main`. 승격 둘은 verifier 완료 검토 `결과: 완료` + 사용자 완성 확인 뒤에만(절차, `/commit` §6) |
+| `origin dev` **직접** 푸시 금지 | dev 는 검증을 통과한 것만 들어오는 곳이다. 직접 밀면 검증 단계를 건너뛴다 → `dev2:dev` 로 올린다 |
+| `main` 직접 푸시 금지 (dev2 → 검증 → dev → main) | `git push origin dev:main` (fast-forward 만, 강제 옵션은 별도 차단) — 완성 확인 뒤 `dev2:dev` 에 이어서 |
+| 커밋은 초안 파일(`.claude/commit-draft.txt`)로만, `--amend`·`--no-verify` 금지 | `/commit` |
 | `reset --hard`, `checkout -- .`, `restore .`, `clean`, `branch -D`, `stash drop`, `filter-branch` 금지 | 되돌리기는 `git revert`. 정말 필요하면 사용자가 직접 |
 | 원격·자격·사용자 설정 변경(`remote set-url`, `config credential…`) 금지 | 사용자가 직접 |
 | 저장소: `https://github.com/SunWoo1213/Relationship.git` (origin). 작업 브랜치 `dev2`, 검증 브랜치 `dev`, 배포 브랜치 `main` | 로컬은 항상 `dev2` 에서 작업. `dev`·`main` 은 승격 뒤 `git fetch origin dev:dev` · `git fetch origin main:main` 으로만 맞춘다 |

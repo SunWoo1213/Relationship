@@ -2,12 +2,13 @@
 # PreToolUse(Write|Edit|MultiEdit|NotebookEdit) 훅 — 단계 게이트
 #
 # 작업 산출물(코드·데이터·리포트 등 docs/ 와 .claude/ 밖의 파일)을 쓰려면
-# docs/wiki/CURRENT.md 에 등록된 활성 작업의 "계획 검증 통과 + 사용자 승인" 기록이 있어야 한다.
+# docs/wiki/CURRENT.md 에 등록된 활성 작업의 "계획 검증 통과" 기록이 있어야 한다.
+# (L-006, 2026-11-07: `승인:` 줄(사용자 승인) 검사는 폐지 — verifier 의 통과 판정만 본다.)
 #
 #   CURRENT.md 형식:   active: P1-schema      (패키지)  또는   active: FIX-003 (수정)
-#   패키지 → docs/wiki/packages/<id>/02-plan-verify.md 에 "결과: 통과" 와 "승인: <비어있지 않음>"
+#   패키지 → docs/wiki/packages/<id>/02-plan-verify.md 에 "결과: 통과"
 #   수정   → docs/wiki/fixes/<id>.md 에 "계획 점검: 통과"(새 템플릿, FIX-027 이후) 또는
-#            "검증: 통과"(FIX-001~026 옛 템플릿, 한 줄뿐) 와 "승인: <비어있지 않음>".
+#            "검증: 통과"(FIX-001~026 옛 템플릿, 한 줄뿐).
 #            코드를 쓰기 전 이 게이트가 보는 것은 "계획 점검"(메인 세션)뿐이다. verifier 의
 #            실제 `검증:` 판정(통과/보류)은 코드가 다 생긴 뒤 커밋 시점에
 #            commit-guard.sh 규칙 6 이 본다 — 역할이 다르다(F-27-1, FIX-027 재작업).
@@ -69,15 +70,6 @@ case "$fp_lc" in "$root_lc"/*) rel="${fp:$((${#root_drive}+1))}" ;; esac
 # 프로젝트 밖 파일은 게이트 대상 아님
 case "$fp" in "$root_fwd"/*|"$root_drive"/*) ;; *) case "$fp_lc" in "$root_lc"/*) ;; *) exit 0 ;; esac ;; esac
 
-# L-003: dev 푸시 후 사용자 결정(승격/수정) 전에는 다음 작업 금지 — HANDOFF·journal·초안·gitlog 만 허용
-AWAIT="$ROOT/.claude/.awaiting-decision"
-if [ -f "$AWAIT" ]; then
-  case "$rel" in
-    docs/wiki/HANDOFF.md|docs/wiki/journal.md|.claude/commit-draft.txt|.claude/gitlog.md) ;;
-    *) deny "dev 푸시($(head -c 12 "$AWAIT" 2>/dev/null)) 후 사용자 결정 대기 중이다. main 승격(/commit release) 또는 수정 계속(approve-commit.sh --decision fix)을 AskUserQuestion 으로 정하기 전에는 다음 작업을 시작하지 않는다 (L-003). 허용: HANDOFF.md, journal.md, commit-draft.txt" ;;
-  esac
-fi
-
 # R-27-5: 하네스 자체(훅·스크립트·설정·CI)는 면제 경로 중 가장 느슨한 쓰기였다 — 활성 작업
 # 게이트 없이 .claude/* 전체가 통째로 면제됐다. 이 저장소의 가드 결함 이력(FIX-002·003·008·
 # 013·014 후보)이 전부 여기서 났고, FIX-027 자신도 독립 리뷰에서 [필수] 4건이 나왔다. 그래서
@@ -99,7 +91,7 @@ if [ -n "$frozen" ] && [ "$frozen" != "none" ]; then
 fi
 
 active="$(grep -E '^active:' "$CURRENT" | head -n1 | sed -E 's/^active:[[:space:]]*//' | tr -d '[:space:]\r')"
-[ -n "$active" ] && [ "$active" != "none" ] || deny "활성 작업이 없다(CURRENT.md active: none). /devlog start <패키지id> 로 계획(01-plan) → 계획검증(02-plan-verify) → 사용자 승인 → 등록을 마친 뒤 코드를 쓰라."
+[ -n "$active" ] && [ "$active" != "none" ] || deny "활성 작업이 없다(CURRENT.md active: none). /devlog start <패키지id> 로 계획(01-plan) → 계획검증(02-plan-verify, verifier 통과) → 등록을 마친 뒤 코드를 쓰라."
 
 case "$active" in
   FIX-*)
@@ -111,7 +103,6 @@ case "$active" in
     # 줄뿐이었으므로 둘 중 하나만 있어도 통과시켜 과거 FIX 문서와 호환한다.
     grep -Eq '^계획 점검:[[:space:]]*통과' "$rec" || grep -Eq '^검증:[[:space:]]*통과' "$rec" \
       || deny "$active 의 계획 점검이 '통과'가 아니다. 원인·수정안·기획서 정합성을 검증하고 '계획 점검: 통과'를 기록하라."
-    grep -Eq '^승인:[[:space:]]*[^[:space:]]' "$rec" || deny "$active 에 사용자 승인 기록이 없다. AskUserQuestion 으로 승인받고 '승인: 사용자 (날짜)'를 기록하라."
     ;;
   *)
     dir="$ROOT/docs/wiki/packages/$active"
@@ -119,7 +110,6 @@ case "$active" in
     [ -f "$dir/01-plan.md" ] || deny "$active 에 01-plan.md 가 없다."
     [ -f "$dir/02-plan-verify.md" ] || deny "$active 에 02-plan-verify.md 가 없다. devlog 스킬의 정합성 점검표로 기획서 정합성을 검증하고 기록하라."
     grep -Eq '^결과:[[:space:]]*통과' "$dir/02-plan-verify.md" || deny "$active 의 계획 검증 결과가 '통과'가 아니다. 보류 사유를 해소한 뒤 다시 검증하라."
-    grep -Eq '^승인:[[:space:]]*[^[:space:]]' "$dir/02-plan-verify.md" || deny "$active 의 계획에 사용자 승인 기록이 없다. AskUserQuestion 으로 승인받고 '승인: 사용자 (날짜)'를 기록하라."
     ;;
 esac
 exit 0

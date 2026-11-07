@@ -31,16 +31,6 @@
       "Bash(npm install:*)"
     ],
     "deny": [
-      "Write(.claude/.commit-approved)",
-      "Edit(.claude/.commit-approved)",
-      "Write(.claude/.push-approved)",
-      "Edit(.claude/.push-approved)",
-      "Write(.claude/.release-approved)",
-      "Edit(.claude/.release-approved)",
-      "Write(.claude/.awaiting-decision)",
-      "Edit(.claude/.awaiting-decision)",
-      "Write(.claude/.stage-approved)",
-      "Edit(.claude/.stage-approved)",
       "Read(./.env)",
       "Read(.env)",
       "Read(**/.env)",
@@ -76,7 +66,7 @@
             "shell": "bash",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/commit-guard.sh\"",
             "timeout": 15,
-            "statusMessage": "커밋 승인 가드 확인 중"
+            "statusMessage": "커밋 가드 확인 중"
           },
           {
             "type": "command",
@@ -84,18 +74,6 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/bash-write-guard.sh\"",
             "timeout": 15,
             "statusMessage": "Bash 파일 쓰기 가드 확인 중"
-          }
-        ]
-      },
-      {
-        "matcher": "Agent",
-        "hooks": [
-          {
-            "type": "command",
-            "shell": "bash",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/delegate-guard.sh\"",
-            "timeout": 15,
-            "statusMessage": "단계 위임 승인 확인 중"
           }
         ]
       },

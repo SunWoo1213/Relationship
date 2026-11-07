@@ -18,7 +18,7 @@ D1~D10  decisions/ ── 결정·이유·파급·"코드에서 지켜야 할 �
 S3.1~S3.7  specs/ ── 스키마·툴·ER·ask_user·메모리·브리핑·평가
    │ 구현 (docs/backlog.md 순서, P4 게이트)
    ▼
-P0~P11  packages/<id>/ ── 01-plan → 02-plan-verify(+승인) → 03-log(커밋마다) → 04-review(+증거) 
+P0~P11  packages/<id>/ ── 01-plan → 02-plan-verify(verifier) → 03-log(커밋마다) → 04-review(+증거, 완성 확인 1회) 
    │ 커밋 (Refs: P D S R)                      ↑ evidence/ 파일이 증거
    ▼
 journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지금 어디, 다음 무엇)
@@ -30,10 +30,10 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 
 | 상황 | 읽는 것 | 그다음 하는 것 |
 |------|---------|----------------|
-| 세션 시작·재개·압축 후 | `HANDOFF.md`(자동 주입) → `CURRENT.md` | **중단된 작업·커밋 안 된 변경이 있으면 다른 일보다 먼저** 사용자에게 목록을 보이고 우선순위를 묻는다(`/devlog resume`) |
-| 새 패키지 착수 | `docs/backlog.md` 해당 항목 → `review-index.md`의 R 행 → 그 행의 D·S 카드 → `registry.md`(이미 있는지) | `/devlog start <id>` (계획 → 기계 검증 → 승인) |
+| 세션 시작·재개·압축 후 | `HANDOFF.md`(자동 주입) → `CURRENT.md` | 중단된 작업이 있으면 HANDOFF 의 "바로 다음"대로 **바로 이어간다**(`/devlog resume`, L-006) |
+| 새 패키지 착수 | `docs/backlog.md` 해당 항목 → `review-index.md`의 R 행 → 그 행의 D·S 카드 → `registry.md`(이미 있는지) | `/devlog start <id>` (계획 → 기계 검증 → verifier 통과 → 활성화) |
 | 코드 쓰는 중 | 활성 패키지 `01-plan.md` 작업 단위 · 해당 S 카드 · D 카드 "코드에서 지켜야 할 것" · `security.md` | 단위 끝나면 `/commit` |
-| 커밋 | `03-log.md` 마지막 항목 · `verification.md` 증거 규칙 | `/commit` (초안 → 승인 → 커밋) |
+| 커밋 | `03-log.md` 마지막 항목 · `verification.md` 증거 규칙 | `/commit` (초안 → 커밋 → dev2 푸시, 승인 없음) |
 | 버그·문서 불일치 | `templates/fix.md` | `/devlog fix` |
 | 패키지 완료 | `04-review` 템플릿 · `verification.md` | `bash .claude/scripts/verify-impl.sh <id>` → `/devlog done` |
 | 기획서 변경 | `templates/change-request.md` · 관련 R 행 | `/devlog change` (동결 → 영향 분석 → 이행) |
@@ -105,6 +105,6 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 |------|------|-----------------|
 | 착수·완료·수정·기획서 변경·핸드오프·재개 | `/devlog` | `stage-gate.sh` (active/frozen), `verify-plan.sh`, `verify-impl.sh` |
 | 검증 결과 → 조치 계획 → 재검증 루프 | `/devlog` (verification.md "루프") | `findings.py` → `packages/<id>/05-remediation.md` |
-| 커밋·푸시 (매 작업 단위, 사용자 승인) | `/commit` | `commit-guard.sh`, `approve-commit.sh`, `commit-cleanup.sh`, `.githooks/pre-commit` |
+| 커밋·푸시 (매 작업 단위, 자동 — L-006) | `/commit` | `commit-guard.sh`, `commit-cleanup.sh`, `.githooks/pre-commit` |
 | 보안 | — | `safety-guard.sh`, `secret-guard.sh`, `settings.json` deny |
 | 컨텍스트 소진 대비 | `/devlog handoff` | `handoff-check.sh`(Stop), `session-start.sh`, `precompact.sh` |
