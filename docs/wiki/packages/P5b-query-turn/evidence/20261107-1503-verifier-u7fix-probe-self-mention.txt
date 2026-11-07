@@ -1,0 +1,15 @@
+# 명령: .venv/bin/python -m pytest -p tests.conftest /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/mut-u7fix/probe_u7_reply.py -q -s -p no:cacheprovider
+# 시각: 2026-11-07T15:03:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 0
+# ---
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+PROBE mentions= ['박선우 과장님', '나']
+PROBE mentions_dropped= 1
+PROBE resolutions= [('박선우 과장님', 'merge')]
+PROBE answer_source= llm
+PROBE reply= '민수 팀장님과 최근에 식사를 했어요.\n한 번에 한 사람씩 물어봐 주세요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+.
+1 passed in 0.43s

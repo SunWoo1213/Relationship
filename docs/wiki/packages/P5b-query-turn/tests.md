@@ -178,3 +178,28 @@
 | M3 `answerer_from_env` 를 최상단 import 로 바인딩 | 5 FAIL(monkeypatch 무효 → 실 공급자 경로 `OpenAIError`) |
 | M4 `answer_question` 의 `already_answered` 조건 제거 | 1 FAIL(`assert 200 == 409`) |
 | M5 `resume_turn` 조회 재개 분기 진입 조건 `"Query"` | 2 FAIL(identity 재개·인물 삭제 재개) |
+
+## U7 결함 수정(2026-11-07)
+
+실 LLM 이 `search_person` 인자를 `person` 으로 내는 결함(`evidence/20261104-2110-u7r-1-relation.txt`). 변이: `evidence/20261107-1455-u7fix-mutation.txt`(런타임 치환 플러그인, 저장소 파일 변경 없음).
+
+| 파일::이름 | 무엇 | 입력 → 기대 | 결과 · 검출 변이 | 실패 이력 |
+|---|---|---|---|---|
+| test_agent_query_loop.py::test_h3_mention_source_rule (변경) | 언급 읽기 규칙 | `search_person` `{person:"읽힘"}` 도 언급 · `{query:"라",person:"마"}` → "라"(query 우선) · `{person:"  "}`·`{person:1}` 제외 · (R-U7F-2 추가) `add_event {person:"바",query:"사"}`→"바" · `search_person {query:"  ",person:"아"}`→"아" · `search_person {query:1,person:"자"}`→"자" → `["가","나","읽힘","다","라","바","아","자"]` | 통과 · U7-M1(폴백 제거)·U7-M2(우선순위 뒤집기)·U7-M4(툴 이름 분기 제거)·U7-M5(공백 query 폴백 제거) | 기록 없음 |
+| test_agent_query_loop.py::test_u7_real_llm_person_arg_shape (신규) | U7 실제 모양 재현 | `search_person` `{person:"박선우 과장님"}`·`{person:"나"}` → `mentions==["박선우 과장님","나"]`·`answer_source=="llm"`·`person_id==인물`·저장 0·기록 툴 0 · (R-U7F-3 현재 동작 기록) `mentions_dropped==1` · reply `splitlines()[-2]==QUERY_ONE_AT_A_TIME_HINT`('나' 가 폴백으로 언급에 들어와 dropped 1 → 힌트가 붙는 부작용, 코드 필터는 D16 결정 7 사용자 결정) | 통과 · U7-M1 | 기록 없음 |
+| test_agent_propose.py::test_proposal_arg_schema_has_query_property (신규) | 스키마 `query` | `PROPOSAL_ARG_SCHEMA["properties"]["query"] == {"type":"string"}` | 통과 · U7-M3(속성 제거) | 기록 없음 |
+| test_agent_propose.py::test_build_propose_prompt_tells_query_field_and_accepts_person (신규) | 프롬프트 문장 | system 에 "query 필드에"·"person 필드에 써도 받아들인다"·"절대 제안하지 마라" | 통과 | 기록 없음 |
+
+| 변이 | 기대 | 결과 |
+|---|---|---|
+| U7-M1 `person` 폴백 제거 | h3·u7 재현 FAIL | 2 FAIL(h3, u7) |
+| U7-M2 우선순위 뒤집기(person 먼저) | h3 FAIL | 1 FAIL(h3) |
+| U7-M3 스키마 `query` 제거 | 스키마 테스트 FAIL | 1 FAIL |
+| U7-M4 툴 이름 분기 제거(모든 툴에서 query 우선) | h3 FAIL | 1 FAIL(h3) · `evidence/20261107-1508-u7fix2-mutation.txt` |
+| U7-M5 공백 query 폴백 제거(`strip()` 검사 삭제) | h3 FAIL | 1 FAIL(h3) · 같은 파일 |
+
+| 파일::이름 | 무엇 | 입력 → 기대 | 결과 · 검출 변이 | 실패 이력 |
+|---|---|---|---|---|
+| test_agent_query_gate.py::test_prompt_has_query_mention_exception_sentences_after_old_sentence (변경) | 조회 예외 문장 위치 | `exception` 문자열을 새 문장으로 교체, "절대 제안하지 마라." 바로 뒤 순서 단언 유지 | 통과 | U7 문장 교체 직후 옛 문장 단언으로 1 FAIL → 문자열 갱신으로 해소 |
+
+이력: 1차 전체 실행(`evidence/20261107-1454-u7fix-pytest-all.txt`)은 위 게이트 테스트가 옛 문장을 못 박아 **1 failed / 2124 passed** — 구현자가 범위 밖 파일이라 멈추고 보고 → 메인이 문자열 교체를 승인 → 2차(`evidence/20261107-1456-u7fix-pytest-all-2.txt`) **2125 passed, skip 0**(기준선 2122 + 신규 3). 메인 재실행(2026-11-07): 대상 5파일 158 passed · ruff check 통과 · `mypy_check.py --run` 38=38.

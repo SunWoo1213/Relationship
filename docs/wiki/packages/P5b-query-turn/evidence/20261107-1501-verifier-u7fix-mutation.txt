@@ -1,0 +1,174 @@
+
+# ===== append 2026-11-07T15:01:53+09:00 =====
+# 명령: .venv/bin/python -m pytest -p vmut_control tests/test_agent_query_loop.py tests/test_agent_propose.py tests/test_agent_query_gate.py tests/test_api_chat_query.py -q
+# 시각: 2026-11-07T15:01:53+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 0
+# ---
+........................................................................ [ 53%]
+..............................................................           [100%]
+=============================== warnings summary ===============================
+tests/test_agent_propose.py::test_gemini_proposer_parses_text_into_proposal
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+134 passed, 1 warning in 2.16s
+
+# ===== append 2026-11-07T15:01:56+09:00 =====
+# 명령: .venv/bin/python -m pytest -p vmut_nofallback tests/test_agent_query_loop.py tests/test_agent_propose.py tests/test_agent_query_gate.py tests/test_api_chat_query.py -q
+# 시각: 2026-11-07T15:01:56+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 1
+# ---
+.........FF............................................................. [ 53%]
+..............................................................           [100%]
+=================================== FAILURES ===================================
+_________________________ test_h3_mention_source_rule __________________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x1124a2c50>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x1124b4b40>
+
+    def test_h3_mention_source_rule(db_session, fake_embedder):
+        """결정 B-3 (b): search_person 은 query, 그 밖은 person; strip·빈 값 제외·중복 제거."""
+        from app.agent.types import Proposal, ToolCallProposal
+    
+        proposal = Proposal(
+            tool_calls=[
+                ToolCallProposal(name="search_person", args={"query": " 가 "}),
+                ToolCallProposal(name="add_event", args={"person": "나"}),
+                ToolCallProposal(name="search_person", args={"query": "가"}),
+                ToolCallProposal(name="search_person", args={"query": "  "}),
+                ToolCallProposal(name="search_person", args={"person": "읽힘"}),  # U7: person 폴백
+                ToolCallProposal(name="add_schedule", args={"person": "다"}),
+                ToolCallProposal(name="search_person", args={"query": "라", "person": "마"}),  # query 우선
+                ToolCallProposal(name="search_person", args={"person": "  "}),
+                ToolCallProposal(name="search_person", args={"person": 1}),
+            ],
+            raw={},
+        )
+>       assert loop_module._query_mentions(proposal) == ["가", "나", "읽힘", "다", "라"]
+E       AssertionError: assert ['가', '나', '다', '라'] == ['가', '나', '읽힘', '다', '라']
+E         
+E         At index 2 diff: '다' != '읽힘'
+E         Right contains one more item: '라'
+E         
+E         Full diff:
+E           [
+E               '가',
+E               '나',
+E         -     '읽힘',
+E               '다',
+E               '라',
+E           ]
+
+tests/test_agent_query_loop.py:593: AssertionError
+______________________ test_u7_real_llm_person_arg_shape _______________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x1124a2f50>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x112564f60>
+
+    def test_u7_real_llm_person_arg_shape(db_session, fake_embedder):
+        """U7 실 LLM 왕복 재현 -- gpt-4o-mini 가 search_person 인자를 person 으로 낸 모양."""
+    
+        person = _seed_person(db_session, fake_embedder, alias="박선우 과장님", name="박선우")
+        utt = "박선우 과장님이랑 나는 관계가 뭐야?"
+        calls = [
+            {"name": "search_person", "args": {"person": "박선우 과장님"}},
+            {"name": "search_person", "args": {"person": "나"}},
+        ]
+        before = _counts(db_session, "local")
+    
+        result, _ = _run(
+            db_session,
+            fake_embedder,
+            utt,
+            calls,
+            judge=FakeJudge(table={person.id: 0.95}),
+            answerer=FakeQueryAnswerer(table={utt: ANSWER_TEXT}),
+            session_id="q-u7",
+        )
+    
+        assert_no_writes(before, _counts(db_session, "local"))
+        assert _write_tool_rows(db_session, "q-u7") == 0
+        out = _query_out(db_session, "q-u7")
+>       assert out["mentions"] == ["박선우 과장님", "나"]
+E       AssertionError: assert [] == ['박선우 과장님', '나']
+E         
+E         Right contains 2 more items, first extra item: '박선우 과장님'
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     '박선우 과장님',
+E         -     '나',
+E         - ]
+
+tests/test_agent_query_loop.py:620: AssertionError
+=============================== warnings summary ===============================
+tests/test_agent_propose.py::test_gemini_proposer_parses_text_into_proposal
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule - AssertionError: assert ['가', '나', '다', '라'] == ['가', '나', '읽힘', '다', '라']
+  
+  At index 2 diff: '다' != '읽힘'
+  Right contains one more item: '라'
+  
+  Full diff:
+    [
+        '가',
+        '나',
+  -     '읽힘',
+        '다',
+        '라',
+    ]
+FAILED tests/test_agent_query_loop.py::test_u7_real_llm_person_arg_shape - AssertionError: assert [] == ['박선우 과장님', '나']
+  
+  Right contains 2 more items, first extra item: '박선우 과장님'
+  
+  Full diff:
+  + []
+  - [
+  -     '박선우 과장님',
+  -     '나',
+  - ]
+2 failed, 132 passed, 1 warning in 1.96s
+
+# ===== append 2026-11-07T15:02:00+09:00 =====
+# 명령: .venv/bin/python -m pytest -p vmut_anytool_query tests/test_agent_query_loop.py tests/test_agent_propose.py tests/test_agent_query_gate.py tests/test_api_chat_query.py -q
+# 시각: 2026-11-07T15:02:00+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 0
+# ---
+........................................................................ [ 53%]
+..............................................................           [100%]
+=============================== warnings summary ===============================
+tests/test_agent_propose.py::test_gemini_proposer_parses_text_into_proposal
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+134 passed, 1 warning in 1.84s
+
+# ===== append 2026-11-07T15:02:02+09:00 =====
+# 명령: .venv/bin/python -m pytest -p vmut_blank_query_wins tests/test_agent_query_loop.py tests/test_agent_propose.py tests/test_agent_query_gate.py tests/test_api_chat_query.py -q
+# 시각: 2026-11-07T15:02:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 0
+# ---
+........................................................................ [ 53%]
+..............................................................           [100%]
+=============================== warnings summary ===============================
+tests/test_agent_propose.py::test_gemini_proposer_parses_text_into_proposal
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+134 passed, 1 warning in 1.83s

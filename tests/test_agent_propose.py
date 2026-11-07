@@ -131,6 +131,21 @@ def test_build_propose_prompt_marks_not_callable_tools():
     assert "제안" in system  # "절대 제안하지 마라" 안내문
 
 
+def test_proposal_arg_schema_has_query_property():
+    """U7 -- 조회 제안의 search_person 인자 `query` 가 스키마에 있다(`person` 바로 뒤)."""
+
+    assert PROPOSAL_ARG_SCHEMA["properties"]["query"] == {"type": "string"}
+
+
+def test_build_propose_prompt_tells_query_field_and_accepts_person():
+    """U7 -- 조회 예외 문장이 query 필드를 지시하고 person 도 받아들인다고 말한다."""
+
+    system, _ = build_propose_prompt("u", NOW)
+    assert "query 필드에" in system
+    assert "person 필드에 써도 받아들인다" in system
+    assert "절대 제안하지 마라" in system  # 기존 문장 유지
+
+
 def test_build_propose_prompt_excludes_injected_args_from_tool_lines():
     _, user_text = build_propose_prompt("u", NOW)
     # add_event 설명 줄에 raw_utterance 가 나타나지 않는다(루프가 주입).

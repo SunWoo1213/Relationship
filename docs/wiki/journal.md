@@ -582,3 +582,5 @@
 - 2026-11-02 15:17 | PUSH-dev2 | origin dev2 a004cdd (실험 푸시)
 - 2026-11-04 23:36 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
 - 2026-11-07 | LESSON | L-006 사용자 승인 관문 폐지 — 요청→완성까지 자동, 완성 확인 1회(사용자 지시). delegate-guard·approve-commit 삭제, 마커 5종 폐지, test-guards 실패 0 |
+- 2026-11-07 14:36 | COMMIT | be67c76 harness(hooks): 사용자 승인 관문을 없애고 완성 확인 한 번만 남긴다 (L-006)
+- 2026-11-07 14:36 | PUSH-dev2 | origin dev2 be67c76 (실험 푸시)

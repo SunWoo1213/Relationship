@@ -1,0 +1,7 @@
+# 명령: curl -s http://127.0.0.1:8000/persons/9
+# 시각: 2026-11-02T15:19:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a004cdd (dev2)
+# exit: 0
+# ---
+{"person":{"id":9,"display_name":"박선우 과장님","relation_tag":"직장","hierarchy":"동"},"aliases":["과장님","박선우 과장님"],"last_contact_at":"2026-10-21T06:00:00Z","facts":[{"id":24,"key":"life_event","value":"이사 간다","updated_at":"2026-10-16T10:05:39.779509Z","source_count":2}],"patterns":[],"timeline":[{"id":31,"type":"meeting","content":"커피 마심","occurred_at":"2026-10-21T06:00:00Z"},{"id":28,"type":"meal","content":"점심 먹음","occurred_at":"2026-10-16T03:00:00Z"},{"id":27,"type":"meal","content":"점심 먹음","occurred_at":"2026-10-16T03:00:00Z"}],"upcoming_schedules":[]}

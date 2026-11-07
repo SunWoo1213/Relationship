@@ -1,0 +1,16 @@
+# 명령: git diff --stat
+# 시각: 2026-11-07T14:57:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 0
+# ---
+ app/agent/loop.py                           | 12 ++++++++--
+ app/agent/propose.py                        |  5 ++--
+ docs/wiki/HANDOFF.md                        |  3 ++-
+ docs/wiki/journal.md                        |  2 ++
+ docs/wiki/packages/P5b-query-turn/03-log.md |  3 ++-
+ docs/wiki/packages/P5b-query-turn/tests.md  | 23 ++++++++++++++++++
+ tests/test_agent_propose.py                 | 15 ++++++++++++
+ tests/test_agent_query_gate.py              |  4 ++--
+ tests/test_agent_query_loop.py              | 36 +++++++++++++++++++++++++++--
+ 9 files changed, 93 insertions(+), 10 deletions(-)

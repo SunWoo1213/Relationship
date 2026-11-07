@@ -136,6 +136,7 @@ PROPOSAL_ARG_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
         "person": {"type": "string"},
+        "query": {"type": "string"},
         "type": {"type": "string", "enum": list(EVENT_TYPES)},
         "content": {"type": "string"},
         "occurred_at": {"type": ["string", "null"]},
@@ -239,8 +240,8 @@ def build_propose_prompt(utterance: str, now: datetime) -> tuple[str, str]:
         f"{not_callable} 은 네가 직접 제안할 수 없는 내부 전용 툴이다 -- "
         "절대 제안하지 마라. "
         "단, intent 가 query 일 때만 예외로, 물어본 인물마다 search_person 을 "
-        "그 언급(query)으로 하나씩 제안하라. 이 제안은 실행되지 않고 대상 "
-        "표시로만 쓰인다. "
+        "하나씩 제안하고 그 언급을 query 필드에 써라(person 필드에 써도 "
+        "받아들인다). 이 제안은 실행되지 않고 대상 표시로만 쓰인다. "
         "발화가 이미 기록된 인물 정보를 묻는 질문이면 intent 를 query, 새 "
         "사실·사건·일정을 알려주는 말이면 record 로 답하라. 둘이 섞이면 "
         "query 다. "

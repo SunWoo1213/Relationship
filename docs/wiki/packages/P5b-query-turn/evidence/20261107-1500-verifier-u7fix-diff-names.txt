@@ -1,0 +1,15 @@
+# 명령: git diff --name-only
+# 시각: 2026-11-07T15:00:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 0
+# ---
+app/agent/loop.py
+app/agent/propose.py
+docs/wiki/HANDOFF.md
+docs/wiki/journal.md
+docs/wiki/packages/P5b-query-turn/03-log.md
+docs/wiki/packages/P5b-query-turn/tests.md
+tests/test_agent_propose.py
+tests/test_agent_query_gate.py
+tests/test_agent_query_loop.py

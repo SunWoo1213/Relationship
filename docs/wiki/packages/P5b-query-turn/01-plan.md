@@ -192,6 +192,7 @@ CR-004 §1 표 1행(기획서 1장 "…장기 메모리를 구축하고, 만남 
 | (c) (a)+(b) | 둘 다 읽고 합친다 | (a) 와 같은 D16 문제 | 출처가 둘이 되어 "이중 출처 금지"(P5-loop 01-plan 80행) 정신과 어긋난다 |
 
 확정: **B-1 `query_turn_no_write` · B-2 ①②Q④③⑤ · B-3 (b)** — 사용자 2026-10-28
+**보정(U7, 2026-11-07, review-u7-fix R-U7F-1)**: `search_person` 은 `query` **우선**, 문자열이 아니거나 비면 `person` 폴백(그 밖의 툴은 `person` 그대로) — 실 LLM(gpt-4o-mini)이 7/7 `person` 으로 냈다. `PROPOSAL_ARG_SCHEMA` 에 `query` 속성 1개가 늘어 "스키마는 `intent` 하나만 늘어난다" 는 더 이상 성립하지 않는다 → D16 갱신 이력 보정 ③. 프롬프트 (ii) 문장은 "그 언급을 query 필드에 써라(person 필드에 써도 받아들인다)" 로 바뀌었다.
 
 ### 결정 C · trace step 어휘와 `loop_query.output` 스키마, `stop_reason`
 

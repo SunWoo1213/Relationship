@@ -1,0 +1,432 @@
+
+# ===== append 2026-11-07T15:08:06+09:00 =====
+# 명령: .venv/bin/python -m pytest -p mut_v1_allquery tests/test_agent_query_loop.py -q -k h3_mention_source_rule or u7_real_llm
+# 시각: 2026-11-07T15:08:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 4
+# ---
+ERROR: file or directory not found: or
+
+
+no tests ran in 0.05s
+
+# ===== append 2026-11-07T15:08:06+09:00 =====
+# 명령: .venv/bin/python -m pytest -p mut_v2_nostrip tests/test_agent_query_loop.py -q -k h3_mention_source_rule or u7_real_llm
+# 시각: 2026-11-07T15:08:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 4
+# ---
+ERROR: file or directory not found: or
+
+
+no tests ran in 0.05s
+
+# ===== append 2026-11-07T15:08:14+09:00 =====
+# 명령: .venv/bin/python -m pytest -p mut_v1_allquery tests/test_agent_query_loop.py::test_h3_mention_source_rule tests/test_agent_query_loop.py::test_u7_real_llm_person_arg_shape -q
+# 시각: 2026-11-07T15:08:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 1
+# ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________________________ test_h3_mention_source_rule __________________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x110bf8d70>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x110c65b10>
+
+    def test_h3_mention_source_rule(db_session, fake_embedder):
+        """결정 B-3 (b): search_person 은 query, 그 밖은 person; strip·빈 값 제외·중복 제거.
+        뒤 세 입력은 V1·V2 변이 검출용(review-u7-fix R-U7F-2)."""
+        from app.agent.types import Proposal, ToolCallProposal
+    
+        proposal = Proposal(
+            tool_calls=[
+                ToolCallProposal(name="search_person", args={"query": " 가 "}),
+                ToolCallProposal(name="add_event", args={"person": "나"}),
+                ToolCallProposal(name="search_person", args={"query": "가"}),
+                ToolCallProposal(name="search_person", args={"query": "  "}),
+                ToolCallProposal(name="search_person", args={"person": "읽힘"}),  # U7: person 폴백
+                ToolCallProposal(name="add_schedule", args={"person": "다"}),
+                ToolCallProposal(name="search_person", args={"query": "라", "person": "마"}),  # query 우선
+                ToolCallProposal(name="search_person", args={"person": "  "}),
+                ToolCallProposal(name="search_person", args={"person": 1}),
+                ToolCallProposal(name="add_event", args={"person": "바", "query": "사"}),  # V1: 비검색 툴은 query 안 읽음
+                ToolCallProposal(name="search_person", args={"query": "  ", "person": "아"}),  # V2: 공백 query → person
+                ToolCallProposal(name="search_person", args={"query": 1, "person": "자"}),  # 비문자열 query → person
+            ],
+            raw={},
+        )
+>       assert loop_module._query_mentions(proposal) == ["가", "나", "읽힘", "다", "라", "바", "아", "자"]
+E       AssertionError: assert ['가', '나', '읽...'라', '사', ...] == ['가', '나', '읽...'라', '바', ...]
+E         
+E         At index 5 diff: '사' != '바'
+E         
+E         Full diff:
+E           [
+E               '가',
+E               '나',
+E               '읽힘',
+E               '다',
+E               '라',
+E         -     '바',
+E         ?      ^
+E         +     '사',
+E         ?      ^
+E               '아',
+E               '자',
+E           ]
+
+tests/test_agent_query_loop.py:597: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+______________________ test_u7_real_llm_person_arg_shape _______________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x110c0b390>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x110c8dd20>
+
+    def test_u7_real_llm_person_arg_shape(db_session, fake_embedder):
+        """U7 실 LLM 왕복 재현 -- gpt-4o-mini 가 search_person 인자를 person 으로 낸 모양."""
+    
+        person = _seed_person(db_session, fake_embedder, alias="박선우 과장님", name="박선우")
+        utt = "박선우 과장님이랑 나는 관계가 뭐야?"
+        calls = [
+            {"name": "search_person", "args": {"person": "박선우 과장님"}},
+            {"name": "search_person", "args": {"person": "나"}},
+        ]
+        before = _counts(db_session, "local")
+    
+        result, _ = _run(
+            db_session,
+            fake_embedder,
+            utt,
+            calls,
+            judge=FakeJudge(table={person.id: 0.95}),
+            answerer=FakeQueryAnswerer(table={utt: ANSWER_TEXT}),
+            session_id="q-u7",
+        )
+    
+        assert_no_writes(before, _counts(db_session, "local"))
+        assert _write_tool_rows(db_session, "q-u7") == 0
+        out = _query_out(db_session, "q-u7")
+        assert out["mentions"] == ["박선우 과장님", "나"]
+        assert out["answer_source"] == "llm"
+        assert out["person_id"] == person.id
+        # '나' 가 폴백으로 언급에 들어와 dropped 1 → 힌트 문장이 붙는 부작용의 기록
+        # (R-U7F-3, 코드 필터는 D16 결정 7 사용자 결정 사항). 현재 동작 기록이다.
+        assert out["mentions_dropped"] == 1
+>       assert result.reply.splitlines()[-1] == QUERY_ONE_AT_A_TIME_HINT
+E       AssertionError: assert '자세한 건 인물 화면에서 볼 수 있어요.' == '한 번에 한 사람씩 물어봐 주세요.'
+E         
+E         - 한 번에 한 사람씩 물어봐 주세요.
+E         + 자세한 건 인물 화면에서 볼 수 있어요.
+
+tests/test_agent_query_loop.py:630: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule - AssertionError: assert ['가', '나', '읽...'라', '사', ...] == ['가', '나', '읽...'라', '바', ...]
+  
+  At index 5 diff: '사' != '바'
+  
+  Full diff:
+    [
+        '가',
+        '나',
+        '읽힘',
+        '다',
+        '라',
+  -     '바',
+  ?      ^
+  +     '사',
+  ?      ^
+        '아',
+        '자',
+    ]
+FAILED tests/test_agent_query_loop.py::test_u7_real_llm_person_arg_shape - AssertionError: assert '자세한 건 인물 화면에서 볼 수 있어요.' == '한 번에 한 사람씩 물어봐 주세요.'
+  
+  - 한 번에 한 사람씩 물어봐 주세요.
+  + 자세한 건 인물 화면에서 볼 수 있어요.
+2 failed in 0.46s
+
+# ===== append 2026-11-07T15:08:15+09:00 =====
+# 명령: .venv/bin/python -m pytest -p mut_v2_nostrip tests/test_agent_query_loop.py::test_h3_mention_source_rule tests/test_agent_query_loop.py::test_u7_real_llm_person_arg_shape -q
+# 시각: 2026-11-07T15:08:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 1
+# ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________________________ test_h3_mention_source_rule __________________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x10bf14c20>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x10bf79640>
+
+    def test_h3_mention_source_rule(db_session, fake_embedder):
+        """결정 B-3 (b): search_person 은 query, 그 밖은 person; strip·빈 값 제외·중복 제거.
+        뒤 세 입력은 V1·V2 변이 검출용(review-u7-fix R-U7F-2)."""
+        from app.agent.types import Proposal, ToolCallProposal
+    
+        proposal = Proposal(
+            tool_calls=[
+                ToolCallProposal(name="search_person", args={"query": " 가 "}),
+                ToolCallProposal(name="add_event", args={"person": "나"}),
+                ToolCallProposal(name="search_person", args={"query": "가"}),
+                ToolCallProposal(name="search_person", args={"query": "  "}),
+                ToolCallProposal(name="search_person", args={"person": "읽힘"}),  # U7: person 폴백
+                ToolCallProposal(name="add_schedule", args={"person": "다"}),
+                ToolCallProposal(name="search_person", args={"query": "라", "person": "마"}),  # query 우선
+                ToolCallProposal(name="search_person", args={"person": "  "}),
+                ToolCallProposal(name="search_person", args={"person": 1}),
+                ToolCallProposal(name="add_event", args={"person": "바", "query": "사"}),  # V1: 비검색 툴은 query 안 읽음
+                ToolCallProposal(name="search_person", args={"query": "  ", "person": "아"}),  # V2: 공백 query → person
+                ToolCallProposal(name="search_person", args={"query": 1, "person": "자"}),  # 비문자열 query → person
+            ],
+            raw={},
+        )
+>       assert loop_module._query_mentions(proposal) == ["가", "나", "읽힘", "다", "라", "바", "아", "자"]
+E       AssertionError: assert ['가', '나', '읽...'라', '바', ...] == ['가', '나', '읽...'라', '바', ...]
+E         
+E         At index 6 diff: '자' != '아'
+E         Right contains one more item: '자'
+E         
+E         Full diff:
+E           [
+E               '가',
+E               '나',
+E               '읽힘',
+E               '다',
+E               '라',
+E               '바',
+E         -     '아',
+E               '자',
+E           ]
+
+tests/test_agent_query_loop.py:597: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+______________________ test_u7_real_llm_person_arg_shape _______________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x10bf2b110>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x10bfa1850>
+
+    def test_u7_real_llm_person_arg_shape(db_session, fake_embedder):
+        """U7 실 LLM 왕복 재현 -- gpt-4o-mini 가 search_person 인자를 person 으로 낸 모양."""
+    
+        person = _seed_person(db_session, fake_embedder, alias="박선우 과장님", name="박선우")
+        utt = "박선우 과장님이랑 나는 관계가 뭐야?"
+        calls = [
+            {"name": "search_person", "args": {"person": "박선우 과장님"}},
+            {"name": "search_person", "args": {"person": "나"}},
+        ]
+        before = _counts(db_session, "local")
+    
+        result, _ = _run(
+            db_session,
+            fake_embedder,
+            utt,
+            calls,
+            judge=FakeJudge(table={person.id: 0.95}),
+            answerer=FakeQueryAnswerer(table={utt: ANSWER_TEXT}),
+            session_id="q-u7",
+        )
+    
+        assert_no_writes(before, _counts(db_session, "local"))
+        assert _write_tool_rows(db_session, "q-u7") == 0
+        out = _query_out(db_session, "q-u7")
+        assert out["mentions"] == ["박선우 과장님", "나"]
+        assert out["answer_source"] == "llm"
+        assert out["person_id"] == person.id
+        # '나' 가 폴백으로 언급에 들어와 dropped 1 → 힌트 문장이 붙는 부작용의 기록
+        # (R-U7F-3, 코드 필터는 D16 결정 7 사용자 결정 사항). 현재 동작 기록이다.
+        assert out["mentions_dropped"] == 1
+>       assert result.reply.splitlines()[-1] == QUERY_ONE_AT_A_TIME_HINT
+E       AssertionError: assert '자세한 건 인물 화면에서 볼 수 있어요.' == '한 번에 한 사람씩 물어봐 주세요.'
+E         
+E         - 한 번에 한 사람씩 물어봐 주세요.
+E         + 자세한 건 인물 화면에서 볼 수 있어요.
+
+tests/test_agent_query_loop.py:630: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule - AssertionError: assert ['가', '나', '읽...'라', '바', ...] == ['가', '나', '읽...'라', '바', ...]
+  
+  At index 6 diff: '자' != '아'
+  Right contains one more item: '자'
+  
+  Full diff:
+    [
+        '가',
+        '나',
+        '읽힘',
+        '다',
+        '라',
+        '바',
+  -     '아',
+        '자',
+    ]
+FAILED tests/test_agent_query_loop.py::test_u7_real_llm_person_arg_shape - AssertionError: assert '자세한 건 인물 화면에서 볼 수 있어요.' == '한 번에 한 사람씩 물어봐 주세요.'
+  
+  - 한 번에 한 사람씩 물어봐 주세요.
+  + 자세한 건 인물 화면에서 볼 수 있어요.
+2 failed in 0.44s
+
+# ===== append 2026-11-07T15:08:29+09:00 =====
+# 명령: .venv/bin/python -m pytest -p mut_v1_allquery tests/test_agent_query_loop.py::test_h3_mention_source_rule tests/test_agent_query_loop.py::test_u7_real_llm_person_arg_shape -q
+# 시각: 2026-11-07T15:08:29+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 1
+# ---
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_________________________ test_h3_mention_source_rule __________________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x10cca8c20>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x10cd116f0>
+
+    def test_h3_mention_source_rule(db_session, fake_embedder):
+        """결정 B-3 (b): search_person 은 query, 그 밖은 person; strip·빈 값 제외·중복 제거.
+        뒤 세 입력은 V1·V2 변이 검출용(review-u7-fix R-U7F-2)."""
+        from app.agent.types import Proposal, ToolCallProposal
+    
+        proposal = Proposal(
+            tool_calls=[
+                ToolCallProposal(name="search_person", args={"query": " 가 "}),
+                ToolCallProposal(name="add_event", args={"person": "나"}),
+                ToolCallProposal(name="search_person", args={"query": "가"}),
+                ToolCallProposal(name="search_person", args={"query": "  "}),
+                ToolCallProposal(name="search_person", args={"person": "읽힘"}),  # U7: person 폴백
+                ToolCallProposal(name="add_schedule", args={"person": "다"}),
+                ToolCallProposal(name="search_person", args={"query": "라", "person": "마"}),  # query 우선
+                ToolCallProposal(name="search_person", args={"person": "  "}),
+                ToolCallProposal(name="search_person", args={"person": 1}),
+                ToolCallProposal(name="add_event", args={"person": "바", "query": "사"}),  # V1: 비검색 툴은 query 안 읽음
+                ToolCallProposal(name="search_person", args={"query": "  ", "person": "아"}),  # V2: 공백 query → person
+                ToolCallProposal(name="search_person", args={"query": 1, "person": "자"}),  # 비문자열 query → person
+            ],
+            raw={},
+        )
+>       assert loop_module._query_mentions(proposal) == ["가", "나", "읽힘", "다", "라", "바", "아", "자"]
+E       AssertionError: assert ['가', '나', '읽...'라', '사', ...] == ['가', '나', '읽...'라', '바', ...]
+E         
+E         At index 5 diff: '사' != '바'
+E         
+E         Full diff:
+E           [
+E               '가',
+E               '나',
+E               '읽힘',
+E               '다',
+E               '라',
+E         -     '바',
+E         ?      ^
+E         +     '사',
+E         ?      ^
+E               '아',
+E               '자',
+E           ]
+
+tests/test_agent_query_loop.py:597: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule - AssertionError: assert ['가', '나', '읽...'라', '사', ...] == ['가', '나', '읽...'라', '바', ...]
+  
+  At index 5 diff: '사' != '바'
+  
+  Full diff:
+    [
+        '가',
+        '나',
+        '읽힘',
+        '다',
+        '라',
+  -     '바',
+  ?      ^
+  +     '사',
+  ?      ^
+        '아',
+        '자',
+    ]
+1 failed, 1 passed in 0.42s
+
+# ===== append 2026-11-07T15:08:30+09:00 =====
+# 명령: .venv/bin/python -m pytest -p mut_v2_nostrip tests/test_agent_query_loop.py::test_h3_mention_source_rule tests/test_agent_query_loop.py::test_u7_real_llm_person_arg_shape -q
+# 시각: 2026-11-07T15:08:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 1
+# ---
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_________________________ test_h3_mention_source_rule __________________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x10c4dcc20>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x10c541640>
+
+    def test_h3_mention_source_rule(db_session, fake_embedder):
+        """결정 B-3 (b): search_person 은 query, 그 밖은 person; strip·빈 값 제외·중복 제거.
+        뒤 세 입력은 V1·V2 변이 검출용(review-u7-fix R-U7F-2)."""
+        from app.agent.types import Proposal, ToolCallProposal
+    
+        proposal = Proposal(
+            tool_calls=[
+                ToolCallProposal(name="search_person", args={"query": " 가 "}),
+                ToolCallProposal(name="add_event", args={"person": "나"}),
+                ToolCallProposal(name="search_person", args={"query": "가"}),
+                ToolCallProposal(name="search_person", args={"query": "  "}),
+                ToolCallProposal(name="search_person", args={"person": "읽힘"}),  # U7: person 폴백
+                ToolCallProposal(name="add_schedule", args={"person": "다"}),
+                ToolCallProposal(name="search_person", args={"query": "라", "person": "마"}),  # query 우선
+                ToolCallProposal(name="search_person", args={"person": "  "}),
+                ToolCallProposal(name="search_person", args={"person": 1}),
+                ToolCallProposal(name="add_event", args={"person": "바", "query": "사"}),  # V1: 비검색 툴은 query 안 읽음
+                ToolCallProposal(name="search_person", args={"query": "  ", "person": "아"}),  # V2: 공백 query → person
+                ToolCallProposal(name="search_person", args={"query": 1, "person": "자"}),  # 비문자열 query → person
+            ],
+            raw={},
+        )
+>       assert loop_module._query_mentions(proposal) == ["가", "나", "읽힘", "다", "라", "바", "아", "자"]
+E       AssertionError: assert ['가', '나', '읽...'라', '바', ...] == ['가', '나', '읽...'라', '바', ...]
+E         
+E         At index 6 diff: '자' != '아'
+E         Right contains one more item: '자'
+E         
+E         Full diff:
+E           [
+E               '가',
+E               '나',
+E               '읽힘',
+E               '다',
+E               '라',
+E               '바',
+E         -     '아',
+E               '자',
+E           ]
+
+tests/test_agent_query_loop.py:597: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule - AssertionError: assert ['가', '나', '읽...'라', '바', ...] == ['가', '나', '읽...'라', '바', ...]
+  
+  At index 6 diff: '자' != '아'
+  Right contains one more item: '자'
+  
+  Full diff:
+    [
+        '가',
+        '나',
+        '읽힘',
+        '다',
+        '라',
+        '바',
+  -     '아',
+        '자',
+    ]
+1 failed, 1 passed in 0.43s

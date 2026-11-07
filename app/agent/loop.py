@@ -1237,11 +1237,19 @@ def _query_mentions(proposal: Proposal) -> list[str]:
     """결정 B-3 (b) -- 제안을 인덱스 순으로 훑어 `search_person` 은 `query`,
     그 밖의 툴은 `person` 의 문자열을 모은다(`strip()`, 빈 값 제외, 첫 등장
     순 중복 제거). 게이트 판정과 무관하게 제안에서 읽는다(조회 턴에서는
-    기록 툴이 전부 거부돼 있다). 코드로 "나" 를 거르지 않는다(결정 J)."""
+    기록 툴이 전부 거부돼 있다). 코드로 "나" 를 거르지 않는다(결정 J).
+
+    B-3 (b) 보정(U7, 2026-11-07): 실 LLM 이 `search_person` 인자를 `query` 가
+    아니라 `person` 으로 내는 경우를 수용한다(`query` 우선, 문자열이 아니거나
+    비면 `person`)."""
 
     mentions: list[str] = []
     for call in proposal.tool_calls:
-        value = call.args.get("query" if call.name == "search_person" else "person")
+        value = call.args.get("person")
+        if call.name == "search_person":
+            primary = call.args.get("query")
+            if isinstance(primary, str) and primary.strip():
+                value = primary
         if not isinstance(value, str):
             continue
         text = value.strip()

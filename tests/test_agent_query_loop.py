@@ -573,7 +573,8 @@ def test_h2_me_first_asks_identity_and_stops(db_session, fake_embedder, monkeypa
 
 
 def test_h3_mention_source_rule(db_session, fake_embedder):
-    """결정 B-3 (b): search_person 은 query, 그 밖은 person; strip·빈 값 제외·중복 제거."""
+    """결정 B-3 (b): search_person 은 query, 그 밖은 person; strip·빈 값 제외·중복 제거.
+    뒤 세 입력은 V1·V2 변이 검출용(review-u7-fix R-U7F-2)."""
     from app.agent.types import Proposal, ToolCallProposal
 
     proposal = Proposal(
@@ -582,12 +583,51 @@ def test_h3_mention_source_rule(db_session, fake_embedder):
             ToolCallProposal(name="add_event", args={"person": "나"}),
             ToolCallProposal(name="search_person", args={"query": "가"}),
             ToolCallProposal(name="search_person", args={"query": "  "}),
-            ToolCallProposal(name="search_person", args={"person": "무시"}),
+            ToolCallProposal(name="search_person", args={"person": "읽힘"}),  # U7: person 폴백
             ToolCallProposal(name="add_schedule", args={"person": "다"}),
+            ToolCallProposal(name="search_person", args={"query": "라", "person": "마"}),  # query 우선
+            ToolCallProposal(name="search_person", args={"person": "  "}),
+            ToolCallProposal(name="search_person", args={"person": 1}),
+            ToolCallProposal(name="add_event", args={"person": "바", "query": "사"}),  # V1: 비검색 툴은 query 안 읽음
+            ToolCallProposal(name="search_person", args={"query": "  ", "person": "아"}),  # V2: 공백 query → person
+            ToolCallProposal(name="search_person", args={"query": 1, "person": "자"}),  # 비문자열 query → person
         ],
         raw={},
     )
-    assert loop_module._query_mentions(proposal) == ["가", "나", "다"]
+    assert loop_module._query_mentions(proposal) == ["가", "나", "읽힘", "다", "라", "바", "아", "자"]
+
+
+def test_u7_real_llm_person_arg_shape(db_session, fake_embedder):
+    """U7 실 LLM 왕복 재현 -- gpt-4o-mini 가 search_person 인자를 person 으로 낸 모양."""
+
+    person = _seed_person(db_session, fake_embedder, alias="박선우 과장님", name="박선우")
+    utt = "박선우 과장님이랑 나는 관계가 뭐야?"
+    calls = [
+        {"name": "search_person", "args": {"person": "박선우 과장님"}},
+        {"name": "search_person", "args": {"person": "나"}},
+    ]
+    before = _counts(db_session, "local")
+
+    result, _ = _run(
+        db_session,
+        fake_embedder,
+        utt,
+        calls,
+        judge=FakeJudge(table={person.id: 0.95}),
+        answerer=FakeQueryAnswerer(table={utt: ANSWER_TEXT}),
+        session_id="q-u7",
+    )
+
+    assert_no_writes(before, _counts(db_session, "local"))
+    assert _write_tool_rows(db_session, "q-u7") == 0
+    out = _query_out(db_session, "q-u7")
+    assert out["mentions"] == ["박선우 과장님", "나"]
+    assert out["answer_source"] == "llm"
+    assert out["person_id"] == person.id
+    # '나' 가 폴백으로 언급에 들어와 dropped 1 → 힌트 문장이 붙는 부작용의 기록
+    # (R-U7F-3, 코드 필터는 D16 결정 7 사용자 결정 사항). 현재 동작 기록이다.
+    assert out["mentions_dropped"] == 1
+    assert result.reply.splitlines()[-2] == QUERY_ONE_AT_A_TIME_HINT  # 끝은 "자세한 건 ..." 안내
 
 
 # ---------------------------------------------------------------------------

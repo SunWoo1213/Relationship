@@ -1,0 +1,316 @@
+
+# ===== append 2026-11-07T15:10:17+09:00 =====
+# 명령: .venv/bin/python -m pytest -p vmut_control tests/test_agent_query_loop.py tests/test_agent_propose.py tests/test_agent_query_gate.py tests/test_api_chat_query.py -q
+# 시각: 2026-11-07T15:10:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 0
+# ---
+........................................................................ [ 53%]
+..............................................................           [100%]
+=============================== warnings summary ===============================
+tests/test_agent_propose.py::test_gemini_proposer_parses_text_into_proposal
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+134 passed, 1 warning in 1.72s
+
+# ===== append 2026-11-07T15:10:20+09:00 =====
+# 명령: .venv/bin/python -m pytest -p vmut_anytool_query tests/test_agent_query_loop.py tests/test_agent_propose.py tests/test_agent_query_gate.py tests/test_api_chat_query.py -q
+# 시각: 2026-11-07T15:10:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 1
+# ---
+.........F.............................................................. [ 53%]
+..............................................................           [100%]
+=================================== FAILURES ===================================
+_________________________ test_h3_mention_source_rule __________________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x110acec50>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x110ad8bf0>
+
+    def test_h3_mention_source_rule(db_session, fake_embedder):
+        """결정 B-3 (b): search_person 은 query, 그 밖은 person; strip·빈 값 제외·중복 제거.
+        뒤 세 입력은 V1·V2 변이 검출용(review-u7-fix R-U7F-2)."""
+        from app.agent.types import Proposal, ToolCallProposal
+    
+        proposal = Proposal(
+            tool_calls=[
+                ToolCallProposal(name="search_person", args={"query": " 가 "}),
+                ToolCallProposal(name="add_event", args={"person": "나"}),
+                ToolCallProposal(name="search_person", args={"query": "가"}),
+                ToolCallProposal(name="search_person", args={"query": "  "}),
+                ToolCallProposal(name="search_person", args={"person": "읽힘"}),  # U7: person 폴백
+                ToolCallProposal(name="add_schedule", args={"person": "다"}),
+                ToolCallProposal(name="search_person", args={"query": "라", "person": "마"}),  # query 우선
+                ToolCallProposal(name="search_person", args={"person": "  "}),
+                ToolCallProposal(name="search_person", args={"person": 1}),
+                ToolCallProposal(name="add_event", args={"person": "바", "query": "사"}),  # V1: 비검색 툴은 query 안 읽음
+                ToolCallProposal(name="search_person", args={"query": "  ", "person": "아"}),  # V2: 공백 query → person
+                ToolCallProposal(name="search_person", args={"query": 1, "person": "자"}),  # 비문자열 query → person
+            ],
+            raw={},
+        )
+>       assert loop_module._query_mentions(proposal) == ["가", "나", "읽힘", "다", "라", "바", "아", "자"]
+E       AssertionError: assert ['가', '나', '읽...'라', '사', ...] == ['가', '나', '읽...'라', '바', ...]
+E         
+E         At index 5 diff: '사' != '바'
+E         
+E         Full diff:
+E           [
+E               '가',
+E               '나',
+E               '읽힘',
+E               '다',
+E               '라',
+E         -     '바',
+E         ?      ^
+E         +     '사',
+E         ?      ^
+E               '아',
+E               '자',
+E           ]
+
+tests/test_agent_query_loop.py:597: AssertionError
+=============================== warnings summary ===============================
+tests/test_agent_propose.py::test_gemini_proposer_parses_text_into_proposal
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule - AssertionError: assert ['가', '나', '읽...'라', '사', ...] == ['가', '나', '읽...'라', '바', ...]
+  
+  At index 5 diff: '사' != '바'
+  
+  Full diff:
+    [
+        '가',
+        '나',
+        '읽힘',
+        '다',
+        '라',
+  -     '바',
+  ?      ^
+  +     '사',
+  ?      ^
+        '아',
+        '자',
+    ]
+1 failed, 133 passed, 1 warning in 1.79s
+
+# ===== append 2026-11-07T15:10:22+09:00 =====
+# 명령: .venv/bin/python -m pytest -p vmut_blank_query_wins tests/test_agent_query_loop.py tests/test_agent_propose.py tests/test_agent_query_gate.py tests/test_api_chat_query.py -q
+# 시각: 2026-11-07T15:10:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 1
+# ---
+.........F.............................................................. [ 53%]
+..............................................................           [100%]
+=================================== FAILURES ===================================
+_________________________ test_h3_mention_source_rule __________________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x1127a6c50>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x1127bcb40>
+
+    def test_h3_mention_source_rule(db_session, fake_embedder):
+        """결정 B-3 (b): search_person 은 query, 그 밖은 person; strip·빈 값 제외·중복 제거.
+        뒤 세 입력은 V1·V2 변이 검출용(review-u7-fix R-U7F-2)."""
+        from app.agent.types import Proposal, ToolCallProposal
+    
+        proposal = Proposal(
+            tool_calls=[
+                ToolCallProposal(name="search_person", args={"query": " 가 "}),
+                ToolCallProposal(name="add_event", args={"person": "나"}),
+                ToolCallProposal(name="search_person", args={"query": "가"}),
+                ToolCallProposal(name="search_person", args={"query": "  "}),
+                ToolCallProposal(name="search_person", args={"person": "읽힘"}),  # U7: person 폴백
+                ToolCallProposal(name="add_schedule", args={"person": "다"}),
+                ToolCallProposal(name="search_person", args={"query": "라", "person": "마"}),  # query 우선
+                ToolCallProposal(name="search_person", args={"person": "  "}),
+                ToolCallProposal(name="search_person", args={"person": 1}),
+                ToolCallProposal(name="add_event", args={"person": "바", "query": "사"}),  # V1: 비검색 툴은 query 안 읽음
+                ToolCallProposal(name="search_person", args={"query": "  ", "person": "아"}),  # V2: 공백 query → person
+                ToolCallProposal(name="search_person", args={"query": 1, "person": "자"}),  # 비문자열 query → person
+            ],
+            raw={},
+        )
+>       assert loop_module._query_mentions(proposal) == ["가", "나", "읽힘", "다", "라", "바", "아", "자"]
+E       AssertionError: assert ['가', '나', '읽...'라', '바', ...] == ['가', '나', '읽...'라', '바', ...]
+E         
+E         At index 6 diff: '자' != '아'
+E         Right contains one more item: '자'
+E         
+E         Full diff:
+E           [
+E               '가',
+E               '나',
+E               '읽힘',
+E               '다',
+E               '라',
+E               '바',
+E         -     '아',
+E               '자',
+E           ]
+
+tests/test_agent_query_loop.py:597: AssertionError
+=============================== warnings summary ===============================
+tests/test_agent_propose.py::test_gemini_proposer_parses_text_into_proposal
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule - AssertionError: assert ['가', '나', '읽...'라', '바', ...] == ['가', '나', '읽...'라', '바', ...]
+  
+  At index 6 diff: '자' != '아'
+  Right contains one more item: '자'
+  
+  Full diff:
+    [
+        '가',
+        '나',
+        '읽힘',
+        '다',
+        '라',
+        '바',
+  -     '아',
+        '자',
+    ]
+1 failed, 133 passed, 1 warning in 1.82s
+
+# ===== append 2026-11-07T15:10:25+09:00 =====
+# 명령: .venv/bin/python -m pytest -p vmut_nofallback tests/test_agent_query_loop.py tests/test_agent_propose.py tests/test_agent_query_gate.py tests/test_api_chat_query.py -q
+# 시각: 2026-11-07T15:10:25+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: be67c76 (dev2)
+# exit: 1
+# ---
+.........FF............................................................. [ 53%]
+..............................................................           [100%]
+=================================== FAILURES ===================================
+_________________________ test_h3_mention_source_rule __________________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x1124cac50>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x1124e0b40>
+
+    def test_h3_mention_source_rule(db_session, fake_embedder):
+        """결정 B-3 (b): search_person 은 query, 그 밖은 person; strip·빈 값 제외·중복 제거.
+        뒤 세 입력은 V1·V2 변이 검출용(review-u7-fix R-U7F-2)."""
+        from app.agent.types import Proposal, ToolCallProposal
+    
+        proposal = Proposal(
+            tool_calls=[
+                ToolCallProposal(name="search_person", args={"query": " 가 "}),
+                ToolCallProposal(name="add_event", args={"person": "나"}),
+                ToolCallProposal(name="search_person", args={"query": "가"}),
+                ToolCallProposal(name="search_person", args={"query": "  "}),
+                ToolCallProposal(name="search_person", args={"person": "읽힘"}),  # U7: person 폴백
+                ToolCallProposal(name="add_schedule", args={"person": "다"}),
+                ToolCallProposal(name="search_person", args={"query": "라", "person": "마"}),  # query 우선
+                ToolCallProposal(name="search_person", args={"person": "  "}),
+                ToolCallProposal(name="search_person", args={"person": 1}),
+                ToolCallProposal(name="add_event", args={"person": "바", "query": "사"}),  # V1: 비검색 툴은 query 안 읽음
+                ToolCallProposal(name="search_person", args={"query": "  ", "person": "아"}),  # V2: 공백 query → person
+                ToolCallProposal(name="search_person", args={"query": 1, "person": "자"}),  # 비문자열 query → person
+            ],
+            raw={},
+        )
+>       assert loop_module._query_mentions(proposal) == ["가", "나", "읽힘", "다", "라", "바", "아", "자"]
+E       AssertionError: assert ['가', '나', '다', '라', '바'] == ['가', '나', '읽...'라', '바', ...]
+E         
+E         At index 2 diff: '다' != '읽힘'
+E         Right contains 3 more items, first extra item: '바'
+E         
+E         Full diff:
+E           [
+E               '가',
+E               '나',
+E         -     '읽힘',
+E               '다',
+E               '라',
+E               '바',
+E         -     '아',
+E         -     '자',
+E           ]
+
+tests/test_agent_query_loop.py:597: AssertionError
+______________________ test_u7_real_llm_person_arg_shape _______________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x1124cb050>
+fake_embedder = <function fake_embedder.<locals>._embed at 0x112595220>
+
+    def test_u7_real_llm_person_arg_shape(db_session, fake_embedder):
+        """U7 실 LLM 왕복 재현 -- gpt-4o-mini 가 search_person 인자를 person 으로 낸 모양."""
+    
+        person = _seed_person(db_session, fake_embedder, alias="박선우 과장님", name="박선우")
+        utt = "박선우 과장님이랑 나는 관계가 뭐야?"
+        calls = [
+            {"name": "search_person", "args": {"person": "박선우 과장님"}},
+            {"name": "search_person", "args": {"person": "나"}},
+        ]
+        before = _counts(db_session, "local")
+    
+        result, _ = _run(
+            db_session,
+            fake_embedder,
+            utt,
+            calls,
+            judge=FakeJudge(table={person.id: 0.95}),
+            answerer=FakeQueryAnswerer(table={utt: ANSWER_TEXT}),
+            session_id="q-u7",
+        )
+    
+        assert_no_writes(before, _counts(db_session, "local"))
+        assert _write_tool_rows(db_session, "q-u7") == 0
+        out = _query_out(db_session, "q-u7")
+>       assert out["mentions"] == ["박선우 과장님", "나"]
+E       AssertionError: assert [] == ['박선우 과장님', '나']
+E         
+E         Right contains 2 more items, first extra item: '박선우 과장님'
+E         
+E         Full diff:
+E         + []
+E         - [
+E         -     '박선우 과장님',
+E         -     '나',
+E         - ]
+
+tests/test_agent_query_loop.py:624: AssertionError
+=============================== warnings summary ===============================
+tests/test_agent_propose.py::test_gemini_proposer_parses_text_into_proposal
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_loop.py::test_h3_mention_source_rule - AssertionError: assert ['가', '나', '다', '라', '바'] == ['가', '나', '읽...'라', '바', ...]
+  
+  At index 2 diff: '다' != '읽힘'
+  Right contains 3 more items, first extra item: '바'
+  
+  Full diff:
+    [
+        '가',
+        '나',
+  -     '읽힘',
+        '다',
+        '라',
+        '바',
+  -     '아',
+  -     '자',
+    ]
+FAILED tests/test_agent_query_loop.py::test_u7_real_llm_person_arg_shape - AssertionError: assert [] == ['박선우 과장님', '나']
+  
+  Right contains 2 more items, first extra item: '박선우 과장님'
+  
+  Full diff:
+  + []
+  - [
+  -     '박선우 과장님',
+  -     '나',
+  - ]
+2 failed, 132 passed, 1 warning in 1.80s
