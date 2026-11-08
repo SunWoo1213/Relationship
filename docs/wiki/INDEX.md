@@ -106,5 +106,5 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | 착수·완료·수정·기획서 변경·핸드오프·재개 | `/devlog` | `stage-gate.sh` (active/frozen), `verify-plan.sh`, `verify-impl.sh` |
 | 검증 결과 → 조치 계획 → 재검증 루프 | `/devlog` (verification.md "루프") | `findings.py` → `packages/<id>/05-remediation.md` |
 | 커밋·푸시 (매 작업 단위, 자동 — L-006) | `/commit` | `commit-guard.sh`, `commit-cleanup.sh`, `.githooks/pre-commit` |
-| 보안 | — | `safety-guard.sh`, `secret-guard.sh`, `settings.json` deny |
+| 보안 | — | `safety-guard.sh`(서버 기동 `--env-file .env` 만 예외, L-007), `secret-guard.sh`, `settings.json` deny |
 | 컨텍스트 소진 대비 | `/devlog handoff` | `handoff-check.sh`(Stop), `session-start.sh`, `precompact.sh` |

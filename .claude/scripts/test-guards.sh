@@ -111,6 +111,22 @@ for c in \
 done
 expect_allow "$H/safety-guard.sh" 'heredoc with .env in body' "$(mk "$(printf 'cat > .gitignore <<EOF\n.env\nEOF')")"
 
+echo "== safety-guard: L-007 서버 기동 --env-file .env 예외 (값은 서버 프로세스 안에서만 읽힌다) =="
+for c in \
+  'uvicorn app.main:app --env-file .env' \
+  'uvicorn app.main:create_app --factory --env-file=.env --port 8000' \
+  'kill 84372; sleep 2; cd /Users/x/Relationship && nohup .venv/bin/python -m uvicorn app.main:app --env-file .env --host 127.0.0.1 --port 8000 --reload > /tmp/relationship-8000.log 2>&1 &' ; do
+  expect_allow "$H/safety-guard.sh" "$c" "$(mk "$c")"
+done
+for c in \
+  'cat .env; uvicorn app.main:app --env-file .env' \
+  'uvicorn app.main:app --env-file .env | tee /tmp/x.log' \
+  'uvicorn other.main:app --env-file .env' \
+  'python -m uvicorn app.main:app --env-file .env && cat .env' \
+  'cp .env /tmp/e && uvicorn app.main:app --env-file .env' ; do
+  expect_deny "$H/safety-guard.sh" "$c" "$(mk "$c")"
+done
+
 echo "== commit-guard =="
 expect_deny  "$H/commit-guard.sh" 'git commit -m x (no marker)' "$(mk 'git commit -m x')"
 expect_deny  "$H/commit-guard.sh" 'git commit --amend' "$(mk 'git commit --amend -F .claude/commit-draft.txt')"

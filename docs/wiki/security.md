@@ -8,6 +8,7 @@
 | 규칙 | 대신 |
 |------|------|
 | `.env`, `*.pem`, `*.key`, tfstate/tfvars 는 에이전트가 읽지도 쓰지도 않는다 | 사용자가 직접 만든다. 에이전트는 `.env.example`에 **이름만** 적는다 |
+| **예외 하나(L-007, 2026-11-08)**: 이 프로젝트 서버 기동 `uvicorn app.main:app … --env-file .env` 는 허용 — 값이 서버 프로세스 안에서만 읽히고 어디에도 출력되지 않는다 | 첫 줄에 파이프(`\|`)가 있거나 `--env-file .env` 인자를 지운 뒤에도 `.env` 가 남으면(`cat .env; uvicorn …`) 그대로 거부. 다른 모듈(`other:app`)은 예외가 아니다 |
 | 코드·문서·커밋에 키 문자열을 넣지 않는다 (패턴 검사) | `os.environ["OPENAI_API_KEY"]` 로 읽는다. 배포는 SSM Parameter Store |
 | 환경변수 전체 출력(`env`, `printenv`, `Get-ChildItem env:`)·KEY/SECRET 변수 echo 금지 | 존재 여부만: `test -n "$OPENAI_API_KEY" && echo set` 는 허용 |
 | `git add -A` / `git add .` 금지 — 비밀·임시 파일이 섞인다 | 파일을 명시해서 `git add path/a path/b` |

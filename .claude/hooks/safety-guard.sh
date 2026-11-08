@@ -98,8 +98,17 @@ fi
 first="${cmd%%$'\n'*}"
 ENV_RE='(^|[^A-Za-z0-9_./-])[.]env([^A-Za-z0-9_.]|$)'
 ENV_OK_RE='^[[:space:]]*(cd[[:space:]]+[^;&|]*(&&|;)[[:space:]]*)?(ls|test|stat|git[[:space:]]+(status|check-ignore|ls-files)|[[]|find)[[:space:]]'
+# 예외(L-007, 2026-11-08): 이 프로젝트 서버 기동 `uvicorn app.main:… --env-file .env` 는 값이 서버 프로세스 안에서만 읽히고
+# 어디에도 출력되지 않으므로 허용한다. 첫 줄에 파이프가 있거나, `--env-file .env` 인자를 지운 뒤에도 `.env` 가 남으면(cat .env; …) 그대로 거부한다.
+ENV_UVICORN_RE='(^|[;&[:space:]])(nohup[[:space:]]+)?(([^[:space:];&|]*/)?python[0-9.]*[[:space:]]+-m[[:space:]]+)?uvicorn[[:space:]]+app[.]main:(app|create_app)([[:space:]]|$)'
 if [[ $first =~ $ENV_RE ]]; then
-  [[ $first =~ $ENV_OK_RE ]] || deny ".env 파일 읽기·복사·출력 금지. 값이 필요하면 코드에서 os.environ 으로 읽고, 키 이름만 .env.example 에 적으라"
+  rest="$first"
+  if [[ $first =~ $ENV_UVICORN_RE && $first != *"|"* ]]; then
+    rest="${rest//--env-file .env/}"; rest="${rest//--env-file=.env/}"
+  fi
+  if [[ $rest =~ $ENV_RE ]]; then
+    [[ $first =~ $ENV_OK_RE ]] || deny ".env 파일 읽기·복사·출력 금지. 값이 필요하면 코드에서 os.environ 으로 읽고, 키 이름만 .env.example 에 적으라"
+  fi
 fi
 hasi "[.]aws/credentials|[.]ssh/id_|[.]netrc|[.]git-credentials|[.]docker/config[.]json" && deny "자격 증명 파일 접근 금지"
 hasi "${W}(printenv|env)([[:space:]]|$)|get-childitem[[:space:]]+env:|${W}(gci|ls|dir)[[:space:]]+env:" && deny "환경변수 전체 출력 금지"
