@@ -1,0 +1,28 @@
+# 명령: POSTGRES_PORT=5433 bash .claude/scripts/verify-impl.sh P5b-query-turn
+# 시각: 2026-11-08T20:26:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+== verify-impl P5b-query-turn  (20261108-2026) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2136 passed, 1 warning in 24.37s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261108-2026-pytest.txt
+WARN  ruff 경고/오류 → evidence/20261108-2026-lint.txt
+PASS  태그 P5b-query-turn 커밋 11 건 → evidence/20261108-2026-commits.txt
+PASS  커밋에 태그 존재: CR-004
+PASS  커밋에 태그 존재: D1
+PASS  커밋에 태그 존재: D10
+PASS  커밋에 태그 존재: D11
+PASS  커밋에 태그 존재: D16
+PASS  커밋에 태그 존재: D2
+PASS  커밋에 태그 존재: FIX-021
+PASS  커밋에 태그 존재: R19
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.4
+PASS  커밋에 태그 존재: S3.6
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P5b-query-turn 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=2 → evidence/20261108-2026-summary.txt ==

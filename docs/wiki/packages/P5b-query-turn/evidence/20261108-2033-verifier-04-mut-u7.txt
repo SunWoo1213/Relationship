@@ -1,0 +1,20 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/mut.sh u7
+# 시각: 2026-11-08T20:33:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+== 대조군(플러그인 없음): tests/test_agent_query_answer.py ==
+82 passed, 1 warning in 0.83s
+== 변이 mut_u7 ==
+"""변이 U7 수정 3 (verifier 04-review, 보너스) — 관계 줄 서술형 사전에서 '동' 항목을 원문으로 되돌림.
+기대: test_prompt_relation_and_hierarchy_each_value_is_descriptive[동] 등 FAIL."""
+import app.agent.respond as _r
+
+[MUT-U7] respond._HIERARCHY_DESC['동'] = '동'
+FAILED tests/test_agent_query_answer.py::test_prompt_user_text_has_question_now_and_evidence_values - AssertionError: 관계: 직장 관계, 위계 동(같은 급)
+FAILED tests/test_agent_query_answer.py::test_prompt_relation_line_is_descriptive - AssertionError: assert '\n관계: 직장 관계, 위계 동(같은 급)\n' in '질문: 박선우 과장님 요즘 어때?\n현재 시각: 2026-10-25T12:00:00+09:00\n\n[인물 카드]\n이름: 박선우 과장님\n관계:
+FAILED tests/test_agent_query_answer.py::test_prompt_relation_and_hierarchy_each_value_is_descriptive[hierarchy-\ub3d9-, \uc704\uacc4 \ub3d9(\uac19\uc740 \uae09)\n] - AssertionError: assert ', 위계 동(같은 급)\n' in '질문: 박선우 과
+3 failed, 79 passed, 1 warning in 0.84s
+== 변이 뒤 저장소 작업 트리(app tests) — 기대: 빈 출력 ==
+git-status-exit=0

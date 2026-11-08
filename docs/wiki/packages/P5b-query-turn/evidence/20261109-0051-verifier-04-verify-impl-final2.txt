@@ -1,0 +1,50 @@
+# 명령: POSTGRES_PORT=5433 bash .claude/scripts/verify-impl.sh P5b-query-turn
+# 시각: 2026-11-09T00:51:27+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+== verify-impl P5b-query-turn  (20261109-0051) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2136 passed, 1 warning in 24.15s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261109-0051-pytest.txt
+WARN  ruff 경고/오류 → evidence/20261109-0051-lint.txt
+PASS  태그 P5b-query-turn 커밋 11 건 → evidence/20261109-0051-commits.txt
+PASS  커밋에 태그 존재: CR-004
+PASS  커밋에 태그 존재: D1
+PASS  커밋에 태그 존재: D10
+PASS  커밋에 태그 존재: D11
+PASS  커밋에 태그 존재: D16
+PASS  커밋에 태그 존재: D2
+PASS  커밋에 태그 존재: FIX-021
+PASS  커밋에 태그 존재: R19
+PASS  커밋에 태그 존재: S3.2
+PASS  커밋에 태그 존재: S3.4
+PASS  커밋에 태그 존재: S3.6
+PASS  검토자 = verifier (L-002)
+PASS  증거 확인:  [backend-agent] **P5b-query-turn** — 채팅 조회 발화: 인식 ← evidence/20261108-2026-verifier-04-verif
+PASS  증거 확인:  D-1 · D16 "`propose.py` 구조화 출력 스키마에 `intent` enum ← evidence/20261108-2031-verifier-04-D-1a-
+PASS  증거 확인:  D-2 · D16 "`gate.py` 는 `intent == "query"` 턴의 기록  ← evidence/20261108-2033-verifier-04-D-2-r
+PASS  증거 확인:  D-3 · D16 "`loop.py` 조회 분기는 `app.er.resolve`/`app ← evidence/20261108-2031-verifier-04-D-3a-
+PASS  증거 확인:  D-4 · D16 "조회 턴에 `add_event`·`add_schedule`·`upda ← evidence/20261108-2030-verifier-04-D-4.t
+PASS  증거 확인:  D-5 · D16 "`new_person` 구간의 조회 턴은 `pending_questi ← evidence/20261108-2033-verifier-04-D-5-r
+PASS  증거 확인:  D-6 · D16 "답 생성 프롬프트에 들어가는 근거는 `get_person_card`  ← evidence/20261108-2033-verifier-04-D-6a-
+PASS  증거 확인:  D-7 · D16 "프론트(`web/`) diff 0."  ← evidence/20261108-2029-verifier-04-D-7.t
+PASS  증거 확인:  A-1 · "조회 턴 저장 0(`events`·`schedules`·`person_fac ← evidence/20261108-2030-verifier-04-A-1.t
+PASS  증거 확인:  A-2 · "툴 7종 불변(`tools_check` 7/7)"  ← evidence/20261108-2029-verifier-04-D-3b-
+PASS  증거 확인:  A-3 · "trace 에 의도·해석·조회 근거 건수·답"  ← evidence/20261108-2030-verifier-04-A-3.t
+PASS  증거 확인:  A-4 · "pytest 통과"  ← evidence/20261108-2027-verifier-04-A-4-p
+PASS  증거 확인:  A-5 · 린트  ← evidence/20261108-2029-verifier-04-A-5-r
+PASS  증거 확인:  R-1 · 기존 테스트 무수정(회귀 그물) `git diff --name-only --d ← evidence/20261108-2029-verifier-04-R-1.t
+PASS  증거 확인:  R-2 · 허용 파일 / 무변경 경로 ①②  ← evidence/20261108-2029-verifier-04-R-2a.
+PASS  증거 확인:  R-3 · 스키마 무변경 `alembic check`  ← evidence/20261108-2030-verifier-04-R-3-a
+PASS  증거 확인:  R-4 · P5-loop 불변식 grep ①~⑤(⑤ 는 `grep -E` 로 `8a876 ← evidence/20261108-2029-verifier-04-R-4.t
+PASS  증거 확인:  R-5 · 기록 턴 회귀(기존 6파일)  ← evidence/20261108-2030-verifier-04-R-5.t
+PASS  증거 확인:  R-6 · 네트워크 0(신규 5파일)  ← evidence/20261108-2030-verifier-04-R-6.t
+PASS  증거 확인:  R-7 · 순환 import 없음(결정 L)  ← evidence/20261108-2031-verifier-04-R-7a-
+PASS  증거 확인:  R-8 · 원칙7 경계 — 상담성 답 없음  ← evidence/20261108-2033-verifier-04-R-8-r
+PASS  증거 확인:  H-1 · "실 LLM 왕복 1회(trace 368 류 질문에 카드 근거 답)" — 결정 ← evidence/20261108-2002-u7t-1-relation.tx
+PASS  registry 에 P5b-query-turn 행 있음
+PASS  작업 단위 모두 완료 표시
+== 결과: FAIL=0 WARN=1 → evidence/20261109-0051-summary.txt ==

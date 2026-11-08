@@ -1,0 +1,74 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/r4.sh
+# 시각: 2026-11-08T20:29:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+== ① create_person\( -B1 (현재, app/agent/*.py) ==
+app/agent/loop.py-1874-            ctx.confirmed_question_id = question_id
+app/agent/loop.py:1875:            created = app_tools.create_person(
+-- ① 기준 8a8767b 건수:
+types.py: 0
+propose.py: 0
+gate.py: 0
+loop.py: 1
+respond.py: 0
+__init__.py: 0
+-- ① 현재 건수:
+types.py: 0
+propose.py: 0
+gate.py: 0
+loop.py: 1
+respond.py: 0
+__init__.py: 0
+
+== ② update_person\( (현재) ==
+app/agent/respond.py:18:- `stored_facts`(FIX-016): 그 턴에 실행에 성공한 `update_person(facts=…)`
+app/agent/loop.py:741:    턴에 **실행에 성공한** `update_person(facts=…)` 호출의 키를
+app/agent/loop.py:840:    """U7 -- 실행에 성공한 `update_person(facts=…)` 호출 하나에서 직접 쓴
+app/agent/loop.py:891:        return app_tools.update_person(
+app/agent/loop.py:1845:            app_tools.update_person(ctx, person_id, new_alias=mention)
+-- ② 기준 8a8767b 건수:
+types.py: 0
+propose.py: 0
+gate.py: 0
+loop.py: 4
+respond.py: 1
+__init__.py: 0
+-- ② 현재 건수:
+types.py: 0
+propose.py: 0
+gate.py: 0
+loop.py: 4
+respond.py: 1
+__init__.py: 0
+
+== ③ T_merge|t_merge|T_new|t_new|confidence (현재, 기대 0건) ==
+exit=1
+
+== ④ time.sleep|asyncio.sleep|while True (현재, 기대 0건) ==
+exit=1
+
+== ⑤ PendingQuestion\b|flag_modified|\.context *= — 현재 vs 기준 (파일별 건수) ==
+-- 기준 8a8767b:
+types.py: 2
+propose.py: 0
+gate.py: 0
+loop.py: 3
+respond.py: 0
+__init__.py: 0
+-- 현재:
+types.py: 2
+propose.py: 0
+gate.py: 0
+loop.py: 3
+respond.py: 0
+__init__.py: 0
+-- ⑤ 추가 줄(git diff 8a8767b..HEAD -- app/agent, '+' 줄)에서의 매치(기대 0건):
+exit=1
+-- ⑤ 현재 매치 줄(참고):
+app/agent/types.py:423:    .load_resume_input`(U6/U7)이 `PendingQuestion` 행에서 `kind`·`context`
+app/agent/types.py:426:    로 더해 이 타입을 만든다 -- `app/agent/` 는 `PendingQuestion` ORM 을
+app/agent/loop.py:1067:    으로 다시 만든다 -- `PendingQuestion` ORM 을 조회하지 않고, 이 루프가
+app/agent/loop.py:1462:# (`app/api/deps.py::load_resume_input` 이 `PendingQuestion` 에서 값만 뽑아
+app/agent/loop.py:1721:    `app.api.deps.load_resume_input` 이 `PendingQuestion` 행에서 값만 뽑아

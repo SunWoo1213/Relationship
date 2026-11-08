@@ -589,3 +589,5 @@
 - 2026-11-07 16:34 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
 - 2026-11-08 20:07 | COMMIT | 9eb9d2e harness(hooks): 서버 기동의 --env-file .env 는 비밀 노출이 아니므로 허용한다 (L-007)
 - 2026-11-08 20:07 | PUSH-dev2 | origin dev2 9eb9d2e (실험 푸시)
+- 2026-11-08 20:22 | COMMIT | cf26dce fix(P5b-query-turn): 관계 질문에 카드의 관계·위계로 답하도록 조회 답 프롬프트를 보강한다
+- 2026-11-08 20:22 | PUSH-dev2 | origin dev2 cf26dce (실험 푸시)

@@ -1,0 +1,19 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/mut.sh u1
+# 시각: 2026-11-08T20:33:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+== 대조군(플러그인 없음): tests/test_agent_query_types.py ==
+24 passed in 0.11s
+== 변이 mut_u1 ==
+"""변이 U1 (verifier 04-review) — validate_proposal 의 intent 누락 기본값을 record → query 로.
+핵심 계약: 결정 A "키 없음/null → record". 기대: test_validate_proposal_missing_intent_is_record
+· test_validate_proposal_null_intent_is_record FAIL (런타임 치환, 저장소 무수정)."""
+import app.agent.propose as _p
+[MUT-U1] validate_proposal: missing/null intent -> 'query'
+FAILED tests/test_agent_query_types.py::test_fake_proposer_intents_table - AssertionError: assert 'query' == 'record'
+FAILED tests/test_agent_query_types.py::test_fake_proposer_without_intents_is_record - AssertionError: assert 'query' == 'record'
+2 failed, 22 passed in 0.07s
+== 변이 뒤 저장소 작업 트리(app tests) — 기대: 빈 출력 ==
+git-status-exit=0

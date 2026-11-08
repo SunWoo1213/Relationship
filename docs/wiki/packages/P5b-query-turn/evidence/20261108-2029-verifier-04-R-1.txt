@@ -1,0 +1,7 @@
+# 명령: git diff --name-only --diff-filter=M 8a8767b..HEAD -- tests/
+# 시각: 2026-11-08T20:29:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+tests/test_agent_propose.py

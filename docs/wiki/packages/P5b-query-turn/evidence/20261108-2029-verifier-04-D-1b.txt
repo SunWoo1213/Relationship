@@ -1,0 +1,15 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/d1b.sh
+# 시각: 2026-11-08T20:29:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
++        "query": {"type": "string"},
++        "intent": {"type": "string", "enum": list(INTENTS)},
+grep exit=0 (1 = 0줄)
+--- 참고: 추가 줄 중 "query" 속성(D16 보정 ③, U7 e49f78d) ---
+5:+        "query": {"type": "string"},
+10:+        "intent": {"type": "string", "enum": list(INTENTS)},
+27:+    intent_raw = raw.get("intent")
+37:+    #: `{발화: 의도}` -- 표에 있는 발화만 `raw["intent"]` 로 넘긴다. 없는
+45:+            raw["intent"] = self.intents[utterance]

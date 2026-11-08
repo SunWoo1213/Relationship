@@ -71,7 +71,7 @@
 - Refs: P5b-query-turn U6 CR-004 D16 S3.4 원칙8 원칙9 R19 R-U5-1 R-U5-2 R-U6-1 R-U6-2 R-U6-3 FIX-021
 - **커밋 뒤(2026-11-02)**: `a004cdd`, dev2 푸시. CI 41399011046 **success**(U4·U5 의 mypy 빨강 복구 확인, 2026-11-07 `gh run list`).
 
-## 2026-11-07 · fix(P5b-query-turn): 실제 LLM 이 search_person 인자를 person 으로 내도 조회 대상으로 읽는다 · pending (U7 실 LLM 왕복 + 결함 수정, 메인 세션·backend-agent)
+## 2026-11-07 · fix(P5b-query-turn): 실제 LLM 이 search_person 인자를 person 으로 내도 조회 대상으로 읽는다 · e49f78d (U7 실 LLM 왕복 + 결함 수정, 메인 세션·backend-agent)
 - 변경: `app/agent/loop.py`(+10/−2) — `_query_mentions()` 가 `search_person` 에서 `query` 를 먼저 읽고 문자열이 아니거나 비면 `person` 을 읽는다(다른 툴은 `person` 그대로, "나" 코드 필터 없음, docstring 에 B-3 (b) 보정 문단). `app/agent/propose.py`(+3/−2) — `PROPOSAL_ARG_SCHEMA` 에 `query` 속성, 조회 예외 문장을 "그 언급을 query 필드에 써라(person 필드에 써도 받아들인다)" 로. 테스트 `tests/test_agent_query_loop.py`(h3 개정 + `test_u7_real_llm_person_arg_shape` 신규) · `tests/test_agent_propose.py`(스키마·프롬프트 2건 신규) · `tests/test_agent_query_gate.py`(옛 문장 단언 → 새 문장, +2/−2). 문서 `tests.md` U7 절. 제품 코드 밖(`app/api/`·`web/`·`app/settings.py`) 변경 0.
 - U7 실 LLM 왕복 경과(사용자·메인 세션, 결정 H): **1차 2026-11-02** 발화 ①~④ 전부 `loop_error`(`JudgeUnavailable api_error`) — OpenAI 키 만료(401 `expired_secret_key`), 코드 결함 아님, 저장 0 확인(`evidence/20261102-1524-u7-{1..4}-*.txt`). **2차 2026-11-04**(키 갱신, 사용자가 :8000 을 `--env-file` 로 기동) 발화 7건(결정 H 6 + "박 과장님" identity) → `evidence/20261104-2110-u7r-{1..7}-*.txt` + 카드 기준 `u7r-card-9/7-before`. 결과: `intent == "query"` 7/7 · 저장 0 7/7 · **`answer_source`: ③ `llm`(마지막 접촉 "10월 21일" == `last_contact_at`, 토큰 412/23) 1건, 나머지 6건 `no_mention`**. 원인: gpt-4o-mini 가 `search_person` 인자를 7/7 `{"person": …}` 으로 냈고(프롬프트 일반 규칙 "person 필드에" 가 괄호 표기 "(query)" 보다 강했고 스키마에 `query` 가 열거되지 않았음 — `additionalProperties: True` 라 금지는 아니었음, R-U7F-4) 추출기는 `query` 만 읽음. ③만 통과한 것은 `get_briefing(person=…)` 제안이 덧붙어 거기서 언급을 읽은 덕. 또 하나의 관찰: ① 에서 `search_person("나")` 가 2번째 제안으로 나옴(D16 결정 7 프롬프트 지시 새어 나옴 — 결정 J 규칙상 첫 언급 merge 로 답하므로 결과 영향 없음, P10 표본).
 - 이유(기획서·카드 연결): 수용 기준 "실 LLM 왕복 1회(trace 368 류 질문에 카드 근거 답)" 가 코드 결함으로 미달 → 결정 B-3 (b) "search_person 은 query" 를 **보정**(query 우선 + person 수용). D16 "코드에서 지켜야 할 것" 과 충돌 없음(언급 출처만 넓힘). 프롬프트·스키마도 함께 고쳐 LLM 이 `query` 로 내도록 유도하되, 폴백으로 어느 쪽이든 받는다(실 LLM 출력 형태에 코드가 깨지지 않게 — 원칙8 "성능 미달도 결과" 로 기록).
@@ -97,7 +97,7 @@
 - **관찰 2(코드 결함 아님, 04-review §7·P10)**: (가) ④ ER 결정 3-c(b) — 판정 null 이면 통과 후보가 있을 때 identity 되묻기(원칙1 안전 쪽). 결정 H #4 의 "new_person·pending +0" 기대는 통과 후보 0 을 전제한 문구 → 04-review 판정은 "저장 0·인물 생성 0·되묻기 1행 허용" 으로 읽는다. (나) ⑦ **오병합 위험 표본**: "박 과장님" 에 박 성 과장 2명(9·10)이 있는데 판정 LLM 이 9 를 0.9 로 골라 merge. 조회 턴이라 별칭 학습·저장 0(결정 I (a)) 이지만 기록 턴이었다면 자동 병합됐을 것 — R-U10R-4(호칭 단독 언급) 와 같은 계열의 ER 보정·판정 프롬프트 과제. 1차 평가셋에 "같은 성·같은 직함 2명" 함정이 없음을 뜻함.
 - Refs: P5b-query-turn U7 CR-004 D16 원칙1 원칙7 원칙8 R19 결정H 결정I 결정J R-U7F-3 R-U7F-6 R-U10R-4
 
-## 2026-11-08 20:02 · U7 실 LLM 왕복 4차(수정 3 — `respond.py` 관계 줄·지시 문장, 메인 세션) · 커밋 없음(관찰 기록, 커밋은 수정 3 과 함께)
+## 2026-11-08 20:02 · U7 실 LLM 왕복 4차(수정 3 — `respond.py` 관계 줄·지시 문장, 메인 세션) · 수정 3 커밋 `cf26dce`
 - 서버: **메인 세션이 직접 재기동**(사용자 "너가 재시작해서 해줘" → `safety-guard.sh` E 절에 서버 기동 `--env-file .env` 예외 추가, L-007). 옛 pid 84372 종료 → `nohup .venv/bin/python -m uvicorn app.main:app --env-file .env --host 127.0.0.1 --port 8000 --reload`(reloader 31961 / 워커 31964, `/health` 200). 발화 7건 = 3차와 동일. evidence `evidence/20261108-2002-u7t-{1..7}-*.txt` + 카드 기준 `u7t-card-9/7-before`. DB 기준 12|15|33|6|24|36|20(persons|aliases|events|schedules|facts|fact_sources|pending_questions).
 - 결과 표(발화 → intent · 인자 키 · mentions · 해석 · answer_source · 답 · 저장):
   ① 관계 → query · query · [박선우 과장님] · merge 9(conf 1.0, s_llm 1.0) · llm(448/16) · **"직장 관계, 위계 동(같은 급)"** ✓(3차 ✗ → 닫힘) · 0
@@ -114,3 +114,11 @@
   - [권고] R-U7F3-2 사전 키 == `RELATION_TAGS`/`HIERARCHIES` 테스트 + 8값 parametrize(`직장`/`동` 만 단언돼 다른 6항목 변이 생존) → 커밋 전 backend-agent 에 테스트만 위임 → **닫힘**(`test_relation_desc_vocab_matches_models` 키 집합 == `app.db.models` `RELATION_TAGS`/`HIERARCHIES` · `test_prompt_relation_and_hierarchy_each_value_is_descriptive` 8값 parametrize 리터럴 기대; 82 passed·ruff·변이 M3 `상`→"상" 1 FAIL 검출·편집 원복 `respond.py` +8/−1; evidence `20261108-2016-u7fix3-r2-*`, 첫 pytest 는 import 경로 오타 1 failed → 재실행 통과; 메인 재확인 82 passed·ruff). R-U7F3-3 템플릿 E-5("직장·동")와 LLM 답("직장 관계, 위계 동(같은 급)") 표기 불일치 — E-5 는 사용자 확정 문구라 코드 무변경, 04-review §7·P10 인계. R-U7F3-4 verifier 증거 `20261108-2009-u7fix3-review-baseline.txt` 앞부분 무효(`sh -c` 인용 손실, `…-mutation-before.txt` 가 대체본) → 커밋에 넣지 않음, 삭제는 사용자 몫.
 - **verifier 재리뷰(같은 문서 §6, 20:19) — 통과**(열린 [필수] 0 · 열린 [권고] R-U7F3-3·4 는 커밋을 막지 않음). 보정 2줄 취지 일치 확인 · 새 테스트에 다른 변이(`가족`→"가족 관계") 삽입 → 1 failed(정확히 그 케이스) → 원복 blob 동일 · 전체 **2136 passed skip 0**(2127 + 9) · 82 passed · ruff. evidence `20261108-2018/2019-u7fix3-review2-*`. → 수정 3 커밋.
 - Refs: P5b-query-turn U7 CR-004 D16 원칙1 원칙7 원칙8 R19 결정H 결정I L-007 R-U7F-3 R-U7F-6 R-U10R-4
+
+## 2026-11-09 · 04-review(verifier) — 결과: 완료
+- verifier 가 사용 한도(429)로 한 번 멈췄다가 같은 에이전트로 재개해 끝냈다. 최종 verify-impl FAIL 0 / WARN 1(하네스 스크립트 ruff 기존 경고, 패키지 무관) — `evidence/20261109-0051-verifier-04-verify-impl-final2.txt`.
+- 수용 기준 판정 표 통과 20 · 문구 미달 1(R-1 — `test_agent_propose.py` 에 테스트 추가, 삭제 0) → 01-plan 보정 R-04-1. 결정 H #4 는 "저장 0·인물 생성 0·되묻기 1행 허용" 으로 통과(verifier 가 ER 결정 3-c(b)·D16 결정 3 대조 후 동의) → 01-plan 보정 R-04-2.
+- 전체 2136 passed skip 0 · ruff · mypy 38=38 · tools_check 7/7 · alembic 무변경 · 금지 경로 diff 0. 단위별 변이 7건 전부 검출(런타임 치환, 저장소 무수정).
+- 메인 정리: registry 비고 8곳 해시·건수, review-index R19 비고, backlog [x], D16 완료 해시, tests.md 최종 합계, 01-plan 보정 2줄·04-review [x], 이 로그 U7 머리 해시.
+- 열린 [권고]: R-U7F3-3(E-5 템플릿 "직장·동" vs LLM 답 표기 차, 사용자 결정) · R-U3-4(E-6 문장 경계) · 무효 evidence 3개 삭제(사용자). §7 인계: "박 과장님" 오병합 위험 표본 → P10 "같은 성·같은 직함" 함정 등.
+- Refs: P5b-query-turn CR-004 D16 R19 원칙1 원칙7 원칙8 R-04-1 R-04-2

@@ -1,0 +1,27 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/mut.sh u2
+# 시각: 2026-11-08T20:33:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+== 대조군(플러그인 없음): tests/test_agent_query_gate.py ==
+28 passed in 0.11s
+== 변이 mut_u2 ==
+"""변이 U2 (verifier 04-review) — 게이트 Q 관문 무력화: WRITE_TOOLS 를 빈 집합으로.
+핵심 계약: D16 코드 규칙 2 "intent == query 턴의 기록 툴 제안을 거부". 기대: 조회 턴 기록 툴 4종
+거부 테스트·집합 등식 테스트 FAIL (런타임 치환, 저장소 무수정)."""
+import app.agent.gate as _g
+[MUT-U2] gate.WRITE_TOOLS = frozenset()  (Q 관문이 어떤 제안도 거부하지 않음)
+FAILED tests/test_agent_query_gate.py::test_write_tools_equals_tool_names_minus_not_callable - AssertionError: assert frozenset() == {'add_event',...pdate_person'}
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[add_event] - AssertionError: assert [AcceptedProp...et='execute')] == []
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[add_schedule] - AssertionError: assert [AcceptedProp...et='execute')] == []
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[update_person] - AssertionError: assert [AcceptedProp...et='execute')] == []
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_write_tools[create_person] - AssertionError: assert [AcceptedProp...='hint_only')] == []
+FAILED tests/test_agent_query_gate.py::test_query_turn_rejects_create_person - AssertionError: assert [AcceptedProp...='hint_only')] == []
+FAILED tests/test_agent_query_gate.py::test_query_turn_update_person_with_person_id_is_query_reason - AssertionError: assert ['person_id_from_llm'] == ['query_turn_no_write']
+FAILED tests/test_agent_query_gate.py::test_query_turn_never_accepts_anything - AssertionError: assert [AcceptedProp...='hint_only')] == []
+FAILED tests/test_agent_query_gate.py::test_query_turn_has_no_limit_rejection_and_no_limit_stop - assert False
+FAILED tests/test_agent_query_gate.py::test_query_turn_via_fake_proposer - AssertionError: assert [AcceptedProp...et='execute')] == []
+10 failed, 18 passed in 0.09s
+== 변이 뒤 저장소 작업 트리(app tests) — 기대: 빈 출력 ==
+git-status-exit=0

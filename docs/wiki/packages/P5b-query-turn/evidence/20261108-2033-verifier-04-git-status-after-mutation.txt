@@ -1,0 +1,6 @@
+# 명령: git status --short -- app tests alembic
+# 시각: 2026-11-08T20:33:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---

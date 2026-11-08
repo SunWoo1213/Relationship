@@ -1,0 +1,23 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/mut.sh u6
+# 시각: 2026-11-08T20:33:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+== 대조군(플러그인 없음): tests/test_api_chat_query.py ==
+8 passed in 0.70s
+== 변이 mut_u6 ==
+"""변이 U6 (verifier 04-review) — run_turn 조회 분기 진입 조건 오타(01-plan U6 변이 표 1번 "Query").
+loop 모듈의 INTENT_QUERY 를 "Query" 로 바꾸면 `proposal.intent == INTENT_QUERY` 가 거짓이 되어
+조회 발화가 기록 턴으로 처리된다. 기대: HTTP 조회 테스트(loop_query 0행·reply 다름) FAIL."""
+import app.agent.loop as _l
+[MUT-U6] loop.INTENT_QUERY = 'Query'  (조회 분기 진입 조건 오타)
+FAILED tests/test_api_chat_query.py::test_chat_query_merge_stored_zero_no_writes_and_trace - AssertionError: assert '이번 발화에서는 새로 기억한 것이 없어요.' == '민수 팀장님과 최근에 ...화면에서 볼 수 있어요.'
+FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes - AssertionError: assert None == 'ask_user'
+FAILED tests/test_api_chat_query.py::test_chat_query_identity_second_answer_returns_409 - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_api_chat_query.py::test_chat_query_new_person_no_question_no_writes - assert '이번 발화에서는 새로 기억한 것이 없어요.' == '"박선우"에 대한 기록이 없어요.'
+FAILED tests/test_api_chat_query.py::test_chat_query_resume_person_deleted_says_no_record_stored_zero - TypeError: 'NoneType' object is not subscriptable
+FAILED tests/test_api_chat_query.py::test_chat_query_issues_session_id_when_header_missing - AssertionError: assert '이번 발화에서는 새로 기억한 것이 없어요.' == '민수 팀장님과 최근에 ...화면에서 볼 수 있어요.'
+6 failed, 2 passed in 0.60s
+== 변이 뒤 저장소 작업 트리(app tests) — 기대: 빈 출력 ==
+git-status-exit=0

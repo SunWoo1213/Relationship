@@ -1,0 +1,11 @@
+# 명령: PYTHONUTF8=1 .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/r7a.py
+# 시각: 2026-11-08T20:29:46+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 1
+# ---
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/r7a.py", line 2, in <module>
+    import app.agent  # noqa: F401
+    ^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'app'

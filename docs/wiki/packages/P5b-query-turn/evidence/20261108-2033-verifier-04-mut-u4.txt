@@ -1,0 +1,22 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/mut.sh u4
+# 시각: 2026-11-08T20:33:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+== 대조군(플러그인 없음): tests/test_agent_query_loop.py ==
+34 passed in 1.00s
+== 변이 mut_u4 ==
+"""변이 U4 (verifier 04-review) — merge 에서 apply_resolution() 을 부르게(결정 I (a) 위반).
+loop.resolve 를 감싸 band == merge 면 apply_resolution 을 먼저 실행한다(별칭 누적 =
+update_person tool_call 1행). 기대: (a) 저장 0·기록 툴 tool_call 0 단언, 금지 호출 스파이 등 FAIL."""
+import app.agent.loop as _l
+[MUT-U4] loop.resolve: merge 이면 apply_resolution() 호출 (별칭 누적·update_person tool_call)
+FAILED tests/test_agent_query_loop.py::test_a_merge_answers_from_card_and_writes_nothing - AssertionError: assert 1 == 0
+FAILED tests/test_agent_query_loop.py::test_g_mixed_utterance_does_not_execute_write - AssertionError: assert 1 == 0
+FAILED tests/test_agent_query_loop.py::test_u7_real_llm_person_arg_shape - AssertionError: assert 1 == 0
+FAILED tests/test_agent_query_loop.py::test_j_record_turn_does_not_enter_query_branch - app.er.types.AlreadyApplied: apply_resolution: trace 486861 was already applied
+FAILED tests/test_agent_query_loop.py::test_forbidden_callees_are_never_called - AssertionError: 조회 턴이 부르면 안 되는 함수
+5 failed, 29 passed in 1.18s
+== 변이 뒤 저장소 작업 트리(app tests) — 기대: 빈 출력 ==
+git-status-exit=0

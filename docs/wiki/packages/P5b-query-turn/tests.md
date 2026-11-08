@@ -4,6 +4,8 @@
 
 **단위별 건수 합계 (U6 완성)**: U1 24 + U2 28 + U3 71 + U4 23 + U5 10 + U6 8 = **164건**(신규 테스트 파일 5개). 전체 `pytest tests/ -q -rs`: 기준선 1958 → **2122 passed, skip 0**(`evidence/20261102-1452-u6-pytest-all.txt`).
 
+**최종 (U7 뒤, 04-review)**: 새 파일 5개 176건(U7 결함 수정 +1 loop · 수정 3 +11 answer) + 기존 `test_agent_propose.py` +2 = **178건**. 전체 기준선 1958 → **2136 passed, skip 0**(`evidence/20261108-2019-u7fix3-review2-pytest-all.txt`, 04-review `evidence/20261109-0051-verifier-04-verify-impl-final2.txt`).
+
 ## tests/test_agent_query_types.py — U1 계약 (신규 24건 = 함수 18개, 그중 1개가 파라미터 7건)
 
 실행: `POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_agent_query_types.py -v` → 24 passed.

@@ -1,0 +1,11 @@
+cf26dce fix(P5b-query-turn): 관계 질문에 카드의 관계·위계로 답하도록 조회 답 프롬프트를 보강한다
+9eb9d2e harness(hooks): 서버 기동의 --env-file .env 는 비밀 노출이 아니므로 허용한다 (L-007)
+e49f78d fix(P5b-query-turn): 실제 LLM 이 search_person 인자를 person 으로 내도 조회 대상으로 읽는다
+a004cdd feat(P5b-query-turn): 조회 발화를 API 끝에서 끝까지 검증하고 CI 의 mypy 오류를 고친다
+49c1c67 feat(P5b-query-turn): 조회 되묻기에 답하면 별칭을 쌓지 않고 그 인물 카드로 답한다
+18219ba feat(P5b-query-turn): 채팅에서 인물을 물으면 기억에서 답하는 조회 턴을 루프에 잇는다
+a002706 feat(P5b-query-turn): 조회 답을 만들고 검증하고 템플릿으로 대체하는 순수 층을 더한다
+06b7bb5 feat(P5b-query-turn): 조회 발화에서는 기록 제안을 거부하고 인식 프롬프트에 의도 분류를 넣는다
+1dccb95 feat(P5b-query-turn): 발화 의도 필드와 조회 턴 상수·재개 재료를 계약으로 더한다
+fe4a99e docs(P5b-query-turn): 채팅 조회 발화 계획을 검증·승인까지 마치고 활성화한다
+8a8767b cr(CR-004): 채팅에서 인물을 물으면 기억에서 답하는 조회 발화를 결정으로 옮긴다

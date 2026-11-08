@@ -1,0 +1,18 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/mut.sh u5
+# 시각: 2026-11-08T20:33:26+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+== 대조군(플러그인 없음): tests/test_agent_query_loop.py ==
+34 passed in 1.30s
+== 변이 mut_u5 ==
+"""변이 U5 (verifier 04-review) — resume_turn 의 intent 기본값을 record → query 로
+(01-plan U5 변이 표 3번 "기본값을 query 로 → 하위 호환 테스트 FAIL").
+loop.py 는 `resume_raw.get("intent", INTENT_RECORD) == INTENT_QUERY` 로 읽으므로
+loop 모듈의 INTENT_RECORD 만 바꾼다. 기대: test_v_resume_without_intent_key_keeps_record_path FAIL."""
+[MUT-U5] loop.INTENT_RECORD = 'query'  (intent 키 없는 옛 identity context 가 조회 재개로 감)
+FAILED tests/test_agent_query_loop.py::test_v_resume_without_intent_key_keeps_record_path - assert 0 == 1
+1 failed, 33 passed in 0.97s
+== 변이 뒤 저장소 작업 트리(app tests) — 기대: 빈 출력 ==
+git-status-exit=0

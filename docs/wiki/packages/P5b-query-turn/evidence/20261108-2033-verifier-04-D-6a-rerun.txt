@@ -1,0 +1,9 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/krow.sh D-6a
+# 시각: 2026-11-08T20:33:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
++ .venv/bin/python -m pytest tests/test_agent_query_answer.py tests/test_agent_query_loop.py -q -k 'prompt or timeline_limit or forbidden or fallback'
+.................................                                        [100%]
+33 passed, 83 deselected in 1.00s

@@ -1,0 +1,33 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/mut.sh u3
+# 시각: 2026-11-08T20:33:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+== 대조군(플러그인 없음): tests/test_agent_query_answer.py tests/test_agent_query_loop.py ==
+116 passed, 1 warning in 1.69s
+== 변이 mut_u3 ==
+"""변이 U3 (verifier 04-review) — 검증기의 금지 표현 검사 제거(목록을 비움).
+핵심 계약: D16 결정 5 "R19 금지 표현 검증기를 통과하지 못하면 템플릿". 기대:
+test_validate_rejects_each_forbidden_expression[14] 와 루프 (d) 폴백 테스트 FAIL."""
+import app.agent.respond as _r
+[MUT-U3] respond.BRIEFING_FORBIDDEN_EXPRESSIONS = ()  (금지 표현 검사 무력화)
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uae30\ubd84] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uac10\uc815] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc704\ub85c] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uace0\ubbfc] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc0c1\ub2f4] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc2a4\ud2b8\ub808\uc2a4] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ub9c8\uc74c\uc774] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ub9c8\uc74c\uc744] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ubc30\ub824] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ud798\ub4dc] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\ud798\ub4e4] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc6b0\uc6b8] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc18d\uc0c1] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_answer.py::test_validate_rejects_each_forbidden_expression[\uc11c\uc6b4] - AssertionError: assert None == 'forbidden_expression'
+FAILED tests/test_agent_query_loop.py::test_d_forbidden_expression_falls_back_to_template - AssertionError: assert '요즘 많이 힘들어 보여...화면에서 볼 수 있어요.' == '김민수 — 직장·동, ...화면에서 볼 수 있어요.'
+FAILED tests/test_agent_query_loop.py::test_x_answer_is_stripped_but_rejected_answer_is_verbatim - AssertionError: assert 'llm' == 'template'
+16 failed, 100 passed, 1 warning in 1.71s
+== 변이 뒤 저장소 작업 트리(app tests) — 기대: 빈 출력 ==
+git-status-exit=0

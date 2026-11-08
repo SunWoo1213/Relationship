@@ -1,0 +1,54 @@
+[1m[91m]8;;https://docs.astral.sh/ruff/rules/unused-loop-control-variable\B007]8;;\[0m[1m Loop control variable `code` not used within loop body[0m
+    [1m[94m--> [0m.claude/scripts/bash_write_check.py:1228:13
+     [1m[94m|[0m
+[1m[94m1227[0m [1m[94m|[0m     def shell_dynamic(self, name, args, frag, xa=False):
+[1m[94m1228[0m [1m[94m|[0m         for code, dyn, _ in _shell_codes(name, args, frag, xa):
+     [1m[94m|[0m             [1m[91m^^^^[0m
+[1m[94m1229[0m [1m[94m|[0m             if dyn:
+[1m[94m1230[0m [1m[94m|[0m                 raise Deny(f"[bash-write-guard] {name} 가 실행할 코드를 판정할 수 없다(변수·치환·인코딩). "
+     [1m[94m|[0m
+[1m[96mhelp[0m[1m: Rename unused `code` to `_code`[0m
+
+[1m[91m]8;;https://docs.astral.sh/ruff/rules/call-datetime-now-without-tzinfo\DTZ005]8;;\[0m[1m `datetime.datetime.now()` called without a `tz` argument[0m
+   [1m[94m--> [0m.claude/scripts/findings.py:129:13
+    [1m[94m|[0m
+[1m[94m127[0m [1m[94m|[0m         return 2
+[1m[94m128[0m [1m[94m|[0m     path = os.path.join(pdir, "05-remediation.md")
+[1m[94m129[0m [1m[94m|[0m     today = datetime.now().strftime("%Y-%m-%d")
+    [1m[94m|[0m             [1m[91m^^^^^^^^^^^^^^[0m
+[1m[94m130[0m [1m[94m|[0m     now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    [1m[94m|[0m
+[1m[96mhelp[0m[1m: Pass a `datetime.timezone` object to the `tz` parameter[0m
+
+[1m[91m]8;;https://docs.astral.sh/ruff/rules/call-datetime-now-without-tzinfo\DTZ005]8;;\[0m[1m `datetime.datetime.now()` called without a `tz` argument[0m
+   [1m[94m--> [0m.claude/scripts/findings.py:130:11
+    [1m[94m|[0m
+[1m[94m128[0m [1m[94m|[0m     path = os.path.join(pdir, "05-remediation.md")
+[1m[94m129[0m [1m[94m|[0m     today = datetime.now().strftime("%Y-%m-%d")
+[1m[94m130[0m [1m[94m|[0m     now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    [1m[94m|[0m           [1m[91m^^^^^^^^^^^^^^[0m
+[1m[94m131[0m [1m[94m|[0m
+[1m[94m132[0m [1m[94m|[0m     existing = io.open(path, encoding="utf-8").read() if os.path.exists(path) else ""
+    [1m[94m|[0m
+[1m[96mhelp[0m[1m: Pass a `datetime.timezone` object to the `tz` parameter[0m
+
+[1m[91m]8;;https://docs.astral.sh/ruff/rules/f-string-missing-placeholders\F541]8;;\[0m [[1m[96m*[0m][1m f-string without any placeholders[0m
+   [1m[94m--> [0m.claude/scripts/findings.py:163:38
+    [1m[94m|[0m
+[1m[94m161[0m [1m[94m|[0m         b = blocks[i]
+[1m[94m162[0m [1m[94m|[0m         if i not in seen and status_of(b) == "열림" and source_of(b) == source:
+[1m[94m163[0m [1m[94m|[0m             b = re.sub(r"^상태:\s*열림", f"상태: 해소", b, count=1, flags=re.M)
+    [1m[94m|[0m                                          [1m[91m^^^^^^^^^^^^^[0m
+[1m[94m164[0m [1m[94m|[0m             b = re.sub(r"\|\s*해소:\s*-", f"| 해소: {today}", b, count=1)
+[1m[94m165[0m [1m[94m|[0m             blocks[i] = b
+    [1m[94m|[0m
+[1m[96mhelp[0m[1m: Remove extraneous `f` prefix[0m
+[1m[94m   [0m [1m[94m|[0m
+[1m[94m162[0m [1m[94m|[0m         if i not in seen and status_of(b) == "열림" and source_of(b) == source:
+[1m[94m   [0m [1m[31m-[0m [31m            b = re.sub(r"^상태:\s*열림", [0m[1m[31mf"상태:[0m[0m[31m 해소", b, count=1, flags=re.M)
+[0m[1m[94m163[0m [1m[32m+[0m [32m            b = re.sub(r"^상태:\s*열림", [0m[1m[32m"상태:[0m[0m[32m 해소", b, count=1, flags=re.M)
+[0m[1m[94m164[0m [1m[94m|[0m             b = re.sub(r"\|\s*해소:\s*-", f"| 해소: {today}", b, count=1)
+[1m[94m   [0m [1m[94m|[0m
+
+Found 4 errors.
+[[36m*[0m] 1 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).

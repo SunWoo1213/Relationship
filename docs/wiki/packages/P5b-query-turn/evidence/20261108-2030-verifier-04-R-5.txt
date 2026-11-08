@@ -1,0 +1,16 @@
+# 명령: POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_agent_gate.py tests/test_agent_loop.py tests/test_api_chat.py tests/test_api_answers_resume.py tests/test_agent_propose.py tests/test_agent_types.py -q
+# 시각: 2026-11-08T20:30:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+........................................................................ [ 44%]
+........................................................................ [ 88%]
+..................                                                       [100%]
+=============================== warnings summary ===============================
+tests/test_agent_propose.py::test_gemini_proposer_parses_text_into_proposal
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+162 passed, 1 warning in 2.25s

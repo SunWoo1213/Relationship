@@ -1,0 +1,11 @@
+# 명령: PYTHONPATH=/Users/sunwoo/Desktop/Portfolio/Relationship PYTHONUTF8=1 .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/v04/d1a.py
+# 시각: 2026-11-08T20:31:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+['intent', 'tool_calls']
+['record', 'query']
+True
+required: ['tool_calls']
+arg_schema_keys: ['aliases', 'content', 'display_name', 'facts', 'hierarchy', 'new_alias', 'occurred_at', 'person', 'query', 'relation_tag', 'scheduled_at', 'title', 'type']

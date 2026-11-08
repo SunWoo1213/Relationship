@@ -1,0 +1,20 @@
+# 명령: git diff --stat 8a8767b..HEAD -- app tests
+# 시각: 2026-11-08T20:29:46+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: cf26dce (dev2)
+# exit: 0
+# ---
+ app/agent/__init__.py            |   40 +-
+ app/agent/gate.py                |   28 +-
+ app/agent/loop.py                |  408 +++++++++++-
+ app/agent/propose.py             |   44 +-
+ app/agent/respond.py             |  472 ++++++++++++++
+ app/agent/types.py               |   17 +
+ app/settings.py                  |    9 +
+ tests/test_agent_propose.py      |   15 +
+ tests/test_agent_query_answer.py |  639 +++++++++++++++++++
+ tests/test_agent_query_gate.py   |  279 +++++++++
+ tests/test_agent_query_loop.py   | 1284 ++++++++++++++++++++++++++++++++++++++
+ tests/test_agent_query_types.py  |  125 ++++
+ tests/test_api_chat_query.py     |  440 +++++++++++++
+ 13 files changed, 3785 insertions(+), 15 deletions(-)
