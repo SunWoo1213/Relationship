@@ -1,0 +1,27 @@
+# 명령: .venv/bin/python -m pytest -q tests/test_agent_query_answer.py
+# 시각: 2026-11-08T20:16:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9eb9d2e (dev2)
+# exit: 1
+# ---
+........................................F............................... [ 87%]
+..........                                                               [100%]
+=================================== FAILURES ===================================
+___________________ test_relation_desc_vocab_matches_models ____________________
+
+    def test_relation_desc_vocab_matches_models():
+        """서술 사전의 키 집합이 models.py 어휘와 같다(어휘가 늘면 사전도 늘려야 한다)."""
+        from app.agent.respond import _HIERARCHY_DESC, _RELATION_DESC
+>       from app.models import HIERARCHIES, RELATION_TAGS
+E       ModuleNotFoundError: No module named 'app.models'
+
+tests/test_agent_query_answer.py:272: ModuleNotFoundError
+=============================== warnings summary ===============================
+tests/test_agent_query_answer.py::test_gemini_answerer_request_uses_schema_and_parses
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_answer.py::test_relation_desc_vocab_matches_models - ModuleNotFoundError: No module named 'app.models'
+1 failed, 81 passed, 1 warning in 0.86s

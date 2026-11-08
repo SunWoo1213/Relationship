@@ -1,0 +1,55 @@
+# 명령: .venv/bin/python -m pytest -q tests/test_agent_query_answer.py
+# 시각: 2026-11-08T20:11:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9eb9d2e (dev2)
+# exit: 1
+# ---
+......................................FF................................ [ 98%]
+.                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_prompt_user_text_has_question_now_and_evidence_values __________
+
+    def test_prompt_user_text_has_question_now_and_evidence_values():
+        card = _card(
+            facts=[_fact("hobby", "등산")],
+            patterns=[_pattern("3회 (2026-01-01, 2026-02-01, 2026-03-01)")],
+            timeline=[_event(1)],
+            schedules=[UpcomingScheduleOut(id=5, title="저녁 약속", scheduled_at=BOUNDARY_UTC, briefed_at=None)],
+        )
+        _, user = build_query_answer_prompt(QUESTION, card, NOW)
+        assert user.count(QUESTION) == 1
+        assert "2026-10-25T12:00:00+09:00" in user  # now 는 사용자 시간대
+        for needle in (
+            "박선우 과장님",
+            "관계: 직장 관계, 위계 동(같은 급)",
+            "과장님, 선우 씨",
+            "마지막 접촉: 10월 21일",
+            "hobby=등산 (10월 21일)",
+            "3회 (2026-01-01, 2026-02-01, 2026-03-01)",
+            "[meal] 타임라인1 (10월 21일)",
+            "저녁 약속 (10월 21일)",
+        ):
+>           assert needle in user, needle
+E           AssertionError: 관계: 직장 관계, 위계 동(같은 급)
+E           assert '관계: 직장 관계, 위계 동(같은 급)' in '질문: 박선우 과장님 요즘 어때?\n현재 시각: 2026-10-25T12:00:00+09:00\n\n[인물 카드]\n이름: 박선우 과장님\n관계: 직장 관계, 위계 동\n별칭: 과장님, 선우 씨\n마지막 접촉:... 패턴:\n- 3회 (2026-01-01, 2026-02-01, 2026-03-01)\n최근 타임라인(최대 5건):\n- [meal] 타임라인1 (10월 21일)\n예정된 일정:\n- 저녁 약속 (10월 21일)'
+
+tests/test_agent_query_answer.py:261: AssertionError
+___________________ test_prompt_relation_line_is_descriptive ___________________
+
+    def test_prompt_relation_line_is_descriptive():
+        _, user = build_query_answer_prompt(QUESTION, _card(facts=[_fact()]), NOW)
+>       assert "\n관계: 직장 관계, 위계 동(같은 급)\n" in user
+E       AssertionError: assert '\n관계: 직장 관계, 위계 동(같은 급)\n' in '질문: 박선우 과장님 요즘 어때?\n현재 시각: 2026-10-25T12:00:00+09:00\n\n[인물 카드]\n이름: 박선우 과장님\n관계: 직장 관계, 위계 동\n별칭: 과장님, 선우 씨\n마지막 접촉: 10월 21일\n알고 있는 사실:\n- hobby=등산 (10월 21일)\n반복 패턴:\n- 없음\n최근 타임라인(최대 5건):\n- 없음\n예정된 일정:\n- 없음'
+
+tests/test_agent_query_answer.py:266: AssertionError
+=============================== warnings summary ===============================
+tests/test_agent_query_answer.py::test_gemini_answerer_request_uses_schema_and_parses
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_answer.py::test_prompt_user_text_has_question_now_and_evidence_values - AssertionError: 관계: 직장 관계, 위계 동(같은 급)
+assert '관계: 직장 관계, 위계 동(같은 급)' in '질문: 박선우 과장님 요즘 어때?\n현재 시각: 2026-10-25T12:00:00+09:00\n\n[인물 카드]\n이름: 박선우 과장님\n관계: 직장 관계, 위계 동\n별칭: 과장님, 선우 씨\n마지막 접촉:... 패턴:\n- 3회 (2026-01-01, 2026-02-01, 2026-03-01)\n최근 타임라인(최대 5건):\n- [meal] 타임라인1 (10월 21일)\n예정된 일정:\n- 저녁 약속 (10월 21일)'
+FAILED tests/test_agent_query_answer.py::test_prompt_relation_line_is_descriptive - AssertionError: assert '\n관계: 직장 관계, 위계 동(같은 급)\n' in '질문: 박선우 과장님 요즘 어때?\n현재 시각: 2026-10-25T12:00:00+09:00\n\n[인물 카드]\n이름: 박선우 과장님\n관계: 직장 관계, 위계 동\n별칭: 과장님, 선우 씨\n마지막 접촉: 10월 21일\n알고 있는 사실:\n- hobby=등산 (10월 21일)\n반복 패턴:\n- 없음\n최근 타임라인(최대 5건):\n- 없음\n예정된 일정:\n- 없음'
+2 failed, 71 passed, 1 warning in 0.81s

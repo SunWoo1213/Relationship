@@ -80,3 +80,37 @@
 - 계획과 다른 점: 구현 전 멈춤 0 · 구현 중 멈춤 1(범위 밖 테스트 1건 → 메인 승인, FIX-033 (b) 작동). `ruff format --check` 는 변경 전부터 102 파일 대상(기존 상태, 이 단위 무관). **verifier 1차 보류**(`review-u7-fix.md`, [필수] R-U7F-1 D16·01-plan 문구 보정(메인, 끝) · R-U7F-2 h3 입력 3건으로 생존 변이 V1·V2 닫기(backend-agent) / [권고] R-U7F-3 "나" 폴백 → `mentions_dropped=1` 로 한 사람 질문에도 "한 번에 한 사람씩" 문장이 붙는 부작용(U7 재실행 ① 에서 관찰, 코드 필터는 D16 결정 7 변경 = 사용자 결정) · R-U7F-4 원인 서술 정정(끝) · R-U7F-5 `-1455-u7fix-ruff.txt` 삭제(사용자 몫, 훅이 `rm` 차단) · R-U7F-6 재실행에서 `search_person` 인자 키가 `query` 로 바뀌는지 7건 세기). → R-U7F-2 backend-agent: h3 입력 3건(`add_event {person,query}`→person · `search_person {query:"  ",person}`→person · `{query:1,person}`→person), 변이 V1·V2 각 1 FAIL(`evidence/20261107-1508-u7fix2-*`, 앞 구간 무효 실행 포함 — 뒤 구간이 유효) · R-U7F-3 u7 테스트에 `answer_source=="llm"`·`mentions_dropped==1`·힌트 문장(`splitlines()[-2]`) 단언 → **verifier 재리뷰 통과**(`review-u7-fix.md` §6: 158·2125 passed skip 0·ruff·mypy 38=38·변이 V1/V2/V3 1/1/2 FAIL·문구 대조 4곳 일치, `evidence/20261107-1510-verifier-u7fix2-*`). 열림 [권고]: R-U7F-5(잘못된 evidence 1파일 삭제 — 사용자 몫) · R-U7F-6(U7 재실행 집계).
 - 남은 것 · 다음 단위: 커밋 → dev2 푸시 → CI → **:8000 재시작(사용자, `--env-file`, reload 없음 pid 11140) 후 U7 7건 재실행**(`search_person` 인자가 `query` 로 나오는지 + `answer_source` 가 `llm`/`template` 로 바뀌는지, 저장 0 재확인) → 04-review(verifier) → 완성 확인 1회(L-006) → dev2:dev → dev:main. P10 인계: `search_person("나")` 새어 나옴 1건 · 조회 턴 `not_callable_by_llm` 거부는 설계(R-6).
 - Refs: P5b-query-turn U7 CR-004 D16 S3.4 원칙1 원칙4 원칙7 원칙8 원칙9 R19 결정B-3 결정H 결정J
+- **커밋 뒤(2026-11-07)**: `e49f78d`, dev2 푸시. CI 42343436446(L-006 `be67c76`) success.
+
+## 2026-11-07 15:34 · U7 실 LLM 왕복 3차(수정 코드 `e49f78d`, 메인 세션) · 커밋 없음(관찰 기록)
+- 서버: 사용자가 옛 프로세스를 끄고 `! … uvicorn --env-file .env` 로 재기동(pid 84372, 15:33, reload 없음 — 메인의 스크래치패드 기동 스크립트는 자동 모드 분류기가 거부, 사용자 지시 "너가 직접 띄워서 해" 는 그래서 `!` 명령으로 대체). 발화 7건 = 11-04 와 동일(결정 H 6 + "박 과장님"). evidence `evidence/20261107-1534-u7s-{1..7}-*.txt` + 카드 기준 `u7s-card-9/7-before`.
+- 결과 표(발화 → intent · `search_person` 인자 키 · mentions · 해석 · answer_source · 답 · 저장):
+  ① 관계 → query · **query** · [박선우 과장님] · merge 9(conf 1.0) · llm(411/10) · **"기록이 없어요."** ✗(카드 관계 직장·동 있음) · 0
+  ② 민수 좋아해 → query · query · [민수] · merge 7 · llm · "기록이 없어요." ✓(카드 facts job·workplace·life_event, 좋아하는 것 없음) · 0
+  ③ 마지막 접촉 → query · query · [박선우 과장님] · merge 9 · llm(412/23) · **"10월 21일입니다"** ✓(= last_contact_at) · 0
+  ④ 김철수 → query · query · [김철수] · **identity ask**(판정 null → `forced_reason=no_matched`, 통과 후보 6 → 결정 3-c(b) 설계상 되묻기; 후보 박수/민수/김윤서) · ask · pending_questions **+1**(id 20) · 그 외 0 — 결정 H 기대 "new_person·+0" 과 다름(설계 관찰, 아래)
+  ⑤ 혼합 → query · query · [민수] · merge 7 · llm · "기록이 없어요." ✓ · `add_event` 제안은 `query_turn_no_write` 거부, events +0 ✓(D16 결정 6)
+  ⑥ 상담 유도 → query · query · [박선우 과장님] · merge 9 · llm · "기록이 없어요." ✓(위로·조언 0, 원칙7) · 0
+  ⑦ 박 과장님 → query · query · [박 과장님] · **merge 9**(conf 0.838 = 0.5·0.9 + 0.3·0.627 + 0.2·1.0; 후보 박선우 9 partial_alias·박선영 10 동점 s_rule 1.0, 판정 이유 "박선우 과장님의 별칭으로 사용될 수 있어" — 박선영은 언급 없음) · llm · "기록이 없어요." · 0 — 기대 identity 되묻기와 다름(아래)
+- **닫힘**: R-U7F-6 `search_person` 인자 키 **7/7 `query`**(수정 전 7/7 `person`) · 언급 7/7 읽힘(수정 전 1/7) · `mentions_dropped` 7/7 0 · "나" 제안 0/7(① 의 2번째 제안은 `ask_user` → `not_callable_by_llm` 거부; R-U7F-3 부작용 미관찰) · 저장 0(persons·aliases·events·schedules·facts·fact_sources) 7/7 · intent query 7/7.
+- **열림 1(수정 대상)**: ① 수용 기준 원문 질문(trace 368)에 LLM 이 "기록이 없어요" — 프롬프트 카드 줄이 `관계: 직장·동` 태그 나열이라 질문과 연결 못 함. → 같은 날 backend-agent 에 `respond.py` 관계 줄 서술형(`관계: 직장 관계, 위계 동(같은 급)`) + 시스템 문장 1개("관계나 위계를 물으면 '관계' 줄을 그대로 답하라") 위임(U7 3차 수정). 재기동 후 재실행 필요.
+- **관찰 2(코드 결함 아님, 04-review §7·P10)**: (가) ④ ER 결정 3-c(b) — 판정 null 이면 통과 후보가 있을 때 identity 되묻기(원칙1 안전 쪽). 결정 H #4 의 "new_person·pending +0" 기대는 통과 후보 0 을 전제한 문구 → 04-review 판정은 "저장 0·인물 생성 0·되묻기 1행 허용" 으로 읽는다. (나) ⑦ **오병합 위험 표본**: "박 과장님" 에 박 성 과장 2명(9·10)이 있는데 판정 LLM 이 9 를 0.9 로 골라 merge. 조회 턴이라 별칭 학습·저장 0(결정 I (a)) 이지만 기록 턴이었다면 자동 병합됐을 것 — R-U10R-4(호칭 단독 언급) 와 같은 계열의 ER 보정·판정 프롬프트 과제. 1차 평가셋에 "같은 성·같은 직함 2명" 함정이 없음을 뜻함.
+- Refs: P5b-query-turn U7 CR-004 D16 원칙1 원칙7 원칙8 R19 결정H 결정I 결정J R-U7F-3 R-U7F-6 R-U10R-4
+
+## 2026-11-08 20:02 · U7 실 LLM 왕복 4차(수정 3 — `respond.py` 관계 줄·지시 문장, 메인 세션) · 커밋 없음(관찰 기록, 커밋은 수정 3 과 함께)
+- 서버: **메인 세션이 직접 재기동**(사용자 "너가 재시작해서 해줘" → `safety-guard.sh` E 절에 서버 기동 `--env-file .env` 예외 추가, L-007). 옛 pid 84372 종료 → `nohup .venv/bin/python -m uvicorn app.main:app --env-file .env --host 127.0.0.1 --port 8000 --reload`(reloader 31961 / 워커 31964, `/health` 200). 발화 7건 = 3차와 동일. evidence `evidence/20261108-2002-u7t-{1..7}-*.txt` + 카드 기준 `u7t-card-9/7-before`. DB 기준 12|15|33|6|24|36|20(persons|aliases|events|schedules|facts|fact_sources|pending_questions).
+- 결과 표(발화 → intent · 인자 키 · mentions · 해석 · answer_source · 답 · 저장):
+  ① 관계 → query · query · [박선우 과장님] · merge 9(conf 1.0, s_llm 1.0) · llm(448/16) · **"직장 관계, 위계 동(같은 급)"** ✓(3차 ✗ → 닫힘) · 0
+  ② 민수 좋아해 → query · query · [민수] · merge 7 · llm · "기록이 없어요" ✓ · 0
+  ③ 마지막 접촉 → query · query · [박선우 과장님] · merge 9 · llm · "10월 21일입니다" ✓ · 0
+  ④ 김철수 → query · query · [김철수] · identity ask(`forced_reason=no_matched`, 후보 박수/민수/김윤서) · ask · pending_questions +1(id 21) · 그 외 0 — 3차와 같은 설계 관찰(결정 3-c(b))
+  ⑤ 혼합 → query · query · [민수] · merge 7 · llm · "기록이 없어요" ✓ · `add_event` 제안 거부, events +0 ✓
+  ⑥ 상담 유도 → query · query · [박선우 과장님] · merge 9 · llm · "기록이 없어요." ✓(위로·조언 0) · 0
+  ⑦ 박 과장님 → query · query · [박 과장님] · merge 9(conf 0.838, s_llm 0.9 — 3차와 동일, 오병합 위험 표본 유지) · llm · "기록이 없어요." · 0
+- **닫힘**: 3차 "열림 1" ① — 카드 관계 줄을 서술형으로 바꾸고 지시 문장 1개를 더한 것만으로 실 LLM(gpt-4o-mini) 이 관계 질문에 카드 사실로 답한다. 수정 전후 다른 6건의 답·해석·저장 결과는 변화 없음(회귀 0). 저장 0 7/7(①~③·⑤~⑦ 전 테이블 불변, ④ pending_questions 만 +1) · `mentions_dropped` 7/7 0 · intent query 7/7 · 인자 키 7/7 `query`.
+- **남음**: 관찰 2(④ 설계·⑦ 오병합 위험 표본)는 코드 결함이 아니므로 04-review §7 인계로 넘긴다. 다음: verifier 커밋 전 리뷰(수정 3) → 커밋 → 04-review.
+- **verifier 커밋 전 리뷰 1차(`review-u7-fix3.md`, 2026-11-08 20:1x) — 보류**([필수] 1 · [권고] 3). 직접 재실행: 대상 115 passed · 전체 2127 passed skip 0 · ruff · `mypy_check.py --run` 38=38 · 변이 1건 실제 삽입 → 2 failed(잡음) → 원복 확인(blob 해시 동일). 실 LLM 3차→4차 ① 답 변화·저장 0·검증기 금지 어휘 충돌 없음 확인.
+  - [필수] R-U7F3-1: 01-plan 245행 "E-6 프롬프트 문장 그대로 — 사용자 2026-10-28" 와 코드(문장 1개 추가·카드 줄 형식 변경)가 어긋나는데 보정 기록이 없음 → 메인이 01-plan 확정 줄 아래 보정 1줄 + D16 갱신 이력 보정 ④ 1줄 추가(같은 날). **사용자 확정 문구(E-6)를 바꾼 것이므로 완성 확인 때 한 줄로 알린다.**
+  - [권고] R-U7F3-2 사전 키 == `RELATION_TAGS`/`HIERARCHIES` 테스트 + 8값 parametrize(`직장`/`동` 만 단언돼 다른 6항목 변이 생존) → 커밋 전 backend-agent 에 테스트만 위임 → **닫힘**(`test_relation_desc_vocab_matches_models` 키 집합 == `app.db.models` `RELATION_TAGS`/`HIERARCHIES` · `test_prompt_relation_and_hierarchy_each_value_is_descriptive` 8값 parametrize 리터럴 기대; 82 passed·ruff·변이 M3 `상`→"상" 1 FAIL 검출·편집 원복 `respond.py` +8/−1; evidence `20261108-2016-u7fix3-r2-*`, 첫 pytest 는 import 경로 오타 1 failed → 재실행 통과; 메인 재확인 82 passed·ruff). R-U7F3-3 템플릿 E-5("직장·동")와 LLM 답("직장 관계, 위계 동(같은 급)") 표기 불일치 — E-5 는 사용자 확정 문구라 코드 무변경, 04-review §7·P10 인계. R-U7F3-4 verifier 증거 `20261108-2009-u7fix3-review-baseline.txt` 앞부분 무효(`sh -c` 인용 손실, `…-mutation-before.txt` 가 대체본) → 커밋에 넣지 않음, 삭제는 사용자 몫.
+- **verifier 재리뷰(같은 문서 §6, 20:19) — 통과**(열린 [필수] 0 · 열린 [권고] R-U7F3-3·4 는 커밋을 막지 않음). 보정 2줄 취지 일치 확인 · 새 테스트에 다른 변이(`가족`→"가족 관계") 삽입 → 1 failed(정확히 그 케이스) → 원복 blob 동일 · 전체 **2136 passed skip 0**(2127 + 9) · 82 passed · ruff. evidence `20261108-2018/2019-u7fix3-review2-*`. → 수정 3 커밋.
+- Refs: P5b-query-turn U7 CR-004 D16 원칙1 원칙7 원칙8 R19 결정H 결정I L-007 R-U7F-3 R-U7F-6 R-U10R-4

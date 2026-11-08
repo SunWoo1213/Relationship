@@ -587,3 +587,5 @@
 - 2026-11-07 15:13 | COMMIT | e49f78d fix(P5b-query-turn): 실제 LLM 이 search_person 인자를 person 으로 내도 조회 대상으로 읽는다
 - 2026-11-07 15:13 | PUSH-dev2 | origin dev2 e49f78d (실험 푸시)
 - 2026-11-07 16:34 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
+- 2026-11-08 20:07 | COMMIT | 9eb9d2e harness(hooks): 서버 기동의 --env-file .env 는 비밀 노출이 아니므로 허용한다 (L-007)
+- 2026-11-08 20:07 | PUSH-dev2 | origin dev2 9eb9d2e (실험 푸시)

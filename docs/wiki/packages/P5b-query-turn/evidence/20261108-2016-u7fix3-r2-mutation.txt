@@ -1,0 +1,44 @@
+# 명령: .venv/bin/python -m pytest -q tests/test_agent_query_answer.py
+# 시각: 2026-11-08T20:16:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9eb9d2e (dev2)
+# exit: 1
+# ---
+..............................................F......................... [ 87%]
+..........                                                               [100%]
+=================================== FAILURES ===================================
+_ test_prompt_relation_and_hierarchy_each_value_is_descriptive[hierarchy-\uc0c1-, \uc704\uacc4 \uc0c1(\uc717\uc0ac\ub78c)\n] _
+
+field = 'hierarchy', value = '상', expected = ', 위계 상(윗사람)\n'
+
+    @pytest.mark.parametrize(
+        ("field", "value", "expected"),
+        [
+            ("relation_tag", "가족", "관계: 가족, "),
+            ("relation_tag", "연인", "관계: 연인, "),
+            ("relation_tag", "친구", "관계: 친구, "),
+            ("relation_tag", "직장", "관계: 직장 관계, "),
+            ("relation_tag", "지인", "관계: 지인, "),
+            ("hierarchy", "상", ", 위계 상(윗사람)\n"),
+            ("hierarchy", "동", ", 위계 동(같은 급)\n"),
+            ("hierarchy", "하", ", 위계 하(아랫사람)\n"),
+        ],
+    )
+    def test_prompt_relation_and_hierarchy_each_value_is_descriptive(field, value, expected):
+        """관계 5값·위계 3값이 각각 기대 서술(리터럴)로 카드 줄에 나온다."""
+        card = _card(facts=[_fact()])
+        setattr(card.person, field, value)
+        _, user = build_query_answer_prompt(QUESTION, card, NOW)
+>       assert expected in user
+E       AssertionError: assert ', 위계 상(윗사람)\n' in '질문: 박선우 과장님 요즘 어때?\n현재 시각: 2026-10-25T12:00:00+09:00\n\n[인물 카드]\n이름: 박선우 과장님\n관계: 직장 관계, 위계 상\n별칭: 과장님, 선우 씨\n마지막 접촉: 10월 21일\n알고 있는 사실:\n- hobby=등산 (10월 21일)\n반복 패턴:\n- 없음\n최근 타임라인(최대 5건):\n- 없음\n예정된 일정:\n- 없음'
+
+tests/test_agent_query_answer.py:296: AssertionError
+=============================== warnings summary ===============================
+tests/test_agent_query_answer.py::test_gemini_answerer_request_uses_schema_and_parses
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_agent_query_answer.py::test_prompt_relation_and_hierarchy_each_value_is_descriptive[hierarchy-\uc0c1-, \uc704\uacc4 \uc0c1(\uc717\uc0ac\ub78c)\n] - AssertionError: assert ', 위계 상(윗사람)\n' in '질문: 박선우 과장님 요즘 어때?\n현재 시각: 2026-10-25T12:00:00+09:00\n\n[인물 카드]\n이름: 박선우 과장님\n관계: 직장 관계, 위계 상\n별칭: 과장님, 선우 씨\n마지막 접촉: 10월 21일\n알고 있는 사실:\n- hobby=등산 (10월 21일)\n반복 패턴:\n- 없음\n최근 타임라인(최대 5건):\n- 없음\n예정된 일정:\n- 없음'
+1 failed, 81 passed, 1 warning in 0.87s

@@ -1,0 +1,8 @@
+# 명령: git diff --stat -- app
+# 시각: 2026-11-08T20:16:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9eb9d2e (dev2)
+# exit: 0
+# ---
+ app/agent/respond.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)

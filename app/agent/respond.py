@@ -147,11 +147,17 @@ QUERY_ANSWER_SCHEMA: dict[str, Any] = {
     "additionalProperties": False,
 }
 
+#: 프롬프트 카드의 관계·위계 풀어쓰기(어휘는 `app/db/models.py` 의 RELATION_TAGS·HIERARCHIES).
+#: 사전 밖 값은 원문 그대로 쓴다.
+_RELATION_DESC = {"가족": "가족", "연인": "연인", "친구": "친구", "직장": "직장 관계", "지인": "지인"}
+_HIERARCHY_DESC = {"상": "상(윗사람)", "동": "동(같은 급)", "하": "하(아랫사람)"}
+
 _QUERY_SYSTEM_PROMPT = (
     "너는 사용자가 기록해 둔 한 인물의 정보를 묻는 질문에 답하는 보조 도구다. "
     "채팅의 조회 답(CR-004 · D16)도 기록된 사실의 재진술로 한정한다 — "
     "평가·조언·감정 대화는 하지 않는다"
     f" 아래 인물 카드 자료만 근거로 1~{QUERY_ANSWER_MAX_LINES}줄 한국어로 답하고, "
+    "관계나 위계를 물으면 [인물 카드]의 '관계' 줄을 그대로 답하라 — 그것도 기록된 사실이다. "
     "자료에 없는 것은 '기록이 없어요'라고 답하라. 추측하거나 새 사실을 만들지 마라. "
     "다른 인물과의 관계는 말하지 마라. 위로·조언·감정 표현을 쓰지 마라. "
     f"{QUERY_ANSWER_TOOL_NAME} 도구로만 답하라."
@@ -225,7 +231,8 @@ def build_query_answer_prompt(
         "",
         "[인물 카드]",
         f"이름: {person.display_name}",
-        f"관계: {person.relation_tag}·{person.hierarchy}",
+        f"관계: {_RELATION_DESC.get(person.relation_tag, person.relation_tag)}, "
+        f"위계 {_HIERARCHY_DESC.get(person.hierarchy, person.hierarchy)}",
         "별칭: " + (", ".join(evidence.aliases) if evidence.aliases else "없음"),
         "마지막 접촉: "
         + (_fmt_date(evidence.last_contact_at) if evidence.last_contact_at else "기록 없음"),

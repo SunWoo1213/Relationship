@@ -230,7 +230,9 @@ def test_prompt_system_exact_sentences():
     assert system == (
         "너는 사용자가 기록해 둔 한 인물의 정보를 묻는 질문에 답하는 보조 도구다. "
         + _PRINCIPLE7
-        + " 아래 인물 카드 자료만 근거로 1~3줄 한국어로 답하고, 자료에 없는 것은 '기록이 없어요'라고 답하라. "
+        + " 아래 인물 카드 자료만 근거로 1~3줄 한국어로 답하고, "
+        "관계나 위계를 물으면 [인물 카드]의 '관계' 줄을 그대로 답하라 — 그것도 기록된 사실이다. "
+        "자료에 없는 것은 '기록이 없어요'라고 답하라. "
         "추측하거나 새 사실을 만들지 마라. 다른 인물과의 관계는 말하지 마라. "
         "위로·조언·감정 표현을 쓰지 마라. report_query_answer 도구로만 답하라."
     )
@@ -248,7 +250,7 @@ def test_prompt_user_text_has_question_now_and_evidence_values():
     assert "2026-10-25T12:00:00+09:00" in user  # now 는 사용자 시간대
     for needle in (
         "박선우 과장님",
-        "직장·동",
+        "관계: 직장 관계, 위계 동(같은 급)",
         "과장님, 선우 씨",
         "마지막 접촉: 10월 21일",
         "hobby=등산 (10월 21일)",
@@ -257,6 +259,49 @@ def test_prompt_user_text_has_question_now_and_evidence_values():
         "저녁 약속 (10월 21일)",
     ):
         assert needle in user, needle
+
+
+def test_prompt_relation_line_is_descriptive():
+    _, user = build_query_answer_prompt(QUESTION, _card(facts=[_fact()]), NOW)
+    assert "\n관계: 직장 관계, 위계 동(같은 급)\n" in user
+
+
+def test_relation_desc_vocab_matches_models():
+    """서술 사전의 키 집합이 models.py 어휘와 같다(어휘가 늘면 사전도 늘려야 한다)."""
+    from app.agent.respond import _HIERARCHY_DESC, _RELATION_DESC
+    from app.db.models import HIERARCHIES, RELATION_TAGS
+
+    assert set(_RELATION_DESC) == set(RELATION_TAGS)
+    assert set(_HIERARCHY_DESC) == set(HIERARCHIES)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "expected"),
+    [
+        ("relation_tag", "가족", "관계: 가족, "),
+        ("relation_tag", "연인", "관계: 연인, "),
+        ("relation_tag", "친구", "관계: 친구, "),
+        ("relation_tag", "직장", "관계: 직장 관계, "),
+        ("relation_tag", "지인", "관계: 지인, "),
+        ("hierarchy", "상", ", 위계 상(윗사람)\n"),
+        ("hierarchy", "동", ", 위계 동(같은 급)\n"),
+        ("hierarchy", "하", ", 위계 하(아랫사람)\n"),
+    ],
+)
+def test_prompt_relation_and_hierarchy_each_value_is_descriptive(field, value, expected):
+    """관계 5값·위계 3값이 각각 기대 서술(리터럴)로 카드 줄에 나온다."""
+    card = _card(facts=[_fact()])
+    setattr(card.person, field, value)
+    _, user = build_query_answer_prompt(QUESTION, card, NOW)
+    assert expected in user
+
+
+def test_prompt_relation_line_unknown_values_passthrough():
+    card = _card(facts=[_fact()])
+    card.person.relation_tag = "기타"
+    card.person.hierarchy = "?"
+    _, user = build_query_answer_prompt(QUESTION, card, NOW)
+    assert "\n관계: 기타, 위계 ?\n" in user
 
 
 def test_prompt_excludes_raw_ids_and_secrets():

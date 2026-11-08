@@ -1,0 +1,7 @@
+# 명령: .venv/bin/ruff check app/agent/respond.py tests/test_agent_query_answer.py
+# 시각: 2026-11-08T20:09:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9eb9d2e (dev2)
+# exit: 0
+# ---
+All checks passed!

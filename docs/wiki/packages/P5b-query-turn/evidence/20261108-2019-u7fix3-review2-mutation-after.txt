@@ -1,0 +1,12 @@
+# 명령: sh /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/u7fix3-review/hash_stat.sh
+# 시각: 2026-11-08T20:19:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9eb9d2e (dev2)
+# exit: 0
+# ---
+respond.py blob: 4752e815cf9b54de68efc2852d1c1b5f078926ea
+_HIERARCHY_DESC 줄:
+153:_HIERARCHY_DESC = {"상": "상(윗사람)", "동": "동(같은 급)", "하": "하(아랫사람)"}
+ app/agent/respond.py             |  9 +++++++-
+ tests/test_agent_query_answer.py | 49 ++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 55 insertions(+), 3 deletions(-)

@@ -203,3 +203,25 @@
 | test_agent_query_gate.py::test_prompt_has_query_mention_exception_sentences_after_old_sentence (변경) | 조회 예외 문장 위치 | `exception` 문자열을 새 문장으로 교체, "절대 제안하지 마라." 바로 뒤 순서 단언 유지 | 통과 | U7 문장 교체 직후 옛 문장 단언으로 1 FAIL → 문자열 갱신으로 해소 |
 
 이력: 1차 전체 실행(`evidence/20261107-1454-u7fix-pytest-all.txt`)은 위 게이트 테스트가 옛 문장을 못 박아 **1 failed / 2124 passed** — 구현자가 범위 밖 파일이라 멈추고 보고 → 메인이 문자열 교체를 승인 → 2차(`evidence/20261107-1456-u7fix-pytest-all-2.txt`) **2125 passed, skip 0**(기준선 2122 + 신규 3). 메인 재실행(2026-11-07): 대상 5파일 158 passed · ruff check 통과 · `mypy_check.py --run` 38=38.
+
+## U7 3차 — 관계 질문 답 프롬프트 보강(2026-11-07)
+
+실 LLM 왕복 3차에서 "관계가 뭐야?" 에 카드가 `직장·동` 인데도 "기록이 없어요." 로 답한 결함(`evidence/20261107-1534-u7s-1-relation.txt`). 카드 관계 줄을 풀어 쓰고 시스템 프롬프트에 관계 질문 문장을 넣었다. 증거: `evidence/20261107-1538-u7fix3-answer-tests.txt`(115 passed)·`evidence/20261107-1538-u7fix3-pytest-all.txt`(**2127 passed**, skip 0; 기준선 2125 + 신규 2)·`u7fix3-ruff`·`u7fix3-mypy`(38=38). 변이: `evidence/20261107-1539-u7fix3-mutation.txt`(런타임 치환 플러그인, 저장소 무수정).
+
+| 파일::이름 | 무엇 | 입력 → 기대 | 결과 · 검출 변이 | 실패 이력 |
+|---|---|---|---|---|
+| test_agent_query_answer.py::test_prompt_system_exact_sentences (변경) | 시스템 프롬프트 정확 일치 | "…1~3줄 한국어로 답하고, " 뒤·"자료에 없는 것은…" 앞에 관계 질문 문장 | 통과 · M2 | 기록 없음 |
+| test_agent_query_answer.py::test_prompt_user_text_has_question_now_and_evidence_values (변경) | user_text 근거 값 | `직장·동` 단언 → `관계: 직장 관계, 위계 동(같은 급)` | 통과 · M1 | 기록 없음 |
+| test_agent_query_answer.py::test_prompt_relation_line_is_descriptive (신규) | 관계 줄 풀어쓰기 | 직장/동 → 한 줄 `관계: 직장 관계, 위계 동(같은 급)` | 통과 · M1 | 기록 없음 |
+| test_agent_query_answer.py::test_prompt_relation_line_unknown_values_passthrough (신규) | 사전 밖 값 | 기타/? → `관계: 기타, 위계 ?` | 통과 | 기록 없음 |
+| test_agent_query_answer.py::test_relation_desc_vocab_matches_models (신규, R-U7F3-2) | 사전 키 = 모델 어휘 | `set(_RELATION_DESC)==set(RELATION_TAGS)`, `set(_HIERARCHY_DESC)==set(HIERARCHIES)` (`app.db.models`) | 통과 · 키 추가/삭제 변이 | 첫 실행 FAIL: import 경로 `app.models` 오기 → `app.db.models` 로 수정(`evidence/20261108-2016-u7fix3-r2-pytest.txt`) |
+| test_agent_query_answer.py::test_prompt_relation_and_hierarchy_each_value_is_descriptive (신규, R-U7F3-2, parametrize 8) | 8개 값 각각의 서술 | 가족/연인/친구/직장/지인/상/동/하 → 리터럴 `관계: 가족, `…`, 위계 하(아랫사람)\n` | 통과(82 passed, `evidence/20261108-2016-u7fix3-r2-pytest-rerun.txt`) · M3 | 기록 없음 |
+
+| 변이 | 기대 | 결과 |
+|---|---|---|
+| M3 `_HIERARCHY_DESC["상"]` 를 `"상"` 으로 | 신규 parametrize `hierarchy-상` FAIL | 1 FAIL(`evidence/20261108-2016-u7fix3-r2-mutation.txt`), 편집으로 원복 · `git diff --stat -- app` = respond.py +8/−1(`evidence/20261108-2016-u7fix3-r2-revert-diffstat.txt`) |
+
+| 변이 | 기대 | 결과 |
+|---|---|---|
+| M1 `_HIERARCHY_DESC` 를 빈 dict 로 | 신규 1 FAIL | 2 FAIL(신규 descriptive + user_text 변경 테스트) |
+| M2 시스템 프롬프트 새 문장 제거 | exact_sentences FAIL | 1 FAIL |

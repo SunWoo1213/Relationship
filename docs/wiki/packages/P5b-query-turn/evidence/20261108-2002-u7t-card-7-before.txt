@@ -1,0 +1,7 @@
+# 명령: curl -s http://127.0.0.1:8000/persons/7
+# 시각: 2026-11-08T20:02:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e49f78d (dev2)
+# exit: 0
+# ---
+{"person":{"id":7,"display_name":"민수","relation_tag":"친구","hierarchy":"동"},"aliases":["민수","박 과장","박지훈 과장님"],"last_contact_at":"2026-10-15T03:00:00Z","facts":[{"id":22,"key":"job","value":"과장","updated_at":"2026-10-15T11:03:38.181092Z","source_count":1},{"id":23,"key":"workplace","value":"회사","updated_at":"2026-10-15T11:03:38.181092Z","source_count":1},{"id":21,"key":"life_event","value":"이사 간다","updated_at":"2026-10-15T11:03:11.177507Z","source_count":1}],"patterns":[],"timeline":[{"id":25,"type":"meal","content":"점심을 함께 먹었다","occurred_at":"2026-10-15T03:00:00Z"},{"id":24,"type":"meal","content":"점심 먹었다","occurred_at":"2026-10-15T03:00:00Z"}],"upcoming_schedules":[]}
