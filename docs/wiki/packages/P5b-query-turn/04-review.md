@@ -242,4 +242,4 @@ FAIL 0 이므로 `findings.py --source verify-impl` 소견은 만들지 않았�
 - 인터페이스 요약: `run_turn(..., answerer=None)`·`resume_turn(..., answerer=None)`(결정 K — 라우트 무수정, 운영은 `respond.answerer_from_env()` 지연 해소) · `PendingResume.intent`(`"query"` 일 때만 `context["resume"]["intent"]` 에 실림, version "1") · `loop_query` trace 10키(결정 C) · 상수 `QUERY_TIMELINE_LIMIT=5`·`QUERY_MAX_PERSONS=1`·`QUERY_ANSWER_MAX_LINES=3`·`QUERY_ANSWER_MAX_CHARS=240`(`app/settings.py`, 환경변수 없음) · 게이트 사유 `query_turn_no_write`(7번째) · `PROPOSAL_ARG_SCHEMA.query`(D16 보정 ③).
 
 결과: 완료
-확인: (L-006 — 완성 확인 질문에 사용자가 "확인"하면 "사용자 (YYYY-MM-DD)")
+확인: 사용자 (2026-11-09) — 완성 확인 질문에 "확인". E-6 1문장 추가·R-U7F3-3 표기 차·"박 과장님" P10 인계를 함께 고지함.

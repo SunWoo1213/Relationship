@@ -591,3 +591,6 @@
 - 2026-11-08 20:07 | PUSH-dev2 | origin dev2 9eb9d2e (실험 푸시)
 - 2026-11-08 20:22 | COMMIT | cf26dce fix(P5b-query-turn): 관계 질문에 카드의 관계·위계로 답하도록 조회 답 프롬프트를 보강한다
 - 2026-11-08 20:22 | PUSH-dev2 | origin dev2 cf26dce (실험 푸시)
+- 2026-11-09 00:55 | COMMIT | fb8841a docs(P5b-query-turn): 완료 검토 결과 "완료" 와 그 증거를 남기고 목록 문서를 정리한다
+- 2026-11-09 00:55 | PUSH-dev2 | origin dev2 fb8841a (실험 푸시)
+- 2026-11-09 01:30 | DONE | P5b-query-turn 완료 — verifier 04-review `완료`([필수] 0), 판정 표 통과 20·문구 보정 1(R-04-1)·결정 H #4 되묻기 허용(R-04-2), 2136 passed skip 0, 변이 7/7, verify-impl FAIL 0/WARN 1(하네스 ruff 기존). 실 LLM 4차 ① 관계 질문 정답. 사용자 완성 확인(L-006 첫 적용) — E-6 1문장 추가·E-5 표기 차(R-U7F3-3)·"박 과장님" P10 인계 고지. active none. 이어서 dev2:dev → dev:main 승격 | P5b-query-turn CR-004 D16 R19 L-006 L-007
