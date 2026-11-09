@@ -1,0 +1,31 @@
+# 명령: MUTANT=RA PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u1-review .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=line -p mutplug_review -p no:cacheprovider
+# 시각: 2026-11-09T16:41:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 1
+# ---
+[mutplug_review] MUTANT=RA 적용
+.....F..........FF......F................                                [100%]
+=================================== FAILURES ===================================
+E   AssertionError: assert False is True
+     +  where False = references_person({'resume': {'extra': [{'person_ids': {'a': 987654321}}]}}, 987654321)
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_person_refs.py:138: AssertionError: assert False is True
+E   AssertionError: assert False is True
+     +  where False = references_person({'aliases': [], 'facts': [], 'generated_at': '2026-11-09T12:00:00+00:00', 'person': {'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 7, ...}, ...}, 987654321, tool_name='get_briefing')
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_person_refs.py:245: AssertionError: assert False is True
+E   AssertionError: assert False is True
+     +  where False = references_person({'candidates': [{'aliases_matched': [], 'display_name': '민수', 'excluded_by': None, 'passed_rules': False, ...}], 'confidence_breakdown': {}, 'decision': {}, 'er_version': '1', ...}, 987654321, tool_name='er')
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_person_refs.py:253: AssertionError: assert False is True
+E   AssertionError: assert False is True
+     +  where False = references_person({'a': [{'b': {'c': [{'person_id': 987654321}]}}]}, 987654321)
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_person_refs.py:310: AssertionError: assert False is True
+=========================== short test summary info ============================
+FAILED tests/test_person_refs.py::test_person_ids_map_in_stored_context_literal - AssertionError: assert False is True
+ +  where False = references_person({'resume': {'extra': [{'person_ids': {'a': 987654321}}]}}, 987654321)
+FAILED tests/test_person_refs.py::test_event_out_and_schedule_out_person_id - AssertionError: assert False is True
+ +  where False = references_person({'aliases': [], 'facts': [], 'generated_at': '2026-11-09T12:00:00+00:00', 'person': {'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 7, ...}, ...}, 987654321, tool_name='get_briefing')
+FAILED tests/test_person_refs.py::test_er_resolution_candidates_person_id - AssertionError: assert False is True
+ +  where False = references_person({'candidates': [{'aliases_matched': [], 'display_name': '민수', 'excluded_by': None, 'passed_rules': False, ...}], 'confidence_breakdown': {}, 'decision': {}, 'er_version': '1', ...}, 987654321, tool_name='er')
+FAILED tests/test_person_refs.py::test_deep_nesting_and_top_level_list - AssertionError: assert False is True
+ +  where False = references_person({'a': [{'b': {'c': [{'person_id': 987654321}]}}]}, 987654321)
+4 failed, 37 passed in 0.06s

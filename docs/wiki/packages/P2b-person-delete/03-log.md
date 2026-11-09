@@ -10,3 +10,13 @@
 - verifier [권고] 처리: R-1 판정 명령 따옴표 요령(`save_evidence.py` 가 `" ".join` → `bash -c` 라 `-k "a or b"` 가 깨짐, BSD grep `\|`) → 위임 프롬프트에 넣는다. **R-2 보정**: 01-plan 32행 "trace 를 읽는 평가 스크립트는 `run_pilot_eval.py` 하나" → `evaluation/runner.py`(370행)도 읽는다 — U1 ① 원칙8 확인 범위를 `scripts/run_pilot_eval.py` + `evaluation/` 로 넓힌다(결론 불변). R-3 registry 236행 "8테이블" → "9테이블" 은 U5. R-4 ① 01-plan 상태 줄 갱신(이 커밋) · ② U3 HTTP 테스트는 `client.request("DELETE", url, json=…)` — 위임 프롬프트에.
 - 남은 것 · 다음 단위: U1 [backend-agent] 판별 순수 함수 `references_person` + `PERSON_REF_RULES` + 전수 조사.
 - Refs: P2b-person-delete F-4d2507 security 원칙5 원칙8 원칙9
+
+## 2026-11-09 16:45 · feat(P2b-person-delete): 기록 속에서 지울 인물을 가리키는 항목을 판별하는 규칙을 더한다 · pending (U1, backend-agent)
+- 변경: 새 `app/api/delete.py`(규칙 상수 5종·`PERSON_REF_RULES` 1~5·`references_person(obj, person_id, *, tool_name=None)`, docstring 에 전수 조사 표) · 새 `tests/test_person_refs.py` 41건(실제 직렬화 코드로 픽스처) · `tests.md` 신설. 기존 파일 무수정.
+- 결과: 41 passed · 전체 2177(2136+41) skip 0 · ruff · tools 7/7 · mypy 38=38 · 변이 V1-1~V1-9 전부 검출(런타임 치환). 메인 재확인 41 passed·ruff·새 파일 2개뿐.
+- 전수 조사: `agent_traces` 쓰는 곳 7곳(`tools/context.py` 2·`memory/hooks.py`·`push/notifier.py`·`briefing/run.py` 3·`api/routes.py` loop_error), `pending_questions` 는 `ask_user` 1곳. 계획 표 밖 모양 없음. **계획과 다른 점**: `person_ids` 는 `PendingResume` 이 아니라 `ResolveOutcome.to_dict()`(`loop_resolve_done` output) · `candidate_person_ids` 는 스키마 설명에만(규칙 5 방어 유지) · `briefing_run` 은 일정 id 만. 원칙8(R-2): `run_pilot_eval.py`·`evaluation/runner.py` 만 trace 를 읽고 둘 다 세이브포인트 롤백 안 — 결론 불변. `fact_sources` 교차 연결 없음(6곳 확인).
+- 하네스 메모: `bash-write-guard` 가 `.venv/bin/python --version` 을 stdin 코드로 오탐(기존 L 후보와 같음).
+- verifier 커밋 전 리뷰(`review-u1-person-refs.md`): 1차 **보류**([필수] 1 · [권고] 4). 직접 재실행 41 passed·2177 skip 0·ruff·mypy 38=38, 다른 변이 RA 검출·RB 생존(→ R-U1-3), JSONB 왕복 형 보존 직접 확인, 전수 조사 재실행(쓰기 **8곳** — 위 "7곳" 은 오기, R-U1-2). [필수] R-U1-1 01-plan·02-plan-verify 의 `resume.person_ids` 오기 → 메인이 보정 2줄. [권고] R-U1-2 docstring 7→8곳·R-U1-3 규칙 2 `tool_name` 없이 고정 테스트 → U2 위임문 · R-U1-4 남는 행 목록 보완 → U5/security §5.
+- verifier 재리뷰(§6) **통과** — 보정 2줄·코드 무변경 확인.
+- 남은 것 · 다음 단위: U2 삭제 서비스(위임문에 R-U1-2·R-U1-3).
+- Refs: P2b-person-delete F-4d2507 security 원칙8 원칙9 결정C 결정G

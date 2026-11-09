@@ -1,0 +1,11 @@
+# 명령: git status --short -- app tests web && echo -- modified tracked files under app/ tests/: && git diff --name-only --diff-filter=M -- app/ tests/ && echo -- HEAD: && git rev-parse --short HEAD
+# 시각: 2026-11-09T16:42:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 0
+# ---
+?? app/api/delete.py
+?? tests/test_person_refs.py
+-- modified tracked files under app/ tests/:
+-- HEAD:
+2ff0efb

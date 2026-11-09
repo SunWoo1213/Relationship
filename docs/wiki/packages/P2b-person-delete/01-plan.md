@@ -35,6 +35,8 @@
 6. 프론트: `web/src/api/client.ts` 45행 `method?: 'GET' | 'POST'` — `DELETE` 가 아직 없다. 인물 카드 화면은 `web/src/screens/PersonCardScreen.tsx`(`CardView` 223행). shadcn `ui/` 에 `dialog`·`alert-dialog` 가 없다(button·card·badge·collapsible·skeleton·tabs·sonner·sheet 8개). **P8b 판정 12행 불변식**: `grep -rlE "Sheet|Dialog|Drawer" web/src --include=*.tsx | grep -v "^web/src/components/ui/"` → `AppShell.tsx` **1파일뿐**(라우트 밖 패널 1개, 원칙5). 삭제 확인을 대화상자로 만들면 이 불변식이 깨진다(결정 A·B).
 7. HTTP 엔드포인트 중 툴이 아닌 것(`/push/subscriptions`·읽기 API)은 `agent_traces` 를 남기지 않는 선례가 있다(registry 216·225행).
 
+**보정(U1, 2026-11-09, review-u1-person-refs R-U1-1)**: 23행 `person_ids` 는 `pending_questions.context["resume"]` 가 아니라 `ResolveOutcome.to_dict()` = `agent_traces` `loop_resolve_done.output`(loop.py 294~313행)에 있다(`PendingResume.to_dict()` 에는 없다, types.py 400~417행) — V1-2·해석 ㄴ 의 `resume.person_ids` 도 `loop_resolve_done.output.person_ids` 로 읽는다. 24행 `candidate_person_ids` 는 judge.py 523행 변환기 설명에만 있고 저장되지 않는다(규칙 5 는 방어적으로 유지). 26행 `briefing_run` output 은 일정 id(`selected/briefed/skipped[].schedule_id`)만 담고 `person_id` 는 `briefing_compose`·`briefing_error` 에만 있다. 규칙 ①~⑤ 는 그대로.
+
 ## 목표
 
 기획서 9장 "제3자 개인정보" 대응으로 `docs/wiki/security.md` §5 첫 줄 "인물 단위 완전 삭제 API (`DELETE /persons/{id}` → CASCADE)" 를 구현한다. 이 제품은 사용자가 아닌 제3자(가족·동료·친구)에 대한 기록을 쌓으므로, 사용자가 한 인물을 잊게 하고 싶을 때 그 인물에 대한 별칭·사실·이벤트(원문 포함)·일정이 **한 번에, 남김없이** 지워져야 한다. 테이블 행은 이미 걸린 FK CASCADE 로 지우고, CASCADE 가 닿지 않는 JSONB(`pending_questions.context`, `agent_traces.input/output`) 안의 그 인물 참조를 같은 트랜잭션에서 정리한다. 실수로 지우지 않도록 삭제 전 확인을 요구하고, 남의 인물은 지울 수 없게 한다(존재 여부도 흘리지 않는다). 예: 사용자가 "민수" 카드에서 삭제를 누르고 확인하면 민수의 별칭 3개·사실 4개·이벤트 12건·일정 1건이 사라지고, 민수를 후보로 들고 있던 미답변 질문 "민수/민준 중 한 분이 맞으실까요?" 와 민수 id 가 들어 있던 trace 행이 함께 정리된다. 다른 인물 "민준" 의 데이터는 1바이트도 바뀌지 않는다.

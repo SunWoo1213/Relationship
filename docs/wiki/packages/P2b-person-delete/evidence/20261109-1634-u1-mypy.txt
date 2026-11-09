@@ -1,0 +1,7 @@
+# 명령: .venv/bin/python scripts/mypy_check.py --run
+# 시각: 2026-11-09T16:34:31+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 0
+# ---
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)

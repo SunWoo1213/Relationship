@@ -1,0 +1,9 @@
+# 명령: MUTANT=RB PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u1-review .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=line -p mutplug_review -p no:cacheprovider
+# 시각: 2026-11-09T16:41:50+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 0
+# ---
+[mutplug_review] MUTANT=RB 적용
+.........................................                                [100%]
+41 passed in 0.06s

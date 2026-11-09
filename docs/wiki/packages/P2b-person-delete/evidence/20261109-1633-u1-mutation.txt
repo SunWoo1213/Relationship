@@ -1,0 +1,214 @@
+
+# ===== append 2026-11-09T16:33:42+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=no -p mutplug -p no:cacheprovider
+# 시각: 2026-11-09T16:33:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 1
+# ---
+F.F..F...................................                                [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_refs.py::test_rule_constants_are_fixed_values - AssertionError: assert ('person_ids',) == ('candidate_i... 'person_ids')
+  
+  At index 0 diff: 'person_ids' != 'candidate_ids'
+  Right contains one more item: 'person_ids'
+  
+  Full diff:
+    (
+  -     'candidate_ids',
+        'person_ids',
+    )
+FAILED tests/test_person_refs.py::test_identity_question_context_candidate_ids_values - AssertionError: assert False is True
+ +  where False = references_person({'affirmative_options': ['민준', '민수'], 'candidate_ids': {'민수': 987654321, '민준': 7}, 'confidence_breakdown': {'confidence': 0.5, 'matched_person_id': None}, 'mention': '민수씨', ...}, 987654321)
+FAILED tests/test_person_refs.py::test_person_ids_map_in_stored_context_literal - AssertionError: assert False is True
+ +  where False = references_person({'candidate_ids': {'a': 1, 'b': 987654321}}, 987654321)
+3 failed, 38 passed in 0.06s
+
+# ===== append 2026-11-09T16:33:43+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=no -p mutplug -p no:cacheprovider
+# 시각: 2026-11-09T16:33:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 1
+# ---
+F...FF...................................                                [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_refs.py::test_rule_constants_are_fixed_values - AssertionError: assert ('candidate_ids',) == ('candidate_i... 'person_ids')
+  
+  Right contains one more item: 'person_ids'
+  
+  Full diff:
+    (
+        'candidate_ids',
+  -     'person_ids',
+    )
+FAILED tests/test_person_refs.py::test_resolve_outcome_person_ids_values - AssertionError: assert False is True
+ +  where False = references_person({'decisions': [], 'pending_question_id': None, 'person_ids': {'민수': 987654321, '민준': 7}, 'stopped': False}, 987654321)
+FAILED tests/test_person_refs.py::test_person_ids_map_in_stored_context_literal - AssertionError: assert False is True
+ +  where False = references_person({'resume': {'extra': [{'person_ids': {'a': 987654321}}]}}, 987654321)
+3 failed, 38 passed in 0.06s
+
+# ===== append 2026-11-09T16:33:44+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=no -p mutplug -p no:cacheprovider
+# 시각: 2026-11-09T16:33:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 1
+# ---
+F.....FF.................................                                [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_refs.py::test_rule_constants_are_fixed_values - AssertionError: assert () == ('person',)
+  
+  Right contains one more item: 'person'
+  
+  Full diff:
+  + ()
+  - (
+  -     'person',
+  - )
+FAILED tests/test_person_refs.py::test_search_person_output_person_object_id - AssertionError: assert False is True
+ +  where False = references_person([{'aliases_matched': [], 'person': {'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 987654321, ...}, ...rson': {'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 7, ...}, 'rule_flags': {}, 'similarity': 0.5}], 987654321, tool_name='search_person')
+FAILED tests/test_person_refs.py::test_briefing_out_person_object_id - AssertionError: assert False is True
+ +  where False = references_person({'aliases': [], 'facts': [], 'generated_at': '2026-11-09T12:00:00+00:00', 'person': {'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 987654321, ...}, ...}, 987654321, tool_name='get_briefing')
+3 failed, 38 passed in 0.06s
+
+# ===== append 2026-11-09T16:33:44+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=no -p mutplug -p no:cacheprovider
+# 시각: 2026-11-09T16:33:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 1
+# ---
+F........FF..............................                                [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_refs.py::test_rule_constants_are_fixed_values - AssertionError: assert frozenset() == frozenset({'c...date_person'})
+  
+  Extra items in the right set:
+  'create_person'
+  'update_person'
+  
+  Full diff:
+  - frozenset({
+  ?           ^
+  + frozenset()
+  ?           ^
+  -     'create_person',
+  -     'update_person',
+  - })
+FAILED tests/test_person_refs.py::test_person_out_top_level_id_with_person_tools[create_person] - AssertionError: assert False is True
+ +  where False = references_person({'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 987654321, ...}, 987654321, tool_name='create_person')
+FAILED tests/test_person_refs.py::test_person_out_top_level_id_with_person_tools[update_person] - AssertionError: assert False is True
+ +  where False = references_person({'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 987654321, ...}, 987654321, tool_name='update_person')
+3 failed, 38 passed in 0.06s
+
+# ===== append 2026-11-09T16:33:45+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=no -p mutplug -p no:cacheprovider
+# 시각: 2026-11-09T16:33:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 1
+# ---
+...........F.FF..........................                                [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_refs.py::test_person_out_top_level_id_without_tool_name_is_not_reference - AssertionError: assert True is False
+ +  where True = references_person({'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 987654321, ...}, 987654321)
+FAILED tests/test_person_refs.py::test_event_out_id_equal_to_person_id_is_not_reference - AssertionError: assert True is False
+ +  where True = references_person({'content': '점심', 'created_at': '2026-11-09T12:00:00+00:00', 'id': 987654321, 'occurred_at': '2026-11-09T12:00:00+00:00', ...}, 987654321, tool_name='add_event')
+FAILED tests/test_person_refs.py::test_schedule_out_id_equal_to_person_id_is_not_reference - AssertionError: assert True is False
+ +  where True = references_person({'briefed_at': None, 'id': 987654321, 'person_id': 7, 'scheduled_at': '2026-11-09T12:00:00+00:00', ...}, 987654321, tool_name='add_schedule')
+3 failed, 38 passed in 0.06s
+
+# ===== append 2026-11-09T16:33:46+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=no -p mutplug -p no:cacheprovider
+# 시각: 2026-11-09T16:33:46+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 1
+# ---
+.......FFFFFFFF..FF..FF..FF.F............                                [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_refs.py::test_briefing_out_person_object_id - AssertionError: assert True is False
+ +  where True = references_person({'aliases': [], 'facts': [], 'generated_at': '2026-11-09T12:00:00+00:00', 'person': {'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 987654321, ...}, ...}, 7, tool_name='get_briefing')
+FAILED tests/test_person_refs.py::test_person_key_with_string_value_is_not_reference - AssertionError: assert True is False
+ +  where True = references_person({'person': '987654321'}, 987654321)
+FAILED tests/test_person_refs.py::test_person_out_top_level_id_with_person_tools[create_person] - AssertionError: assert True is False
+ +  where True = references_person({'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 987654321, ...}, 7, tool_name='create_person')
+FAILED tests/test_person_refs.py::test_person_out_top_level_id_with_person_tools[update_person] - AssertionError: assert True is False
+ +  where True = references_person({'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 987654321, ...}, 7, tool_name='update_person')
+FAILED tests/test_person_refs.py::test_person_out_top_level_id_without_tool_name_is_not_reference - AssertionError: assert True is False
+ +  where True = references_person({'aliases': ['민수'], 'display_name': '민수', 'hierarchy': '동', 'id': 987654321, ...}, 987654321)
+FAILED tests/test_person_refs.py::test_top_level_id_rule_does_not_apply_to_nested_id - AssertionError: assert True is False
+ +  where True = references_person({'data': {'id': 987654321}}, 987654321, tool_name='create_person')
+FAILED tests/test_person_refs.py::test_event_out_id_equal_to_person_id_is_not_reference - AssertionError: assert True is False
+ +  where True = references_person({'content': '점심', 'created_at': '2026-11-09T12:00:00+00:00', 'id': 987654321, 'occurred_at': '2026-11-09T12:00:00+00:00', ...}, 987654321, tool_name='add_event')
+FAILED tests/test_person_refs.py::test_schedule_out_id_equal_to_person_id_is_not_reference - AssertionError: assert True is False
+ +  where True = references_person({'briefed_at': None, 'id': 987654321, 'person_id': 7, 'scheduled_at': '2026-11-09T12:00:00+00:00', ...}, 987654321, tool_name='add_schedule')
+FAILED tests/test_person_refs.py::test_er_resolution_candidates_person_id - AssertionError: assert True is False
+ +  where True = references_person({'candidates': [{'aliases_matched': [], 'display_name': '민수', 'excluded_by': None, 'passed_rules': False, ...}], 'confidence_breakdown': {}, 'decision': {}, 'er_version': '1', ...}, 7, tool_name='er')
+FAILED tests/test_person_refs.py::test_er_breakdown_matched_person_id_only - AssertionError: assert True is False
+ +  where True = references_person({'candidates': [], 'confidence_breakdown': {'matched_person_id': 987654321, 's_llm': 0.9}, 'decision': {}, 'er_version': '1', ...}, 7, tool_name='er')
+FAILED tests/test_person_refs.py::test_candidate_person_ids_list_elements - AssertionError: assert True is False
+ +  where True = references_person({'candidate_person_ids': {'a': 987654321}}, 987654321)
+FAILED tests/test_person_refs.py::test_resume_schedule_person_id_in_pending_question_context - AssertionError: assert True is False
+ +  where True = references_person({'mention': '민수', 'resume': {'dropped': 0, 'held_drafts': [], 'hints': {}, 'mention': '민수', ...}}, 7)
+FAILED tests/test_person_refs.py::test_same_number_other_meanings_is_not_reference - AssertionError: assert True is False
+ +  where True = references_person({'briefed': [987654321], 'considered_event_ids': [987654321], 'event_ids': [987654321], 'fact_id': 987654321, ...}, 987654321)
+FAILED tests/test_person_refs.py::test_memory_promote_output_event_ids_only_is_not_reference - AssertionError: assert True is False
+ +  where True = references_person({'considered_event_ids': [987654321], 'facts': [], 'person_id': 7}, 987654321)
+FAILED tests/test_person_refs.py::test_string_digits_are_not_integer_id - AssertionError: assert True is False
+ +  where True = references_person({'person_id': '987654321'}, 987654321)
+15 failed, 26 passed in 0.06s
+
+# ===== append 2026-11-09T16:33:46+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=no -p mutplug -p no:cacheprovider
+# 시각: 2026-11-09T16:33:46+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 1
+# ---
+F.................FF.F..F................                                [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_refs.py::test_rule_constants_are_fixed_values - AssertionError: assert ('person_id',) == ('person_id',...ed_person_id')
+  
+  Right contains one more item: 'matched_person_id'
+  
+  Full diff:
+    (
+        'person_id',
+  -     'matched_person_id',
+    )
+FAILED tests/test_person_refs.py::test_er_breakdown_matched_person_id_only - AssertionError: assert False is True
+ +  where False = references_person({'candidates': [], 'confidence_breakdown': {'matched_person_id': 987654321, 's_llm': 0.9}, 'decision': {}, 'er_version': '1', ...}, 987654321, tool_name='er')
+FAILED tests/test_person_refs.py::test_er_decision_matched_person_id_only - AssertionError: assert False is True
+ +  where False = references_person({'candidates': [], 'confidence_breakdown': {}, 'decision': {'band': 'merge', 'matched_person_id': 987654321}, 'er_version': '1', ...}, 987654321, tool_name='er')
+FAILED tests/test_person_refs.py::test_candidate_person_ids_list_elements - AssertionError: assert False is True
+ +  where False = references_person({'candidate_person_ids': [3, 987654321, 9]}, 987654321)
+FAILED tests/test_person_refs.py::test_deep_nesting_and_top_level_list - AssertionError: assert False is True
+ +  where False = references_person([[[{'matched_person_id': 987654321}]]], 987654321)
+5 failed, 36 passed in 0.06s
+
+# ===== append 2026-11-09T16:33:47+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=no -p mutplug -p no:cacheprovider
+# 시각: 2026-11-09T16:33:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 1
+# ---
+...........................F.............                                [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_refs.py::test_bool_is_not_integer_id - AssertionError: assert True is False
+ +  where True = references_person({'person_id': True}, 1)
+1 failed, 40 passed in 0.06s
+
+# ===== append 2026-11-09T16:33:48+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_person_refs.py -q --tb=no -p mutplug -p no:cacheprovider
+# 시각: 2026-11-09T16:33:48+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 1
+# ---
+............................F............                                [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_refs.py::test_string_digits_are_not_integer_id - AssertionError: assert True is False
+ +  where True = references_person({'person_id': '987654321'}, 987654321)
+1 failed, 40 passed in 0.06s

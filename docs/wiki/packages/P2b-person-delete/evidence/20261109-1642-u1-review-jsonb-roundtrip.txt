@@ -1,0 +1,41 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u1-review/jsonb_roundtrip.py
+# 시각: 2026-11-09T16:42:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 0
+# ---
+test db env: ('relationship', 'relationship_test')
+== agent_traces.output (ORM 재조회)
+  person_id          -> int    987654321
+  matched_person_id  -> NoneType None
+  flag               -> bool   True
+  as_str             -> str    '987654321'
+  as_float           -> float  987654321.0
+  small_float        -> float  1.0
+  candidate_ids values -> ['int', 'int']
+  person.id            -> int
+  candidate_person_ids -> ['int', 'int']
+  nested person_id     -> int
+  references_person(obj, 987654321) = True
+  references_person(obj, 1)  = False  (flag=True 가 1 로 안 잡혀야 False)
+  references_person(obj, 7)  = True
+== pending_questions.context (ORM 재조회)
+  person_id          -> int    987654321
+  matched_person_id  -> NoneType None
+  flag               -> bool   True
+  as_str             -> str    '987654321'
+  as_float           -> float  987654321.0
+  small_float        -> float  1.0
+  candidate_ids values -> ['int', 'int']
+  person.id            -> int
+  candidate_person_ids -> ['int', 'int']
+  nested person_id     -> int
+  references_person(obj, 987654321) = True
+  references_person(obj, 1)  = False  (flag=True 가 1 로 안 잡혀야 False)
+  references_person(obj, 7)  = True
+== SQL side
+  output::text         = {"flag": true, "as_str": "987654321", "nested": [{"b": {"person_id": 987654321}}], "person": {"id": 987654321}, "as_float": 987654321.0, "person_id": 987654321, "small_float": 1.0, "candidate_ids": {"민수": 987654321, "민준": 7}, "matched_person_id": null, "candidate_person_ids": [3, 987654321]}
+  jsonb_typeof person_id/flag/as_str/as_float = number boolean string number
+  output->>'as_float'  = 987654321.0
+  LIKE '%987654321%'   = True
+rolled back (쓰기 0)

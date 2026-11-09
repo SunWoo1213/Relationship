@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_person_refs.py -q
+# 시각: 2026-11-09T16:37:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2ff0efb (dev2)
+# exit: 0
+# ---
+.........................................                                [100%]
+41 passed in 0.26s
