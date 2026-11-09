@@ -5,9 +5,9 @@
 > 길이: 60줄 이내. 이력은 `journal.md`, 상세는 `packages/<id>/03-log.md`·`fixes/FIX-nnn.md`. 여기에는 "지금 어디, 다음 무엇"만.
 > 세션 시작·재개·압축 직후 `session-start.sh`가 이 문서를 자동으로 컨텍스트에 넣는다.
 
-갱신: 2026-11-09 01:30 (P5b-query-turn **완료 — 사용자 확인 2026-11-09**. 완료 커밋 뒤 dev2 → dev → main 승격 진행 중.)
+갱신: 2026-11-09 09:25 (P5b-query-turn 완료·승격 끝(dev2=dev=main `f67d8e4`). **사용자 2026-11-09 "다음 일들도 쭉 진행, 배포는 하지 않음"** → P9·구글 로그인 CR·P10 제외(메모리 `no-deployment`). 다음 패키지 **`P2b-person-delete`**(`DELETE /persons/{id}`, backlog 38행) — 01-plan 끝(U1 판별 함수 · U2 삭제 서비스 · U3 라우트 · U4 프론트 카드 인라인 확인 · U5 판정·문서), 결정 A~K **확정**(사용자 2026-11-09: A 서버 2단계+화면 확인 · B 프론트 포함 · C 참조 행 통째 삭제 · G id 참조만+한계 문서화, 나머지 추천안 위임). verifier 02-plan-verify **통과**([필수] 0 · [권고] R-1~R-4 → 03-log). **활성화(CURRENT active P2b-person-delete)** · 계획 커밋 → **backend-agent U1 위임**(R-1 따옴표 요령·R-2 원칙8 범위·R-4② `client.request("DELETE", …)` 포함). 단위마다 verifier 커밋 전 리뷰 → 커밋 → dev2. 그 뒤 FIX 후보(R-U10R-4 오병합 계열 등) → 하네스 후보.)
 
-active: **none** | frozen: none | 브랜치 `dev2`(04-review 커밋 `fb8841a` 뒤 완료 커밋) → 승격 대상 `dev2:dev` → `dev:main` | 승격 전 origin/dev `678bca7` · origin/main `f05d017` | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 12), 테스트 `relationship_test` | 기준선: 백엔드 **2136 passed skip 0** · 프론트 156 passed · E2E 4 | 로컬 서버 :8000(`--reload`, 메인 세션이 직접 기동 가능 — L-007)
+active: **none** | frozen: none | **origin/dev2 = origin/dev = origin/main = `f67d8e4`** | 미커밋: `journal.md`(훅이 쓴 COMMIT·PUSH·RELEASE 3줄 — 다음 커밋에 같이) | DB `capstone2-postgres-1`(5433): 개발 `relationship`(인물 12), 테스트 `relationship_test` | 기준선: 백엔드 **2136 passed skip 0** · 프론트 156 passed · E2E 4 | 로컬 서버 :8000(`--reload`, 메인 세션이 직접 기동 가능 — L-007)
 
 ## 최근 끝낸 것
 | 무엇 | 결과 | 기록 |
@@ -18,10 +18,10 @@ active: **none** | frozen: none | 브랜치 `dev2`(04-review 커밋 `fb8841a` �
 | P8b-persons-grid 완료(10-28) | `678bca7` | `packages/P8b-persons-grid/04-review.md` |
 
 ## 진행 중 (이 턴에서 멈춘 자리)
-- 완료 커밋(04-review `확인:` 줄 · CURRENT active none · journal DONE · 이 문서) → `git push origin dev2` → `git push origin dev2:dev` → `git fetch origin dev:dev` → `git push origin dev:main` → `git fetch origin main:main`. 이 순서 중 어디서 멈췄는지는 `git log --oneline -1 origin/main` 으로 확인한다.
+- 없음. 완료 커밋 `f67d8e4` → `dev2:dev`(678bca7..f67d8e4) → `dev:main`(0e943eb..f67d8e4, fast-forward) 끝.
 
 ## 바로 다음에 할 것 (순서대로)
-1. 승격이 끝났는지 확인(origin/dev·origin/main 이 완료 커밋과 같은지). 안 끝났으면 위 순서 이어서.
+1. 사용자 요청 대기. 새 작업을 시작하면 첫 커밋에 미커밋 `journal.md` 3줄을 같이 넣는다.
 2. 다음 패키지 후보(사용자 요청 대기): **① 구글 로그인 + 사용자 격리**(CR, P9 착수 조건 R-U10D-3·F-fbaaae) → P9-infra(R-U10D-1~4·S1~S15) · P10 평가.
 3. FIX 후보: R-U10R-4·이번 ⑦ — 호칭 단독/같은 성·같은 직함 2명일 때 자동 병합("박 과장님" → 박선우 conf 0.838, 박선영도 있음; 원칙1) · R-U7F3-3 E-5 템플릿 "직장·동" vs LLM 답 "직장 관계, 위계 동(같은 급)" 표기 통일(사용자 결정) · R-U5R-1/3/4 · R-U10R-5.
 4. 하네스 L/FIX 후보: `stage-gate.sh`·`verify-impl.sh` 가 `결과: **통과**` 굵게를 못 읽음 · `save_evidence.py` 가 `-k "a or b"`·`-c "…"` 인자를 쪼갬(이번 04-review 에서 재실행 필요했음) · 서브에이전트 429 중단 시 SendMessage 로 재개하면 이어서 된다(이번 확인) · ruff 하네스 기존 경고(`findings.py` DTZ005·`bash_write_check.py` B007).

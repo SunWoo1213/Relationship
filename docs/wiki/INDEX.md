@@ -64,6 +64,7 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | `P1-schema` | 스키마 v2 마이그레이션 | backend-agent | R8 R9 |
 | `P1-pilot-dataset` | 파일럿 데이터셋 30~50건 | eval-agent | — |
 | `P2-tools` | 툴 7종 v2 | backend-agent | R6 R7 R10 R18 |
+| `P2b-person-delete` | `DELETE /persons/{id}` 인물 단위 완전 삭제 (security §5, F-4d2507) — P5b 뒤, 배포 없이 진행(2026-11-09) | backend-agent (+ 프론트 확인 UI 는 계획 결정) | — |
 | `P3-er` | ER 4단계 + 확신도 + trace | backend-agent | R4 R9 |
 | `P3-baselines` | 베이스라인 3종 | eval-agent | — |
 | `P3-llm-providers` | LLM 판정기 공급자 등록표·활성 스위치 + Gemini 구현 | backend-agent | — (R4 는 P4 가 닫는다 — 이 패키지는 공급자를 늘릴 뿐 실호출 미검증 꼬리표를 풀지 않는다) |

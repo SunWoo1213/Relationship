@@ -594,3 +594,7 @@
 - 2026-11-09 00:55 | COMMIT | fb8841a docs(P5b-query-turn): 완료 검토 결과 "완료" 와 그 증거를 남기고 목록 문서를 정리한다
 - 2026-11-09 00:55 | PUSH-dev2 | origin dev2 fb8841a (실험 푸시)
 - 2026-11-09 01:30 | DONE | P5b-query-turn 완료 — verifier 04-review `완료`([필수] 0), 판정 표 통과 20·문구 보정 1(R-04-1)·결정 H #4 되묻기 허용(R-04-2), 2136 passed skip 0, 변이 7/7, verify-impl FAIL 0/WARN 1(하네스 ruff 기존). 실 LLM 4차 ① 관계 질문 정답. 사용자 완성 확인(L-006 첫 적용) — E-6 1문장 추가·E-5 표기 차(R-U7F3-3)·"박 과장님" P10 인계 고지. active none. 이어서 dev2:dev → dev:main 승격 | P5b-query-turn CR-004 D16 R19 L-006 L-007
+- 2026-11-09 09:14 | COMMIT | f67d8e4 docs(P5b-query-turn): 사용자 완성 확인을 남기고 패키지를 닫는다
+- 2026-11-09 09:14 | PUSH-dev2 | origin dev2 f67d8e4 (실험 푸시)
+- 2026-11-09 09:15 | RELEASE | origin main ← dev f67d8e4
+- 2026-11-09 16:35 | START | P2b-person-delete 활성화 — 사용자 "다음 일들 쭉 진행, 배포는 하지 않음". architect 01-plan(U1~U5) → 결정 A~K 사용자 확정(A 서버 2단계+화면 확인 · B 프론트 포함 · C 참조 행 통째 삭제 · G id 참조만+한계 문서화 · 나머지 추천안) → verify-plan FAIL 0/WARN 2 오탐 → verifier 02-plan-verify 통과([필수] 0 · [권고] R-1~R-4). L-006 첫 패키지 시작(승인 없음) | P2b-person-delete F-4d2507 security
