@@ -196,3 +196,48 @@
 | `terraform fmt -check`·`validate` | 미실행(`terraform` 없음) | **U4 직전으로 이월**(13 문서 A-6) | — |
 
 메모: `…-u3b-mutations-names.txt` 는 불완전 사본(완전본 `names-v11-v29`) — 사용자 삭제 대상.
+
+## U3c — U3b 리뷰 권고 묶음 R-U3b-3·4·5·6·7·10 (backend-agent, 2026-11-14, 제품 코드 변경 0)
+
+`terraform` 은 이 단위 리뷰 중 설치됐다(v1.17.2) — `fmt -check`·`validate` 통과(evidence `u3c-terraform-fmt-check`·`u3c-terraform-validate`·verifier `u3c-review-tf-fmt-validate`), validation 실발화 확인(자리표·`0.0.0.0/0` 거부: `u3c-plan-rejects-*`·`u3c-review-cidr-validation`), 정상 값 plan 은 B-1 때. `tests/test_infra_files.py` 33 → **40건**(신규 7 + 기존 21 의 정규식이 `-o DPkg::Lock::Timeout=600` 을 허용하도록 수정). 증거 이름은 `evidence/20261114-15NN-u3c-<이름>.txt`.
+
+| # | 테스트 | 무엇을 단언 | 권고 |
+|---|---|---|---|
+| U3c-1 | `test_instance_enforces_imdsv2` | `metadata_options` 정확히 1개 · `http_tokens="required"` · `http_endpoint="enabled"` | R-U3b-3 |
+| U3c-2 | `test_ssh_cidr_validation_rejects_placeholder_and_open_to_world` | `ssh_cidr` validation 1개 · condition 문자열 `can(cidrnetmask(var.ssh_cidr)) && var.ssh_cidr != "0.0.0.0/0"` 정확 일치 · error_message 존재 · default 없음 | R-U3b-4 |
+| U3c-3 | `test_every_apt_get_call_waits_for_dpkg_lock` | `apt-get` 코드 줄 정확히 5개, 전부 `-o DPkg::Lock::Timeout=600` | R-U3b-5 |
+| U3c-4 | `test_instance_gets_public_ip_at_launch` | `associate_public_ip_address == "true"` | R-U3b-6① |
+| U3c-5 | `test_resource_and_data_block_counts_are_exactly_5_and_3` | 전체 `.tf` 의 `resource` 블록 5개 · `data` 블록 3개 | R-U3b-6② |
+| U3c-6 | `test_readme_says_user_runs_apply_directly` | README `3. \`apply\`` 줄 하나가 "사용자가 직접" 과 apply 명령을 함께 가짐(destroy 문구에 가려지지 않게 줄 단위) | R-U3b-6③ |
+| U3c-7 | `test_readme_has_az_unsupported_and_cloud_init_recovery_guidance` | `Unsupported` 줄(`subnet_id`·`t4g.small`) · `cloud-init status --long` 줄(`status: done`·`/var/log/cloud-init-output.log`·`재접속`·`docker`) | R-U3b-7·10 |
+
+### 변이 시험 (스크래치패드 사본 `p9-u3c/mutate.py`, 저장소 파일 무수정) — 기준 사본 40 passed, 변이 19종 **19/19 FAIL**
+
+| 변이 | 변경 | 잡은 테스트 |
+|---|---|---|
+| M1·M3 | `http_tokens` required→optional / `http_endpoint` enabled→disabled | U3c-1 |
+| M2 | `metadata_options` 블록 삭제 | U3c-1 |
+| M4 | validation 에서 `0.0.0.0/0` 거부 조건 삭제 | U3c-2 |
+| M5 | validation 에서 `can(cidrnetmask…)` 조건 삭제 | U3c-2 |
+| M6·M7 | validation 블록 삭제 / condition 을 `true` 로 | U3c-2 |
+| M8·M9 | `apt-get` 한 줄에서 잠금 옵션 제거(ca-certificates 줄·docker 설치 줄) | U3c-3 |
+| M10 | 타임아웃 600→60 전부 | U3c-3 + 21 |
+| M11 | `apt-get upgrade` 줄 삭제(호출 5→4) | U3c-3 |
+| M12·M13 | `associate_public_ip_address` false / 줄 삭제 | U3c-4 |
+| M14 | 두 번째 `aws_instance "app2"` 추가 | U3c-5 (②·③ 은 통과 — 개수 단언만 잡음) |
+| M15 | `data` 블록 4번째 추가 | U3c-5 |
+| M16 | README apply 단계 줄에서 "사용자가 직접" 제거(변이 RF 재현) | U3c-6 (기존 29 는 destroy 문구 때문에 통과 — 새 단언만 잡음) |
+| M17 | README `Unsupported` 줄 삭제 | U3c-7 |
+| M18·M19 | README `cloud-init status --long` 줄 삭제 / "재접속" 제거 | U3c-7 |
+
+### 확인
+
+| 확인 항목 | 결과 | evidence |
+|---|---|---|
+| `tests/test_infra_files.py -v` | 40 passed, skip 0 | `u3c-infra-tests` |
+| 변이 19종 | 19/19 FAIL(기준 사본 PASS) | `u3c-mutations` |
+| 전체 pytest | **2261 passed**(2254 + 7), skip 0 | `u3c-pytest-all` |
+| ruff · mypy | 통과 · 38=38 | `u3c-ruff` · `u3c-mypy` |
+| `git status --short -- app web/src alembic docker-compose.yml` · `.gitignore` check-ignore · 자격 증명 grep | 빈 출력 · tfstate/tfvars/.terraform ignore, example·.tf·sh·README·lock 은 ignore 아님(exit 1) · 0건 | `u3c-gitcheck` |
+| `terraform fmt -check`·`validate` | `terraform -chdir=infra fmt -check -diff` · `init -backend=false` · `validate` | exit 0 · aws 5.100.0, lock 생성 · "Success! The configuration is valid." | `u3c-terraform-fmt-check` · `u3c-terraform-init` · `u3c-terraform-validate` |
+| `ssh_cidr` validation 실발화 | `plan -var ssh_cidr=YOUR.IP.HERE/32` · `=0.0.0.0/0`(자격 증명 없이) | 둘 다 `Error: Invalid value for variable`(자격 증명 오류와 함께 exit 1); verifier 사본: `/32` 통과, prefix 없음·IPv6 거부, **`/24`·`/1` 통과 → R-U3c-3 `endswith("/32")` 추가로 닫음** | `u3c-plan-rejects-placeholder` · `u3c-plan-rejects-open-world` · `u3c-review-cidr-validation` |

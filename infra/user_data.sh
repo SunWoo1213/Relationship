@@ -4,13 +4,16 @@
 # `curl … | sh` 식 설치는 쓰지 않는다(security §3) — 키 파일을 내려받아 저장소로 등록하고 apt 로 설치한다.
 # .env 는 만들지 않는다 — 비밀은 사용자가 서버에서 직접 쓴다(security §1, 11 문서 §4).
 # 진행 로그: /var/log/cloud-init-output.log  ·  끝났는지: cloud-init status --wait
+#
+# 모든 apt-get 에 -o DPkg::Lock::Timeout=600 을 둔다 — 첫 부팅에 unattended-upgrades 가 dpkg 잠금을 잡고 있어도
+# 실패하지 않고 최대 600초 기다린다(R-U3b-5). 기본값은 기다리지 않고 바로 실패해 set -e 로 스크립트가 죽는다.
 set -euxo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
-apt-get update
-apt-get upgrade -y
-apt-get install -y ca-certificates curl git
+apt-get -o DPkg::Lock::Timeout=600 update
+apt-get -o DPkg::Lock::Timeout=600 upgrade -y
+apt-get -o DPkg::Lock::Timeout=600 install -y ca-certificates curl git
 
 # Docker 공식 문서 "Install using the apt repository" (Ubuntu) 그대로.
 install -m 0755 -d /etc/apt/keyrings
@@ -20,8 +23,8 @@ chmod a+r /etc/apt/keyrings/docker.asc
 . /etc/os-release
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu ${UBUNTU_CODENAME:-$VERSION_CODENAME} stable" > /etc/apt/sources.list.d/docker.list
 
-apt-get update
-apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+apt-get -o DPkg::Lock::Timeout=600 update
+apt-get -o DPkg::Lock::Timeout=600 install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 systemctl enable --now docker
 usermod -aG docker ubuntu

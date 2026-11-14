@@ -37,11 +37,13 @@ AWS_PROFILE=<프로필 이름> terraform -chdir=infra plan -var-file=terraform.t
 3. `apply` — **사용자가 직접 실행한다**(에이전트는 `plan` 까지 — security §4 "apply/destroy 는 사용자"). 사용자가 "띄워 달라" 고 한 뒤 1회, 사용자 터미널에서 `AWS_PROFILE=<프로필 이름> terraform -chdir=infra apply -var-file=terraform.tfvars` 를 치고 plan 을 한 번 더 본 뒤 `yes` 를 입력한다. 에이전트는 명령을 보여 주고 결과 출력을 evidence 로 받는다. (`apply -auto-approve` 는 safety-guard 가 막는다.)
 4. `output` — `AWS_PROFILE=<프로필 이름> terraform -chdir=infra output` 으로 `public_ip`·`ssh_command`·`sslip_hostname`·`instance_id` 를 본다.
 5. 이후는 사람 몫 — 첫 부팅이 끝났는지 `ssh -i <개인키> ubuntu@<public_ip>` 로 들어가 `cloud-init status --wait` · `docker compose version` 으로 확인한 뒤 **11 문서 §3-4(배포 커밋 checkout)부터** — `.env` 작성(§4) · 호스트명(§5) · 기동(§6) · 스모크(§7).
+   - `cloud-init status --wait` 가 `status: done` 이 아니면 `cloud-init status --long` 과 `/var/log/cloud-init-output.log` 끝을 메인 세션에 붙인다. 첫 부팅이 아직 도는 중에 들어갔다면 `docker ps` 가 permission denied 일 수 있다 — 로그아웃 후 재접속해 docker 그룹을 반영한다(11 문서 §3-3).
 
 ## 바꿔 적용하기
 
 - 발표 장소에서 IP 가 바뀌면(13 문서 D-2) `ssh_cidr` 만 고쳐 `plan` → `apply` 한다. `lifecycle.ignore_changes` 가 AMI 최신화·user-data 수정으로 인스턴스가 교체(= DB 볼륨 소실)되는 것을 막는다. 보안 그룹 규칙 하나만 바뀐다.
 - `instance_type` 을 x86(`t3.*`)으로 바꾸면 `ami_architecture = "amd64"` 도 함께 바꾼다.
+- 서브넷은 `sort(data.aws_subnets.default.ids)[0]` 로 고른 AZ 하나다. `plan` 은 인스턴스 유형의 AZ 지원 여부를 검사하지 않아 `apply` 에서 `Unsupported: Your requested instance type (t4g.small) is not supported in your requested Availability Zone` 으로 멈출 수 있다 — 그러면 `main.tf` 의 `subnet_id` 를 다른 기본 서브넷으로 바꾼다(`[0]` → `[1]`, 안 되면 `[2]`). 테스트 `⑫` 가 `[0]` 을 단언하므로 같이 고친다(메인 세션에 맡긴다).
 
 ## 끝내기 (12 문서)
 

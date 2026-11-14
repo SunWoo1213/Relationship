@@ -1,0 +1,41 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/u3c-review/mutate.py
+# 시각: 2026-11-14T15:39:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe45a0d (dev2)
+# exit: 0
+# ---
+name	desc	exit	verdict	failed_tests
+BASE	변이 없음(기준 사본) — PASS 가 정상	exit=0	기준 PASS	-
+    40 passed in 0.11s
+RB	[U3b 생존] associate_public_ip_address = true → false	exit=1	잡힘(FAIL)	test_instance_gets_public_ip_at_launch
+    1 failed, 39 passed in 0.10s
+RC	[U3b 생존] 두 번째 aws_instance "app2" 추가(라벨만 다른 복제, 비용 2배)	exit=1	잡힘(FAIL)	test_resource_and_data_block_counts_are_exactly_5_and_3
+    1 failed, 39 passed in 0.10s
+RF	[U3b 생존] README 3번 apply 줄에서 주체 "**사용자가 직접 실행한다**" 삭제	exit=1	잡힘(FAIL)	test_readme_says_user_runs_apply_directly
+    1 failed, 39 passed in 0.10s
+N1	apt-get 잠금 timeout 600 → 6000 (한 줄) — 부분 문자열 단언이면 생존	exit=0	생존(PASS)	-
+    40 passed in 0.10s
+N2	apt-get 옵션 철자 DPkg::Lock::Timeout → Dpkg::Lock::Timeout (한 줄; apt 는 대소문자 무시하지만 단언은?)	exit=1	잡힘(FAIL)	test_every_apt_get_call_waits_for_dpkg_lock
+    1 failed, 39 passed in 0.10s
+N3	apt-get 한 줄을 주석 처리(# apt-get … upgrade) — 호출 5 → 4	exit=1	잡힘(FAIL)	test_every_apt_get_call_waits_for_dpkg_lock
+    1 failed, 39 passed in 0.10s
+N4	ssh_cidr validation condition 의 && → ||  (자리표만 넣어도 통과하는 조건)	exit=1	잡힘(FAIL)	test_ssh_cidr_validation_rejects_placeholder_and_open_to_world
+    1 failed, 39 passed in 0.10s
+N5	ssh_cidr validation 의 0.0.0.0/0 → 0.0.0.0/1 (전체 개방 다시 허용)	exit=1	잡힘(FAIL)	test_ssh_cidr_validation_rejects_placeholder_and_open_to_world
+    1 failed, 39 passed in 0.10s
+N6	metadata_options 를 두 번(중복 블록) — HCL validate 는 거부, 텍스트 단언은?	exit=1	잡힘(FAIL)	test_instance_enforces_imdsv2
+    1 failed, 39 passed in 0.10s
+N7	metadata_options 에서 http_tokens 줄 삭제(기본 optional 로 회귀)	exit=1	잡힘(FAIL)	test_instance_enforces_imdsv2
+    1 failed, 39 passed in 0.10s
+N8	associate_public_ip_address 를 문자열 "true" 로(HCL 은 동치 — 단언이 거짓 FAIL 을 내는지)	exit=1	잡힘(FAIL)	test_instance_gets_public_ip_at_launch
+    1 failed, 39 passed in 0.10s
+N9	data 블록을 outputs.tf 에 하나 추가(main.tf 밖 — 개수 단언이 전체 .tf 를 보는지)	exit=1	잡힘(FAIL)	test_resource_and_data_block_counts_are_exactly_5_and_3
+    1 failed, 39 passed in 0.10s
+N10	README Unsupported 줄에서 subnet_id 처방 삭제(오류 문구만 남김)	exit=1	잡힘(FAIL)	test_readme_has_az_unsupported_and_cloud_init_recovery_guidance
+    1 failed, 39 passed in 0.10s
+N11	README cloud-init 줄에서 로그 경로 /var/log/cloud-init-output.log 삭제	exit=1	잡힘(FAIL)	test_readme_has_az_unsupported_and_cloud_init_recovery_guidance
+    1 failed, 39 passed in 0.10s
+N12	README 3번 apply 줄의 명령에서 -var-file=terraform.tfvars 삭제	exit=1	잡힘(FAIL)	test_readme_documents_order_and_guards,test_readme_says_user_runs_apply_directly
+    2 failed, 38 passed in 0.11s
+N13	ssh_cidr 에 default = "0.0.0.0/0" 추가(validation 은 있어도 기본값이 열림)	exit=1	잡힘(FAIL)	test_ssh_cidr_and_key_path_have_no_default,test_ssh_cidr_validation_rejects_placeholder_and_open_to_world
+    2 failed, 38 passed in 0.10s

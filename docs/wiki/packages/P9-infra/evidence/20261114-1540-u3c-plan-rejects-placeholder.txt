@@ -1,0 +1,37 @@
+# 명령: terraform -chdir=infra plan -input=false -no-color -var ssh_cidr=YOUR.IP.HERE/32 -var ssh_public_key_path=/dev/null
+# 시각: 2026-11-14T15:40:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe45a0d (dev2)
+# exit: 1
+# ---
+
+Planning failed. Terraform encountered an error while generating this plan.
+
+
+Error: No valid credential sources found
+
+  with provider["registry.terraform.io/hashicorp/aws"],
+  on main.tf line 23, in provider "aws":
+  23: provider "aws" {
+
+Please see https://registry.terraform.io/providers/hashicorp/aws
+for more information about providing credentials.
+
+Error: failed to refresh cached credentials, no EC2 IMDS role found,
+operation error ec2imds: GetMetadata, exceeded maximum number of attempts, 3,
+request send failed, Get
+"http://169.254.169.254/latest/meta-data/iam/security-credentials/": dial tcp
+169.254.169.254:80: connect: host is down
+
+
+Error: Invalid value for variable
+
+  on variables.tf line 32:
+  32: variable "ssh_cidr" {
+    ├────────────────
+    │ var.ssh_cidr is "YOUR.IP.HERE/32"
+
+Set ssh_cidr to your own IPv4 address as a /32 cidr, for example
+203.0.113.7/32. The placeholder and 0.0.0.0/0 are rejected.
+
+This was checked by the validation rule at variables.tf:37,3-13.

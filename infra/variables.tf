@@ -32,6 +32,13 @@ variable "ssh_public_key_path" {
 variable "ssh_cidr" {
   description = "SSH(22) 를 허용할 내 공인 IP 의 cidr (예: 203.0.113.7/32). 기동 당일 다시 확인한다 — 13 문서 A-9"
   type        = string
+
+  # 자리표(YOUR.IP.HERE/32)를 안 바꿨거나 전체 개방(0.0.0.0/0)이거나 /32 가 아니면 plan 단계에서 멈춘다
+  # (R-U3b-4 · R-U3c-3 — 결정 D "22 는 내 IP 만" 이므로 /24 같은 대역도 거부한다).
+  validation {
+    condition     = can(cidrnetmask(var.ssh_cidr)) && var.ssh_cidr != "0.0.0.0/0" && endswith(var.ssh_cidr, "/32")
+    error_message = "Set ssh_cidr to your own IPv4 address as a /32 cidr, for example 203.0.113.7/32. The placeholder, 0.0.0.0/0 and wider ranges are rejected."
+  }
 }
 
 variable "root_volume_gb" {

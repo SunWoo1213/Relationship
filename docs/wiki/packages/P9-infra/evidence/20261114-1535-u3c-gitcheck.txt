@@ -1,0 +1,30 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u3c/gitcheck.sh
+# 시각: 2026-11-14T15:35:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe45a0d (dev2)
+# exit: 0
+# ---
+== git status --short -- app web/src alembic docker-compose.yml (빈 출력이어야 한다) ==
+(끝)
+== 이번 단위로 바뀐 파일 ==
+ M infra/README.md
+ M infra/main.tf
+ M infra/user_data.sh
+ M infra/variables.tf
+ M tests/test_infra_files.py
+?? docs/wiki/packages/P9-infra/evidence/20261114-1512-u3b-mutations-names.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1534-u3c-infra-tests.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1534-u3c-mutations.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1535-u3c-mypy.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1535-u3c-ruff.txt
+== check-ignore: ignore 되어야 하는 것 ==
+.gitignore:46:infra/*.tfstate	infra/terraform.tfstate
+.gitignore:47:infra/*.tfstate.*	infra/terraform.tfstate.backup
+.gitignore:48:infra/*.tfvars	infra/terraform.tfvars
+.gitignore:45:infra/.terraform/	infra/.terraform/x
+.gitignore:48:infra/*.tfvars	infra/prod.auto.tfvars
+exit=0
+== check-ignore: ignore 되면 안 되는 것(exit 1 이 정상) ==
+exit=1
+== 자격 증명 모양 grep(0건이 정상) ==
+exit=1 (1 = 0건)

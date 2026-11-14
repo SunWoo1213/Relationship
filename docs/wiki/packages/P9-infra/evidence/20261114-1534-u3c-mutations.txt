@@ -1,0 +1,46 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u3c/mutations.sh
+# 시각: 2026-11-14T15:34:56+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe45a0d (dev2)
+# exit: 0
+# ---
+BASE	변이 없음(기준 사본)	exit=0	생존(PASS)	-
+    40 passed in 0.11s
+M1	http_tokens required → optional (IMDSv2 해제)	exit=1	잡힘(FAIL)	test_instance_enforces_imdsv2
+    1 failed, 39 passed in 0.12s
+M2	metadata_options 블록 통째 삭제	exit=1	잡힘(FAIL)	test_instance_enforces_imdsv2
+    1 failed, 39 passed in 0.12s
+M3	http_endpoint enabled → disabled	exit=1	잡힘(FAIL)	test_instance_enforces_imdsv2
+    1 failed, 39 passed in 0.12s
+M4	ssh_cidr validation 에서 0.0.0.0/0 거부 조건 삭제	exit=1	잡힘(FAIL)	test_ssh_cidr_validation_rejects_placeholder_and_open_to_world
+    1 failed, 39 passed in 0.12s
+M5	ssh_cidr validation 에서 can(cidrnetmask) 조건 삭제	exit=1	잡힘(FAIL)	test_ssh_cidr_validation_rejects_placeholder_and_open_to_world
+    1 failed, 39 passed in 0.12s
+M6	ssh_cidr validation 블록 통째 삭제	exit=1	잡힘(FAIL)	test_ssh_cidr_validation_rejects_placeholder_and_open_to_world
+    1 failed, 39 passed in 0.12s
+M7	ssh_cidr validation 조건을 true 로	exit=1	잡힘(FAIL)	test_ssh_cidr_validation_rejects_placeholder_and_open_to_world
+    1 failed, 39 passed in 0.12s
+M8	install(ca-certificates) apt-get 에서 잠금 옵션 제거	exit=1	잡힘(FAIL)	test_every_apt_get_call_waits_for_dpkg_lock
+    1 failed, 39 passed in 0.12s
+M9	마지막 docker install apt-get 에서 잠금 옵션 제거	exit=1	잡힘(FAIL)	test_every_apt_get_call_waits_for_dpkg_lock
+    1 failed, 39 passed in 0.12s
+M10	모든 잠금 타임아웃 600 → 60	exit=1	잡힘(FAIL)	test_user_data_installs_docker_from_apt_repository, test_every_apt_get_call_waits_for_dpkg_lock
+    2 failed, 38 passed in 0.12s
+M11	apt-get upgrade 줄 삭제(호출 개수 4)	exit=1	잡힘(FAIL)	test_every_apt_get_call_waits_for_dpkg_lock
+    1 failed, 39 passed in 0.12s
+M12	associate_public_ip_address true → false	exit=1	잡힘(FAIL)	test_instance_gets_public_ip_at_launch
+    1 failed, 39 passed in 0.12s
+M13	associate_public_ip_address 줄 삭제	exit=1	잡힘(FAIL)	test_instance_gets_public_ip_at_launch
+    1 failed, 39 passed in 0.12s
+M14	두 번째 aws_instance(app2) 추가	exit=1	잡힘(FAIL)	test_resource_and_data_block_counts_are_exactly_5_and_3
+    1 failed, 39 passed in 0.12s
+M15	data aws_region 추가(data 4개)	exit=1	잡힘(FAIL)	test_resource_and_data_block_counts_are_exactly_5_and_3
+    1 failed, 39 passed in 0.12s
+M16	README apply 단계 줄에서 '사용자가 직접' 제거(RF)	exit=1	잡힘(FAIL)	test_readme_says_user_runs_apply_directly
+    1 failed, 39 passed in 0.12s
+M17	README 의 Unsupported/subnet_id 안내 줄 삭제	exit=1	잡힘(FAIL)	test_readme_has_az_unsupported_and_cloud_init_recovery_guidance
+    1 failed, 39 passed in 0.12s
+M18	README 의 cloud-init status --long 줄 삭제	exit=1	잡힘(FAIL)	test_readme_has_az_unsupported_and_cloud_init_recovery_guidance
+    1 failed, 39 passed in 0.12s
+M19	README cloud-init 줄에서 '재접속' 제거	exit=1	잡힘(FAIL)	test_readme_has_az_unsupported_and_cloud_init_recovery_guidance
+    1 failed, 39 passed in 0.12s

@@ -1,0 +1,57 @@
+# 명령: .venv/bin/python -m pytest tests/test_infra_files.py -v
+# 시각: 2026-11-14T15:34:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe45a0d (dev2)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 40 items
+
+tests/test_infra_files.py::test_infra_files_exist PASSED                 [  2%]
+tests/test_infra_files.py::test_only_allowed_resources_and_data_sources PASSED [  5%]
+tests/test_infra_files.py::test_security_group_inbound_is_80_443_22_only PASSED [  7%]
+tests/test_infra_files.py::test_security_group_http_https_open_ipv4_and_ipv6 PASSED [ 10%]
+tests/test_infra_files.py::test_security_group_ssh_cidr_is_the_variable_only PASSED [ 12%]
+tests/test_infra_files.py::test_no_db_or_backend_port_anywhere_in_main PASSED [ 15%]
+tests/test_infra_files.py::test_egress_is_all_traffic PASSED             [ 17%]
+tests/test_infra_files.py::test_ssh_cidr_and_key_path_have_no_default PASSED [ 20%]
+tests/test_infra_files.py::test_variable_defaults_are_the_decided_values PASSED [ 22%]
+tests/test_infra_files.py::test_variables_declared_are_exactly_the_planned_set PASSED [ 25%]
+tests/test_infra_files.py::test_root_volume_gp3_delete_on_termination_true PASSED [ 27%]
+tests/test_infra_files.py::test_instance_uses_variable_type_security_group_key_and_static_user_data PASSED [ 30%]
+tests/test_infra_files.py::test_ami_is_looked_up_from_canonical_not_hardcoded PASSED [ 32%]
+tests/test_infra_files.py::test_default_vpc_and_default_subnets_are_used PASSED [ 35%]
+tests/test_infra_files.py::test_key_pair_registers_public_key_from_variable_path PASSED [ 37%]
+tests/test_infra_files.py::test_elastic_ip_is_associated_with_the_instance PASSED [ 40%]
+tests/test_infra_files.py::test_tags_project_and_shutdown_by PASSED      [ 42%]
+tests/test_infra_files.py::test_lifecycle_ignores_ami_and_user_data_changes PASSED [ 45%]
+tests/test_infra_files.py::test_provider_pinned_and_has_no_credentials PASSED [ 47%]
+tests/test_infra_files.py::test_terraform_and_provider_versions_are_pinned PASSED [ 50%]
+tests/test_infra_files.py::test_no_credential_shaped_strings_in_infra_files PASSED [ 52%]
+tests/test_infra_files.py::test_credential_detector_catches_samples PASSED [ 55%]
+tests/test_infra_files.py::test_outputs_declared_with_expected_values PASSED [ 57%]
+tests/test_infra_files.py::test_ssh_command_output_has_no_private_key_path PASSED [ 60%]
+tests/test_infra_files.py::test_user_data_installs_docker_from_apt_repository PASSED [ 62%]
+tests/test_infra_files.py::test_user_data_has_no_download_pipe_to_shell PASSED [ 65%]
+tests/test_infra_files.py::test_user_data_docker_group_clone_and_no_env_file PASSED [ 67%]
+tests/test_infra_files.py::test_user_data_starts_with_bash_shebang PASSED [ 70%]
+tests/test_infra_files.py::test_gitignore_blocks_state_vars_and_plugin_cache PASSED [ 72%]
+tests/test_infra_files.py::test_gitignore_does_not_ignore_lock_file_or_tf_sources PASSED [ 75%]
+tests/test_infra_files.py::test_no_state_or_vars_files_are_present_in_tree PASSED [ 77%]
+tests/test_infra_files.py::test_tfvars_example_has_placeholders_only PASSED [ 80%]
+tests/test_infra_files.py::test_readme_documents_order_and_guards PASSED [ 82%]
+tests/test_infra_files.py::test_instance_enforces_imdsv2 PASSED          [ 85%]
+tests/test_infra_files.py::test_ssh_cidr_validation_rejects_placeholder_and_open_to_world PASSED [ 87%]
+tests/test_infra_files.py::test_every_apt_get_call_waits_for_dpkg_lock PASSED [ 90%]
+tests/test_infra_files.py::test_instance_gets_public_ip_at_launch PASSED [ 92%]
+tests/test_infra_files.py::test_resource_and_data_block_counts_are_exactly_5_and_3 PASSED [ 95%]
+tests/test_infra_files.py::test_readme_says_user_runs_apply_directly PASSED [ 97%]
+tests/test_infra_files.py::test_readme_has_az_unsupported_and_cloud_init_recovery_guidance PASSED [100%]
+
+============================== 40 passed in 0.11s ==============================

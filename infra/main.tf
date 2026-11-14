@@ -138,6 +138,12 @@ resource "aws_instance" "app" {
     delete_on_termination = true
   }
 
+  # IMDSv2 강제 -- 메타데이터 조회에 토큰이 필요해 SSRF 류로 인스턴스 정보를 읽히는 길을 닫는다(R-U3b-3, 비용 0).
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
   # 기동 뒤 plan 이 AMI 최신화·user-data 수정만으로 인스턴스를 교체하려 들면(= 루트 볼륨의 DB 소실) 막는다.
   # 보안 그룹 규칙 변경(예: 22 의 cidr, 13 문서 D-2)은 원래 인스턴스를 건드리지 않는다 — 이 블록은 그와 별개로
   # 같은 apply 에서 AMI 가 바뀌어 있어도 인스턴스가 교체되지 않게 하는 안전장치다.

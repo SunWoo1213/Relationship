@@ -1,0 +1,13 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/u3c-review/credgrep.sh
+# 시각: 2026-11-14T15:41:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe45a0d (dev2)
+# exit: 0
+# ---
+== 자격 증명 모양 grep -r (0건이 정상) ==
+cred exit=1 (1 = 0건)
+== 12자리 숫자(Canonical 소유자 099720109477 제외, 0건이 정상) ==
+Binary file infra/.terraform/providers/registry.terraform.io/hashicorp/aws/5.100.0/darwin_arm64/terraform-provider-aws_v5.100.0_x5 matches
+12digit exit=0 (1 = 0건)
+== 비밀 파일 접근 없음: infra/ 에 .env·tfvars 실파일 없는지 ==
+ls exit=1 (1 = 없음)

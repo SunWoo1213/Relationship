@@ -1,0 +1,38 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/u3c-review/cidr-validation.sh
+# 시각: 2026-11-14T15:43:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe45a0d (dev2)
+# exit: 0
+# ---
+== 사본이 저장소 원문과 같은지 ==
+same
+== init -backend=false (공급자 없음 → 네트워크 없음) ==
+init exit=0
+== 자리표(거부 기대) : ssh_cidr="YOUR.IP.HERE/32" ==
+Error: Invalid value for variable
+Set ssh_cidr to your own IPv4 address as a /32 cidr, for example
+plan exit=1
+== 전체 개방(거부 기대) : ssh_cidr="0.0.0.0/0" ==
+Error: Invalid value for variable
+Set ssh_cidr to your own IPv4 address as a /32 cidr, for example
+plan exit=1
+== 정상 /32(통과 기대) : ssh_cidr="203.0.113.7/32" ==
+Changes to Outputs:
+  + ssh_cidr = "203.0.113.7/32"
+plan exit=0
+== prefix 없는 IP(거부 기대) : ssh_cidr="203.0.113.7" ==
+Error: Invalid value for variable
+Set ssh_cidr to your own IPv4 address as a /32 cidr, for example
+plan exit=1
+== IPv6(거부 — cidrnetmask 는 IPv4 만) : ssh_cidr="2001:db8::/32" ==
+Error: Invalid value for variable
+Set ssh_cidr to your own IPv4 address as a /32 cidr, for example
+plan exit=1
+== /24(조건상 통과 — /32 강제 아님) : ssh_cidr="203.0.113.0/24" ==
+Changes to Outputs:
+  + ssh_cidr = "203.0.113.0/24"
+plan exit=0
+== /1(조건상 통과 — 거의 전체 개방) : ssh_cidr="0.0.0.0/1" ==
+Changes to Outputs:
+  + ssh_cidr = "0.0.0.0/1"
+plan exit=0

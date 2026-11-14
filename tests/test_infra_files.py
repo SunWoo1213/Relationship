@@ -366,7 +366,8 @@ def test_user_data_installs_docker_from_apt_repository():
     assert "https://download.docker.com/linux/ubuntu/gpg" in code
     assert "/etc/apt/sources.list.d/docker.list" in code
     assert re.search(
-        r"apt-get install -y docker-ce docker-ce-cli containerd\.io docker-buildx-plugin docker-compose-plugin\b",
+        r"apt-get (-o DPkg::Lock::Timeout=600 )?install -y docker-ce docker-ce-cli containerd\.io "
+        r"docker-buildx-plugin docker-compose-plugin\b",
         code,
     )
     assert "get.docker.com" not in code
@@ -424,10 +425,10 @@ def test_gitignore_does_not_ignore_lock_file_or_tf_sources():
 
 
 def test_no_state_or_vars_files_are_present_in_tree():
-    """27 `infra/` 에 tfstate·tfvars(example 제외)·`.terraform/` 가 놓여 있지 않다 -- 에이전트는 apply 한 적이 없다."""
+    """27 `infra/` 에 tfstate·tfvars(example 제외)가 놓여 있지 않다 -- 에이전트는 apply 한 적이 없다.
+    `.terraform/`(provider 캐시)은 `init` 의 정상 산출물이라 여기서 보지 않는다(R-U3c-1) — `.gitignore` 가 막는 것은 테스트 25·26 이 본다."""
     infra = ROOT / "infra"
     names = {p.name for p in infra.iterdir()}
-    assert ".terraform" not in names
     for n in names:
         assert ".tfstate" not in n, n
         if n.endswith(".tfvars"):
@@ -472,3 +473,63 @@ def test_readme_documents_order_and_guards():
     assert "-auto-approve" not in re.sub(r"`apply -auto-approve`[^\n]*", "", text), (
         "README 가 auto-approve 를 권하는 명령으로 쓴다"
     )
+
+
+# U3c -- U3b 리뷰 권고 R-U3b-3·4·5·6·7·10 ----------------------------------------------------------
+def test_instance_enforces_imdsv2():
+    """U3c-1 (R-U3b-3) 인스턴스 `metadata_options` 가 IMDSv2 를 강제한다 -- `http_tokens = required`·`http_endpoint = enabled`."""
+    blocks = _brace_blocks(_resource_block("aws_instance"), r"metadata_options")
+    assert len(blocks) == 1, "metadata_options 블록이 정확히 하나여야 한다"
+    assert _attr(blocks[0], "http_tokens") == '"required"'
+    assert _attr(blocks[0], "http_endpoint") == '"enabled"'
+
+
+def test_ssh_cidr_validation_rejects_placeholder_and_open_to_world():
+    """U3c-2 (R-U3b-4) `ssh_cidr` validation 이 `cidrnetmask` 파싱(자리표 `YOUR.IP.HERE/32` 거부)과 `0.0.0.0/0` 거부를 모두 건다."""
+    blocks = _brace_blocks(_variable_block("ssh_cidr"), r"validation")
+    assert len(blocks) == 1, "ssh_cidr validation 블록이 정확히 하나여야 한다"
+    condition = _attr(blocks[0], "condition")
+    # /32 강제(R-U3c-3): 결정 D "22 는 내 IP 만" — /24·/1 같은 넓은 대역은 거부한다.
+    assert condition == 'can(cidrnetmask(var.ssh_cidr)) && var.ssh_cidr != "0.0.0.0/0" && endswith(var.ssh_cidr, "/32")'
+    assert _attr(blocks[0], "error_message"), "error_message 가 없다"
+    # validation 이 들어와도 기본값이 없어야 한다는 ⑥ 의 전제가 그대로인지 -- 자리표가 기본값으로 둔갑하지 않는다.
+    assert _attr(_variable_block("ssh_cidr"), "default") is None
+
+
+def test_every_apt_get_call_waits_for_dpkg_lock():
+    """U3c-3 (R-U3b-5) user-data 의 모든 `apt-get` 호출이 `-o DPkg::Lock::Timeout=600` 을 갖는다(호출 5개 -- 줄이 사라져 공전하지 않게)."""
+    calls = [ln for ln in _code_lines(_read(USER_DATA)) if re.search(r"\bapt-get\b", ln)]
+    assert len(calls) == 5, f"apt-get 호출은 5개여야 한다(지금 {len(calls)}): {calls}"
+    for ln in calls:
+        assert re.search(r"\s-o DPkg::Lock::Timeout=600(\s|$)", ln), f"잠금 대기 옵션이 없다(또는 값이 다르다): {ln.strip()}"
+
+
+def test_instance_gets_public_ip_at_launch():
+    """U3c-4 (R-U3b-6①) `associate_public_ip_address = true` -- EIP 가 붙기 전에도 user-data 의 apt 가 인터넷에 나간다."""
+    assert _attr(_resource_block("aws_instance"), "associate_public_ip_address") == "true"
+
+
+def test_resource_and_data_block_counts_are_exactly_5_and_3():
+    """U3c-5 (R-U3b-6②) 자원 블록 정확히 5개·data 블록 정확히 3개 -- `aws_instance` 두 번째(라벨만 다른 복제)가 생기면 FAIL."""
+    code = _all_tf_code()
+    assert len(re.findall(r'^resource\s+"', code, re.M)) == 5
+    assert len(re.findall(r'^data\s+"', code, re.M)) == 3
+
+
+def test_readme_says_user_runs_apply_directly():
+    """U3c-6 (R-U3b-6③) README 의 `apply` 단계(3번) 줄 자체가 "사용자가 직접" 을 말한다(destroy 문구에 가려지지 않게 줄 단위)."""
+    lines = [ln for ln in _read(README).splitlines() if re.match(r"^3\.\s+`apply`", ln)]
+    assert len(lines) == 1, "README 에 `3. `apply`` 단계 줄이 정확히 하나여야 한다"
+    assert "사용자가 직접" in lines[0]
+    assert "terraform -chdir=infra apply -var-file=terraform.tfvars" in lines[0]
+
+
+def test_readme_has_az_unsupported_and_cloud_init_recovery_guidance():
+    """U3c-7 (R-U3b-7·10) README 가 AZ 미지원(`Unsupported`→`subnet_id` 교체)·cloud-init 실패 판정·docker 그룹 재접속을 안내한다."""
+    text = _read(README)
+    az = [ln for ln in text.splitlines() if "Unsupported" in ln]
+    assert len(az) == 1 and "subnet_id" in az[0] and "t4g.small" in az[0], "AZ 미지원 처방 줄이 없다"
+    ci = [ln for ln in text.splitlines() if "cloud-init status --long" in ln]
+    assert len(ci) == 1
+    assert "status: done" in ci[0] and "/var/log/cloud-init-output.log" in ci[0]
+    assert "재접속" in ci[0] and "docker" in ci[0]

@@ -616,3 +616,5 @@
 - 2026-11-14 14:55 | PUSH-dev2 | origin dev2 70fcd08 (실험 푸시)
 - 2026-11-14 15:23 | COMMIT | 809fc96 ci(P9-infra): CI 가 운영 이미지를 빌드해 compose 로 띄우고 건강 상태를 확인하도록 하고, 첫 화면 캐시 헤더와 검사 테스트를 보강한다
 - 2026-11-14 15:23 | PUSH-dev2 | origin dev2 809fc96 (실험 푸시)
+- 2026-11-14 15:32 | COMMIT | fe45a0d infra(P9-infra): AWS 권한을 받으면 Terraform 으로 EC2·보안 그룹·EIP 를 만들 수 있게 선언 파일을 두고, 사용자가 할 일 문서를 더한다
+- 2026-11-14 15:32 | PUSH-dev2 | origin dev2 fe45a0d (실험 푸시)

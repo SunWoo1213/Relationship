@@ -1,0 +1,8 @@
+# 명령: terraform -chdir=infra validate -no-color
+# 시각: 2026-11-14T15:40:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe45a0d (dev2)
+# exit: 0
+# ---
+Success! The configuration is valid.
+

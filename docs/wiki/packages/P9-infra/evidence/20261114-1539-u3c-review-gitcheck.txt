@@ -1,0 +1,104 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/u3c-review/gitcheck.sh
+# 시각: 2026-11-14T15:39:53+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe45a0d (dev2)
+# exit: 0
+# ---
+== HEAD ==
+fe45a0d
+dev2
+== 제품 코드 미커밋 변경(빈 출력이어야 한다): git status --short -- app web/src alembic docker-compose.yml docker/initdb ==
+(끝)
+== git diff --stat HEAD -- app web/src alembic (빈 출력이어야 한다) ==
+(끝)
+== 이번 단위 변경 파일 ==
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P9-infra/03-log.md
+ M docs/wiki/packages/P9-infra/tests.md
+ M infra/README.md
+ M infra/main.tf
+ M infra/user_data.sh
+ M infra/variables.tf
+ M tests/test_infra_files.py
+?? docs/wiki/fixes/evidence/20261108-2000-L-007-test-guards.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261107-1455-u7fix-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261108-2009-u7fix3-review-baseline.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1512-u3b-mutations-names.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1534-u3c-infra-tests.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1534-u3c-mutations.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1535-u3c-gitcheck.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1535-u3c-mypy.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1535-u3c-pytest-all.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1535-u3c-ruff.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1539-u3c-review-infra-tests.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1539-u3c-review-ruff.txt
+== HCL 블록 개수(결정 S: resource 5 · data 3 · variable 7 · output 4) ==
+resource=5
+data=3
+variable=7
+output=4
+== metadata_options 블록 ==
+142:  metadata_options {
+143-    http_endpoint = "enabled"
+144-    http_tokens   = "required"
+145-  }
+== ssh_cidr validation ==
+38-    condition     = can(cidrnetmask(var.ssh_cidr)) && var.ssh_cidr != "0.0.0.0/0"
+39-    error_message = "Set ssh_cidr to your own IPv4 address as a /32 cidr, for example 203.0.113.7/32. The placeholder and 0.0.0.0/0 are rejected."
+40-  }
+41-}
+38:    condition     = can(cidrnetmask(var.ssh_cidr)) && var.ssh_cidr != "0.0.0.0/0"
+39:    error_message = "Set ssh_cidr to your own IPv4 address as a /32 cidr, for example 203.0.113.7/32. The placeholder and 0.0.0.0/0 are rejected."
+== user_data.sh 의 apt-get 호출 줄(주석 제외, 5줄 전부 -o DPkg::Lock::Timeout=600 이어야 한다) ==
+14:apt-get -o DPkg::Lock::Timeout=600 update
+15:apt-get -o DPkg::Lock::Timeout=600 upgrade -y
+16:apt-get -o DPkg::Lock::Timeout=600 install -y ca-certificates curl git
+26:apt-get -o DPkg::Lock::Timeout=600 update
+27:apt-get -o DPkg::Lock::Timeout=600 install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+apt-get 줄 수=5
+그중 Timeout=600 줄 수=5
+== check-ignore: ignore 되어야 하는 것(exit 0) ==
+.gitignore:48:infra/*.tfvars	infra/terraform.tfvars
+.gitignore:46:infra/*.tfstate	infra/terraform.tfstate
+.gitignore:47:infra/*.tfstate.*	infra/terraform.tfstate.backup
+.gitignore:45:infra/.terraform/	infra/.terraform/x
+.gitignore:48:infra/*.tfvars	infra/prod.auto.tfvars
+exit=0
+== check-ignore: ignore 되면 안 되는 것(exit 1 이 정상) ==
+exit=1
+== 자격 증명 모양 grep(0건이 정상, Canonical 소유자 id 제외) ==
+grep: infra/: Is a directory
+cred exit=2 (1 = 0건)
+grep: infra/: Is a directory
+12digit exit=1 (1 = 0건)
+== README 가 가리키는 테스트 ⑫ 의 [0] 단언 ==
+260:    assert _attr(_resource_block("aws_instance"), "subnet_id") == "sort(data.aws_subnets.default.ids)[0]"
+== 위키에 U3c 흔적 ==
+docs/wiki/packages/P9-infra/03-log.md:37:- verifier 리뷰(`review-u3b-terraform.md`) **통과**([필수] 2 · [권고] 8). 직접: 33 passed·2254·ruff·mypy·check-ignore(lock exit 1
+docs/wiki/packages/P9-infra/03-log.md:39:- 남은 것 · 다음 단위: U3c(권고 코드 묶음) → terraform 설치(사용자) → U4 는 사용자 "띄워 달라" 뒤(`init·validate·plan` 메인, `apply` 사용자).
+docs/wiki/packages/P9-infra/03-log.md:42:## 2026-11-14 · infra(P9-infra): EC2 메타데이터 토큰 강제·SSH cidr 검증·apt 잠금 대기를 넣고 Terraform 검사 테스트를 보강한다 · pending (U3c, backe
+docs/wiki/packages/P9-infra/03-log.md:43:- 변경: `infra/main.tf` `metadata_options { http_endpoint="enabled" http_tokens="required" }`(IMDSv2, R-U3b-3) · `infra/v
+docs/wiki/packages/P9-infra/tests.md:200:## U3c — U3b 리뷰 권고 묶음 R-U3b-3·4·5·6·7·10 (backend-agent, 2026-11-14, 제품 코드 변경 0)
+docs/wiki/packages/P9-infra/tests.md:206:| U3c-1 | `test_instance_enforces_imdsv2` | `metadata_options` 정확히 1개 · `http_tokens="required"` · `http_endpoint="enab
+docs/wiki/packages/P9-infra/tests.md:207:| U3c-2 | `test_ssh_cidr_validation_rejects_placeholder_and_open_to_world` | `ssh_cidr` validation 1개 · condition 문자열 `
+docs/wiki/packages/P9-infra/tests.md:208:| U3c-3 | `test_every_apt_get_call_waits_for_dpkg_lock` | `apt-get` 코드 줄 정확히 5개, 전부 `-o DPkg::Lock::Timeout=600` | R-U3
+docs/wiki/packages/P9-infra/tests.md:209:| U3c-4 | `test_instance_gets_public_ip_at_launch` | `associate_public_ip_address == "true"` | R-U3b-6① |
+docs/wiki/packages/P9-infra/tests.md:210:| U3c-5 | `test_resource_and_data_block_counts_are_exactly_5_and_3` | 전체 `.tf` 의 `resource` 블록 5개 · `data` 블록 3개 | R-U3
+docs/wiki/packages/P9-infra/tests.md:211:| U3c-6 | `test_readme_says_user_runs_apply_directly` | README `3. \`apply\`` 줄 하나가 "사용자가 직접" 과 apply 명령을 함께 가짐(destroy
+docs/wiki/packages/P9-infra/tests.md:212:| U3c-7 | `test_readme_has_az_unsupported_and_cloud_init_recovery_guidance` | `Unsupported` 줄(`subnet_id`·`t4g.small`) 
+docs/wiki/packages/P9-infra/tests.md:218:| M1·M3 | `http_tokens` required→optional / `http_endpoint` enabled→disabled | U3c-1 |
+docs/wiki/packages/P9-infra/tests.md:219:| M2 | `metadata_options` 블록 삭제 | U3c-1 |
+docs/wiki/packages/P9-infra/tests.md:220:| M4 | validation 에서 `0.0.0.0/0` 거부 조건 삭제 | U3c-2 |
+docs/wiki/packages/P9-infra/tests.md:221:| M5 | validation 에서 `can(cidrnetmask…)` 조건 삭제 | U3c-2 |
+docs/wiki/packages/P9-infra/tests.md:222:| M6·M7 | validation 블록 삭제 / condition 을 `true` 로 | U3c-2 |
+docs/wiki/packages/P9-infra/tests.md:223:| M8·M9 | `apt-get` 한 줄에서 잠금 옵션 제거(ca-certificates 줄·docker 설치 줄) | U3c-3 |
+docs/wiki/packages/P9-infra/tests.md:224:| M10 | 타임아웃 600→60 전부 | U3c-3 + 21 |
+docs/wiki/packages/P9-infra/tests.md:225:| M11 | `apt-get upgrade` 줄 삭제(호출 5→4) | U3c-3 |
+docs/wiki/packages/P9-infra/tests.md:226:| M12·M13 | `associate_public_ip_address` false / 줄 삭제 | U3c-4 |
+docs/wiki/packages/P9-infra/tests.md:227:| M14 | 두 번째 `aws_instance "app2"` 추가 | U3c-5 (②·③ 은 통과 — 개수 단언만 잡음) |
+docs/wiki/packages/P9-infra/tests.md:228:| M15 | `data` 블록 4번째 추가 | U3c-5 |
+docs/wiki/packages/P9-infra/tests.md:229:| M16 | README apply 단계 줄에서 "사용자가 직접" 제거(변이 RF 재현) | U3c-6 (기존 29 는 destroy 문구 때문에 통과 — 새 단언만 잡음) |
+docs/wiki/packages/P9-infra/tests.md:230:| M17 | README `Unsupported` 줄 삭제 | U3c-7 |
+docs/wiki/packages/P9-infra/tests.md:231:| M18·M19 | README `cloud-init status --long` 줄 삭제 / "재접속" 제거 | U3c-7 |
+grep exit=0

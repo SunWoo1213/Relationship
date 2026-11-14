@@ -10,7 +10,7 @@
 - [ ] **A-3 Budgets 알림 $10 / $30 / $50**(`02-aws-budgets.md`). 고급 옵션에서 **크레딧을 비용에 포함**하는지 확인(크레딧이 상쇄하면 알림이 늦게 울린다). **EC2 를 만들기 전에.**
 - [ ] **A-4 OpenAI 월 지출 한도** 설정(대시보드 Limits). 공개 중 LLM 비용 상한.
 - [ ] **A-5 도메인 구입** + 등록기관 DNS 관리 화면 접근 확인. 구입하면 **도메인 이름을 메인 세션에 알린다**(11·12 문서의 `<도메인>` 자리표를 채운다 — Terraform 은 DNS 를 다루지 않으므로 변수가 없고, A 레코드는 등록기관에서 B-2 로 직접). 늦으면 `<EIP>.sslip.io` 로 먼저 띄운다.
-- [ ] **A-6 Terraform 설치**(에이전트가 `terraform validate`·`plan`·`apply` 를 돌리려면 이 Mac 에 있어야 한다 — 지금 없음): `brew tap hashicorp/tap && brew install hashicorp/tap/terraform` → `terraform -version`. 에이전트에게 설치를 맡기려면 "terraform 설치해 줘" 라고 한 번 말하면 된다(brew 설치는 시스템 변경이라 사용자 지시가 있어야 한다).
+- [x] **A-6 Terraform 설치** — **끝(2026-11-14, 사용자 지시로 에이전트가 `brew install hashicorp/tap/terraform` → v1.17.2 arm64)**. `fmt -check`·`init`(aws provider 5.100.0, lock 파일 커밋)·`validate` 통과, `ssh_cidr` 자리표·`0.0.0.0/0` 거부 확인. 정상 값 plan 은 B-1 때.
 - [ ] **A-7 에이전트에게 줄 AWS 권한(Terraform 용)** — 사용자가 "aws 권한을 주면 terraform 으로" 하기로 했다(2026-11-14). 준비:
   1. IAM 사용자 하나를 **Terraform 전용**으로 만들고 액세스 키 1개 발급(루트·관리자 키는 쓰지 않는다).
   2. 권한은 이 배포에 필요한 것만: EC2(인스턴스·보안 그룹·키 페어·EIP·AMI 조회), VPC 읽기(기본 VPC·서브넷 조회). 간단히 가려면 `AmazonEC2FullAccess` 하나. S3·RDS·IAM 쓰기는 주지 않는다.

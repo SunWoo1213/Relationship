@@ -1,0 +1,16 @@
+# 명령: bash -c cd /Users/sunwoo/Desktop/Portfolio/Relationship && echo "== terraform version ==" && terraform version && echo "== fmt -check -diff (exit 0 = 정렬 OK) ==" && terraform -chdir=infra fmt -check -diff; echo "fmt exit=$?"; echo "== validate (오프라인, init 산출물 .terraform/ 이미 있음) =="; terraform -chdir=infra validate; echo "validate exit=$?"
+# 시각: 2026-11-14T15:42:57+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fe45a0d (dev2)
+# exit: 0
+# ---
+== terraform version ==
+Terraform v1.17.2
+on darwin_arm64
+
+== fmt -check -diff (exit 0 = 정렬 OK) ==
+fmt exit=0
+== validate (오프라인, init 산출물 .terraform/ 이미 있음) ==
+Success! The configuration is valid.
+
+validate exit=0
