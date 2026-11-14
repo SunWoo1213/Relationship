@@ -1,0 +1,30 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u3b/gitcheck.sh
+# 시각: 2026-11-14T15:13:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+== check-ignore: 아래 3개는 전부 ignore 여야 한다 (줄마다 규칙 출력)
+.gitignore:46:infra/*.tfstate	infra/terraform.tfstate
+.gitignore:48:infra/*.tfvars	infra/terraform.tfvars
+.gitignore:45:infra/.terraform/	infra/.terraform/x
+.gitignore:47:infra/*.tfstate.*	infra/terraform.tfstate.backup
+.gitignore:47:infra/*.tfstate.*	infra/terraform.tfstate.1234
+exit=0 (0 = 하나 이상 ignore)
+== check-ignore: 아래 2개는 ignore 가 아니어야 한다 (exit 1 = 아무것도 ignore 아님)
+exit=1
+== 제품 코드 무변경 (빈 출력이어야 한다)
+(끝)
+== 새·변경 파일 (infra·tests·.gitignore)
+ M .gitignore
+?? infra/
+?? tests/test_infra_files.py
+== 자격 증명 모양 검색 (infra/ — 0건이어야 한다)
+0건
+== infra 에 놓인 파일
+main.tf
+outputs.tf
+README.md
+terraform.tfvars.example
+user_data.sh
+variables.tf

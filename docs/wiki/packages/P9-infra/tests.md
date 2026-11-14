@@ -180,3 +180,19 @@
 | ⑦ | `HEAD /index.html` · `HEAD /sw.js` | 둘 다 `no-cache` 유지 | `smoke-ci-steps` |
 | ⑧ | `caddy adapt` | `header /` 가 경로 매처 `["/"]`(정확 일치, 와일드카드 없음)로 headers 핸들러에 붙음 | `caddy-adapt` |
 | ⑨ | `down`(`-v` 없음) 전·후 | 개발 DB `capstone2-postgres-1`·`broker-agent-postgres-1` `Up 2 weeks (healthy)` 그대로, `relationship-prod_*` 볼륨 3개 그대로 | `pre-docker-state` · `post-docker-state` |
+
+## U3b — Terraform EC2 선언 + 텍스트 검사 (backend-agent, 2026-11-14, 제품 코드 변경 0)
+
+사용자 지시 "나중에 aws 권한을 주면 terraform 으로 수행하도록 세팅만". 이 Mac 에 `terraform` 이 없어 `fmt`·`validate`·`plan` 은 미실행 — 설치 뒤 U4 직전에 돈다. 증거 파일 이름은 `evidence/20261114-15NN-u3b-<이름>.txt`, 표에는 `<이름>` 만.
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| `tests/test_infra_files.py` 33건(텍스트 검사, terraform 불필요) — 파일 6개 존재 · 자원 5종/data 3종만 · 보안 그룹 80·443(IPv4·IPv6)·22(`var.ssh_cidr` 만) · 5432/8000 0 · egress 전체 · `ssh_cidr`·`ssh_public_key_path` default 없음 · 기본값(서울·t4g.small·arm64·20GB·`relationship-demo`) · 변수 정확히 7개 · gp3·`delete_on_termination` · AMI `data` 조회(리터럴 0) · 기본 VPC/서브넷 · 키 페어 `file(pathexpand(var…))` · EIP 연결 · 태그 `Project`·`ShutdownBy=2026-11-19T18:00+09:00` · `ignore_changes=[ami,user_data]` · provider 속성 `region` 만(자격 증명 속성 0) · 버전 고정 · 자격 증명 모양 0(+탐지기 자기검증) · 출력 4개·`ssh_command` 에 개인키 경로 0 · user-data apt 저장소 설치·`curl \| sh` 0·docker 그룹·clone·`.env` 생성 0·shebang · `.gitignore` tfstate·tfvars·`.terraform/` 차단, lock·`.tf` 는 추적 · 트리에 상태 파일 없음 · tfvars.example 자리표만 · README 순서·`-auto-approve` 권장 없음 | `POSTGRES_PORT=5433 … pytest tests/test_infra_files.py -v` | 33 passed, skip 0 | `infra-tests` |
+| 변이 시험 33종(계획 5 + 추가 28) — 22 cidr 하드코딩·5432/8000 규칙·`access_key`/`profile` 속성·`curl \| sh`/`wget \| bash`·`.gitignore` 줄 삭제 4종·lock ignore·IPv6 개방 변경·`delete_on_termination=false`·gp2·AMI 하드코딩·IAM 자원 추가·default 추가·tfvars 실제 IP·sslip `replace` 제거·개인키 경로 출력·`.env` 생성·docker 그룹 삭제·provider 버전·`ShutdownBy`·`t3.micro`·개인키 `file()`·EIP 연결 변경·`ignore_changes` 축소 | 스크래치패드 사본 `mutate.py <id>`, 변이마다 `--append` | 기준 사본 통과, **33/33 FAIL** | `mutations` · `names-v11-v29` |
+| 전체 pytest | `POSTGRES_PORT=5433 … pytest -q` | **2254 passed**(2221 + 33), skip 0 | `pytest-all` |
+| ruff · mypy | `ruff check app tests` · `scripts/mypy_check.py --run` | 통과 · 38=38 | `ruff` · `mypy` |
+| `.gitignore` 동작 | `git check-ignore -v infra/terraform.tfstate infra/terraform.tfvars infra/.terraform/x …` | 전부 ignore(규칙 줄 출력); example·`.tf`·`user_data.sh`·README·lock 은 ignore 아님(exit 1) | `gitcheck` |
+| 제품 코드 무변경 · 자격 증명 모양 | `git status --short -- app web/src alembic docker-compose.yml` · `grep -rnE 'AKIA…\|aws_secret_access_key\|BEGIN … PRIVATE KEY\|sk-…' infra` | 빈 출력 · 0건 | `gitcheck` |
+| `terraform fmt -check`·`validate` | 미실행(`terraform` 없음) | **U4 직전으로 이월**(13 문서 A-6) | — |
+
+메모: `…-u3b-mutations-names.txt` 는 불완전 사본(완전본 `names-v11-v29`) — 사용자 삭제 대상.

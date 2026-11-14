@@ -20,6 +20,7 @@
 | 10 | [파일럿 평가 실 실행(P4 U7)](10-pilot-eval-run.md) | 03·08 스모크를 끝낸 뒤 **한 번**. 40건 × 5방식 실 LLM·실 임베딩 | **미실행**(P4 U7) | `scripts/run_pilot_eval.py`, `reports/cost_estimate.md`, `docs/wiki/packages/P4-pilot-eval/01-plan.md` |
 | 11 | [EC2 최소 구성 배포(신규 계정·한 대·Compose)](11-ec2-minimal-deploy.md) | **사용자가 "띄워 달라" 할 때** — §0(계정·Budgets·도메인)은 11-16 까지 미리 | **미착수**(P9 U4) | `docker-compose.prod.yml`·`Caddyfile`·`Dockerfile`(P9 U1), `12-shutdown.md` |
 | 12 | [공개 종료 체크리스트](12-shutdown.md) | **2026-11-19(목) 18:00 KST** | 예정 | `11-ec2-minimal-deploy.md`, security §4·§5 |
+| 13 | [**사용자가 할 일 — 배포 전후**](13-user-todo-deploy.md) | **지금부터**(A 미리 11건 → B 기동 지시 → C .env → D 발표 → E 종료 → F 로컬 정리) | 진행 중 | 11·12, `infra/`(Terraform, P9 U3b) |
 
 ## 규칙 (전 카드 공통)
 

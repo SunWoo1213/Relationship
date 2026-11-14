@@ -614,3 +614,5 @@
 - 2026-11-14 14:20 | PUSH-dev2 | origin dev2 5ece780 (실험 푸시)
 - 2026-11-14 14:55 | COMMIT | 70fcd08 infra(P9-infra): EC2 한 대에 올릴 Docker 이미지·compose·Caddy 설정과 사용자 배포·종료 절차를 더한다
 - 2026-11-14 14:55 | PUSH-dev2 | origin dev2 70fcd08 (실험 푸시)
+- 2026-11-14 15:23 | COMMIT | 809fc96 ci(P9-infra): CI 가 운영 이미지를 빌드해 compose 로 띄우고 건강 상태를 확인하도록 하고, 첫 화면 캐시 헤더와 검사 테스트를 보강한다
+- 2026-11-14 15:23 | PUSH-dev2 | origin dev2 809fc96 (실험 푸시)

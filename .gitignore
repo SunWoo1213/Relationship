@@ -40,6 +40,13 @@ build/
 *.tfstate
 *.tfstate.backup
 *.tfvars
+# infra/ (P9-infra U3b) — 상태 파일·변수 파일·플러그인 캐시는 커밋하지 않는다. 값 자리표 example 만 예외.
+# infra/.terraform.lock.hcl(provider 버전 잠금)은 비밀이 아니고 재현성을 위해 커밋 대상이다 — 일부러 ignore 하지 않는다.
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/*.tfvars
+!infra/terraform.tfvars.example
 
 # OS / IDE
 .DS_Store

@@ -1,0 +1,83 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/u3b-review/gitcheck.sh
+# 시각: 2026-11-14T15:22:48+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+== ignore 돼야 하는 것 (check-ignore -v, 줄마다 규칙)
+.gitignore:46:infra/*.tfstate	infra/terraform.tfstate
+.gitignore:48:infra/*.tfvars	infra/terraform.tfvars
+.gitignore:45:infra/.terraform/	infra/.terraform/x
+.gitignore:47:infra/*.tfstate.*	infra/terraform.tfstate.backup
+.gitignore:48:infra/*.tfvars	infra/prod.auto.tfvars
+exit=0  (0 = 하나 이상 ignore)
+== ignore 되면 안 되는 것 (exit 1 기대)
+.gitignore:49:!infra/terraform.tfvars.example	infra/terraform.tfvars.example
+exit=0  (1 = 아무것도 ignore 아님)
+== 제품 코드 무변경 (빈 출력 기대)
+(끝)
+== 새·변경 파일
+ M .gitignore
+?? infra/
+?? tests/test_infra_files.py
+== 자격 증명 모양 검색 (infra/ + 테스트, 0건 기대 — Canonical 소유자 id 는 제외)
+infra/main.tf:7:# 자격 증명은 이 코드 어디에도 없다. provider 에 access_key/secret_key/profile 속성을 쓰지 않고,
+infra/README.md:22:자격 증명은 코드에 없다. `provider "aws"` 에는 `access_key`·`secret_key`·`profile` 이 없고, Terraform 이 **환경변수 `AWS_PROFILE`** 로 `~/.aws/credentials` 를 읽는다. 에이전트는 그 파일을 읽지 않는다(훅).
+tests/test_infra_files.py:300:    """⑰ provider 는 `region` 만 -- `access_key`·`secret_key`·`profile`·`token`·자격 증명 파일 속성이 없다(security §1)."""
+grep exit=0 (1 = 0건)
+== 12자리 숫자 (Canonical 제외, 0건 기대)
+grep exit=1 (1 = 0건)
+== infra/ 파일 목록
+main.tf
+outputs.tf
+README.md
+terraform.tfvars.example
+user_data.sh
+variables.tf
+== 11 문서 §1~§2 와 값 대조 grep
+5:> 사용자 결정(2026-11-14): 인스턴스 **t4g.small(ARM, 2GB) + gp3 20GB** · 리전 **서울 `ap-northeast-2`** · 접속 **SSH 키 페어, 22 는 내 IP 만** · 호스트명 **새로 구입한 도메인**(준비 전엔 `<EIP>.sslip.io`) · 종료 **11-19(목) 18:00 KST**(12 문서).
+10:| 0-1 | **AWS 신규 계정 가입**(Free Plan — 가입 화면 aws.amazon.com/free 에서 크레딧 금액·기간·적격 인스턴스 목록을 확인해 아래 표에 메모). 용도: **비상업·개인 학습(졸업평가 데모)** | 계정 활성 메일. 메모: 크레딧 $___ / 기간 ___개월 / t4g.small 적격 ☐ |
+21:| 1-3 | EC2 → 보안 그룹 생성: 인바운드 **80 TCP `0.0.0.0/0`·`::/0`** · **443 TCP `0.0.0.0/0`·`::/0`** · **22 TCP "내 IP"/32** 만. **5432·8000 규칙 없음.** 아웃바운드 기본(전체) | 규칙 3개(80·443·22) |
+25:## 2. EC2 생성 · Elastic IP
+28:| 2-1 | 인스턴스 시작: **Ubuntu Server 24.04 LTS (arm64)** AMI · **t4g.small** · 위 키 페어 · 위 보안 그룹 · 기본 VPC 퍼블릭 서브넷 · 퍼블릭 IP 자동 할당 켜기 · 스토리지 **gp3 20GiB**, "종료 시 삭제" 체크 유지 | 인스턴스 `running`, 상태 검사 2/2 |
+29:| 2-2 | **Elastic IP** 할당 → 인스턴스에 연결(호스트명이 IP 에 묶이므로 필수) | EIP 연결됨. 메모: EIP `___.___.___.___`(IP 는 비밀이 아니다) |
+82:첫 빌드는 프론트 `npm ci` 포함 수 분 걸린다(t4g.small). 실패하면 `logs` 를 메인 세션에 붙여 준다(비밀 값이 찍히지 않는지 먼저 본다).
+== main.tf 참조 이름 (자원·data 선언 vs 참조)
+   1 infra/main.tf:aws_eip.app
+   1 infra/main.tf:aws_instance.app
+   1 infra/main.tf:aws_key_pair.app
+   1 infra/main.tf:aws_security_group.app
+   1 infra/main.tf:data.aws_ami.ubuntu
+   1 infra/main.tf:data.aws_subnets.default
+   2 infra/main.tf:data.aws_vpc.default
+   4 infra/main.tf:local.tags
+   1 infra/main.tf:var.ami_architecture
+   1 infra/main.tf:var.instance_type
+   4 infra/main.tf:var.project_tag
+   1 infra/main.tf:var.region
+   1 infra/main.tf:var.root_volume_gb
+   2 infra/main.tf:var.ssh_cidr
+   1 infra/main.tf:var.ssh_public_key_path
+   3 infra/outputs.tf:aws_eip.app
+   1 infra/outputs.tf:aws_instance.app
+== 선언
+infra/main.tf:26:locals {
+infra/main.tf:37:data "aws_vpc" "default" {
+infra/main.tf:42:data "aws_subnets" "default" {
+infra/main.tf:55:data "aws_ami" "ubuntu" {
+infra/main.tf:74:resource "aws_security_group" "app" {
+infra/main.tf:119:resource "aws_key_pair" "app" {
+infra/main.tf:125:resource "aws_instance" "app" {
+infra/main.tf:150:resource "aws_eip" "app" {
+infra/main.tf:155:resource "aws_eip_association" "app" {
+infra/outputs.tf:3:output "public_ip" {
+infra/outputs.tf:9:output "ssh_command" {
+infra/outputs.tf:15:output "sslip_hostname" {
+infra/outputs.tf:20:output "instance_id" {
+infra/variables.tf:4:variable "region" {
+infra/variables.tf:10:variable "instance_type" {
+infra/variables.tf:16:variable "ami_architecture" {
+infra/variables.tf:27:variable "ssh_public_key_path" {
+infra/variables.tf:32:variable "ssh_cidr" {
+infra/variables.tf:37:variable "root_volume_gb" {
+infra/variables.tf:43:variable "project_tag" {

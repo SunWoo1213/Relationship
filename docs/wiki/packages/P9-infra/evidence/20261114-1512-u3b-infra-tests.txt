@@ -1,0 +1,50 @@
+# 명령: .venv/bin/python -m pytest tests/test_infra_files.py -v
+# 시각: 2026-11-14T15:12:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 33 items
+
+tests/test_infra_files.py::test_infra_files_exist PASSED                 [  3%]
+tests/test_infra_files.py::test_only_allowed_resources_and_data_sources PASSED [  6%]
+tests/test_infra_files.py::test_security_group_inbound_is_80_443_22_only PASSED [  9%]
+tests/test_infra_files.py::test_security_group_http_https_open_ipv4_and_ipv6 PASSED [ 12%]
+tests/test_infra_files.py::test_security_group_ssh_cidr_is_the_variable_only PASSED [ 15%]
+tests/test_infra_files.py::test_no_db_or_backend_port_anywhere_in_main PASSED [ 18%]
+tests/test_infra_files.py::test_egress_is_all_traffic PASSED             [ 21%]
+tests/test_infra_files.py::test_ssh_cidr_and_key_path_have_no_default PASSED [ 24%]
+tests/test_infra_files.py::test_variable_defaults_are_the_decided_values PASSED [ 27%]
+tests/test_infra_files.py::test_variables_declared_are_exactly_the_planned_set PASSED [ 30%]
+tests/test_infra_files.py::test_root_volume_gp3_delete_on_termination_true PASSED [ 33%]
+tests/test_infra_files.py::test_instance_uses_variable_type_security_group_key_and_static_user_data PASSED [ 36%]
+tests/test_infra_files.py::test_ami_is_looked_up_from_canonical_not_hardcoded PASSED [ 39%]
+tests/test_infra_files.py::test_default_vpc_and_default_subnets_are_used PASSED [ 42%]
+tests/test_infra_files.py::test_key_pair_registers_public_key_from_variable_path PASSED [ 45%]
+tests/test_infra_files.py::test_elastic_ip_is_associated_with_the_instance PASSED [ 48%]
+tests/test_infra_files.py::test_tags_project_and_shutdown_by PASSED      [ 51%]
+tests/test_infra_files.py::test_lifecycle_ignores_ami_and_user_data_changes PASSED [ 54%]
+tests/test_infra_files.py::test_provider_pinned_and_has_no_credentials PASSED [ 57%]
+tests/test_infra_files.py::test_terraform_and_provider_versions_are_pinned PASSED [ 60%]
+tests/test_infra_files.py::test_no_credential_shaped_strings_in_infra_files PASSED [ 63%]
+tests/test_infra_files.py::test_credential_detector_catches_samples PASSED [ 66%]
+tests/test_infra_files.py::test_outputs_declared_with_expected_values PASSED [ 69%]
+tests/test_infra_files.py::test_ssh_command_output_has_no_private_key_path PASSED [ 72%]
+tests/test_infra_files.py::test_user_data_installs_docker_from_apt_repository PASSED [ 75%]
+tests/test_infra_files.py::test_user_data_has_no_download_pipe_to_shell PASSED [ 78%]
+tests/test_infra_files.py::test_user_data_docker_group_clone_and_no_env_file PASSED [ 81%]
+tests/test_infra_files.py::test_user_data_starts_with_bash_shebang PASSED [ 84%]
+tests/test_infra_files.py::test_gitignore_blocks_state_vars_and_plugin_cache PASSED [ 87%]
+tests/test_infra_files.py::test_gitignore_does_not_ignore_lock_file_or_tf_sources PASSED [ 90%]
+tests/test_infra_files.py::test_no_state_or_vars_files_are_present_in_tree PASSED [ 93%]
+tests/test_infra_files.py::test_tfvars_example_has_placeholders_only PASSED [ 96%]
+tests/test_infra_files.py::test_readme_documents_order_and_guards PASSED [100%]
+
+============================== 33 passed in 0.08s ==============================

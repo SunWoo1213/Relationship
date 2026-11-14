@@ -1,0 +1,12 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u3b/names.sh
+# 시각: 2026-11-14T15:12:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+== V3-11
+FAILED tests/test_infra_files.py::test_security_group_http_https_open_ipv4_and_ipv6 - assert '["::1/128"]' == '["::/0"]'
+1 failed, 32 passed in 0.07s
+== V3-29
+FAILED tests/test_infra_files.py::test_security_group_ssh_cidr_is_the_variable_only - assert '["::/0"]' is None
+1 failed, 32 passed in 0.07s

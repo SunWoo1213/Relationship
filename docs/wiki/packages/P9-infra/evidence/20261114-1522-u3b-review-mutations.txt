@@ -1,0 +1,94 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/u3b-review/mutate_review.py ALL
+# 시각: 2026-11-14T15:22:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+[R0] 변이 없는 사본(기준)
+  pytest exit=0  failed=0
+  33 passed in 0.10s
+  판정: 기준 통과
+
+[RA] aws_eip 를 deprecated `vpc = true` 로
+  pytest exit=1  failed=1
+    FAILED tests/test_infra_files.py::test_elastic_ip_is_associated_with_the_instance - assert None == '"vpc"'
+  1 failed, 32 passed in 0.10s
+  판정: 잡힘(FAIL)
+
+[RB] associate_public_ip_address = false (EIP 연결 전 user-data 가 인터넷에 못 나감 가능)
+  pytest exit=0  failed=0
+  33 passed in 0.10s
+  판정: **생존(테스트가 못 봄)**
+
+[RC] 두 번째 aws_instance 자원 "app2" 추가(비용 2배) — 허용 집합엔 같은 타입이라 ② 가 못 볼 수 있음
+  pytest exit=0  failed=0
+  33 passed in 0.10s
+  판정: **생존(테스트가 못 봄)**
+
+[RD] 5432 를 신식 자원 aws_vpc_security_group_ingress_rule 로 연다
+  pytest exit=1  failed=2
+    FAILED tests/test_infra_files.py::test_only_allowed_resources_and_data_sources - AssertionError: 허용 밖 자원: {'aws_vpc_security_group_ingress_rule'}
+    FAILED tests/test_infra_files.py::test_no_db_or_backend_port_anywhere_in_main - assert not <re.Match object; span=(2940, 2944), match='5432'>
+  2 failed, 31 passed in 0.10s
+  판정: 잡힘(FAIL)
+
+[RE] 22 규칙 cidr 을 [var.ssh_cidr, "0.0.0.0/0"] 로 넓힘
+  pytest exit=1  failed=1
+    FAILED tests/test_infra_files.py::test_security_group_ssh_cidr_is_the_variable_only - assert '[var.ssh_cidr, "0.0.0.0/0"]' == '[var.ssh_cidr]'
+  1 failed, 32 passed in 0.10s
+  판정: 잡힘(FAIL)
+
+[RF] README 의 apply 단계에서 사용자 몫 표현을 지움(destroy 절 '사용자가 직접' 은 남김)
+  pytest exit=0  failed=0
+  33 passed in 0.10s
+  판정: **생존(테스트가 못 봄)**
+
+[RG] user-data 가 개인 토큰으로 private clone (URL 에 자격 증명)
+  pytest exit=1  failed=1
+    FAILED tests/test_infra_files.py::test_user_data_docker_group_clone_and_no_env_file - assert 'git clone https://github.com/SunWoo1213/Relationship.git
+  1 failed, 32 passed in 0.09s
+  판정: 잡힘(FAIL)
+
+[RH] most_recent = false
+  pytest exit=1  failed=1
+    FAILED tests/test_infra_files.py::test_ami_is_looked_up_from_canonical_not_hardcoded - AssertionError: assert 'false' == 'true'
+  1 failed, 32 passed in 0.09s
+  판정: 잡힘(FAIL)
+
+[RI] ami 필터 소유자를 다른 계정으로(위조 AMI)
+  pytest exit=1  failed=2
+    FAILED tests/test_infra_files.py::test_ami_is_looked_up_from_canonical_not_hardcoded - assert '["123456789012"]' == '["099720109477"]'
+    FAILED tests/test_infra_files.py::test_no_credential_shaped_strings_in_infra_files - AssertionError: infra/main.tf: ['12-digit-account-id']
+  2 failed, 31 passed in 0.09s
+  판정: 잡힘(FAIL)
+
+[RJ] tfvars.example 의 ssh_cidr 자리표를 0.0.0.0/0 으로
+  pytest exit=1  failed=1
+    FAILED tests/test_infra_files.py::test_tfvars_example_has_placeholders_only - AssertionError: ssh_cidr 값이 자리표가 아니다: 0.0.0.0/0
+  1 failed, 32 passed in 0.10s
+  판정: 잡힘(FAIL)
+
+[RK] user-data 첫 실행 줄 set -euxo pipefail 삭제
+  pytest exit=1  failed=1
+    FAILED tests/test_infra_files.py::test_user_data_docker_group_clone_and_no_env_file - AssertionError: 첫 실행 줄이 set -euxo pipefail 이 아니다(실패해도 계속 달린다)
+  1 failed, 32 passed in 0.09s
+  판정: 잡힘(FAIL)
+
+[RL] lifecycle 블록 전체 삭제
+  pytest exit=1  failed=1
+    FAILED tests/test_infra_files.py::test_lifecycle_ignores_ami_and_user_data_changes - assert 0 == 1
+  1 failed, 32 passed in 0.10s
+  판정: 잡힘(FAIL)
+
+[RM] README 실행 순서에서 validate 줄 삭제
+  pytest exit=1  failed=1
+    FAILED tests/test_infra_files.py::test_readme_documents_order_and_guards - AssertionError: README 에 `terraform -chdir=infra validate` 가 없다
+  1 failed, 32 passed in 0.10s
+  판정: 잡힘(FAIL)
+
+[RN] 변수 ssh_cidr 의 type 을 list(string) 으로(테스트 ⑥ type 단언)
+  pytest exit=1  failed=1
+    FAILED tests/test_infra_files.py::test_ssh_cidr_and_key_path_have_no_default - AssertionError: assert 'list(string)' == 'string'
+  1 failed, 32 passed in 0.10s
+  판정: 잡힘(FAIL)
+

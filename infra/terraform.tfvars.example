@@ -1,0 +1,15 @@
+# 이 파일을 terraform.tfvars 로 복사해 값을 채운다(terraform.tfvars 는 .gitignore 대상 — 커밋하지 않는다).
+# 여기에는 변수 이름과 자리표만 둔다. 자격 증명(키·프로필 값)은 이 파일에 넣지 않는다 — 환경변수 AWS_PROFILE 로만 받는다.
+
+# 내 공인 IP 의 cidr — `curl -s https://checkip.amazonaws.com` 결과에 /32 를 붙인다. 기동 당일 다시 확인(13 문서 A-9).
+ssh_cidr = "YOUR.IP.HERE/32"
+
+# ed25519 공개키 경로(13 문서 A-8). 개인키가 아니라 .pub 파일이다.
+ssh_public_key_path = "~/.ssh/YOUR_KEY_NAME.pub"
+
+# 아래는 기본값이 있어 보통 바꾸지 않는다. 바꿀 때만 주석을 풀고 값을 쓴다.
+# region           = "ap-northeast-2"
+# instance_type    = "t4g.small"
+# ami_architecture = "arm64"
+# root_volume_gb   = 20
+# project_tag      = "relationship-demo"
