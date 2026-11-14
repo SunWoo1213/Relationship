@@ -1,0 +1,33 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1-review/caddy-adapt.sh
+# 시각: 2026-11-14T14:43:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+== Caddyfile blob(작업 트리)
+288ae09c7d1035f2f690dab01ae630e734d80cba
+== caddy validate
+{"level":"info","ts":1794635015.721671,"logger":"http","msg":"servers shutting down with eternal grace period"}
+{"level":"info","ts":1794635015.7217166,"logger":"tls.cache.maintenance","msg":"stopped background certificate maintenance","cache":"0xb848033bc00"}
+Valid configuration
+validate exit=0
+== caddy adapt (JSON) → 라우트 순서 요약
+adapt exit=0
+server srv0 listen=[':80']
+- headers match=[{"path": ["/manifest.webmanifest"]}] set={'Content-Type': ['application/manifest+json']} delete=None
+- headers match=[{"path": ["/index.html"]}] set={'Cache-Control': ['no-cache']} delete=None
+- headers match=[{"path": ["/sw.js"]}] set={'Cache-Control': ['no-cache']} delete=None
+- headers set=None delete=['Server']
+- encode
+- subroute match=[{"path": ["/api/*"]}]
+  - rewrite strip_path_prefix=/api
+  - static_response match=[{"path": ["/docs*", "/redoc*", "/openapi.json"]}] status=404
+  - reverse_proxy upstreams=['backend:8000']
+- subroute
+  - vars root=/srv
+  - rewrite match=[{"file": {"try_files": ["{http.request.uri.path}", "/index.html"]}}] strip_path_prefix=None
+  - file_server
+== 판정: /api/* subroute 안 순서가 rewrite → static_response(404, /docs* /redoc* /openapi.json) → reverse_proxy 인가
+순서: [('rewrite', None), ('static_response', ['/docs*', '/redoc*', '/openapi.json']), ('reverse_proxy', None)]
+PASS
+

@@ -1,0 +1,10 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/s-v14b-smoke.sh
+# 시각: 2026-11-14T14:30:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+/api/docs -> 200 text/html; charset=utf-8
+/api/openapi.json -> 200 application/json
+/api/redoc -> 200 text/html; charset=utf-8
+임시 컨테이너 제거됨

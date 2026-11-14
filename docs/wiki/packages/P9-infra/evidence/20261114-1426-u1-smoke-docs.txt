@@ -1,0 +1,14 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/s-docs.sh
+# 시각: 2026-11-14T14:26:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+/api/docs -> 404 
+/api/openapi.json -> 404 
+/api/redoc -> 404 
+/api/docs/oauth2-redirect -> 404 
+/api/redoc/x -> 404 
+== 대조: 다른 /api 경로는 백엔드로 간다
+/api/persons -> 200
+/api/nonexistent -> 404 application/json

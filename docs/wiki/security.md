@@ -9,7 +9,7 @@
 |------|------|
 | `.env`, `*.pem`, `*.key`, tfstate/tfvars 는 에이전트가 읽지도 쓰지도 않는다 | 사용자가 직접 만든다. 에이전트는 `.env.example`에 **이름만** 적는다 |
 | **예외 하나(L-007, 2026-11-08)**: 이 프로젝트 서버 기동 `uvicorn app.main:app … --env-file .env` 는 허용 — 값이 서버 프로세스 안에서만 읽히고 어디에도 출력되지 않는다 | 첫 줄에 파이프(`\|`)가 있거나 `--env-file .env` 인자를 지운 뒤에도 `.env` 가 남으면(`cat .env; uvicorn …`) 그대로 거부. 다른 모듈(`other:app`)은 예외가 아니다 |
-| 코드·문서·커밋에 키 문자열을 넣지 않는다 (패턴 검사) | `os.environ["OPENAI_API_KEY"]` 로 읽는다. 배포는 SSM Parameter Store |
+| 코드·문서·커밋에 키 문자열을 넣지 않는다 (패턴 검사) | `os.environ["OPENAI_API_KEY"]` 로 읽는다. 배포(CR-005 · D17)는 **사용자가 EC2 에 직접 올린 `.env`(권한 600)** 를 compose `env_file` 로 — SSM Parameter Store 는 쓰지 않는다 |
 | 환경변수 전체 출력(`env`, `printenv`, `Get-ChildItem env:`)·KEY/SECRET 변수 echo 금지 | 존재 여부만: `test -n "$OPENAI_API_KEY" && echo set` 는 허용 |
 | `git add -A` / `git add .` 금지 — 비밀·임시 파일이 섞인다 | 파일을 명시해서 `git add path/a path/b` |
 | 로그·trace에 키·비밀을 남기지 않는다 | `agent_traces.input`은 발화·후보만. 헤더·키는 마스킹 |
@@ -63,7 +63,7 @@
 
 - 인물 단위 완전 삭제 API (`DELETE /persons/{id}` → CASCADE).
 - 저장 최소화: `pending_questions.context`에는 재개에 필요한 것만. 전체 대화 이력 저장 금지.
-- 웹푸시 VAPID 개인키는 환경변수/SSM. 프론트에는 공개키만.
+- 웹푸시 VAPID 개인키는 환경변수(서버 `.env`, SSM 아님 — CR-005). 프론트에는 공개키만. 배포용은 로컬과 다른 새 키 쌍(결정 N).
 - ~~RDS 프라이빗 서브넷, 저장 시 암호화(RDS 기본), 전송 시 TLS(D7).~~ → **AWS 최소 구성(CR-005 · D17 개정 ②)**: Postgres 는 같은 EC2 의 compose 컨테이너, **호스트 포트 미노출**(compose 네트워크 안에서만), 저장 암호화는 EBS 기본, 전송 TLS 는 Caddy(Let's Encrypt). 보안 그룹은 80·443 과 사용자 IP 의 22 만. `.env` 는 사용자가 서버에 직접 올린다. 공개 기간(~2026-11-19) 뒤 인스턴스·EBS·EIP 삭제와 비밀 회전이 종료 절차에 포함된다.
 - 멀티테넌시 미검증(부록 A) — 그래도 모든 조회는 `user_id` 조건을 넣는다.
 

@@ -1,0 +1,9 @@
+# 명령: docker ps -a
+# 시각: 2026-11-14T14:25:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+CONTAINER ID   IMAGE                    COMMAND                   CREATED       STATUS                 PORTS                                         NAMES
+34f419503837   postgres:16.15           "docker-entrypoint.s…"   6 weeks ago   Up 2 weeks (healthy)   0.0.0.0:5434->5432/tcp, [::]:5434->5432/tcp   broker-agent-postgres-1
+c1399b19337d   pgvector/pgvector:pg16   "docker-entrypoint.s…"   6 weeks ago   Up 2 weeks (healthy)   0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp   capstone2-postgres-1

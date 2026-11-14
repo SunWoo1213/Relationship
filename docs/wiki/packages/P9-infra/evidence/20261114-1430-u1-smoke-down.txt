@@ -1,0 +1,20 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/dc.sh down
+# 시각: 2026-11-14T14:30:48+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+ Container relationship-prod-caddy-1 Stopping 
+ Container relationship-prod-caddy-1 Stopped 
+ Container relationship-prod-caddy-1 Removing 
+ Container relationship-prod-caddy-1 Removed 
+ Container relationship-prod-backend-1 Stopping 
+ Container relationship-prod-backend-1 Stopped 
+ Container relationship-prod-backend-1 Removing 
+ Container relationship-prod-backend-1 Removed 
+ Container relationship-prod-postgres-1 Stopping 
+ Container relationship-prod-postgres-1 Stopped 
+ Container relationship-prod-postgres-1 Removing 
+ Container relationship-prod-postgres-1 Removed 
+ Network relationship-prod_default Removing 
+ Network relationship-prod_default Removed 

@@ -9,15 +9,17 @@
 | # | 카드 | 언제 필요한가 | 상태 | 관련 |
 |---|------|-------------|------|------|
 | 01 | [환경변수·API 키(.env)](01-env-keys.md) | 로컬 DB 기동 시(DB 4개), 실 LLM 호출 시(키), P4 파일럿 평가 전 | DB 값 완료(5433) · OpenAI 키 **입력 완료**(스모크 03·08 rc=0, 사용자 셸 `.env` 로드) · Anthropic/Gemini 키 미입력(선택) | `.env.example`, `docs/wiki/security.md` §1 |
-| 02 | [AWS Budgets 비용 알림](02-aws-budgets.md) | **첫날 필수** — 아직 미완. 실서버 배포(P9) 전에는 반드시 | **미완** | `docs/backlog.md` 13행, `SERVER-CHECKLIST.md` 0-5 |
+| 02 | [AWS Budgets 비용 알림](02-aws-budgets.md) | **EC2 생성 전 필수**(CR-005 개정 ② — 신규 계정 크레딧 Free Plan 이라도 켠다) | **미완** | `docs/backlog.md` 13행, `SERVER-CHECKLIST.md` 0-5 |
 | 03 | [ER 실호출 스모크](03-er-smoke.md) | 키를 넣은 뒤 아무 때나. P4 전에 한 번 | **완료 2026-09-21**(openai gpt-4o-mini, confidence 0.8384 merge — F-87c597 해소; anthropic·gemini 선택 미실행) | `docs/wiki/packages/P3-er/05-remediation.md` F-87c597 |
 | 04 | [로컬 DB(Docker)](04-local-db.md) | 테스트·ER 회귀 실행 전 | 완료(컨테이너 capstone2-postgres-1, 호스트 포트 5433) | `README.md` "로컬 DB" |
-| 05 | [실서버·배포 비밀(SSM·VAPID·GitHub)](05-server-secrets.md) | P7(웹푸시)·P9(Terraform/Actions) 착수 시 | 해당 없음(P9 전) | `SERVER-CHECKLIST.md` §0·§4, `docs/wiki/decisions/D07-tls-caddy.md` |
+| 05 | [실서버·배포 비밀(SSM·VAPID·GitHub)](05-server-secrets.md) | P7(웹푸시) 때 VAPID 절만 유효. **SSM·Actions 절은 CR-005 로 해당 없음** — 배포 비밀은 서버 `.env`(11 문서 §4) | VAPID 절만 | `SERVER-CHECKLIST.md` §0·§4, `docs/wiki/decisions/D07-tls-caddy.md` |
 | 06 | [하네스 승인 결정(무엇을 물어보는가)](06-approval-decisions.md) | 매 세션 | 상시 | `docs/wiki/lessons/`, `.claude/skills/commit` |
 | 07 | [데모 리허설(P11)](07-demo-rehearsal.md) | P9 배포 후 | 해당 없음 | `docs/backlog.md` 74행, `README.md` "데모 시나리오" |
 | 08 | [베이스라인 3 실 LLM 스모크](08-baseline-smoke.md) | 키를 넣은 뒤. **P4 파일럿 평가 전에 한 번**(03 카드와 같은 시점) | **완료 2026-09-22**(openai gpt-4o-mini, identity·llm_error None — `P3-baselines/evidence/20260922-1309-baseline-smoke-real.txt`) | `scripts/baseline_smoke.py`, `README.md` "베이스라인 3종 실행법" |
-| 09 | [AWS 배포 가이드라인(몇 명 규모)](09-aws-deploy.md) | P9 착수 전 §2 결정 10개 확정, 4.0 은 지금(Budgets·도메인·SSO 프로필·GitHub prod 환경) | **미착수**(P9 전) | `SERVER-CHECKLIST.md`, `05-server-secrets.md`, `docs/wiki/decisions/D07-tls-caddy.md` |
+| 09 | [AWS 배포 가이드라인(몇 명 규모, 원안)](09-aws-deploy.md) | **부분 대체(CR-005 개정 ②)** — §2 결정 1·2·3·4·8·§5·§7 만 참고, 실제 절차는 11 | 원안 기록 | `docs/wiki/decisions/D17-vercel-deploy.md`(AWS 최소 안) |
 | 10 | [파일럿 평가 실 실행(P4 U7)](10-pilot-eval-run.md) | 03·08 스모크를 끝낸 뒤 **한 번**. 40건 × 5방식 실 LLM·실 임베딩 | **미실행**(P4 U7) | `scripts/run_pilot_eval.py`, `reports/cost_estimate.md`, `docs/wiki/packages/P4-pilot-eval/01-plan.md` |
+| 11 | [EC2 최소 구성 배포(신규 계정·한 대·Compose)](11-ec2-minimal-deploy.md) | **사용자가 "띄워 달라" 할 때** — §0(계정·Budgets·도메인)은 11-16 까지 미리 | **미착수**(P9 U4) | `docker-compose.prod.yml`·`Caddyfile`·`Dockerfile`(P9 U1), `12-shutdown.md` |
+| 12 | [공개 종료 체크리스트](12-shutdown.md) | **2026-11-19(목) 18:00 KST** | 예정 | `11-ec2-minimal-deploy.md`, security §4·§5 |
 
 ## 규칙 (전 카드 공통)
 

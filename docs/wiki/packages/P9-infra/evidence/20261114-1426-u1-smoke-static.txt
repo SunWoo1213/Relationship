@@ -1,0 +1,63 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/s-static.sh
+# 시각: 2026-11-14T14:26:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+== ⑤ GET /
+200 text/html; charset=utf-8
+== ⑥ GET /api/persons
+[]
+200 application/json
+== ⑦ S4: HEAD /sw.js
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: no-cache
+Content-Length: 3055
+Content-Type: text/javascript; charset=utf-8
+Etag: "dmuomq70229s-2cv"
+Last-Modified: Sat, 14 Nov 2026 05:25:22 GMT
+Vary: Accept-Encoding
+Date: Sat, 14 Nov 2026 05:26:32 GMT
+
+== ⑦ S4: HEAD /manifest.webmanifest
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 406
+Content-Type: application/manifest+json
+Etag: "dmuomq70229s-ba"
+Last-Modified: Sat, 14 Nov 2026 05:25:22 GMT
+Vary: Accept-Encoding
+Date: Sat, 14 Nov 2026 05:26:32 GMT
+
+== ⑦ S4: HEAD /index.html
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: no-cache
+Content-Length: 573
+Content-Type: text/html; charset=utf-8
+Etag: "dmuomq70229s-fx"
+Last-Modified: Sat, 14 Nov 2026 05:25:22 GMT
+Vary: Accept-Encoding
+Date: Sat, 14 Nov 2026 05:26:32 GMT
+
+== ⑦ S4: HEAD /assets/index-DB5EDvsy.js
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 363621
+Content-Type: text/javascript; charset=utf-8
+Etag: "dmuomq70229s-7skl"
+Last-Modified: Sat, 14 Nov 2026 05:25:22 GMT
+Vary: Accept-Encoding
+Date: Sat, 14 Nov 2026 05:26:32 GMT
+
+== ⑦ S4: GET /assets/index-DB5EDvsy.js 상태
+200 text/javascript; charset=utf-8
+== ⑨ 부정: GET /health (접두 없음 → JSON 아님, SPA fallback)
+200 text/html; charset=utf-8
+== ⑨ 부정 본문 첫 줄
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/

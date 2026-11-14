@@ -1,0 +1,17 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/wait-2min.sh
+# 시각: 2026-11-14T14:27:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+backend StartedAt=2026-11-14T05:27:33.671704333Z
+14:27:43 age=10s health=healthy
+14:27:58 age=25s health=healthy
+14:28:13 age=40s health=healthy
+14:28:28 age=55s health=healthy
+14:28:43 age=70s health=healthy
+14:28:58 age=85s health=healthy
+14:29:13 age=100s health=healthy
+14:29:28 age=115s health=healthy
+14:29:43 age=130s health=healthy
+READY

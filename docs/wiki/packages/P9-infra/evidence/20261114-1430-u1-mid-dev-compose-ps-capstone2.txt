@@ -1,0 +1,8 @@
+# 명령: docker compose -p capstone2 -f docker-compose.yml ps
+# 시각: 2026-11-14T14:30:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+NAME                   IMAGE                    COMMAND                   SERVICE    CREATED       STATUS                 PORTS
+capstone2-postgres-1   pgvector/pgvector:pg16   "docker-entrypoint.s…"   postgres   6 weeks ago   Up 2 weeks (healthy)   0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp

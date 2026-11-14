@@ -1,0 +1,7 @@
+# 명령: .venv/bin/python -m alembic heads
+# 시각: 2026-11-14T14:33:11+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+0002 (head)

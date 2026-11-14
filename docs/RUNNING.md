@@ -376,6 +376,21 @@ npm run e2e                # E2E(Playwright). 빌드 후 vite preview(4173 포�
 
 PowerShell 도 같은 명령이다(`cd web` 뒤 한 줄씩). E2E 는 4173 포트가 비어 있어야 한다. 어떤 테스트가 무엇을 확인하는지는 `docs/wiki/packages/P8-frontend/tests.md` 에 있다.
 
+### 운영 compose 로 띄우기 (P9-infra — EC2 한 대, 로컬 스모크도 같은 명령)
+
+운영 구성(CR-005 · D17)은 `docker-compose.prod.yml` 하나다 — `caddy`(80/443, 자동 HTTPS, `/api/*` 접두 제거 프록시, 프론트 정적 서빙) · `backend`(FastAPI, 기동 시 `alembic upgrade head`) · `postgres`(pgvector, 볼륨 `pgdata`, **호스트 포트 없음**). 위 "로컬 DB" 절의 `docker-compose.yml` 과는 별개 프로젝트(`name: relationship-prod`)라 개발 DB 에 영향이 없다. 제품 코드는 그대로고 이미지 빌드가 프론트 `npm run build` 까지 한다.
+
+```
+# 필수 변수가 든 파일(값은 여기에만) — 서버에서는 ./.env, 로컬 스모크는 비밀 없는 더미 파일
+docker compose -f docker-compose.prod.yml --env-file <파일> config --quiet      # 필수 변수 빠지면 거부
+GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml --env-file <파일> up -d --build
+docker compose -f docker-compose.prod.yml ps                                      # 셋 다 running, backend·postgres healthy
+curl -sS http://localhost:<포트>/api/health                                       # {"status":"ok","db":"up","alembic_revision":"…"}
+docker compose -f docker-compose.prod.yml down                                    # -v 는 쓰지 않는다(security §4)
+```
+
+필수 변수 이름: `POSTGRES_USER`·`POSTGRES_PASSWORD`·`POSTGRES_DB`·`SITE_ADDRESS`(Caddy 호스트명; 로컬 스모크는 `:80`). `DATABASE_URL` 은 compose 가 비밀번호 없는 값으로 덮어쓰고 비밀번호는 `POSTGRES_PASSWORD` 로 채운다(결정 O) — `.env` 에 넣지 않는다. `OPENAI_API_KEY` 가 없으면 브리핑 1분 루프가 매분 예외만 남긴다. 서버 절차 전체는 `docs/user-setup/11-ec2-minimal-deploy.md`, 종료는 `12-shutdown.md`. 로컬 스모크 증거는 `docs/wiki/packages/P9-infra/evidence/*-u1-smoke-*.txt`.
+
 ### 평가 데이터셋(파일럿 40건)
 
 `data/scenarios/`는 엔티티 해석·이벤트 추출을 채점하기 위한 **한국어 대화 시나리오 40건**과 그 골드 라벨이다. 지표 계산(오병합률·미검출률·트레이드오프 곡선)은 여기서 하지 않는다 — P4-pilot-eval이 이 데이터를 읽어서 한다. 실명·연락처는 들어 있지 않다(가상 성명 목록 밖 이름은 검증기가 FAIL 한다).

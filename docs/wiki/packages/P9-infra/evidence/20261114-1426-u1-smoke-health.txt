@@ -1,0 +1,13 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/s-health.sh
+# 시각: 2026-11-14T14:26:31+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+== GET /api/health
+{"status":"ok","db":"up","alembic_revision":"0002"}
+200 application/json
+== alembic heads (venv)
+0002 (head)
+alembic_revision=0002  head=0002
+MATCH

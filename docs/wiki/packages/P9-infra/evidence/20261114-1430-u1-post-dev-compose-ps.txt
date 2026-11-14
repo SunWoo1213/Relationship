@@ -1,0 +1,7 @@
+# 명령: docker compose -f docker-compose.yml ps
+# 시각: 2026-11-14T14:30:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS

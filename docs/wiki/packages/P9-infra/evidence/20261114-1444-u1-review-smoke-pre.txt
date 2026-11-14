@@ -1,0 +1,22 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1-review/smoke-state.sh
+# 시각: 2026-11-14T14:44:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+== docker ps
+34f419503837 broker-agent-postgres-1 Up 2 weeks (healthy) 0.0.0.0:5434->5432/tcp, [::]:5434->5432/tcp
+c1399b19337d capstone2-postgres-1 Up 2 weeks (healthy) 0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+== docker compose ls -a
+NAME                STATUS              CONFIG FILES
+broker-agent        running(1)          /Users/sunwoo/Desktop/Portfolio/broker-agent/docker-compose.yml
+capstone2           running(1)          /Users/sunwoo/Desktop/Portfolio/Relationship/docker-compose.yml
+== docker volume ls
+broker-agent_pgdata
+capstone2_pgdata
+relationship_pgdata
+relationship-prod_caddy_config
+relationship-prod_caddy_data
+relationship-prod_pgdata
+== ports 8088/8443 LISTEN
+(lsof exit=1 — 1 이면 비어 있음)

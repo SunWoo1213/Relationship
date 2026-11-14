@@ -1,0 +1,48 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/s-logs.sh
+# 시각: 2026-11-14T14:27:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 1
+# ---
+backend-1  | INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+backend-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
+backend-1  | INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Refs: P1-schema R8 R9 D4 D5 S3.1
+backend-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, Refs: FIX-020 S3.1 -- 세 upsert 키에 UNIQUE 제약을 건다.
+backend-1  | INFO:     Started server process [1]
+backend-1  | INFO:     Waiting for application startup.
+backend-1  | INFO:     Application startup complete.
+backend-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+backend-1  | INFO:     127.0.0.1:57714 - "GET /health HTTP/1.1" 200 OK
+backend-1  | INFO:     172.21.0.4:60294 - "GET /health HTTP/1.1" 200 OK
+backend-1  | INFO:     172.21.0.4:60294 - "GET /persons HTTP/1.1" 200 OK
+backend-1  | INFO:     172.21.0.4:60294 - "GET /persons HTTP/1.1" 200 OK
+backend-1  | INFO:     172.21.0.4:60294 - "GET /nonexistent HTTP/1.1" 404 Not Found
+backend-1  | INFO:     127.0.0.1:37900 - "GET /health HTTP/1.1" 200 OK
+backend-1  | 브리핑 주기 작업 실행 중 예외가 났습니다 -- 다음 주기에 다시 시도합니다
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "/app/app/briefing/scheduler.py", line 119, in run_scheduler_loop
+backend-1  |     await asyncio.to_thread(run_once)
+backend-1  |   File "/usr/local/lib/python3.13/asyncio/threads.py", line 26, in to_thread
+backend-1  |     return await loop.run_in_executor(None, func_call)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/usr/local/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+backend-1  |     result = self.fn(*self.args, **self.kwargs)
+backend-1  |   File "/app/app/briefing/scheduler.py", line 106, in default_run_once
+backend-1  |     run_briefings(ctx, composer=composer_from_env(), notifier=notifier, trigger="scheduler")
+backend-1  |                                 ~~~~~~~~~~~~~~~~~^^
+backend-1  |   File "/app/app/briefing/compose.py", line 938, in composer_from_env
+backend-1  |     return BRIEFING_COMPOSERS[select_provider(env)]()
+backend-1  |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+backend-1  |   File "<string>", line 7, in __init__
+backend-1  |   File "/app/app/briefing/compose.py", line 788, in __post_init__
+backend-1  |     self.client = openai.OpenAI(timeout=self.timeout, max_retries=self.max_retries)
+backend-1  |                   ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/usr/local/lib/python3.13/site-packages/openai/_client.py", line 158, in __init__
+backend-1  |     raise OpenAIError(
+backend-1  |         "The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable"
+backend-1  |     )
+backend-1  | openai.OpenAIError: The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+backend-1  | INFO:     127.0.0.1:33736 - "GET /health HTTP/1.1" 200 OK
+== Traceback 줄 수
+Traceback=1
+FAIL

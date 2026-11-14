@@ -1,0 +1,53 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1-review/shutdown-doc-grep.sh
+# 시각: 2026-11-14T14:44:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+== #6 grep (12-shutdown.md)
+1:# 12 · 공개 종료 체크리스트 — 2026-11-19(목) 18:00 KST (P9-infra U3)
+4:> 실행 시각은 사용자 결정 J(2026-11-14). 항목마다 "확인 방법" 과 "실행 시각·결과" 칸을 채운다(값 아닌 이름·상태만). 순서대로 — **1번(백업)이 먼저**, 인스턴스 종료는 3번.
+9:| 1 | **종료 직전 백업** — 서버에서 `docker compose -f docker-compose.prod.yml exec -T postgres pg_dump -Fc -U <POSTGRES_USER> <POSTGRES_DB> > ~/rel
+10:| 2 | (선택) `docker compose -f docker-compose.prod.yml down` — 인스턴스 종료로 함께 사라지므로 생략 가능. **`-v` 는 붙이지 않는다** | `docker compose ps` 빈 출력 | |
+11:| 3 | EC2 인스턴스 **종료(terminate)** | 콘솔 상태 `terminated` | |
+12:| 4 | EBS: 볼륨 목록에 이 인스턴스의 `available` 볼륨 **0**(루트 볼륨 "종료 시 삭제" 였는지 포함) · 스냅샷 **0** | 볼륨·스냅샷 화면 | |
+13:| 5 | **Elastic IP 해제(release)** — 연결 안 된 EIP 도 과금된다 | EIP 목록 0 | |
+14:| 6 | 보안 그룹·키 페어 삭제(콘솔) + 사용자 PC 의 `.pem` 삭제 | 목록에서 사라짐 | |
+16:| 8 | **비밀 회전**: OpenAI 배포용 키 폐기(로컬 `.env` 가 같은 키였다면 새 키로) · 배포용 VAPID 키 폐기(결정 N — 로컬 구독 영향 없음) | OpenAI 대시보드 키 목록 · 로컬 `.env` 갱신 | |
+17:| 9 | **유지하는 것**: AWS Budgets 알림 3개 · 계정(크레딧 잔여 — 6개월 뒤 Free Plan 종료 안내를 확인하고 그때 계정 처리 결정) | Budgets 화면 | |
+18:| 10 | 최종 확인: `curl -sS -m 5 -o /dev/null -w '%{http_code}' https://<호스트명>/` 가 연결 실패(`000`) · **다음 날** Billing 에서 EC2·EBS·퍼블릭 IPv4 사용량이 종
+21:3·4·5 번의 콘솔 상태(terminated / 볼륨 0 / EIP 0) · 1 번 백업 파일 크기(값 아닌 바이트 수) · 8 번 회전 완료 — 03-log 에 시각과 함께 한 줄. P9 패키지는 이 문서가 전부 채워진 뒤 04-review 
+== 항목별 1줄 이상: 백업/인스턴스/EBS/EIP/보안 그룹/회전
+pg_dump      1
+terminate    2
+EBS          2
+Elastic IP   1
+보안 그룹 1
+회전       2
+== 11 문서 §7 S10 세 경로
+90:| S10 | `curl -s -o /dev/null -w '%{http_code}' https://<호스트명>/api/docs` · `/api/openapi.json` · `/api/redoc` | 전부 `404` |
+112:`https://<호스트명>/api/health` 200 · S10 404 ×3 · 데모 5단계 사용자 확인 · `docker compose ps` 세 서비스 healthy · `.env` 권한 600 · 보안 그룹 규칙 3개 · Budgets 3개 — 전부 **이름·상태만** 
+/api/docs            1
+/api/openapi.json    1
+/api/redoc           1
+== 결정 값 grep (A t4g.small·arm64 / B 도메인·sslip.io / C ap-northeast-2 / D 내 IP / J 18:00 / N RUNNING.md 273 / O DATABASE_URL 넣지 않음)
+t4g.small        11:4 12:0
+arm64            11:1 12:0
+sslip.io         11:5 12:1
+ap-northeast-2   11:2 12:0
+내 IP           11:3 12:0
+18:00            11:1 12:1
+273              11:1 12:0
+DATABASE_URL     11:1 12:0
+GIT_SHA          11:2 12:0
+SITE_ADDRESS     11:2 12:0
+apt              11:2 12:0
+down -v          11:1 12:1
+curl … \\| sh  11:1 12:0
+== 비밀·계정 값을 적으라는 문장 후보(값·ID·비밀번호·키 를 '적' '메모' 와 같은 줄)
+docs/user-setup/11-ec2-minimal-deploy.md:4:> **실제 EC2 생성·기동은 사용자가 "띄워 달라" 고 지시한 뒤에만 한다**(CR-005 개정 ②). 이 문서는 그때 위에서부터 그대로 따라가는 절차다. 단계마다 "끝났다는 증거" 는 이름·상태만 적고 **계정 ID·키 값·비밀번호는 어디에도 적지 않는다**(security §1).
+(grep exit=0 — 1 이면 없음)
+== 메모 칸 전부
+10:메모). 용도: **비상업·개인 학습(졸업평가 데모)** 
+10:메모: 크레딧 $___ / 기간 ___개월 / t4g.small 적격 ☐ 
+29:메모: EIP `___.___.___.___`(IP 는 비밀이 아니다) 

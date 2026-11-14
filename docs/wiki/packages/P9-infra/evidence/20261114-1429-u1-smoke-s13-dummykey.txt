@@ -1,0 +1,13 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/s-s13.sh
+# 시각: 2026-11-14T14:29:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+현재 시각 14:29:47, backend 시작 시각:
+2026-11-14T05:27:33.671704333Z
+briefing_run 행 수 = 2
+PASS (>=1)
+== 최근 briefing_run 3행 (session_id·created_at 만)
+2|briefing:d0e94e51-2d82-4bf1-baf7-1317a90a740b|2026-11-14 05:29:34.990078+00
+1|briefing:5f27d4e2-f72f-4f56-aaa6-8b99d3d5d07b|2026-11-14 05:28:34.971785+00

@@ -1,0 +1,23 @@
+# 명령: git diff --name-only 4a4d8cb
+# 시각: 2026-11-14T14:33:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+.env.example
+docs/user-setup/README.md
+docs/wiki/CURRENT.md
+docs/wiki/HANDOFF.md
+docs/wiki/changes/CR-005.md
+docs/wiki/journal.md
+docs/wiki/packages/P9-infra/01-plan.md
+docs/wiki/packages/P9-infra/02-plan-verify.md
+docs/wiki/packages/P9-infra/03-log.md
+docs/wiki/packages/P9-infra/evidence/20261114-1359-verify-plan.txt
+docs/wiki/packages/P9-infra/evidence/20261114-1401-verify-plan.txt
+docs/wiki/packages/P9-infra/evidence/20261114-1406-plan-verify-caddy-order.txt
+docs/wiki/packages/P9-infra/evidence/20261114-1411-verify-plan.txt
+docs/wiki/packages/P9-infra/evidence/20261114-1415-verify-plan.txt
+docs/wiki/packages/P9-infra/evidence/20261114-1416-plan-verify-caddy-order-fixed.txt
+docs/wiki/packages/P9-infra/evidence/20261114-1417-verify-plan.txt
+docs/wiki/packages/P9-infra/evidence/20261114-1418-verify-plan.txt

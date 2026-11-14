@@ -1,0 +1,29 @@
+# Refs: P9-infra D17 security — 빌드 문맥에 비밀·불필요 파일을 넣지 않는다.
+# "이미지에 비밀 값 0" 의 근거다(.env 는 서버에서 env_file 로만 참조).
+
+# 비밀
+.env
+.env.*
+*.pem
+*.key
+
+# 저장소·가상환경·캐시
+.git
+.venv
+**/__pycache__
+**/node_modules
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# 빌드에 필요 없는 디렉터리 (프론트는 web/ 안에서 다시 빌드한다)
+web/node_modules
+web/dist
+web/test-results
+test-results
+docs
+tests
+evaluation
+reports
+data
+.claude

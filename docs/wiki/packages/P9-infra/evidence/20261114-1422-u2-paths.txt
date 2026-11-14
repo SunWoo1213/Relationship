@@ -1,0 +1,98 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u2/paths.sh
+# 시각: 2026-11-14T14:22:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+--- dist/index.html
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#171717" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>관계 메모리</title>
+    <script type="module" crossorigin src="/assets/index-DB5EDvsy.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-SUxzZwmI.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+
+--- 자산 참조(src|href) 목록
+href="/favicon.svg"
+href="/manifest.webmanifest"
+src="/assets/index-DB5EDvsy.js"
+href="/assets/index-SUxzZwmI.css"
+--- 상대 경로(./ 또는 슬래시 없는 자산) 참조 개수 (기대 0)
+0
+--- vite.config.ts 에 base 설정 (기대: 매치 없음)
+base 없음
+--- dist 최상위 필수 파일
+있음 dist/index.html
+있음 dist/sw.js
+있음 dist/manifest.webmanifest
+있음 dist/assets
+--- dist/manifest.webmanifest
+{
+  "name": "관계 메모리",
+  "short_name": "관계 메모리",
+  "start_url": "/#/chat",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#171717",
+  "background_color": "#ffffff",
+  "icons": [
+    { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
+--- dist/sw.js 와 public/sw.js 동일?
+동일
+manifest 동일
+--- 서비스 워커 등록 경로/scope
+7:export const SERVICE_WORKER_URL = '/sw.js'
+60:    const registration = await navigator.serviceWorker.register(SERVICE_WORKER_URL)
+src 에 scope 옵션 없음(기본 scope = sw.js 디렉터리 = /)
+4:  "start_url": "/#/chat",
+5:  "scope": "/",
+--- API_BASE
+23:export const API_BASE = '/api'
+67:  const response = await fetch(`${API_BASE}${path}`, {
+--- 번들 안 localhost/127.0.0.1 (기대 0)
+번들에 하드코딩 0
+--- 번들 안 /api 접두 사용
+   1 `/api`
+--- src 하드코딩 grep (비테스트)
+src/proxy.ts:5:export const DEFAULT_API_TARGET = 'http://localhost:8000'
+--- src 하드코딩 grep (테스트 제외 후 매치 수)
+       1
+--- fetch( 호출이 client.ts 외에 있는가
+src/api/client.ts:67:  const response = await fetch(`${API_BASE}${path}`, {
+--- 프록시 규약 한 줄 대조: stripApiPrefix
+vite.config.ts:6:import { resolveApiTarget, stripApiPrefix } from './src/proxy.ts'
+vite.config.ts:27:          rewrite: stripApiPrefix,
+src/proxy.ts:13:export function stripApiPrefix(path: string): string {
+--- 해시 라우팅
+// 해시 라우팅 3경로 (결정 C, 원칙5 — 화면 3개 고정). 새 경로를 더하지 않는다.
+import { useEffect, useSyncExternalStore } from 'react'
+
+export type Route =
+  | { name: 'chat' }
+  | { name: 'persons'; personId: number | null }
+  | { name: 'briefings' }
+
+export const HREF = {
+  chat: '#/chat',
+  persons: '#/persons',
+  briefings: '#/briefings',
+} as const
+
+export const DEFAULT_HASH = HREF.chat
+
+--- dist ignore
+web/.gitignore:7:dist	web/dist
+web/.gitignore:6:node_modules	web/node_modules

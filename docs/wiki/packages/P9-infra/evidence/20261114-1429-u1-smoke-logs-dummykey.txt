@@ -1,0 +1,22 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/s-logs.sh
+# 시각: 2026-11-14T14:29:48+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+backend-1  | INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+backend-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
+backend-1  | INFO:     Started server process [1]
+backend-1  | INFO:     Waiting for application startup.
+backend-1  | INFO:     Application startup complete.
+backend-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+backend-1  | INFO:     127.0.0.1:39910 - "GET /health HTTP/1.1" 200 OK
+backend-1  | INFO:     127.0.0.1:48428 - "GET /health HTTP/1.1" 200 OK
+backend-1  | INFO:     127.0.0.1:35128 - "GET /health HTTP/1.1" 200 OK
+backend-1  | INFO:     127.0.0.1:57228 - "GET /health HTTP/1.1" 200 OK
+backend-1  | INFO:     127.0.0.1:47646 - "GET /health HTTP/1.1" 200 OK
+== Traceback 줄 수
+Traceback=0
+PASS
+== warn 줄(F-P9V-7 확인)
+(warn 줄 없음)

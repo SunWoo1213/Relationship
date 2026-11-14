@@ -1,0 +1,13 @@
+# 명령: docker compose --env-file /dev/null -f docker-compose.prod.yml config --quiet
+# 시각: 2026-11-14T14:25:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 1
+# ---
+time="2026-11-14T14:25:01+09:00" level=warning msg="The \"POSTGRES_USER\" variable is not set. Defaulting to a blank string."
+time="2026-11-14T14:25:01+09:00" level=warning msg="The \"POSTGRES_DB\" variable is not set. Defaulting to a blank string."
+error while interpolating services.backend.environment.POSTGRES_PASSWORD: required variable POSTGRES_PASSWORD is missing a value: POSTGRES_PASSWORD is required (.env)
+error while interpolating services.caddy.environment.SITE_ADDRESS: required variable SITE_ADDRESS is missing a value: SITE_ADDRESS is required (.env)
+error while interpolating services.postgres.environment.POSTGRES_DB: required variable POSTGRES_DB is missing a value: POSTGRES_DB is required (.env)
+error while interpolating services.postgres.environment.POSTGRES_PASSWORD: required variable POSTGRES_PASSWORD is missing a value: POSTGRES_PASSWORD is required (.env)
+error while interpolating services.postgres.environment.POSTGRES_USER: required variable POSTGRES_USER is missing a value: POSTGRES_USER is required (.env)

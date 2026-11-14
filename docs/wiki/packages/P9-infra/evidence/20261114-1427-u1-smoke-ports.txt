@@ -1,0 +1,14 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/s-ports.sh
+# 시각: 2026-11-14T14:27:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+backend 8000/tcp
+caddy 0.0.0.0:8088->80/tcp, [::]:8088->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp
+postgres 5432/tcp
+== postgres·backend 줄에서 호스트 바인딩(0.0.0.0: 또는 ->) 검색
+PASS: 호스트 포트 0
+== 호스트에서 5432·8000 연결 시도 (실패해야 정상)
+nc: connectx to 127.0.0.1 port 5432 (tcp) failed: Connection refused
+Connection to 127.0.0.1 port 8000 [tcp/irdmi] succeeded!

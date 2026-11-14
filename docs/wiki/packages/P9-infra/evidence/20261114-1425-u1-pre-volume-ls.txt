@@ -1,0 +1,10 @@
+# 명령: docker volume ls
+# 시각: 2026-11-14T14:25:00+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+DRIVER    VOLUME NAME
+local     broker-agent_pgdata
+local     capstone2_pgdata
+local     relationship_pgdata

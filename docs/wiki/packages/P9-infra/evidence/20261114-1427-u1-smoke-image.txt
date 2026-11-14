@@ -1,0 +1,35 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/s-image.sh
+# 시각: 2026-11-14T14:27:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+== relationship-backend:local
+arch=arm64 os=linux size_bytes=449808080 user=app
+== relationship-caddy:local
+arch=arm64 os=linux size_bytes=88231757 user=
+== 이미지 크기(사람이 읽는 형태)
+relationship-backend:local 450MB
+relationship-caddy:local 88.2MB
+== backend 이미지 /app 내용(ls -a)
+.
+..
+alembic
+alembic.ini
+app
+docker
+requirements.txt
+== .env 존재 여부(없어야 함)
+PASS: /app/.env 없음
+== caddy 이미지 /srv 최상위
+.
+..
+assets
+favicon.svg
+icon-192.svg
+icon-512.svg
+index.html
+manifest.webmanifest
+sw.js
+== backend 이미지 실행 사용자
+uid=10001(app) gid=999(app) groups=999(app)

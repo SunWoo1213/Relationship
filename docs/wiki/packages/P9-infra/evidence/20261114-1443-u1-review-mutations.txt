@@ -1,0 +1,75 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1-review/mutate_review.py R0
+# 시각: 2026-11-14T14:43:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+=== R0: 무변이 기준선  (기대 실패: -)
+diff vs repo: None
+17 passed in 0.08s
+pytest exit=0 (변이 생존(전부 통과))
+
+# ===== append 2026-11-14T14:44:23+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1-review/mutate_review.py RB
+# 시각: 2026-11-14T14:44:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+7,8d6
+< *.pem
+< *.key
+=== RB: .dockerignore 에서 `*.pem`·`*.key` 줄 삭제(개인키 파일이 빌드 문맥에 들어감)  (기대 실패: ⑭(기대: 계획 ⑭ 는 .env·.git·web/node_modules 만 요구 → 생존 예상))
+diff vs repo: .dockerignore
+17 passed in 0.08s
+pytest exit=0 (변이 생존(전부 통과))
+
+# ===== append 2026-11-14T14:44:24+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1-review/mutate_review.py RM
+# 시각: 2026-11-14T14:44:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+25c25
+< 		root * /srv
+---
+> 		root * /var/www
+=== RM: Caddyfile `root * /srv` → `root * /var/www`(Dockerfile 이 복사하는 경로와 어긋남 → 정적 / 가 404)  (기대 실패: ⑪(기대: 테스트는 root 경로를 보지 않음 → 생존 예상, 스모크 ⑤ 만 잡음))
+diff vs repo: Caddyfile
+17 passed in 0.07s
+pytest exit=0 (변이 생존(전부 통과))
+
+# ===== append 2026-11-14T14:44:24+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1-review/mutate_review.py RD
+# 시각: 2026-11-14T14:44:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+8c8
+< set -eu
+---
+> set -u
+=== RD: entrypoint `set -eu` → `set -u`(마이그레이션 실패해도 uvicorn 이 뜬다 — D17 4 위반)  (기대 실패: ⑫)
+diff vs repo: docker/entrypoint.sh
+FAILED tests/test_deploy_files.py::test_entrypoint_migrates_then_execs_single_worker - AssertionError: assert None
+1 failed, 16 passed in 0.08s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T14:44:25+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1-review/mutate_review.py RN
+# 시각: 2026-11-14T14:44:25+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+57c57
+<       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+---
+>       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+=== RN: compose backend healthcheck URL 을 `/api/health` 로(백엔드 라우트는 접두 없음 → 항상 unhealthy)  (기대 실패: 보조)
+diff vs repo: docker-compose.prod.yml
+FAILED tests/test_deploy_files.py::test_compose_backend_dependencies_logging_and_tags - assert 'http://127.0.0.1:8000/health' in '    build:\n      context: .\n      target: backend\n    image: relationship-backend:${GIT_SHA:-local}\n    restart: ...est.urlopen(\'http://127.0.0.1:8000/api/health\', timeout=3)"]\n      start_period: 60s\n    logging: *default-logging'
+1 failed, 16 passed in 0.08s
+pytest exit=1 (변이 감지(실패))

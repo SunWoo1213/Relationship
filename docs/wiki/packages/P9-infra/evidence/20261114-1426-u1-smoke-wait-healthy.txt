@@ -1,0 +1,13 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/wait-healthy.sh
+# 시각: 2026-11-14T14:26:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+--- 폴링 1 (14:26:15)
+NAME                           IMAGE                        COMMAND                   SERVICE    CREATED          STATUS                    PORTS
+relationship-prod-backend-1    relationship-backend:local   "sh /app/docker/entr…"   backend    45 seconds ago   Up 14 seconds (healthy)   8000/tcp
+relationship-prod-caddy-1      relationship-caddy:local     "caddy run --config …"   caddy      45 seconds ago   Up 14 seconds             0.0.0.0:8088->80/tcp, [::]:8088->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp
+relationship-prod-postgres-1   pgvector/pgvector:pg16       "docker-entrypoint.s…"   postgres   45 seconds ago   Up 45 seconds (healthy)   5432/tcp
+backend health=healthy
+HEALTHY

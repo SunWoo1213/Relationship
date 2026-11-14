@@ -1,0 +1,83 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1-review/smoke-check.sh
+# 시각: 2026-11-14T14:45:27+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+== /api/health
+{"status":"ok","db":"up","alembic_revision":"0002"}
+200 application/json
+== alembic heads (venv)
+0002 (head)
+== /
+200 text/html; charset=utf-8
+== /api/persons
+[]
+200 application/json
+== S10 docs 경로(전부 404 기대)
+/api/docs -> 404 
+/api/openapi.json -> 404 
+/api/redoc -> 404 
+/api/docs/oauth2-redirect -> 404 
+== 부정: /health 는 SPA fallback(text/html, JSON 아님)
+200 text/html; charset=utf-8
+== 부정: /api/nonexistent 는 백엔드 404 JSON
+404 application/json
+== S4 헤더
+-- /sw.js
+HTTP/1.1 200 OK
+Cache-Control: no-cache
+Content-Type: text/javascript; charset=utf-8
+-- /index.html
+HTTP/1.1 200 OK
+Cache-Control: no-cache
+Content-Type: text/html; charset=utf-8
+-- /manifest.webmanifest
+HTTP/1.1 200 OK
+Content-Type: application/manifest+json
+== 게시 포트(docker port — postgres·backend 는 비어야 함)
+[postgres]
+invalid IP:0
+[backend]
+invalid IP:0
+[caddy]
+0.0.0.0:8088
+== backend 컨테이너 사용자·/app 목록(.env 없어야 함)
+uid=10001(app) gid=999(app) groups=999(app)
+.
+..
+alembic
+alembic.ini
+app
+docker
+requirements.txt
+PASS: /app/.env 없음
+== backend 환경에 DATABASE_URL 에 비밀번호가 없는지(값 대신 꼴만: @ 앞에 : 가 없어야 함)
+FAIL: userinfo 에 :
+POSTGRES_PASSWORD set
+== backend 로그 Traceback 수
+0
+backend-1  | INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+backend-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
+backend-1  | INFO:     Waiting for application startup.
+backend-1  | INFO:     Application startup complete.
+
+# ===== append 2026-11-14T14:46:13+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1-review/smoke-check2.sh
+# 시각: 2026-11-14T14:46:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+== (재검사) backend 컨테이너의 DATABASE_URL userinfo(스킴·호스트 제외) — 값은 사용자 이름뿐이어야 함
+userinfo=app host=postgres:5432
+PASS: userinfo 에 비밀번호 없음 (결정 O — 비밀번호는 POSTGRES_PASSWORD 로)
+POSTGRES_PASSWORD set
+== 그 환경으로 app.config.resolve_connection 이 고르는 접속 정보(비밀번호 제외 safe_summary) — db up 의 근거
+user=app host=postgres port=5432 dbname=relationship (source=DATABASE_URL)
+password_len>0: True
+warnings: ['[warn] POSTGRES_PASSWORD 가 DATABASE_URL 과 다르다']
+== alembic/env.py 도 같은 resolve_connection 을 쓰는가(이미지 안 파일 grep)
+4:접속 정보는 이 파일이 `app.config.resolve_connection()` 으로 `os.environ`
+35:from app.config import resolve_connection  # noqa: E402
+53:_conn_info, _warnings = resolve_connection()

@@ -1,5 +1,7 @@
 # 05 · 실서버·배포 비밀 (SSM Parameter Store · VAPID · GitHub Actions) — P7/P9 때
 
+> **부분 대체(CR-005 · D17, 2026-11-14)**: 배포는 AWS 최소 구성(EC2 1대 + Compose)이라 **SSM Parameter Store·GitHub Actions 배포 secrets 절은 해당 없음**. 배포 비밀은 사용자가 서버 `.env`(권한 600)에 직접 쓴다 — 이름 표는 `11-ec2-minimal-deploy.md` §4. 이 문서는 **VAPID 키 생성 절만 유효**(배포용은 새 키 쌍, 결정 N).
+
 ## 언제 필요한가
 - **P7 웹푸시**: VAPID 키 쌍 생성 → `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT`.
 - **P9 인프라**: Terraform 실행 자격(AWS 계정), SSM Parameter Store 에 `.env.example` 의 이름 전부(값은 SSM 에만), GitHub Actions secrets(AWS 배포 역할·S3/CloudFront), EC2 의 Caddy 가 Let's Encrypt 를 받을 도메인(D7).

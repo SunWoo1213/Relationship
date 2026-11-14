@@ -1,0 +1,71 @@
+# 명령: git status --short
+# 시각: 2026-11-14T14:33:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
+ M .env.example
+ M docs/user-setup/README.md
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+?? .dockerignore
+?? Caddyfile
+?? Dockerfile
+?? docker-compose.prod.yml
+?? docker/entrypoint.sh
+?? docs/user-setup/11-ec2-minimal-deploy.md
+?? docs/user-setup/12-shutdown.md
+?? docs/wiki/fixes/evidence/20261108-2000-L-007-test-guards.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261107-1455-u7fix-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261108-2009-u7fix3-review-baseline.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1422-u2-build.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1422-u2-paths.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1422-u2-tests.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1425-u1-compose-config.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1425-u1-compose-required.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1425-u1-pre-compose-ls.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1425-u1-pre-dev-compose-ps-capstone2.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1425-u1-pre-dev-compose-ps.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1425-u1-pre-docker-ps.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1425-u1-pre-volume-ls.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1425-u1-smoke-up.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1426-u1-smoke-docs.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1426-u1-smoke-health.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1426-u1-smoke-static.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1426-u1-smoke-wait-healthy.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1427-u1-smoke-alembic.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1427-u1-smoke-image.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1427-u1-smoke-logs.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1427-u1-smoke-ports-docker-port.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1427-u1-smoke-ports.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1427-u1-smoke-s13.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1427-u1-smoke-secretgrep.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1427-u1-smoke-up-dummykey.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1427-u1-smoke-wait-2min.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1429-u1-smoke-logs-dummykey.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1429-u1-smoke-s13-dummykey.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-mid-compose-ls.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-mid-dev-compose-ps-capstone2.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-mid-volume-ls.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-mut-v14b-smoke.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-post-compose-ls-all.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-post-compose-ls.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-post-dev-compose-ps-capstone2.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-post-dev-compose-ps.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-post-docker-ps.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-post-volume-ls.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-secret-grep-fixed.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1430-u1-smoke-down.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1432-u1-mutations.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1432-u1-pytest-all.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1433-u1-deploy-files.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1433-u1-mypy.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1433-u1-product-unchanged-worktree.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1433-u1-product-unchanged.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1433-u1-ruff-plan-scope.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1433-u1-ruff.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1433-u1-scope-diff-name-only.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1433-u1-tests-unmodified.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1433-u1-tools-check.txt
+?? docs/wiki/packages/P9-infra/tests.md
+?? tests/test_deploy_files.py

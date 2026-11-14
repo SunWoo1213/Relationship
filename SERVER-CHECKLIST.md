@@ -5,8 +5,7 @@
 > 원칙: 점검은 **가시적 증거**로만 한다(`docs/wiki/verification.md`). "확인했습니다"는 증거가 아니다. 명령 출력·HTTP 응답 본문·스크린샷 경로·커밋 해시만 증거다.
 > 비밀: 키·비밀번호·접속 문자열은 **절대** 출력·복사·문서에 넣지 않는다(`docs/wiki/security.md` §1). 필요한 것은 환경변수 **이름**뿐이다.
 
-배포 구성(확정 D7): CloudFront → EC2(Caddy, Let's Encrypt HTTPS) → FastAPI(Docker) → RDS PostgreSQL + pgvector(프라이빗 서브넷). 프론트는 S3 + CloudFront. 비밀은 SSM Parameter Store. ALB 없음.
-인프라 자동화(Terraform·GitHub Actions)는 P9-infra 에서 만든다. 그 전까지는 아래 절차를 사람이 손으로 수행하되, 명령과 증거 규약은 동일하다.
+배포 구성(**CR-005 개정 ② · D17, 2026-11-14 — D7 대체**): EC2 **1대**에 Docker Compose 3서비스 — Caddy(Let's Encrypt HTTPS, `/api/*` 접두 제거 프록시, 프론트 정적 서빙) → FastAPI(`backend`) → PostgreSQL + pgvector(`postgres` 컨테이너, 호스트 포트 없음). CloudFront·S3·RDS·ALB·SSM·Terraform·GitHub Actions 배포 **없음**. 비밀은 서버 `.env`. 절차는 `docs/user-setup/11-ec2-minimal-deploy.md`, 종료는 `12-shutdown.md`(11-19 18:00). 아래 절차 중 CloudFront·RDS·SSM 항목은 해당 없음.
 
 ---
 

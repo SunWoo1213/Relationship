@@ -1,0 +1,6 @@
+# 명령: docker compose --env-file /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1/prod.env -f docker-compose.prod.yml config --quiet
+# 시각: 2026-11-14T14:25:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5ece780 (dev2)
+# exit: 0
+# ---
