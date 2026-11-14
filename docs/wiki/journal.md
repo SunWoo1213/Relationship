@@ -607,3 +607,6 @@
 - 2026-11-14 11:30 | CR | CR-005 이행완료(문서) — 배포를 AWS(D7) 대신 Vercel(프론트 정적 + FastAPI Python 함수) + Neon Free(pgvector) + GitHub Actions 5분 스케줄로, 접근 보호 없이 2026-11-18(수) 졸업평가까지 공개 뒤 종료. 사용자 결정 A~D(AskUserQuestion 4문). D17 신설·D07 대체. 되돌릴 코드 0, frozen 생략. P2b-person-delete 는 U2 3a1bcec 에서 보류, P9-infra 재계획(architect 진행 중) | CR-005 D17 D7 R14 P9-infra P2b-person-delete
 - 2026-11-14 11:29 | COMMIT | 53cbefe cr(CR-005): 배포를 AWS 대신 Vercel + Neon 무료 티어로 바꾸고 졸업평가까지만 공개하는 결정을 문서에 옮긴다
 - 2026-11-14 11:29 | PUSH-dev2 | origin dev2 53cbefe (실험 푸시)
+- 2026-11-14 12:46 | COMMIT | 4a4d8cb cr(CR-005): 배포 결정을 Vercel 에서 AWS 최소 구성(EC2 1대 + Compose)으로 개정하고 신규 계정·비상업 전제를 적는다
+- 2026-11-14 12:46 | PUSH-dev2 | origin dev2 4a4d8cb (실험 푸시)
+- 2026-11-14 14:20 | START | P9-infra 활성화 — AWS 최소 구성(EC2 1대 + Compose: caddy·backend·postgres, 제품 코드 0, 공개 ~11-19 18:00). architect 01-plan(1차 Vercel 안 같은 날 폐기 → AWS 최소 재작성) → 사용자 결정 A~P(A t4g.small · B 새 도메인/준비 전 sslip.io · D SSH 내 IP · J 11-19 18:00, 나머지 추천안) → verify-plan FAIL 0 → verifier 02-plan-verify 1차 보류(F-P9V-1 Caddyfile 404 가 handle_path 뒤에 평가, caddy adapt 로 확인) → 보정 → 재검증 통과. U1(backend-agent 배포 파일+로컬 스모크)·U2(frontend-agent 빌드 확인) 동시 시작. **U4 실제 기동은 사용자 지시 뒤.** | P9-infra CR-005 D17 R14 F-P9V-1

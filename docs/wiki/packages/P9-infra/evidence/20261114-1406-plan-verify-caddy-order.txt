@@ -1,0 +1,227 @@
+# 명령: docker run --rm -v /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1dde2d0/scratchpad/caddy-probe/Caddyfile:/etc/caddy/Caddyfile:ro -e SITE_ADDRESS=:80 caddy:2-alpine caddy adapt --config /etc/caddy/Caddyfile --pretty
+# 시각: 2026-11-14T14:06:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 4a4d8cb (dev2)
+# exit: 0
+# ---
+Unable to find image 'caddy:2-alpine' locally
+2-alpine: Pulling from library/caddy
+4f4fb700ef54: Pulling fs layer
+87e497759aee: Pulling fs layer
+b90627b8f429: Pulling fs layer
+020ddb702a1f: Pulling fs layer
+d01380b75b6b: Pulling fs layer
+4f4fb700ef54: Download complete
+d01380b75b6b: Download complete
+020ddb702a1f: Download complete
+87e497759aee: Download complete
+44b8117ba151: Download complete
+b90627b8f429: Download complete
+f16e2332dea4: Download complete
+b90627b8f429: Pull complete
+020ddb702a1f: Pull complete
+87e497759aee: Pull complete
+4f4fb700ef54: Pull complete
+d01380b75b6b: Pull complete
+Digest: sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0
+Status: Downloaded newer image for caddy:2-alpine
+{
+	"apps": {
+		"http": {
+			"servers": {
+				"srv0": {
+					"listen": [
+						":80"
+					],
+					"routes": [
+						{
+							"match": [
+								{
+									"path": [
+										"/manifest.webmanifest"
+									]
+								}
+							],
+							"handle": [
+								{
+									"handler": "headers",
+									"response": {
+										"set": {
+											"Content-Type": [
+												"application/manifest+json"
+											]
+										}
+									}
+								}
+							]
+						},
+						{
+							"match": [
+								{
+									"path": [
+										"/index.html"
+									]
+								}
+							],
+							"handle": [
+								{
+									"handler": "headers",
+									"response": {
+										"set": {
+											"Cache-Control": [
+												"no-cache"
+											]
+										}
+									}
+								}
+							]
+						},
+						{
+							"match": [
+								{
+									"path": [
+										"/sw.js"
+									]
+								}
+							],
+							"handle": [
+								{
+									"handler": "headers",
+									"response": {
+										"set": {
+											"Cache-Control": [
+												"no-cache"
+											]
+										}
+									}
+								}
+							]
+						},
+						{
+							"handle": [
+								{
+									"handler": "headers",
+									"response": {
+										"deferred": true,
+										"delete": [
+											"Server"
+										]
+									}
+								},
+								{
+									"encodings": {
+										"gzip": {}
+									},
+									"handler": "encode",
+									"prefer": [
+										"gzip"
+									]
+								}
+							]
+						},
+						{
+							"group": "group2",
+							"match": [
+								{
+									"path": [
+										"/api/*"
+									]
+								}
+							],
+							"handle": [
+								{
+									"handler": "subroute",
+									"routes": [
+										{
+											"handle": [
+												{
+													"handler": "rewrite",
+													"strip_path_prefix": "/api"
+												}
+											]
+										},
+										{
+											"handle": [
+												{
+													"handler": "reverse_proxy",
+													"upstreams": [
+														{
+															"dial": "backend:8000"
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"group": "group2",
+							"handle": [
+								{
+									"handler": "subroute",
+									"routes": [
+										{
+											"handle": [
+												{
+													"handler": "vars",
+													"root": "/srv"
+												}
+											]
+										},
+										{
+											"handle": [
+												{
+													"handler": "rewrite",
+													"uri": "{http.matchers.file.relative}"
+												}
+											],
+											"match": [
+												{
+													"file": {
+														"try_files": [
+															"{http.request.uri.path}",
+															"/index.html"
+														]
+													}
+												}
+											]
+										},
+										{
+											"handle": [
+												{
+													"handler": "file_server",
+													"hide": [
+														"/etc/caddy/Caddyfile"
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"match": [
+								{
+									"path": [
+										"/api/docs*",
+										"/api/redoc*",
+										"/api/openapi.json"
+									]
+								}
+							],
+							"handle": [
+								{
+									"handler": "static_response",
+									"status_code": 404
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

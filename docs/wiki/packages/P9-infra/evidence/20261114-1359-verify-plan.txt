@@ -1,0 +1,45 @@
+# 명령: bash .claude/scripts/verify-plan.sh P9-infra
+# 시각: 2026-11-14T13:59:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 4a4d8cb (dev2)
+# exit: 1
+# ---
+== verify-plan P9-infra  (2026-11-14 13:59) ==
+PASS  존재: docs/wiki/packages/P9-infra/01-plan.md
+FAIL  없음: docs/wiki/packages/P9-infra/02-plan-verify.md
+PASS  카드 존재: D17
+PASS  카드 존재: D4
+PASS  패키지 id 등록됨: P0-compose
+PASS  패키지 id 등록됨: P9-infra
+PASS  검증 항목 존재: R14
+FAIL  작업 단위(- [ ] U1 …)가 없다
+PASS  backlog 일치: 배포 URL(HTTPS)에서 데모 시나리오 5단계 재현 + `git diff --stat -- app web
+PASS  의존 완료: P8-frontend
+PASS  P4 게이트 통과 (P4b-er-redesign)
+WARN  registry 에 다른 패키지로 이미 있음: requirements.txt → | 문서/설정 | 런타임·개발 의존성 선언(첫 도입, `==` 고정) | requirements.txt, requirements-dev.txt 
+| 모듈 | 웹푸시 설정 읽기 | app/settings.py | P2-tools | 85393e0 | **P7-push U1(85393e0)*
+WARN  registry 에 다른 패키지로 이미 있음: alembic.ini → | 마이그레이션 | Alembic 도입 + 초기 스키마 v2 | alembic/ (alembic.ini, alembic/env.py, scrip
+PASS  registry 중복 없음: docker/entrypoint.sh
+PASS  registry 중복 없음: /app/docker/entrypoint.sh
+PASS  registry 중복 없음: docker/entrypoint.sh
+PASS  registry 중복 없음: app.main
+PASS  registry 중복 없음: docker-compose.prod.yml
+PASS  registry 중복 없음: /api/openapi.json
+WARN  registry 에 다른 패키지로 이미 있음: /index.html → | 확인 도구(제품 화면 아님, 스위치 기본 꺼짐) | 웹푸시 구독 확인 페이지 — `/push-dev/`·`/push-dev/sw.js`·`/
+| PWA 껍데기 | `web/public/manifest.webmanifest`(이름 `관계 메모리`·`start_url` `/#/chat`·
+| 테스트 | `sw.test.ts` 14건(가짜 self 로 sw.js 평가 — push 인자·postMessage·잘못된 JSON·click
+WARN  registry 에 다른 패키지로 이미 있음: /sw.js → | 확인 도구(제품 화면 아님, 스위치 기본 꺼짐) | 웹푸시 구독 확인 페이지 — `/push-dev/`·`/push-dev/sw.js`·`/
+| 서비스 워커 | `web/public/sw.js`(범위 `/` 단일 파일 — `push` → `showNotification(title,{b
+| 푸시 구독 | `web/src/push.ts`(`subscribeToPush`·`getPushStatus`·`urlBase64ToUint8A
+WARN  registry 에 다른 패키지로 이미 있음: /index.html → | 확인 도구(제품 화면 아님, 스위치 기본 꺼짐) | 웹푸시 구독 확인 페이지 — `/push-dev/`·`/push-dev/sw.js`·`/
+| PWA 껍데기 | `web/public/manifest.webmanifest`(이름 `관계 메모리`·`start_url` `/#/chat`·
+| 테스트 | `sw.test.ts` 14건(가짜 self 로 sw.js 평가 — push 인자·postMessage·잘못된 JSON·click
+WARN  registry 에 다른 패키지로 이미 있음: /manifest.webma → | PWA 껍데기 | `web/public/manifest.webmanifest`(이름 `관계 메모리`·`start_url` `/#/chat`·
+PASS  registry 중복 없음: tests/test_deploy_files.py
+WARN  registry 에 다른 패키지로 이미 있음: .github/workflows/tests.yml → | 설정 | GitHub Actions 테스트 워크플로(pgvector 서비스 컨테이너에서 pytest) | .github/workflows/t
+| CI | `.github/workflows/tests.yml` 의 `web` job(matrix ubuntu-latest·windows-la
+PASS  registry 중복 없음: docs/user-setup/11-ec2-minimal-deploy.md
+PASS  registry 중복 없음: docs/user-setup/12-shutdown.md
+PASS  registry 중복 없음: docs/wiki/packages/P9-infra/tests.md
+PASS  registry 중복 없음: 03-log.md
+== 결과: FAIL=2 WARN=7 ==
