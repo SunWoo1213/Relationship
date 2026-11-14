@@ -48,11 +48,11 @@
 ## 기술 스택
 
 - 백엔드: FastAPI (Python), Docker
-- 프론트: React + PWA (S3 + CloudFront)
+- 프론트: React + PWA — **Vercel 정적 호스팅**(CR-005 · D17, 2026-11-14. 원안 S3 + CloudFront 는 폐기)
 - DB: PostgreSQL + pgvector (RDS). 별도 벡터 DB 미도입 — 인물·별칭 테이블과 임베딩을 같은 DB에서 조인.
 - 임베딩: 별도 공급자 필요(Claude API에는 임베딩 엔드포인트가 없다). 공급자·차원은 임베딩 파일럿(D4) 후 확정.
-- 인프라: Terraform, GitHub Actions, SSM Parameter Store. CloudFront → EC2 구간은 EC2의 Caddy(Let's Encrypt)로 HTTPS, ALB 미사용(D7).
-- 첫날 필수: AWS Budgets 알림($10 / $30 / $50)
+- 인프라(CR-005 · D17, 2026-11-14): **Vercel Hobby** — 백엔드는 FastAPI 를 Python 서버리스 함수 1개로, `/api/*` rewrite. DB 는 **Neon Free**(PostgreSQL + pgvector, TLS). 브리핑 주기 작업은 GitHub Actions `schedule`(5분)이 비밀 헤더로 `/api/briefings/run` 호출. 비밀은 Vercel 환경변수. **공개 기간 한정(~2026-11-18 졸업평가) 뒤 종료 절차.** 원안(Terraform·SSM·CloudFront→EC2 Caddy·RDS, D7)은 폐기.
+- 첫날 필수였던 AWS Budgets 알림은 CR-005 로 불필요 — 대신 **OpenAI 대시보드 월 지출 한도**(사용자 몫, 공개 기간 중 LLM 비용 상한)
 
 ## 툴 7종 (제품 속 에이전트가 호출) — 시그니처 v2
 

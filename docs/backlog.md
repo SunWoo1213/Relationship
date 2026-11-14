@@ -92,7 +92,7 @@
 
 ### P9
 
-- [ ] [infra-agent(신설)] Terraform + GitHub Actions + Caddy TLS / 의존: P8 / 수용기준: 배포 URL에서 데모 시나리오 5단계 재현 **+ 배포 유효성 점검 요구(verifier `docs/wiki/packages/P8-frontend/review-u10-deploy-validity.md`, 2026-10-16)**: ① 착수 전 사용자 결정 R-U10D-3 — 인증 없는 공개 배포 정책(공개 범위·`/api/docs`·`/api/openapi.json` 노출·최소 보호, F-fbaaae) ② 첫 단위에 `Dockerfile` + 스모크 S1(이미지 빌드·기동·`/health`)을 CI 에(R-U10D-1) ③ 수용기준에 스모크 **S1~S15**(§9) 글자 그대로 — 특히 S2·S4 `/api` 접두 제거·CloudFront 경로·정적 MIME/캐시(R-U10D-2), S7·S8 RDS 마이그레이션 주체·`CREATE EXTENSION` 권한·SSL(R-U10D-4) ④ [권고] R-U10D-5(`.env.example` 미사용 이름 3개)·-7(계약 대조 자동화)·-9(스케줄러 워커 수)·-10(운영 경로로 데모 5단계) 검토
+- [ ] [backend-agent + frontend-agent + 사용자] **P9-infra(CR-005 · D17 재계획, 2026-11-14)** — Vercel Hobby(프론트 정적 + FastAPI Python 함수, `/api/*` rewrite) + Neon Free(pgvector, TLS) + GitHub Actions 5분 스케줄이 비밀 헤더로 `/api/briefings/run` 호출 + **공개 기간 ~2026-11-18 뒤 종료 절차** / 의존: P8 / 수용기준: 배포 URL에서 데모 시나리오 5단계 재현 + `/api/briefings/run` 헤더 없음 → 실행 0 + 배포 설정 `BRIEFING_SCHEDULER_ENABLED` off + 종료 체크리스트 문서 존재 + 아래 유효성 점검 중 Vercel·Neon 대응 항목(Dockerfile·RDS·CloudFront 항목은 치환). ~~(원안) [infra-agent(신설)] Terraform + GitHub Actions + Caddy TLS~~ / 원안 수용기준: 배포 URL에서 데모 시나리오 5단계 재현 **+ 배포 유효성 점검 요구(verifier `docs/wiki/packages/P8-frontend/review-u10-deploy-validity.md`, 2026-10-16)**: ① 착수 전 사용자 결정 R-U10D-3 — 인증 없는 공개 배포 정책(공개 범위·`/api/docs`·`/api/openapi.json` 노출·최소 보호, F-fbaaae) ② 첫 단위에 `Dockerfile` + 스모크 S1(이미지 빌드·기동·`/health`)을 CI 에(R-U10D-1) ③ 수용기준에 스모크 **S1~S15**(§9) 글자 그대로 — 특히 S2·S4 `/api` 접두 제거·CloudFront 경로·정적 MIME/캐시(R-U10D-2), S7·S8 RDS 마이그레이션 주체·`CREATE EXTENSION` 권한·SSL(R-U10D-4) ④ [권고] R-U10D-5(`.env.example` 미사용 이름 3개)·-7(계약 대조 자동화)·-9(스케줄러 워커 수)·-10(운영 경로로 데모 5단계) 검토
 
 ### P10
 

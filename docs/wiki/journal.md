@@ -602,3 +602,6 @@
 - 2026-11-09 16:29 | PUSH-dev2 | origin dev2 2ff0efb (실험 푸시)
 - 2026-11-09 16:49 | COMMIT | a4b44b1 feat(P2b-person-delete): 기록 속에서 지울 인물을 가리키는 항목을 판별하는 규칙을 더한다
 - 2026-11-09 16:49 | PUSH-dev2 | origin dev2 a4b44b1 (실험 푸시)
+- 2026-11-14 11:28 | COMMIT | 3a1bcec feat(P2b-person-delete): 인물을 지우면 별칭·사실·사건·일정과 그 인물을 가리키는 질문·판단 기록까지 함께 지우는 서비스를 더한다
+- 2026-11-14 11:28 | PUSH-dev2 | origin dev2 3a1bcec (실험 푸시)
+- 2026-11-14 11:30 | CR | CR-005 이행완료(문서) — 배포를 AWS(D7) 대신 Vercel(프론트 정적 + FastAPI Python 함수) + Neon Free(pgvector) + GitHub Actions 5분 스케줄로, 접근 보호 없이 2026-11-18(수) 졸업평가까지 공개 뒤 종료. 사용자 결정 A~D(AskUserQuestion 4문). D17 신설·D07 대체. 되돌릴 코드 0, frozen 생략. P2b-person-delete 는 U2 3a1bcec 에서 보류, P9-infra 재계획(architect 진행 중) | CR-005 D17 D7 R14 P9-infra P2b-person-delete

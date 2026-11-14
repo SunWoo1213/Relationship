@@ -1,5 +1,7 @@
 # 09 · AWS 배포 가이드라인 — 처음 규모: 사용자 몇 명 (P9 착수 전 기준 문서)
 
+> **대체됨(CR-005 · D17, 2026-11-14)**: 배포는 AWS 가 아니라 **Vercel + Neon** 으로 한다. 이 문서는 원안 기록으로 남긴다. 새 절차는 P9-infra 01-plan 과 `docs/user-setup/` 의 Vercel 문서(P9 에서 작성)를 본다. §2 결정 표·§7 확장 신호 중 규모 전제는 그대로 참고할 수 있다.
+
 > Refs: P9 D7 D4 D11 S3.1 security §1 §4 · `SERVER-CHECKLIST.md` · `05-server-secrets.md` · `02-aws-budgets.md`
 > 이 카드는 **"어떤 모양으로, 얼마에, 어떤 순서로"** 를 정하는 가이드라인이다. Terraform·GitHub Actions 코드는 P9 에서 infra-agent 가 쓰고, `terraform apply`·콘솔 조작·비밀 값 입력은 전부 사용자 몫이다.
 > 규모 전제: **동시 사용자 1~5명, 하루 대화 수백 건 이하, 데이터 수 MB.** 이 전제를 넘는 신호는 §7 에 적었다 — 그 전에는 아래 구성을 키우지 않는다.

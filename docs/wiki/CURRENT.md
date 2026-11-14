@@ -1,6 +1,6 @@
 # CURRENT — 지금 하는 일
 
-active: P2b-person-delete
+active: none
 frozen: none
 
 <!--
@@ -12,6 +12,8 @@ frozen: none
 -->
 
 ## 메모
+- **P2b-person-delete 보류(2026-11-14, U2 `3a1bcec` 까지 커밋)** — CR-005(배포, 11-18 졸업평가 전) 때문에 P9-infra 를 먼저 한다. 재개는 U3 라우트부터(`01-plan.md` U3~U5, 열린 권고 R-U2-1·2·5, R-U1-4). `delete_person` 은 라우트가 없어 배포본에 노출되지 않는다.
+- **CR-005 이행완료(문서, 2026-11-14, 사용자 A 수용)** — 배포를 Vercel(프론트 정적 + FastAPI Python 함수) + Neon(pgvector) + GitHub Actions 5분 스케줄로, 공개 ~2026-11-18 뒤 종료. D7 → D17. 코드는 P9-infra 재계획(architect 01-plan 작성 중 → verifier → 활성화).
 - **P5b-query-turn 완료(2026-11-09, verifier 04-review `결과: 완료`, 사용자 확인)** — 판정 표 통과 20·문구 보정 1(R-04-1), 결정 H #4 는 되묻기 1행 허용(R-04-2), 열린 [필수] 0, 2136 passed skip 0, 변이 7/7, verify-impl FAIL 0. U1 `1dccb95` · U2 `06b7bb5` · U3 `a002706` · U4 `18219ba` · U5 `49c1c67` · U6 `a004cdd` · U7 `e49f78d`·`cf26dce` · 04-review `fb8841a`. 고지: E-6 1문장 추가. 열린 [권고]: R-U7F3-3(E-5 템플릿 "직장·동" vs LLM 답 표기 차, 사용자 결정) · R-U3-4. 인계 P10: "박 과장님" 같은 성·같은 직함 2명 오병합 위험 표본. 하네스: L-006(승인 관문 폐지)·L-007(서버 기동 `--env-file .env` 예외).
 - **P8-frontend 계획 승인(2026-10-10)·활성화(2026-10-11)** — architect 초안 → 사용자 결정(A frontend-agent 신설 sonnet · B Vite+React+TS `web/` · C 같은 출처 + `/api` 접두, 운영 정적 서빙은 P9 · D localStorage 세션 · E 칩 입력 막지 않음 · F 원문 조회 API 2개 · G 브리핑은 trace 최신 1행 · H 브리핑 화면 "알림 받기"·해제 없음 · I 캐시 없음 · J 자동화 후 사람 점검 · K 404 안내 · L 챗봇형 UI Tailwind+shadcn/ui 수정 1회 · M 오프라인 제외(부록 A 385행) · N ChatGPT 식 왼쪽 사이드바) → 개정 1 → verifier 1차 보류([필수] R-1 FIX 게이트 실제 판정 파일 `fix_guard_check.py:180`) → 개정 2 → 재검증 통과(N-1~N-3 권고). 승인 조건: U1~U9 모든 단위 커밋 전 verifier 리뷰, 디자인 추가 수정은 추후 별도 작업. 활성화는 FIX-030(test-guards 상태 의존 시험) `c37c99a` 뒤. 다음 U0 하네스(훅 diff 계획 먼저 승인 · settings.json npm allow 여부 사용자 결정).
 - **FIX-030 완료(2026-10-11)** — `50fd7fc` CI 실패 원인(test-guards R-27-5 시험이 실제 저장소 CURRENT 에 의존)을 격리 저장소 + 대조로 고침. `c37c99a`, CI run 38062960426 세 job success. 남은 FIX 후보 R-30-1(L-003·L-004 마커·357행·`_selftest` 시험 격리)·R-30-2(`head -c 150` 한글 절단).
