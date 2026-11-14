@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_person_delete.py -q -k confirm
+# 시각: 2026-11-09T17:00:46+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 0
+# ---
+.............                                                            [100%]
+13 passed, 11 deselected in 1.86s

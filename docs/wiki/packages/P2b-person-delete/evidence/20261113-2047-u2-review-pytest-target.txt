@@ -1,0 +1,17 @@
+# 명령: .venv/bin/python -m pytest tests/test_person_delete.py tests/test_person_refs.py -q --durations=8
+# 시각: 2026-11-13T20:47:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 0
+# ---
+..................................................................       [100%]
+============================= slowest 8 durations ==============================
+0.27s setup    tests/test_person_delete.py::test_world_sentinel_is_planted_in_questions_and_traces_before_delete
+0.11s setup    tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[None]
+0.10s setup    tests/test_person_delete.py::test_cascade_removes_every_row_of_the_person_and_leaves_control_identical
+0.10s setup    tests/test_person_delete.py::test_summary_counts_equal_seeded_counts
+0.10s setup    tests/test_person_delete.py::test_traces_delete_writes_no_trace_row
+0.09s setup    tests/test_person_delete.py::test_not_found_on_second_delete_of_same_id
+0.09s setup    tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\ub2e4\ub978\uc774\ub984]
+0.09s setup    tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[]
+66 passed in 2.82s

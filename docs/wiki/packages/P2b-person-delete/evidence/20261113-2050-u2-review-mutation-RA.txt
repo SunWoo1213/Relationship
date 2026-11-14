@@ -1,0 +1,114 @@
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2-review MUTANT=RA .venv/bin/python -m pytest -p mutplug_review tests/test_person_delete.py tests/test_person_refs.py -q --tb=line -rf
+# 시각: 2026-11-13T20:50:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# ---
+...FF..F...............F..........................................       [100%]
+=================================== FAILURES ===================================
+E   assert 9 == 0
+     +  where 9 = _text_hits(<sqlalchemy.orm.session.Session object at 0x10ca06780>, <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x109654a40>, 987654321)
+     +    where <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x109654a40> = AgentTrace.output
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_person_delete.py:546: assert 9 == 0
+E   AssertionError: assert {('er_resolve...arch_person')} == set()
+      
+      Extra items in the left set:
+      ('tool_call', 'search_person')
+      ('loop_resolve_done', 'agent')
+      ('er_resolve', 'er')
+      
+      Full diff:
+      - set()
+      + {
+      +     (
+      +         'er_resolve',
+      +         'er',
+      +     ),
+      +     (
+      +         'loop_resolve_done',
+      +         'agent',
+      +     ),
+      +     (
+      +         'tool_call',
+      +         'search_person',
+      +     ),
+      + }
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_person_delete.py:581: AssertionError: assert {('er_resolve...arch_person')} == set()
+E   AssertionError: assert {'deleted': {...d': 987654321} == {'deleted': {...d': 987654321}
+      
+      Omitting 1 identical items, use -vv to show
+      Differing items:
+      {'deleted': {'agent_traces': 13, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}} != {'deleted': {'agent_traces': 22, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}}
+      
+      Full diff:
+        {
+            'deleted': {
+      -         'agent_traces': 22,
+      ?                         ^^
+      +         'agent_traces': 13,
+      ?                         ^^
+                'events': 5,
+                'fact_sources': 8,
+                'pending_questions': 2,
+                'person_aliases': 2,
+                'person_facts': 3,
+                'persons': 1,
+                'schedules': 1,
+            },
+            'person_id': 987654321,
+        }
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_person_delete.py:631: AssertionError: assert {'deleted': {...d': 987654321} == {'deleted': {...d': 987654321}
+E   assert 1 == 3
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_person_delete.py:823: assert 1 == 3
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_traces_no_sentinel_text_remains_in_input_or_output - assert 9 == 0
+ +  where 9 = _text_hits(<sqlalchemy.orm.session.Session object at 0x10ca06780>, <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x109654a40>, 987654321)
+ +    where <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x109654a40> = AgentTrace.output
+FAILED tests/test_person_delete.py::test_traces_covering_each_shape_in_the_scenario_are_deleted - AssertionError: assert {('er_resolve...arch_person')} == set()
+  
+  Extra items in the left set:
+  ('tool_call', 'search_person')
+  ('loop_resolve_done', 'agent')
+  ('er_resolve', 'er')
+  
+  Full diff:
+  - set()
+  + {
+  +     (
+  +         'er_resolve',
+  +         'er',
+  +     ),
+  +     (
+  +         'loop_resolve_done',
+  +         'agent',
+  +     ),
+  +     (
+  +         'tool_call',
+  +         'search_person',
+  +     ),
+  + }
+FAILED tests/test_person_delete.py::test_summary_counts_equal_seeded_counts - AssertionError: assert {'deleted': {...d': 987654321} == {'deleted': {...d': 987654321}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'deleted': {'agent_traces': 13, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}} != {'deleted': {'agent_traces': 22, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}}
+  
+  Full diff:
+    {
+        'deleted': {
+  -         'agent_traces': 22,
+  ?                         ^^
+  +         'agent_traces': 13,
+  ?                         ^^
+            'events': 5,
+            'fact_sources': 8,
+            'pending_questions': 2,
+            'person_aliases': 2,
+            'person_facts': 3,
+            'persons': 1,
+            'schedules': 1,
+        },
+        'person_id': 987654321,
+    }
+FAILED tests/test_person_delete.py::test_traces_same_digits_in_other_roles_are_not_deleted - assert 1 == 3
+4 failed, 62 passed in 2.96s

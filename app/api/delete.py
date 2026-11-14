@@ -1,5 +1,5 @@
-"""Refs: P2b-person-delete U1 F-4d2507 security§5 원칙8 원칙9 -- 인물 완전 삭제의
-JSONB 참조 판별 규칙(순수 함수, DB 없음).
+"""Refs: P2b-person-delete U1 U2 F-4d2507 security§5 원칙8 원칙9 -- 인물 완전 삭제의
+JSONB 참조 판별 규칙(순수 함수, DB 없음)과 삭제 서비스 `delete_person`(U2).
 
 `DELETE /persons/{id}` 는 FK CASCADE 로 5개 테이블(+`fact_sources`)을 지우지만,
 `pending_questions.context` 와 `agent_traces.input/output` 은 `person_id` 컬럼이
@@ -22,7 +22,7 @@ JSON 값이 그 인물 id 를 가리키는가" 를 **구조 규칙**으로 판�
 
 ## 쓰는 곳 전수 목록 (U1, `grep -rn "AgentTrace(\\|ask_payload\\|to_jsonable(" app/`)
 
-`agent_traces` 를 쓰는 곳은 7곳(`app/tools/context.py` 2·`app/memory/hooks.py`·
+`agent_traces` 를 쓰는 곳은 8곳(`app/tools/context.py` 2·`app/memory/hooks.py`·
 `app/push/notifier.py`·`app/briefing/run.py` 3·`app/api/routes.py`)이고,
 `pending_questions` 는 `app/tools/questions.py::ask_user` 한 곳이 쓴다.
 
@@ -67,6 +67,25 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
+
+from sqlalchemy import Text, cast, delete, func, or_, select
+from sqlalchemy.orm import Session
+
+from app.db.models import (
+    AgentTrace,
+    Event,
+    FactSource,
+    PendingQuestion,
+    Person,
+    PersonAlias,
+    PersonFact,
+    Schedule,
+)
+from app.tools.persons import _owned_person
+from app.tools.types import ConfirmationRequired
+
+#: `ConfirmationRequired.reason` -- 확인값이 없거나 현재 `display_name` 과 다를 때(결정 A).
+CONFIRM_REASON = "person_delete"
 
 
 @dataclass(frozen=True)
@@ -146,3 +165,106 @@ def references_person(obj: Any, person_id: int, *, tool_name: str | None = None)
     ):
         return True
     return _walk(obj, person_id)
+
+
+# ---------------------------------------------------------------------------
+# U2 -- 삭제 서비스
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class PersonDeleteSummary:
+    """`delete_person` 의 반환(결정 F) -- 테이블별 삭제 건수. 이름·원문은 담지 않는다."""
+
+    person_id: int
+    deleted: dict[str, int]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"person_id": self.person_id, "deleted": dict(self.deleted)}
+
+
+def _count(session: Session, model: Any, *conditions: Any) -> int:
+    return session.execute(select(func.count()).select_from(model).where(*conditions)).scalar_one()
+
+
+def _referencing_question_ids(session: Session, person_id: int) -> list[int]:
+    """그 인물을 참조하는 `pending_questions` 행 id(답변 여부 무관, 결정 C-1).
+
+    SQL 은 숫자가 텍스트에 들어 있는 행만 **넉넉히** 거르고(과잉 포함·누락 0),
+    정밀 판정은 `references_person` 이 한다(결정 C-3). `tool_name` 은 넘기지 않는다."""
+
+    rows = session.execute(
+        select(PendingQuestion.id, PendingQuestion.context)
+        .where(cast(PendingQuestion.context, Text).like(f"%{person_id}%"))
+        .order_by(PendingQuestion.id)
+    ).all()
+    return [row.id for row in rows if references_person(row.context, person_id)]
+
+
+def _referencing_trace_ids(session: Session, person_id: int) -> list[int]:
+    """그 인물을 참조하는 `agent_traces` 행 id(전 세션, 결정 C-2·K). `output` 은 행의
+    `tool_name` 과 함께, `input` 은 `tool_name` 없이 판정한다(U1 계약)."""
+
+    pattern = f"%{person_id}%"
+    rows = session.execute(
+        select(AgentTrace.id, AgentTrace.tool_name, AgentTrace.input, AgentTrace.output)
+        .where(
+            or_(
+                cast(AgentTrace.input, Text).like(pattern),
+                cast(AgentTrace.output, Text).like(pattern),
+            )
+        )
+        .order_by(AgentTrace.id)
+    ).all()
+    return [
+        row.id
+        for row in rows
+        if references_person(row.output, person_id, tool_name=row.tool_name)
+        or references_person(row.input, person_id)
+    ]
+
+
+def delete_person(
+    session: Session, user_id: str, person_id: int, confirm: str | None
+) -> PersonDeleteSummary:
+    """인물 한 명을 완전히 지운다(P2b U2, 결정 A·C·D·E·F·H·K).
+
+    순서(이 순서가 계약이다 -- 변이 V2-3·V2-5·V2-7 이 지킨다):
+    ① 소유 확인 -- 없거나 남의 것이면 `PersonNotFound`(확인값 검사보다 **먼저**, 결정 E)
+    ② 확인값 검사 -- `confirm` 이 현재 `display_name` 과 정확히 같지 않으면
+       `ConfirmationRequired("person_delete")`. **여기까지 쓰기 0.**
+    ③ 삭제 건수 집계(삭제 **전**) ④ `pending_questions` 참조 행 삭제
+    ⑤ `agent_traces` 참조 행 삭제 ⑥ `DELETE FROM persons` 한 문장 -- 별칭·사실·
+    이벤트·일정과 `fact_sources` 는 FK CASCADE 가 지운다(결정 D, 앱이 따로 지우지 않음)
+    ⑦ commit 하지 않는다 -- 트랜잭션 경계는 호출자(`get_session`)다. trace 도 남기지
+    않는다(결정 H -- 방금 지운 참조를 다시 만들지 않는다).
+    """
+
+    person = _owned_person(session, person_id, user_id)
+    if confirm is None or confirm != person.display_name:
+        raise ConfirmationRequired(CONFIRM_REASON)
+
+    pid = person.id
+    fact_source_condition = or_(
+        FactSource.fact_id.in_(select(PersonFact.id).where(PersonFact.person_id == pid)),
+        FactSource.event_id.in_(select(Event.id).where(Event.person_id == pid)),
+    )
+    question_ids = _referencing_question_ids(session, pid)
+    trace_ids = _referencing_trace_ids(session, pid)
+    deleted = {
+        "persons": 1,
+        "person_aliases": _count(session, PersonAlias, PersonAlias.person_id == pid),
+        "person_facts": _count(session, PersonFact, PersonFact.person_id == pid),
+        "fact_sources": _count(session, FactSource, fact_source_condition),
+        "events": _count(session, Event, Event.person_id == pid),
+        "schedules": _count(session, Schedule, Schedule.person_id == pid),
+        "pending_questions": len(question_ids),
+        "agent_traces": len(trace_ids),
+    }
+
+    if question_ids:
+        session.execute(delete(PendingQuestion).where(PendingQuestion.id.in_(question_ids)))
+    if trace_ids:
+        session.execute(delete(AgentTrace).where(AgentTrace.id.in_(trace_ids)))
+    session.execute(delete(Person).where(Person.id == pid).where(Person.user_id == user_id))
+    return PersonDeleteSummary(person_id=pid, deleted=deleted)

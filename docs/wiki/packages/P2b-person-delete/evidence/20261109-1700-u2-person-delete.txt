@@ -1,0 +1,83 @@
+# 명령: .venv/bin/python -m pytest tests/test_person_delete.py tests/test_person_refs.py -v
+# 시각: 2026-11-09T17:00:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 66 items
+
+tests/test_person_delete.py::test_world_sentinel_is_planted_in_questions_and_traces_before_delete PASSED [  1%]
+tests/test_person_delete.py::test_cascade_removes_every_row_of_the_person_and_leaves_control_identical PASSED [  3%]
+tests/test_person_delete.py::test_pending_questions_referencing_person_are_deleted_answered_or_not PASSED [  4%]
+tests/test_person_delete.py::test_traces_no_sentinel_text_remains_in_input_or_output PASSED [  6%]
+tests/test_person_delete.py::test_traces_covering_each_shape_in_the_scenario_are_deleted PASSED [  7%]
+tests/test_person_delete.py::test_traces_control_only_and_unrelated_rows_are_unchanged PASSED [  9%]
+tests/test_person_delete.py::test_traces_delete_writes_no_trace_row PASSED [ 10%]
+tests/test_person_delete.py::test_summary_counts_equal_seeded_counts PASSED [ 12%]
+tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[None] PASSED [ 13%]
+tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[] PASSED [ 15%]
+tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\ub2e4\ub978\uc774\ub984] PASSED [ 16%]
+tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[ \uc0ad\uc81c\ub300\uc0c1\uc13c\ud2f0\ub110] PASSED [ 18%]
+tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\uc0ad\uc81c\ub300\uc0c1\uc13c\ud2f0\ub110 ] PASSED [ 19%]
+tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\uc0ad\uc81c\ub300\uc0c1\uc13f\ud2f0\ub110] PASSED [ 21%]
+tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\ub300\uc870\uad70] PASSED [ 22%]
+tests/test_person_delete.py::test_confirm_correct_value_deletes_the_person PASSED [ 24%]
+tests/test_person_delete.py::test_confirm_uses_current_display_name_not_alias PASSED [ 25%]
+tests/test_person_delete.py::test_other_user_person_is_not_found_whatever_the_confirm_is[\ub0a8\uc758\ub300\uc870] PASSED [ 27%]
+tests/test_person_delete.py::test_other_user_person_is_not_found_whatever_the_confirm_is[None] PASSED [ 28%]
+tests/test_person_delete.py::test_other_user_person_is_not_found_whatever_the_confirm_is[\ud2c0\ub9b0\uc774\ub984] PASSED [ 30%]
+tests/test_person_delete.py::test_not_found_for_missing_id_even_with_any_confirm PASSED [ 31%]
+tests/test_person_delete.py::test_not_found_on_second_delete_of_same_id PASSED [ 33%]
+tests/test_person_delete.py::test_service_does_not_commit_outer_rollback_restores_everything PASSED [ 34%]
+tests/test_person_delete.py::test_traces_same_digits_in_other_roles_are_not_deleted PASSED [ 36%]
+tests/test_person_refs.py::test_rule_constants_are_fixed_values PASSED   [ 37%]
+tests/test_person_refs.py::test_person_ref_rules_numbered_one_to_five PASSED [ 39%]
+tests/test_person_refs.py::test_identity_question_context_candidate_ids_values PASSED [ 40%]
+tests/test_person_refs.py::test_new_person_question_context_references_nobody PASSED [ 42%]
+tests/test_person_refs.py::test_resolve_outcome_person_ids_values PASSED [ 43%]
+tests/test_person_refs.py::test_person_ids_map_in_stored_context_literal PASSED [ 45%]
+tests/test_person_refs.py::test_search_person_output_person_object_id PASSED [ 46%]
+tests/test_person_refs.py::test_briefing_out_person_object_id PASSED     [ 48%]
+tests/test_person_refs.py::test_person_object_id_does_not_need_tool_name PASSED [ 50%]
+tests/test_person_refs.py::test_person_key_with_string_value_is_not_reference PASSED [ 51%]
+tests/test_person_refs.py::test_person_out_top_level_id_with_person_tools[create_person] PASSED [ 53%]
+tests/test_person_refs.py::test_person_out_top_level_id_with_person_tools[update_person] PASSED [ 54%]
+tests/test_person_refs.py::test_person_out_top_level_id_without_tool_name_is_not_reference PASSED [ 56%]
+tests/test_person_refs.py::test_top_level_id_rule_does_not_apply_to_nested_id PASSED [ 57%]
+tests/test_person_refs.py::test_event_out_id_equal_to_person_id_is_not_reference PASSED [ 59%]
+tests/test_person_refs.py::test_schedule_out_id_equal_to_person_id_is_not_reference PASSED [ 60%]
+tests/test_person_refs.py::test_tool_input_person_id PASSED              [ 62%]
+tests/test_person_refs.py::test_event_out_and_schedule_out_person_id PASSED [ 63%]
+tests/test_person_refs.py::test_er_resolution_candidates_person_id PASSED [ 65%]
+tests/test_person_refs.py::test_er_breakdown_matched_person_id_only PASSED [ 66%]
+tests/test_person_refs.py::test_er_decision_matched_person_id_only PASSED [ 68%]
+tests/test_person_refs.py::test_matched_person_id_none_is_not_reference PASSED [ 69%]
+tests/test_person_refs.py::test_candidate_person_ids_list_elements PASSED [ 71%]
+tests/test_person_refs.py::test_resume_schedule_person_id_in_pending_question_context PASSED [ 72%]
+tests/test_person_refs.py::test_loop_mention_decision_person_id PASSED   [ 74%]
+tests/test_person_refs.py::test_deep_nesting_and_top_level_list PASSED   [ 75%]
+tests/test_person_refs.py::test_same_number_other_meanings_is_not_reference PASSED [ 77%]
+tests/test_person_refs.py::test_memory_promote_output_event_ids_only_is_not_reference PASSED [ 78%]
+tests/test_person_refs.py::test_bool_is_not_integer_id PASSED            [ 80%]
+tests/test_person_refs.py::test_string_digits_are_not_integer_id PASSED  [ 81%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[None] PASSED [ 83%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[0] PASSED [ 84%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[1] PASSED [ 86%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[x] PASSED [ 87%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[True] PASSED [ 89%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[1.5] PASSED [ 90%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[value6] PASSED [ 92%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[value7] PASSED [ 93%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[value8] PASSED [ 95%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[value9] PASSED [ 96%]
+tests/test_person_refs.py::test_scalars_and_empties_are_not_reference[value10] PASSED [ 98%]
+tests/test_person_refs.py::test_references_person_does_not_mutate_input PASSED [100%]
+
+============================== 66 passed in 3.13s ==============================

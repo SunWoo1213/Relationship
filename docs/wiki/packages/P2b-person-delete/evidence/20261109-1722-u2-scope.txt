@@ -1,0 +1,13 @@
+# 명령: git diff --name-only f67d8e4 -- app/ ; echo ---; git diff --stat f67d8e4 -- app/main.py app/db app/tools app/agent app/er app/memory app/briefing app/push alembic; echo ---modified-tests; git diff --name-only --diff-filter=M f67d8e4 -- tests/; echo ---status; git status --short -- app tests
+# 시각: 2026-11-09T17:22:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 0
+# ---
+app/api/delete.py
+---
+---modified-tests
+---status
+ M app/api/delete.py
+ M tests/test_person_refs.py
+?? tests/test_person_delete.py

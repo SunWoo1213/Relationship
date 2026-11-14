@@ -164,6 +164,15 @@ def test_briefing_out_person_object_id() -> None:
     assert references_person(output, OTHER, tool_name="get_briefing") is False
 
 
+def test_person_object_id_does_not_need_tool_name() -> None:
+    """규칙 2(`person.id`)는 `tool_name` 없이도 참이다 -- U2 가 `input`·`context` 판정에서
+    `tool_name` 을 넘기지 않고도 기대는 계약(R-U1-3)."""
+    assert references_person({"person": {"id": PID}}, PID) is True
+    candidates = to_jsonable([Candidate(person=_person_out(PID), similarity=0.9)])
+    assert references_person(candidates, PID) is True
+    assert references_person(candidates, OTHER) is False
+
+
 def test_person_key_with_string_value_is_not_reference() -> None:
     """`person` 키가 언급 **문자열**(루프 `pending_calls[].args.person`)이면 참조가 아니다."""
     resume = PendingResume(

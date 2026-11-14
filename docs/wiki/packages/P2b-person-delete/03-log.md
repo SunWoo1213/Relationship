@@ -20,3 +20,11 @@
 - verifier 재리뷰(§6) **통과** — 보정 2줄·코드 무변경 확인.
 - 남은 것 · 다음 단위: U2 삭제 서비스(위임문에 R-U1-2·R-U1-3).
 - Refs: P2b-person-delete F-4d2507 security 원칙8 원칙9 결정C 결정G
+
+## 2026-11-14 · feat(P2b-person-delete): 인물을 지우면 별칭·사실·사건·일정과 그 인물을 가리키는 질문·판단 기록까지 함께 지우는 서비스를 더한다 · pending (U2, backend-agent)
+- 변경: `app/api/delete.py` — `delete_person(session, user_id, person_id, confirm) -> PersonDeleteSummary`, `_referencing_question_ids`·`_referencing_trace_ids`, `CONFIRM_REASON="person_delete"`, docstring 7곳→**8곳**(R-U1-2 닫힘). 순서 소유 확인 → 확인값(`ConfirmationRequired`, 쓰기 0) → 집계 → 질문 삭제(답변 여부 무관, 결정 C-1) → trace 삭제(행 통째, C-2) → `DELETE persons` 한 문장(CASCADE, D) → commit 없음·trace 없음(H). `tests/test_person_refs.py` +1(R-U1-3 닫힘) · 새 `tests/test_person_delete.py` 24건(센티널 987654321, 실제 경로 world) · `tests.md` U2 절.
+- 결과: 66 passed(두 파일) · 전체 **2202**(2177+25) skip 0 · ruff · tools 7/7 · mypy 38=38 · `alembic check` 무변경 · 기존 테스트 무수정. 변이 V2-1~V2-11 중 **V2-3(정리를 persons 삭제 뒤로) 는 동치 변이로 생존** — id 목록을 먼저 구해 지우고 `pending_questions`·`agent_traces` 에 persons FK 가 없어 순서가 결과를 바꾸지 않는다(verifier 재실행으로 확인; 계획 전제 "순서가 중요" 는 해당 없음). 메인 재확인 66 passed·ruff·3파일.
+- verifier 커밋 전 리뷰(`review-u2-delete-service.md`) **통과**([필수] 0 · [권고] 5). 직접 재실행 2202 passed(28초)·다른 변이 RA(trace 사전 거름 input 만)·RB(확인값 strip) 검출. **R-U2-4 기록**: ① 결정 K "전 세션, `user_id` 한정" 의 실제 메커니즘 — JSONB 질의에 `user_id` 조건은 없고, `_owned_person` 이 `user_id` 로 소유를 확인한 뒤 전역 IDENTITY 인 `persons.id` 로 찾는다. 인물 id 를 JSONB 에 쓰는 경로 6곳이 모두 `user_id` 로 걸러진 조회에서 나오므로 다른 사용자의 기록이 같은 id 를 가질 수 없다(남는 사각 = 기존 F-fbaaae 단일 사용자 전제). ② V2-3 동치(위). ③ 구현자가 보고한 "전체 pytest 약 20분" 은 재현되지 않았고(28초, 다른 연결·락 0) 원인 미확정 — 이 단위 테스트가 원인이라는 증거 없음. ④ 센티널이 지나지 않는 3곳(`tool_error`·`push_send`·`resume.schedule.person_id`)은 쓰는 코드가 `person_id` 를 int 로 쓰고 규칙 1 이 깊이 무관 + decoy 왕복으로 덮음 — `tool_error` 경로 보강은 R-U2-2(U5 전).
+- [권고] 처리: R-U2-1 docstring 232행 "V2-3 이 지킨다" 문구 → U3 에서 backend-agent · R-U2-2 `tool_error` world 추가 → U5 전 · R-U2-3 registry 행 3개(모듈·테스트 2) **이 커밋** · R-U2-5 tests.md 한 줄 → U5.
+- **보류(CR-005, 2026-11-14)**: 사용자가 배포(Vercel)를 11-18 졸업평가 전에 요구 → 이 패키지는 **U2 커밋에서 멈추고 P9-infra 를 먼저 한다.** `delete_person` 은 호출자(라우트)가 없어 배포본에 노출되지 않는다. 재개는 U3(라우트)부터, 11-18 뒤.
+- Refs: P2b-person-delete F-4d2507 security 원칙8 원칙9 결정A 결정C 결정D 결정E 결정H 결정K R-U1-2 R-U1-3 CR-005

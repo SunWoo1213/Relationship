@@ -78,3 +78,38 @@ RB 가 살아남는 이유: 규칙 2 양성 테스트 두 개(`search_person`·`
 근거: 코드는 결정 C-3 확정 규칙 ①~⑤ 와 상수·테스트 수준에서 1:1 이고, 위임 범위 안(새 파일 2개, 추적 파일 변경 0)이며, 거짓 양성(같은 숫자의 다른 뜻)·거짓 음성(JSONB 왕복 뒤 `int` 보존)을 각각 테스트와 실 DB 왕복 evidence 로 확인했다. 전수 조사를 내가 다시 돌려(쓰기 8곳 + `ask_payload` 4곳 + `to_jsonable` 저장 2곳, to_dict 14종) 표 밖 모양이 없음을 확인했고, 구현자가 보고한 "계획과 다른 점" 3건은 모두 코드가 맞다. 41/2177 passed·ruff·mypy 38=38 직접 재실행, 변이 RA 1건 검출(4 FAIL). 그러나 **계획(01-plan 사실 3 표·V1-2·해석 ㄴ)과 내 02-plan-verify 가 코드에 없는 경로(`resume.person_ids`)를 사실로 적고 있어** 문서 보정 2줄(R-U1-1)이 들어가야 통과다 — 제품 코드 수정 0, 재리뷰는 grep 확인만.
 
 한 줄: 코드·테스트·전수 조사·JSONB 왕복 전부 맞고 변이도 잡히나, 계획과 계획 검증 문서가 코드에 없는 `resume.person_ids` 경로를 사실로 적어 보류 — 문서 2줄(01-plan·02-plan-verify), 코드 변경 0. [필수] 1 · [권고] 4.
+
+---
+
+## 6. 재리뷰(2026-11-09 16:48) — R-U1-1 닫힘 확인
+
+### 6.1 본 것
+
+| 항목 | 확인 |
+|---|---|
+| R-U1-1 `01-plan.md` 38행 | `grep -n "R-U1-1"` → 38행 "**보정(U1, 2026-11-09, review-u1-person-refs R-U1-1)**: 23행 `person_ids` 는 `pending_questions.context["resume"]` 가 아니라 `ResolveOutcome.to_dict()` = `agent_traces` `loop_resolve_done.output`(loop.py 294~313행)에 있다(`PendingResume.to_dict()` 에는 없다, types.py 400~417행) — V1-2·해석 ㄴ 의 `resume.person_ids` 도 `loop_resolve_done.output.person_ids` 로 읽는다. 24행 `candidate_person_ids` … 저장되지 않는다(규칙 5 는 방어적으로 유지). 26행 `briefing_run` output 은 일정 id … `person_id` 는 `briefing_compose`·`briefing_error` 에만 있다. 규칙 ①~⑤ 는 그대로." — §4 제안 문구 그대로, 사실 7(36행) 아래. 세 요소(`person_ids` 위치·`candidate_person_ids`·`briefing_run`) 모두 §2 코드 확인과 일치 |
+| R-U1-1 `02-plan-verify.md` 75행 | 사실 검증 표 74행 바로 아래 행 "↑ **보정(U1 리뷰 2026-11-09, R-U1-1)** \| — \| `resume.person_ids` 는 오기 — loop.py 303·310행은 `ResolveOutcome.person_ids`(`loop_resolve_done.output`)이고 `PendingResume.to_dict()` 에 `person_ids` 는 없다. 모양 자체(언급→id 사전, 규칙 4)는 맞다." — 제안 문구 그대로 |
+| 제품 코드 무변경 | `git status --short -- app tests web` → `?? app/api/delete.py` `?? tests/test_person_refs.py` 만, `git diff --name-only --diff-filter=M -- app/ tests/` 빈 출력, HEAD `2ff0efb`. blob `app/api/delete.py` = `4b1c38c0…`, `tests/test_person_refs.py` = `dda33fac…`(1차 리뷰 대상과 같은 작업 트리 파일 — 1차 §3 5c 상태와 동일) |
+| 변경 범위 | 1차 대비 늘어난 것은 `01-plan.md`·`02-plan-verify.md` 문서 보정 각 1줄뿐 |
+
+### 6.2 직접 실행
+
+| # | 명령 | evidence | 결과 |
+|---|---|---|---|
+| 1 | `pytest tests/test_person_refs.py -q` | `20261109-1648-u1-review2-pytest-target.txt` | **41 passed**, exit 0(1차 §3 #1 과 동일 — 코드 무변경 확인) |
+
+### 6.3 소견 상태
+
+| 소견 | 상태 |
+|---|---|
+| R-U1-1 [필수] 01-plan·02-plan-verify `resume.person_ids` 보정 | **닫힘** — 38행·75행, 코드(loop.py 294~313·types.py 400~417)와 일치 |
+| R-U1-2 [권고] docstring "7곳"→"8곳" | 열림 — 메인이 U2 위임문에 넣는다 |
+| R-U1-3 [권고] 규칙 2 `tool_name` 없이 고정하는 테스트 | 열림 — U2 위임문 |
+| R-U1-4 [권고] "남는 행" 목록 보완 | 열림 — U5/security §5 |
+| R-U1-5 참고 | 수정 없음 |
+
+### 6.4 판정
+
+**결과: 통과.** [필수] 1건은 제품 코드 변경 없이 문서 2줄로 닫혔고(코드 blob 동일, 추적 파일 변경 0), 계획(01-plan 38행)·계획 검증(02-plan-verify 75행)·코드(`ResolveOutcome.to_dict()`)·모듈 docstring(48~51행 "계획 표와 다른 점")·테스트(`test_resolve_outcome_person_ids_values`) 다섯 곳이 같은 사실을 말한다. 열린 [권고] 3건은 U2·U5 몫이며 커밋을 막지 않는다.
+
+한 줄: R-U1-1 보정 2줄 확인(코드 무변경, 41 passed 재확인) — 통과. 남은 것은 [권고] R-U1-2·3(U2)·R-U1-4(U5/security §5).

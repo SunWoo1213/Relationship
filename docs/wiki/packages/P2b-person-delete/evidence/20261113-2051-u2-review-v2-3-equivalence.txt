@@ -1,0 +1,8 @@
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 MUT=V2-3 .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=line -rf
+# 시각: 2026-11-13T20:51:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 0
+# ---
+........................                                                 [100%]
+24 passed in 3.00s

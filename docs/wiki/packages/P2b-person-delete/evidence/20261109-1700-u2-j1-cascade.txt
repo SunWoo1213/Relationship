@@ -1,0 +1,9 @@
+# 명령: .venv/bin/python -m pytest tests/test_person_delete.py tests/test_schema_models.py -q -k 'cascade or fk'; grep -nE 'delete\((PersonAlias|PersonFact|Event|Schedule|FactSource)\)' app/api/delete.py; echo grep-exit=$?
+# 시각: 2026-11-09T17:00:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 0
+# ---
+...                                                                      [100%]
+3 passed, 38 deselected in 0.56s
+grep-exit=1

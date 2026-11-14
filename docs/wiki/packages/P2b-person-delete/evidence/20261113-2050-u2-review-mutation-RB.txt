@@ -1,0 +1,16 @@
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2-review MUTANT=RB .venv/bin/python -m pytest -p mutplug_review tests/test_person_delete.py tests/test_person_refs.py -q --tb=line -rf
+# 시각: 2026-11-13T20:50:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# ---
+...........FF.....................................................       [100%]
+=================================== FAILURES ===================================
+E   Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_person_delete.py:660: Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+E   Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_person_delete.py:660: Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[ \uc0ad\uc81c\ub300\uc0c1\uc13c\ud2f0\ub110] - Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\uc0ad\uc81c\ub300\uc0c1\uc13c\ud2f0\ub110 ] - Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+2 failed, 64 passed in 2.87s

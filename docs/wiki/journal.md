@@ -600,3 +600,5 @@
 - 2026-11-09 16:35 | START | P2b-person-delete 활성화 — 사용자 "다음 일들 쭉 진행, 배포는 하지 않음". architect 01-plan(U1~U5) → 결정 A~K 사용자 확정(A 서버 2단계+화면 확인 · B 프론트 포함 · C 참조 행 통째 삭제 · G id 참조만+한계 문서화 · 나머지 추천안) → verify-plan FAIL 0/WARN 2 오탐 → verifier 02-plan-verify 통과([필수] 0 · [권고] R-1~R-4). L-006 첫 패키지 시작(승인 없음) | P2b-person-delete F-4d2507 security
 - 2026-11-09 16:29 | COMMIT | 2ff0efb docs(P2b-person-delete): 인물 완전 삭제 계획을 검증까지 마치고 활성화한다
 - 2026-11-09 16:29 | PUSH-dev2 | origin dev2 2ff0efb (실험 푸시)
+- 2026-11-09 16:49 | COMMIT | a4b44b1 feat(P2b-person-delete): 기록 속에서 지울 인물을 가리키는 항목을 판별하는 규칙을 더한다
+- 2026-11-09 16:49 | PUSH-dev2 | origin dev2 a4b44b1 (실험 푸시)

@@ -1,0 +1,470 @@
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=NONE .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 0
+# 메모: MUT=NONE
+# ---
+........................                                                 [100%]
+24 passed in 4.82s
+
+# ===== append 2026-11-09T16:57:08+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-1 .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-1
+# ---
+..FF...F...............F                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_pending_questions_referencing_person_are_deleted_answered_or_not - assert <app.db.models.PendingQuestion object at 0x10ff2fc50> is None
+ +  where <app.db.models.PendingQuestion object at 0x10ff2fc50> = get(PendingQuestion, 15556)
+ +    where get = <sqlalchemy.orm.session.Session object at 0x110090550>.get
+ +    and   15556 = World(session=<sqlalchemy.orm.session.Session object at 0x110090550>, embedder=<function fake_embedder.<locals>._embed..._user_person=<app.db.models.Person object at 0x11020c850>, unanswered_qid=15556, answered_qid=15557, control_qid=15558).unanswered_qid
+FAILED tests/test_person_delete.py::test_traces_no_sentinel_text_remains_in_input_or_output - assert 2 == 0
+ +  where 2 = _text_hits(<sqlalchemy.orm.session.Session object at 0x1100c68b0>, <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x10ccfaa20>, 987654321)
+ +    where <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x10ccfaa20> = PendingQuestion.context
+FAILED tests/test_person_delete.py::test_summary_counts_equal_seeded_counts - AssertionError: assert {'deleted': {...d': 987654321} == {'deleted': {...d': 987654321}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'deleted': {'agent_traces': 22, 'events': 5, 'fact_sources': 8, 'pending_questions': 0, ...}} != {'deleted': {'agent_traces': 22, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}}
+  
+  Full diff:
+    {
+        'deleted': {
+            'agent_traces': 22,
+            'events': 5,
+            'fact_sources': 8,
+  -         'pending_questions': 2,
+  ?                              ^
+  +         'pending_questions': 0,
+  ?                              ^
+            'person_aliases': 2,
+            'person_facts': 3,
+            'persons': 1,
+            'schedules': 1,
+        },
+        'person_id': 987654321,
+    }
+FAILED tests/test_person_delete.py::test_traces_same_digits_in_other_roles_are_not_deleted - assert 0 == 1
+4 failed, 20 passed in 4.15s
+
+# ===== append 2026-11-09T16:57:13+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-2a .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-2a
+# ---
+...FF..F...............F                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_traces_no_sentinel_text_remains_in_input_or_output - assert 13 == 0
+ +  where 13 = _text_hits(<sqlalchemy.orm.session.Session object at 0x1103ca780>, <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x10cffcea0>, 987654321)
+ +    where <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x10cffcea0> = AgentTrace.input
+FAILED tests/test_person_delete.py::test_traces_covering_each_shape_in_the_scenario_are_deleted - AssertionError: assert {('briefing_c...memory'), ...} == set()
+  
+  Extra items in the left set:
+  ('tool_call', 'add_event')
+  ('memory_promote', 'memory')
+  ('briefing_compose', 'briefing')
+  ('tool_call', 'search_person')
+  ('loop_record', 'agent')
+  ('loop_resolve_done', 'agent')
+  ('tool_call', 'add_schedule')
+  ('memory_pattern', 'memory')
+  ('tool_call', 'ask_user')
+  ('er_resolve', 'er')
+  ('tool_call', 'update_person')
+  ('tool_call', 'get_briefing')
+  
+  Full diff:
+  - set()
+  + {
+  +     (
+  +         'briefing_compose',
+  +         'briefing',
+  +     ),
+  +     (
+  +         'er_resolve',
+  +         'er',
+  +     ),
+  +     (
+  +         'loop_record',
+  +         'agent',
+  +     ),
+  +     (
+  +         'loop_resolve_done',
+  +         'agent',
+  +     ),
+  +     (
+  +         'memory_pattern',
+  +         'memory',
+  +     ),
+  +     (
+  +         'memory_promote',
+  +         'memory',
+  +     ),
+  +     (
+  +         'tool_call',
+  +         'add_event',
+  +     ),
+  +     (
+  +         'tool_call',
+  +         'add_schedule',
+  +     ),
+  +     (
+  +         'tool_call',
+  +         'ask_user',
+  +     ),
+  +     (
+  +         'tool_call',
+  +         'get_briefing',
+  +     ),
+  +     (
+  +         'tool_call',
+  +         'search_person',
+  +     ),
+  +     (
+  +         'tool_call',
+  +         'update_person',
+  +     ),
+  + }
+FAILED tests/test_person_delete.py::test_summary_counts_equal_seeded_counts - AssertionError: assert {'deleted': {...d': 987654321} == {'deleted': {...d': 987654321}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'deleted': {'agent_traces': 0, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}} != {'deleted': {'agent_traces': 22, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}}
+  
+  Full diff:
+    {
+        'deleted': {
+  -         'agent_traces': 22,
+  ?                         ^^
+  +         'agent_traces': 0,
+  ?                         ^
+            'events': 5,
+            'fact_sources': 8,
+            'pending_questions': 2,
+            'person_aliases': 2,
+            'person_facts': 3,
+            'persons': 1,
+            'schedules': 1,
+        },
+        'person_id': 987654321,
+    }
+FAILED tests/test_person_delete.py::test_traces_same_digits_in_other_roles_are_not_deleted - assert 0 == 3
+4 failed, 20 passed in 5.20s
+
+# ===== append 2026-11-09T16:57:19+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-2b-input-only .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-2b-input-only
+# ---
+...FF..F...............F                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_traces_no_sentinel_text_remains_in_input_or_output - assert 9 == 0
+ +  where 9 = _text_hits(<sqlalchemy.orm.session.Session object at 0x110eb6060>, <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x10dae4c20>, 987654321)
+ +    where <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x10dae4c20> = AgentTrace.output
+FAILED tests/test_person_delete.py::test_traces_covering_each_shape_in_the_scenario_are_deleted - AssertionError: assert {('er_resolve...arch_person')} == set()
+  
+  Extra items in the left set:
+  ('loop_resolve_done', 'agent')
+  ('er_resolve', 'er')
+  ('tool_call', 'search_person')
+  
+  Full diff:
+  - set()
+  + {
+  +     (
+  +         'er_resolve',
+  +         'er',
+  +     ),
+  +     (
+  +         'loop_resolve_done',
+  +         'agent',
+  +     ),
+  +     (
+  +         'tool_call',
+  +         'search_person',
+  +     ),
+  + }
+FAILED tests/test_person_delete.py::test_summary_counts_equal_seeded_counts - AssertionError: assert {'deleted': {...d': 987654321} == {'deleted': {...d': 987654321}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'deleted': {'agent_traces': 13, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}} != {'deleted': {'agent_traces': 22, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}}
+  
+  Full diff:
+    {
+        'deleted': {
+  -         'agent_traces': 22,
+  ?                         ^^
+  +         'agent_traces': 13,
+  ?                         ^^
+            'events': 5,
+            'fact_sources': 8,
+            'pending_questions': 2,
+            'person_aliases': 2,
+            'person_facts': 3,
+            'persons': 1,
+            'schedules': 1,
+        },
+        'person_id': 987654321,
+    }
+FAILED tests/test_person_delete.py::test_traces_same_digits_in_other_roles_are_not_deleted - assert 1 == 3
+4 failed, 20 passed in 3.32s
+
+# ===== append 2026-11-09T16:57:23+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-2c-output-only .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-2c-output-only
+# ---
+...FF..F................                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_traces_no_sentinel_text_remains_in_input_or_output - assert 3 == 0
+ +  where 3 = _text_hits(<sqlalchemy.orm.session.Session object at 0x1105aa060>, <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x10d234ea0>, 987654321)
+ +    where <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x10d234ea0> = AgentTrace.input
+FAILED tests/test_person_delete.py::test_traces_covering_each_shape_in_the_scenario_are_deleted - AssertionError: assert {('loop_recor..., 'ask_user')} == set()
+  
+  Extra items in the left set:
+  ('loop_record', 'agent')
+  ('tool_call', 'ask_user')
+  
+  Full diff:
+  - set()
+  + {
+  +     (
+  +         'loop_record',
+  +         'agent',
+  +     ),
+  +     (
+  +         'tool_call',
+  +         'ask_user',
+  +     ),
+  + }
+FAILED tests/test_person_delete.py::test_summary_counts_equal_seeded_counts - AssertionError: assert {'deleted': {...d': 987654321} == {'deleted': {...d': 987654321}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'deleted': {'agent_traces': 19, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}} != {'deleted': {'agent_traces': 22, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}}
+  
+  Full diff:
+    {
+        'deleted': {
+  -         'agent_traces': 22,
+  ?                         ^^
+  +         'agent_traces': 19,
+  ?                         ^^
+            'events': 5,
+            'fact_sources': 8,
+            'pending_questions': 2,
+            'person_aliases': 2,
+            'person_facts': 3,
+            'persons': 1,
+            'schedules': 1,
+        },
+        'person_id': 987654321,
+    }
+3 failed, 21 passed in 4.03s
+
+# ===== append 2026-11-09T16:57:28+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-3 .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:28+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 0
+# 메모: MUT=V2-3
+# ---
+........................                                                 [100%]
+24 passed in 3.39s
+
+# ===== append 2026-11-09T16:57:32+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-4 .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-4
+# ---
+.................FFF....                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_other_user_person_is_not_found_whatever_the_confirm_is[\ub0a8\uc758\ub300\uc870] - Failed: DID NOT RAISE <class 'app.tools.types.PersonNotFound'>
+FAILED tests/test_person_delete.py::test_other_user_person_is_not_found_whatever_the_confirm_is[None] - app.tools.types.ConfirmationRequired: person_delete
+FAILED tests/test_person_delete.py::test_other_user_person_is_not_found_whatever_the_confirm_is[\ud2c0\ub9b0\uc774\ub984] - app.tools.types.ConfirmationRequired: person_delete
+3 failed, 21 passed in 4.19s
+
+# ===== append 2026-11-09T16:57:37+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-5 .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-5
+# ---
+........FFFFFFF.F.......                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[None] - AssertionError: 행 수가 달라졌다(쓰기 또는 trace 발생)
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[] - AssertionError: 행 수가 달라졌다(쓰기 또는 trace 발생)
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\ub2e4\ub978\uc774\ub984] - AssertionError: 행 수가 달라졌다(쓰기 또는 trace 발생)
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[ \uc0ad\uc81c\ub300\uc0c1\uc13c\ud2f0\ub110] - AssertionError: 행 수가 달라졌다(쓰기 또는 trace 발생)
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\uc0ad\uc81c\ub300\uc0c1\uc13c\ud2f0\ub110 ] - AssertionError: 행 수가 달라졌다(쓰기 또는 trace 발생)
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\uc0ad\uc81c\ub300\uc0c1\uc13f\ud2f0\ub110] - AssertionError: 행 수가 달라졌다(쓰기 또는 trace 발생)
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\ub300\uc870\uad70] - AssertionError: 행 수가 달라졌다(쓰기 또는 trace 발생)
+FAILED tests/test_person_delete.py::test_confirm_uses_current_display_name_not_alias - AssertionError: 행 수가 달라졌다(쓰기 또는 trace 발생)
+8 failed, 16 passed in 4.47s
+
+# ===== append 2026-11-09T16:57:42+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-6 .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-6
+# ---
+.......................F                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_traces_same_digits_in_other_roles_are_not_deleted - assert 6 == 3
+1 failed, 23 passed in 3.73s
+
+# ===== append 2026-11-09T16:57:47+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-7 .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-7
+# ---
+.......F................                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_summary_counts_equal_seeded_counts - AssertionError: assert {'deleted': {...d': 987654321} == {'deleted': {...d': 987654321}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'deleted': {'agent_traces': 22, 'events': 0, 'fact_sources': 0, 'pending_questions': 2, ...}} != {'deleted': {'agent_traces': 22, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}}
+  
+  Full diff:
+    {
+        'deleted': {
+            'agent_traces': 22,
+  -         'events': 5,
+  ?                   ^
+  +         'events': 0,
+  ?                   ^
+  -         'fact_sources': 8,
+  ?                         ^
+  +         'fact_sources': 0,
+  ?                         ^
+            'pending_questions': 2,
+  -         'person_aliases': 2,
+  ?                           ^
+  +         'person_aliases': 0,
+  ?                           ^
+  -         'person_facts': 3,
+  ?                         ^
+  +         'person_facts': 0,
+  ?                         ^
+            'persons': 1,
+  -         'schedules': 1,
+  ?                      ^
+  +         'schedules': 0,
+  ?                      ^
+        },
+        'person_id': 987654321,
+    }
+1 failed, 23 passed in 4.59s
+
+# ===== append 2026-11-09T16:57:52+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-8 .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-8
+# ---
+......................F.                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_service_does_not_commit_outer_rollback_restores_everything - sqlalchemy.exc.ResourceClosedError: This transaction is closed
+1 failed, 23 passed in 5.18s
+
+# ===== append 2026-11-09T16:57:58+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-9-no-toolname .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:57:58+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-9-no-toolname
+# ---
+.......................F                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_traces_same_digits_in_other_roles_are_not_deleted - assert 2 == 3
+1 failed, 23 passed in 5.29s
+
+# ===== append 2026-11-09T16:58:04+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-10-unanswered-only .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:58:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-10-unanswered-only
+# ---
+..FF...F................                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_pending_questions_referencing_person_are_deleted_answered_or_not - assert <app.db.models.PendingQuestion object at 0x11062bc50> is None
+ +  where <app.db.models.PendingQuestion object at 0x11062bc50> = get(PendingQuestion, 16338)
+ +    where get = <sqlalchemy.orm.session.Session object at 0x110790550>.get
+ +    and   16338 = World(session=<sqlalchemy.orm.session.Session object at 0x110790550>, embedder=<function fake_embedder.<locals>._embed..._user_person=<app.db.models.Person object at 0x11091ca50>, unanswered_qid=16337, answered_qid=16338, control_qid=16339).answered_qid
+FAILED tests/test_person_delete.py::test_traces_no_sentinel_text_remains_in_input_or_output - assert 1 == 0
+ +  where 1 = _text_hits(<sqlalchemy.orm.session.Session object at 0x1107c6b10>, <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x10d45aa20>, 987654321)
+ +    where <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x10d45aa20> = PendingQuestion.context
+FAILED tests/test_person_delete.py::test_summary_counts_equal_seeded_counts - AssertionError: assert {'deleted': {...d': 987654321} == {'deleted': {...d': 987654321}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'deleted': {'agent_traces': 22, 'events': 5, 'fact_sources': 8, 'pending_questions': 1, ...}} != {'deleted': {'agent_traces': 22, 'events': 5, 'fact_sources': 8, 'pending_questions': 2, ...}}
+  
+  Full diff:
+    {
+        'deleted': {
+            'agent_traces': 22,
+            'events': 5,
+            'fact_sources': 8,
+  -         'pending_questions': 2,
+  ?                              ^
+  +         'pending_questions': 1,
+  ?                              ^
+            'person_aliases': 2,
+            'person_facts': 3,
+            'persons': 1,
+            'schedules': 1,
+        },
+        'person_id': 987654321,
+    }
+3 failed, 21 passed in 4.88s
+
+# ===== append 2026-11-09T16:58:10+09:00 =====
+# 명령: PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p2b-u2 POSTGRES_PORT=5433 MUT=V2-11-confirm-any .venv/bin/python -m pytest -p mutate_plugin tests/test_person_delete.py -q --tb=no -rf
+# 시각: 2026-11-09T16:58:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 1
+# 메모: MUT=V2-11-confirm-any
+# ---
+.........FFFFFF.F.......                                                 [100%]
+=========================== short test summary info ============================
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[] - Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\ub2e4\ub978\uc774\ub984] - Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[ \uc0ad\uc81c\ub300\uc0c1\uc13c\ud2f0\ub110] - Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\uc0ad\uc81c\ub300\uc0c1\uc13c\ud2f0\ub110 ] - Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\uc0ad\uc81c\ub300\uc0c1\uc13f\ud2f0\ub110] - Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+FAILED tests/test_person_delete.py::test_confirm_missing_or_mismatch_raises_and_writes_nothing[\ub300\uc870\uad70] - Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+FAILED tests/test_person_delete.py::test_confirm_uses_current_display_name_not_alias - Failed: DID NOT RAISE <class 'app.tools.types.ConfirmationRequired'>
+7 failed, 17 passed in 5.44s

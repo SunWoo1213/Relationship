@@ -1,0 +1,27 @@
+# 명령: git rev-parse --short HEAD; git branch --show-current; echo ---status-app-tests; git status --short -- app tests; echo ---modified-tests-vs-f67d8e4; git diff --name-only --diff-filter=M f67d8e4 -- tests/; echo ---blobs; git hash-object app/api/delete.py tests/test_person_refs.py tests/test_person_delete.py; echo ---J1-grep-child-deletes; grep -nE "delete\((PersonAlias|PersonFact|Event|Schedule|FactSource)\)" app/api/delete.py; echo grep-exit=$?; echo ---fk-to-persons-from-jsonb-tables; grep -n "ForeignKey" app/db/models.py
+# 시각: 2026-11-13T20:51:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a4b44b1 (dev2)
+# exit: 0
+# ---
+a4b44b1
+dev2
+---status-app-tests
+ M app/api/delete.py
+ M tests/test_person_refs.py
+?? tests/test_person_delete.py
+---modified-tests-vs-f67d8e4
+---blobs
+4823f967eb64b82e063d9b5fe00ca17a7e2c7504
+761e5055881f9f3efdedc26d2f3a9685299cf106
+4ade6e27078ed788af613aeb42fcae67b137b5e1
+---J1-grep-child-deletes
+grep-exit=1
+---fk-to-persons-from-jsonb-tables
+47:    ForeignKey,
+133:        BigInteger, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False
+152:        BigInteger, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False
+175:        BigInteger, ForeignKey("person_facts.id", ondelete="CASCADE"), nullable=False
+178:        BigInteger, ForeignKey("events.id", ondelete="CASCADE"), nullable=False
+195:        BigInteger, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False
+212:        BigInteger, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False
