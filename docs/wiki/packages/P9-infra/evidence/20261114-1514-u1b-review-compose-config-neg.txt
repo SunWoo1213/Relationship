@@ -1,0 +1,18 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b-review/compose-config-neg.sh
+# 시각: 2026-11-14T15:14:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+== 사본 디렉터리에 .env: 없음
+== (B') APP_ENV_FILE 없이 --env-file 만
+env file <SCRATCH>/no-dotenv-copy/.env not found: stat <SCRATCH>/no-dotenv-copy/.env: no such file or directory
+exit=1 (0 이 아니어야 한다 — CI 에 .env 가 없으면 APP_ENV_FILE 없이는 못 뜬다)
+== (A') APP_ENV_FILE=<변수 파일> 주면 통과 + env_file 이 그 파일을 읽었는지(APP_USER_ID 가 backend environment 에 inline)
+config --quiet exit=0
+13:      APP_USER_ID: ci-smoke
+14:      BRIEFING_SCHEDULER_ENABLED: ""
+(OPENAI 줄이 없어야 한다)
+== (E) --wait-timeout 미지정 기본값(compose v5 도움말 전문)
+      --wait-timeout int             Maximum duration in seconds to wait
+                                     for the project to be running|healthy

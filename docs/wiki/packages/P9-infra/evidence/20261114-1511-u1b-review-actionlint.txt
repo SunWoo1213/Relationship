@@ -1,0 +1,16 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b-review/actionlint.sh
+# 시각: 2026-11-14T15:11:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+== actionlint version
+1.7.12
+installed by building from source
+built with go1.26.1 compiler for linux/arm64
+== actionlint .github/workflows/tests.yml (전체 파일, 기존 job 포함)
+verbose: Linting .github/workflows/tests.yml
+verbose: Using project at /repo
+verbose: Found 0 parse errors in 0 ms for .github/workflows/tests.yml
+verbose: Found total 0 errors in 43 ms for .github/workflows/tests.yml
+actionlint exit=0

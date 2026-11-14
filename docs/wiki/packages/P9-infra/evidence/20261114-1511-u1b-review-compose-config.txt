@@ -1,0 +1,35 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b-review/compose-config.sh
+# 시각: 2026-11-14T15:11:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+== 저장소 루트에 .env 가 있는가(있으면 CI 와 조건이 다르므로 기록만): 있음(사용자 파일, 읽지 않음)
+== 변수 파일 이름 목록
+POSTGRES_USER
+POSTGRES_PASSWORD
+POSTGRES_DB
+SITE_ADDRESS
+BRIEFING_SCHEDULER_ENABLED
+APP_USER_ID
+== (A) CI 와 같은 호출: APP_ENV_FILE 환경변수 + --env-file 같은 파일
+config --quiet exit=0
+-- 렌더된 backend env_file 경로·DATABASE_URL·caddy 포트·프로젝트 이름
+1:name: relationship-prod
+15:      DATABASE_URL: postgresql://app@postgres:5432/relationship
+19:      SITE_ADDRESS: :80
+47:      SITE_ADDRESS: :80
+59:        published: "8088"
+63:        published: "8443"
+== (B) 부정: APP_ENV_FILE 환경변수 없이 --env-file 만 → env_file 이 .env 로 떨어져 실패해야 한다(CI 에 .env 없음)
+exit=0
+   (참고: --project-directory 가 저장소라 루트의 .env 가 있으면 B 는 통과할 수 있다 — 위 '있는가' 줄과 함께 읽는다)
+== (C) 부정: --env-file 없이(변수 없음) → :? 가 거부해야 한다
+time="2026-11-14T15:11:15+09:00" level=warning msg="The \"POSTGRES_USER\" variable is not set. Defaulting to a blank string."
+time="2026-11-14T15:11:15+09:00" level=warning msg="The \"POSTGRES_DB\" variable is not set. Defaulting to a blank string."
+error while interpolating services.backend.environment.POSTGRES_PASSWORD: required variable POSTGRES_PASSWORD is missing a value: POSTGRES_PASSWORD is required (.env)
+exit=1
+== (D) docker compose version / --wait-timeout 기본값
+Docker Compose version v5.5.1
+      --wait                         Wait for services to be
+      --wait-timeout int             Maximum duration in seconds to wait

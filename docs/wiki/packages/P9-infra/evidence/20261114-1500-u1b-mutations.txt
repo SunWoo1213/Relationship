@@ -1,0 +1,337 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py V0
+# 시각: 2026-11-14T15:00:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== V0: 무변이 기준선(사본이 원본과 같을 때 전부 통과해야 함)  (기대 실패: -)
+19 passed in 0.10s
+pytest exit=0
+
+# ===== append 2026-11-14T15:00:34+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py RB1
+# 시각: 2026-11-14T15:00:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== RB1: R-U1-2 .dockerignore 에서 *.pem 삭제  (기대 실패: ⑭)
+FAILED tests/test_deploy_files.py::test_dockerignore_excludes_secrets_and_vcs - AssertionError: *.pem
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:34+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py RB2
+# 시각: 2026-11-14T15:00:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== RB2: R-U1-2 .dockerignore 에서 *.key 삭제  (기대 실패: ⑭)
+FAILED tests/test_deploy_files.py::test_dockerignore_excludes_secrets_and_vcs - AssertionError: *.key
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:34+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py RM1
+# 시각: 2026-11-14T15:00:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== RM1: R-U1-3 Caddyfile root * /srv -> /var/www  (기대 실패: ⑪⑬)
+FAILED tests/test_deploy_files.py::test_caddyfile_routing_contract - assert None
+FAILED tests/test_deploy_files.py::test_dockerfile_stages_user_and_bases - AssertionError: assert '/srv' == '/var/www'
+2 failed, 17 passed in 0.10s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:35+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py RM2
+# 시각: 2026-11-14T15:00:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== RM2: R-U1-3 Dockerfile COPY 대상 /srv -> /var/www  (기대 실패: ⑬)
+FAILED tests/test_deploy_files.py::test_dockerfile_stages_user_and_bases - AssertionError: assert '/var/www' == '/srv'
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:35+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py RC1
+# 시각: 2026-11-14T15:00:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== RC1: R-U1-4 `header / Cache-Control` 줄 삭제  (기대 실패: ⑪)
+FAILED tests/test_deploy_files.py::test_caddyfile_routing_contract - assert None
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:35+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py RC2
+# 시각: 2026-11-14T15:00:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== RC2: R-U1-4 `header /` 를 `header /*`(전부)로  (기대 실패: ⑪)
+FAILED tests/test_deploy_files.py::test_caddyfile_routing_contract - assert None
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:36+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py RC3
+# 시각: 2026-11-14T15:00:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== RC3: R-U1-4 /assets/* 에도 no-cache 추가  (기대 실패: ⑪)
+FAILED tests/test_deploy_files.py::test_caddyfile_routing_contract - assert not <re.Match object; span=(222, 253), match='\theader /assets/* Cache-Control'>
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:36+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J1
+# 시각: 2026-11-14T15:00:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J1: job 이름 오타(deploy-smoke -> deploy-smok)  (기대 실패: ⑯⑰)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - AssertionError: tests.yml 에 deploy-smoke job 이 없다
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_is_safe_and_independent - AssertionError: tests.yml 에 deploy-smoke job 이 없다
+2 failed, 17 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:36+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J2
+# 시각: 2026-11-14T15:00:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J2: compose 호출 하나가 로컬 docker-compose.yml 을 가리킴  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - AssertionError:         run: docker compose --env-file "$APP_ENV_FILE" -f docker-compose.
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:37+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J3
+# 시각: 2026-11-14T15:00:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J3: up 에서 --wait 삭제  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert None
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:37+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J4
+# 시각: 2026-11-14T15:00:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J4: health 판정에서 "db":"up" 삭제  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert '"db":"up"' in '    runs-on: ubuntu-latest\n    timeout-minutes: 15\n    env:\n   
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:38+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J5
+# 시각: 2026-11-14T15:00:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J5: /api/docs 기대 코드 404 -> 200  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert 'test "$code" = "404"' in '    runs-on: ubuntu-latest\n    timeout-minutes: 15\n  
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:38+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J6
+# 시각: 2026-11-14T15:00:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J6: down 에 -v 추가  (기대 실패: ⑯⑰)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert None
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_is_safe_and_independent - assert not <re.Match object; span=(2067, 2070), match=' -v'>
+2 failed, 17 passed in 0.10s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:38+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J7
+# 시각: 2026-11-14T15:00:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J7: job 에 secrets.* 참조 추가  (기대 실패: ⑰)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_is_safe_and_independent - assert 'secrets.' not in '    runs-on...rod.yml down'
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:39+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J8
+# 시각: 2026-11-14T15:00:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J8: job 에 needs: pytest 추가(독립성 깨짐)  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - AssertionError: pytest·windows·web 와 독립(병렬)이어야 한다
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:39+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J9
+# 시각: 2026-11-14T15:00:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J9: POSTGRES_PASSWORD 에 32자 영숫자 덩어리  (기대 실패: ⑰⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert 'echo "POSTGRES_PASSWORD=ci-dummy"' in '    runs-on: ubuntu-latest\n    timeout-mi
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_is_safe_and_independent - AssertionError: assert ['long-alnum-chunk'] == []
+2 failed, 17 passed in 0.10s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:39+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J10
+# 시각: 2026-11-14T15:00:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J10: 변수 파일에 OPENAI_API_KEY 줄 추가  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert 'OPENAI_API_KEY' not in '    runs-on...rod.yml down'
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:40+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J11
+# 시각: 2026-11-14T15:00:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J11: Traceback 검사 step 삭제  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert 'grep -q Traceback' in '    runs-on: ubuntu-latest\n    timeout-minutes: 15\n    e
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:40+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J12
+# 시각: 2026-11-14T15:00:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J12: SITE_ADDRESS=:80 -> 도메인  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert 'echo "SITE_ADDRESS=:80"' in '    runs-on: ubuntu-latest\n    timeout-minutes: 15\
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:40+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J13
+# 시각: 2026-11-14T15:00:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J13: down step 의 if: always() 삭제  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert None
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:41+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J14
+# 시각: 2026-11-14T15:00:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J14: 실패 로그 step 의 if: failure() 삭제  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert None
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:41+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J15
+# 시각: 2026-11-14T15:00:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J15: BRIEFING_SCHEDULER_ENABLED=1 로 켬  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert 'echo "BRIEFING_SCHEDULER_ENABLED="' in '    runs-on: ubuntu-latest\n    timeout-m
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:42+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J16
+# 시각: 2026-11-14T15:00:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J16: timeout-minutes 15 -> 60 (deploy-smoke 만)  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert None
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:42+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J17
+# 시각: 2026-11-14T15:00:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J17: 호출 하나에서 --env-file 삭제  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - AssertionError:         run: docker compose -f docker-compose.prod.yml config --quiet
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:42+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J18
+# 시각: 2026-11-14T15:00:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J18: / 200 판정 삭제  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert 'test "$code" = "200"' in '    runs-on: ubuntu-latest\n    timeout-minutes: 15\n  
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:43+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J19
+# 시각: 2026-11-14T15:00:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J19: web job 삭제(기존 job 보존)  (기대 실패: ⑰)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_is_safe_and_independent - AssertionError: assert {'deploy-smok...b', 'windows'} <= {'deploy-smok...e', '
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))
+
+# ===== append 2026-11-14T15:00:43+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/mutate.py J20
+# 시각: 2026-11-14T15:00:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== J20: /api/health 주소 오타(/health)  (기대 실패: ⑯)
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert 'http://localhost:8088/api/health' in '    runs-on: ubuntu-latest\n    timeout-min
+1 failed, 18 passed in 0.09s
+pytest exit=1 (변이 감지(실패))

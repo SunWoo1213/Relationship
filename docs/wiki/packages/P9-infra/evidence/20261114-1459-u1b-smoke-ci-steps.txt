@@ -1,0 +1,220 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/ci-steps.sh
+# 시각: 2026-11-14T14:59:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+== compose 설정 검증
+== 이미지 빌드 + 기동 (헬스체크 대기)
+ Image relationship-caddy:local Building 
+ Image relationship-backend:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.09kB done
+#1 DONE 0.0s
+
+#2 [backend internal] load build definition from Dockerfile
+#2 DONE 0.0s
+
+#2 [caddy internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.39kB done
+#2 DONE 0.0s
+
+#3 [caddy internal] load metadata for docker.io/library/caddy:2-alpine
+#3 DONE 0.0s
+
+#4 [caddy internal] load metadata for docker.io/library/node:24-slim
+#4 DONE 1.2s
+
+#5 [backend internal] load metadata for docker.io/library/python:3.13-slim
+#5 DONE 1.3s
+
+#6 [caddy internal] load .dockerignore
+#6 transferring context: 568B done
+#6 DONE 0.0s
+
+#7 [caddy internal] load build context
+#7 transferring context: 4.66kB done
+#7 DONE 0.0s
+
+#8 [caddy web-build 1/6] FROM docker.io/library/node:24-slim@sha256:dc26ae92c9fb15cf6b1d63e20f0944b2efe0f115b20e00be48fb23fceb061c54
+#8 resolve docker.io/library/node:24-slim@sha256:dc26ae92c9fb15cf6b1d63e20f0944b2efe0f115b20e00be48fb23fceb061c54 0.0s done
+#8 DONE 0.0s
+
+#9 [backend backend 1/9] FROM docker.io/library/python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90
+#9 resolve docker.io/library/python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90 0.0s done
+#9 DONE 0.0s
+
+#10 [caddy caddy 1/3] FROM docker.io/library/caddy:2-alpine@sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0
+#10 resolve docker.io/library/caddy:2-alpine@sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0 0.0s done
+#10 DONE 0.0s
+
+#11 [caddy web-build 2/6] WORKDIR /web
+#11 CACHED
+
+#12 [caddy web-build 5/6] COPY web/ ./
+#12 CACHED
+
+#13 [caddy web-build 6/6] RUN npm run build
+#13 CACHED
+
+#14 [caddy web-build 4/6] RUN npm ci
+#14 CACHED
+
+#15 [caddy web-build 3/6] COPY web/package.json web/package-lock.json ./
+#15 CACHED
+
+#16 [caddy caddy 2/3] COPY --from=web-build /web/dist /srv
+#16 CACHED
+
+#17 [backend internal] load build context
+#17 transferring context: 3.04kB done
+#17 DONE 0.0s
+
+#18 [backend backend 4/9] RUN pip install --no-cache-dir -r requirements.txt
+#18 CACHED
+
+#19 [backend backend 7/9] COPY alembic.ini ./
+#19 CACHED
+
+#20 [backend backend 6/9] COPY alembic ./alembic
+#20 CACHED
+
+#21 [backend backend 5/9] COPY app ./app
+#21 CACHED
+
+#22 [backend backend 3/9] COPY requirements.txt ./
+#22 CACHED
+
+#23 [backend backend 2/9] WORKDIR /app
+#23 CACHED
+
+#24 [backend backend 8/9] COPY docker/entrypoint.sh ./docker/entrypoint.sh
+#24 CACHED
+
+#25 [backend backend 9/9] RUN sed -i 's/\r$//' /app/docker/entrypoint.sh     && useradd --system --uid 10001 --no-create-home --shell /usr/sbin/nologin app
+#25 CACHED
+
+#26 [caddy caddy 3/3] COPY Caddyfile /etc/caddy/Caddyfile
+#26 DONE 0.0s
+
+#27 [backend] exporting to image
+#27 exporting layers done
+#27 exporting manifest sha256:804a25647fa0bffdabca6ee854fbfd3d5c07abe81fd5d9b8ca10c0a14460c375 done
+#27 exporting config sha256:efa8e80a80abc7836a3ec855f7f4c29acd6282b48f814728b08539a35c404d78 done
+#27 exporting attestation manifest sha256:548bc951ed1015395e3ac67e8b353baf5f3ed41eb214d43814a81a07f30f22d4 done
+#27 exporting manifest list sha256:85eb73c2d5ff78ef253071fc201c9e2acd319a082c61e749988c08906948ecbc done
+#27 naming to docker.io/library/relationship-backend:local done
+#27 unpacking to docker.io/library/relationship-backend:local done
+#27 DONE 0.0s
+
+#28 [caddy] exporting to image
+#28 exporting layers 0.0s done
+#28 exporting manifest sha256:eea0766b8ed6cb629a80eee833989dc4a9b862c278d5d3c2fa06fb2ef5b71601 done
+#28 exporting config sha256:e8303b94a0d57ddbead171f865db817484f9a864455b4b332af2a40521ff5ecc done
+#28 exporting attestation manifest sha256:10134fd9c8347fbbafe200ea295230a42cec88418ddd7c1fa256a9b09d6f93c2 done
+#28 exporting manifest list sha256:bb0c629154a9e70a08f571ba41da337d464c7d88bbc2afbb87d2c061ecc42f27 done
+#28 naming to docker.io/library/relationship-caddy:local done
+#28 unpacking to docker.io/library/relationship-caddy:local 0.0s done
+#28 DONE 0.1s
+
+#29 [backend] resolving provenance for metadata file
+#29 DONE 0.0s
+
+#30 [caddy] resolving provenance for metadata file
+#30 DONE 0.0s
+ Image relationship-backend:local Built 
+ Image relationship-caddy:local Built 
+ Network relationship-prod_default Creating 
+ Network relationship-prod_default Creating 
+ Network relationship-prod_default Created 
+ Network relationship-prod_default Created 
+ Container relationship-prod-postgres-1 Creating 
+ Container relationship-prod-postgres-1 Created 
+ Container relationship-prod-backend-1 Creating 
+ Container relationship-prod-backend-1 Created 
+ Container relationship-prod-caddy-1 Creating 
+ Container relationship-prod-caddy-1 Created 
+ Container relationship-prod-postgres-1 Starting 
+ Container relationship-prod-postgres-1 Started 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-1 Starting 
+ Container relationship-prod-backend-1 Started 
+ Container relationship-prod-caddy-1 Starting 
+ Container relationship-prod-caddy-1 Started 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-backend-1 Waiting 
+ Container relationship-prod-caddy-1 Waiting 
+ Container relationship-prod-caddy-1 Healthy 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-1 Healthy 
+== /api/health 가 db up
+{"status":"ok","db":"up","alembic_revision":"0002"}
+== / 가 200
+GET / -> 200
+== /api/docs 가 404
+GET /api/docs -> 404
+== 백엔드 로그에 Traceback 0
+Traceback 0 (줄 수:        8)
+== (추가) 캐시 헤더 — R-U1-4
+-- HEAD /
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: no-cache
+Content-Length: 573
+Content-Type: text/html; charset=utf-8
+Etag: "dmuomq70229s-fx"
+Last-Modified: Sat, 14 Nov 2026 05:25:22 GMT
+Vary: Accept-Encoding
+Date: Sat, 14 Nov 2026 05:59:45 GMT
+
+-- HEAD /assets/index-DB5EDvsy.js
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 363621
+Content-Type: text/javascript; charset=utf-8
+Etag: "dmuomq70229s-7skl"
+Last-Modified: Sat, 14 Nov 2026 05:25:22 GMT
+Vary: Accept-Encoding
+Date: Sat, 14 Nov 2026 05:59:45 GMT
+
+-- HEAD /index.html
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: no-cache
+Content-Length: 573
+Content-Type: text/html; charset=utf-8
+Etag: "dmuomq70229s-fx"
+Last-Modified: Sat, 14 Nov 2026 05:25:22 GMT
+Vary: Accept-Encoding
+Date: Sat, 14 Nov 2026 05:59:45 GMT
+
+-- HEAD /sw.js
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Cache-Control: no-cache
+Content-Length: 3055
+Content-Type: text/javascript; charset=utf-8
+Etag: "dmuomq70229s-2cv"
+Last-Modified: Sat, 14 Nov 2026 05:25:22 GMT
+Vary: Accept-Encoding
+Date: Sat, 14 Nov 2026 05:59:45 GMT
+
+-- /(Cache-Control) 줄 수 / 자산(Cache-Control) 줄 수
+root:  1
+asset: 0
+== 정리 (down, -v 없음)
+ Container relationship-prod-caddy-1 Stopping 
+ Container relationship-prod-caddy-1 Stopped 
+ Container relationship-prod-caddy-1 Removing 
+ Container relationship-prod-caddy-1 Removed 
+ Container relationship-prod-backend-1 Stopping 
+ Container relationship-prod-backend-1 Stopped 
+ Container relationship-prod-backend-1 Removing 
+ Container relationship-prod-backend-1 Removed 
+ Container relationship-prod-postgres-1 Stopping 
+ Container relationship-prod-postgres-1 Stopped 
+ Container relationship-prod-postgres-1 Removing 
+ Container relationship-prod-postgres-1 Removed 
+ Network relationship-prod_default Removing 
+ Network relationship-prod_default Removed 

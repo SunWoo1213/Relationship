@@ -1,0 +1,18 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/yaml-valid.py
+# 시각: 2026-11-14T15:01:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+jobs: ['pytest', 'windows', 'deploy-smoke', 'web']
+runs-on: ubuntu-latest | timeout-minutes: 15 | needs: None
+0 actions/checkout@v4 | if: None
+1 스모크 변수 파일 만들기 (비밀 아님, 러너 임시 디렉터리) | if: None
+2 compose 설정 검증 | if: None
+3 이미지 빌드 + 기동 (헬스체크 대기) | if: None
+4 /api/health 가 db up | if: None
+5 / 가 200 (정적 화면) | if: None
+6 /api/docs 가 404 (Swagger 비공개, F-P9V-1) | if: None
+7 백엔드 로그에 Traceback 0 | if: None
+8 실패 시 로그 출력 | if: failure()
+9 정리 (down) | if: always()

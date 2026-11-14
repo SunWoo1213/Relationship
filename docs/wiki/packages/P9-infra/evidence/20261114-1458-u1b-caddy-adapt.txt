@@ -1,0 +1,70 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/caddy-adapt.sh
+# 시각: 2026-11-14T14:58:58+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+adapt exit=0
+30-						},
+31-						{
+32-							"match": [
+33-								{
+34-									"path": [
+35-										"/index.html"
+36-									]
+37-								}
+38-							],
+39-							"handle": [
+40-								{
+41-									"handler": "headers",
+42-									"response": {
+43-										"set": {
+44:											"Cache-Control": [
+45-												"no-cache"
+46-											]
+47-										}
+48-									}
+49-								}
+50-							]
+51-						},
+52-						{
+53-							"match": [
+54-								{
+55-									"path": [
+56-										"/sw.js"
+57-									]
+58-								}
+59-							],
+60-							"handle": [
+61-								{
+62-									"handler": "headers",
+63-									"response": {
+64-										"set": {
+65:											"Cache-Control": [
+66-												"no-cache"
+67-											]
+68-										}
+69-									}
+70-								}
+71-							]
+72-						},
+73-						{
+74-							"match": [
+75-								{
+76-									"path": [
+77-										"/"
+78-									]
+79-								}
+80-							],
+81-							"handle": [
+82-								{
+83-									"handler": "headers",
+84-									"response": {
+85-										"set": {
+86:											"Cache-Control": [
+87-												"no-cache"
+88-											]
+89-										}
+90-									}
+91-								}
+92-							]

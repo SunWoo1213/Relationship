@@ -117,3 +117,66 @@
 이미지: `relationship-backend:local` **arm64** · 450MB(`449808080` B) · `User=app` · `/app` 에 `.env` 없음, `relationship-caddy:local` **arm64** · 88.2MB · `/srv` 에 `index.html`·`sw.js`·`manifest.webmanifest`·`assets/` 등 (`smoke-image`). 개발 DB 무영향: `capstone2-postgres-1`(c1399b19337d) 가 스모크 전(`pre-docker-ps`)·중(`mid-dev-compose-ps-capstone2`)·후(`post-docker-ps`) 모두 `Up 2 weeks (healthy)` 5433 그대로, `docker compose ls`(`pre-`/`mid-`/`post-compose-ls`)에 `relationship-prod` 가 스모크 중에만 나타났다 사라지고 `capstone2`·`broker-agent` 불변, 기존 볼륨 `capstone2_pgdata`·`relationship_pgdata`·`broker-agent_pgdata` 불변(`pre-`/`post-volume-ls`).
 
 판정 표 #4 비밀 grep: 계획의 정규식은 `${NAME:?메시지}` 의 `:?` 를 값으로 오인해 `docker-compose.prod.yml` 2줄(전부 `${POSTGRES_PASSWORD:?…}` 보간)을 잡는다(`smoke-secretgrep` — 새 파일이 추적 전이라 `git grep` 이 trivially 빈 출력). 제외 문자 집합에 `?` 를 더한 보정 정규식은 **일치 0**, 리터럴 표본 3줄은 잡는다(`secret-grep-fixed`).
+
+## U1b — CI `deploy-smoke` job + U1 리뷰 권고 R-U1-2·3·4 (backend-agent, 2026-11-14, 제품 코드·로컬 `docker-compose.yml` 변경 0)
+
+증거 이름은 모두 `evidence/20261114-14NN-u1b-<이름>.txt` — 표에는 `<이름>` 만. 변이는 전부 저장소 밖 스크래치패드 사본(`…/scratchpad/p9-u1b/mut/<ID>/`)에서만 돌렸고 저장소 파일은 고치지 않았다. **CI 실행 결과(GitHub Actions run) 자체는 푸시 뒤에만 볼 수 있다 — 푸시 뒤 메인이 `gh run view` 로 확인한다(여기서는 미확인).**
+
+### 자동 테스트 `tests/test_deploy_files.py` (17 → 19건, skip 0)
+
+| # | 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|---|
+| ⑭ 보강 (R-U1-2) | `.dockerignore` 에 `*.pem`·`*.key` 줄 | `pytest tests/test_deploy_files.py -v` | PASSED | `deploy-files` |
+| ⑪ 보강 (R-U1-3·4) | Caddyfile `root * /srv` · `header / Cache-Control "no-cache"` 한 줄(정확히 `/`) · `header /*`·`header /assets…` 에 Cache-Control 0 | 같음 | PASSED | `deploy-files` |
+| ⑬ 보강 (R-U1-3) | Dockerfile `COPY --from=web-build … <경로>` 의 경로 == Caddyfile `root * <경로>` == `/srv` | 같음 | PASSED | `deploy-files` |
+| ⑯ | `tests.yml` 에 `deploy-smoke` job: ubuntu-latest·15분·`needs` 없음 · `docker compose` 호출 ≥5 전부 `-f docker-compose.prod.yml` + `--env-file "$APP_ENV_FILE"`·로컬 `docker-compose.yml` 0 · `up -d --build --wait` · `/api/health` `"db":"up"` · `/` 200 · `/api/docs` 404 · `grep -q Traceback` · `if: failure()` 로그 · `if: always()` down · 더미 변수(`POSTGRES_PASSWORD=ci-dummy`·`SITE_ADDRESS=:80`·`BRIEFING_SCHEDULER_ENABLED=` 비움·`OPENAI_API_KEY` 없음) | 같음 | PASSED | `deploy-files` |
+| ⑰ | job 안 `secrets.` 0 · 비밀 모양 값 0(⑥ 의 탐지기) · 볼륨 삭제 옵션 0(`-v`·`--volumes`·`volume rm`·`prune`) · `pytest`·`windows`·`web` job 보존 | 같음 | PASSED | `deploy-files` |
+
+전체 판정:
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| 전체 | `pytest -q -rs tests/` | **2221 passed**(기준 2219 + 신규 2), skip 0 | `pytest-all` |
+| ruff | `ruff check app tests` | All checks passed | `ruff` |
+| mypy | `scripts/mypy_check.py --run` | 새 오류 없음, 38건 = 기준선 38건 | `mypy` |
+| 제품 코드 무변경 | `git status --short -- app web/src alembic docker-compose.yml` | 빈 출력 | `product-unchanged` |
+| YAML 유효 | PyYAML `safe_load` + job 구조 출력(actionlint 없음) | jobs `pytest·windows·deploy-smoke·web`, deploy-smoke steps 10개(`if: failure()`·`if: always()` 각 1) | `yaml-valid` |
+
+### 변이 → 잡는 테스트 (`mutations` — 무변이 기준선 V0 통과, 27종 모두 실패로 감지, 미감지 0)
+
+| ID | 변이 | 잡은 테스트 |
+|---|---|---|
+| RB1 · RB2 | R-U1-2 `.dockerignore` 에서 `*.pem` / `*.key` 삭제 | ⑭ (`AssertionError: *.pem` / `*.key`) |
+| RM1 | R-U1-3 Caddyfile `root * /srv` → `/var/www` | ⑪ + ⑬ (`'/srv' == '/var/www'`) |
+| RM2 | R-U1-3 Dockerfile COPY 대상 `/srv` → `/var/www` | ⑬ |
+| RC1 | R-U1-4 `header / Cache-Control` 줄 삭제 | ⑪ |
+| RC2 | `header /` → `header /*`(전부에 걸림) | ⑪ |
+| RC3 | `/assets/*` 에도 no-cache 추가 | ⑪ |
+| J1 | job 이름 오타(`deploy-smok`) | ⑯ + ⑰ |
+| J2 · J17 | compose 호출 하나가 로컬 `docker-compose.yml` / `--env-file` 없음 | ⑯ |
+| J3 | `up` 에서 `--wait` 삭제 | ⑯ |
+| J4 · J20 | health 판정에서 `"db":"up"` 삭제 / 주소 `/health` 오타 | ⑯ |
+| J5 · J18 | `/api/docs` 기대 404→200 / `/` 200 판정 삭제 | ⑯ |
+| J6 | `down -v` | ⑯ + ⑰ |
+| J7 | `secrets.FOO` 참조 | ⑰ |
+| J8 | `needs: pytest`(독립성) | ⑯ |
+| J9 | `POSTGRES_PASSWORD` 에 32자 영숫자 덩어리 | ⑰(`long-alnum-chunk`) + ⑯ |
+| J10 · J12 · J15 | `OPENAI_API_KEY` 추가 / `SITE_ADDRESS` 도메인 / 스케줄러 `=1` | ⑯ |
+| J11 | Traceback 검사 제거 | ⑯ |
+| J13 · J14 | `if: always()` / `if: failure()` 삭제 | ⑯ |
+| J16 | `timeout-minutes` 15→60 | ⑯ |
+| J19 | `web` job 삭제 | ⑰ |
+
+### 로컬 스모크 (CI step 명령을 같은 순서로 `ci-steps.sh` 로 재현 — 변수 파일은 스크래치패드 `vars.env`, `OPENAI_API_KEY` 없음·스케줄러 비움·`CADDY_HTTP_PORT=8088`/`8443`, 기존 볼륨 `relationship-prod_*` 재사용이라 비밀번호만 U1 때의 로컬 전용 값 — CI 는 `ci-dummy` + 새 볼륨)
+
+| # | 확인 항목 | 결과 | evidence |
+|---|---|---|---|
+| ① | `config --quiet` · `up -d --build --wait` | exit 0, `--wait` 가 postgres·backend·caddy `Healthy` 까지 기다림 | `smoke-ci-steps` |
+| ② | `GET /api/health` | `{"status":"ok","db":"up","alembic_revision":"0002"}` | `smoke-ci-steps` |
+| ③ | `GET /` · `GET /api/docs` | `200` · `404` | `smoke-ci-steps` |
+| ④ | backend 로그 Traceback | 0 (8줄) | `smoke-ci-steps` |
+| ⑤ (R-U1-4) | `HEAD /` | `Cache-Control: no-cache` **있음** | `smoke-ci-steps` |
+| ⑥ (R-U1-4) | `HEAD /assets/index-DB5EDvsy.js` | `Cache-Control` **없음**(줄 수 0) — 해시 자산 캐시 보존 | `smoke-ci-steps` |
+| ⑦ | `HEAD /index.html` · `HEAD /sw.js` | 둘 다 `no-cache` 유지 | `smoke-ci-steps` |
+| ⑧ | `caddy adapt` | `header /` 가 경로 매처 `["/"]`(정확 일치, 와일드카드 없음)로 headers 핸들러에 붙음 | `caddy-adapt` |
+| ⑨ | `down`(`-v` 없음) 전·후 | 개발 DB `capstone2-postgres-1`·`broker-agent-postgres-1` `Up 2 weeks (healthy)` 그대로, `relationship-prod_*` 볼륨 3개 그대로 | `pre-docker-state` · `post-docker-state` |

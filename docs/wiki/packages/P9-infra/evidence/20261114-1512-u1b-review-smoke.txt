@@ -1,0 +1,125 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b-review/smoke.sh
+# 시각: 2026-11-14T15:12:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+===== 사전 상태
+-- docker ps
+broker-agent-postgres-1 Up 2 weeks (healthy) 0.0.0.0:5434->5432/tcp, [::]:5434->5432/tcp
+capstone2-postgres-1 Up 2 weeks (healthy) 0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+-- volumes
+broker-agent_pgdata
+capstone2_pgdata
+relationship_pgdata
+relationship-prod_caddy_config
+relationship-prod_caddy_data
+relationship-prod_pgdata
+-- 8088/8443 LISTEN
+(없음)
+-- compose ls
+NAME                STATUS              CONFIG FILES
+broker-agent        running(1)          /Users/sunwoo/Desktop/Portfolio/broker-agent/docker-compose.yml
+capstone2           running(1)          /Users/sunwoo/Desktop/Portfolio/Relationship/docker-compose.yml
+
+== compose 설정 검증
+exit=0
+
+== 이미지 빌드 + 기동 (헬스체크 대기) — CI 와 같이 --wait-timeout 없음
+ Image relationship-caddy:local Built 
+ Network relationship-prod_default Creating 
+ Network relationship-prod_default Creating 
+ Network relationship-prod_default Created 
+ Network relationship-prod_default Created 
+ Container relationship-prod-postgres-1 Creating 
+ Container relationship-prod-postgres-1 Created 
+ Container relationship-prod-backend-1 Creating 
+ Container relationship-prod-backend-1 Created 
+ Container relationship-prod-caddy-1 Creating 
+ Container relationship-prod-caddy-1 Created 
+ Container relationship-prod-postgres-1 Starting 
+ Container relationship-prod-postgres-1 Started 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-1 Starting 
+ Container relationship-prod-backend-1 Started 
+ Container relationship-prod-caddy-1 Starting 
+ Container relationship-prod-caddy-1 Started 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-backend-1 Waiting 
+ Container relationship-prod-caddy-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-caddy-1 Healthy 
+ Container relationship-prod-backend-1 Healthy 
+up exit=0 (38s)
+-- ps
+backend Up 5 seconds (healthy) 8000/tcp
+caddy Up 5 seconds 0.0.0.0:8088->80/tcp, [::]:8088->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp
+postgres Up 36 seconds (healthy) 5432/tcp
+
+== /api/health 가 db up
+{"status":"ok","db":"up","alembic_revision":"0002"}
+PASS db up
+
+== / 가 200
+GET / -> 200 text/html; charset=utf-8
+PASS
+
+== /api/docs 가 404
+GET /api/docs -> 404
+PASS
+
+== 백엔드 로그에 Traceback 0
+Traceback 줄 수: 0 (로그        8 줄)
+PASS
+
+== (R-U1-4) Cache-Control — 네 경로 + SPA fallback 경로
+/                                200  Cache-Control=[no-cache]  Content-Type=[text/html; charset=utf-8]
+/index.html                      200  Cache-Control=[no-cache]  Content-Type=[text/html; charset=utf-8]
+/sw.js                           200  Cache-Control=[no-cache]  Content-Type=[text/javascript; charset=utf-8]
+/assets/index-DB5EDvsy.js        200  Cache-Control=[없음]  Content-Type=[text/javascript; charset=utf-8]
+/manifest.webmanifest            200  Cache-Control=[없음]  Content-Type=[application/manifest+json]
+/some-deep-link                  200  Cache-Control=[없음]  Content-Type=[text/html; charset=utf-8]
+-- 판정
+PASS / no-cache
+PASS /assets/index-DB5EDvsy.js Cache-Control 없음(해시 자산 캐시 보존)
+PASS /index.html no-cache
+PASS /sw.js no-cache
+-- Server 헤더: 0 줄(0 이어야)
+
+== 정리 (down, -v 없음)
+ Container relationship-prod-caddy-1 Stopping 
+ Container relationship-prod-caddy-1 Stopped 
+ Container relationship-prod-caddy-1 Removing 
+ Container relationship-prod-caddy-1 Removed 
+ Container relationship-prod-backend-1 Stopping 
+ Container relationship-prod-backend-1 Stopped 
+ Container relationship-prod-backend-1 Removing 
+ Container relationship-prod-backend-1 Removed 
+ Container relationship-prod-postgres-1 Stopping 
+ Container relationship-prod-postgres-1 Stopped 
+ Container relationship-prod-postgres-1 Removing 
+ Container relationship-prod-postgres-1 Removed 
+ Network relationship-prod_default Removing 
+ Network relationship-prod_default Removed 
+down exit=0
+
+===== 사후 상태
+-- docker ps
+broker-agent-postgres-1 Up 2 weeks (healthy) 0.0.0.0:5434->5432/tcp, [::]:5434->5432/tcp
+capstone2-postgres-1 Up 2 weeks (healthy) 0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+-- volumes
+broker-agent_pgdata
+capstone2_pgdata
+relationship_pgdata
+relationship-prod_caddy_config
+relationship-prod_caddy_data
+relationship-prod_pgdata
+-- 8088/8443 LISTEN
+(없음)
+-- compose ls
+NAME                STATUS              CONFIG FILES
+broker-agent        running(1)          /Users/sunwoo/Desktop/Portfolio/broker-agent/docker-compose.yml
+capstone2           running(1)          /Users/sunwoo/Desktop/Portfolio/Relationship/docker-compose.yml
+
+smoke fail=0

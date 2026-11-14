@@ -150,6 +150,67 @@ jobs:
       - shell: bash
         run: bash .claude/scripts/test-guards.sh
 
+  deploy-smoke:
+    # Refs: P9-infra U1b (결정 H (i), R-U10D-1) -- 운영 배포 파일(Dockerfile·docker-compose.prod.yml·Caddyfile)이
+    # 깨지지 않았는지 dev2 푸시마다 기계가 본다: 이미지 빌드 -> compose 기동(--wait) -> 헬스·정적·docs 404 확인.
+    # ubuntu 러너는 amd64 라 x86 빌드 증거가 된다(운영 EC2 는 arm64 t4g — 둘 다 빌드되는 것이 목적).
+    # pytest·windows·web job 과 의존(needs)이 없어 병렬로 돈다. secrets.* 를 쓰지 않는다 -- 아래 값은 전부
+    # CI 안에서 만드는 일회성 더미이고(비밀 아님), OPENAI_API_KEY 는 주지 않으며 브리핑 스케줄러는 끈다.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # 로컬 80/443 충돌 회피와 같은 포트(U1 로컬 스모크). 러너에서도 같은 값을 쓴다.
+      CADDY_HTTP_PORT: "8088"
+      CADDY_HTTPS_PORT: "8443"
+    steps:
+      - uses: actions/checkout@v4
+      - name: 스모크 변수 파일 만들기 (비밀 아님, 러너 임시 디렉터리)
+        run: |
+          f="$RUNNER_TEMP/p9-smoke-vars.txt"
+          {
+            echo "POSTGRES_USER=app"
+            echo "POSTGRES_PASSWORD=ci-dummy"
+            echo "POSTGRES_DB=relationship"
+            echo "SITE_ADDRESS=:80"
+            echo "BRIEFING_SCHEDULER_ENABLED="
+            echo "APP_USER_ID=ci-smoke"
+          } > "$f"
+          # compose 보간(--env-file)과 백엔드 env_file(APP_ENV_FILE) 둘 다 이 파일을 쓴다. .env 는 CI 에 없다.
+          echo "APP_ENV_FILE=$f" >> "$GITHUB_ENV"
+      - name: compose 설정 검증
+        run: docker compose --env-file "$APP_ENV_FILE" -f docker-compose.prod.yml config --quiet
+      - name: 이미지 빌드 + 기동 (헬스체크 대기)
+        run: docker compose --env-file "$APP_ENV_FILE" -f docker-compose.prod.yml up -d --build --wait --wait-timeout 600
+      - name: /api/health 가 db up
+        run: |
+          body="$(curl -fsS http://localhost:8088/api/health)"
+          echo "$body"
+          echo "$body" | grep -q '"db":"up"'
+      - name: / 가 200 (정적 화면)
+        run: |
+          code="$(curl -fsS -o /dev/null -w '%{http_code}' http://localhost:8088/)"
+          echo "GET / -> $code"
+          test "$code" = "200"
+      - name: /api/docs 가 404 (Swagger 비공개, F-P9V-1)
+        run: |
+          code="$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8088/api/docs)"
+          echo "GET /api/docs -> $code"
+          test "$code" = "404"
+      - name: 백엔드 로그에 Traceback 0
+        run: |
+          docker compose --env-file "$APP_ENV_FILE" -f docker-compose.prod.yml logs backend > "$RUNNER_TEMP/backend.log"
+          if grep -q Traceback "$RUNNER_TEMP/backend.log"; then
+            echo "::error::backend 로그에 Traceback 이 있다"
+            exit 1
+          fi
+      - name: 실패 시 로그 출력
+        if: failure()
+        run: docker compose --env-file "$APP_ENV_FILE" -f docker-compose.prod.yml logs --tail=200
+      # 볼륨을 지우는 옵션을 쓰지 않는다(security.md §4) — 러너는 일회용이라 필요도 없다.
+      - name: 정리 (down)
+        if: always()
+        run: docker compose --env-file "$APP_ENV_FILE" -f docker-compose.prod.yml down
+
   web:
     # Refs: P8-frontend U4 결정 B -- 프론트 골격 검증. 타입 검사 · Vitest · 빌드.
     # 자동 테스트는 실제 네트워크를 쓰지 않는다(결정 J). Playwright E2E 는 U9 에서 ubuntu 에만 더했다.

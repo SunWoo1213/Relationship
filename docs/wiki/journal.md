@@ -612,3 +612,5 @@
 - 2026-11-14 14:20 | START | P9-infra 활성화 — AWS 최소 구성(EC2 1대 + Compose: caddy·backend·postgres, 제품 코드 0, 공개 ~11-19 18:00). architect 01-plan(1차 Vercel 안 같은 날 폐기 → AWS 최소 재작성) → 사용자 결정 A~P(A t4g.small · B 새 도메인/준비 전 sslip.io · D SSH 내 IP · J 11-19 18:00, 나머지 추천안) → verify-plan FAIL 0 → verifier 02-plan-verify 1차 보류(F-P9V-1 Caddyfile 404 가 handle_path 뒤에 평가, caddy adapt 로 확인) → 보정 → 재검증 통과. U1(backend-agent 배포 파일+로컬 스모크)·U2(frontend-agent 빌드 확인) 동시 시작. **U4 실제 기동은 사용자 지시 뒤.** | P9-infra CR-005 D17 R14 F-P9V-1
 - 2026-11-14 14:20 | COMMIT | 5ece780 docs(P9-infra): AWS 최소 구성 배포 계획을 검증까지 마치고 활성화한다
 - 2026-11-14 14:20 | PUSH-dev2 | origin dev2 5ece780 (실험 푸시)
+- 2026-11-14 14:55 | COMMIT | 70fcd08 infra(P9-infra): EC2 한 대에 올릴 Docker 이미지·compose·Caddy 설정과 사용자 배포·종료 절차를 더한다
+- 2026-11-14 14:55 | PUSH-dev2 | origin dev2 70fcd08 (실험 푸시)

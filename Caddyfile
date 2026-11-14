@@ -16,6 +16,10 @@
 	}
 
 	header /sw.js Cache-Control "no-cache"
+	# `header` 의 경로 매처는 요청 경로 기준이다 — `/` 로 받은 index.html 은 `/index.html` 줄에 안 걸린다(R-U1-4).
+	# 사라진 해시 자산을 가리키는 낡은 index.html 이 캐시되면 흰 화면이 되므로 `/` 도 no-cache.
+	# `/` 는 정확히 그 경로만 맞춘다(와일드카드 없음) — /assets/* 해시 자산의 캐시는 건드리지 않는다.
+	header / Cache-Control "no-cache"
 	header /index.html Cache-Control "no-cache"
 	header /manifest.webmanifest Content-Type "application/manifest+json"
 	header -Server

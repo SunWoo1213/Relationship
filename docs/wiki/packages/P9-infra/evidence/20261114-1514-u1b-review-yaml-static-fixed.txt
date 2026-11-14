@@ -1,0 +1,17 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b-review/yaml-static-fixed.py
+# 시각: 2026-11-14T15:14:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+[PASS] 변수 파일(`{ … } > "$f"` 블록) 안 이름 6개 -- ['POSTGRES_USER', 'POSTGRES_PASSWORD', 'POSTGRES_DB', 'SITE_ADDRESS', 'BRIEFING_SCHEDULER_ENABLED', 'APP_USER_ID']
+[PASS] 블록 밖 `echo "…="` 는 APP_ENV_FILE → GITHUB_ENV 1줄뿐
+전체 파일 일치: [(41, 'POSTGRES_PASSWORD: pass'), (172, 'echo "POSTGRES_PASSWORD=ci-dummy"')]
+HEAD(70fcd08) 에 이미 있던 일치: ['POSTGRES_PASSWORD: pass']
+[PASS] U1b 가 새로 더한 일치는 `POSTGRES_PASSWORD=ci-dummy`(CI 안에서 만드는 더미) 1줄 -- [(172, 'echo "POSTGRES_PASSWORD=ci-dummy"')]
+[PASS] deploy-smoke job 본문 안 #4 일치는 그 1줄 -- ['PASSWORD=c']
+compose(주석 제외) 가 보간하는 변수: ['APP_ENV_FILE', 'CADDY_HTTPS_PORT', 'CADDY_HTTP_PORT', 'GIT_SHA', 'POSTGRES_DB', 'POSTGRES_PASSWORD', 'POSTGRES_USER', 'SITE_ADDRESS']
+[PASS] 전부 CI 변수 파일(4) + 환경(APP_ENV_FILE·CADDY_*) + 기본값 있는 GIT_SHA 로 공급됨
+[PASS] 기본값 없는 `:?` 변수 4개는 변수 파일에 전부 있음
+
+FAIL=0

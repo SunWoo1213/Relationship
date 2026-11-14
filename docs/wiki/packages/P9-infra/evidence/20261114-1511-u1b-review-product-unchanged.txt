@@ -1,0 +1,6 @@
+# 명령: git status --short -- app web/src alembic docker-compose.yml docker/initdb docker/entrypoint.sh Dockerfile docker-compose.prod.yml .dockerignore .env.example
+# 시각: 2026-11-14T15:11:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---

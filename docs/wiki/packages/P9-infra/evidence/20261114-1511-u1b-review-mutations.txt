@@ -1,0 +1,75 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b-review/mut-loop.sh
+# 시각: 2026-11-14T15:11:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+=== V0: 무변이 기준선  (기대 실패: -)
+19 passed in 0.09s
+pytest exit=0 (변이 생존(전부 통과))
+
+=== M1: 기존 job 이름 변경 `pytest:` → `pytest-main:`(기존 job 보존 깨짐)  (기대 실패: ⑰)
+25c25
+<   pytest:
+---
+>   pytest-main:
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_is_safe_and_independent - AssertionError: assert {'deploy-smok...b', 'windows'} <= {'deploy-smok...b', 'windows'}
+1 failed, 18 passed in 0.10s
+pytest exit=1 (변이 감지(실패))
+
+=== M2: Caddyfile `header /` 를 `header /index.html` 로(R-U1-4 되돌림 — /index.html 중복)  (기대 실패: ⑪)
+22d21
+< 	header / Cache-Control "no-cache"
+23a23
+> 	header /index.html Cache-Control "no-cache"
+FAILED tests/test_deploy_files.py::test_caddyfile_routing_contract - assert None
+1 failed, 18 passed in 0.10s
+pytest exit=1 (변이 감지(실패))
+
+=== M3: job env `CADDY_HTTP_PORT: "8088"` → `"8080"`(curl 은 8088 그대로 → CI 에서 연결 실패)  (기대 실패: ⑯? (env↔curl 포트 일치는 단언 없음 → 생존 예상))
+163c163
+<       CADDY_HTTP_PORT: "8088"
+---
+>       CADDY_HTTP_PORT: "8080"
+19 passed in 0.09s
+pytest exit=0 (변이 생존(전부 통과))
+
+=== M4: compose `env_file: - ${APP_ENV_FILE:-.env}` → `- .env`(CI 에 .env 없음 → config 실패)  (기대 실패: ⑤? (env_file 개수만 셈 → 생존 예상))
+46c46
+<       - ${APP_ENV_FILE:-.env}
+---
+>       - .env
+FAILED tests/test_deploy_files.py::test_compose_backend_dependencies_logging_and_tags - assert '${APP_ENV_FILE:-.env}' in '    build:\n      context: .\n      target: backend\n    image: relationship-backend:${GIT_SHA:-local}\n    restart: ...request.urlopen(\'http://127.0.0.1:8000/health\', timeout=3)"]\n      start_period: 60s\n    logging: *default-logging'
+1 failed, 18 passed in 0.10s
+pytest exit=1 (변이 감지(실패))
+
+=== M5: Caddyfile `header /` 값 `no-cache` → `public, max-age=31536000`(index 를 1년 캐시)  (기대 실패: ⑪)
+22c22
+< 	header / Cache-Control "no-cache"
+---
+> 	header / Cache-Control "public, max-age=31536000"
+FAILED tests/test_deploy_files.py::test_caddyfile_routing_contract - assert None
+1 failed, 18 passed in 0.10s
+pytest exit=1 (변이 감지(실패))
+
+=== M6: `compose 설정 검증` step 삭제(config 단계 없음)  (기대 실패: ⑯)
+180,181d179
+<       - name: compose 설정 검증
+<         run: docker compose --env-file "$APP_ENV_FILE" -f docker-compose.prod.yml config --quiet
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - AssertionError: ['        run: docker compose --env-file "$APP_ENV_FILE" -f docker-compose.prod.yml up -d --build --wait', '          ...se.prod.yml logs --tail=200', '        run: docker compose --env-file "$APP_ENV_FILE" -f docker-compose.prod.yml down']
+1 failed, 18 passed in 0.11s
+pytest exit=1 (변이 감지(실패))
+
+=== M7: `APP_ENV_FILE` 을 GITHUB_ENV 가 아니라 `export` 로(다음 step 에 전달 안 됨)  (기대 실패: ⑯)
+179c179
+<           echo "APP_ENV_FILE=$f" >> "$GITHUB_ENV"
+---
+>           export APP_ENV_FILE="$f"
+FAILED tests/test_deploy_files.py::test_ci_deploy_smoke_job_contract - assert 'echo "APP_ENV_FILE=$f" >> "$GITHUB_ENV"' in '    runs-on: ubuntu-latest\n    timeout-minutes: 15\n    env:\n      CADDY_HTTP_PORT: "8088"\n      CADDY_HTTPS_PORT:...리 (down)\n        if: always()\n        run: docker compose --env-file "$APP_ENV_FILE" -f docker-compose.prod.yml down'
+1 failed, 18 passed in 0.10s
+pytest exit=1 (변이 감지(실패))
+
+== 저장소 상태(변이가 저장소를 건드리지 않았는지 — 기존 수정 목록과 같아야 함)
+ M .github/workflows/tests.yml
+ M Caddyfile
+ M tests/test_deploy_files.py

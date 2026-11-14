@@ -3,7 +3,8 @@
 `Dockerfile`·`docker/entrypoint.sh`·`docker-compose.prod.yml`·`Caddyfile`·`.dockerignore`·`.env.example`
 의 계약 값을 **텍스트로** 단언한다. DB·Docker·PyYAML 이 필요 없고(skip 0), 파일만 읽는다.
 
-번호 ①~⑮ 는 `docs/wiki/packages/P9-infra/01-plan.md` U1 "테스트" 항목의 번호다.
+번호 ①~⑮ 는 `docs/wiki/packages/P9-infra/01-plan.md` U1 "테스트" 항목의 번호이고, ⑯·⑰ 은 U1b(CI `deploy-smoke` job)다.
+`.github/workflows/tests.yml` 도 PyYAML 없이 들여쓰기로 잘라 텍스트로만 본다.
 변이 시험(V1-1~V1-15)은 이 파일과 배포 파일을 스크래치패드 사본에 복사해 한 줄씩 어긋나게 만든 뒤
 돌린다 -- 그래서 저장소 루트는 이 파일 위치(`<루트>/tests/`)에서 계산한다.
 
@@ -267,6 +268,12 @@ def test_caddyfile_routing_contract():
     assert "file_server" in code
     assert re.search(r'header\s+/sw\.js\s+Cache-Control\s+"no-cache"', code)
     assert re.search(r'header\s+/index\.html\s+Cache-Control\s+"no-cache"', code)
+    # R-U1-4: `/` 로 받은 index.html 에도 no-cache. `header` 매처는 요청 경로 기준이라 `/index.html` 줄에 안 걸린다.
+    # 와일드카드 없는 `/` 만 — `/assets/*` 해시 자산이나 전체(`/*`)에 걸면 캐시 이점이 사라진다.
+    assert re.search(r'^\s*header\s+/\s+Cache-Control\s+"no-cache"\s*$', code, re.M)
+    assert not re.search(r"^\s*header\s+(/\*|/assets\S*)\s+Cache-Control", code, re.M)
+    # R-U1-3: 정적 루트. Dockerfile 의 `COPY … /srv` 와 같은 값인지는 ⑬ 에서 묶는다.
+    assert re.search(r"^\s*root\s+\*\s+/srv\s*$", code, re.M)
     assert re.search(
         r'header\s+/manifest\.webmanifest\s+Content-Type\s+"application/manifest\+json"', code
     )
@@ -311,6 +318,13 @@ def test_dockerfile_stages_user_and_bases():
 
     assert not re.search(r"^COPY\b.*\.env", text, re.M)
 
+    # R-U1-3: 프론트 빌드를 담는 경로(`COPY --from=web-build … <경로>`)와 Caddyfile 의 `root * <경로>` 가
+    # 같은 값이어야 `/` 가 200 이다(다르면 정적 화면이 404/빈 화면).
+    copy = re.search(r"^COPY --from=web-build \S+ (\S+)\s*$", text, re.M)
+    root = re.search(r"^\s*root\s+\*\s+(\S+)\s*$", _code_text(CADDYFILE), re.M)
+    assert copy and root
+    assert copy.group(1) == root.group(1) == "/srv"
+
     web_text = text.split("AS web-build", 1)[1].split("AS caddy", 1)[0]
     before_ci = web_text.split("npm ci", 1)[0]
     assert "NODE_ENV=production" not in before_ci
@@ -319,9 +333,10 @@ def test_dockerfile_stages_user_and_bases():
 
 # ⑭ -------------------------------------------------------------------------------------------
 def test_dockerignore_excludes_secrets_and_vcs():
-    """⑭ .dockerignore 에 `.env`·`.git`·`web/node_modules` 줄(빌드 문맥에 비밀이 안 들어간다)."""
+    """⑭ .dockerignore 에 `.env`·`.env.*`·`.git`·`web/node_modules` 줄과 `*.pem`·`*.key`(R-U1-2 — 키 파일을
+    저장소 폴더에 두는 실수를 막는 유일한 장치). 빌드 문맥에 비밀이 안 들어간다."""
     lines = {ln.strip() for ln in _read(DOCKERIGNORE).splitlines()}
-    for entry in (".env", ".env.*", ".git", "web/node_modules"):
+    for entry in (".env", ".env.*", ".git", "web/node_modules", "*.pem", "*.key"):
         assert entry in lines, entry
 
 
@@ -330,6 +345,102 @@ def test_env_example_has_empty_site_address():
     """⑮ .env.example 에 `SITE_ADDRESS=` 이름 줄이 있고 값이 비어 있다."""
     lines = _read(ENV_EXAMPLE).splitlines()
     assert "SITE_ADDRESS=" in [ln.rstrip() for ln in lines]
+
+
+# ⑯·⑰ (U1b) ------------------------------------------------------------------------------------
+WORKFLOW = ".github/workflows/tests.yml"
+CI_JOB = "deploy-smoke"
+
+
+def _ci_job(name: str) -> str:
+    """워크플로의 `jobs:` 아래 2칸 들여쓴 job `name` 의 본문(주석 줄 제외). 없으면 빈 문자열.
+
+    PyYAML 없이 들여쓰기로 자른다 — job 키는 정확히 2칸 들여쓴 `name:` 줄이고, 본문은 다음 2칸 키 직전까지다.
+    """
+    lines = _code_lines(_read(WORKFLOW))
+    body: list[str] = []
+    in_jobs = False
+    inside = False
+    for line in lines:
+        if re.match(r"^jobs:\s*$", line):
+            in_jobs = True
+            continue
+        if not in_jobs:
+            continue
+        m = re.match(r"^ {2}([A-Za-z0-9_-]+):\s*$", line)
+        if m:
+            inside = m.group(1) == name
+            continue
+        if inside:
+            body.append(line)
+    return "\n".join(body)
+
+
+def _ci_job_names() -> set[str]:
+    names: set[str] = set()
+    in_jobs = False
+    for line in _code_lines(_read(WORKFLOW)):
+        if re.match(r"^jobs:\s*$", line):
+            in_jobs = True
+            continue
+        m = re.match(r"^ {2}([A-Za-z0-9_-]+):\s*$", line)
+        if in_jobs and m:
+            names.add(m.group(1))
+    return names
+
+
+# ⑯ -------------------------------------------------------------------------------------------
+def test_ci_deploy_smoke_job_contract():
+    """⑯ tests.yml 에 `deploy-smoke` job — 운영 compose(`docker-compose.prod.yml`)를 빌드·기동(--wait)하고
+    `/api/health` 의 `"db":"up"`·`/` 200·`/api/docs` 404·Traceback 0 을 본다. 실패 시 로그 출력, 끝에 down."""
+    job = _ci_job(CI_JOB)
+    assert job, f"tests.yml 에 {CI_JOB} job 이 없다"
+    assert re.search(r"^\s*runs-on:\s*ubuntu-latest\s*$", job, re.M)  # amd64 빌드 증거
+    assert re.search(r"^\s*timeout-minutes:\s*15\s*$", job, re.M)
+    assert not re.search(r"^\s*needs:", job, re.M), "pytest·windows·web 와 독립(병렬)이어야 한다"
+
+    # docker compose 호출은 전부 운영 파일 + 변수 파일을 가리킨다(로컬 개발 docker-compose.yml 금지).
+    compose_calls = re.findall(r"^\s*(?:run:\s*)?docker compose\b.*$", job, re.M)
+    assert len(compose_calls) >= 5, compose_calls
+    for call in compose_calls:
+        assert "-f docker-compose.prod.yml" in call, call
+        assert '--env-file "$APP_ENV_FILE"' in call, call
+    assert not re.search(r"docker-compose\.yml", job)  # prod 아닌 로컬 파일 이름이 없다
+
+    # --wait 에 상한을 두어 hang 이 "로그 있는 명시적 실패" 가 된다(R-U1b-2; job timeout 15분 안).
+    assert re.search(r"up -d --build --wait --wait-timeout 600\s*$", job, re.M)
+    # 러너 포트는 로컬 스모크와 같은 8088/8443 (R-U1b-3 — curl 주소와 어긋나면 잡힌다).
+    assert re.search(r'^\s*CADDY_HTTP_PORT:\s*"8088"\s*$', job, re.M)
+    assert re.search(r'^\s*CADDY_HTTPS_PORT:\s*"8443"\s*$', job, re.M)
+    assert "http://localhost:8088/api/health" in job
+    assert "\"db\":\"up\"" in job
+    assert re.search(r"curl -fsS -o /dev/null -w '%\{http_code\}' http://localhost:8088/\)", job)
+    assert 'test "$code" = "200"' in job
+    assert re.search(r"curl -s -o /dev/null -w '%\{http_code\}' http://localhost:8088/api/docs\)", job)
+    assert 'test "$code" = "404"' in job
+    assert "grep -q Traceback" in job
+    # 실패하면 로그를 남기고, 성공·실패와 무관하게 정리한다.
+    assert re.search(r"if: failure\(\)\s*\n\s*run: .*logs --tail=200", job)
+    assert re.search(r"if: always\(\)\s*\n\s*run: .*-f docker-compose\.prod\.yml down\s*$", job, re.M)
+
+    # 스모크 변수 파일 — 비밀 아닌 더미, LLM 키 없음, 스케줄러 끔, HTTP 전용(:80).
+    assert 'echo "POSTGRES_PASSWORD=ci-dummy"' in job
+    assert 'echo "SITE_ADDRESS=:80"' in job
+    assert 'echo "BRIEFING_SCHEDULER_ENABLED="' in job
+    assert "OPENAI_API_KEY" not in job
+    assert 'echo "APP_ENV_FILE=$f" >> "$GITHUB_ENV"' in job
+
+
+# ⑰ -------------------------------------------------------------------------------------------
+def test_ci_deploy_smoke_is_safe_and_independent():
+    """⑰ deploy-smoke 는 `secrets.` 0 · 비밀 모양 값 0 · 볼륨을 지우는 옵션 0(`-v`·`--volumes`·`volume rm`·prune),
+    기존 job(pytest·windows·web)은 그대로 있다."""
+    job = _ci_job(CI_JOB)
+    assert job, f"tests.yml 에 {CI_JOB} job 이 없다"
+    assert "secrets." not in job
+    assert _secret_hits(job) == []
+    assert not re.search(r"\s-v\b|--volumes|volume\s+(rm|prune)|\bprune\b", job)
+    assert {"pytest", "windows", "web", CI_JOB} <= _ci_job_names()
 
 
 # 보조 -----------------------------------------------------------------------------------------

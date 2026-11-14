@@ -1,0 +1,29 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b-review/caddy-adapt.sh
+# 시각: 2026-11-14T15:11:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+== caddy version
+v2.11.9 h1:bhZtcRKQOq0fuLvEgCdPYvUxXyGn9kzjG4lh2332DTE=
+== caddy validate
+Valid configuration
+== caddy adapt → header 핸들러의 path 매처(순서대로)
+adapt exit=0
+headers match.path=[['/manifest.webmanifest']] set={'Content-Type': ['application/manifest+json']} delete=
+headers match.path=[['/index.html']] set={'Cache-Control': ['no-cache']} delete=
+headers match.path=[['/sw.js']] set={'Cache-Control': ['no-cache']} delete=
+headers match.path=[['/']] set={'Cache-Control': ['no-cache']} delete=
+headers match.path=[None] set=None delete=True['Server']
+encode match.path=[None]
+subroute match.path=[['/api/*']]
+  rewrite match.path=[None]
+  static_response match.path=[['/docs*', '/redoc*', '/openapi.json']]
+  reverse_proxy match.path=[None]
+subroute match.path=[None]
+  vars match.path=[None]
+  rewrite match.path=[None]
+  file_server match.path=[None]
+Cache-Control 매처 집합: [('/',), ('/index.html',), ('/sw.js',)]
+PASS: `/` 정확 일치 매처 있음
+PASS: Cache-Control 매처에 와일드카드 없음

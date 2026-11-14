@@ -1,0 +1,17 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/43092def-7f6f-4756-af6b-c6fc1ddde2d0/scratchpad/p9-u1b/pre-state.sh
+# 시각: 2026-11-14T14:59:50+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 70fcd08 (dev2)
+# exit: 0
+# ---
+== docker ps
+broker-agent-postgres-1 Up 2 weeks (healthy)
+capstone2-postgres-1 Up 2 weeks (healthy)
+== relationship-prod 볼륨
+relationship-prod_caddy_config
+relationship-prod_caddy_data
+relationship-prod_pgdata
+== docker compose ls -a
+NAME                STATUS              CONFIG FILES
+broker-agent        running(1)          /Users/sunwoo/Desktop/Portfolio/broker-agent/docker-compose.yml
+capstone2           running(1)          /Users/sunwoo/Desktop/Portfolio/Relationship/docker-compose.yml
