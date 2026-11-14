@@ -64,7 +64,7 @@
 - 인물 단위 완전 삭제 API (`DELETE /persons/{id}` → CASCADE).
 - 저장 최소화: `pending_questions.context`에는 재개에 필요한 것만. 전체 대화 이력 저장 금지.
 - 웹푸시 VAPID 개인키는 환경변수/SSM. 프론트에는 공개키만.
-- ~~RDS 프라이빗 서브넷, 저장 시 암호화(RDS 기본), 전송 시 TLS(D7).~~ → **Neon 관리형 Postgres(CR-005 · D17)**: 접속은 `sslmode=require`(TLS), 접속 문자열은 Vercel 환경변수에만. 공개 기간(~2026-11-18) 뒤 Neon 프로젝트 삭제·비밀 회전이 종료 절차에 포함된다.
+- ~~RDS 프라이빗 서브넷, 저장 시 암호화(RDS 기본), 전송 시 TLS(D7).~~ → **AWS 최소 구성(CR-005 · D17 개정 ②)**: Postgres 는 같은 EC2 의 compose 컨테이너, **호스트 포트 미노출**(compose 네트워크 안에서만), 저장 암호화는 EBS 기본, 전송 TLS 는 Caddy(Let's Encrypt). 보안 그룹은 80·443 과 사용자 IP 의 22 만. `.env` 는 사용자가 서버에 직접 올린다. 공개 기간(~2026-11-19) 뒤 인스턴스·EBS·EIP 삭제와 비밀 회전이 종료 절차에 포함된다.
 - 멀티테넌시 미검증(부록 A) — 그래도 모든 조회는 `user_id` 조건을 넣는다.
 
 ## 6. 예외가 필요할 때

@@ -19,7 +19,7 @@
 | R11 | M | 반복 패턴 감지 메커니즘 없음 | 구현완료(d67d084 규칙 기반 감지(LLM 0회)·8d3967a 대화 턴마다 자동 실행; CR-002/D14 기본 365일·3회 설정값 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT` → 완료, P6-memory 04-review §2 ㄷ·ㄹ) | D14 → S3.5 → P6-memory |
 | R12 | M | 브리핑 트리거·푸시 구독 저장소 없음 | 구현완료(브리핑 트리거: P6-briefing e2155f9…e2cca80, 주기 작업+`POST /briefings/run` · 푸시 구독 저장·VAPID 발송: P7-push 85393e0…6428180, 데스크톱 Chrome 실수신 2026-10-10 · FIX-029 e555142) | S3.6 → P6-briefing, P7-push |
 | R13 | M | LLM·임베딩 비용 미산정 | 결정완료 | P0-cost |
-| R14 | M | CloudFront→EC2 TLS 미정 | **재결정(CR-005, 2026-11-14)** — TLS 는 Vercel·Neon 이 제공, Caddy·CloudFront 폐기 | D7(대체됨) → **D17** → P9-infra(재계획) |
+| R14 | M | CloudFront→EC2 TLS 미정 | **재결정(CR-005 개정 ②, 2026-11-14)** — CloudFront 없음, EC2 의 Caddy 가 직접 HTTPS(도메인 또는 sslip.io) | D7(대체됨) → **D17** → P9-infra(재계획) |
 | R15 | L | 데모 날짜 9/10(화) 달력 불일치 | 결정완료 | P11-demo |
 | R16 | L | 부록 수치가 결과처럼 읽힘 | 해소(문서) | proposal.md 상단 안내 |
 | R17 | L | 제목 "관계 그래프" ↔ A–B 제외 | 해소(문서) | D8 |

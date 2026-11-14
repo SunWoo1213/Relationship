@@ -1,6 +1,6 @@
 # 09 · AWS 배포 가이드라인 — 처음 규모: 사용자 몇 명 (P9 착수 전 기준 문서)
 
-> **대체됨(CR-005 · D17, 2026-11-14)**: 배포는 AWS 가 아니라 **Vercel + Neon** 으로 한다. 이 문서는 원안 기록으로 남긴다. 새 절차는 P9-infra 01-plan 과 `docs/user-setup/` 의 Vercel 문서(P9 에서 작성)를 본다. §2 결정 표·§7 확장 신호 중 규모 전제는 그대로 참고할 수 있다.
+> **부분 대체(CR-005 · D17 개정 ②, 2026-11-14)**: 배포는 이 문서의 풀구성이 아니라 **AWS 최소 구성**(EC2 1대 + Docker Compose: Caddy·FastAPI·Postgres, 프론트 정적도 Caddy, 공개 ~11-19 뒤 종료)으로 한다. **그대로 쓰는 것**: §2 결정 1(서울)·2(A안 compose DB)·3(인스턴스)·4(도메인 — 없으면 sslip.io)·8(EC2 에서 직접 빌드), §4.2 EC2 초기화 골격, §4.3 Caddyfile 골격, §5 운영 규칙 일부, §7 확장 신호. **쓰지 않는 것**: CloudFront·S3·Route 53 필수·Terraform(§4.1)·GitHub Actions 배포(§4.4)·SSM·RDS(B안)·매일 백업 파이프라인(5일 데모 — 종료 직전 `pg_dump` 1회로 갈음). 실제 절차는 P9-infra 01-plan 과 `11-ec2-minimal-deploy.md`(P9 에서 작성)를 본다.
 
 > Refs: P9 D7 D4 D11 S3.1 security §1 §4 · `SERVER-CHECKLIST.md` · `05-server-secrets.md` · `02-aws-budgets.md`
 > 이 카드는 **"어떤 모양으로, 얼마에, 어떤 순서로"** 를 정하는 가이드라인이다. Terraform·GitHub Actions 코드는 P9 에서 infra-agent 가 쓰고, `terraform apply`·콘솔 조작·비밀 값 입력은 전부 사용자 몫이다.

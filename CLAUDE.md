@@ -48,11 +48,11 @@
 ## 기술 스택
 
 - 백엔드: FastAPI (Python), Docker
-- 프론트: React + PWA — **Vercel 정적 호스팅**(CR-005 · D17, 2026-11-14. 원안 S3 + CloudFront 는 폐기)
+- 프론트: React + PWA — 정적 빌드를 **같은 EC2 의 Caddy 가 서빙**(CR-005 · D17 개정 ②, 2026-11-14. 원안 S3 + CloudFront 는 폐기)
 - DB: PostgreSQL + pgvector (RDS). 별도 벡터 DB 미도입 — 인물·별칭 테이블과 임베딩을 같은 DB에서 조인.
 - 임베딩: 별도 공급자 필요(Claude API에는 임베딩 엔드포인트가 없다). 공급자·차원은 임베딩 파일럿(D4) 후 확정.
-- 인프라(CR-005 · D17, 2026-11-14): **Vercel Hobby** — 백엔드는 FastAPI 를 Python 서버리스 함수 1개로, `/api/*` rewrite. DB 는 **Neon Free**(PostgreSQL + pgvector, TLS). 브리핑 주기 작업은 GitHub Actions `schedule`(5분)이 비밀 헤더로 `/api/briefings/run` 호출. 비밀은 Vercel 환경변수. **공개 기간 한정(~2026-11-18 졸업평가) 뒤 종료 절차.** 원안(Terraform·SSM·CloudFront→EC2 Caddy·RDS, D7)은 폐기.
-- 첫날 필수였던 AWS Budgets 알림은 CR-005 로 불필요 — 대신 **OpenAI 대시보드 월 지출 한도**(사용자 몫, 공개 기간 중 LLM 비용 상한)
+- 인프라(CR-005 · D17 개정 ②, 2026-11-14): **AWS 최소 구성** — EC2 1대에 Docker Compose 서비스 3개(`caddy` 자동 HTTPS + `/api/*` 접두 제거 프록시 + 프론트 정적 서빙 · `backend` FastAPI, 기동 시 `alembic upgrade head` · `postgres` pgvector 볼륨). DB 는 RDS 가 아니라 **compose 안 Postgres**. 브리핑 주기 작업은 컨테이너 안 1분 루프(`BRIEFING_SCHEDULER_ENABLED=1`). 비밀은 사용자가 EC2 에 올린 `.env`. 갱신은 SSH `git pull` + `compose up -d --build`. **공개 기간 한정(~2026-11-19, 졸업평가 11-18) 뒤 인스턴스 종료.** 원안(Terraform·SSM·CloudFront·RDS, D7)과 1차 CR-005 안(Vercel + Neon)은 폐기. **실제 기동은 사용자가 따로 지시할 때.**
+- 배포 전 필수: AWS Budgets 알림($10 / $30 / $50 — 계정 무료 자격에 따라 EC2 비용 발생 가능) + **OpenAI 대시보드 월 지출 한도**(공개 기간 중 LLM 비용 상한). 둘 다 사용자 몫.
 
 ## 툴 7종 (제품 속 에이전트가 호출) — 시그니처 v2
 

@@ -77,7 +77,7 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | `P7-push` | 웹푸시 | backend-agent | R12 |
 | `P8-frontend` | 프론트 3화면 + PWA | frontend-agent(U0 신설, `web/`) + backend-agent(조회 API U1~U3) | — |
 | `P8b-persons-grid` | 인물 화면 카드 그리드 + 이름·별칭 검색 + 사이드바 최근 5명 (CR-003 · D15) — P8 04-review 뒤 | frontend-agent(`web/`) + backend-agent(U0 — `GET /persons` 응답 `aliases` 필드만, 결정 K (나)) | — |
-| `P9-infra` | **Vercel(프론트 정적 + FastAPI Python 함수) + Neon + GitHub Actions 5분 스케줄, 공개 ~11-18 뒤 종료(CR-005 · D17)** — 원안 Terraform + Actions + Caddy 폐기 | backend-agent + frontend-agent + 사용자(콘솔·비밀·마이그레이션·종료) | R14 |
+| `P9-infra` | **AWS 최소 — EC2 1대 + Docker Compose(Caddy·FastAPI·Postgres/pgvector), 프론트 정적도 Caddy, 공개 ~11-19 뒤 종료(CR-005 · D17 개정 ②)** — 원안 Terraform·CloudFront·RDS·SSM 과 1차 Vercel 안 폐기. 실제 기동은 사용자 지시 뒤 | backend-agent(Dockerfile·compose·Caddyfile) + frontend-agent(빌드 확인) + 사용자(EC2·SSH·`.env`·기동·종료) | R14 |
 | `P10-final-eval` | 150건 + 최종 평가 | eval-agent | — |
 | `P11-demo` | 데모 리허설 | 사용자 | R15 |
 

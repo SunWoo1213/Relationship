@@ -1,31 +1,33 @@
-# D17 · 배포는 Vercel(프론트 정적 + FastAPI Python 함수) + Neon(PostgreSQL/pgvector), 기간 한정 공개
+# D17 · 배포는 AWS 최소 구성 — EC2 1대에 Docker Compose(Caddy·FastAPI·Postgres/pgvector), 프론트 정적도 Caddy, 기간 한정 공개
 
-상태: 유효 (D7 을 대체한다) | 해결하는 검증: R14(재결정) | 출처: CR-005 (제기 2026-11-13, 승인 2026-11-14, 사용자)
+상태: 유효 (D7 을 대체한다) | 해결하는 검증: R14(재결정) | 출처: CR-005 (제기 2026-11-13, 승인 2026-11-14, **개정 ② 2026-11-14 오후** — 1차 "Vercel + Neon" 에서 AWS 최소로 바뀜, 사용자)
 
 **결정**
-1. **플랫폼**: Vercel Hobby 프로젝트 1개. `web/` Vite 빌드는 정적 호스팅, FastAPI(`app.main:create_app`)는 **Python 서버리스 함수 1개**(Fluid compute, 최대 300초). `vercel.json` `rewrites` 로 `/api/*` → 함수(FastAPI 쪽은 `/api` 접두 제거 — 프론트 `API_BASE='/api'`·Vite 프록시 `stripApiPrefix` 와 같은 규약). Terraform·Dockerfile·Caddy·CloudFront·EC2·SSM 은 쓰지 않는다. 비밀은 Vercel 환경변수.
-2. **DB**: **Neon Free**(PostgreSQL + pgvector, Vercel Marketplace 연동으로 `DATABASE_URL` 주입, `sslmode=require`). 스키마 v2·Alembic 그대로. `alembic upgrade head` 는 사용자 로컬 또는 GitHub Actions 수동 워크플로에서 Neon 을 향해 실행(실행 주체 = 사용자, R-U10D-4 대응). 5분 유휴 자동 중지·접속 시 자동 재개는 수용.
-3. **주기 작업**: `BRIEFING_SCHEDULER_ENABLED` 는 배포에서 **끈다**(서버리스에 상주 루프 없음). 대신 **GitHub Actions `schedule`(5분, 공개 저장소 무료)** 이 비밀 헤더 `X-Briefing-Token`(이름은 P9 01-plan 결정)으로 `POST /api/briefings/run` 을 부른다. 그 엔드포인트는 헤더가 없거나 다르면 404/401(P9 결정). Vercel cron(Hobby 하루 1회)은 쓰지 않는다 — 브리핑 "만남 직전(≤24h)" 의미 유지, 지연 ≤ 5분(+Actions 지연).
-4. **공개 보호**: 접근 코드·로그인 **없음**. **공개 기간 2026-11-14 ~ 2026-11-18(수, 졸업평가)**. 종료 절차(P9 수용 기준): Vercel 배포 삭제 또는 프로젝트 비공개 · GitHub Actions 스케줄 비활성 · Neon 프로젝트 삭제 · 비밀 값(OpenAI 키·VAPID·브리핑 토큰) 회전. 공개 중 LLM 비용은 OpenAI 월 지출 한도(사용자 몫)로 막는다. 사용자 격리(구글 로그인, F-fbaaae)는 여전히 미결 — 단일 사용자 `APP_USER_ID` 데모.
-5. **웹푸시**: `pywebpush` 발송은 함수 안에서 그대로(상태 없음). VAPID 키는 Vercel 환경변수. 구독 저장은 Neon.
+1. **구성**: EC2 **1대**(퍼블릭 서브넷, Elastic IP)에 Docker Compose 서비스 3개 — `caddy`(80/443, 자동 HTTPS, `/api/*` 는 `handle_path` 로 접두를 떼고 `backend` 로 프록시, 그 밖은 프론트 정적 빌드 `file_server`) · `backend`(FastAPI uvicorn, entrypoint 가 `alembic upgrade head` 뒤 기동) · `postgres`(`pgvector/pgvector:pg16`, 볼륨 `pgdata`, 호스트 포트 미노출). **S3·CloudFront·RDS·ALB·NAT·Terraform·SSM·ECR 없음.** 기존 `docker-compose.yml`(로컬 DB 전용)은 그대로 두고 `docker-compose.prod.yml`·`Dockerfile`·`Caddyfile` 을 새로 만든다.
+2. **HTTPS**: Caddy 가 Let's Encrypt 로 발급. 호스트명은 보유 도메인이 있으면 그것, 없으면 `sslip.io` 류 IP 기반 무료 호스트명(P9 01-plan 결정). PWA·웹푸시는 HTTPS 필수라 생략 불가.
+3. **주기 작업**: 서버 안 1분 루프 그대로(`BRIEFING_SCHEDULER_ENABLED=1`, S3.6 원문). 외부 스케줄·비밀 헤더·`/api` 접두 래퍼는 **만들지 않는다**(제품 코드 변경 0).
+4. **비밀**: `.env` 는 사용자가 EC2 에 직접 올린다(security §1). 저장소·이미지에 값 없음.
+5. **배포·갱신**: 사용자가 SSH 로 `git pull` → `docker compose -f docker-compose.prod.yml up -d --build`. 이미지 태그 = 커밋 해시(SERVER-CHECKLIST 0-4). GitHub Actions 배포 워크플로는 만들지 않는다(기간이 5일).
+6. **공개 기간**: 2026-11-14 ~ **2026-11-19(목)** (졸업평가 11-18 다음 날 종료). 종료 절차(P9 수용 기준): 인스턴스 종료 + EBS 볼륨·EIP 해제 확인 · 보안 그룹 삭제 · 비밀 값 회전(OpenAI·VAPID) · AWS Budgets 알림은 유지. 접근 코드·로그인은 없음(발표용). LLM 비용은 OpenAI 월 지출 한도(사용자). **계정은 신규 가입(사용자 2026-11-14), 비상업·개인 학습 용도.** 2025-07 이후 신규 계정은 크레딧 방식 Free Plan($100 + 활동 최대 $100, 6개월) — 적격 인스턴스(t3.micro·t4g.small 등)도 크레딧에서 차감되므로 **Budgets 알림($10/$30/$50, user-setup 02)을 EC2 생성 전에 켠다.** 5일 공개 비용은 크레딧 안(약 $3 안팎 추정, P9 01-plan 에서 재계산).
+7. **백업**: 공개 5일·데모 데이터라 자동 백업 파이프라인은 두지 않는다. 종료 직전 `pg_dump` 1회를 사용자가 내려받는 것으로 갈음(09 가이드 §5 의 "A안 백업 필수" 예외 — 기간 한정 데모).
+8. **실제 기동 시점**: 사용자가 따로 지시할 때. P9 계획·파일 작성·로컬 compose 스모크까지는 에이전트, EC2 생성·기동·DNS 는 사용자.
 
 **이유**
-- 사용자 지시(CR-005): Vercel, 무료 티어, 졸업평가(11-18)까지만 공개. AWS 구성(D7)은 비용·준비 시간이 발표 일정에 맞지 않고 IaC 작성 분량이 크다.
-- Neon 은 Supabase 와 달리 7일 무요청 일시중지가 없어(자동 재개) 드물게 열리는 데모가 죽어 있지 않다.
-- Vercel Hobby cron 은 하루 1회라 S3.6 의 "≤24h 전 브리핑" 을 분 단위로 지키지 못한다. GitHub Actions 스케줄은 공개 저장소에서 무료고 기존 수동 트리거 엔드포인트를 그대로 쓴다(코드 변경 = 보호 헤더 1개).
+- 사용자 선택(CR-005 개정 ②): Vercel 안은 제품 코드 4단위(`/api` 래퍼·브리핑 토큰·DSN 수정·Actions 스케줄)를 요구했고 자동 브리핑이 main 승격 뒤에나 돌았다. AWS 최소는 **제품 코드 변경 0** 으로 지금 로컬 구성을 그대로 올리고 1분 스케줄러도 그대로 돈다. 대신 사용자 콘솔·서버 작업이 늘고 계정 무료 자격에 따라 비용이 생길 수 있다 — 비교표를 보고 사용자가 골랐다.
+- 원안 D7(CloudFront·RDS·Terraform·SSM)은 몇 명 규모·5일 공개에 과하다(09 가이드 §6 "하지 않는 것" 과 같은 논리를 더 밀었다).
 
 **파급**
-- S3.6 운용 절 보충(주기 작업의 실행 주체가 컨테이너 루프 → 외부 스케줄 호출). S3.1~S3.5·S3.7 무변경.
-- P9-infra 01-plan 재작성(infra-agent 신설 불필요 — backend-agent: `vercel.json`·함수 진입점·`/briefings/run` 헤더·`BRIEFING_SCHEDULER_ENABLED` 기본 off 확인 · frontend-agent: 빌드 출력·`/api` 규약 확인 · 사용자: Vercel/Neon 콘솔·환경변수·`alembic upgrade head`·OpenAI 한도·종료). 스모크 S1~S15(review-u10-deploy-validity) 중 Dockerfile·RDS·CloudFront 항목은 Vercel·Neon 대응 항목으로 치환.
-- CLAUDE.md 기술 스택 2줄, backlog P9, review-index R14, INDEX P9 행, user-setup 09(AWS 가이드)·02(AWS Budgets) 상단 "대체됨", security §5 "RDS 프라이빗 서브넷" → "Neon TLS 접속".
-- 원칙 5·7 무관. 보안 카드 §1(비밀은 Vercel 환경변수에만)·§5 유지.
+- S3.6: 운용 보충 불필요(원문 그대로 — 1분 루프). CLAUDE.md 기술 스택 3줄(프론트 서빙·인프라·Budgets). backlog P9 항목, review-index R14, INDEX P9 행. user-setup 09(AWS 가이드)는 **부분 유효**(§2 결정 1·2·3·4·8, §5 운영 규칙 일부, §7 확장 신호) — CloudFront·Terraform·SSM·Actions 절은 이번에 쓰지 않음. user-setup 02(Budgets) **다시 필수**. security §5: 저장 암호화는 EBS 기본, 전송 TLS 는 Caddy.
+- P9-infra 01-plan 재작성(architect) — 단위: `Dockerfile`·`docker-compose.prod.yml`·`Caddyfile`·entrypoint(backend-agent, 로컬 compose 스모크 포함), 프론트 빌드 산출물 경로 확인(frontend-agent, 변경 0 기대), user-setup 11(EC2 절차)·12(종료 체크리스트)(메인), 첫 기동·스모크(사용자 지시 뒤). 스모크 S1~S15 중 RDS·CloudFront 항목은 compose·Caddy 대응으로 치환.
+- 원칙 5·7 무관. security §1(비밀은 `.env` 를 사용자가 서버에 직접)·§4(destroy·`down -v` 금지는 종료 절차에서 사용자만) 유지.
 
 **코드에서 지켜야 할 것**
-1. `vercel.json` 의 `rewrites` 는 `/api/(.*)` 한 줄로 FastAPI 함수를 가리키고, FastAPI 라우트에는 `/api` 접두가 없다(기존 `app/api/routes.py` 경로 그대로).
-2. `POST /briefings/run` 은 비밀 헤더 검사 없이 실행되지 않는다(테스트: 헤더 없음 → 실행 0·응답 404 또는 401, 맞는 헤더 → 기존 동작). 토큰 값은 코드·문서에 없다(`.env.example` 에 이름만).
-3. 배포 설정에서 `BRIEFING_SCHEDULER_ENABLED` 는 비어 있거나 `0`(lifespan 루프 없음).
-4. `.github/workflows/` 의 스케줄 워크플로는 `secrets.*` 로만 토큰·URL 을 읽고, 저장소 파일에 값이 없다.
-5. 종료 절차 체크리스트가 `docs/user-setup/` 에 있고 P9 04-review 가 그 존재를 증거로 든다.
+1. 제품 코드(`app/`·`web/src/`·`alembic/`)는 이 결정으로 바뀌지 않는다 — `git diff --stat <기준>..HEAD -- app web/src alembic` 빈 출력.
+2. `Caddyfile` 의 `/api/*` 는 `handle_path`(접두 제거)로 `backend:8000` 에 프록시하고, 나머지는 `web/dist` 정적 `file_server`(SPA fallback `try_files … /index.html`).
+3. `docker-compose.prod.yml` 의 `postgres` 는 호스트 포트를 노출하지 않고(`ports` 없음), 볼륨 `pgdata` 를 쓴다. `backend` 의 `DATABASE_URL` 은 compose 네트워크 이름(`postgres:5432`)을 가리킨다.
+4. `backend` 컨테이너는 기동 시 `alembic upgrade head` 를 먼저 실행하고 실패하면 죽는다(`docker compose ps` 로 보임).
+5. 저장소·이미지·compose 파일에 비밀 값이 없다(`.env` 는 `env_file` 로 참조만). `BRIEFING_SCHEDULER_ENABLED=1` 은 운영 `.env` 에서 켠다(기본값 off 유지).
+6. 종료 체크리스트가 `docs/user-setup/` 에 있고 P9 04-review 가 그 존재를 증거로 든다.
 
 **갱신 이력**
-- 2026-11-14 신설(CR-005). 구현은 P9-infra 재계획 — 완료 해시는 그때 적는다.
+- 2026-11-14 신설(CR-005 1차: Vercel Python 함수 + Neon Free + GitHub Actions 5분 스케줄, 공개 ~11-18). 같은 날 **개정 ②**: 사용자 선택으로 AWS 최소 구성(EC2 1대 + Compose, 코드 변경 0, 1분 루프 유지, 공개 ~11-19)으로 전면 교체. Vercel 조사 사실은 CR-005 §2-1 에 기록으로 남김. 구현은 P9-infra 재계획 — 완료 해시는 그때 적는다. 파일명 `D17-vercel-deploy.md` 는 링크 유지를 위해 그대로 둔다.
