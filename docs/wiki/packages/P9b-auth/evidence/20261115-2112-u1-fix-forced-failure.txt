@@ -1,0 +1,112 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-1
+# 시각: 2026-11-15T21:12:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-1: alembic/versions/0003_auth_users.py
+    - '    op.execute("DELETE FROM persons")\n'
+    + ''
+........F
+=================================== FAILURES ===================================
+______________________ test_upgrade_clears_all_user_data _______________________
+
+mig = {'before': {'agent_traces': 1, 'events': 1, 'fact_sources': 1, 'pending_questions': 1, ...}, 'cfg': <alembic.config.Co...g://app:***@localhost:5433/relationship_test_mig_v15), 'env': <_EnvOverrides keys=['POSTGRES_DB', 'TEST_POSTGRES_DB']>}
+
+    def test_upgrade_clears_all_user_data(mig):
+        # 시작 상태가 실제로 채워져 있었음을 먼저 값으로 확인(빈 DB 에서 통과하는 가짜 시험 방지).
+        assert mig["before"] == {t: 1 for t in CLEARED_TABLES}
+        with mig["engine"].connect() as c:
+            after = {
+                t: c.execute(text(f"SELECT count(*) FROM {t}")).scalar_one()
+                for t in CLEARED_TABLES
+            }
+>       assert after == {t: 0 for t in CLEARED_TABLES}
+E       AssertionError: assert {'agent_trace...ions': 0, ...} == {'agent_trace...ions': 0, ...}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Differing items:
+E         {'person_facts': 1} != {'person_facts': 0}
+E         {'events': 1} != {'events': 0}
+E         {'schedules': 1} != {'schedules': 0}
+E         {'persons': 1} != {'persons': 0}
+E         {'fact_sources': 1} != {'fact_sources': 0}
+E         {'person_aliases': 1} != {'person_aliases': 0}
+E         
+E         Full diff:
+E           {
+E               'agent_traces': 0,
+E         -     'events': 0,
+E         ?               ^
+E         +     'events': 1,
+E         ?               ^
+E         -     'fact_sources': 0,
+E         ?                     ^
+E         +     'fact_sources': 1,
+E         ?                     ^
+E               'pending_questions': 0,
+E         -     'person_aliases': 0,
+E         ?                       ^
+E         +     'person_aliases': 1,
+E         ?                       ^
+E         -     'person_facts': 0,
+E         ?                     ^
+E         +     'person_facts': 1,
+E         ?                     ^
+E         -     'persons': 0,
+E         ?                ^
+E         +     'persons': 1,
+E         ?                ^
+E               'push_subscriptions': 0,
+E         -     'schedules': 0,
+E         ?                  ^
+E         +     'schedules': 1,
+E         ?                  ^
+E           }
+
+tests/test_migration_0003.py:324: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_migration_0003.py::test_upgrade_clears_all_user_data - AssertionError: assert {'agent_trace...ions': 0, ...} == {'agent_trace...ions': 0, ...}
+  
+  Omitting 3 identical items, use -vv to show
+  Differing items:
+  {'person_facts': 1} != {'person_facts': 0}
+  {'events': 1} != {'events': 0}
+  {'schedules': 1} != {'schedules': 0}
+  {'persons': 1} != {'persons': 0}
+  {'fact_sources': 1} != {'fact_sources': 0}
+  {'person_aliases': 1} != {'person_aliases': 0}
+  
+  Full diff:
+    {
+        'agent_traces': 0,
+  -     'events': 0,
+  ?               ^
+  +     'events': 1,
+  ?               ^
+  -     'fact_sources': 0,
+  ?                     ^
+  +     'fact_sources': 1,
+  ?                     ^
+        'pending_questions': 0,
+  -     'person_aliases': 0,
+  ?                       ^
+  +     'person_aliases': 1,
+  ?                       ^
+  -     'person_facts': 0,
+  ?                     ^
+  +     'person_facts': 1,
+  ?                     ^
+  -     'persons': 0,
+  ?                ^
+  +     'persons': 1,
+  ?                ^
+        'push_subscriptions': 0,
+  -     'schedules': 0,
+  ?                  ^
+  +     'schedules': 1,
+  ?                  ^
+    }
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 8 passed in 0.37s
+=== 변이 V1-1 pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)

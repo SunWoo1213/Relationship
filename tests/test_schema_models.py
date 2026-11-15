@@ -55,6 +55,7 @@ S3_1_TABLE_COLUMNS = {
     "pending_questions": {
         "id",
         "session_id",
+        "user_id",
         "kind",
         "question",
         "options",
@@ -75,9 +76,20 @@ S3_1_TABLE_COLUMNS = {
         "tokens_out",
         "created_at",
     },
+    # 보충(CR-006 · D18, S3.1 0003) — 계정과 계정별 격리.
+    "users": {"id", "username", "password_hash", "created_at"},
+    "auth_sessions": {"id", "user_id", "token_hash", "created_at", "expires_at"},
+    "chat_messages": {"id", "user_id", "role", "content", "question_id", "created_at"},
 }
 
-NULLABLE_COLUMNS = {"embedding", "confirmed_at", "briefed_at", "answer", "answered_at"}
+NULLABLE_COLUMNS = {
+    "embedding",
+    "confirmed_at",
+    "briefed_at",
+    "answer",
+    "answered_at",
+    "question_id",
+}
 
 JSONB_COLUMNS = {
     ("pending_questions", "options"),
@@ -110,6 +122,9 @@ EXPECTED_FKS = {
     ("schedules", "person_id", "persons", "id"),
     ("fact_sources", "fact_id", "person_facts", "id"),
     ("fact_sources", "event_id", "events", "id"),
+    # 보충(0003) — 새 테이블 두 곳만 users FK. 기존 user_id 컬럼에는 FK 가 없다(결정 O).
+    ("auth_sessions", "user_id", "users", "id"),
+    ("chat_messages", "user_id", "users", "id"),
 }
 
 
@@ -118,10 +133,10 @@ def _table(name: str):
 
 
 def test_table_name_set_matches_s3_1_exactly_and_person_embeddings_absent():
-    """9개 테이블 이름이 S3.1 과 정확히 같고 person_embeddings 는 없다(D5 R9)."""
+    """12개 테이블 이름이 S3.1(+0003 보충)과 정확히 같고 person_embeddings 는 없다(D5 R9)."""
     names = set(Base.metadata.tables.keys())
     assert names == set(S3_1_TABLE_COLUMNS.keys())
-    assert len(names) == 9
+    assert len(names) == 12
     assert "person_embeddings" not in names
 
 
@@ -135,13 +150,13 @@ def test_each_table_column_set_matches_s3_1_exactly():
         )
 
 
-def test_total_column_count_equals_56_verified_by_literal_transcription_of_s3_1():
-    """S3.1 컬럼을 테이블별로 세어 합산하면 56개다 (위임 프롬프트의 "55" 는 오기 —
-    03-log 에 근거 표와 함께 기록)."""
+def test_total_column_count_equals_72_verified_by_literal_transcription_of_s3_1():
+    """S3.1 컬럼을 테이블별로 세어 합산하면 72개다. 원본 56 + 0003 보충 16
+    (users 4 + auth_sessions 5 + chat_messages 6 + pending_questions.user_id 1)."""
     total = sum(len(cols) for cols in S3_1_TABLE_COLUMNS.values())
     actual_total = sum(len(t.columns) for t in Base.metadata.tables.values())
-    assert total == 56
-    assert actual_total == 56
+    assert total == 72
+    assert actual_total == 72
 
 
 def _check_constraints(table_name: str) -> list[CheckConstraint]:
@@ -191,25 +206,26 @@ def test_pending_questions_kind_check_contains_all_three_kinds():
         assert value in sql_text
 
 
-def test_exactly_four_check_constraints_exist_total():
-    """CHECK 제약이 정확히 4개(events, persons x2, pending_questions)다."""
+def test_exactly_five_check_constraints_exist_total():
+    """CHECK 제약이 정확히 5개(events, persons x2, pending_questions, chat_messages)다."""
     total = sum(
         len(_check_constraints(t))
         for t in ("events", "persons", "pending_questions", "person_aliases", "person_facts",
-                   "fact_sources", "schedules", "push_subscriptions", "agent_traces")
+                   "fact_sources", "schedules", "push_subscriptions", "agent_traces",
+                   "chat_messages")
     )
-    assert total == 4
+    assert total == 5
 
 
-def test_all_six_foreign_keys_have_ondelete_cascade():
-    """FK 6개 모두 ondelete='CASCADE' 이고 기대한 (table, col, ref_table, ref_col) 집합과 같다."""
+def test_all_eight_foreign_keys_have_ondelete_cascade():
+    """FK 8개 모두 ondelete='CASCADE' 이고 기대한 (table, col, ref_table, ref_col) 집합과 같다."""
     found = set()
     for table in Base.metadata.tables.values():
         for fk in table.foreign_keys:
             assert fk.ondelete == "CASCADE", f"{table.name}.{fk.parent.name} ondelete={fk.ondelete}"
             found.add((table.name, fk.parent.name, fk.column.table.name, fk.column.name))
     assert found == EXPECTED_FKS
-    assert len(found) == 6
+    assert len(found) == 8
 
 
 def test_fact_sources_has_composite_primary_key_and_no_surrogate_id_column():
@@ -229,8 +245,9 @@ def test_person_aliases_embedding_is_nullable_vector_of_dimension_1536():
     assert column.nullable is True
 
 
-def test_nullable_columns_are_exactly_the_five_deferred_fields():
-    """nullable 컬럼이 정확히 {embedding, confirmed_at, briefed_at, answer, answered_at} 뿐이다(F-08e812)."""
+def test_nullable_columns_are_exactly_the_six_deferred_fields():
+    """nullable 컬럼이 정확히 {embedding, confirmed_at, briefed_at, answer, answered_at,
+    question_id} 뿐이다(F-08e812 + 0003 보충 `chat_messages.question_id`)."""
     nullable_found = set()
     for table in Base.metadata.tables.values():
         for column in table.columns:
@@ -287,7 +304,10 @@ EXPECTED_INDEXES = {
     "pending_questions": [
         ("ix_pending_questions_session_id_created_at", None),
         ("ix_pending_questions_session_id_unanswered", "partial"),
+        ("ix_pending_questions_user_id_answered_at", None),
     ],
+    "auth_sessions": [("ix_auth_sessions_user_id", None)],
+    "chat_messages": [("ix_chat_messages_user_id_created_at", None)],
     "person_facts": [("ix_person_facts_person_id_key", None)],
     "fact_sources": [("ix_fact_sources_event_id", None)],
     "agent_traces": [("ix_agent_traces_session_id_created_at", None)],
@@ -295,7 +315,7 @@ EXPECTED_INDEXES = {
 
 
 def test_all_expected_indexes_exist_with_partial_index_having_postgresql_where():
-    """계획의 인덱스 목록(부분 인덱스 포함) 10개가 각 테이블에 존재한다."""
+    """계획의 인덱스 목록(부분 인덱스 포함) 13개(원본 10 + 0003 보충 3)가 각 테이블에 존재한다."""
     total = 0
     for table_name, expected in EXPECTED_INDEXES.items():
         table = _table(table_name)
@@ -306,7 +326,7 @@ def test_all_expected_indexes_exist_with_partial_index_having_postgresql_where()
             if kind == "partial":
                 where_clause = index_by_name[index_name].dialect_options["postgresql"]["where"]
                 assert where_clause is not None
-    assert total == 10
+    assert total == 13
 
 
 def test_ddl_compiles_with_vector_1536_and_on_delete_cascade_in_postgresql_dialect():

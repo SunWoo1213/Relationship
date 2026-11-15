@@ -52,6 +52,7 @@ def _make_question_row(
         context = {}
     row = PendingQuestion(
         session_id=session_id,
+        user_id="local",
         kind=kind,
         question=question,
         options=options,
@@ -88,7 +89,7 @@ def test_health_ok(client: TestClient) -> None:
     body = resp.json()
     assert body["status"] == "ok"
     assert body["db"] == "up"
-    assert body["alembic_revision"] == "0002"  # FIX-020 -- 0002 리비전 추가
+    assert body["alembic_revision"] == "0003"  # P9b-auth U1 -- 0003 리비전 추가(R3-1)
 
     text = resp.text
     assert "postgresql://" not in text

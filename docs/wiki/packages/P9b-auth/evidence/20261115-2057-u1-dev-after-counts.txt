@@ -1,0 +1,18 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/count_dev.py
+# 시각: 2026-11-15T20:57:11+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+user=app host=localhost port=5433 dbname=relationship (source=POSTGRES_*)
+alembic_version: 0003
+persons: 0
+person_aliases: 0
+person_facts: 0
+events: 0
+fact_sources: 0
+schedules: 0
+pending_questions: 0
+push_subscriptions: 0
+agent_traces: 0
+users 테이블: users

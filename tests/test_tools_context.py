@@ -94,6 +94,7 @@ def _make_pending_question(
         options = ["예", "아니오"]
     row = PendingQuestion(
         session_id=session_id,
+        user_id="local",
         kind=kind,
         question=question,
         options=options,

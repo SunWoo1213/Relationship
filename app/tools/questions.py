@@ -216,6 +216,7 @@ def ask_user(
 
     row = PendingQuestion(
         session_id=ctx.session_id,
+        user_id=ctx.user_id,
         kind=kind,
         question=normalized_question,
         options=list(normalized_options),

@@ -1,0 +1,1226 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-1
+# 시각: 2026-11-15T21:00:11+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-1: alembic/versions/0003_auth_users.py
+    - '    op.execute("DELETE FROM persons")\n'
+    + ''
+........F
+=================================== FAILURES ===================================
+______________________ test_upgrade_clears_all_user_data _______________________
+
+mig = {'before': {'agent_traces': 1, 'events': 1, 'fact_sources': 1, 'pending_questions': 1, ...}, 'cfg': <alembic.config.Co... 'env': {'AI_AGENT': 'claude-code_2-1-325_agent', 'CI': '1', 'CLAUDECODE': '1', 'CLAUDE_CODE_CHILD_SESSION': '1', ...}}
+
+    def test_upgrade_clears_all_user_data(mig):
+        # 시작 상태가 실제로 채워져 있었음을 먼저 값으로 확인(빈 DB 에서 통과하는 가짜 시험 방지).
+        assert mig["before"] == {t: 1 for t in CLEARED_TABLES}
+        with mig["engine"].connect() as c:
+            after = {
+                t: c.execute(text(f"SELECT count(*) FROM {t}")).scalar_one()
+                for t in CLEARED_TABLES
+            }
+>       assert after == {t: 0 for t in CLEARED_TABLES}
+E       AssertionError: assert {'agent_trace...ions': 0, ...} == {'agent_trace...ions': 0, ...}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Differing items:
+E         {'persons': 1} != {'persons': 0}
+E         {'fact_sources': 1} != {'fact_sources': 0}
+E         {'events': 1} != {'events': 0}
+E         {'person_aliases': 1} != {'person_aliases': 0}
+E         {'schedules': 1} != {'schedules': 0}
+E         {'person_facts': 1} != {'person_facts': 0}
+E         
+E         Full diff:
+E           {
+E               'agent_traces': 0,
+E         -     'events': 0,
+E         ?               ^
+E         +     'events': 1,
+E         ?               ^
+E         -     'fact_sources': 0,
+E         ?                     ^
+E         +     'fact_sources': 1,
+E         ?                     ^
+E               'pending_questions': 0,
+E         -     'person_aliases': 0,
+E         ?                       ^
+E         +     'person_aliases': 1,
+E         ?                       ^
+E         -     'person_facts': 0,
+E         ?                     ^
+E         +     'person_facts': 1,
+E         ?                     ^
+E         -     'persons': 0,
+E         ?                ^
+E         +     'persons': 1,
+E         ?                ^
+E               'push_subscriptions': 0,
+E         -     'schedules': 0,
+E         ?                  ^
+E         +     'schedules': 1,
+E         ?                  ^
+E           }
+
+tests/test_migration_0003.py:308: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_migration_0003.py::test_upgrade_clears_all_user_data - AssertionError: assert {'agent_trace...ions': 0, ...} == {'agent_trace...ions': 0, ...}
+  
+  Omitting 3 identical items, use -vv to show
+  Differing items:
+  {'persons': 1} != {'persons': 0}
+  {'fact_sources': 1} != {'fact_sources': 0}
+  {'events': 1} != {'events': 0}
+  {'person_aliases': 1} != {'person_aliases': 0}
+  {'schedules': 1} != {'schedules': 0}
+  {'person_facts': 1} != {'person_facts': 0}
+  
+  Full diff:
+    {
+        'agent_traces': 0,
+  -     'events': 0,
+  ?               ^
+  +     'events': 1,
+  ?               ^
+  -     'fact_sources': 0,
+  ?                     ^
+  +     'fact_sources': 1,
+  ?                     ^
+        'pending_questions': 0,
+  -     'person_aliases': 0,
+  ?                       ^
+  +     'person_aliases': 1,
+  ?                       ^
+  -     'person_facts': 0,
+  ?                     ^
+  +     'person_facts': 1,
+  ?                     ^
+  -     'persons': 0,
+  ?                ^
+  +     'persons': 1,
+  ?                ^
+        'push_subscriptions': 0,
+  -     'schedules': 0,
+  ?                  ^
+  +     'schedules': 1,
+  ?                  ^
+    }
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 8 passed in 0.36s
+=== 변이 V1-1 pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)
+
+# ===== append 2026-11-15T21:00:11+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-1b
+# 시각: 2026-11-15T21:00:11+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-1b: alembic/versions/0003_auth_users.py
+    - '    op.execute("DELETE FROM agent_traces")\n'
+    + ''
+........F
+=================================== FAILURES ===================================
+______________________ test_upgrade_clears_all_user_data _______________________
+
+mig = {'before': {'agent_traces': 1, 'events': 1, 'fact_sources': 1, 'pending_questions': 1, ...}, 'cfg': <alembic.config.Co... 'env': {'AI_AGENT': 'claude-code_2-1-325_agent', 'CI': '1', 'CLAUDECODE': '1', 'CLAUDE_CODE_CHILD_SESSION': '1', ...}}
+
+    def test_upgrade_clears_all_user_data(mig):
+        # 시작 상태가 실제로 채워져 있었음을 먼저 값으로 확인(빈 DB 에서 통과하는 가짜 시험 방지).
+        assert mig["before"] == {t: 1 for t in CLEARED_TABLES}
+        with mig["engine"].connect() as c:
+            after = {
+                t: c.execute(text(f"SELECT count(*) FROM {t}")).scalar_one()
+                for t in CLEARED_TABLES
+            }
+>       assert after == {t: 0 for t in CLEARED_TABLES}
+E       AssertionError: assert {'agent_trace...ions': 0, ...} == {'agent_trace...ions': 0, ...}
+E         
+E         Omitting 8 identical items, use -vv to show
+E         Differing items:
+E         {'agent_traces': 1} != {'agent_traces': 0}
+E         
+E         Full diff:
+E           {
+E         -     'agent_traces': 0,
+E         ?                     ^
+E         +     'agent_traces': 1,
+E         ?                     ^
+E               'events': 0,
+E               'fact_sources': 0,
+E               'pending_questions': 0,
+E               'person_aliases': 0,
+E               'person_facts': 0,
+E               'persons': 0,
+E               'push_subscriptions': 0,
+E               'schedules': 0,
+E           }
+
+tests/test_migration_0003.py:308: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_migration_0003.py::test_upgrade_clears_all_user_data - AssertionError: assert {'agent_trace...ions': 0, ...} == {'agent_trace...ions': 0, ...}
+  
+  Omitting 8 identical items, use -vv to show
+  Differing items:
+  {'agent_traces': 1} != {'agent_traces': 0}
+  
+  Full diff:
+    {
+  -     'agent_traces': 0,
+  ?                     ^
+  +     'agent_traces': 1,
+  ?                     ^
+        'events': 0,
+        'fact_sources': 0,
+        'pending_questions': 0,
+        'person_aliases': 0,
+        'person_facts': 0,
+        'persons': 0,
+        'push_subscriptions': 0,
+        'schedules': 0,
+    }
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 8 passed in 0.37s
+=== 변이 V1-1b pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)
+
+# ===== append 2026-11-15T21:00:12+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-2
+# 시각: 2026-11-15T21:00:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-2: alembic/versions/0003_auth_users.py
+    - '        sa.UniqueConstraint("username", name=op.f("uq_users_username")),\n'
+    + ''
+..F
+=================================== FAILURES ===================================
+________________________ test_users_username_is_unique _________________________
+
+mig = {'before': {'agent_traces': 1, 'events': 1, 'fact_sources': 1, 'pending_questions': 1, ...}, 'cfg': <alembic.config.Co... 'env': {'AI_AGENT': 'claude-code_2-1-325_agent', 'CI': '1', 'CLAUDECODE': '1', 'CLAUDE_CODE_CHILD_SESSION': '1', ...}}
+
+    def test_users_username_is_unique(mig):
+>       err = _constraint_violated(
+            mig["engine"],
+            "INSERT INTO users (id, username, password_hash) VALUES ('u-b', 'dup', 'h')",
+            setup=("INSERT INTO users (id, username, password_hash) VALUES ('u-a', 'dup', 'h')",),
+        )
+
+tests/test_migration_0003.py:209: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+engine = Engine(postgresql+psycopg://app:***@localhost:5433/relationship_test_mig)
+sql = "INSERT INTO users (id, username, password_hash) VALUES ('u-b', 'dup', 'h')"
+setup = ("INSERT INTO users (id, username, password_hash) VALUES ('u-a', 'dup', 'h')",)
+
+    def _constraint_violated(
+        engine: Engine, sql: str, setup: tuple[str, ...] = ()
+    ) -> IntegrityError:
+        """`setup` 을 실행한 뒤 `sql` 이 IntegrityError 를 내는지 확인해 돌려준다.
+    
+        전부 한 트랜잭션 안에서 돌고 끝에 항상 롤백한다(시험 행을 남기지 않는다).
+        """
+        with engine.connect() as c:
+            trans = c.begin()
+            try:
+                for stmt in setup:
+                    c.execute(text(stmt))
+>               with pytest.raises(IntegrityError) as info:
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE <class 'sqlalchemy.exc.IntegrityError'>
+
+tests/test_migration_0003.py:185: Failed
+=========================== short test summary info ============================
+FAILED tests/test_migration_0003.py::test_users_username_is_unique - Failed: DID NOT RAISE <class 'sqlalchemy.exc.IntegrityError'>
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 2 passed in 0.36s
+=== 변이 V1-2 pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)
+
+# ===== append 2026-11-15T21:00:13+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-3
+# 시각: 2026-11-15T21:00:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-3: alembic/versions/0003_auth_users.py
+    - 'sa.Column("user_id", sa.Text(), nullable=False))\n    # ④'
+    + 'sa.Column("user_id", sa.Text(), nullable=True))\n    # ④'
+.......F
+=================================== FAILURES ===================================
+__________________ test_pending_questions_user_id_is_not_null __________________
+
+mig = {'before': {'agent_traces': 1, 'events': 1, 'fact_sources': 1, 'pending_questions': 1, ...}, 'cfg': <alembic.config.Co... 'env': {'AI_AGENT': 'claude-code_2-1-325_agent', 'CI': '1', 'CLAUDECODE': '1', 'CLAUDE_CODE_CHILD_SESSION': '1', ...}}
+
+    def test_pending_questions_user_id_is_not_null(mig):
+        engine = mig["engine"]
+        with engine.connect() as c:
+            nullable = c.execute(text(
+                "SELECT is_nullable FROM information_schema.columns "
+                "WHERE table_name = 'pending_questions' AND column_name = 'user_id'"
+            )).scalar_one()
+>       assert nullable == "NO"
+E       AssertionError: assert 'YES' == 'NO'
+E         
+E         - NO
+E         + YES
+
+tests/test_migration_0003.py:290: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_migration_0003.py::test_pending_questions_user_id_is_not_null - AssertionError: assert 'YES' == 'NO'
+  
+  - NO
+  + YES
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 7 passed in 0.37s
+=== 변이 V1-3 pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)
+
+# ===== append 2026-11-15T21:00:14+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-3b
+# 시각: 2026-11-15T21:00:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-3b: app/tools/questions.py
+    - '        user_id=ctx.user_id,\n        kind=kind,'
+    + '        kind=kind,'
+F
+=================================== FAILURES ===================================
+_____________ test_ask_user_stores_row_and_returns_pending_status ______________
+
+self = <sqlalchemy.engine.base.Connection object at 0x10e415c50>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x10de06ad0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x10e416b50>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x10e3e7750>
+parameters = [{'answer': None, 'answered_at': None, 'context': Jsonb({'affirmative_options': ['응, 기억해줘']}), 'kind': 'new_person', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [INTRANS] (host=localhost port=5433 user=app database=relationship_test) at 0x10e458410>
+query = 'INSERT INTO pending_questions (session_id, user_id, kind, question, options, context, answer, answered_at) VALUES (%(...er)s::VARCHAR, %(answered_at)s::TIMESTAMP WITH TIME ZONE) RETURNING pending_questions.id, pending_questions.created_at'
+params = {'answer': None, 'answered_at': None, 'context': Jsonb({'affirmative_options': ['응, 기억해줘']}), 'kind': 'new_person', ...}
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NotNullViolation: null value in column "user_id" of relation "pending_questions" violates not-null constraint
+E           DETAIL:  Failing row contains (20241, evidence-session, new_person, 이 사람을 기억해둘까요?, ["응, 기억해줘", "아니, 됐어"], {"affirmative_options": ["응, 기억해줘"]}, null, 2026-11-15 12:00:14.921709+00, null, null).
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/psycopg/cursor.py:117: NotNullViolation
+
+The above exception was the direct cause of the following exception:
+
+db_session = <sqlalchemy.orm.session.Session object at 0x10e3bd940>
+
+    def test_ask_user_stores_row_and_returns_pending_status(db_session):
+        ctx = _ctx(db_session, session_id="evidence-session")
+    
+>       result = ask_user(
+            ctx,
+            kind="new_person",
+            question="이 사람을 기억해둘까요?",
+            options=["응, 기억해줘", "아니, 됐어"],
+            context={AFFIRMATIVE_KEY: ["응, 기억해줘"]},
+        )
+
+tests/test_tools_questions.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/tools/context.py:193: in wrapper
+    result = fn(ctx, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+app/tools/questions.py:225: in ask_user
+    ctx.session.flush()
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py:4352: in flush
+    self._flush(objects)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py:4487: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py:4448: in _flush
+    flush_context.execute()
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [INTRANS] (host=localhost port=5433 user=app database=relationship_test) at 0x10e458410>
+query = 'INSERT INTO pending_questions (session_id, user_id, kind, question, options, context, answer, answered_at) VALUES (%(...er)s::VARCHAR, %(answered_at)s::TIMESTAMP WITH TIME ZONE) RETURNING pending_questions.id, pending_questions.created_at'
+params = {'answer': None, 'answered_at': None, 'context': Jsonb({'affirmative_options': ['응, 기억해줘']}), 'kind': 'new_person', ...}
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) null value in column "user_id" of relation "pending_questions" violates not-null constraint
+E           DETAIL:  Failing row contains (20241, evidence-session, new_person, 이 사람을 기억해둘까요?, ["응, 기억해줘", "아니, 됐어"], {"affirmative_options": ["응, 기억해줘"]}, null, 2026-11-15 12:00:14.921709+00, null, null).
+E           [SQL: INSERT INTO pending_questions (session_id, user_id, kind, question, options, context, answer, answered_at) VALUES (%(session_id)s::VARCHAR, %(user_id)s::VARCHAR, %(kind)s::VARCHAR, %(question)s::VARCHAR, %(options)s::JSONB, %(context)s::JSONB, %(answer)s::VARCHAR, %(answered_at)s::TIMESTAMP WITH TIME ZONE) RETURNING pending_questions.id, pending_questions.created_at]
+E           [parameters: {'session_id': 'evidence-session', 'user_id': None, 'kind': 'new_person', 'question': '이 사람을 기억해둘까요?', 'options': Jsonb(['응, 기억해줘', '아니, 됐어']), 'context': Jsonb({'affirmative_options': ['응, 기억해줘']}), 'answer': None, 'answered_at': None}]
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/psycopg/cursor.py:117: IntegrityError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+=========================== short test summary info ============================
+FAILED tests/test_tools_questions.py::test_ask_user_stores_row_and_returns_pending_status - sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) null value in column "user_id" of relation "pending_questions" violates not-null constraint
+DETAIL:  Failing row contains (20241, evidence-session, new_person, 이 사람을 기억해둘까요?, ["응, 기억해줘", "아니, 됐어"], {"affirmative_options": ["응, 기억해줘"]}, null, 2026-11-15 12:00:14.921709+00, null, null).
+[SQL: INSERT INTO pending_questions (session_id, user_id, kind, question, options, context, answer, answered_at) VALUES (%(session_id)s::VARCHAR, %(user_id)s::VARCHAR, %(kind)s::VARCHAR, %(question)s::VARCHAR, %(options)s::JSONB, %(context)s::JSONB, %(answer)s::VARCHAR, %(answered_at)s::TIMESTAMP WITH TIME ZONE) RETURNING pending_questions.id, pending_questions.created_at]
+[parameters: {'session_id': 'evidence-session', 'user_id': None, 'kind': 'new_person', 'question': '이 사람을 기억해둘까요?', 'options': Jsonb(['응, 기억해줘', '아니, 됐어']), 'context': Jsonb({'affirmative_options': ['응, 기억해줘']}), 'answer': None, 'answered_at': None}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 0.39s
+=== 변이 V1-3b pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)
+
+# ===== append 2026-11-15T21:00:15+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-4
+# 시각: 2026-11-15T21:00:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-4: alembic/versions/0003_auth_users.py
+    - '        sa.CheckConstraint(\n            "role IN (\'user\', \'assistant\')",\n            name=op.f("ck_chat_messages_role_valid"),\n        ),\n'
+    + ''
+....F
+=================================== FAILURES ===================================
+______________ test_chat_messages_role_check_rejects_other_values ______________
+
+mig = {'before': {'agent_traces': 1, 'events': 1, 'fact_sources': 1, 'pending_questions': 1, ...}, 'cfg': <alembic.config.Co... 'env': {'AI_AGENT': 'claude-code_2-1-325_agent', 'CI': '1', 'CLAUDECODE': '1', 'CLAUDE_CODE_CHILD_SESSION': '1', ...}}
+
+    def test_chat_messages_role_check_rejects_other_values(mig):
+>       err = _constraint_violated(
+            mig["engine"],
+            "INSERT INTO chat_messages (user_id, role, content) VALUES ('u-r', 'system', '안녕')",
+            setup=("INSERT INTO users (id, username, password_hash) VALUES ('u-r', 'role', 'h')",),
+        )
+
+tests/test_migration_0003.py:234: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+engine = Engine(postgresql+psycopg://app:***@localhost:5433/relationship_test_mig)
+sql = "INSERT INTO chat_messages (user_id, role, content) VALUES ('u-r', 'system', '안녕')"
+setup = ("INSERT INTO users (id, username, password_hash) VALUES ('u-r', 'role', 'h')",)
+
+    def _constraint_violated(
+        engine: Engine, sql: str, setup: tuple[str, ...] = ()
+    ) -> IntegrityError:
+        """`setup` 을 실행한 뒤 `sql` 이 IntegrityError 를 내는지 확인해 돌려준다.
+    
+        전부 한 트랜잭션 안에서 돌고 끝에 항상 롤백한다(시험 행을 남기지 않는다).
+        """
+        with engine.connect() as c:
+            trans = c.begin()
+            try:
+                for stmt in setup:
+                    c.execute(text(stmt))
+>               with pytest.raises(IntegrityError) as info:
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE <class 'sqlalchemy.exc.IntegrityError'>
+
+tests/test_migration_0003.py:185: Failed
+=========================== short test summary info ============================
+FAILED tests/test_migration_0003.py::test_chat_messages_role_check_rejects_other_values - Failed: DID NOT RAISE <class 'sqlalchemy.exc.IntegrityError'>
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 4 passed in 0.36s
+=== 변이 V1-4 pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)
+
+# ===== append 2026-11-15T21:00:16+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-5
+# 시각: 2026-11-15T21:00:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-5: alembic/versions/0003_auth_users.py
+    - '    op.drop_table("users")\n'
+    + ''
+E
+==================================== ERRORS ====================================
+________ ERROR at setup of test_head_revision_is_0003_and_db_is_at_head ________
+
+self = <sqlalchemy.engine.base.Connection object at 0x10de00410>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x10dd9bc50>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x10dd31f50>
+statement = <sqlalchemy.dialects.postgresql.base.PGDDLCompiler object at 0x10de2efc0>
+parameters = [immutabledict({})]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [BAD] at 0x10dd79010>
+query = '\nCREATE TABLE users (\n\tid TEXT NOT NULL, \n\tusername TEXT NOT NULL, \n\tpassword_hash TEXT NOT NULL, \n\tcreated_...LT now() NOT NULL, \n\tCONSTRAINT pk_users PRIMARY KEY (id), \n\tCONSTRAINT uq_users_username UNIQUE (username)\n)\n\n'
+params = immutabledict({})
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.DuplicateTable: relation "users" already exists
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/psycopg/cursor.py:117: DuplicateTable
+
+The above exception was the direct cause of the following exception:
+
+db_engine = Engine(postgresql+psycopg://app:***@localhost:5433/relationship_test)
+
+    @pytest.fixture(scope="module")
+    def mig(db_engine: Engine) -> Iterator[dict[str, Any]]:
+        """전용 DB 를 0002 상태 + 원시 SQL 행으로 만든 뒤 head 로 올린다.
+    
+        `db_engine` 은 테스트 서버에 닿는지(닿지 않으면 skip) 확인하는 용도다.
+        yield 값: engine, env, before(0002 상태에서 센 행 수), pre_head_rows.
+        """
+        env = _mig_env()
+        conn, _warnings = resolve_connection(dict(env))
+        engine = create_engine(conn.sqlalchemy_url())
+        cfg = _alembic_cfg()
+        with _in_mig_env(env):
+            # 없으면 만들고(vector 확장 포함) head 까지 올린다 — relationship_test 와 같은 방식.
+            ensure_test_database_ready(conn.sqlalchemy_url(), repo_root=REPO_ROOT)
+            command.downgrade(cfg, "base")
+            command.upgrade(cfg, "0002")
+    
+            with engine.begin() as c:
+                # 0002 상태의 사용자 데이터(원시 SQL — ORM 은 0003 기준이다).
+                c.execute(text(
+                    "INSERT INTO persons (id, user_id, display_name, relation_tag, hierarchy) "
+                    "OVERRIDING SYSTEM VALUE VALUES (101, 'mig-user', '김팀장', '직장', '상')"
+                ))
+                c.execute(text(
+                    "INSERT INTO person_aliases (person_id, alias, source) "
+                    "VALUES (101, '팀장님', 'user_said')"
+                ))
+                c.execute(text(
+                    "INSERT INTO person_facts (person_id, key, value, confidence) "
+                    "VALUES (101, 'pattern:meal', '자주 식사', 1.0)"
+                ))
+                c.execute(text(
+                    "INSERT INTO events (id, person_id, type, content, raw_utterance, occurred_at) "
+                    "OVERRIDING SYSTEM VALUE VALUES "
+                    "(201, 101, 'meal', '점심', '팀장님이랑 점심', now())"
+                ))
+                c.execute(text(
+                    "INSERT INTO fact_sources (fact_id, event_id) "
+                    "SELECT id, 201 FROM person_facts WHERE person_id = 101"
+                ))
+                c.execute(text(
+                    "INSERT INTO schedules (person_id, title, scheduled_at) "
+                    "VALUES (101, '미팅', now() + interval '1 day')"
+                ))
+                c.execute(text(
+                    "INSERT INTO pending_questions (session_id, kind, question, options, context) "
+                    "VALUES ('mig-s', 'identity', '누구?', CAST('[]' AS jsonb), CAST('{}' AS jsonb))"
+                ))
+                c.execute(text(
+                    "INSERT INTO push_subscriptions (user_id, endpoint, keys) "
+                    "VALUES ('mig-user', 'https://push.example/x', CAST('{}' AS jsonb))"
+                ))
+                c.execute(text(
+                    "INSERT INTO agent_traces "
+                    "(session_id, step, tool_name, input, output, tokens_in, tokens_out) "
+                    "VALUES ('mig-s', '인식', 'search_person', CAST('{}' AS jsonb), "
+                    "CAST('{}' AS jsonb), 0, 0)"
+                ))
+            with engine.connect() as c:
+                before = {
+                    t: c.execute(text(f"SELECT count(*) FROM {t}")).scalar_one()
+                    for t in CLEARED_TABLES
+                }
+    
+>           command.upgrade(cfg, "head")
+
+tests/test_migration_0003.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/command.py:487: in upgrade
+    script.run_env()
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/script/base.py:550: in run_env
+    util.load_python_file(self.dir, "env.py")
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/util/pyfiles.py:114: in load_python_file
+    module = load_module_py(module_id, path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/util/pyfiles.py:132: in load_module_py
+    spec.loader.exec_module(module)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap_external>:759: in exec_module
+    ???
+<frozen importlib._bootstrap>:491: in _call_with_frames_removed
+    ???
+alembic/env.py:125: in <module>
+    run_migrations_online()
+alembic/env.py:119: in run_migrations_online
+    context.run_migrations()
+<string>:8: in run_migrations
+    ???
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/runtime/environment.py:970: in run_migrations
+    self.get_context().run_migrations(**kw)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/runtime/migration.py:621: in run_migrations
+    step.migration_fn(**kw)
+alembic/versions/0003_auth_users.py:48: in upgrade
+    op.create_table(
+<string>:8: in create_table
+    ???
+<string>:3: in create_table
+    ???
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/operations/ops.py:1323: in create_table
+    return operations.invoke(op)
+           ^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/operations/base.py:448: in invoke
+    return fn(self, operation)
+           ^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/operations/toimpl.py:140: in create_table
+    operations.impl.create_table(table, **kw)
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/ddl/impl.py:434: in create_table
+    self._exec(schema.CreateTable(table, **kw))
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/ddl/impl.py:252: in _exec
+    return conn.execute(construct, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/sql/ddl.py:188: in _execute_on_connection
+    return connection._execute_ddl(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1532: in _execute_ddl
+    ret = self._execute_context(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [BAD] at 0x10dd79010>
+query = '\nCREATE TABLE users (\n\tid TEXT NOT NULL, \n\tusername TEXT NOT NULL, \n\tpassword_hash TEXT NOT NULL, \n\tcreated_...LT now() NOT NULL, \n\tCONSTRAINT pk_users PRIMARY KEY (id), \n\tCONSTRAINT uq_users_username UNIQUE (username)\n)\n\n'
+params = immutabledict({})
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.DuplicateTable) relation "users" already exists
+E           [SQL: 
+E           CREATE TABLE users (
+E           	id TEXT NOT NULL, 
+E           	username TEXT NOT NULL, 
+E           	password_hash TEXT NOT NULL, 
+E           	created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+E           	CONSTRAINT pk_users PRIMARY KEY (id), 
+E           	CONSTRAINT uq_users_username UNIQUE (username)
+E           )
+E           
+E           ]
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/psycopg/cursor.py:117: ProgrammingError
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Refs: P1-schema R8 R9 D4 D5 S3.1
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, Refs: FIX-020 S3.1 -- 세 upsert 키에 UNIQUE 제약을 건다.
+INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Refs: P9b-auth D18 S3.1 CR-006 F-fbaaae -- 계정·세션·대화 기록 테이블과 질문 소유자.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 0003 -> 0002, Refs: P9b-auth D18 S3.1 CR-006 F-fbaaae -- 계정·세션·대화 기록 테이블과 질문 소유자.
+INFO  [alembic.runtime.migration] Running downgrade 0002 -> 0001, Refs: FIX-020 S3.1 -- 세 upsert 키에 UNIQUE 제약을 건다.
+INFO  [alembic.runtime.migration] Running downgrade 0001 -> , Refs: P1-schema R8 R9 D4 D5 S3.1
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, Refs: P1-schema R8 R9 D4 D5 S3.1
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 0002, Refs: FIX-020 S3.1 -- 세 upsert 키에 UNIQUE 제약을 건다.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Refs: P9b-auth D18 S3.1 CR-006 F-fbaaae -- 계정·세션·대화 기록 테이블과 질문 소유자.
+=========================== short test summary info ============================
+ERROR tests/test_migration_0003.py::test_head_revision_is_0003_and_db_is_at_head - sqlalchemy.exc.ProgrammingError: (psycopg.errors.DuplicateTable) relation "users" already exists
+[SQL: 
+CREATE TABLE users (
+	id TEXT NOT NULL, 
+	username TEXT NOT NULL, 
+	password_hash TEXT NOT NULL, 
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+	CONSTRAINT pk_users PRIMARY KEY (id), 
+	CONSTRAINT uq_users_username UNIQUE (username)
+)
+
+]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 error in 0.51s
+=== 변이 V1-5 pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)
+
+# ===== append 2026-11-15T21:00:17+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-6
+# 시각: 2026-11-15T21:00:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-6: alembic/versions/0003_auth_users.py
+    - 'name=op.f("fk_auth_sessions_user_id_users"),\n            ondelete="CASCADE",'
+    + 'name=op.f("fk_auth_sessions_user_id_users"),'
+......F
+=================================== FAILURES ===================================
+___________ test_only_new_tables_have_users_foreign_key_with_cascade ___________
+
+mig = {'before': {'agent_traces': 1, 'events': 1, 'fact_sources': 1, 'pending_questions': 1, ...}, 'cfg': <alembic.config.Co... 'env': {'AI_AGENT': 'claude-code_2-1-325_agent', 'CI': '1', 'CLAUDECODE': '1', 'CLAUDE_CODE_CHILD_SESSION': '1', ...}}
+
+    def test_only_new_tables_have_users_foreign_key_with_cascade(mig):
+        with mig["engine"].connect() as c:
+            rows = c.execute(text(
+                "SELECT conrelid::regclass::text, conname, confdeltype FROM pg_constraint "
+                "WHERE contype = 'f' AND confrelid = 'users'::regclass ORDER BY 1"
+            )).all()
+>       assert [(r[0], r[1], r[2]) for r in rows] == [
+            ("auth_sessions", "fk_auth_sessions_user_id_users", "c"),
+            ("chat_messages", "fk_chat_messages_user_id_users", "c"),
+        ]
+E       AssertionError: assert [('auth_sessi..._users', 'c')] == [('auth_sessi..._users', 'c')]
+E         
+E         At index 0 diff: ('auth_sessions', 'fk_auth_sessions_user_id_users', 'a') != ('auth_sessions', 'fk_auth_sessions_user_id_users', 'c')
+E         
+E         Full diff:
+E           [
+E               (
+E                   'auth_sessions',
+E                   'fk_auth_sessions_user_id_users',
+E         -         'c',
+E         ?          ^
+E         +         'a',
+E         ?          ^
+E               ),
+E               (
+E                   'chat_messages',
+E                   'fk_chat_messages_user_id_users',
+E                   'c',
+E               ),
+E           ]
+
+tests/test_migration_0003.py:268: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_migration_0003.py::test_only_new_tables_have_users_foreign_key_with_cascade - AssertionError: assert [('auth_sessi..._users', 'c')] == [('auth_sessi..._users', 'c')]
+  
+  At index 0 diff: ('auth_sessions', 'fk_auth_sessions_user_id_users', 'a') != ('auth_sessions', 'fk_auth_sessions_user_id_users', 'c')
+  
+  Full diff:
+    [
+        (
+            'auth_sessions',
+            'fk_auth_sessions_user_id_users',
+  -         'c',
+  ?          ^
+  +         'a',
+  ?          ^
+        ),
+        (
+            'chat_messages',
+            'fk_chat_messages_user_id_users',
+            'c',
+        ),
+    ]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 6 passed in 0.37s
+=== 변이 V1-6 pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)
+
+# ===== append 2026-11-15T21:00:18+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-7
+# 시각: 2026-11-15T21:00:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-7: app/db/models.py
+    - 'question_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)'
+    + 'question_id: Mapped[int | None] = mapped_column(BigInteger, nullable=False)'
+...........F
+=================================== FAILURES ===================================
+__________ test_nullable_columns_are_exactly_the_six_deferred_fields ___________
+
+    def test_nullable_columns_are_exactly_the_six_deferred_fields():
+        """nullable 컬럼이 정확히 {embedding, confirmed_at, briefed_at, answer, answered_at,
+        question_id} 뿐이다(F-08e812 + 0003 보충 `chat_messages.question_id`)."""
+        nullable_found = set()
+        for table in Base.metadata.tables.values():
+            for column in table.columns:
+                if column.nullable:
+                    nullable_found.add(column.name)
+>       assert nullable_found == NULLABLE_COLUMNS
+E       AssertionError: assert {'answer', 'a..., 'embedding'} == {'answer', 'a...'question_id'}
+E         
+E         Extra items in the right set:
+E         'question_id'
+E         
+E         Full diff:
+E           {
+E               'answer',
+E               'answered_at',
+E               'briefed_at',
+E               'confirmed_at',
+E               'embedding',
+E         -     'question_id',
+E           }
+
+tests/test_schema_models.py:256: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_schema_models.py::test_nullable_columns_are_exactly_the_six_deferred_fields - AssertionError: assert {'answer', 'a..., 'embedding'} == {'answer', 'a...'question_id'}
+  
+  Extra items in the right set:
+  'question_id'
+  
+  Full diff:
+    {
+        'answer',
+        'answered_at',
+        'briefed_at',
+        'confirmed_at',
+        'embedding',
+  -     'question_id',
+    }
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 11 passed in 0.10s
+=== 변이 V1-7 pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)
+
+# ===== append 2026-11-15T21:00:18+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u1/run_mutants.sh V1-8
+# 시각: 2026-11-15T21:00:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+=== 변이 V1-8: app/db/models.py
+    - '        Index("ix_auth_sessions_user_id", "user_id"),\n'
+    + ''
+.........F
+=================================== FAILURES ===================================
+_________________ test_alembic_check_reports_no_new_operations _________________
+
+mig = {'before': {'agent_traces': 1, 'events': 1, 'fact_sources': 1, 'pending_questions': 1, ...}, 'cfg': <alembic.config.Co... 'env': {'AI_AGENT': 'claude-code_2-1-325_agent', 'CI': '1', 'CLAUDECODE': '1', 'CLAUDE_CODE_CHILD_SESSION': '1', ...}}
+
+    def test_alembic_check_reports_no_new_operations(mig):
+        with _in_mig_env(mig["env"]):
+>           command.check(mig["cfg"])  # 차이가 있으면 CommandError
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_migration_0003.py:314: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+config = <alembic.config.Config object at 0x109d76d50>
+
+    def check(config: Config) -> None:
+        """Check if revision command with autogenerate has pending upgrade ops.
+    
+        :param config: a :class:`.Config` object.
+    
+        .. versionadded:: 1.9.0
+    
+        """
+    
+        script_directory = ScriptDirectory.from_config(config)
+    
+        command_args = dict(
+            message=None,
+            autogenerate=True,
+            sql=False,
+            head="head",
+            splice=False,
+            branch_label=None,
+            version_path=None,
+            rev_id=None,
+            depends_on=None,
+        )
+        revision_context = autogen.RevisionContext(
+            config,
+            script_directory,
+            command_args,
+        )
+    
+        def retrieve_migrations(rev, context):
+            revision_context.run_autogenerate(rev, context)
+            return []
+    
+        with EnvironmentContext(
+            config,
+            script_directory,
+            fn=retrieve_migrations,
+            as_sql=False,
+            template_args=revision_context.template_args,
+            revision_context=revision_context,
+        ):
+            script_directory.run_env()
+    
+        # the revision_context now has MigrationScript structure(s) present.
+    
+        migration_script = revision_context.generated_revisions[-1]
+        diffs = []
+        for upgrade_ops in migration_script.upgrade_ops_list:
+            diffs.extend(upgrade_ops.as_diffs())
+    
+        if diffs:
+>           raise util.AutogenerateDiffsDetected(
+                f"New upgrade operations detected: {diffs}",
+                revision_context=revision_context,
+                diffs=diffs,
+            )
+E           alembic.util.exc.AutogenerateDiffsDetected: New upgrade operations detected: [('remove_index', Index('ix_auth_sessions_user_id', Column('user_id', TEXT(), table=<auth_sessions>, nullable=False)))]
+
+/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/alembic/command.py:370: AutogenerateDiffsDetected
+----------------------------- Captured stderr call -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+INFO  [alembic.autogenerate.compare.constraints] Detected removed index 'ix_auth_sessions_user_id' on 'auth_sessions'
+------------------------------ Captured log call -------------------------------
+INFO     alembic.runtime.migration:migration.py:205 Context impl PostgresqlImpl.
+INFO     alembic.runtime.migration:migration.py:208 Will assume transactional DDL.
+INFO     alembic.runtime.plugins:plugins.py:121 setting up autogenerate plugin alembic.autogenerate.schemas
+INFO     alembic.runtime.plugins:plugins.py:121 setting up autogenerate plugin alembic.autogenerate.tables
+INFO     alembic.runtime.plugins:plugins.py:121 setting up autogenerate plugin alembic.autogenerate.types
+INFO     alembic.runtime.plugins:plugins.py:121 setting up autogenerate plugin alembic.autogenerate.constraints
+INFO     alembic.runtime.plugins:plugins.py:121 setting up autogenerate plugin alembic.autogenerate.defaults
+INFO     alembic.runtime.plugins:plugins.py:121 setting up autogenerate plugin alembic.autogenerate.comments
+INFO     alembic.autogenerate.compare.constraints:constraints.py:305 Detected removed index 'ix_auth_sessions_user_id' on 'auth_sessions'
+=========================== short test summary info ============================
+FAILED tests/test_migration_0003.py::test_alembic_check_reports_no_new_operations - alembic.util.exc.AutogenerateDiffsDetected: New upgrade operations detected: [('remove_index', Index('ix_auth_sessions_user_id', Column('user_id', TEXT(), table=<auth_sessions>, nullable=False)))]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 9 passed in 0.41s
+=== 변이 V1-8 pytest exit=1 (0 이면 변이를 못 잡은 것 — 실패해야 정상)

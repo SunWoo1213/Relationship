@@ -1,0 +1,25 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu1/vm5.py
+# 시각: 2026-11-15T21:08:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+--- 변이 VM-5: exit=1
+    E   AssertionError: assert 'user_id' not in {'answer', 'answered_at', 'context', 'created_at', 'id', 'kind', ...}
+    E   psycopg.errors.DuplicateColumn: column "user_id" of relation "pending_questions" already exists
+    E   sqlalchemy.exc.ProgrammingError: (psycopg.errors.DuplicateColumn) column "user_id" of relation "pending_questions" already exists
+    FAILED tests/test_migration_0003.py::test_downgrade_to_0002_removes_new_objects_and_upgrade_restores - sqlalchemy.exc.ProgrammingError: (psycopg.errors.DuplicateColumn) column "user_id" of relation "pending_questions" already exists
+    [SQL: ALTER TABLE pending_questions ADD COLUMN user_id TEXT NOT NULL]
+    1 failed, 10 passed in 0.42s
+--- 변이 직후 상태: exit=0
+    [relationship_test_mig_v15] version=['0002'] tables=10 indexes=24 constraints=23
+       counts={'agent_traces': 0, 'events': 0, 'fact_sources': 0, 'pending_questions': 0, 'person_aliases': 0, 'person_facts': 0, 'persons': 0, 'push_subscriptions': 0, 'schedules': 0}
+--- 정리: 원본 리비전으로 downgrade base: exit=0
+--- 원본으로 정상화: exit=0
+    11 passed in 0.47s
+--- 끝 상태: exit=0
+    [relationship_test_mig_v15] version=['0003'] tables=13 indexes=31 constraints=31
+       counts={'agent_traces': 0, 'auth_sessions': 0, 'chat_messages': 0, 'events': 0, 'fact_sources': 0, 'pending_questions': 0, 'person_aliases': 0, 'person_facts': 0, 'persons': 0, 'push_subscriptions': 0, 'schedules': 0, 'users': 0}
+    [relationship_test_mig] version=['0003'] tables=13 indexes=31 constraints=31
+       counts={'agent_traces': 0, 'auth_sessions': 0, 'chat_messages': 0, 'events': 0, 'fact_sources': 0, 'pending_questions': 0, 'person_aliases': 0, 'person_facts': 0, 'persons': 0, 'push_subscriptions': 0, 'schedules': 0, 'users': 0}
+사본 리비전 원복: True

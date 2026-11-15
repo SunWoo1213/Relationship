@@ -77,6 +77,7 @@ def _make_question_row(
         context = {AFFIRMATIVE_KEY: ["예"]}
     row = PendingQuestion(
         session_id=session_id,
+        user_id="local",
         kind=kind,
         question=question,
         options=options,

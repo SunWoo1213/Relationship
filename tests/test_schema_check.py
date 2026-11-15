@@ -21,7 +21,7 @@ from app.db.base import Base  # noqa: E402
 def test_expected_tables_matches_base_metadata_exactly():
     """`EXPECTED_TABLES` 는 하드코딩이 아니라 `Base.metadata.tables` 에서 그대로 가져온 것이다."""
     assert set(sc.EXPECTED_TABLES) == set(Base.metadata.tables.keys())
-    assert len(sc.EXPECTED_TABLES) == 9
+    assert len(sc.EXPECTED_TABLES) == 12
 
 
 def test_expected_tables_excludes_person_embeddings_and_relation_tables():
@@ -53,21 +53,23 @@ def test_missing_values_helper_finds_absent_entries():
     assert sc._missing_values(sc.m.EVENT_TYPES, complete_haystack) == []
 
 
-def test_model_index_expectations_returns_ten_names_and_the_partial_index():
+def test_model_index_expectations_returns_thirteen_names_and_the_partial_index():
     names, partial_name = sc.model_index_expectations()
-    assert len(names) == 10
+    assert len(names) == 13
     assert partial_name == "ix_pending_questions_session_id_unanswered"
     assert partial_name in names
 
 
-def test_model_unique_constraint_expectations_returns_fix_020_three():
-    """Refs: FIX-020 -- UniqueConstraint 3개(person_facts/person_aliases/
-    push_subscriptions)가 `Base.metadata` 에서 그대로 나온다(중복 정의 방지)."""
+def test_model_unique_constraint_expectations_returns_fix_020_three_plus_0003_two():
+    """Refs: FIX-020 P9b-auth -- UniqueConstraint 5개(FIX-020 세 개 + 0003 보충
+    users.username·auth_sessions.token_hash)가 `Base.metadata` 에서 그대로 나온다."""
     expected = sc.model_unique_constraint_expectations()
     assert expected == {
         ("person_facts", "uq_person_facts_person_id_key"),
         ("person_aliases", "uq_person_aliases_person_id_alias"),
         ("push_subscriptions", "uq_push_subscriptions_user_id_endpoint"),
+        ("users", "uq_users_username"),
+        ("auth_sessions", "uq_auth_sessions_token_hash"),
     }
 
 

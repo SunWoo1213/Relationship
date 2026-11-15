@@ -234,11 +234,11 @@ def _check_foreign_keys(cur, results: list[CheckResult]) -> None:
     )
     rows = cur.fetchall()
     bad = [r for r in rows if r[2] != "c"]
-    ok = len(rows) == 6 and not bad
+    ok = len(rows) == 8 and not bad
     detail = "; ".join(f"{t}.{n}={d}" for t, n, d in rows)
     _emit(
         results,
-        "6 foreign keys all confdeltype='c' (ON DELETE CASCADE)",
+        "8 foreign keys all confdeltype='c' (ON DELETE CASCADE)",
         "PASS" if ok else "FAIL",
         f"count={len(rows)} {detail}",
     )
@@ -356,7 +356,7 @@ def run_all_checks(cur, expect_empty: bool) -> list[CheckResult]:
         ok = len(present) == 0
         _emit(
             results,
-            "9 tables absent (--expect-empty)",
+            f"{len(EXPECTED_TABLES)} tables absent (--expect-empty)",
             "PASS" if ok else "FAIL",
             "0 tables (as expected)" if ok else f"still present: {sorted(present)}",
         )
@@ -365,7 +365,7 @@ def run_all_checks(cur, expect_empty: bool) -> list[CheckResult]:
         ok = present == set(EXPECTED_TABLES)
         _emit(
             results,
-            "9 tables exist exactly",
+            f"{len(EXPECTED_TABLES)} tables exist exactly",
             "PASS" if ok else "FAIL",
             f"got {len(present)}: {sorted(present)}" + (f" missing={missing}" if missing else ""),
         )

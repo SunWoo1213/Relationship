@@ -1,0 +1,21 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu1/atom.py
+# 시각: 2026-11-15T21:06:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: d9c5a5f (dev2)
+# exit: 0
+# ---
+--- 변이(③ 에서 실패하는 upgrade): exit=1
+    [SQL: ALTER TABLE pending_questions ADD COLUMN user_id TEXT NOT NULL]
+    (Background on this error at: https://sqlalche.me/e/20/gkpj)
+    11 errors in 0.33s
+--- 실패 직후 v15 — 0002 에 넣은 행이 그대로인가: exit=0
+    [relationship_test_mig_v15] version=['0002'] tables=10 indexes=23 constraints=23
+       counts={'agent_traces': 1, 'events': 1, 'fact_sources': 1, 'pending_questions': 1, 'person_aliases': 1, 'person_facts': 1, 'persons': 1, 'push_subscriptions': 1, 'schedules': 1}
+--- 원본으로 정상화: exit=0
+    ...........                                                              [100%]
+    11 passed in 0.43s
+--- 끝 상태: exit=0
+       counts={'agent_traces': 0, 'auth_sessions': 0, 'chat_messages': 0, 'events': 0, 'fact_sources': 0, 'pending_questions': 0, 'person_aliases': 0, 'person_facts': 0, 'persons': 0, 'push_subscriptions': 0, 'schedules': 0, 'users': 0}
+    [relationship_test_mig] version=['0003'] tables=13 indexes=31 constraints=31
+       counts={'agent_traces': 0, 'auth_sessions': 0, 'chat_messages': 0, 'events': 0, 'fact_sources': 0, 'pending_questions': 0, 'person_aliases': 0, 'person_facts': 0, 'persons': 0, 'push_subscriptions': 0, 'schedules': 0, 'users': 0}
+사본 리비전 원복: True

@@ -31,6 +31,11 @@
     `answered_at`) 값이 없는 것이 정상 상태이다. nullable 집합은 정확히
     `{embedding, confirmed_at, briefed_at, answer, answered_at}`.
 
+(보충 CR-006 · D18, 리비전 0003) 위 9개에 `users`·`auth_sessions`·
+`chat_messages` 3개와 `pending_questions.user_id` 가 더해졌다 — 위 문단의
+"`users` 를 추가하지 않는다" 는 0003 이전(스키마 v2 원본) 기준이다. 새 `question_id`
+는 나중에 채워지는 nullable 컬럼이다(칩이 달린 답에만 값).
+
 `pending_questions.status` 컬럼은 만들지 않는다(S3.1 에 없음, 미결 항목).
 S3.2 의 `{question_id, status:"pending"}` 은 `answered_at IS NULL` 에서
 애플리케이션이 파생시키는 값이다.
@@ -229,10 +234,17 @@ class PendingQuestion(Base):
             "session_id",
             postgresql_where=text("answered_at IS NULL"),
         ),
+        # 보충(CR-006 · D18, 리비전 0003) -- 답변 소유 검사의 조회 조건
+        # `user_id = ? AND answered_at ...`. 단순 인덱스(부분 인덱스 아님)를
+        # 고른 이유는 03-log 에 있다.
+        Index("ix_pending_questions_user_id_answered_at", "user_id", "answered_at"),
     )
 
     id: Mapped[int] = _pk()
     session_id: Mapped[str] = mapped_column(Text, nullable=False)
+    # 보충(CR-006 · D18, 리비전 0003) -- 질문 소유자. `users.id` 값을 담지만
+    # FK 는 두지 않는다(P9b 결정 O: 기존 테스트가 users 행 없이 질문을 만든다).
+    user_id: Mapped[str] = mapped_column(Text, nullable=False)
     kind: Mapped[str] = mapped_column(Text, nullable=False)
     question: Mapped[str] = mapped_column(Text, nullable=False)
     options: Mapped[object] = mapped_column(JSONB, nullable=False)
@@ -273,6 +285,73 @@ class AgentTrace(Base):
     output: Mapped[object] = mapped_column(JSONB, nullable=False)
     tokens_in: Mapped[int] = mapped_column(Integer, nullable=False)
     tokens_out: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[object] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+# 보충(CR-006 · D18, 리비전 0003) -- 계정과 계정별 격리. 값 집합은 CHECK 와
+# 테스트가 같은 출처를 쓴다.
+CHAT_ROLES = ("user", "assistant")
+
+
+class User(Base):
+    """로그인 계정. `id` 는 uuid4 hex(Text, 결정 O) — 값은 앱이 정한다.
+
+    `users` 는 사용자이지 인물이 아니다(원칙7). `username` 은 소문자 정규화
+    한 값이 UNIQUE.
+    """
+
+    __tablename__ = "users"
+    # name 미지정 — naming_convention 의 uq 템플릿이 이름을 만든다
+    # (PersonAlias.__table_args__ 주석 참고).
+    __table_args__ = (UniqueConstraint("username"),)
+
+    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    username: Mapped[str] = mapped_column(Text, nullable=False)
+    password_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[object] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class AuthSession(Base):
+    """서버 세션. 토큰 원문은 저장하지 않고 해시만 둔다(UNIQUE)."""
+
+    __tablename__ = "auth_sessions"
+    __table_args__ = (
+        UniqueConstraint("token_hash"),
+        Index("ix_auth_sessions_user_id", "user_id"),
+    )
+
+    id: Mapped[int] = _pk()
+    user_id: Mapped[str] = mapped_column(
+        Text, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    token_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[object] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    expires_at: Mapped[object] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class ChatMessage(Base):
+    """계정당 채팅방 하나의 대화 기록. `question_id` 는 FK 가 아니다 —
+    질문이 지워져도 기록은 남는다."""
+
+    __tablename__ = "chat_messages"
+    __table_args__ = (
+        CheckConstraint("role IN ('user', 'assistant')", name="role_valid"),
+        Index("ix_chat_messages_user_id_created_at", "user_id", "created_at"),
+    )
+
+    id: Mapped[int] = _pk()
+    user_id: Mapped[str] = mapped_column(
+        Text, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    role: Mapped[str] = mapped_column(Text, nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    question_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     created_at: Mapped[object] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

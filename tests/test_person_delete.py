@@ -800,6 +800,7 @@ def test_traces_same_digits_in_other_roles_are_not_deleted(db_session: Any) -> N
     ]
     keep_question = PendingQuestion(
         session_id="p2b-u2-decoy",
+        user_id=USER,
         kind="schedule",
         question="언제?",
         options=["모르겠어요"],
@@ -807,6 +808,7 @@ def test_traces_same_digits_in_other_roles_are_not_deleted(db_session: Any) -> N
     )
     gone_question = PendingQuestion(
         session_id="p2b-u2-decoy",
+        user_id=USER,
         kind="identity",
         question="누구?",
         options=["동숫자대상", "아니요"],

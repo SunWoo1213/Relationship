@@ -42,6 +42,7 @@ def _q(
 ) -> PendingQuestion:
     q = PendingQuestion(
         session_id=session_id,
+        user_id="local",
         kind=kind,
         question=question,
         options=list(options),

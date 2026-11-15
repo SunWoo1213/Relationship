@@ -206,6 +206,8 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 
 ### 3차 검증 권고 반영 (메인 세션 2026-11-15 — 위 단위 문장에 더해 적용한다)
 - **R3-1 (U1 닫힌 목록에 추가)**: `tests/test_api.py:91` `assert body["alembic_revision"] == "0002"` → `"0003"`. 리비전 문자열을 단언하는 곳은 저장소에서 이 한 줄뿐이다.
+- **U1 구현 중 추가(메인 승인 2026-11-15 21:10, backend-agent 가 멈추고 보고)**: 닫힌 목록 ②에 `tests/test_schema_check.py::test_model_unique_constraint_expectations_returns_fix_020_three` — 기대 집합에 새 UNIQUE 2개(`uq_users_username`·`uq_auth_sessions_token_hash`)를 더하고 이름을 "five" 로. S3.1 보충 반영이며 기존 3개 항목은 그대로.
+- **U1 리뷰 권고 반영(review-u1.md, 메인 2026-11-15)**: R-7 — `scripts/schema_check.py` 의 라벨 "9 tables …" 두 곳을 `len(EXPECTED_TABLES)` 로 동적화한 것도 U1 닫힌 목록에 든다(값 불변, 라벨만) · R-5 — **U7 배포 반영 절차에 두 줄 추가**: ① 옛 backend 컨테이너가 내려간 뒤 upgrade 가 돌게 한다(`compose up -d --build` 가 backend 를 교체하면서 새 컨테이너 entrypoint 가 upgrade — 옛 컨테이너가 살아 있는 채 따로 upgrade 하지 않는다) ② 반영 직후 backend 로그의 `Running upgrade 0002 -> 0003` 줄과 `/api/health` 의 `alembic_revision` 0003 을 확인한다 · R-3 — downgrade 를 깨는 변이는 전용 시험 DB 를 스스로 복구할 수 없는 상태로 남기므로 다시 돌리지 않는다(임시 `drop_table` 은 선례가 아니다) · R-6 — CI dbtest 작업 결과를 푸시 뒤 03-log 에 적는다.
 - **R3-2 (재귀 grep 판정 전부)**: `u3a-tests-fixed-user.sh`·`u3b-request-path.sh`·`u5-no-fixed-user.sh` 의 재귀 grep 에 `--include='*.py'` 를 붙인다. `.github` 를 함께 보는 `u5-outside-app.sh` 는 `--exclude-dir=__pycache__`. (`__pycache__/*.pyc` 가 일치해 헛실패하는 것을 막는다.)
 - **R3-3 (U7 문서 목록에 추가)**: `docs/reliability.md:101` "이 프로젝트에는 인증이 없다. 서버 환경변수 `APP_USER_ID` …" 를 패키지 뒤 사실로.
 - **R3-4 (U3a)**: `tests/test_answer_concurrency.py` 는 docstring 3곳(71·73·127행)의 언급까지 고친다 — 03-log 에 "docstring 포함" 을 적는다.
