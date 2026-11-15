@@ -21,13 +21,13 @@ vapid_config()` 를 인자 없이(= `os.environ` 읽기) 그대로 부르기 때
 from __future__ import annotations
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app.api.deps import get_session
 from app.db.models import PushSubscription
 from app.main import create_app
 from app.push.subscriptions import list_subscriptions, save_subscription
+from tests.auth_helpers import logged_in_client
 
 dbtest = pytest.mark.dbtest
 pytestmark = dbtest
@@ -44,7 +44,7 @@ def app_and_client(db_session):
     (`tests/test_api_briefings.py` 와 같은 모양, P2 결정 13)."""
     app = create_app()
     app.dependency_overrides[get_session] = lambda: db_session
-    return app, TestClient(app)
+    return app, logged_in_client(app, db_session)
 
 
 #: 테스트가 만드는 가짜 구독 본문(실제 브라우저 값이 아니다 -- 테스트

@@ -109,7 +109,7 @@ def _make_pending_question(
 
 def test_traced_success_writes_exactly_one_tool_call_row(db_session):
     session_id = "trace-success-1"
-    ctx = ToolContext(session=db_session, session_id=session_id)
+    ctx = ToolContext(session=db_session, session_id=session_id, user_id="local")
     when = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
     result = _dummy_success(ctx, "김팀장", when=when)
@@ -129,7 +129,7 @@ def test_traced_success_writes_exactly_one_tool_call_row(db_session):
 
 def test_traced_exception_writes_tool_error_row_and_reraises(db_session):
     session_id = "trace-error-1"
-    ctx = ToolContext(session=db_session, session_id=session_id)
+    ctx = ToolContext(session=db_session, session_id=session_id, user_id="local")
 
     with pytest.raises(InvalidValue):
         _dummy_error(ctx, "x")
@@ -158,7 +158,7 @@ def test_traced_flush_failure_preserves_original_error(db_session):
     `StatementError`/`IntegrityError` 계열)여야 한다. `__context__` 도
     `PendingRollbackError` 로 덮이지 않아야 한다(결정7)."""
     session_id = "trace-flush-fail-1"
-    ctx = ToolContext(session=db_session, session_id=session_id)
+    ctx = ToolContext(session=db_session, session_id=session_id, user_id="local")
 
     with pytest.raises(Exception) as exc_info:
         _dummy_flush_failure(ctx)
@@ -199,6 +199,7 @@ def test_add_alias_rejects_dimension_mismatch_before_flush(db_session):
     ctx = ToolContext(
         session=db_session,
         session_id=session_id,
+        user_id="local",
         confirmed_question_id=question.id,
         embedder=lambda texts: [[0.1] * 1535 for _ in texts],
     )
@@ -215,7 +216,7 @@ def test_add_alias_rejects_dimension_mismatch_before_flush(db_session):
 
 def test_traced_step_argument_and_trace_tokens_are_recorded(db_session):
     session_id = "trace-step-tokens-1"
-    ctx = ToolContext(session=db_session, session_id=session_id)
+    ctx = ToolContext(session=db_session, session_id=session_id, user_id="local")
 
     result = _fake_step_with_tokens(ctx, "부장님")
 
@@ -230,7 +231,7 @@ def test_traced_step_argument_and_trace_tokens_are_recorded(db_session):
 
 def test_traced_truncates_long_string_argument(db_session):
     session_id = "trace-trunc-1"
-    ctx = ToolContext(session=db_session, session_id=session_id)
+    ctx = ToolContext(session=db_session, session_id=session_id, user_id="local")
     long_value = "가" * 3000
 
     _dummy_long(ctx, long_value)
@@ -246,7 +247,7 @@ def test_traced_truncates_long_string_argument(db_session):
 
 def test_traced_datetime_argument_becomes_isoformat_string(db_session):
     session_id = "trace-dt-1"
-    ctx = ToolContext(session=db_session, session_id=session_id)
+    ctx = ToolContext(session=db_session, session_id=session_id, user_id="local")
     when = datetime(2026, 3, 4, 5, 6, tzinfo=timezone.utc)
 
     _dummy_success(ctx, "이대리", when=when)
@@ -268,7 +269,7 @@ def test_tool_context_repr_excludes_session_object_repr():
         def __repr__(self) -> str:  # pragma: no cover -- only used via repr()
             return "<FakeSessionRepr SECRET_MARKER_e91a>"
 
-    ctx = ToolContext(session=_FakeSession(), session_id="s1")
+    ctx = ToolContext(session=_FakeSession(), session_id="s1", user_id="local")
     assert "SECRET_MARKER_e91a" not in repr(ctx)
     assert "session_id='s1'" in repr(ctx)
 
@@ -283,7 +284,7 @@ def test_amend_trace_output_adds_keys_persists_and_refuses_overwrite_fix035(db_s
     기존 키 덮어쓰기는 거부하고, 행이 없거나 id 가 None 이면 False."""
     from app.tools.context import amend_trace_output
 
-    ctx = ToolContext(session=db_session, session_id="amend-fix035")
+    ctx = ToolContext(session=db_session, session_id="amend-fix035", user_id="local")
     row = AgentTrace(
         session_id="amend-fix035",
         step="loop_resume",

@@ -1,0 +1,36 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3a/run.sh
+# 시각: 2026-11-15T22:12:00+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# ---
+mutated
+--- 사본 안 app_user_id 잔존(app, 코드·주석 전부) ---
+app/settings.py:322:    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/`er_config()`
+app/settings.py:350:    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/
+app/settings.py:381:    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/`pattern_
+app/settings.py:435:    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()` 와 같은 규약).
+app/settings.py:492:    되돌아가지 않고 사람이 읽는 오류를 낸다 -- `app_user_id()`/`er_config()`
+--- context.py user_id 줄 ---
+102:    user_id: str
+--- settings 에 함수 정의 잔존 수 ---
+0
+--- app·도우미 모듈 경로 ---
+/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3a/mut/app/__init__.py
+/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3a/mut/tests/auth_helpers.py
+--- pytest ---
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+........................................................................ [ 87%]
+........................................................................ [ 90%]
+........................................................................ [ 93%]
+........................................................................ [ 96%]
+........................................................................ [ 99%]
+.................                                                        [100%]
+=============================== warnings summary ===============================
+../../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2393 passed, 1 warning in 36.18s

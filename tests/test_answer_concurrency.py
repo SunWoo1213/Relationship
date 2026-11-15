@@ -35,9 +35,9 @@ from __future__ import annotations
 
 import threading
 import uuid
+from contextlib import ExitStack
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
@@ -45,10 +45,10 @@ import app.api.routes as routes_module
 from app.agent.types import SCHEDULE_UNKNOWN_OPTION
 from app.db.models import PendingQuestion, Person, Schedule
 from app.main import create_app
-from app.settings import app_user_id
 from app.tools.context import ToolContext
 from app.tools.questions import answer_question, ask_user
 from app.tools.types import QuestionNotAnswerable
+from tests.auth_helpers import committed_login
 
 dbtest = pytest.mark.dbtest
 pytestmark = dbtest
@@ -68,9 +68,9 @@ def _make_person_and_schedule_question(engine) -> tuple[int, int]:
     없이 `add_schedule` 만 부르는 가장 단순한 경로, 모듈 docstring
     참고). 반환값은 `(person_id, question_id)`.
 
-    `user_id=app_user_id()`(고정값, 기본 `"local"`) -- (b) API 수준 테스트는
+    `user_id="local"`(고정값) -- (b) API 수준 테스트는
     `POST /answers/{id}` 가 실제로 타는 `build_ctx()` 를 그대로 쓰고,
-    그 함수는 `ctx.user_id` 를 항상 `app_user_id()` 로 고정한다(단일
+    그 함수는 `ctx.user_id` 를 항상 같은 고정값 `"local"` 로 만든다(단일
     사용자 제품 전제, `app/api/deps.py` 참고). 여기서 임의의 `user_id` 를
     쓰면 `add_schedule` 의 소유권 검사(security.md §5 격리)가
     `PersonNotFound` 로 막아 재개 자체가 실패한다 -- (a)/(b) 가 같은
@@ -80,7 +80,7 @@ def _make_person_and_schedule_question(engine) -> tuple[int, int]:
     setup_session = Session(bind=engine)
     try:
         person = Person(
-            user_id=app_user_id(),
+            user_id="local",
             display_name="동시성테스트",
             relation_tag="친구",
             hierarchy="동",
@@ -89,7 +89,9 @@ def _make_person_and_schedule_question(engine) -> tuple[int, int]:
         setup_session.flush()
 
         ctx = ToolContext(
-            session=setup_session, session_id=f"concurrency-setup-{uuid.uuid4().hex}"
+            session=setup_session,
+            session_id=f"concurrency-setup-{uuid.uuid4().hex}",
+            user_id="local",
         )
         asked = ask_user(
             ctx,
@@ -124,7 +126,7 @@ def _make_person_and_schedule_question(engine) -> tuple[int, int]:
 def _cleanup(engine, *, person_id: int, question_id: int) -> None:
     """이 테스트가 만든 행만 **지정 ID** 로 지운다(person_id/question_id 는
     `_make_person_and_schedule_question` 이 돌려준 값 -- 여러 테스트가
-    같은 고정 `user_id=app_user_id()` 를 공유하므로 `user_id` 로 범위를
+    같은 고정 `user_id="local"` 을 공유하므로 `user_id` 로 범위를
     좁히면 다른 테스트 데이터까지 지울 수 있다, 테이블 전체 삭제 금지)."""
     cleanup = Session(bind=engine)
     try:
@@ -162,13 +164,17 @@ def test_answer_question_second_connection_sees_already_answered(db_engine) -> N
     session_b = Session(bind=conn_b)
     try:
         session_a.begin()
-        ctx_a = ToolContext(session=session_a, session_id="answer-concurrency-tool-a")
+        ctx_a = ToolContext(
+            session=session_a, session_id="answer-concurrency-tool-a", user_id="local"
+        )
         result_a = answer_question(ctx_a, question_id, _SCHEDULE_LABEL)
         assert result_a.status == "answered"
         # A 는 행을 잠근 채(with_for_update) 아직 커밋하지 않는다.
 
         session_b.begin()
-        ctx_b = ToolContext(session=session_b, session_id="answer-concurrency-tool-b")
+        ctx_b = ToolContext(
+            session=session_b, session_id="answer-concurrency-tool-b", user_id="local"
+        )
 
         result_holder: dict[str, object] = {}
 
@@ -235,9 +241,14 @@ def test_post_answers_concurrent_requests_exactly_one_resume(db_engine, monkeypa
     # 본문 전체를 try/finally 로 감싼다 -- 실패 경로에서 정리가 빠지면
     # 전역 집계(`select(Schedule)` 전체 개수 등)를 쓰는 다른 테스트가
     # 이 테스트의 잔여 행 때문에 깨진다(실제로 한 번 그렇게 깨졌다).
+    logins = ExitStack()
     try:
         app = create_app()
-        client = TestClient(app)
+        # 로그인 사용자 `"local"`(= 이 테스트가 넣는 인물의 `user_id`)의 행을 커밋하고 쿠키를
+        # 붙인다. 끝에서 `logins.close()` 가 그 사용자·세션 행을 지정 id 로 지운다(R2-2 ②).
+        client = logins.enter_context(
+            committed_login(app, lambda: Session(bind=db_engine), user_id="local")
+        )
 
         real_answer_question = routes_module.answer_question
         real_resume_turn = routes_module.resume_turn
@@ -323,4 +334,5 @@ def test_post_answers_concurrent_requests_exactly_one_resume(db_engine, monkeypa
         finally:
             check_session.close()
     finally:
+        logins.close()
         _cleanup(db_engine, person_id=person_id, question_id=question_id)

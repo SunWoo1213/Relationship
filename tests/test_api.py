@@ -24,6 +24,7 @@ from app.db.models import AgentTrace, PendingQuestion
 from app.main import create_app
 from app.tools.context import ToolContext
 from app.tools.questions import ask_user
+from tests.auth_helpers import logged_in_client
 
 #: 모듈 전체가 아니라 `db_session`/`client` 픽스처를 실제로 쓰는 테스트에만
 #: 붙인다(conftest.py 지시 -- 마커만 붙고 픽스처를 안 쓰면 "DB 없이도
@@ -73,7 +74,7 @@ def client(db_session) -> TestClient:
     하므로) -- 툴이 `flush()` 까지 하므로 조회에는 문제가 없다."""
     app = create_app()
     app.dependency_overrides[get_session] = lambda: db_session
-    return TestClient(app)
+    return logged_in_client(app, db_session)
 
 
 # ---------------------------------------------------------------------------
@@ -132,7 +133,7 @@ def test_health_degraded_on_db_down() -> None:
 
 @dbtest
 def test_answer_success_saves_row_same_transaction(client: TestClient, db_session) -> None:
-    ctx = ToolContext(session=db_session, session_id="api-answer-success")
+    ctx = ToolContext(session=db_session, session_id="api-answer-success", user_id="local")
     asked = ask_user(
         ctx,
         kind="schedule",

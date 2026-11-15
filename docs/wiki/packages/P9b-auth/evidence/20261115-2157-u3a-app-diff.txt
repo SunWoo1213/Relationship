@@ -1,0 +1,6 @@
+# 명령: git diff --stat -- app evaluation reports data
+# 시각: 2026-11-15T21:57:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# ---

@@ -1,0 +1,19 @@
+# 명령: /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u3a/run-helper-mutations.py
+# 시각: 2026-11-15T22:05:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# ---
+H-0 원본(대조): 변이적용=False exit=0 :: 
+   stdout 끝: .............                                                            [100%] | stderr 끝: -
+H-1 쿠키 이름 하드코딩: 변이적용=True exit=1 :: FAILED tests/test_auth_helpers.py::test_logged_in_client_cookie_name_follows_setting - AssertionError: assert ['__Host-rel_session'] == ['rel_session']
+   stdout 끝: !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!! | stderr 끝: -
+H-2 make_user 가 user_id 무시(고정 'local'): 변이적용=True exit=1 :: FAILED tests/test_auth_helpers.py::test_make_user_custom_id_and_username - AssertionError: assert ('local', 'helper-seven') == ('u-helper-7', 'helper-seven')
+   stdout 끝: !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!! | stderr 끝: -
+H-4 committed_login 기본 id 고정: 변이적용=True exit=1 :: FAILED tests/test_auth_helpers.py::test_committed_login_default_ids_differ_per_call - AssertionError: assert 'fixed-id' != 'fixed-id'
+   stdout 끝: !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!! | stderr 끝: -
+H-5 make_user 멱등 제거: 변이적용=True exit=1 :: FAILED tests/test_auth_helpers.py::test_make_user_uses_given_id_and_is_idempotent - sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "pk_users"
+   stdout 끝: !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!! | stderr 끝: -
+H-6 쿠키 값을 엉뚱한 문자열로: 변이적용=True exit=1 :: FAILED tests/test_auth_helpers.py::test_logged_in_client_session_row_matches_cookie - AssertionError: 세션 행의 token_hash 가 쿠키 값의 sha256 과 다르다
+   stdout 끝: !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!! | stderr 끝: -
+사본 도우미 원복 완료

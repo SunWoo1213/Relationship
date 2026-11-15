@@ -1,0 +1,11 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u3a/run-v3a1.sh
+# 시각: 2026-11-15T21:58:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 3
+# ---
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u3a/mutate_v3a1.py", line 30, in <module>
+    assert m, "app_user_id 정의를 못 찾음"
+           ^
+AssertionError: app_user_id 정의를 못 찾음

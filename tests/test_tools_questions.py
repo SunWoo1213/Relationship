@@ -52,6 +52,7 @@ def _ctx(
     return ToolContext(
         session=db_session,
         session_id=session_id,
+        user_id="local",
         confirmed_question_id=confirmed_question_id,
         **kwargs,
     )

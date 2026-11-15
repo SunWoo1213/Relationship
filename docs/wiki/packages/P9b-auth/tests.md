@@ -141,3 +141,43 @@
 | `test_logout_clear_cookie_keeps_secure_and_plain_name_when_off` — **R-2** 삭제 쿠키 켬: `__Host-`·Secure·Path=/·Domain 없음, 끔: `rel_session`·Secure 없음·Max-Age=0(R-2·R-2b 변이 잡힘) | 같음 | passed | `u2-fix-mutations` |
 | 전체 pytest · ruff(`alembic` 포함) · mypy | 전체 명령 | 2426 passed · All checks passed · 새 오류 없음(38/38) | `u2-fix-pytest-all` · `u2-fix-ruff` · `u2-fix-mypy` |
 | 변이(저장소 밖 사본) | `run_fix.sh` | F-1·F-2·F-2b·R-3a·R-2·R-2b·V2-9b·V2-7a·V2-1 전부 잡힘 | `u2-fix-mutations` |
+
+## U3a — 기존 테스트 이관·로그인 도우미 (backend-agent, 2026-11-15)
+
+> 동작 불변. `app/` diff 0, 기존 단언 변경 0. 새 시험은 도우미 자체 시험 13건뿐. 증거 접두 `20261115-HHMM-u3a-`.
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| `make_user` — `id == "local"` 행 생성, 같은 id 재호출은 같은 객체·행 1개 | `pytest tests/test_auth_helpers.py` | passed | `u3a-pytest-all-final2` |
+| `make_user` — 사용자 지정 id·username 값 | 같음 | passed | 같음 |
+| `make_user` — `password_hash == NO_LOGIN_HASH` 이고 `verify_password` 가 False(이 사용자로 로그인 불가) | 같음 | passed | 같음 |
+| `make_ctx` — `user_id` 기본 `"local"`·`session_id` 기본 `"test-session"`, 인자로 바꾸면 그 값 | 같음 | passed | 같음 |
+| `logged_in_client`(세션) — 쿠키 값의 sha256 == `auth_sessions.token_hash`(행 1개)·원문과 다름·`GET /auth/me` == `{"id","username"}` | 같음 | passed | 같음 |
+| `logged_in_client` 기본 사용자는 `"local"`(`/auth/me` id) | 같음 | passed | 같음 |
+| `logged_in_client` 두 번 호출 — `users` 행 1개·`auth_sessions` 행 2개 | 같음 | passed | 같음 |
+| 쿠키 이름이 설정을 따른다 — 켬 `__Host-rel_session`(접두 없는 이름 없음), 끔 `rel_session` + `/auth/me` 200 | 같음 | passed | 같음 |
+| 쿠키 제거 뒤 `/auth/me` 401 | 같음 | passed | 같음 |
+| `logged_in_client`(세션 팩토리) — 별도 세션에 커밋된 `users`·`auth_sessions` 각 1행(시험이 직접 정리) | 같음 | passed | 같음 |
+| `committed_login` — 안에서 커밋 행 보임(username `helper-` 접두), 나오면 사용자·세션 행 0 | 같음 | passed | 같음 |
+| `committed_login` — 본문이 예외를 내도 행 0(정리 보장) | 같음 | passed | 같음 |
+| `committed_login` 기본값 — 두 번 호출한 `user_id`·`username` 이 서로 다르다 | 같음 | passed | 같음 |
+| 전체 pytest | `POSTGRES_PORT=5433 .venv/bin/python -m pytest -q` | **2439 passed**(2426 + 13)·실패 0·skip 0(리뷰 F-1 수정 뒤 재실행도 2439 — `u3a-fix-pytest-all`) | `u3a-pytest-all-final2` |
+| ruff · mypy · tools_check | 판정 방법 공통 회귀 | All checks passed · 새 오류 없음(38/38) · 7/7 | `u3a-ruff-final` · `u3a-mypy-final` · `u3a-tools-check-final` |
+| `app/`·`evaluation`·`reports`·`data`·`scripts` 무변경 | `git diff --stat -- app evaluation reports data scripts` | 빈 출력 | `u3a-er-unchanged` · `u3a-app-diff-final` |
+| 테스트 쪽 고정 사용자 언급 목록 | `bash <SCR>/u3a-tests-fixed-user.sh`(`grep -rnE 'app_user_id|APP_USER_ID' tests scripts evaluation --include='*.py'`) | exit 0, 일치 = `test_settings.py`(U5)·`test_commit_boundaries.py:81,181,293`(U3b)·주석 2곳 | `u3a-tests-fixed-user-final` |
+| 평가 러너 불변(참고) | `pytest tests/test_eval_runner.py tests/test_run_pilot_eval.py tests/test_baseline_parity.py` | 145 passed | `u3a-eval-runner-tests` |
+| **변이 V3a-1**(저장소 밖 사본: `ToolContext.user_id` 기본값·`app_user_id()` 삭제 + 호출자 리터럴 치환, `test_settings`·`test_commit_boundaries`·(사본에 .git 없어 `test_infra_files`) 제외) | `bash <SCR>/run-v3a1.sh` | 이관 전: **30건 실패**(`test_tools_questions.py` `**kwargs` 도우미의 `user_id` 누락) → 고친 뒤 **2393 passed 실패 0** | `u3a-mutation-v3a1-run2`(실패) · `u3a-mutation-v3a1-run3`(통과) · `u3a-mutation-v3a1`(스크립트 정규식 오류로 변이 전 중단, exit 3) |
+
+도우미 변이(저장소 밖 사본의 `tests/auth_helpers.py` 만 치환, `evidence/20261115-2205-u3a-helper-mutations.txt`, 각 변이는 `-x` 로 첫 실패에서 멈춤):
+
+| 변이 | 잡은 시험(실제 결과) |
+|---|---|
+| H-1 쿠키 이름 `"__Host-rel_session"` 하드코딩 | `test_logged_in_client_cookie_name_follows_setting` — `['__Host-rel_session'] == ['rel_session']` |
+| H-2 `make_user` 가 `user_id` 인자를 무시(`"local"` 고정) | `test_make_user_custom_id_and_username` |
+| H-4 `committed_login` 기본 id·username 고정 | `test_committed_login_default_ids_differ_per_call` |
+| H-5 `make_user` 멱등 제거 | `test_make_user_uses_given_id_and_is_idempotent` — `pk_users` UniqueViolation |
+| H-6 쿠키 값을 엉뚱한 문자열로 | `test_logged_in_client_session_row_matches_cookie` — 해시 불일치(토큰 값은 메시지에 없음) |
+
+(번호 H-3 이 빠진 것은 아래 "돌리지 않은 변이"인 `committed_login` 정리 제거 변이의 자리이기 때문이다.)
+
+**돌리지 않은 변이**: `committed_login` 의 `finally` 정리 제거 — 공유 시험 DB 에 커밋 행이 남아 이후 시험을 오염시킬 수 있어 일부러 돌리지 않았다. 그 보장은 `test_committed_login_cleans_up_even_when_body_raises`(예외 경로)·`…commits_then_cleans_up` 이 값(행 0)으로 단언하며, 변이 시험 뒤 시험 DB 잔여 행 0 을 `evidence/20261115-2205-u3a-test-db-leftover.txt` 로 확인했다. 첫 변이 실행(`…-2204-…`)은 사본에 `tests/tests` 중첩 사본이 생겨 변이가 적용되지 않은 채 전부 통과로 나왔으므로 폐기하고 다시 돌렸다.

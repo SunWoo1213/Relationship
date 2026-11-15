@@ -31,7 +31,6 @@ import uuid
 from datetime import datetime, timezone
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -44,6 +43,7 @@ from app.er.types import JudgeUnavailable
 from app.main import create_app
 from app.tools.context import ToolContext
 from app.tools.questions import ask_user
+from tests.auth_helpers import logged_in_client
 
 dbtest = pytest.mark.dbtest
 pytestmark = dbtest
@@ -94,7 +94,7 @@ def app_and_client(db_session, fake_embedder):
     app = create_app()
     app.dependency_overrides[get_session] = lambda: db_session
     app.dependency_overrides[get_embedder] = lambda: fake_embedder
-    return app, TestClient(app)
+    return app, logged_in_client(app, db_session)
 
 
 def _make_person(db_session, *, display_name: str, user_id: str = "local") -> Person:
@@ -287,7 +287,7 @@ def test_chat_db_error_does_not_return_200(db_session, fake_embedder):
     app.dependency_overrides[get_session] = lambda: db_session
     app.dependency_overrides[get_proposer] = lambda: _DbErrorProposer()
     app.dependency_overrides[get_embedder] = lambda: fake_embedder
-    client = TestClient(app, raise_server_exceptions=False)
+    client = logged_in_client(app, db_session, raise_server_exceptions=False)
 
     resp = client.post(
         "/chat", json={"utterance": "아무 발화"}, headers={"X-Session-Id": "chat-db-error"}
@@ -308,7 +308,7 @@ def test_chat_pending_survives_when_new_utterance_arrives(app_and_client, db_ses
 
     app, client = app_and_client
     session_id = "chat-pending-survives"
-    ctx = ToolContext(session=db_session, session_id=session_id)
+    ctx = ToolContext(session=db_session, session_id=session_id, user_id="local")
     asked = ask_user(
         ctx,
         kind="schedule",

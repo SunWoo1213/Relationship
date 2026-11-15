@@ -1,0 +1,39 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u3a/run-v3a1.sh
+# 시각: 2026-11-15T21:58:48+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# ---
+mutated
+--- 변이 확인: app/ 안 app_user_id 코드 호출 (주석·docstring 제외) ---
+app/settings.py:492:    되돌아가지 않고 사람이 읽는 오류를 낸다 -- `app_user_id()`/`er_config()`
+--- 사본 app 경로 ---
+/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u3a/mut/app/__init__.py
+--- 기본값 제거 확인 ---
+102:    user_id: str
+--- 전체 pytest (test_settings·test_commit_boundaries 제외) ---
+FAILED tests/test_tools_questions.py::test_ask_user_empty_options_raises - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_duplicate_options_raises - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_identity_without_affirmative_options_raises - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_new_person_with_empty_affirmative_list_raises - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_affirmative_options_outside_options_raises - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_schedule_without_affirmative_options_succeeds - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_context_with_secret_like_key_raises[password] - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_context_with_secret_like_key_raises[api_key] - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_context_with_secret_like_key_raises[token] - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_context_with_secret_like_key_raises[secret] - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_context_with_secret_like_key_raises[authorization] - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_context_with_secret_like_key_raises[API_KEY] - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_context_long_string_is_truncated - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_context_roundtrips_through_jsonb - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_answer_question_success_records_answer_and_answered_at - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_answer_question_already_answered_raises - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_answer_question_expired_raises_and_keeps_answered_at_null - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_answer_question_option_outside_stored_options_raises_and_row_unchanged - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_answer_question_nonexistent_id_raises_question_not_found - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_and_answer_question_each_write_one_trace_row - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_d1_roundtrip_affirmative_answer_allows_create_person - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_d1_roundtrip_negative_answer_blocks_create_person - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_ask_user_never_calls_time_sleep - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+FAILED tests/test_tools_questions.py::test_list_pending_excludes_answered_and_expired - TypeError: ToolContext.__init__() missing 1 required positional argument: 'user_id'
+31 failed, 2402 passed, 1 warning in 35.21s

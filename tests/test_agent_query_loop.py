@@ -197,7 +197,9 @@ def _run(
     intent: str | None = "query",
     **kw,
 ):
-    ctx = ToolContext(session=db_session, session_id=session_id, embedder=fake_embedder)
+    ctx = ToolContext(
+        session=db_session, session_id=session_id, user_id="local", embedder=fake_embedder
+    )
     intents = {utterance: intent} if intent is not None else {}
     proposer = FakeProposer(table={utterance: calls}, intents=intents)
     result = run_turn(
@@ -352,7 +354,9 @@ def test_c_identity_asks_with_query_resume(db_session, fake_embedder):
     judge = FakeJudge(fail="timeout")  # 판정 실패 -> 규칙 통과 후보가 있으면 identity
 
     # ER 원본 options 는 같은 입력의 resolve() 결과에서 읽는다.
-    er_ctx = ToolContext(session=db_session, session_id="q-c-er", embedder=fake_embedder)
+    er_ctx = ToolContext(
+        session=db_session, session_id="q-c-er", user_id="local", embedder=fake_embedder
+    )
     original = loop_module.resolve(er_ctx, "팀장", utt, None, judge=judge)
     assert original.band == "identity"
     before = _counts(db_session, "local")
@@ -1125,7 +1129,9 @@ def test_v_resume_without_intent_key_keeps_record_path(db_session, fake_embedder
     utt = "팀장이랑 저녁 먹었어"
     person = _make_person(db_session, "김민수")
     _add_alias(db_session, person, "팀장님", fake_embedder)
-    ctx = ToolContext(session=db_session, session_id=sid, embedder=fake_embedder)
+    ctx = ToolContext(
+        session=db_session, session_id=sid, user_id="local", embedder=fake_embedder
+    )
     call = {
         "name": "add_event",
         "args": {
@@ -1168,7 +1174,9 @@ def test_w_other_kinds_ignore_intent(db_session, fake_embedder, monkeypatch, kin
     monkeypatch.setattr(
         loop_module, "_resume_query_turn", lambda *a_, **k: called.append(1)
     )
-    ctx = ToolContext(session=db_session, session_id=f"q-w-{kind}", embedder=fake_embedder)
+    ctx = ToolContext(
+        session=db_session, session_id=f"q-w-{kind}", user_id="local", embedder=fake_embedder
+    )
     resume_input = ResumeInput(
         kind=kind,
         context={

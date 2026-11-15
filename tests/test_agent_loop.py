@@ -58,7 +58,7 @@ def _add_alias(
 
 
 def _ctx(db_session, *, session_id: str, embedder=None) -> ToolContext:
-    return ToolContext(session=db_session, session_id=session_id, embedder=embedder)
+    return ToolContext(session=db_session, session_id=session_id, user_id="local", embedder=embedder)
 
 
 def _call(name: str, **args) -> ToolCallProposal:
@@ -492,7 +492,11 @@ def test_run_turn_schedule_without_time_asks_schedule_question(db_session, fake_
     person = _make_person(db_session, display_name="김민수")
     _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
     ctx = ToolContext(
-        session=db_session, session_id=session_id, embedder=fake_embedder, now=lambda: NOW
+        session=db_session,
+        session_id=session_id,
+        user_id="local",
+        embedder=fake_embedder,
+        now=lambda: NOW,
     )
     schedules_before = _count(db_session, Schedule)
 

@@ -10,7 +10,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from fastapi.testclient import TestClient
 
 from app.api.deps import get_now, get_session
 from app.api.read import FACT_SOURCES_LIMIT
@@ -23,6 +22,7 @@ from app.db.models import (
     Schedule,
 )
 from app.main import create_app
+from tests.auth_helpers import logged_in_client
 from tests.helpers_read_api import assert_no_writes, snapshot_db
 
 pytestmark = pytest.mark.dbtest
@@ -39,7 +39,7 @@ def client(db_session):
     app = create_app()
     app.dependency_overrides[get_session] = lambda: db_session
     app.dependency_overrides[get_now] = lambda: (lambda: NOW)
-    return TestClient(app)
+    return logged_in_client(app, db_session)
 
 
 def _person(db, name="민수", user_id="local") -> Person:

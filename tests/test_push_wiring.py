@@ -41,7 +41,6 @@ import pytest
 import pywebpush
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from fastapi import Depends
-from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -54,7 +53,7 @@ from app.db.models import AgentTrace, Person, PushSubscription, Schedule
 from app.main import create_app
 from app.push.notifier import MisconfiguredNotifier, WebPushNotifier
 from app.push.types import PUSH_TRACE_TOOL_NAME, STEP_PUSH_SEND, FakePushSender, VapidConfig
-from app.settings import app_user_id
+from tests.auth_helpers import logged_in_client
 
 dbtest = pytest.mark.dbtest
 pytestmark = dbtest
@@ -108,7 +107,7 @@ def _set_full_vapid_env(monkeypatch) -> tuple[str, str]:
 
 def _make_person(db_session) -> Person:
     person = Person(
-        user_id=app_user_id(), display_name="민수", relation_tag="친구", hierarchy="동"
+        user_id="local", display_name="민수", relation_tag="친구", hierarchy="동"
     )
     db_session.add(person)
     db_session.flush()
@@ -124,7 +123,7 @@ def _make_schedule(db_session, person: Person, *, scheduled_at: datetime) -> Sch
 
 def _make_subscription(db_session, *, n: int) -> PushSubscription:
     row = PushSubscription(
-        user_id=app_user_id(),
+        user_id="local",
         endpoint=f"https://push.example.test/u5-wiring/{n}",
         keys={"p256dh": "p", "auth": "a"},
     )
@@ -155,7 +154,7 @@ def manual_client(db_session):
     app.dependency_overrides[get_session] = lambda: db_session
     app.dependency_overrides[get_now] = lambda: (lambda: NOW)
     app.dependency_overrides[get_briefing_composer] = lambda: FakeBriefingComposer()
-    return app, TestClient(app)
+    return app, logged_in_client(app, db_session)
 
 
 @contextmanager
@@ -201,7 +200,7 @@ def test_manual_path_override_receives_same_session_and_sends(db_session, manual
             public_key="pub-placeholder", private_key="priv-placeholder", subject="mailto:x@y.z"
         )
         return WebPushNotifier(
-            session=session, user_id=app_user_id(), sender=sender, vapid=vapid, now=now
+            session=session, user_id="local", sender=sender, vapid=vapid, now=now
         )
 
     app.dependency_overrides[get_notifier] = _override
@@ -341,7 +340,7 @@ def test_scheduler_passes_web_push_notifier_sharing_session_user_and_clock(
     ctx = captured["ctx"]
     assert isinstance(notifier, WebPushNotifier)
     assert notifier.session is ctx.session is scheduler_env
-    assert notifier.user_id == ctx.user_id == app_user_id()
+    assert notifier.user_id == ctx.user_id == "local"
     assert notifier.now is ctx.now
     assert notifier.sender is sender
 

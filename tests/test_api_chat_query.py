@@ -17,7 +17,6 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import select, text
 
 from app.agent.propose import FakeProposer
@@ -35,6 +34,7 @@ from app.db.models import (
 from app.er.judge import FakeJudge
 from app.main import create_app
 from app.tools.types import PersonNotFound
+from tests.auth_helpers import logged_in_client
 
 pytestmark = pytest.mark.dbtest
 
@@ -55,7 +55,7 @@ def app_and_client(db_session, fake_embedder):
     app = create_app()
     app.dependency_overrides[get_session] = lambda: db_session
     app.dependency_overrides[get_embedder] = lambda: fake_embedder
-    return app, TestClient(app)
+    return app, logged_in_client(app, db_session)
 
 
 def _make_person(db_session, *, display_name: str, user_id: str = "local") -> Person:

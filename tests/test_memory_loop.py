@@ -16,7 +16,6 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 import app.agent.loop as loop_module
@@ -33,6 +32,7 @@ from app.main import create_app
 from app.memory.extract import FakeFactExtractor
 from app.tools.context import ToolContext
 from app.tools.questions import answer_question
+from tests.auth_helpers import logged_in_client
 
 dbtest = pytest.mark.dbtest
 
@@ -78,7 +78,9 @@ def _add_event(
 
 
 def _ctx(db_session, *, session_id: str, embedder=None, now=lambda: NOW) -> ToolContext:
-    return ToolContext(session=db_session, session_id=session_id, embedder=embedder, now=now)
+    return ToolContext(
+        session=db_session, session_id=session_id, user_id="local", embedder=embedder, now=now
+    )
 
 
 def _add_event_call(person_mention: str, *, event_type: str = "conflict", content: str = "다툼") -> dict:
@@ -274,7 +276,7 @@ def app_and_client(db_session, fake_embedder):
     app.dependency_overrides[get_session] = lambda: db_session
     app.dependency_overrides[get_embedder] = lambda: fake_embedder
     app.dependency_overrides[get_fact_extractor] = lambda: FakeFactExtractor()
-    return app, TestClient(app)
+    return app, logged_in_client(app, db_session)
 
 
 @dbtest

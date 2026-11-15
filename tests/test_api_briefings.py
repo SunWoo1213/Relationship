@@ -21,7 +21,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app.api.deps import get_briefing_composer, get_now, get_session
@@ -29,6 +28,7 @@ from app.briefing.compose import FakeBriefingComposer
 from app.briefing.types import BRIEFING_TRACE_TOOL_NAME, STEP_BRIEFING_COMPOSE, STEP_BRIEFING_RUN
 from app.db.models import AgentTrace, Event, Person, PersonFact, Schedule
 from app.main import create_app
+from tests.auth_helpers import logged_in_client
 
 dbtest = pytest.mark.dbtest
 pytestmark = dbtest
@@ -53,7 +53,7 @@ def app_and_client(db_session):
     app.dependency_overrides[get_session] = lambda: db_session
     app.dependency_overrides[get_now] = lambda: (lambda: NOW)
     app.dependency_overrides[get_briefing_composer] = lambda: FakeBriefingComposer()
-    return app, TestClient(app)
+    return app, logged_in_client(app, db_session)
 
 
 def _make_person(

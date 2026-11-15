@@ -16,7 +16,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app.api.deps import get_briefing_composer, get_notifier, get_now, get_session
@@ -31,6 +30,7 @@ from app.briefing.types import (
 from app.db.models import AgentTrace, Event, FactSource, Person, PersonFact, Schedule
 from app.main import create_app
 from app.tools.context import ToolContext
+from tests.auth_helpers import logged_in_client
 
 pytestmark = pytest.mark.dbtest
 
@@ -47,7 +47,7 @@ def env(db_session):
     app.dependency_overrides[get_now] = lambda: (lambda: NOW)
     app.dependency_overrides[get_briefing_composer] = lambda: composer
     app.dependency_overrides[get_notifier] = lambda: NullNotifier()
-    return TestClient(app), composer
+    return logged_in_client(app, db_session), composer
 
 
 def _person(db, name="김팀장", user_id="local") -> Person:

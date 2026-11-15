@@ -647,3 +647,5 @@
 - 2026-11-15 21:16 | PUSH-dev2 | origin dev2 0f9223e (실험 푸시)
 - 2026-11-15 21:33 | COMMIT | 6ecf635 feat(P9b-auth): 로그인·가입 화면과 로그아웃, 지난 대화 불러오기를 프론트에 넣는다
 - 2026-11-15 21:33 | PUSH-dev2 | origin dev2 6ecf635 (실험 푸시)
+- 2026-11-15 21:50 | COMMIT | 1cf67cd feat(P9b-auth): 아이디·비밀번호 가입·로그인·로그아웃 API 와 요청 출처 검사를 넣는다
+- 2026-11-15 21:50 | PUSH-dev2 | origin dev2 1cf67cd (실험 푸시)

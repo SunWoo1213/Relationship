@@ -29,7 +29,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app.agent.propose import FakeProposer
@@ -46,6 +45,7 @@ from app.er.judge import FakeJudge
 from app.main import create_app
 from app.tools.context import ToolContext
 from app.tools.questions import ask_user
+from tests.auth_helpers import logged_in_client
 
 dbtest = pytest.mark.dbtest
 pytestmark = dbtest
@@ -67,7 +67,7 @@ def app_and_client(db_session, fake_embedder):
     app = create_app()
     app.dependency_overrides[get_session] = lambda: db_session
     app.dependency_overrides[get_embedder] = lambda: fake_embedder
-    return app, TestClient(app)
+    return app, logged_in_client(app, db_session)
 
 
 def _make_person(db_session, *, display_name: str, user_id: str = "local") -> Person:
@@ -292,7 +292,7 @@ def test_answers_resume_new_person_reject_creates_nothing(
 def test_answers_resume_expired_question_returns_409(app_and_client, db_session):
     app, client = app_and_client
     session_id = "resume-expired"
-    ctx = ToolContext(session=db_session, session_id=session_id)
+    ctx = ToolContext(session=db_session, session_id=session_id, user_id="local")
     asked = ask_user(
         ctx,
         kind="schedule",
@@ -423,7 +423,12 @@ def test_answers_resume_schedule_answer_stores_scheduled_time(
 ):
     app, client = app_and_client
     person = _make_person(db_session, display_name="김민수")
-    ctx = ToolContext(session=db_session, session_id="resume-schedule-answer", embedder=fake_embedder)
+    ctx = ToolContext(
+        session=db_session,
+        session_id="resume-schedule-answer",
+        user_id="local",
+        embedder=fake_embedder,
+    )
     question_id, options_map = _make_schedule_question(db_session, ctx, person=person)
     label, iso = next(iter(options_map.items()))
 
@@ -449,7 +454,10 @@ def test_answers_resume_schedule_unknown_answer_stores_nothing(
     app, client = app_and_client
     person = _make_person(db_session, display_name="박서준")
     ctx = ToolContext(
-        session=db_session, session_id="resume-schedule-unknown", embedder=fake_embedder
+        session=db_session,
+        session_id="resume-schedule-unknown",
+        user_id="local",
+        embedder=fake_embedder,
     )
     question_id, _ = _make_schedule_question(db_session, ctx, person=person)
 

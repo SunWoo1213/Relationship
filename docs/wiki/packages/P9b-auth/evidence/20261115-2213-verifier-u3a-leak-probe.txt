@@ -1,0 +1,12 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3a/leak_probe.py
+# 시각: 2026-11-15T22:13:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# ---
+[plain] exit=1 요약=['========================= 8 failed, 5 passed in 0.57s =========================='] 토큰모양 일치=0
+   'cookie' 값 표기 수: Cookies(=0 <cookie =0 set-cookie=0
+[locals] exit=1 요약=['========================= 8 failed, 5 passed in 0.56s =========================='] 토큰모양 일치=2
+    token      = '<43자 가림>
+   'cookie' 값 표기 수: Cookies(=0 <cookie =0 set-cookie=0
+사본 시험 파일 원복: True

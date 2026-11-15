@@ -1,0 +1,25 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u3a/u3a-wip-docs.sh
+# 시각: 2026-11-15T21:57:48+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# ---
+tests/test_push_devpage.py:29:    return TestClient(create_app())
+tests/test_api_chat.py:3:`TestClient(create_app())` + `app.dependency_overrides[get_session]`
+tests/test_api_briefings.py:3:`TestClient(create_app())` + `app.dependency_overrides[get_session]`
+tests/test_api_answers_resume.py:4:`TestClient(create_app())` + `app.dependency_overrides[get_session]`(U1
+tests/test_briefing_scheduler.py:10:`with TestClient(create_app()) as client:` 로 **반드시 컨텍스트 매니저로
+tests/test_briefing_scheduler.py:11:진입**해야 lifespan 이 실제로 돈다(그냥 `TestClient(app)` 은 lifespan을
+tests/test_briefing_scheduler.py:73:    with TestClient(create_app()):
+tests/test_briefing_scheduler.py:94:    with TestClient(create_app()):
+tests/test_briefing_scheduler.py:129:    with TestClient(create_app()):
+tests/test_briefing_scheduler.py:149:        with TestClient(create_app()):
+tests/test_briefing_scheduler.py:197:    client = TestClient(app)
+tests/test_push_subscriptions.py:6:`TestClient(create_app())` + `app.dependency_overrides[get_session]`
+tests/test_api.py:3:`TestClient(create_app())` + `app.dependency_overrides[get_session]` 로
+tests/test_api.py:117:    client = TestClient(app, raise_server_exceptions=False)
+tests/test_api_read_persons.py:3:`TestClient(create_app())` + `get_session`(롤백 픽스처)·`get_now`(고정 시계)
+tests/test_commit_boundaries.py:120:        client = TestClient(app)
+tests/test_commit_boundaries.py:239:        client = TestClient(app, raise_server_exceptions=False)
+tests/test_commit_boundaries.py:311:    client = TestClient(app)
+tests/auth_helpers.py:94:    client = TestClient(

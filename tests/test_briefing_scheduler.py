@@ -41,6 +41,7 @@ from app.api.deps import get_briefing_composer, get_now, get_session
 from app.briefing.compose import FakeBriefingComposer
 from app.main import create_app
 from app.tools.types import InvalidValue
+from tests.auth_helpers import logged_in_client
 
 #: 테스트 전용 짧은 간격(초). 01-plan U7 "실 시간 1분을 기다리지 않는다".
 _FAST_INTERVAL = 0.02
@@ -194,7 +195,7 @@ def test_manual_endpoint_and_scheduler_call_the_same_run_briefings_object(
     app.dependency_overrides[get_session] = lambda: db_session
     app.dependency_overrides[get_now] = lambda: (lambda: _NOW)
     app.dependency_overrides[get_briefing_composer] = lambda: FakeBriefingComposer()
-    client = TestClient(app)
+    client = logged_in_client(app, db_session)
 
     resp = client.post("/briefings/run")
     assert resp.status_code == 200

@@ -78,6 +78,7 @@ def test_run_turn_stores_naive_occurred_at_as_user_timezone_instant(db_session, 
     ctx = ToolContext(
         session=db_session,
         session_id=session_id,
+        user_id="local",
         embedder=fake_embedder,
         now=lambda: datetime(2026, 9, 25, 3, 0, 0, tzinfo=timezone.utc),
     )
@@ -167,7 +168,13 @@ def test_schedule_candidates_use_user_timezone_wall_clock(db_session, fake_embed
     person = _make_person(db_session, display_name="김민수")
     _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
     fixed_now = datetime(2026, 9, 24, 23, 30, 0, tzinfo=timezone.utc)
-    ctx = ToolContext(session=db_session, session_id=session_id, embedder=fake_embedder, now=lambda: fixed_now)
+    ctx = ToolContext(
+        session=db_session,
+        session_id=session_id,
+        user_id="local",
+        embedder=fake_embedder,
+        now=lambda: fixed_now,
+    )
 
     utterance = "팀장이랑 다음에 약속 잡기로 했어"
     calls = [{"name": "add_schedule", "args": {"person": "팀장", "title": "약속"}}]
@@ -216,6 +223,7 @@ def test_run_turn_passes_user_timezone_localized_now_to_proposer(db_session, fak
     ctx = ToolContext(
         session=db_session,
         session_id=session_id,
+        user_id="local",
         embedder=fake_embedder,
         now=lambda: datetime(2026, 9, 24, 3, 0, 0, tzinfo=timezone.utc),
     )

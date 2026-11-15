@@ -70,7 +70,9 @@ def _add_alias(db_session: Any, person: Person, alias: str, embedding: list[floa
 
 
 def _ctx(db_session: Any, *, session_id: str, embedder: Any) -> ToolContext:
-    return ToolContext(session=db_session, session_id=session_id, embedder=embedder)
+    return ToolContext(
+        session=db_session, session_id=session_id, user_id="local", embedder=embedder
+    )
 
 
 def _row_counts(db_session: Any) -> tuple[int, int, int]:
