@@ -1,0 +1,56 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u7/up.sh
+# 시각: 2026-11-16T01:35:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 4be331b (dev2)
+# exit: 0
+# ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Image relationship-backend:4be331b Built 
+ Image relationship-caddy:4be331b Built 
+ Network relationship-prod_default Creating 
+ Network relationship-prod_default Creating 
+ Network relationship-prod_default Created 
+ Network relationship-prod_default Created 
+ Container relationship-prod-postgres-1 Creating 
+ Container relationship-prod-postgres-1 Created 
+ Container relationship-prod-backend-1 Creating 
+ Container relationship-prod-backend-1 Created 
+ Container relationship-prod-caddy-1 Creating 
+ Container relationship-prod-caddy-1 Created 
+ Container relationship-prod-postgres-1 Starting 
+ Container relationship-prod-postgres-1 Started 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-1 Starting 
+ Container relationship-prod-backend-1 Started 
+ Container relationship-prod-caddy-1 Starting 
+ Container relationship-prod-caddy-1 Started 
+ Container relationship-prod-caddy-1 Waiting 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-backend-1 Waiting 
+ Container relationship-prod-caddy-1 Healthy 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-1 Healthy 
+exit-of-up: 0
+NAME                           IMAGE                          COMMAND                   SERVICE    CREATED          STATUS                    PORTS
+relationship-prod-backend-1    relationship-backend:4be331b   "sh /app/docker/entr…"   backend    37 seconds ago   Up 5 seconds (healthy)    8000/tcp
+relationship-prod-caddy-1      relationship-caddy:4be331b     "caddy run --config …"   caddy      37 seconds ago   Up 5 seconds              0.0.0.0:8088->80/tcp, [::]:8088->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp
+relationship-prod-postgres-1   pgvector/pgvector:pg16         "docker-entrypoint.s…"   postgres   37 seconds ago   Up 36 seconds (healthy)   5432/tcp
+== backend log (alembic lines, Traceback count)
+1:backend-1  | INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+2:backend-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
+3:backend-1  | INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Refs: P9b-auth D18 S3.1 CR-006 F-fbaaae -- 계정·세션·대화 기록 테이블과 질문 소유자.
+Traceback count: 0

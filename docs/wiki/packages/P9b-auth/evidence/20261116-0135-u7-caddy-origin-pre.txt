@@ -1,0 +1,27 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u7/pre.sh
+# 시각: 2026-11-16T01:35:26+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 4be331b (dev2)
+# exit: 0
+# ---
+== docker ps -a
+NAMES                     STATUS                 PORTS
+broker-agent-postgres-1   Up 2 weeks (healthy)   0.0.0.0:5434->5432/tcp, [::]:5434->5432/tcp
+capstone2-postgres-1      Up 2 weeks (healthy)   0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+== compose ls -a
+NAME                STATUS              CONFIG FILES
+broker-agent        running(1)          /Users/sunwoo/Desktop/Portfolio/broker-agent/docker-compose.yml
+capstone2           running(1)          /Users/sunwoo/Desktop/Portfolio/Relationship/docker-compose.yml
+== compose prod ps -a
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS
+== volumes
+DRIVER    VOLUME NAME
+local     broker-agent_pgdata
+local     capstone2_pgdata
+local     relationship-prod_caddy_config
+local     relationship-prod_caddy_data
+local     relationship-prod_pgdata
+local     relationship_pgdata
+== HEAD
+4be331b
+dev2

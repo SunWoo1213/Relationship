@@ -1,0 +1,17 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u7/g1.sh
+# 시각: 2026-11-16T01:37:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 4be331b (dev2)
+# exit: 0
+# ---
+계정 아이디: u7h760641 (비밀번호 ***)
+-- POST http://localhost:8088/api/auth/signup (Origin http://localhost:8088), 리다이렉트 응답만
+HTTP/1.1 308 Permanent Redirect
+Location: https://localhost/api/auth/signup
+-- 따라가기(-L --connect-to localhost:443:localhost:8443), Origin 은 http://localhost:8088 그대로(리다이렉트 뒤 브라우저는 교차 출처 아님; curl 은 헤더를 유지)
+final=403 url=https://localhost/api/auth/signup
+{"detail":{"code":"bad_origin"}}
+-- 같은 요청, Origin 을 리다이렉트 목적지(https://localhost)로 (같은 출처 상황)
+final=201 url=https://localhost/api/auth/signup
+{"id":"7650a87400a3420d80165bb175b45737","username":"u7i760641"}
+계정 아이디: u7i760641

@@ -363,3 +363,44 @@
 | VV-1 상한 2001 / VV-2 1999 / VV-3 상한 제거 / VV-4 최소 길이 제거 | 2000·2001 경계 시험 / 빈 발화 422 시험 |
 
 변이 뒤 시험 DB 잔여: 12개 테이블 모두 0행, `agent_traces` 261행은 전부 `concurrency-*`(`evidence/20261116-0123-u5-residue-after-mutations.txt`, 그 외 접두 0 확인).
+
+## U7 — 배포 전 스모크 2종 (backend-agent, 2026-11-16, HEAD `4be331b`)
+
+코드·테스트 변경 0. 스모크 1건 = 1줄. 증거 파일은 `evidence/20261116-013x-u7-*.txt`.
+
+### ① Caddy 경유 Origin (운영 compose, 로컬 `https://localhost:8443`, `SITE_ADDRESS=localhost`, `-k`)
+
+| 항목 | 기대 | 실제 | 증거 |
+|---|---|---|---|
+| 0003 적용 | 볼륨(0002)에서 0003 으로 | `Running upgrade 0002 -> 0003` 로그 줄 · Traceback 0 · `/api/health` `alembic_revision":"0003"` | `u7-caddy-origin-up` |
+| (a) 같은 Origin 가입 | 201, 쿠키 속성 | 201 · `__Host-rel_session=***; HttpOnly; Max-Age=604800; Path=/; SameSite=lax; Secure` | `u7-caddy-origin-requests` |
+| (b) 쿠키로 me·persons·chat/history | 200·`[]`·`[]` | 200 · 200 `[]` · 200 `[]` | 같음 |
+| (c) 로그아웃 → 옛 쿠키 | 204 → 401 | 204 → 401 `unauthenticated` | 같음 |
+| (d) 다른 Origin 가입·로그인 | 403 `bad_origin`, 행 불변 | 403·403 `bad_origin` · `users` 수 1 → 1 · 같은 아이디 정상 가입 201 → 2 | 같음 |
+| (e1) XFH=evil + Origin=evil | 403 | 403 `bad_origin` | 같음 |
+| (e2) XFH=evil + Origin=진짜 | 201(Caddy 가 덮어쓰면) | 201 — Caddy 가 클라이언트의 `X-Forwarded-Host` 를 자기 값으로 덮어씀 | 같음 |
+| (f) Origin 없음 POST | 통과 | signup 201 · login 200 | 같음 |
+| (f) 쿠키 없음 GET 3종·`/` | 401×3·200 | 401·401·401 · `/` 200 | 같음 |
+| (g) HTTP 8088 → HTTPS | 308 | 308 `Location: https://localhost/…`(포트 8443 아님 — 로컬 매핑 때문에 따라가면 443) | `u7-caddy-origin-requests`·`g1-redirect` |
+| (g) 포트 붙은 Origin(`https://localhost:8443`) | 201 | 201 | 같음 |
+| (g) 포트 뺀 Origin(`https://localhost`) + Host `localhost:8443` | 403(로컬 포트 차이) | 403 `bad_origin` | 같음 |
+| (g) 운영 모양(Host `localhost`, Origin `https://localhost` / `:443`) | 201 | 201 · 201 | 같음 |
+| (g) 308 따라간 뒤 Origin `http://localhost:8088` 유지 | 403(출처 다름) | 403 · Origin `https://localhost` 로 바꾸면 201 | `g1-redirect` |
+| 프론트 번들 | 로그인 관문 포함 | `assets/index-DNYl7nPx.js` 에 `/auth/me`·`/auth/signup`·`/chat/history` 각 1행 | `u7-caddy-origin-requests` |
+| 로그·종료 | Traceback 0 · down(-v 없음) | backend Traceback 0 · 비밀번호·`rel_session` 문자열 0 · caddy error 0 · down 뒤 `relationship-prod_*` 볼륨 3개 남음 · 개발 컨테이너 불변 | `u7-caddy-origin-logs-down` |
+
+### ② 로컬 통합 (개발 DB 5433, `AUTH_COOKIE_SECURE=0`, `http://localhost:8765`, 실 LLM 1턴)
+
+| 항목 | 기대 | 실제 | 증거 |
+|---|---|---|---|
+| 가입 A·B | 201·201, 쿠키 `rel_session` | 201·201 · `rel_session=***; HttpOnly; Max-Age=604800; Path=/; SameSite=lax`(Secure 없음) | `u7-local-integration` |
+| A `/chat` 1턴 | 200, `session_id == chat:<A id>` | 200(3.2초) · `chat:db5aec5e…` 일치 · `stop_reason=ask_user` · `kind=new_person` 질문 id 22 · `stored` 0·0·0 | 같음 |
+| A 상태 | — | `/persons` `[]`(인물 미생성 — 승인 전) · `/questions/pending` 질문 22 1건 | 같음 |
+| B 격리 | 인물 0, 질문 0 | `/persons` `[]` · `/questions/pending` `[]` · `/chat/history` `[]` | 같음 |
+| B `POST /answers/22` | 404 | 404 `not_found` · A 의 질문은 그대로 | 같음 |
+| B `GET /persons/{id}` | 404 | **미실행** — A 인물이 생기지 않았다(질문 단계에서 턴 종료). 단위 시험 `test_user_isolation.py` 가 맡음 | — |
+| 다른 Origin 으로 A `/chat` | 403 | 403 `bad_origin` | 같음 |
+| A 로그아웃 → 옛 쿠키 | 204 → 401 | 204 · `/auth/me` 401 · `/persons` 401 | 같음 |
+| A 재로그인 `/chat/history` | 2행 user→assistant | 2행, `user`(id 1) → `assistant`(id 2, `question_id=22`) | 같음 |
+| 2001자 | 422 | 422 `string_too_long` | 같음 |
+| 서버 로그 | Traceback 0 · 비밀 0 | Traceback 0 · 비밀번호·`rel_session`·긴 토큰 문자열 0 · 프로세스 종료 확인 | `u7-local-serverlog` |

@@ -1,0 +1,72 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u7/origin.sh
+# 시각: 2026-11-16T01:37:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 4be331b (dev2)
+# exit: 0
+# ---
+비밀번호: *** (스크래치 변수에만)
+계정 아이디: u7a760623 u7d760623 u7e1760623 u7e2760623 u7f760623 u7g1760623 u7g2760623 u7g3760623 u7g4760623 u7g5760623
+
+=== 0. 사전 확인
+health: {"status":"ok","db":"up","alembic_revision":"0003"}
+users 행 수(시작): 0
+
+=== (a) 같은 Origin(https://localhost:8443) POST /api/auth/signup
+HTTP/2 201 
+Set-Cookie(값 가림):
+set-cookie: __Host-rel_session=***; HttpOnly; Max-Age=604800; Path=/; SameSite=lax; Secure
+body: {"id":"f9d413b2c2a24832b931e914dfe6c53d","username":"u7a760623"}
+
+=== (b) 그 쿠키로 GET
+[me] -> 200  body: {"id":"f9d413b2c2a24832b931e914dfe6c53d","username":"u7a760623"}
+[persons] -> 200  body: []
+[chat/history] -> 200  body: []
+
+=== (c) 로그아웃 (로그아웃 전 쿠키 항아리 사본으로 재사용 시도)
+[logout(같은 Origin+쿠키)] -> 204  body: 
+[me(로그아웃 전 쿠키 값 재사용)] -> 401  body: {"detail":{"code":"unauthenticated"}}
+
+=== (d) 다른 Origin(https://evil-1-2-3-4.sslip.io)
+users 행 수(전): 1
+[signup evil origin] -> 403  body: {"detail":{"code":"bad_origin"}}
+[login evil origin (UA)] -> 403  body: {"detail":{"code":"bad_origin"}}
+users 행 수(후): 1
+[같은 아이디(u7d760623)로 정상 가입 (기대 201 = 앞선 403 이 행을 안 만듦)] -> 201  body: {"id":"4531756efbcf4985a5a234376798a057","username":"u7d760623"}
+users 행 수(정상 가입 뒤, +1 기대): 2
+
+=== (e) X-Forwarded-Host 위조
+[e1 XFH=evil + Origin=evil (403 기대)] -> 403  body: {"detail":{"code":"bad_origin"}}
+[e2 XFH=evil + Origin=진짜 (Caddy 가 덮어쓰면 201, 그대로 전달하면 403)] -> 201  body: {"id":"6f71bf39885347bf85b915e0f73b2b08","username":"u7e2760623"}
+users 행 수: 3
+
+=== (f) Origin 없음 / 쿠키 없음
+[f1 Origin 없이 signup] -> 201  body: {"id":"ed97694e0ac74dab9288e45d8d62942c","username":"u7f760623"}
+[f1b Origin 없이 login] -> 200  body: {"id":"ed97694e0ac74dab9288e45d8d62942c","username":"u7f760623"}
+[f2 쿠키 없이 /persons] -> 401  body: {"detail":{"code":"unauthenticated"}}
+[f2 쿠키 없이 /auth/me] -> 401  body: {"detail":{"code":"unauthenticated"}}
+[f2 쿠키 없이 /chat/history] -> 401  body: {"detail":{"code":"unauthenticated"}}
+[f3 /] -> 200  body: <!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <me
+[f4 /api/health] -> 200  body: {"status":"ok","db":"up","alembic_revision":"0003"}
+
+=== (g) HTTP→HTTPS 리다이렉트·포트 차이
+-- GET http://localhost:8088/api/health 헤더
+HTTP/1.1 308 Permanent Redirect
+Location: https://localhost/api/health
+[g1 HTTP 8088 POST signup(Origin http://localhost:8088), 리다이렉트 따라감] -> 308  body: {"status":"ok","db":"up","alembic_revision":"0003"}
+-- 마지막 URL: https://localhost/api/health
+[g2 HTTPS :8443 Origin 포트 있음(=a와 동일 조건)] -> 201  body: {"id":"e9f0cab28fc343eba2e236345518aa39","username":"u7g2760623"}
+[g3 HTTPS :8443 Origin 포트 뺌 (Host=localhost:8443 ≠ Origin 호스트=localhost)] -> 403  body: {"detail":{"code":"bad_origin"}}
+[g4 운영 모양 재현: Host 헤더를 'localhost'(포트 없음)로 + Origin https://localhost] -> 201  body: {"id":"28ad9264a4804c69907f31af401041c3","username":"u7g4760623"}
+[g5 운영 모양: Host localhost + Origin https://localhost:443 (명시 기본 포트)] -> 201  body: {"id":"9e071262674247df9b27f89beea0871f","username":"u7g5760623"}
+
+=== 프론트 번들
+index.html 크기:      573
+assets/index-DNYl7nPx.js
+assets/index-DNYl7nPx.js: 크기   370552, '/auth/me' 포함 1행, '/auth/signup' 1, '/chat/history' 1
+users 행 수(끝): 7

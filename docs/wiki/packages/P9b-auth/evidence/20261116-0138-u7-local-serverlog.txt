@@ -1,0 +1,24 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u7/serverlog.sh
+# 시각: 2026-11-16T01:38:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 4be331b (dev2)
+# exit: 0
+# ---
+로그 줄 수:       29
+Traceback: 0
+비밀번호 문자열(U7local-pw / U7smoke-pw): 0
+rel_session 문자열: 0
+세션 토큰 모양(긴 hex/base64 40자+): 0
+상태코드 집계:
+  12 " 200 
+   2 " 201 
+   1 " 204 
+   2 " 401 
+   1 " 403 
+   1 " 404 
+   1 " 422 
+서버 프로세스 잔존(8765):        0 줄
+--- 로그 마지막 줄 ---
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [64157]

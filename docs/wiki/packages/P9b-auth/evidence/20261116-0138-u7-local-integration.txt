@@ -1,0 +1,59 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u7/local.sh
+# 시각: 2026-11-16T01:38:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 4be331b (dev2)
+# exit: 0
+# ---
+계정: A=u7la760694 B=u7lb760694 (비밀번호 ***)
+
+== 0 health
+{"status":"ok","db":"up","alembic_revision":"0003"}
+
+== 1 가입 A·B (Origin 같게, AUTH_COOKIE_SECURE=0 → rel_session)
+HTTP/1.1 201 Created
+set-cookie: rel_session=***; HttpOnly; Max-Age=604800; Path=/; SameSite=lax
+A id: db5aec5e194847459e3fc780ec332761
+HTTP/1.1 201 Created
+B id: fc3a0ec2e1b943b3bf404a205f891bd4
+
+== 2 A 로 POST /chat 1턴 (실 LLM)
+status=200 time=3.235384s
+session_id: chat:db5aec5e194847459e3fc780ec332761 | 기대: chat:db5aec5e194847459e3fc780ec332761 -> True
+stop_reason: ask_user | stored: {'persons': 0, 'events': 0, 'schedules': 0}
+reply: 이번 발화에서는 새로 기억한 것이 없어요.
+"김팀장님"을(를) 새 인물로 기억해둘까요?
+pending_question: {'question_id': 22, 'status': 'pending', 'kind': 'new_person', 'question': '"김팀장님"을(를) 새 인물로 기억해둘까요?', 'options': ['가족으로 기억할게요', '연인으로 기억할게요', '친구로 기억할게요', '직장으로 기억할게요', '지인으로 기억할게요', '아니요']}
+trace_ids 수: 4
+
+== 3 A 의 상태
+[A /persons] -> 200  []
+[A /questions/pending] -> 200  [{"question_id":22,"status":"pending","kind":"new_person","question":"\"김팀장님\"을(를) 새 인물로 기억해둘까요?","options":["가족으로 기억할게요","연인으로 기억할게요","친구로 기억할게요","직장으로 기억할게요","지인으로 기억할게요","아니요"]}]
+A 인물 id: ''  대기 질문 id: '22'
+
+== 4 B 로 접근 (격리)
+[B /persons (A 인물 0 기대: [])] -> 200  []
+[B /questions/pending (A 질문 0 기대: [])] -> 200  []
+[B POST /answers/22 (404 기대)] -> 404  {"detail":{"code":"not_found"}}
+[A /questions/pending 여전히 질문 유지 확인] -> 200  [{"question_id":22,"status":"pending","kind":"new_person","question":"\"김팀장님\"을(를) 새 인물로 기억해둘까요?","options":["가족으로 기억할게요","연인으로 기억할게요","친구로 기억할게요","직장으로 기억할게요","지인으로 기억할게요","아니
+[B /chat/history (A 대화 0 기대)] -> 200  []
+
+== 5 다른 Origin 으로 A 의 /chat (403 기대, LLM 호출 0)
+[A /chat evil origin] -> 403  {"detail":{"code":"bad_origin"}}
+
+== 6 A 로그아웃 → A 쿠키 401
+[A logout] -> 204  
+[A 옛 쿠키로 /auth/me (401 기대)] -> 401  {"detail":{"code":"unauthenticated"}}
+[A 옛 쿠키로 /persons (401 기대)] -> 401  {"detail":{"code":"unauthenticated"}}
+
+== 7 A 재로그인 → /chat/history 2행
+login status=200
+행 수: 2
+  1 user question_id= None | 오늘 점심에 김팀장님이랑 같이 밥 먹었어요.
+  2 assistant question_id= 22 | 이번 발화에서는 새로 기억한 것이 없어요.
+"김팀장님"을(를) 새 인물로 기억해둘까요?
+순서 user→assistant: True
+
+== 8 2001자 → 422
+[A /chat 2001자 (재로그인 쿠키)] -> 422  {"detail":[{"type":"string_too_long","loc":["body","utterance"],"msg":"String should have at most 2000 characters","input":"가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가�
+(2000자 경계는 LLM 호출이 생기므로 이 스모크에서는 보내지 않음 — 단위 테스트 경계 시험이 맡음)
+계정 아이디(개발 DB 에 남음): u7la760694 u7lb760694

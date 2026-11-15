@@ -60,12 +60,12 @@
 
 - [ ] **G-1** (선택) 반영 전 DB 백업 1회 — `12-shutdown.md` 1항의 `pg_dump` 명령. 비우기로 했으므로 필수 아님.
 - [ ] **G-2** 서버 접속: `ssh -i ~/.ssh/relationship-deploy ubuntu@54.79.202.221`
-- [ ] **G-3** 코드 받기: `cd ~/Relationship && git fetch origin && git checkout <에이전트가 알려 준 해시>`
+- [ ] **G-3** 코드 받기: `cd ~/Relationship && git fetch origin && git checkout 4be331b` (2026-11-16 기준 — 로컬 운영 구성 스모크를 통과한 해시. 그 뒤 수정이 생기면 에이전트가 새 해시를 알려 준다)
 - [ ] **G-4** 기동(옛 backend 가 내려가고 새 backend 가 올라오면서 리비전 0003 이 돈다 — 따로 `alembic` 을 치지 않는다): `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build`
 - [ ] **G-5** 상태: `docker compose -f docker-compose.prod.yml ps` → 세 서비스 running, postgres·backend healthy. 출력을 에이전트에 붙인다.
 - [ ] **G-6** 로그: `docker compose -f docker-compose.prod.yml logs --tail=200 backend | grep -c Traceback` (기대 0) 와 `docker compose -f docker-compose.prod.yml logs backend | grep "Running upgrade"` (기대: `0002 -> 0003` 한 줄). 두 출력을 에이전트에 붙인다.
 - [ ] **G-7** 브라우저(탭 하나)로 `https://54-79-202-221.sslip.io` → 로그인 화면이 뜨는지 → **시연 계정 가입**(아이디·비밀번호는 직접 정하고 저장소·채팅에 적지 않는다. 아이디 3~20자 영문 소문자·숫자·밑줄, 비밀번호 8자 이상) → 채팅 한 줄 → 로그아웃 → 다시 로그인하면 방금 대화가 보이는지.
-- [ ] **G-8** 에이전트가 주는 발화 목록(10~15개)을 시연 계정 채팅에 넣어 데이터를 쌓는다. 확인 칩이 뜨면 직접 판단해 누른다.
+- [ ] **G-8** 발화 목록 13개(`docs/wiki/packages/P9b-auth/u8-demo-script.md`)를 시연 계정 채팅에 넣어 데이터를 쌓는다. 확인 칩이 뜨면 직접 판단해 누른다.
 - [ ] **G-9** 리허설: (가) 로그아웃 → 새 계정 가입 → 인물 화면이 비어 있음, 채팅 기록 없음 (나) 로그아웃 → 시연 계정 로그인 → 인물 카드·브리핑·지난 대화가 그대로. **로그아웃은 채팅 화면에서**(인물 상세 화면에서 로그아웃하면 다음 계정의 첫 화면이 "인물을 찾을 수 없어요" 로 뜬다 — 정보 노출은 아님), **탭은 하나만**.
 - [ ] **G-10** OpenAI 사용량 확인 — 11-17 저녁과 11-18 아침. 누구나 가입할 수 있어 월 한도 $10 이 평가 전에 소진될 수 있다. 소진됐으면 한도를 올리거나 키를 바꾼다(사용자만 가능).
 - [ ] **G-11** (푸시를 시연에 쓸 때) 시연 계정으로 로그인한 브라우저에서 브리핑 화면 "알림 받기" → 권한 허용 → 알림을 눌러 그 브리핑이 열리는지.

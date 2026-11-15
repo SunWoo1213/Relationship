@@ -1,0 +1,49 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u7/down.sh
+# 시각: 2026-11-16T01:37:31+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 4be331b (dev2)
+# exit: 0
+# ---
+== health(마지막)
+{"status":"ok","db":"up","alembic_revision":"0003"}
+backend 로그 줄 수:       35
+Traceback: 0  | 'U7smoke-pw' 문자열: 0  | rel_session 문자열: 0
+-- 요청 줄 중 상태 코드별 집계 (backend)
+  10 " 200 
+   8 " 201 
+   1 " 204 
+   4 " 401 
+   5 " 403 
+== caddy 로그에서 에러 수
+0
+== down (-v 없음)
+ Container relationship-prod-caddy-1 Stopping 
+ Container relationship-prod-caddy-1 Stopped 
+ Container relationship-prod-caddy-1 Removing 
+ Container relationship-prod-caddy-1 Removed 
+ Container relationship-prod-backend-1 Stopping 
+ Container relationship-prod-backend-1 Stopped 
+ Container relationship-prod-backend-1 Removing 
+ Container relationship-prod-backend-1 Removed 
+ Container relationship-prod-postgres-1 Stopping 
+ Container relationship-prod-postgres-1 Stopped 
+ Container relationship-prod-postgres-1 Removing 
+ Container relationship-prod-postgres-1 Removed 
+ Network relationship-prod_default Removing 
+ Network relationship-prod_default Removed 
+== 종료 뒤 docker ps -a
+NAMES                     STATUS
+broker-agent-postgres-1   Up 2 weeks (healthy)
+capstone2-postgres-1      Up 2 weeks (healthy)
+== 볼륨
+DRIVER    VOLUME NAME
+local     broker-agent_pgdata
+local     capstone2_pgdata
+local     relationship-prod_caddy_config
+local     relationship-prod_caddy_data
+local     relationship-prod_pgdata
+local     relationship_pgdata
+== compose ls -a
+NAME                STATUS              CONFIG FILES
+broker-agent        running(1)          /Users/sunwoo/Desktop/Portfolio/broker-agent/docker-compose.yml
+capstone2           running(1)          /Users/sunwoo/Desktop/Portfolio/Relationship/docker-compose.yml

@@ -59,12 +59,26 @@
 - 남은 것 · 다음 단위: U5. U5 에서 함께: R-1(`/answers` 409 뒤 기록 0 시험)·R-4(발화 길이 상한 — 결정 V 로 채택). 열린 권고 R-2(동시 요청 시 기록 순서는 요청 시작 순)·R-3(질문 줄이 최근 50개 밖이면 맨 위에 따로 복원 — 프론트 몫).
 - Refs: P9b-auth D18 CR-006 security 원칙9
 
-## 2026-11-16 03:35 · feat(P9b-auth): 브리핑 주기 작업과 알림을 계정별로 돌리고 고정 사용자 설정을 없앤다 · pending
+## 2026-11-16 03:35 · feat(P9b-auth): 브리핑 주기 작업과 알림을 계정별로 돌리고 고정 사용자 설정을 없앤다 · ca539a1
 - 변경: `app/briefing/scheduler.py`(창 안 일정이 있는 사용자마다 `run_briefings`, 사용자 단위 실패 격리, 0명이면 `user_id=""` 로 1회, `default_run_once(now=None)`), `app/push/subscriptions.py`(같은 endpoint 인수 — 결정 P, `delete_subscription`), `app/auth/routes.py`(로그아웃 때 그 브라우저 구독 삭제), `app/api/schemas.py`(`CHAT_UTTERANCE_MAX_LENGTH=2000` — 결정 V), `app/settings.py`(`app_user_id()`·`DEFAULT_APP_USER_ID` 삭제), `.env.example`, `.github/workflows/tests.yml` 176행, 새 시험 `test_briefing_scheduler_users.py` 13건·`test_push_endpoint_owner.py` 10건·`test_chat_history.py` +3건, `tests/test_settings.py` 삭제(−2), `review-u5.md`, registry.
 - 이유(기획서·카드 연결): CR-006 · D18 결정 6·7 · S3.6 보충 — 계정이 여럿이 되면 한 사용자만 돌던 주기 작업과 브라우저 단위 알림이 계정 기준이어야 한다. 시연 노트북에서 두 계정을 오갈 때 앞 계정의 일정 알림이 뒤 계정에 오지 않게 한다.
 - 정합성 확인: D18 지킬 것 5(`app_user_id`·`APP_USER_ID` 참조 0 — grep exit 1)·8 / S3.6 / 원칙9("일정이 없어도 매분 `briefing_run` 1행" 유지) / 툴 7종 불변 — 위반 없음. **계획 문장과 다른 것 2건(verifier 수용)**: ① 계획은 "고치는 기존 단언은 `test_push_wiring.py:344` 하나" 였지만 `tests/test_push_subscriptions.py` 의 옛 계약 단언(같은 endpoint 라도 사용자가 다르면 별개 행) 1건을 결정 P 에 맞게 교체 ② `delete_subscription` 이 NUL·UTF-8 로 못 바꾸는 endpoint 는 DB 에 보내지 않고 0 반환(U2 의 "로그아웃 이상 입력 500 없음" 계약 유지).
 - 남은 것 · 다음 단위: U7(문서·Caddy 경유 Origin 스모크·로컬 통합 스모크·사용자 배포 반영). 열린 권고 R-1(실패 격리 시험을 A·B 양쪽으로)·R-2(실패 로그 traceback 의 DB 매개변수 — 엔진 `hide_parameters`, FIX 후보)·R-3(동시 구독 경합 시 두 행 가능 — UNIQUE 가 `(user_id, endpoint)` 뿐)·R-4(`https://…\x00` endpoint 로 `POST /push/subscriptions` 가 500 — P7 기존 결함, FIX 후보)·R-5·R-6.
 - Refs: P9b-auth D18 S3.6 R12 CR-006
+
+## 2026-11-16 03:40 · docs(P9b-auth): 로그인 버전을 서버에 반영하는 절차와 시연 두 갈래를 사용자 문서에 적는다 · 4be331b
+- 변경: `docs/user-setup/13-user-todo-deploy.md` G 절·`11-ec2-minimal-deploy.md`·`SERVER-CHECKLIST.md` §5-1·`docs/RUNNING.md`·`docs/reliability.md`.
+- 이유(기획서·카드 연결): U7 문서 — 반영은 운영 데이터를 비우고 되돌릴 수 없어 사용자가 직접 실행할 명령과 확인 항목을 한곳에.
+- 정합성 확인: D17 · D18 · security §1·§4 — 위반 없음.
+- 남은 것 · 다음 단위: U7 스모크.
+- Refs: P9b-auth D17 D18 CR-006 security
+
+## 2026-11-16 04:10 · docs(P9b-auth): 배포 전 로컬 확인 결과와 시연 계정에 넣을 대화 목록을 남긴다 · pending
+- 변경: U7 스모크 증거 8개(`evidence/20261116-013*-u7-*`, `…0400-u7-local-browser-check.txt`), `tests.md` U7 절, 아래 "U7 스모크 메모", 새 `u8-demo-script.md`(발화 13개), 13 문서 G-3 에 반영 해시 `4be331b`.
+- 이유(기획서·카드 연결): 계획 U7 "Caddy 경유 Origin 스모크(배포 반영 전 필수)" — 운영 compose 를 로컬에 띄워(0002 상태 볼륨 재사용) `Running upgrade 0002 -> 0003`, 같은 Origin 가입 201, 다른 Origin 403, 위조 `X-Forwarded-Host` 는 Caddy 가 덮어써 통과 불가, 쿠키 `__Host-rel_session; HttpOnly; Secure; SameSite=lax; Path=/` 를 확인. 로컬 통합(실 LLM 1턴)에서 계정 A·B 격리·재로그인 기록 2행·2001자 422. 메인이 실제 Chrome 으로 가입·채팅·새로고침·로그아웃·재로그인 확인.
+- 정합성 확인: security §4(원격 요청 0, `down -v`·볼륨 삭제 없음) — 위반 없음. 코드 변경 0.
+- 남은 것 · 다음 단위: **사용자 배포 반영(13 문서 G 절, 해시 `4be331b`)** → 메인 바깥 GET 스모크(`/api/health` 0003, 쿠키 없이 401) → U8(사용자: 시연 계정 가입·`u8-demo-script.md` 입력·리허설) → verify-impl → verifier 04-review → 완성 확인. 스모크 관찰: `/chat` 422 가 입력을 되돌려 줌(비밀 아님, 기록만) · 실제 브라우저가 HTTP→HTTPS 308 뒤 POST 에 Origin 을 어떻게 싣는지는 미확인(운영은 처음부터 HTTPS 주소로 접속). 남은 것: 로컬 Docker 볼륨 `relationship-prod_*` 3개, 개발 DB 스모크 계정 3개(`u7la760694`·`u7lb760694`·`u7browser01`).
+- Refs: P9b-auth D17 D18 CR-006 security
 
 ## U1 구현 메모 (backend-agent, 2026-11-15 — /commit 전 초안, 커밋 항목이 아니다)
 - **개발 DB 인물 12명 삭제됨**(사용자 결정 4 "모두 비운다"). 실행 전 행 수 `evidence/20261115-2056-u1-dev-before-counts.txt`: persons 12 · person_aliases 15 · person_facts 24 · events 33 · fact_sources 36 · schedules 6 · pending_questions 21 · push_subscriptions 2 · agent_traces 605. `alembic upgrade head`(0002→0003) 뒤 `…-2057-u1-dev-after-counts.txt` 전부 0, `alembic_version` 0003. 비우기는 리비전 파일의 `DELETE`(security §4) 로만 했다.
@@ -156,3 +170,14 @@
 - **결정 V**: `ChatIn.utterance` `max_length=2000`(모듈 상수 `CHAT_UTTERANCE_MAX_LENGTH`), 기존 `min_length=1` 유지. 2001자는 pydantic 기본 422(`detail` 목록, `loc ["body","utterance"]`·`type string_too_long`)로 `current_user` 이후·루프 전에 거부 — 인식 단계(LLM) 호출 수·`chat_messages`·`agent_traces` 행 수가 그대로임을 시험이 단언. 기존 시험 중 2000자를 넘는 발화를 보내는 것은 없었다(전체 통과).
 - **고정 사용자 grep**: `docs/`·`CLAUDE.md` 의 `APP_USER_ID` 언급(`docs/user-setup/11·13`, 옛 패키지 문서)은 이 단위 범위 밖(U7 문서) — 건드리지 않았다.
 - **멈춘 곳**: 없음. **registry 후보(메인이 추가)**: 갱신 — `app/briefing/scheduler.py`(사용자별 루프·`NO_USER_MARKER`·`default_run_once(now=None)`)·`app/push/subscriptions.py`(결정 P 인수·`delete_subscription`)·`app/settings.py`(`app_user_id` 삭제 — registry 56행의 `app_user_id()` 언급·71행 `tests/test_settings.py` 행 삭제)·`app/api/schemas.py`(`CHAT_UTTERANCE_MAX_LENGTH`) · 새 — 시험 `tests/test_briefing_scheduler_users.py`·`tests/test_push_endpoint_owner.py`.
+
+## U7 스모크 메모(초안, backend-agent, 2026-11-16, HEAD `4be331b`)
+
+- **결과 한 줄**: 스모크 ① Caddy 경유 Origin — 같은 출처 POST 가 403 이 아니다(201·200). 스모크 ② 로컬 통합 — 격리·로그아웃·기록·422 통과. 코드·설정 변경 0, 커밋 0, 원격 요청 0.
+- **① 구성**: 운영 compose(`relationship-prod`, 이전 P9 스모크 볼륨 `relationship-prod_pgdata` 재사용 — 더미 비밀번호 `p9smokelocalonly` 가 P9 때와 같아 붙음), `SITE_ADDRESS=localhost`(Caddy 내부 CA 로컬 TLS), `CADDY_HTTP_PORT=8088`·`CADDY_HTTPS_PORT=8443`, 더미 env 는 스크래치패드 `p9b-u7/smoke.env`. 이미지 `relationship-*:4be331b` 새로 빌드. 볼륨은 지우지 않았다.
+- **0003 적용 줄**: `INFO  [alembic.runtime.migration] Running upgrade 0002 -> 0003, Refs: P9b-auth D18 S3.1 CR-006 F-fbaaae -- 계정·세션·대화 기록 테이블과 질문 소유자.` — 실제 0002 상태 DB 에서 올라감(시작 시 `users` 0행). Traceback 0.
+- **사실 근거(배포 판단)**: Caddy 는 `Host` 를 원래 값(`localhost:8443`)으로 전달했고, 같은 Origin POST 는 201 이었다. 클라이언트가 보낸 `X-Forwarded-Host: evil…` 은 Caddy 가 덮어썼다 — Origin 이 진짜일 때 201(e2), 위조 호스트일 때 403(e1). 따라서 사실 10 의 빈칸이 채워졌고 "중요 발견"(403 이 아닌 위조 통과) 은 없다.
+- **(g) 로컬 한정 차이(사실만)**: HTTP 8088 → 308 `Location: https://localhost/…`(포트 없음, 로컬 매핑 때문에 따라가면 443 이 닫혀 있음). 포트 매핑이 있는 `https://localhost:8443` 에서 Origin 에 포트를 빼면 403, 붙이면 201. 운영은 기본 포트라 Origin 에 포트가 없고 Host 도 포트가 없어 일치(`Host: localhost` 로 재현 201). 실제 브라우저가 308 뒤 POST 에 Origin 을 어떻게 싣는지는 이 스모크로 확인하지 않았다(브라우저 점검 몫). curl 로 308 을 따라가며 Origin 을 `http://localhost:8088` 으로 유지하면 403, `https://localhost` 로 바꾸면 201.
+- **관찰(문제 아님)**: ② `POST /chat` 2001자 422 응답 본문에 `input` 으로 입력 전체가 그대로 되돌아온다(pydantic 기본, `/auth/*` 와 달리 `_NoInputEchoRoute` 가 `/chat` 에는 없음). 발화는 비밀이 아니지만 2000자 초과분이 응답에 echo 된다는 사실만 기록.
+- **미실행 1건**: ② B 가 `GET /persons/{id}` 404 — A 의 인물이 생기지 않아(new_person 질문에서 턴 종료) 실행하지 않았다. 질문 id 로 `POST /answers/22` 404 는 확인. 인물이 생기는 경로는 단위 시험 `tests/test_user_isolation.py` 가 맡음.
+- **남긴 것**: 볼륨 `relationship-prod_{pgdata,caddy_data,caddy_config}`(pgdata 에 스모크 계정 9개(스크립트 끝 7 + g1 보충 2)·0003 상태 — 삭제는 사용자 몫) · 개발 DB 계정 `u7la760694`·`u7lb760694`(A 에 대기 질문 22 1건, `chat_messages` 2행). 증거 `evidence/20261116-0135~0138-u7-*.txt` 7개(비밀번호·쿠키 값 `***`).
