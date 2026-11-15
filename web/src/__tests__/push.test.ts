@@ -42,6 +42,8 @@ interface PushWorld {
   getSubscription: ReturnType<typeof vi.fn>
   /** 서비스 워커 컨테이너로 메시지를 보낸다(워커가 하는 일). */
   post: (data: unknown) => void
+  /** 앱이 서비스 워커 메시지 리스너를 붙였는지 — 붙기 전에 보낸 메시지는 유실된다. */
+  hasListener: () => boolean
 }
 
 /** 웹푸시를 지원하는 브라우저를 흉내 낸다. existing=true 면 이미 구독돼 있다. */
@@ -95,6 +97,7 @@ function installPushBrowser(options: { permission?: string; existing?: boolean; 
     subscribe,
     unsubscribe,
     getSubscription,
+    hasListener: () => listeners.size > 0,
     post: (data) => {
       act(() => listeners.forEach((fn) => fn({ data } as MessageEvent)))
     },
@@ -353,6 +356,7 @@ describe('인앱 배너 (결정 H)', () => {
     render(createElement(App))
     await screen.findByRole('button', { name: BRIEFING_NOTICE.subscribe })
     expect(screen.queryByTestId('push-banner')).toBeNull()
+    await waitFor(() => expect(world.hasListener()).toBe(true)) // effect 는 DOM 반영보다 늦을 수 있다 — 리스너가 붙은 뒤에 보낸다
 
     world.post({ type: 'briefing', schedule_id: 9 })
     const banner = await screen.findByTestId('push-banner')
@@ -370,6 +374,7 @@ describe('인앱 배너 (결정 H)', () => {
     appFetch()
     render(createElement(App))
     await screen.findByRole('button', { name: BRIEFING_NOTICE.subscribe })
+    await waitFor(() => expect(world.hasListener()).toBe(true))
     world.post({ type: 'briefing', schedule_id: 3 })
     await screen.findByTestId('push-banner')
     await userEvent.click(screen.getByRole('button', { name: BANNER_NOTICE.close }))
@@ -382,6 +387,7 @@ describe('인앱 배너 (결정 H)', () => {
     appFetch()
     render(createElement(App))
     await screen.findByRole('button', { name: BRIEFING_NOTICE.subscribe })
+    await waitFor(() => expect(world.hasListener()).toBe(true))
     world.post({ type: 'other', schedule_id: 1 })
     world.post('briefing')
     world.post(null)
@@ -403,6 +409,7 @@ describe('인앱 배너 (결정 H)', () => {
     })
     render(createElement(App))
     await screen.findByRole('textbox', { name: '메시지 입력' }) // 관문을 통과한 뒤에야 서비스 워커 메시지를 듣는다
+    await waitFor(() => expect(world.hasListener()).toBe(true))
     world.post({ type: 'open-briefing', schedule_id: 12 })
     await waitFor(() => expect(window.location.hash).toBe('#/briefings?schedule_id=12'))
     expect(screen.queryByTestId('push-banner')).toBeNull()
@@ -420,6 +427,7 @@ describe('인앱 배너 (결정 H)', () => {
     })
     render(createElement(App))
     await screen.findByRole('textbox', { name: '메시지 입력' }) // 관문을 통과한 뒤에야 서비스 워커 메시지를 듣는다
+    await waitFor(() => expect(world.hasListener()).toBe(true))
     world.post({ type: 'open-briefing', schedule_id: null })
     await waitFor(() => expect(window.location.hash).toBe('#/briefings'))
     expect(screen.queryByTestId('push-banner')).toBeNull()

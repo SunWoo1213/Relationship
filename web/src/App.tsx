@@ -1,5 +1,5 @@
 import { AuthProvider, useAuth } from '@/auth'
-import AppShell from '@/components/AppShell'
+import AppShell, { OpenBriefingListener } from '@/components/AppShell'
 import { Button } from '@/components/ui/button'
 import { Toaster } from '@/components/ui/sonner'
 import { useRoute } from '@/routes'
@@ -49,6 +49,7 @@ function Gate() {
 export default function App() {
   return (
     <AuthProvider>
+      <OpenBriefingListener />
       <Gate />
     </AuthProvider>
   )

@@ -77,3 +77,24 @@
 | E2E 가짜 API(갱신) | `fixtures.ts` 기본 `/auth/me` 200·`/chat/history?limit=50` 빈 목록 + 204 본문 없음, `e2e/auth.spec.ts`(로그인 → 앱 틀 → 로그아웃) | web/e2e/fixtures.ts web/e2e/auth.spec.ts | P9b-auth U6 (P8 U9a 행 갱신) |
 | 프록시(갱신) | `vite.config.ts` `/api` 프록시 `xfwd: true` | web/vite.config.ts | P9b-auth U6 (사실 14) |
 | 변이 러너(저장소 밖) | `<스크래치패드>/p9b-u6/mutate.py` — 사본에서만 16건 변이 | (저장소 밖) | P9b-auth U6 |
+
+## 5. CI 수정 — `web (windows-latest)` push.test 배너 테스트 실패
+
+- 증상: `push.test.ts` "인앱 배너" 의 첫 테스트가 `push-banner` 를 못 찾음(1058ms, 1000ms 대기 만료). ubuntu·Mac 은 통과.
+- 원인(테스트 쪽): `findByRole(subscribe)` 는 DOM 반영(commit) 직후 풀리지만 `WorkerMessages` 의 `useEffect`(리스너 등록)는 passive effect 라 그보다 늦게 돌 수 있다. 느린 러너에서 effect 전에 `world.post()` 가 불리면 리스너 집합이 비어 메시지가 유실된다.
+- CI 실패 원인은 테스트 경합이다. 다만 (c) 관문이 `loading` 일 때 (d) 로그인 화면일 때 `open-briefing` 을 받을 리스너가 없어(리스너가 `AppShell` 안) 알림 클릭이 유실되는 경로가 있었다 → 아래 C-2 로 고쳤다(앞서 "의도된 동작" 이라 한 판단은 근거가 없어 철회).
+- 고침: `web/src/__tests__/push.test.ts` — `installPushBrowser` 의 `PushWorld` 에 `hasListener()` 추가, 인앱 배너 5개 테스트 모두 `world.post` 직전에 `await waitFor(() => expect(world.hasListener()).toBe(true))`. 단언·타임아웃은 그대로.
+- 재현·변이(verifier 증거가 정본): `evidence/20261115-2158-verifier-u6-cifix-repro.txt`(고치기 전 + 리스너 150ms 지연 5 failed, 고친 것 21 passed 등)·`…-2159-verifier-u6-cifix-probe.txt`(자연 발생 3600라운드 중 9). **무효 증거**: `…-u6-cifix-mutation.txt`(echo 한 줄 요약일 뿐 실행 출력 아님)·`…-u6-cifix-repeat.txt`(상대경로 문제로 "no tests") — 근거로 쓰지 않는다. `…-2203-u6-fix2-vitest-x15.txt` 도 문법 오류로 무효(같은 이름의 `…-2204-…` 가 유효).
+- 판정(1차): vitest 188 passed(`evidence/20261115-2154-u6-cifix-vitest-rerun.txt`), typecheck·build 통과.
+
+### 5.1 C-1 — 간헐 `window.matchMedia is not a function` (Mac 재현)
+
+- 원인: `afterEach` 가 스택 순서라 파일의 `vi.unstubAllGlobals()` 가 `test-setup.ts` 의 `cleanup()` 보다 먼저 돌아, 밀린 sonner `Toaster` effect 가 스텁이 걷힌 뒤 실행된다.
+- 고침(한 곳): `web/vite.config.ts` `test.sequence.hooks: 'list'` — `afterEach` 를 등록 순서로 돌려 setup 의 `cleanup()` 이 먼저 돈다. 4개 파일을 따로 고치지 않는다.
+
+### 5.2 C-2 — 알림 클릭 `open-briefing` 유실 (제품 코드)
+
+- 고침: `web/src/components/AppShell.tsx` 에 `OpenBriefingListener`(해시만 바꿈, 본문 렌더 없음)를 더해 `web/src/App.tsx` 의 `AuthProvider` 안·`Gate` 위에 둔다. `WorkerMessages`(앱 틀 안)는 인앱 배너만 맡는다. 새 라우트·화면 없음.
+- 테스트: `web/src/__tests__/auth.test.tsx` "알림 클릭 open-briefing" 3건 — (c) `/auth/me` 응답 전, (d) 로그인 화면 + 로그인 뒤 그 브리핑, 로그인 화면의 `type:"briefing"` 은 배너·문구·해시 이동 없음. 로그인된 상태의 기존 동작은 `push.test.ts` 5건이 유지.
+- 변이: 리스너를 `SignedInApp`(앱 틀 안)으로 되돌린 사본(스크래치패드 `p9b-u6fix2/`)에서 위 3건 실패(`auth.test`+`push.test` 46건 중 3 failed).
+- 판정(2차): vitest 191 passed. 고친 뒤 전체 40회 연속 실패 0(`evidence/20261115-2204-u6-fix2-vitest-x15.txt` 15회, `…-u6-fix2-vitest-x40.txt` 40회). `sequence.hooks` 만 되돌린 사본은 40회 중 5회 실패(`…-u6-fix2-mutation-no-sequence-x40.txt`; `…-no-sequence.txt` 15회는 0회라 변이 판별력은 x40 이 정본). typecheck·build·E2E 5 passed(`…-u6-fix2-{typecheck,build,e2e}.txt`).

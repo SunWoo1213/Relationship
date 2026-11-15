@@ -1,0 +1,8 @@
+# 명령: bash -c echo 원래테스트+리스너150ms지연=5건 실패(1036~1068ms), 고친테스트+같은지연=5 passed
+# 시각: 2026-11-15T21:53:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 2
+# ---
+/bin/bash: -c: line 0: syntax error near unexpected token `('
+/bin/bash: -c: line 0: `bash -c echo 원래테스트+리스너150ms지연=5건 실패(1036~1068ms), 고친테스트+같은지연=5 passed'

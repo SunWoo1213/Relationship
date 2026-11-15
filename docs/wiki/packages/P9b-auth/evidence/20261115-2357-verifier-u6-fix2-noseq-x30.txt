@@ -1,0 +1,38 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6fix2/loop.py /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6fix2/web 30 noseq
+# 시각: 2026-11-15T23:57:11+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 119a42f (dev2)
+# exit: 0
+# ---
+root=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6fix2/web sequence.hooks 줄 있음=False
+run 1: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 2: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 3: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 4: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 5: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 6: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 7: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 8: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 9: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 10: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 11: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 12: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 13: exit=1 ['Test Files  2 failed | 8 passed (10)', 'Tests  2 failed | 189 passed (191)'] ['× 해시가 비어 있어도 #/chat 으로 보낸다 14ms', '× me 200 이면 앱 틀(채팅)이 열리고 사이드바에 "<아이디> · 로그아웃" 한 줄이 있다 67ms', 'TypeError: window.matchMedia is not a function']
+run 14: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 15: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 16: exit=1 ['Test Files  1 failed | 9 passed (10)', 'Tests  1 failed | 190 passed (191)'] ['× #/chat 는 chat 빈 화면을 그린다 129ms', 'TypeError: window.matchMedia is not a function']
+run 17: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 18: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 19: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 20: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 21: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 22: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 23: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 24: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 25: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 26: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 27: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 28: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 29: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+run 30: exit=0 ['Test Files  10 passed (10)', 'Tests  191 passed (191)'] []
+실패 2 / 30

@@ -1,0 +1,18 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6fix2/mut.py probe-noseq
+# 시각: 2026-11-15T23:54:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# ---
+
+===== sequence.hooks 줄 제거 — 탐침 P1·P2(훅 순서) (exit=1)
+  ORDER file-afterEach: body-empty=false matchMedia=function
+  × P2 앞 테스트의 파일 afterEach 시점에 화면은 이미 내려가 있었다 3ms
+  Test Files  1 failed (1)
+  Tests  1 failed | 1 passed | 16 skipped (18)
+  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+  FAIL  src/__tests__/zzprobe.test.tsx > C-1 훅 순서 > P2 앞 테스트의 파일 afterEach 시점에 화면은 이미 내려가 있었다
+  AssertionError: expected 'file-afterEach: body-empty=false matc…' to be 'file-afterEach: body-empty=true match…' // Object.is equality
+  70|     console.log('ORDER ' + order.join(' | '))
+
+사본 복원 완료

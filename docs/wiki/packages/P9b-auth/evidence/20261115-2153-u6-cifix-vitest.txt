@@ -1,0 +1,36 @@
+# 명령: npm --prefix web exec -- vitest run --root web
+# 시각: 2026-11-15T21:53:31+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 1
+# ---
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+ ❯ src/__tests__/routes.test.tsx (14 tests | 1 failed) 1067ms
+   ❯ 앱 틀 — 사이드바 (결정 N) (7)
+     × 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바 26ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes.test.tsx > 앱 틀 — 사이드바 (결정 N) > 1024px 경계: 1023 은 서랍형, 1024 는 고정 사이드바
+TypeError: window.matchMedia is not a function
+ ❯ node_modules/sonner/dist/index.mjs:1072:39
+ ❯ Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:28656:20
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:1048:13
+ ❯ commitHookEffectListMount node_modules/react-dom/cjs/react-dom-client.development.js:13748:29
+ ❯ commitHookPassiveMountEffects node_modules/react-dom/cjs/react-dom-client.development.js:13835:11
+ ❯ commitPassiveMountOnFiber node_modules/react-dom/cjs/react-dom-client.development.js:16906:13
+ ❯ recursivelyTraversePassiveMountEffects node_modules/react-dom/cjs/react-dom-client.development.js:16851:13
+ ❯ commitPassiveMountOnFiber node_modules/react-dom/cjs/react-dom-client.development.js:16898:11
+ ❯ recursivelyTraversePassiveMountEffects node_modules/react-dom/cjs/react-dom-client.development.js:16851:13
+ ❯ commitPassiveMountOnFiber node_modules/react-dom/cjs/react-dom-client.development.js:17183:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 9 passed (10)
+      Tests  1 failed | 187 passed (188)
+   Start at  21:53:31
+   Duration  3.41s (tests 56%, environment 26%, import 11%, setup 4%, transform 4%)
+

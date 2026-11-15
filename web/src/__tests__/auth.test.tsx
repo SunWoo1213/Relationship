@@ -1,10 +1,11 @@
 // P9b U6 — 로그인·가입 관문, 로그아웃, 401 처리. 실제 네트워크 없음: fetch 는 테스트마다 vi.stubGlobal 로 가짜를 건다 (결정 J).
 // 가짜 서버 응답은 01-plan "API 계약" 표의 모양이다(백엔드 U2 구현 전에도 돈다).
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App, { GATE_NOTICE } from '@/App'
-import { ACCOUNT_NOTICE } from '@/components/AppShell'
+import { ACCOUNT_NOTICE, BANNER_NOTICE } from '@/components/AppShell'
+import { BRIEFING_NOTICE } from '@/screens/BriefingScreen'
 import { AUTH_NOTICE } from '@/screens/AuthScreen'
 import { SESSION_STORAGE_KEY } from '@/session'
 import { installFakeMatchMedia } from './helpers'
@@ -378,5 +379,68 @@ describe('로그아웃 (POST /auth/logout)', () => {
     await screen.findByRole('textbox', { name: '메시지 입력' })
     expect(screen.getByTestId('sidebar-username')).toHaveTextContent('second_user')
     expect(screen.queryByText('첫 계정의 발화')).toBeNull()
+  })
+})
+
+describe('알림 클릭 open-briefing — 관문 위에서 해시만 바꾼다 (C-2)', () => {
+  /** 메시지를 보낼 수 있는 서비스 워커 컨테이너. 리스너가 붙었는지 확인할 수 있다. */
+  function installWorker() {
+    const listeners = new Set<(e: MessageEvent) => void>()
+    Object.defineProperty(navigator, 'serviceWorker', {
+      configurable: true,
+      value: {
+        getRegistration: vi.fn(() => Promise.resolve(undefined)),
+        addEventListener: (_: string, fn: (e: MessageEvent) => void) => listeners.add(fn),
+        removeEventListener: (_: string, fn: (e: MessageEvent) => void) => listeners.delete(fn),
+      },
+    })
+    return {
+      hasListener: () => listeners.size > 0,
+      post: (data: unknown) => act(() => listeners.forEach((fn) => fn({ data } as MessageEvent))),
+    }
+  }
+  const BRIEFING_ROUTE = '#/briefings?schedule_id=12'
+
+  it('(c) /auth/me 응답 전에 받아도 유실되지 않는다 — 응답 200 뒤 그 브리핑 화면이 열린다', async () => {
+    const worker = installWorker()
+    let answerMe: (r: Response) => void = () => {}
+    install({ 'GET /api/auth/me': () => new Promise<Response>((resolve) => (answerMe = resolve)) })
+    render(<App />)
+    await waitFor(() => expect(worker.hasListener()).toBe(true))
+    expect(screen.queryByRole('textbox', { name: '메시지 입력' })).toBeNull() // 관문은 아직 loading
+    worker.post({ type: 'open-briefing', schedule_id: 12 })
+    expect(window.location.hash).toBe(BRIEFING_ROUTE)
+
+    await act(async () => answerMe(json(ME)))
+    await screen.findByRole('button', { name: BRIEFING_NOTICE.subscribe })
+    expect(window.location.hash).toBe(BRIEFING_ROUTE)
+    expect(screen.queryByRole('textbox', { name: '메시지 입력' })).toBeNull()
+  })
+
+  it('(d) 로그인 화면에서 받으면 해시만 바뀌고 로그인 화면은 그대로 — 로그인 성공 뒤 그 브리핑 화면', async () => {
+    const worker = installWorker()
+    install({ 'GET /api/auth/me': UNAUTH, 'POST /api/auth/login': () => json(ME) })
+    render(<App />)
+    await screen.findByRole('heading', { name: AUTH_NOTICE.titleLogin })
+    await waitFor(() => expect(worker.hasListener()).toBe(true))
+    worker.post({ type: 'open-briefing', schedule_id: 12 })
+    expect(window.location.hash).toBe(BRIEFING_ROUTE)
+    expect(screen.getByRole('heading', { name: AUTH_NOTICE.titleLogin })).toBeInTheDocument()
+
+    await fillAndSubmit({ username: 'minji_01', password: 'correct-horse-9', submit: AUTH_NOTICE.submitLogin })
+    await screen.findByRole('button', { name: BRIEFING_NOTICE.subscribe })
+    expect(window.location.hash).toBe(BRIEFING_ROUTE)
+  })
+
+  it('로그인 화면에서 type:"briefing" 메시지가 와도 배너·문구·해시 이동이 없다', async () => {
+    const worker = installWorker()
+    install({ 'GET /api/auth/me': UNAUTH })
+    render(<App />)
+    await screen.findByRole('heading', { name: AUTH_NOTICE.titleLogin })
+    await waitFor(() => expect(worker.hasListener()).toBe(true))
+    worker.post({ type: 'briefing', schedule_id: 9 })
+    expect(screen.queryByTestId('push-banner')).toBeNull()
+    expect(screen.queryByText(BANNER_NOTICE.text)).toBeNull()
+    expect(window.location.hash).toBe('#/chat')
   })
 })

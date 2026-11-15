@@ -117,6 +117,25 @@ function readWorkerMessage(data: unknown): { type: 'briefing' | 'open-briefing';
  * 누르면 `#/briefings?schedule_id=N`. 알림을 눌러 온 `open-briefing` 은 배너 없이 바로 그 주소로 간다.
  * 새 화면이 아니다.
  */
+/**
+ * 알림 클릭 `{type:"open-briefing"}` — 로그인 상태와 무관하게(관문 위에서) 해시만 바꾼다.
+ * 로그인 전이면 관문이 먼저 보이고, 로그인 뒤 그 해시의 브리핑이 열린다. 메시지 본문은 그리지 않는다.
+ * 새 라우트·새 화면이 아니다.
+ */
+export function OpenBriefingListener() {
+  useEffect(() => {
+    const container = typeof navigator === 'undefined' ? undefined : navigator.serviceWorker
+    if (!container) return
+    const onMessage = (event: MessageEvent) => {
+      const message = readWorkerMessage(event.data)
+      if (message?.type === 'open-briefing') window.location.hash = briefingHref(message.scheduleId)
+    }
+    container.addEventListener('message', onMessage)
+    return () => container.removeEventListener('message', onMessage)
+  }, [])
+  return null
+}
+
 function WorkerMessages() {
   const [banner, setBanner] = useState<{ scheduleId: number | null } | null>(null)
 
@@ -127,8 +146,7 @@ function WorkerMessages() {
       const message = readWorkerMessage(event.data)
       if (!message) return
       if (message.type === 'open-briefing') {
-        setBanner(null)
-        window.location.hash = briefingHref(message.scheduleId)
+        setBanner(null) // 해시 이동은 OpenBriefingListener(관문 위)가 한다
         return
       }
       setBanner({ scheduleId: message.scheduleId })

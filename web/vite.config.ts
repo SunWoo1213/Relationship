@@ -34,6 +34,9 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: 'jsdom',
       globals: true,
+      // afterEach 를 등록 순서대로 돌린다 — test-setup 의 cleanup()(언마운트·밀린 effect 비움)이
+      // 파일의 vi.unstubAllGlobals() 보다 먼저 돌게 한다(기본 stack 은 반대라 Toaster effect 가 스텁 뒤에 돌았다).
+      sequence: { hooks: 'list' },
       setupFiles: ['./src/test-setup.ts'],
       include: ['src/**/*.test.{ts,tsx}'],
     },

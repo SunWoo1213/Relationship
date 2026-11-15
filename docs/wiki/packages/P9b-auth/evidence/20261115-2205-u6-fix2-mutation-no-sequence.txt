@@ -1,0 +1,22 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/loop.py /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u6fix2/web 15
+# 시각: 2026-11-15T22:05:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# ---
+run 1: exit=0 ['Tests  191 passed (191)'] []
+run 2: exit=0 ['Tests  191 passed (191)'] []
+run 3: exit=0 ['Tests  191 passed (191)'] []
+run 4: exit=0 ['Tests  191 passed (191)'] []
+run 5: exit=0 ['Tests  191 passed (191)'] []
+run 6: exit=0 ['Tests  191 passed (191)'] []
+run 7: exit=0 ['Tests  191 passed (191)'] []
+run 8: exit=0 ['Tests  191 passed (191)'] []
+run 9: exit=0 ['Tests  191 passed (191)'] []
+run 10: exit=0 ['Tests  191 passed (191)'] []
+run 11: exit=0 ['Tests  191 passed (191)'] []
+run 12: exit=0 ['Tests  191 passed (191)'] []
+run 13: exit=0 ['Tests  191 passed (191)'] []
+run 14: exit=0 ['Tests  191 passed (191)'] []
+run 15: exit=0 ['Tests  191 passed (191)'] []
+실패 0 / 15

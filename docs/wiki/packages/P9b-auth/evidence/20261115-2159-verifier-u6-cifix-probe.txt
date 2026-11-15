@@ -1,0 +1,117 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6fix/probe.sh 0 6 150; bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6fix/probe.sh 1 6 150
+# 시각: 2026-11-15T21:59:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# 메모: 저장소 밖 사본의 탐침 테스트(zzprobe.test.tsx): App 을 그려 관문 통과를 기다린 직후 리스너 유무를 세고, 파일 afterEach(unstubAllGlobals)가 setup 의 cleanup 보다 먼저 도는지 찍는다. PROBE_FIX=1 은 unstub 전에 cleanup() 을 먼저 부른다
+# ---
+--- PROBE_FIX=0 mode=waitfor 실행 1/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=0 mode=waitfor 실행 2/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=1 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/zzprobe.test.tsx > 탐침 > 라운드 30
+TypeError: window.matchMedia is not a function
+      Tests  1 failed | 149 passed (150)
+--- PROBE_FIX=0 mode=waitfor 실행 3/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=0 mode=waitfor 실행 4/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=0 mode=waitfor 실행 5/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=0 mode=waitfor 실행 6/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=0 mode=find 실행 1/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=0 mode=find 실행 2/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=1 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/zzprobe.test.tsx > 탐침 > 라운드 73
+TypeError: window.matchMedia is not a function
+      Tests  1 failed | 149 passed (150)
+--- PROBE_FIX=0 mode=find 실행 3/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=0 mode=find 실행 4/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=1 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/zzprobe.test.tsx > 탐침 > 라운드 76
+TypeError: window.matchMedia is not a function
+      Tests  1 failed | 149 passed (150)
+--- PROBE_FIX=0 mode=find 실행 5/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=0 mode=find 실행 6/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=1 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__tests__/zzprobe.test.tsx > 탐침 > 라운드 17
+TypeError: window.matchMedia is not a function
+      Tests  1 failed | 149 passed (150)
+=== PROBE_FIX=0 실패한 실행 수: 4 / 12
+--- PROBE_FIX=1 mode=waitfor 실행 1/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=1 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=waitfor 실행 2/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=waitfor 실행 3/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=waitfor 실행 4/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=waitfor 실행 5/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=1 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=waitfor 실행 6/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=find 실행 1/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=1 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=find 실행 2/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=1 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=find 실행 3/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=find 실행 4/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=find 실행 5/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=1 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+--- PROBE_FIX=1 mode=find 실행 6/6 (라운드 150)
+PROBE rounds=150 리스너가_아직_없음=0 (관문 통과 직후 world.post 를 했다면 유실됐을 횟수)
+PROBE afterEach 순서(첫 라운드): file-afterEach: App mounted=true | after-unstub: matchMedia=undefined
+      Tests  150 passed (150)
+=== PROBE_FIX=1 실패한 실행 수: 0 / 12

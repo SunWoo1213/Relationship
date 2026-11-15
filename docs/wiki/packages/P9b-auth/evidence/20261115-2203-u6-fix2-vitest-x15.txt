@@ -1,0 +1,8 @@
+# 명령: bash -c for i in $(seq 1 15); do echo "run $i"; npm --prefix web exec -- vitest run --root web 2>&1 | grep -E "Tests |×"; done
+# 시각: 2026-11-15T22:03:59+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 2
+# ---
+/bin/bash: -c: line 0: syntax error near unexpected token `do'
+/bin/bash: -c: line 0: `bash -c for i in $(seq 1 15); do echo "run $i"; npm --prefix web exec -- vitest run --root web 2>&1 | grep -E "Tests |×"; done'

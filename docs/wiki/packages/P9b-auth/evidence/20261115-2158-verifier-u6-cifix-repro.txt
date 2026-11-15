@@ -1,0 +1,54 @@
+# 명령: for v in 'orig none' 'orig latelisten' 'fixed latelisten' 'fixed nolisten' 'fixed nobanner' 'fixed none'; do python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6fix/run.py $v 2>&1 | grep -E '###|✓|×|Tests |exit|Unable to find|AssertionError|Timed out'; done
+# 시각: 2026-11-15T21:58:48+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# 메모: 저장소 밖 사본(vu6fix/web). orig=HEAD 1cf67cd 의 push.test.ts, fixed=미커밋 수정본. latelisten=가짜 addEventListener 가 150ms 늦게 등록, nolisten=AppShell 이 리스너를 안 붙임, nobanner=setBanner 삭제
+# ---
+### test=orig mutation=none repeat=1
+      Tests  21 passed (21)
+--- exit 0
+### test=orig mutation=latelisten repeat=1
+     × {type:"briefing", schedule_id} 를 받으면 한 줄 배너 — 누르면 #/briefings?schedule_id=N, 누른 뒤 사라진다 1017ms
+     × 닫기 버튼으로 닫는다(주소는 그대로) 1020ms
+     × schedule_id 가 없으면 일정 없는 브리핑 주소, 모양이 다른 메시지는 무시한다 1040ms
+     × 알림을 눌러 온 {type:"open-briefing"} 은 배너 없이 바로 그 일정 주소로 간다 1021ms
+     × 알림을 눌러 온 {type:"open-briefing", schedule_id:null} 은 배너 없이 일정 없는 #/briefings 로 간다 (R-U8-1) 1012ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+TestingLibraryElementError: Unable to find an element by: [data-testid="push-banner"]
+TestingLibraryElementError: Unable to find an element by: [data-testid="push-banner"]
+TestingLibraryElementError: Unable to find an element by: [data-testid="push-banner"]
+AssertionError: expected '#/chat' to be '#/briefings?schedule_id=12' // Object.is equality
+AssertionError: expected '#/chat' to be '#/briefings' // Object.is equality
+      Tests  5 failed | 16 passed (21)
+--- exit 1
+### test=fixed mutation=latelisten repeat=1
+      Tests  21 passed (21)
+--- exit 0
+### test=fixed mutation=nolisten repeat=1
+     × {type:"briefing", schedule_id} 를 받으면 한 줄 배너 — 누르면 #/briefings?schedule_id=N, 누른 뒤 사라진다 1020ms
+     × 닫기 버튼으로 닫는다(주소는 그대로) 1020ms
+     × schedule_id 가 없으면 일정 없는 브리핑 주소, 모양이 다른 메시지는 무시한다 1037ms
+     × 알림을 눌러 온 {type:"open-briefing"} 은 배너 없이 바로 그 일정 주소로 간다 1037ms
+     × 알림을 눌러 온 {type:"open-briefing", schedule_id:null} 은 배너 없이 일정 없는 #/briefings 로 간다 (R-U8-1) 1013ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected false to be true // Object.is equality
+AssertionError: expected false to be true // Object.is equality
+AssertionError: expected false to be true // Object.is equality
+AssertionError: expected false to be true // Object.is equality
+AssertionError: expected false to be true // Object.is equality
+      Tests  5 failed | 16 passed (21)
+--- exit 1
+### test=fixed mutation=nobanner repeat=1
+     × {type:"briefing", schedule_id} 를 받으면 한 줄 배너 — 누르면 #/briefings?schedule_id=N, 누른 뒤 사라진다 1029ms
+     × 닫기 버튼으로 닫는다(주소는 그대로) 1031ms
+     × schedule_id 가 없으면 일정 없는 브리핑 주소, 모양이 다른 메시지는 무시한다 1015ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+TestingLibraryElementError: Unable to find an element by: [data-testid="push-banner"]
+TestingLibraryElementError: Unable to find an element by: [data-testid="push-banner"]
+TestingLibraryElementError: Unable to find an element by: [data-testid="push-banner"]
+      Tests  3 failed | 18 passed (21)
+--- exit 1
+### test=fixed mutation=none repeat=1
+      Tests  21 passed (21)
+--- exit 0

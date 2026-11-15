@@ -1,0 +1,12 @@
+# 명령: bash -c cd web && for i in 1 2 3 4 5 6; do npm exec -- vitest run src/__tests__/push.test.ts 2>&1 | grep "Tests "; done
+# 시각: 2026-11-15T21:54:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# ---
+      Tests  no tests
+      Tests  no tests
+      Tests  no tests
+      Tests  no tests
+      Tests  no tests
+      Tests  no tests

@@ -1,0 +1,18 @@
+# 명령: npm --prefix web exec -- vitest run --root web
+# 시각: 2026-11-15T21:54:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1cf67cd (dev2)
+# exit: 0
+# ---
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  10 passed (10)
+      Tests  188 passed (188)
+   Start at  21:54:12
+   Duration  3.41s (tests 48%, environment 31%, import 12%, setup 5%, transform 4%)
+
+    Isolate  10 workers spawned · ~638ms startup each (spawn + environment, per file)
+             at least ~274ms faster with isolate: false — reuses workers across files instead of one per file
+
