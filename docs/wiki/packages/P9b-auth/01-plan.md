@@ -387,6 +387,20 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 **빼지 않는 것**: 닉네임 필수 입력·저장·표시 · 409 두 코드 · 0004 백필(삭제 없음) · U11 로컬 Caddy 경유 스모크.
 **P9c(달력)**: 포기 시점(11-17 12:00 까지 U1·U2 리뷰 통과, `packages/P9c-briefing-calendar/01-plan.md:9`)이 이 일정과 겹치고 P9c 는 P9b 04-review 뒤에야 활성화할 수 있다 → **평가 전 달력은 사실상 들어가지 못한다**(리스크 절, 사용자 할 일 10).
 
+### 4차 검증 권고 반영 (메인 세션, 2026-11-16 — `02-plan-verify.md` 4차 통과, [필수] 0 · [권고] R4-1~R4-11. 아래는 U9·U10·U11 에 그대로 적용한다)
+
+- **R4-1 (U9 제어문자 시험 값)**: `str.strip()` 은 앞뒤의 공백류 제어문자(U+001C~001F·U+000B·U+000C·U+0085·U+2028 등)도 지운다 — 닉네임 규칙의 "앞뒤 공백·줄바꿈 제거"에 포함된다(`"\x1f민지"` 는 `민지` 로 통과). "제어문자 → 422" 는 **가운데에 있거나 공백류가 아닌** 제어문자에 대한 것이다. 시험 값은 `"\x00"`·`"a\x00b"`·`"민\x01지"`·`"민지\x7f"`·`"​민지"` 로 고정한다.
+- **R4-2 (B15 새 단언)**: `tests/test_auth_required_routes.py` 의 `bare_client` 는 엔진에 묶이지 않은 세션을 쓴다. 조회 API 단언은 DB 에 가지 않는 요청으로만 쓴다 — 쿼리 없음(422 `missing_query`) 또는 `?username=`(200 `"invalid"`).
+- **R4-3 (결정 AH 비상 되돌리기)**: 명령은 U11 로컬 Caddy 스모크 끝에 **로컬 볼륨에서 예행해 증거를 남긴 뒤에만** 13 문서에 적는다. 예행할 순서: ① 새 해시 상태에서 `docker compose -f docker-compose.prod.yml stop backend` ② `GIT_SHA=<새 해시> docker compose -f docker-compose.prod.yml run --rm --entrypoint python backend -m alembic downgrade 0003` ③ `git checkout 4be331b` ④ `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build`. 떠 있는 컨테이너에 `exec` 로 downgrade 하지 않는다(entrypoint 가 재시작 때 다시 올린다). 예행이 실패하거나 못 하면 13 문서에는 "앞으로 고쳐 다시 올린다"만 적는다.
+- **R4-4 (조회 API 시험)**: 쿼리로는 짝 없는 서로게이트가 서버에 닿지 않는다(`%ED%A0%80` → U+FFFD). 그 시험은 원시 경로 문자열로 쓰고 기대는 `"invalid"`. NUL(`%00`)은 닿는다.
+- **R4-5 (U9 파일 목록 추가)**: `app/auth/__init__.py` 의 docstring 라우트 목록에 `GET /auth/availability` 를 더한다(문서 문자열만).
+- **R4-6 (U10 화면 상태, 닫힌 값)**: ① 조회 응답이 돌아왔을 때 칸의 현재 값이 요청 때 값과 다르면 그 응답은 버린다. ② 칸 값을 바꾸면 그 칸의 확인 결과를 지운다. ③ 가입↔로그인 전환 때 닉네임 값과 두 칸의 확인 결과를 지운다. ④ E2E·시험에서 `getByLabel('아이디')` 류는 `{ exact: true }` 를 쓴다("아이디 중복 확인" 버튼과 겹침).
+- **R4-7**: U9 ∥ U10 의 `03-log.md`·`tests.md` 는 에이전트가 직접 고치지 않고 **보고문에 초안으로** 돌려준다. 메인이 차례로 붙인다.
+- **R4-8 (U11)**: 로컬 스모크의 "기존 계정 로그인"에 쓸 비밀번호 파일(스크래치패드 `p9b-u7/`)이 없으면, 새 이미지 빌드 전에 `relationship-*:4be331b` 이미지로 계정 하나를 가입해 둔다.
+- **R4-9**: 04-review 에서 수용 기준 구절 2(판정 #2)는 #16 과 함께 판정한다. `Caddyfile` 에 `log` 지시문이 없어 Caddy 접근 로그는 남지 않는다 — 조회 요청 기록은 uvicorn 접근 로그뿐이다.
+- **R4-10 (U9 판정 추가, 원칙7)**: `grep -rln nickname app --include='*.py'` 결과가 `app/db/models.py`·`app/api/schemas.py` 또는 인증 스키마 파일·`app/auth/routes.py`·`app/auth/names.py`(와 필요 시 `app/auth/__init__.py`) 밖의 파일을 포함하지 않는다 — 에이전트 루프·툴·브리핑·프롬프트 파일에 `nickname` 이 없어야 한다.
+- **R4-11**: 영문 닉네임이 소문자로 보이는 것(결정 Y)은 사용자에게 알린다(메인, 2026-11-16 알림).
+
 ## 판정 방법
 
 명령은 저장소 루트에서, 증거는 `python3 .claude/scripts/save_evidence.py P9b-auth <이름> -- <명령>`(FIX-034). 환경변수는 래퍼 앞. **따옴표·`$`·`|` 가 든 안쪽 명령은 스크래치패드 `<SCR>/<이름>.sh` 로 Write 해 `-- bash <SCR>/<이름>.sh`**(P9 F-P9V-2 와 같은 우회 — `save_evidence.py` 는 `--` 뒤 인자를 공백으로 이어 `bash -c` 로 돌려 따옴표가 사라지고 `|` 가 파이프가 된다, 02-plan-verify F-4 `evidence/20261115-2019-planverify-cmd4-probe.txt`). `alembic` 은 `.venv/bin/python -m alembic`. `<URL>` = `https://54-79-202-221.sslip.io`.

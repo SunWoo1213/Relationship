@@ -1,0 +1,46 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/planverify4/nickname_probe.py
+# 시각: 2026-11-16T07:04:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: bfbcdb1 (dev2)
+# exit: 0
+# ---
+python 3.14.7
+짝 없는 상위 서로게이트            -> None
+가운데 하위 서로게이트             -> None
+서로게이트 10만 자              -> None
+NUL 단독                   -> None
+NUL 가운데                  -> None
+NUL 앞                    -> None
+제어 U+001F 앞              -> '민지'
+제어 U+001C 뒤              -> '민지'
+제어 U+000B 앞              -> '민지'
+제어 U+0085 뒤              -> '민지'
+U+2028 뒤                 -> '민지'
+제어 U+0001 앞              -> None
+제어 U+0001 가운데            -> None
+제어 U+007F 뒤              -> None
+제로폭 U+200B 앞             -> None
+BOM U+FEFF 앞             -> None
+NBSP 앞                   -> '민지'
+NBSP 가운데                 -> None
+전각 공백 앞                  -> '민지'
+NFD 민지                   -> '민지'
+자모 ㅋㅋ                    -> None
+옛한글 조합                   -> None
+켈빈 기호 U+212A + im        -> 'kim'
+전각 영문                    -> None
+앞뒤 공백·줄바꿈                -> '민지'
+Demo                     -> 'demo'
+x 10만 자                  -> None
+빈 값                      -> None
+공백뿐                      -> None
+한글 1자                    -> None
+한글 2자                    -> '가힣'
+한글 20자                   -> '가가가가가가가가가가가가가가가가가가가가'
+한글 21자                   -> None
+min-ji                   -> None
+이모지                      -> None
+한자                       -> None
+백필 표본 200000개 중 norm(username) != username: 0
+strip 대상(<U+0100): ['U+0009', 'U+000A', 'U+000B', 'U+000C', 'U+000D', 'U+001C', 'U+001D', 'U+001E', 'U+001F', 'U+0020', 'U+0085', 'U+00A0']
+parse_qsl: [('username', ['U+0000']), ('nickname', ['U+FFFD', 'U+FFFD', 'U+FFFD']), ('x', [])]
