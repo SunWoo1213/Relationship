@@ -1,0 +1,103 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vmut036/run.sh
+# 시각: 2026-11-15T20:27:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5c0f26d (dev2)
+# exit: 0
+# ---
+=== C0 대조군(무변이) 기대: PASS
+main.tf outputs.tf README.md terraform.tfvars.example user_data.sh variables.tf 
+.                                                                        [100%]
+1 passed, 39 deselected in 0.10s
+pytest exit=0
+=== C1 infra/x.tfstate 를 git add -f 기대: FAIL
+F                                                                        [100%]
+>       assert not bad, f"git 이 상태·변수 파일을 추적한다: {bad}"
+=========================== short test summary info ============================
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git 이 상태·변수 파일을 추적한다: ['infra/x.tfstate']
+assert not ['infra/x.tfstate']
+1 failed, 39 deselected in 0.10s
+pytest exit=1
+=== C2 추적 안 됨 + ignore 된 infra/terraform.tfstate 만 있음(배포 뒤 이 기기 상태) 기대: PASS
+A  .gitignore
+A  infra/.terraform.lock.hcl
+A  infra/README.md
+.                                                                        [100%]
+1 passed, 39 deselected in 0.10s
+pytest exit=0
+=== C3 .gitignore 의 tfstate 줄 제거 + 작업 트리 infra/terraform.tfstate 기대: FAIL
+F                                                                        [100%]
+>           assert chk.returncode == 0, f"{p.name}: 작업 트리에 있는데 ignore 되지 않는다(rc={chk.returncode}): {chk.stderr}"
+=========================== short test summary info ============================
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: terraform.tfstate: 작업 트리에 있는데 ignore 되지 않는다(rc=1): 
+assert 1 == 0
+ +  where 1 = CompletedProcess(args=['git', 'check-ignore', '-q', 'infra/terraform.tfstate'], returncode=1, stdout='', stderr='').returncode
+1 failed, 39 deselected in 0.11s
+pytest exit=1
+=== C4 비ASCII 이름 실제 변수 파일 infra/비밀.tfvars 를 git add -f 기대: FAIL(추적됨)
+ls-files 출력:
+infra/terraform.tfvars.example
+"infra/\353\271\204\353\260\200.tfvars"
+F                                                                        [100%]
+>           assert chk.returncode == 0, f"{p.name}: 작업 트리에 있는데 ignore 되지 않는다(rc={chk.returncode}): {chk.stderr}"
+=========================== short test summary info ============================
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: 비밀.tfvars: 작업 트리에 있는데 ignore 되지 않는다(rc=1): 
+assert 1 == 0
+ +  where 1 = CompletedProcess(args=['git', 'check-ignore', '-q', 'infra/비밀.tfvars'], returncode=1, stdout='', stderr='').returncode
+1 failed, 39 deselected in 0.11s
+pytest exit=1
+=== C5 .gitignore 의 tfstate 줄 제거, 대신 .git/info/exclude(저장소에 안 올라가는 로컬 설정)로만 ignore 기대: 27 은 통과할 수 있음 → 25·26 이 잡는지
+-- 27 만:
+.                                                                        [100%]
+1 passed, 39 deselected in 0.10s
+pytest exit=0
+-- gitignore 테스트 포함:
+F..                                                                      [100%]
+>           assert needed in lines, f".gitignore 에 `{needed}` 가 없다"
+=========================== short test summary info ============================
+FAILED tests/test_infra_files.py::test_gitignore_blocks_state_vars_and_plugin_cache - AssertionError: .gitignore 에 `infra/*.tfstate` 가 없다
+assert 'infra/*.tfstate' in ['.claude/commit-draft.txt', '.claude/gitlog.md', '.claude/settings.local.json', '.env', '.env.*', '!.env.example', ...]
+1 failed, 2 passed, 37 deselected in 0.08s
+pytest exit=1
+=== C6 하위 디렉터리 infra/env/prod.tfvars 를 git add -f 기대: FAIL(ls-files 는 재귀)
+F                                                                        [100%]
+>       assert not bad, f"git 이 상태·변수 파일을 추적한다: {bad}"
+=========================== short test summary info ============================
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git 이 상태·변수 파일을 추적한다: ['infra/env/prod.tfvars']
+assert not ['infra/env/prod.tfvars']
+1 failed, 39 deselected in 0.10s
+pytest exit=1
+=== C7 추적 안 됨 + ignore 안 된 infra/prod.auto.tfvars(.gitignore 의 tfvars 줄 제거) 기대: FAIL
+F                                                                        [100%]
+>           assert chk.returncode == 0, f"{p.name}: 작업 트리에 있는데 ignore 되지 않는다(rc={chk.returncode}): {chk.stderr}"
+=========================== short test summary info ============================
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: prod.auto.tfvars: 작업 트리에 있는데 ignore 되지 않는다(rc=1): 
+assert 1 == 0
+ +  where 1 = CompletedProcess(args=['git', 'check-ignore', '-q', 'infra/prod.auto.tfvars'], returncode=1, stdout='', stderr='').returncode
+1 failed, 39 deselected in 0.11s
+pytest exit=1
+=== C8 옛 테스트(HEAD 판)를 C2 상태에 기대: FAIL(증상 재현 — 고치기 전에는 정상 배포 상태에서 실패)
+F                                                                        [100%]
+>           assert ".tfstate" not in n, n
+=========================== short test summary info ============================
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_present_in_tree - AssertionError: terraform.tfstate
+assert '.tfstate' not in 'terraform.tfstate'
+  
+  '.tfstate' is contained here:
+1 failed, 39 deselected in 0.10s
+pytest exit=1
+=== 저장소 작업 트리 무변경 확인
+ M tests/test_infra_files.py
+
+# ===== append 2026-11-15T20:27:31+09:00 =====
+# 명령: cd /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vmut036/202713-c4 && rm infra/비밀.tfvars && git ls-files infra | grep tfvars; /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python -m pytest tests/test_infra_files.py -q -p no:cacheprovider -k tracked_by_git; echo pytest exit=$?
+# 시각: 2026-11-15T20:27:31+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5c0f26d (dev2)
+# exit: 0
+# 메모: C9 C4 사본에서 작업 트리의 infra/비밀.tfvars 만 지움(색인에는 남음) 기대: FAIL(추적됨)
+# ---
+infra/terraform.tfvars.example
+"infra/\353\271\204\353\260\200.tfvars"
+.                                                                        [100%]
+1 passed, 39 deselected in 0.06s
+pytest exit=0

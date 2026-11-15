@@ -1,0 +1,55 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/mut036.sh
+# 시각: 2026-11-15T20:24:57+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5c0f26d (dev2)
+# exit: 0
+# ---
+=== V0 기준선(무변이, 사본에 상태 파일 없음) 기대: PASS
+.                                                                        [100%]
+1 passed in 0.10s
+pytest exit=0
+=== V1 infra/x.tfstate 를 git add -f 기대: FAIL
+=========================== short test summary info ============================
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git 이 상태·변수 파일을 추적한다: ['infra/x.tfstate']
+assert not ['infra/x.tfstate']
+1 failed in 0.11s
+pytest exit=1
+=== V2 infra/terraform.tfvars 를 git add -f 기대: FAIL
+=========================== short test summary info ============================
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git 이 상태·변수 파일을 추적한다: ['infra/terraform.tfvars']
+assert not ['infra/terraform.tfvars']
+1 failed in 0.11s
+pytest exit=1
+=== V3 infra/terraform.tfstate.backup 를 git add -f 기대: FAIL
+=========================== short test summary info ============================
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git 이 상태·변수 파일을 추적한다: ['infra/terraform.tfstate.backup']
+assert not ['infra/terraform.tfstate.backup']
+1 failed in 0.11s
+pytest exit=1
+=== V4 작업 트리에 ignore 된 tfstate 만 있음(정상 배포 뒤 상태) 기대: PASS
+(ignored 확인)
+.                                                                        [100%]
+1 passed in 0.10s
+pytest exit=0
+=== V5 .gitignore 의 tfstate 줄을 모두 빼고 작업 트리 tfstate 유지 기대: FAIL(ignore 단언)
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: terraform.tfstate: 작업 트리에 있는데 ignore 되지 않는다(rc=1): 
+assert 1 == 0
+ +  where 1 = CompletedProcess(args=['git', 'check-ignore', '-q', 'infra/terraform.tfstate'], returncode=1, stdout='', stderr='').returncode
+1 failed in 0.12s
+pytest exit=1
+=== V6 .gitignore 의 tfvars 줄을 빼고 작업 트리 terraform.tfvars 둠 기대: FAIL
+FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: terraform.tfvars: 작업 트리에 있는데 ignore 되지 않는다(rc=1): 
+assert 1 == 0
+ +  where 1 = CompletedProcess(args=['git', 'check-ignore', '-q', 'infra/terraform.tfvars'], returncode=1, stdout='', stderr='').returncode
+1 failed in 0.12s
+pytest exit=1
+=== V7 git 저장소가 아님(.git 이동) 기대: FAIL(skip 아님)
+  
+assert 128 == 0
+ +  where 128 = CompletedProcess(args=['git', 'ls-files', 'infra'], returncode=128, stdout='', stderr='fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git\n').returncode
+1 failed in 0.11s
+pytest exit=1
+=== V8 테스트 변이: tfstate 판정을 '.tfstate' in -> endswith('.tfstate') 로 약화, backup 추적 기대: FAIL 해야 하나 약화 테스트는 PASS(=이 변이를 V3 이 잡는지 확인)
+.                                                                        [100%]
+1 passed in 0.10s
+pytest exit=0

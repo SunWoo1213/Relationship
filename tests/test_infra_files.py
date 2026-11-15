@@ -12,6 +12,7 @@ HCL 은 파서를 쓰지 않고 중괄호 블록을 잘라 본다. 주석(`#`·`
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -424,15 +425,33 @@ def test_gitignore_does_not_ignore_lock_file_or_tf_sources():
         assert ln not in ("*.tf", "infra/*.tf", "infra/*", "*.sh", "infra/*.sh"), f"소스를 막는 줄: {ln}"
 
 
-def test_no_state_or_vars_files_are_present_in_tree():
-    """27 `infra/` 에 tfstate·tfvars(example 제외)가 놓여 있지 않다 -- 에이전트는 apply 한 적이 없다.
-    `.terraform/`(provider 캐시)은 `init` 의 정상 산출물이라 여기서 보지 않는다(R-U3c-1) — `.gitignore` 가 막는 것은 테스트 25·26 이 본다."""
-    infra = ROOT / "infra"
-    names = {p.name for p in infra.iterdir()}
-    for n in names:
-        assert ".tfstate" not in n, n
-        if n.endswith(".tfvars"):
-            raise AssertionError(f"{n}: 실제 변수 파일이 있다")
+def _is_state_or_vars(name: str) -> bool:
+    """상태(`.tfstate`·`.tfstate.backup`)·실제 변수(`*.tfvars`) 파일 이름인가. example 은 `.tfvars.example` 이라 해당하지 않는다."""
+    return ".tfstate" in name or name.endswith(".tfvars")
+
+
+def _git(*args: str) -> subprocess.CompletedProcess:
+    """저장소 루트에서 git 을 부른다. git 이 없거나 저장소가 아니면 예외로 실패한다(skip 하지 않는다)."""
+    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True)
+
+
+def test_no_state_or_vars_files_are_tracked_by_git():
+    """27 tfstate·tfvars(example 제외)가 **git 에 추적되지 않는다** -- security §1 "상태·변수 파일을 커밋하지 않는다".
+    작업 트리에 그런 파일이 있는 것은 정상이다(사용자가 `terraform apply` 한 뒤 11-19 destroy 에 필요) — 있다면 `.gitignore` 가
+    막고 있어야 한다(`git check-ignore`). 없으면 이 부분은 "없음" 으로 통과한다. 파일 내용은 읽지 않고 이름만 본다.
+    git 을 못 부르면 실패한다(skip 없음). `.terraform/`(provider 캐시)은 여기서 보지 않는다(R-U3c-1)."""
+    ls = _git("ls-files", "infra")
+    assert ls.returncode == 0, f"git ls-files 실패(git 없음·저장소 아님?): {ls.stderr}"
+    tracked = [ln for ln in ls.stdout.splitlines() if ln]
+    assert tracked, "추적 파일이 0 -- git 저장소가 아니거나 infra/ 가 추적되지 않는다"
+    bad = [t for t in tracked if _is_state_or_vars(Path(t).name)]
+    assert not bad, f"git 이 상태·변수 파일을 추적한다: {bad}"
+
+    for p in (ROOT / "infra").iterdir():
+        if not _is_state_or_vars(p.name):
+            continue
+        chk = _git("check-ignore", "-q", f"infra/{p.name}")
+        assert chk.returncode == 0, f"{p.name}: 작업 트리에 있는데 ignore 되지 않는다(rc={chk.returncode}): {chk.stderr}"
 
 
 # 28 ------------------------------------------------------------------------------------------
