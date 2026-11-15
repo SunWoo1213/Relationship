@@ -43,7 +43,7 @@
 ## D. 발표 11-18(수)
 - [ ] **D-1** 전날 저녁·당일 10분 전 `https://<호스트명>/api/health` 와 `/` 한 번씩(첫 요청 데우기).
 - [ ] **D-2** 발표 장소에서 SSH 가 필요하면 보안 그룹 22 규칙의 "내 IP" 를 바꾼다: `infra/terraform.tfvars` 의 `ssh_cidr` 을 새 IP`/32` 로 고치고 **사용자가** `AWS_PROFILE=<이름> terraform -chdir=infra apply -var-file=terraform.tfvars`(규칙 1개만 바뀌는 plan 확인 뒤 `yes`) — 또는 콘솔에서 규칙 수정. 사이트 자체는 영향 없음.
-- [ ] **D-3** 기억 초기화가 필요하면 11 문서 §10(`APP_USER_ID` 바꾸고 `up -d`).
+- [ ] **D-3** 빈 기억이 필요하면 화면에서 새 계정을 가입한다(CR-006 뒤 — 계정마다 기억이 따로, `.env` 수정 없음).
 - [ ] **D-4** 서버가 죽으면 로컬 실행(`docs/RUNNING.md`)으로 발표.
 
 ## E. 종료 11-19(목) 18:00 — `12-shutdown.md` 그대로
@@ -54,6 +54,23 @@
 - [ ] **E-5** 도메인 A 레코드 삭제(쓴 경우). 다음 날 Billing 에서 EC2·EBS·IPv4 사용량 증가 0 확인.
 - [ ] **E-6** 완성 확인 질문(P9 04-review)에 답한다 → 승격 → P2b(인물 삭제) 재개.
 
+## G. 로그인 버전 반영 (P9b-auth U7 — 에이전트가 "반영해 달라" 고 해시를 알려 준 뒤, 11-16~11-17)
+
+> **이 반영은 운영 서버의 기존 데이터(인물·사건·일정·질문·푸시 구독·판단 기록)를 한 번 비운다**(사용자 결정 2026-11-15 "모두 비운다"). **반영 뒤에는 옛 버전으로 되돌릴 수 없다** — 문제가 생기면 에이전트가 고친 새 해시를 다시 올린다. 서버 `.env` 는 고치지 않는다(새 값 없음).
+
+- [ ] **G-1** (선택) 반영 전 DB 백업 1회 — `12-shutdown.md` 1항의 `pg_dump` 명령. 비우기로 했으므로 필수 아님.
+- [ ] **G-2** 서버 접속: `ssh -i ~/.ssh/relationship-deploy ubuntu@54.79.202.221`
+- [ ] **G-3** 코드 받기: `cd ~/Relationship && git fetch origin && git checkout <에이전트가 알려 준 해시>`
+- [ ] **G-4** 기동(옛 backend 가 내려가고 새 backend 가 올라오면서 리비전 0003 이 돈다 — 따로 `alembic` 을 치지 않는다): `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build`
+- [ ] **G-5** 상태: `docker compose -f docker-compose.prod.yml ps` → 세 서비스 running, postgres·backend healthy. 출력을 에이전트에 붙인다.
+- [ ] **G-6** 로그: `docker compose -f docker-compose.prod.yml logs --tail=200 backend | grep -c Traceback` (기대 0) 와 `docker compose -f docker-compose.prod.yml logs backend | grep "Running upgrade"` (기대: `0002 -> 0003` 한 줄). 두 출력을 에이전트에 붙인다.
+- [ ] **G-7** 브라우저(탭 하나)로 `https://54-79-202-221.sslip.io` → 로그인 화면이 뜨는지 → **시연 계정 가입**(아이디·비밀번호는 직접 정하고 저장소·채팅에 적지 않는다. 아이디 3~20자 영문 소문자·숫자·밑줄, 비밀번호 8자 이상) → 채팅 한 줄 → 로그아웃 → 다시 로그인하면 방금 대화가 보이는지.
+- [ ] **G-8** 에이전트가 주는 발화 목록(10~15개)을 시연 계정 채팅에 넣어 데이터를 쌓는다. 확인 칩이 뜨면 직접 판단해 누른다.
+- [ ] **G-9** 리허설: (가) 로그아웃 → 새 계정 가입 → 인물 화면이 비어 있음, 채팅 기록 없음 (나) 로그아웃 → 시연 계정 로그인 → 인물 카드·브리핑·지난 대화가 그대로. **로그아웃은 채팅 화면에서**(인물 상세 화면에서 로그아웃하면 다음 계정의 첫 화면이 "인물을 찾을 수 없어요" 로 뜬다 — 정보 노출은 아님), **탭은 하나만**.
+- [ ] **G-10** OpenAI 사용량 확인 — 11-17 저녁과 11-18 아침. 누구나 가입할 수 있어 월 한도 $10 이 평가 전에 소진될 수 있다. 소진됐으면 한도를 올리거나 키를 바꾼다(사용자만 가능).
+- [ ] **G-11** (푸시를 시연에 쓸 때) 시연 계정으로 로그인한 브라우저에서 브리핑 화면 "알림 받기" → 권한 허용 → 알림을 눌러 그 브리핑이 열리는지.
+
 ## F. 로컬 정리 (언제든, 에이전트는 못 함)
+- [ ] 로컬 Postgres 의 시험용 DB 2개(P9b-auth U1 이 만든 빈 DB, 지워도 다음 테스트 때 하나는 다시 생긴다): `relationship_test_mig`, `relationship_test_mig_v15` — 원하면 `dropdb` 로 직접.
 - [ ] 로컬 Docker 의 스모크 볼륨 3개: `docker volume rm relationship-prod_pgdata relationship-prod_caddy_data relationship-prod_caddy_config`
 - [ ] 무효 evidence 4개(마지막은 U3b 변이 이름 파일의 불완전 사본 — `…-u3b-names-v11-v29.txt` 가 완전본): `rm /Users/sunwoo/Desktop/Portfolio/Relationship/docs/wiki/packages/P9-infra/evidence/20261114-1512-u3b-mutations-names.txt` 와 `rm /Users/sunwoo/Desktop/Portfolio/Relationship/docs/wiki/packages/P5b-query-turn/evidence/20261107-1455-u7fix-ruff.txt /Users/sunwoo/Desktop/Portfolio/Relationship/docs/wiki/fixes/evidence/20261108-2000-L-007-test-guards.txt /Users/sunwoo/Desktop/Portfolio/Relationship/docs/wiki/packages/P5b-query-turn/evidence/20261108-2009-u7fix3-review-baseline.txt`

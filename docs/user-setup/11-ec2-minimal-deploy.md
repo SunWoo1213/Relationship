@@ -55,7 +55,7 @@ nano .env && chmod 600 .env
 | `OPENAI_MODEL` | 로컬 `.env` 와 같은 값 | |
 | `LLM_PROVIDER` / `LLM_PROVIDERS_ENABLED` | `openai` / `openai` | 결정 K — 공급자 하나만 |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | **배포용 새 키 쌍**(결정 N): 사용자 PC 터미널에서 `docs/RUNNING.md` "① VAPID 키는 사용자가 직접 만든다"(273행 근처)의 명령을 **그대로 한 번** 실행해 나온 두 줄을 쓴다(에이전트는 실행하지 않는다 — 값이 대화 기록에 남는다) · `VAPID_SUBJECT=mailto:<내 메일>` | 값은 화면과 이 파일에만. 로컬 `.env` 의 키와 다른 쌍이어야 종료 때 로컬 구독이 살아남는다 |
-| `APP_USER_ID` | `demo` | 로컬 `local` 과 구분. 평가 직전 기억 초기화는 14단계 |
+| ~~`APP_USER_ID`~~ | (쓰지 않음) | **CR-006(2026-11-15)으로 폐지** — 사용자는 로그인 계정으로 나뉜다. 서버 `.env` 에 이 줄이 남아 있어도 무시되므로 지우지 않아도 된다. 로그인에 필요한 새 `.env` 값은 없다 |
 | `APP_TIMEZONE` | 비움(기본 Asia/Seoul) | |
 | `BRIEFING_SCHEDULER_ENABLED` | `1` | 컨테이너 안 1분 브리핑 루프(D17 3) |
 
@@ -102,7 +102,7 @@ GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml 
 마이그레이션은 entrypoint 가 자동으로 돈다. 되돌리기 = 직전 해시로 같은 명령(SERVER-CHECKLIST 0-4·§6).
 
 ## 10. 평가 직전 기억 초기화가 필요하면
-`.env` 의 `APP_USER_ID` 를 새 값(예 `demo2`)으로 바꾸고 `up -d` — 빈 기억으로 시작한다. `DROP`·`TRUNCATE`·`down -v` 는 쓰지 않는다(security §4). 주의: 모든 방문자가 같은 기억을 공유한다(F-fbaaae, 단일 사용자 데모).
+**(CR-006 뒤, 2026-11-16)** 빈 기억으로 시작하려면 화면에서 **새 계정을 가입**한다 — 계정마다 기억이 따로다(D18). `.env` 를 바꿀 필요가 없다. `DROP`·`TRUNCATE`·`down -v` 는 쓰지 않는다(security §4). 방문자끼리 기억을 공유하지 않는다(F-fbaaae 는 P9b-auth 로 해소). 로그인 버전(리비전 0003)을 처음 반영할 때 기존 데이터가 한 번 비워지고, 그 뒤에는 옛 버전으로 되돌릴 수 없다 — 절차는 `13-user-todo-deploy.md` G 절.
 
 ## 11. 로그 · 비상시
 - 로그는 `docker compose -f docker-compose.prod.yml logs --tail=200 <서비스>` 만(결정 L — 서비스당 10MB×3 상한, 외부 전송 없음).

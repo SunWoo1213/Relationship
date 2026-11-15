@@ -347,6 +347,13 @@ npm run dev
 
 터미널에 나오는 주소(기본 **http://localhost:5173**)를 브라우저로 연다. 처음 열면 `#/chat` 으로 간다.
 
+**로그인 (CR-006 · P9b-auth, 2026-11-16)** — 처음 열면 로그인 화면이 뜬다. "계정 만들기" 로 아이디(3~20자 영문 소문자·숫자·밑줄)·비밀번호(8자 이상)를 정해 가입하면 바로 로그인된다. 계정마다 인물·일정·대화 기록이 따로다. 알아 둘 것:
+- **로컬 http 에서는 백엔드를 `AUTH_COOKIE_SECURE=0` 으로 띄운다**(예: `AUTH_COOKIE_SECURE=0 POSTGRES_PORT=5433 python -m uvicorn app.main:app --reload`). 기본값은 켜짐(운영 HTTPS 용, 쿠키 이름 `__Host-rel_session`)이라 http 에서는 브라우저가 쿠키를 돌려보내지 않아 로그인이 유지되지 않는다. 끄면 쿠키 이름은 `rel_session`.
+- **리비전 0003 을 처음 올리면(`alembic upgrade head`) 그 DB 의 기존 인물·사건·일정·질문·푸시 구독·판단 기록이 한 번 비워진다**(사용자 결정 2026-11-15). 다시 올려도 또 비우지 않는다.
+- 옛 `APP_USER_ID` 환경변수는 폐지됐다 — `.env` 에 남아 있어도 무시된다.
+- 다른 주소에서 온 요청(`Origin` 이 접속 주소와 다른 POST)은 403 `bad_origin` 으로 막힌다. 개발 서버 프록시가 원래 주소를 넘기므로(`xfwd`) `localhost:5173` 에서는 그대로 된다.
+- `/chat` 발화는 2000자까지다.
+
 **③ 프록시 규칙** — 브라우저는 항상 같은 주소의 `/api/...` 로 요청하고, 개발 서버(Vite)가 앞의 `/api` 를 떼어 백엔드로 넘긴다. 예: 브라우저 `GET /api/persons` → 백엔드 `GET http://localhost:8000/persons`. 그래서 CORS 설정이 필요 없다. 규칙의 코드는 `web/src/proxy.ts`(`stripApiPrefix`)·`web/vite.config.ts` 이다. 운영에서 정적 파일을 누가 내는지는 P9-infra 에서 정한다.
 
 **④ 포트 일치** — 백엔드를 8000 이 아닌 포트로 띄웠다면(예: `--port 8001`) 프론트가 같은 곳을 보게 `VITE_API_TARGET` 을 맞춘다. 두 쪽이 어긋나면 화면에 "불러오지 못했어요" 류 안내가 뜬다. 값은 주소뿐이며 비밀이 아니다(`web/.env.example` 참고, 기본값 `http://localhost:8000`). 바꾼 뒤에는 `npm run dev` 를 다시 시작한다.
