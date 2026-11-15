@@ -624,3 +624,5 @@
 - 2026-11-15 19:07 | PUSH-dev2 | origin dev2 92bd3b9 (실험 푸시)
 - 2026-11-15 19:26 | COMMIT | 1c003af docs(P9-infra): AWS 비용 알림 3개와 Terraform 전용 IAM 사용자 생성을 기록한다
 - 2026-11-15 19:26 | PUSH-dev2 | origin dev2 1c003af (실험 푸시)
+- 2026-11-15 19:33 | COMMIT | 2635ff1 docs(P9-infra): 푸시 알림 키는 새로 만들지 않고 기존 것을 쓰기로 한 결정을 적는다
+- 2026-11-15 19:33 | PUSH-dev2 | origin dev2 2635ff1 (실험 푸시)

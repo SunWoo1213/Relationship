@@ -21,7 +21,7 @@ active: **P9-infra**(U1~U3 `70fcd08` · U1b `809fc96`(CI success) · U3b `fe45a0
 - **11-15 P9 사용자 몫 대행 시작**(사용자 "너가 이 작업을 해주길 원해" → 분담 계획 승인: Chrome 조작 허용 · OpenAI 한도 $10 · 도메인 없이 sslip.io). **A-4 끝**(OpenAI 조직 월 한도 $10 + hard limit 켬, "Limit enforced" 화면 확인) · **A-5 닫음**(sslip.io) → 13 문서 체크. → (중간에 사용자가 Vercel+Neon 전환을 말했다가 결정 질문에서 취소 — **AWS 안 유지**, 문서·코드 변경 0) → 사용자 AWS 가입·로그인 → **A-3 끝**(Budgets `capstone2-10/-30/-50`, Actual 100% 메일, Credit 제외 필터, 크레딧 잔액 $120) · **A-7 앞 절반 끝**(IAM 사용자 `relationship-terraform` + `AmazonEC2FullAccess`, 콘솔 접속 없음). 주의: IAM 사용자 목록이 0명이었음 → 사용자가 루트로 로그인 중일 수 있음(A-2 MFA·관리자 IAM 확인 권고함).
 
 ## 바로 다음에 할 것 (순서대로)
-0. **사용자 몫 대기**: A-7 액세스 키 발급 + `aws configure --profile relationship-deploy`(AWS CLI 2.40.3 은 메인이 brew 로 설치함) · A-8 `ssh-keygen` · A-11 배포용 OpenAI 키. (사용자 결정 11-15: 루트 계정 그대로 진행 · **VAPID 는 로컬 기존 쌍 재사용**(A-10 닫음, 종료 때 로컬 쌍 교체).) 그 뒤 사용자 "띄워 달라" + 프로필 이름·공개키 경로 → 메인: A-9 IP·`infra/terraform.tfvars`·`init/validate/plan`(apply 는 사용자, 호스트명은 sslip.io) → U4.
+0. **사용자 몫 대기**: A-7 액세스 키 발급 + `aws configure --profile relationship-deploy`(AWS CLI 2.40.3 은 메인이 brew 로 설치함) · A-8 `ssh-keygen`. (사용자 결정 11-15: 루트 계정 그대로 진행 · **VAPID·OpenAI 키 모두 로컬 `.env` 의 기존 값 재사용**(A-10·A-11 닫음, 종료 때 둘 다 새로 만들어 로컬 교체).) 그 뒤 사용자 "띄워 달라" + 프로필 이름·공개키 경로 → 메인: A-9 IP·`infra/terraform.tfvars`·`init/validate/plan`(apply 는 사용자, 호스트명은 sslip.io) → U4.
 1. 사용자 요청 대기. 새 작업을 시작하면 첫 커밋에 미커밋 `journal.md` 3줄을 같이 넣는다.
 2. 다음 패키지 후보(사용자 요청 대기): **① 구글 로그인 + 사용자 격리**(CR, P9 착수 조건 R-U10D-3·F-fbaaae) → P9-infra(R-U10D-1~4·S1~S15) · P10 평가.
 3. FIX 후보: R-U10R-4·이번 ⑦ — 호칭 단독/같은 성·같은 직함 2명일 때 자동 병합("박 과장님" → 박선우 conf 0.838, 박선영도 있음; 원칙1) · R-U7F3-3 E-5 템플릿 "직장·동" vs LLM 답 "직장 관계, 위계 동(같은 급)" 표기 통일(사용자 결정) · R-U5R-1/3/4 · R-U10R-5.
