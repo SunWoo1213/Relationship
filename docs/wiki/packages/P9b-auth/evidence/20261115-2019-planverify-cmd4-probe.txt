@@ -1,0 +1,8 @@
+# 명령: grep -rnE app_user_id|APP_USER_ID app
+# 시각: 2026-11-15T20:19:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5c0f26d (dev2)
+# exit: 127
+# 메모: 01-plan 판정 표 #4 명령을 계획에 적힌 그대로 래퍼에 넘긴 결과(따옴표 소실 확인용, verifier)
+# ---
+/bin/bash: APP_USER_ID: command not found
