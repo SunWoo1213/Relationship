@@ -1,0 +1,12 @@
+# 명령: .venv/bin/python scripts/mypy_check.py --run
+# 시각: 2026-11-16T07:15:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 1
+# ---
+[new] 기준선에 없는 새 오류:
+  + app/auth/routes.py: [arg-type] Argument 1 to "fullmatch" of "Pattern" has incompatible type "str | None"; expected "str" (x1)
+  + app/auth/routes.py: [arg-type] Argument 3 to "_exists" has incompatible type "str | None"; expected "str" (x1)
+
+[FAIL] 새 오류 2건 -- scripts/mypy_baseline.txt 와 비교해 결함이면 고치고,
+기준선에 넣을 것이면 --update-baseline 로 재생성 후 사람이 검토하고 커밋한다.

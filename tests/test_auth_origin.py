@@ -100,7 +100,9 @@ def _counts(db_session) -> dict[str, int]:
 
 
 def _logged_in(client: TestClient, username: str = "originuser") -> None:
-    resp = client.post("/auth/signup", json={"username": username, "password": PW})
+    resp = client.post(
+        "/auth/signup", json={"username": username, "password": PW, "nickname": username}
+    )
     assert resp.status_code == 201
 
 

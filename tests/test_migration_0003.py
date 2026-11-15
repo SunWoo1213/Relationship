@@ -45,7 +45,8 @@ MIG_DB_NAME = "relationship_test_mig"
 
 # S3.1 보충(0003)에서 글자 그대로 옮긴 새 테이블 컬럼 집합.
 NEW_TABLE_COLUMNS = {
-    "users": {"id", "username", "password_hash", "created_at"},
+    # head 기준 -- 0004 보충(nickname) 포함.
+    "users": {"id", "username", "password_hash", "nickname", "created_at"},
     "auth_sessions": {"id", "user_id", "token_hash", "created_at", "expires_at"},
     "chat_messages": {"id", "user_id", "role", "content", "question_id", "created_at"},
 }
@@ -211,12 +212,14 @@ def _constraint_violated(
             trans.rollback()
 
 
-# ① head == 0003
-def test_head_revision_is_0003_and_db_is_at_head(mig):
+# ① DB 버전 == 스크립트 head, 0003 이 이력에 있다(head 리터럴은 test_migration_0004 가 본다)
+def test_db_is_at_head_and_0003_is_in_history(mig):
     with _in_mig_env(mig["env"]):
-        head = ScriptDirectory.from_config(mig["cfg"]).get_current_head()
-    assert head == "0003"
-    assert _version(mig["engine"]) == "0003"
+        script = ScriptDirectory.from_config(mig["cfg"])
+        head = script.get_current_head()
+        history = {rev.revision for rev in script.walk_revisions()}
+    assert _version(mig["engine"]) == head
+    assert "0003" in history
 
 
 # ② 새 테이블 3개·컬럼 집합이 S3.1 보충과 같다
@@ -230,8 +233,10 @@ def test_new_tables_have_exactly_the_s3_1_columns(mig):
 def test_users_username_is_unique(mig):
     err = _constraint_violated(
         mig["engine"],
-        "INSERT INTO users (id, username, password_hash) VALUES ('u-b', 'dup', 'h')",
-        setup=("INSERT INTO users (id, username, password_hash) VALUES ('u-a', 'dup', 'h')",),
+        "INSERT INTO users (id, username, nickname, password_hash) VALUES ('u-b', 'dup', 'dup_b', 'h')",
+        setup=(
+            "INSERT INTO users (id, username, nickname, password_hash) VALUES ('u-a', 'dup', 'dup_a', 'h')",
+        ),
     )
     assert err.orig.diag.constraint_name == "uq_users_username"
 
@@ -245,7 +250,7 @@ def test_auth_sessions_token_hash_is_unique(mig):
         mig["engine"],
         insert,
         setup=(
-            "INSERT INTO users (id, username, password_hash) VALUES ('u-t', 'tok', 'h')",
+            "INSERT INTO users (id, username, nickname, password_hash) VALUES ('u-t', 'tok', 'tok', 'h')",
             insert,
         ),
     )
@@ -256,7 +261,9 @@ def test_chat_messages_role_check_rejects_other_values(mig):
     err = _constraint_violated(
         mig["engine"],
         "INSERT INTO chat_messages (user_id, role, content) VALUES ('u-r', 'system', '안녕')",
-        setup=("INSERT INTO users (id, username, password_hash) VALUES ('u-r', 'role', 'h')",),
+        setup=(
+            "INSERT INTO users (id, username, nickname, password_hash) VALUES ('u-r', 'role', 'role', 'h')",
+        ),
     )
     assert err.orig.diag.constraint_name == "ck_chat_messages_role_valid"
 
@@ -266,7 +273,8 @@ def test_chat_messages_role_check_accepts_user_and_assistant(mig):
         trans = c.begin()
         try:
             c.execute(text(
-                "INSERT INTO users (id, username, password_hash) VALUES ('u-ok', 'roleok', 'h')"
+                "INSERT INTO users (id, username, nickname, password_hash) "
+                "VALUES ('u-ok', 'roleok', 'roleok', 'h')"
             ))
             c.execute(text(
                 "INSERT INTO chat_messages (user_id, role, content) VALUES "
@@ -355,7 +363,9 @@ def test_downgrade_to_0002_removes_new_objects_and_upgrade_restores(mig):
             assert leftover == []
         finally:
             command.upgrade(mig["cfg"], "head")
-    assert _version(engine) == "0003"
+    with _in_mig_env(mig["env"]):
+        head = ScriptDirectory.from_config(mig["cfg"]).get_current_head()
+    assert _version(engine) == head
     for table, expected in NEW_TABLE_COLUMNS.items():
         assert _columns(engine, table) == expected
     assert "user_id" in _columns(engine, "pending_questions")

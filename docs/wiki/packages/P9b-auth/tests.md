@@ -434,3 +434,35 @@
 | `api.test.ts` checkAvailability 401 | 전역 로그아웃 신호 없음 | 통과 |
 
 기존 시험 갱신(닫힌 목록 F1~F4): 가입 본문 단언 `{username, nickname, password}`, `ME.nickname='민지'`. E2E 5 passed(목 데이터만 갱신, 가입 화면 새 E2E 는 없음).
+
+## U9 — 닉네임·중복검사 백엔드 (backend-agent, 2026-11-16, CR-007)
+
+실행: `POSTGRES_PORT=5433 .venv/bin/python -m pytest -q` → **2624 passed · 0 failed · skip 0**(= 기준선 2515 + 새 109: 63 + 38 + 8). 증거 `evidence/20261116-0721-u9-pytest-all-final.txt`, verifier 재실행 `evidence/20261116-0724-review-u9-pytest-all.txt`. 파라미터 시험은 한 줄에 케이스 수를 적는다.
+
+| 파일 | 시험 | 값으로 단언하는 것 | 결과 |
+|---|---|---|---|
+| test_auth_nickname | `test_signup_201_has_exactly_id_username_nickname` | 201, 키 `{id,username,nickname}`, 값 `민지` | 통과 |
+| 〃 | `test_login_and_me_return_the_same_nickname` | 로그인·me 응답이 가입 닉네임 `심사위원` | 통과 |
+| 〃 | `test_login_ignores_a_nickname_in_the_body` | 로그인 본문의 닉네임 무시 | 통과 |
+| 〃 | `test_nickname_is_normalized_nfc_strip_lower` ×6 | `" 민지 "`·`"\t민지\n"`·NFD → `민지`, `Demo→demo`, `DEMO_01→demo_01`, `민지ABC→민지abc`, DB 저장값 | 통과 |
+| 〃 | `test_nickname_length_boundaries_accepted` ×6 | 2자·20자 201 | 통과 |
+| 〃 | `test_nickname_length_boundaries_rejected` ×5 | 1자·21자 422 `invalid_nickname`, users 행 수 불변 | 통과 |
+| 〃 | `test_forbidden_nicknames_are_422_invalid_nickname` ×13 | 자모·가운데 공백·NBSP·전각 공백·이모지·한자·`-`·`.`·공백뿐·빈 값·제로폭 → 422, 행 수 불변 | 통과 |
+| 〃 | `test_weird_nickname_strings_are_422_not_500` ×7 | NUL·가운데 제어문자·`\x7f`·서로게이트·10만 자 → 422(500 0) | 통과 |
+| 〃 | `test_leading_trailing_whitespace_control_chars_are_stripped_not_rejected` | R4-1: `"\x1f민지"` → 201 `민지` | 통과 |
+| 〃 | `test_nickname_wrong_type_is_default_422_list_without_input_echo` ×8 | 숫자·null·bool·float·배열·객체 → 기본 422 목록(`input`·`ctx` 없음) | 통과 |
+| 〃 | `test_nickname_missing_is_default_422_list` | 누락 `loc == ["body","nickname"]` | 통과 |
+| 〃 | 409 6건(`same_nickname_other_username`·`case_only`·`normalized_equal`·`same_username_new_nickname`·`both_taken…username_taken_first`·`my_nickname_may_equal_another_accounts_username`) | `nickname_taken`/`username_taken`, 둘 다 겹치면 `username_taken`, 내 닉네임 = 남의 아이디는 201(결정 Z) | 통과 |
+| 〃 | `test_my_nickname_may_equal_my_own_username` | 201 | 통과 |
+| 〃 | 경합 3건(`race_nickname…`·`race_username…`·`race_unknown_constraint…`) | 제약 이름 → 코드, 모르는 제약은 500 | 통과 |
+| 〃 | `test_422_order_username_then_password_then_nickname` | 검사 순서 `invalid_username` → `invalid_password` → `invalid_nickname` | 통과 |
+| 〃 | `test_signup_creates_no_person_alias_or_trace_rows` | persons·aliases·traces 행 수 불변 | 통과 |
+| 〃 | `test_422_body_never_echoes_the_password` | 비밀번호 되울림 0 | 통과 |
+| test_auth_availability | `test_open_without_cookie_returns_200` · `test_same_body_with_a_login_cookie` | 쿠키 없이 200, 쿠키가 있어도 같은 본문 | 통과 |
+| 〃 | `test_username_statuses` ×9 · `test_nickname_statuses` ×11 | `available`/`taken`/`invalid`(정규화 뒤 판정) | 통과 |
+| 〃 | `test_nickname_case_folded_taken_after_signup` · `test_asking_both_returns_both_and_one_returns_other_null` | 대소문자 접힘 `taken`, 묻지 않은 필드 `null` | 통과 |
+| 〃 | `test_no_query_is_422_missing_query` · `test_empty_string_counts_as_asked_and_is_invalid` | `{"detail":{"code":"missing_query"}}`, `?username=` → `invalid` | 통과 |
+| 〃 | `test_weird_query_values_are_invalid_never_500` ×8 · `test_raw_lone_surrogate_string_is_invalid_without_touching_db` | NUL·U+FFFD·6만 자 → `invalid`, 원시 서로게이트는 DB 0 | 통과 |
+| 〃 | `test_lookup_writes_nothing` · `test_response_is_no_store_and_keys_are_exact` · `test_get_with_foreign_origin_is_not_403` | 4개 테이블 행 수 불변, `cache-control: no-store`, 키 `{username,nickname}`, 다른 Origin GET 200 | 통과 |
+| test_migration_0004 | ① `test_head_is_0004_and_db_is_at_0004` ② `test_users_columns_match_s3_1_0004` ③ `test_backfill_sets_nickname_to_username` ④ `test_upgrade_deletes_nothing` ⑤ `test_nickname_is_not_null` ⑥ `test_nickname_is_unique` ⑦ `test_alembic_check_reports_no_new_operations` ⑧ `test_downgrade_to_0003_keeps_rows_and_upgrade_backfills_again` | head `0004`, 컬럼 5개, 닉네임 = 아이디, 행 수 불변, NOT NULL, `uq_users_nickname`, check 무변경, downgrade 뒤 행 유지 + 재 upgrade 재백필 | 통과 |
+| (기존 시험 수정) | 닫힌 목록 B1~B17 — 9파일 | 03-log U9 항목 | 통과 |

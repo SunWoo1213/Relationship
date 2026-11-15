@@ -443,6 +443,9 @@ class SignupIn(BaseModel):
 
     username: str
     password: str
+    # CR-007 결정 W: 필수 문자열. 규칙(`normalize_nickname`)은 라우트가 검사해
+    # `invalid_nickname` 으로 422 를 낸다.
+    nickname: str
 
 
 class LoginIn(BaseModel):
@@ -465,3 +468,12 @@ class MeOut(BaseModel):
 
     id: str
     username: str
+    nickname: str
+
+
+class AvailabilityOut(BaseModel):
+    """`GET /auth/availability` 응답(CR-007). 묻지 않은 필드는 `None`(JSON `null`).
+    id·다른 필드는 담지 않는다."""
+
+    username: Literal["available", "taken", "invalid"] | None = None
+    nickname: Literal["available", "taken", "invalid"] | None = None

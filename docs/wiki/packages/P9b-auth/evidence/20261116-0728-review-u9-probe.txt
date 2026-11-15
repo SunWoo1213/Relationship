@@ -1,0 +1,77 @@
+# 명령: POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -p no:cacheprovider -rP /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9/probe_u9.py 2>&1 | grep -v '^_____\|^-----.*Captured'
+# 시각: 2026-11-16T07:28:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: verifier 직접 탐침(저장소 밖 파일, 롤백 픽스처): 이상 문자열·타입·깨진 본문·쿼리 500 0, 409 뒤 쿠키·세션 0, 가입·조회 판정 일치, 로그 누출 0
+# ---
+........................................................................ [ 46%]
+........................................................................ [ 92%]
+...........                                                              [100%]
+==================================== PASSES ====================================
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+b'' -> 422
+b'{' -> 422
+b'null' -> 422
+b'[]' -> 422
+b'"x"' -> 422
+b'{"username":"a\xff"}' -> 400
+b'\x00\x00' -> 422
+b'{"nickname":"\\ud800"}' -> 422
+Q0 '?username=a&username=b' -> 200 {'username': 'invalid', 'nickname': None}
+Q1 '?nickname=a&nickname=%EB%AF%BC%EC%A7%80' -> 200 {'username': None, 'nickname': 'available'}
+Q2 '?username=taken_probe&username=' -> 200 {'username': 'invalid', 'nickname': None}
+Q3 '?username=' -> 200 {'username': 'invalid', 'nickname': None}
+Q4 '?nickname=' -> 200 {'username': None, 'nickname': 'invalid'}
+Q5 '?username=&nickname=' -> 200 {'username': 'invalid', 'nickname': 'invalid'}
+Q6 '?username' -> 200 {'username': 'invalid', 'nickname': None}
+Q7 '?nickname' -> 200 {'username': None, 'nickname': 'invalid'}
+Q8 '?username=%' -> 200 {'username': 'invalid', 'nickname': None}
+Q9 '?username=%zz' -> 200 {'username': 'invalid', 'nickname': None}
+Q10 '?nickname=%E0%A4' -> 200 {'username': None, 'nickname': 'invalid'}
+Q11 '?nickname=%FF%FE' -> 200 {'username': None, 'nickname': 'invalid'}
+Q12 '?nickname=%C0%80' -> 200 {'username': None, 'nickname': 'invalid'}
+Q13 '?username=%00' -> 200 {'username': 'invalid', 'nickname': None}
+Q14 '?nickname=%00%00' -> 200 {'username': None, 'nickname': 'invalid'}
+Q15 '?nickname=%ED%A0%80' -> 200 {'username': None, 'nickname': 'invalid'}
+Q16 '?nickname=%F0%9F%98%80' -> 200 {'username': None, 'nickname': 'invalid'}
+Q17 '?username=a+b' -> 200 {'username': 'invalid', 'nickname': None}
+Q18 '?nickname=+%EB%AF%BC%EC%A7%80+' -> 200 {'username': None, 'nickname': 'available'}
+Q19 '?username[]=abc' -> 422 {'detail': {'code': 'missing_query'}}
+Q20 '?USERNAME=abc' -> 422 {'detail': {'code': 'missing_query'}}
+Q21 '?username=abc&other=1' -> 200 {'username': 'available', 'nickname': None}
+Q22 '?nickname=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' -> 200 {'username': None, 'nickname': 'invalid'}
+Q23 '?username=%00%00%00%00%00%00%00%00%00%00%00%00%0' -> 200 {'username': 'invalid', 'nickname': None}
+Q24 '?nickname=%0A%0D' -> 200 {'username': None, 'nickname': 'invalid'}
+Q25 '?nickname=%1F%EB%AF%BC%EC%A7%80' -> 200 {'username': None, 'nickname': 'available'}
+Q26 '?&&&=' -> 422 {'detail': {'code': 'missing_query'}}
+Q27 '?=x' -> 422 {'detail': {'code': 'missing_query'}}
+둘 다 겹친 경합의 코드: {'detail': {'code': 'username_taken'}}
+username ' abc_p1 ': availability=invalid signup=422 {'detail': {'code': 'invalid_username'}}
+username 'abc_p2\n': availability=invalid signup=422 {'detail': {'code': 'invalid_username'}}
+username 'ABC_P3': availability=available signup=201 {'id': '753e20ab826042399ca98d26aa5c9519', 'username': 'abc_p3', 'nickname': '규칙닉2'}
+username 'Kelvin_p': availability=available signup=201 {'id': '59cd67093ef54a4db1af7ee5c53ff1f6', 'username': 'kelvin_p', 'nickname': '규칙닉3'}
+username 'İstanbul': availability=invalid signup=422 {'detail': {'code': 'invalid_username'}}
+username 'ab': availability=invalid signup=422 {'detail': {'code': 'invalid_username'}}
+username 'aaaaaaaaaaaaaaaaaaaaa': availability=invalid signup=422 {'detail': {'code': 'invalid_username'}}
+username 'abc-p': availability=invalid signup=422 {'detail': {'code': 'invalid_username'}}
+username 'ａｂｃ': availability=invalid signup=422 {'detail': {'code': 'invalid_username'}}
+username 'abc_p4': availability=available signup=201 {'id': 'd7b0104d580a45b0a27b185795bdc2c6', 'username': 'abc_p4', 'nickname': '규칙닉9'}
+nickname ' 민지p ': availability=available signup=201 {'id': '4229c1e431a0489e82188d873a895f68', 'username': 'nickrule0', 'nickname': '민지p'}
+nickname '민지q\n': availability=available signup=201 {'id': 'a452c07c17c34c2ca7cc9a1577d8073a', 'username': 'nickrule1', 'nickname': '민지q'}
+nickname '\x1f민지r': availability=available signup=201 {'id': '38772949bf4f438ba09d3e653da8cb72', 'username': 'nickrule2', 'nickname': '민지r'}
+nickname 'DeMo_P': availability=available signup=201 {'id': '70ffa4324abc4bcab31b0eee07f38ae1', 'username': 'nickrule3', 'nickname': 'demo_p'}
+nickname '한글닉': availability=available signup=201 {'id': 'e655124289b64fbfa5bb8281241d3241', 'username': 'nickrule4', 'nickname': '한글닉'}
+nickname 'ＡＢ': availability=invalid signup=422 {'detail': {'code': 'invalid_nickname'}}
+nickname 'ⓐⓑ': availability=invalid signup=422 {'detail': {'code': 'invalid_nickname'}}
+nickname 'áb': availability=invalid signup=422 {'detail': {'code': 'invalid_nickname'}}
+nickname 'ㅋㅋ': availability=invalid signup=422 {'detail': {'code': 'invalid_nickname'}}
+nickname '민 지': availability=invalid signup=422 {'detail': {'code': 'invalid_nickname'}}
+nickname '가': availability=invalid signup=422 {'detail': {'code': 'invalid_nickname'}}
+nickname '가가가가가가가가가가가가가가가가가가가가가': availability=invalid signup=422 {'detail': {'code': 'invalid_nickname'}}
+nickname '가가가가가가가가가가가가가가가가가가가가': availability=available signup=201 {'id': '5a61c55583c64dc7bd41785d0ed0f57e', 'username': 'nickrule12', 'nickname': '가가가가가가가가가가가가가가가가가가가가'}
+nickname '\ufeff민지s': availability=invalid signup=422 {'detail': {'code': 'invalid_nickname'}}
+nickname '민지t\u200b': availability=invalid signup=422 {'detail': {'code': 'invalid_nickname'}}
+닉네임이 찍힌 로거: 없음 · 레코드 수 0
+155 passed in 2.84s

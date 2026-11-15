@@ -1,13 +1,14 @@
-"""Refs: P9b-auth U2 D18 CR-006 -- `/auth/signup`·`/auth/login`·`/auth/logout`·`/auth/me`.
+"""Refs: P9b-auth U2 U9 D18 CR-006 CR-007 -- `/auth/signup`·`/auth/login`·`/auth/logout`·`/auth/me`·`/auth/availability`.
 
-계약은 `01-plan.md` "API 계약" 표 그대로:
+계약은 `01-plan.md` "API 계약"(개정 3) 표 그대로:
 
 | 경로 | 성공 | 실패 |
 |---|---|---|
-| `POST /auth/signup` | 201 `{id, username}` + 로그인 쿠키(가입 즉시 로그인, 결정 G) | 422 `invalid_username`/`invalid_password` · 409 `username_taken` |
-| `POST /auth/login` | 200 `{id, username}` + 쿠키 | 401 `invalid_credentials`(없는 아이디·틀린 비밀번호 같은 응답) |
+| `POST /auth/signup` | 201 `{id, username, nickname}` + 로그인 쿠키(가입 즉시 로그인, 결정 G) | 422 `invalid_username` -> `invalid_password` -> `invalid_nickname`(첫 위반) · 409 `username_taken`/`nickname_taken`(둘 다 겹치면 `username_taken`) |
+| `POST /auth/login` | 200 `{id, username, nickname}` + 쿠키 | 401 `invalid_credentials`(없는 아이디·틀린 비밀번호 같은 응답) |
 | `POST /auth/logout` | 204(본문 없음) + 쿠키 삭제 | 미로그인 401 `unauthenticated`(F-3) |
-| `GET /auth/me` | 200 `{id, username}` | 401 `unauthenticated` |
+| `GET /auth/me` | 200 `{id, username, nickname}` | 401 `unauthenticated` |
+| `GET /auth/availability` | 200 `{username, nickname}`(각 `available`/`taken`/`invalid`/`null`) · 로그인 불필요 · `Cache-Control: no-store` | 두 쿼리가 모두 없으면 422 `missing_query` |
 
 - 아이디는 소문자로 정규화한 뒤 `^[a-z0-9_]{3,20}$`(결정 A), 비밀번호는 8~128자(결정 B).
 - 로그인 실패는 없는 아이디도 **더미 해시 검증을 한 번 돌려** 응답 시간 차를 줄인다.
@@ -21,7 +22,7 @@ from __future__ import annotations
 import re
 from collections.abc import Callable, Coroutine
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
@@ -32,8 +33,9 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.api.schemas import LoginIn, LogoutIn, MeOut, SignupIn
+from app.api.schemas import AvailabilityOut, LoginIn, LogoutIn, MeOut, SignupIn
 from app.auth.deps import current_user, get_auth_now
+from app.auth.names import normalize_nickname
 from app.auth.passwords import dummy_hash, hash_password, is_utf8_encodable, verify_password
 from app.auth.sessions import (
     clear_login_cookie,
@@ -86,6 +88,25 @@ def _invalid(code: str) -> HTTPException:
     return HTTPException(status_code=422, detail={"code": code})
 
 
+def _taken(code: str) -> HTTPException:
+    return HTTPException(status_code=409, detail={"code": code})
+
+
+#: 가입 INSERT 경합 때 위반된 UNIQUE 제약 이름 -> 409 코드.
+_CONSTRAINT_CODES = {
+    "uq_users_username": "username_taken",
+    "uq_users_nickname": "nickname_taken",
+}
+
+
+def _exists(session: Session, column: Any, value: str) -> bool:
+    return session.execute(select(User.id).where(column == value)).first() is not None
+
+
+def _me_out(user: User) -> MeOut:
+    return MeOut(id=user.id, username=user.username, nickname=user.nickname)
+
+
 @router.post("/signup", response_model=MeOut, status_code=201)
 def signup(
     body: SignupIn,
@@ -93,6 +114,7 @@ def signup(
     session: Session = Depends(get_session),
     now: Callable[[], datetime] = Depends(get_auth_now),
 ) -> MeOut:
+    # ①~③ 형식 검사 -- DB 조회 0(형식 위반 입력이 DB 에 가지 않는다).
     username = normalize_username(body.username)
     if _USERNAME_RE.fullmatch(username) is None:
         raise _invalid("invalid_username")
@@ -101,21 +123,38 @@ def signup(
     if not is_utf8_encodable(body.password):
         # 짝 없는 서로게이트 등 UTF-8 로 바꿀 수 없는 비밀번호 -- 해시 전에 422(500 방지).
         raise _invalid("invalid_password")
+    nickname = normalize_nickname(body.nickname)
+    if nickname is None:
+        raise _invalid("invalid_nickname")
+
+    # ④⑤ 사전 조회 -- 아이디 먼저(둘 다 겹치면 `username_taken`, 결정 AB).
+    if _exists(session, User.username, username):
+        raise _taken("username_taken")
+    if _exists(session, User.nickname, nickname):
+        raise _taken("nickname_taken")
 
     user = User(
-        id=new_user_id(), username=username, password_hash=hash_password(body.password)
+        id=new_user_id(),
+        username=username,
+        nickname=nickname,
+        password_hash=hash_password(body.password),
     )
     try:
-        # 동시 가입이 같은 아이디로 부딪히면 UNIQUE 위반 -- 세이브포인트로 격리해 409 로.
+        # ⑥ 사전 조회와 INSERT 사이 경합 -- 세이브포인트로 격리하고 제약 이름으로 코드를 정한다.
         with session.begin_nested():
             session.add(user)
             session.flush()
-    except IntegrityError:
-        raise HTTPException(status_code=409, detail={"code": "username_taken"}) from None
+    except IntegrityError as err:
+        constraint = getattr(getattr(err.orig, "diag", None), "constraint_name", None)
+        code = _CONSTRAINT_CODES.get(constraint or "")
+        if code is None:
+            # 다른 제약 위반은 다른 결함이다 -- 409 로 숨기지 않고 다시 올린다(500).
+            raise
+        raise _taken(code) from None
 
     token = create_session(session, user.id, now())
     set_login_cookie(response, token)
-    return MeOut(id=user.id, username=user.username)
+    return _me_out(user)
 
 
 @router.post("/login", response_model=MeOut)
@@ -143,7 +182,7 @@ def login(
 
     token = create_session(session, user.id, now())
     set_login_cookie(response, token)
-    return MeOut(id=user.id, username=user.username)
+    return _me_out(user)
 
 
 @router.post("/logout", status_code=204, response_class=Response)
@@ -166,4 +205,44 @@ def logout(
 
 @router.get("/me", response_model=MeOut)
 def me(user: User = Depends(current_user)) -> MeOut:
-    return MeOut(id=user.id, username=user.username)
+    return _me_out(user)
+
+
+def _availability(
+    session: Session, raw: str | None, kind: str
+) -> Literal["available", "taken", "invalid"] | None:
+    """물은 값 하나의 판정. 묻지 않았으면 `None`. 형식 위반은 DB 조회 없이 `invalid`."""
+    if raw is None:
+        return None
+    column: Any
+    if kind == "username":
+        username = normalize_username(raw)
+        if _USERNAME_RE.fullmatch(username) is None:
+            return "invalid"
+        value, column = username, User.username
+    else:
+        nickname = normalize_nickname(raw)
+        if nickname is None:
+            return "invalid"
+        value, column = nickname, User.nickname
+    return "taken" if _exists(session, column, value) else "available"
+
+
+@router.get("/availability", response_model=AvailabilityOut)
+def availability(
+    response: Response,
+    username: str | None = None,
+    nickname: str | None = None,
+    session: Session = Depends(get_session),
+) -> AvailabilityOut:
+    """로그인 없이 부르는 아이디·닉네임 중복 조회(CR-007 · D18 결정 11).
+
+    결과는 참고용 -- 최종 판정은 DB UNIQUE + 가입 시 409. 쓰기·trace·LLM 호출 0.
+    """
+    if username is None and nickname is None:
+        raise _invalid("missing_query")
+    response.headers["Cache-Control"] = "no-store"
+    return AvailabilityOut(
+        username=_availability(session, username, "username"),
+        nickname=_availability(session, nickname, "nickname"),
+    )

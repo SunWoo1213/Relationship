@@ -77,7 +77,8 @@ S3_1_TABLE_COLUMNS = {
         "created_at",
     },
     # 보충(CR-006 · D18, S3.1 0003) — 계정과 계정별 격리.
-    "users": {"id", "username", "password_hash", "created_at"},
+    # 0004 보충(CR-007): users.nickname 추가.
+    "users": {"id", "username", "password_hash", "nickname", "created_at"},
     "auth_sessions": {"id", "user_id", "token_hash", "created_at", "expires_at"},
     "chat_messages": {"id", "user_id", "role", "content", "question_id", "created_at"},
 }
@@ -150,13 +151,14 @@ def test_each_table_column_set_matches_s3_1_exactly():
         )
 
 
-def test_total_column_count_equals_72_verified_by_literal_transcription_of_s3_1():
-    """S3.1 컬럼을 테이블별로 세어 합산하면 72개다. 원본 56 + 0003 보충 16
-    (users 4 + auth_sessions 5 + chat_messages 6 + pending_questions.user_id 1)."""
+def test_total_column_count_equals_73_verified_by_literal_transcription_of_s3_1():
+    """S3.1 컬럼을 테이블별로 세어 합산하면 73개다. 원본 56 + 0003 보충 16
+    (users 4 + auth_sessions 5 + chat_messages 6 + pending_questions.user_id 1)
+    + 0004 보충 1(users.nickname)."""
     total = sum(len(cols) for cols in S3_1_TABLE_COLUMNS.values())
     actual_total = sum(len(t.columns) for t in Base.metadata.tables.values())
-    assert total == 72
-    assert actual_total == 72
+    assert total == 73
+    assert actual_total == 73
 
 
 def _check_constraints(table_name: str) -> list[CheckConstraint]:

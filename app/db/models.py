@@ -305,11 +305,13 @@ class User(Base):
     __tablename__ = "users"
     # name 미지정 — naming_convention 의 uq 템플릿이 이름을 만든다
     # (PersonAlias.__table_args__ 주석 참고).
-    __table_args__ = (UniqueConstraint("username"),)
+    __table_args__ = (UniqueConstraint("username"), UniqueConstraint("nickname"))
 
     id: Mapped[str] = mapped_column(Text, primary_key=True)
     username: Mapped[str] = mapped_column(Text, nullable=False)
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    # 0004 보충(CR-007): 정규화한 닉네임이 UNIQUE. 기본값 없음 -- 값은 앱이 정한다.
+    nickname: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[object] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

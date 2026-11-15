@@ -1,0 +1,7 @@
+# 명령: git status --short -- app/er evaluation reports data app/agent app/tools app/briefing app/llm; echo rc=$?
+# 시각: 2026-11-16T07:24:29+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# ---
+rc=0

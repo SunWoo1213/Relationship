@@ -60,15 +60,17 @@ def test_model_index_expectations_returns_thirteen_names_and_the_partial_index()
     assert partial_name in names
 
 
-def test_model_unique_constraint_expectations_returns_fix_020_three_plus_0003_two():
-    """Refs: FIX-020 P9b-auth -- UniqueConstraint 5개(FIX-020 세 개 + 0003 보충
-    users.username·auth_sessions.token_hash)가 `Base.metadata` 에서 그대로 나온다."""
+def test_model_unique_constraint_expectations_returns_fix_020_three_plus_0003_two_plus_0004_one():
+    """Refs: FIX-020 P9b-auth -- UniqueConstraint 6개(FIX-020 세 개 + 0003 보충
+    users.username·auth_sessions.token_hash + 0004 보충 users.nickname)가
+    `Base.metadata` 에서 그대로 나온다."""
     expected = sc.model_unique_constraint_expectations()
     assert expected == {
         ("person_facts", "uq_person_facts_person_id_key"),
         ("person_aliases", "uq_person_aliases_person_id_alias"),
         ("push_subscriptions", "uq_push_subscriptions_user_id_endpoint"),
         ("users", "uq_users_username"),
+        ("users", "uq_users_nickname"),
         ("auth_sessions", "uq_auth_sessions_token_hash"),
     }
 

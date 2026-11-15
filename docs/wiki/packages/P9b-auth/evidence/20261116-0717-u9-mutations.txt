@@ -1,0 +1,403 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py CONTROL
+# 시각: 2026-11-16T07:17:26+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# 메모: 원본 사본(변이 없음) 통제 실행
+# ---
+## CONTROL: app/auth/names.py 변이 0건, 시험 ['tests/test_auth_nickname.py', 'tests/test_auth_availability.py', 'tests/test_auth_required_routes.py', 'tests/test_auth_api.py', 'tests/test_auth_helpers.py', 'tests/test_schema_check.py'], env []
+
+(FAILED/ERROR 줄 0건) 마지막 줄: 215 passed in 9.93s
+## CONTROL pytest exit=0 (못 잡음(PASS))
+
+# ===== append 2026-11-16T07:17:37+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-2
+# 시각: 2026-11-16T07:17:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-2: alembic/versions/0004_users_nickname.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_schema_check.py', 'tests/test_migration_0004.py'], env ['TEST_POSTGRES_DB']
+ERROR tests/test_auth_nickname.py - sqlalchemy.exc.ArgumentError: __table_args__ value must be a tuple, dict, or None
+ERROR tests/test_schema_check.py - sqlalchemy.exc.InvalidRequestError: Table 'persons' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on
+(FAILED/ERROR 줄 2건) 마지막 줄: 1 warning, 2 errors in 0.38s
+## V9-2 pytest exit=2 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:17:38+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-3
+# 시각: 2026-11-16T07:17:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-3: app/auth/names.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\u1106\u1175\u11ab\u110c\u1175-\ubbfc\uc9c0] - assert 422 == 201
+FAILED tests/test_auth_nickname.py::test_normalized_equal_nickname_is_409 - assert 422 == 409
+FAILED tests/test_auth_availability.py::test_nickname_statuses[\u1106\u1175\u11ab\u110c\u1175-taken] - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...ername': None}
+(FAILED/ERROR 줄 3건) 마지막 줄: 3 failed, 98 passed in 3.63s
+## V9-3 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:17:43+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-4
+# 시각: 2026-11-16T07:17:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-4: app/auth/names.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[Demo-demo] - AssertionError: assert 'Demo' == 'demo'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[DEMO_01-demo_01] - AssertionError: assert 'DEMO_01' == 'demo_01'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\ubbfc\uc9c0ABC-\ubbfc\uc9c0abc] - AssertionError: assert '민지ABC' == '민지abc'
+FAILED tests/test_auth_nickname.py::test_nickname_differing_only_by_case_is_409_nickname_taken - assert 201 == 409
+FAILED tests/test_auth_availability.py::test_nickname_case_folded_taken_after_signup - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...ername': None}
+(FAILED/ERROR 줄 5건) 마지막 줄: 5 failed, 96 passed in 3.50s
+## V9-4 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:17:47+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-5
+# 시각: 2026-11-16T07:17:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-5: app/auth/names.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[ \ubbfc\uc9c0 -\ubbfc\uc9c0] - assert 422 == 201
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\t\ubbfc\uc9c0\n-\ubbfc\uc9c0] - assert 422 == 201
+FAILED tests/test_auth_nickname.py::test_leading_trailing_whitespace_control_chars_are_stripped_not_rejected - assert 422 == 201
+FAILED tests/test_auth_nickname.py::test_normalized_equal_nickname_is_409 - assert 422 == 409
+FAILED tests/test_auth_availability.py::test_nickname_statuses[ \ubbfc\uc9c0 -taken] - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...ername': None}
+(FAILED/ERROR 줄 5건) 마지막 줄: 5 failed, 96 passed in 3.20s
+## V9-5 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:17:51+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-6
+# 시각: 2026-11-16T07:17:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-6: app/settings.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_nickname.py::test_forbidden_nicknames_are_422_invalid_nickname[\u314b\u314b] - assert 201 == 422
+FAILED tests/test_auth_nickname.py::test_forbidden_nicknames_are_422_invalid_nickname[\u314f\u3163] - assert 201 == 422
+FAILED tests/test_auth_nickname.py::test_forbidden_nicknames_are_422_invalid_nickname[\ubbfc \uc9c0] - assert 201 == 422
+FAILED tests/test_auth_nickname.py::test_forbidden_nicknames_are_422_invalid_nickname[\ubbfc\xa0\uc9c0] - assert 201 == 422
+FAILED tests/test_auth_nickname.py::test_forbidden_nicknames_are_422_invalid_nickname[\ubbfc\u3000\uc9c0] - assert 201 == 422
+FAILED tests/test_auth_nickname.py::test_forbidden_nicknames_are_422_invalid_nickname[\ubbfc\uc9c0\U0001f600] - assert 201 == 422
+FAILED tests/test_auth_nickname.py::test_forbidden_nicknames_are_422_invalid_nickname[\u6c11\u667a] - assert 201 == 422
+FAILED tests/test_auth_nickname.py::test_forbidden_nicknames_are_422_invalid_nickname[min-ji] - assert 201 == 422
+(FAILED/ERROR 줄 21건) 마지막 줄: 21 failed, 80 passed in 3.69s
+## V9-6 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:17:55+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-7
+# 시각: 2026-11-16T07:17:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-7: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_nickname.py'], env []
+FAILED tests/test_auth_nickname.py::test_both_taken_reports_username_taken_first - AssertionError: assert {'detail': {'...kname_taken'}} == {'detail': {'...rname_taken'}}
+(FAILED/ERROR 줄 1건) 마지막 줄: 1 failed, 62 passed in 2.04s
+## V9-7 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:17:58+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-8
+# 시각: 2026-11-16T07:17:58+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-8: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_nickname.py'], env []
+FAILED tests/test_auth_nickname.py::test_race_nickname_collision_maps_to_nickname_taken - AssertionError: assert {'detail': {'...rname_taken'}} == {'detail': {'...kname_taken'}}
+FAILED tests/test_auth_nickname.py::test_race_unknown_constraint_is_not_hidden_as_409 - assert 409 == 500
+(FAILED/ERROR 줄 2건) 마지막 줄: 2 failed, 61 passed in 2.04s
+## V9-8 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:18:00+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-9
+# 시각: 2026-11-16T07:18:00+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-9: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_availability.py', 'tests/test_auth_required_routes.py'], env []
+FAILED tests/test_auth_availability.py::test_open_without_cookie_returns_200 - assert 401 == 200
+FAILED tests/test_auth_availability.py::test_same_body_with_a_login_cookie - AssertionError: assert {'nickname': ...ame': 'taken'} == {'detail': {'...thenticated'}}
+FAILED tests/test_auth_availability.py::test_username_statuses[free_name-available] - assert 401 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[taken_user-taken] - assert 401 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[TAKEN_USER-taken] - assert 401 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[Free_Name-available] - assert 401 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[ab-invalid] - assert 401 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[aaaaaaaaaaaaaaaaaaaaa-invalid] - assert 401 == 200
+(FAILED/ERROR 줄 37건) 마지막 줄: 37 failed, 12 passed in 3.65s
+## V9-9 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:18:04+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-10
+# 시각: 2026-11-16T07:18:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-10: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_availability.py::test_weird_query_values_are_invalid_never_500[/auth/availability?username=%00-expected0] - assert 500 == 200
+FAILED tests/test_auth_availability.py::test_weird_query_values_are_invalid_never_500[/auth/availability?username=ab%00cd-expected1] - assert 500 == 200
+FAILED tests/test_auth_availability.py::test_weird_query_values_are_invalid_never_500[/auth/availability?nickname=%00-expected2] - assert 500 == 200
+FAILED tests/test_auth_availability.py::test_weird_query_values_are_invalid_never_500[/auth/availability?nickname=a%00b-expected3] - assert 500 == 200
+FAILED tests/test_auth_availability.py::test_raw_lone_surrogate_string_is_invalid_without_touching_db - AssertionError: 형식 위반 입력이 DB 에 갔다
+(FAILED/ERROR 줄 5건) 마지막 줄: 5 failed, 33 passed in 1.67s
+## V9-10 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:18:07+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-11a
+# 시각: 2026-11-16T07:18:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-11a: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_auth_api.py'], env []
+FAILED tests/test_auth_nickname.py::test_signup_201_has_exactly_id_username_nickname - AssertionError: assert 'nickuser1' == '민지'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[ \ubbfc\uc9c0 -\ubbfc\uc9c0] - AssertionError: assert 'normuser' == '민지'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\t\ubbfc\uc9c0\n-\ubbfc\uc9c0] - AssertionError: assert 'normuser' == '민지'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\u1106\u1175\u11ab\u110c\u1175-\ubbfc\uc9c0] - AssertionError: assert 'normuser' == '민지'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[Demo-demo] - AssertionError: assert 'normuser' == 'demo'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[DEMO_01-demo_01] - AssertionError: assert 'normuser' == 'demo_01'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\ubbfc\uc9c0ABC-\ubbfc\uc9c0abc] - AssertionError: assert 'normuser' == '민지abc'
+FAILED tests/test_auth_nickname.py::test_leading_trailing_whitespace_control_chars_are_stripped_not_rejected - AssertionError: assert 'stripuser' == '민지'
+(FAILED/ERROR 줄 9건) 마지막 줄: 9 failed, 132 passed in 5.22s
+## V9-11a pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:18:12+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-11b
+# 시각: 2026-11-16T07:18:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-11b: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_auth_api.py'], env []
+FAILED tests/test_auth_nickname.py::test_login_and_me_return_the_same_nickname - AssertionError: assert {'id': '8043c...: 'nickuser2'} == {'id': '8043c...: 'nickuser2'}
+FAILED tests/test_auth_nickname.py::test_login_ignores_a_nickname_in_the_body - AssertionError: assert 'nickuser3' == '민지'
+(FAILED/ERROR 줄 2건) 마지막 줄: 2 failed, 139 passed in 5.17s
+## V9-11b pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:18:18+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-11c
+# 시각: 2026-11-16T07:18:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-11c: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_auth_api.py', 'tests/test_auth_helpers.py'], env []
+FAILED tests/test_auth_nickname.py::test_login_and_me_return_the_same_nickname - AssertionError: assert {'id': '7c4bb...: 'nickuser2'} == {'id': '7c4bb...: 'nickuser2'}
+(FAILED/ERROR 줄 1건) 마지막 줄: 1 failed, 153 passed in 5.39s
+## V9-11c pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:19:50+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-2b
+# 시각: 2026-11-16T07:19:50+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-2b: alembic/versions/0004_users_nickname.py 변이 1건, 시험 ['tests/test_migration_0004.py'], env []
+ERROR tests/test_migration_0004.py::test_head_is_0004_and_db_is_at_0004 - sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedObject) constraint "uq_users_nickname" of relation "users" does not 
+ERROR tests/test_migration_0004.py::test_users_columns_match_s3_1_0004 - sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedObject) constraint "uq_users_nickname" of relation "users" does not e
+ERROR tests/test_migration_0004.py::test_backfill_sets_nickname_to_username - sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedObject) constraint "uq_users_nickname" of relation "users" does 
+ERROR tests/test_migration_0004.py::test_upgrade_deletes_nothing - sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedObject) constraint "uq_users_nickname" of relation "users" does not exist
+ERROR tests/test_migration_0004.py::test_nickname_is_not_null - sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedObject) constraint "uq_users_nickname" of relation "users" does not exist
+ERROR tests/test_migration_0004.py::test_nickname_is_unique - sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedObject) constraint "uq_users_nickname" of relation "users" does not exist
+ERROR tests/test_migration_0004.py::test_alembic_check_reports_no_new_operations - sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedObject) constraint "uq_users_nickname" of relation "users" 
+ERROR tests/test_migration_0004.py::test_downgrade_to_0003_keeps_rows_and_upgrade_backfills_again - sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedObject) constraint "uq_users_nickname" of 
+(FAILED/ERROR 줄 8건) 마지막 줄: 8 errors in 1.13s
+## V9-2b pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:19:51+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-2a
+# 시각: 2026-11-16T07:19:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-2a: alembic/versions/0004_users_nickname.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_schema_check.py'], env ['TEST_POSTGRES_DB']
+FAILED tests/test_auth_nickname.py::test_race_nickname_collision_maps_to_nickname_taken - assert 201 == 409
+FAILED tests/test_auth_nickname.py::test_race_unknown_constraint_is_not_hidden_as_409 - assert 201 == 500
+FAILED tests/test_schema_check.py::test_model_unique_constraint_expectations_returns_fix_020_three_plus_0003_two_plus_0004_one - AssertionError: assert {('auth_sessi...rs_username')} == {('auth_sessi.
+(FAILED/ERROR 줄 3건) 마지막 줄: 3 failed, 72 passed in 3.18s
+## V9-2a pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:20:06+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-2b
+# 시각: 2026-11-16T07:20:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# 메모: V9-2b 재실행: 첫 실행은 변이가 downgrade 를 깨 fixture ERROR(스퓨리어스) — upgrade·downgrade 둘 다에서 UNIQUE 를 뺀 정합 변이로 다시
+# ---
+## V9-2b: alembic/versions/0004_users_nickname.py 변이 2건, 시험 ['tests/test_migration_0004.py'], env []
+FAILED tests/test_migration_0004.py::test_nickname_is_unique - Failed: DID NOT RAISE <class 'sqlalchemy.exc.IntegrityError'>
+(FAILED/ERROR 줄 1건) 마지막 줄: 1 failed, 7 passed in 0.43s
+## V9-2b pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:20:17+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-1
+# 시각: 2026-11-16T07:20:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-1: alembic/versions/0004_users_nickname.py 변이 1건, 시험 ['tests/test_migration_0004.py'], env []
+ERROR tests/test_migration_0004.py::test_head_is_0004_and_db_is_at_0004 - sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) column "nickname" of relation "users" contains null values
+ERROR tests/test_migration_0004.py::test_users_columns_match_s3_1_0004 - sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) column "nickname" of relation "users" contains null values
+ERROR tests/test_migration_0004.py::test_backfill_sets_nickname_to_username - sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) column "nickname" of relation "users" contains null value
+ERROR tests/test_migration_0004.py::test_upgrade_deletes_nothing - sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) column "nickname" of relation "users" contains null values
+ERROR tests/test_migration_0004.py::test_nickname_is_not_null - sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) column "nickname" of relation "users" contains null values
+ERROR tests/test_migration_0004.py::test_nickname_is_unique - sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) column "nickname" of relation "users" contains null values
+ERROR tests/test_migration_0004.py::test_alembic_check_reports_no_new_operations - sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) column "nickname" of relation "users" contains null 
+ERROR tests/test_migration_0004.py::test_downgrade_to_0003_keeps_rows_and_upgrade_backfills_again - sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) column "nickname" of relation "user
+(FAILED/ERROR 줄 8건) 마지막 줄: 8 errors in 1.27s
+## V9-1 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:20:19+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py V9-13
+# 시각: 2026-11-16T07:20:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## V9-13: alembic/versions/0004_users_nickname.py 변이 1건, 시험 ['tests/test_migration_0004.py'], env []
+FAILED tests/test_migration_0004.py::test_backfill_sets_nickname_to_username - AssertionError: assert {} == {'demo_01': '...test': 'test'}
+FAILED tests/test_migration_0004.py::test_upgrade_deletes_nothing - AssertionError: assert {'auth_sessio...0, 'users': 0} == {'auth_sessio...1, 'users': 2}
+FAILED tests/test_migration_0004.py::test_nickname_is_unique - Failed: DID NOT RAISE <class 'sqlalchemy.exc.IntegrityError'>
+FAILED tests/test_migration_0004.py::test_downgrade_to_0003_keeps_rows_and_upgrade_backfills_again - AssertionError: assert {'auth_sessio...0, 'users': 0} == {'auth_sessio...1, 'users': 2}
+(FAILED/ERROR 줄 4건) 마지막 줄: 4 failed, 4 passed in 1.07s
+## V9-13 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:20:31+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py CONTROL-MIG
+# 시각: 2026-11-16T07:20:31+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## CONTROL-MIG: app/auth/names.py 변이 0건, 시험 ['tests/test_migration_0004.py'], env []
+
+(FAILED/ERROR 줄 0건) 마지막 줄: 8 passed in 0.42s
+## CONTROL-MIG pytest exit=0 (못 잡음(PASS))
+
+# ===== append 2026-11-16T07:20:32+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py X-min3
+# 시각: 2026-11-16T07:20:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## X-min3: app/settings.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_nickname.py::test_signup_201_has_exactly_id_username_nickname - assert 422 == 201
+FAILED tests/test_auth_nickname.py::test_login_ignores_a_nickname_in_the_body - assert 401 == 200
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[ \ubbfc\uc9c0 -\ubbfc\uc9c0] - assert 422 == 201
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\t\ubbfc\uc9c0\n-\ubbfc\uc9c0] - assert 422 == 201
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\u1106\u1175\u11ab\u110c\u1175-\ubbfc\uc9c0] - assert 422 == 201
+FAILED tests/test_auth_nickname.py::test_nickname_length_boundaries_accepted[\uac00\ub098] - AssertionError: assert 422 == 201
+FAILED tests/test_auth_nickname.py::test_nickname_length_boundaries_accepted[ab] - AssertionError: assert 422 == 201
+FAILED tests/test_auth_nickname.py::test_nickname_length_boundaries_accepted[a_] - AssertionError: assert 422 == 201
+(FAILED/ERROR 줄 39건) 마지막 줄: 13 failed, 62 passed, 26 errors in 2.21s
+## X-min3 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:20:35+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py X-max21
+# 시각: 2026-11-16T07:20:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## X-max21: app/settings.py 변이 1건, 시험 ['tests/test_auth_nickname.py', 'tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_nickname.py::test_nickname_length_boundaries_rejected[\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\ua
+FAILED tests/test_auth_nickname.py::test_nickname_length_boundaries_rejected[aaaaaaaaaaaaaaaaaaaaa] - assert 201 == 422
+FAILED tests/test_auth_availability.py::test_nickname_statuses[\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00\uac00-invalid] -
+(FAILED/ERROR 줄 3건) 마지막 줄: 3 failed, 98 passed in 3.29s
+## X-max21 pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:20:39+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py X-emptyq
+# 시각: 2026-11-16T07:20:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## X-emptyq: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_availability.py::test_username_statuses[-invalid] - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...e': 'invalid'}
+FAILED tests/test_auth_availability.py::test_nickname_statuses[-invalid] - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...ername': None}
+FAILED tests/test_auth_availability.py::test_empty_string_counts_as_asked_and_is_invalid - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...e': 'invalid'}
+(FAILED/ERROR 줄 3건) 마지막 줄: 3 failed, 35 passed in 1.64s
+## X-emptyq pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:20:41+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py X-nostore
+# 시각: 2026-11-16T07:20:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## X-nostore: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_availability.py::test_response_is_no_store_and_keys_are_exact - KeyError: 'cache-control'
+(FAILED/ERROR 줄 1건) 마지막 줄: 1 failed, 37 passed in 1.66s
+## X-nostore pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:20:43+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py X-missing-or
+# 시각: 2026-11-16T07:20:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## X-missing-or: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_availability.py::test_open_without_cookie_returns_200 - assert 422 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[free_name-available] - assert 422 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[taken_user-taken] - assert 422 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[TAKEN_USER-taken] - assert 422 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[Free_Name-available] - assert 422 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[ab-invalid] - assert 422 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[aaaaaaaaaaaaaaaaaaaaa-invalid] - assert 422 == 200
+FAILED tests/test_auth_availability.py::test_username_statuses[bad-name-invalid] - assert 422 == 200
+(FAILED/ERROR 줄 33건) 마지막 줄: 33 failed, 5 passed in 1.68s
+## X-missing-or pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:20:45+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py X-reraise
+# 시각: 2026-11-16T07:20:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## X-reraise: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_nickname.py'], env []
+FAILED tests/test_auth_nickname.py::test_race_unknown_constraint_is_not_hidden_as_409 - assert 409 == 500
+(FAILED/ERROR 줄 1건) 마지막 줄: 1 failed, 62 passed in 2.04s
+## X-reraise pytest exit=1 (잡힘(FAIL))
+
+# ===== append 2026-11-16T07:20:48+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py X-skip-nick-check
+# 시각: 2026-11-16T07:20:48+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## X-skip-nick-check: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_nickname.py'], env []
+
+(FAILED/ERROR 줄 0건) 마지막 줄: 63 passed in 2.06s
+## X-skip-nick-check pytest exit=0 (못 잡음(PASS))
+
+# ===== append 2026-11-16T07:20:51+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u9/mutate.py X-dup-nick-lookup-col
+# 시각: 2026-11-16T07:20:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+## X-dup-nick-lookup-col: app/auth/routes.py 변이 1건, 시험 ['tests/test_auth_availability.py'], env []
+FAILED tests/test_auth_availability.py::test_same_body_with_a_login_cookie - AssertionError: assert {'nickname': ...ame': 'taken'} == {'nickname': ...ame': 'taken'}
+FAILED tests/test_auth_availability.py::test_nickname_statuses[\ubbfc\uc9c0-taken] - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...ername': None}
+FAILED tests/test_auth_availability.py::test_nickname_statuses[ \ubbfc\uc9c0 -taken] - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...ername': None}
+FAILED tests/test_auth_availability.py::test_nickname_statuses[\u1106\u1175\u11ab\u110c\u1175-taken] - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...ername': None}
+FAILED tests/test_auth_availability.py::test_nickname_case_folded_taken_after_signup - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...ername': None}
+(FAILED/ERROR 줄 5건) 마지막 줄: 5 failed, 33 passed in 1.65s
+## X-dup-nick-lookup-col pytest exit=1 (잡힘(FAIL))

@@ -1,0 +1,10 @@
+# 명령: grep -rln nickname app --include=*.py
+# 시각: 2026-11-16T07:24:29+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# ---
+app/auth/names.py
+app/auth/routes.py
+app/db/models.py
+app/api/schemas.py

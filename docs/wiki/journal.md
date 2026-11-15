@@ -674,3 +674,5 @@
 - 2026-11-16 06:56 | PUSH-dev2 | origin dev2 bfbcdb1 (실험 푸시)
 - 2026-11-16 07:09 | COMMIT | f1ea1b4 docs(P9b-auth): 닉네임 계획이 검증을 통과해 동결을 풀고 권고를 계획에 반영한다
 - 2026-11-16 07:09 | PUSH-dev2 | origin dev2 f1ea1b4 (실험 푸시)
+- 2026-11-16 07:23 | COMMIT | 8b6946f feat(P9b-auth): 가입 화면에 닉네임 칸과 아이디·닉네임 중복 확인을 더한다
+- 2026-11-16 07:23 | PUSH-dev2 | origin dev2 8b6946f (실험 푸시)

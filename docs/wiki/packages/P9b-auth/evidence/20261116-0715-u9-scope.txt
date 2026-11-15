@@ -1,0 +1,58 @@
+# 명령: git status --porcelain
+# 시각: 2026-11-16T07:15:31+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+ M app/api/schemas.py
+ M app/auth/__init__.py
+ M app/auth/routes.py
+ M app/db/models.py
+ M app/settings.py
+ M docs/wiki/journal.md
+ M tests/auth_helpers.py
+ M tests/test_api.py
+ M tests/test_auth_api.py
+ M tests/test_auth_helpers.py
+ M tests/test_auth_origin.py
+ M tests/test_auth_required_routes.py
+ M tests/test_migration_0003.py
+ M tests/test_schema_check.py
+ M tests/test_schema_models.py
+ M web/e2e/auth.spec.ts
+ M web/e2e/fixtures.ts
+ M web/src/__tests__/api.test.ts
+ M web/src/__tests__/auth.test.tsx
+ M web/src/__tests__/card.test.tsx
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/routes.test.tsx
+ M web/src/api/client.ts
+ M web/src/api/types.ts
+ M web/src/auth.tsx
+ M web/src/components/AppShell.tsx
+ M web/src/screens/AuthScreen.tsx
+?? alembic/versions/0004_users_nickname.py
+?? app/auth/names.py
+?? docs/wiki/fixes/evidence/20261108-2000-L-007-test-guards.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261107-1455-u7fix-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261108-2009-u7fix3-review-baseline.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1512-u3b-mutations-names.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0712-u10-build.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0712-u10-e2e.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0712-u10-lint.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0712-u10-typecheck.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0712-u10-vitest.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0713-u10-mutations.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0714-u9-check.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0714-u9-dev-after-counts.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0714-u9-dev-before-counts.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0714-u9-pytest-all.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0714-u9-schema-check.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0714-u9-tools-check.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0714-u9-upgrade.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0715-u9-er-unchanged.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0715-u9-mypy.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-0715-u9-ruff.txt
+?? tests/test_auth_availability.py
+?? tests/test_auth_nickname.py
+?? tests/test_migration_0004.py

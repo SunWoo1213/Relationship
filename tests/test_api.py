@@ -90,7 +90,7 @@ def test_health_ok(client: TestClient) -> None:
     body = resp.json()
     assert body["status"] == "ok"
     assert body["db"] == "up"
-    assert body["alembic_revision"] == "0003"  # P9b-auth U1 -- 0003 리비전 추가(R3-1)
+    assert body["alembic_revision"] == "0004"  # P9b-auth U9 -- 0004 리비전 추가(CR-007)
 
     text = resp.text
     assert "postgresql://" not in text

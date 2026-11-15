@@ -196,7 +196,7 @@
 - 남은 것 · 다음 단위: U9 ∥ U10.
 - Refs: P9b-auth CR-007 D18
 
-## 2026-11-16 08:40 · feat(P9b-auth): 가입 화면에 닉네임 칸과 아이디·닉네임 중복 확인을 더한다 · pending
+## 2026-11-16 08:40 · feat(P9b-auth): 가입 화면에 닉네임 칸과 아이디·닉네임 중복 확인을 더한다 · 8b6946f
 - 변경: `web/` 12파일 — 타입(`SignupIn`·`MeOut.nickname`·`AvailabilityOut`)·`checkAvailability`·`AuthScreen`(닉네임 칸, 칸마다 "중복 확인", 결과 줄 `role=status`, 닉네임 안내 문구)·`AppShell` 계정 줄(닉네임 · 아이디 · 로그아웃)·목 데이터 5곳·시험 2파일. 앞 항목 해시 `f1ea1b4`.
 - 이유(기획서·카드 연결): CR-007 · D18 결정 10·11, 01-plan U10. 백엔드(U9)는 따로 커밋한다 — 이 커밋만으로는 가입이 서지 않으므로 배포 해시로 쓰지 않는다.
 - 정합성 확인: 원칙 5(가입 화면 안에서만) · 원칙 7(닉네임은 가입·사이드바에만, 채팅·브리핑·카드·에이전트 요청에 없음 — review-u10) / D18 / 보안 — 위반 없음.
@@ -205,3 +205,17 @@
 - 열린 권고: R-1 조회 중 전환 시험 없음 · R-2 `null` 응답 갈래 시험 없음 · R-3 "입력 그대로" 고정 시험 없음 · R-4 조회 시간 제한 없음(응답이 안 오면 그 칸 버튼 비활성 유지, 제출은 가능) · R-5 결과 줄이 결과가 있을 때만 DOM 에 생김. 가입 화면 새 E2E 미추가.
 - 남은 것 · 다음 단위: U9 리뷰·커밋 → U11.
 - Refs: P9b-auth CR-007 D18
+
+## 2026-11-16 09:30 · feat(P9b-auth): 가입 때 닉네임을 저장하고 아이디·닉네임이 겹치는지 묻는 API 를 더한다 · pending
+- 변경: 리비전 0004(`users.nickname` 추가 → 백필 `nickname = username` → NOT NULL → `uq_users_nickname`, 삭제 0) · `app/auth/names.py normalize_nickname`(NFC → strip → fullmatch → lower, 가입·조회 공용) · `NICKNAME_PATTERN` · 가입 판정 ①~⑥(③까지 DB 0, ④⑤ 사전 조회, ⑥ `IntegrityError` 를 `diag.constraint_name` 으로 `uq_users_username` → `username_taken` / `uq_users_nickname` → `nickname_taken`, 그 밖은 재발생) · `GET /auth/availability`(로그인 없음·`no-store`·`missing_query` 422·형식 위반은 `invalid` 로 DB 0) · `MeOut.nickname`(`_me_out` 도우미) · `app/auth/__init__.py` docstring(R4-5). 닫힌 목록 B1~B17(9파일) 반영, 목록 밖 파손 0. 새 시험 3파일.
+- 이유(기획서·카드 연결): CR-007 · D18 결정 10·11 · S3.1 0004 보충, 01-plan U9.
+- 정합성 확인: 원칙 7(R4-10 — `nickname` 이 나오는 `app/` 파일은 `names.py`·`routes.py`·`models.py`·`schemas.py` 4개뿐, 에이전트·툴·브리핑·프롬프트에 없음) / D18(로그인 예외에 `GET /auth/availability` 추가, 면제 목록 두 곳 일치) / S3.1 / 보안(`app/auth/` 로깅 0, 422 가 입력을 되울리지 않음) — 위반 없음.
+- 통과 수 수식: 2515(U5 기준선) + 109(새 시험 63 + 38 + 8) = **2624 passed · 0 failed · skip 0**. 기존 시험 수는 그대로(단언만 추가).
+- `test_migration_0004` 도우미: `tests.test_migration_0003` 에서 import 해 전용 DB `relationship_test_mig` 를 재사용한다(새 DB 없음).
+- 계획과 다르게 한 곳(review-u9 에서 모두 타당 판정): (가) 조회 쿼리 긴 입력은 10만 자 대신 60,000자 — httpx 가 65536 넘는 URL 을 클라이언트에서 거부 (나) 서로게이트 조회 시험을 `%ED%A0%80`(서버에 U+FFFD 로 닿음)과 `_availability` 직접 호출 둘로 나눔 (다) `MeOut` 3곳을 `_me_out` 도우미로 통일 (라) 경합 시험이 `app.auth.routes._exists` 를 monkeypatch (마) ⑤ 닉네임 사전 조회 삭제 변이는 등가(⑥ 이 같은 `nickname_taken` 을 낸다).
+- mypy 경위: 첫 실행에서 새 오류 2건(`_availability` 의 `str | None`) → 고쳐서 38건(기준선 38). ruff 통과, `alembic check` 무변경, `schema_check` FAIL 0, `tools_check` 7/7.
+- 개발 DB: 0003 → 0004 (`Running upgrade 0003 -> 0004`), users 3행 유지·닉네임 = 아이디. 테스트 DB 3개도 0004, 두 UNIQUE 존재(verifier 읽기 전용 확인).
+- 검증: 변이 구현자 V9-1~13(V9-12 제외) + 추가 8 중 등가 1 외 전부 검출, verifier 6건 중 4 검출·2 생존(시험 공백). 직접 탐침 155건에서 500 0. `review-u9.md` 결과 통과.
+- 열린 권고: R-1 아이디 조회에만 `strip()` 을 넣는 변이 생존(공백 붙은 아이디 시험 없음) · R-2 NFC → NFKC 변이 생존(전각 문자 거부 시험 없음) · R-3 409 뒤 쿠키·세션 0 단언 없음 · R-4 닉네임은 앞뒤 공백이 지워지지만 아이디는 `invalid`(결정 A 그대로, U11 브라우저 점검 때 봄) · R-5 조회 10만 자 직접 호출 시험 · R-6 `missing_query` 422 에 `Cache-Control` 없음 · R-7 아이디의 켈빈 기호(U9 이전부터).
+- 남은 것 · 다음 단위: U11(로컬 Caddy 스모크 `0003 -> 0004`, 비상 되돌리기 예행, 13 문서, 사용자 재배포).
+- Refs: P9b-auth CR-007 D18 S3.1

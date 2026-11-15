@@ -1,0 +1,20 @@
+# 명령: git diff --name-only HEAD -- app alembic tests scripts
+# 시각: 2026-11-16T07:21:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+app/api/schemas.py
+app/auth/__init__.py
+app/auth/routes.py
+app/db/models.py
+app/settings.py
+tests/auth_helpers.py
+tests/test_api.py
+tests/test_auth_api.py
+tests/test_auth_helpers.py
+tests/test_auth_origin.py
+tests/test_auth_required_routes.py
+tests/test_migration_0003.py
+tests/test_schema_check.py
+tests/test_schema_models.py

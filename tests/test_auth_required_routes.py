@@ -1,6 +1,6 @@
 """Refs: P9b-auth U3b D18 CR-006 지킬 것 4 -- 라우트 열거 401 계약.
 
-`app.routes` 를 **열거**해 `/health`·`/auth/signup`·`/auth/login`·문서 경로를 뺀 모든 API 라우트가
+`app.routes` 를 **열거**해 `/health`·`/auth/signup`·`/auth/login`·`GET /auth/availability`(CR-007)·문서 경로를 뺀 모든 API 라우트가
 쿠키 없이 401 `unauthenticated` 인지 본다(경로 매개변수는 `1` 로 채운다). **`/auth/logout` 은 예외가
 아니다**(F-3). 새 라우트가 `current_user` 의존성을 빠뜨리면 이 시험이 실패한다.
 
@@ -30,11 +30,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 UNAUTHENTICATED = {"detail": {"code": "unauthenticated"}}
 
-#: 로그인 없이 열려 있어야 하는 API(공개 3개) + FastAPI 기본 문서 경로.
+#: 로그인 없이 열려 있어야 하는 API(공개 4개 -- CR-007 이 `GET /auth/availability` 를 더했다)
+#: + FastAPI 기본 문서 경로.
 _EXEMPT = {
     ("GET", "/health"),
     ("POST", "/auth/signup"),
     ("POST", "/auth/login"),
+    ("GET", "/auth/availability"),
     ("GET", "/docs"),
     ("GET", "/docs/oauth2-redirect"),
     ("GET", "/redoc"),
@@ -104,6 +106,7 @@ def test_enumerated_routes_cover_the_known_api_surface(bare_client):
         ("GET", "/health"),
         ("POST", "/auth/signup"),
         ("POST", "/auth/login"),
+        ("GET", "/auth/availability"),
         ("GET", "/docs"),
         ("GET", "/docs/oauth2-redirect"),
         ("GET", "/redoc"),
@@ -137,6 +140,14 @@ def test_public_routes_stay_open(bare_client):
     _app, client = bare_client
     assert client.post("/auth/signup", json={}).status_code == 422
     assert client.post("/auth/login", json={}).status_code == 422
+    # (CR-007 · R4-2) 조회 API 는 쿠키 없이 401 이 아니다 -- `bare_client` 의 세션은 엔진에 묶이지
+    # 않아 DB 에 가는 요청은 쓸 수 없으므로 DB 에 가지 않는 두 요청만 쓴다.
+    missing = client.get("/auth/availability")
+    assert missing.status_code == 422
+    assert missing.json() == {"detail": {"code": "missing_query"}}
+    empty = client.get("/auth/availability", params={"username": ""})
+    assert empty.status_code == 200
+    assert empty.json() == {"username": "invalid", "nickname": None}
 
 
 def test_push_dev_page_routes_are_the_only_other_exempt(monkeypatch):

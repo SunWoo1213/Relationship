@@ -56,15 +56,22 @@ SessionOrFactory = Session | Callable[[], Session]
 
 
 def make_user(
-    session: Session, user_id: str = DEFAULT_USER_ID, username: str | None = None
+    session: Session,
+    user_id: str = DEFAULT_USER_ID,
+    username: str | None = None,
+    *,
+    nickname: str | None = None,
 ) -> User:
     """`id == user_id` 인 사용자 행을 보장한다(있으면 그대로, 없으면 flush 로 넣는다)."""
     existing = session.get(User, user_id)
     if existing is not None:
         return existing
+    resolved_username = username if username is not None else f"helper-{user_id}"
     user = User(
         id=user_id,
-        username=username if username is not None else f"helper-{user_id}",
+        username=resolved_username,
+        # 0004 보충: 생략하면 그 행의 아이디 값(기존 호출 시그니처 불변).
+        nickname=nickname if nickname is not None else resolved_username,
         password_hash=NO_LOGIN_HASH,
     )
     session.add(user)

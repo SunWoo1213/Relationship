@@ -1,0 +1,119 @@
+# 명령: U9_MUT=CONTROL PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -s -p no:cacheprovider -p u9mut tests/test_auth_nickname.py tests/test_auth_availability.py tests/test_auth_api.py tests/test_auth_required_routes.py tests/test_auth_helpers.py tests/test_auth_origin.py 2>&1 | grep -E '^\[u9mut\]|^FAILED|^ERROR|passed|failed|error' | cut -c1-260
+# 시각: 2026-11-16T07:28:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: verifier 변이 CONTROL (런타임 치환, 저장소 무수정)
+# ---
+[u9mut] 변이=CONTROL · 접속 DB 이름=relationship_test
+248 passed in 8.53s
+
+# ===== append 2026-11-16T07:28:28+09:00 =====
+# 명령: U9_MUT=M-A-raw-store PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -s -p no:cacheprovider -p u9mut tests/test_auth_nickname.py tests/test_auth_availability.py tests/test_auth_api.py tests/test_auth_required_routes.py tests/test_auth_helpers.py tests/test_auth_origin.py 2>&1 | grep -E '^\[u9mut\]|^FAILED|^ERROR|passed|failed|error' | cut -c1-260
+# 시각: 2026-11-16T07:28:28+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: verifier 변이 M-A-raw-store (런타임 치환, 저장소 무수정)
+# ---
+[u9mut] 변이=M-A-raw-store · 접속 DB 이름=relationship_test
+[u9mut] app/auth/routes.py 사본에 변이 1건 적용
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[ \ubbfc\uc9c0 -\ubbfc\uc9c0] - AssertionError: assert ' 민지 ' == '민지'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\t\ubbfc\uc9c0\n-\ubbfc\uc9c0] - AssertionError: assert '\t민지\n' == '민지'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\u1106\u1175\u11ab\u110c\u1175-\ubbfc\uc9c0] - AssertionError: assert '\u1106\u1175...b\u110c\u1175' == '\ubbfc\uc9c0'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[Demo-demo] - AssertionError: assert 'Demo' == 'demo'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[DEMO_01-demo_01] - AssertionError: assert 'DEMO_01' == 'demo_01'
+FAILED tests/test_auth_nickname.py::test_nickname_is_normalized_nfc_strip_lower[\ubbfc\uc9c0ABC-\ubbfc\uc9c0abc] - AssertionError: assert '민지ABC' == '민지abc'
+FAILED tests/test_auth_nickname.py::test_leading_trailing_whitespace_control_chars_are_stripped_not_rejected - AssertionError: assert '\x1f민지' == '민지'
+FAILED tests/test_auth_nickname.py::test_nickname_differing_only_by_case_is_409_nickname_taken - assert 201 == 409
+FAILED tests/test_auth_availability.py::test_nickname_case_folded_taken_after_signup - AssertionError: assert {'nickname': ...ername': None} == {'nickname': ...ername': None}
+9 failed, 239 passed in 8.51s
+
+# ===== append 2026-11-16T07:28:37+09:00 =====
+# 명령: U9_MUT=M-B-avail-no-lower PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -s -p no:cacheprovider -p u9mut tests/test_auth_nickname.py tests/test_auth_availability.py tests/test_auth_api.py tests/test_auth_required_routes.py tests/test_auth_helpers.py tests/test_auth_origin.py 2>&1 | grep -E '^\[u9mut\]|^FAILED|^ERROR|passed|failed|error' | cut -c1-260
+# 시각: 2026-11-16T07:28:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: verifier 변이 M-B-avail-no-lower (런타임 치환, 저장소 무수정)
+# ---
+[u9mut] 변이=M-B-avail-no-lower · 접속 DB 이름=relationship_test
+[u9mut] app/auth/routes.py 사본에 변이 1건 적용
+FAILED tests/test_auth_availability.py::test_username_statuses[TAKEN_USER-taken] - AssertionError: assert {'nickname': ...e': 'invalid'} == {'nickname': ...ame': 'taken'}
+FAILED tests/test_auth_availability.py::test_username_statuses[Free_Name-available] - AssertionError: assert {'nickname': ...e': 'invalid'} == {'nickname': ...: 'available'}
+2 failed, 246 passed in 8.57s
+
+# ===== append 2026-11-16T07:28:46+09:00 =====
+# 명령: U9_MUT=M-E-no-cache PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -s -p no:cacheprovider -p u9mut tests/test_auth_nickname.py tests/test_auth_availability.py tests/test_auth_api.py tests/test_auth_required_routes.py tests/test_auth_helpers.py tests/test_auth_origin.py 2>&1 | grep -E '^\[u9mut\]|^FAILED|^ERROR|passed|failed|error' | cut -c1-260
+# 시각: 2026-11-16T07:28:46+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: verifier 변이 M-E-no-cache (런타임 치환, 저장소 무수정)
+# ---
+[u9mut] 변이=M-E-no-cache · 접속 DB 이름=relationship_test
+[u9mut] app/auth/routes.py 사본에 변이 1건 적용
+FAILED tests/test_auth_availability.py::test_response_is_no_store_and_keys_are_exact - AssertionError: assert 'no-cache' == 'no-store'
+1 failed, 247 passed in 8.57s
+
+# ===== append 2026-11-16T07:28:56+09:00 =====
+# 명령: U9_MUT=M-L-nfkc PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -s -p no:cacheprovider -p u9mut tests/test_auth_nickname.py tests/test_auth_availability.py tests/test_auth_api.py tests/test_auth_required_routes.py tests/test_auth_helpers.py tests/test_auth_origin.py 2>&1 | grep -E '^\[u9mut\]|^FAILED|^ERROR|passed|failed|error' | cut -c1-260
+# 시각: 2026-11-16T07:28:56+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: verifier 변이 M-L-nfkc (런타임 치환, 저장소 무수정)
+# ---
+[u9mut] 변이=M-L-nfkc · 접속 DB 이름=relationship_test
+[u9mut] app/auth/names.py 사본에 변이 1건 적용
+248 passed in 8.76s
+
+# ===== append 2026-11-16T07:29:05+09:00 =====
+# 명령: U9_MUT=M-Q-avail-username-strip PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -s -p no:cacheprovider -p u9mut tests/test_auth_nickname.py tests/test_auth_availability.py tests/test_auth_api.py tests/test_auth_required_routes.py tests/test_auth_helpers.py tests/test_auth_origin.py 2>&1 | grep -E '^\[u9mut\]|^FAILED|^ERROR|passed|failed|error' | cut -c1-260
+# 시각: 2026-11-16T07:29:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: verifier 변이 M-Q-avail-username-strip (런타임 치환, 저장소 무수정)
+# ---
+[u9mut] 변이=M-Q-avail-username-strip · 접속 DB 이름=relationship_test
+[u9mut] app/auth/routes.py 사본에 변이 1건 적용
+248 passed in 8.53s
+
+# ===== append 2026-11-16T07:29:35+09:00 =====
+# 명령: U9_MUT=CONTROL-MIG-V15 PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -s -p no:cacheprovider -p u9mut tests/test_migration_0004.py 2>&1 | grep -E '^\[u9mut\]|^FAILED|^ERROR|passed|failed|error' | cut -c1-260
+# 시각: 2026-11-16T07:29:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: verifier 변이 CONTROL-MIG-V15 (전용 DB relationship_test_mig_v15, 런타임 치환)
+# ---
+[u9mut] 변이=CONTROL-MIG-V15 · 접속 DB 이름=relationship_test
+8 passed in 0.34s
+
+# ===== append 2026-11-16T07:29:35+09:00 =====
+# 명령: U9_MUT=M-D-backfill-id PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -s -p no:cacheprovider -p u9mut tests/test_migration_0004.py 2>&1 | grep -E '^\[u9mut\]|^FAILED|^ERROR|passed|failed|error' | cut -c1-260
+# 시각: 2026-11-16T07:29:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: verifier 변이 M-D-backfill-id (전용 DB relationship_test_mig_v15, 런타임 치환)
+# ---
+[u9mut] 변이=M-D-backfill-id · 접속 DB 이름=relationship_test
+[u9mut] 백필 치환 1회째
+[u9mut] 백필 치환 2회째
+FAILED tests/test_migration_0004.py::test_backfill_sets_nickname_to_username - AssertionError: assert {'demo_01': '...st': 'mig4-a'} == {'demo_01': '...test': 'test'}
+FAILED tests/test_migration_0004.py::test_nickname_is_unique - Failed: DID NOT RAISE <class 'sqlalchemy.exc.IntegrityError'>
+FAILED tests/test_migration_0004.py::test_downgrade_to_0003_keeps_rows_and_upgrade_backfills_again - AssertionError: assert {'demo_01': '...st': 'mig4-a'} == {'demo_01': '...test': 'test'}
+3 failed, 5 passed in 0.37s
+
+# ===== append 2026-11-16T07:29:36+09:00 =====
+# 명령: U9_MUT=CONTROL-MIG-V15 PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9 POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -s -p no:cacheprovider -p u9mut tests/test_migration_0004.py 2>&1 | grep -E '^\[u9mut\]|^FAILED|^ERROR|passed|failed|error' | cut -c1-260
+# 시각: 2026-11-16T07:29:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: verifier 변이 CONTROL-MIG-V15 (전용 DB relationship_test_mig_v15, 런타임 치환)
+# ---
+[u9mut] 변이=CONTROL-MIG-V15 · 접속 DB 이름=relationship_test
+8 passed in 0.35s

@@ -516,6 +516,10 @@ AUTH_COOKIE_NAME_PLAIN = "rel_session"
 #: 아이디 규칙(결정 A) -- 소문자로 정규화한 뒤 `fullmatch`.
 USERNAME_PATTERN = r"[a-z0-9_]{3,20}"
 
+#: 닉네임 규칙(CR-007 결정 X) -- NFC·앞뒤 공백 제거 뒤 `fullmatch`. 완성형 한글 음절·
+#: ASCII 영문·ASCII 숫자·밑줄, 2~20자. `\w`·`\d` 는 유니코드 문자가 섞여 쓰지 않는다.
+NICKNAME_PATTERN = r"[가-힣A-Za-z0-9_]{2,20}"
+
 #: 비밀번호 길이(결정 B) -- 문자 수 8~128, 복잡도 규칙 없음.
 PASSWORD_MIN_LEN = 8
 PASSWORD_MAX_LEN = 128

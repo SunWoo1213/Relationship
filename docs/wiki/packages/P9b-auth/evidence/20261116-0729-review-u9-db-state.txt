@@ -1,0 +1,19 @@
+# 명령: POSTGRES_PORT=5433 .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u9/db_state.py
+# 시각: 2026-11-16T07:29:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8b6946f (dev2)
+# exit: 0
+# 메모: 변이 실행 뒤 4개 DB 읽기 전용 SELECT
+# ---
+relationship: alembic=0004 users=3 nickname_null=0 nickname==username=3
+   UNIQUE: [('uq_users_nickname', 'UNIQUE (nickname)'), ('uq_users_username', 'UNIQUE (username)')]
+   nickname (is_nullable, default): [('NO', None)]
+relationship_test: alembic=0004 users=0 nickname_null=0 nickname==username=0
+   UNIQUE: [('uq_users_nickname', 'UNIQUE (nickname)'), ('uq_users_username', 'UNIQUE (username)')]
+   nickname (is_nullable, default): [('NO', None)]
+relationship_test_mig: alembic=0004 users=2 nickname_null=0 nickname==username=2
+   UNIQUE: [('uq_users_nickname', 'UNIQUE (nickname)'), ('uq_users_username', 'UNIQUE (username)')]
+   nickname (is_nullable, default): [('NO', None)]
+relationship_test_mig_v15: alembic=0004 users=2 nickname_null=0 nickname==username=2
+   UNIQUE: [('uq_users_nickname', 'UNIQUE (nickname)'), ('uq_users_username', 'UNIQUE (username)')]
+   nickname (is_nullable, default): [('NO', None)]
