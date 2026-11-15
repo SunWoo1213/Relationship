@@ -339,7 +339,12 @@ describe('인앱 배너 (결정 H)', () => {
   })
 
   function appFetch() {
-    return installFetch({ 'GET /api/briefings': () => json([]), 'GET /api/persons': () => json([]) })
+    // 로그인 관문(P9b U6): App 은 `/auth/me` 200 이어야 앱 틀을 그린다.
+    return installFetch({
+      'GET /api/auth/me': () => json({ id: 'u1', username: 'tester' }),
+      'GET /api/briefings': () => json([]),
+      'GET /api/persons': () => json([]),
+    })
   }
 
   it('{type:"briefing", schedule_id} 를 받으면 한 줄 배너 — 누르면 #/briefings?schedule_id=N, 누른 뒤 사라진다', async () => {
@@ -390,11 +395,14 @@ describe('인앱 배너 (결정 H)', () => {
     const world = installPushBrowser()
     window.history.replaceState(null, '', '#/chat')
     installFetch({
+      'GET /api/auth/me': () => json({ id: 'u1', username: 'tester' }),
+      'GET /api/chat/history?limit=50': () => json([]),
       'GET /api/briefings': () => json([]),
       'GET /api/persons': () => json([]),
       'GET /api/questions/pending': () => json([]),
     })
     render(createElement(App))
+    await screen.findByRole('textbox', { name: '메시지 입력' }) // 관문을 통과한 뒤에야 서비스 워커 메시지를 듣는다
     world.post({ type: 'open-briefing', schedule_id: 12 })
     await waitFor(() => expect(window.location.hash).toBe('#/briefings?schedule_id=12'))
     expect(screen.queryByTestId('push-banner')).toBeNull()
@@ -404,11 +412,14 @@ describe('인앱 배너 (결정 H)', () => {
     const world = installPushBrowser()
     window.history.replaceState(null, '', '#/chat')
     installFetch({
+      'GET /api/auth/me': () => json({ id: 'u1', username: 'tester' }),
+      'GET /api/chat/history?limit=50': () => json([]),
       'GET /api/briefings': () => json([]),
       'GET /api/persons': () => json([]),
       'GET /api/questions/pending': () => json([]),
     })
     render(createElement(App))
+    await screen.findByRole('textbox', { name: '메시지 입력' }) // 관문을 통과한 뒤에야 서비스 워커 메시지를 듣는다
     world.post({ type: 'open-briefing', schedule_id: null })
     await waitFor(() => expect(window.location.hash).toBe('#/briefings'))
     expect(screen.queryByTestId('push-banner')).toBeNull()

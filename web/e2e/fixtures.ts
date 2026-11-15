@@ -36,7 +36,18 @@ export async function freezeClock(page: Page) {
   await page.clock.setFixedTime(new Date('2026-10-15T09:00:00+09:00'))
 }
 
-export async function installFakeApi(page: Page, baseURL: string, table: ApiTable): Promise<FakeApi> {
+/**
+ * 로그인 관문(P9b U6)을 통과시키는 기본 응답. 표에 같은 키가 있으면 표가 우선한다.
+ * - `/auth/me` 200: 앱 틀이 열린다.
+ * - `/chat/history?limit=50`: 채팅 화면이 마운트 때 부르는 기록 조회 — 기본은 빈 기록.
+ */
+const SESSION_DEFAULTS: ApiTable = {
+  'GET /api/auth/me': { json: { id: 'u-e2e', username: 'e2e_user' } },
+  'GET /api/chat/history?limit=50': { json: [] },
+}
+
+export async function installFakeApi(page: Page, baseURL: string, givenTable: ApiTable): Promise<FakeApi> {
+  const table: ApiTable = { ...SESSION_DEFAULTS, ...givenTable }
   const requests: string[] = []
   const calls: ApiCall[] = []
   const unexpected: string[] = []
@@ -68,8 +79,14 @@ export async function installFakeApi(page: Page, baseURL: string, table: ApiTabl
     }
     calls.push(call)
     const reply = typeof entry === 'function' ? entry(call) : entry
+    const status = reply.status ?? 200
+    // 204 는 본문이 없다(로그아웃 — 계약 표).
+    if (status === 204) {
+      await route.fulfill({ status })
+      return
+    }
     await route.fulfill({
-      status: reply.status ?? 200,
+      status,
       contentType: 'application/json',
       body: JSON.stringify(reply.json),
     })

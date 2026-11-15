@@ -5,6 +5,34 @@
 /** ISO 8601 문자열 (pydantic datetime 직렬화). */
 export type IsoDateTime = string
 
+// --- 계정 (P9b U2·U4, 01-plan "API 계약" 표 — 백엔드 구현 전에는 계획 표가 원본) ---
+
+/** 가입 `POST /auth/signup`(201)·로그인 `POST /auth/login`(200) 요청 본문. */
+export interface Credentials {
+  username: string
+  password: string
+}
+
+/** `POST /auth/signup`·`POST /auth/login`·`GET /auth/me` 의 성공 본문. */
+export interface MeOut {
+  id: string
+  username: string
+}
+
+/** `POST /auth/logout` 요청 본문. endpoint 는 이 브라우저의 푸시 구독이 있을 때만. */
+export interface LogoutIn {
+  endpoint?: string
+}
+
+/** `GET /chat/history` 한 줄 — 오래된 것 → 최근 순으로 온다. */
+export interface ChatHistoryItemOut {
+  id: number
+  role: 'user' | 'assistant'
+  content: string
+  question_id: number | null
+  created_at: IsoDateTime
+}
+
 // --- 채팅 · 답변 (POST /chat, POST /answers/{question_id}) ---
 
 export interface ChatIn {

@@ -1,0 +1,45 @@
+# 명령: npm --prefix web exec -- vitest run --root /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6/web src/__tests__/probe.test.tsx
+# 시각: 2026-11-15T21:31:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 1
+# ---
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6/web
+
+ ❯ src/__tests__/probe.test.tsx (2 tests | 1 failed) 419ms
+   ❯ 탐침 (2)
+     × P2: A 의 늦은 401 응답이 B 로그인 뒤에 도착하면 B 가 관문으로 밀려나는가 (관찰) 186ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/probe.test.tsx > 탐침 > P2: A 의 늦은 401 응답이 B 로그인 뒤에 도착하면 B 가 관문으로 밀려나는가 (관찰)
+AssertionError: expected <h1 id="auth-title" …(1)></h1> to be null
+
+- Expected:
+null
+
++ Received:
+<h1
+  class="mb-6 text-2xl font-semibold"
+  id="auth-title"
+>
+  로그인
+</h1>
+
+ ❯ src/__tests__/probe.test.tsx:102:87
+    100|     await waitFor(() => expect(screen.queryByRole('heading', { level: …
+    101|     await new Promise((r) => setTimeout(r, 50))
+    102|     expect(screen.queryByRole('heading', { level: 1, name: AUTH_NOTICE…
+       |                                                                                       ^
+    103|     expect(screen.getByTestId('sidebar-username')).toHaveTextContent('…
+    104|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  21:31:37
+   Duration  927ms (tests 48%, environment 26%, import 17%, setup 5%, transform 4%)
+

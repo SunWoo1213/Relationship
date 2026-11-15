@@ -1,0 +1,186 @@
+# 명령: npm --prefix web exec -- vitest run
+# 시각: 2026-11-15T21:17:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 1
+# ---
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship
+
+ ❯ web/src/__tests__/api.test.ts (0 test)
+ ❯ web/src/__tests__/network.test.ts (0 test)
+ ❯ web/src/__tests__/briefing.test.tsx (0 test)
+ ❯ web/src/__tests__/chat.test.tsx (0 test)
+ ❯ web/src/__tests__/card.test.tsx (0 test)
+ ❯ web/e2e/briefing.spec.ts (0 test)
+ ❯ web/src/__tests__/proxy.test.ts (0 test)
+ ❯ web/e2e/chat.spec.ts (0 test)
+ ❯ web/e2e/card.spec.ts (0 test)
+ ❯ web/src/__tests__/push.test.ts (0 test)
+ ❯ web/src/__tests__/routes.test.tsx (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 11 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  web/e2e/briefing.spec.ts [ web/e2e/briefing.spec.ts ]
+Error: Playwright Test did not expect test() to be called here.
+Most common reasons include:
+- You are calling test() in a configuration file.
+- You are calling test() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite web/node_modules/playwright/lib/common/index.js:2235:13
+ ❯ _TestTypeImpl._createTest web/node_modules/playwright/lib/common/index.js:2249:24
+ ❯ web/node_modules/playwright/lib/common/index.js:1169:12
+ ❯ web/e2e/briefing.spec.ts:20:1
+     18| }
+     19|
+     20| test('쿼리의 일정이 맨 위에 강조돼 열리고, 지금 브리핑을 누르면 목록이 다시 읽힌다', async ({ page, ba…
+       | ^
+     21|   await freezeClock(page)
+     22|   // 서버 순서 = 일정 시각 내림차순: 9 가 7 보다 앞. 실행 전/후로 7 의 줄이 달라진다.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  web/e2e/card.spec.ts [ web/e2e/card.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test.describe() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite web/node_modules/playwright/lib/common/index.js:2235:13
+ ❯ _TestTypeImpl._describe web/node_modules/playwright/lib/common/index.js:2277:24
+ ❯ Function.describe web/node_modules/playwright/lib/common/index.js:1169:12
+ ❯ web/e2e/card.spec.ts:47:6
+     45| const SCREEN = (name: string) => `[data-screen="${name}"]`
+     46|
+     47| test.describe('데스크톱 폭 1280px', () => {
+       |      ^
+     48|   test.use({ viewport: { width: 1280, height: 800 } })
+     49|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  web/e2e/chat.spec.ts [ web/e2e/chat.spec.ts ]
+Error: Playwright Test did not expect test() to be called here.
+Most common reasons include:
+- You are calling test() in a configuration file.
+- You are calling test() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+- You are calling test() from an async test.describe() block. Only sync ones are supported.
+ ❯ _TestTypeImpl._currentSuite web/node_modules/playwright/lib/common/index.js:2235:13
+ ❯ _TestTypeImpl._createTest web/node_modules/playwright/lib/common/index.js:2249:24
+ ❯ web/node_modules/playwright/lib/common/index.js:1169:12
+ ❯ web/e2e/chat.spec.ts:8:1
+      6| const stored0 = { persons: 0, events: 0, schedules: 0 }
+      7|
+      8| test('발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, 새로고침하면 남은 질문 칩이 복원된다', async …
+       | ^
+      9|   await freezeClock(page)
+     10|   // 서버가 들고 있는 미답변 질문 -- 상태가 있는 가짜
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  web/src/__tests__/api.test.ts [ web/src/__tests__/api.test.ts ]
+Error: Cannot find package '@/api/client' imported from /Users/sunwoo/Desktop/Portfolio/Relationship/web/src/__tests__/api.test.ts
+ ❯ web/src/__tests__/api.test.ts:2:1
+      1| import { afterEach, describe, expect, it, vi } from 'vitest'
+      2| import { ApiError, apiFetch } from '@/api/client'
+       | ^
+      3|
+      4| function jsonResponse(status: number, body: unknown) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  web/src/__tests__/briefing.test.tsx [ web/src/__tests__/briefing.test.tsx ]
+Error: Cannot find package '@/screens/BriefingScreen' imported from /Users/sunwoo/Desktop/Portfolio/Relationship/web/src/__tests__/briefing.test.tsx
+ ❯ web/src/__tests__/briefing.test.tsx:5:1
+      3| import userEvent from '@testing-library/user-event'
+      4| import { afterEach, beforeEach, describe, expect, it, vi } from 'vites…
+      5| import BriefingScreen, { BRIEFING_NOTICE } from '@/screens/BriefingScr…
+       | ^
+      6| import { parseScheduleId } from '@/routes'
+      7| import { formatDateTime } from '@/lib/format'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  web/src/__tests__/card.test.tsx [ web/src/__tests__/card.test.tsx ]
+Error: Cannot find package '@/App' imported from /Users/sunwoo/Desktop/Portfolio/Relationship/web/src/__tests__/card.test.tsx
+ ❯ web/src/__tests__/card.test.tsx:6:1
+      4| import userEvent from '@testing-library/user-event'
+      5| import { afterEach, beforeEach, describe, expect, it, vi } from 'vites…
+      6| import App from '@/App'
+       | ^
+      7| import PersonCardScreen, { CARD_NOTICE } from '@/screens/PersonCardScr…
+      8| import { PERSON_LIST_NOTICE } from '@/components/PersonList'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  web/src/__tests__/chat.test.tsx [ web/src/__tests__/chat.test.tsx ]
+Error: Cannot find package '@/screens/ChatScreen' imported from /Users/sunwoo/Desktop/Portfolio/Relationship/web/src/__tests__/chat.test.tsx
+ ❯ web/src/__tests__/chat.test.tsx:5:1
+      3| import userEvent from '@testing-library/user-event'
+      4| import { afterEach, beforeEach, describe, expect, it, vi } from 'vites…
+      5| import ChatScreen, { NOTICE } from '@/screens/ChatScreen'
+       | ^
+      6| import { SESSION_STORAGE_KEY } from '@/session'
+      7| import type { AnswerOut, ChatOut, ChatPendingQuestionOut } from '@/api…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ FAIL  web/src/__tests__/network.test.ts [ web/src/__tests__/network.test.ts ]
+Error: Cannot find package '@/api/client' imported from /Users/sunwoo/Desktop/Portfolio/Relationship/web/src/__tests__/network.test.ts
+ ❯ web/src/__tests__/network.test.ts:5:1
+      3| // 이 안전망이 풀리면(예: setup 에서 fetch 교체가 빠지면) 다른 테스트가 모르는 새 실제 요청이 나가도 조용히 …
+      4| import { describe, expect, it } from 'vitest'
+      5| import { apiFetch } from '@/api/client'
+       | ^
+      6|
+      7| describe('실 네트워크 0 (setup 의 가짜 fetch)', () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
+
+ FAIL  web/src/__tests__/proxy.test.ts [ web/src/__tests__/proxy.test.ts ]
+Error: Cannot find package '@/proxy' imported from /Users/sunwoo/Desktop/Portfolio/Relationship/web/src/__tests__/proxy.test.ts
+ ❯ web/src/__tests__/proxy.test.ts:2:1
+      1| import { describe, expect, it } from 'vitest'
+      2| import { DEFAULT_API_TARGET, resolveApiTarget, stripApiPrefix } from '…
+       | ^
+      3|
+      4| describe('프록시 대상 (R-U4-11 — 환경이 아니라 순수 함수에 대해 단언)', () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯
+
+ FAIL  web/src/__tests__/push.test.ts [ web/src/__tests__/push.test.ts ]
+Error: Cannot find package '@/App' imported from /Users/sunwoo/Desktop/Portfolio/Relationship/web/src/__tests__/push.test.ts
+ ❯ web/src/__tests__/push.test.ts:7:1
+      5| import { createElement } from 'react'
+      6| import { afterEach, beforeEach, describe, expect, it, vi } from 'vites…
+      7| import App from '@/App'
+       | ^
+      8| import { BANNER_NOTICE } from '@/components/AppShell'
+      9| import { getPushStatus, subscribeToPush, urlBase64ToUint8Array } from …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/11]⎯
+
+ FAIL  web/src/__tests__/routes.test.tsx [ web/src/__tests__/routes.test.tsx ]
+Error: Cannot find package '@/App' imported from /Users/sunwoo/Desktop/Portfolio/Relationship/web/src/__tests__/routes.test.tsx
+ ❯ web/src/__tests__/routes.test.tsx:4:1
+      2| import userEvent from '@testing-library/user-event'
+      3| import { afterEach, beforeEach, describe, expect, it, vi } from 'vites…
+      4| import App from '@/App'
+       | ^
+      5| import { parseHash } from '@/routes'
+      6| import { installFakeMatchMedia } from './helpers'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/11]⎯
+
+
+ Test Files  11 failed | 1 passed (12)
+      Tests  16 passed (16)
+   Start at  21:17:40
+   Duration  425ms (worker 58%, import 16%, transform 15%, tests 9%, environment 2%)
+

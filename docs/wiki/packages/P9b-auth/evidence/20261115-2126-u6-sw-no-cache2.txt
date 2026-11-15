@@ -1,0 +1,7 @@
+# 명령: grep -c -e fetch -e caches -e cache web/public/sw.js
+# 시각: 2026-11-15T21:26:56+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 1
+# ---
+0

@@ -1,0 +1,15 @@
+# 명령: npm --prefix web exec -- vitest run --root web
+# 시각: 2026-11-15T21:29:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  10 passed (10)
+      Tests  188 passed (188)
+   Start at  21:29:45
+   Duration  2.58s (tests 49%, environment 30%, import 11%, setup 5%, transform 4%)
+

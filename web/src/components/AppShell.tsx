@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { MenuIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { useAuth } from '@/auth'
 import PersonList from '@/components/PersonList'
 import { PersonsProvider } from '@/components/PersonsProvider'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
@@ -18,6 +19,56 @@ const NAV_ITEMS: { key: Route['name']; label: string; href: string }[] = [
   { key: 'persons', label: '인물', href: HREF.persons },
   { key: 'briefings', label: '브리핑', href: HREF.briefings },
 ]
+
+/** 프론트가 만드는 고정 문구(로그아웃 줄·실패 안내). */
+export const ACCOUNT_NOTICE = {
+  logout: '로그아웃',
+  logoutFailed: '로그아웃하지 못했어요. 잠시 후 다시 시도해 주세요.',
+} as const
+
+/** 사이드바 맨 아래 "<아이디> · 로그아웃" 한 줄 (P9b U6). 채팅방 목록은 만들지 않는다(원칙7). */
+function AccountRow() {
+  const { state, signOut } = useAuth()
+  const [failed, setFailed] = useState(false)
+  const [busy, setBusy] = useState(false)
+  if (state.status !== 'user') return null
+
+  async function onLogout() {
+    if (busy) return
+    setBusy(true)
+    setFailed(false)
+    try {
+      await signOut() // 성공하면 관문이 이 틀을 내린다
+    } catch {
+      setFailed(true)
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div data-testid="sidebar-account" className="border-t border-sidebar-border pt-3 text-sm">
+      <div className="flex items-center gap-2">
+        <span data-testid="sidebar-username" className="min-w-0 truncate font-medium">
+          {state.username}
+        </span>
+        <span aria-hidden="true">·</span>
+        <button
+          type="button"
+          onClick={() => void onLogout()}
+          disabled={busy}
+          className="shrink-0 text-muted-foreground underline-offset-4 hover:underline disabled:opacity-50"
+        >
+          {ACCOUNT_NOTICE.logout}
+        </button>
+      </div>
+      {failed && (
+        <p role="alert" className="mt-1 text-destructive">
+          {ACCOUNT_NOTICE.logoutFailed}
+        </p>
+      )}
+    </div>
+  )
+}
 
 function SidebarContent({ route, onNavigate }: { route: Route; onNavigate: () => void }) {
   return (
@@ -40,6 +91,7 @@ function SidebarContent({ route, onNavigate }: { route: Route; onNavigate: () =>
       <div aria-label="인물 목록" data-testid="sidebar-persons" className="min-h-0 flex-1 overflow-y-auto">
         <PersonList onNavigate={onNavigate} limit={SIDEBAR_RECENT_LIMIT} />
       </div>
+      <AccountRow />
     </nav>
   )
 }

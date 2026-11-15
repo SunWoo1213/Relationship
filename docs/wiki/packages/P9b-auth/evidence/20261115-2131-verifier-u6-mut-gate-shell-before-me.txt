@@ -1,0 +1,69 @@
+# 명령: npm --prefix web exec -- vitest run --root /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6/web --exclude **/probe.test.tsx
+# 시각: 2026-11-15T21:31:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 1
+# ---
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu6/web
+
+ ❯ src/__tests__/card.test.tsx (50 tests | 1 failed) 1789ms
+   ❯ 인물 목록 — 카드 그리드 (D15, P8b U1) (19)
+     × #/persons 진입 시 GET /api/persons 1회, 타일 필드(이름·태그·위계·마지막 접촉)가 서버 값·서버 순서 그대로 85ms
+ ❯ src/__tests__/auth.test.tsx (22 tests | 1 failed) 1931ms
+   ❯ 관문 — GET /auth/me 두 갈래 (결정 L) (3)
+     × me 401 이면 로그인 화면이 뜨고 앱 틀은 그려지지 않는다 125ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/auth.test.tsx > 관문 — GET /auth/me 두 갈래 (결정 L) > me 401 이면 로그인 화면이 뜨고 앱 틀은 그려지지 않는다
+AssertionError: expected [ '/api/chat/history?limit=50', …(3) ] to deeply equal [ '/api/auth/me' ]
+
+- Expected
++ Received
+
+  [
++   "/api/chat/history?limit=50",
++   "/api/questions/pending",
++   "/api/persons",
+    "/api/auth/me",
+  ]
+
+ ❯ src/__tests__/auth.test.tsx:94:56
+     92|     expect(screen.queryByRole('navigation', { name: '주 메뉴' })).toBeNul…
+     93|     // 관문 앞에서는 /auth/me 외의 API 를 부르지 않는다
+     94|     expect(fetchFn.mock.calls.map(([u]) => String(u))).toEqual(['/api/…
+       |                                                        ^
+     95|   })
+     96|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/card.test.tsx > 인물 목록 — 카드 그리드 (D15, P8b U1) > #/persons 진입 시 GET /api/persons 1회, 타일 필드(이름·태그·위계·마지막 접촉)가 서버 값·서버 순서 그대로
+AssertionError: expected [ '/api/persons', '/api/auth/me' ] to deeply equal [ '/api/auth/me', '/api/persons' ]
+
+- Expected
++ Received
+
+  [
+-   "/api/auth/me",
+    "/api/persons",
++   "/api/auth/me",
+  ]
+
+ ❯ src/__tests__/card.test.tsx:180:56
+    178|     expect(callsTo(fetchFn, '/api/persons')).toHaveLength(1)
+    179|     // 로그인 관문이 `/auth/me` 를 먼저 부른다(P9b U6). 그 밖의 요청은 `/persons` 하나뿐 — …
+    180|     expect(fetchFn.mock.calls.map(([u]) => String(u))).toEqual(['/api/…
+       |                                                        ^
+    181|     const tiles = screen.getAllByTestId('person-tile')
+    182|     const f = (name: string) => tiles.map((t) => t.querySelector(`[dat…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 8 passed (10)
+      Tests  2 failed | 186 passed (188)
+   Start at  21:31:38
+   Duration  2.98s (tests 49%, environment 29%, import 11%, transform 6%, setup 4%)
+

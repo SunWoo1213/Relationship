@@ -59,7 +59,7 @@ test('발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, �
   await page.getByTestId('chips-8').getByRole('button', { name: '예' }).click()
   await expect(page.getByText('일정으로 저장했어요.')).toBeVisible()
 
-  // 요청 본문·세션 헤더: 첫 /chat 에는 세션이 없고, 이후는 응답이 준 s-1 을 보낸다
+  // 요청 본문·세션 헤더: 세션은 서버가 계정에서 만든다 — 프론트는 X-Session-Id 를 어떤 요청에도 보내지 않는다 (P9b U6)
   const chat = api.callsTo('POST /api/chat')
   expect(chat).toHaveLength(1)
   expect(chat[0].body).toEqual({ utterance: '어제 민지랑 점심 먹었어' })
@@ -67,13 +67,12 @@ test('발화를 보내면 칩이 뜨고, 눌러 재개된 reply 가 보이며, �
   const a7 = api.callsTo('POST /api/answers/7')
   expect(a7).toHaveLength(1)
   expect(a7[0].body).toEqual({ answer: '친구' })
-  expect(a7[0].headers['x-session-id']).toBe('s-1')
+  expect(a7[0].headers['x-session-id']).toBeUndefined()
   const a8 = api.callsTo('POST /api/answers/8')
   expect(a8).toHaveLength(1)
   expect(a8[0].body).toEqual({ answer: '예' })
-  // 새로고침 뒤에도 세션이 localStorage 에 남아 복원 요청에 실린다
   const restore = api.callsTo('GET /api/questions/pending').at(-1)!
-  expect(restore.headers['x-session-id']).toBe('s-1')
+  expect(restore.headers['x-session-id']).toBeUndefined()
 
   // 판정 27b: 요청 URL 전부가 preview 호스트의 앱 파일 또는 /api/ 경로
   expectNoStrayRequests(api, baseURL!)

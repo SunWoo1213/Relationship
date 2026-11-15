@@ -24,6 +24,9 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target,
           changeOrigin: true,
+          // changeOrigin 이 Host 를 대상으로 바꾸므로, 백엔드의 Origin 검사(P9b 결정 T)가 원래 호스트를
+          // X-Forwarded-Host 로 읽게 한다 (P9b 사실 14).
+          xfwd: true,
           rewrite: stripApiPrefix,
         },
       },

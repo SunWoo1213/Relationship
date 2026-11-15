@@ -64,6 +64,7 @@ function routerWith(overrides: Record<string, Handler>): Handler {
   return (url, init) => {
     if (overrides[url]) return overrides[url](url, init)
     if (url === '/api/questions/pending') return json([])
+    if (url === '/api/chat/history?limit=50') return json([])
     throw new Error(`예상하지 못한 요청: ${url}`)
   }
 }
@@ -102,7 +103,7 @@ describe('전송과 세션 (결정 D)', () => {
     expect(JSON.parse((call[1] as RequestInit).body as string)).toEqual({ utterance: '민수랑 점심 먹었어' })
   })
 
-  it('첫 요청에는 X-Session-Id 가 없고, 응답 session_id 를 저장해 두 번째 요청에 보낸다', async () => {
+  it('두 요청 모두 X-Session-Id 가 없고, 응답 session_id 도 저장하지 않는다 (P9b U6)', async () => {
     const fetchFn = install(routerWith({ '/api/chat': () => json(chatOut({ session_id: 'sess-abc' })) }))
     render(<ChatScreen />)
     await sendText('첫째')
@@ -110,39 +111,97 @@ describe('전송과 세션 (결정 D)', () => {
 
     const first = callsTo(fetchFn, '/api/chat')[0]
     expect(headersOf(first)['X-Session-Id']).toBeUndefined()
-    expect(window.localStorage.getItem(SESSION_STORAGE_KEY)).toBe('sess-abc')
+    expect(window.localStorage.getItem(SESSION_STORAGE_KEY)).toBeNull()
 
     const user = await type('둘째')
     await user.click(screen.getByRole('button', { name: '보내기' }))
     await waitFor(() => expect(callsTo(fetchFn, '/api/chat')).toHaveLength(2))
-    expect(headersOf(callsTo(fetchFn, '/api/chat')[1])['X-Session-Id']).toBe('sess-abc')
+    expect(headersOf(callsTo(fetchFn, '/api/chat')[1])['X-Session-Id']).toBeUndefined()
   })
 
-  it('저장된 세션이 있으면 진입 시 복원 요청에도 헤더를 보낸다', async () => {
+  it('예전 세션 키가 남아 있어도 진입 시 복원·기록 요청에 헤더를 보내지 않는다', async () => {
     window.localStorage.setItem(SESSION_STORAGE_KEY, 'sess-old')
     const fetchFn = install(routerWith({}))
     render(<ChatScreen />)
     await waitFor(() => expect(callsTo(fetchFn, '/api/questions/pending')).toHaveLength(1))
-    expect(headersOf(callsTo(fetchFn, '/api/questions/pending')[0])['X-Session-Id']).toBe('sess-old')
+    expect(headersOf(callsTo(fetchFn, '/api/questions/pending')[0])['X-Session-Id']).toBeUndefined()
+    expect(headersOf(callsTo(fetchFn, '/api/chat/history?limit=50')[0])['X-Session-Id']).toBeUndefined()
+  })
+})
+
+describe('대화 기록 불러오기 (P9b U6, 결정 I)', () => {
+  const H = (id: number, role: 'user' | 'assistant', content: string, question_id: number | null = null) => ({
+    id,
+    role,
+    content,
+    question_id,
+    created_at: '2026-11-15T09:00:00Z',
   })
 
-  it('422 invalid_session_id 면 저장된 세션을 버리고 다음 요청은 헤더 없이 간다', async () => {
-    window.localStorage.setItem(SESSION_STORAGE_KEY, 'sess-bad')
-    let n = 0
+  it('마운트 때 GET /api/chat/history?limit=50 한 번 — 서버 순서(오래된 것 → 최근) 그대로, 역할대로 그린다', async () => {
     const fetchFn = install(
       routerWith({
-        '/api/chat': () => (n++ === 0 ? json({ detail: { code: 'invalid_session_id' } }, 422) : json(chatOut())),
+        '/api/chat/history?limit=50': () =>
+          json([H(1, 'user', '첫째 발화'), H(2, 'assistant', '첫째 응답'), H(3, 'user', '둘째 발화'), H(4, 'assistant', '둘째 응답')]),
       }),
     )
     render(<ChatScreen />)
-    const user = await sendText('안녕')
-    expect(await screen.findByText(NOTICE.sessionReset)).toBeInTheDocument()
-    expect(window.localStorage.getItem(SESSION_STORAGE_KEY)).toBeNull()
+    await screen.findByText('둘째 응답')
+    expect(callsTo(fetchFn, '/api/chat/history?limit=50')).toHaveLength(1)
+    const list = screen.getByTestId('message-list')
+    const rows = Array.from(list.querySelectorAll('[data-role]')).map((el) => [el.getAttribute('data-role'), el.textContent])
+    expect(rows).toEqual([
+      ['user', '첫째 발화'],
+      ['bot', '첫째 응답'],
+      ['user', '둘째 발화'],
+      ['bot', '둘째 응답'],
+    ])
+    expect(screen.queryByText(NOTICE.empty)).toBeNull()
+  })
 
-    await user.type(screen.getByRole('textbox', { name: '메시지 입력' }), '다시')
-    await user.click(screen.getByRole('button', { name: '보내기' }))
-    await waitFor(() => expect(callsTo(fetchFn, '/api/chat')).toHaveLength(2))
-    expect(headersOf(callsTo(fetchFn, '/api/chat')[1])['X-Session-Id']).toBeUndefined()
+  it('기록의 질문 줄에 같은 번호의 미답변 칩이 붙고, 질문 문장은 한 번만 보인다', async () => {
+    install(
+      routerWith({
+        '/api/chat/history?limit=50': () =>
+          json([H(1, 'user', '민지 만났어'), H(2, 'assistant', '민지가 누구죠?', 7), H(3, 'assistant', '이미 답한 질문', 6)]),
+        '/api/questions/pending': () => json([pq(7, ['직장', '친구'], '민지가 누구죠?')]),
+      }),
+    )
+    render(<ChatScreen />)
+    const group = await screen.findByTestId('chips-7')
+    expect(within(group).getAllByRole('button').map((b) => b.textContent)).toEqual(['직장', '친구'])
+    expect(screen.getAllByText('민지가 누구죠?')).toHaveLength(1)
+    const bot = screen.getByText('민지가 누구죠?').closest('[data-role="bot"]') as HTMLElement
+    expect(bot).toContainElement(group)
+    // 이미 답한 질문(미답변 목록에 없음)은 칩 없이 문장만
+    expect(screen.queryByTestId('chips-6')).toBeNull()
+    expect(screen.getByText('이미 답한 질문')).toBeInTheDocument()
+  })
+
+  it('기록 개수 밖의 미답변 질문은 맨 앞에 복원된다', async () => {
+    install(
+      routerWith({
+        '/api/chat/history?limit=50': () => json([H(10, 'user', '최근 발화')]),
+        '/api/questions/pending': () => json([pq(2, ['가', '나'], '오래된 질문')]),
+      }),
+    )
+    render(<ChatScreen />)
+    await screen.findByTestId('chips-2')
+    const rows = Array.from(screen.getByTestId('message-list').querySelectorAll('[data-role]')).map((el) => el.getAttribute('data-role'))
+    expect(rows).toEqual(['bot', 'user'])
+  })
+
+  it('기록 조회가 실패하면 한 줄 안내 후 빈 채팅 — 입력은 막지 않고 미답변 칩은 복원된다', async () => {
+    install(
+      routerWith({
+        '/api/chat/history?limit=50': () => json({ detail: { code: 'internal_error' } }, 500),
+        '/api/questions/pending': () => json([pq(3, ['가', '나'], '남은 질문')]),
+      }),
+    )
+    render(<ChatScreen />)
+    expect(await screen.findByRole('alert')).toHaveTextContent(NOTICE.historyFailed)
+    expect(screen.getByTestId('chips-3')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: '메시지 입력' })).toBeEnabled()
   })
 })
 
@@ -358,12 +417,22 @@ describe('오류 안내', () => {
     expect(await screen.findByText(NOTICE.failed)).toBeInTheDocument()
   })
 
-  it('진입 시 복원 요청이 실패하면 한 줄 안내가 뜨고 빈 상태 안내도 남는다 (R-U5-2)', async () => {
-    install(() => {
+  it('진입 시 복원 요청만 실패하면 한 줄 안내가 뜨고 빈 상태 안내도 남는다 (R-U5-2)', async () => {
+    install((url) => {
+      if (url === '/api/chat/history?limit=50') return json([])
       throw new TypeError('Failed to fetch')
     })
     render(<ChatScreen />)
     expect(await screen.findByRole('alert')).toHaveTextContent(NOTICE.restoreFailed)
+    expect(screen.getByText(NOTICE.empty)).toBeInTheDocument()
+  })
+
+  it('기록·복원 요청이 모두 실패하면 기록 실패 안내 한 줄과 빈 상태 안내가 남는다', async () => {
+    install(() => {
+      throw new TypeError('Failed to fetch')
+    })
+    render(<ChatScreen />)
+    expect(await screen.findByRole('alert')).toHaveTextContent(NOTICE.historyFailed)
     expect(screen.getByText(NOTICE.empty)).toBeInTheDocument()
   })
 })

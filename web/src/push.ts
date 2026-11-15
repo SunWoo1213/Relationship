@@ -49,6 +49,21 @@ export async function getPushStatus(): Promise<PushStatus> {
   }
 }
 
+/**
+ * 이 브라우저의 현재 푸시 구독 endpoint (없거나 조회가 안 되면 undefined). 권한 창·등록·네트워크 없음.
+ * 로그아웃이 이 endpoint 를 서버에 보내 그 구독 행을 지우게 한다 (P9b U6 · 결정 P).
+ */
+export async function getCurrentPushEndpoint(): Promise<string | undefined> {
+  if (!isPushSupported()) return undefined
+  try {
+    const registration = await navigator.serviceWorker.getRegistration()
+    const subscription = registration ? await registration.pushManager.getSubscription() : null
+    return subscription?.endpoint
+  } catch {
+    return undefined
+  }
+}
+
 export async function subscribeToPush(): Promise<SubscribeOutcome> {
   if (!isPushSupported()) return 'unsupported'
   try {

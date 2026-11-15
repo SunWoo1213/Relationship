@@ -1,4 +1,5 @@
-// 해시 라우팅 3경로 (결정 C, 원칙5 — 화면 3개 고정). 새 경로를 더하지 않는다.
+// 해시 라우팅 3경로 (결정 C): #/chat · #/persons[/:id] · #/briefings. 로그인·가입 화면은 해시 경로가 아니라
+// 로그인 상태가 가르는 관문이다(P9b U6, 원칙5 개정 CR-006) — 이 표에 로그인 경로를 더하지 않는다.
 import { useEffect, useSyncExternalStore } from 'react'
 
 export type Route =

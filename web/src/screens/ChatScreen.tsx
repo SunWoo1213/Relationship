@@ -1,11 +1,12 @@
 // 채팅 화면 (U5, 결정 D·E·L) — 챗봇형 대화 UI + 응답 아래 확인 칩.
 // 서버가 준 문자열(reply · question · options)은 고치지 않고 그대로 보여 준다 (원칙7).
 // 이 파일이 만드는 문장은 아래 NOTICE 의 오류·빈 상태 안내와 링크 글자뿐이다.
-// 대화 기록은 React 상태에만 둔다 — 새로고침하면 지워진다(서버에 대화 이력 API 없음).
+// 대화 기록은 서버가 계정에 묶어 보관한다(P9b) — 마운트 때 `GET /chat/history` 로 불러와 오래된 것 → 최근 순으로 보여 준다.
+// 미답변 칩은 `GET /questions/pending` 이 원천이고, 기록의 질문 줄(question_id)에 같은 번호의 칩을 붙인다.
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { SendIcon } from 'lucide-react'
-import { ApiError, getPendingQuestions, postAnswer, postChat } from '@/api/client'
-import type { ChatPendingQuestionOut, StoredOut } from '@/api/types'
+import { getChatHistory, getPendingQuestions, postAnswer, postChat, ApiError } from '@/api/client'
+import type { ChatHistoryItemOut, ChatPendingQuestionOut, StoredOut } from '@/api/types'
 import { notifyPersonsChanged } from '@/components/PersonsProvider'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -16,8 +17,8 @@ export const NOTICE = {
   empty: '메시지를 입력해 대화를 시작하세요.',
   failed: '요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.',
   questionClosed: '이미 답했거나 만료된 질문이에요.',
-  sessionReset: '세션이 초기화됐어요. 다시 보내 주세요.',
   restoreFailed: '이전에 남은 질문을 불러오지 못했어요.',
+  historyFailed: '이전 대화를 불러오지 못했어요.',
   personsLink: '인물 카드 보기',
 } as const
 
@@ -49,6 +50,25 @@ function hasStored(stored: StoredOut): boolean {
 
 function toQuestion(q: ChatPendingQuestionOut): QuestionState {
   return { id: q.question_id, options: q.options, selected: null, closed: false, notice: null }
+}
+
+/**
+ * 기록 한 줄 → 화면 메시지. 문장(content)은 서버가 준 그대로다.
+ * assistant 줄의 question_id 가 미답변 질문과 같으면 그 질문의 칩을 붙인다(한 질문에 한 번만).
+ */
+function toHistoryMessage(
+  item: ChatHistoryItemOut,
+  pending: Map<number, ChatPendingQuestionOut>,
+  attached: Set<number>,
+  key: number,
+): Message {
+  if (item.role === 'user') return { key, role: 'user', text: item.content }
+  const q = item.question_id === null ? undefined : pending.get(item.question_id)
+  if (q && !attached.has(q.question_id)) {
+    attached.add(q.question_id)
+    return { key, role: 'bot', text: item.content, question: toQuestion(q) }
+  }
+  return { key, role: 'bot', text: item.content }
 }
 
 function TypingDots() {
@@ -122,24 +142,31 @@ export default function ChatScreen() {
     )
   }, [])
 
-  // 진입 시 미답변 질문 전부를 질문별로 복원한다 (결정 E).
+  // 진입 시 ① 대화 기록(결정 I 의 개수)을 서버 순서 그대로 채우고 ② 미답변 질문 전부를 질문별로 복원한다 (결정 E).
+  // 기록의 assistant 줄 중 question_id 가 미답변 질문 번호와 같으면 그 줄에 칩을 붙인다(질문 문장이 두 번 보이지 않게).
+  // 기록에 없는 미답변 질문(기록 개수 밖)은 지금까지처럼 맨 앞에 복원한다.
   useEffect(() => {
     let alive = true
-    getPendingQuestions()
-      .then((list) => {
-        if (!alive) return
-        setMessages((prev) => {
-          const have = new Set(prev.flatMap((m) => (m.question ? [m.question.id] : [])))
-          const restored = list
-            .filter((q) => !have.has(q.question_id))
-            .map<Message>((q) => ({ key: newKey(), role: 'bot', text: q.question, question: toQuestion(q) }))
-          return restored.length ? [...restored, ...prev] : prev
-        })
+    Promise.allSettled([getChatHistory(), getPendingQuestions()]).then(([history, pending]) => {
+      if (!alive) return
+      const pendingList = pending.status === 'fulfilled' ? pending.value : []
+      const byId = new Map(pendingList.map((q) => [q.question_id, q]))
+      const attached = new Set<number>()
+      const fromHistory = (history.status === 'fulfilled' ? history.value : []).map<Message>((item) =>
+        toHistoryMessage(item, byId, attached, newKey()),
+      )
+      setMessages((prev) => {
+        const have = new Set(prev.flatMap((m) => (m.question ? [m.question.id] : [])))
+        const restored = pendingList
+          .filter((q) => !attached.has(q.question_id) && !have.has(q.question_id))
+          .map<Message>((q) => ({ key: newKey(), role: 'bot', text: q.question, question: toQuestion(q) }))
+        const head = [...restored, ...fromHistory]
+        return head.length ? [...head, ...prev] : prev
       })
-      .catch(() => {
-        // 복원 실패는 한 줄로 알린다(R-U5-2) — 대화는 새 발화로 계속할 수 있다.
-        if (alive) setNotice(NOTICE.restoreFailed)
-      })
+      // 실패는 한 줄로 알린다(R-U5-2) — 대화는 새 발화로 계속할 수 있다(입력을 막지 않는다).
+      if (history.status === 'rejected') setNotice(NOTICE.historyFailed)
+      else if (pending.status === 'rejected') setNotice(NOTICE.restoreFailed)
+    })
     return () => {
       alive = false
     }
@@ -156,13 +183,6 @@ export default function ChatScreen() {
     if (!el) return
     el.style.height = 'auto'
     el.style.height = `${Math.min(el.scrollHeight, INPUT_MAX_HEIGHT)}px`
-  }
-
-  function failureNotice(error: unknown): string {
-    if (error instanceof ApiError && error.status === 422 && error.code === 'invalid_session_id') {
-      return NOTICE.sessionReset
-    }
-    return NOTICE.failed
   }
 
   async function send() {
@@ -187,8 +207,8 @@ export default function ChatScreen() {
           link: hasStored(out.stored),
         },
       ])
-    } catch (error) {
-      setNotice(failureNotice(error))
+    } catch {
+      setNotice(NOTICE.failed)
     } finally {
       setSending(false)
       setWaiting((n) => n - 1)
@@ -218,7 +238,7 @@ export default function ChatScreen() {
         patchQuestion(questionId, { selected: null, closed: true, notice: NOTICE.questionClosed })
       } else {
         patchQuestion(questionId, { selected: null })
-        setNotice(failureNotice(error))
+        setNotice(NOTICE.failed)
       }
     } finally {
       setWaiting((n) => n - 1)

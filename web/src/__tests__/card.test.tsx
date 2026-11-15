@@ -31,6 +31,15 @@ function install(handler: Handler) {
   return fn
 }
 
+/** App 을 그리고 로그인 관문을 통과해 화면이 나타날 때까지 기다린다 (P9b U6 — `/auth/me` 는 router 기본 200). */
+async function renderApp() {
+  const result = render(<App />)
+  await waitFor(() => {
+    expect(result.container.querySelector('[data-screen]:not([data-screen="auth"])')).not.toBeNull()
+  })
+  return result
+}
+
 function callsTo(fn: ReturnType<typeof install>, path: string) {
   return fn.mock.calls.filter(([url]) => String(url) === path)
 }
@@ -38,6 +47,9 @@ function callsTo(fn: ReturnType<typeof install>, path: string) {
 function router(table: Record<string, Handler>): Handler {
   return (url, init) => {
     if (table[url]) return table[url](url, init)
+    // 로그인 관문(P9b U6): App 을 그리는 테스트는 `/auth/me` 200 과 빈 대화 기록이 기본이다.
+    if (url === '/api/auth/me') return json({ id: 'u1', username: 'tester' })
+    if (url === '/api/chat/history?limit=50') return json([])
     throw new Error(`예상하지 못한 요청: ${url}`)
   }
 }
@@ -161,10 +173,11 @@ describe('인물 목록 — 카드 그리드 (D15, P8b U1)', () => {
   it('#/persons 진입 시 GET /api/persons 1회, 타일 필드(이름·태그·위계·마지막 접촉)가 서버 값·서버 순서 그대로', async () => {
     window.history.replaceState(null, '', '#/persons')
     const fetchFn = install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<App />)
+    await renderApp()
     await screen.findByTestId('person-grid')
     expect(callsTo(fetchFn, '/api/persons')).toHaveLength(1)
-    expect(fetchFn.mock.calls.map(([u]) => String(u))).toEqual(['/api/persons'])
+    // 로그인 관문이 `/auth/me` 를 먼저 부른다(P9b U6). 그 밖의 요청은 `/persons` 하나뿐 — 대화 기록은 채팅 화면만 부른다.
+    expect(fetchFn.mock.calls.map(([u]) => String(u))).toEqual(['/api/auth/me', '/api/persons'])
     const tiles = screen.getAllByTestId('person-tile')
     const f = (name: string) => tiles.map((t) => t.querySelector(`[data-field="${name}"]`)?.textContent)
     expect(f('name')).toEqual(['박대리', '철수', '엄마'])
@@ -202,7 +215,7 @@ describe('인물 목록 — 카드 그리드 (D15, P8b U1)', () => {
   it('목록 상태는 본문 폭 전체를 쓴다 — 그리드부터 main 까지 모든 조상과 그리드 자신, section 안 그리드를 감싼 요소에 mx-auto·max-w-*·md:w-* 가 없다 (R-U10C-3)', async () => {
     window.history.replaceState(null, '', '#/persons')
     install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<App />)
+    await renderApp()
     const grid = await screen.findByTestId('person-grid')
     const main = document.querySelector('main')!
     const section = document.querySelector('[data-screen="persons"]')!
@@ -399,7 +412,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
   it('#/persons 에서 사이드바에는 목록이, 본문에는 같은 순서의 그리드가 그려진다 (P8b U1: 본문은 PersonGrid)', async () => {
     window.history.replaceState(null, '', '#/persons')
     install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<App />)
+    await renderApp()
     await screen.findByTestId('person-grid')
     const a = screen.getByTestId('person-list')
     const inSidebar = screen.getByTestId('sidebar-persons').querySelectorAll('[data-testid="person-list"]')
@@ -422,7 +435,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
   it('R-U6-2: 앱을 열면 GET /persons 는 1회(사이드바·본문이 한 번 받은 값을 같이 쓴다)', async () => {
     window.history.replaceState(null, '', '#/persons')
     const fetchFn = install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<App />)
+    await renderApp()
     await screen.findByTestId('person-grid')
     await screen.findByTestId('person-list')
     expect(callsTo(fetchFn, '/api/persons')).toHaveLength(1)
@@ -434,7 +447,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
     const fetchFn = install(
       router({ '/api/persons': () => json(body), '/api/questions/pending': () => json([]) }),
     )
-    render(<App />)
+    await renderApp()
     const side = screen.getByTestId('sidebar-persons')
     await within(side).findByText('박대리')
     expect(within(side).queryByText('철수')).toBeNull()
@@ -465,7 +478,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
         },
       }),
     )
-    render(<App />)
+    await renderApp()
     const side = screen.getByTestId('sidebar-persons')
     await within(side).findByText('박대리')
     const user = userEvent.setup()
@@ -492,7 +505,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
           }),
       }),
     )
-    render(<App />)
+    await renderApp()
     await within(screen.getByTestId('sidebar-persons')).findByText('박대리')
     const user = userEvent.setup()
     await user.type(screen.getByRole('textbox'), '점심 먹었어')
@@ -506,7 +519,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
   it('R-U6-2: 알림 이벤트(persons-changed)만으로도 다시 읽는다', async () => {
     window.history.replaceState(null, '', '#/persons')
     const fetchFn = install(router({ '/api/persons': () => json(PERSONS) }))
-    render(<App />)
+    await renderApp()
     await screen.findByTestId('person-grid')
     notifyPersonsChanged()
     await waitFor(() => expect(callsTo(fetchFn, '/api/persons')).toHaveLength(2))
@@ -528,7 +541,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
         },
       }),
     )
-    render(<App />)
+    await renderApp()
     await waitFor(() => expect(n).toBe(1))
     notifyPersonsChanged()
     const side = screen.getByTestId('sidebar-persons')
@@ -550,7 +563,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
     expect(SIDEBAR_RECENT_LIMIT).toBe(5)
     window.history.replaceState(null, '', '#/chat')
     install(router({ '/api/persons': () => json(SEVEN), '/api/questions/pending': () => json([]) }))
-    render(<App />)
+    await renderApp()
     const side = screen.getByTestId('sidebar-persons')
     await within(side).findByText('아린')
     const links = within(side).getAllByRole('link')
@@ -571,7 +584,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
   it('P8b U2: 인물이 5명 이하(3명)이면 3명 + 전체 보기 →', async () => {
     window.history.replaceState(null, '', '#/chat')
     install(router({ '/api/persons': () => json(PERSONS), '/api/questions/pending': () => json([]) }))
-    render(<App />)
+    await renderApp()
     const side = screen.getByTestId('sidebar-persons')
     await within(side).findByText('박대리')
     expect(within(side).getAllByRole('link').map((l) => l.getAttribute('href'))).toEqual([
@@ -586,7 +599,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
   it('P8b U2: 정확히 5명이면 5명 모두 + 전체 보기 → (경계)', async () => {
     window.history.replaceState(null, '', '#/chat')
     install(router({ '/api/persons': () => json(SEVEN.slice(0, 5)), '/api/questions/pending': () => json([]) }))
-    render(<App />)
+    await renderApp()
     const side = screen.getByTestId('sidebar-persons')
     await within(side).findByText('마루')
     expect(within(side).getAllByRole('link')).toHaveLength(6)
@@ -595,7 +608,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
   it('P8b U2: 인물 0명이면 전체 보기 없음', async () => {
     window.history.replaceState(null, '', '#/chat')
     install(router({ '/api/persons': () => json([]), '/api/questions/pending': () => json([]) }))
-    render(<App />)
+    await renderApp()
     const side = screen.getByTestId('sidebar-persons')
     await within(side).findByText(PERSON_LIST_NOTICE.empty)
     expect(screen.queryByTestId('sidebar-see-all')).toBeNull()
@@ -610,7 +623,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
         '/api/questions/pending': () => json([]),
       }),
     )
-    render(<App />)
+    await renderApp()
     const side = screen.getByTestId('sidebar-persons')
     await within(side).findByText(PERSON_LIST_NOTICE.failed)
     expect(screen.queryByTestId('sidebar-see-all')).toBeNull()
@@ -619,7 +632,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
   it('P8b U2: #/persons 본문 그리드는 7명 전원을 서버 순서로 그린다(사이드바 자르기가 번지지 않는다)', async () => {
     window.history.replaceState(null, '', '#/persons')
     install(router({ '/api/persons': () => json(SEVEN) }))
-    render(<App />)
+    await renderApp()
     await screen.findByTestId('person-grid')
     expect(tileIds()).toEqual(['51', '48', '55', '50', '53', '49', '52'])
     expect(within(screen.getByTestId('sidebar-persons')).getAllByRole('link')).toHaveLength(6)
@@ -629,7 +642,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
     installFakeMatchMedia(800)
     window.history.replaceState(null, '', '#/chat')
     install(router({ '/api/persons': () => json(SEVEN), '/api/questions/pending': () => json([]) }))
-    render(<App />)
+    await renderApp()
     await userEvent.click(screen.getByRole('button', { name: '메뉴 열기' }))
     const nav = screen.getByRole('navigation', { name: '주 메뉴' })
     await userEvent.click(await within(nav).findByTestId('sidebar-see-all'))
@@ -646,7 +659,7 @@ describe('사이드바의 인물 목록 (결정 N)', () => {
         '/api/questions/pending': () => json([]),
       }),
     )
-    render(<App />)
+    await renderApp()
     await userEvent.click(screen.getByRole('button', { name: '메뉴 열기' }))
     const nav = screen.getByRole('navigation', { name: '주 메뉴' })
     await userEvent.click(await within(nav).findByRole('link', { name: /철수/ }))

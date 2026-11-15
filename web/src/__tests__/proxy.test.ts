@@ -17,10 +17,13 @@ describe('vite.config.ts 프록시 연결 (결정 C (ii))', () => {
   it('/api 프록시가 stripApiPrefix 로 접두를 벗긴다', async () => {
     const mod = await import('../../vite.config')
     const factory = mod.default as unknown as (env: { mode: string; command: string }) => {
-      server: { proxy: Record<string, { target: string; rewrite: (p: string) => string }> }
+      server: { proxy: Record<string, { target: string; rewrite: (p: string) => string; changeOrigin: boolean; xfwd: boolean }> }
     }
     const rule = factory({ mode: 'test', command: 'serve' }).server.proxy['/api']
     expect(rule.rewrite).toBe(stripApiPrefix)
+    // P9b 사실 14: changeOrigin 이 Host 를 바꾸므로 xfwd 가 X-Forwarded-Host 로 원래 호스트를 넘겨야 Origin 검사가 통과한다.
+    expect(rule.changeOrigin).toBe(true)
+    expect(rule.xfwd).toBe(true)
     expect(rule.rewrite('/api/persons/3')).toBe('/persons/3')
   })
 })

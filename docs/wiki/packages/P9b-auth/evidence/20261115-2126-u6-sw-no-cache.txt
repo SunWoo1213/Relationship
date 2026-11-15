@@ -1,0 +1,36 @@
+# 명령: bash -c grep -nE "addEventListener\(['\"]fetch|caches\.|cache" web/public/sw.js; echo "[grep exit $?]"; grep -n addEventListener web/public/sw.js; echo '--- push-dev / 서버 문자열'; grep -rn 'push-dev' web/src web/public web/index.html --exclude-dir=__tests__; echo "[exit $?]"; git status --short -- app tests alembic | head
+# 시각: 2026-11-15T21:26:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+usage: grep [-abcdDEFGHhIiJLlMmnOopqRSsUVvwXxZz] [-A num] [-B num] [-C[num]]
+	[-e pattern] [-f file] [--binary-files=value] [--color=when]
+	[--context[=num]] [--directories=action] [--label] [--line-buffered]
+	[--null] [pattern] [file ...]
+[grep exit 2]
+33:self.addEventListener("install", function () {
+37:self.addEventListener("activate", function (event) {
+41:self.addEventListener("push", function (event) {
+54:self.addEventListener("notificationclick", function (event) {
+--- push-dev / 서버 문자열
+[exit 1]
+ M app/api/schemas.py
+ M app/main.py
+ M app/settings.py
+ M tests/test_migration_0003.py
+?? app/auth/
+?? tests/test_auth_api.py
+?? tests/test_auth_origin.py
+?? tests/test_auth_passwords.py
+?? tests/test_auth_settings.py
+
+# ===== append 2026-11-15T21:26:52+09:00 =====
+# 명령: grep -nE fetch|caches|cache web/public/sw.js
+# 시각: 2026-11-15T21:26:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 127
+# ---
+/bin/bash: cache: command not found
+/bin/bash: caches: command not found
