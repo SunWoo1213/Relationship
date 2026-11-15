@@ -1,0 +1,104 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3b/static-checks.sh
+# 시각: 2026-11-16T00:24:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+## 1. 요청 경로의 고정 사용자 (기대: 일치 0줄, grep exit 1)
+grep exit=1
+
+## 1-통제. 같은 grep 을 app 전체에 (기대: scheduler·settings 만, exit 0)
+app/briefing/scheduler.py:20:session.py`)로 세션을 열고 `ToolContext`(`user_id = app_user_id()`)를
+app/briefing/scheduler.py:79:from app.settings import BRIEFING_INTERVAL_SECONDS, app_user_id
+app/briefing/scheduler.py:100:            user_id=app_user_id(),
+app/settings.py:4:으로만 읽는다. `.env` 파일 자체는 존재 확인도 하지 않는다. `APP_USER_ID`
+app/settings.py:42:`Asia/Seoul` 은 단일 사용자 전제(`APP_USER_ID` 고정)에 맞춘 설정값
+app/settings.py:107:DEFAULT_APP_USER_ID = "local"
+app/settings.py:322:    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/`er_config()`
+app/settings.py:350:    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/
+app/settings.py:381:    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/`pattern_
+app/settings.py:435:    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()` 와 같은 규약).
+app/settings.py:492:    되돌아가지 않고 사람이 읽는 오류를 낸다 -- `app_user_id()`/`er_config()`
+app/settings.py:554:def app_user_id(env: dict[str, str] | None = None) -> str:
+app/settings.py:555:    """`APP_USER_ID` 환경변수를 읽는다. 없으면 `"local"`.
+app/settings.py:563:    return env.get("APP_USER_ID", DEFAULT_APP_USER_ID)
+grep exit=0
+
+## 2. X-Session-Id·Header·resolve_session_id 가 app/ 코드에서 다시 읽히는가 (기대: 주석·docstring 언급뿐)
+app/api/deps.py:25:= `chat:<user_id>`, 결정 S). 예전의 `resolve_session_id()`(`X-Session-Id` 헤더를 읽고 형식
+app/api/routes.py:321:    `session_id` 로 돌려준다(`X-Session-Id` 헤더는 무시). `ctx.user_id` 는 로그인한
+app/api/routes.py:489:    세션은 서버가 계정에서 만든 `chat:<user.id>`(`/chat` 과 같다, 결정 S) -- `X-Session-Id`
+grep exit=0
+
+## 3. ToolContext.user_id 기본값 (기대: 0줄, exit 1)
+grep exit=1
+
+## 4. U5 로 미룬 것·범위 밖 파일이 그대로인가 (기대: 빈 출력)
+(끝)
+107:DEFAULT_APP_USER_ID = "local"
+554:def app_user_id(env: dict[str, str] | None = None) -> str:
+53:APP_USER_ID=local
+
+## 5. 바뀐 추적 파일·새 파일 전체
+ M app/api/deps.py
+ M app/api/read.py
+ M app/api/routes.py
+ M app/auth/deps.py
+ M app/auth/routes.py
+ M app/db/session.py
+ M app/tools/context.py
+ M app/tools/questions.py
+ M tests/test_api_answers_resume.py
+ M tests/test_api_chat.py
+ M tests/test_api_chat_query.py
+ M tests/test_api_questions_pending.py
+ M tests/test_api_read_persons.py
+ M tests/test_commit_boundaries.py
+?? tests/test_auth_required_routes.py
+?? tests/test_user_isolation.py
+
+## 6. get_session 이 같은 객체인가 / 어느 모듈을 먼저 import 해도 되는가
+api.deps.get_session is db.session.get_session: True
+auth.deps.get_session is db.session.get_session: True
+auth.routes.get_session is db.session.get_session: True
+current_user 의 세션 의존성 is get_session: True
+import app.auth.deps          먼저 -> exit 0 
+import app.auth.routes        먼저 -> exit 0 
+import app.auth.sessions      먼저 -> exit 0 
+import app.auth.origin        먼저 -> exit 0 
+import app.api.deps           먼저 -> exit 0 
+import app.api.routes         먼저 -> exit 0 
+import app.api.read           먼저 -> exit 0 
+import app.api                먼저 -> exit 0 
+import app.tools              먼저 -> exit 0 
+import app.tools.questions    먼저 -> exit 0 
+import app.agent.loop         먼저 -> exit 0 
+import app.briefing           먼저 -> exit 0 
+import app.push               먼저 -> exit 0 
+import app.main               먼저 -> exit 0 
+import app.db.session         먼저 -> exit 0 
+
+## 7. PUSH_DEV_PAGE_ENABLED=1 일 때 라우트와 쿠키 없는 응답
+  GET   /openapi.json                                      -> 200 application/json
+  GET   /docs                                              -> 200 text/html; charset=utf-8
+  GET   /docs/oauth2-redirect                              -> 200 text/html; charset=utf-8
+  GET   /redoc                                             -> 200 text/html; charset=utf-8
+  GET   /health                                            (DB 필요 -- 건너뜀, 공개)
+  POST  /answers/{question_id}                             -> 401 application/json
+  POST  /chat                                              -> 401 application/json
+  POST  /briefings/run                                     -> 401 application/json
+  GET   /push/vapid-public-key                             -> 401 application/json
+  POST  /push/subscriptions                                -> 401 application/json
+  GET   /persons                                           -> 401 application/json
+  GET   /persons/{person_id}                               -> 401 application/json
+  GET   /events/{event_id}/raw                             -> 401 application/json
+  GET   /persons/{person_id}/facts/{fact_id}/sources       -> 401 application/json
+  GET   /questions/pending                                 -> 401 application/json
+  GET   /briefings                                         -> 401 application/json
+  POST  /auth/signup                                       -> 422 application/json
+  POST  /auth/login                                        -> 422 application/json
+  POST  /auth/logout                                       -> 401 application/json
+  GET   /auth/me                                           -> 401 application/json
+  GET   /push-dev/                                         -> 200 text/html; charset=utf-8
+  GET   /push-dev/sw.js                                    -> 200 application/javascript
+  GET   /push-dev/devpage.js                               -> 200 application/javascript

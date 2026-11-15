@@ -1,0 +1,8 @@
+# 명령: POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_auth_required_routes.py tests/test_user_isolation.py -q -rs
+# 시각: 2026-11-16T00:17:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+.............................                                            [100%]
+29 passed in 2.68s

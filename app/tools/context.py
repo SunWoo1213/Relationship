@@ -80,7 +80,6 @@ from sqlalchemy.orm.attributes import flag_modified
 
 from app.db.models import AgentTrace
 from app.embedding import EmbedderCallable, EmbeddingProvider
-from app.settings import app_user_id
 
 #: agent_traces.input/output 에 들어가는 개별 문자열 값의 최대 길이. 초과분은
 #: 잘라내고 "…[truncated N chars]" 표식을 붙인다(N = 잘려나간 문자 수).
@@ -96,11 +95,15 @@ class ToolContext:
     툴은 이 객체 밖의 전역 상태를 읽지 않는다. `session` 은 `repr=False`로
     두어 `repr(ctx)`/로그에 SQLAlchemy `Session` 객체(커넥션 정보 포함)가
     통째로 찍히지 않게 한다.
+
+    `user_id` 는 기본값이 없다(P9b-auth U3b, D18 지킬 것 5) -- 호출자가 로그인한 계정
+    (또는 스케줄러가 고른 사용자)의 id 를 명시해야 한다. 값의 출처를 환경변수에
+    두지 않으므로 "깜빡 빠뜨려 엉뚱한 사용자로 도는" 경로가 없다.
     """
 
     session: Session = field(repr=False)
     session_id: str
-    user_id: str = field(default_factory=app_user_id)
+    user_id: str
     embedder: EmbeddingProvider | EmbedderCallable | None = None
     now: Callable[[], datetime] = lambda: datetime.now(timezone.utc)
     confirmed_question_id: int | None = None

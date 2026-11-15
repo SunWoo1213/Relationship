@@ -75,6 +75,26 @@ class _SessionLocalProxy:
 SessionLocal = _SessionLocalProxy()
 
 
+def get_session() -> Iterator[Session]:
+    """FastAPI 요청 단위 세션 의존성. 정상 종료 시 commit, 예외 시 rollback, 항상 close.
+
+    P9b-auth U3b -- 원래 `app/api/deps.py` 에 있던 것을 여기로 옮겼다. `app.api.deps` 가
+    `app.auth.deps.current_user`(로그인 의존성)를 import 하고 `app.auth.deps` 는 이 함수를
+    import 해야 하는데, 둘이 서로를 import 하면 순환이 된다 -- 둘 다 이 모듈(`app.db`,
+    `app.api` 를 끌어오지 않는다)에서 가져오게 해 끊었다. `app.api.deps.get_session` 은
+    **같은 객체**를 다시 내보낸다(`app.dependency_overrides[get_session]` 키가 그대로 맞는다).
+    """
+    session = SessionLocal()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+
 @contextmanager
 def session_scope() -> Iterator[Session]:
     """세션 하나를 만들어 정상 종료 시 commit, 예외 시 rollback, 항상 close.

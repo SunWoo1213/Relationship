@@ -1,0 +1,112 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3b/vmutate.py all
+# 시각: 2026-11-16T00:20:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+### 변이: baseline
+[새 시험 2파일] pytest exit=0 :: 29 passed in 2.84s
+[기존 시험(롤백형)] pytest exit=0 :: 172 passed in 2.53s
+
+### 변이: VV-1-fact-sources-no-user-cond
+[새 시험 2파일] pytest exit=1 :: 1 failed, 28 passed in 2.91s
+    FAILED tests/test_user_isolation.py::test_fact_sources_of_other_user_is_404_same_as_missing - assert 200 == 404
+[기존 시험(롤백형)] pytest exit=1 :: 2 failed, 170 passed in 2.53s
+    FAILED tests/test_api_read_raw.py::test_근거_404_남의_인물_경로의_남의_사실 - assert 200 == 404
+    FAILED tests/test_api_read_raw.py::test_근거_세_404_응답이_서로_같다 - assert {200, 404} == {404}
+
+### 변이: VV-2-event-raw-no-user-cond
+[새 시험 2파일] pytest exit=1 :: 1 failed, 28 passed in 2.96s
+    FAILED tests/test_user_isolation.py::test_event_raw_of_other_user_is_404_same_as_missing - assert 200 == 404
+[기존 시험(롤백형)] pytest exit=1 :: 1 failed, 171 passed in 2.54s
+    FAILED tests/test_api_read_raw.py::test_이벤트_404_타사용자_이벤트 - assert 200 == 404
+
+### 변이: VV-3-briefing-run-schedule-no-owner
+[새 시험 2파일] pytest exit=1 :: 1 failed, 28 passed in 2.96s
+    FAILED tests/test_user_isolation.py::test_briefing_run_with_other_users_schedule_is_404_and_changes_nothing - assert 200 == 404
+[기존 시험(롤백형)] pytest exit=1 :: 1 failed, 171 passed in 2.54s
+    FAILED tests/test_api_briefings.py::test_run_briefings_other_user_schedule_id_returns_404 - assert 200 == 404
+
+### 변이: VV-4-briefing-run-window-no-owner
+[새 시험 2파일] pytest exit=0 :: 29 passed in 2.95s
+[기존 시험(롤백형)] pytest exit=0 :: 172 passed in 2.56s
+
+### 변이: VV-5-briefing-trace-list-no-user-cond
+[새 시험 2파일] pytest exit=1 :: 1 failed, 28 passed in 2.96s
+    FAILED tests/test_user_isolation.py::test_briefings_list_and_schedule_filter_are_scoped - assert [39016, 39015] == [39015]
+[기존 시험(롤백형)] pytest exit=1 :: 1 failed, 171 passed in 2.55s
+    FAILED tests/test_api_read_briefings.py::test_다른_사용자_일정은_제외 - assert [39068, 39067] == [39067]
+
+### 변이: VV-6-briefings-schedule-filter-no-owner-check
+[새 시험 2파일] pytest exit=1 :: 1 failed, 28 passed in 2.97s
+    FAILED tests/test_user_isolation.py::test_briefings_list_and_schedule_filter_are_scoped - assert 200 == 404
+[기존 시험(롤백형)] pytest exit=1 :: 4 failed, 168 passed in 2.56s
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_없는_일정은_404 - assert 200 == 404
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_남의_일정은_404 - assert 200 == 404
+    FAILED tests/test_api_read_briefings.py::test_schedule_id_두_404_응답이_같다 - assert 200 == 404
+    FAILED tests/test_api_read_briefings.py::test_쓰기_0_trace_0_briefed_at_updated_at_불변 - AssertionError: assert 200 == 404
+
+### 변이: VV-7-owned-person-no-user-cond
+[새 시험 2파일] pytest exit=1 :: 3 failed, 26 passed in 2.96s
+    FAILED tests/test_user_isolation.py::test_person_card_of_other_user_is_404_same_as_missing - assert 200 == 404
+    FAILED tests/test_user_isolation.py::test_loop_resolving_to_other_users_person_ends_with_person_not_found - AssertionError: assert {'events': 1,...schedules': 0} == {'events': 0,...schedules': 0}
+    FAILED tests/test_user_isolation.py::test_tools_with_other_users_person_id_raise_person_not_found - Failed: DID NOT RAISE <class 'app.tools.types.PersonNotFound'>
+[기존 시험(롤백형)] pytest exit=1 :: 5 failed, 167 passed in 2.57s
+    FAILED tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 - assert 200 == 404
+    FAILED tests/test_tools_persons.py::test_update_person_other_users_person_raises_person_not_found - Failed: DID NOT RAISE <class 'app.tools.types.PersonNotFound'>
+    FAILED tests/test_tools_records.py::test_add_event_other_user_person_raises_person_not_found - Failed: DID NOT RAISE <class 'app.tools.types.PersonNotFound'>
+    FAILED tests/test_tools_records.py::test_add_schedule_other_user_person_raises_person_not_found - Failed: DID NOT RAISE <class 'app.tools.types.PersonNotFound'>
+    FAILED tests/test_tools_briefing.py::test_get_briefing_other_user_person_raises_person_not_found - Failed: DID NOT RAISE <class 'app.tools.types.PersonNotFound'>
+
+### 변이: VV-8-search-person-alias-no-user-cond
+[새 시험 2파일] pytest exit=1 :: 1 failed, 28 passed in 2.96s
+    FAILED tests/test_user_isolation.py::test_my_own_question_flow_still_works_and_creates_my_person - AssertionError: assert 'identity' == 'new_person'
+[기존 시험(롤백형)] pytest exit=1 :: 1 failed, 171 passed in 2.56s
+    FAILED tests/test_tools_persons.py::test_other_user_persons_are_excluded - AssertionError: assert [Candidate(pe...pped': True})] == []
+
+### 변이: VV-9-search-person-topk-no-user-cond
+[새 시험 2파일] pytest exit=1 :: 2 failed, 27 passed in 2.95s
+    FAILED tests/test_user_isolation.py::test_my_own_question_flow_still_works_and_creates_my_person - KeyError: 86336
+    FAILED tests/test_user_isolation.py::test_loop_resolving_to_other_users_person_ends_with_person_not_found - KeyError: 86342
+[기존 시험(롤백형)] pytest exit=0 :: 172 passed in 2.55s
+
+### 변이: VV-10-new-route-without-login
+[새 시험 2파일] pytest exit=1 :: 2 failed, 27 passed in 2.96s
+    FAILED tests/test_auth_required_routes.py::test_every_non_exempt_route_requires_login - AssertionError: GET /persons-count -> 200
+    FAILED tests/test_auth_required_routes.py::test_every_api_route_declares_current_user_dependency - AssertionError: assert [('GET', '/persons-count')] == []
+[기존 시험(롤백형)] pytest exit=0 :: 172 passed in 2.58s
+
+### 변이: VV-11-persons-list-alias-no-user-cond
+[새 시험 2파일] pytest exit=0 :: 29 passed in 2.97s
+[기존 시험(롤백형)] pytest exit=0 :: 172 passed in 2.59s
+
+### 변이: VV-12-list-pending-no-session-cond
+[새 시험 2파일] pytest exit=1 :: 1 failed, 28 passed in 2.97s
+    FAILED tests/test_user_isolation.py::test_pending_questions_list_has_only_my_chatroom_questions - assert [26369, 26371] == [26369]
+[기존 시험(롤백형)] pytest exit=1 :: 8 failed, 164 passed in 2.55s
+    FAILED tests/test_api_questions_pending.py::test_헤더_없어도_계정_채팅방의_질문이_나오고_쓰기_0 - assert [26382, 26383, 24899, 24900] == [26382]
+    FAILED tests/test_api_questions_pending.py::test_형식_위반_세션_헤더는_무시되고_계정_목록이_나온다 - AssertionError: a b
+    FAILED tests/test_api_questions_pending.py::test_필드_5개_값_일치 - assert [{'kind': 'ne...: 24900, ...}] == [{'kind': 'ne...: 26385, ...}]
+    FAILED tests/test_api_questions_pending.py::test_created_at_오름차순 - assert [26387, 26388... 24899, 24900] == [26387, 26388, 26386]
+    FAILED tests/test_api_questions_pending.py::test_다른_세션_질문은_제외 - assert [26389, 26390, 24899, 24900] == [26389]
+    FAILED tests/test_api_questions_pending.py::test_답변된_질문은_제외 - assert [26391, 24899, 24900] == [26391]
+    FAILED tests/test_api_questions_pending.py::test_만료_경계_24시간 - assert [26393, 24899, 24900] == [26393]
+    FAILED tests/test_api_questions_pending.py::test_쓰기_0_trace_0 - assert 3 == 1
+
+### 변이: VV-13-notifier-fixed-user
+[새 시험 2파일] pytest exit=0 :: 29 passed in 2.97s
+[기존 시험(롤백형)] pytest exit=0 :: 172 passed in 2.57s
+
+### 변이: VV-14-persons-list-n-plus-1
+[새 시험 2파일] pytest exit=0 :: 29 passed in 2.97s
+[기존 시험(롤백형)] pytest exit=1 :: 1 failed, 171 passed in 2.58s
+    FAILED tests/test_api_read_persons.py::test_목록_SELECT_수는_인물_수와_무관한_상수 - assert 5 == 12
+
+### 변이: VV-15-both-answer-owner-checks-removed
+[새 시험 2파일] pytest exit=1 :: 4 failed, 25 passed in 2.96s
+    FAILED tests/test_user_isolation.py::test_answering_other_users_question_is_404_no_change_no_resume - assert 409 == 404
+    FAILED tests/test_user_isolation.py::test_answering_question_in_my_chatroom_but_owned_by_other_is_404 - assert 409 == 404
+    FAILED tests/test_user_isolation.py::test_answer_question_tool_rejects_other_users_question - Failed: DID NOT RAISE <class 'app.tools.types.QuestionNotFound'>
+    FAILED tests/test_user_isolation.py::test_my_own_question_flow_still_works_and_creates_my_person - assert 200 == 404
+[기존 시험(롤백형)] pytest exit=0 :: 172 passed in 2.56s
+

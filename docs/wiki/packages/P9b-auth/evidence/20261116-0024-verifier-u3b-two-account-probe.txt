@@ -1,0 +1,97 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3b/probe.py
+# 시각: 2026-11-16T00:24:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+## (0) app.routes 열거
+   GET            /openapi.json
+   GET            /docs
+   GET            /docs/oauth2-redirect
+   GET            /redoc
+   GET            /health
+   POST           /answers/{question_id}
+   POST           /chat
+   POST           /briefings/run
+   GET            /push/vapid-public-key
+   POST           /push/subscriptions
+   GET            /persons
+   GET            /persons/{person_id}
+   GET            /events/{event_id}/raw
+   GET            /persons/{person_id}/facts/{fact_id}/sources
+   GET            /questions/pending
+   GET            /briefings
+   POST           /auth/signup
+   POST           /auth/login
+   POST           /auth/logout
+   GET            /auth/me
+
+## (1) 쿠키 없음 -- 공개 3개·문서 경로 밖은 전부 401 unauthenticated 여야 한다
+   OK  GET   /openapi.json                                        -> 200 (공개)
+   OK  GET   /docs                                                -> 200 (공개)
+   OK  GET   /docs/oauth2-redirect                                -> 200 (공개)
+   OK  GET   /redoc                                               -> 200 (공개)
+   OK  GET   /health                                              -> 200 (공개)
+   OK  POST  /answers/{question_id}                               -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  POST  /chat                                                -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  POST  /briefings/run                                       -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  GET   /push/vapid-public-key                               -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  POST  /push/subscriptions                                  -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  GET   /persons                                             -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  GET   /persons/{person_id}                                 -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  GET   /events/{event_id}/raw                               -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  GET   /persons/{person_id}/facts/{fact_id}/sources         -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  GET   /questions/pending                                   -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  GET   /briefings                                           -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  POST  /auth/signup                                         -> 422 (공개)
+   OK  POST  /auth/login                                          -> 422 (공개)
+   OK  POST  /auth/logout                                         -> 401 {"detail":{"code":"unauthenticated"}}
+   OK  GET   /auth/me                                             -> 401 {"detail":{"code":"unauthenticated"}}
+   가짜 쿠키 GET /persons -> 401 {"detail":{"code":"unauthenticated"}}
+   쿠키 없음 + 깨진 JSON POST /chat -> 422 {"detail":[{"type":"json_invalid","loc":["body",1],"msg":"JSON decode error","in
+   쿠키 없음 + 숫자 아닌 경로 GET /persons/abc -> 401 {"detail":{"code":"unauthenticated"}}
+   쿠키 없음 + 숫자 아닌 질의 GET /briefings?schedule_id=abc -> 401 {"detail":{"code":"unauthenticated"}}
+
+## (2)(3) A 쿠키로 B 의 자원 id -- 2xx 가 없어야 하고 '없는 id' 응답과 상태·본문이 같아야 한다
+   OK  GET   /persons/87843                                   -> 404 {"detail":{"code":"not_found"}} | 없는 id 와 같음=True 헤더키 같음=True B 문자열 노출=False
+   OK  GET   /events/107749/raw                               -> 404 {"detail":{"code":"not_found"}} | 없는 id 와 같음=True 헤더키 같음=True B 문자열 노출=False
+   OK  GET   /persons/87843/facts/43857/sources               -> 404 {"detail":{"code":"not_found"}} | 없는 id 와 같음=True 헤더키 같음=True B 문자열 노출=False
+   OK  GET   /persons/87842/facts/43857/sources               -> 404 {"detail":{"code":"not_found"}} | 없는 id 와 같음=True 헤더키 같음=True B 문자열 노출=False
+   OK  GET   /persons/87843/facts/43856/sources               -> 404 {"detail":{"code":"not_found"}} | 없는 id 와 같음=True 헤더키 같음=True B 문자열 노출=False
+   OK  GET   /briefings?schedule_id=40449                     -> 404 {"detail":{"code":"not_found"}} | 없는 id 와 같음=True 헤더키 같음=True B 문자열 노출=False
+   OK  POST  /briefings/run                                   -> 404 {"detail":{"code":"not_found"}} | 없는 id 와 같음=True 헤더키 같음=True B 문자열 노출=False
+   OK  POST  /answers/26657                                   -> 404 {"detail":{"code":"not_found"}} | 없는 id 와 같음=True 헤더키 같음=True B 문자열 노출=False
+   OK  POST  /answers/26657                                   -> 404 {"detail":{"code":"not_found"}} | 없는 id 와 같음=True 헤더키 같음=True B 문자열 노출=False
+   OK  GET   /persons                                         -> 200 항목=[87842] B 문자열 노출=False
+   OK  GET   /briefings                                       -> 200 항목=[(40448, 87842, 827010)] B 문자열 노출=False
+   OK  GET   /questions/pending                               -> 200 항목=[] B 문자열 노출=False
+   OK  POST  /briefings/run (본문 없음) -> 200 briefings=[40448] skipped=[] (B 일정 id=40449)
+   OK  B 의 상태 불변: True  {'b_events': 1, 'b_aliases': 1, 'b_facts': 1, 'b_schedules': 1, 'b_briefed_at': None, 'b_q_answer': (None, None), 'b_traces': 0, 'b_subs': 0}
+
+## (4) A 소유 질문의 context 가 B 의 person_id 를 가리킬 때(질문 행 context 는 소유 검사 대상이 아님)
+   OK  identity(기록) 후보=B 인물         -> 200 stored={'persons': 0, 'events': 0, 'schedules': 0} reply='지금은 기억하지 못했어요. 잠시 뒤 다시 말씀해 주세요.' B 불변=True B 문자열 노출=False
+        trace loop_error: {'error': 'PersonNotFound', 'message': 'person_not_found'}
+   OK  identity(조회) 후보=B 인물         -> 200 stored={'persons': 0, 'events': 0, 'schedules': 0} reply='"민수"에 대한 기록이 없어요.' B 불변=True B 문자열 노출=False
+        trace loop_resume: {'kind': 'identity', 'answer': '민수 맞아요', 'context': {'resume': {'hints': {}, 'intent': 'query', 'dropped': 0, 
+        trace loop_query: {'reply': '"민수"에 대한 기록이 없어요.', 'intent': 'query', 'mentions': ['민수'], 'person_id': None, 'resolutions': [{'ban
+   OK  schedule 대상=B 인물             -> 200 stored={'persons': 0, 'events': 0, 'schedules': 0} reply='지금은 기억하지 못했어요. 잠시 뒤 다시 말씀해 주세요.' B 불변=True B 문자열 노출=False
+        trace loop_error: {'error': 'PersonNotFound', 'message': 'person_not_found'}
+
+## (5) session_id -- 헤더 무시, chat:<user.id>
+   A /chat + X-Session-Id=chat:B -> 200 session_id=chat:iso-user-a
+   그 턴 trace 의 session_id 집합 = {'chat:iso-user-a'}
+   A /questions/pending + X-Session-Id=chat:B -> 200 ids=[] (B 질문 id=26657)
+   형식이 어긋난 헤더 -> 200 session_id=chat:iso-user-a
+
+## (6) 같은 endpoint 를 A·B 가 차례로 구독(endpoint 하나 규칙은 U5)
+   A -> 200, B -> 200, 그 endpoint 의 행 소유자 = ['iso-user-a', 'iso-user-b']
+
+## (7) 처리 시간(ms, 중앙값 40회) -- 남의 id vs 없는 id
+   GET   /persons/87843                                   남의 id 1.95 / 없는 id 1.90  차 +0.05
+   GET   /events/107749/raw                               남의 id 1.90 / 없는 id 1.86  차 +0.04
+   GET   /persons/87843/facts/43857/sources               남의 id 1.96 / 없는 id 1.95  차 +0.01
+   GET   /briefings?schedule_id=40449                     남의 id 2.01 / 없는 id 1.99  차 +0.02
+   POST  /answers/26657                                   남의 id 1.84 / 없는 id 2.22  차 -0.38
+
+## 결과: BAD 0건
+## 탐침 뒤 시험 DB 잔여(users, persons) = (0, 0)

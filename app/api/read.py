@@ -48,7 +48,8 @@ from app.tools.persons import _owned_person
 from app.tools.types import PersonNotFound, ScheduleNotFound
 
 #: 카드 타임라인 최대 건수. 카드 화면은 "최근 무슨 일이 있었나"를 한눈에
-#: 보여 주는 용도이고 전체 이력 페이지가 아니다(화면 3개 고정, 원칙5).
+#: 보여 주는 용도이고 전체 이력 페이지가 아니다(CR-006 으로 원칙5 의 화면 수 고정은
+#: 폐지됐지만 이 카드 목록은 상한을 둔다).
 #: 모바일 한 화면 스크롤로 훑을 수 있는 20건이면 충분하고 응답 크기도
 #: 작게 유지된다. 더 오래된 이벤트는 승격된 사실(facts)·패턴이 요약한다.
 TIMELINE_LIMIT = 20

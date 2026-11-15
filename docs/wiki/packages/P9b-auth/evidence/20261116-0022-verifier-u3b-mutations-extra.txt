@@ -1,0 +1,13 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3b/vmutate_extra.py
+# 시각: 2026-11-16T00:22:28+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+### 변이: VV-4-briefing-run-window-no-owner  (시험: tests/test_briefing_select.py -k not concurrent_sessions)
+pytest exit=1 :: 1 failed, 25 passed, 1 deselected in 0.26s
+    FAILED tests/test_briefing_select.py::test_select_due_schedules_excludes_other_user - assert [<app.db.mode... 0x10a7d0290>] == []
+
+### 변이: VV-13-notifier-fixed-user  (시험: tests/test_push_wiring.py tests/test_push_notifier.py tests/test_api_briefings.py tests/test_briefing_run.py)
+pytest exit=0 :: 45 passed in 0.95s
+

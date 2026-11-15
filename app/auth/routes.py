@@ -32,7 +32,6 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_session
 from app.api.schemas import LoginIn, LogoutIn, MeOut, SignupIn
 from app.auth.deps import current_user, get_auth_now
 from app.auth.passwords import dummy_hash, hash_password, is_utf8_encodable, verify_password
@@ -45,6 +44,7 @@ from app.auth.sessions import (
     set_login_cookie,
 )
 from app.db.models import User
+from app.db.session import get_session
 from app.settings import PASSWORD_MAX_LEN, PASSWORD_MIN_LEN, USERNAME_PATTERN
 
 class _NoInputEchoRoute(APIRoute):

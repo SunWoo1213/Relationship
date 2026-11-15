@@ -2,30 +2,28 @@
 
 `get_session()` 은 제너레이터 의존성이다: `SessionLocal()` 로 요청 단위
 세션을 만들고, 정상 종료 시 commit, 예외 시 rollback, finally 에서 항상
-close 한다 -- `app/db/session.py` 의 `session_scope()` 와 같은 규약을
-FastAPI 의존성 형태로 옮긴 것이다. 툴 함수는 여전히 commit 하지 않는다
-(01-plan 결정 2) -- 트랜잭션 경계는 이 의존성(호출자)이 잡는다.
+close 한다. **P9b-auth U3b -- 정의는 `app/db/session.py` 로 옮겼고 이 모듈은 같은
+객체를 다시 내보낸다**(`app.auth.deps.current_user` 와의 순환 import 를 끊으려고;
+`app.dependency_overrides[get_session]` 키는 그대로 맞는다). 툴 함수는 여전히
+commit 하지 않는다(01-plan 결정 2) -- 트랜잭션 경계는 이 의존성(호출자)이 잡는다.
 
 `get_engine()` 은 `SessionLocal()` 이 실제로 호출될 때(즉 요청이 들어와
 이 의존성이 실행될 때)까지 지연된다(`app/db/session.py` 의 `_SessionLocalProxy`
 -- 리스크 A). 이 모듈을 import 하는 것만으로는 엔진이 생성되지 않는다.
 
-`build_ctx(session, question_id)` 는 **답할 `pending_questions` 행을 먼저
+`build_ctx(session, question_id, user)` 는 **답할 `pending_questions` 행을 먼저
 조회해 그 행의 `session_id` 로 `ToolContext` 를 만든다**(결정 12) --
 클라이언트가 헤더로 주장하는 세션 값보다 저장된 행이 권위 있고, trace 가
-질문을 만든 턴과 같은 세션에 묶인다. `X-Session-Id` 헤더 규약은 세션을
-새로 여는 쪽(P5-loop 의 채팅 엔드포인트)이 정한다 -- 이 모듈은 헤더를
-읽지 않는다. 행이 없으면 `QuestionNotFound` 를 올린다(라우트에서 404 로
+질문을 만든 턴과 같은 세션에 묶인다. **P9b-auth U3b(S3.4 답변 소유)** -- 행이
+없거나 **로그인한 사용자 소유가 아니면**(`PendingQuestion.user_id != user.id`)
+같은 `QuestionNotFound` 를 올려 "없음"과 "남의 것"이 구별되지 않는다(라우트에서 404 로
 매핑, `app/main.py`).
 
 ## U6 추가분 -- `POST /chat` 용 세션 귀속 + `ToolContext` 조립 (결정 I)
 
-`resolve_session_id()` 는 `X-Session-Id` 헤더가 있으면 형식(길이 1~128,
-`[A-Za-z0-9._-]`)을 검증해 그대로 쓰고, 없으면 서버가 `uuid4` 로 새로
-발급한다. 형식이 어긋나면 `fastapi.HTTPException(422)` 를 **이 함수 자신이**
-던진다 -- `app/main.py` 는 U6 의 허용 파일이 아니므로(01-plan 75행) 새
-예외 핸들러를 등록하지 않고 FastAPI 가 기본으로 처리하는 `HTTPException`
-을 그대로 쓴다.
+**P9b-auth U3b** -- 대화 `session_id` 는 서버가 계정에서 만든다(`chat_session_id(user_id)`
+= `chat:<user_id>`, 결정 S). 예전의 `resolve_session_id()`(`X-Session-Id` 헤더를 읽고 형식
+검증, 없으면 uuid4)는 없어졌고 헤더는 무시된다.
 
 `build_chat_ctx()` 는 `build_ctx()`(위, 답 저장 전용)와 **다른** 조립
 함수다 -- 옆에 나란히 둔다(01-plan 70행 "그대로 두고 옆에 새 조립 함수를
@@ -96,47 +94,46 @@ FastAPI 의존성이다 -- 운영 경로는 각각 `None`/`None`/`_embedder_from
 from __future__ import annotations
 
 import os
-import re
 import uuid
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 from datetime import datetime, timezone
 
-from fastapi import Depends, Header, HTTPException
+from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.agent import Proposer, ResumeInput
+from app.auth.deps import current_user
 from app.briefing import BriefingComposer, Notifier, composer_from_env
-from app.db.models import PendingQuestion
-from app.db.session import SessionLocal
+from app.db.models import PendingQuestion, User
+from app.db.session import get_session
 from app.embedding import EmbeddingProvider, OpenAIEmbeddingProvider
 from app.er import Judge
 from app.memory import FactExtractor
 from app.push.notifier import notifier_from_env
-from app.settings import app_user_id
 from app.tools.context import ToolContext
 from app.tools.types import QuestionNotFound
 
+# `get_session` 은 `app.db.session` 에서 온 같은 객체다(모듈 docstring) -- 기존 import 경로
+# (`from app.api.deps import get_session`)와 `app.dependency_overrides` 키를 그대로 지킨다.
 
-def get_session() -> Iterator[Session]:
-    """요청 단위 세션. 정상 종료 시 commit, 예외 시 rollback, 항상 close."""
-    session = SessionLocal()
-    try:
-        yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()
+
+def chat_session_id(user_id: str) -> str:
+    """계정마다 채팅방 하나 -- 대화 `session_id` 는 서버가 계정에서 만든다(결정 S).
+    클라이언트가 보낸 헤더 값은 어디에서도 쓰지 않는다."""
+    return f"chat:{user_id}"
 
 
 def build_ctx(
-    session: Session, question_id: int, embedder: EmbeddingProvider | None = None
+    session: Session,
+    question_id: int,
+    user: User,
+    embedder: EmbeddingProvider | None = None,
 ) -> ToolContext:
     """답할 `pending_questions` 행을 조회해 그 `session_id` 로 `ToolContext`
-    를 만든다(결정 12). 행이 없으면 `QuestionNotFound`.
+    를 만든다(결정 12). 행이 없거나 **로그인한 사용자 소유가 아니면**(S3.4 답변
+    소유, F-fbaaae) 같은 `QuestionNotFound` -- 존재 여부를 흘리지 않는다.
 
-    `user_id = app_user_id()`(로컬 단일 사용자), `now` 는 기본값
+    `user_id = user.id`(로그인한 계정), `now` 는 기본값
     (`datetime.now(timezone.utc)`).
 
     **U7 추가** -- `embedder` 파라미터(기본 `None`, 하위 호환). 답 저장만
@@ -148,12 +145,12 @@ def build_ctx(
     같은 관례, R-15)으로 받은 값을 넘긴다. 아무것도 넘기지 않으면 예전과
     똑같이 `None` 이다."""
     question = session.get(PendingQuestion, question_id)
-    if question is None:
+    if question is None or question.user_id != user.id:
         raise QuestionNotFound("question_not_found")
     return ToolContext(
         session=session,
         session_id=question.session_id,
-        user_id=app_user_id(),
+        user_id=user.id,
         embedder=embedder,
     )
 
@@ -193,24 +190,6 @@ def load_resume_input(session: Session, question_id: int) -> ResumeInput:
 # U6 -- `POST /chat` 세션 귀속(결정 I) + `ToolContext` 조립 + 테스트용 오버라이드 지점
 # ---------------------------------------------------------------------------
 
-#: 세션 id 형식 검증(결정 I "길이·문자 집합"). `uuid4()` 표기(16진수 +
-#: 하이픈)를 포함하고, 프론트가 직접 지정하는 짧은 태그도 허용한다.
-_SESSION_ID_PATTERN = re.compile(r"^[A-Za-z0-9._-]{1,128}$")
-
-
-def resolve_session_id(
-    x_session_id: str | None = Header(default=None, alias="X-Session-Id"),
-) -> str:
-    """S3.4·결정 I -- `X-Session-Id` 헤더가 있으면 형식을 검증해 그대로
-    쓰고, 없으면 서버가 `uuid4` 로 새로 발급한다. 형식이 어긋나면 422
-    (모듈 docstring "U6 추가분" 참고 -- `app/main.py` 를 고치지 않는다)."""
-    if x_session_id is None:
-        return str(uuid.uuid4())
-    if not _SESSION_ID_PATTERN.fullmatch(x_session_id):
-        raise HTTPException(status_code=422, detail={"code": "invalid_session_id"})
-    return x_session_id
-
-
 def _embedder_from_env() -> EmbeddingProvider | None:
     """`OPENAI_API_KEY` 가 있으면 실제 임베더(`OpenAIEmbeddingProvider`)를,
     없으면 `None` 을 돌려준다(R-15 -- 조용한 미검출을 트레이드오프로 받되
@@ -221,11 +200,11 @@ def _embedder_from_env() -> EmbeddingProvider | None:
 
 
 def build_chat_ctx(
-    session: Session, session_id: str, embedder: EmbeddingProvider | None
+    session: Session, user: User, embedder: EmbeddingProvider | None
 ) -> ToolContext:
-    """`POST /chat`(U6) 용 `ToolContext` 조립. `user_id = app_user_id()`
-    고정(로컬 단일 사용자 전제, 결정 I -- `pending_questions`/`agent_traces`
-    에 `user_id` 컬럼이 없어 다중 사용자 격리는 이 패키지 범위 밖이다).
+    """`POST /chat`(U6) 용 `ToolContext` 조립. `user_id = user.id`(로그인한
+    계정), `session_id = chat:<user.id>`(`chat_session_id`, 결정 S -- 서버가
+    계정에서 만들고 클라이언트 헤더는 읽지 않는다).
 
     `embedder` 는 **호출자(`routes.chat`)가 `get_embedder()` 의존성으로
     주입한 값을 그대로 받는다** -- 이 함수 자신은 `_embedder_from_env()`
@@ -236,8 +215,8 @@ def build_chat_ctx(
     고정)와 다르다."""
     return ToolContext(
         session=session,
-        session_id=session_id,
-        user_id=app_user_id(),
+        session_id=chat_session_id(user.id),
+        user_id=user.id,
         embedder=embedder,
     )
 
@@ -313,6 +292,7 @@ def get_now() -> Callable[[], datetime]:
 def get_notifier(
     session: Session = Depends(get_session),
     now: Callable[[], datetime] = Depends(get_now),
+    user: User = Depends(current_user),
 ) -> Notifier:
     """P7-push U5 -- `POST /briefings/run` 이 `run_briefings()` 에 넘길
     알림기. `notifier_from_env()`(U4)가 VAPID 설정 세 가지 상태(전무 ->
@@ -326,23 +306,25 @@ def get_notifier(
     쓰므로, 다른 세션이면 `briefed_at`·trace 가 커밋 시점에 따라 갈린다
     (02-plan-verify R-1). 테스트가 `app.dependency_overrides[get_notifier]`
     로 가짜 알림기를 넣을 때도 오버라이드 함수가 `Depends(get_session)` 을
-    선언해 같은 세션을 받아야 한다. `user_id = app_user_id()`(로컬 단일
-    사용자 전제, `build_briefing_ctx()` 와 같음), `now` 는 `get_now()` 가
-    준 같은 시계다."""
-    return notifier_from_env(session, app_user_id(), now)
+    선언해 같은 세션을 받아야 한다. `user_id = user.id`(로그인한 계정 -- 그
+    사용자의 구독으로만 보낸다, `build_briefing_ctx()` 와 같음), `now` 는
+    `get_now()` 가 준 같은 시계다."""
+    return notifier_from_env(session, user.id, now)
 
 
-def build_briefing_ctx(session: Session, now: Callable[[], datetime]) -> ToolContext:
+def build_briefing_ctx(
+    session: Session, now: Callable[[], datetime], user: User
+) -> ToolContext:
     """`POST /briefings/run`(U6) 용 `ToolContext` 조립. `session_id` 는
     `run_briefings()`(U5)가 내부에서 자신만의 `"briefing:<uuid4>"` 로
     바꿔 쓰므로(결정 I, `app/briefing/run.py` 모듈 docstring "실행 하나의
     session_id" 절) 여기서 넣는 값은 그 전까지만 쓰인다 -- 그래도
     추적 가능하도록 `build_chat_ctx()` 와 같은 생성 관례로
-    `"briefings-api:<uuid4>"` 를 쓴다. `user_id = app_user_id()` 고정
-    (로컬 단일 사용자 전제, `build_chat_ctx()`와 같은 이유)."""
+    `"briefings-api:<uuid4>"` 를 쓴다. `user_id = user.id`(로그인한 계정,
+    `build_chat_ctx()` 와 같음)."""
     return ToolContext(
         session=session,
         session_id=f"briefings-api:{uuid.uuid4()}",
-        user_id=app_user_id(),
+        user_id=user.id,
         now=now,
     )

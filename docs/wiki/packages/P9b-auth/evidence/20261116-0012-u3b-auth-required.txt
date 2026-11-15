@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_auth_required_routes.py -q -p no:cacheprovider
+# 시각: 2026-11-16T00:12:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+...........                                                              [100%]
+11 passed in 2.10s

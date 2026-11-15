@@ -1,0 +1,6 @@
+# 명령: git diff --stat -- app/settings.py app/briefing .env.example app/main.py app/push app/agent app/memory alembic scripts
+# 시각: 2026-11-16T00:17:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---

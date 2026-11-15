@@ -13,7 +13,6 @@
 
 from __future__ import annotations
 
-import uuid
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -166,9 +165,13 @@ def _search(mention: str) -> list[dict]:
     return [{"name": "search_person", "args": {"query": mention}}]
 
 
-def _post_chat(client, utterance: str, session_id: str | None):
-    headers = {"X-Session-Id": session_id} if session_id else {}
-    return client.post("/chat", json={"utterance": utterance}, headers=headers)
+#: U3b -- 대화 세션은 서버가 계정에서 만든다. 이 파일의 로그인 사용자는 `local` 이다.
+CHAT_SESSION = "chat:local"
+
+
+def _post_chat(client, utterance: str, session_id: str | None = None):
+    """`session_id` 인자는 호환용으로만 남았다 -- `X-Session-Id` 헤더는 서버가 무시한다(U3b)."""
+    return client.post("/chat", json={"utterance": utterance})
 
 
 # ---------------------------------------------------------------------------
@@ -183,7 +186,7 @@ def test_chat_query_merge_stored_zero_no_writes_and_trace(app_and_client, db_ses
     answerer = _setup_query(app, monkeypatch, utt, _search("팀장"), judge=FakeJudge(table={person.id: 0.95}))
     before = _counts(db_session)
 
-    resp = _post_chat(client, utt, "api-q-merge")
+    resp = _post_chat(client, utt, CHAT_SESSION)
 
     assert resp.status_code == 200
     body = resp.json()
@@ -195,26 +198,26 @@ def test_chat_query_merge_stored_zero_no_writes_and_trace(app_and_client, db_ses
     assert answerer.call_count == 1
     # 요청 전후 행 수 불변(7개 테이블 -- person_aliases·pending_questions 포함).
     assert _counts(db_session) == before
-    assert _write_tool_rows(db_session, "api-q-merge") == 0
+    assert _write_tool_rows(db_session, CHAT_SESSION) == 0
 
     # trace -- 각 step 정확히 1행.
     for step in ("loop_extract", "loop_gate", "er_resolve", "loop_query", "loop_turn"):
-        assert len(_rows(db_session, "api-q-merge", step)) == 1, step
-    assert _rows(db_session, "api-q-merge", "loop_extract")[0].output["intent"] == "query"
-    assert _rows(db_session, "api-q-merge", "loop_record") == []
-    q = _rows(db_session, "api-q-merge", "loop_query")[0].output
+        assert len(_rows(db_session, CHAT_SESSION, step)) == 1, step
+    assert _rows(db_session, CHAT_SESSION, "loop_extract")[0].output["intent"] == "query"
+    assert _rows(db_session, CHAT_SESSION, "loop_record") == []
+    q = _rows(db_session, CHAT_SESSION, "loop_query")[0].output
     assert q["intent"] == "query"
     assert q["person_id"] == person.id
     assert q["answer_source"] == "llm"
     assert q["evidence_counts"] == {"facts": 3, "patterns": 0, "timeline": 5, "schedules": 2}
     assert q["reply"] == body["reply"]
-    assert _rows(db_session, "api-q-merge", "loop_turn")[0].output["reply"] == body["reply"]
+    assert _rows(db_session, CHAT_SESSION, "loop_turn")[0].output["reply"] == body["reply"]
     # er_resolve -- merge 라도 적용(별칭 누적)하지 않는다(결정 I (a)).
-    er = _rows(db_session, "api-q-merge", "er_resolve")[0].output
+    er = _rows(db_session, CHAT_SESSION, "er_resolve")[0].output
     assert er["decision"]["applied"] is False
     assert q["resolutions"][0]["band"] == "merge"
     assert q["resolutions"][0]["applied"] is False
-    assert q["resolutions"][0]["er_trace_id"] == _rows(db_session, "api-q-merge", "er_resolve")[0].id
+    assert q["resolutions"][0]["er_trace_id"] == _rows(db_session, CHAT_SESSION, "er_resolve")[0].id
 
 
 # ---------------------------------------------------------------------------
@@ -238,7 +241,7 @@ def test_chat_query_identity_asks_then_answer_stored_zero_no_writes(
     app, client = app_and_client
     utt = "팀장님 어떤 분이었지?"
     a, b, answerer, body = _ask_identity_over_http(
-        app, client, db_session, fake_embedder, monkeypatch, utt, "api-q-ident"
+        app, client, db_session, fake_embedder, monkeypatch, utt, CHAT_SESSION
     )
     # 되묻기로 끝난 턴 -- 저장 0, 질문 1행(identity), 답 생성기는 아직 안 불렸다.
     assert body["stop_reason"] == "ask_user"
@@ -260,9 +263,9 @@ def test_chat_query_identity_asks_then_answer_stored_zero_no_writes(
     assert answerer.call_count == 1
     # 재개 뒤에도 행 수 불변(별칭 누적 없음 -- 결정 G (a)) · 기록 툴 tool_call 0.
     assert _counts(db_session) == before
-    assert _write_tool_rows(db_session, "api-q-ident") == 0
+    assert _write_tool_rows(db_session, CHAT_SESSION) == 0
     # 카드 근거 -- 고른 인물(김민수) 의 카드 건수.
-    queries = _rows(db_session, "api-q-ident", "loop_query")
+    queries = _rows(db_session, CHAT_SESSION, "loop_query")
     assert len(queries) == 2  # 되묻기 턴(ask) + 재개 턴(llm)
     assert queries[0].output["answer_source"] == "ask"
     q = queries[1].output
@@ -271,16 +274,16 @@ def test_chat_query_identity_asks_then_answer_stored_zero_no_writes(
     assert q["person_id"] != b.id
     assert q["evidence_counts"] == {"facts": 3, "patterns": 0, "timeline": 5, "schedules": 2}
     # 재개 trace -- loop_resume·loop_query·loop_turn, 기록 단계 행 없음.
-    assert len(_rows(db_session, "api-q-ident", "loop_resume")) == 1
-    assert _rows(db_session, "api-q-ident", "loop_resolve_done") == []
-    assert _rows(db_session, "api-q-ident", "loop_record") == []
+    assert len(_rows(db_session, CHAT_SESSION, "loop_resume")) == 1
+    assert _rows(db_session, CHAT_SESSION, "loop_resolve_done") == []
+    assert _rows(db_session, CHAT_SESSION, "loop_record") == []
 
 
 def test_chat_query_identity_second_answer_returns_409(app_and_client, db_session, fake_embedder, monkeypatch):
     app, client = app_and_client
     utt = "팀장님 어떤 분이었지?"
     _, _, _, body = _ask_identity_over_http(
-        app, client, db_session, fake_embedder, monkeypatch, utt, "api-q-409"
+        app, client, db_session, fake_embedder, monkeypatch, utt, CHAT_SESSION
     )
     qid = body["pending_question"]["question_id"]
 
@@ -302,7 +305,7 @@ def test_chat_query_new_person_no_question_no_writes(app_and_client, db_session,
     answerer = _setup_query(app, monkeypatch, utt, _search("박선우"), judge=FakeJudge())
     before = _counts(db_session)
 
-    resp = _post_chat(client, utt, "api-q-new")
+    resp = _post_chat(client, utt, CHAT_SESSION)
 
     assert resp.status_code == 200
     body = resp.json()
@@ -314,10 +317,10 @@ def test_chat_query_new_person_no_question_no_writes(app_and_client, db_session,
     assert _counts(db_session) == before
     assert _counts(db_session)["pending_questions"] == 0
     ask_rows = db_session.execute(
-        text("SELECT count(*) FROM agent_traces WHERE session_id = 'api-q-new' AND tool_name = 'ask_user'")
+        text("SELECT count(*) FROM agent_traces WHERE session_id = 'chat:local' AND tool_name = 'ask_user'")
     ).scalar_one()
     assert ask_rows == 0
-    assert _write_tool_rows(db_session, "api-q-new") == 0
+    assert _write_tool_rows(db_session, CHAT_SESSION) == 0
 
 
 # ---------------------------------------------------------------------------
@@ -340,13 +343,13 @@ def test_chat_query_turn_mixed_utterance_no_writes_loop_gate_rejects(
     _setup_query(app, monkeypatch, utt, calls, judge=FakeJudge(table={person.id: 0.95}))
     before = _counts(db_session)
 
-    resp = _post_chat(client, utt, "api-q-mixed")
+    resp = _post_chat(client, utt, CHAT_SESSION)
 
     assert resp.status_code == 200
     assert resp.json()["stored"] == {"persons": 0, "events": 0, "schedules": 0}
     assert _counts(db_session) == before
-    assert _write_tool_rows(db_session, "api-q-mixed") == 0
-    gate = _rows(db_session, "api-q-mixed", "loop_gate")[0].output
+    assert _write_tool_rows(db_session, CHAT_SESSION) == 0
+    gate = _rows(db_session, CHAT_SESSION, "loop_gate")[0].output
     assert {"index": 1, "name": "add_event", "reason": "query_turn_no_write"} in gate["rejected"]
 
 
@@ -370,14 +373,14 @@ def test_chat_record_turn_control_still_adds_event(app_and_client, db_session, f
     app.dependency_overrides[get_judge] = lambda: FakeJudge(table={person.id: 0.95})
     before = _counts(db_session)
 
-    resp = _post_chat(client, utt, "api-q-control")
+    resp = _post_chat(client, utt, CHAT_SESSION)
 
     assert resp.status_code == 200
     assert resp.json()["stored"]["events"] == 1
     after = _counts(db_session)
     assert after["events"] == before["events"] + 1
-    assert len(_rows(db_session, "api-q-control", "loop_query")) == 0
-    assert len(_rows(db_session, "api-q-control", "loop_record")) == 1
+    assert len(_rows(db_session, CHAT_SESSION, "loop_query")) == 0
+    assert len(_rows(db_session, CHAT_SESSION, "loop_record")) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -391,7 +394,7 @@ def test_chat_query_resume_person_deleted_says_no_record_stored_zero(
     app, client = app_and_client
     utt = "팀장님 어떤 분이었지?"
     a, _, answerer, body = _ask_identity_over_http(
-        app, client, db_session, fake_embedder, monkeypatch, utt, "api-q-gone"
+        app, client, db_session, fake_embedder, monkeypatch, utt, CHAT_SESSION
     )
     qid = body["pending_question"]["question_id"]
     # 질문을 낸 뒤 고른 후보(김민수) 가 삭제됐다 -- 실제 카드 조회가 PersonNotFound 를 낸다.
@@ -412,7 +415,7 @@ def test_chat_query_resume_person_deleted_says_no_record_stored_zero(
     assert out["pending_question"] is None
     assert answerer.call_count == 0
     assert _counts(db_session) == before
-    queries = _rows(db_session, "api-q-gone", "loop_query")
+    queries = _rows(db_session, CHAT_SESSION, "loop_query")
     assert [r.output["answer_source"] for r in queries] == ["ask", "no_record"]
     q = queries[1].output
     assert q["person_id"] is None
@@ -424,7 +427,7 @@ def test_chat_query_resume_person_deleted_says_no_record_stored_zero(
 # ---------------------------------------------------------------------------
 
 
-def test_chat_query_issues_session_id_when_header_missing(app_and_client, db_session, fake_embedder, monkeypatch):
+def test_chat_query_session_id_is_account_session_when_header_missing(app_and_client, db_session, fake_embedder, monkeypatch):
     app, client = app_and_client
     person = _seed_person(db_session, fake_embedder)
     utt = "팀장님 어떤 분이었지?"
@@ -434,7 +437,7 @@ def test_chat_query_issues_session_id_when_header_missing(app_and_client, db_ses
 
     assert resp.status_code == 200
     body = resp.json()
-    uuid.UUID(body["session_id"])  # uuid4 형식이 아니면 ValueError
+    assert body["session_id"] == "chat:local"  # U3b ② -- uuid4 발급 대신 계정 세션
     assert body["reply"] == f"{ANSWER_TEXT}\n{QUERY_MORE_HINT}"
     assert body["stored"] == {"persons": 0, "events": 0, "schedules": 0}
     assert len(_rows(db_session, body["session_id"], "loop_query")) == 1

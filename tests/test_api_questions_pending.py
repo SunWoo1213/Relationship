@@ -20,7 +20,8 @@ from tests.helpers_read_api import assert_no_writes, snapshot_db
 pytestmark = pytest.mark.dbtest
 
 NOW = datetime(2026, 3, 1, 9, 0, 0, tzinfo=timezone.utc)
-SID = "sess-pending-1"
+# U3b -- 대화 세션은 서버가 계정에서 만든다(`chat:<user_id>`). 이 파일의 로그인 사용자는 `local`.
+SID = "chat:local"
 
 
 @pytest.fixture()
@@ -56,24 +57,30 @@ def _q(
     return q
 
 
-def _get(client, sid=SID):
-    return client.get("/questions/pending", headers={"X-Session-Id": sid})
+def _get(client, sid=None):
+    """`sid` 가 있으면 `X-Session-Id` 로 보낸다 -- 서버는 이 헤더를 무시한다(U3b)."""
+    headers = {"X-Session-Id": sid} if sid is not None else {}
+    return client.get("/questions/pending", headers=headers)
 
 
-def test_헤더_없으면_빈_목록_이고_쓰기_0(client, db_session):
-    _q(db_session)  # 다른 세션 질문이 있어도 헤더 없는 요청에는 나가지 않는다
+def test_헤더_없어도_계정_채팅방의_질문이_나오고_쓰기_0(client, db_session):
+    # U3b ③ -- 헤더 없는 요청의 기대가 "빈 목록"에서 "로그인 계정 기준 목록"으로 바뀌었다.
+    mine = _q(db_session)
+    _q(db_session, session_id="sess-other", question="다른 세션 질문")  # 나가지 않는다
     before = snapshot_db(db_session)
     r = client.get("/questions/pending")
     assert r.status_code == 200
-    assert r.json() == []
+    assert [x["question_id"] for x in r.json()] == [mine.id]
     assert_no_writes(before, snapshot_db(db_session))
 
 
-def test_형식_위반_세션_헤더는_422(client):
+def test_형식_위반_세션_헤더는_무시되고_계정_목록이_나온다(client, db_session):
+    # U3b ① -- 예전의 422 `invalid_session_id` 는 없어졌다(헤더를 읽지 않는다).
+    mine = _q(db_session)
     for bad in ["a b", "a@b", "x" * 129, "a/b", ""]:
         r = client.get("/questions/pending", headers={"X-Session-Id": bad})
-        assert r.status_code == 422, bad
-        assert r.json() == {"detail": {"code": "invalid_session_id"}}
+        assert r.status_code == 200, bad
+        assert [x["question_id"] for x in r.json()] == [mine.id], bad
 
 
 def test_필드_5개_값_일치(client, db_session):
@@ -127,8 +134,9 @@ def test_쓰기_0_trace_0(client, db_session):
     _q(db_session, question="만료", created_at=NOW - timedelta(days=2))
     before = snapshot_db(db_session)
     assert len(_get(client).json()) == 1
-    assert _get(client, "none").json() == []
-    assert client.get("/questions/pending").json() == []
+    # U3b ③ -- 다른 세션 헤더를 보내도 무시된다(예전 기대는 빈 목록).
+    assert len(_get(client, "none").json()) == 1
+    assert len(client.get("/questions/pending").json()) == 1
     after = snapshot_db(db_session)
     assert_no_writes(before, after)
     assert after.counts == before.counts

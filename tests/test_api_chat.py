@@ -27,7 +27,6 @@
 
 from __future__ import annotations
 
-import uuid
 from datetime import datetime, timezone
 
 import pytest
@@ -145,7 +144,8 @@ def test_chat_stores_event_and_replies_in_one_request(app_and_client, db_session
 
     assert resp.status_code == 200
     body = resp.json()
-    assert body["session_id"] == "chat-one-flow"
+    # U3b ② -- 헤더(`chat-one-flow`)가 아니라 서버가 계정에서 만든 `chat:<user_id>`.
+    assert body["session_id"] == "chat:local"
     assert body["stored"] == {"persons": 0, "events": 1, "schedules": 0}
     assert body["reply"]
     assert body["pending_question"] is None
@@ -198,19 +198,19 @@ def test_chat_new_person_returns_pending_question_id(app_and_client, db_session)
 # ---------------------------------------------------------------------------
 
 
-def test_chat_issues_session_id_when_header_missing(app_and_client):
+def test_chat_session_id_is_account_session_when_header_missing(app_and_client):
+    # U3b ② -- 헤더가 없어도 세션은 서버가 계정에서 만든다(uuid4 발급은 없어졌다).
     app, client = app_and_client
     app.dependency_overrides[get_proposer] = lambda: FakeProposer(table={})
 
     resp = client.post("/chat", json={"utterance": "안녕"})
 
     assert resp.status_code == 200
-    session_id = resp.json()["session_id"]
-    assert session_id
-    uuid.UUID(session_id)  # 파싱되면 uuid4 형식이다 -- 실패하면 ValueError
+    assert resp.json()["session_id"] == "chat:local"
 
 
-def test_chat_reuses_given_session_id(app_and_client):
+def test_chat_ignores_given_session_id_header(app_and_client):
+    # U3b ② -- 클라이언트가 보낸 세션 값은 쓰이지 않는다.
     app, client = app_and_client
     app.dependency_overrides[get_proposer] = lambda: FakeProposer(table={})
 
@@ -219,21 +219,22 @@ def test_chat_reuses_given_session_id(app_and_client):
     )
 
     assert resp.status_code == 200
-    assert resp.json()["session_id"] == "custom-session-1"
+    assert resp.json()["session_id"] == "chat:local"
 
 
-def test_chat_invalid_session_id_header_returns_422(app_and_client):
+def test_chat_invalid_session_id_header_is_ignored_and_returns_200(app_and_client):
+    # U3b ① -- 형식이 어긋난 헤더도 422 가 아니라 무시된다(헤더를 읽지 않는다).
     app, client = app_and_client
     app.dependency_overrides[get_proposer] = lambda: FakeProposer(table={})
 
     # ASCII 불량값(공백·`!`) -- 한글 헤더 값은 httpx 인코딩에서
-    # UnicodeEncodeError 가 나 이 테스트의 목적(형식 검증 422)과 다른
-    # 이유로 실패한다(U6 추가 수정, 사용자 승인).
+    # UnicodeEncodeError 가 나 이 테스트의 목적과 다른 이유로 실패한다(U6 추가 수정).
     resp = client.post(
         "/chat", json={"utterance": "안녕"}, headers={"X-Session-Id": "bad id!"}
     )
 
-    assert resp.status_code == 422
+    assert resp.status_code == 200
+    assert resp.json()["session_id"] == "chat:local"
 
 
 # ---------------------------------------------------------------------------
@@ -245,12 +246,10 @@ def test_chat_provider_error_returns_200_with_no_storage_and_loop_error_trace(
     app_and_client, db_session
 ):
     app, client = app_and_client
-    session_id = "chat-provider-error"
+    session_id = "chat:local"  # U3b -- 서버가 계정에서 만든 대화 세션(trace 조회 조건)
     app.dependency_overrides[get_proposer] = lambda: _FailingProposer("timeout")
 
-    resp = client.post(
-        "/chat", json={"utterance": "아무 발화"}, headers={"X-Session-Id": session_id}
-    )
+    resp = client.post("/chat", json={"utterance": "아무 발화"})
 
     assert resp.status_code == 200
     body = resp.json()
@@ -356,7 +355,7 @@ def test_chat_partial_rollback_when_second_mention_resolve_fails(
     비교, FIX-004 와 같은 방향). (4) `loop_error` 가 정확히 1행 남는다."""
 
     app, client = app_and_client
-    session_id = "chat-partial-rollback"
+    session_id = "chat:local"  # U3b -- 서버가 계정에서 만든 대화 세션(trace 조회 조건)
     person = _make_person(db_session, display_name="김민수")
     _add_alias(db_session, person, "팀장", embedding=fake_embedder(["팀장"])[0])
 
@@ -407,9 +406,7 @@ def test_chat_partial_rollback_when_second_mention_resolve_fails(
 
     monkeypatch.setattr(loop_module, "resolve", _flaky_resolve)
 
-    resp = client.post(
-        "/chat", json={"utterance": utterance}, headers={"X-Session-Id": session_id}
-    )
+    resp = client.post("/chat", json={"utterance": utterance})
 
     assert resp.status_code == 200
     body = resp.json()

@@ -8,12 +8,11 @@
 본다). 브리핑의 `app.api.deps.get_now` 와 일부러 분리했다 -- 그 시계를 고정하는 기존
 테스트가 로그인 만료 판정까지 흔들지 않게.
 
-**순환 import 주의(U3b 인계)**: 이 모듈은 `app.api.deps.get_session` 을 import 한다.
-`app.api.routes` 가 이 모듈을 import 하게 되면(U3b), `import app.auth.deps` 를 **가장
-먼저** 하는 경로에서 `app.api` 패키지 초기화 → `routes` → 아직 덜 불러온 이 모듈의
-`current_user` import 로 순환한다. 진입점(`app.main`)은 `app.api` 를 먼저 불러 문제가
-없지만, 테스트·스크립트가 `app.auth.deps` 를 맨 처음 import 하지 않게 하거나 U3b 에서
-`get_session` 의 위치를 정리한다.
+**순환 import 를 끊은 방법(U3b)**: 이 모듈은 `get_session` 을 `app.db.session` 에서 가져온다
+(`app.api` 패키지를 끌어오지 않는다). 예전에는 `app.api.deps.get_session` 을 import 했는데,
+`app.api.deps`·`app.api.routes` 가 이 모듈의 `current_user` 를 import 하게 되면서 어느 쪽을
+먼저 import 하든 순환이 될 수 있었다. 지금은 `app.api.*` → `app.auth.deps` → `app.db.session`
+한 방향뿐이라 `import app.auth.deps` 를 맨 먼저 해도 안전하다(시험: `tests/test_auth_required_routes.py`).
 """
 
 from __future__ import annotations
@@ -24,9 +23,9 @@ from datetime import datetime, timezone
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_session
 from app.auth.sessions import cookie_name, find_user_by_token
 from app.db.models import User
+from app.db.session import get_session
 
 
 def get_auth_now() -> Callable[[], datetime]:

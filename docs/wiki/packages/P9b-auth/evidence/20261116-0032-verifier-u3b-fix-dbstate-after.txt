@@ -1,0 +1,27 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3b/dbstate.py
+# 시각: 2026-11-16T00:32:27+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+dev db: relationship / test db: relationship_test
+current_database: relationship_test
+users 0
+auth_sessions 0
+persons 0
+pending_questions 0
+agent_traces 225
+push_subscriptions 0
+events 0
+schedules 0
+chat_messages 0
+TRACE ('concurrency-setup-ae6223fcd65c4d8282d1e4dc3d89308d', 7, datetime.datetime(2026, 11, 15, 15, 31, 40, 314341, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 31, 40, 365369, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('answer-concurrency-tool-a', 25, datetime.datetime(2026, 11, 15, 11, 57, 23, 171467, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 31, 39, 773907, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-7a11eec01eee486d999764bfffa135d4', 1, datetime.datetime(2026, 11, 15, 15, 31, 39, 766682, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 31, 39, 766682, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-4d4c717ee5d74b77aff66f9a1b04db9a', 7, datetime.datetime(2026, 11, 15, 15, 29, 47, 678715, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 29, 47, 737025, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-c8cfcc84cef44692ada22882992627d6', 1, datetime.datetime(2026, 11, 15, 15, 29, 47, 128278, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 29, 47, 128278, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-db77cbd9c2854fc7b5d516d3f8cfeb2f', 7, datetime.datetime(2026, 11, 15, 15, 17, 2, 107863, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 17, 2, 166752, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-983f9aa14f504cda854d503b279ddab9', 1, datetime.datetime(2026, 11, 15, 15, 17, 1, 562356, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 17, 1, 562356, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-f40f5cbc9ded447094ef9b8b5e9170fc', 7, datetime.datetime(2026, 11, 15, 15, 9, 28, 732852, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 9, 28, 784265, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-0551d12d8759494995fe5915aa9dd5cb', 1, datetime.datetime(2026, 11, 15, 15, 9, 28, 181995, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 9, 28, 181995, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-e23c99ff82744d81ab2bf9089c68b17e', 7, datetime.datetime(2026, 11, 15, 15, 5, 18, 256330, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 5, 18, 308432, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))

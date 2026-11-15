@@ -649,3 +649,7 @@
 - 2026-11-15 21:33 | PUSH-dev2 | origin dev2 6ecf635 (실험 푸시)
 - 2026-11-15 21:50 | COMMIT | 1cf67cd feat(P9b-auth): 아이디·비밀번호 가입·로그인·로그아웃 API 와 요청 출처 검사를 넣는다
 - 2026-11-15 21:50 | PUSH-dev2 | origin dev2 1cf67cd (실험 푸시)
+- 2026-11-15 23:58 | COMMIT | 119a42f test(P9b-auth): 기존 테스트가 로그인한 사용자와 명시한 사용자 id 로 돌도록 옮긴다
+- 2026-11-15 23:58 | PUSH-dev2 | origin dev2 119a42f (실험 푸시)
+- 2026-11-16 00:01 | COMMIT | fa7ad82 fix(P9b-auth): 로그인 화면에서 알림을 눌러도 그 브리핑으로 가게 하고, 가끔 실패하던 프론트 테스트를 고친다
+- 2026-11-16 00:01 | PUSH-dev2 | origin dev2 fa7ad82 (실험 푸시)

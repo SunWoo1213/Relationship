@@ -1,0 +1,22 @@
+# 명령: git status --short -- app tests scripts alembic .github .env.example
+# 시각: 2026-11-16T00:10:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+ M app/api/deps.py
+ M app/api/read.py
+ M app/api/routes.py
+ M app/auth/deps.py
+ M app/auth/routes.py
+ M app/db/session.py
+ M app/tools/context.py
+ M app/tools/questions.py
+ M tests/test_api_answers_resume.py
+ M tests/test_api_chat.py
+ M tests/test_api_chat_query.py
+ M tests/test_api_questions_pending.py
+ M tests/test_api_read_persons.py
+ M tests/test_commit_boundaries.py
+?? tests/test_auth_required_routes.py
+?? tests/test_user_isolation.py

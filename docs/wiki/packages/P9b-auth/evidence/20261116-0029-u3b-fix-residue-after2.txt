@@ -1,0 +1,9 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u3b/cleanup_residue.py after
+# 시각: 2026-11-16T00:29:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+current_database: relationship_test
+pending_questions 전체: 0
+agent_traces(session_id='chat:shared'): 0 / 전체: 207

@@ -1,0 +1,75 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3b/residue.sh
+# 시각: 2026-11-16T00:25:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+## 1. 시험 DB(relationship_test)에 커밋돼 남은 행
+dev db: relationship / test db: relationship_test
+current_database: relationship_test
+users 0
+auth_sessions 0
+persons 0
+pending_questions 2
+agent_traces 235
+push_subscriptions 0
+events 0
+schedules 0
+chat_messages 0
+PQ (24899, 'local', 'chat:fix023-chat-ok-0e87c910', 'new_person', datetime.datetime(2026, 11, 15, 15, 12, 18, 303447, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), None)
+PQ (24900, 'local', 'chat:fix023-chat-dberr-b036dcf0', 'new_person', datetime.datetime(2026, 11, 15, 15, 12, 18, 328260, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), None)
+TRACE ('concurrency-setup-db77cbd9c2854fc7b5d516d3f8cfeb2f', 7, datetime.datetime(2026, 11, 15, 15, 17, 2, 107863, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 17, 2, 166752, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('answer-concurrency-tool-a', 23, datetime.datetime(2026, 11, 15, 11, 57, 23, 171467, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 17, 1, 569737, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-983f9aa14f504cda854d503b279ddab9', 1, datetime.datetime(2026, 11, 15, 15, 17, 1, 562356, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 17, 1, 562356, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('chat:shared', 28, datetime.datetime(2026, 11, 15, 15, 12, 22, 974026, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 12, 23, 40618, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-f40f5cbc9ded447094ef9b8b5e9170fc', 7, datetime.datetime(2026, 11, 15, 15, 9, 28, 732852, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 9, 28, 784265, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-0551d12d8759494995fe5915aa9dd5cb', 1, datetime.datetime(2026, 11, 15, 15, 9, 28, 181995, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 9, 28, 181995, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-e23c99ff82744d81ab2bf9089c68b17e', 7, datetime.datetime(2026, 11, 15, 15, 5, 18, 256330, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 5, 18, 308432, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-9b653e86265a4319925346bffe8f744b', 1, datetime.datetime(2026, 11, 15, 15, 5, 17, 705766, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 5, 17, 705766, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-9beb5f77af6a41a588a518ef4e6e3e14', 7, datetime.datetime(2026, 11, 15, 15, 2, 26, 415437, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 2, 26, 468726, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+TRACE ('concurrency-setup-b25f7083f9c04083aa29d85cdb5bd08e', 1, datetime.datetime(2026, 11, 15, 15, 2, 25, 866235, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')), datetime.datetime(2026, 11, 15, 15, 2, 25, 866235, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')))
+
+## 2. 작업 트리(U3b)에서 그 테스트 단독
+/Users/sunwoo/Desktop/Portfolio/Relationship/tests/test_api_chat_query.py:318: assert 2 == 0
+=========================== short test summary info ============================
+FAILED tests/test_api_chat_query.py::test_chat_query_new_person_no_question_no_writes - assert 2 == 0
+1 failed in 0.43s
+
+## 3. U3b 이전(HEAD fa7ad82 를 git archive 로 푼 저장소 밖 사본)에서 같은 파일
+/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3b/head/tests/test_api_chat_query.py:315: assert 2 == 0
+=========================== short test summary info ============================
+FAILED tests/test_api_chat_query.py::test_chat_query_new_person_no_question_no_writes - assert 2 == 0
+1 failed, 7 passed in 0.70s
+
+## 4. 잔여 행을 만든 실행 -- 구현자 변이 스크립트의 시험 목록(실제 커밋형 포함)과 변이 V3b-9
+26:    "tests/test_commit_boundaries.py",
+27-    "tests/test_tools_questions.py",
+28-]
+29-
+30-# 변이: 이름 -> (파일, 바꿀 원문, 새 문장) 목록
+31-MUTATIONS: dict[str, list[tuple[str, str, str]]] = {
+--
+127:    "V3b-9-chat-ctx-fixed-user": [
+128-        (
+129-            "app/api/deps.py",
+130-            "        session_id=chat_session_id(user.id),\n        user_id=user.id,",
+131-            '        session_id=chat_session_id(user.id),\n        user_id="local",',
+132-        )
+
+127-
+128-# ===== append 2026-11-16T00:12:14+09:00 =====
+129:# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u3b/mutate.py V3b-9-chat-ctx-fixed-user
+130-# 시각: 2026-11-16T00:12:14+09:00
+131-# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+132-# HEAD: fa7ad82 (dev2)
+133-# exit: 0
+134-# ---
+135:### 변이: V3b-9-chat-ctx-fixed-user
+136-pytest exit=1
+137-FAILED tests/test_user_isolation.py::test_pending_questions_list_has_only_my_chatroom_questions - assert [] == [24868]
+138-FAILED tests/test_user_isolation.py::test_my_own_question_flow_still_works_and_creates_my_person - AssertionError: assert ('local', 'chat:iso-user-c') == ('iso-user-c'...t:iso-user-c')
+139-FAILED tests/test_commit_boundaries.py::test_chat_real_commit_persists_event_and_trace - AssertionError: assert {'events': 0,...schedules': 0} == {'events': 1,...schedules': 0}
+140-FAILED tests/test_commit_boundaries.py::test_chat_db_error_during_record_commits_nothing_and_leaves_no_trace - assert 200 == 500
+141-FAILED tests/test_commit_boundaries.py::test_answers_resume_real_commit_persists_answer_and_resume_result - assert 404 == 200
+142-5 failed, 119 passed in 4.07s
+143-

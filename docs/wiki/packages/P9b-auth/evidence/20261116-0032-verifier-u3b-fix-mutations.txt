@@ -1,0 +1,36 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu3b/vmutate_fix.py
+# 시각: 2026-11-16T00:32:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+### 변이: baseline
+pytest exit=0 :: 38 passed in 1.35s
+
+### 변이: VV-4-briefing-run-window-no-owner
+pytest exit=1 :: 1 failed, 37 passed in 1.33s
+    FAILED tests/test_user_isolation.py::test_briefing_run_without_body_only_briefs_my_schedules - AssertionError: assert [{'reason': '...e_id': 41209}] == []
+
+### 변이: VV-7-owned-person-no-user-cond
+pytest exit=1 :: 7 failed, 31 passed in 1.53s
+    FAILED tests/test_user_isolation.py::test_person_card_of_other_user_is_404_same_as_missing - assert 200 == 404
+    FAILED tests/test_user_isolation.py::test_loop_resolving_to_other_users_person_ends_with_person_not_found - AssertionError: assert {'events': 1,...schedules': 0} == {'events': 0,...schedules': 0}
+    FAILED tests/test_user_isolation.py::test_tools_with_other_users_person_id_raise_person_not_found - Failed: DID NOT RAISE <class 'app.tools.types.PersonNotFound'>
+    FAILED tests/test_user_isolation.py::test_resume_context_pointing_at_other_users_person_changes_nothing[identity_record] - AssertionError: assert {'aliases': 1...acts': 1, ...} == {'aliases': 1...acts': 1, ...}
+    FAILED tests/test_user_isolation.py::test_resume_context_pointing_at_other_users_person_changes_nothing[identity_query] - openai.OpenAIError: The api_key client option must be set either by passing api_key to the client or by setting the OP
+    FAILED tests/test_user_isolation.py::test_resume_context_pointing_at_other_users_person_changes_nothing[schedule] - AssertionError: assert {'aliases': 1...acts': 1, ...} == {'aliases': 1...acts': 1, ...}
+    FAILED tests/test_api_read_persons.py::test_없는_인물과_타사용자_인물은_같은_404 - assert 200 == 404
+
+### 변이: VF-1-auth-lookup-twice
+pytest exit=1 :: 1 failed, 37 passed in 1.36s
+    FAILED tests/test_api_read_persons.py::test_목록_SELECT_수는_인물_수와_무관한_상수 - AssertionError: assert 2 == 1
+
+### 변이: VF-2-read-card-no-owner
+pytest exit=1 :: 1 failed, 37 passed in 1.51s
+    FAILED tests/test_user_isolation.py::test_resume_context_pointing_at_other_users_person_changes_nothing[identity_query] - openai.OpenAIError: The api_key client option must be set either by passing api_key to the client or by setting the OP
+
+### 변이: VF-3-add-schedule-no-owner
+pytest exit=1 :: 2 failed, 36 passed in 1.34s
+    FAILED tests/test_user_isolation.py::test_tools_with_other_users_person_id_raise_person_not_found - Failed: DID NOT RAISE <class 'app.tools.types.PersonNotFound'>
+    FAILED tests/test_user_isolation.py::test_resume_context_pointing_at_other_users_person_changes_nothing[schedule] - AssertionError: assert {'aliases': 1...acts': 1, ...} == {'aliases': 1...acts': 1, ...}
+

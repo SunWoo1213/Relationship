@@ -1,0 +1,15 @@
+# 명령: git diff --stat -- app
+# 시각: 2026-11-16T00:32:28+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: fa7ad82 (dev2)
+# exit: 0
+# ---
+ app/api/deps.py        | 116 +++++++++++++++++++++----------------------------
+ app/api/read.py        |   3 +-
+ app/api/routes.py      |  82 +++++++++++++++++++---------------
+ app/auth/deps.py       |  13 +++---
+ app/auth/routes.py     |   2 +-
+ app/db/session.py      |  20 +++++++++
+ app/tools/context.py   |   7 ++-
+ app/tools/questions.py |  28 ++++++------
+ 8 files changed, 143 insertions(+), 128 deletions(-)

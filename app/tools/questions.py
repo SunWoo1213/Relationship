@@ -54,15 +54,15 @@ trace 값의 절단 기준을 하나로 유지한다). 다만 S3.4 "비밀·전�
 `ask_user` 는 저장 후 즉시 돌아오고, 답은 별도 호출(`answer_question`,
 `POST /answers/{question_id}` 는 U8 몫)로 비동기에 들어온다.
 
-## user_id 격리 부재 (F-fbaaae, 열린 소견)
+## user_id 격리 (F-fbaaae — CR-006 · P9b-auth 로 해소)
 
-`pending_questions` 에는 `user_id` 컬럼이 없다(`session_id` 만, S3.1).
-`answer_question` 은 "다른 사용자의 질문"을 걸러낼 방법이 없다 -- 로컬 단일
-사용자(`APP_USER_ID` 고정) 데모에서는 실효 문제가 없지만, 여러 사용자를
-지원하게 되면 `session_id` 를 사용자에게 귀속시키는 계층(P5-loop 의 세션
-관리)이 이 격리를 대신 맡아야 한다. 이 모듈은 그 전제를 깨지 않는다 --
-`question_id` 하나로 전 세션에 걸쳐 조회 가능한 채로 남겨 두고, 이 사각지대를
-여기 문서화하는 것까지가 P2-tools 의 몫이다(05-remediation F-fbaaae).
+예전에는 `pending_questions` 에 `user_id` 컬럼이 없어(`session_id` 만) `question_id`
+하나만 알면 누구의 질문에든 답할 수 있었다. 리비전 0003 이 `pending_questions.user_id`
+(NOT NULL)를 더했고, `ask_user` 가 `ctx.user_id` 를 저장한다. 이제 `answer_question`·
+`list_pending` 은 `ctx.user_id` 소유 행만 본다 -- 남의 질문은 "없는 질문"과 같은
+`QuestionNotFound`(존재 여부 비노출)이고 그 행은 바뀌지 않는다(S3.4 답변 소유).
+`persons.py` 의 `confirmed_question_id` 확인(`_require_confirmation`)은 `build_ctx` 가
+소유 검사를 끝낸 뒤에만 불리므로 따로 소유 조건을 두지 않는다.
 """
 
 from __future__ import annotations
@@ -246,10 +246,9 @@ def answer_question(ctx: ToolContext, question_id: int, answer: str) -> PendingQ
     정상이면 `answer`·`answered_at = ctx.now()` 를 기록하고 `"answered"` 를
     돌려준다.
 
-    **user_id 격리 없음**(F-fbaaae, 모듈 docstring "user_id 격리 부재" 참고)
-    -- `pending_questions` 에 `user_id` 컬럼이 없어 "다른 사용자의 질문"을
-    걸러낼 수 없다. P5-loop 이 세션을 사용자에게 귀속시키는 계층으로 이
-    사각지대를 메워야 한다.
+    **user_id 격리**(F-fbaaae, CR-006 으로 해소 -- 모듈 docstring 참고) -- 행의
+    `user_id` 가 `ctx.user_id` 와 다르면 행이 없는 것과 같은 `QuestionNotFound`
+    (그 행은 읽기만 하고 `answer`·`answered_at` 을 바꾸지 않는다).
 
     **FIX-019** -- `with_for_update=True` 로 행을 잠근 채 읽는다. 잠금 없는
     조회는 두 요청이 거의 동시에 오면 둘 다 `answered_at IS NULL` 을 읽고
@@ -260,7 +259,7 @@ def answer_question(ctx: ToolContext, question_id: int, answer: str) -> PendingQ
     커밋 후의 최신(answered) 행을 읽어 `already_answered` 로 끝난다.
     """
     question = ctx.session.get(PendingQuestion, question_id, with_for_update=True)
-    if question is None:
+    if question is None or question.user_id != ctx.user_id:
         raise QuestionNotFound("question_not_found")
 
     status = question_status(question, ctx.now())
@@ -302,6 +301,7 @@ def list_pending(
     rows = (
         ctx.session.execute(
             select(PendingQuestion)
+            .where(PendingQuestion.user_id == ctx.user_id)
             .where(PendingQuestion.session_id == target_session_id)
             .where(PendingQuestion.answered_at.is_(None))
             .order_by(PendingQuestion.created_at.asc())

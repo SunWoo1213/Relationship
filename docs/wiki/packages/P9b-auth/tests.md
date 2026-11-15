@@ -181,3 +181,68 @@
 (번호 H-3 이 빠진 것은 아래 "돌리지 않은 변이"인 `committed_login` 정리 제거 변이의 자리이기 때문이다.)
 
 **돌리지 않은 변이**: `committed_login` 의 `finally` 정리 제거 — 공유 시험 DB 에 커밋 행이 남아 이후 시험을 오염시킬 수 있어 일부러 돌리지 않았다. 그 보장은 `test_committed_login_cleans_up_even_when_body_raises`(예외 경로)·`…commits_then_cleans_up` 이 값(행 0)으로 단언하며, 변이 시험 뒤 시험 DB 잔여 행 0 을 `evidence/20261115-2205-u3a-test-db-leftover.txt` 로 확인했다. 첫 변이 실행(`…-2204-…`)은 사본에 `tests/tests` 중첩 사본이 생겨 변이가 적용되지 않은 채 전부 통과로 나왔으므로 폐기하고 다시 돌렸다.
+
+## U3b — 모든 API 를 로그인 사용자 기준으로 (backend-agent, 2026-11-16)
+
+새 시험 29건(`test_auth_required_routes.py` 11 · `test_user_isolation.py` 18), 전체 **2468 passed**(2439 + 29)·실패 0·skip 0(`evidence/20261116-0009-u3b-pytest-all.txt`). 증거 파일 이름의 접두는 `20261116-00NN-`.
+
+### `tests/test_auth_required_routes.py` (`dbtest` 표식 없음 — DB 접속 없이 돈다, 빈 세션을 끼워 쿼리가 나가면 오류)
+
+| 시험 | 단언 값 |
+|---|---|
+| 열거 라우트가 알려진 보호 대상 13개를 모두 포함하고 면제 집합이 정확히 7개(`/health`·`/auth/signup`·`/auth/login`·문서 4) | 집합 동일 |
+| 면제가 아닌 **모든** 라우트가 쿠키 없이 401 + 본문 `{"detail":{"code":"unauthenticated"}}` (경로 매개변수 `1`) | 상태 401·본문 일치, 검사된 목록이 보호 대상 13개를 포함 |
+| `POST /auth/logout` 쿠키 없이 401(F-3 — 예외 아님) | 401·본문 |
+| `/auth/signup`·`/auth/login` 은 401 이 아니라 422(공개 유지) | 422 |
+| `PUSH_DEV_PAGE_ENABLED=1` 이면 `/push-dev/` 세 경로만 더 생기고 그 밖의 새 면제 없음 | 세 경로 집합 |
+| 면제가 아닌 모든 `APIRoute` 의 의존성 트리에 `current_user` 가 있다(구조 검사) | 누락 `[]` |
+| `app.auth.deps`·`app.auth.routes`·`app.api.deps`·`app.api.routes`·`app.main` 을 새 인터프리터에서 **맨 먼저** import 해도 순환 오류 없음(5건) | returncode 0 |
+
+### `tests/test_user_isolation.py` (`dbtest`, 롤백 세션 — 계정 A·B·(C), B 의 인물·별칭("민수")·사건·사실·일정·브리핑 trace·질문을 직접 삽입)
+
+| 시험 | 단언 값 |
+|---|---|
+| `GET /persons` — A 목록 id 가 `[A 인물]` 뿐, "민수" 문자열 0, B 쪽도 대칭 | id 리스트 |
+| `GET /persons/{B}` 404 == 없는 id 404(상태·본문 같음), 내 카드 200 | `{"detail":{"code":"not_found"}}` |
+| `GET /events/{B}/raw` 404 == 없는 id, B 원문 문자열 응답에 0, 내 원문 200 | 같음 |
+| `GET /persons/{B}/facts/{f}/sources` 404 == 없는 id, 내 인물+B 사실 섞어 넣기도 404, 내 근거 200 | 같음 |
+| `GET /briefings` 에 B 일정 0(`[A 일정]`), `?schedule_id={B}` 404 == 없는 id | 같음 |
+| `POST /briefings/run {schedule_id: B}` 404 == 없는 id, B 일정 `briefed_at` 불변, 행 수 전부 불변, 문장 생성기 호출 0 | 같음 |
+| `POST /briefings/run`(본문 없음) — B 일정이 창 안에 있어도 A 의 일정만 브리핑, B `briefed_at` None | `[A 일정]` |
+| `POST /push/subscriptions` — 저장 행 `user_id` 가 로그인 계정(`iso-user-a`) | 쌍 일치 |
+| `GET /questions/pending` — 내 채팅방 질문만, **세션 이름이 `chat:A` 여도 소유가 B 인 질문은 제외**, B 는 B 질문만 | id 리스트 |
+| `POST /answers/{B 질문}` 404 == 없는 id, 질문 행 `answer`·`answered_at` None, **재개 루프 호출 0**, 모든 테이블 행 수 불변 | 호출 수 0 |
+| 세션 이름은 `chat:A` 이고 소유가 B 인 질문에 A 가 답하면 404·불변·재개 0 | 같음 |
+| 툴 층 — `answer_question(ctx_A, B 질문)` → `QuestionNotFound`·행 불변, B 의 ctx 로는 `answered`(통제) | 예외·상태 |
+| 통제+ER 격리 — 빈 계정 C 가 B 와 같은 별칭 "민수" 로 말하면 후보 0(`er_resolve.candidates == []`)·`new_person` 질문, 질문 행 `user_id`=C·`session_id`=`chat:C`, A·B 는 답할 수 없고(재개 0), C 가 답하면 인물이 C 의 id 로 생기고 재개 정확히 1회, 늘어난 것은 인물 +1·사건 +1 뿐 | 값 |
+| `POST /chat` 응답 `session_id` == `chat:A`, `X-Session-Id: chat:B` 를 보내도 같고 trace 세션에 `chat:B` 0 | 문자열 |
+| 헤더 없는 B 의 `/chat` 도 `chat:B` | 문자열 |
+| ER 이 (가정상) B 의 인물을 골라도(`resolve` 결과를 B 로 치환) 200 오류 답·`loop_error` 1행 `PersonNotFound`·B 의 사건·별칭·`chat:B` trace 불변 | 값 |
+| A 의 ctx 로 B 인물에 `add_event`·`get_briefing`·`add_schedule`·`update_person` → 각각 `PersonNotFound`, B 일정 `briefed_at` None, 행 수 불변 | 예외·불변 |
+| `ToolContext.user_id` 기본값 없음 — `inspect.signature` 의 `default is empty`, `ToolContext(session=…, session_id=…)` 가 `TypeError` | 값 |
+
+### 변이 17종 — 저장소 밖 사본(`…/scratchpad/p9b-u3b/copy`)에서 변이 하나씩, 관련 9개 시험 파일(124건)만(`evidence/20261116-0011-u3b-mutations.txt`)
+
+| 변이 | 잡은 시험(요약) |
+|---|---|
+| V3b-1 `GET /briefings` 에서 `current_user` 제거(가짜 사용자) | `test_every_non_exempt_route_requires_login`(UnboundExecutionError — 인증 없이 DB 로 감)·`…declares_current_user_dependency`(`[('GET','/briefings')]`)·`test_briefings_list_and_schedule_filter_are_scoped` |
+| V3b-2 `build_ctx` 의 소유 조건 제거 | `test_answering_other_users_question_is_404_no_change_no_resume` — 응답은 툴 층 방어로 똑같이 404 지만 그 툴이 `tool_error` trace 행을 한 줄 남겨 **행 수 동일 단언**이 깨진다(운영은 라우트 예외가 롤백해 trace 도 사라지므로 외부 차이는 없는 이중 방어) |
+| V3b-2b `answer_question` 의 소유 조건 제거 | `test_answer_question_tool_rejects_other_users_question`(DID NOT RAISE) |
+| V3b-2c 두 소유 조건 모두 제거 | 4건 — `/answers` 409(답이 저장됨)·`DID NOT RAISE`·통제 흐름의 `200 == 404` |
+| V3b-3 `/chat` 이 `X-Session-Id` 헤더를 다시 받음 | `test_chat_session_id_is_account_session_and_header_is_ignored`(`chat:B` ≠ `chat:A`)·`test_api_chat` 3건 |
+| V3b-4 `ToolContext.user_id` 기본값 복원 | `test_tool_context_user_id_has_no_default` (+ 판정 `u3b-ctx-default` grep) |
+| V3b-5 `list_persons` 에 고정 문자열 | `test_persons_list_has_only_my_persons` |
+| V3b-6 `list_pending` 의 `user_id` 조건 제거 | `test_pending_questions_list_has_only_my_chatroom_questions`(`[A질문, B질문]`) |
+| V3b-7 푸시 구독 저장에 고정 문자열 | `test_push_subscription_belongs_to_the_logged_in_user` |
+| V3b-8 브리핑 ctx 의 사용자를 고정 문자열로 | `test_briefing_run_without_body_only_briefs_my_schedules` |
+| V3b-9 채팅 ctx 의 사용자를 고정 문자열로 | 5건(`test_commit_boundaries` 3건 포함) |
+| V3b-10 `chat_session_id` 가 계정과 무관한 상수 | 20건(세션 id 단언 전반) |
+| V3b-11 `app.auth.deps` 가 다시 `app.api.deps` 에서 `get_session` import(순환) | 수집 단계에서 9개 파일 전부 ERROR(`import app.main` 부터 깨짐) — 순서 시험은 수집 전에 막혀 돌지 못함 |
+| V3b-12 인물 카드 조회를 고정 문자열로 | `test_person_card_of_other_user_is_404_same_as_missing`(내 카드 404) |
+| V3b-13 이벤트 원문 조회를 고정 문자열로 | `test_event_raw_of_other_user_is_404_same_as_missing` |
+| V3b-14 브리핑 목록 조회를 고정 문자열로 | `test_briefings_list_and_schedule_filter_are_scoped` |
+| V3b-15 (시험 쪽) `test_api_read_persons` 의 SELECT 계수기에서 인증 조회 제외 줄 삭제 | `test_목록_SELECT_수는_인물_수와_무관한_상수` — `3 == 2` |
+
+### 바꾼 기존 단언·헬퍼(닫힌 목록 ①②③ 대조) — 03-log "U3b 구현 메모(초안)" 에 파일:줄 전/후 전부
+
+① 422 `invalid_session_id` → "무시되고 200": `test_api_chat.py`(`…invalid_session_id_header_is_ignored_and_returns_200`)·`test_api_questions_pending.py`(`…형식_위반_세션_헤더는_무시되고_계정_목록이_나온다`) ② `session_id` 기대 → `chat:<user_id>`: `test_api_chat.py` 3곳·`test_api_chat_query.py` 1곳 ③ 헤더 없는/다른 세션 헤더 `/questions/pending` 의 빈 목록 기대 → 계정 기준 목록: `test_api_questions_pending.py` 2곳. 단언 변경이 아닌 것: `SID`·trace 조회 조건을 `chat:local` 로(`test_api_answers_resume.py`·`test_api_chat.py` 2곳·`test_api_chat_query.py`·`test_api_questions_pending.py`), `test_commit_boundaries.py` 3곳 `committed_login`. **닫힌 목록 밖 1건**: `test_api_read_persons.py::_count_selects`(인증 SELECT 1건 제외 — 기대값 `== 2` 는 그대로, 보고 참조).

@@ -250,14 +250,23 @@ def _count_selects(db_session, client) -> int:
     stmts: list[str] = []
 
     def before(_conn, _cursor, statement, *_a):
+        # U3b -- 모든 라우트가 로그인 쿠키를 `auth_sessions` 로 조회하는 SELECT 1건을 더한다.
+        # 이 시험이 지키려는 것은 "목록이 인물 수와 무관한 상수 개 SELECT"(N+1 없음)이므로
+        # 인증 조회는 세지 않는다(기대값 `== 2` 는 그대로).
+        if "auth_sessions" in statement:
+            skipped.append(statement)
+            return
         if statement.lstrip().upper().startswith("SELECT"):
             stmts.append(statement)
 
+    skipped: list[str] = []
     event.listen(conn, "before_cursor_execute", before)
     try:
         assert client.get("/persons").status_code == 200
     finally:
         event.remove(conn, "before_cursor_execute", before)
+    # 걸러낸 문장은 정확히 인증 조회 1건이어야 한다(필터가 다른 SELECT 를 삼키지 못하게).
+    assert len(skipped) == 1
     return len(stmts)
 
 

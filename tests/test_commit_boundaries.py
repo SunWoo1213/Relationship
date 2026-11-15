@@ -25,10 +25,10 @@ LLM·임베딩은 가짜(`FakeProposer`/`FakeJudge`/`fake_embedder`)로 네트�
 from __future__ import annotations
 
 import uuid
+from contextlib import ExitStack
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import delete, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -56,6 +56,7 @@ from app.db.session import session_scope
 from app.er.judge import FakeJudge
 from app.main import create_app
 from app.tools.context import ToolContext
+from tests.auth_helpers import committed_login
 
 pytestmark = pytest.mark.dbtest
 
@@ -71,14 +72,14 @@ def _unique(prefix: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def test_chat_real_commit_persists_event_and_trace(db_engine, fake_embedder, monkeypatch) -> None:
+def test_chat_real_commit_persists_event_and_trace(db_engine, fake_embedder) -> None:
     """`get_session` 을 오버라이드하지 않고(운영 경로 그대로, 요청마다
     새 커넥션) `POST /chat` 한 건을 보낸 뒤, **요청이 끝난 뒤 새
     `Session`** 으로 이벤트·trace 행이 실제로 남았는지 확인한다(FIX-023
     수정안 1a)."""
     user_id = _unique("chat-ok")
-    session_id = _unique("chat-ok-session")
-    monkeypatch.setenv("APP_USER_ID", user_id)
+    session_id = f"chat:{user_id}"  # U3b -- 대화 세션은 서버가 계정에서 만든다
+    stack = ExitStack()  # 로그인 사용자·세션 행 정리(committed_login, 요청 뒤 새 커넥션으로 정리)
 
     setup_session = Session(bind=db_engine)
     try:
@@ -117,13 +118,14 @@ def test_chat_real_commit_persists_event_and_trace(db_engine, fake_embedder, mon
         ]
         app.dependency_overrides[get_proposer] = lambda: FakeProposer(table={utterance: calls})
         app.dependency_overrides[get_judge] = lambda: FakeJudge(table={person_id: 0.95})
-        client = TestClient(app)
-
-        resp = client.post(
-            "/chat", json={"utterance": utterance}, headers={"X-Session-Id": session_id}
+        client = stack.enter_context(
+            committed_login(app, lambda: Session(bind=db_engine), user_id=user_id)
         )
+
+        resp = client.post("/chat", json={"utterance": utterance})
         assert resp.status_code == 200
         body = resp.json()
+        assert body["session_id"] == session_id
         assert body["stored"] == {"persons": 0, "events": 1, "schedules": 0}
 
         # 핵심 확인 -- 이 요청을 처리한 세션과는 다른 새 커넥션으로 조회한다.
@@ -146,6 +148,7 @@ def test_chat_real_commit_persists_event_and_trace(db_engine, fake_embedder, mon
         finally:
             check.close()
     finally:
+        stack.close()
         cleanup = Session(bind=db_engine)
         try:
             cleanup.execute(delete(Event).where(Event.person_id == person_id))
@@ -177,8 +180,8 @@ def test_chat_db_error_during_record_commits_nothing_and_leaves_no_trace(
     사라지고, 라우트의 `_record_loop_error()` 자체가 호출되지 않으므로
     `loop_error` 행도 생기지 않는다."""
     user_id = _unique("chat-dberr")
-    session_id = _unique("chat-dberr-session")
-    monkeypatch.setenv("APP_USER_ID", user_id)
+    session_id = f"chat:{user_id}"  # U3b -- 대화 세션은 서버가 계정에서 만든다
+    stack = ExitStack()  # 로그인 사용자·세션 행 정리(committed_login)
 
     setup_session = Session(bind=db_engine)
     try:
@@ -236,11 +239,16 @@ def test_chat_db_error_during_record_commits_nothing_and_leaves_no_trace(
         ]
         app.dependency_overrides[get_proposer] = lambda: FakeProposer(table={utterance: calls})
         app.dependency_overrides[get_judge] = lambda: FakeJudge(table={person_id: 0.95})
-        client = TestClient(app, raise_server_exceptions=False)
-
-        resp = client.post(
-            "/chat", json={"utterance": utterance}, headers={"X-Session-Id": session_id}
+        client = stack.enter_context(
+            committed_login(
+                app,
+                lambda: Session(bind=db_engine),
+                user_id=user_id,
+                raise_server_exceptions=False,
+            )
         )
+
+        resp = client.post("/chat", json={"utterance": utterance})
 
         assert resp.status_code == 500
         assert resp.json() == {"detail": {"code": "internal_error"}}
@@ -265,6 +273,7 @@ def test_chat_db_error_during_record_commits_nothing_and_leaves_no_trace(
         finally:
             check.close()
     finally:
+        stack.close()
         cleanup = Session(bind=db_engine)
         try:
             cleanup.execute(delete(Event).where(Event.person_id == person_id))
@@ -282,15 +291,15 @@ def test_chat_db_error_during_record_commits_nothing_and_leaves_no_trace(
 
 
 def test_answers_resume_real_commit_persists_answer_and_resume_result(
-    db_engine, fake_embedder, monkeypatch
+    db_engine, fake_embedder
 ) -> None:
     """`POST /chat` → `new_person` 되묻기 → `POST /answers/{id}` 재개를
     `get_session` 오버라이드 없이(운영 경로 그대로) 돌린 뒤, **새
     `Session`** 으로 답(`answered_at`)과 재개 결과(인물·이벤트)가 함께
     커밋됐는지 확인한다(FIX-023 수정안 1c)."""
     user_id = _unique("resume-ok")
-    session_id = _unique("resume-ok-session")
-    monkeypatch.setenv("APP_USER_ID", user_id)
+    session_id = f"chat:{user_id}"  # U3b -- 대화 세션은 서버가 계정에서 만든다
+    stack = ExitStack()  # 로그인 사용자·세션 행 정리(committed_login)
 
     app = create_app()
     app.dependency_overrides[get_embedder] = lambda: fake_embedder
@@ -308,14 +317,13 @@ def test_answers_resume_real_commit_persists_answer_and_resume_result(
     ]
     app.dependency_overrides[get_proposer] = lambda: FakeProposer(table={utterance: calls})
     app.dependency_overrides[get_judge] = lambda: FakeJudge(table={})
-    client = TestClient(app)
-
     person_id: int | None = None
     question_id: int | None = None
     try:
-        resp1 = client.post(
-            "/chat", json={"utterance": utterance}, headers={"X-Session-Id": session_id}
+        client = stack.enter_context(
+            committed_login(app, lambda: Session(bind=db_engine), user_id=user_id)
         )
+        resp1 = client.post("/chat", json={"utterance": utterance})
         assert resp1.status_code == 200
         body1 = resp1.json()
         assert body1["pending_question"] is not None
@@ -352,6 +360,7 @@ def test_answers_resume_real_commit_persists_answer_and_resume_result(
         finally:
             check.close()
     finally:
+        stack.close()
         cleanup = Session(bind=db_engine)
         try:
             if person_id is not None:

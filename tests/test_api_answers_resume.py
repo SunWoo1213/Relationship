@@ -593,7 +593,8 @@ def test_answers_resume_identity_reject_writes_trace_fields_fix035(
 
     row = db_session.execute(
         select(AgentTrace)
-        .where(AgentTrace.session_id == "resume-fix035-trace", AgentTrace.step == STEP_LOOP_RESUME)
+        # U3b -- 대화 세션은 서버가 계정에서 만든다(`chat:<user_id>`). 헤더 값은 무시된다.
+        .where(AgentTrace.session_id == "chat:local", AgentTrace.step == STEP_LOOP_RESUME)
         .order_by(AgentTrace.id.desc())
     ).scalars().first()
     assert row is not None

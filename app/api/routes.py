@@ -88,16 +88,15 @@ trace까지 전부) 바깥 트랜잭션에는 손대지 않은 채 `_record_loop
 구분해 알리는 것은 **발송 결과**(U4 `WebPushNotifier`, 상태
 `"misconfigured"`) 몫이고, 이 공개키 조회는 "지금 구독을 받을 수
 있는가"만 답한다). `app.main.create_app()` 에 새 예외 핸들러를 등록하지
-않고 `fastapi.HTTPException` 을 라우트가 직접 던진다 -- `resolve_session_id`
-(`app/api/deps.py`)의 422 와 같은 경계(이 코드는 `app.tools.types.ToolError`
+않고 `fastapi.HTTPException` 을 라우트가 직접 던진다 -- `current_user`
+(`app/auth/deps.py`)의 401 과 같은 경계(이 코드는 `app.tools.types.ToolError`
 계층이 아니다, U2 범위에서 `app/main.py` 를 고치지 않는다).
 
 `POST /push/subscriptions` 는 본문 검증(`https://` 시작·길이 상한·
 base64url)을 `app/api/schemas.py::PushSubscriptionIn` 의 pydantic
 필드 검증기가 맡는다(`ChatIn.utterance` 의 `Field(min_length=1)` 과
 같은 경계 -- 어긋나면 FastAPI 기본 422). 사용자 귀속은
-`app_user_id()`(로컬 단일 사용자, `build_chat_ctx()` 와 같음) 고정이고,
-저장은 `app.push.save_subscription()`(U2, 같은 `(user_id, endpoint)`
+로그인한 계정(`current_user`, P9b-auth U3b)이고, 저장은 `app.push.save_subscription()`(U2, 같은 `(user_id, endpoint)`
 는 행을 늘리지 않고 `keys` 만 갱신)에 그대로 맡긴다."""
 
 from __future__ import annotations
@@ -125,7 +124,6 @@ from app.api.deps import (
     get_proposer,
     get_session,
     load_resume_input,
-    resolve_session_id,
 )
 from app.api.schemas import (
     AnswerIn,
@@ -155,13 +153,14 @@ from app.api.read import (
     list_briefings,
     list_persons,
 )
+from app.auth.deps import current_user
 from app.briefing import BriefingComposer, Notifier, run_briefings
-from app.db.models import AgentTrace
+from app.db.models import AgentTrace, User
 from app.embedding import EmbeddingProvider
 from app.er import Judge, JudgeUnavailable
 from app.memory import FactExtractor
 from app.push import VAPID_PARTIAL, save_subscription
-from app.settings import app_user_id, vapid_config
+from app.settings import vapid_config
 from app.tools.context import TRACE_MAX_STRING, ToolContext
 from app.tools.questions import answer_question, list_pending
 from app.tools.types import ToolError
@@ -207,6 +206,7 @@ def health(session: Session = Depends(get_session)) -> HealthOut:
 def submit_answer(
     question_id: int,
     body: AnswerIn,
+    user: User = Depends(current_user),
     session: Session = Depends(get_session),
     judge: Judge | None = Depends(get_judge),
     embedder: EmbeddingProvider | None = Depends(get_embedder),
@@ -242,7 +242,7 @@ def submit_answer(
     재개로 이벤트가 저장된 인물의 패턴·승격을 처리한다 -- 실패해도
     `SQLAlchemyError` 가 아니면 이 라우트까지 올라오지 않고
     `memory_error` trace 로만 남는다(`app/memory/hooks.py` 참고)."""
-    ctx = build_ctx(session, question_id, embedder=embedder)
+    ctx = build_ctx(session, question_id, user, embedder=embedder)
     result = answer_question(ctx, question_id, body.answer)
     resume_input = load_resume_input(session, question_id)
 
@@ -309,17 +309,17 @@ def _record_loop_error(ctx: ToolContext, utterance: str, exc: Exception) -> Agen
 @router.post("/chat", response_model=ChatOut)
 def chat(
     body: ChatIn,
-    session_id: str = Depends(resolve_session_id),
+    user: User = Depends(current_user),
     session: Session = Depends(get_session),
     proposer: Proposer | None = Depends(get_proposer),
     judge: Judge | None = Depends(get_judge),
     embedder: EmbeddingProvider | None = Depends(get_embedder),
     extractor: FactExtractor | None = Depends(get_fact_extractor),
 ) -> ChatOut:
-    """S3.4 턴 N -- 발화 한 건 = 턴 한 번(01-plan U6). 세션 귀속은 결정 I
-    (`X-Session-Id` 없으면 서버가 발급해 응답 `session_id` 로 돌려준다).
-    단일 사용자 제품 전제(`ctx.user_id = app_user_id()` 고정, `build_chat_ctx`
-    참고) -- 다중 사용자 격리는 이 패키지 범위 밖이다.
+    """S3.4 턴 N -- 발화 한 건 = 턴 한 번(01-plan U6). 세션 귀속은 P9b-auth
+    U3b 로 바뀌었다: 서버가 계정에서 `chat:<user.id>` 를 만들고(결정 S) 응답
+    `session_id` 로 돌려준다(`X-Session-Id` 헤더는 무시). `ctx.user_id` 는 로그인한
+    계정(`build_chat_ctx` 참고) -- 계정 간 격리는 이 값이 만든다.
 
     `embedder` 는 `get_embedder()` 의존성이 고른다(U6 추가 수정, 사용자
     승인) -- 운영 경로는 `_embedder_from_env()`(R-15), 테스트는
@@ -359,7 +359,7 @@ def chat(
     처리 자체는 위 "부분 롤백" 세이브포인트 **안**에서 돈다 -- 되묻기로
     끝나 이번 턴에 저장된 이벤트가 없으면 `after_record()` 는 아무 것도
     하지 않는다."""
-    ctx = build_chat_ctx(session, session_id, embedder)
+    ctx = build_chat_ctx(session, user, embedder)
     try:
         with session.begin_nested():
             turn = run_turn(
@@ -369,7 +369,7 @@ def chat(
         error_trace = _record_loop_error(ctx, body.utterance, exc)
         return ChatOut(
             reply=_LOOP_ERROR_REPLY,
-            session_id=session_id,
+            session_id=ctx.session_id,
             stored=StoredOut(persons=0, events=0, schedules=0),
             pending_question=None,
             stop_reason=None,
@@ -381,6 +381,7 @@ def chat(
 @router.post("/briefings/run", response_model=BriefingRunOut)
 def run_briefings_endpoint(
     body: BriefingRunIn | None = None,
+    user: User = Depends(current_user),
     session: Session = Depends(get_session),
     composer: BriefingComposer = Depends(get_briefing_composer),
     now: Callable[[], datetime] = Depends(get_now),
@@ -395,7 +396,7 @@ def run_briefings_endpoint(
     `ScheduleNotFound` 는 여기서 잡지 않는다 -- 모듈 docstring 참고,
     `app/main.py` 의 공통 404 매핑이 처리한다."""
     schedule_id = body.schedule_id if body is not None else None
-    ctx = build_briefing_ctx(session, now)
+    ctx = build_briefing_ctx(session, now, user)
     result = run_briefings(
         ctx, composer=composer, notifier=notifier, schedule_id=schedule_id, trigger="manual"
     )
@@ -408,7 +409,7 @@ def run_briefings_endpoint(
 
 
 @router.get("/push/vapid-public-key", response_model=VapidPublicKeyOut)
-def get_vapid_public_key() -> VapidPublicKeyOut:
+def get_vapid_public_key(user: User = Depends(current_user)) -> VapidPublicKeyOut:
     """P7-push U2(모듈 docstring 절 참고) -- VAPID 공개키만 돌려준다.
     세 이름(`VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT`)이
     전무하거나 반쪽이면 404 `push_not_configured`(01-plan 결정 D·F)."""
@@ -421,13 +422,14 @@ def get_vapid_public_key() -> VapidPublicKeyOut:
 @router.post("/push/subscriptions", response_model=PushSubscriptionOut)
 def create_push_subscription(
     body: PushSubscriptionIn,
+    user: User = Depends(current_user),
     session: Session = Depends(get_session),
 ) -> PushSubscriptionOut:
     """P7-push U2(모듈 docstring 절 참고) -- 같은 `(user_id, endpoint)`
     는 행을 늘리지 않고 `keys` 만 갱신한다(결정 F(i))."""
     result = save_subscription(
         session,
-        app_user_id(),
+        user.id,
         body.endpoint,
         {"p256dh": body.keys.p256dh, "auth": body.keys.auth},
     )
@@ -435,63 +437,71 @@ def create_push_subscription(
 
 
 @router.get("/persons", response_model=list[PersonListItemOut])
-def read_persons(session: Session = Depends(get_session)) -> list[PersonListItemOut]:
-    """P8-frontend U1 -- 인물 목록(읽기 전용, 쓰기·trace 0). 단일 사용자
-    전제(`app_user_id()`, 결정 D)."""
-    return list_persons(session, app_user_id())
+def read_persons(
+    user: User = Depends(current_user), session: Session = Depends(get_session)
+) -> list[PersonListItemOut]:
+    """P8-frontend U1 -- 인물 목록(읽기 전용, 쓰기·trace 0). 로그인한 계정의
+    인물만(CR-006 -- `user.id`, 결정 D 의 고정 사용자는 폐지)."""
+    return list_persons(session, user.id)
 
 
 @router.get("/persons/{person_id}", response_model=PersonCardOut)
 def read_person_card(
     person_id: int,
+    user: User = Depends(current_user),
     session: Session = Depends(get_session),
     now: Callable[[], datetime] = Depends(get_now),
 ) -> PersonCardOut:
     """P8-frontend U1 -- 인물 카드(읽기 전용). 없는/타 사용자 인물은
     `PersonNotFound` -> 공통 404(`app/main.py`). "다가오는 일정"의 기준
     시각은 `get_now()`."""
-    return get_person_card(session, app_user_id(), person_id, now())
+    return get_person_card(session, user.id, person_id, now())
 
 
 @router.get("/events/{event_id}/raw", response_model=EventRawOut)
-def read_event_raw(event_id: int, session: Session = Depends(get_session)) -> EventRawOut:
+def read_event_raw(
+    event_id: int, user: User = Depends(current_user), session: Session = Depends(get_session)
+) -> EventRawOut:
     """P8-frontend U2 -- 이벤트 원문(읽기 전용, 쓰기·trace 0). 없는/타 사용자
     이벤트는 `PersonNotFound` -> 공통 404."""
-    return get_event_raw(session, app_user_id(), event_id)
+    return get_event_raw(session, user.id, event_id)
 
 
 @router.get("/persons/{person_id}/facts/{fact_id}/sources", response_model=FactSourcesOut)
 def read_fact_sources(
-    person_id: int, fact_id: int, session: Session = Depends(get_session)
+    person_id: int,
+    fact_id: int,
+    user: User = Depends(current_user),
+    session: Session = Depends(get_session),
 ) -> FactSourcesOut:
     """P8-frontend U2 -- 사실의 근거 원문 목록(읽기 전용, 쓰기·trace 0)."""
-    return get_fact_sources(session, app_user_id(), person_id, fact_id)
+    return get_fact_sources(session, user.id, person_id, fact_id)
 
 
 @router.get("/questions/pending", response_model=list[ChatPendingQuestionOut])
 def read_pending_questions(
-    session_id: str = Depends(resolve_session_id),
+    user: User = Depends(current_user),
     session: Session = Depends(get_session),
     now: Callable[[], datetime] = Depends(get_now),
 ) -> list[ChatPendingQuestionOut]:
-    """P8-frontend U3 -- 이 세션의 미답변·미만료 대기 질문(읽기 전용, 쓰기·trace 0).
-    새 조회 로직 없이 `app.tools.questions.list_pending` 을 그대로 쓴다.
-    세션은 `X-Session-Id`(`/chat` 과 같은 `resolve_session_id`, 형식 위반 422).
-    헤더가 없으면 `resolve_session_id` 가 만든 임의 uuid 는 어디에도 저장되지
-    않으므로 결과는 항상 빈 목록이다(세션을 새로 만들지 않는다)."""
+    """P8-frontend U3 -- 로그인한 계정 채팅방의 미답변·미만료 대기 질문(읽기 전용,
+    쓰기·trace 0). 새 조회 로직 없이 `app.tools.questions.list_pending` 을 그대로 쓴다.
+    세션은 서버가 계정에서 만든 `chat:<user.id>`(`/chat` 과 같다, 결정 S) -- `X-Session-Id`
+    헤더는 읽지 않는다. 소유 조건(`user_id == user.id`)도 함께 걸린다(S3.4 답변 소유)."""
     # R-U3-1 -- 만료 판정 기준 시각을 get_now() 로 고정한다(테스트·운영 동일 경로).
     # 조립된 ctx 의 속성을 덮어쓰지 않고 복사본을 만든다(`run.py` 의 `replace(ctx, ...)` 관례).
-    ctx = replace(build_chat_ctx(session, session_id, None), now=now)
-    return [ChatPendingQuestionOut(**q.to_dict()) for q in list_pending(ctx, session_id)]
+    ctx = replace(build_chat_ctx(session, user, None), now=now)
+    return [ChatPendingQuestionOut(**q.to_dict()) for q in list_pending(ctx)]
 
 
 @router.get("/briefings", response_model=list[BriefingRecordOut])
 def read_briefings(
     schedule_id: int | None = None,
+    user: User = Depends(current_user),
     session: Session = Depends(get_session),
     now: Callable[[], datetime] = Depends(get_now),
 ) -> list[BriefingRecordOut]:
     """P8-frontend U3 -- 저장된 브리핑 목록(읽기 전용, 쓰기·trace 0,
     `get_briefing` 툴을 부르지 않는다). `schedule_id` 가 없거나 남의 것이면
     `ScheduleNotFound` -> 공통 404. 규칙은 `app.api.read.list_briefings`."""
-    return list_briefings(session, app_user_id(), now(), schedule_id)
+    return list_briefings(session, user.id, now(), schedule_id)
