@@ -13,6 +13,7 @@
 | 환경변수 전체 출력(`env`, `printenv`, `Get-ChildItem env:`)·KEY/SECRET 변수 echo 금지 | 존재 여부만: `test -n "$OPENAI_API_KEY" && echo set` 는 허용 |
 | `git add -A` / `git add .` 금지 — 비밀·임시 파일이 섞인다 | 파일을 명시해서 `git add path/a path/b` |
 | 로그·trace에 키·비밀을 남기지 않는다 | `agent_traces.input`은 발화·후보만. 헤더·키는 마스킹 |
+| (CR-006 · D18) 사용자 비밀번호·세션 토큰·쿠키 값은 로그·`agent_traces`·응답 본문·예외 메시지·증거 파일에 남기지 않는다 | 비밀번호는 솔트 있는 느린 해시로만 저장(`users.password_hash`), 토큰은 DB 에 해시만(`auth_sessions.token_hash`). 쿠키는 `HttpOnly`·`SameSite=Lax`·`Path=/`·운영 `Secure`. 스모크용 계정 비밀번호는 스크래치패드 파일로만 넘기고 증거에는 "set" 만. 현재 방식(서버 세션 테이블)은 새 서버 비밀 값이 없다 — 서명 쿠키 방식으로 바꾸면 그 비밀은 사용자가 서버 `.env` 에 넣는다 |
 
 ## 2. GitHub / git
 
@@ -62,10 +63,10 @@
 ## 5. 제품 코드가 지킬 것 (기획서 9장 "제3자 개인정보")
 
 - 인물 단위 완전 삭제 API (`DELETE /persons/{id}` → CASCADE).
-- 저장 최소화: `pending_questions.context`에는 재개에 필요한 것만. 전체 대화 이력 저장 금지.
+- 저장 최소화: `pending_questions.context`에는 재개에 필요한 것만 — context 안에 대화 이력을 넣지 않는다. (CR-006 · D18) 대화 기록은 계정당 채팅방 하나를 위해 `chat_messages` 에만 **계정 소유로** 저장하고(다른 계정·로그·trace 로 복사 금지), 조회는 로그인 계정 것만. 계정 삭제 기능은 이번 범위 밖이다(`auth_sessions`·`chat_messages` 만 `users` FK CASCADE). 인물 단위 삭제(P2b)가 `chat_messages` 속 언급을 어떻게 다룰지는 P2b 재개 때 정한다.
 - 웹푸시 VAPID 개인키는 환경변수(서버 `.env`, SSM 아님 — CR-005). 프론트에는 공개키만. 배포용은 로컬과 다른 새 키 쌍(결정 N).
 - ~~RDS 프라이빗 서브넷, 저장 시 암호화(RDS 기본), 전송 시 TLS(D7).~~ → **AWS 최소 구성(CR-005 · D17 개정 ②)**: Postgres 는 같은 EC2 의 compose 컨테이너, **호스트 포트 미노출**(compose 네트워크 안에서만), 저장 암호화는 EBS 기본, 전송 TLS 는 Caddy(Let's Encrypt). 보안 그룹은 80·443 과 사용자 IP 의 22 만. `.env` 는 사용자가 서버에 직접 올린다. 공개 기간(~2026-11-19) 뒤 인스턴스·EBS·EIP 삭제와 비밀 회전이 종료 절차에 포함된다.
-- 멀티테넌시 미검증(부록 A) — 그래도 모든 조회는 `user_id` 조건을 넣는다.
+- 멀티테넌시 미검증(부록 A) — 그래도 모든 조회는 `user_id` 조건을 넣는다. (CR-006) `user_id` 는 로그인 계정에서만 온다(환경변수 고정 사용자 폐지), 남의 자원은 404.
 
 ## 6. 예외가 필요할 때
 

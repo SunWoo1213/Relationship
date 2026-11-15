@@ -24,7 +24,7 @@
 |---------|------|------|------|
 | `.claude/agents/architect.md` | 계획. 기획서를 작업으로 분해, 01-plan 초안, backlog | opus | 문서·의존성 분해 |
 | `.claude/agents/backend-agent.md` | 구현. 툴 7종·에이전트 루프·엔티티 해석 4단계 | sonnet | 코드 생산, 비용 |
-| `.claude/agents/frontend-agent.md` | 구현. 프론트 3화면(채팅/인물 카드/브리핑)·PWA, `web/` 만 쓴다 (P8 U0 신설) | sonnet | 코드 생산, 비용. 검증은 verifier 가 따로 |
+| `.claude/agents/frontend-agent.md` | 구현. 프론트 핵심 화면(채팅/인물 카드/브리핑, CR-006 로 로그인·가입 추가)·PWA, `web/` 만 쓴다 (P8 U0 신설) | sonnet | 코드 생산, 비용. 검증은 verifier 가 따로 |
 | `.claude/agents/eval-agent.md` | 평가 데이터·지표. 한국어 대화 150건 데이터셋·베이스라인 | opus | 라벨 품질, 구현자와 다른 모델 |
 | `.claude/agents/verifier.md` | **검증 전담.** 02-plan-verify 점검표·04-review·코드 리뷰 | fable | 가장 강한 모델을 가장 비판적인 자리에. 구현자와 다른 모델·새 컨텍스트 |
 
@@ -38,9 +38,9 @@
 2. **임계치는 두 개다(T_merge, T_new).** 확신도 ≥ `T_merge`만 자동 연결한다. 그 미만은 반드시 `ask_user`다 — `[T_new, T_merge)`는 `kind="identity"`, `< T_new`는 `kind="new_person"`. 초기값 `T_merge = 0.8`, `T_new = 0.3` (파일럿 평가로 확정).
 3. **확신도는 3신호 결합이다.** `confidence = Σ w_i·s_i / Σ w_i` — **관측된 신호만** 결합하며 가중치는 `w_llm=0.5 · w_emb=0.3 · w_rule=0.2`(D12, CR-001). 세 신호가 모두 있으면 `0.5·s_llm + 0.3·s_emb + 0.2·s_rule` 이고, `s_rule` 이 미측정(`rule_checked=0`)이면 0 으로 넣지 않고 분모에서 뺀다(`0.625·s_llm + 0.375·s_emb`). 2단계 규칙 충돌은 후보 배제가 아니라 `s_rule` 감점이다(D13). `s_llm`은 LLM이 **구조화 출력으로 자기보고한 0~1 점수**이며, **LLM 로그 확률은 쓰지 않는다**(Claude API가 제공하지 않는다). 자기보고 점수는 보정표(`reports/calibration.json`)로 뒷받침한다.
 4. **엔티티 해석은 LLM 단일 호출로 하지 않는다.** 반드시 4단계(후보검색 → 규칙필터 → LLM판정 → 확신도 미달 시 ask_user). 이유는 `.claude/skills/entity-resolution` 참조.
-5. **프론트 화면은 3개로 고정**: 채팅 / 인물 카드 / 브리핑. UI에 시간을 쓰지 않는다.
+5. **핵심 화면은 채팅 / 인물 카드 / 브리핑이다.** 화면 수를 고정하지 않는다 — 필요한 화면(로그인·가입 등)은 계획에서 근거와 함께 더한다(CR-006, 사용자 2026-11-15). UI에 시간을 쓰지 않는다.
 6. **포함 범위에 명시**: 반복 패턴 감지(규칙 기반, D14 — CR-002) — 같은 인물의 같은 `events.type`이 설정된 기간 내 설정된 횟수 이상(`PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`, 기본 365일·3회)이면 `person_facts(key="pattern:{type}")`를 생성한다. LLM은 패턴 문장화만 한다.
-7. **의도적으로 제외한 것**: 고민 상담, 인물 간(A–B) 관계 저장, 상담 페르소나, 음성 입력, 네이티브 앱. "왜 안 했는가"를 설명할 수 있는 것이 범위 통제 능력이다.
+7. **의도적으로 제외한 것**: 고민 상담, 인물 간(A–B) 관계 저장, 상담 페르소나, 음성 입력, 네이티브 앱, **채팅방 목록(여러 대화방)** — 계정마다 채팅방은 하나다. 기억 단위는 대화방이 아니라 인물이다(CR-006, 사용자 2026-11-15 "우리는 관계를 기억하는 것이 메인이니까"). "왜 안 했는가"를 설명할 수 있는 것이 범위 통제 능력이다.
    - 경계 문장: **브리핑의 "제안"은 기록된 사실에서 도출되는 한 줄 행동 제안으로 한정한다.** 감정·고민에 대한 대화는 하지 않는다 — 고민 상담이 아니다. **채팅의 조회 답(CR-004 · D16)도 기록된 사실의 재진술로 한정한다** — 평가·조언·감정 대화는 하지 않는다.
 8. **평가 수치는 재현 가능해야 한다.** 데이터셋·라벨·베이스라인을 조작하지 않는다. 성능 미달도 결과다 — 실패 케이스 분석을 산출물로 남긴다.
 9. **모든 판정에는 근거를 남긴다.** `agent_traces`에 step·입력·출력·툴·토큰(in/out)·후보·확신도 분해를 기록한다.
@@ -52,6 +52,7 @@
 - DB: PostgreSQL + pgvector (RDS). 별도 벡터 DB 미도입 — 인물·별칭 테이블과 임베딩을 같은 DB에서 조인.
 - 임베딩: 별도 공급자 필요(Claude API에는 임베딩 엔드포인트가 없다). 공급자·차원은 임베딩 파일럿(D4) 후 확정.
 - 인프라(CR-005 · D17 개정 ②, 2026-11-14): **AWS 최소 구성** — EC2 1대에 Docker Compose 서비스 3개(`caddy` 자동 HTTPS + `/api/*` 접두 제거 프록시 + 프론트 정적 서빙 · `backend` FastAPI, 기동 시 `alembic upgrade head` · `postgres` pgvector 볼륨). DB 는 RDS 가 아니라 **compose 안 Postgres**. 브리핑 주기 작업은 컨테이너 안 1분 루프(`BRIEFING_SCHEDULER_ENABLED=1`). 비밀은 사용자가 EC2 에 올린 `.env`. 갱신은 SSH `git pull` + `compose up -d --build`. **공개 기간 한정(~2026-11-19, 졸업평가 11-18) 뒤 인스턴스 종료.** 원안(Terraform·SSM·CloudFront·RDS, D7)과 1차 CR-005 안(Vercel + Neon)은 폐기. **실제 기동은 사용자가 따로 지시할 때.**
+- 인증(CR-006 · D18, 2026-11-15): 서비스 안 **아이디 + 비밀번호** 가입·로그인(비밀번호는 해시로만). 같은 출처 **HttpOnly 쿠키** + 서버 세션 테이블(`auth_sessions`, 토큰 해시만 저장). `/health`·`/auth/signup`·`/auth/login` 밖의 API 는 로그인 필수(401). 모든 데이터는 로그인 계정 기준으로 격리, 계정마다 채팅방 하나. `APP_USER_ID` 고정 사용자는 폐지.
 - 배포 전 필수: AWS Budgets 알림($10 / $30 / $50 — 계정 무료 자격에 따라 EC2 비용 발생 가능) + **OpenAI 대시보드 월 지출 한도**(공개 기간 중 LLM 비용 상한). 둘 다 사용자 몫.
 
 ## 툴 7종 (제품 속 에이전트가 호출) — 시그니처 v2
@@ -79,10 +80,16 @@ person_facts(id, person_id, key, value, confidence, updated_at)
 fact_sources(fact_id, event_id)                          -- 시맨틱 사실 → 근거 원문 링크
 events(id, person_id, type, content, raw_utterance, occurred_at, created_at)
 schedules(id, person_id, title, scheduled_at, briefed_at)
-pending_questions(id, session_id, kind, question, options, context, answer, created_at, answered_at)
+pending_questions(id, session_id, user_id, kind, question, options, context, answer, created_at, answered_at)  -- user_id: CR-006
 push_subscriptions(id, user_id, endpoint, keys, created_at)
 agent_traces(id, session_id, step, tool_name, input, output, tokens_in, tokens_out, created_at)
+-- CR-006 · D18 (리비전 0003): 계정과 계정별 격리
+users(id, username, password_hash, created_at)
+auth_sessions(id, user_id, token_hash, created_at, expires_at)
+chat_messages(id, user_id, role, content, question_id, created_at)
 ```
+
+- (CR-006) `auth_sessions.user_id`·`chat_messages.user_id` 는 `users.id` FK(ON DELETE CASCADE). `persons`·`push_subscriptions`·`pending_questions` 의 `user_id` 는 `users.id` 값을 담지만 FK 는 두지 않는다(S3.1 보충, P9b 결정 O). 대화 `session_id` 는 서버가 계정에서 만든다(`chat:<user_id>`).
 
 - **`person_embeddings` 테이블은 없다.** 임베딩은 **별칭 단위**로 `person_aliases.embedding`에 둔다. 후보 검색은 별칭 top-K → 인물별 max 유사도로 집계한다.
 - `events.type` 고정 집합: `conflict / praise / meal / meeting / personal_share / favor / other`. 추출 F1의 라벨 집합이 된다.

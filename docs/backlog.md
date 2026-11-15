@@ -88,11 +88,20 @@
 
 - [x] [frontend-agent(신설)] 프론트 3화면 + PWA / 의존: P5, P6 / 수용기준: 채팅 확인 칩, 카드 원문 펼치기, 브리핑 화면 — **P8-frontend 완료 2026-10-21**(verifier 04-review `완료`, [필수] 0 · [권고] 10, 사용자 승인 — OS 알림 클릭·밝은 모드 확인은 면제; 단위 커밋 해시는 `packages/P8-frontend/03-log.md`, 마지막 제품 코드 커밋 `3bd5025`)
 - [x] [frontend-agent] **P8b-persons-grid** — 인물 화면 카드 그리드 + 이름·별칭 검색(프론트, 태그 필터 없음) + 사이드바 최근 5명(`last_contact_at`)·"전체 보기" 링크 (CR-003 · D15) — **완료 2026-10-28**(verifier 04-review `완료`, [필수] 0 · [권고] R-U5R-1~11, 사용자 승인 R-U5R-2 면제; U0 `adc650e` · U1 `2112a2a` · U2 `529922f` · U3 `a0f4bc3` · U4 `fff6e8c`) / 의존: P8-frontend 04-review 완료(충족 2026-10-21) / 수용기준: D15 "코드에서 지켜야 할 것" 전부 · 백엔드 변경은 `GET /persons` 응답에 `aliases` 필드를 더하는 것뿐(결정 K (나), 읽기 전용, 스키마 v2 무변경 — `app/api/read.py`·`app/api/schemas.py`·`tests/test_api_read_persons.py` 밖 `app/`·`alembic/` diff 0) · `card.test.tsx`·`routes.test.tsx`·E2E `card.spec.ts` 사이드바 단언 5명으로 갱신 · 목록 폭 단언 보강(R-U10C-3, 조상 전부 + `boundingBox()`) · typecheck·Vitest·build·E2E 통과 · 상세 가운데 75% 는 `3bd5025` 유지 — 사용자 승인 2026-10-16, 결정 K·A~J 확정 2026-10-21
-- [ ] [미정 — CR 필요] 사용자별 메모리 설정을 앱 안에서 선택(패턴 기간·횟수, 카드 정리 기준) / 의존: P6-memory, P8 / 수용기준: (CR 에서 정함) — 사용자 요청 2026-09-28. 지금은 서버 설정 파일(`PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`)로만 고른다. 사용자별 저장은 스키마 v2 변경(설정 테이블), 선택 UI 는 기존 3화면 안(원칙5)이라 CR 선행
+- [ ] [미정 — CR 필요] 사용자별 메모리 설정을 앱 안에서 선택(패턴 기간·횟수, 카드 정리 기준) / 의존: P6-memory, P8 / 수용기준: (CR 에서 정함) — 사용자 요청 2026-09-28. 지금은 서버 설정 파일(`PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`·`MEMORY_PROMOTE_MIN_EVENTS`)로만 고른다. 사용자별 저장은 스키마 v2 변경(설정 테이블)이라 CR 선행. (CR-006 이후: 원칙5 의 화면 수 고정은 폐지 — 선택 UI 는 새 화면이어도 되고, 사용자 단위는 `users` 테이블 위에 둔다)
 
 ### P9
 
 - [ ] [backend-agent + frontend-agent + 사용자] **P9-infra(CR-005 · D17 개정 ② 재계획, 2026-11-14)** — **AWS 최소 구성**: EC2 1대 + Docker Compose(`caddy` 자동 HTTPS·`/api/*` 접두 제거·프론트 정적 서빙 / `backend` FastAPI + `alembic upgrade head` entrypoint / `postgres` pgvector 볼륨), 제품 코드 변경 0, 1분 스케줄러 그대로, **공개 기간 ~2026-11-19 뒤 인스턴스 종료 절차** / 의존: P8 / 수용기준: 배포 URL(HTTPS)에서 데모 시나리오 5단계 재현 + `git diff --stat -- app web/src alembic` 빈 출력(제품 코드 무변경) + `postgres` 호스트 포트 미노출 + 저장소·compose 파일에 비밀 값 0 + 로컬에서 `docker compose -f docker-compose.prod.yml up --build` 스모크(`/api/health` 200, 정적 `/` 200) + 종료 체크리스트 문서 존재 + 아래 유효성 점검 중 compose·Caddy 대응 항목(RDS·CloudFront 항목은 치환). **실제 EC2 기동은 사용자가 따로 지시할 때(계획·파일·로컬 스모크까지 먼저).** ~~(원안) [infra-agent(신설)] Terraform + GitHub Actions + Caddy TLS~~ / 원안 수용기준: 배포 URL에서 데모 시나리오 5단계 재현 **+ 배포 유효성 점검 요구(verifier `docs/wiki/packages/P8-frontend/review-u10-deploy-validity.md`, 2026-10-16)**: ① 착수 전 사용자 결정 R-U10D-3 — 인증 없는 공개 배포 정책(공개 범위·`/api/docs`·`/api/openapi.json` 노출·최소 보호, F-fbaaae) ② 첫 단위에 `Dockerfile` + 스모크 S1(이미지 빌드·기동·`/health`)을 CI 에(R-U10D-1) ③ 수용기준에 스모크 **S1~S15**(§9) 글자 그대로 — 특히 S2·S4 `/api` 접두 제거·CloudFront 경로·정적 MIME/캐시(R-U10D-2), S7·S8 RDS 마이그레이션 주체·`CREATE EXTENSION` 권한·SSL(R-U10D-4) ④ [권고] R-U10D-5(`.env.example` 미사용 이름 3개)·-7(계약 대조 자동화)·-9(스케줄러 워커 수)·-10(운영 경로로 데모 5단계) 검토
+
+### P9b — 로그인·계정별 격리 (CR-006 · D18)
+
+- [ ] [backend-agent + frontend-agent + 사용자] **P9b-auth** — 아이디·비밀번호 가입·로그인(HttpOnly 쿠키 + 서버 세션 테이블), 모든 API 를 로그인 사용자 기준으로, 계정마다 채팅방 하나와 대화 기록 저장·불러오기, 스케줄러·푸시 사용자별, 리비전 0003(기존 데이터 비우기), 프론트 로그인·가입 화면, 배포 반영과 시연 두 갈래 / 의존: P9-infra U4(배포본 기동 `7830f6c`, 04-review 는 P9b 반영 뒤 함께) · P8 · P5b — **졸업평가 2026-11-18 전 배포 필수(CR-006 결정 3)** / 수용기준: 가입·로그인·로그아웃·내 정보 API 가 동작하고 비밀번호는 해시로만 저장된다 + `/health`·`/auth/signup`·`/auth/login` 밖의 모든 API 가 로그인 없이 401 + 계정 A 로 계정 B 의 인물·사건 원문·사실 근거·일정 브리핑·대기 질문에 접근하면 404 이고 B 의 질문에 답할 수 없다(F-fbaaae 닫힘) + 요청 경로의 `app_user_id()` 호출 0·`ToolContext.user_id` 기본값 없음 + 계정마다 채팅방 하나 — 대화 기록이 서버에 저장되고 다시 로그인하면 이어서 보이며 session_id 는 계정에 묶인다 + 브리핑 주기 작업과 푸시가 사용자마다 돌고 다른 계정의 일정 알림이 내 브라우저로 오지 않는다 + 리비전 0003 이 기존 데이터를 비우고 `alembic upgrade head`·`alembic check` 통과 + 프론트 로그인·가입 화면·로그아웃·대화 기록 불러오기·401 시 로그인 화면 복귀 + 배포 URL 에서 시연 두 갈래 재현 — (가) 새 계정 가입 뒤 빈 상태 (나) 데이터가 쌓인 시연 계정으로 로그인해 인물 카드·브리핑·대화 기록이 보이고, 새 계정에는 시연 계정의 인물이 보이지 않는다 + 툴 7종 불변(`tools_check` 7/7) + pytest 전체 통과 skip 0
+  - 세분화는 `docs/wiki/packages/P9b-auth/01-plan.md`(U1~U8). 하지 않는 것: 비밀번호 재설정·이메일 인증·소셜 로그인·채팅방 목록(원칙7 제외)·관리자 화면.
+
+### P9c — 브리핑 달력 보기 (CR-006 변경 항목 2)
+
+- [ ] [backend-agent + frontend-agent] **P9c-briefing-calendar** — 브리핑 화면에 월 달력 보기(목록 보기 유지), 월 범위 일정 조회 API 1개(읽기 전용) / 의존: **P9b-auth 04-review 완료**(달력 조회가 로그인 사용자 기준) — 평가(11-18) 전에 못 들어가면 배포본은 로그인만 반영된 상태로 시연하고 평가 뒤 이어간다 / 수용기준: 브리핑 화면에서 목록 보기와 달력 보기를 전환할 수 있다 + 월 달력에 그달 일정이 날짜별로 표시되고 브리핑이 만들어진 일정은 구분된다 + 날짜를 누르면 그날의 일정·브리핑이 보인다 + 월 범위 일정 조회 API 는 로그인 사용자의 일정만 돌려주고(남의 일정 0) 읽기 전용이다(쓰기·trace·LLM 호출 0) + 기존 목록 보기·`GET /briefings` 동작 불변 + 새 프론트 의존성 0 + pytest·typecheck·Vitest·build 통과
 
 ### P10
 
@@ -105,10 +114,11 @@
 
 ## 리스크 로그 (기획서 9장)
 
-- **다중 사용자 격리가 없다(F-fbaaae)** → `pending_questions`·`agent_traces` 에 `user_id` 컬럼이 없어 세션 단위 귀속만 하고 사용자 단위 격리는 하지 못한다. 단일 사용자(`app_user_id()` 고정) 전제에서는 문제가 드러나지 않지만 **P9 배포 전에 다시 꺼내야 하는 부채**다. 스키마 변경(S3.1)이 필요하므로 P5-loop 범위 밖이고, P5 는 이 사실을 모듈 docstring·README 에 명시만 한다(01-plan 결정 I(i), architect 개정 제안 4 · 사용자 승인 2026-09-23).
+- ~~**다중 사용자 격리가 없다(F-fbaaae)** → `pending_questions`·`agent_traces` 에 `user_id` 컬럼이 없어 세션 단위 귀속만 하고 사용자 단위 격리는 하지 못한다. 단일 사용자(`app_user_id()` 고정) 전제에서는 문제가 드러나지 않지만 **P9 배포 전에 다시 꺼내야 하는 부채**다.~~ → **CR-006 · D18 로 해소 예정(P9b-auth, 2026-11-15)**: 로그인 계정 기준 격리, `pending_questions.user_id` 추가·답변 소유 검사, 대화 `session_id` 를 계정에 묶음(`agent_traces` 는 `session_id` 로 계정 추적, 컬럼 추가 없음). P9b 04-review 완료 시 이 줄을 닫는다. (원 기록: 스키마 변경(S3.1)이 필요하므로 P5-loop 범위 밖이었고 P5 는 모듈 docstring·README 에 명시만 했다 — 01-plan 결정 I(i), 사용자 승인 2026-09-23.)
 
 - 엔티티 해석 성능 미달 → **P4 파일럿 평가 시점**에 점검, 실패 케이스 분석을 산출물로
-- 1인 개발 범위 초과 → 프론트 3화면 고정, 음성·메시지 초안 제외
+- 1인 개발 범위 초과 → 프론트는 핵심 3화면 중심(화면 수 고정은 CR-006 로 폐지 — 더하는 화면은 계획에서 근거와 함께), 음성·메시지 초안·채팅방 목록 제외
+- 졸업평가(11-18) 전 로그인 반영 일정 → P9b 범위를 최소로(재설정·이메일·소셜·관리자 제외), 달력(P9c)은 P9b 뒤 여유가 있을 때만. 밀리면 범위를 줄인다(CR-006 결정 3)
 - LLM API 비용 → 소형 모델·프롬프트 캐싱·`metrics.json` 재사용, 착수 준비의 `cost_estimate.md`로 사전 추정
 - `s_llm` 자기보고 점수의 신뢰성 → **P4 파일럿 평가 시점**에 보정표(`reports/calibration.json`)로 검증
 - 임베딩 공급자 미확정(D4) → 착수 준비 파일럿 전까지 스키마의 `vector(N)` 차원을 고정하지 않는다

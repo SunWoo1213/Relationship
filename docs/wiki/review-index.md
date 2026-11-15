@@ -17,9 +17,9 @@
 | R9 | M | 인물당 임베딩 1개 | 구현완료(4dfaf33, 09c2bd1, a9cb254, 2c63c60 — 별칭 단위 임베딩·top-K 인물별 max·OpenAIEmbeddingProvider 런타임; **실 공급자 호출 확인**(2026-09-22 P4 U7 ef18143 — text-embedding-3-small N=1536, 40 시나리오 별칭 임베딩 `embedded == aliases` 40/40, 임베딩 배치 62회, `packages/P4-pilot-eval/evidence/20260922-1324-u7-real-run.txt`; `embedding_only` 베이스라인 오병합 0/132 — 별칭 max 집계가 실 임베딩에서 동작)) | D5 → S3.1 → P1-schema, P2-tools, P3-er |
 | R10 | M | 툴 시그니처 ↔ 스키마 불일치 | 구현완료(f2e9e05 — tools_check 7/7, CLAUDE.md 표 = 실제 시그니처) | S3.2 |
 | R11 | M | 반복 패턴 감지 메커니즘 없음 | 구현완료(d67d084 규칙 기반 감지(LLM 0회)·8d3967a 대화 턴마다 자동 실행; CR-002/D14 기본 365일·3회 설정값 `PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT` → 완료, P6-memory 04-review §2 ㄷ·ㄹ) | D14 → S3.5 → P6-memory |
-| R12 | M | 브리핑 트리거·푸시 구독 저장소 없음 | 구현완료(브리핑 트리거: P6-briefing e2155f9…e2cca80, 주기 작업+`POST /briefings/run` · 푸시 구독 저장·VAPID 발송: P7-push 85393e0…6428180, 데스크톱 Chrome 실수신 2026-10-10 · FIX-029 e555142) | S3.6 → P6-briefing, P7-push |
+| R12 | M | 브리핑 트리거·푸시 구독 저장소 없음 | 구현완료(브리핑 트리거: P6-briefing e2155f9…e2cca80, 주기 작업+`POST /briefings/run` · 푸시 구독 저장·VAPID 발송: P7-push 85393e0…6428180, 데스크톱 Chrome 실수신 2026-10-10 · FIX-029 e555142). **CR-006(D18, 2026-11-15)**: 주기 작업·푸시가 사용자마다 돌도록 재작업 — P9b-auth(구현대기) | S3.6 → P6-briefing, P7-push · D18 → P9b-auth |
 | R13 | M | LLM·임베딩 비용 미산정 | 결정완료 | P0-cost |
-| R14 | M | CloudFront→EC2 TLS 미정 | **재결정(CR-005 개정 ②, 2026-11-14)** — CloudFront 없음, EC2 의 Caddy 가 직접 HTTPS(도메인 또는 sslip.io) | D7(대체됨) → **D17** → P9-infra(재계획) |
+| R14 | M | CloudFront→EC2 TLS 미정 | **재결정(CR-005 개정 ②, 2026-11-14)** — CloudFront 없음, EC2 의 Caddy 가 직접 HTTPS(도메인 또는 sslip.io). D17 결정 6 "로그인 없음" 은 **CR-006 · D18**(2026-11-15)로 개정 — 배포본에 로그인 반영(P9b-auth) | D7(대체됨) → **D17** → P9-infra(재계획) · D18 → P9b-auth |
 | R15 | L | 데모 날짜 9/10(화) 달력 불일치 | 결정완료 | P11-demo |
 | R16 | L | 부록 수치가 결과처럼 읽힘 | 해소(문서) | proposal.md 상단 안내 |
 | R17 | L | 제목 "관계 그래프" ↔ A–B 제외 | 해소(문서) | D8 |
