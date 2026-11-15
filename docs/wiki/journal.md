@@ -676,3 +676,5 @@
 - 2026-11-16 07:09 | PUSH-dev2 | origin dev2 f1ea1b4 (실험 푸시)
 - 2026-11-16 07:23 | COMMIT | 8b6946f feat(P9b-auth): 가입 화면에 닉네임 칸과 아이디·닉네임 중복 확인을 더한다
 - 2026-11-16 07:23 | PUSH-dev2 | origin dev2 8b6946f (실험 푸시)
+- 2026-11-16 07:33 | COMMIT | bd0e061 feat(P9b-auth): 가입 때 닉네임을 저장하고 아이디·닉네임이 겹치는지 묻는 API 를 더한다
+- 2026-11-16 07:33 | PUSH-dev2 | origin dev2 bd0e061 (실험 푸시)

@@ -1,0 +1,75 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u11/caddy.sh
+# 시각: 2026-11-16T07:37:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: bd0e061 (dev2)
+# exit: 0
+# ---
+=== 1. health
+{"status":"ok","db":"up","alembic_revision":"0004"}
+users 행 수(시작): 8
+
+=== 2. 0003 시절 기존 계정(u7a760623) 로그인 — 닉네임은 아이디와 같아야 한다
+[login] -> 200  body: {"id":"f9d413b2c2a24832b931e914dfe6c53d","username":"u7a760623","nickname":"u7a760623"}
+[me] -> 200  body: {"id":"f9d413b2c2a24832b931e914dfe6c53d","username":"u7a760623","nickname":"u7a760623"}
+users 행 수(로그인 뒤): 8
+
+=== 3. GET /api/auth/availability (쿠키·Origin 없음)
+[쿼리 없음 (422 missing_query 기대)] -> 422  body: {"detail":{"code":"missing_query"}}
+[기존 아이디 (taken 기대)] -> 200  body: {"username":"taken","nickname":null}
+[새 아이디 (available 기대)] -> 200  body: {"username":"available","nickname":null}
+[아이디 형식 위반 대문자 (invalid 기대)] -> 200  body: {"username":"available","nickname":null}
+[아이디 너무 짧음 (invalid 기대)] -> 200  body: {"username":"invalid","nickname":null}
+[기존 닉네임=아이디값 (taken 기대)] -> 200  body: {"username":null,"nickname":"taken"}
+[한글 닉네임 새 값 퍼센트 인코딩 (available 기대)] -> 200  body: {"username":null,"nickname":"available"}
+[닉네임 형식 위반 1자 (invalid 기대)] -> 200  body: {"username":null,"nickname":"invalid"}
+[닉네임 형식 위반 공백·기호 (invalid 기대)] -> 200  body: {"username":null,"nickname":"invalid"}
+[두 칸 동시 (taken/available 기대)] -> 200  body: {"username":"taken","nickname":"available"}
+-- 응답 헤더(Cache-Control 기대 no-store), 쿠키·Origin 없음
+HTTP/2 200 
+cache-control: no-store
+content-type: application/json
+-- 쿼리 없음 422 의 헤더(참고)
+HTTP/2 422 
+
+=== 4. 가입 (같은 Origin https://localhost:8443)
+users 행 수(전): 8
+[새 가입, 닉네임 앞뒤 공백·대문자 입력 (201 + nickname=smoke_nick782236 기대)] -> 201  body: {"id":"5e66c94761a846cc8d3305cdc49b7482","username":"u11n782236","nickname":"smoke_nick782236"}
+[새 계정 /me (nickname 정규화 값)] -> 200  body: {"id":"5e66c94761a846cc8d3305cdc49b7482","username":"u11n782236","nickname":"smoke_nick782236"}
+[같은 닉네임 다른 아이디 (409 nickname_taken 기대)] -> 409  body: {"detail":{"code":"nickname_taken"}}
+[대소문자만 다른 닉네임 (409 nickname_taken 기대)] -> 409  body: {"detail":{"code":"nickname_taken"}}
+[같은 아이디 새 닉네임 (409 username_taken 기대)] -> 409  body: {"detail":{"code":"username_taken"}}
+[기존 0003 아이디 재가입 (409 username_taken 기대)] -> 409  body: {"detail":{"code":"username_taken"}}
+[닉네임 누락 (422 기대)] -> 422  body: {"detail":[{"type":"missing","loc":["body","nickname"],"msg":"Field required"}]}
+[닉네임 형식 위반 1자 (422 invalid_nickname 기대)] -> 422  body: {"detail":{"code":"invalid_nickname"}}
+[한글 닉네임 가입 (201 기대)] -> 201  body: {"id":"a144ccd91e744c8e801c884bb7e192ab","username":"u11k782236","nickname":"한글닉782236"}
+[새 계정 재로그인 (nickname 기대)] -> 200  body: {"id":"5e66c94761a846cc8d3305cdc49b7482","username":"u11n782236","nickname":"smoke_nick782236"}
+users 행 수(후, +2 기대): 10
+-- DB 확인: 실패한 시도가 행을 만들지 않았는지(아이디가 u11n782236x/y/z/w 인 행 수 0 기대)
+0
+
+=== 5. 프론트 정적 파일
+[/ (200 기대)] -> 200  body: <!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color
+번들: /assets/index-DUYQ9mON.js
+js http=200 bytes=373218
+grep '닉네임 중복 확인': 1 줄
+grep '사용할 수 있는 닉네임이에요': 1 줄
+grep '이미 쓰고 있는 닉네임이에요': 1 줄
+grep 'auth/availability': 1 줄
+
+=== 6. 다른 Origin(https://evil-1-2-3-4.sslip.io)
+users 행 수(전): 10
+[POST signup 다른 Origin (403 bad_origin 기대)] -> 403  body: {"detail":{"code":"bad_origin"}}
+[POST login 다른 Origin (403 기대)] -> 403  body: {"detail":{"code":"bad_origin"}}
+[GET availability 다른 Origin (200 기대)] -> 200  body: {"username":"taken","nickname":null}
+users 행 수(후, 같아야 함): 10
+
+=== 7. 회귀: 쿠키 없이 보호 경로
+[/api/persons (401 기대)] -> 401  body: {"detail":{"code":"unauthenticated"}}
+[/api/auth/me (401 기대)] -> 401  body: {"detail":{"code":"unauthenticated"}}
+users 최종: 10  (남긴 계정: u11n782236 u11k782236)

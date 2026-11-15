@@ -1,0 +1,49 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u11/up-old.sh
+# 시각: 2026-11-16T07:35:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: bd0e061 (dev2)
+# exit: 0
+# ---
+ Container relationship-prod-postgres-1 Creating 
+ Container relationship-prod-postgres-1 Created 
+ Container relationship-prod-backend-1 Creating 
+ Container relationship-prod-backend-1 Created 
+ Container relationship-prod-caddy-1 Creating 
+ Container relationship-prod-caddy-1 Created 
+ Container relationship-prod-postgres-1 Starting 
+ Container relationship-prod-postgres-1 Started 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-1 Starting 
+ Container relationship-prod-backend-1 Started 
+ Container relationship-prod-caddy-1 Starting 
+ Container relationship-prod-caddy-1 Started 
+ Container relationship-prod-caddy-1 Waiting 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-backend-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-caddy-1 Healthy 
+ Container relationship-prod-backend-1 Healthy 
+NAME                           IMAGE                          COMMAND                   SERVICE    CREATED          STATUS                    PORTS
+relationship-prod-backend-1    relationship-backend:4be331b   "sh /app/docker/entr…"   backend    37 seconds ago   Up 5 seconds (healthy)    8000/tcp
+relationship-prod-caddy-1      relationship-caddy:4be331b     "caddy run --config …"   caddy      37 seconds ago   Up 5 seconds              0.0.0.0:8088->80/tcp, [::]:8088->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp
+relationship-prod-postgres-1   pgvector/pgvector:pg16         "docker-entrypoint.s…"   postgres   37 seconds ago   Up 36 seconds (healthy)   5432/tcp
+== alembic 줄
+2:backend-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
+Traceback count: 0
+== health
+{"status":"ok","db":"up","alembic_revision":"0003"}
+== users 행 수: 8
+== users 아이디(앞 12개)
+28ad9264a4804c69907f31af401041c3|u7g4760623
+4531756efbcf4985a5a234376798a057|u7d760623
+6f71bf39885347bf85b915e0f73b2b08|u7e2760623
+7650a87400a3420d80165bb175b45737|u7i760641
+9e071262674247df9b27f89beea0871f|u7g5760623
+e9f0cab28fc343eba2e236345518aa39|u7g2760623
+ed97694e0ac74dab9288e45d8d62942c|u7f760623
+f9d413b2c2a24832b931e914dfe6c53d|u7a760623
+== users 컬럼(nickname 없어야 함)
+id username password_hash created_at 
+== alembic_version
+0003

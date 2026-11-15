@@ -1,0 +1,62 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u11/up-new.sh
+# 시각: 2026-11-16T07:36:29+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: bd0e061 (dev2)
+# exit: 0
+# ---
+GIT_SHA=bd0e061
+users 행 수(기동 전): 8
+
+
+
+
+
+
+
+
+
+
+
+ Image relationship-backend:bd0e061 Built 
+ Image relationship-caddy:bd0e061 Built 
+ Container relationship-prod-postgres-1 Running 
+ Container relationship-prod-backend-1 Recreate 
+ Container relationship-prod-backend-1 Recreated 
+ Container relationship-prod-caddy-1 Recreate 
+ Container relationship-prod-caddy-1 Recreated 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-1 Starting 
+ Container relationship-prod-backend-1 Started 
+ Container relationship-prod-caddy-1 Starting 
+ Container relationship-prod-caddy-1 Started 
+ Container relationship-prod-caddy-1 Waiting 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-backend-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-caddy-1 Healthy 
+ Container relationship-prod-backend-1 Healthy 
+exit-of-up: 0
+NAME                           IMAGE                          COMMAND                   SERVICE    CREATED              STATUS                        PORTS
+relationship-prod-backend-1    relationship-backend:bd0e061   "sh /app/docker/entr…"   backend    7 seconds ago        Up 5 seconds (healthy)        8000/tcp
+relationship-prod-caddy-1      relationship-caddy:bd0e061     "caddy run --config …"   caddy      7 seconds ago        Up 5 seconds                  0.0.0.0:8088->80/tcp, [::]:8088->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp
+relationship-prod-postgres-1   pgvector/pgvector:pg16         "docker-entrypoint.s…"   postgres   About a minute ago   Up About a minute (healthy)   5432/tcp
+== backend 로그 alembic 줄
+2:backend-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
+3:backend-1  | INFO  [alembic.runtime.migration] Running upgrade 0003 -> 0004, Refs: P9b-auth U9 CR-007 D18 S3.1 -- `users.nickname` (닉네임, UNIQUE).
+Traceback count: 0
+== health
+{"status":"ok","db":"up","alembic_revision":"0004"}
+users 행 수(기동 후): 8
+== alembic_version: 0004
+== nickname = username 인 행 / 전체 / nickname NULL
+8|8|0
+== users 컬럼·제약
+id NO
+username NO
+password_hash NO
+created_at NO
+nickname NO
+pk_users
+uq_users_nickname
+uq_users_username

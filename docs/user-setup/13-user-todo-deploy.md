@@ -70,6 +70,35 @@
 - [ ] **G-10** OpenAI 사용량 확인 — 11-17 저녁과 11-18 아침. 누구나 가입할 수 있어 월 한도 $10 이 평가 전에 소진될 수 있다. 소진됐으면 한도를 올리거나 키를 바꾼다(사용자만 가능).
 - [ ] **G-11** (푸시를 시연에 쓸 때) 시연 계정으로 로그인한 브라우저에서 브리핑 화면 "알림 받기" → 권한 허용 → 알림을 눌러 그 브리핑이 열리는지.
 
+## H. 닉네임·중복검사 버전 반영 (P9b-auth U11, CR-007 — 2026-11-16, 해시 `bd0e061`)
+
+> 가입 화면에 닉네임 칸과 아이디·닉네임 "중복 확인" 이 생긴다. **이번 반영은 데이터를 지우지 않는다** — 계정 표에 닉네임 칸만 더하고, 이미 있는 계정은 닉네임이 아이디와 같은 값으로 채워진다(닉네임을 나중에 바꾸는 기능은 없다). 서버 `.env` 는 고치지 않는다(새 값 없음).
+> 로컬에서 운영과 같은 구성으로 먼저 확인했다(계정이 있는 0003 DB → 0004, 계정 수 그대로, `evidence/20261116-0735~0737-u11-*.txt`).
+> **시연 계정은 이 반영이 끝난 뒤에 가입한다** — 먼저 만든 계정은 닉네임이 아이디로 고정된다.
+
+- [ ] **H-1** 서버 접속: `ssh -i ~/.ssh/relationship-deploy ubuntu@54.79.202.221`
+- [ ] **H-2** 코드 받기: `cd ~/Relationship && git fetch origin && git checkout bd0e061`
+- [ ] **H-3** 기동(새 backend 가 올라오면서 리비전 0004 가 돈다 — 따로 `alembic` 을 치지 않는다): `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build`
+- [ ] **H-4** 상태: `docker compose -f docker-compose.prod.yml ps` → 세 서비스 running, postgres·backend healthy. 출력을 에이전트에 붙인다.
+- [ ] **H-5** 로그: `docker compose -f docker-compose.prod.yml logs --tail=200 backend | grep -c Traceback` (기대 `0`) 와 `docker compose -f docker-compose.prod.yml logs backend | grep "Running upgrade"` (기대: `0003 -> 0004` 가 있는 줄). 두 출력을 에이전트에 붙인다.
+- [ ] **H-6** 에이전트에 "반영했어" 라고 알린다 → 에이전트가 바깥 확인(본문 없는 조회)을 한다: `/api/health` 의 `alembic_revision` 이 `0004`, `/api/auth/availability?username=test` 가 `taken`.
+- [ ] **H-7** 브라우저(열려 있던 탭은 **새로고침**) → 기존 `test` 계정은 사이드바 아래에 `test · test · 로그아웃` 으로 보인다(닉네임 = 아이디) → 로그아웃 → "계정 만들기" → 아이디·닉네임을 넣고 칸마다 "중복 확인" → 가입 → 사이드바에 `닉네임 · 아이디 · 로그아웃`.
+  - 닉네임 규칙: 한글(완성형)·영문·숫자·밑줄 2~20자, 가운데 공백 불가. 영문은 소문자로 저장·표시된다(`Demo` → `demo`).
+  - "중복 확인" 을 누르지 않아도 가입은 된다. 겹치면 가입할 때 화면에 이유가 나온다.
+  - 아이디 앞뒤에 공백이 들어가면 "형식이 맞지 않는다" 로 나온다(닉네임은 앞뒤 공백을 알아서 뗀다).
+- [ ] **H-8** 이어서 G-8(시연 계정에 발화 13개) · G-9(리허설) · G-10(OpenAI 사용량) · G-11(푸시).
+
+### H 가 잘못됐을 때
+
+- **먼저**: H-4·H-5 출력을 에이전트에 붙인다. 고친 새 해시를 받아 H-2·H-3 을 다시 한다(권장).
+- **급하게 로그인 버전(`4be331b`, 닉네임 없음)으로 되돌려야 할 때** — 로컬에서 예행해 동작을 확인한 순서다(`evidence/20261116-0737-u11-rollback.txt`). 계정과 기억 데이터는 그대로 남고 **닉네임 값만 사라진다**. 순서를 바꾸지 않는다(옛 버전은 0004 상태의 DB 에서 뜨지 않는다).
+  1. `docker compose -f docker-compose.prod.yml stop backend`
+  2. `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml run --rm --entrypoint python backend -m alembic downgrade 0003` → `Running downgrade 0004 -> 0003` 한 줄
+  3. `git checkout 4be331b`
+  4. `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build`
+  - 1~4 사이에는 사이트가 잠깐 열리지 않는다(502). 되돌린 뒤 나중에 다시 닉네임 버전을 올리면 **모든 계정의 닉네임이 아이디 값으로 다시 채워진다**(그 전에 정한 닉네임은 남지 않는다).
+  - 에이전트는 이 명령을 운영 서버에서 실행해 보지 않았다(로컬 운영 구성에서만 확인).
+
 ## F. 로컬 정리 (언제든, 에이전트는 못 함)
 - [ ] 로컬 Postgres 의 시험용 DB 2개(P9b-auth U1 이 만든 빈 DB, 지워도 다음 테스트 때 하나는 다시 생긴다): `relationship_test_mig`, `relationship_test_mig_v15` — 원하면 `dropdb` 로 직접.
 - [ ] 로컬 Docker 의 스모크 볼륨 3개: `docker volume rm relationship-prod_pgdata relationship-prod_caddy_data relationship-prod_caddy_config`

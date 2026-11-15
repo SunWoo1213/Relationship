@@ -1,0 +1,70 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u11/rollback.sh
+# 시각: 2026-11-16T07:37:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: bd0e061 (dev2)
+# exit: 0
+# ---
+=== 0. 시작 상태: HEAD=bd0e061 branch=dev2
+health: {"status":"ok","db":"up","alembic_revision":"0004"}
+users: 10  alembic_version: 0004
+
+=== ① GIT_SHA=bd0e061 docker compose -f docker-compose.prod.yml stop backend
+ Container relationship-prod-backend-1 Stopping 
+ Container relationship-prod-backend-1 Stopped 
+NAME                           IMAGE                          COMMAND                   SERVICE    CREATED              STATUS                              PORTS
+relationship-prod-backend-1    relationship-backend:bd0e061   "sh /app/docker/entr…"   backend    About a minute ago   Exited (0) Less than a second ago   
+relationship-prod-caddy-1      relationship-caddy:bd0e061     "caddy run --config …"   caddy      About a minute ago   Up About a minute                   0.0.0.0:8088->80/tcp, [::]:8088->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp
+relationship-prod-postgres-1   pgvector/pgvector:pg16         "docker-entrypoint.s…"   postgres   2 minutes ago        Up 2 minutes (healthy)              5432/tcp
+
+=== ② GIT_SHA=bd0e061 docker compose -f docker-compose.prod.yml run --rm --entrypoint python backend -m alembic downgrade 0003
+ Container relationship-prod-postgres-1 Running 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-run-ddd112b9ee0d Creating 
+ Container relationship-prod-backend-run-ddd112b9ee0d Created 
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 0004 -> 0003, Refs: P9b-auth U9 CR-007 D18 S3.1 -- `users.nickname` (닉네임, UNIQUE).
+exit: 0  (②소요 1초)
+alembic_version: 0003   users: 10
+users 컬럼: id username password_hash created_at
+users 제약: pk_users uq_users_username
+NAME                           IMAGE                          COMMAND                   SERVICE    CREATED              STATUS                    PORTS
+relationship-prod-backend-1    relationship-backend:bd0e061   "sh /app/docker/entr…"   backend    About a minute ago   Exited (0) 1 second ago   
+relationship-prod-caddy-1      relationship-caddy:bd0e061     "caddy run --config …"   caddy      About a minute ago   Up About a minute         0.0.0.0:8088->80/tcp, [::]:8088->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp
+relationship-prod-postgres-1   pgvector/pgvector:pg16         "docker-entrypoint.s…"   postgres   2 minutes ago        Up 2 minutes (healthy)    5432/tcp
+
+=== ③ (git checkout 4be331b 는 저장소에서 하지 않음 — 이미지 relationship-*:4be331b 로 대신)
+relationship-backend:4be331b   cf23c50172ef        450MB         91.1MB        
+relationship-caddy:4be331b     f5f40bbae14b       88.2MB         23.6MB        
+
+=== ④ GIT_SHA=4be331b docker compose -f docker-compose.prod.yml up -d --no-build   (운영에서는 --build)
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-1 Starting 
+ Container relationship-prod-backend-1 Started 
+ Container relationship-prod-caddy-1 Starting 
+ Container relationship-prod-caddy-1 Started 
+ Container relationship-prod-backend-1 Waiting 
+ Container relationship-prod-caddy-1 Waiting 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-caddy-1 Healthy 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-1 Healthy 
+④소요 7초
+NAME                           IMAGE                          COMMAND                   SERVICE    CREATED         STATUS                   PORTS
+relationship-prod-backend-1    relationship-backend:4be331b   "sh /app/docker/entr…"   backend    7 seconds ago   Up 5 seconds (healthy)   8000/tcp
+relationship-prod-caddy-1      relationship-caddy:4be331b     "caddy run --config …"   caddy      7 seconds ago   Up 5 seconds             0.0.0.0:8088->80/tcp, [::]:8088->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp
+relationship-prod-postgres-1   pgvector/pgvector:pg16         "docker-entrypoint.s…"   postgres   2 minutes ago   Up 2 minutes (healthy)   5432/tcp
+== backend 로그 alembic 줄(마지막 기동분)
+2:backend-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
+6:backend-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Traceback count: 0
+health: {"status":"ok","db":"up","alembic_revision":"0003"}
+users: 10  alembic_version: 0003
+-- 되돌린 뒤 기존 계정 로그인
+[login 0003 시절 계정 u7a760623 (200 기대)] -> 200  body: {"id":"f9d413b2c2a24832b931e914dfe6c53d","username":"u7a760623"}
+[me] -> 200  body: {"id":"f9d413b2c2a24832b931e914dfe6c53d","username":"u7a760623"}
+[login 0004 때 만든 계정 u11n782236 (200 기대)] -> 200  body: {"id":"5e66c94761a846cc8d3305cdc49b7482","username":"u11n782236"}
+총 소요(①~④ 포함 스크립트 전체): 9초
+HEAD(끝): bd0e061 branch=dev2

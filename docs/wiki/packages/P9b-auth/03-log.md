@@ -206,7 +206,7 @@
 - 남은 것 · 다음 단위: U9 리뷰·커밋 → U11.
 - Refs: P9b-auth CR-007 D18
 
-## 2026-11-16 09:30 · feat(P9b-auth): 가입 때 닉네임을 저장하고 아이디·닉네임이 겹치는지 묻는 API 를 더한다 · pending
+## 2026-11-16 09:30 · feat(P9b-auth): 가입 때 닉네임을 저장하고 아이디·닉네임이 겹치는지 묻는 API 를 더한다 · bd0e061
 - 변경: 리비전 0004(`users.nickname` 추가 → 백필 `nickname = username` → NOT NULL → `uq_users_nickname`, 삭제 0) · `app/auth/names.py normalize_nickname`(NFC → strip → fullmatch → lower, 가입·조회 공용) · `NICKNAME_PATTERN` · 가입 판정 ①~⑥(③까지 DB 0, ④⑤ 사전 조회, ⑥ `IntegrityError` 를 `diag.constraint_name` 으로 `uq_users_username` → `username_taken` / `uq_users_nickname` → `nickname_taken`, 그 밖은 재발생) · `GET /auth/availability`(로그인 없음·`no-store`·`missing_query` 422·형식 위반은 `invalid` 로 DB 0) · `MeOut.nickname`(`_me_out` 도우미) · `app/auth/__init__.py` docstring(R4-5). 닫힌 목록 B1~B17(9파일) 반영, 목록 밖 파손 0. 새 시험 3파일.
 - 이유(기획서·카드 연결): CR-007 · D18 결정 10·11 · S3.1 0004 보충, 01-plan U9.
 - 정합성 확인: 원칙 7(R4-10 — `nickname` 이 나오는 `app/` 파일은 `names.py`·`routes.py`·`models.py`·`schemas.py` 4개뿐, 에이전트·툴·브리핑·프롬프트에 없음) / D18(로그인 예외에 `GET /auth/availability` 추가, 면제 목록 두 곳 일치) / S3.1 / 보안(`app/auth/` 로깅 0, 422 가 입력을 되울리지 않음) — 위반 없음.
@@ -219,3 +219,14 @@
 - 열린 권고: R-1 아이디 조회에만 `strip()` 을 넣는 변이 생존(공백 붙은 아이디 시험 없음) · R-2 NFC → NFKC 변이 생존(전각 문자 거부 시험 없음) · R-3 409 뒤 쿠키·세션 0 단언 없음 · R-4 닉네임은 앞뒤 공백이 지워지지만 아이디는 `invalid`(결정 A 그대로, U11 브라우저 점검 때 봄) · R-5 조회 10만 자 직접 호출 시험 · R-6 `missing_query` 422 에 `Cache-Control` 없음 · R-7 아이디의 켈빈 기호(U9 이전부터).
 - 남은 것 · 다음 단위: U11(로컬 Caddy 스모크 `0003 -> 0004`, 비상 되돌리기 예행, 13 문서, 사용자 재배포).
 - Refs: P9b-auth CR-007 D18 S3.1
+
+## 2026-11-16 10:15 · docs(P9b-auth): 닉네임 버전을 서버에 올리기 전 로컬 확인 결과와 재배포 절차를 적는다 · pending
+- 변경: `docs/user-setup/13-user-todo-deploy.md` H 절(H-1~H-8, 잘못됐을 때) · 증거 `u11-*` 7개(로컬 Caddy 스모크) + 브라우저 관찰 기록 1개 · 앞 항목 해시 `bd0e061`.
+- 이유(기획서·카드 연결): 01-plan U11 — 서버 반영 전에 "계정이 있는 0003 DB 에서 새 해시가 뜨는가"를 로컬 운영 구성으로 확인하고, 사용자 재배포 절차를 문서로 준다. 비상 되돌리기 명령은 예행이 성공해 문서에 적었다(R4-3).
+- 정합성 확인: D17(갱신은 SSH `git checkout` + `compose up -d --build`) / D18 / 보안(§1 값 미기재, §4 서버 명령은 사용자) — 위반 없음. 제품 코드 무변경.
+- **U11 스모크 메모(backend-agent 실행, HEAD `bd0e061`)**: 운영 compose(`relationship-prod`), 기존 볼륨(0003, 스모크 계정 8개 — U7 메모의 "9" 와 다름, 실측 8), `SITE_ADDRESS=localhost`, 8088/8443, 더미 env 스크래치패드 `p9b-u11/`. 먼저 `4be331b` 이미지로 0003·8행·nickname 컬럼 없음 확인 → `GIT_SHA=bd0e061 up -d --build`. 적용 줄 `Running upgrade 0003 -> 0004, Refs: P9b-auth U9 CR-007 D18 S3.1 -- users.nickname (닉네임, UNIQUE).` Traceback 0, users 8행 불변·닉네임 = 아이디 8/8. Caddy 경유: health 0004 · 기존 계정 로그인 200(`nickname` = 아이디) · availability 422 `missing_query`/`taken`/`available`/`invalid`/한글 퍼센트 인코딩/`no-store`/쿠키 없이 200 · 가입 201(닉네임 정규화)·409 `nickname_taken`(대소문자 포함)·409 `username_taken`·422(누락·`invalid_nickname`) · 다른 Origin POST 403 `bad_origin`, GET 200 · 번들에 닉네임 문구.
+- **비상 되돌리기 예행**: R4-3 ① `stop backend` ② `run --rm --entrypoint python backend -m alembic downgrade 0003`(약 1초) ④ `4be331b` 기동 — 계획 명령 그대로 동작(③ 은 저장소 체크아웃 대신 로컬 `4be331b` 이미지로 대신). 0003·10행 그대로, 계정 로그인 200. 다시 올리면 `0003 -> 0004` 가 깨끗이 되지만 **닉네임이 모두 아이디 값으로 초기화**된다(13 문서에 적음). ② 동안 caddy 는 떠 있고 502.
+- 로컬 브라우저 점검(메인): 가입 화면 칸 순서·중복 확인 세 결과·값 변경 시 결과 지움·가입 뒤 사이드바 "demo팀 · 아이디 · 로그아웃" 확인(`evidence/20261116-1010-u11-local-browser-check.txt`).
+- 관찰: 대문자 아이디 조회는 소문자로 바꿔 판정(`ABC` → `abc` 기준, 계획대로) · 닉네임·아이디가 둘 다 길면 사이드바에서 둘 다 말줄임.
+- 남은 것 · 다음 단위: 사용자 SSH 재배포(H-1~H-5) → 메인 바깥 GET(H-6) → U8 시연 계정·리허설 → verify-impl·04-review.
+- Refs: P9b-auth CR-007 D17 D18

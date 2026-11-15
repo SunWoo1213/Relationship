@@ -1,0 +1,10 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u11/login-old.sh
+# 시각: 2026-11-16T07:36:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: bd0e061 (dev2)
+# exit: 0
+# ---
+health: {"status":"ok","db":"up","alembic_revision":"0003"}
+[login(u7a760623)] -> 200  body: {"id":"f9d413b2c2a24832b931e914dfe6c53d","username":"u7a760623"}
+[me] -> 200  body: {"id":"f9d413b2c2a24832b931e914dfe6c53d","username":"u7a760623"}
+users 행 수: 8
