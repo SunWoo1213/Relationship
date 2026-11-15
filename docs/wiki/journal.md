@@ -626,3 +626,5 @@
 - 2026-11-15 19:26 | PUSH-dev2 | origin dev2 1c003af (실험 푸시)
 - 2026-11-15 19:33 | COMMIT | 2635ff1 docs(P9-infra): 푸시 알림 키는 새로 만들지 않고 기존 것을 쓰기로 한 결정을 적는다
 - 2026-11-15 19:33 | PUSH-dev2 | origin dev2 2635ff1 (실험 푸시)
+- 2026-11-15 19:34 | COMMIT | a06f6ad docs(P9-infra): OpenAI 키도 새로 발급하지 않고 기존 것을 쓰기로 한 결정을 적는다
+- 2026-11-15 19:34 | PUSH-dev2 | origin dev2 a06f6ad (실험 푸시)
