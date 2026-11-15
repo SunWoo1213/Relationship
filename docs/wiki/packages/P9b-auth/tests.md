@@ -404,3 +404,33 @@
 | A 재로그인 `/chat/history` | 2행 user→assistant | 2행, `user`(id 1) → `assistant`(id 2, `question_id=22`) | 같음 |
 | 2001자 | 422 | 422 `string_too_long` | 같음 |
 | 서버 로그 | Traceback 0 · 비밀 0 | Traceback 0 · 비밀번호·`rel_session`·긴 토큰 문자열 0 · 프로세스 종료 확인 | `u7-local-serverlog` |
+
+## U10 — 가입 닉네임 칸·중복 확인·사이드바 닉네임 (frontend-agent, 2026-11-16, CR-007)
+
+실행: `npm --prefix web exec -- vitest run --root web` → 212 passed(기준선 191). 증거 `evidence/20261116-0712-u10-vitest.txt`, verifier 재실행 `evidence/20261116-0717-review-u10-vitest.txt`.
+
+| 시험 (`web/src/__tests__/auth.test.tsx` 새 describe) | 단언 | 결과 |
+|---|---|---|
+| 가입 화면 칸·버튼·순서 | 닉네임 칸 `autocomplete=nickname`·`required`, "중복 확인" 버튼 2개, 칸 순서 username→nickname→password→password_confirm, `rules` 문구에 닉네임 규칙 | 통과 |
+| 로그인 화면 0 | 닉네임 칸·두 버튼 없음 | 통과 |
+| 아이디 중복 확인 — available | 요청 URL 정확히 `/api/auth/availability?username=minji_01`, `role=status` 안내, alert 없음 | 통과 |
+| 아이디 중복 확인 — taken | 같은 URL, taken 안내 | 통과 |
+| 아이디 중복 확인 — invalid | 같은 URL, invalid 안내 | 통과 |
+| 닉네임 중복 확인 — available | 요청 URL `?nickname=%EB%AF%BC%EC%A7%80`, 안내 | 통과 |
+| 닉네임 중복 확인 — taken | 같은 URL, taken 안내 | 통과 |
+| 닉네임 중복 확인 — invalid | 같은 URL, invalid 안내 | 통과 |
+| 값 변경 시 결과 사라짐 | 그 칸 결과만 사라지고 다른 칸은 남음 | 통과 |
+| 늦은 응답 폐기 | 요청 때 값과 지금 값이 다르면 결과 없음, 버튼 다시 활성 | 통과 |
+| 가입↔로그인 전환 시 초기화 | 닉네임 값·두 결과 지움 | 통과 |
+| 빈/공백 비활성 | 버튼 `disabled`, 요청 0 | 통과 |
+| 조회 실패 — 5xx | `checkFailed` 안내, 가입은 진행(요청 1회) | 통과 |
+| 조회 실패 — 네트워크 | `checkFailed` 안내, 가입은 진행 | 통과 |
+| 확인 없이 제출 | 가입 요청 1회, 조회 요청 0회(결정 AA) | 통과 |
+| 가입 409 `nickname_taken` | 안내 `alert` 한 줄, 가입 화면 유지 | 통과 |
+| 가입 422 `invalid_nickname` | 안내 `alert` 한 줄, 가입 화면 유지 | 통과 |
+| me 200 사이드바 | `sidebar-nickname` '민지', `sidebar-username` 'minji_01', 민지 · minji_01 · 로그아웃 순서 | 통과 |
+| 가입 직후 사이드바 | 201 응답 닉네임 '심사위원' 표시 | 통과 |
+| `api.test.ts` checkAvailability URL | 준 키만, 한글·공백 인코딩, `GET`·`same-origin` | 통과 |
+| `api.test.ts` checkAvailability 401 | 전역 로그아웃 신호 없음 | 통과 |
+
+기존 시험 갱신(닫힌 목록 F1~F4): 가입 본문 단언 `{username, nickname, password}`, `ME.nickname='민지'`. E2E 5 passed(목 데이터만 갱신, 가입 화면 새 E2E 는 없음).

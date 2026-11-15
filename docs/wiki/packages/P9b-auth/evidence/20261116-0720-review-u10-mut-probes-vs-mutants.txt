@@ -1,0 +1,12 @@
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u10/mutate.mjs probes-vs-mutants
+# 시각: 2026-11-16T07:20:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+검출  [탐침 포함] M1 모드 전환 때 세대 카운터를 올리지 않음(조회 중 전환) :: 216/217 passed
+    FAIL [탐침 P1] 아이디 조회 중에 로그인으로 갔다가 가입으로 돌아온 뒤 늦은 응답이 와도 결과가 보이지 않는다
+검출  [탐침 포함] M5 물은 칸이 null 인 응답을 available 로 취급 :: 216/217 passed
+    FAIL [탐침 P2] 물은 칸이 null 로 온 200 응답은 checkFailed 로 안내한다
+검출  [탐침 포함] M6 조회 요청 값을 trim 해서 보냄 :: 216/217 passed
+    FAIL [탐침 P3] 앞뒤 공백이 붙은 값은 공백째 조회로 간다(가입 본문과 같은 값)

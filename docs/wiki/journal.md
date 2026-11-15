@@ -672,3 +672,5 @@
 - 2026-11-16 06:35 | NOTE | 컨텍스트 압축(manual). 재개 시 HANDOFF.md 확인 |
 - 2026-11-16 06:56 | COMMIT | bfbcdb1 cr(CR-007): 가입 때 닉네임을 받고 아이디·닉네임 중복검사를 하도록 기획과 계획을 고친다
 - 2026-11-16 06:56 | PUSH-dev2 | origin dev2 bfbcdb1 (실험 푸시)
+- 2026-11-16 07:09 | COMMIT | f1ea1b4 docs(P9b-auth): 닉네임 계획이 검증을 통과해 동결을 풀고 권고를 계획에 반영한다
+- 2026-11-16 07:09 | PUSH-dev2 | origin dev2 f1ea1b4 (실험 푸시)

@@ -3,6 +3,8 @@
 
 import type {
   AnswerIn,
+  AvailabilityOut,
+  SignupIn,
   AnswerOut,
   BriefingRecordOut,
   BriefingRunIn,
@@ -184,8 +186,16 @@ export function getPendingQuestions(): Promise<ChatPendingQuestionOut[]> {
 // 401 은 정상 응답의 한 갈래(로그인 실패·미로그인)라 전역 신호를 끄고 호출 쪽이 다룬다.
 
 /** 가입 — 201 이고 즉시 로그인 쿠키가 실린다 (P9b 결정 G). */
-export function signup(credentials: Credentials): Promise<MeOut> {
-  return apiFetch<MeOut>('/auth/signup', { method: 'POST', body: credentials, signalUnauthorized: false })
+export function signup(body: SignupIn): Promise<MeOut> {
+  return apiFetch<MeOut>('/auth/signup', { method: 'POST', body, signalUnauthorized: false })
+}
+
+/** 가입 화면의 "중복 확인". 준 키만 쿼리에 싣는다. 로그인 없이 부르는 조회라 401 관문 신호를 내지 않는다. */
+export function checkAvailability(q: { username?: string; nickname?: string }): Promise<AvailabilityOut> {
+  const params = new URLSearchParams()
+  if (q.username !== undefined) params.set('username', q.username)
+  if (q.nickname !== undefined) params.set('nickname', q.nickname)
+  return apiFetch<AvailabilityOut>(`/auth/availability?${params.toString()}`, { signalUnauthorized: false })
 }
 
 export function login(credentials: Credentials): Promise<MeOut> {

@@ -16,7 +16,7 @@ function stubSignedInFetch() {
     vi.fn((input: RequestInfo | URL) =>
       String(input) === '/api/auth/me'
         ? Promise.resolve(
-            new Response(JSON.stringify({ id: 'u1', username: 'tester' }), {
+            new Response(JSON.stringify({ id: 'u1', username: 'tester', nickname: '테스터' }), {
               status: 200,
               headers: { 'Content-Type': 'application/json' },
             }),

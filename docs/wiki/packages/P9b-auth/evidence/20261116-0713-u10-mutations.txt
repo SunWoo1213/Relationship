@@ -1,0 +1,25 @@
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u10/mutate.mjs
+# 시각: 2026-11-16T07:13:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+KILLED   V10-1 가입 본문에서 nickname 빠짐 :: 1건 201 이면 가입 즉시 로그인된 앱 틀이 열린다 — 본문은 {username, nickname, password}(확인 칸은 보내지 않는다)
+KILLED   V10-2 아이디 확인이 nickname 도 보냄 :: 5건 checkAvailability 는 준 키만 쿼리에 싣고(한글·공백은 인코딩) same-origin 으로 GET 한다 | 아이디 중복 확인 → 요청은 정확히 ?username=minji_01 (닉네임 키 없음), available 면 그 안내 한 줄(role=status) | 아이디 중복 확인 → 요청은 정확히 ?username=minji_01 (닉네임 키 없음), taken 면 그 안내 한 줄(role=status)
+KILLED   V10-3 nickname_taken 을 일반 실패 문구로 :: 1건 가입이 409 nickname_taken 면 그 안내를 alert 한 줄로 보이고 가입 화면에 남는다
+KILLED   V10-3b invalid_nickname 을 일반 실패 문구로 :: 1건 가입이 422 invalid_nickname 면 그 안내를 alert 한 줄로 보이고 가입 화면에 남는다
+KILLED   V10-4 사이드바 닉네임 자리에 아이디 :: 2건 me 200 이면 사이드바에 닉네임(굵게 자리)과 아이디가 따로 보인다 — 닉네임은 아이디와 다른 값 | 가입 직후(201 응답의 닉네임)에도 사이드바에 그 닉네임이 보인다
+KILLED   V10-5 값이 바뀌어도 결과 유지 :: 1건 칸 값을 바꾸면 그 칸의 결과만 사라진다 (R4-6 ②)
+KILLED   V10-6 로그인 모드에도 닉네임 칸·중복 확인 :: 1건 로그인 화면에는 닉네임 칸도 중복 확인 버튼도 없다
+KILLED   V10-6b 로그인 모드에도 닉네임 칸 :: 7건 성공하면 앱 틀이 열린다 — 본문은 {username, password}, 예전 세션 키는 지워진다, 비밀번호는 저장·로그되지 않는다 | 401 invalid_credentials 면 안내 한 줄만 — 로그인 화면에 남는다 | 403 bad_origin 과 코드 없는 5xx 도 각자의 안내 한 줄
+KILLED   V10-7 결과 줄을 role=alert 로 :: 6건 아이디 중복 확인 → 요청은 정확히 ?username=minji_01 (닉네임 키 없음), available 면 그 안내 한 줄(role=status) | 아이디 중복 확인 → 요청은 정확히 ?username=minji_01 (닉네임 키 없음), taken 면 그 안내 한 줄(role=status) | 아이디 중복 확인 → 요청은 정확히 ?username=minji_01 (닉네임 키 없음), invalid 면 그 안내 한 줄(role=status)
+KILLED   V10-8 중복 확인을 안 하면 제출 막기 :: 9건 비밀번호 확인이 다르면 요청을 한 번도 보내지 않고 안내만 띄운다 | 409 username_taken 이면 그 안내를 보인다 | 422 invalid_username 면 그 규칙 안내를 보인다
+KILLED   R4-6① 늦은 응답(값 달라짐)을 버리지 않음 :: 1건 조회 응답이 돌아왔을 때 칸 값이 요청 때와 다르면 그 응답은 버린다 (R4-6 ①)
+KILLED   R4-6③ 전환 때 닉네임 값 안 지움 :: 1건 가입↔로그인 전환 때 닉네임 값과 두 칸의 결과가 지워진다 (R4-6 ③)
+KILLED   R4-6③ 전환 때 결과 안 지움 :: 1건 가입↔로그인 전환 때 닉네임 값과 두 칸의 결과가 지워진다 (R4-6 ③)
+KILLED   빈 값이면 비활성 조건 제거 :: 1건 칸이 비었거나 공백뿐이면 중복 확인 버튼이 비활성이고 눌러도 요청이 없다
+KILLED   공백뿐 허용(trim 제거) :: 1건 칸이 비었거나 공백뿐이면 중복 확인 버튼이 비활성이고 눌러도 요청이 없다
+KILLED   조회 실패를 안내하지 않음 :: 2건 조회가 실패(5xx)하면 checkFailed 안내이고 가입은 계속 할 수 있다 | 조회가 실패(네트워크 실패)하면 checkFailed 안내이고 가입은 계속 할 수 있다
+KILLED   닉네임 칸 autocomplete 제거 :: 1건 가입 화면: 닉네임 칸(autocomplete=nickname, required)·중복 확인 버튼 2개(보이는 글자 "중복 확인")가 있고 칸 순서는 아이디→닉네
+KILLED   조회 401 이 관문 신호를 냄 :: 1건 checkAvailability 가 401 을 받아도 전역 로그아웃 신호는 없다
+KILLED   규칙 문구에서 닉네임 규칙 삭제 :: 1건 가입 화면: 닉네임 칸(autocomplete=nickname, required)·중복 확인 버튼 2개(보이는 글자 "중복 확인")가 있고 칸 순서는 아이디→닉네

@@ -17,7 +17,7 @@ function json(body: unknown, status = 200): Response {
 }
 
 const UNAUTH = () => json({ detail: { code: 'unauthenticated' } }, 401)
-const ME = { id: 'u1', username: 'minji_01' }
+const ME = { id: 'u1', username: 'minji_01', nickname: '민지' }
 
 /** 표의 키는 `메서드 경로`. 표에 없는 요청은 실패시킨다(테스트가 모르는 요청이 나가면 눈에 띈다). 기본: 대화 기록·질문·인물·브리핑은 빈 목록. */
 function install(table: Record<string, Handler>) {
@@ -75,9 +75,10 @@ afterEach(() => {
   window.history.replaceState(null, '', '#/chat')
 })
 
-async function fillAndSubmit(opts: { username?: string; password?: string; confirm?: string; submit: string }) {
+async function fillAndSubmit(opts: { username?: string; nickname?: string; password?: string; confirm?: string; submit: string }) {
   const user = userEvent.setup()
   if (opts.username !== undefined) await user.type(screen.getByLabelText(AUTH_NOTICE.username), opts.username)
+  if (opts.nickname !== undefined) await user.type(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true }), opts.nickname)
   if (opts.password !== undefined) await user.type(screen.getByLabelText(AUTH_NOTICE.password, { exact: true }), opts.password)
   if (opts.confirm !== undefined) await user.type(screen.getByLabelText(AUTH_NOTICE.confirm), opts.confirm)
   await user.click(screen.getByRole('button', { name: opts.submit }))
@@ -224,7 +225,7 @@ describe('가입 (POST /auth/signup)', () => {
     render(<App />)
     await screen.findByRole('heading', { name: AUTH_NOTICE.titleLogin })
     await userEvent.setup().click(screen.getByRole('button', { name: AUTH_NOTICE.toSignup }))
-    await fillAndSubmit({ username: 'minji_01', password: 'password-1', confirm: 'password-2', submit: AUTH_NOTICE.submitSignup })
+    await fillAndSubmit({ username: 'minji_01', nickname: '민지', password: 'password-1', confirm: 'password-2', submit: AUTH_NOTICE.submitSignup })
     expect(await screen.findByRole('alert')).toHaveTextContent(AUTH_NOTICE.mismatch)
     expect(callsTo(fetchFn, 'POST /api/auth/signup')).toHaveLength(0)
   })
@@ -237,7 +238,7 @@ describe('가입 (POST /auth/signup)', () => {
     render(<App />)
     await screen.findByRole('heading', { name: AUTH_NOTICE.titleLogin })
     await userEvent.setup().click(screen.getByRole('button', { name: AUTH_NOTICE.toSignup }))
-    await fillAndSubmit({ username: 'minji_01', password: 'password-1', confirm: 'password-1', submit: AUTH_NOTICE.submitSignup })
+    await fillAndSubmit({ username: 'minji_01', nickname: '민지', password: 'password-1', confirm: 'password-1', submit: AUTH_NOTICE.submitSignup })
     expect(await screen.findByRole('alert')).toHaveTextContent(AUTH_NOTICE.usernameTaken)
     expect(document.querySelector('[data-screen="auth"]')).not.toBeNull()
   })
@@ -253,11 +254,11 @@ describe('가입 (POST /auth/signup)', () => {
     render(<App />)
     await screen.findByRole('heading', { name: AUTH_NOTICE.titleLogin })
     await userEvent.setup().click(screen.getByRole('button', { name: AUTH_NOTICE.toSignup }))
-    await fillAndSubmit({ username: 'x', password: 'short', confirm: 'short', submit: AUTH_NOTICE.submitSignup })
+    await fillAndSubmit({ username: 'x', nickname: '민지', password: 'short', confirm: 'short', submit: AUTH_NOTICE.submitSignup })
     expect(await screen.findByRole('alert')).toHaveTextContent(expected)
   })
 
-  it('201 이면 가입 즉시 로그인된 앱 틀이 열린다 — 본문은 {username, password}(확인 칸은 보내지 않는다)', async () => {
+  it('201 이면 가입 즉시 로그인된 앱 틀이 열린다 — 본문은 {username, nickname, password}(확인 칸은 보내지 않는다)', async () => {
     const fetchFn = install({
       'GET /api/auth/me': UNAUTH,
       'POST /api/auth/signup': () => json(ME, 201),
@@ -265,9 +266,210 @@ describe('가입 (POST /auth/signup)', () => {
     render(<App />)
     await screen.findByRole('heading', { name: AUTH_NOTICE.titleLogin })
     await userEvent.setup().click(screen.getByRole('button', { name: AUTH_NOTICE.toSignup }))
-    await fillAndSubmit({ username: 'minji_01', password: 'password-1', confirm: 'password-1', submit: AUTH_NOTICE.submitSignup })
+    await fillAndSubmit({ username: 'minji_01', nickname: '민지', password: 'password-1', confirm: 'password-1', submit: AUTH_NOTICE.submitSignup })
     await screen.findByRole('textbox', { name: '메시지 입력' })
-    expect(bodyOf(callsTo(fetchFn, 'POST /api/auth/signup')[0])).toEqual({ username: 'minji_01', password: 'password-1' })
+    expect(bodyOf(callsTo(fetchFn, 'POST /api/auth/signup')[0])).toEqual({ username: 'minji_01', nickname: '민지', password: 'password-1' })
+  })
+})
+
+describe('가입 화면 — 닉네임 칸·중복 확인·사이드바 닉네임 (P9b U10, CR-007)', () => {
+  const AVAIL_USERNAME = 'GET /api/auth/availability?username=minji_01'
+  const AVAIL_NICKNAME = 'GET /api/auth/availability?nickname=%EB%AF%BC%EC%A7%80' // '민지'
+
+  async function openSignup(table: Record<string, Handler> = {}) {
+    const fetchFn = install({ 'GET /api/auth/me': UNAUTH, ...table })
+    render(<App />)
+    await screen.findByRole('heading', { name: AUTH_NOTICE.titleLogin })
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: AUTH_NOTICE.toSignup }))
+    await screen.findByRole('heading', { name: AUTH_NOTICE.titleSignup })
+    return { fetchFn, user }
+  }
+  const checkButton = (name: string) => screen.getByRole('button', { name })
+
+  it('가입 화면: 닉네임 칸(autocomplete=nickname, required)·중복 확인 버튼 2개(보이는 글자 "중복 확인")가 있고 칸 순서는 아이디→닉네임→비밀번호→확인', async () => {
+    await openSignup()
+    const nickname = screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true })
+    expect(nickname).toHaveAttribute('autocomplete', 'nickname')
+    expect(nickname).toBeRequired()
+    expect(checkButton(AUTH_NOTICE.checkUsername)).toHaveTextContent(AUTH_NOTICE.check)
+    expect(checkButton(AUTH_NOTICE.checkNickname)).toHaveTextContent(AUTH_NOTICE.check)
+    expect(screen.getAllByRole('button', { name: /중복 확인$/ })).toHaveLength(2)
+    const order = ['username', 'nickname', 'password', 'password_confirm']
+    const names = Array.from(document.querySelectorAll('form input')).map((el) => el.getAttribute('name'))
+    expect(names).toEqual(order)
+    expect(screen.getByText(AUTH_NOTICE.rules)).toHaveTextContent('닉네임은 2~20자의 한글·영문·숫자·밑줄(_)')
+  })
+
+  it('로그인 화면에는 닉네임 칸도 중복 확인 버튼도 없다', async () => {
+    install({ 'GET /api/auth/me': UNAUTH })
+    render(<App />)
+    await screen.findByRole('heading', { name: AUTH_NOTICE.titleLogin })
+    expect(screen.queryByLabelText(AUTH_NOTICE.nickname, { exact: true })).toBeNull()
+    expect(screen.queryByRole('button', { name: AUTH_NOTICE.checkUsername })).toBeNull()
+    expect(screen.queryByRole('button', { name: AUTH_NOTICE.checkNickname })).toBeNull()
+    expect(screen.queryByText(AUTH_NOTICE.check)).toBeNull()
+  })
+
+  it.each([
+    ['available', AUTH_NOTICE.usernameAvailable],
+    ['taken', AUTH_NOTICE.usernameTaken],
+    ['invalid', AUTH_NOTICE.invalidUsername],
+  ] as const)('아이디 중복 확인 → 요청은 정확히 ?username=minji_01 (닉네임 키 없음), %s 면 그 안내 한 줄(role=status)', async (status, expected) => {
+    const { fetchFn, user } = await openSignup({ [AVAIL_USERNAME]: () => json({ username: status, nickname: null }) })
+    await user.type(screen.getByLabelText(AUTH_NOTICE.username, { exact: true }), 'minji_01')
+    await user.click(checkButton(AUTH_NOTICE.checkUsername))
+    const result = await screen.findByTestId('username-check')
+    expect(result).toHaveTextContent(expected)
+    expect(result).toHaveAttribute('role', 'status')
+    expect(screen.queryByTestId('nickname-check')).toBeNull()
+    expect(screen.queryByRole('alert')).toBeNull() // 결과 줄은 alert 가 아니다(기존 findByRole('alert') 시험과 겹치지 않게)
+    const calls = fetchFn.mock.calls.filter(([url]) => String(url).startsWith('/api/auth/availability'))
+    expect(calls.map(([url]) => String(url))).toEqual(['/api/auth/availability?username=minji_01'])
+  })
+
+  it.each([
+    ['available', AUTH_NOTICE.nicknameAvailable],
+    ['taken', AUTH_NOTICE.nicknameTaken],
+    ['invalid', AUTH_NOTICE.invalidNickname],
+  ] as const)('닉네임 중복 확인 → 요청은 정확히 ?nickname=<한글 인코딩> (아이디 키 없음), %s 면 그 안내 한 줄(role=status)', async (status, expected) => {
+    const { fetchFn, user } = await openSignup({ [AVAIL_NICKNAME]: () => json({ username: null, nickname: status }) })
+    await user.type(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true }), '민지')
+    await user.click(checkButton(AUTH_NOTICE.checkNickname))
+    const result = await screen.findByTestId('nickname-check')
+    expect(result).toHaveTextContent(expected)
+    expect(result).toHaveAttribute('role', 'status')
+    expect(screen.queryByTestId('username-check')).toBeNull()
+    const calls = fetchFn.mock.calls.filter(([url]) => String(url).startsWith('/api/auth/availability'))
+    expect(calls.map(([url]) => String(url))).toEqual(['/api/auth/availability?nickname=%EB%AF%BC%EC%A7%80'])
+  })
+
+  it('칸 값을 바꾸면 그 칸의 결과만 사라진다 (R4-6 ②)', async () => {
+    const { user } = await openSignup({
+      [AVAIL_USERNAME]: () => json({ username: 'taken', nickname: null }),
+      [AVAIL_NICKNAME]: () => json({ username: null, nickname: 'available' }),
+    })
+    await user.type(screen.getByLabelText(AUTH_NOTICE.username, { exact: true }), 'minji_01')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true }), '민지')
+    await user.click(checkButton(AUTH_NOTICE.checkUsername))
+    await user.click(checkButton(AUTH_NOTICE.checkNickname))
+    await screen.findByTestId('username-check')
+    await screen.findByTestId('nickname-check')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.username, { exact: true }), '2')
+    expect(screen.queryByTestId('username-check')).toBeNull()
+    expect(screen.getByTestId('nickname-check')).toHaveTextContent(AUTH_NOTICE.nicknameAvailable)
+    await user.type(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true }), 'x')
+    expect(screen.queryByTestId('nickname-check')).toBeNull()
+  })
+
+  it('조회 응답이 돌아왔을 때 칸 값이 요청 때와 다르면 그 응답은 버린다 (R4-6 ①)', async () => {
+    let answer: (r: Response) => void = () => {}
+    const { user } = await openSignup({ [AVAIL_USERNAME]: () => new Promise<Response>((resolve) => (answer = resolve)) })
+    const input = screen.getByLabelText(AUTH_NOTICE.username, { exact: true })
+    await user.type(input, 'minji_01')
+    await user.click(checkButton(AUTH_NOTICE.checkUsername))
+    expect(checkButton(AUTH_NOTICE.checkUsername)).toBeDisabled() // 조회 중
+    await user.type(input, 'x')
+    await act(async () => answer(json({ username: 'available', nickname: null })))
+    expect(screen.queryByTestId('username-check')).toBeNull()
+    expect(checkButton(AUTH_NOTICE.checkUsername)).toBeEnabled()
+  })
+
+  it('가입↔로그인 전환 때 닉네임 값과 두 칸의 결과가 지워진다 (R4-6 ③)', async () => {
+    const { user } = await openSignup({
+      [AVAIL_USERNAME]: () => json({ username: 'taken', nickname: null }),
+      [AVAIL_NICKNAME]: () => json({ username: null, nickname: 'taken' }),
+    })
+    await user.type(screen.getByLabelText(AUTH_NOTICE.username, { exact: true }), 'minji_01')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true }), '민지')
+    await user.click(checkButton(AUTH_NOTICE.checkUsername))
+    await user.click(checkButton(AUTH_NOTICE.checkNickname))
+    await screen.findByTestId('nickname-check')
+    await user.click(screen.getByRole('button', { name: AUTH_NOTICE.toLogin }))
+    await screen.findByRole('heading', { name: AUTH_NOTICE.titleLogin })
+    await user.click(screen.getByRole('button', { name: AUTH_NOTICE.toSignup }))
+    expect(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true })).toHaveValue('')
+    expect(screen.queryByTestId('username-check')).toBeNull()
+    expect(screen.queryByTestId('nickname-check')).toBeNull()
+  })
+
+  it('칸이 비었거나 공백뿐이면 중복 확인 버튼이 비활성이고 눌러도 요청이 없다', async () => {
+    const { fetchFn, user } = await openSignup()
+    expect(checkButton(AUTH_NOTICE.checkUsername)).toBeDisabled()
+    expect(checkButton(AUTH_NOTICE.checkNickname)).toBeDisabled()
+    await user.type(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true }), '   ')
+    expect(checkButton(AUTH_NOTICE.checkNickname)).toBeDisabled()
+    await user.click(checkButton(AUTH_NOTICE.checkUsername))
+    await user.click(checkButton(AUTH_NOTICE.checkNickname))
+    expect(fetchFn.mock.calls.map(([u]) => String(u))).toEqual(['/api/auth/me'])
+    await user.type(screen.getByLabelText(AUTH_NOTICE.username, { exact: true }), 'a')
+    expect(checkButton(AUTH_NOTICE.checkUsername)).toBeEnabled()
+  })
+
+  it.each([
+    ['5xx', () => json({ detail: { code: 'internal_error' } }, 500)],
+    ['네트워크 실패', () => Promise.reject(new TypeError('Failed to fetch')) as unknown as Response],
+  ])('조회가 실패(%s)하면 checkFailed 안내이고 가입은 계속 할 수 있다', async (_name, handler) => {
+    const { fetchFn, user } = await openSignup({ [AVAIL_USERNAME]: handler, 'POST /api/auth/signup': () => json(ME, 201) })
+    await user.type(screen.getByLabelText(AUTH_NOTICE.username, { exact: true }), 'minji_01')
+    await user.click(checkButton(AUTH_NOTICE.checkUsername))
+    expect(await screen.findByTestId('username-check')).toHaveTextContent(AUTH_NOTICE.checkFailed)
+    expect(checkButton(AUTH_NOTICE.checkUsername)).toBeEnabled()
+    await user.type(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true }), '민지')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.password, { exact: true }), 'password-1')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.confirm), 'password-1')
+    await user.click(screen.getByRole('button', { name: AUTH_NOTICE.submitSignup }))
+    await screen.findByRole('textbox', { name: '메시지 입력' })
+    expect(callsTo(fetchFn, 'POST /api/auth/signup')).toHaveLength(1)
+  })
+
+  it('중복 확인을 한 번도 안 하고 제출해도 막지 않는다 — 가입 요청 1회, 조회 요청 0회 (결정 AA)', async () => {
+    const { fetchFn, user } = await openSignup({ 'POST /api/auth/signup': () => json(ME, 201) })
+    await user.type(screen.getByLabelText(AUTH_NOTICE.username, { exact: true }), 'minji_01')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true }), '민지')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.password, { exact: true }), 'password-1')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.confirm), 'password-1')
+    await user.click(screen.getByRole('button', { name: AUTH_NOTICE.submitSignup }))
+    await screen.findByRole('textbox', { name: '메시지 입력' })
+    expect(callsTo(fetchFn, 'POST /api/auth/signup')).toHaveLength(1)
+    expect(fetchFn.mock.calls.some(([u]) => String(u).startsWith('/api/auth/availability'))).toBe(false)
+  })
+
+  it.each([
+    [409, 'nickname_taken', AUTH_NOTICE.nicknameTaken],
+    [422, 'invalid_nickname', AUTH_NOTICE.invalidNickname],
+  ] as const)('가입이 %i %s 면 그 안내를 alert 한 줄로 보이고 가입 화면에 남는다', async (status, code, expected) => {
+    const { user } = await openSignup({ 'POST /api/auth/signup': () => json({ detail: { code } }, status) })
+    await user.type(screen.getByLabelText(AUTH_NOTICE.username, { exact: true }), 'minji_01')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true }), '민지')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.password, { exact: true }), 'password-1')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.confirm), 'password-1')
+    await user.click(screen.getByRole('button', { name: AUTH_NOTICE.submitSignup }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(expected)
+    expect(document.querySelector('[data-screen="auth"]')).not.toBeNull()
+  })
+
+  it('me 200 이면 사이드바에 닉네임(굵게 자리)과 아이디가 따로 보인다 — 닉네임은 아이디와 다른 값', async () => {
+    install({ 'GET /api/auth/me': () => json(ME) })
+    render(<App />)
+    await screen.findByRole('textbox', { name: '메시지 입력' })
+    const row = screen.getByTestId('sidebar-account')
+    expect(within(row).getByTestId('sidebar-nickname')).toHaveTextContent('민지')
+    expect(within(row).getByTestId('sidebar-username')).toHaveTextContent('minji_01')
+    // 사이 간격은 flex gap 이라 DOM 글자에는 공백이 없다 — 순서와 구분점만 본다
+    expect(row).toHaveTextContent('민지·minji_01·로그아웃')
+  })
+
+  it('가입 직후(201 응답의 닉네임)에도 사이드바에 그 닉네임이 보인다', async () => {
+    const { user } = await openSignup({ 'POST /api/auth/signup': () => json({ id: 'u9', username: 'judge01', nickname: '심사위원' }, 201) })
+    await user.type(screen.getByLabelText(AUTH_NOTICE.username, { exact: true }), 'judge01')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.nickname, { exact: true }), '심사위원')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.password, { exact: true }), 'password-1')
+    await user.type(screen.getByLabelText(AUTH_NOTICE.confirm), 'password-1')
+    await user.click(screen.getByRole('button', { name: AUTH_NOTICE.submitSignup }))
+    await screen.findByRole('textbox', { name: '메시지 입력' })
+    expect(screen.getByTestId('sidebar-nickname')).toHaveTextContent('심사위원')
+    expect(screen.getByTestId('sidebar-username')).toHaveTextContent('judge01')
   })
 })
 
@@ -368,7 +570,7 @@ describe('로그아웃 (POST /auth/logout)', () => {
       'POST /api/auth/logout': () => new Response(null, { status: 204 }),
       'POST /api/auth/login': () => {
         who = 1
-        return json({ id: 'u2', username: 'second_user' })
+        return json({ id: 'u2', username: 'second_user', nickname: '두번째' })
       },
     })
     render(<App />)

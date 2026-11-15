@@ -13,10 +13,27 @@ export interface Credentials {
   password: string
 }
 
-/** `POST /auth/signup`·`POST /auth/login`·`GET /auth/me` 의 성공 본문. */
+/** 가입 `POST /auth/signup` 요청 본문(개정 3, CR-007 — 세 필드 모두 필수). 로그인은 `Credentials` 그대로. */
+export interface SignupIn {
+  username: string
+  password: string
+  nickname: string
+}
+
+/** `POST /auth/signup`·`POST /auth/login`·`GET /auth/me` 의 성공 본문. `nickname` 은 서버가 저장한 정규화 값. */
 export interface MeOut {
   id: string
   username: string
+  nickname: string
+}
+
+/** `GET /auth/availability` 한 칸의 판정. */
+export type AvailabilityStatus = 'available' | 'taken' | 'invalid'
+
+/** `GET /auth/availability` 응답 — 묻지 않은 필드는 null. 결과는 참고용이고 최종 판정은 가입 409. */
+export interface AvailabilityOut {
+  username: AvailabilityStatus | null
+  nickname: AvailabilityStatus | null
 }
 
 /** `POST /auth/logout` 요청 본문. endpoint 는 이 브라우저의 푸시 구독이 있을 때만. */

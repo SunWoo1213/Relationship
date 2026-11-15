@@ -1,0 +1,30 @@
+# 명령: node /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/review-u10/mutate.mjs mutants
+# 시각: 2026-11-16T07:19:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f1ea1b4 (dev2)
+# exit: 0
+# ---
+생존  M1 모드 전환 때 세대 카운터를 올리지 않음(조회 중 전환) :: 212/212 passed, 실패 0건
+검출  M2 늦은 응답 폐기 조건 뒤집기(!== → ===) :: 201/212 passed, 실패 11건
+    FAIL 아이디 중복 확인 → 요청은 정확히 ?username=minji_01 (닉네임 키 없음), available 면 그 안내 한 줄(role=status)
+    FAIL 아이디 중복 확인 → 요청은 정확히 ?username=minji_01 (닉네임 키 없음), taken 면 그 안내 한 줄(role=status)
+    FAIL 아이디 중복 확인 → 요청은 정확히 ?username=minji_01 (닉네임 키 없음), invalid 면 그 안내 한 줄(role=status)
+    FAIL 닉네임 중복 확인 → 요청은 정확히 ?nickname=<한글 인코딩> (아이디 키 없음), available 면 그 안내 한 줄(role=status)
+    … 외 7건
+검출  M3 전환 때 아이디 결과만 남김(닉네임 결과만 지움) :: 211/212 passed, 실패 1건
+    FAIL 가입↔로그인 전환 때 닉네임 값과 두 칸의 결과가 지워진다 (R4-6 ③)
+검출  M4 조회 URL 의 닉네임 키 이름을 nick 으로 :: 207/212 passed, 실패 5건
+    FAIL checkAvailability 는 준 키만 쿼리에 싣고(한글·공백은 인코딩) same-origin 으로 GET 한다
+    FAIL 닉네임 중복 확인 → 요청은 정확히 ?nickname=<한글 인코딩> (아이디 키 없음), available 면 그 안내 한 줄(role=status)
+    FAIL 닉네임 중복 확인 → 요청은 정확히 ?nickname=<한글 인코딩> (아이디 키 없음), taken 면 그 안내 한 줄(role=status)
+    FAIL 닉네임 중복 확인 → 요청은 정확히 ?nickname=<한글 인코딩> (아이디 키 없음), invalid 면 그 안내 한 줄(role=status)
+    … 외 1건
+생존  M5 물은 칸이 null 인 응답을 available 로 취급 :: 212/212 passed, 실패 0건
+생존  M6 조회 요청 값을 trim 해서 보냄 :: 212/212 passed, 실패 0건
+검출  M7 한 칸 값이 바뀌면 두 칸 결과를 다 지움 :: 211/212 passed, 실패 1건
+    FAIL 칸 값을 바꾸면 그 칸의 결과만 사라진다 (R4-6 ②)
+검출  M8 사이드바 아이디에 접두 @ :: 211/212 passed, 실패 1건
+    FAIL me 200 이면 사이드바에 닉네임(굵게 자리)과 아이디가 따로 보인다 — 닉네임은 아이디와 다른 값
+검출  M9 버려진 응답 뒤 조회 중 표시를 풀지 않음 :: 211/212 passed, 실패 1건
+    FAIL 조회 응답이 돌아왔을 때 칸 값이 요청 때와 다르면 그 응답은 버린다 (R4-6 ①)
+생존  M10 가입 본문의 닉네임을 trim 해서 보냄(값은 입력 그대로 계약) :: 212/212 passed, 실패 0건

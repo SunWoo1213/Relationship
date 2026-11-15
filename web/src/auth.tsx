@@ -12,7 +12,7 @@ export type AuthState =
   | { status: 'anonymous' }
   /** `/auth/me` 가 401 도 200 도 아니다(서버 연결 실패·5xx) — 로그인 화면을 보이지 않고 다시 시도하게 한다. */
   | { status: 'error' }
-  | { status: 'user'; username: string }
+  | { status: 'user'; username: string; nickname: string }
 
 export interface AuthApi {
   state: AuthState
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const mine = ++latest.current
     getMe().then(
       (me) => {
-        if (mine === latest.current) setState({ status: 'user', username: me.username })
+        if (mine === latest.current) setState({ status: 'user', username: me.username, nickname: me.nickname })
       },
       (error: unknown) => {
         if (mine !== latest.current) return
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signedIn = useCallback((me: MeOut) => {
     clearLegacySessionId()
     latest.current++
-    setState({ status: 'user', username: me.username })
+    setState({ status: 'user', username: me.username, nickname: me.nickname })
   }, [])
 
   const signOut = useCallback(async () => {

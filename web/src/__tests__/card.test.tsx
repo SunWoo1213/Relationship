@@ -48,7 +48,7 @@ function router(table: Record<string, Handler>): Handler {
   return (url, init) => {
     if (table[url]) return table[url](url, init)
     // 로그인 관문(P9b U6): App 을 그리는 테스트는 `/auth/me` 200 과 빈 대화 기록이 기본이다.
-    if (url === '/api/auth/me') return json({ id: 'u1', username: 'tester' })
+    if (url === '/api/auth/me') return json({ id: 'u1', username: 'tester', nickname: '테스터' })
     if (url === '/api/chat/history?limit=50') return json([])
     throw new Error(`예상하지 못한 요청: ${url}`)
   }

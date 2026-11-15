@@ -7,10 +7,10 @@ test('로그인 화면에서 로그인하면 앱 틀이 열리고, 로그아웃�
   await freezeClock(page)
   let loggedIn = false
   const api = await installFakeApi(page, baseURL!, {
-    'GET /api/auth/me': () => (loggedIn ? { json: { id: 'u1', username: 'minji_01' } } : { status: 401, json: { detail: { code: 'unauthenticated' } } }),
+    'GET /api/auth/me': () => (loggedIn ? { json: { id: 'u1', username: 'minji_01', nickname: '민지' } } : { status: 401, json: { detail: { code: 'unauthenticated' } } }),
     'POST /api/auth/login': () => {
       loggedIn = true
-      return { json: { id: 'u1', username: 'minji_01' } }
+      return { json: { id: 'u1', username: 'minji_01', nickname: '민지' } }
     },
     'POST /api/auth/logout': () => {
       loggedIn = false

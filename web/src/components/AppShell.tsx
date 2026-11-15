@@ -26,7 +26,7 @@ export const ACCOUNT_NOTICE = {
   logoutFailed: '로그아웃하지 못했어요. 잠시 후 다시 시도해 주세요.',
 } as const
 
-/** 사이드바 맨 아래 "<아이디> · 로그아웃" 한 줄 (P9b U6). 채팅방 목록은 만들지 않는다(원칙7). */
+/** 사이드바 맨 아래 "<닉네임> · <아이디> · 로그아웃" 한 줄 (P9b U6·U10, 결정 AF). 채팅방 목록은 만들지 않는다(원칙7). */
 function AccountRow() {
   const { state, signOut } = useAuth()
   const [failed, setFailed] = useState(false)
@@ -48,7 +48,11 @@ function AccountRow() {
   return (
     <div data-testid="sidebar-account" className="border-t border-sidebar-border pt-3 text-sm">
       <div className="flex items-center gap-2">
-        <span data-testid="sidebar-username" className="min-w-0 truncate font-medium">
+        <span data-testid="sidebar-nickname" className="min-w-0 truncate font-medium">
+          {state.nickname}
+        </span>
+        <span aria-hidden="true">·</span>
+        <span data-testid="sidebar-username" className="min-w-0 truncate text-muted-foreground">
           {state.username}
         </span>
         <span aria-hidden="true">·</span>

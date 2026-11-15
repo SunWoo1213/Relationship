@@ -42,7 +42,7 @@ export async function freezeClock(page: Page) {
  * - `/chat/history?limit=50`: 채팅 화면이 마운트 때 부르는 기록 조회 — 기본은 빈 기록.
  */
 const SESSION_DEFAULTS: ApiTable = {
-  'GET /api/auth/me': { json: { id: 'u-e2e', username: 'e2e_user' } },
+  'GET /api/auth/me': { json: { id: 'u-e2e', username: 'e2e_user', nickname: '이투이' } },
   'GET /api/chat/history?limit=50': { json: [] },
 }
 

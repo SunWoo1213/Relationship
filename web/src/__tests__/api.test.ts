@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, apiFetch, CHAT_HISTORY_LIMIT, getChatHistory, login, logout, onUnauthorized } from '@/api/client'
+import { ApiError, apiFetch, CHAT_HISTORY_LIMIT, checkAvailability, getChatHistory, login, logout, onUnauthorized } from '@/api/client'
 
 function jsonResponse(status: number, body: unknown) {
   return new Response(JSON.stringify(body), {
@@ -96,6 +96,26 @@ describe('API 클라이언트 래퍼 (결정 C (ii))', () => {
     const err = await failureOf(login({ username: 'a', password: 'b' }))
     off()
     expect(err.code).toBe('invalid_credentials')
+    expect(listener).not.toHaveBeenCalled()
+  })
+
+  it('checkAvailability 는 준 키만 쿼리에 싣고(한글·공백은 인코딩) same-origin 으로 GET 한다', async () => {
+    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(200, { username: null, nickname: 'available' })))
+    vi.stubGlobal('fetch', fetchMock)
+    await checkAvailability({ nickname: '민 지' })
+    await checkAvailability({ username: 'minji_01' })
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/auth/availability?nickname=%EB%AF%BC+%EC%A7%80')
+    expect(fetchMock.mock.calls[1][0]).toBe('/api/auth/availability?username=minji_01')
+    expect(fetchMock.mock.calls[0][1].method).toBe('GET')
+    expect(fetchMock.mock.calls[0][1].credentials).toBe('same-origin')
+  })
+
+  it('checkAvailability 가 401 을 받아도 전역 로그아웃 신호는 없다', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(401, { detail: { code: 'unauthenticated' } })))
+    const listener = vi.fn()
+    const off = onUnauthorized(listener)
+    await failureOf(checkAvailability({ username: 'a' }))
+    off()
     expect(listener).not.toHaveBeenCalled()
   })
 

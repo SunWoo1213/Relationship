@@ -344,7 +344,7 @@ describe('인앱 배너 (결정 H)', () => {
   function appFetch() {
     // 로그인 관문(P9b U6): App 은 `/auth/me` 200 이어야 앱 틀을 그린다.
     return installFetch({
-      'GET /api/auth/me': () => json({ id: 'u1', username: 'tester' }),
+      'GET /api/auth/me': () => json({ id: 'u1', username: 'tester', nickname: '테스터' }),
       'GET /api/briefings': () => json([]),
       'GET /api/persons': () => json([]),
     })
@@ -401,7 +401,7 @@ describe('인앱 배너 (결정 H)', () => {
     const world = installPushBrowser()
     window.history.replaceState(null, '', '#/chat')
     installFetch({
-      'GET /api/auth/me': () => json({ id: 'u1', username: 'tester' }),
+      'GET /api/auth/me': () => json({ id: 'u1', username: 'tester', nickname: '테스터' }),
       'GET /api/chat/history?limit=50': () => json([]),
       'GET /api/briefings': () => json([]),
       'GET /api/persons': () => json([]),
@@ -419,7 +419,7 @@ describe('인앱 배너 (결정 H)', () => {
     const world = installPushBrowser()
     window.history.replaceState(null, '', '#/chat')
     installFetch({
-      'GET /api/auth/me': () => json({ id: 'u1', username: 'tester' }),
+      'GET /api/auth/me': () => json({ id: 'u1', username: 'tester', nickname: '테스터' }),
       'GET /api/chat/history?limit=50': () => json([]),
       'GET /api/briefings': () => json([]),
       'GET /api/persons': () => json([]),
