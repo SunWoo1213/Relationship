@@ -1,0 +1,27 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9c_probe_401_before_422.py
+# 시각: 2026-11-16T01:51:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1723a84 (dev2)
+# exit: 0
+# ---
+쿼리 없음(json={}): 401
+형식 오류 from=x&to=y: 401
+현재 API 라우트 수: 17
+   ('GET', '/health')
+   ('POST', '/answers/{question_id}')
+   ('POST', '/chat')
+   ('GET', '/chat/history')
+   ('POST', '/briefings/run')
+   ('GET', '/push/vapid-public-key')
+   ('POST', '/push/subscriptions')
+   ('GET', '/persons')
+   ('GET', '/persons/{person_id}')
+   ('GET', '/events/{event_id}/raw')
+   ('GET', '/persons/{person_id}/facts/{fact_id}/sources')
+   ('GET', '/questions/pending')
+   ('GET', '/briefings')
+   ('POST', '/auth/signup')
+   ('POST', '/auth/login')
+   ('POST', '/auth/logout')
+   ('GET', '/auth/me')
+briefing.test.tsx it( 건수: 19

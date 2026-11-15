@@ -1,0 +1,27 @@
+# 명령: bash .claude/scripts/verify-impl.sh P9b-auth
+# 시각: 2026-11-16T01:43:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1723a84 (dev2)
+# exit: 0
+# ---
+== verify-impl P9b-auth  (20261116-0143) ==
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2515 passed, 1 warning in 36.62s
+PASS  pytest 통과(/Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python) → evidence/20261116-0143-pytest.txt
+WARN  ruff 경고/오류 → evidence/20261116-0143-lint.txt
+PASS  태그 P9b-auth 커밋 13 건 → evidence/20261116-0143-commits.txt
+PASS  커밋에 태그 존재: CR-006
+PASS  커밋에 태그 존재: D16
+PASS  커밋에 태그 존재: D17
+PASS  커밋에 태그 존재: D18
+PASS  커밋에 태그 존재: D2
+PASS  커밋에 태그 존재: R12
+PASS  커밋에 태그 존재: R14
+PASS  커밋에 태그 존재: S3.1
+PASS  커밋에 태그 존재: S3.4
+PASS  커밋에 태그 존재: S3.6
+WARN  04-review.md 없음 (완료 검토 전이면 정상)
+PASS  registry 에 P9b-auth 행 있음
+WARN  미완료 작업 단위 9 개
+== 결과: FAIL=0 WARN=3 → evidence/20261116-0143-summary.txt ==

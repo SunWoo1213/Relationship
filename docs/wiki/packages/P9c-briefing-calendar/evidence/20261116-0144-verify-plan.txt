@@ -1,0 +1,54 @@
+# 명령: bash .claude/scripts/verify-plan.sh P9c-briefing-calendar
+# 시각: 2026-11-16T01:44:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1723a84 (dev2)
+# exit: 1
+# ---
+== verify-plan P9c-briefing-calendar  (2026-11-16 01:44) ==
+PASS  존재: docs/wiki/packages/P9c-briefing-calendar/01-plan.md
+FAIL  없음: docs/wiki/packages/P9c-briefing-calendar/02-plan-verify.md
+PASS  카드 존재: D17
+PASS  카드 존재: D18
+PASS  Refs 있음: - [ ] U1 **[backend-agent] 월 범위 일정 조회 API `GET /schedules`**
+PASS  Refs 있음: - [ ] U2 **[frontend-agent] 브리핑 화면 목록/달력 전환과 달력 컴포넌트** / Ref
+PASS  Refs 있음: - [ ] U3 **[메인 세션 + 사용자] registry·문서·배포 반영·사람 점검** / Refs: P
+PASS  backlog 일치: 브리핑 화면에서 목록 보기와 달력 보기를 전환할 수 있다 + 월 달력에 그달 일정이 날짜별로 표시되고 브리핑
+PASS  의존 완료: P6-briefing
+PASS  의존 완료: P8-frontend
+PASS  registry 중복 없음: tests/test_api_schedules_range.py
+PASS  registry 중복 없음: web/src/components/BriefingCalendar.tsx
+PASS  registry 중복 없음: web/src/__tests__/calendar.test.tsx
+PASS  registry 중복 없음: docs/wiki/packages/P9c-briefing-calendar/tests.md
+PASS  registry 중복 없음: 03-log.md
+WARN  registry 에 다른 패키지로 이미 있음: app/api/read.py → | 모듈 | 읽기 전용 조회 `list_persons()`·`get_person_card()` · 상수 `TIMELINE_LIMIT=20`·`U
+| 모듈 | 원문 조회 `get_event_raw()`·`get_fact_sources()` · 상수 `FACT_SOURCES_LIMIT=20`
+| 모듈 | 브리핑 조회 `list_briefings()` · 상수 `BRIEFINGS_LOOKBACK_DAYS=7`·`BRIEFINGS_LIM
+WARN  registry 에 다른 패키지로 이미 있음: app/api/routes.py → | 엔드포인트 | GET /health · POST /answers/{id} | app/api/routes.py | P2-tools | 4d58
+| 엔드포인트 | POST /chat | app/api/routes.py | P5-loop | d5c8ec9 | 발화 1건 → 인식(LLM 1회
+| 엔드포인트 | GET /push/vapid-public-key · POST /push/subscriptions | app/api/routes
+| 엔드포인트 | GET /persons · GET /persons/{person_id} (읽기 전용) | app/api/routes.py | 
+| 엔드포인트 | GET /events/{event_id}/raw · GET /persons/{person_id}/facts/{fact_id}/
+| 엔드포인트 | GET /questions/pending · GET /briefings (읽기 전용) | app/api/routes.py | 
+| 모듈 | 계정 대화 세션 `chat_session_id(user)` = `chat:<user_id>` · 전 라우트 로그인 필수(`/heal
+| 모듈 | 대화 기록 `append(session, user_id, role, content, question_id=None)`(flush 만
+| 엔드포인트 | `GET /chat/history?limit=N`(1~200, 기본 50) → `ChatHistoryItemOut[]`(`id
+WARN  registry 에 다른 패키지로 이미 있음: app/api/schemas.py → | 엔드포인트 | API 요청/응답 스키마 | app/api/schemas.py | P2-tools | 4d5817e | `AnswerIn`·`
+| 엔드포인트 | GET /push/vapid-public-key · POST /push/subscriptions | app/api/routes
+| 모듈 | 조회 응답 `PersonListItemOut`·`PersonBasicOut`·`PersonFactOut`·`PersonPattern
+| 모듈 | 원문 응답 `EventRawOut`·`FactBriefOut`·`FactSourceEventOut`·`FactSourcesOut` 
+| 모듈 | 브리핑 조회 응답 `BriefingRecordOut`·`BriefingScheduleOut`·`BriefingPersonOut` |
+| API 클라이언트·타입 | `web/src/api/client.ts`(`apiFetch`·`ApiError`·`API_BASE='/api'`
+| 엔드포인트 | `GET /chat/history?limit=N`(1~200, 기본 50) → `ChatHistoryItemOut[]`(`id
+| 설정 | 고정 사용자 폐지 — `app_user_id()`·`DEFAULT_APP_USER_ID`·`APP_USER_ID` 삭제(`tests
+WARN  registry 에 다른 패키지로 이미 있음: web/src/api/client.ts → | API 클라이언트·타입 | `web/src/api/client.ts`(`apiFetch`·`ApiError`·`API_BASE='/api'`
+| 세션 보관·채팅 호출 | `web/src/session.ts`(`getSessionId`·`setSessionId`·`clearSession
+| 인물 카드 화면 | `web/src/screens/PersonCardScreen.tsx`(`PersonCardScreen`·`CARD_NOT
+| 브리핑 화면 | `web/src/screens/BriefingScreen.tsx`(`BriefingScreen`·`BRIEFING_NOTIC
+| 푸시 구독 | `web/src/push.ts`(`subscribeToPush`·`getPushStatus`·`urlBase64ToUint8A
+| 모듈 | 계정 API 클라이언트 `signup`·`login`·`getMe`·`logout(endpoint?)`·`getChatHistory
+WARN  registry 에 다른 패키지로 이미 있음: types.ts → | API 클라이언트·타입 | `web/src/api/client.ts`(`apiFetch`·`ApiError`·`API_BASE='/api'`
+| 모듈 | 계정 API 클라이언트 `signup`·`login`·`getMe`·`logout(endpoint?)`·`getChatHistory
+WARN  registry 에 다른 패키지로 이미 있음: web/src/screens/BriefingScreen.tsx → | 브리핑 화면 | `web/src/screens/BriefingScreen.tsx`(`BriefingScreen`·`BRIEFING_NOTIC
+| 브리핑 화면 알림 버튼·인앱 배너 | `BriefingScreen.tsx` `PushSubscribe`(미구독 "알림 받기"/진행 "알림 켜
+PASS  registry 중복 없음: docs/wiki/registry.md
+== 결과: FAIL=1 WARN=6 ==
