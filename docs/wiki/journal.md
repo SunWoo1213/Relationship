@@ -665,3 +665,5 @@
 - 2026-11-16 01:42 | PUSH-dev2 | origin dev2 1723a84 (실험 푸시)
 - 2026-11-16 01:56 | COMMIT | db3d116 docs(P9c-briefing-calendar): 달력 계획을 미리 검증받아 빠진 계약을 채우고, 로그인 패키지의 끝난 단위를 표시한다
 - 2026-11-16 01:56 | PUSH-dev2 | origin dev2 db3d116 (실험 푸시)
+- 2026-11-16 06:27 | COMMIT | f93e7e6 docs(P9b-auth): 로그인 버전을 서버에 반영한 결과와 바깥 점검 증거를 남긴다
+- 2026-11-16 06:27 | PUSH-dev2 | origin dev2 f93e7e6 (실험 푸시)
