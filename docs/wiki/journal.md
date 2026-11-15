@@ -618,3 +618,5 @@
 - 2026-11-14 15:23 | PUSH-dev2 | origin dev2 809fc96 (실험 푸시)
 - 2026-11-14 15:32 | COMMIT | fe45a0d infra(P9-infra): AWS 권한을 받으면 Terraform 으로 EC2·보안 그룹·EIP 를 만들 수 있게 선언 파일을 두고, 사용자가 할 일 문서를 더한다
 - 2026-11-14 15:32 | PUSH-dev2 | origin dev2 fe45a0d (실험 푸시)
+- 2026-11-14 15:49 | COMMIT | e9f94fa infra(P9-infra): EC2 메타데이터 토큰 강제·SSH cidr 검증·apt 잠금 대기를 넣고 Terraform 검사 테스트를 보강한다
+- 2026-11-14 15:49 | PUSH-dev2 | origin dev2 e9f94fa (실험 푸시)
