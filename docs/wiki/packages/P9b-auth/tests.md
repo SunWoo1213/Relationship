@@ -246,3 +246,57 @@
 ### 바꾼 기존 단언·헬퍼(닫힌 목록 ①②③ 대조) — 03-log "U3b 구현 메모(초안)" 에 파일:줄 전/후 전부
 
 ① 422 `invalid_session_id` → "무시되고 200": `test_api_chat.py`(`…invalid_session_id_header_is_ignored_and_returns_200`)·`test_api_questions_pending.py`(`…형식_위반_세션_헤더는_무시되고_계정_목록이_나온다`) ② `session_id` 기대 → `chat:<user_id>`: `test_api_chat.py` 3곳·`test_api_chat_query.py` 1곳 ③ 헤더 없는/다른 세션 헤더 `/questions/pending` 의 빈 목록 기대 → 계정 기준 목록: `test_api_questions_pending.py` 2곳. 단언 변경이 아닌 것: `SID`·trace 조회 조건을 `chat:local` 로(`test_api_answers_resume.py`·`test_api_chat.py` 2곳·`test_api_chat_query.py`·`test_api_questions_pending.py`), `test_commit_boundaries.py` 3곳 `committed_login`. **닫힌 목록 밖 1건**: `test_api_read_persons.py::_count_selects`(인증 SELECT 1건 제외 — 기대값 `== 2` 는 그대로, 보고 참조).
+
+## U4 — 계정당 채팅방 하나: 대화 기록 저장과 `GET /chat/history` (backend-agent, 2026-11-16)
+
+새 시험 20건(`tests/test_chat_history.py`), 전체 **2491 passed**(2471 + 20)·실패 0·skip 0(`evidence/20261116-0045-u4-pytest-final.txt` 계열). 기존 시험 단언은 바꾸지 않았고, 아래 R-10·R-11 시험 보강 2곳만 `test_user_isolation.py` 에서 고쳤다.
+
+### `tests/test_chat_history.py` (`dbtest`, `env` 픽스처 = 운영 `get_session` 과 같은 commit/rollback 규약을 SAVEPOINT 위에 올림. 준비 데이터는 `db_session.commit()` 으로 확정해 요청이 롤백돼도 남는다)
+
+| 시험 | 단언 값 |
+|---|---|
+| 채팅 2턴 + 답변 1회(신원 거절 흐름) 뒤 6행이 순서대로 | `(role, content, question_id)` 6쌍 — `(user, 발화1, None)·(assistant, 응답1, q1)·(user, "아니요, 다른 사람이에요", q1)·(assistant, 응답2, q2)·(user, 발화2, None)·(assistant, 응답3, None)`, id 단조 증가 |
+| 응답 한 줄의 모양이 프론트 `ChatHistoryItemOut` 과 같다 | 키 집합 `{id, role, content, question_id, created_at}`, `id` int, `created_at` 타임존 포함 ISO |
+| `limit=2·1·5·200` 은 최근 N 행을 오래된 것부터 | 전체 목록의 끝 N 개와 같다 |
+| 기본 50 · 최대 200 | 상수 `(50, 200)`, 줄 60개일 때 기본 = 줄 10~59(50개), `limit=200` = 60개 |
+| `limit` 0·201·-1·abc | 422 (4건) |
+| 정렬 키 `(created_at, id)` — id 와 시각을 어긋나게 둔 4행(r3·r4 는 시각 동률) | 전체 `[r2,r3,r4,r1]`, `limit=2` → `[r4,r1]`, `limit=1` → `[r1]`, API `limit=3` → `[r3,r4,r1]` |
+| 같은 트랜잭션 6행(`created_at` 동률)은 삽입(id) 순서 | `limit=4` → `[t2,t3,t4,t5]` |
+| `append` 가 모르는 role 을 거부 | `ValueError`·행 수 불변 |
+| 계정 B 의 기록은 A 에 섞이지 않는다(양방향) | A 6행·B 1행(`"B 만의 말 ZXCV"`), 서로의 문자열 0 |
+| B 가 `/chat` 하면 B 에만 2행 | B 2·A 0·A 의 기록 `[]` |
+| B 가 A 의 질문에 `/answers` → 404 | 어느 쪽도 행 수 불변(A 2·B 0) |
+| 쿠키 없이 `GET /chat/history` | 401 (`limit` 있어도 401) |
+| `GET /chat/history` 읽기 전용 | 6번 읽은 뒤 `chat_messages`·`agent_traces` 행 수 불변 |
+| `/chat` 이 DB 오류로 500 이면 그 요청의 기록 0 (앞선 성공 턴 2행은 남음) | 행 수 2, 발화 문자열 없음 |
+| `/answers` 가 DB 오류로 500 이면 그 요청의 기록 0 | 행 수 2, 답 문자열 없음 |
+| `/chat` 에서 루프가 오류를 삼켜 200 이면 사용자 행 + 응답 행 저장 | `[(user, 발화, None), (assistant, 오류 한 줄, None)]` |
+| `/answers` 에서 루프가 오류를 삼켜 200 이면 답 행(`question_id=q`) + 응답 행(None) 저장 | 4행, 끝 2행 일치 |
+
+### R-10·R-11 (`tests/test_user_isolation.py`)
+
+- R-10: `world` 픽스처가 `answerer_from_env` 를 `_EchoAnswerer`(카드의 이름·사실 값을 한 줄로 되돌림 — 길면 검증이 거부해 서식 답으로 바뀌어 새어 나간 내용이 보이지 않는다)로 바꿔 끼운다. 변이 VR10(`_read_card` 가 소유자 무시) → `[identity_query]` 가 **`assert '등산' not in …` 단언**으로 실패(OpenAIError 아님, 사본에서 `--tb=line` 으로 확인).
+- R-11: `status_code in (200, 404)` → `== 200` + `stored == {persons:0, events:0, schedules:0}`.
+
+### 변이 23종 — 저장소 밖 사본(`…/scratchpad/p9b-u4/copy`)에서 하나씩, 관련 6개 시험 파일(85건)만(`evidence/20261116-0042-u4-mutations-final.txt`; 실제 커밋형 시험은 넣지 않음. 앞서 돈 `…-0039-u4-mutations.txt` 는 R-10 보강 전이라 VR10 이 엉뚱한 시험에서 잡힌 시험 중간 산물 — 최종은 `-final`)
+
+| 변이 | 잡는 시험 |
+|---|---|
+| V4-1a `recent` 의 `reversed` 제거(최근→오래된 순) | 순서·`limit`·정렬 시험 9건 |
+| V4-1b 최근 N 고르기의 2차 키 `id.desc()`→`asc()` | 6행 순서·기본 50·정렬 키·동일 트랜잭션 순서 등 8건 |
+| V4-1c `created_at` 키 삭제(id 만) | 정렬 키 시험 |
+| V4-1d `created_at.desc()`→`asc()` | 정렬 키 시험 |
+| V4-2 `recent` 의 `user_id` 조건 삭제 | `test_other_accounts_history_is_never_mixed`(`7 == 6`)·`test_chat_saves_only_to_the_logged_in_account` |
+| V4-2b `/chat` 응답 행을 고정 다른 계정으로 저장 | `test_chat_saves_only_…`(`1 == 2`) 외 FK 위반 30건 |
+| V4-3 `append` 가 commit(롤백 밖 저장) | `/chat`·`/answers` 실패 시 기록 0 두 시험(`3 == 2`) |
+| V4-4a 기본 51 / V4-4b 최대 201 / V4-4c 최대 199 / V4-4d `ge=0` | 상수 시험·`limit=201`·`limit=0` 422 시험 |
+| V4-5a `/chat` 응답 행에 `question_id` 안 담음 / V4-5b `/answers` 사용자 행에 안 담음 / V4-5c `/answers` 응답 행에 새 질문 대신 옛 질문 id | 6행 순서 시험(+모양 시험·오류 삼킴 시험) |
+| V4-6a·6b 루프 오류 삼킴 경로에서 응답 행 저장 안 함(`/chat`·`/answers` 각각) | 오류 삼킴 시험 각각 |
+| V4-7a `/chat` 사용자 행 / V4-7b `/answers` 사용자 행 / V4-7c `/chat` 응답 행 저장 안 함 | 6행 순서·계정 격리·실패 롤백 시험 등 9·3·7건 |
+| V4-8 `GET /chat/history` 의 `current_user` 제거 | `test_history_requires_login`(`200 == 401`) + U3b 열거 시험 2건이 새 라우트를 자동으로 잡음 |
+| V4-9 `GET /chat/history` 가 읽다가 행을 씀 | 읽기 전용 시험(`12 == 6`) 외 9건 |
+| V4-10 `GET /chat/history` 가 고정 다른 계정 기록을 읽음 | `test_other_accounts_history_is_never_mixed` |
+| V4-11 응답 스키마에서 `question_id` 삭제 | 6행 순서·모양 시험 등 4건 |
+| VR10 `_read_card` 가 소유자를 무시(R-10) | `test_resume_context_pointing_at_other_users_person_changes_nothing[identity_query]` |
+
+변이 뒤 시험 DB 잔여: `chat_messages`·`users`·`persons` 등 전부 0행(`evidence/20261116-0044-u4-residue-after-mutations.txt`). `agent_traces` 234행은 모두 `concurrency-setup-*`·`answer-concurrency-tool-a`(기존 R-7 — 전체 pytest 가 `test_answer_concurrency` 를 돌릴 때마다 쌓이는 것, 변이 실행엔 그 시험이 없다).

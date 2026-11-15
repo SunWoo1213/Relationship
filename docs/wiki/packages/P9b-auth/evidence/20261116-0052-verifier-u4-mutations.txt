@@ -1,0 +1,107 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu4/run-mut.sh
+# 시각: 2026-11-16T00:52:26+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 75845d1 (dev2)
+# exit: 0
+# ---
+### 변이: BASE
+pytest exit=0
+102 passed in 5.22s
+
+### 변이: VV-1-chat-order-assistant-then-user
+pytest exit=1
+FAILED tests/test_chat_history.py::test_two_chats_and_one_answer_give_six_rows_in_order_with_question_ids - assert [('assistant'...서 말해봐', None)] == [('user', '팀장... 없어요.', None)]
+FAILED tests/test_chat_history.py::test_history_item_shape_matches_frontend_type - assert (31585 is None)
+FAILED tests/test_chat_history.py::test_failed_chat_request_leaves_no_history_rows - assert '이번 발화에서는 새로 ...김민수 님이 맞으실까요?' == '팀장이랑 점심 먹었어'
+FAILED tests/test_chat_history.py::test_chat_loop_error_swallowed_as_200_still_saves_both_rows - AssertionError: assert [('assistant'... 주세요.', None)] == [('user', '그냥... 주세요.', None)]
+FAILED tests/test_vprobe_u4.py::test_probe_frontend_scenarios_a_b_c - assert ({0: 31656} == {1: 31656}
+FAILED tests/test_vprobe_u4.py::test_probe_frontend_scenario_d_question_row_cut_off - AssertionError: assert ('assistant' == 'user'
+FAILED tests/test_vprobe_u4.py::test_probe_append_then_request_rollback_removes_only_request_rows - AssertionError: assert [('assistant'...다시 말씀해 주세요.')] == [('user', '삼킴...er', '다시 삼킴')]
+7 failed, 95 passed in 5.28s
+
+### 변이: VV-2-answer-order-assistant-then-user
+pytest exit=1
+FAILED tests/test_chat_history.py::test_two_chats_and_one_answer_give_six_rows_in_order_with_question_ids - assert [('user', '팀장... 없어요.', None)] == [('user', '팀장... 없어요.', None)]
+FAILED tests/test_chat_history.py::test_answer_loop_error_swallowed_as_200_still_saves_both_rows - assert [('assistant'... 주세요.', None)] == [('user', '아니... 주세요.', None)]
+FAILED tests/test_vprobe_u4.py::test_probe_frontend_scenarios_a_b_c - assert ({2: 31733} == {3: 31733}
+3 failed, 99 passed in 5.30s
+
+### 변이: VV-3-chat-user-row-inside-savepoint
+pytest exit=1
+FAILED tests/test_chat_history.py::test_chat_loop_error_swallowed_as_200_still_saves_both_rows - AssertionError: assert [('assistant'... 주세요.', None)] == [('user', '그냥... 주세요.', None)]
+FAILED tests/test_vprobe_u4.py::test_probe_append_then_request_rollback_removes_only_request_rows - AssertionError: assert [('assistant'...다시 말씀해 주세요.')] == [('user', '삼킴...er', '다시 삼킴')]
+2 failed, 100 passed in 5.33s
+
+### 변이: VV-4-answer-user-row-inside-savepoint
+pytest exit=1
+FAILED tests/test_chat_history.py::test_answer_loop_error_swallowed_as_200_still_saves_both_rows - assert [('assistant'... 주세요.', None)] == [('user', '아니... 주세요.', None)]
+1 failed, 101 passed in 5.35s
+
+### 변이: VV-5-chat-user-row-only-on-success
+pytest exit=1
+FAILED tests/test_chat_history.py::test_chat_loop_error_swallowed_as_200_still_saves_both_rows - AssertionError: assert [('assistant'... 주세요.', None)] == [('user', '그냥... 주세요.', None)]
+FAILED tests/test_vprobe_u4.py::test_probe_append_then_request_rollback_removes_only_request_rows - AssertionError: assert [('assistant'...다시 말씀해 주세요.')] == [('user', '삼킴...er', '다시 삼킴')]
+2 failed, 100 passed in 5.37s
+
+### 변이: VV-6-answer-user-row-before-answer-and-committed
+pytest exit=1
+FAILED tests/test_chat_history.py::test_answering_other_users_question_is_404_and_saves_nothing_for_either - assert (2, 1) == (2, 0)
+FAILED tests/test_chat_history.py::test_failed_answer_request_leaves_no_history_rows - AssertionError: assert 3 == 2
+FAILED tests/test_vprobe_u4.py::test_probe_second_answer_409_leaves_no_rows - assert [{'content': ...: 32036, ...}] == [{'content': ...: 32037, ...}]
+FAILED tests/test_vprobe_u4.py::test_probe_expired_answer_409_leaves_no_rows - assert [{'content': ...: 32038, ...}] == [{'content': ...: 32038, ...}]
+FAILED tests/test_vprobe_u4.py::test_probe_answer_not_in_options_leaves_no_rows - assert [{'content': ...: 32039, ...}] == [{'content': ...: 32039, ...}]
+FAILED tests/test_vprobe_u4.py::test_probe_missing_question_404_leaves_no_rows - AssertionError: assert 1 == 0
+6 failed, 96 passed in 5.39s
+
+### 변이: VV-7-answer-loop-error-row-carries-old-question-id
+pytest exit=1
+FAILED tests/test_chat_history.py::test_answer_loop_error_swallowed_as_200_still_saves_both_rows - AssertionError: assert [('user', '아니...주세요.', 32057)] == [('user', '아니... 주세요.', None)]
+1 failed, 101 passed in 5.36s
+
+### 변이: VV-8-answer-rows-saved-under-ctx-user-constant
+pytest exit=1
+FAILED tests/test_chat_history.py::test_two_chats_and_one_answer_give_six_rows_in_order_with_question_ids - assert [('user', '팀장... 없어요.', None)] == [('user', '팀장... 없어요.', None)]
+FAILED tests/test_chat_history.py::test_other_accounts_history_is_never_mixed - AssertionError: assert 5 == 6
+FAILED tests/test_chat_history.py::test_answer_loop_error_swallowed_as_200_still_saves_both_rows - assert [('assistant'... 주세요.', None)] == [('user', '아니... 주세요.', None)]
+FAILED tests/test_user_isolation.py::test_my_own_question_flow_still_works_and_creates_my_person - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constraint "fk_chat_messages_u
+FAILED tests/test_user_isolation.py::test_resume_context_pointing_at_other_users_person_changes_nothing[identity_record] - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constr
+FAILED tests/test_user_isolation.py::test_resume_context_pointing_at_other_users_person_changes_nothing[identity_query] - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constra
+FAILED tests/test_user_isolation.py::test_resume_context_pointing_at_other_users_person_changes_nothing[schedule] - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constraint "f
+FAILED tests/test_api_chat_query.py::test_chat_query_identity_asks_then_answer_stored_zero_no_writes - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constraint "fk_chat_messag
+FAILED tests/test_api_chat_query.py::test_chat_query_identity_second_answer_returns_409 - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constraint "fk_chat_messages_user_id_us
+FAILED tests/test_api_chat_query.py::test_chat_query_resume_person_deleted_says_no_record_stored_zero - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constraint "fk_chat_messa
+FAILED tests/test_api_answers_resume.py::test_answers_resume_round_trip_creates_person_and_stores_event - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constraint "fk_chat_mes
+FAILED tests/test_api_answers_resume.py::test_answers_resume_new_person_tag_answer_sets_relation_tag - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constraint "fk_chat_messag
+FAILED tests/test_api_answers_resume.py::test_answers_resume_second_submission_returns_409 - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constraint "fk_chat_messages_user_id
+FAILED tests/test_api_answers_resume.py::test_answers_resume_create_person_only_targets_context_mention - sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "chat_messages" violates foreign key constraint "fk_chat_mes
+... 외 13건
+27 failed, 75 passed in 5.15s
+
+### 변이: VV-9-recent-ignores-limit
+pytest exit=1
+FAILED tests/test_chat_history.py::test_limit_returns_latest_rows_oldest_first - assert [{'content': ...': None, ...}] == [{'content': ...': None, ...}]
+FAILED tests/test_chat_history.py::test_default_limit_is_fifty_and_max_is_two_hundred - AssertionError: assert ['줄 0', '줄 1'...', '줄 5', ...] == ['줄 10', '줄 1..., '줄 15', ...]
+FAILED tests/test_chat_history.py::test_order_is_created_at_then_id_and_latest_pick_uses_same_key - AssertionError: assert ['r2', 'r3', 'r4', 'r1'] == ['r4', 'r1']
+FAILED tests/test_chat_history.py::test_same_transaction_rows_keep_insert_order_by_id - AssertionError: assert ['t0', 't1', ...', 't4', 't5'] == ['t2', 't3', 't4', 't5']
+FAILED tests/test_vprobe_u4.py::test_probe_frontend_scenario_d_question_row_cut_off - AssertionError: assert 52 == 50
+5 failed, 97 passed in 5.35s
+
+### 변이: VV-10-chat-assistant-content-is-utterance
+pytest exit=1
+FAILED tests/test_chat_history.py::test_two_chats_and_one_answer_give_six_rows_in_order_with_question_ids - assert [('user', '팀장...서 말해봐', None)] == [('user', '팀장... 없어요.', None)]
+FAILED tests/test_vprobe_u4.py::test_probe_frontend_scenarios_a_b_c - assert '팀장이랑 점심 먹었어' == '이번 발화에서는 새로 ...김민수 님이 맞으실까요?'
+2 failed, 100 passed in 5.34s
+
+### 변이: VVR10-read_card-uses-real-owner
+pytest exit=1
+FAILED tests/test_user_isolation.py::test_resume_context_pointing_at_other_users_person_changes_nothing[identity_query] - assert '등산' not in '{"question_...816,896817]}'
+  tb: E   assert '등산' not in '{"question_...816,896817]}'
+  tb: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu4/copy/tests/test_user_isolation.py:692: assert '등산' not in '{"question_...816,896817]}'
+1 failed, 101 passed in 5.36s
+
+### 저장소 무수정 확인
+ M app/api/routes.py
+ M app/api/schemas.py
+ M tests/test_user_isolation.py
+?? app/chat/
+?? tests/test_chat_history.py

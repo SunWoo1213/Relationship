@@ -123,6 +123,23 @@ class ChatOut(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# P9b-auth U4 -- `GET /chat/history`
+# ---------------------------------------------------------------------------
+
+
+class ChatHistoryItemOut(BaseModel):
+    """`GET /chat/history` 한 줄(결정 R). 질문을 던진 assistant 줄에는 그 질문의
+    `question_id` 가, 칩 답을 담은 user 줄에는 답한 질문의 id 가 실린다(프론트가 칩을 붙이는 근거).
+    `created_at` 은 ISO 8601(타임존 포함) 문자열로 직렬화된다."""
+
+    id: int
+    role: Literal["user", "assistant"]
+    content: str
+    question_id: int | None
+    created_at: datetime
+
+
+# ---------------------------------------------------------------------------
 # U6 추가분 -- `POST /briefings/run` (P6-briefing, 모듈 docstring 참고)
 # ---------------------------------------------------------------------------
 

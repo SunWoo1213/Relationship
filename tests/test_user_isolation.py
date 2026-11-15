@@ -28,6 +28,7 @@ from sqlalchemy import func, select
 import app.agent.loop as loop_module
 import app.api.routes as routes_module
 from app.agent.propose import FakeProposer
+from app.agent.respond import QueryAnswer
 from app.api.deps import (
     get_briefing_composer,
     get_embedder,
@@ -192,8 +193,21 @@ class World:
         return q
 
 
+class _EchoAnswerer:
+    """조회 답 생성기 대역(네트워크 0) -- 근거로 받은 인물 카드의 이름·사실 값을 한 줄로 되돌린다
+    (한 줄·짧게 -- 길면 검증이 거부해 서식 답으로 바뀌어 카드 내용이 응답에서 사라진다).
+    남의 카드가 새어 들어오면 그 값이 응답 문자열에 그대로 나타나므로 "B 문자열 없음" 단언
+    (`"등산" not in resp.text`)이 직접 잡는다(R-10 -- 실제 답변기를 만들려다 키 없음 오류로
+    실패하지 않게 한다)."""
+
+    def answer(self, question, evidence, now):
+        line = " ".join([evidence.person.display_name, *(f.value for f in evidence.facts)])
+        return QueryAnswer(text=line, provider="fake")
+
+
 @pytest.fixture()
-def world(db_session, fake_embedder):
+def world(db_session, fake_embedder, monkeypatch):
+    monkeypatch.setattr("app.agent.respond.answerer_from_env", lambda env=None: _EchoAnswerer())
     app = create_app()
     app.dependency_overrides[get_session] = lambda: db_session
     app.dependency_overrides[get_now] = lambda: (lambda: NOW)
@@ -670,7 +684,9 @@ def test_resume_context_pointing_at_other_users_person_changes_nothing(world, ca
 
     resp = world.client_a.post(f"/answers/{q.id}", json={"answer": answer})
 
-    assert resp.status_code in (200, 404)
+    # R-11 -- 질문이 다른 이유로 404 가 되어 재개가 돌지 않은 채 통과하지 못하게 200 으로 고정한다.
+    assert resp.status_code == 200
+    assert resp.json()["stored"] == {"persons": 0, "events": 0, "schedules": 0}
     assert _b_state(world) == before
     assert B_RAW not in resp.text
     assert "등산" not in resp.text

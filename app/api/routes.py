@@ -105,7 +105,7 @@ from collections.abc import Callable
 from dataclasses import replace
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -133,6 +133,7 @@ from app.api.schemas import (
     BriefingRunIn,
     BriefingRunOut,
     BriefingSkippedOut,
+    ChatHistoryItemOut,
     ChatIn,
     ChatOut,
     ChatPendingQuestionOut,
@@ -155,6 +156,12 @@ from app.api.read import (
 )
 from app.auth.deps import current_user
 from app.briefing import BriefingComposer, Notifier, run_briefings
+from app.chat.history import (
+    HISTORY_DEFAULT_LIMIT,
+    HISTORY_MAX_LIMIT,
+    append as append_chat_message,
+    recent as recent_chat_messages,
+)
 from app.db.models import AgentTrace, User
 from app.embedding import EmbeddingProvider
 from app.er import Judge, JudgeUnavailable
@@ -245,6 +252,10 @@ def submit_answer(
     ctx = build_ctx(session, question_id, user, embedder=embedder)
     result = answer_question(ctx, question_id, body.answer)
     resume_input = load_resume_input(session, question_id)
+    # P9b-auth U4 결정 R -- 사용자가 고른 답 1행. 라우트의 기존 트랜잭션 안에서 저장하므로(커밋
+    # 없음) 아래에서 요청이 실패해 롤백되면 기록도 사라진다. 세이브포인트 밖이라 루프 예외를
+    # 삼켜 세이브포인트만 롤백돼도 이 행은 남는다.
+    append_chat_message(session, user.id, "user", body.answer, question_id=question_id)
 
     try:
         with session.begin_nested():
@@ -253,6 +264,7 @@ def submit_answer(
             )
     except (LoopError, JudgeUnavailable, ToolError) as exc:
         error_trace = _record_loop_error(ctx, body.answer, exc)
+        append_chat_message(session, user.id, "assistant", _LOOP_ERROR_REPLY)
         return AnswerOut(
             question_id=result.question_id,
             status=result.status,
@@ -263,7 +275,7 @@ def submit_answer(
             trace_ids=[error_trace.id],
         )
 
-    return AnswerOut(
+    answer_out = AnswerOut(
         question_id=result.question_id,
         status=result.status,
         reply=turn.reply,
@@ -276,6 +288,18 @@ def submit_answer(
         stop_reason=turn.stop_reason,
         trace_ids=list(turn.trace_ids),
     )
+    append_chat_message(
+        session,
+        user.id,
+        "assistant",
+        answer_out.reply,
+        question_id=(
+            answer_out.pending_question.question_id
+            if answer_out.pending_question is not None
+            else None
+        ),
+    )
+    return answer_out
 
 
 def _record_loop_error(ctx: ToolContext, utterance: str, exc: Exception) -> AgentTrace:
@@ -360,6 +384,9 @@ def chat(
     끝나 이번 턴에 저장된 이벤트가 없으면 `after_record()` 는 아무 것도
     하지 않는다."""
     ctx = build_chat_ctx(session, user, embedder)
+    # P9b-auth U4 결정 R -- 사용자 발화 1행. 기존 트랜잭션 안(커밋 없음)·세이브포인트 밖이라,
+    # 루프 예외를 삼켜도 남고 요청이 실패해 롤백되면 함께 사라진다.
+    append_chat_message(session, user.id, "user", body.utterance)
     try:
         with session.begin_nested():
             turn = run_turn(
@@ -367,6 +394,7 @@ def chat(
             )
     except (LoopError, JudgeUnavailable, ToolError) as exc:
         error_trace = _record_loop_error(ctx, body.utterance, exc)
+        append_chat_message(session, user.id, "assistant", _LOOP_ERROR_REPLY)
         return ChatOut(
             reply=_LOOP_ERROR_REPLY,
             session_id=ctx.session_id,
@@ -375,7 +403,31 @@ def chat(
             stop_reason=None,
             trace_ids=[error_trace.id],
         )
-    return ChatOut.model_validate(turn.to_dict())
+    chat_out = ChatOut.model_validate(turn.to_dict())
+    append_chat_message(
+        session,
+        user.id,
+        "assistant",
+        chat_out.reply,
+        question_id=(
+            chat_out.pending_question.question_id if chat_out.pending_question is not None else None
+        ),
+    )
+    return chat_out
+
+
+@router.get("/chat/history", response_model=list[ChatHistoryItemOut])
+def read_chat_history(
+    limit: int = Query(HISTORY_DEFAULT_LIMIT, ge=1, le=HISTORY_MAX_LIMIT),
+    user: User = Depends(current_user),
+    session: Session = Depends(get_session),
+) -> list[ChatHistoryItemOut]:
+    """P9b-auth U4 결정 I -- 로그인 계정 채팅방의 최근 `limit` 줄(기본 50·최대 200)을 오래된 것 ->
+    최근 순으로 돌려준다. 읽기 전용(쓰기·trace 0). 다른 계정의 기록은 섞이지 않는다."""
+    return [
+        ChatHistoryItemOut.model_validate(row, from_attributes=True)
+        for row in recent_chat_messages(session, user.id, limit)
+    ]
 
 
 @router.post("/briefings/run", response_model=BriefingRunOut)
