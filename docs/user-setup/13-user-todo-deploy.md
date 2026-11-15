@@ -7,11 +7,12 @@
 
 - [ ] **A-1 AWS 신규 계정 가입** (Free Plan, 비상업·개인 학습). 가입 화면 aws.amazon.com/free 에서 메모: 크레딧 $___ · 기간 ___개월 · t4g.small 적격 ☐. 계정 검증에 하루까지 걸릴 수 있다 — 그래서 먼저.
 - [ ] **A-2 루트 MFA** 켜기 → **관리자 IAM 사용자**(또는 Identity Center) + MFA → 이후 루트 미사용.
-- [ ] **A-3 Budgets 알림 $10 / $30 / $50**(`02-aws-budgets.md`). 고급 옵션에서 **크레딧을 비용에 포함**하는지 확인(크레딧이 상쇄하면 알림이 늦게 울린다). **EC2 를 만들기 전에.**
+- [x] **A-3 Budgets 알림 $10 / $30 / $50**(`02-aws-budgets.md`) — **끝(2026-11-15, 에이전트가 Chrome 에서 생성)**: `capstone2-10`·`-30`·`-50`, 각각 Actual 100% 메일, **크레딧 제외 필터 적용**. 크레딧 잔액 $120. 아래는 원래 안내. 고급 옵션에서 **크레딧을 비용에 포함**하는지 확인(크레딧이 상쇄하면 알림이 늦게 울린다). **EC2 를 만들기 전에.**
 - [x] **A-4 OpenAI 월 지출 한도** 설정(대시보드 Limits). 공개 중 LLM 비용 상한. — **끝(2026-11-15, 사용자 지시로 에이전트가 Chrome 에서 설정)**: 조직 월 한도 $10 + **Enforce a hard limit 켬**("Limit enforced" 확인). 알림 80%($8)·100%($10)는 기존 그대로. 주의: 한도에 닿으면 조직 전체 요청이 429 로 거부된다(로컬 개발 포함, 강제는 즉시가 아니라 약간 넘을 수 있음).
 - [x] **A-5 도메인** — **사지 않는다(사용자 결정 2026-11-15): `<EIP>.sslip.io` 로 진행.** B-2(DNS A 레코드)·E-5 의 레코드 삭제는 해당 없음. 아래는 원래 안내(이력). ~~도메인 구입~~ + 등록기관 DNS 관리 화면 접근 확인. 구입하면 **도메인 이름을 메인 세션에 알린다**(11·12 문서의 `<도메인>` 자리표를 채운다 — Terraform 은 DNS 를 다루지 않으므로 변수가 없고, A 레코드는 등록기관에서 B-2 로 직접). 늦으면 `<EIP>.sslip.io` 로 먼저 띄운다.
 - [x] **A-6 Terraform 설치** — **끝(2026-11-14, 사용자 지시로 에이전트가 `brew install hashicorp/tap/terraform` → v1.17.2 arm64)**. `fmt -check`·`init`(aws provider 5.100.0, lock 파일 커밋)·`validate` 통과, `ssh_cidr` 자리표·`0.0.0.0/0` 거부 확인. 정상 값 plan 은 B-1 때.
 - [ ] **A-7 에이전트에게 줄 AWS 권한(Terraform 용)** — 사용자가 "aws 권한을 주면 terraform 으로" 하기로 했다(2026-11-14). 준비:
+  0. **진행(2026-11-15)**: 1·2번의 사용자 생성과 권한 연결은 에이전트가 Chrome 에서 끝냄 — IAM 사용자 `relationship-terraform`(콘솔 접속 없음, `AmazonEC2FullAccess` 직접 연결). **남은 것은 사용자 몫: 액세스 키 발급(1번 뒷부분)과 3번 `aws configure`.**
   1. IAM 사용자 하나를 **Terraform 전용**으로 만들고 액세스 키 1개 발급(루트·관리자 키는 쓰지 않는다).
   2. 권한은 이 배포에 필요한 것만: EC2(인스턴스·보안 그룹·키 페어·EIP·AMI 조회), VPC 읽기(기본 VPC·서브넷 조회). 간단히 가려면 `AmazonEC2FullAccess` 하나. S3·RDS·IAM 쓰기는 주지 않는다.
   3. 키 값은 **사용자 PC 의 `~/.aws/credentials` 에 프로필 이름(예 `relationship-deploy`)으로** 넣는다(`aws configure --profile relationship-deploy` 또는 파일 직접 편집). 에이전트는 그 파일을 읽지 않고(훅이 막음) `AWS_PROFILE=relationship-deploy` 이름만 받아 Terraform 이 SDK 로 읽게 한다. 값은 대화에 붙이지 않는다.

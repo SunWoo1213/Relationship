@@ -47,9 +47,16 @@
 - 남은 것 · 다음 단위: 재검증(40 passed·전체·fmt·validate) → 커밋(lock 파일 포함) → **사용자 지시 대기**(13 문서 A → "띄워 달라" → U4).
 - Refs: P9-infra D17 security 결정D 결정S R-U3b-3 R-U3b-4 R-U3b-5 R-U3b-6 R-U3b-7 R-U3b-10 R-U3c-1 R-U3c-2 R-U3c-3 R-U3c-4
 
-## 2026-11-15 · docs(P9-infra): OpenAI 월 한도 $10 강제 설정과 도메인 없이 sslip.io 로 가는 결정을 사용자 할 일 문서에 적는다 · pending (메인)
+## 2026-11-15 · docs(P9-infra): OpenAI 월 한도 $10 강제 설정과 도메인 없이 sslip.io 로 가는 결정을 사용자 할 일 문서에 적는다 · 92bd3b9 (메인)
 - 변경: `docs/user-setup/13-user-todo-deploy.md` A-4 [x](조직 월 한도 $10 + Enforce a hard limit 켬) · A-5 [x](도메인 사지 않음, `<EIP>.sslip.io`). 사용자 지시 "너가 이 작업을 해주길 원해" → 분담 계획 승인(Chrome 조작 허용 · 한도 $10 · sslip.io) · hard limit 은 따로 물어 "켠다" 선택.
 - 결과: OpenAI Limits 화면 "Limit enforced" · `$0.01 / $10.00` 확인(화면). AWS 콘솔은 로그인 안 됨 → A-3·A-7 은 사용자 가입·로그인 뒤.
 - 정합성 확인: security §1(값 0 — 키·계정 값 기록 없음) · D17 "배포 전 필수: OpenAI 월 지출 한도" 충족 · 제품 코드 무변경.
 - 남은 것 · 다음 단위: 사용자 A-1·A-2 → Chrome 로그인 → A-3 Budgets · A-7 IAM 사용자(키 발급은 사용자) → "띄워 달라" → U4.
+- Refs: P9-infra CR-005 D17 security
+
+## 2026-11-15 · docs(P9-infra): AWS 비용 알림 3개와 Terraform 전용 IAM 사용자를 만든 것을 사용자 할 일 문서에 적는다 · pending (메인)
+- 변경: `docs/user-setup/02-aws-budgets.md` 증거 표 1행 · `13-user-todo-deploy.md` A-3 [x]·A-7 진행 줄. 사용자가 AWS 가입·로그인 → 메인이 Chrome 으로 Budgets `capstone2-10`·`-30`·`-50`(월 고정, Actual 100% → 사용자가 알려 준 메일, Charge type Credit 제외) 생성, IAM 사용자 `relationship-terraform`(콘솔 접속 없음, `AmazonEC2FullAccess`) 생성. 액세스 키는 만들지 않음(사용자 몫).
+- 결과: Budgets 목록 3개 `OK`(화면) · IAM users (1) `relationship-terraform`(화면) · Credits 페이지 잔액 $120.00.
+- 정합성 확인: security §1(계정 ID·키·메일 주소 기록 없음) · D17 6 "Budgets 알림을 EC2 생성 전에" 충족 · 제품 코드 무변경.
+- 남은 것 · 다음 단위: 사용자 — 액세스 키 발급·`aws configure`·ssh-keygen·VAPID·OpenAI 키 → "띄워 달라" → U4.
 - Refs: P9-infra CR-005 D17 security

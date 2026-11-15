@@ -620,3 +620,5 @@
 - 2026-11-14 15:32 | PUSH-dev2 | origin dev2 fe45a0d (실험 푸시)
 - 2026-11-14 15:49 | COMMIT | e9f94fa infra(P9-infra): EC2 메타데이터 토큰 강제·SSH cidr 검증·apt 잠금 대기를 넣고 Terraform 검사 테스트를 보강한다
 - 2026-11-14 15:49 | PUSH-dev2 | origin dev2 e9f94fa (실험 푸시)
+- 2026-11-15 19:07 | COMMIT | 92bd3b9 docs(P9-infra): OpenAI 월 한도 $10 강제 설정과 sslip.io 결정을 할 일 문서에 적는다
+- 2026-11-15 19:07 | PUSH-dev2 | origin dev2 92bd3b9 (실험 푸시)
