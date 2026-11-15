@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_auth_api.py tests/test_auth_passwords.py tests/test_auth_settings.py -q
+# 시각: 2026-11-15T21:22:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+........................................................................ [100%]
+72 passed in 2.04s

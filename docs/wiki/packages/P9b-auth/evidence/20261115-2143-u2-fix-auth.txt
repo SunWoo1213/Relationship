@@ -1,0 +1,10 @@
+# 명령: .venv/bin/python -m pytest tests/test_auth_api.py tests/test_auth_passwords.py tests/test_auth_settings.py tests/test_auth_origin.py tests/test_migration_0003.py -q
+# 시각: 2026-11-15T21:43:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 6ecf635 (dev2)
+# exit: 0
+# ---
+........................................................................ [ 43%]
+........................................................................ [ 87%]
+.....................                                                    [100%]
+165 passed in 4.34s

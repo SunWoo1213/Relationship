@@ -1,0 +1,54 @@
+# 명령: git status --short
+# 시각: 2026-11-15T21:23:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+ M .env.example
+ M app/api/schemas.py
+ M app/main.py
+ M app/settings.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M tests/test_migration_0003.py
+ M web/e2e/chat.spec.ts
+ M web/e2e/fixtures.ts
+ M web/src/App.tsx
+ M web/src/__tests__/api.test.ts
+ M web/src/__tests__/card.test.tsx
+ M web/src/__tests__/chat.test.tsx
+ M web/src/__tests__/push.test.ts
+ M web/src/__tests__/routes.test.tsx
+ M web/src/api/client.ts
+ M web/src/api/types.ts
+ M web/src/components/AppShell.tsx
+ M web/src/push.ts
+ M web/src/routes.ts
+ M web/src/screens/ChatScreen.tsx
+ M web/src/session.ts
+ M web/vite.config.ts
+?? app/auth/
+?? docs/wiki/fixes/evidence/20261108-2000-L-007-test-guards.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261107-1455-u7fix-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261108-2009-u7fix3-review-baseline.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1512-u3b-mutations-names.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2117-u6-baseline-typecheck.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2117-u6-baseline-vitest-web.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2117-u6-baseline-vitest.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2122-u2-auth.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2122-u2-hash-grep.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2122-u2-migration.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2122-u2-origin.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2122-u2-pytest-all.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2123-u2-alembic-check.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2123-u2-er-unchanged.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2123-u2-mypy.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2123-u2-ruff.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2123-u2-schema-check.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261115-2123-u2-tools-check.txt
+?? tests/test_auth_api.py
+?? tests/test_auth_origin.py
+?? tests/test_auth_passwords.py
+?? tests/test_auth_settings.py
+?? web/src/auth.tsx
+?? web/src/screens/AuthScreen.tsx

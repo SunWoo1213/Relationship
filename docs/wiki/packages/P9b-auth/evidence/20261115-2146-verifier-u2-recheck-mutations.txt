@@ -1,0 +1,107 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu2/vrun.py mutall
+# 시각: 2026-11-15T21:46:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 6ecf635 (dev2)
+# exit: 0
+# ---
+=== VM-1 find_user_by_token 이 만료 조건을 뺌
+    치환: app/auth/sessions.py
+    결과: 1 failed, 153 passed in 4.29s
+      잡은 테스트: tests/test_auth_api.py::test_session_expiry_boundary_is_exclusive_at_seven_days
+    판정: 잡힘(KILLED)
+=== VM-2 로그아웃이 그 사용자의 모든 세션을 지움
+    치환: app/auth/sessions.py
+    결과: 1 failed, 153 passed in 4.30s
+      잡은 테스트: tests/test_auth_api.py::test_logout_removes_only_that_session
+    판정: 잡힘(KILLED)
+=== VM-3 쿠키 삭제가 이름 분기를 빼먹음(항상 __Host- 이름)
+    치환: app/auth/sessions.py
+    결과: 1 failed, 153 passed in 4.28s
+      잡은 테스트: tests/test_auth_api.py::test_logout_clear_cookie_keeps_secure_and_plain_name_when_off
+    판정: 잡힘(KILLED)
+=== VM-4 쿠키 삭제에서 Secure 속성 빠짐(__Host- 삭제가 브라우저에서 거부됨)
+    치환: app/auth/sessions.py
+    결과: 1 failed, 153 passed in 4.26s
+      잡은 테스트: tests/test_auth_api.py::test_logout_clear_cookie_keeps_secure_and_plain_name_when_off
+    판정: 잡힘(KILLED)
+=== VM-5 로그인 128자 초과 방어 제거(긴 비밀번호도 해시)
+    치환: app/auth/routes.py
+    결과: 1 failed, 153 passed in 4.32s
+      잡은 테스트: tests/test_auth_api.py::test_login_with_over_128_chars_password_skips_the_hash
+    판정: 잡힘(KILLED)
+=== VM-6 Origin 헤더가 여러 개면 마지막 값 사용
+    치환: app/auth/origin.py
+    결과: 154 passed in 4.29s
+    판정: 살아남음(SURVIVED)
+=== VM-7 current_user 가 쿠키 이름 분기를 빼먹음(항상 rel_session)
+    치환: app/auth/deps.py
+    결과: 25 failed, 129 passed in 4.22s
+      잡은 테스트: tests/test_auth_api.py::test_login_200_sets_cookie
+      잡은 테스트: tests/test_auth_api.py::test_logout_204_no_body_clears_cookie_and_deletes_row
+      잡은 테스트: tests/test_auth_api.py::test_logout_clear_cookie_keeps_secure_and_plain_name_when_off
+      잡은 테스트: tests/test_auth_api.py::test_logout_endpoint_input_never_causes_a_server_error
+      잡은 테스트: tests/test_auth_api.py::test_logout_removes_only_that_session
+      잡은 테스트: tests/test_auth_api.py::test_logout_without_body_is_accepted
+    판정: 잡힘(KILLED)
+=== VM-8 세션 만료를 주입 시계가 아니라 실제 시계로 계산
+    치환: app/auth/routes.py
+    결과: 2 failed, 152 passed in 4.29s
+      잡은 테스트: tests/test_auth_api.py::test_session_expires_at_uses_configured_days
+      잡은 테스트: tests/test_auth_api.py::test_session_expiry_boundary_is_exclusive_at_seven_days
+    판정: 잡힘(KILLED)
+=== VM-9 가입 시 비밀번호 길이 검사를 해시 뒤로(상한 미적용)
+    치환: app/auth/routes.py
+    결과: 2 failed, 152 passed in 4.33s
+      잡은 테스트: tests/test_auth_api.py::test_auth_string_inputs_never_cause_a_server_error
+      잡은 테스트: tests/test_auth_api.py::test_signup_invalid_password_422
+    판정: 잡힘(KILLED)
+=== VM-10 X-Forwarded-Host 를 무시하고 Host 만 비교
+    치환: app/auth/origin.py
+    결과: 6 failed, 148 passed in 4.30s
+      잡은 테스트: tests/test_auth_origin.py::test_origin_matches_table
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_equal_to_origin_passes
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_uses_first_value_only
+    판정: 잡힘(KILLED)
+=== VM-11 X-Forwarded-Host 와 Host 어느 쪽이든 맞으면 통과
+    치환: app/auth/origin.py
+    결과: 3 failed, 151 passed in 4.27s
+      잡은 테스트: tests/test_auth_origin.py::test_origin_matches_table
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_uses_first_value_only
+    판정: 잡힘(KILLED)
+=== VM-12 로그인이 422 입력 되울림 방어 밖(로그인만 기본 라우트)
+    치환: app/auth/routes.py
+    결과: 1 failed, 153 passed in 4.24s
+      잡은 테스트: tests/test_auth_api.py::test_signup_validation_error_body_does_not_echo_password
+    판정: 잡힘(KILLED)
+=== RM-1 로그인의 아이디 형식 문 제거(F-1 되돌림)
+    치환: app/auth/routes.py
+    결과: 4 failed, 150 passed in 4.10s
+      잡은 테스트: tests/test_auth_api.py::test_auth_string_inputs_never_cause_a_server_error
+      잡은 테스트: tests/test_auth_api.py::test_login_with_malformed_username_is_the_same_401_and_still_runs_one_hash
+    판정: 잡힘(KILLED)
+=== RM-2 가입의 UTF-8 변환 검사 제거(F-2 되돌림)
+    치환: app/auth/routes.py
+    결과: 2 failed, 152 passed in 4.29s
+      잡은 테스트: tests/test_auth_api.py::test_auth_string_inputs_never_cause_a_server_error
+      잡은 테스트: tests/test_auth_api.py::test_signup_with_unencodable_password_is_422_and_creates_no_user
+    판정: 잡힘(KILLED)
+=== RM-3 형식 위반 아이디는 더미 해시를 건너뜀(타이밍 평준화 깨짐)
+    치환: app/auth/routes.py
+    결과: 9 failed, 145 passed in 4.00s
+      잡은 테스트: tests/test_auth_api.py::test_login_with_malformed_username_is_the_same_401_and_still_runs_one_hash
+    판정: 잡힘(KILLED)
+=== RM-4 verify_password 의 명시적 False 분기 제거(우연한 except 에 기댐)
+    치환: app/auth/passwords.py
+    결과: 1 failed, 153 passed in 4.28s
+      잡은 테스트: tests/test_auth_passwords.py::test_unencodable_password_is_explicitly_rejected_not_an_accident
+    판정: 잡힘(KILLED)
+=== RM-5 가입 UTF-8 검사 실패를 다른 코드로(invalid_username)
+    치환: app/auth/routes.py
+    결과: 1 failed, 153 passed in 4.29s
+      잡은 테스트: tests/test_auth_api.py::test_signup_with_unencodable_password_is_422_and_creates_no_user
+    판정: 잡힘(KILLED)
+=== VM-13 strict_content_type=False (구현자 V2-9b 재현)
+    치환: app/main.py
+    결과: 3 failed, 151 passed in 4.47s
+      잡은 테스트: tests/test_auth_api.py::test_json_shaped_body_without_content_type_is_rejected_and_writes_nothing
+    판정: 잡힘(KILLED)

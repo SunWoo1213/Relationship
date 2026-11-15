@@ -66,6 +66,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 
 from app.api import router
+from app.auth.origin import OriginCheckMiddleware
+from app.auth.routes import router as auth_router
 from app.briefing.scheduler import start_scheduler_task
 from app.settings import briefing_scheduler_enabled, push_dev_page_enabled
 from app.tools.types import (
@@ -178,7 +180,10 @@ def create_app() -> FastAPI:
     있으면 lifespan 이 1분 주기 브리핑 작업만 띄운다(P6-briefing U7,
     모듈 docstring 참고)."""
     app = FastAPI(title="관계 메모리 에이전트 API", lifespan=_lifespan)
+    # P9b-auth U2(결정 T) -- 상태 변경 요청의 Origin 검사를 앱 전역 한 곳에서.
+    app.add_middleware(OriginCheckMiddleware)
     app.include_router(router)
+    app.include_router(auth_router)
     _register_push_dev_page(app)
 
     app.add_exception_handler(PersonNotFound, _not_found_handler)

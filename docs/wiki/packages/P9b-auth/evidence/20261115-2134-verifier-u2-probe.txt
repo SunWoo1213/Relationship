@@ -1,0 +1,68 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu2/vrun.py probe
+# 시각: 2026-11-15T21:34:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 6ecf635 (dev2)
+# exit: 0
+# ---
+PROBE p01 login NUL username -> 500 {"detail":{"code":"internal_error"}} | canary_in_body: False
+PROBE p02 lone-surrogate password /auth/login -> 401 {"detail":{"code":"invalid_credentials"}}
+PROBE p04 /auth/signup type -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup list-body -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup str-body -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup bad-json -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup text-plain -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup no-ctype -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login missing -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login type -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login list-body -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login str-body -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login bad-json -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login text-plain -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login no-ctype -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /chat 422 keys -> 422 ['input', 'loc', 'msg', 'type']
+PROBE p04 /chat missing keys -> 422 ['input', 'loc', 'msg', 'type']
+PROBE p05 origin_matches 'https://[::1]:443' '[::1]' None -> True
+PROBE p05 origin_matches 'https://[2001:db8::443]' '[2001:db8::443]' None -> True
+PROBE p05 origin_matches 'https://[2001:db8::443]:443' '[2001:db8::443]' None -> True
+PROBE p05 origin_matches 'https://[2001:db8::443]' '[2001:db8::]' None -> False
+PROBE p05 origin_matches 'https://testserver@evil.example' 'testserver' None -> False
+PROBE p05 origin_matches 'https://evil.example@testserver' 'testserver' None -> False
+PROBE p05 origin_matches 'https://testserver.' 'testserver' None -> False
+PROBE p05 origin_matches 'http://testserver' 'testserver' None -> True
+PROBE p05 origin_matches 'http://testserver:443' 'testserver' None -> False
+PROBE p05 origin_matches 'https://testserver:80' 'testserver:80' None -> True
+PROBE p05 origin_matches 'https://testserver, https://evil.example' 'testserver' None -> False
+PROBE p05 origin_matches 'https://testserver https://evil.example' 'testserver' None -> False
+PROBE p05 origin_matches 'https://testserver' '' None -> False
+PROBE p05 origin_matches 'https://' '' None -> False
+PROBE p05 origin_matches 'https://:443' '' None -> True
+PROBE p05 origin_matches 'https://testserver' 'testserver' '' -> True
+PROBE p05 origin_matches 'https://testserver' 'testserver' ' , evil.example' -> True
+PROBE p05 origin_matches 'https://evil.example' 'testserver' ',evil.example' -> False
+PROBE p05 origin_matches 'https://[bad' 'testserver' None -> False
+PROBE p05 origin_matches 'HTTPS://testserver' 'testserver' None -> True
+PROBE p05 origin_matches 'https://testserver?x=1' 'testserver' None -> True
+PROBE p05 origin_matches 'https://testserver#f' 'testserver' None -> True
+PROBE p05 origin_matches 'https://testserver\\@evil.example' 'testserver' None -> False
+PROBE p06 two Origin(same first) -> 401
+PROBE p06 two Origin(evil first) -> 403
+PROBE p06 http-scheme same host Origin on https site -> 401
+PROBE p06 OPTIONS preflight from evil -> 405 {}
+PROBE p07 secure-off clear cookie -> 204 ['rel_session=""; expires=Sun, 15 Nov 2026 12:34:18 GMT; HttpOnly; Max-Age=0; Path=/; SameSite=lax']
+PROBE p09 then ascii kim_01 signup -> 409
+PROBE p09 signup 'İab' lower= 'i̇ab' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'ＡＢＣ' lower= 'ａｂｃ' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'ſam' lower= 'ſam' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'ǅab' lower= 'ǆab' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'Åab' lower= 'åab' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'abċ' lower= 'abċ' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'a\u200bbc' lower= 'a\u200bbc' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'abı' lower= 'abı' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p10 logout endpoint int -> 422 {"detail":[{"type":"string_type","loc":["body","endpoint"],"msg":"Input should be a valid string"}]} me: 200
+PROBE p10 logout text/plain -> 422 me: 200
+PROBE p11 AUTH_COOKIE_SECURE=yes signup -> 422 {"detail":{"code":"invalid_value"}}
+PROBE p11 /health -> 200
+PROBE p14 2MB password signup -> 422 {"detail":{"code":"invalid_password"}}
+E   httpx2.CookieConflict: Multiple cookies exist with name=__Host-rel_session
+FAILED tests/test_vu2_probe.py::test_p08_relogin_sessions - httpx2.CookieConflict: Multiple cookies exist with name=__Host-rel_session
+1 failed, 14 passed in 2.11s

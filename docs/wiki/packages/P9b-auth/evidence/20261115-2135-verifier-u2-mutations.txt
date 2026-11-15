@@ -1,0 +1,100 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu2/vrun.py mutall
+# 시각: 2026-11-15T21:35:53+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 6ecf635 (dev2)
+# exit: 0
+# ---
+=== VM-1 find_user_by_token 이 만료 조건을 뺌
+    치환: app/auth/sessions.py
+    결과: 1 failed, 116 passed in 2.48s
+      잡은 테스트: tests/test_auth_api.py::test_session_expiry_boundary_is_exclusive_at_seven_days
+    판정: 잡힘(KILLED)
+=== VM-2 로그아웃이 그 사용자의 모든 세션을 지움
+    치환: app/auth/sessions.py
+    결과: 1 failed, 116 passed in 2.49s
+      잡은 테스트: tests/test_auth_api.py::test_logout_removes_only_that_session
+    판정: 잡힘(KILLED)
+=== VM-3 쿠키 삭제가 이름 분기를 빼먹음(항상 __Host- 이름)
+    치환: app/auth/sessions.py
+    결과: 117 passed in 2.53s
+    판정: 살아남음(SURVIVED)
+[ERROR] VM-4 쿠키 삭제에서 Secure 속성 빠짐(__Host- 삭제가 브라우저에서 거부됨): 치환 대상 2곳
+=== VM-5 로그인 128자 초과 방어 제거(긴 비밀번호도 해시)
+    치환: app/auth/routes.py
+    결과: 117 passed in 2.53s
+    판정: 살아남음(SURVIVED)
+=== VM-6 Origin 헤더가 여러 개면 마지막 값 사용
+    치환: app/auth/origin.py
+    결과: 117 passed in 2.53s
+    판정: 살아남음(SURVIVED)
+=== VM-7 current_user 가 쿠키 이름 분기를 빼먹음(항상 rel_session)
+    치환: app/auth/deps.py
+    결과: 9 failed, 108 passed in 2.52s
+      잡은 테스트: tests/test_auth_api.py::test_login_200_sets_cookie
+      잡은 테스트: tests/test_auth_api.py::test_logout_204_no_body_clears_cookie_and_deletes_row
+      잡은 테스트: tests/test_auth_api.py::test_logout_removes_only_that_session
+      잡은 테스트: tests/test_auth_api.py::test_logout_without_body_is_accepted
+      잡은 테스트: tests/test_auth_api.py::test_me_with_cookie_200_without_401
+      잡은 테스트: tests/test_auth_api.py::test_session_expiry_boundary_is_exclusive_at_seven_days
+    판정: 잡힘(KILLED)
+=== VM-8 세션 만료를 주입 시계가 아니라 실제 시계로 계산
+    치환: app/auth/routes.py
+    결과: 2 failed, 115 passed in 2.55s
+      잡은 테스트: tests/test_auth_api.py::test_session_expires_at_uses_configured_days
+      잡은 테스트: tests/test_auth_api.py::test_session_expiry_boundary_is_exclusive_at_seven_days
+    판정: 잡힘(KILLED)
+=== VM-9 가입 시 비밀번호 길이 검사를 해시 뒤로(상한 미적용)
+    치환: app/auth/routes.py
+    결과: 1 failed, 116 passed in 2.57s
+      잡은 테스트: tests/test_auth_api.py::test_signup_invalid_password_422
+    판정: 잡힘(KILLED)
+=== VM-10 X-Forwarded-Host 를 무시하고 Host 만 비교
+    치환: app/auth/origin.py
+    결과: 6 failed, 111 passed in 2.55s
+      잡은 테스트: tests/test_auth_origin.py::test_origin_matches_table
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_equal_to_origin_passes
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_uses_first_value_only
+    판정: 잡힘(KILLED)
+=== VM-11 X-Forwarded-Host 와 Host 어느 쪽이든 맞으면 통과
+    치환: app/auth/origin.py
+    결과: 3 failed, 114 passed in 2.57s
+      잡은 테스트: tests/test_auth_origin.py::test_origin_matches_table
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_uses_first_value_only
+    판정: 잡힘(KILLED)
+=== VM-12 로그인이 422 입력 되울림 방어 밖(로그인만 기본 라우트)
+    치환: app/auth/routes.py
+    결과: 5 failed, 112 passed in 2.34s
+      잡은 테스트: tests/test_auth_api.py::test_login_200_sets_cookie
+      잡은 테스트: tests/test_auth_api.py::test_login_failures_share_one_response_for_unknown_user_and_wrong_password
+      잡은 테스트: tests/test_auth_api.py::test_login_runs_a_hash_verification_even_for_unknown_user
+      잡은 테스트: tests/test_auth_api.py::test_logout_removes_only_that_session
+      잡은 테스트: tests/test_auth_api.py::test_signup_normalizes_username_to_lowercase
+    판정: 잡힘(KILLED)
+=== VM-13 strict_content_type=False (구현자 V2-9b 재현)
+    치환: app/main.py
+    결과: 117 passed in 2.56s
+    판정: 살아남음(SURVIVED)
+
+# ===== append 2026-11-15T21:36:58+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu2/vrun.py mut VM-4
+# 시각: 2026-11-15T21:36:58+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 6ecf635 (dev2)
+# exit: 0
+# ---
+=== VM-4 쿠키 삭제에서 Secure 속성 빠짐(__Host- 삭제가 브라우저에서 거부됨)
+    치환: app/auth/sessions.py
+    결과: 117 passed in 2.51s
+    판정: 살아남음(SURVIVED)
+
+# ===== append 2026-11-15T21:37:01+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu2/vrun.py mut VM-12
+# 시각: 2026-11-15T21:37:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 6ecf635 (dev2)
+# exit: 0
+# ---
+=== VM-12 로그인이 422 입력 되울림 방어 밖(로그인만 기본 라우트)
+    치환: app/auth/routes.py
+    결과: 117 passed in 2.51s
+    판정: 살아남음(SURVIVED)

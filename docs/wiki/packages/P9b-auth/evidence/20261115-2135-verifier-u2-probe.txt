@@ -1,0 +1,82 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu2/vrun.py probe
+# 시각: 2026-11-15T21:35:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 6ecf635 (dev2)
+# exit: 0
+# ---
+PROBE p01 login NUL username -> 500 {"detail":{"code":"internal_error"}} | canary_in_body: False
+PROBE p02 lone-surrogate password /auth/signup -> 500 {"detail":{"code":"internal_error"}}
+PROBE p02 lone-surrogate password /auth/login -> 401 {"detail":{"code":"invalid_credentials"}}
+PROBE p03 NUL password signup/login/prefix-login -> 201 200 401
+PROBE p04 /auth/signup missing -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup type -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup list-body -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup str-body -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup bad-json -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup text-plain -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/signup no-ctype -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login missing -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login type -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login list-body -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login str-body -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login bad-json -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login text-plain -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /auth/login no-ctype -> 422 keys: ['loc', 'msg', 'type'] | canary: False
+PROBE p04 /chat 422 keys -> 422 ['input', 'loc', 'msg', 'type']
+PROBE p04 /chat missing keys -> 422 ['input', 'loc', 'msg', 'type']
+PROBE p05 origin_matches 'https://[::1]' '[::1]' None -> True
+PROBE p05 origin_matches 'https://[::1]:443' '[::1]' None -> True
+PROBE p05 origin_matches 'https://[2001:db8::443]' '[2001:db8::443]' None -> True
+PROBE p05 origin_matches 'https://[2001:db8::443]:443' '[2001:db8::443]' None -> True
+PROBE p05 origin_matches 'https://[2001:db8::443]' '[2001:db8::]' None -> False
+PROBE p05 origin_matches 'https://testserver@evil.example' 'testserver' None -> False
+PROBE p05 origin_matches 'https://evil.example@testserver' 'testserver' None -> False
+PROBE p05 origin_matches 'https://testserver.' 'testserver' None -> False
+PROBE p05 origin_matches 'http://testserver' 'testserver' None -> True
+PROBE p05 origin_matches 'http://testserver:443' 'testserver' None -> False
+PROBE p05 origin_matches 'https://testserver:80' 'testserver:80' None -> True
+PROBE p05 origin_matches 'https://testserver, https://evil.example' 'testserver' None -> False
+PROBE p05 origin_matches 'https://testserver https://evil.example' 'testserver' None -> False
+PROBE p05 origin_matches 'https://testserver' '' None -> False
+PROBE p05 origin_matches 'https://' '' None -> False
+PROBE p05 origin_matches 'https://:443' '' None -> True
+PROBE p05 origin_matches 'https://testserver' 'testserver' '' -> True
+PROBE p05 origin_matches 'https://testserver' 'testserver' ' , evil.example' -> True
+PROBE p05 origin_matches 'https://evil.example' 'testserver' ',evil.example' -> False
+PROBE p05 origin_matches 'https://[bad' 'testserver' None -> False
+PROBE p05 origin_matches 'HTTPS://testserver' 'testserver' None -> True
+PROBE p05 origin_matches 'https://testserver?x=1' 'testserver' None -> True
+PROBE p05 origin_matches 'https://testserver#f' 'testserver' None -> True
+PROBE p05 origin_matches 'https://testserver\\@evil.example' 'testserver' None -> False
+PROBE p06 empty Origin -> 403
+PROBE p06 two Origin(same first) -> 401
+PROBE p06 two Origin(evil first) -> 403
+PROBE p06 http-scheme same host Origin on https site -> 401
+PROBE p06 OPTIONS preflight from evil -> 405 {}
+PROBE p07 secure-on clear cookie -> ['__Host-rel_session=""; expires=Sun, 15 Nov 2026 12:35:04 GMT; HttpOnly; Max-Age=0; Path=/; SameSite=lax; Secure']
+PROBE p07 secure-off clear cookie -> 204 ['rel_session=""; expires=Sun, 15 Nov 2026 12:35:04 GMT; HttpOnly; Max-Age=0; Path=/; SameSite=lax']
+PROBE p08 relogin: token changed: True len: 43 rows: 2 old token still valid: 200
+PROBE p08 fixation: issued token == attacker value: False
+PROBE p08 plain-name cookie under secure-on -> 401
+PROBE p09 kelvin signup -> 201 {'id': '47bb81aa58e64b2399ea33fd2ff40207', 'username': 'kim_01'}
+PROBE p09 then ascii kim_01 signup -> 409
+PROBE p09 signup 'İab' lower= 'i̇ab' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'ＡＢＣ' lower= 'ａｂｃ' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'ſam' lower= 'ſam' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'ǅab' lower= 'ǆab' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'Åab' lower= 'åab' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'abċ' lower= 'abċ' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'a\u200bbc' lower= 'a\u200bbc' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p09 signup 'abı' lower= 'abı' -> 422 {'detail': {'code': 'invalid_username'}}
+PROBE p10 logout invalid json -> 422 {"detail":[{"type":"json_invalid","loc":["body",1],"msg":"JSON decode error"}]} me: 200
+PROBE p10 logout endpoint int -> 422 {"detail":[{"type":"string_type","loc":["body","endpoint"],"msg":"Input should be a valid string"}]} me: 200
+PROBE p10 logout text/plain -> 422 me: 200
+PROBE p11 AUTH_COOKIE_SECURE=yes /auth/me -> 422 {"detail":{"code":"invalid_value"}}
+PROBE p11 AUTH_COOKIE_SECURE=yes signup -> 422 {"detail":{"code":"invalid_value"}}
+PROBE p11 /health -> 200
+PROBE p12 median ms unknown: 20.9 wrong: 20.8 too_long(real user): 1.3 too_long(unknown): 1.3 ok: 22.2
+PROBE p13 no Content-Type POST -> [('/chat', 422), ('/answers/1', 422), ('/push/subscriptions', 422), ('/auth/signup', 422)] db unchanged: True
+PROBE p14 200k username login -> 401
+PROBE p14 2MB password signup -> 422 {"detail":{"code":"invalid_password"}}
+PROBE p15 PUT no origin /auth/me -> 405 DELETE evil -> 403
+15 passed in 2.04s

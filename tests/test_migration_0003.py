@@ -35,7 +35,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import IntegrityError
 
-from app.config import resolve_connection
+from app.config import ConnInfo, resolve_connection
 from tests.db_bootstrap import apply_test_database_env, ensure_test_database_ready
 
 pytestmark = pytest.mark.dbtest
@@ -66,23 +66,30 @@ CLEARED_TABLES = (
 
 class _EnvOverrides(dict):  # type: ignore[type-arg]
     """`patch.dict` 에 줄 "바뀐 키" 만 담는다. 값(접속 URL·비밀번호 가능)이 pytest
-    실패 출력에 찍히지 않도록 repr 은 키 이름만 보인다(security §1)."""
+    실패 출력에 찍히지 않도록 repr 은 키 이름만 보인다(security §1).
+
+    **주의(review-u1 R-9)**: repr 만 가린다. 이 객체를 `==` 로 비교하는 단언
+    (`assert mig["env"] == …`, `dict(...)` 로 풀어 비교하는 것 포함)을 쓰지 않는다 --
+    pytest 가 값 차이를 그대로 찍는다(CI 에서는 그 값이 `DATABASE_URL`, 비밀번호 포함).
+    쓰는 곳은 `_in_mig_env(...)` 로 환경에 덮어쓰는 것뿐이다."""
 
     def __repr__(self) -> str:
         return f"<_EnvOverrides keys={sorted(self)}>"
 
 
-def _mig_env() -> tuple[dict[str, str], _EnvOverrides]:
+def _mig_env() -> tuple[ConnInfo, _EnvOverrides]:
     """현재(테스트 DB 를 가리키는) 환경을 복사해 전용 DB 이름으로 바꾼다.
 
-    돌려주는 것: (접속 해석용 전체 사본 — 호출한 쪽 지역변수로만 쓴다,
-    `os.environ` 과 달라진 키만 담은 덮어쓰기). 전체 사본은 fixture 값으로 내주지 않는다.
+    돌려주는 것: (접속 정보 — 비밀번호는 `repr` 에 나오지 않는다, `os.environ` 과 달라진
+    키만 담은 덮어쓰기). **전체 환경 사본은 돌려주지 않는다** -- 호출한 fixture 의
+    지역변수에 남으면 `pytest -l` 로 실패 출력에 찍힐 수 있다(review-u1 R-8).
     """
     env = dict(os.environ)
     env["TEST_POSTGRES_DB"] = MIG_DB_NAME
     apply_test_database_env(env)
     overrides = _EnvOverrides({k: v for k, v in env.items() if os.environ.get(k) != v})
-    return env, overrides
+    conn, _warnings = resolve_connection(env)
+    return conn, overrides
 
 
 @contextmanager
@@ -105,8 +112,7 @@ def mig(db_engine: Engine) -> Iterator[dict[str, Any]]:
     yield 값: engine, env(os.environ 과 달라진 키만 담은 덮어쓰기 — 전체 환경 사본 아님),
     before(0002 상태에서 센 행 수), cfg.
     """
-    env, overrides = _mig_env()
-    conn, _warnings = resolve_connection(dict(env))
+    conn, overrides = _mig_env()
     engine = create_engine(conn.sqlalchemy_url())
     cfg = _alembic_cfg()
     with _in_mig_env(overrides):

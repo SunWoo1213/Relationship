@@ -405,3 +405,41 @@ class FactSourcesOut(BaseModel):
 
     fact: FactBriefOut
     sources: list[FactSourceEventOut]
+
+
+# ---------------------------------------------------------------------------
+# P9b-auth U2 -- `/auth/*` (D18, CR-006)
+# ---------------------------------------------------------------------------
+#
+# 비밀번호가 든 요청 모델의 형식 오류(422)는 FastAPI 기본 본문의 `input` 에 요청 본문(비밀번호
+# 포함)이 되돌아 실린다 -- `app/auth/routes.py` 의 라우트 클래스가 `input` 을 뺀다(D18 지킬 것 3).
+
+
+class SignupIn(BaseModel):
+    """`POST /auth/signup` 요청. 아이디·비밀번호 규칙(결정 A·B)은 라우트가 검사해
+    `invalid_username`/`invalid_password` 코드로 422 를 낸다(형식만 여기서)."""
+
+    username: str
+    password: str
+
+
+class LoginIn(BaseModel):
+    """`POST /auth/login` 요청."""
+
+    username: str
+    password: str
+
+
+class LogoutIn(BaseModel):
+    """`POST /auth/logout` 요청(본문은 선택). `endpoint` 는 그 브라우저의 푸시 구독
+    endpoint -- 구독 삭제는 U5 에서 연결한다(이 단위는 받기만)."""
+
+    endpoint: str | None = None
+
+
+class MeOut(BaseModel):
+    """`POST /auth/signup`·`POST /auth/login`·`GET /auth/me` 응답. 비밀번호·해시·토큰은
+    담지 않는다."""
+
+    id: str
+    username: str

@@ -506,6 +506,51 @@ def user_timezone(env: dict[str, str] | None = None) -> ZoneInfo:
         ) from exc
 
 
+# ---------------------------------------------------------------------------
+# 인증(P9b-auth U2, D18 · 결정 A·B·E·F)
+# ---------------------------------------------------------------------------
+
+#: 로그인 유지 기간(일) -- 결정 E(7일 고정, 연장 없음).
+AUTH_SESSION_DAYS = 7
+
+#: 쿠키 이름(결정 F, R-5). Secure 가 켜지면 `__Host-` 접두(브라우저가 `Domain` 쿠키
+#: 덮어쓰기를 막는다), 로컬 http 개발(Secure 끔)에서는 접두 없이.
+AUTH_COOKIE_NAME_SECURE = "__Host-rel_session"
+AUTH_COOKIE_NAME_PLAIN = "rel_session"
+
+#: 아이디 규칙(결정 A) -- 소문자로 정규화한 뒤 `fullmatch`.
+USERNAME_PATTERN = r"[a-z0-9_]{3,20}"
+
+#: 비밀번호 길이(결정 B) -- 문자 수 8~128, 복잡도 규칙 없음.
+PASSWORD_MIN_LEN = 8
+PASSWORD_MAX_LEN = 128
+
+
+def auth_cookie_secure(env: dict[str, str] | None = None) -> bool:
+    """`AUTH_COOKIE_SECURE` 를 읽는다(결정 F). 비었거나 없으면 `True`(기본 켜짐 --
+    운영은 HTTPS). `"1"`/`"true"` 는 켬, `"0"`/`"false"` 는 끔(로컬 http 개발 전용).
+    그 밖의 값은 조용히 한쪽으로 가지 않고 `InvalidValue`(`briefing_scheduler_enabled()`
+    와 같은 관례, 원칙8).
+
+    `env` 를 생략하면 `os.environ` 을 읽는다. `.env` 파일은 읽지 않는다(security §1).
+    """
+    from app.tools.types import InvalidValue  # 지연 import -- 다른 settings 함수와 같은 관례.
+
+    if env is None:
+        env = dict(os.environ)
+    raw = env.get("AUTH_COOKIE_SECURE")
+    if raw is None or raw == "":
+        return True
+    if raw in ("1", "true"):
+        return True
+    if raw in ("0", "false"):
+        return False
+    raise InvalidValue(
+        "environment variable 'AUTH_COOKIE_SECURE' must be '1'/'true' (secure, default), "
+        f"'0'/'false' (local http only), or empty (got {raw!r})"
+    )
+
+
 def app_user_id(env: dict[str, str] | None = None) -> str:
     """`APP_USER_ID` 환경변수를 읽는다. 없으면 `"local"`.
 

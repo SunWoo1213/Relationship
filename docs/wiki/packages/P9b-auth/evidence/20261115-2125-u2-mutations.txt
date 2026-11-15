@@ -1,0 +1,459 @@
+
+# ===== append 2026-11-15T21:25:04+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-1
+# 시각: 2026-11-15T21:25:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-1 compare_digest -> ==
+    치환: app/auth/passwords.py
+    결과: 1 failed, 116 passed in 2.61s
+      잡은 테스트: tests/test_auth_passwords.py::test_verify_uses_constant_time_compare
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:07+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-2
+# 시각: 2026-11-15T21:25:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-2 토큰 원문을 DB 에 저장
+    치환: app/auth/sessions.py
+    결과: 2 failed, 115 passed in 2.58s
+      잡은 테스트: tests/test_auth_api.py::test_token_hash_is_sha256_of_cookie_not_the_cookie
+      잡은 테스트: tests/test_auth_settings.py::test_hash_token_is_sha256_hex
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:10+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-3
+# 시각: 2026-11-15T21:25:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-3 HttpOnly 제거
+    치환: app/auth/sessions.py
+    결과: 2 failed, 115 passed in 2.59s
+      잡은 테스트: tests/test_auth_api.py::test_cookie_name_secure_off_is_plain_without_secure_attribute
+      잡은 테스트: tests/test_auth_api.py::test_signup_201_body_and_cookie_attributes
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:13+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-4
+# 시각: 2026-11-15T21:25:13+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-4 Path 제거(set_cookie)
+    치환: app/auth/sessions.py
+    결과: 2 failed, 115 passed in 2.59s
+      잡은 테스트: tests/test_auth_api.py::test_cookie_name_secure_off_is_plain_without_secure_attribute
+      잡은 테스트: tests/test_auth_api.py::test_signup_201_body_and_cookie_attributes
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:17+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-5
+# 시각: 2026-11-15T21:25:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-5 로그아웃이 행을 안 지움
+    치환: app/auth/routes.py
+    결과: 1 failed, 116 passed in 2.56s
+      잡은 테스트: tests/test_auth_api.py::test_logout_204_no_body_clears_cookie_and_deletes_row
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:20+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-6
+# 시각: 2026-11-15T21:25:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-6 없는 아이디에 다른 응답(404)
+    치환: app/auth/routes.py
+    결과: 2 failed, 115 passed in 2.59s
+      잡은 테스트: tests/test_auth_api.py::test_login_failures_share_one_response_for_unknown_user_and_wrong_password
+      잡은 테스트: tests/test_auth_api.py::test_login_runs_a_hash_verification_even_for_unknown_user
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:23+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-7a
+# 시각: 2026-11-15T21:25:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-7a Origin 미들웨어 등록 제거
+    치환: app/main.py
+    결과: 13 failed, 104 passed in 2.84s
+      잡은 테스트: tests/test_auth_origin.py::test_every_state_changing_method_is_checked_before_routing
+      잡은 테스트: tests/test_auth_origin.py::test_evil_origin_logout_keeps_the_session_alive
+      잡은 테스트: tests/test_auth_origin.py::test_evil_origin_post_is_403_bad_origin_and_changes_nothing
+      잡은 테스트: tests/test_auth_origin.py::test_non_default_port_origin_is_403
+      잡은 테스트: tests/test_auth_origin.py::test_null_origin_is_403
+      잡은 테스트: tests/test_auth_origin.py::test_origin_not_equal_to_host_without_forwarded_host_is_403
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_uses_first_value_only
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:27+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-7b
+# 시각: 2026-11-15T21:25:27+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-7b 비교를 항상 참으로
+    치환: app/auth/origin.py
+    결과: 18 failed, 99 passed in 2.83s
+      잡은 테스트: tests/test_auth_origin.py::test_every_state_changing_method_is_checked_before_routing
+      잡은 테스트: tests/test_auth_origin.py::test_evil_origin_logout_keeps_the_session_alive
+      잡은 테스트: tests/test_auth_origin.py::test_evil_origin_post_is_403_bad_origin_and_changes_nothing
+      잡은 테스트: tests/test_auth_origin.py::test_non_default_port_origin_is_403
+      잡은 테스트: tests/test_auth_origin.py::test_origin_matches_table
+      잡은 테스트: tests/test_auth_origin.py::test_origin_not_equal_to_host_without_forwarded_host_is_403
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_uses_first_value_only
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:30+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-8
+# 시각: 2026-11-15T21:25:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-8 쿠키 이름을 Secure 와 무관하게 rel_session
+    치환: app/auth/sessions.py
+    결과: 6 failed, 111 passed in 3.22s
+      잡은 테스트: tests/test_auth_api.py::test_cookie_name_secure_on_is_host_prefixed_without_domain
+      잡은 테스트: tests/test_auth_api.py::test_login_200_sets_cookie
+      잡은 테스트: tests/test_auth_api.py::test_logout_204_no_body_clears_cookie_and_deletes_row
+      잡은 테스트: tests/test_auth_api.py::test_signup_201_body_and_cookie_attributes
+      잡은 테스트: tests/test_auth_api.py::test_token_hash_is_sha256_of_cookie_not_the_cookie
+      잡은 테스트: tests/test_auth_settings.py::test_cookie_name_follows_secure_flag
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:34+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-9
+# 시각: 2026-11-15T21:25:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-9 push 본문을 Request.json() 으로 직접 해석(콘텐츠 타입 무시)
+    치환: app/api/routes.py
+    결과: 1 failed, 116 passed in 2.62s
+      잡은 테스트: tests/test_auth_api.py::test_non_json_content_types_are_rejected_and_write_nothing
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:38+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-10
+# 시각: 2026-11-15T21:25:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-10 로그아웃에서 current_user 제거
+    치환: app/auth/routes.py
+    결과: 7 failed, 110 passed in 2.59s
+      잡은 테스트: tests/test_auth_api.py::test_logout_without_cookie_401
+      잡은 테스트: tests/test_auth_origin.py::test_default_port_origin_passes
+      잡은 테스트: tests/test_auth_origin.py::test_no_origin_header_passes
+      잡은 테스트: tests/test_auth_origin.py::test_same_origin_without_login_reaches_route_with_401_not_403
+      잡은 테스트: tests/test_auth_origin.py::test_uppercase_origin_host_passes
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_equal_to_origin_passes
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_uses_first_value_only
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:41+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-11
+# 시각: 2026-11-15T21:25:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-11 만료 경계 > -> >=
+    치환: app/auth/sessions.py
+    결과: 1 failed, 116 passed in 3.60s
+      잡은 테스트: tests/test_auth_api.py::test_session_expiry_boundary_is_exclusive_at_seven_days
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:45+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-12
+# 시각: 2026-11-15T21:25:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-12 유지 기간 7 -> 8일
+    치환: app/settings.py
+    결과: 4 failed, 113 passed in 3.40s
+      잡은 테스트: tests/test_auth_api.py::test_session_expires_at_uses_configured_days
+      잡은 테스트: tests/test_auth_api.py::test_session_expiry_boundary_is_exclusive_at_seven_days
+      잡은 테스트: tests/test_auth_api.py::test_signup_201_body_and_cookie_attributes
+      잡은 테스트: tests/test_auth_settings.py::test_auth_constants_match_the_plan
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:49+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-13
+# 시각: 2026-11-15T21:25:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-13 X-Forwarded-Host 첫 값 -> 마지막 값
+    치환: app/auth/origin.py
+    결과: 3 failed, 114 passed in 3.68s
+      잡은 테스트: tests/test_auth_origin.py::test_origin_matches_table
+      잡은 테스트: tests/test_auth_origin.py::test_x_forwarded_host_uses_first_value_only
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:54+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-14
+# 시각: 2026-11-15T21:25:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-14 기본 포트 제거 안 함
+    치환: app/auth/origin.py
+    결과: 4 failed, 113 passed in 3.42s
+      잡은 테스트: tests/test_auth_origin.py::test_default_port_origin_passes
+      잡은 테스트: tests/test_auth_origin.py::test_origin_matches_table
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:25:58+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-15
+# 시각: 2026-11-15T21:25:58+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-15 Origin 소문자 비교 제거
+    치환: app/auth/origin.py
+    결과: 3 failed, 114 passed in 2.67s
+      잡은 테스트: tests/test_auth_origin.py::test_origin_matches_table
+      잡은 테스트: tests/test_auth_origin.py::test_uppercase_origin_host_passes
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:02+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-16
+# 시각: 2026-11-15T21:26:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-16 아이디 소문자 정규화 제거
+    치환: app/auth/routes.py
+    결과: 2 failed, 115 passed in 2.90s
+      잡은 테스트: tests/test_auth_api.py::test_signup_duplicate_409_username_taken
+      잡은 테스트: tests/test_auth_api.py::test_signup_normalizes_username_to_lowercase
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:06+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-17
+# 시각: 2026-11-15T21:26:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-17 비밀번호 최소 8 -> 7
+    치환: app/settings.py
+    결과: 2 failed, 115 passed in 3.20s
+      잡은 테스트: tests/test_auth_api.py::test_signup_invalid_password_422
+      잡은 테스트: tests/test_auth_settings.py::test_auth_constants_match_the_plan
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:10+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-18
+# 시각: 2026-11-15T21:26:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-18 비밀번호 최대 128 -> 129
+    치환: app/settings.py
+    결과: 2 failed, 115 passed in 3.86s
+      잡은 테스트: tests/test_auth_api.py::test_signup_invalid_password_422
+      잡은 테스트: tests/test_auth_settings.py::test_auth_constants_match_the_plan
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:15+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-19
+# 시각: 2026-11-15T21:26:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-19 아이디 길이 20 -> 21
+    치환: app/settings.py
+    결과: 2 failed, 115 passed in 3.78s
+      잡은 테스트: tests/test_auth_api.py::test_signup_invalid_username_422
+      잡은 테스트: tests/test_auth_settings.py::test_auth_constants_match_the_plan
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:20+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-20
+# 시각: 2026-11-15T21:26:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-20 scrypt n 2**14 -> 2**13
+    치환: app/auth/passwords.py
+    결과: 3 failed, 114 passed in 2.75s
+      잡은 테스트: tests/test_auth_api.py::test_password_hash_has_no_plaintext_substring
+      잡은 테스트: tests/test_auth_passwords.py::test_format_carries_parameters_and_sizes
+      잡은 테스트: tests/test_auth_passwords.py::test_parse_hash_returns_components
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:23+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-21
+# 시각: 2026-11-15T21:26:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-21 더미 해시 검증 제거
+    치환: app/auth/routes.py
+    결과: 1 failed, 116 passed in 3.47s
+      잡은 테스트: tests/test_auth_api.py::test_login_runs_a_hash_verification_even_for_unknown_user
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:28+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-22
+# 시각: 2026-11-15T21:26:28+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-22 422 에서 input 제거 안 함(route_class 해제)
+    치환: app/auth/routes.py
+    결과: 1 failed, 116 passed in 3.77s
+      잡은 테스트: tests/test_auth_api.py::test_signup_validation_error_body_does_not_echo_password
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:32+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-23
+# 시각: 2026-11-15T21:26:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-23 SameSite lax -> strict
+    치환: app/auth/sessions.py
+    결과: 2 failed, 115 passed in 3.93s
+      잡은 테스트: tests/test_auth_api.py::test_cookie_name_secure_off_is_plain_without_secure_attribute
+      잡은 테스트: tests/test_auth_api.py::test_signup_201_body_and_cookie_attributes
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:37+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-24
+# 시각: 2026-11-15T21:26:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-24 Secure 속성을 항상 끔
+    치환: app/auth/sessions.py
+    결과: 1 failed, 116 passed in 3.60s
+      잡은 테스트: tests/test_auth_api.py::test_signup_201_body_and_cookie_attributes
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:42+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-25
+# 시각: 2026-11-15T21:26:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-25 Max-Age 를 1일로
+    치환: app/auth/sessions.py
+    결과: 1 failed, 116 passed in 3.69s
+      잡은 테스트: tests/test_auth_api.py::test_signup_201_body_and_cookie_attributes
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:46+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-26
+# 시각: 2026-11-15T21:26:46+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-26 가입 시 409 대신 500(IntegrityError 미처리)
+    치환: app/auth/routes.py
+    결과: 1 failed, 116 passed in 2.62s
+      잡은 테스트: tests/test_auth_api.py::test_signup_duplicate_409_username_taken
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:49+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-27
+# 시각: 2026-11-15T21:26:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-27 로그아웃 쿠키 삭제 안 함
+    치환: app/auth/routes.py
+    결과: 1 failed, 116 passed in 2.62s
+      잡은 테스트: tests/test_auth_api.py::test_logout_204_no_body_clears_cookie_and_deletes_row
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:53+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-28
+# 시각: 2026-11-15T21:26:53+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-28 안전 메서드(GET)도 검사
+    치환: app/auth/origin.py
+    결과: 3 failed, 114 passed in 2.68s
+      잡은 테스트: tests/test_auth_origin.py::test_get_with_other_origin_is_not_403
+      잡은 테스트: tests/test_auth_origin.py::test_safe_methods_are_not_checked
+      잡은 테스트: tests/test_auth_origin.py::test_unsafe_methods_set_is_exactly_the_four_state_changing_methods
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:56+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-29
+# 시각: 2026-11-15T21:26:56+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-29 PATCH 를 검사 대상에서 제외
+    치환: app/auth/origin.py
+    결과: 2 failed, 115 passed in 2.64s
+      잡은 테스트: tests/test_auth_origin.py::test_every_state_changing_method_is_checked_before_routing
+      잡은 테스트: tests/test_auth_origin.py::test_unsafe_methods_set_is_exactly_the_four_state_changing_methods
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:26:59+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py M-30
+# 시각: 2026-11-15T21:26:59+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== M-30 Origin 이 null 이면 통과
+    치환: app/auth/origin.py
+    결과: 5 failed, 112 passed in 2.64s
+      잡은 테스트: tests/test_auth_origin.py::test_null_origin_is_403
+      잡은 테스트: tests/test_auth_origin.py::test_origin_matches_table
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-15T21:27:19+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u2/run_mutant.py V2-9b
+# 시각: 2026-11-15T21:27:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 0f9223e (dev2)
+# exit: 0
+# ---
+=== V2-9b (보조) strict_content_type=False
+    치환: app/main.py
+    결과: 117 passed in 2.59s
+    판정: 살아남음(SURVIVED)

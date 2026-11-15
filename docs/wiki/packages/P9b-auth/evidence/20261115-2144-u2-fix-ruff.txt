@@ -1,0 +1,7 @@
+# 명령: .venv/bin/python -m ruff check app tests scripts evaluation alembic
+# 시각: 2026-11-15T21:44:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 6ecf635 (dev2)
+# exit: 0
+# ---
+All checks passed!

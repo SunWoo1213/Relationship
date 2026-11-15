@@ -1,0 +1,12 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu2/vrun.py showlocals
+# 시각: 2026-11-15T21:37:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 6ecf635 (dev2)
+# exit: 0
+# ---
+exit: 1
+카나리아 값 등장 횟수: 0
+카나리아 키 이름 등장 횟수: 0
+접속 URL 모양(://user:pw@) 등장 횟수: 3 · 그중 비밀번호 자리가 '***' 가 아닌 것: 0
+찍힌 지역변수 이름: ['conn', 'db_engine', 'engine', 'overrides']
+'forced fixture failure' 등장: True
