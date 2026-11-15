@@ -1,0 +1,12 @@
+# U7 배포 반영 — 사용자가 서버 SSH 에서 실행해 붙여 준 출력 (2026-11-16 아침, 메인이 Write 로 옮김 — 명령 출력 원문은 사용자 제공)
+
+명령(13 문서 G-5·G-6): `docker compose -f docker-compose.prod.yml ps` · `docker compose -f docker-compose.prod.yml logs --tail=200 backend | grep -c Traceback`
+
+NAME                           IMAGE                          COMMAND                  SERVICE    CREATED         STATUS                   PORTS
+relationship-prod-backend-1    relationship-backend:4be331b   "sh /app/docker/entr…"   backend    8 seconds ago   Up 6 seconds (healthy)   8000/tcp
+relationship-prod-caddy-1      relationship-caddy:4be331b     "caddy run --config …"   caddy      7 seconds ago   Up 6 seconds             0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp, 443/udp, 2019/tcp
+relationship-prod-postgres-1   pgvector/pgvector:pg16         "docker-entrypoint.s…"   postgres   11 hours ago    Up 11 hours (healthy)    5432/tcp
+0
+
+읽는 법: 세 서비스 Up, backend·postgres healthy, 이미지 태그 `4be331b`(반영 해시), postgres 는 재생성되지 않음(볼륨 유지, 호스트 포트 없음). 마지막 줄 `0` = backend 로그 Traceback 수.
+받지 못한 것: `logs backend | grep "Running upgrade"` 출력(0002 -> 0003 줄). 대신 바깥 스모크 `20261116-0625-u7-public-smoke.txt` 의 `/api/health` 가 `alembic_revision: 0003` 이다.

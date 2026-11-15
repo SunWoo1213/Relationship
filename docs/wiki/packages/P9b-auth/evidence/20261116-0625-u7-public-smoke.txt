@@ -1,0 +1,27 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u7-public.sh
+# 시각: 2026-11-16T06:25:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: db3d116 (dev2)
+# exit: 0
+# ---
+== /api/health
+{"status":"ok","db":"up","alembic_revision":"0003"}
+/api/persons 401
+/api/auth/me 401
+/api/chat/history 401
+/api/briefings 401
+/api/questions/pending 401
+/ 200
+== 401 본문
+{"detail":{"code":"unauthenticated"}}
+== 문서 경로
+/api/docs 404
+/api/openapi.json 404
+/api/redoc 404
+== 프론트 번들에 로그인 경로
+bundle: assets/index-DNYl7nPx.js
+   1 /auth/me
+   1 /auth/signup
+   1 /chat/history
+== HTTP -> HTTPS
+308 https://54-79-202-221.sslip.io/

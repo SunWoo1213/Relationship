@@ -663,3 +663,5 @@
 - 2026-11-16 01:34 | PUSH-dev2 | origin dev2 4be331b (실험 푸시)
 - 2026-11-16 01:42 | COMMIT | 1723a84 docs(P9b-auth): 배포 전 로컬 확인 결과와 시연 계정에 넣을 대화 목록을 남긴다
 - 2026-11-16 01:42 | PUSH-dev2 | origin dev2 1723a84 (실험 푸시)
+- 2026-11-16 01:56 | COMMIT | db3d116 docs(P9c-briefing-calendar): 달력 계획을 미리 검증받아 빠진 계약을 채우고, 로그인 패키지의 끝난 단위를 표시한다
+- 2026-11-16 01:56 | PUSH-dev2 | origin dev2 db3d116 (실험 푸시)
