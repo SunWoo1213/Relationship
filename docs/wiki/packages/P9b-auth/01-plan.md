@@ -1,7 +1,7 @@
 # P9b-auth · 계획 (01-plan)
 
-상태: 개정 2(2026-11-15, architect — verifier 02-plan-verify 1차 보류 F-1~F-7·R-1~R-13, 2차 보류 N-1~N-4·R2-1~R2-4 반영, 처리표는 맨 끝 "개정 이력") — 사용자 결정 표는 **권장안을 기본값으로 채택**(사용자 지시 "계획하고 실행하고 독립 검토까지 진행, 검토할 수 없는 부분만 말해 달라", 2026-11-15) → verify-plan → verifier 재검증 → 활성화 | 담당: backend-agent(sonnet, U1·U2·U3a·U3b·U4·U5) · frontend-agent(sonnet, U6) · 메인 세션(U7 문서·로컬 통합 스모크·증거 저장, U8 진행) · 사용자(U7 서버 반영 SSH·U8 시연 계정 대화·브라우저 점검) · 검증 verifier(fable, 02-plan-verify·단위 리뷰·04-review) | 작성: 2026-11-15
-태그 — 패키지: P9b-auth · 닫는 검증: (직접 R 없음) F-fbaaae · R-U10D-3 · 관련 R12·R14 · 기대는 결정: D18(신설) · D17(결정 6 개정) · D2 · D16 · 구현하는 명세: S3.1(보충 0003) · S3.4(답변 소유) · S3.6(사용자별 루프·endpoint 하나) · 관련 원칙: 원칙1 원칙5(폐지 문장) 원칙7 원칙8 원칙9 · 출처 CR: CR-006
+상태: 개정 2(2026-11-15, architect — verifier 02-plan-verify 1차 보류 F-1~F-7·R-1~R-13, 2차 보류 N-1~N-4·R2-1~R2-4 반영, 처리표는 맨 끝 "개정 이력") — 사용자 결정 표는 **권장안을 기본값으로 채택**(사용자 지시 "계획하고 실행하고 독립 검토까지 진행, 검토할 수 없는 부분만 말해 달라", 2026-11-15) → verify-plan → verifier 재검증 → 활성화 | 담당: backend-agent(sonnet, U1·U2·U3a·U3b·U4·U5) · frontend-agent(sonnet, U6) · 메인 세션(U7 문서·로컬 통합 스모크·증거 저장, U8 진행) · 사용자(U7 서버 반영 SSH·U8 시연 계정 대화·브라우저 점검) · 검증 verifier(fable, 02-plan-verify·단위 리뷰·04-review) | 작성: 2026-11-15 | **개정 3: 2026-11-16(architect, CR-007 — 가입 닉네임·아이디·닉네임 중복검사. 새 단위 U9 backend-agent · U10 frontend-agent · U11 메인+사용자 재배포를 더한다. 기존 단위·문장은 그대로 두고 덧붙였다. 사용자 결정 표 W~AH 는 권장안 채택(사용자 위임 2026-11-15, 메인 지시 2026-11-16). 처리표는 맨 끝 "개정 이력" 개정 3) → verify-plan → verifier 02-plan-verify 재검증(개정분) → U9∥U10 위임**
+태그 — 패키지: P9b-auth · 닫는 검증: (직접 R 없음) F-fbaaae · R-U10D-3 · 관련 R12·R14 · 기대는 결정: D18(신설) · D17(결정 6 개정) · D2 · D16 · 구현하는 명세: S3.1(보충 0003) · S3.4(답변 소유) · S3.6(사용자별 루프·endpoint 하나) · 관련 원칙: 원칙1 원칙5(폐지 문장) 원칙7 원칙8 원칙9 · 출처 CR: CR-006 · **(개정 3) 출처 CR: CR-007 · 기대는 결정: D18 결정 10·11(CR-007 갱신) · 구현하는 명세: S3.1(보충 0004) · 관련 원칙: 원칙5 원칙7 원칙9**
 의존: P8-frontend(완료 2026-10-21) — 충족 · P5b-query-turn(완료 2026-11-09, `f67d8e4`) — 충족 · P4 게이트(P4b 통과 2026-09-23) — 충족.
 관련(선행 완료 조건이 아님): **배포 패키지(P9 인프라)는 U4 기동·바깥 스모크(`7830f6c`)까지, 04-review 보류.** U1~U6 코드는 배포 패키지 산출물에 기대지 않는다. **U7·U8 과 수용 기준 9번은 P9 인프라 U4 산출물(`7830f6c`, 떠 있는 서버 `54-79-202-221.sslip.io`·`docker-compose.prod.yml`·entrypoint)에 기댄다 — 충족**(backlog 99행 "의존: P9-infra U4" 와 같은 말, R-1). 반영 뒤 배포 패키지 04-review 를 함께 닫는다(CURRENT 메모, 사용자 결정 "반드시 평가 전에") · P2b-person-delete 보류(U2 `3a1bcec`) — 영향 없음(라우트 없음), 재개 시 `chat_messages` 재검토.
 
@@ -29,9 +29,22 @@
 13. **배포 호스트와 SameSite(F-7)**: `sslip.io` 는 공개 접미사 목록(PSL)에 없다(verifier 2026-11-15 확인) → 누구나 만들 수 있는 `<임의 IP>.sslip.io` 가 우리와 **같은 사이트**다. `SameSite=Lax` 쿠키는 그 호스트에서 보낸 POST 에도 실린다. 또 그 호스트가 `Domain=sslip.io` 쿠키를 심어 우리 쿠키를 덮을 수 있다(R-5). FastAPI 는 `Content-Type` 이 JSON 이 아니면 본문을 JSON 으로 해석하지 않는다(→ 폼·`text/plain` 위장 POST 는 422 — U2 테스트로 박는다).
 14. **로컬 개발 프록시**: `web/vite.config.ts:23-26` 프록시가 `changeOrigin: true` 라 백엔드가 보는 `Host` 가 대상(`localhost:8000`)으로 바뀐다 — 브라우저 `Origin` 은 `http://localhost:5173`. Origin 검사(결정 T)는 `X-Forwarded-Host` 가 있으면 그것과 비교하고, U6 이 프록시에 `xfwd: true` 를 더한다.
 
+### 코드에서 확인한 사실 — 개정 3(CR-007, architect 2026-11-16, HEAD `f93e7e6`)
+
+15. **가입·로그인 현황**: `app/auth/routes.py:89-118` `signup` — 아이디 `normalize_username`(=`str.lower()`, 80-82) 뒤 `_USERNAME_RE.fullmatch`(97), 비밀번호 길이(99)·UTF-8 검사(101, review-u2 F-2), `User(...)` 를 `begin_nested` 안에서 flush 하고 `IntegrityError` 면 무조건 409 `username_taken`(108-114 — **사전 조회 없음**, 어느 제약인지 구별하지 않음). `login`(121-146)은 형식 위반 아이디를 DB 에 묻지 않고 없는 아이디로 본다(review-u2 F-1 — NUL 이 DB 에 가면 `DataError` 500). `MeOut(id, username)` 을 만드는 곳 3(118·146·169). 라우터 `route_class=_NoInputEchoRoute`(51-75) — 422 본문의 `input`·`ctx` 를 뺀다(쿼리 매개변수 오류에도 같은 라우터라 적용된다). 규칙 상수 `app/settings.py:516-521`(`USERNAME_PATTERN = r"[a-z0-9_]{3,20}"`·`PASSWORD_MIN_LEN`·`PASSWORD_MAX_LEN`). `app/api/schemas.py:440-467` `SignupIn{username, password}`·`LoginIn`·`LogoutIn`·`MeOut{id, username}`.
+16. **스키마**: `app/db/models.py:298-315` `User` — `__table_args__ = (UniqueConstraint("username"),)`(이름은 naming_convention 이 `uq_users_username` 으로), 컬럼 4. 리비전 head `0003`(`alembic/versions/0003_auth_users.py`, `down_revision = "0002"`). 스키마 수치 단언: `tests/test_schema_models.py:80`(users 컬럼 집합)·`153-159`(컬럼 합 `72`, 함수 이름에도 72)·`tests/test_schema_check.py:63-73`(UNIQUE 집합 5개, 함수 이름 `…three_plus_0003_two`). **`scripts/schema_check.py` 는 고칠 곳 없음**: 테이블·UNIQUE 기대값을 모델에서 읽고(`model_unique_constraint_expectations` 77-87, `_check_unique_constraints` 247-265), FK `== 8`(237)은 FK 를 더하지 않으므로 그대로, 인덱스 `>= 10`(286)은 하한. `NULLABLE_COLUMNS`(nickname 은 NOT NULL)·`EXPECTED_INDEXES`(UNIQUE 제약은 `table.indexes` 가 아니다)·CHECK 총수 5(CHECK 를 두지 않는다)·FK 8 은 그대로 선다.
+17. **리비전 문자열·원시 SQL**: `tests/test_api.py:93`(메인 위임문의 "91행" 은 지금 93행) `assert body["alembic_revision"] == "0003"` · `tests/test_migration_0003.py` — `head == "0003"`·`_version == "0003"`(218·219), 왕복 뒤 `_version == "0003"`(358), `NEW_TABLE_COLUMNS["users"]`(48, 225·360 에서 등식), head 상태 DB 에 `INSERT INTO users (id, username, password_hash)` **5문장**(233·234·248·259·269 — 0004 의 NOT NULL 뒤 `nickname` 없이 넣으면 깨진다). 이 파일은 `dbtest` 표식, 전용 DB `relationship_test_mig`(모듈 픽스처가 `downgrade base` → `upgrade 0002` → 원시 SQL → `upgrade head`).
+18. **가입을 부르는 시험**(grep `/auth/signup|signup\(` 2026-11-16 — 3파일 45곳): `tests/test_auth_api.py` 38곳(대부분 `_signup` 도우미 69-70 경유; 직접 본문 `_post_json` 551(서로게이트 비밀번호 → 422 `invalid_password` 단언)·607(`good` 사전 — 문자열 전수 500-0 시험); 응답 키 단언 83 `set(body) == {"id","username"}`·213 `== {"id": uid, "username": "loginuser"}`; 264 `ok.json() == created` 는 양쪽에 닉네임이 함께 실려 그대로) · `tests/test_auth_origin.py` 2곳(103 `_logged_in` 이 201 을 단언 — 닉네임 없으면 깨짐; 117 은 Origin 403 이 본문 검증보다 먼저라 그대로) · `tests/test_auth_required_routes.py` 5곳(빈 본문 422 — 그대로). `/auth/me` 응답 전체 단언 `tests/test_auth_helpers.py:105`. `User(` 를 직접 만드는 시험 코드는 `tests/auth_helpers.py:65`(`make_user`) 하나 — `logged_in_client`·`committed_login` 은 `_issue_token` → `make_user` 경유(grep `User\(|INSERT INTO users` app·tests·scripts·alembic).
+19. **로그인 예외 목록**: `tests/test_auth_required_routes.py:34-42` `_EXEMPT`(이름 목록)와 103-111 면제 집합 등식 — 새 공개 라우트는 **두 곳 모두**에 이름으로 넣어야 열거 시험(`test_every_non_exempt_route_requires_login`·`…declares_current_user_dependency`)이 선다. 모듈 docstring 3-5행도 예외를 나열한다.
+20. **프론트**: `web/src/screens/AuthScreen.tsx` — `AUTH_NOTICE`(11-29), 가입·로그인 공용 본문 `{ username, password }`(79), **라벨이 입력을 감싼다**(`<label>아이디<input/></label>`, 94-108) → 시험이 `getByLabelText(AUTH_NOTICE.username)`(정확 일치)로 찾는다(`auth.test.tsx:80`). 라벨 안에 버튼·결과 문장을 넣으면 라벨 텍스트가 바뀌어 기존 시험이 깨진다. 오류 안내는 `role="alert"` 하나(136-140) — 시험이 `findByRole('alert')`(하나만 있어야 함)로 찾는다(241·257). `web/src/api/types.ts:11-20` `Credentials`(가입·로그인 공용)·`MeOut{id, username}`. `web/src/auth.tsx:15·44·70` 상태에 `username` 만. `web/src/components/AppShell.tsx:29-53` `AccountRow` — `data-testid="sidebar-username"` 에 `state.username`. 그 단언: `auth.test.tsx:104·153·358·380`·`web/e2e/auth.spec.ts:32`(`toHaveText('minji_01')` — 완전 일치). 가입 본문 단언 `auth.test.tsx:270`(시험 이름 260 에도 `{username, password}`). 가입 시험의 입력 227·240·256·268(도우미 `fillAndSubmit` 78-85). `/auth/me`·로그인 목 응답(닉네임 없음): `auth.test.tsx:20(ME)·371` · `web/e2e/fixtures.ts:45` · `web/e2e/auth.spec.ts:10·13` · `routes.test.tsx:19` · `push.test.ts:347·404·422` · `card.test.tsx:51`. `api.test.ts:96` 은 `login(...)` 만 부른다(가입 타입과 무관).
+21. **운영·로컬 데이터**: 서버는 `4be331b`(0003) 가동 중이고 사용자 계정 `test` 가 있다(`evidence/20261116-0625-u7-public-smoke.txt`·`…0640-u7-server-ps-user.txt`). 로컬에는 0003 상태 운영 compose 볼륨 `relationship-prod_pgdata`(스모크 계정 9개, 03-log U7 메모)와 개발 DB 계정 3개(`u7la760694`·`u7lb760694`·`u7browser01`)가 있다 — **0004 백필을 실제 0003 데이터에서 볼 수 있다**. 기존 아이디는 모두 결정 A(`[a-z0-9_]{3,20}`, 소문자) — 결정 X 의 닉네임 규칙에도 맞는다(길이 3~20 ⊂ 2~20, 문자 집합 ⊂). 시험 DB 의 도우미 계정 아이디(`helper-…`)는 하이픈이 있어 닉네임 규칙 밖이지만 DB 에는 CHECK 가 없어 백필이 막히지 않는다(시험 전용 값).
+22. **기준선(U9 시작 전 재측정)**: 마지막 전체 pytest **2515 passed · 0 failed · skip 0**(U5 `ca539a1`, `evidence/20261116-0101-u5-pytest-all.txt` — 그 뒤 커밋은 문서뿐). Vitest·typecheck 수는 U10 시작 전 `--root web` 명령(review-u6 R-5)으로 재어 03-log 에.
+
 ## 목표
 
 CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가하고 싶어 그 로그인에 따라서 채팅방이 나오도록 그리고 로그인을 한 계정마다 세션을 별개로 해서 하고싶은데" 를 실현한다. 목적(사용자 원문): "졸업종합평가 날에 시연을 해야하는데 서비스의 구조상 아예 백지인 상태에서 우리의 성능을 보여주긴 어려울 것 같아서 그래 그래서 새로운 계정을 생성하는 모습을 보이고 그리고 이미 데이터가 들어가있으면 어떻게 해주는지 보여주려고 하는거야". 즉 **(가) 새 계정 가입 → 빈 상태에서 첫 언급**, **(나) 데이터가 쌓인 시연 계정으로 로그인 → 인물 카드·브리핑·지난 대화가 그대로**, 그리고 **두 계정의 기억이 섞이지 않음**을 배포 URL 에서 보인다. 구현은 아이디·비밀번호 가입·로그인(HttpOnly 쿠키 + 서버 세션 테이블), 모든 API 의 사용자 출처를 환경변수에서 로그인 계정으로 바꾸기, 계정당 채팅방 하나(서버가 정하는 `session_id = chat:<user_id>` + `chat_messages` 기록), 스케줄러·푸시 사용자별, 리비전 0003(기존 데이터 비우기), 프론트 로그인·가입 화면. 예: 심사자 앞에서 "새 계정 만들기" 로 `judge01` 을 만들면 인물 화면이 비어 있고, 로그아웃 뒤 `demo` 로 로그인하면 김 대리 카드·내일 점심 브리핑·어제 대화가 보인다. `judge01` 의 쿠키로 `GET /api/persons/<demo 의 인물 id>` 를 부르면 404.
+
+**개정 3 목표(CR-007 · D18 결정 10·11)** — 사용자 원문 "그리고 계정가입을 할 때 닉네임도 입력받게 해줘" · "아이디, 닉네임은 중복검사를 하도록 하고" 를 실현한다. 가입 화면에 닉네임 칸(필수)과 아이디·닉네임 칸마다 "중복 확인" 을 더하고, 서버는 가입 때 409 두 코드로 중복을 거부하며 로그인 없이 부르는 조회 API 1개를 둔다. 가입·로그인·내 정보 응답과 사이드바에 닉네임이 보인다. 기존 계정은 리비전 0004 가 닉네임을 아이디로 채워 **그대로 쓸 수 있다**. 예: 심사자 앞에서 가입 화면에 아이디 `judge01`·닉네임 `심사위원` 을 넣고 "중복 확인" 을 누르면 "사용할 수 있어요" 가 뜨고, 이미 있는 `test` 를 넣으면 "이미 쓰고 있는 아이디예요" 가 뜬다. 가입하면 사이드바에 "심사위원 · judge01 · 로그아웃" 이 보인다. 운영의 `test` 계정은 재배포 뒤에도 같은 비밀번호로 로그인되고 사이드바에 닉네임 `test` 가 보인다.
 
 ## 범위
 
@@ -44,6 +57,7 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
   - 스케줄러 사용자별 루프(대상 0명이면 표식 `user_id=""` 로 `run_briefings` 1회 — `briefing_run` 1행, 결정 U), 푸시 endpoint 하나 규칙, 로그아웃 시 그 브라우저 구독 떼기, `app_user_id()` 함수·`.env.example` 줄 삭제(U5).
   - 프론트 로그인·가입 화면, 로그아웃, 대화 기록 불러오기, 401 처리, `X-Session-Id` 제거, E2E `/auth/me` 목, Vite 프록시 `xfwd`(U6).
   - 문서·로컬 통합 스모크·배포 반영 절차와 스모크(U7). 시연 계정 데이터 쌓기·시연 두 갈래 리허설(U8).
+  - **(개정 3, CR-007)** 리비전 0004 `users.nickname`(기존 계정 백필, 삭제 없음)·가입 계약 `{username, password, nickname}`·409 `nickname_taken`·422 `invalid_nickname`·로그인 없이 부르는 `GET /auth/availability`·`MeOut.nickname`(U9). 가입 화면 닉네임 칸·칸마다 "중복 확인"·`nickname_taken`/`invalid_nickname` 안내·사이드바 닉네임 표시(U10). 0004 재배포·스모크(U11).
 - 이 패키지에서 하지 않는 것 (각 줄 끝이 "왜 안 하는가"):
   - **비밀번호 재설정·이메일 인증** — 메일 발송 인프라·이메일 수집이 필요하고 평가 전 3일에 맞지 않는다. 시연 계정은 사용자가 비밀번호를 안다.
   - **소셜(구글) 로그인** — CR-006 결정 1. OAuth 클라이언트 등록·콜백 도메인·비밀 값이 필요.
@@ -55,6 +69,11 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
   - **툴 7종·ER 4단계·임계치·확신도·평가 산출물 변경** — 원칙1~4·8. 값의 출처만 바뀐다.
   - **`agent_traces.user_id` 컬럼** — 결정 N. 대화 trace 는 `session_id = chat:<user_id>` 로 계정 추적.
   - **P2b-person-delete U3~U5** — 보류 유지.
+  - **(개정 3) 닉네임 변경·내 정보 수정** — 사용자가 요청하지 않았고 화면·API 가 하나 더 생긴다(결정 AG). 그래서 0004 반영 **전에** 만든 계정의 닉네임은 아이디 값으로 고정된다(사용자 할 일 9).
+  - **(개정 3) 제품 속 에이전트가 답·브리핑에서 닉네임으로 사용자를 부르기** — 원칙7 경계("기록된 사실의 재진술"·"기록된 사실에서 도출되는 한 줄") 밖이고 답 템플릿·툴 입력을 바꾸면 툴 7종 불변을 다시 판정해야 한다(결정 AE). 원하면 별도 요청.
+  - **(개정 3) 닉네임으로 로그인** — 로그인은 아이디만(D18 결정 10). 두 이름으로 로그인하면 "없는 아이디·틀린 비밀번호 같은 401" 설계를 다시 따져야 한다.
+  - **(개정 3) 중복 조회 시도 제한·CAPTCHA** — 결정 AC(결정 H 와 같은 근거).
+  - **(개정 3) 닉네임을 다른 사용자에게 보이는 곳(공개 프로필·계정 목록)** — 범위 밖 "관리자 화면·계정 목록" 그대로, 원칙7.
 
 ## 산출물 (파일 경로)
 
@@ -98,6 +117,24 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | `web/src/api/client.ts` · `web/src/session.ts` · `web/src/App.tsx` · `web/src/routes.ts`(주석) · `web/src/components/AppShell.tsx` · `web/src/screens/ChatScreen.tsx` · `web/src/push.ts` · `web/src/api/types.ts` · `web/vite.config.ts`(`xfwd: true`) · `web/e2e/fixtures.ts`(`/auth/me` 목) | 401 처리·204 무본문·`X-Session-Id` 제거·관문·로그아웃·기록 불러오기·주석(원칙5 개정)·프록시·E2E | U6 |
 | `docs/RUNNING.md` · `docs/user-setup/11-ec2-minimal-deploy.md`(58·105행 `APP_USER_ID` → 계정) · `docs/user-setup/13-user-todo-deploy.md` · `SERVER-CHECKLIST.md` §5(시연 두 갈래) · `docs/wiki/registry.md` | 문서 | U7 |
 
+**개정 3 산출물(CR-007)** — 단위 시작 전 `registry.md` grep(이 개정 작성 시 `nickname|availability|닉네임` 제품 행 0 — 105행 `nickname_shared` 는 평가 데이터셋 함정 이름이라 무관. 관련 행: 282~289 `app/auth/*`, 297·298 `web/src/auth.tsx`·`AuthScreen.tsx`).
+
+새로 만드는 파일(이름은 권장 — 바꾸면 03-log 에)
+- `alembic/versions/0004_users_nickname.py`(U9) · `app/auth/names.py`(닉네임 정규화·검사 함수 하나 — 가입과 조회가 같이 쓴다, U9)
+- 테스트: `tests/test_migration_0004.py`·`tests/test_auth_nickname.py`(가입 닉네임 규칙·409 두 코드·응답 필드)·`tests/test_auth_availability.py`(조회 API)(U9)
+
+고치는 기존 파일
+
+| 파일 | 고치는 내용 | 단위 |
+|---|---|---|
+| `app/db/models.py` | `User.nickname`(Text NOT NULL) · `__table_args__` 에 `UniqueConstraint("nickname")`(이름 `uq_users_nickname` 은 naming_convention) · 모듈·클래스 docstring 의 "보충" 줄 | U9 |
+| `app/settings.py` | `NICKNAME_PATTERN`(결정 X — 값은 아래 규칙 표) | U9 |
+| `app/api/schemas.py` | `SignupIn.nickname: str`(필수) · `MeOut.nickname: str` · 새 `AvailabilityOut` | U9 |
+| `app/auth/routes.py` | 가입 검사 순서·409 두 코드(사전 조회 + 제약 이름 매핑)·`MeOut` 3곳에 닉네임·`GET /auth/availability` · 모듈 docstring 계약 표 | U9 |
+| U9 닫힌 목록의 기존 테스트 9파일(아래 U9 "깨뜨릴 기존 단언") | S3.1 0004 보충·API 계약 개정 3 반영 | U9 |
+| `web/src/api/types.ts` · `web/src/api/client.ts` · `web/src/auth.tsx` · `web/src/screens/AuthScreen.tsx` · `web/src/components/AppShell.tsx` · `web/src/__tests__/auth.test.tsx` · `web/src/__tests__/api.test.ts`(조회 URL 시험 추가) · (바꿔도 되는 목 데이터) `web/e2e/fixtures.ts`·`web/e2e/auth.spec.ts`·`routes.test.tsx`·`push.test.ts`·`card.test.tsx` | 가입 본문·`SignupIn`·`MeOut.nickname`·`AvailabilityOut`·`checkAvailability`·닉네임 칸·중복 확인·안내 문구·사이드바 | U10 |
+| `docs/user-setup/13-user-todo-deploy.md`(0004 재배포 절) · `docs/RUNNING.md`(가입 닉네임 한 줄) · `SERVER-CHECKLIST.md` §5-1·`packages/P9b-auth/u8-demo-script.md`(가입 장면에 닉네임) · `docs/wiki/registry.md`(U9·U10 산출물 행) | 문서 | U11 |
+
 ### API 계약 (U2~U5 백엔드 ↔ U6 프론트 — U6 이 동시에 시작할 수 있도록 여기서 고정)
 
 | 메서드·경로 | 요청 | 성공 | 실패 |
@@ -111,6 +148,37 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | (공통) 상태를 바꾸는 메서드(POST·PUT·PATCH·DELETE) | `Origin` 헤더가 있으면 그 호스트(:포트)가 `X-Forwarded-Host`(있으면) 또는 `Host` 와 같아야 함 | 통과 | **403 `bad_origin`**. `Origin` 이 없으면 통과(curl·테스트 클라이언트) — 결정 T |
 
 401 본문은 `{"detail":{"code":"unauthenticated"}}` (기존 오류 본문 모양과 같은 `detail.code`). 403 은 `{"detail":{"code":"bad_origin"}}`.
+
+### API 계약 — 개정 3(CR-007 · D18 결정 10·11. U9 백엔드 ↔ U10 프론트 — U10 이 U9 커밋 전에 시작할 수 있도록 값으로 고정)
+
+| 메서드·경로 | 요청 | 성공 | 실패 |
+|---|---|---|---|
+| `POST /auth/signup` | `{username, password, nickname}` — **세 필드 모두 필수 문자열** | **201** `{id, username, nickname}` + 로그인 쿠키(결정 G 그대로). `nickname` 은 저장된 정규화 값(아래 규칙 표) | 422 `{"detail":{"code":C}}` — C 는 `invalid_username` → `invalid_password` → `invalid_nickname` **이 순서로 검사해 첫 위반 하나** · 필드 누락·타입 오류는 FastAPI 기본 422(`detail` 목록, `input`·`ctx` 없음 — 지금과 같다) · **409** `username_taken` / `nickname_taken` — **둘 다 겹치면 `username_taken`** · 403 `bad_origin`(기존) |
+| `POST /auth/login` | `{username, password}` — 변경 없음(닉네임을 보내도 무시 — pydantic 기본 `extra` 무시) | 200 `{id, username, nickname}` + 쿠키 | 401 `invalid_credentials` — 변경 없음(없는 아이디·틀린 비밀번호 같은 응답 유지) |
+| `GET /auth/me` | — | 200 `{id, username, nickname}` | 401 `unauthenticated` — 변경 없음 |
+| **`GET /auth/availability`**(새) | 쿼리 `username`·`nickname` 중 **하나 이상**(문자열). **로그인 불필요**(쿠키가 있어도 보지 않는다) · GET 이라 Origin 검사 대상 아님(결정 T 그대로) | 200 `{"username": S \| null, "nickname": S \| null}` — S ∈ `"available"` · `"taken"` · `"invalid"`, **묻지 않은 필드는 `null`**. 응답 헤더 `Cache-Control: no-store` | 422 `{"detail":{"code":"missing_query"}}` — 두 쿼리가 모두 **없을** 때만. 빈 문자열(`?username=`)은 "물었다" 로 보고 `"invalid"` |
+| `POST /auth/logout` · 기존 11개 라우트 | 변경 없음 | 변경 없음 | 변경 없음 |
+
+- **가입 판정 순서(U9 가 이 순서 그대로 구현)**: ① 아이디 `normalize_username` + `fullmatch`(기존) ② 비밀번호 길이·UTF-8(기존) ③ 닉네임 정규화·`fullmatch`(아래 규칙 표) — ①~③ 은 **DB 조회 0**(형식 위반 입력이 DB 에 가지 않는다 — review-u2 F-1 교훈) ④ 사전 조회: 정규화 아이디가 `users.username` 에 있으면 409 `username_taken` ⑤ 정규화 닉네임이 `users.nickname` 에 있으면 409 `nickname_taken` ⑥ INSERT(기존 `begin_nested` 세이브포인트) — `IntegrityError` 면 `err.orig.diag.constraint_name` 으로 정한다: `uq_users_username` → `username_taken`, `uq_users_nickname` → `nickname_taken`, **그 밖의 제약이면 다시 올린다**(500 — 다른 결함을 409 로 숨기지 않는다). ⑥ 은 ④⑤ 와 INSERT 사이 경합(동시 가입)용이다.
+- **조회 판정**: 물은 값마다 가입과 **같은 정규화 함수**(`app/auth/names.py` 닉네임 · 기존 `normalize_username`+`USERNAME_PATTERN` 아이디) → 형식 위반이면 `"invalid"`(DB 조회 0) → 정규화 값과 같은 행이 있으면 `"taken"` → 아니면 `"available"`. 응답에 id·다른 필드 0. 쓰기·`agent_traces`·LLM 호출 0(D18 지킬 것 11). 결과는 **참고용** — 최종 판정은 DB UNIQUE + 가입 시 409(조회와 가입 사이 경합, D18 결정 11).
+- **계정 열거와의 관계(사실)**: 로그인은 없는 아이디·틀린 비밀번호를 같은 401 로 답한다(결정 A 구현, 더미 해시). 그러나 **가입 409 `username_taken` 이 이미 아이디 존재를 알려 준다** — 조회 API 는 새 정보를 드러내지 않고 묻는 비용만 낮춘다(계정을 만들지 않고 물을 수 있음). 남용 완화는 두지 않는다(결정 AC). 로그인 응답 설계는 바꾸지 않는다(D18 지킬 것 11).
+- **호환(결정 W)**: 프론트 정적 파일과 백엔드는 **한 해시로 같이 배포**된다(같은 저장소 해시에서 `compose up -d --build` — D17) → 과도기 호환을 두지 않는다(`nickname` 을 선택 필드로 두지 않음). 재배포 순간 옛 JS 를 연 탭에서 가입하면 닉네임 누락 422 → 일반 실패 안내, 새로고침으로 해결(리스크 절). 옛 JS 는 `MeOut` 의 새 필드를 무시하므로 로그인·셸은 그대로 동작.
+
+### 닉네임 규칙 — 개정 3(결정 X·Y·Z, 닫힌 값)
+
+| 항목 | 값 |
+|---|---|
+| 필수 | 예 — 가입 본문 필수 필드(결정 W) |
+| 처리 순서(한 함수, 가입·조회 공용) | `raw` → `unicodedata.normalize("NFC", raw)` → `.strip()`(앞뒤 유니코드 공백 제거) → `re.fullmatch(NICKNAME_PATTERN, s)` 실패면 위반 → 통과하면 **`s.lower()` 가 저장·비교 값** |
+| `NICKNAME_PATTERN`(`app/settings.py`) | `r"[가-힣A-Za-z0-9_]{2,20}"` — 완성형 한글 음절(U+AC00~U+D7A3) · ASCII 영문 대소문자 · ASCII 숫자 · 밑줄, **2~20자**(NFC·strip 뒤 코드포인트 수). `\w`·`\d` 금지(유니코드 문자·숫자가 섞인다). `fullmatch` 라 `$` 줄바꿈 함정 없음 |
+| 한글 | 허용 — 완성형 음절만. 자모 단독(ㄱ~ㅎ·ㅏ~ㅣ, 예 `ㅋㅋ`)·옛한글 거부. NFD 로 들어온 한글(macOS 등)은 NFC 로 합쳐져 허용 |
+| 공백 | 앞뒤는 제거(끝 줄바꿈·탭 포함 — `" 민지\n"` → `민지`). **가운데 공백은 거부**(일반 공백·NBSP·전각 공백 혼동 차단). 공백뿐인 입력은 strip 뒤 빈 문자열 → 위반 |
+| 대소문자(결정 Y) | 영문은 **소문자로 접어 저장·비교** — `Demo`·`DEMO`·`demo` 는 같은 닉네임이고 표시도 `demo`. 한글은 대소문자가 없어 그대로 |
+| 제어문자·NUL·짝 없는 서로게이트·이모지·한자·하이픈·마침표 등 | 정규식 밖 → 가입 422 `invalid_nickname` / 조회 `"invalid"` — **DB 에 묻기 전**. 어느 입력도 500 0(U2 의 "문자열 입력 전수 500-0" 시험 방식 그대로 닉네임에 적용) |
+| 입력 길이 사전 상한 | 두지 않는다 — 10만 자 입력도 NFC·strip·정규식 뒤 422(시험으로 박음). 새 상수 없음 |
+| 중복 판정 | **정규화 최종 값의 완전 일치**. DB UNIQUE `uq_users_nickname` 이 바로 그 값(`users.nickname`)에 걸린다 — 앱 정규화 값 = DB 비교 대상(함수 인덱스 없음, S3.1 0004 보충) |
+| 이름 공간(결정 Z) | 아이디와 **별개** — 내 닉네임이 남의 아이디와 같아도, 내 아이디와 같아도 된다(0004 백필이 닉네임 = 아이디) |
+| 아이디 규칙 | 결정 A 그대로(변경 없음) |
 
 ## 작업 단위 (단위 하나 = 커밋 하나. 끝나면 /commit. 단위마다 verifier 커밋 전 리뷰 + 핵심 계약 변이 시험 최소 1개)
 
@@ -204,7 +272,96 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
   - 확인(사람, 증거는 사용자가 준 화면 설명·응답을 메인이 Write 로 `evidence/<시각>-u8-*.txt`): (나) 시연 계정 로그아웃 → 재로그인 → 지난 대화가 이어서 보임 · 인물 카드에 사실·타임라인(패턴 포함) · 브리핑 화면에 브리핑 1건 이상. (가) 새 계정 가입 → 인물 화면 0명 · 채팅 빈 기록 · 첫 언급 1턴 → 새 인물 확인 칩. 격리: 새 계정 인물 화면에 시연 계정 인물 0, 시연 계정 인물 상세 주소(`#/persons/<id>`)를 새 계정에서 열면 404 안내.
   - 시드 스크립트(결정 Q 후보 — 권장하지 않음): DB 에 인물·사건을 직접 넣는 스크립트는 화면 모양은 같지만 ER·루프·승격을 거치지 않아 "데이터가 들어 있으면 어떻게 해 주는지" 의 근거가 약하다. 실제 대화가 실패할 때의 예비안으로만 남긴다(쓰면 03-log·시연 설명에 "시드" 라고 밝힌다).
 
-### 3차 검증 권고 반영 (메인 세션 2026-11-15 — 위 단위 문장에 더해 적용한다)
+#### 개정 3 단위(CR-007) — 순서·병렬
+
+**(CR-007 문서 이행 + 이 개정 verify-plan·verifier 재검증 통과 → 메인이 `frozen: none`) → U9 ∥ U10 → U11 → U8(시연 계정 가입·데이터·리허설) → verify-impl → 04-review.** U10 은 위 "API 계약 — 개정 3" 표와 목 응답으로 U9 커밋 전에도 시작한다(선례: U6 `6ecf635` 이 U2 `1cf67cd` 보다 먼저 커밋 — 03-log). U9·U10 은 파일이 겹치지 않는다(`app/`·`alembic/`·`tests/` ↔ `web/`). **U8 과의 순서**: 시연 계정은 U11 반영 **뒤** 가입한다 — 닉네임 변경 기능이 없어(결정 AG) 반영 전에 만든 계정은 닉네임이 아이디로 고정된다(사용자 할 일 9). U8 의 발화 목록(`u8-demo-script.md`)은 그대로 쓰고 가입 장면에 닉네임 입력만 더한다(U11 문서). **U7 체크박스**: 첫 반영(`4be331b`)과 바깥 스모크(`f93e7e6`)로 U7 항목은 끝났다 — 메인이 판단해 닫는다. 재배포는 U7 을 다시 여는 것이 아니라 U11 이다. 위임 프롬프트에는 이 개정의 해당 U 원문을 인용하고 임의 제한을 덧붙이지 않는다. 계획에 없는 상수·정렬·상한·방어가 필요하면 구현 전에 멈추고 보고한다(FIX-033 (b)).
+
+**각 단위 커밋 시점에 전체 시험이 서는가(단위 순서로 따짐)**: ① **U9 커밋** — 스키마·API 를 바꾸는 커밋에 아래 U9 닫힌 목록(백엔드 시험 9파일)을 **같이** 넣는다 → 전체 pytest 통과 가능. 프론트는 손대지 않으므로 Vitest·typecheck·build·E2E 는 U9 직전과 같다(목 응답 기반 — 실제 서버와 무관). ② **U10 커밋** — `web/` 만 바뀐다 → Vitest·typecheck·build·E2E 통과 가능, pytest 는 무관(U9 전이든 뒤든 같다). ③ U9 만 커밋된 해시를 **배포하면** 옛 프론트가 닉네임 없이 가입해 422 — 그래서 **배포 해시는 U9·U10 이 모두 들어간 해시뿐**(U11 의존). ④ U9·U10 계약 어긋남(목 응답이 실제 서버와 다른 경우)은 단위 시험으로 잡히지 않는다 → U11 의 로컬 Caddy 경유 스모크(실제 백엔드 + 실제 빌드)와 로컬 브라우저 점검이 반영 전 관문이다.
+
+- [ ] U9 **[backend-agent] 닉네임·중복검사 백엔드 — 리비전 0004 `users.nickname`(기존 계정 백필, 삭제 없음), 가입 계약 `{username, password, nickname}`·409 두 코드·422 `invalid_nickname`, 로그인 없이 부르는 `GET /auth/availability`, 로그인·`/auth/me` 응답에 `nickname`** / Refs: P9b-auth CR-007 D18 S3.1 security 원칙7 원칙9 / 의존: CR-007 문서 이행 + 개정 3 계획 검증 통과(`frozen: none`) · U5 커밋(`ca539a1` — 충족)
+  - 모델(`app/db/models.py`, S3.1 0004 보충 그대로): `User.nickname: Mapped[str] = mapped_column(Text, nullable=False)` · `__table_args__ = (UniqueConstraint("username"), UniqueConstraint("nickname"))`(이름은 naming_convention → `uq_users_nickname`). 기본값·server_default 두지 않는다(값은 앱이 정한다 — 0004 는 백필로 채운다). DB CHECK 두지 않는다(`username` 과 같다).
+  - **리비전 `0004`**(`alembic/versions/0004_users_nickname.py`, `down_revision = "0003"`): **upgrade** = ① `op.add_column("users", sa.Column("nickname", sa.Text(), nullable=True))` ② `op.execute("UPDATE users SET nickname = username WHERE nickname IS NULL")` ③ `op.alter_column("users", "nickname", nullable=False)` ④ `op.create_unique_constraint(op.f("uq_users_nickname"), "users", ["nickname"])`. **`DELETE`·`TRUNCATE`·`DROP` 0 — 데이터를 지우지 않는다**(0003 과 다르다 — 모듈 docstring 에 명시). ② 가 ④ 를 어기지 않는 근거: `username` 이 이미 UNIQUE 라 닉네임 = 아이디 값도 서로 다르다. 한 리비전 안에서 nullable 추가 → 채움 → NOT NULL → UNIQUE 순서라 기존 행이 있는 DB(운영 `test`·개발 DB 3계정·로컬 운영 볼륨 9계정)에서도 실패하지 않는다. **downgrade** = `op.drop_constraint(op.f("uq_users_nickname"), "users", type_="unique")` → `op.drop_column("users", "nickname")` — 계정 행은 남고 닉네임 값만 사라진다(docstring 에 명시).
+  - `app/settings.py`: `NICKNAME_PATTERN = r"[가-힣A-Za-z0-9_]{2,20}"`(결정 X, `USERNAME_PATTERN` 옆). 새 상수는 이것 하나.
+  - `app/auth/names.py`: `normalize_nickname(raw: str) -> str | None` — 규칙 표의 처리 순서 그대로, 위반이면 `None`. 가입·조회가 이 함수 하나만 쓴다(D18 지킬 것 10). 아이디 쪽은 기존 `normalize_username`·`_USERNAME_RE` 를 그대로 재사용(옮기지 않는다 — 옮기면 U2 시험의 import 경로가 바뀐다).
+  - `app/api/schemas.py`: `SignupIn.nickname: str`(필수, 형식은 라우트가 검사 — 아이디와 같은 방식) · `MeOut.nickname: str` · 새 `AvailabilityOut{username: Literal["available","taken","invalid"] | None, nickname: … | None}`.
+  - `app/auth/routes.py`: 위 "가입 판정 순서" ①~⑥ 그대로 · `MeOut(...)` 3곳(가입·로그인·me)에 `nickname=user.nickname` · `GET /auth/availability`(같은 `router` — `_NoInputEchoRoute` 가 쿼리 422 에도 적용, `current_user` 의존성 **없음**, `Response` 헤더 `Cache-Control: no-store`) · 모듈 docstring 계약 표 갱신. `/auth/*` 는 여전히 `agent_traces` 를 쓰지 않는다.
+  - **깨뜨릴 기존 단언 — 닫힌 목록(architect grep 2026-11-16, 9파일 17항목)**. 값은 S3.1 0004 보충·위 API 계약 개정 3 에서 나온다 → 단언 의미 변경이 아니라 카드 반영. **목록 밖 테스트가 깨지면 멈추고 보고.**
+
+    | # | 파일:줄 | 지금 | 바꾼 뒤 | 종류 |
+    |---|---|---|---|---|
+    | B1 | `tests/test_schema_models.py:80` | users 컬럼 집합 4 | `nickname` 추가(주석 "0004 보충") | 단언 상수 |
+    | B2 | `tests/test_schema_models.py:153-159` | 컬럼 합 `72`(함수 이름·docstring 포함) | `73`(원본 56 + 0003 보충 16 + 0004 보충 1), 함수 이름 `…_73_…` | 단언 |
+    | B3 | `tests/test_schema_check.py:63-73` | UNIQUE 집합 5 | `("users", "uq_users_nickname")` 추가 → 6, 함수 이름·docstring `…plus_0004_one` | 단언 |
+    | B4 | `tests/test_api.py:93` | `alembic_revision == "0003"` | `"0004"` | 단언 |
+    | B5 | `tests/test_migration_0003.py:47-51` | `NEW_TABLE_COLUMNS["users"]` 4 컬럼(225·360 이 등식으로 씀) | `nickname` 추가(주석 "head 기준 — 0004 보충 포함") | 단언 상수 |
+    | B6 | `tests/test_migration_0003.py:214-219` | ① `head == "0003"`·`_version == "0003"` | ① "DB 버전 == 스크립트 head" + "`0003` 이 head 의 조상(`ScriptDirectory.walk_revisions()` 에 0003)" — head 리터럴을 이 파일에서 없앤다(head == `0004` 는 `test_migration_0004.py` 가 본다), 함수 이름 `test_db_is_at_head_and_0003_is_in_history` | 단언 |
+    | B7 | `tests/test_migration_0003.py:358` | 왕복 뒤 `_version == "0003"` | `_version == <스크립트 head>` | 단언 |
+    | B8 | `tests/test_migration_0003.py:233·234·248·259·269` | `INSERT INTO users (id, username, password_hash)` 5문장 | `nickname` 컬럼·값 추가(값은 각 문장의 username 과 같게 — UNIQUE 위반 시험 233·234 는 username 만 겹치고 nickname 은 서로 다르게 해 제약 이름 `uq_users_username` 단언을 지킨다) | 데이터 |
+    | B9 | `tests/test_auth_api.py:69-70` | `_signup(client, username, password)` 본문 `{username, password}` | `nickname` 매개변수 추가, 기본값 = 그 호출의 `username` 인자(시험마다 아이디가 달라 닉네임도 겹치지 않는다) | 도우미 데이터 |
+    | B10 | `tests/test_auth_api.py:83` | `set(body) == {"id","username"}` | `{"id","username","nickname"}` | 단언 |
+    | B11 | `tests/test_auth_api.py:213` | `== {"id": uid, "username": "loginuser"}` | `"nickname": "loginuser"` 추가 | 단언 |
+    | B12 | `tests/test_auth_api.py:551` | 서로게이트 비밀번호 본문에 닉네임 없음(→ 지금은 422 `invalid_password`, 고치지 않으면 기본 422 목록이라 단언 실패) | 유효한 `nickname` 추가 | 데이터 |
+    | B13 | `tests/test_auth_api.py:607` | 문자열 전수 시험의 `good = {username, password}`(고치지 않으면 가입 쪽이 전부 "닉네임 누락 422" 로 헛통과) | `good` 에 유효한 `nickname` 추가(`field` 매개변수 목록은 그대로 — 닉네임 필드 전수는 새 시험 `test_auth_nickname.py`) | 데이터 |
+    | B14 | `tests/test_auth_origin.py:103` | `_logged_in` 가입 본문에 닉네임 없음(201 단언이 깨짐) | `nickname` 추가(값 = username 인자). 117 은 403 이 본문 검증보다 먼저라 그대로 둬도 되고 닉네임을 더해도 된다 | 데이터 |
+    | B15 | `tests/test_auth_required_routes.py:34-42·103-111`(+ docstring 3-5) | 면제 7개(공개 3 + 문서 4) | `("GET", "/auth/availability")` 를 **두 곳 모두**에 추가 → 8 — D18 지킬 것 4(CR-007 보충)의 카드 변경 반영. `test_public_routes_stay_open` 에 조회 API 가 쿠키 없이 401 이 아님(200/422)을 더하는 것은 새 단언 | 계약 단언 |
+    | B16 | `tests/test_auth_helpers.py:105` | `/auth/me == {"id": "u-helper-1", "username": "helper-one"}` | `"nickname": "helper-one"` 추가 | 단언 |
+    | B17 | `tests/auth_helpers.py:58-72` `make_user` | `User(id, username, password_hash)` | `nickname: str \| None = None` 키워드 추가, 생략하면 **그 행의 username 값**(기본 `helper-{user_id}`)과 같게 — `logged_in_client`·`committed_login` 은 `make_user` 경유라 손대지 않는다. 기존 호출 시그니처 불변 | 도우미 |
+
+    **깨지지 않음을 확인한 것(고치지 않는다)**: `scripts/schema_check.py`(사실 16) · `test_schema_models.py` 의 `NULLABLE_COLUMNS`·`EXPECTED_INDEXES`/총수 13·CHECK 총수 5·FK 8 · `test_schema_check.py:24`(테이블 12)·`:58`(인덱스 이름 13) · `test_auth_api.py:264`(`ok.json() == created` — 양쪽에 닉네임) · `test_auth_required_routes.py:138`(빈 본문 422) · `test_auth_api.py:183·184·463-484`(본문 오류는 여전히 4xx) · `tests/helpers_read_api.py` `_COUNTED_MODELS`(9모델 고정). 위 목록은 grep(`users|User\(|INSERT INTO users|0003|/auth/signup|signup\(|auth/me|\{"id"|set\(body\)|_EXEMPT`, `tests/`·`scripts/`) 결과 전부다.
+  - 새 테스트(값으로 단언):
+    - `tests/test_auth_nickname.py` — 가입 201 응답 키 `{id, username, nickname}`·값이 정규화 값 · 로그인·`/auth/me` 가 같은 닉네임 · 정규화 `" 민지 "`→`민지`, NFD `민지`→NFC 저장, `Demo`→`demo` · 경계: 한글 2자·20자·영문 2자·20자 201, 1자·21자 422 · 거부: `ㅋㅋ`·`민 지`(가운데 공백)·NBSP 가운데·이모지·한자·`min-ji`·`min.ji`·공백뿐·빈 값 → 422 `invalid_nickname` · **NUL·제어문자·짝 없는 서로게이트·10만 자 → 422(500 0), `users` 행 수 불변**(U2 `_post_json` 방식) · 타입 오류(숫자·null·배열·객체)·누락 → 기본 422 · 409: 같은 닉네임 다른 아이디 → `nickname_taken` · 대소문자만 다른 닉네임 → `nickname_taken` · 아이디만 겹침 → `username_taken` · **둘 다 겹침 → `username_taken`** · 내 닉네임 = 남의 아이디 → 201(결정 Z) · **경합: ④⑤ 사전 조회를 "없음" 으로 바꿔 끼운 뒤 INSERT 충돌 → 닉네임 충돌은 `nickname_taken`, 아이디 충돌은 `username_taken`(제약 이름 매핑)** · 422 순서: 아이디·닉네임 둘 다 위반 → `invalid_username`, 비밀번호·닉네임 위반 → `invalid_password` · 가입이 `persons`·`person_aliases`·`agent_traces` 행을 만들지 않는다(닉네임이 인물·trace 로 가지 않음, 원칙7·9) · 422 본문에 비밀번호 되울림 0(기존 방식).
+    - `tests/test_auth_availability.py` — 쿠키 없이 200(쿠키가 있어도 같은 본문) · 아이디 `available`/`taken`/`invalid`, 대문자 입력 → 정규화 뒤 `taken` · 닉네임 `available`/`taken`/`invalid`, `" 민지 "`·`MINJI` 정규화 뒤 판정 · 둘 다 물으면 두 필드, 하나만 물으면 다른 쪽 `null` · 둘 다 없음 → 422 `{"detail":{"code":"missing_query"}}` · `?username=` → `"invalid"` · NUL(`%00`)·서로게이트·10만 자 → `"invalid"`, 500 0 · **쓰기 0**: `users`·`auth_sessions`·`chat_messages`·`agent_traces` 행 수 불변 · `Cache-Control: no-store` · 다른 `Origin` 의 GET → 403 아님 · 응답 키가 정확히 `{username, nickname}`(id 등 0).
+    - `tests/test_migration_0004.py`(`dbtest`, 전용 DB `relationship_test_mig` 재사용 — `CREATE DATABASE` 는 없으면만, `DROP DATABASE` 0, `test_migration_0003.py` 의 헬퍼(`_mig_env`·`_in_mig_env`·`_alembic_cfg`·`_columns`·`_version`·`_constraint_violated`)를 import 하거나 같은 방식 — 03-log 에): 모듈 픽스처 `downgrade base` → `upgrade 0003` → **원시 SQL** 로 0003 상태 계정 2행(예 `test`·`demo_01`)·`auth_sessions` 1행·`chat_messages` 1행 → `upgrade head`. ① head == `0004`·DB 버전 `0004` ② `users` 컬럼 집합 = S3.1 0004 보충(5) ③ **백필: 두 계정의 `nickname == username`** ④ **삭제 0: `users`·`auth_sessions`·`chat_messages` 행 수가 upgrade 전과 같다** ⑤ `nickname` NOT NULL(누락 INSERT 가 `IntegrityError`, 컬럼 이름 `nickname`) ⑥ UNIQUE(같은 닉네임 INSERT → 제약 이름 `uq_users_nickname`) ⑦ `alembic check` 무변경 ⑧ `downgrade 0003` → `nickname` 컬럼·`uq_users_nickname` 없음 + **`users` 행 수 그대로** → `upgrade head` → 다시 `nickname == username`.
+  - 판정(이 단위): 새 테스트 3파일 · `POSTGRES_PORT=5433 … u9-pytest-all -- .venv/bin/python -m pytest -q` 실패 0·skip 0, 통과 수 = U9 시작 전 재측정값 + 새 테스트(03-log 에 수식) · `… u9-dev-before-counts`/`u9-dev-after-counts`(개발 DB `users` 행 수·`nickname IS NULL` 수 — 스크래치패드 스크립트, 읽기 전용 `SELECT`) 사이에 `… u9-upgrade -- .venv/bin/python -m alembic upgrade head`(**개발 DB 계정은 지워지지 않는다** — 0003 과 달리 사용자 알림 불필요, 행 수 같음·닉네임 = 아이디를 증거로) · `… u9-check -- .venv/bin/python -m alembic check` → `No new upgrade operations detected.` · `… u9-schema-check -- .venv/bin/python scripts/schema_check.py` 전부 PASS · 범위 `… u9-scope -- git diff --name-only <U9 직전 해시>..HEAD` → 위 개정 3 산출물 표의 U9 행과 닫힌 목록 파일만(+ `docs/wiki/**`).
+  - 변이 → 잡는 테스트(저장소 밖 사본 또는 런타임 치환, 저장소 무수정. **변이 실행 목록에 실제 커밋형 시험(`test_commit_boundaries`·`test_answer_concurrency`)을 넣지 않는다**(U3b 교훈). 마이그레이션 변이는 전용 DB `relationship_test_mig_v15`(이미 있음 — 새 DB 를 만들지 않는다)):
+    | 변이 | 잡는 테스트 |
+    |---|---|
+    | V9-1 0004 의 백필 `UPDATE` 삭제 | `test_migration_0004` 픽스처의 `upgrade head` 가 NOT NULL 로 실패(기존 행 있음) — 트랜잭션 DDL 이라 DB 는 0003 에 남아 다음 실행이 복구 가능 |
+    | V9-2 모델·리비전의 `nickname` UNIQUE 제거 | `test_auth_nickname` 경합 시험(사전 조회 우회 뒤 같은 닉네임 201 이 됨) · `test_migration_0004` ⑥ · `test_schema_check` B3 |
+    | V9-3 NFC 정규화 제거 | NFD 입력 시험(저장값이 NFC 가 아님/길이 위반) |
+    | V9-4 `.lower()` 제거 | 대소문자만 다른 닉네임 409 시험 · `Demo`→`demo` 시험 |
+    | V9-5 `.strip()` 제거 | `" 민지 "` 시험 |
+    | V9-6 정규식을 `.{2,20}`(문자 집합 없음)으로 | 거부 목록 시험(가운데 공백·이모지·NUL·제어문자 → 201 또는 500) |
+    | V9-7 409 순서 뒤집기(닉네임 먼저) | "둘 다 겹침 → `username_taken`" 시험 |
+    | V9-8 `IntegrityError` 를 제약 이름 없이 항상 `username_taken` | 경합 시험(닉네임 충돌 → `nickname_taken`) |
+    | V9-9 조회 API 에 `current_user` 의존성 | `test_auth_availability` 쿠키 없이 200 · `test_auth_required_routes` 면제 등식 |
+    | V9-10 조회 API 가 형식 검사 전에 DB 조회 | NUL 값 시험(PostgreSQL 이 NUL 을 거부해 500) |
+    | V9-11 `MeOut` 에서 `nickname` 빠짐(응답 3곳 중 하나) | 응답 키 시험(B10·B11·B16·`test_auth_nickname`) |
+    | V9-12 0004 downgrade 가 컬럼을 남김 | **실행하지 않는다** — 전용 시험 DB 를 스스로 복구할 수 없는 상태로 남긴다(U1 리뷰 R-3). `test_migration_0004` ⑧ 이 있고 리뷰가 downgrade 코드를 읽어 확인 |
+    | V9-13 0004 upgrade 에 `DELETE FROM users` 한 줄 | `test_migration_0004` ④(행 수 불변) — V9-1 과 같은 DB 에서 |
+
+- [ ] U10 **[frontend-agent] 가입 화면 닉네임 칸·아이디·닉네임 "중복 확인"·`nickname_taken`/`invalid_nickname` 안내·사이드바 닉네임 표시** / Refs: P9b-auth CR-007 D18 원칙5 원칙7 / 의존: 개정 3 계획 검증 통과(위 "API 계약 — 개정 3" 표 고정) — **U9 와 동시**(목 응답)
+  - `web/src/api/types.ts`: 새 `SignupIn{username, password, nickname}`(가입 전용 — `Credentials` 는 로그인에 그대로) · `MeOut` 에 `nickname: string` · `AvailabilityStatus = 'available' | 'taken' | 'invalid'` · `AvailabilityOut{username: AvailabilityStatus | null, nickname: AvailabilityStatus | null}`.
+  - `web/src/api/client.ts`: `signup(body: SignupIn)` · 새 `checkAvailability(q: {username?: string; nickname?: string}): Promise<AvailabilityOut>` — `GET /auth/availability?<URLSearchParams — 준 키만>`, `signalUnauthorized: false`(401 이 날 일이 없지만 관문 신호를 내지 않는다).
+  - `web/src/auth.tsx`: 로그인 상태에 `nickname` 을 함께 둔다(`{status:'user', username, nickname}` — `signedIn`·`getMe` 두 곳).
+  - `web/src/screens/AuthScreen.tsx`(가입 모드만 바뀐다 — 로그인 모드는 지금 그대로): 칸 순서 **아이디 → 닉네임 → 비밀번호 → 비밀번호 확인**. 닉네임 칸 `name="nickname"`·`autoComplete="nickname"`·`required`(`maxLength` 두지 않음 — 규칙은 서버가 판정). **라벨은 지금처럼 라벨 문구 + 입력만 감싼다**(접근 이름이 정확히 `아이디`/`닉네임` — 사실 20, 기존 `getByLabelText` 시험 보존). 칸마다 **라벨 밖에** `type="button"` "중복 확인" 버튼(보이는 글자 `AUTH_NOTICE.check`, 접근 이름 `AUTH_NOTICE.checkUsername`/`checkNickname` — `aria-label`), 입력값이 앞뒤 공백 제거 뒤 비면 `disabled`(요청 0), 조회 중 `disabled`. 결과는 칸 아래 한 줄 **`role="status"`**(`role="alert"` 를 쓰지 않는다 — 기존 시험이 `findByRole('alert')` 하나를 찾는다, 사실 20), `data-testid="username-check"`/`"nickname-check"`. **그 칸 값이 바뀌면 그 칸의 결과를 지운다.** **가입 제출은 중복 확인을 하지 않아도 막지 않는다**(결정 AA — 서버 409 가 최종). 가입 본문은 `{username, nickname, password}`(확인 칸 제외, 값은 입력 그대로 — 정규화는 서버). 규칙 안내 한 줄에 닉네임 규칙을 더한다.
+  - `AUTH_NOTICE` 추가·변경(고정 문구 — 이 값 그대로, 바꾸면 03-log 에 이유): `nickname: '닉네임'` · `check: '중복 확인'` · `checkUsername: '아이디 중복 확인'` · `checkNickname: '닉네임 중복 확인'` · `usernameAvailable: '사용할 수 있는 아이디예요.'` · `nicknameAvailable: '사용할 수 있는 닉네임이에요.'` · `nicknameTaken: '이미 쓰고 있는 닉네임이에요.'` · `invalidNickname: '닉네임은 2~20자의 한글·영문·숫자·밑줄(_)만 쓸 수 있어요.'` · `checkFailed: '확인하지 못했어요. 잠시 후 다시 시도해 주세요.'` · `rules`(변경): `'아이디는 3~20자의 영문 소문자·숫자·밑줄(_), 닉네임은 2~20자의 한글·영문·숫자·밑줄(_), 비밀번호는 8~128자예요.'`. 조회 결과 `taken`/`invalid` 문구는 기존 `usernameTaken`·`invalidUsername` 과 새 `nicknameTaken`·`invalidNickname` 을 재사용. `authFailureNotice` 에 `nickname_taken` → `nicknameTaken`, `invalid_nickname` → `invalidNickname`.
+  - `web/src/components/AppShell.tsx` `AccountRow`(결정 AF): 한 줄 **"<닉네임> · <아이디> · 로그아웃"** — 닉네임 `data-testid="sidebar-nickname"`(굵게, `truncate`), 아이디 `data-testid="sidebar-username"`(흐리게, `truncate`, **글자는 아이디 그대로 — 접두·괄호 없음**: `e2e/auth.spec.ts:32` 의 `toHaveText('minji_01')` 완전 일치와 Vitest 4곳을 그대로 지킨다). 주석 "<아이디> · 로그아웃" → 새 문장. 채팅방 목록은 여전히 없다(원칙7).
+  - **깨뜨릴 기존 단언 — 닫힌 목록(4항목 7줄)**: F1 `auth.test.tsx:78-85` `fillAndSubmit` 에 `nickname?` 선택지(도우미) · F2 가입 시험의 입력 `auth.test.tsx:227·240·256·268` 에 닉네임 입력(데이터 — 닉네임 칸이 `required` 라 비워 두면 jsdom 제출 검사에 걸릴 수 있다) · F3 `auth.test.tsx:270` 가입 본문 단언 `{username, password}` → `{username, nickname, password}`(+ 시험 이름 260) · F4 `auth.test.tsx:20` `ME` 에 `nickname`(목 데이터 — 사이드바 닉네임 단언을 위해 **아이디와 다른 값**, 예 `'민지'`). **바꿔도 되는 목 데이터(단언 아님)**: `auth.test.tsx:371` · `web/e2e/fixtures.ts:45` · `web/e2e/auth.spec.ts:10·13` · `routes.test.tsx:19` · `push.test.ts:347·404·422` · `card.test.tsx:51` 의 `/auth/me`·로그인 응답에 `nickname` — 새 계약 모양으로 맞추는 것. **바꾸지 않는 단언**: `sidebar-username` 4곳(`auth.test.tsx:104·153·358·380`)·`e2e/auth.spec.ts:32`·`auth.test.tsx:219`(`AUTH_NOTICE.rules` 상수 참조)·`:241`(`username_taken` 안내). 그 밖의 단언을 바꿔야 통과하면 멈추고 보고.
+  - 새 시험(Vitest): 가입 화면에 닉네임 칸(`autocomplete=nickname`)·중복 확인 버튼 2개, **로그인 화면에는 둘 다 0** · 아이디 중복 확인 → 요청 URL 이 정확히 `/api/auth/availability?username=minji_01`(닉네임 키 없음) → `taken`·`available`·`invalid` 각각 안내(`role=status`) · 닉네임 중복 확인 → `?nickname=<인코딩>`(한글 인코딩 값으로 단언) → 세 결과 · 값을 바꾸면 결과가 사라진다 · 빈 값이면 버튼 `disabled`·요청 0 · 조회 실패(500·네트워크) → `checkFailed`, 가입은 계속 가능 · **중복 확인 없이도 가입 제출 → 요청 1회**(결정 AA) · 409 `nickname_taken`·422 `invalid_nickname` 안내 · me 200 → `sidebar-nickname` `'민지'`·`sidebar-username` `'minji_01'`. `api.test.ts`: `checkAvailability` URL(한글·공백 인코딩)·`credentials: 'same-origin'`·401 이어도 관문 신호 없음.
+  - E2E: 목 응답 갱신(바꿔도 되는 목록)만 필수. 가입 화면 E2E 1건(닉네임·중복 확인 목)은 일정이 남으면.
+  - 판정: `… u10-typecheck -- npm --prefix web run typecheck` · `… u10-vitest -- npm --prefix web exec -- vitest run --root web`(review-u6 R-5 — 루트에서 E2E 파일을 줍지 않게) · `… u10-build -- npm --prefix web run build` · `… u10-e2e -- npm --prefix web run e2e` 전부 통과. 시험 수는 U10 시작 전 같은 명령 기준선 + 새 시험(03-log). 범위 `… u10-scope -- git diff --name-only <U10 직전 해시>..HEAD` → `web/` 의 위 파일 + `docs/wiki/**`.
+  - 변이 → 잡는 테스트:
+    | 변이 | 잡는 테스트 |
+    |---|---|
+    | V10-1 가입 본문에서 `nickname` 빠짐 | F3 본문 단언 |
+    | V10-2 아이디 중복 확인이 `nickname=` 쿼리를 보냄(또는 두 키를 다 보냄) | URL 정확 일치 시험 |
+    | V10-3 `nickname_taken` 을 일반 실패 문구로 | 409 닉네임 안내 시험 |
+    | V10-4 사이드바 닉네임 자리에 아이디 | `sidebar-nickname` `'민지'` 시험 |
+    | V10-5 값이 바뀌어도 이전 결과 유지 | 값 변경 시 결과 사라짐 시험 |
+    | V10-6 로그인 모드에도 닉네임 칸·중복 확인 | 로그인 화면 0 시험 |
+    | V10-7 결과 줄을 `role="alert"` 로 | 기존 `findByRole('alert')` 시험(241·257)이 여럿을 찾아 실패 — 또는 새 `role=status` 시험 |
+    | V10-8 중복 확인을 안 하면 제출을 막음 | "확인 없이 제출 → 요청 1회" 시험 |
+
+- [ ] U11 **[메인 세션 + 사용자] 0004 재배포 — 문서·로컬 Caddy 경유 스모크(0003 데이터에서 `0003 -> 0004`)·로컬 브라우저 점검·사용자 SSH 반영·바깥 GET 스모크** / Refs: P9b-auth CR-007 D18 D17 security / 의존: **U9·U10 각 verifier 리뷰 통과 + 반영할 해시(U9·U10 이 모두 들어간 dev2 해시)에서의 전체 pytest·Vitest 증거**(U7 의 R-7 과 같은 관문)
+  - 문서(메인): `docs/user-setup/13-user-todo-deploy.md` 에 **0004 재배포 절**(G 절의 명령을 재사용 — 해시만 새 값) — "0004 는 계정을 지우지 않는다(0003 과 다름), 반영 뒤 옛 해시로 checkout 만 하면 backend 가 뜨지 않는다(모르는 리비전 `0004`), 기본은 앞으로 고쳐 다시 올린다, 비상시 새 해시 컨테이너에서 `alembic downgrade 0003` 뒤 옛 해시(닉네임 값만 잃음 — 정확한 명령 형태는 메인이 backend entrypoint·이미지 안 alembic 경로와 대조해 적는다)", `pg_dump` 는 선택(삭제 없는 리비전). `docs/RUNNING.md` 가입 닉네임 한 줄 · `SERVER-CHECKLIST.md` §5-1·`u8-demo-script.md` 의 가입 장면에 닉네임 · `registry.md` 행(U9: `app/auth/names.py`·`GET /auth/availability`·리비전 0004·시험 3파일 / U10: `checkAvailability`·`AuthScreen` 갱신·`AccountRow`).
+  - **로컬 Caddy 경유 스모크(메인, 에이전트 실행 가능 — 반영 전 필수)**: U7 과 같은 구성(`docker-compose.prod.yml`, 프로젝트 이름 `relationship-prod`, `SITE_ADDRESS=localhost`, 스크래치패드 더미 env, **0003 상태 볼륨 `relationship-prod_pgdata` 재사용 — 볼륨 삭제·`down -v` 0**) → 새 해시 이미지 빌드·기동 → backend 로그에 `Running upgrade 0003 -> 0004`·Traceback 0 → 읽기 전용 `SELECT`(compose 안 `psql -c`)로 `users` 행 수가 기동 전과 같고(9) `nickname = username` 인 행 수 = 전체 → `curl -k` 로컬: 기존 스모크 계정으로 `POST /api/auth/login` 200·응답에 `nickname` · 쿠키·Origin 없이 `GET /api/auth/availability?username=<그 계정>` → `taken`, `?nickname=<새 값>` → `available` · 같은 Origin 으로 `POST /api/auth/signup {username, password, nickname}` 201 · 같은 닉네임 다른 아이디 → 409 `nickname_taken` · 다른 Origin 가입 403(회귀) · `/api/health` `alembic_revision` `0004`. 비밀번호는 스크래치패드 파일로만, 증거에는 `***`. 증거 `u11-caddy-*`. **이 스모크가 실패하면 재배포하지 않는다.**
+  - **로컬 브라우저 점검(메인 — 실제 Chrome)**: 개발 DB(U9 에서 0004) + `npm --prefix web run dev` → 가입 화면: 닉네임 칸·중복 확인 두 버튼·세 결과 문구 → 가입 → 사이드바 "<닉네임> · <아이디> · 로그아웃" → 로그아웃 → 기존 개발 계정 로그인 → 사이드바 닉네임 = 아이디. 증거 `u11-local-browser-check.txt`(메인이 Write).
+  - **재배포(사용자 몫 — 사용자 할 일 1 과 같은 명령)**: 서버 SSH `cd Relationship && git fetch && git checkout <메인이 알려 준 해시>` → `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build` → `ps`(세 서비스 running/healthy) → `logs --tail=200 backend` 에 `Running upgrade 0003 -> 0004` 와 Traceback 0. **이 기동은 계정을 지우지 않는다**. `.env` 변경 없음. 해시는 dev2 해시(승격 전 반영 — U7 과 같은 이유).
+  - **바깥 스모크(메인, 본문 없는 GET 만 — security §4)**: `<URL>/api/health` → `alembic_revision` `0004` · `<URL>/api/auth/availability?username=test` → `{"username":"taken","nickname":null}`(사용자 계정 `test` 가 남아 있다는 증거 — 삭제 0) · `?username=zz_probe_u11` → `available` · `/api/persons`·`/api/auth/me` 쿠키 없이 401(회귀) · `/` 200.
+  - 사람 확인(사용자 브라우저): `test` 계정으로 로그인 → 사이드바 "test · test · 로그아웃" · 가입 화면의 중복 확인(`test` → 이미 쓰는 아이디).
+  - 판정: 아래 판정 표 #19·#20.
+ (메인 세션 2026-11-15 — 위 단위 문장에 더해 적용한다)
 - **R3-1 (U1 닫힌 목록에 추가)**: `tests/test_api.py:91` `assert body["alembic_revision"] == "0002"` → `"0003"`. 리비전 문자열을 단언하는 곳은 저장소에서 이 한 줄뿐이다.
 - **U1 구현 중 추가(메인 승인 2026-11-15 21:10, backend-agent 가 멈추고 보고)**: 닫힌 목록 ②에 `tests/test_schema_check.py::test_model_unique_constraint_expectations_returns_fix_020_three` — 기대 집합에 새 UNIQUE 2개(`uq_users_username`·`uq_auth_sessions_token_hash`)를 더하고 이름을 "five" 로. S3.1 보충 반영이며 기존 3개 항목은 그대로.
 - **U1 리뷰 권고 반영(review-u1.md, 메인 2026-11-15)**: R-7 — `scripts/schema_check.py` 의 라벨 "9 tables …" 두 곳을 `len(EXPECTED_TABLES)` 로 동적화한 것도 U1 닫힌 목록에 든다(값 불변, 라벨만) · R-5 — **U7 배포 반영 절차에 두 줄 추가**: ① 옛 backend 컨테이너가 내려간 뒤 upgrade 가 돌게 한다(`compose up -d --build` 가 backend 를 교체하면서 새 컨테이너 entrypoint 가 upgrade — 옛 컨테이너가 살아 있는 채 따로 upgrade 하지 않는다) ② 반영 직후 backend 로그의 `Running upgrade 0002 -> 0003` 줄과 `/api/health` 의 `alembic_revision` 0003 을 확인한다 · R-3 — downgrade 를 깨는 변이는 전용 시험 DB 를 스스로 복구할 수 없는 상태로 남기므로 다시 돌리지 않는다(임시 `drop_table` 은 선례가 아니다) · R-6 — CI dbtest 작업 결과를 푸시 뒤 03-log 에 적는다.
@@ -219,6 +376,16 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 3. U5 의 로그아웃 endpoint 삭제를 뺀다 — **이것은 수용 기준 6번 "다른 계정의 일정 알림이 내 브라우저로 오지 않는다" 를 글자 그대로는 깨뜨리므로(A 로그아웃 뒤 B 가 구독 없이 쓰면 A 알림이 온다) 수용 기준 변경이고 사용자 결정이다**(R-11 ②). 메인이 묻기 전에는 적용하지 않는다.
 4. U4 의 `/answers` 기록을 뺀다(채팅 발화·응답만).
 **빼지 않는 것**: U1~U3b(격리·401·답변 소유)·U2 Origin 검사·U6 관문·U7 반영 — 이것이 시연 두 갈래의 최소 조건이다. 줄이면 03-log 와 04-review 에 "범위 축소" 로 적고 사용자에게 보고.
+
+### 범위 축소 순서 — 개정 3(CR-007)
+
+일정: 오늘 11-16(월). 목표 **11-16 안에 U9·U10 커밋(각 verifier 리뷰 통과) → 11-17(화) 오전 U11 로컬 스모크·재배포 → 11-17 오후 U8 시연 계정 가입·데이터·리허설 → 11-17 저녁 04-review·완성 확인**. 사용자가 직접 요청한 닉네임·중복검사를 달력(P9c)보다 **먼저** 한다(메인 지시 2026-11-16).
+**판단 시점(기본값 — 사용자 할 일 10·11 로 확인)**: ① **11-17(화) 10:00** 까지 U9·U10 이 리뷰를 통과하지 못하면 아래 1·2 를 적용 ② **11-17(화) 18:00** 까지 U11 재배포를 못 하면 **재배포하지 않는다** — 평가는 `4be331b`(로그인만, 닉네임 없음)로 시연하고 CR-007 은 평가 뒤 반영(0004 가 적용되지 않았으니 되돌릴 것 없음).
+1. U10 의 가입 화면 새 E2E 를 넣지 않는다(목 데이터 갱신만 — CI 가 E2E 를 돌아 갱신 자체는 필수).
+2. U10 의 조회 실패 안내를 일반 실패 문구(`AUTH_NOTICE.failed`) 하나로.
+3. (사용자 결정 — 메인이 묻기 전에는 적용하지 않는다) 조회 API·"중복 확인" 버튼을 빼고 가입 409 만 — 사용자 문장 "중복검사를 하도록" 의 (ii) 를 빼는 것이라 요청 변경이다(CR-007 안 B).
+**빼지 않는 것**: 닉네임 필수 입력·저장·표시 · 409 두 코드 · 0004 백필(삭제 없음) · U11 로컬 Caddy 경유 스모크.
+**P9c(달력)**: 포기 시점(11-17 12:00 까지 U1·U2 리뷰 통과, `packages/P9c-briefing-calendar/01-plan.md:9`)이 이 일정과 겹치고 P9c 는 P9b 04-review 뒤에야 활성화할 수 있다 → **평가 전 달력은 사실상 들어가지 못한다**(리스크 절, 사용자 할 일 10).
 
 ## 판정 방법
 
@@ -241,6 +408,13 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | 11 | 툴 7종 불변(`tools_check` 7/7) | 기계 | `POSTGRES_PORT=5433 … u<N>-tools-check -- .venv/bin/python scripts/tools_check.py` → 7/7 | 에이전트 | 전 단위 |
 | 12 | pytest 전체 통과 skip 0 | 기계 | `POSTGRES_PORT=5433 … u<N>-pytest-all -- .venv/bin/python -m pytest -q` → **실패 0 · skip 0**, 통과 수 = 기준선 2261 + 새 테스트 − (U5 이후) `tests/test_settings.py` 2건 | 에이전트 | 전 단위 |
 | 13 | (보안 보강 — 수용 기준 밖, 결정 T·F-7) | 기계 | `… u2-origin -- .venv/bin/python -m pytest tests/test_auth_origin.py -q` · `test_auth_api.py` 의 text/plain·폼 본문 4xx·DB 불변 · 쿠키 이름 단언 | 에이전트 | U2 |
+| 14 | (CR-007) 가입 때 닉네임을 필수로 입력받아 저장하고 규칙 위반은 422 `invalid_nickname` 이며, 가입·로그인·내 정보 응답과 사이드바에 닉네임이 보인다 | 기계 + 사람 | `POSTGRES_PORT=5433 … u9-nickname -- .venv/bin/python -m pytest tests/test_auth_nickname.py tests/test_auth_api.py tests/test_auth_helpers.py -q` 전부 passed · U10 `… u10-vitest -- npm --prefix web exec -- vitest run --root web`(가입 본문·사이드바 닉네임 시험) · U11 로컬 브라우저 점검 · U11 사람 확인(`test` 사이드바) | 에이전트 + 사용자 | U9·U10·U11 |
+| 15 | (CR-007) 아이디·닉네임이 이미 쓰이면 가입이 409(`username_taken`·`nickname_taken`)로 거부되고, 가입 화면에서 로그인 없이 중복 확인(`GET /auth/availability`)을 할 수 있다 | 기계 + 사람 | `POSTGRES_PORT=5433 … u9-availability -- .venv/bin/python -m pytest tests/test_auth_availability.py tests/test_auth_nickname.py -q`(따옴표 든 `-k` 는 래퍼에서 깨지므로 쓰지 않는다 — 판정 방법 머리 문장) · `u10-vitest`(중복 확인 시험) · U11 로컬 Caddy 스모크(조회 `taken`/`available`, 409 `nickname_taken`) · U11 바깥 GET(`?username=test` → `taken`) | 에이전트 + 사용자 | U9·U10·U11 |
+| 16 | (CR-007) — 이 조회는 `/health`·`/auth/signup`·`/auth/login` 과 함께 로그인 없이 열린 예외다 | 기계 | `… u9-auth-required -- .venv/bin/python -m pytest tests/test_auth_required_routes.py -q`(면제 8 = 공개 4 + 문서 4, 그 밖 전부 401) | 에이전트 | U9 |
+| 17 | (CR-007) 리비전 0004 가 기존 계정을 지우지 않고 닉네임을 아이디 값으로 채우며 `alembic upgrade head`·`alembic check` 통과 | 기계 | `POSTGRES_PORT=5433 … u9-migration -- .venv/bin/python -m pytest tests/test_migration_0004.py tests/test_migration_0003.py -q` · `u9-dev-before-counts`/`u9-upgrade`/`u9-dev-after-counts`(개발 DB 행 수 같음·닉네임 = 아이디) · `… u9-check -- .venv/bin/python -m alembic check` → `No new upgrade operations detected.` · `… u9-schema-check -- .venv/bin/python scripts/schema_check.py` · U11 로컬 Caddy 스모크(0003 볼륨 9계정 → 0004, 행 수 같음) | 에이전트 | U9·U11 |
+| 18 | (CR-007 회귀) U9·U10 의 깨뜨릴 기존 단언은 닫힌 목록(B1~B17·F1~F4) 안에서만 바뀌었다 | 기계 + 리뷰 | `… u9-test-diff -- git diff --stat <U9 직전 해시>..<U9 해시> -- tests` 와 `… u10-test-diff -- git diff --stat <U10 직전 해시>..<U10 해시> -- web/src/__tests__ web/e2e` 의 파일 목록이 닫힌 목록 파일 + 새 시험 파일뿐 · verifier 가 단언 줄 diff 를 목록 번호와 대조 | 에이전트 + verifier | U9·U10 |
+| 19 | (CR-007) 배포 URL 에서 반영 전 계정이 그대로 로그인되고 닉네임이 보인다 | 기계 + 사람 | `… u11-public-health -- curl -fsS <URL>/api/health` → `alembic_revision` `0004` · `… u11-public-availability -- bash <SCR>/u11-availability.sh`(스크립트 안: `curl -fsS '<URL>/api/auth/availability?username=test'` → `{"username":"taken","nickname":null}`, `?username=zz_probe_u11` → `available`) · `… u11-public-401 -- bash <SCR>/u11-401.sh`(`/api/persons`·`/api/auth/me` → 401, `/` → 200) · 사용자 화면 확인(`test` 로그인 → 사이드바 닉네임) → `evidence/<시각>-u11-user-browser.txt` | 에이전트 + 사용자 | U11 |
+| 20 | (CR-007 배포 관문) 로컬 Caddy 경유 스모크 — `0003 -> 0004` 적용 줄·계정 행 수 불변·로그인 응답 닉네임·조회·가입 201·409 `nickname_taken`·다른 Origin 403 | 기계 | `… u11-caddy-* -- bash <SCR>/u11-caddy-*.sh`(U11 본문 목록) · backend 로그 `Running upgrade 0003 -> 0004` · Traceback 0 | 에이전트 | U11 |
 
 ### 단위 공통 회귀 (단위마다, 리뷰 전)
 
@@ -253,10 +427,14 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | ER·평가 무변경 | `… u<N>-er-unchanged -- git diff --stat <기준>..HEAD -- app/er evaluation reports data` | 빈 출력(U3a 의 `scripts/run_pilot_eval.py` 는 이 목록 밖 — 별도 03-log) |
 | 범위 | `… u<N>-scope -- git diff --name-only <직전 단위 해시>..HEAD` | 그 단위 산출물 표의 파일만 |
 | 비밀 0 | Write 단계 `secret-guard`·`save_evidence.py` 내장 검사 통과 · 증거에 비밀번호·쿠키 값 0(저장 전 메인이 읽는다) | — |
+| (개정 3) 프론트 단위(U10) | `… u10-typecheck`·`u10-vitest`(`--root web`)·`u10-build`·`u10-e2e`(U10 판정 그대로) | 통과 |
+| (개정 3) 공통 규칙 | 판정은 **Mac 로컬**에서 한다(Windows CI 는 확인하지 않음 — 사용자 지시 2026-11-15, 03-log `fa7ad82`). **`ruff --fix` 금지**(U3a 사고 — 무관한 파일 import 재배열). 단언은 닫힌 목록(B1~B17·F1~F4) 안에서만 바꾼다. 재귀 grep 판정은 `--include='*.py'`(R3-2). 변이 실행에 실제 커밋형 시험 제외. `alembic` 은 `.venv/bin/python -m alembic`, 전체 pytest 는 `POSTGRES_PORT=5433` | — |
 
 ## 수용 기준 (`docs/backlog.md`의 해당 항목과 글자 그대로 같아야 한다)
 
-- 가입·로그인·로그아웃·내 정보 API 가 동작하고 비밀번호는 해시로만 저장된다 + `/health`·`/auth/signup`·`/auth/login` 밖의 모든 API 가 로그인 없이 401 + 계정 A 로 계정 B 의 인물·사건 원문·사실 근거·일정 브리핑·대기 질문에 접근하면 404 이고 B 의 질문에 답할 수 없다(F-fbaaae 닫힘) + 요청 경로의 `app_user_id()` 호출 0·`ToolContext.user_id` 기본값 없음 + 계정마다 채팅방 하나 — 대화 기록이 서버에 저장되고 다시 로그인하면 이어서 보이며 session_id 는 계정에 묶인다 + 브리핑 주기 작업과 푸시가 사용자마다 돌고 다른 계정의 일정 알림이 내 브라우저로 오지 않는다 + 리비전 0003 이 기존 데이터를 비우고 `alembic upgrade head`·`alembic check` 통과 + 프론트 로그인·가입 화면·로그아웃·대화 기록 불러오기·401 시 로그인 화면 복귀 + 배포 URL 에서 시연 두 갈래 재현 — (가) 새 계정 가입 뒤 빈 상태 (나) 데이터가 쌓인 시연 계정으로 로그인해 인물 카드·브리핑·대화 기록이 보이고, 새 계정에는 시연 계정의 인물이 보이지 않는다 + 툴 7종 불변(`tools_check` 7/7) + pytest 전체 통과 skip 0
+- 가입·로그인·로그아웃·내 정보 API 가 동작하고 비밀번호는 해시로만 저장된다 + `/health`·`/auth/signup`·`/auth/login` 밖의 모든 API 가 로그인 없이 401 + 계정 A 로 계정 B 의 인물·사건 원문·사실 근거·일정 브리핑·대기 질문에 접근하면 404 이고 B 의 질문에 답할 수 없다(F-fbaaae 닫힘) + 요청 경로의 `app_user_id()` 호출 0·`ToolContext.user_id` 기본값 없음 + 계정마다 채팅방 하나 — 대화 기록이 서버에 저장되고 다시 로그인하면 이어서 보이며 session_id 는 계정에 묶인다 + 브리핑 주기 작업과 푸시가 사용자마다 돌고 다른 계정의 일정 알림이 내 브라우저로 오지 않는다 + 리비전 0003 이 기존 데이터를 비우고 `alembic upgrade head`·`alembic check` 통과 + 프론트 로그인·가입 화면·로그아웃·대화 기록 불러오기·401 시 로그인 화면 복귀 + 배포 URL 에서 시연 두 갈래 재현 — (가) 새 계정 가입 뒤 빈 상태 (나) 데이터가 쌓인 시연 계정으로 로그인해 인물 카드·브리핑·대화 기록이 보이고, 새 계정에는 시연 계정의 인물이 보이지 않는다 + 툴 7종 불변(`tools_check` 7/7) + pytest 전체 통과 skip 0 + (CR-007) 가입 때 닉네임을 필수로 입력받아 저장하고 규칙 위반은 422 `invalid_nickname` 이며, 가입·로그인·내 정보 응답과 사이드바에 닉네임이 보인다 + (CR-007) 아이디·닉네임이 이미 쓰이면 가입이 409(`username_taken`·`nickname_taken`)로 거부되고, 가입 화면에서 로그인 없이 중복 확인(`GET /auth/availability`)을 할 수 있다 — 이 조회는 `/health`·`/auth/signup`·`/auth/login` 과 함께 로그인 없이 열린 예외다 + (CR-007) 리비전 0004 가 기존 계정을 지우지 않고 닉네임을 아이디 값으로 채우며 `alembic upgrade head`·`alembic check` 통과, 배포 URL 에서 반영 전 계정이 그대로 로그인되고 닉네임이 보인다
+
+(개정 3 주: 앞 구절 "`/health`·`/auth/signup`·`/auth/login` 밖의 모든 API 가 로그인 없이 401" 은 글자 그대로 두고, 뒤에 더한 CR-007 구절이 예외 하나(`GET /auth/availability`)를 명시한다 — 판정 #2 는 #16 과 함께 읽는다. 판정 #12 의 통과 수 기대는 U9 시작 전 재측정값 + U9 새 시험으로 이어 센다.)
 
 ## 사용자 결정 (상수·정책 — **권장안을 기본값으로 채택**, 사용자 지시 2026-11-15. 표는 근거를 보이려고 남긴다. 사용자가 다르게 정하면 그 값으로 바꾼다)
 
@@ -286,6 +464,23 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | T | 상태 변경 요청의 Origin 검사(F-7 ③) | (i) POST·PUT·PATCH·DELETE 에 `Origin` 이 있고 그 호스트가 `X-Forwarded-Host`(있으면, 쉼표면 첫 값)·`Host` 와 다르면 403 `bad_origin`, `Origin` 없으면 통과, 비교는 소문자·기본 포트 제거(R2-1 ①) — 앱 전역 한 곳 (ii) 넣지 않고 리스크로 수용 (iii) CSRF 토큰 | **(i)** | 같은 사이트(`*.sslip.io`) 공격자가 본문 없는 상태 변경(`/auth/logout`, 본문 선택인 `/briefings/run`)을 유발하는 경로를 막는다. 코드 한 곳·테스트 하나로 끝나고 새 비밀 값이 없다. `Origin` 없는 요청(curl·테스트)은 브라우저 교차 요청이 아니라 통과. 개발 프록시는 `xfwd`(사실 14) |
 | U | 스케줄러 대상 0명일 때의 `ToolContext.user_id`(N-4) | (i) 빈 문자열 `""` 표식으로 `run_briefings` 1회 — 행 `session_id` 는 기존 `briefing:<uuid>` (ii) `run_briefings` 를 거치지 않고 trace 를 직접 씀 (iii) 아무것도 남기지 않음 | **(i)** | `users.id` 는 uuid4 hex·아이디는 3자 이상이라 `""` 와 겹치는 계정이 없어 어떤 일정도 선택되지 않는다. 기존 테스트 4건(`test_briefing_scheduler.py:202-206`·`test_push_wiring.py:308-345`)이 "일정이 없어도 `run_briefings` 1회" 에 기대므로 (ii) 는 그 4건을 깨고, (iii) 은 P9 S13 생존 신호를 없앤다. 바뀌는 기존 단언은 `test_push_wiring.py:344` 하나 |
 
+**개정 3(CR-007) 결정 W~AH** — 권장안 채택(사용자 위임 2026-11-15 "계획·실행·독립 검토까지 진행하고 검토할 수 없는 부분만 말해 달라", 메인 지시 2026-11-16 같은 방식). 사용자가 다르게 정하면 그 값으로 바꾼다. **사용자만 정할 수 있는 것은 이 표가 아니라 "사용자만 할 수 있는 일" 9~11 에 따로 모았다.**
+
+| # | 항목 | 후보 | **채택(권장)** | 이유 |
+|---|---|---|---|---|
+| W | 닉네임 필수 여부·호환 | (i) 필수(가입 본문 필수 필드, DB NOT NULL), 과도기 호환 없음 (ii) 선택 — 비면 아이디로 | **(i)** | 사용자 "닉네임도 입력받게". 프론트·백엔드가 한 해시로 같이 배포돼 옛 클라이언트용 과도기가 필요 없다(재배포 순간 열린 탭은 새로고침 — 리스크). (ii) 는 "빈 값 = 아이디" 분기가 가입·조회·화면에 하나씩 더 생긴다 |
+| X | 닉네임 규칙 | (i) NFC → 앞뒤 공백 제거 → `[가-힣A-Za-z0-9_]{2,20}` (ii) 공백·자모·이모지 포함 1~30자 (iii) 아이디와 같은 규칙(영문 소문자만) | **(i)** | 한국어 서비스라 한글 이름이 기본(2자 이름 허용). 닫힌 허용 목록이라 NUL·제어문자·서로게이트·제로폭 문자·혼동 공백이 정규식에서 한 번에 걸러진다(U2 에서 500 이 났던 종류). 20자 상한은 기존 아이디 최대 길이와 같아 0004 백필 값이 전부 규칙 안이다(사실 21). (ii) 는 혼동 문자·정규화 경우가 많아 시험이 커지고, (iii) 은 "닉네임" 의미(한글 표시 이름)를 못 살린다 |
+| Y | 중복 판정·저장 값 | (i) 영문을 소문자로 접은 값을 저장·비교, 그 컬럼에 보통 UNIQUE 하나 (ii) 입력 표기 보존 + 비교용 키 컬럼 따로 UNIQUE (iii) 대소문자 구분 | **(i)** | 결정 A(아이디 소문자 정규화)와 같은 방식 — 컬럼 1개, 보통 `UniqueConstraint` 라 `alembic check`·`schema_check` UNIQUE 집합이 지금 방식 그대로 선다(함수 인덱스 불필요). 대가: 영문 닉네임 `SunWoo` 는 `sunwoo` 로 보인다(한글은 영향 없음). (iii) 은 `Demo`·`demo` 둘 다 허용돼 "중복검사" 의 뜻과 어긋난다 |
+| Z | 아이디·닉네임 이름 공간 | (i) 따로 — 내 닉네임이 남의 아이디·내 아이디와 같아도 됨 (ii) 하나로 — 닉네임이 어느 아이디와도 같으면 안 됨 | **(i)** | 0004 백필이 닉네임 = 아이디라 (ii) 는 기존 계정부터 어긴다. 닉네임은 로그인에 쓰이지 않아(D18 결정 10) 섞일 위험이 없다 |
+| AA | 중복 확인 방식 | (i) 조회 API `GET /auth/availability` + 가입 화면 칸마다 "중복 확인" 버튼, 결과 한 줄, **제출은 막지 않음**(서버 409 최종) (ii) 입력이 멈추면 자동 조회(디바운스) (iii) 조회 API 없이 가입 409 만(CR-007 안 B) (iv) (i) + 확인을 안 했거나 값이 바뀌면 제출 막기 | **(i)** | 사용자 문장 "중복검사를 하도록" 을 제출 전 확인까지로 읽었다(CR-007 1절). 버튼은 요청 시점이 분명해 시험이 결정적이고(디바운스 타이머 없음) 조회 횟수가 적다. 제출을 막지 않는 이유: 확인 결과는 경합으로 낡을 수 있어 최종 판정이 어차피 서버 409 이고, 막기 상태(확인됨/값 바뀜)를 더하면 화면 상태·시험이 늘어난다. (iv) 를 원하면 U10 에 상태 하나와 시험 2건을 더하면 된다 |
+| AB | 둘 다 겹칠 때 409 코드 | (i) `username_taken` 우선(사전 조회 순서), INSERT 경합은 DB 제약 이름으로 (ii) `{"detail":{"codes":[…]}}` 목록 | **(i)** | 오류 본문 모양 `detail.code` 하나(기존 규약·프론트 `ApiError.code`)를 유지. 화면은 조회 API 로 두 칸을 따로 확인할 수 있어 목록이 필요 없다 |
+| AC | 조회 API 남용 완화 | (i) 두지 않음 + 형식 위반은 DB 조회 없이 `"invalid"` (ii) 프로세스 메모리 카운터(IP·분당 N회) (iii) 로그인 사용자만 | **(i)** | 결정 H 와 같은 근거(공개 기간 4일·소규모). 드러나는 정보는 가입 409 와 같다(API 계약 "계정 열거와의 관계"). (iii) 은 가입 전 확인이라는 목적과 모순. (ii) 는 일정이 남으면 후보 |
+| AD | 기존 계정의 닉네임 | (i) 0004 가 아이디 값으로 채움(삭제 없음) (ii) 비워 두고 첫 로그인 때 입력 화면 (iii) 기존 계정 삭제 | **(i)** | 운영 `test` 계정이 그대로 로그인되고 사이드바가 빈칸이 아니다. (ii) 는 화면·API·상태가 늘고, (iii) 은 사용자 데이터 삭제(요청에 없음) |
+| AE | 닉네임이 쓰이는 곳 | (i) `/auth/*` 응답과 사이드바뿐 — 에이전트 답·브리핑·툴 입력에 쓰지 않음 (ii) 에이전트가 닉네임으로 사용자를 부름 | **(i)** | 원칙7 경계(조회 답은 기록된 사실의 재진술, 브리핑 제안은 기록된 사실에서 도출) — 닉네임은 대화에서 기록된 사실이 아니다. (ii) 는 답 템플릿·trace·툴 7종 불변 판정을 다시 해야 한다 — 원하면 별도 요청 |
+| AF | 사이드바 표시 | (i) "<닉네임> · <아이디> · 로그아웃"(아이디는 흐리게, `sidebar-username` 글자 그대로) (ii) "<닉네임> · 로그아웃"(아이디 숨김) | **(i)** | 기존 단언 5곳(`sidebar-username`)을 바꾸지 않는다. 닉네임은 중복이 막혀 있지만 아이디가 로그인 이름이라 시연 중 "어느 계정인지" 를 바로 보인다. 좁은 사이드바는 `truncate` |
+| AG | 닉네임 변경 기능 | (i) 없음 (ii) 내 정보 수정 API·화면 | **(i)** | 요청에 없다. 대가: 0004 반영 전에 만든 계정은 닉네임이 아이디로 고정(사용자 할 일 9) |
+| AH | 반영 뒤 문제가 생겼을 때 | (i) 앞으로 고쳐 다시 올림(기본) + 비상시 `alembic downgrade 0003` 뒤 옛 해시(닉네임 값만 잃음) (ii) 앞으로만 | **(i)** | 0004 는 0003 과 달리 되돌림 리비전이 계정을 지우지 않아 비상 경로가 실제로 있다. 기본은 0003 때와 같이 앞으로 고치기(U11) |
+
 ## 기획서 원칙과 부딪히는 곳
 
 - **원칙5**: 원문 "화면 3개 고정" 은 CR-006 으로 폐지됐다(사용자 2026-11-15). 이 패키지는 로그인·가입 화면 1개(관문)를 더한다 — 근거는 시연 (가). 채팅·인물·브리핑 핵심 화면은 그대로. 하네스 `frontend-agent.md` 25행은 기준 해시 `5c0f26d` 에서 메인이 처리했다.
@@ -294,6 +489,9 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 - **원칙1~4**: 무변경. 후보 검색·툴이 계정 안으로 좁혀져 있어 계정 간 오병합 경로가 없다(U3b 격리 테스트 R-4 ② 가 API 층에서 박는다).
 - **원칙8**: 평가 러너의 `ToolContext` 는 같은 값을 명시해 결과 불변(U3a). 시연 데이터는 평가와 분리.
 - **security §5 "전체 대화 이력 저장 금지"** 와 대화 기록 저장 — CR-006 에서 "context 에는 넣지 않고, `chat_messages` 에 계정 소유로만" 으로 개정했다.
+- **(개정 3) 원칙7**: 닉네임은 사용자 자신의 표시 이름 — 인물(`persons`·`person_aliases`)이 아니고, 인물 간 관계를 만들지 않으며, 다른 사용자에게 보이는 곳이 없다. 에이전트 답·브리핑에 쓰지 않는다(결정 AE — 경계 문장). U9 시험이 "가입이 `persons`·`person_aliases`·`agent_traces` 행을 만들지 않는다" 를 박는다.
+- **(개정 3) 원칙5**: 새 화면 없음 — 관문 화면에 칸·버튼을 더할 뿐(UI 에 시간을 쓰지 않는다 — 문구·배치는 고정값, 디자인 수정 없음).
+- **(개정 3) 원칙9**: 조회 API·가입은 판정이 아니라 trace 0(D18 지킬 것 11). **원칙1~4·8**: ER·평가 경로 무변경(`git diff --stat <기준>..HEAD -- app/er evaluation reports data` 빈 출력 — 단위 공통 회귀 그대로).
 
 ## 리스크 · 미결
 
@@ -313,6 +511,14 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 - **[P9 연결(R-1)]** P9 04-review 는 이 패키지의 배포 반영 뒤 함께 닫는다. 그때 P9 수용 기준 "`git diff --stat -- app web/src alembic` 빈 출력" 의 범위는 **P9 커밋 구간(P9 기준 `4a4d8cb`..`7830f6c`)으로 고정**해야 한다 — 안 그러면 P9b 의 코드 변경이 P9 판정에 잡힌다. P9 의 사용자 Traceback 0 보고(2026-11-15)는 반영 전 상태의 증거이므로, 반영 뒤 U7 에서 다시 받는다.
 - **[하네스(R-12)]** `verify-plan.sh` 62·68행이 `P5b-…`·`P9b-…` 처럼 숫자 뒤 글자가 있는 id 를 다루지 못해 "의존 완료"·"P4 게이트" 검사가 빠진다 — 이번에는 verifier 가 손으로 확인. 하네스 FIX 후보(이 패키지 범위 밖).
 - **[달력(P9c)]** 이 패키지가 끝나야 시작할 수 있다(한 번에 활성 하나). 평가 전에 못 들어가면 배포본은 로그인만 반영된 상태(브리핑은 목록 보기)로 시연한다.
+- **[개정 3 · 일정과 달력]** CR-007(U9~U11)을 먼저 하면 P9b 04-review 가 빨라야 11-17 저녁이고, P9c 포기 시점(11-17 12:00 까지 U1·U2 리뷰 통과)을 넘긴다 → **평가 전 달력은 사실상 들어가지 못한다.** 그 경우 배포본은 U11 해시(로그인 + 닉네임), 브리핑은 목록 보기로 시연. P9c 01-plan 의 "`4be331b` 그대로" 문장은 U11 뒤 낡는다 — P9c 활성화 때 해시를 고친다(P9c 재계획 몫).
+- **[개정 3 · 0004 적용 뒤 되돌리기]** 0004 는 계정을 지우지 않지만, 적용 뒤 옛 해시(`4be331b`)로 checkout 만 하면 옛 entrypoint 의 `alembic upgrade head` 가 모르는 리비전 `0004` 를 만나 backend 가 뜨지 않는다(0003 때와 같은 성질). 기본은 앞으로 고쳐 다시 올리기, 비상시 새 해시 컨테이너에서 `alembic downgrade 0003` 뒤 옛 해시(결정 AH — 닉네임 값만 잃음). 그래서 U11 의 로컬 Caddy 경유 스모크(0003 데이터에서 실제 `0003 -> 0004`)와 로컬 브라우저 점검이 반영 전 필수다.
+- **[개정 3 · 계약 어긋남]** U10 은 목 응답으로 시험하므로 U9 실제 응답과 어긋나도 단위 시험이 못 잡는다(U6·U2 선례에서는 어긋남 0). → API 계약 개정 3 표를 값으로 고정했고, U11 로컬 스모크·브라우저 점검이 실제 백엔드 + 실제 빌드로 본다.
+- **[개정 3 · 재배포 순간의 열린 탭]** 재배포 중·직후 옛 JS 를 연 탭에서 가입하면 닉네임 누락 기본 422 → 일반 실패 안내. 새로고침으로 해결. 시연 전 브라우저 새로고침을 U8 절차에 넣는다(U11 문서).
+- **[개정 3 · 계정 열거]** 조회 API 로 계정 없이 아이디 존재를 물을 수 있다(가입 409 와 같은 정보, 비용만 낮아짐). 공개 기간 4일·시도 제한 없음(결정 AC). 접근 로그에 조회 값이 남는다(비밀 아님).
+- **[개정 3 · 영문 닉네임 표기]** 결정 Y 로 영문 닉네임은 소문자로 보인다(`SunWoo` → `sunwoo`). 시연에서 영문 대문자 닉네임을 쓰면 표기가 바뀌는 것을 미리 안다(한글은 영향 없음).
+- **[개정 3 · 시연 계정 가입 시점]** 닉네임 변경 기능이 없어(결정 AG) U11 반영 전에 가입한 계정은 닉네임 = 아이디로 고정된다 — 시연 계정은 U11 뒤 가입(사용자 할 일 9).
+- **[개정 3 · `unicodedata.normalize` 와 짝 없는 서로게이트]** 서로게이트가 든 문자열을 NFC 정규화할 때 예외가 나지 않는다고 보지만 이 계획에서 실행해 확인하지 않았다 — U9 의 문자열 전수 시험(500 0)이 판정한다. 예외가 나면 그 경우를 위반(`None`)으로 처리하는 것은 계획 안(새 상수·새 정책 아님 — 규칙 표 "500 0" 의 구현).
 
 ## 사용자만 할 수 있는 일 · 에이전트가 검증할 수 없는 것 (메인 세션이 모아 전한다)
 
@@ -325,6 +531,10 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 6. **11-17 저녁·11-18 아침에 OpenAI 대시보드 사용량 확인**(월 한도 $10 소진 대비, R-6).
 7. U1 에서 로컬 개발 DB 인물 12명이 지워진다는 것을 실행 직전에 한 번 더 확인(결정 4 — 이미 결정, 알림).
 8. (해당 시) 범위 축소 3 을 쓸지 — 수용 기준 6번 변경이라 사용자 결정(R-11 ②).
+9. **(개정 3) 시연 계정을 U11 재배포 뒤에 가입할지** — 닉네임 변경 기능이 없어(결정 AG) 반영 전에 만든 계정은 닉네임 = 아이디로 고정된다. 이미 `test` 외에 시연 계정을 만들었다면 그대로 쓸지, 반영 뒤 새로 만들지(대화 데이터를 다시 쌓아야 함).
+10. **(개정 3) 달력(P9c)의 평가 전 포기 확인** — 닉네임·중복검사를 먼저 하면 P9c 포기 시점(11-17 12:00)을 넘길 가능성이 크다. 달력이 닉네임보다 중요하면 순서를 바꿔야 하므로 사용자 판단.
+11. **(개정 3) 일정이 밀릴 때** — (a) 범위 축소 3(조회 API·중복 확인 버튼을 빼고 가입 409 만 — 요청 문장의 일부를 빼는 것)을 쓸지 (b) 11-17 18:00 까지 재배포를 못 하면 평가를 `4be331b`(닉네임 없음)로 할지. 둘 다 기본값은 "메인이 묻기 전에는 적용하지 않음 / 18:00 기준".
+12. (개정 3) U11 재배포 SSH(사용자 할 일 1 과 같은 명령, 해시만 새 값) · 반영 뒤 `test` 로그인·사이드바 닉네임 화면 확인.
 
 **에이전트가 검증할 수 없는 것**
 1. 배포 URL 의 POST(가입·로그인·채팅) — security §4(로컬 밖 `curl -d` 금지). 에이전트는 본문 없는 GET 으로 401·health 만 본다.
@@ -332,6 +542,8 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 3. 실제 기기 푸시 수신과 같은 브라우저 두 계정 전환 시 알림 섞임 여부 — 단위 테스트로 규칙만, 실수신은 사용자.
 4. 서버 컨테이너 로그·`alembic current`(SSH 안) — 사용자가 붙여 준 출력으로만.
 5. 시연 계정 데이터의 내용이 시연에 적절한지(인물·사건 선택) — 사용자 판단.
+6. (개정 3) 배포 URL 의 가입(닉네임 포함)·409 화면 — POST 라 에이전트는 로컬 Caddy 스모크로 근사하고, 배포 URL 은 본문 없는 GET(조회 API·health·401)만 본다.
+7. (개정 3) 운영 DB 의 백필 결과(계정 행 수·닉네임 = 아이디)를 직접 `SELECT` 할 수 없다 — 바깥 조회 `?username=test` → `taken` 과 사용자 화면(사이드바 닉네임 `test`)으로만 확인한다.
 
 ## 읽은 카드
 
@@ -346,6 +558,8 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 - `.claude/gitlog.md`(2026-11-15 19:50, HEAD `7830f6c`)
 - 코드: `app/db/models.py` 전문 · `app/settings.py` 495~518 · `app/briefing/scheduler.py` 80~119 · `app/api/read.py` 260~349 · `app/api/routes.py` 라우트 데코레이터 grep·486~498 · `app/api/schemas.py` 필드 grep · grep `user_id|session_id`(`app/api/read.py`·`deps.py`·`briefing/select.py`·`run.py`·`scheduler.py`·`tools/questions.py`·`context.py`) · `web/src/routes.ts` 전문 · `web/src/api/client.ts` grep · `web/vite.config.ts` grep(`changeOrigin`) · Glob `web/src/**` · grep `tests/` (`TestClient(`·`X-Session-Id`·`APP_USER_ID` 개수, `ToolContext(` 개수) · `tests/db_bootstrap.py` grep · Glob `alembic/versions` · grep `원칙5|화면 3개|3화면` 저장소 전체
 - 열지 않은 것: `web/src/screens/ChatScreen.tsx`·`AppShell.tsx`·`push.ts`·`sw.js`·`web/e2e/fixtures.ts` 본문(U6 에서 frontend-agent 가 확인) · `app/push/subscriptions.py` 본문(U5) · `app/tools/questions.py` 본문(행 번호는 grep·verifier 대조) · `scripts/schema_check.py`(존재·단언 확인은 U1)
+- **개정 3(2026-11-16) 에 읽은 것**: `docs/wiki/changes/CR-006.md` 전문(형식)·`templates/change-request.md` · `.claude/skills/devlog/SKILL.md` `/devlog change` 절 · `decisions/D18-login-user-isolation.md` 전문 · `specs/S3.1-schema-v2.md` 전문 · `security.md` 전문 · `docs/backlog.md` 95~122 · `INDEX.md` grep · `review-index.md` grep(R12·R14) · `CURRENT.md` · `packages/P9b-auth/03-log.md` 1~119·145~184 · `review-u6.md` R-5 · `packages/P9c-briefing-calendar/01-plan.md` grep(포기 시점) · `.claude/gitlog.md`(2026-11-16 06:27, HEAD `f93e7e6`) · `.claude/scripts/verify-plan.sh` 52~59(수용 기준은 `## 수용 기준` 절의 `- ` 줄을 backlog 에서 `grep -F`). 코드: `app/auth/routes.py` 전문 · `app/auth/passwords.py` 전문 · `app/api/schemas.py` 430~467 · `app/db/models.py` 290~330 · `app/settings.py` grep(`USERNAME|PASSWORD_M`) · `alembic/versions/0003_auth_users.py` 전문 · `tests/auth_helpers.py` 전문 · `tests/test_auth_required_routes.py` 전문 · `tests/test_auth_api.py` grep + 460~629 · `tests/test_auth_origin.py` 100~159 · `tests/test_auth_helpers.py` grep · `tests/test_migration_0003.py` 40~109·195~362 · `tests/test_schema_models.py` grep + 140~159·245~329 · `tests/test_schema_check.py` grep + 56~74 · `scripts/schema_check.py` 55~94·245~266 + grep · grep `0003`(`tests/`·`app/`·`scripts/`·`.github/`·`web/`) · grep `User\(|INSERT INTO users` · `web/src/screens/AuthScreen.tsx` 전문 · `web/src/components/AppShell.tsx` 25~64 · `web/src/api/types.ts` 1~30 · `web/src/__tests__/auth.test.tsx` 60~104·205~224 + grep · grep `username|AccountRow|MeOut|signup`(`web/`) · `docs/wiki/registry.md` grep(`nickname|availability|닉네임`, `app/auth|AuthScreen|auth.tsx`)
+- 개정 3 에서 열지 않은 것: `web/src/auth.tsx`·`web/src/api/client.ts` 본문(grep 줄만 — U10 이 확인) · `app/auth/sessions.py`·`deps.py` 본문(바꾸지 않는다) · `docs/user-setup/13-user-todo-deploy.md` G 절 본문(U11 에서 메인이 재사용) · `web/e2e/auth.spec.ts`·`fixtures.ts` 본문(grep 줄만)
 
 ## 개정 이력
 
@@ -388,3 +602,22 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | R2-4 | 9행을 현재 값(2261·0 failed)만으로 · 판정 #12 기대 문장(−2 포함) |
 
 **grep 판정 점검(N-3 종류 — 계획 안 모든 grep 명령, 2026-11-15)**: ① 판정 #4 `u5-no-fixed-user.sh` — `grep -rnE`, 스크립트 ✔ ② U3b `u3b-request-path.sh` — `-rnE`, 스크립트(개정 2 에서 고침) ✔ ③ `u3b-ctx-default` — 단일 파일·따옴표 없는 패턴(`default_factory=app_user_id`)이라 래퍼 그대로 ✔ ④ U3a `u3a-tests-fixed-user.sh` — `-rnE`, 스크립트 ✔ ⑤ U5 `u5-outside-app.sh` — `-rnE`, 스크립트 ✔ ⑥ 판정 #1 `-k plaintext` 는 pytest 인자(grep 아님) ✔ ⑦ #10 `u7-401.sh`·`u7-root.sh` — `curl -w '%{http_code}'` 는 스크립트 ✔. 모든 grep 판정은 "기대 exit 1(일치 없음) 또는 목록 대조 exit 0, exit 2 는 실패" 로 읽는다.
+
+- **개정 3(2026-11-16, architect — CR-007 가입 닉네임·아이디·닉네임 중복검사)** — 기존 단위(U1~U8)·문장·수용 기준 구절은 바꾸지 않고 덧붙였다. 다음 verifier 02-plan-verify 는 개정분(아래 표의 "반영한 곳")을 본다.
+
+| 무엇 | 반영한 곳 |
+|---|---|
+| 출처 CR·카드 | 3·4행(상태·태그에 개정 3) · CR-007 신설 · D18 결정 10·11·지킬 것 10·11(결정 3·지킬 것 4 보충) · S3.1 0004 보충 · CLAUDE.md 데이터 모델·인증 줄 · security §5 · proposal 상단 · INDEX · backlog P9b 수용 기준 끝 구절·세분화 줄·리스크 줄 |
+| 코드 사실 | 사실 15~22(가입·로그인·스키마·리비전 문자열·가입 시험·예외 목록·프론트·운영 데이터·기준선) |
+| 목표·범위 | "개정 3 목표" 단락 · 포함 1줄 · 하지 않는 것 5줄(닉네임 변경·에이전트 닉네임·닉네임 로그인·시도 제한·공개 노출) |
+| 산출물 | "개정 3 산출물" 새 파일·고치는 파일 표 |
+| API 계약 | "API 계약 — 개정 3" 표(가입·로그인·me·조회 API·로그아웃/기존 불변) + 가입 판정 순서 ①~⑥ · 조회 판정 · 계정 열거와의 관계 · 호환 |
+| 닉네임 규칙 | "닉네임 규칙 — 개정 3" 닫힌 값 표 |
+| 작업 단위 | "개정 3 단위 — 순서·병렬"(U9∥U10 → U11 → U8, U7 체크는 메인, 커밋 시점 전체 시험 성립 ①~④) · U9(모델·0004·규칙 함수·스키마·라우트·닫힌 목록 B1~B17·새 시험 3파일·판정·변이 V9-1~V9-13) · U10(타입·클라이언트·관문 상태·가입 화면·고정 문구·사이드바·닫힌 목록 F1~F4·새 시험·판정·변이 V10-1~V10-8) · U11(문서·로컬 Caddy 스모크·브라우저 점검·사용자 재배포·바깥 GET·사람 확인) |
+| 일정·축소 | "범위 축소 순서 — 개정 3"(판단 시점 11-17 10:00·18:00, 축소 1~3, 빼지 않는 것, P9c) |
+| 판정 | 판정 표 #14~#20 · 단위 공통 회귀에 프론트 단위·공통 규칙(Mac 로컬·`ruff --fix` 금지·닫힌 목록·`--include`·커밋형 시험 제외) |
+| 수용 기준 | 끝에 CR-007 구절 3개(backlog 와 글자 그대로) + 개정 3 주(앞 구절 불변, #2 는 #16 과 함께) |
+| 결정 | 사용자 결정 표 W~AH(권장안 채택) |
+| 원칙·리스크·사용자 | 원칙 절 3줄 · 리스크 9줄 · 사용자만 할 수 있는 일 9~12 · 에이전트가 검증할 수 없는 것 6·7 · 읽은 카드 |
+
+**개정 3 명령 점검(N-3·R3-2 종류)**: ① 개정 3 판정에는 재귀 grep 판정이 없다(닫힌 목록 대조는 `git diff --stat`·verifier 리뷰) ② 따옴표·`|`·`?`·`&` 가 든 명령(`curl '<URL>/api/auth/availability?…'`, Caddy 스모크, `psql -c "SELECT …"`)은 전부 스크래치패드 `<SCR>/<이름>.sh` 로 Write 해 `-- bash <SCR>/<이름>.sh`(판정 방법 머리 문장) ③ 따옴표 든 pytest `-k` 를 쓰지 않는다(#15 에서 뺐다) ④ Vitest 는 `--root web`(review-u6 R-5) ⑤ pytest·alembic 은 `.venv/bin/python`, 전체 pytest 는 `POSTGRES_PORT=5433`.

@@ -44,7 +44,7 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | 태그 | 뜻 | 카드 위치 |
 |------|----|-----------|
 | `P0`~`P11` | 작업 패키지 (P0 = 착수 준비) | `packages/<id>/` |
-| `D1`~`D10`, `D11+` | 설계 결정 (D3 는 D12 로 대체됨 — CR-001; D13 규칙 필터 감점; D9 는 D14 로 대체됨 — CR-002 패턴 기간 설정값; D15 인물 화면 배치 그리드·검색·사이드바 5명 — CR-003, P8 01-plan 결정 N·U6 일부 대체; D16 조회 발화 — CR-004, 의도 분류·읽기 전용 조회·답 경계; D17 배포 AWS 최소 — CR-005; D18 로그인·계정별 격리·계정당 채팅방 하나 — CR-006) | `decisions/Dnn-*.md` |
+| `D1`~`D10`, `D11+` | 설계 결정 (D3 는 D12 로 대체됨 — CR-001; D13 규칙 필터 감점; D9 는 D14 로 대체됨 — CR-002 패턴 기간 설정값; D15 인물 화면 배치 그리드·검색·사이드바 5명 — CR-003, P8 01-plan 결정 N·U6 일부 대체; D16 조회 발화 — CR-004, 의도 분류·읽기 전용 조회·답 경계; D17 배포 AWS 최소 — CR-005; D18 로그인·계정별 격리·계정당 채팅방 하나 — CR-006, 닉네임·중복검사 보충 — CR-007) | `decisions/Dnn-*.md` |
 | `R1`~`R20` | 기획서 검증 항목 | `review-index.md` → 원문 `docs/proposal-review.md` |
 | `S3.1`~`S3.7` | 설계 명세 | `specs/S3.x-*.md` |
 | `원칙1`~`원칙9` | 불변 원칙 | `CLAUDE.md` |
@@ -78,7 +78,7 @@ journal.md (시간순) · registry.md (무엇이 있는가) · HANDOFF.md (지�
 | `P8-frontend` | 프론트 3화면 + PWA | frontend-agent(U0 신설, `web/`) + backend-agent(조회 API U1~U3) | — |
 | `P8b-persons-grid` | 인물 화면 카드 그리드 + 이름·별칭 검색 + 사이드바 최근 5명 (CR-003 · D15) — P8 04-review 뒤 | frontend-agent(`web/`) + backend-agent(U0 — `GET /persons` 응답 `aliases` 필드만, 결정 K (나)) | — |
 | `P9-infra` | **AWS 최소 — EC2 1대 + Docker Compose(Caddy·FastAPI·Postgres/pgvector), 프론트 정적도 Caddy, 공개 ~11-19 뒤 종료(CR-005 · D17 개정 ②)** — 원안 Terraform·CloudFront·RDS·SSM 과 1차 Vercel 안 폐기. 실제 기동은 사용자 지시 뒤 | backend-agent(Dockerfile·compose·Caddyfile) + frontend-agent(빌드 확인) + 사용자(EC2·SSH·`.env`·기동·종료) | R14 |
-| `P9b-auth` | **아이디·비밀번호 로그인 + 계정별 격리 + 계정당 채팅방 하나·대화 기록 + 스케줄러·푸시 사용자별 + 리비전 0003(기존 데이터 비우기) + 로그인·가입 화면 + 배포 반영·시연 두 갈래 (CR-006 · D18)** — 평가(11-18) 전 필수 | backend-agent(U1~U5) + frontend-agent(U6) + 메인·사용자(U7 배포·U8 시연 계정) | — (F-fbaaae · R-U10D-3 닫음) |
+| `P9b-auth` | **아이디·비밀번호 로그인 + 계정별 격리 + 계정당 채팅방 하나·대화 기록 + 스케줄러·푸시 사용자별 + 리비전 0003(기존 데이터 비우기) + 로그인·가입 화면 + 배포 반영·시연 두 갈래 (CR-006 · D18)** — 평가(11-18) 전 필수. **개정 3(CR-007)**: 가입 닉네임·아이디·닉네임 중복검사·리비전 0004(U9~U11) | backend-agent(U1~U5·U9) + frontend-agent(U6·U10) + 메인·사용자(U7 배포·U11 재배포·U8 시연 계정) | — (F-fbaaae · R-U10D-3 닫음) |
 | `P9c-briefing-calendar` | 브리핑 화면 월 달력 보기(목록 유지) + 월 범위 일정 조회 API 1개 (CR-006 변경 항목 2) — P9b 뒤 | backend-agent(조회 API) + frontend-agent(달력) | — |
 | `P10-final-eval` | 150건 + 최종 평가 | eval-agent | — |
 | `P11-demo` | 데모 리허설 | 사용자 | R15 |
