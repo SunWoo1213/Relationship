@@ -300,3 +300,66 @@
 | VR10 `_read_card` 가 소유자를 무시(R-10) | `test_resume_context_pointing_at_other_users_person_changes_nothing[identity_query]` |
 
 변이 뒤 시험 DB 잔여: `chat_messages`·`users`·`persons` 등 전부 0행(`evidence/20261116-0044-u4-residue-after-mutations.txt`). `agent_traces` 234행은 모두 `concurrency-setup-*`·`answer-concurrency-tool-a`(기존 R-7 — 전체 pytest 가 `test_answer_concurrency` 를 돌릴 때마다 쌓이는 것, 변이 실행엔 그 시험이 없다).
+
+## U5 — 스케줄러·푸시 사용자별, 고정 사용자 삭제, 결정 V (backend-agent, 2026-11-16)
+
+전체 pytest **2515 passed**(2491 + 새 시험 26 − `tests/test_settings.py` 2) · 실패 0 · skip 0(`evidence/20261116-0101-u5-pytest-all.txt`).
+
+### `tests/test_briefing_scheduler_users.py` (`dbtest`, 13건, 롤백 세션 + `session_scope` 를 같은 세션으로 바꾼 대역, 시계 `NOW` 주입 — 실제 커밋 0)
+
+| 시험 | 단언(값) |
+|---|---|
+| `test_one_run_briefs_both_users_schedules` | A·B 창 안 일정 1건씩 → 한 번에 둘 다 `briefed_at == NOW` |
+| `test_each_user_gets_own_ctx_and_exactly_one_call` | A 일정 2건·B 1건 → 호출 사용자 `[A, B]`(A 중복 없음), `trigger == "scheduler"` |
+| `test_out_of_window_and_already_briefed_schedules_are_not_processed` | 창 밖(+30h)·지난 일정·이미 브리핑 → 호출 사용자 `[""]` 뿐 |
+| `test_window_boundaries_…` | `NOW+24h` 포함·`NOW+24h+1분` 제외·`NOW` 정확히 포함 → `[A, C]` |
+| `test_window_comes_from_settings_at_call_time_for_both_list_and_run` | `BRIEFING_LEAD_HOURS=2` 로 바꿔 실행 → `NOW+2h` 만 호출, `run_briefings` 의 `lead_hours == 2` |
+| `test_default_window_is_24_hours_passed_to_run_briefings` | 기본 `lead_hours == 24` |
+| `test_one_users_failure_…[python·db]` | A 에서 부분 쓰기 후 예외(파이썬 / `select 1/0` DB 오류) → 예외가 밖으로 안 나옴, B `briefed_at == NOW`, A `None`, A 의 부분 쓰기 행 0, 로그에 `A` 포함·일정 제목 없음 |
+| `test_notifier_sends_only_to_each_users_own_subscriptions` | 일정 있는 A(2구독)·B(1구독)·일정 없는 C(1구독) → 발송 endpoint 정확히 `[a1, a2, b1]`, `push_send` trace 2행 |
+| `test_other_users_subscription_is_not_used_for_a_users_schedule` | A 일정·B 구독만 → 발송 0, A `briefed_at == NOW` |
+| `test_zero_targets_calls_run_briefings_once_with_empty_marker_user` | 대상 0명 → 호출 1회, `user_id == ""` |
+| `test_zero_targets_leave_exactly_one_briefing_run_trace_in_old_format` | `briefing_run` 행 +1, `session_id` 가 `briefing:` 로 시작(`briefing-scheduler:` 아님), 키 집합 ⊇ 기존 형식, `selected == []`, `lead_hours == 24` |
+| `test_one_or_more_targets_never_call_the_marker_ctx` | 대상 1명 → 호출 `[A]`, `""` 0 |
+
+### `tests/test_push_endpoint_owner.py` (`dbtest`, 10건, 롤백 세션)
+
+| 시험 | 단언 |
+|---|---|
+| `test_second_account_subscribing_same_endpoint_takes_it_over` | A 구독 뒤 B 가 같은 EP → `[(B, EP)]`, `created is True` |
+| `test_takeover_leaves_other_endpoints_of_the_old_account` | A 의 EP·OTHER 중 B 가 EP 구독 → `[(A, OTHER), (B, EP)]` |
+| `test_same_account_resubscribing_keeps_one_row_and_created_false` | 같은 계정 재구독 → 같은 id·`created is False`·1행 |
+| `test_other_accounts_schedule_briefing_is_not_pushed_to_taken_over_endpoint` | (U3b R-6) A 일정 브리핑 → `push == "no_subscription"`·발송 0 |
+| `test_manual_briefing_notifier_uses_logged_in_account_subscriptions_only` | (U3b R-2) B 로그인 `/briefings/run` → 발송 endpoint `[b-only]`, `push == "sent"` |
+| `test_get_notifier_builds_notifier_for_the_given_logged_in_user` / `..._without_keys_is_null_notifier` | `WebPushNotifier.user_id == 로그인 사용자 id` / 키 없음 → `NullNotifier` |
+| `test_logout_with_endpoint_deletes_that_users_row_and_keeps_other_endpoints` | 204, `[(A, OTHER)]` |
+| `test_logout_does_not_delete_another_accounts_row_with_same_endpoint` | A 로그아웃이 B 의 같은 EP 행을 안 지움 |
+| `test_logout_without_endpoint_or_body_keeps_subscriptions` | `{}`·본문 없음 → 구독 그대로 |
+
+### 그 밖
+- `tests/test_chat_history.py` +3건 — `test_second_answer_409_leaves_history_rows_unchanged`(U4 R-1: 409 `already_answered`, 기록 4행·내용 그대로) · `test_utterance_of_exactly_2000_chars_is_accepted_and_2001_is_rejected_with_no_side_effects`(결정 V: 2000자 200, 2001자 422 `loc == ["body","utterance"]`·`type == "string_too_long"`, 인식 단계 호출 수 그대로·`chat_messages`·`agent_traces` 행 수 그대로) · `test_existing_chat_validation_unchanged_empty_utterance_still_422`(`string_too_short`).
+- 바꾼 기존 단언: ① `tests/test_push_wiring.py:344` `== "local"` → `== ""`(계획 지정) ② `tests/test_push_subscriptions.py` `test_list_subscriptions_same_endpoint_different_users_are_separate_rows` → `test_save_subscription_same_endpoint_different_user_takes_over_the_endpoint`(결정 P 가 대체한 옛 계약 — 계획 목록에 없던 것, 03-log 보고) · 주석 2곳(`test_push_subscriptions.py:90`·`test_api_read_briefings_e2e.py:185`).
+
+### 변이 28종 — 저장소 밖 사본(`…/scratchpad/p9b-u5/copy`)에서 하나씩, 관련 8개 시험 파일(162건)만(`evidence/20261116-0103-u5-mutations.txt`; 실제 커밋형 시험 없음, 변이 28 전부 실패 ≥ 1 로 잡힘)
+
+| 변이 | 잡는 시험 |
+|---|---|
+| V5-1 사용자 루프를 첫 사용자만 | 두 일정·호출당 1회·경계·실패 격리·발송 6건 |
+| V5-2 예외 격리 제거 / V5-2b 세이브포인트 제거 | 실패 격리 `[python]`·`[db]` 2건 |
+| V5-3a 다른 사용자 같은 endpoint 삭제 제거 | 인수·R-6·로그아웃 격리·`save_subscription` 인수 5건 |
+| V5-3b 삭제가 자기 행도 지움 / V5-3c 다른 endpoint 도 지움 | 재구독 `created False`·`test_create_subscription_same_endpoint_updates_keys_without_new_row` / 인수 시 다른 endpoint 유지 |
+| V5-4 로그아웃 endpoint 삭제 제거 | `test_logout_with_endpoint_deletes_that_users_row_…` |
+| V5-4b 삭제에 `user_id` 조건 제거 / V5-4c `endpoint` 조건 제거 | 로그아웃이 B 행 안 지움 / 다른 endpoint 유지 |
+| V5-4d NUL·서로게이트 방어 제거 | `test_auth_api.py` 로그아웃 이상 값 500 시험 2건 |
+| V5-4e 로그아웃 endpoint 유무 조건 제거 | 본문 없음·`None` 등 6건 |
+| V5-5 0명일 때 `run_briefings` 안 부름 | 새 0명 시험 3건 + **기존** `test_briefing_scheduler.py::test_manual_endpoint_and_scheduler_call_the_same_run_briefings_object`·`test_push_wiring.py` 스케줄러 2건 |
+| V5-5b 0명 표식을 `"local"` | `test_push_wiring.py::test_scheduler_passes_web_push_notifier_…`(`== ""`)·새 표식 시험 2건 |
+| V5-5c 표식 ctx 를 항상 호출 | 사용자 루프 시험 6건 |
+| V5-6a 목록 창을 24 리터럴 / V5-6b `run_briefings` 의 `lead_hours` 24 리터럴 / V5-6c 상수를 import 시점에 읽음 | `test_window_comes_from_settings_at_call_time_…` |
+| V5-7a `>=`→`>` / V5-7b `<=`→`<` | 창 경계 시험 |
+| V5-8 `briefed_at IS NULL` 제거 / V5-9 `DISTINCT` 제거 | 창 밖·이미 브리핑 시험 / 호출당 1회 시험 |
+| V5-10 알림기 사용자 고정 / V5-11 ctx 에 시계 안 넘김 | 사용자별 발송·기존 `test_push_wiring.py` 2건 / 시계 `NOW` 단언들 |
+| V5-R2 `get_notifier` 가 `"local"` 고정(U3b R-2) | `test_push_endpoint_owner.py` 3건 |
+| VV-1 상한 2001 / VV-2 1999 / VV-3 상한 제거 / VV-4 최소 길이 제거 | 2000·2001 경계 시험 / 빈 발화 422 시험 |
+
+변이 뒤 시험 DB 잔여: 12개 테이블 모두 0행, `agent_traces` 261행은 전부 `concurrency-*`(`evidence/20261116-0123-u5-residue-after-mutations.txt`, 그 외 접두 0 확인).

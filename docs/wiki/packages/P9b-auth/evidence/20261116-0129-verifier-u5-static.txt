@@ -1,0 +1,80 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu5/static.sh
+# 시각: 2026-11-16T01:29:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a25123b (dev2)
+# exit: 0
+# ---
+### ruff check app tests scripts evaluation alembic
+All checks passed!
+exit=0
+### mypy_check --run
+[ok] 새 오류 없음 (현재 38건, 기준선 38건)
+exit=0
+### tools_check
+[ok] search_person: CLAUDE.md (query, hints?) == actual (ctx, query, hints=None)
+[ok] create_person: CLAUDE.md (display_name, aliases, relation_tag, hierarchy) == actual (ctx, display_name, aliases, relation_tag, hierarchy)
+[ok] update_person: CLAUDE.md (person_id, facts?, new_alias?, display_name?) == actual (ctx, person_id, facts=None, new_alias=None, display_name=None)
+[ok] add_event: CLAUDE.md (person_id, type, content, occurred_at, raw_utterance) == actual (ctx, person_id, type, content, occurred_at, raw_utterance)
+[ok] add_schedule: CLAUDE.md (person_id, title, scheduled_at) == actual (ctx, person_id, title, scheduled_at)
+[ok] get_briefing: CLAUDE.md (person_id, schedule_id?) == actual (ctx, person_id, schedule_id=None)
+[ok] ask_user: CLAUDE.md (kind, question, options, context) == actual (ctx, kind, question, options, context)
+RESULT: 7/7 ok
+exit=0
+### alembic check
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+No new upgrade operations detected.
+exit=0
+### 판정 #4: grep -rnE --include='*.py' app (기대 exit 1)
+exit=1
+### app/ 밖: tests scripts evaluation .github (기대 exit 1)
+exit=1
+### 대조군: 같은 grep 이 HEAD 사본에서는 일치를 낸다(패턴이 살아 있는지)
+HEAD:.env.example:1
+HEAD:.github/workflows/tests.yml:1
+HEAD:app/briefing/scheduler.py:3
+HEAD:app/settings.py:11
+HEAD:tests/test_api_read_briefings_e2e.py:1
+HEAD:tests/test_push_subscriptions.py:1
+HEAD:tests/test_settings.py:5
+exit=0
+### .env.example · 그 밖 최상위(참고)
+exit=2 (1 이면 0줄)
+### 범위: git status --short (제품·시험·설정 경로)
+ M .env.example
+ M .github/workflows/tests.yml
+ M app/api/schemas.py
+ M app/auth/routes.py
+ M app/briefing/scheduler.py
+ M app/push/subscriptions.py
+ M app/settings.py
+ M tests/test_api_read_briefings_e2e.py
+ M tests/test_chat_history.py
+ M tests/test_push_subscriptions.py
+ M tests/test_push_wiring.py
+D  tests/test_settings.py
+?? tests/test_briefing_scheduler_users.py
+?? tests/test_push_endpoint_owner.py
+### ER·툴·에이전트·마이그레이션·프론트 불변: git diff HEAD --stat
+(위가 비면 불변)
+### tests.yml diff 줄 수
+0	3	.env.example
+0	1	.github/workflows/tests.yml
+### 시험 단언 변경 전수: git diff HEAD -U0 -- tests 의 삭제 줄
+-    # (b) 사용자 B 의 브리핑도 실제 실행으로 만든다 (APP_USER_ID 는 "local" 이라 목록에 없어야 한다)
+-    assert row.user_id == "local"  # app_user_id() 기본값(APP_USER_ID 미설정)
+-def test_list_subscriptions_same_endpoint_different_users_are_separate_rows(db_session):
+-    """같은 엔드포인트라도 `user_id` 가 다르면 별개 행이다(결정 F(i)는
+-    `(user_id, endpoint)` 조합 기준)."""
+-    assert [row.id for row in list_subscriptions(db_session, "user-a")] == [first.id]
+-    assert notifier.user_id == ctx.user_id == "local"
+-"""Refs: P2-tools 결정9 -- app.settings.app_user_id() 해석 규칙 (DB 없이 실행)."""
+-from __future__ import annotations
+-import app.settings as settings
+-def test_app_user_id_defaults_to_local_when_env_not_set():
+-    assert settings.app_user_id({}) == "local"
+-def test_app_user_id_uses_env_value_when_set():
+-    assert settings.app_user_id({"APP_USER_ID": "demo-user-42"}) == "demo-user-42"
+### 기존 스케줄러 시험 파일 변경
+(비면 변경 0)

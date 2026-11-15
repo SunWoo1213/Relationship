@@ -372,3 +372,75 @@ def test_answer_loop_error_swallowed_as_200_still_saves_both_rows(env, monkeypat
         ("assistant", routes_module._LOOP_ERROR_REPLY, None),
     ]
     assert len(items) == 4
+
+
+def test_second_answer_409_leaves_history_rows_unchanged(env):
+    """U4 R-1 -- 이미 답한 질문에 다시 답하면 409 이고 기록은 4행 그대로(두 번째 답이 안 쌓인다)."""
+    r1 = env.a.post("/chat", json={"utterance": UTT1})
+    qid = r1.json()["pending_question"]["question_id"]
+    r2 = env.a.post(f"/answers/{qid}", json={"answer": IDENTITY_REJECT})
+    assert r2.status_code == 200
+    before = env.history(env.a)
+    assert len(before) == 4
+
+    again = env.a.post(f"/answers/{qid}", json={"answer": IDENTITY_REJECT})
+
+    assert again.status_code == 409
+    assert again.json()["detail"]["code"] == "already_answered"
+    assert env.history(env.a) == before
+    assert env.count(A_ID) == 4
+
+
+# ---------------------------------------------------------------------------
+# 결정 V -- 발화 최대 2000자
+# ---------------------------------------------------------------------------
+
+
+class _CountingProposer(FakeProposer):
+    def __init__(self, table):
+        super().__init__(table=table)
+        self.calls = 0
+
+    def propose(self, utterance, now):
+        self.calls += 1
+        return super().propose(utterance, now)
+
+
+def _trace_count(db) -> int:
+    db.flush()
+    return db.execute(select(func.count()).select_from(AgentTrace)).scalar_one()
+
+
+def test_utterance_of_exactly_2000_chars_is_accepted_and_2001_is_rejected_with_no_side_effects(
+    env,
+):
+    ok_text = "가" * 2000
+    too_long = "가" * 2001
+    proposer = _CountingProposer({ok_text: [], too_long: []})
+    env.app.dependency_overrides[get_proposer] = lambda: proposer
+
+    ok = env.a.post("/chat", json={"utterance": ok_text})
+    assert ok.status_code == 200
+    assert proposer.calls == 1
+    rows_before = env.count(A_ID)
+    traces_before = _trace_count(env.db)
+
+    resp = env.a.post("/chat", json={"utterance": too_long})
+
+    assert resp.status_code == 422
+    detail = resp.json()["detail"]
+    assert isinstance(detail, list) and len(detail) == 1  # 기존 422 와 같은 모양(pydantic 목록)
+    assert detail[0]["loc"] == ["body", "utterance"]
+    assert detail[0]["type"] == "string_too_long"
+    assert proposer.calls == 1  # LLM(인식 단계) 호출 0
+    assert env.count(A_ID) == rows_before  # DB 기록 0
+    assert _trace_count(env.db) == traces_before  # trace 도 0
+
+
+def test_existing_chat_validation_unchanged_empty_utterance_still_422(env):
+    resp = env.a.post("/chat", json={"utterance": ""})
+
+    assert resp.status_code == 422
+    detail = resp.json()["detail"]
+    assert detail[0]["loc"] == ["body", "utterance"]
+    assert detail[0]["type"] == "string_too_short"

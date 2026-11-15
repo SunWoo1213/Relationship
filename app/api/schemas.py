@@ -65,11 +65,16 @@ class HealthOut(BaseModel):
     alembic_revision: str | None = None
 
 
+#: `POST /chat` 발화 최대 길이(결정 V -- OpenAI 월 한도 보호, 시연 발화는 한두 문장).
+CHAT_UTTERANCE_MAX_LENGTH = 2000
+
+
 class ChatIn(BaseModel):
     """`POST /chat` 요청 본문. 발화 한 건 = 턴 한 번(01-plan U6 "요청 1건 =
     발화 1건 = 턴 1회")."""
 
-    utterance: str = Field(min_length=1)
+    # 결정 V(P9b-auth) -- 최대 2000자. 넘으면 기본 422(DB·LLM 호출 0).
+    utterance: str = Field(min_length=1, max_length=CHAT_UTTERANCE_MAX_LENGTH)
 
 
 class StoredOut(BaseModel):
@@ -449,7 +454,7 @@ class LoginIn(BaseModel):
 
 class LogoutIn(BaseModel):
     """`POST /auth/logout` 요청(본문은 선택). `endpoint` 는 그 브라우저의 푸시 구독
-    endpoint -- 구독 삭제는 U5 에서 연결한다(이 단위는 받기만)."""
+    endpoint -- 있으면 그 사용자의 그 구독 행을 지운다(U5)."""
 
     endpoint: str | None = None
 

@@ -16,12 +16,20 @@
 ## 실행 하나 = `default_run_once()`
 
 주기 작업이 1분(기본)마다 부르는 실행 하나는 U5(`run_briefings`)·U6
-(`POST /briefings/run`)과 같은 모양이다: `session_scope()`(`app/db/
-session.py`)로 세션을 열고 `ToolContext`(`user_id = app_user_id()`)를
-만들어 `run_briefings(ctx, composer=composer_from_env(), trigger=
-"scheduler")` 를 부른다. `session_scope()` 가 정상 종료 시 commit, 예외
-시 rollback, 항상 close 하므로 이 함수 자신은 커밋하지 않는다(01-plan
-결정 2 와 같은 경계 -- U5 `run_briefings()` 는 `flush()` 까지만 한다).
+(`POST /briefings/run`)과 같은 모양이다. (P9b-auth U5, CR-006 · D18) **사용자
+마다** 돈다: 창(`settings.BRIEFING_LEAD_HOURS` -- **호출 시점에** 모듈 전역을
+읽어 사용자 목록 질의와 `run_briefings(lead_hours=...)` 양쪽에 같은 값을
+넘긴다) 안에 미브리핑 일정이 있는 사용자 id 를 `persons.user_id` 에서
+구하고(`users` 테이블이 아니다), 사용자마다 `session_scope()`(`app/db/
+session.py`)를 따로 열어 `ToolContext(user_id=그 사용자)` 로 `run_briefings(
+ctx, composer=composer_from_env(), trigger="scheduler")` 를 부른다. 한 사용자
+에서 예외가 나면 그 사용자 것만 롤백하고(세션이 따로라 부분 쓰기가 남지 않는다)
+로그에는 사용자 id 만 남기고 다음 사용자로 간다. **대상이 0명이면** 어느
+계정과도 겹치지 않는 표식 `user_id=""` 로 `run_briefings` 를 1회 부른다(결정 U)
+-- 선택 0건이라 LLM·푸시 호출 0 이고 `briefing_run` trace 1행만 남아 주기
+작업이 살아 있다는 신호(P9 S13)가 유지된다. `session_scope()` 가 정상 종료 시
+commit, 예외 시 rollback, 항상 close 하므로 이 함수 자신은 커밋하지 않는다
+(01-plan 결정 2 와 같은 경계 -- U5 `run_briefings()` 는 `flush()` 까지만 한다).
 
 **생성기는 이 호출 안에서(매 실행마다) 만든다** -- `composer_from_env()`
 (D11)를 모듈 최상위나 `start_scheduler_task()` 호출 시점이 아니라 이
@@ -72,11 +80,17 @@ import asyncio
 import logging
 import uuid
 from collections.abc import Callable
+from datetime import datetime, timedelta, timezone
 
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+import app.settings as settings_module
 from app.briefing.compose import composer_from_env
 from app.briefing.run import run_briefings
+from app.db.models import Person, Schedule
 from app.db.session import session_scope
-from app.settings import BRIEFING_INTERVAL_SECONDS, app_user_id
+from app.settings import BRIEFING_INTERVAL_SECONDS
 from app.tools.context import ToolContext
 
 logger = logging.getLogger(__name__)
@@ -84,26 +98,88 @@ logger = logging.getLogger(__name__)
 #: `run_once` 콜러블의 타입 별칭 -- 동기 함수다(스레드 풀에서 돈다).
 RunOnce = Callable[[], None]
 
+#: 대상 사용자가 0명일 때 `run_briefings` 에 넘기는 표식 `user_id`(결정 U). `users.id`
+#: 는 uuid4 hex 이고 아이디 규칙도 3자 이상이라 빈 문자열과 겹치는 계정이 없다 --
+#: 이 ctx 로는 어떤 계정의 일정도 선택되지 않는다.
+NO_USER_MARKER = ""
 
-def default_run_once() -> None:
-    """주기 작업 한 번의 실제 실행(모듈 docstring "실행 하나" 절). 운영
-    경로가 `start_scheduler_task()` 를 통해 기본으로 쓰는 함수다."""
+
+def _due_user_ids(
+    session: Session, now: datetime, lead_hours: float
+) -> list[str]:
+    """창 안(`now <= scheduled_at <= now + lead_hours`)에 미브리핑 일정이 있는
+    사용자 id(중복 없음, 순서 규정 없음). `users` 가 아니라 `persons.user_id` 에서 구한다."""
+
+    window_end = now + timedelta(hours=lead_hours)
+    rows = session.execute(
+        select(Person.user_id)
+        .join(Schedule, Schedule.person_id == Person.id)
+        .where(Schedule.scheduled_at >= now)
+        .where(Schedule.scheduled_at <= window_end)
+        .where(Schedule.briefed_at.is_(None))
+        .distinct()
+    ).scalars()
+    return list(rows)
+
+
+def _run_for_user(
+    user_id: str, now: Callable[[], datetime], lead_hours: float
+) -> None:
+    """사용자 한 명의 브리핑 실행. 세션을 사용자마다 따로 열어 그 사용자의 실패가
+    다른 사용자에게 번지지 않게 한다(예외는 호출자가 잡는다)."""
 
     # 지연 import -- 모듈 상단에 두면 `app.push` 를 먼저 올릴 때
     # push.notifier -> briefing 패키지 -> 이 모듈 -> push.notifier 로 순환한다(FIX-029).
     from app.push.notifier import notifier_from_env
 
     with session_scope() as session:
-        ctx = ToolContext(
-            session=session,
-            session_id=f"briefing-scheduler:{uuid.uuid4()}",
-            user_id=app_user_id(),
-        )
-        # P7-push U5 -- 같은 세션·같은 시계(`ctx.now`)로 알림기를 만든다. 키가
-        # 없으면 `NullNotifier`(기존 동작), 있으면 `WebPushNotifier`. 수동 경로
-        # (`app/api/deps.py::get_notifier`)와 같은 함수를 쓴다.
-        notifier = notifier_from_env(session, ctx.user_id, ctx.now)
-        run_briefings(ctx, composer=composer_from_env(), notifier=notifier, trigger="scheduler")
+        # 세이브포인트 -- 예외 시 이 사용자의 부분 쓰기를 그 안에서 되돌린다(세션 하나가
+        # 예외 뒤에도 쓰이는 대역에서도 실패가 번지지 않게).
+        with session.begin_nested():
+            ctx = ToolContext(
+                session=session,
+                session_id=f"briefing-scheduler:{uuid.uuid4()}",
+                user_id=user_id,
+                now=now,
+            )
+            # P7-push U5 -- 같은 세션·같은 시계(`ctx.now`)로 알림기를 만든다. 키가
+            # 없으면 `NullNotifier`(기존 동작), 있으면 `WebPushNotifier`. 수동 경로
+            # (`app/api/deps.py::get_notifier`)와 같은 함수를 쓴다.
+            notifier = notifier_from_env(session, ctx.user_id, ctx.now)
+            run_briefings(
+                ctx,
+                composer=composer_from_env(),
+                notifier=notifier,
+                trigger="scheduler",
+                lead_hours=lead_hours,
+            )
+
+
+def default_run_once(now: Callable[[], datetime] | None = None) -> None:
+    """주기 작업 한 번의 실제 실행(모듈 docstring "실행 하나" 절). 운영
+    경로가 `start_scheduler_task()` 를 통해 기본으로 쓰는 함수다. `now` 는
+    시계 주입(테스트용, 생략하면 실제 시계)."""
+
+    if now is None:
+        now = _utc_now
+    # 호출 시점에 모듈 전역을 읽는다 -- 목록 질의와 run_briefings 양쪽에 같은 값.
+    lead_hours = settings_module.BRIEFING_LEAD_HOURS
+
+    with session_scope() as session:
+        user_ids = _due_user_ids(session, now(), lead_hours)
+
+    if not user_ids:
+        user_ids = [NO_USER_MARKER]
+
+    for user_id in user_ids:
+        try:
+            _run_for_user(user_id, now, lead_hours)
+        except Exception:  # noqa: BLE001 -- 한 사용자의 실패가 다른 사용자를 막지 않게 한다
+            logger.exception("브리핑 실행 중 예외가 났습니다 user_id=%s", user_id)
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 async def run_scheduler_loop(*, interval_seconds: float, run_once: RunOnce) -> None:

@@ -182,7 +182,7 @@ def test_10행_재실행_사용자_범위_원문_다른_step_혼입(env, db_sess
     rows = _compose_rows(db_session, s1.id)
     assert len(rows) == 2 and rows[1].id > rows[0].id  # 실제 실행이 2행을 남겼다
 
-    # (b) 사용자 B 의 브리핑도 실제 실행으로 만든다 (APP_USER_ID 는 "local" 이라 목록에 없어야 한다)
+    # (b) 사용자 B 의 브리핑도 실제 실행으로 만든다 (로그인 사용자는 "local" 이라 목록에 없어야 한다)
     result_b = run_briefings(
         _ctx(db_session, user_id="other"), composer=composer, notifier=NullNotifier(),
         schedule_id=s_b.id, trigger="manual",

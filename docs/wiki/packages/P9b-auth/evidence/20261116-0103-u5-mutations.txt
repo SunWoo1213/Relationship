@@ -1,0 +1,188 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u5/run-all.sh
+# 시각: 2026-11-16T01:03:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a25123b (dev2)
+# exit: 0
+# ---
+### 변이: V5-1-first-user-only
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_one_run_briefs_both_users_schedules - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+FAILED tests/test_briefing_scheduler_users.py::test_each_user_gets_own_ctx_and_exactly_one_call - AssertionError: assert ['u5sched-a'] == ['u5sched-a', 'u5sched-b']
+FAILED tests/test_briefing_scheduler_users.py::test_window_boundaries_are_inclusive_at_lead_hours_and_exclude_one_minute_later - AssertionError: assert ['u5sched-a'] == ['u5sched-a', 'u5sched-c']
+FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[python] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=date
+FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[db] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime
+FAILED tests/test_briefing_scheduler_users.py::test_notifier_sends_only_to_each_users_own_subscriptions - AssertionError: assert ['https://pus...e.test/u5/a2'] == ['https://pus...e.test/u5/b1']
+6 failed, 156 passed in 6.21s
+
+### 변이: V5-2-no-exception-isolation
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[python] - RuntimeError: simulated failure
+FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[db] - sqlalchemy.exc.DataError: (psycopg.errors.DivisionByZero) division b
+2 failed, 160 passed in 6.29s
+
+### 변이: V5-2b-no-savepoint
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[python] - assert 1 == 0
+FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[db] - sqlalchemy.exc.InternalError: (psycopg.errors.InFailedSqlTransaction
+2 failed, 160 passed in 6.30s
+
+### 변이: V5-3a-no-other-user-delete
+pytest exit=1
+FAILED tests/test_push_endpoint_owner.py::test_second_account_subscribing_same_endpoint_takes_it_over - AssertionError: assert [('u5push-a',...ed-endpoint')] == [('u5push-b',...ed-endpoint')]
+FAILED tests/test_push_endpoint_owner.py::test_takeover_leaves_other_endpoints_of_the_old_account - AssertionError: assert [('u5push-a',...ed-endpoint')] == [('u5push-a',...ed-endpoint')]
+FAILED tests/test_push_endpoint_owner.py::test_other_accounts_schedule_briefing_is_not_pushed_to_taken_over_endpoint - AssertionError: assert ['sent'] == ['no_subscription']
+FAILED tests/test_push_endpoint_owner.py::test_logout_does_not_delete_another_accounts_row_with_same_endpoint - AssertionError: assert [('u5push-a',...ed-endpoint')] == [('u5push-b',...ed-endpoint')]
+FAILED tests/test_push_subscriptions.py::test_save_subscription_same_endpoint_different_user_takes_over_the_endpoint - assert [<app.db.mode... 0x10d8eb950>] == []
+5 failed, 157 passed in 6.38s
+
+### 변이: V5-3b-delete-own-too
+pytest exit=1
+FAILED tests/test_push_endpoint_owner.py::test_same_account_resubscribing_keeps_one_row_and_created_false - assert 6462 == 6461
+FAILED tests/test_push_subscriptions.py::test_create_subscription_same_endpoint_updates_keys_without_new_row - assert True is False
+2 failed, 160 passed in 6.31s
+
+### 변이: V5-3c-delete-all-others-endpoints
+pytest exit=1
+FAILED tests/test_push_endpoint_owner.py::test_takeover_leaves_other_endpoints_of_the_old_account - AssertionError: assert [('u5push-b',...ed-endpoint')] == [('u5push-a',...ed-endpoint')]
+FAILED tests/test_push_endpoint_owner.py::test_logout_without_endpoint_or_body_keeps_subscriptions - AssertionError: assert [('u5push-b',...er-endpoint')] == [('u5push-a',...er-endpoint')]
+2 failed, 160 passed in 6.47s
+
+### 변이: V5-4-logout-no-delete
+pytest exit=1
+FAILED tests/test_push_endpoint_owner.py::test_logout_with_endpoint_deletes_that_users_row_and_keeps_other_endpoints - AssertionError: assert [('u5push-a',...ed-endpoint')] == [('u5push-a',...er-endpo
+1 failed, 161 passed in 6.55s
+
+### 변이: V5-4b-delete-no-user-filter
+pytest exit=1
+FAILED tests/test_push_endpoint_owner.py::test_logout_does_not_delete_another_accounts_row_with_same_endpoint - AssertionError: assert [] == [('u5push-b',...ed-endpoint')]
+1 failed, 161 passed in 6.56s
+
+### 변이: V5-4c-delete-no-endpoint-filter
+pytest exit=1
+FAILED tests/test_push_endpoint_owner.py::test_logout_with_endpoint_deletes_that_users_row_and_keeps_other_endpoints - AssertionError: assert [] == [('u5push-a',...er-endpoint')]
+1 failed, 161 passed in 6.42s
+
+### 변이: V5-4d-no-nul-guard
+pytest exit=1
+FAILED tests/test_auth_api.py::test_logout_endpoint_input_never_causes_a_server_error[\x00] - assert 500 in (204, 422)
+FAILED tests/test_auth_api.py::test_logout_endpoint_input_never_causes_a_server_error[a\x00b] - assert 500 in (204, 422)
+2 failed, 160 passed in 6.52s
+
+### 변이: V5-4e-logout-ignores-empty-guard
+pytest exit=1
+FAILED tests/test_push_endpoint_owner.py::test_logout_without_endpoint_or_body_keeps_subscriptions - TypeError: argument of type 'NoneType' is not a container or iterable
+FAILED tests/test_auth_api.py::test_logout_without_body_is_accepted - AttributeError: 'NoneType' object has no attribute 'endpoint'
+FAILED tests/test_auth_api.py::test_logout_removes_only_that_session - AttributeError: 'NoneType' object has no attribute 'endpoint'
+FAILED tests/test_auth_api.py::test_auth_endpoints_write_no_agent_traces - AttributeError: 'NoneType' object has no attribute 'endpoint'
+FAILED tests/test_auth_api.py::test_logout_endpoint_input_never_causes_a_server_error[None] - assert 500 in (204, 422)
+FAILED tests/test_auth_api.py::test_logout_clear_cookie_keeps_secure_and_plain_name_when_off - AttributeError: 'NoneType' object has no attribute 'endpoint'
+6 failed, 156 passed in 6.55s
+
+### 변이: V5-5-zero-no-run
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_out_of_window_and_already_briefed_schedules_are_not_processed - AssertionError: assert [] == ['']
+FAILED tests/test_briefing_scheduler_users.py::test_zero_targets_calls_run_briefings_once_with_empty_marker_user - assert 0 == 1
+FAILED tests/test_briefing_scheduler_users.py::test_zero_targets_leave_exactly_one_briefing_run_trace_in_old_format - assert 0 == (0 + 1)
+FAILED tests/test_briefing_scheduler.py::test_manual_endpoint_and_scheduler_call_the_same_run_briefings_object - AssertionError: assert 1 == 2
+FAILED tests/test_push_wiring.py::test_scheduler_passes_null_notifier_without_keys - KeyError: 'kwargs'
+FAILED tests/test_push_wiring.py::test_scheduler_passes_misconfigured_notifier_with_half_keys - KeyError: 'kwargs'
+... 외 1건
+7 failed, 155 passed in 6.63s
+
+### 변이: V5-5b-marker-local
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_out_of_window_and_already_briefed_schedules_are_not_processed - AssertionError: assert ['local'] == ['']
+FAILED tests/test_briefing_scheduler_users.py::test_zero_targets_calls_run_briefings_once_with_empty_marker_user - AssertionError: assert 'local' == ''
+FAILED tests/test_push_wiring.py::test_scheduler_passes_web_push_notifier_sharing_session_user_and_clock - AssertionError: assert 'local' == ''
+3 failed, 159 passed in 6.57s
+
+### 변이: V5-5c-marker-always
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_one_run_briefs_both_users_schedules - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+FAILED tests/test_briefing_scheduler_users.py::test_each_user_gets_own_ctx_and_exactly_one_call - AssertionError: assert [''] == ['u5sched-a', 'u5sched-b']
+FAILED tests/test_briefing_scheduler_users.py::test_window_boundaries_are_inclusive_at_lead_hours_and_exclude_one_minute_later - AssertionError: assert [''] == ['u5sched-a', 'u5sched-c']
+FAILED tests/test_briefing_scheduler_users.py::test_window_comes_from_settings_at_call_time_for_both_list_and_run - AssertionError: assert [''] == ['u5sched-a']
+FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[python] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=date
+FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[db] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime
+... 외 5건
+11 failed, 151 passed in 6.52s
+
+### 변이: V5-6a-list-window-literal-24
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_window_comes_from_settings_at_call_time_for_both_list_and_run - AssertionError: assert ['u5sched-a', 'u5sched-b'] == ['u5sched-a']
+1 failed, 161 passed in 6.58s
+
+### 변이: V5-6b-run-lead-literal-24
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_window_comes_from_settings_at_call_time_for_both_list_and_run - assert 24 == 2
+1 failed, 161 passed in 6.49s
+
+### 변이: V5-6c-lead-read-at-import
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_window_comes_from_settings_at_call_time_for_both_list_and_run - AssertionError: assert ['u5sched-a', 'u5sched-b'] == ['u5sched-a']
+1 failed, 161 passed in 6.46s
+
+### 변이: V5-7a-start-exclusive
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_window_boundaries_are_inclusive_at_lead_hours_and_exclude_one_minute_later - AssertionError: assert ['u5sched-a'] == ['u5sched-a', 'u5sched-c']
+1 failed, 161 passed in 6.47s
+
+### 변이: V5-7b-end-exclusive
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_window_boundaries_are_inclusive_at_lead_hours_and_exclude_one_minute_later - AssertionError: assert ['u5sched-c'] == ['u5sched-a', 'u5sched-c']
+FAILED tests/test_briefing_scheduler_users.py::test_window_comes_from_settings_at_call_time_for_both_list_and_run - AssertionError: assert [''] == ['u5sched-a']
+2 failed, 160 passed in 6.52s
+
+### 변이: V5-8-no-briefed-filter
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_out_of_window_and_already_briefed_schedules_are_not_processed - AssertionError: assert ['u5sched-c'] == ['']
+1 failed, 161 passed in 6.50s
+
+### 변이: V5-9-no-distinct
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_each_user_gets_own_ctx_and_exactly_one_call - AssertionError: assert ['u5sched-a',..., 'u5sched-b'] == ['u5sched-a', 'u5sched-b']
+1 failed, 161 passed in 6.60s
+
+### 변이: V5-10-notifier-fixed-user
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_notifier_sends_only_to_each_users_own_subscriptions - AssertionError: assert ['https://pus...e.test/u5/a2'] == ['https://pus...e.test/u5/b1']
+FAILED tests/test_push_wiring.py::test_scheduler_passes_web_push_notifier_sharing_session_user_and_clock - AssertionError: assert 'u5sched-a' == ''
+FAILED tests/test_push_wiring.py::test_scheduler_end_to_end_sends_and_records - assert 0 == 1
+3 failed, 159 passed in 6.56s
+
+### 변이: V5-11-ctx-no-now
+pytest exit=1
+FAILED tests/test_briefing_scheduler_users.py::test_one_run_briefs_both_users_schedules - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[python] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=date
+FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[db] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime
+FAILED tests/test_briefing_scheduler_users.py::test_notifier_sends_only_to_each_users_own_subscriptions - AssertionError: assert [] == ['https://pus...e.test/u5/b1']
+FAILED tests/test_briefing_scheduler_users.py::test_other_users_subscription_is_not_used_for_a_users_schedule - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+5 failed, 157 passed in 6.52s
+
+### 변이: V5-R2-get_notifier-fixed-user
+pytest exit=1
+FAILED tests/test_push_endpoint_owner.py::test_other_accounts_schedule_briefing_is_not_pushed_to_taken_over_endpoint - AssertionError: assert ['failed'] == ['no_subscription']
+FAILED tests/test_push_endpoint_owner.py::test_manual_briefing_notifier_uses_logged_in_account_subscriptions_only - AssertionError: assert ['failed'] == ['sent']
+FAILED tests/test_push_endpoint_owner.py::test_get_notifier_builds_notifier_for_the_given_logged_in_user - AssertionError: assert 'local' == 'u5push-notifier-user'
+3 failed, 159 passed in 6.44s
+
+### 변이: VV-1-max-2001
+pytest exit=1
+FAILED tests/test_chat_history.py::test_utterance_of_exactly_2000_chars_is_accepted_and_2001_is_rejected_with_no_side_effects - assert 200 == 422
+1 failed, 161 passed in 6.57s
+
+### 변이: VV-2-max-1999
+pytest exit=1
+FAILED tests/test_chat_history.py::test_utterance_of_exactly_2000_chars_is_accepted_and_2001_is_rejected_with_no_side_effects - assert 422 == 200
+1 failed, 161 passed in 6.47s
+
+### 변이: VV-3-no-max
+pytest exit=1
+FAILED tests/test_chat_history.py::test_utterance_of_exactly_2000_chars_is_accepted_and_2001_is_rejected_with_no_side_effects - assert 200 == 422
+1 failed, 161 passed in 6.67s
+
+### 변이: VV-4-no-min
+pytest exit=1
+FAILED tests/test_chat_history.py::test_existing_chat_validation_unchanged_empty_utterance_still_422 - assert 200 == 422
+1 failed, 161 passed in 6.48s
+

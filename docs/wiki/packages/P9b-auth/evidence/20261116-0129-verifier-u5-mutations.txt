@@ -1,0 +1,156 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu5/run-mut.sh
+# 시각: 2026-11-16T01:29:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a25123b (dev2)
+# exit: 0
+# ---
+### 변이: BASE
+pytest exit=0
+저장소 시험 실패 3건 · 탐침 실패 0건
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+   ......................................................................................................................................PROBE-LOG message has param: False
+   PROBE-LOG traceback has param: True
+   142 passed in 5.69s
+판정: 기준선 통과
+
+### 변이: VM-1-break-after-first-failure
+pytest exit=1
+저장소 시험 실패 7건 · 탐침 실패 1건
+  [저장소] ERROR    app.briefing.scheduler:scheduler.py:178 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR    app.briefing.scheduler:scheduler.py:178 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[python] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[db] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_failure_isolated_in_both_directions[u5sched-a-u5sched-b] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+   ......FF..........................................................................................................................F...PROBE-LOG message has param: False
+   PROBE-LOG traceback has param: True
+   3 failed, 139 passed in 5.64s
+판정: 잡힘(저장소 시험)
+
+### 변이: VM-2-isolate-only-runtimeerror
+pytest exit=1
+저장소 시험 실패 2건 · 탐침 실패 1건
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[db] - sqlalchemy.exc.DataError: (psycopg.errors.DivisionByZero) division by zero
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_failure_log_exposes_db_parameters - sqlalchemy.exc.DataError: (psycopg.errors.InvalidTextRepresentation) invalid input syntax for type integer: "비밀본문-PROBE"
+   2 failed, 140 passed in 5.70s
+판정: 잡힘(저장소 시험)
+
+### 변이: VM-3-list-join-condition-always-true
+pytest exit=1
+저장소 시험 실패 5건 · 탐침 실패 0건
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_window_boundaries_are_inclusive_at_lead_hours_and_exclude_one_minute_later - AssertionError: assert ['u5sched-a',..., 'u5sched-c'] == ['u5sched-a', 'u5sched-c']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_window_comes_from_settings_at_call_time_for_both_list_and_run - AssertionError: assert ['u5sched-b', 'u5sched-a'] == ['u5sched-a']
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+   ...FF.................................................................................................................................PROBE-LOG message has param: False
+   PROBE-LOG traceback has param: True
+   2 failed, 140 passed in 5.71s
+판정: 잡힘(저장소 시험)
+
+### 변이: VM-4-list-uses-real-clock
+pytest exit=1
+저장소 시험 실패 10건 · 탐침 실패 3건
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_run_briefs_both_users_schedules - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_each_user_gets_own_ctx_and_exactly_one_call - AssertionError: assert [''] == ['u5sched-a', 'u5sched-b']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_window_boundaries_are_inclusive_at_lead_hours_and_exclude_one_minute_later - AssertionError: assert [''] == ['u5sched-a', 'u5sched-c']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_window_comes_from_settings_at_call_time_for_both_list_and_run - AssertionError: assert [''] == ['u5sched-a']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[python] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[db] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_notifier_sends_only_to_each_users_own_subscriptions - AssertionError: assert [] == ['https://pus...e.test/u5/b1']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_other_users_subscription_is_not_used_for_a_users_schedule - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_or_more_targets_never_call_the_marker_ctx - AssertionError: assert [''] == ['u5sched-a']
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_failure_isolated_in_both_directions[u5sched-a-u5sched-b] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_failure_isolated_in_both_directions[u5sched-b-u5sched-a] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_two_users_leave_one_briefing_run_row_each_and_no_marker_row - assert 1 == 2
+   FF.FF.FFFF..F.....................................................................................................................FF.FPROBE-LOG message has param: False
+   PROBE-LOG traceback has param: True
+   12 failed, 130 passed in 5.61s
+판정: 잡힘(저장소 시험)
+
+### 변이: VM-5-list-no-upper-bound
+pytest exit=1
+저장소 시험 실패 6건 · 탐침 실패 0건
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_out_of_window_and_already_briefed_schedules_are_not_processed - AssertionError: assert ['u5sched-a'] == ['']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_window_boundaries_are_inclusive_at_lead_hours_and_exclude_one_minute_later - AssertionError: assert ['u5sched-a',..., 'u5sched-c'] == ['u5sched-a', 'u5sched-c']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_window_comes_from_settings_at_call_time_for_both_list_and_run - AssertionError: assert ['u5sched-a', 'u5sched-b'] == ['u5sched-a']
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+   ..FFF.................................................................................................................................PROBE-LOG message has param: False
+   PROBE-LOG traceback has param: True
+   3 failed, 139 passed in 5.78s
+판정: 잡힘(저장소 시험)
+
+### 변이: VM-6-logout-with-endpoint-skips-session-delete
+pytest exit=1
+저장소 시험 실패 4건 · 탐침 실패 5건
+  [저장소] FAILED tests/test_auth_api.py::test_logout_204_no_body_clears_cookie_and_deletes_row - IndexError: list index out of range
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_logout_with_odd_endpoint_still_logs_out_and_keeps_rows[https://x.test/\x00] - assert 2 == (2 - 1)
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_logout_with_odd_endpoint_still_logs_out_and_keeps_rows[\x00] - assert 2 == (2 - 1)
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_logout_with_odd_endpoint_still_logs_out_and_keeps_rows[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_logout_with_odd_endpoint_still_logs_out_and_keeps_rows[not-a-url] - assert 2 == (2 - 1)
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_logout_with_odd_endpoint_still_logs_out_and_keeps_rows[https://x.test/\ud55c\uae00] - assert 2 == (2 - 1)
+   ..................................................................................F...................................................PROBE-LOG message has param: False
+   PROBE-LOG traceback has param: True
+   6 failed, 136 passed in 5.70s
+판정: 잡힘(저장소 시험)
+
+### 변이: VM-7-guard-drops-nul-check
+pytest exit=1
+저장소 시험 실패 5건 · 탐침 실패 2건
+  [저장소] FAILED tests/test_auth_api.py::test_logout_endpoint_input_never_causes_a_server_error[\x00] - assert 500 in (204, 422)
+  [저장소] FAILED tests/test_auth_api.py::test_logout_endpoint_input_never_causes_a_server_error[a\x00b] - assert 500 in (204, 422)
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [저장소] ERROR [app.briefing.scheduler] 브리핑 실행 중 예외가 났습니다 user_id=u5sched-a
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_logout_with_odd_endpoint_still_logs_out_and_keeps_rows[https://x.test/\x00] - sqlalchemy.exc.DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_logout_with_odd_endpoint_still_logs_out_and_keeps_rows[\x00] - sqlalchemy.exc.DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes
+   ...................................................................................................................FF.................PROBE-LOG message has param: False
+   PROBE-LOG traceback has param: True
+   4 failed, 138 passed in 5.67s
+판정: 잡힘(저장소 시험)
+
+### 변이: VM-8-ctx-user-is-marker
+pytest exit=1
+저장소 시험 실패 12건 · 탐침 실패 3건
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_run_briefs_both_users_schedules - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_each_user_gets_own_ctx_and_exactly_one_call - AssertionError: assert ['', ''] == ['u5sched-a', 'u5sched-b']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_window_boundaries_are_inclusive_at_lead_hours_and_exclude_one_minute_later - AssertionError: assert ['', ''] == ['u5sched-a', 'u5sched-c']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_window_comes_from_settings_at_call_time_for_both_list_and_run - AssertionError: assert [''] == ['u5sched-a']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[python] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_users_failure_does_not_block_other_user_and_rolls_back_partial_writes[db] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_notifier_sends_only_to_each_users_own_subscriptions - AssertionError: assert [] == ['https://pus...e.test/u5/b1']
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_other_users_subscription_is_not_used_for_a_users_schedule - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [저장소] FAILED tests/test_briefing_scheduler_users.py::test_one_or_more_targets_never_call_the_marker_ctx - AssertionError: assert [''] == ['u5sched-a']
+  [저장소] FAILED tests/test_push_wiring.py::test_scheduler_end_to_end_sends_and_records - assert 0 == 1
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_failure_isolated_in_both_directions[u5sched-a-u5sched-b] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_failure_isolated_in_both_directions[u5sched-b-u5sched-a] - assert None == datetime.datetime(2026, 11, 20, 9, 0, tzinfo=datetime.timezone.utc)
+  [탐침] FAILED tests/test_vprobe_u5.py::test_probe_two_users_leave_one_briefing_run_row_each_and_no_marker_row - assert False
+   FF.FF.FFFF..F......................FF.............................................................................................FF.FPROBE-LOG message has param: False
+   PROBE-LOG traceback has param: True
+   14 failed, 128 passed in 5.65s
+판정: 잡힘(저장소 시험)
+
+### 저장소 무수정 확인(작업 트리 상태가 검토 시작 때와 같다)
+ M app/api/schemas.py
+ M app/auth/routes.py
+ M app/briefing/scheduler.py
+ M app/push/subscriptions.py
+ M app/settings.py
+ M tests/test_api_read_briefings_e2e.py
+ M tests/test_chat_history.py
+ M tests/test_push_subscriptions.py
+ M tests/test_push_wiring.py
+D  tests/test_settings.py
+?? tests/test_briefing_scheduler_users.py
+?? tests/test_push_endpoint_owner.py

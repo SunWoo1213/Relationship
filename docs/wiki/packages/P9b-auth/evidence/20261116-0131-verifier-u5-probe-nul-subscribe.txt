@@ -1,0 +1,12 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/vu5/run-nul.sh
+# 시각: 2026-11-16T01:31:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: a25123b (dev2)
+# exit: 0
+# ---
+### 작업 트리(U5) 사본
+PROBE-NUL raised: DataError
+1 passed in 0.48s
+### subscriptions.py 만 HEAD 판으로 되돌린 사본(U5 이전 동작)
+PROBE-NUL raised: DataError
+1 passed in 0.45s

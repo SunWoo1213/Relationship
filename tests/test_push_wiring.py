@@ -340,7 +340,8 @@ def test_scheduler_passes_web_push_notifier_sharing_session_user_and_clock(
     ctx = captured["ctx"]
     assert isinstance(notifier, WebPushNotifier)
     assert notifier.session is ctx.session is scheduler_env
-    assert notifier.user_id == ctx.user_id == "local"
+    # 일정이 없으면 대상 0명 -- 어느 계정과도 겹치지 않는 표식 `""` ctx(결정 U)
+    assert notifier.user_id == ctx.user_id == ""
     assert notifier.now is ctx.now
     assert notifier.sender is sender
 

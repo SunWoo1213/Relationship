@@ -13,7 +13,7 @@
 - 로그인 실패는 없는 아이디도 **더미 해시 검증을 한 번 돌려** 응답 시간 차를 줄인다.
 - 로그·trace·응답·예외 메시지에 비밀번호·토큰 0(D18 지킬 것 3). `/auth/*` 는
   `agent_traces` 를 쓰지 않는다(판정이 아니다, 원칙9 절).
-- `/auth/logout` 의 `endpoint`(푸시 구독 삭제)는 U5 에서 연결한다 -- 이 단위는 받기만 한다.
+- `/auth/logout` 의 `endpoint` 가 있으면 그 사용자의 그 푸시 구독 행을 지운다(U5).
 """
 
 from __future__ import annotations
@@ -44,6 +44,7 @@ from app.auth.sessions import (
     set_login_cookie,
 )
 from app.db.models import User
+from app.push.subscriptions import delete_subscription
 from app.db.session import get_session
 from app.settings import PASSWORD_MAX_LEN, PASSWORD_MIN_LEN, USERNAME_PATTERN
 
@@ -152,7 +153,9 @@ def logout(
     user: User = Depends(current_user),
     session: Session = Depends(get_session),
 ) -> Response:
-    # `body.endpoint`(푸시 구독 삭제)는 U5 에서 연결한다.
+    # (U5) endpoint 가 오면 그 사용자의 그 브라우저 구독 행을 뗀다(같은 트랜잭션).
+    if body is not None and body.endpoint:
+        delete_subscription(session, user.id, body.endpoint)
     token = request.cookies.get(cookie_name())
     if token:
         delete_session(session, token)

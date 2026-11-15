@@ -1,9 +1,8 @@
 """Refs: P2-tools S3.2 S3.3 D5 FIX-005 -- 런타임 설정값의 단일 출처.
 
 이 모듈이 `.env` 를 읽지 않는 이유(security.md §1): 비밀·설정은 `os.environ`
-으로만 읽는다. `.env` 파일 자체는 존재 확인도 하지 않는다. `APP_USER_ID`
-가 없으면 로컬 단일 사용자 기본값 `"local"` 을 쓴다(01-plan 결정 9,
-`.env.example` 에 이름만 추가).
+으로만 읽는다. `.env` 파일 자체는 존재 확인도 하지 않는다. 사용자 식별자는
+환경변수가 아니라 로그인한 계정에서 온다(P9b-auth, 고정 사용자 폐지).
 
 `session_id` 기본 생성 helper(대화 세션을 여는 쪽의 책임)는 U2 이후
 (`ToolContext`/FastAPI 요청 조립부)에서 만든다 -- 이 모듈은 값 하나만 다룬다.
@@ -39,7 +38,7 @@ DB 는 계속 UTC(`timestamptz`)로 저장한다 -- 이 설정은 "사람이 말
 오프셋 없이 준 ISO 8601 문자열 보정)에서만 쓰인다. `ctx.now()` 자체와
 DB 저장 방식은 이 설정과 무관하다(`app/agent/loop.py`·`app/agent/
 propose.py` 의 각 모듈 docstring "사용자 시간대" 절 참고). 기본값
-`Asia/Seoul` 은 단일 사용자 전제(`APP_USER_ID` 고정)에 맞춘 설정값
+`Asia/Seoul` 은 단일 시간대 전제(계정별 시간대 없음)에 맞춘 설정값
 하나다 -- 사용자별 시간대 컬럼은 다중 사용자 격리와 함께 다룰 몫이다.
 
 ## PATTERN_* / MEMORY_PROMOTE_* (D14 -- CR-002, S3.5, P6-memory U1)
@@ -103,8 +102,6 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 if TYPE_CHECKING:  # pragma: no cover -- 순환 import 회피, 타입 힌트 전용.
     from app.er.types import ERConfig
     from app.push.types import VapidConfig, _VapidPartial
-
-DEFAULT_APP_USER_ID = "local"
 
 #: 사용자 발화의 상대 시각을 해석하는 기준 IANA 시간대 이름(FIX-005).
 #: `.env.example` 의 `APP_TIMEZONE` 이 이 값을 오버라이드한다(`user_
@@ -319,8 +316,8 @@ def pattern_config(env: dict[str, str] | None = None) -> PatternConfig:
     하나로 묶어 돌려주는 이유는 모듈 docstring "PATTERN_* /
     MEMORY_PROMOTE_*" 절을 본다.
 
-    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/`er_config()`
-    와 같은 규약). `.env` 파일 자체는 읽지 않는다(security.md §1).
+    `env` 를 생략하면 `os.environ` 을 읽는다(`er_config()` 와 같은 규약).
+    `.env` 파일 자체는 읽지 않는다(security.md §1).
     """
     if env is None:
         env = dict(os.environ)
@@ -347,8 +344,7 @@ def briefing_scheduler_enabled(env: dict[str, str] | None = None) -> bool:
     오류를 낸다(`pattern_config()`/`er_config()` 와 같은 관례 -- 잘못
     설정한 줄 모르고 배포하는 것을 막는다, 원칙8).
 
-    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/
-    `pattern_config()` 와 같은 규약). `.env` 파일 자체는 읽지 않는다
+    `env` 를 생략하면 `os.environ` 을 읽는다(`pattern_config()` 와 같은 규약). `.env` 파일 자체는 읽지 않는다
     (security.md §1).
     """
     from app.tools.types import InvalidValue  # 지연 import -- 다른 settings 함수와 같은 관례.
@@ -378,8 +374,7 @@ def vapid_config(env: dict[str, str] | None = None) -> "VapidConfig | _VapidPart
     어떻게 쓰는지 책임진다. 앱 기동은 이 함수를 부르지 않는다(결정 D
     "앱 기동은 막지 않는다 -- 키는 브리핑이 돌 때 지연해서 읽는다").
 
-    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()`/`pattern_
-    config()` 와 같은 규약). `.env` 파일 자체는 읽지 않는다(security.md
+    `env` 를 생략하면 `os.environ` 을 읽는다(`pattern_config()` 와 같은 규약). `.env` 파일 자체는 읽지 않는다(security.md
     §1).
     """
     from app.push.types import VAPID_PARTIAL, VapidConfig  # 지연 import -- 순환 import 회피.
@@ -432,7 +427,7 @@ def er_config(env: dict[str, str] | None = None) -> "ERConfig":
     함수는 **문자열 파싱 실패**(`float` 변환 실패·허용 어휘 밖 값)에도
     같은 예외를 사람이 읽는 메시지로 던진다.
 
-    `env` 를 생략하면 `os.environ` 을 읽는다(`app_user_id()` 와 같은 규약).
+    `env` 를 생략하면 `os.environ` 을 읽는다(다른 설정 함수와 같은 규약).
     `.env` 파일 자체는 읽지 않는다(security.md §1).
     """
     from app.er.types import ERConfig  # 지연 import -- 순환 import 회피.
@@ -489,7 +484,7 @@ def er_config(env: dict[str, str] | None = None) -> "ERConfig":
 def user_timezone(env: dict[str, str] | None = None) -> ZoneInfo:
     """`APP_TIMEZONE` 환경변수(없으면 `DEFAULT_APP_TIMEZONE = "Asia/Seoul"`)
     를 IANA 시간대로 해석한다(FIX-005). 잘못된 이름이면 조용히 UTC 로
-    되돌아가지 않고 사람이 읽는 오류를 낸다 -- `app_user_id()`/`er_config()`
+    되돌아가지 않고 사람이 읽는 오류를 낸다 -- `er_config()`
     와 같은 `env` 인자 규약(생략하면 `os.environ`, `.env` 파일 자체는 읽지
     않는다, security.md §1)."""
     from app.tools.types import InvalidValue  # 지연 import -- 다른 settings 함수와 같은 관례.
@@ -549,15 +544,3 @@ def auth_cookie_secure(env: dict[str, str] | None = None) -> bool:
         "environment variable 'AUTH_COOKIE_SECURE' must be '1'/'true' (secure, default), "
         f"'0'/'false' (local http only), or empty (got {raw!r})"
     )
-
-
-def app_user_id(env: dict[str, str] | None = None) -> str:
-    """`APP_USER_ID` 환경변수를 읽는다. 없으면 `"local"`.
-
-    `env` 를 생략하면 `os.environ` 을 읽는다(실제 실행 경로). 테스트는 평범한
-    dict 를 직접 넘겨 `os.environ` 을 건드리지 않고 이 함수를 검증한다
-    (app.config.resolve_connection 과 같은 방식).
-    """
-    if env is None:
-        env = dict(os.environ)
-    return env.get("APP_USER_ID", DEFAULT_APP_USER_ID)

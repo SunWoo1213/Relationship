@@ -87,7 +87,7 @@ def test_create_subscription_persists_row_with_user_and_keys(app_and_client, db_
     assert len(rows) == 1
     row = rows[0]
     assert row.id == row_id
-    assert row.user_id == "local"  # app_user_id() 기본값(APP_USER_ID 미설정)
+    assert row.user_id == "local"  # 로그인 사용자(기본 테스트 사용자 "local")
     assert row.endpoint == _VALID_ENDPOINT
     assert row.keys == _VALID_KEYS
 
@@ -224,13 +224,15 @@ def test_list_subscriptions_only_returns_own_user(db_session):
     assert [row.id for row in rows] == [mine.id]
 
 
-def test_list_subscriptions_same_endpoint_different_users_are_separate_rows(db_session):
-    """같은 엔드포인트라도 `user_id` 가 다르면 별개 행이다(결정 F(i)는
-    `(user_id, endpoint)` 조합 기준)."""
+def test_save_subscription_same_endpoint_different_user_takes_over_the_endpoint(db_session):
+    """(P9b-auth U5, 결정 P) 같은 엔드포인트를 다른 `user_id` 가 구독하면 이전 사용자의
+    그 endpoint 행은 지워지고 마지막 구독 계정 하나만 남는다(옛 결정 F(i)의
+    `(user_id, endpoint)` 별개 행 계약을 이 단위가 대체했다)."""
     endpoint = "https://example.com/fcm/shared"
     first = save_subscription(db_session, "user-a", endpoint, {"p256dh": "p", "auth": "a"})
     second = save_subscription(db_session, "user-b", endpoint, {"p256dh": "p2", "auth": "a2"})
 
     assert first.id != second.id
-    assert [row.id for row in list_subscriptions(db_session, "user-a")] == [first.id]
+    assert second.created is True
+    assert list_subscriptions(db_session, "user-a") == []
     assert [row.id for row in list_subscriptions(db_session, "user-b")] == [second.id]

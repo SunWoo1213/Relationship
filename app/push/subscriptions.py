@@ -13,6 +13,10 @@
 keys` 한 문장으로 끝내 두 요청이 동시에 같은 구독을 보내도 중복 행이
 생기지 않는다 -- 조회 후 분기하지 않는다.
 
+(P9b-auth U5, 결정 P) 저장 전에 **같은 endpoint 의 다른 사용자 행을 지운다** --
+endpoint 는 마지막 구독 계정 하나에만 묶인다. `delete_subscription`: 로그아웃 시
+그 사용자의 그 endpoint 행 삭제.
+
 `list_subscriptions`: `user_id` 조건이 **항상** 걸린다(security.md §5
 "모든 조회는 user_id 조건" -- 판정 표 5행 "사용자 격리"). `WebPushNotifier`
 (U4)가 발송 대상 구독을 모을 때 이 함수를 쓴다.
@@ -29,7 +33,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from sqlalchemy import literal_column, select
+from sqlalchemy import delete, literal_column, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
@@ -56,6 +60,15 @@ def save_subscription(
     돌려준다. `INSERT ... ON CONFLICT DO UPDATE` 한 문장이라 조회 후
     분기하지 않는다 -- 두 요청이 동시에 와도 중복 행이 생기지 않는다."""
 
+    # (P9b-auth U5, 결정 P) 같은 endpoint 는 마지막으로 구독한 계정 하나에만 묶는다 --
+    # 같은 브라우저에서 다른 계정으로 바꿔 구독하면 이전 계정의 그 endpoint 행을 지운다.
+    # 이전 계정의 일정 알림이 새 계정의 화면으로 가지 않게 한다.
+    session.execute(
+        delete(PushSubscription)
+        .where(PushSubscription.endpoint == endpoint)
+        .where(PushSubscription.user_id != user_id)
+    )
+
     stmt = (
         pg_insert(PushSubscription)
         .values(user_id=user_id, endpoint=endpoint, keys=dict(keys))
@@ -68,6 +81,30 @@ def save_subscription(
     row = session.execute(stmt).one()
     session.flush()
     return SavedSubscription(id=row.id, created=row.inserted)
+
+
+def delete_subscription(session: Session, user_id: str, endpoint: str) -> int:
+    """그 사용자(`user_id`)의 그 `endpoint` 행을 지운다(로그아웃 시 그 브라우저 구독
+    떼기, P9b-auth U5). 다른 사용자의 같은 endpoint 행·그 사용자의 다른 endpoint 는
+    건드리지 않는다. 지운 행 수를 돌려준다. `flush()` 까지만 한다(커밋은 호출자).
+
+    NUL 문자나 UTF-8 로 못 바꾸는 값(짝 없는 서로게이트)은 저장된 구독 endpoint 가 될 수
+    없으므로(구독 저장 검증 통과 불가) DB 에 보내지 않고 0 을 돌려준다 -- 로그아웃이
+    500 이 되지 않게 한다."""
+
+    if "\x00" in endpoint:
+        return 0
+    try:
+        endpoint.encode("utf-8")
+    except UnicodeEncodeError:
+        return 0
+    result = session.execute(
+        delete(PushSubscription)
+        .where(PushSubscription.user_id == user_id)
+        .where(PushSubscription.endpoint == endpoint)
+    )
+    session.flush()
+    return int(result.rowcount or 0)  # type: ignore[attr-defined]
 
 
 def list_subscriptions(session: Session, user_id: str) -> list[PushSubscription]:
