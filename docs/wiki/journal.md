@@ -622,3 +622,5 @@
 - 2026-11-14 15:49 | PUSH-dev2 | origin dev2 e9f94fa (실험 푸시)
 - 2026-11-15 19:07 | COMMIT | 92bd3b9 docs(P9-infra): OpenAI 월 한도 $10 강제 설정과 sslip.io 결정을 할 일 문서에 적는다
 - 2026-11-15 19:07 | PUSH-dev2 | origin dev2 92bd3b9 (실험 푸시)
+- 2026-11-15 19:26 | COMMIT | 1c003af docs(P9-infra): AWS 비용 알림 3개와 Terraform 전용 IAM 사용자 생성을 기록한다
+- 2026-11-15 19:26 | PUSH-dev2 | origin dev2 1c003af (실험 푸시)
