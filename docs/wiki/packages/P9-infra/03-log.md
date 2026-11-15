@@ -60,3 +60,10 @@
 - 정합성 확인: security §1(계정 ID·키·메일 주소 기록 없음) · D17 6 "Budgets 알림을 EC2 생성 전에" 충족 · 제품 코드 무변경.
 - 남은 것 · 다음 단위: 사용자 — 액세스 키 발급·`aws configure`·ssh-keygen·VAPID·OpenAI 키 → "띄워 달라" → U4.
 - Refs: P9-infra CR-005 D17 security
+
+## 2026-11-15 · infra(P9-infra): 시드니 리전 EC2 에 실제로 띄우고 바깥 스모크를 통과시킨다 · pending (U4, 사용자 apply·기동 + 메인 plan·스모크)
+- 변경: 코드 0. 사용자 결정: 루트 계정 그대로 · VAPID·OpenAI 키는 로컬 값 재사용(`2635ff1`·`a06f6ad`). 메인이 AWS CLI 설치(brew) · `fmt -check`·`init`·`validate` · plan. **서울 plan 403** — 간편 가입 계정의 조직 정책이 시드니(`ap-southeast-2`) 외 리전 EC2 호출을 거부(공식 문서: 한국 연락처 → 시드니 고정, 서울은 "고급 기능 활성화" 필요·되돌릴 수 없음) → `-var region=ap-southeast-2` 로 plan `5 to add`. `infra/terraform.tfvars` 는 Read deny 라 `-var` 로 넘김. 사용자 apply → EIP·`54-79-202-221.sslip.io` → 사용자가 서버에서 `git checkout 843e6e7`·`.env` 전송(16줄 — 로컬 `.env` 중복 이름 2개)·`compose up -d --build`.
+- 결과: `ps` — backend·caddy·postgres Up, postgres healthy, 호스트 포트는 caddy 80/443 뿐(사용자 붙여 줌). 바깥 스모크(메인): S1 `{"status":"ok","db":"up","alembic_revision":"0002"}` · S2 200 `text/html` · S4 `sw.js` `no-cache`·manifest `application/manifest+json` · S10 `/api/docs`·`/api/openapi.json`·`/api/redoc` 404 · S3 308 → https. evidence `20261115-1950-u4-smoke-public.txt`. plan 전체 출력은 계정 ID·IP·공개키가 있어 저장하지 않음.
+- 정합성 확인: D17 1·2·3·4 · security §1(값 0)·§4(apply 는 사용자) · 제품 코드 무변경. 리전은 D17·01-plan 이 서울을 못 박지 않았는지 04-review 에서 대조(변수 기본값만 서울).
+- 남은 것 · 다음 단위: 사용자 데모 5단계·backend 로그 Traceback 0 → 11·12 문서 리전 반영 → verify-impl → 04-review(verifier) → 완성 확인.
+- Refs: P9-infra CR-005 D17 security

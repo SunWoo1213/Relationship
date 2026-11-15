@@ -1,0 +1,22 @@
+# 명령: bash -c H=54-79-202-221.sslip.io; echo "S1:"; curl -sS -m 20 https://$H/api/health; echo; echo "S2:"; curl -sSI -m 20 https://$H/ | grep -i "^HTTP\|content-type\|cache-control"; echo "S4 sw.js:"; curl -sSI -m 20 https://$H/sw.js | grep -i "^HTTP\|cache-control"; echo "S4 manifest:"; curl -sSI -m 20 https://$H/manifest.webmanifest | grep -i "^HTTP\|content-type"; echo "S10:"; for p in api/docs api/openapi.json api/redoc; do curl -s -m 20 -o /dev/null -w "$p %{http_code}\n" https://$H/$p; done; echo "S3:"; curl -sSI -m 20 http://$H/ | grep -i "^HTTP\|location"; echo "TLS:"; curl -sv -m 20 -o /dev/null https://$H/ 2>&1 | grep -i "issuer\|expire\|subject:"
+# 시각: 2026-11-15T19:50:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 843e6e7 (dev2)
+# exit: 1
+# ---
+S1:
+curl: (6) Could not resolve host: api
+
+S2:
+curl: (3) URL rejected: No host part in the URL
+S4 sw.js:
+curl: (6) Could not resolve host: sw.js
+S4 manifest:
+curl: (6) Could not resolve host: manifest.webmanifest
+S10:
+api/docs 000
+api/openapi.json 000
+api/redoc 000
+S3:
+curl: (3) URL rejected: No host part in the URL
+TLS:

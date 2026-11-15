@@ -24,6 +24,11 @@
 
 ## B. 기동 지시 — 사용자가 "띄워 달라" 고 말할 때 (11-17 화 권장)
 
+> **실제 진행(2026-11-15 저녁) — B-1~B-4 끝.** 달라진 점 세 가지:
+> 1. **리전은 시드니(`ap-southeast-2`)다.** 간편 가입 계정은 연락처 국가에 따라 리전이 하나로 고정되고(한국 → 시드니) 조직 정책이 다른 리전의 EC2 호출을 거부한다. 서울을 쓰려면 계정 "고급 기능 활성화"(되돌릴 수 없음)가 필요해 시드니로 갔다.
+> 2. **`infra/terraform.tfvars` 는 만들지 않았다**(에이전트 쓰기 차단). 값은 명령줄 `-var` 로 넘긴다 — apply·destroy 모두 **`-var 'ssh_cidr=<내 IP>/32' -var 'ssh_public_key_path=~/.ssh/relationship-deploy.pub' -var 'region=ap-southeast-2'`** 세 개를 붙인다(`-var-file` 대신). 프로필은 `AWS_PROFILE=relationship-deploy`.
+> 3. 호스트명 `54-79-202-221.sslip.io`(EIP `54.79.202.221`), 배포 커밋 `843e6e7`. 서버 `.env` 는 PC 에서 만들어 ssh 로 보냈다(OpenAI·VAPID 는 로컬 값 재사용, 줄 수 16 — 로컬 `.env` 에 같은 이름이 두 번 적힌 것 2개, 뒤 값이 쓰인다). 바깥 스모크 S1·S2·S3·S4·S10 통과(evidence `20261115-1950-u4-smoke-public.txt`). **남은 것: B-5 사람 점검, B-6.**
+
 - [ ] **B-1** "띄워 달라" + 알릴 것 세 가지: `AWS_PROFILE` 이름 · 공개키 경로 · 도메인(또는 "sslip.io 로"). 그 전에 `infra/terraform.tfvars.example` 을 복사해 `infra/terraform.tfvars` 를 만들고 `ssh_cidr`(A-9 의 내 IP `/32`)·`ssh_public_key_path`(A-8)를 채운다(이 파일은 git 이 무시한다). 에이전트는 `init`·`validate`·`plan` 을 돌려 plan 출력(자원 5개: 보안 그룹·키 페어·EC2·EIP·연결)을 보여 준다.
 - [ ] **B-1b `terraform apply` 는 사용자가 직접 실행**한다(보안 카드 §4 — 에이전트는 `apply`·`destroy` 를 하지 않는다): `cd /Users/sunwoo/Desktop/Portfolio/Relationship && AWS_PROFILE=<이름> terraform -chdir=infra apply -var-file=terraform.tfvars` → plan 을 한 번 더 보고 `yes`. 끝나면 `terraform -chdir=infra output` 의 `public_ip`·`sslip_hostname` 을 에이전트에 알린다. (에이전트가 apply 까지 하길 원하면 보안 카드 예외(L-007 과 같은 절차)를 따로 정해야 한다 — 그때 말해 주면 된다.)
 - [ ] **B-2 DNS A 레코드**: 도메인 쓰면 등록기관에서 `<호스트명>` → EIP(TTL 300). `dig +short <호스트명>` 이 EIP 가 되면 알린다.
@@ -43,7 +48,7 @@
 
 ## E. 종료 11-19(목) 18:00 — `12-shutdown.md` 그대로
 - [ ] **E-1** 백업 `pg_dump` → PC 로 내려받기(저장소에 넣지 않는다).
-- [ ] **E-2** 에이전트에게 "종료해 달라" → 에이전트가 12 문서 순서와 명령을 보여 준다 → 사용자가 `AWS_PROFILE=<이름> terraform -chdir=infra destroy -var-file=terraform.tfvars` 를 **직접** 실행(`destroy` 는 훅이 막아 에이전트가 못 한다; 인스턴스·EIP·보안 그룹·키 페어가 한 번에 사라진다). Terraform 이 안 되면 콘솔에서 인스턴스 종료·EIP 해제·보안 그룹·키 페어 삭제.
+- [ ] **E-2** 에이전트에게 "종료해 달라" → 에이전트가 12 문서 순서와 명령을 보여 준다 → 사용자가 **`cd /Users/sunwoo/Desktop/Portfolio/Relationship && AWS_PROFILE=relationship-deploy terraform -chdir=infra destroy -var 'ssh_cidr=<apply 때 넣은 IP>/32' -var 'ssh_public_key_path=~/.ssh/relationship-deploy.pub' -var 'region=ap-southeast-2'`** 를 **직접** 실행(실제 진행에 맞춘 명령 — `-var-file` 이 아니다. 콘솔로 확인할 때도 리전을 시드니로; `destroy` 는 훅이 막아 에이전트가 못 한다; 인스턴스·EIP·보안 그룹·키 페어가 한 번에 사라진다). Terraform 이 안 되면 콘솔에서 인스턴스 종료·EIP 해제·보안 그룹·키 페어 삭제.
 - [ ] **E-3** EBS `available` 볼륨 0·스냅샷 0·EIP 0 확인.
 - [ ] **E-4** 비밀 회전: OpenAI 키는 기존 것을 재사용했으므로(A-11) **그 키를 폐기하고 새 키를 발급해 로컬 `.env` 교체** · VAPID 는 기존 쌍을 재사용했으므로(A-10) **로컬 VAPID 쌍을 새로 만들어 교체** · **A-7 의 Terraform 액세스 키 비활성·삭제** · PC 의 `.pem`/개인키 정리.
 - [ ] **E-5** 도메인 A 레코드 삭제(쓴 경우). 다음 날 Billing 에서 EC2·EBS·IPv4 사용량 증가 0 확인.

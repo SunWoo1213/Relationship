@@ -628,3 +628,5 @@
 - 2026-11-15 19:33 | PUSH-dev2 | origin dev2 2635ff1 (실험 푸시)
 - 2026-11-15 19:34 | COMMIT | a06f6ad docs(P9-infra): OpenAI 키도 새로 발급하지 않고 기존 것을 쓰기로 한 결정을 적는다
 - 2026-11-15 19:34 | PUSH-dev2 | origin dev2 a06f6ad (실험 푸시)
+- 2026-11-15 19:36 | COMMIT | 843e6e7 docs(P9-infra): 계정이 시드니 리전만 허용해 그 리전으로 plan 을 통과시킨 것을 인계 문서에 적는다
+- 2026-11-15 19:36 | PUSH-dev2 | origin dev2 843e6e7 (실험 푸시)
