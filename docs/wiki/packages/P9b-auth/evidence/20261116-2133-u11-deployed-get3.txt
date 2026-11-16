@@ -1,0 +1,23 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u11-deployed-get.sh
+# 시각: 2026-11-16T21:33:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 43ed1f8 (dev2)
+# exit: 0
+# ---
+# health
+{"status":"ok","db":"up","alembic_revision":"0004"}
+# availability username=test
+HTTP/2 200 
+cache-control: no-store
+{"username":"taken","nickname":null}
+
+# availability no query
+{"detail":{"code":"missing_query"}} [422]
+# availability invalid
+{"username":"invalid","nickname":"invalid"}
+# / 200
+# /api/persons 401
+# /api/auth/me 401
+# /api/docs 404
+# http 308
+# bundle /assets/index-DUYQ9mON.js nickname-string-count:        6

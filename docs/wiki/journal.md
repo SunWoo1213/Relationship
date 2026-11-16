@@ -678,3 +678,5 @@
 - 2026-11-16 07:23 | PUSH-dev2 | origin dev2 8b6946f (실험 푸시)
 - 2026-11-16 07:33 | COMMIT | bd0e061 feat(P9b-auth): 가입 때 닉네임을 저장하고 아이디·닉네임이 겹치는지 묻는 API 를 더한다
 - 2026-11-16 07:33 | PUSH-dev2 | origin dev2 bd0e061 (실험 푸시)
+- 2026-11-16 07:40 | COMMIT | 43ed1f8 docs(P9b-auth): 닉네임 버전을 서버에 올리기 전 로컬 확인 결과와 재배포 절차를 적는다
+- 2026-11-16 07:40 | PUSH-dev2 | origin dev2 43ed1f8 (실험 푸시)

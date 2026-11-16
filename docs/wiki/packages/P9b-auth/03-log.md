@@ -220,7 +220,7 @@
 - 남은 것 · 다음 단위: U11(로컬 Caddy 스모크 `0003 -> 0004`, 비상 되돌리기 예행, 13 문서, 사용자 재배포).
 - Refs: P9b-auth CR-007 D18 S3.1
 
-## 2026-11-16 10:15 · docs(P9b-auth): 닉네임 버전을 서버에 올리기 전 로컬 확인 결과와 재배포 절차를 적는다 · pending
+## 2026-11-16 10:15 · docs(P9b-auth): 닉네임 버전을 서버에 올리기 전 로컬 확인 결과와 재배포 절차를 적는다 · 43ed1f8
 - 변경: `docs/user-setup/13-user-todo-deploy.md` H 절(H-1~H-8, 잘못됐을 때) · 증거 `u11-*` 7개(로컬 Caddy 스모크) + 브라우저 관찰 기록 1개 · 앞 항목 해시 `bd0e061`.
 - 이유(기획서·카드 연결): 01-plan U11 — 서버 반영 전에 "계정이 있는 0003 DB 에서 새 해시가 뜨는가"를 로컬 운영 구성으로 확인하고, 사용자 재배포 절차를 문서로 준다. 비상 되돌리기 명령은 예행이 성공해 문서에 적었다(R4-3).
 - 정합성 확인: D17(갱신은 SSH `git checkout` + `compose up -d --build`) / D18 / 보안(§1 값 미기재, §4 서버 명령은 사용자) — 위반 없음. 제품 코드 무변경.
@@ -229,4 +229,14 @@
 - 로컬 브라우저 점검(메인): 가입 화면 칸 순서·중복 확인 세 결과·값 변경 시 결과 지움·가입 뒤 사이드바 "demo팀 · 아이디 · 로그아웃" 확인(`evidence/20261116-1010-u11-local-browser-check.txt`).
 - 관찰: 대문자 아이디 조회는 소문자로 바꿔 판정(`ABC` → `abc` 기준, 계획대로) · 닉네임·아이디가 둘 다 길면 사이드바에서 둘 다 말줄임.
 - 남은 것 · 다음 단위: 사용자 SSH 재배포(H-1~H-5) → 메인 바깥 GET(H-6) → U8 시연 계정·리허설 → verify-impl·04-review.
+- Refs: P9b-auth CR-007 D17 D18
+
+## 2026-11-16 21:40 · docs(P9b-auth): 닉네임 버전을 서버에 반영한 결과와 바깥 확인 증거를 남긴다 · pending
+- 변경: 증거 `evidence/20261116-2133-u11-deployed-get3.txt` · 01-plan U11 체크 · 앞 항목 해시 `43ed1f8`.
+- 사용자 반영(2026-11-16 저녁, SSH): `docker compose ps` 붙여 줌 — backend `relationship-backend:bd0e061`(health: starting), caddy `relationship-caddy:bd0e061` Up, postgres Up 26 hours (healthy) · Traceback 수 `0`. `Running upgrade` 줄은 붙이지 않았다 — 대신 바깥 health 가 0004.
+- 바깥 확인(메인, 본문 없는 GET): `/api/health` → `alembic_revision: 0004` · `/api/auth/availability?username=test` → 200 `{"username":"taken","nickname":null}` + `cache-control: no-store`(기존 계정이 지워지지 않음) · 쿼리 없음 422 `missing_query` · `?username=ab&nickname=a%20b` → 둘 다 `invalid` · `/` 200 · `/api/persons`·`/api/auth/me` 401 · `/api/docs` 404 · http → 308 · 번들 `/assets/index-DUYQ9mON.js`(로컬 스모크와 같은 이름)에 닉네임 문구.
+- 브라우저(메인, 사용자의 로그인된 `test` 탭): 그냥 이동만 했을 때는 옛 화면("test · 로그아웃")이 보였고, 새로고침 뒤 "test · test · 로그아웃"(닉네임 = 아이디 백필) — 대화 기록·인물(김민수 팀장님)은 그대로.
+- 하지 않은 것: 배포 주소에서 새 계정 가입(닉네임·중복 확인) — 비밀번호 입력은 사용자 몫. 같은 화면은 로컬 브라우저 점검과 로컬 Caddy 스모크로 확인.
+- 실패한 증거 2개(`…-u11-deployed-get.txt`, `…-get2.txt`)는 메인의 명령 인용 오류(변수가 비어 주소가 빠짐)로 생긴 것이라 커밋하지 않는다.
+- 남은 것 · 다음 단위: U8(사용자가 시연 계정 가입 → 발화 13개 → 리허설) → `/devlog done`.
 - Refs: P9b-auth CR-007 D17 D18
