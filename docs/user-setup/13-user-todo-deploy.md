@@ -88,6 +88,28 @@
   - 아이디 앞뒤에 공백이 들어가면 "형식이 맞지 않는다" 로 나온다(닉네임은 앞뒤 공백을 알아서 뗀다).
 - [ ] **H-8** 이어서 G-8(시연 계정에 발화 13개) · G-9(리허설) · G-10(OpenAI 사용량) · G-11(푸시).
 
+### 미리 만든 계정 지우기 (사용자 요청 2026-11-16 "테스트 계정을 미리 만들었던걸 삭제하고 진행")
+
+앱에는 계정 삭제 기능이 없다. 서버에서 아래를 한 번에 붙여 넣는다(`'test'` 자리에 지울 아이디). 그 계정의 인물·사건·일정·질문·알림 구독·판단 기록·대화·로그인 세션이 함께 지워지고 **되돌릴 수 없다**. 다른 계정은 건드리지 않는다. 같은 문장을 로컬 개발 DB 에서 되돌리는 트랜잭션으로 실행해 문법과 동작을 확인했다(운영 서버에서는 에이전트가 실행하지 않았다).
+
+```
+cd ~/Relationship
+docker compose -f docker-compose.prod.yml exec -T postgres sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' <<'SQL'
+BEGIN;
+CREATE TEMP TABLE _t ON COMMIT DROP AS SELECT id FROM users WHERE username = 'test';
+SELECT count(*) AS accounts_to_delete FROM _t;
+DELETE FROM agent_traces WHERE session_id IN (SELECT 'chat:' || id FROM _t);
+DELETE FROM pending_questions WHERE user_id IN (SELECT id FROM _t);
+DELETE FROM push_subscriptions WHERE user_id IN (SELECT id FROM _t);
+DELETE FROM persons WHERE user_id IN (SELECT id FROM _t);
+DELETE FROM users WHERE id IN (SELECT id FROM _t);
+COMMIT;
+SELECT username, nickname FROM users ORDER BY created_at;
+SQL
+```
+
+기대 출력: `accounts_to_delete` 가 `1`, 이어서 `DELETE n` 다섯 줄(마지막이 `DELETE 1`), `COMMIT`, 남은 계정 목록. `accounts_to_delete` 가 `0` 이면 아이디가 틀린 것이다(아무것도 지워지지 않는다). 지운 뒤 그 계정으로 로그인돼 있던 브라우저는 새로고침하면 로그인 화면으로 돌아간다.
+
 ### H 가 잘못됐을 때
 
 - **먼저**: H-4·H-5 출력을 에이전트에 붙인다. 고친 새 해시를 받아 H-2·H-3 을 다시 한다(권장).
