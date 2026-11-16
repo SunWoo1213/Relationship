@@ -231,7 +231,7 @@
 - 남은 것 · 다음 단위: 사용자 SSH 재배포(H-1~H-5) → 메인 바깥 GET(H-6) → U8 시연 계정·리허설 → verify-impl·04-review.
 - Refs: P9b-auth CR-007 D17 D18
 
-## 2026-11-16 21:40 · docs(P9b-auth): 닉네임 버전을 서버에 반영한 결과와 바깥 확인 증거를 남긴다 · pending
+## 2026-11-16 21:40 · docs(P9b-auth): 닉네임 버전을 서버에 반영한 결과와 바깥 확인 증거를 남긴다 · cca42f6
 - 변경: 증거 `evidence/20261116-2133-u11-deployed-get3.txt` · 01-plan U11 체크 · 앞 항목 해시 `43ed1f8`.
 - 사용자 반영(2026-11-16 저녁, SSH): `docker compose ps` 붙여 줌 — backend `relationship-backend:bd0e061`(health: starting), caddy `relationship-caddy:bd0e061` Up, postgres Up 26 hours (healthy) · Traceback 수 `0`. `Running upgrade` 줄은 붙이지 않았다 — 대신 바깥 health 가 0004.
 - 바깥 확인(메인, 본문 없는 GET): `/api/health` → `alembic_revision: 0004` · `/api/auth/availability?username=test` → 200 `{"username":"taken","nickname":null}` + `cache-control: no-store`(기존 계정이 지워지지 않음) · 쿼리 없음 422 `missing_query` · `?username=ab&nickname=a%20b` → 둘 다 `invalid` · `/` 200 · `/api/persons`·`/api/auth/me` 401 · `/api/docs` 404 · http → 308 · 번들 `/assets/index-DUYQ9mON.js`(로컬 스모크와 같은 이름)에 닉네임 문구.
@@ -240,3 +240,12 @@
 - 실패한 증거 2개(`…-u11-deployed-get.txt`, `…-get2.txt`)는 메인의 명령 인용 오류(변수가 비어 주소가 빠짐)로 생긴 것이라 커밋하지 않는다.
 - 남은 것 · 다음 단위: U8(사용자가 시연 계정 가입 → 발화 13개 → 리허설) → `/devlog done`.
 - Refs: P9b-auth CR-007 D17 D18
+
+## 2026-11-16 22:35 · docs(P9b-auth): 배포 주소에 시연 발화 13개를 넣어 본 결과를 남긴다 · pending
+- 변경: 증거 `evidence/20261116-2230-u8-deployed-demo-script-run.txt`(발화별 화면 답·인물 카드·브리핑 관찰) · 13 문서 "미리 만든 계정 지우기"(앞 커밋 `b4b5e43`) · 앞 항목 해시 `cca42f6`.
+- 이유(기획서·카드 연결): 01-plan U8 — 시연 (나) 갈래에 쓸 데이터를 제품 파이프라인 그대로 쌓고 운영본 동작을 본다. 사용자 지시 "가입했으니 나머지 테스트를 진행하세요".
+- 정합성 확인: 원칙 1(확인 칩은 발화 내용대로만 답함 — 새 이름은 "다른 사람" → 관계 태그) · 원칙 8(관찰을 고치지 않고 그대로 기록) / 보안(가입·비밀번호 입력은 사용자) — 위반 없음. 제품 코드 무변경.
+- 결과: 로그인·닉네임 범위 정상(로그인 유지, 채팅, 칩, 인물 3명, 일정, 약 90초 뒤 브리핑, 사이드바 "test · test"). 오류 화면·막힌 요청 0.
+- 범위 밖 관찰(추출 품질, 원인 미확인 — P9b 가 바꾼 코드가 아님): 13발화 중 3·5·8 은 조회로 처리돼 미기록, 7·9 미기록(가족 인물 미생성), 갈등 3건의 유형이 `meeting`·`other`·`praise` 로 갈려 반복 패턴 0, 12번 조회 답 "기록이 없어요", 위계 "동". 사용자에게 보고하고 판단을 기다린다(FIX 로 원인 조사 / 시연 발화 조정).
+- 남은 것 · 다음 단위: 사용자 리허설 두 갈래 → `/devlog done`.
+- Refs: P9b-auth CR-007 D18

@@ -682,3 +682,5 @@
 - 2026-11-16 07:40 | PUSH-dev2 | origin dev2 43ed1f8 (실험 푸시)
 - 2026-11-16 21:34 | COMMIT | cca42f6 docs(P9b-auth): 닉네임 버전을 서버에 반영한 결과와 바깥 확인 증거를 남긴다
 - 2026-11-16 21:34 | PUSH-dev2 | origin dev2 cca42f6 (실험 푸시)
+- 2026-11-16 21:40 | COMMIT | b4b5e43 docs(P9b-auth): 미리 만든 계정을 서버에서 지우는 방법을 사용자 문서에 적는다
+- 2026-11-16 21:40 | PUSH-dev2 | origin dev2 b4b5e43 (실험 푸시)
