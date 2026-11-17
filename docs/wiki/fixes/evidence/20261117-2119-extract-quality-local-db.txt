@@ -1,0 +1,80 @@
+# 명령: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/extract-quality/dbq.sh /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/extract-quality/q.sql
+# 시각: 2026-11-17T21:19:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8404fc3 (dev2)
+# exit: 0
+# ---
+== persons
+ id | display_name  | relation_tag | hierarchy 
+----+---------------+--------------+-----------
+ 13 | 김민수 팀장님 | 직장         | 동
+ 14 | 이서연        | 친구         | 동
+ 15 | 박준호 대리   | 직장         | 동
+(3 rows)
+
+== aliases
+ person_id |     alias     |  source   
+-----------+---------------+-----------
+        13 | 김민수 팀장님 | system
+        14 | 이서연        | system
+        15 | 박준호 대리   | system
+        13 | 팀장님        | user_said
+(4 rows)
+
+== events
+ id | person_id |   type   |                 content                  |                              raw_utterance                              
+----+-----------+----------+------------------------------------------+-------------------------------------------------------------------------
+ 34 |        13 | meeting  | 일정 문제로 부딪힘                       | 오늘 김민수 팀장님이랑 회의하다가 일정 문제로 또 부딪혔어
+ 35 |        13 | conflict | 다른 사람들 앞에서 내 보고서를 지적함    | 지난주에도 김민수 팀장님이 내 보고서를 사람들 앞에서 지적해서 좀 그랬어
+ 36 |        13 | other    | 예산 건으로 언쟁                         | 어제 김민수 팀장님이랑 예산 건으로 한 번 더 언쟁이 있었어
+ 37 |        14 | meal     | 주말에 저녁 먹음                         | 대학 동기 이서연이랑 주말에 저녁 먹었어
+ 38 |        14 | other    | 이직                                     | 이서연이 다음 달에 이직한다고 하더라
+ 39 |        15 | praise   | 내 자료 정리를 도와줘서 일이 일찍 끝났어 | 박준호 대리가 내 자료 정리를 도와줘서 일이 일찍 끝났어
+ 40 |        13 | meeting  | 오늘은 회의를 일찍 끝냈다.               | 팀장님이 오늘은 회의를 일찍 끝내 주셨어
+(7 rows)
+
+== facts
+ id | person_id |   key    |   value   | confidence 
+----+-----------+----------+-----------+------------
+ 27 |        14 | dislikes | 매운 음식 |          1
+ 28 |        15 | job      | 대리      |          1
+(2 rows)
+
+== schedules
+ id | person_id |     title      |      scheduled_at      
+----+-----------+----------------+------------------------
+  7 |        13 | 분기 리뷰 회의 | 2026-11-18 07:00:00+00
+(1 row)
+
+== pending
+ id |    kind    |                              q                               |         answer          
+----+------------+--------------------------------------------------------------+-------------------------
+ 24 | new_person | "김민수 팀장님"을(를) 새 인물로 기억해둘까요?                | 직장으로 기억할게요
+ 25 | identity   | "이서연" -- 김민수 팀장님 님이 맞으실까요?                   | 아니요, 다른 사람이에요
+ 26 | new_person | "이서연"을(를) 새 인물로 기억해둘까요?                       | 친구로 기억할게요
+ 27 | identity   | "박준호 대리" -- 김민수 팀장님/이서연 중 한 분이 맞으실까요? | 아니요, 다른 사람이에요
+ 28 | new_person | "박준호 대리"을(를) 새 인물로 기억해둘까요?                  | 직장으로 기억할게요
+(5 rows)
+
+== trace counts
+       step        |    tool_name    | count 
+-------------------+-----------------+-------
+ er_resolve        | er              |    12
+ loop_extract      | agent           |    13
+ loop_gate         | agent           |    13
+ loop_query        | agent           |     3
+ loop_record       | agent           |    13
+ loop_resolve_done | agent           |    13
+ loop_resume       | agent           |     5
+ loop_turn         | agent           |    18
+ memory_pattern    | memory          |     7
+ memory_promote    | memory          |     9
+ tool_call         | add_event       |     7
+ tool_call         | add_schedule    |     1
+ tool_call         | answer_question |     5
+ tool_call         | ask_user        |     5
+ tool_call         | create_person   |     3
+ tool_call         | search_person   |    12
+ tool_call         | update_person   |     8
+(17 rows)
+

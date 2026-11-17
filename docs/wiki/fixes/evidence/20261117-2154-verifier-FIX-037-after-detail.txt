@@ -1,0 +1,96 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037-review/after_detail.py
+# 시각: 2026-11-17T21:54:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# ---
+== 1. 묶음별: 기대 밖 기록 도구 / 빠진 기대 도구 / raw intent 누락
+  [before] 시도 160
+    기대 밖: {'event:update_person': 4}
+    빠짐: {'fact:update_person': 10, 'fact:add_event': 10, 'event:add_event': 13, 'mixed:add_event': 5, 'mixed:update_person': 1}
+    raw intent 누락: {'fact': 4, 'mixed': 1, 'event': 1} 합 6
+  [after] 시도 160
+    기대 밖: {'event:update_person': 43, 'schedule:add_event': 5, 'fact:add_event': 2}
+    빠짐: {'fact:add_event': 5, 'schedule:add_schedule': 5}
+    raw intent 누락: {'fact': 8, 'event': 16, 'mixed': 7, 'schedule': 4} 합 35
+
+== 2. 일정 발화 s01·s02 의 제안 도구 (before -> after)
+  s01 다음 주 화요일 저녁 7시에 홍지훈이랑 저녁 약속 있어
+    [before] {'add_schedule': 5}
+    [after] {'add_event(meal)': 5}
+  s02 모레 오전 10시에 윤하준 부장님이랑 면담이 잡혔어
+    [before] {'add_schedule': 5}
+    [after] {'add_schedule': 5}
+
+== 3. 사건 묶음에서 기대 밖 update_person 이 나온 시도 수 (발화별, 5회 중)
+  [before] 합 4/70 · {'e10': 2, 'e13': 2}
+  [after] 합 43/70 · {'e02': 5, 'e03': 1, 'e04': 5, 'e05': 5, 'e06': 2, 'e07': 1, 'e09': 1, 'e10': 5, 'e11': 5, 'e12': 5, 'e13': 5, 'e14': 3}
+
+== 4. after rep 0 의 실제 제안 인자 (loop_extract trace) -- 사건 발화에 붙은 사실 값, s01, f04, e14
+  f04 rep0 | 한도윤은 주말마다 북한산에 등산을 다녀
+      update_person facts=[{"key": "hobby", "value": "등산"}]
+  f07 rep0 | 정다은 선배가 내년 봄에 결혼한다고 하더라
+      update_person facts=[{"key": "life_event", "value": "결혼"}]
+      add_event {"type": "other", "content": "결혼 예정", "occurred_at": "2027-03-01T00:00:00+09:00"}
+  e02 rep0 | 오늘 주간 회의에서 윤하준 부장님이 내 기획안을 계속 반대하셔서 언성이 높아졌어
+      update_person facts=[{"key": "job", "value": "부장"}, {"key": "workplace", "value": "모르는 회사 이름"}]
+      add_event {"type": "conflict", "content": "주간 회의에서 기획안을 반대함", "occurred_at": "2026-11-17T21:45:09.454335+09:00"}
+  e04 rep0 | 정다은 선배가 내 포트폴리오를 보고 정말 잘 만들었다고 칭찬해 줬어
+      update_person facts=[{"key": "job", "value": "선배"}]
+      add_event {"type": "praise", "content": "정다은 선배가 내 포트폴리오를 보고 정말 잘 만들었다고 칭찬해 줬어", "occurred_at": "2026-11-17T21:45:13.635612+09:00"}
+  e05 rep0 | 강서준 과장님이 이번 분기 실적 정리를 잘했다고 다른 팀 앞에서 인정해 주셨어
+      update_person facts=[{"key": "job", "value": "과장"}, {"key": "workplace", "value": "기타"}]
+      add_event {"type": "praise", "content": "이번 분기 실적 정리를 잘했다고 다른 팀 앞에서 인정함", "occurred_at": "2026-11-17T21:45:16.179749+09:00"}
+  e10 rep0 | 최지우가 밤에 전화해서 요즘 이직 고민이 많다고 털어놨어
+      update_person facts=[{"key": "life_event", "value": "이직 고민"}]
+      add_event {"type": "personal_share", "content": "이직 고민이 많다고 털어놨어", "occurred_at": "2026-11-17T21:45:26.195591+09:00"}
+  e11 rep0 | 홍지훈이 산책하면서 자기 어릴 적 이야기를 처음으로 들려줬어
+      update_person facts=[{"key": "life_event", "value": "어릴 적 이야기 공유"}]
+      add_event {"type": "personal_share", "content": "어릴 적 이야기를 처음으로 들려줌", "occurred_at": "2026-11-17T21:45:28.584941+09:00"}
+  e12 rep0 | 오유나가 이사할 때 차를 빌려줘서 짐 옮기는 걸 도와줬어
+      update_person facts=[{"key": "life_event", "value": "이사"}]
+      add_event {"type": "favor", "content": "차를 빌려줘서 짐 옮기는 걸 도와줬어", "occurred_at": "2026-11-17T21:45:31.357522+09:00"}
+  e13 rep0 | 내가 송민재 대신 발표 자료를 만들어 줬어
+      update_person facts=[{"key": "job", "value": "발표자"}]
+      add_event {"type": "favor", "content": "발표 자료를 만들어 줌", "occurred_at": "2026-11-17T21:45:33.678211+09:00"}
+  e14 rep0 | 강서준 과장님이랑 같이 엘리베이터에 갇혀서 30분 동안 기다렸어
+      update_person facts=[{"key": "job", "value": "과장"}]
+      add_event {"type": "conflict", "content": "엘리베이터에 갇혀서 30분 동안 기다림", "occurred_at": "2026-11-17T21:45:00+09:00"}
+  s01 rep0 | 다음 주 화요일 저녁 7시에 홍지훈이랑 저녁 약속 있어
+      add_event {"type": "meal", "content": "저녁 약속", "occurred_at": "2026-11-22T19:00:00+09:00"}
+  f04 rep1 | 한도윤은 주말마다 북한산에 등산을 다녀
+      update_person facts=[{"key": "hobby", "value": "등산"}]
+      add_event {"type": "other", "content": "주말마다 북한산에 등산을 다닌다.", "occurred_at": "2026-11-12T21:45:57.681142+09:00"}
+  f07 rep1 | 정다은 선배가 내년 봄에 결혼한다고 하더라
+      update_person facts=[{"key": "life_event", "value": "결혼"}]
+      add_event {"type": "other", "content": "내년 봄에 결혼한다고 하더라", "occurred_at": "2027-03-01T00:00:00+09:00"}
+  e02 rep1 | 오늘 주간 회의에서 윤하준 부장님이 내 기획안을 계속 반대하셔서 언성이 높아졌어
+      update_person facts=[{"key": "job", "value": "부장"}, {"key": "workplace", "value": ""}]
+      add_event {"type": "conflict", "content": "기획안 반대와 언성이 높아진 다툼", "occurred_at": "2026-11-17T21:46:08.651424+09:00"}
+  e04 rep1 | 정다은 선배가 내 포트폴리오를 보고 정말 잘 만들었다고 칭찬해 줬어
+      update_person facts=[{"key": "job", "value": "선배"}]
+      add_event {"type": "praise", "content": "정다은 선배가 내 포트폴리오를 보고 잘 만들었다고 칭찬해 줬어", "occurred_at": "2026-11-17T21:46:12.860141+09:00"}
+  e05 rep1 | 강서준 과장님이 이번 분기 실적 정리를 잘했다고 다른 팀 앞에서 인정해 주셨어
+      update_person facts=[{"key": "job", "value": "과장"}]
+      add_event {"type": "praise", "content": "이번 분기 실적 정리를 잘했다고 다른 팀 앞에서 인정받음", "occurred_at": "2026-11-17T21:46:15.704545+09:00"}
+  e10 rep1 | 최지우가 밤에 전화해서 요즘 이직 고민이 많다고 털어놨어
+      update_person facts=[{"key": "life_event", "value": "이직 고민 중"}]
+      add_event {"type": "personal_share", "content": "이직 고민을 털어놨음", "occurred_at": "2026-11-17T21:46:25.567400+09:00"}
+  e11 rep1 | 홍지훈이 산책하면서 자기 어릴 적 이야기를 처음으로 들려줬어
+      update_person facts=[{"key": "life_event", "value": "어릴 적 이야기 공유"}]
+      add_event {"type": "personal_share", "content": "자기 어릴 적 이야기를 처음으로 들려줬다", "occurred_at": "2026-11-17T21:46:27.818661+09:00"}
+  e12 rep1 | 오유나가 이사할 때 차를 빌려줘서 짐 옮기는 걸 도와줬어
+      update_person facts=[{"key": "life_event", "value": "이사"}]
+      add_event {"type": "favor", "content": "차를 빌려줘서 짐 옮기는 걸 도와줬다", "occurred_at": "2026-11-17T00:00:00+09:00"}
+  e13 rep1 | 내가 송민재 대신 발표 자료를 만들어 줬어
+      update_person facts=[{"key": "job", "value": "발표자"}]
+      add_event {"type": "favor", "content": "발표 자료를 만들어 줌", "occurred_at": "2026-11-17T21:46:32.100575+09:00"}
+  e14 rep1 | 강서준 과장님이랑 같이 엘리베이터에 갇혀서 30분 동안 기다렸어
+      search_person
+      add_event {"type": "other", "content": "엘리베이터에 갇혀서 30분 동안 기다림", "occurred_at": "2026-11-17T21:46:34.248750+09:00"}
+  s01 rep1 | 다음 주 화요일 저녁 7시에 홍지훈이랑 저녁 약속 있어
+      add_event {"type": "meal", "content": "저녁 약속", "occurred_at": "2026-11-22T19:00:00+09:00"}
+
+== 5. after: bad_args 거부 수와 새 거부 문장이 실제로 나온 횟수
+  bad_args 거부: 0
+  답에 '기록하지 못했어요': 0

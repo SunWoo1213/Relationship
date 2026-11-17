@@ -1,0 +1,32 @@
+{"id": "f01", "group": "fact", "utterance": "윤하준 부장님은 회의 자료를 종이로 뽑아 오는 걸 좋아하셔", "intent": "record", "expected_tools": ["update_person"], "expected_type": null, "note": "선호, 존댓말 '-셔' 평서"}
+{"id": "f02", "group": "fact", "utterance": "최지우는 고양이 털 알레르기가 있어", "intent": "record", "expected_tools": ["update_person"], "expected_type": null, "note": "건강"}
+{"id": "f03", "group": "fact", "utterance": "강서준 과장님은 커피를 아예 안 드셔", "intent": "record", "expected_tools": ["update_person"], "expected_type": null, "note": "부정 선호, '-셔' 평서"}
+{"id": "f04", "group": "fact", "utterance": "한도윤은 주말마다 북한산에 등산을 다녀", "intent": "record", "expected_tools": ["update_person"], "expected_type": null, "note": "취미"}
+{"id": "f05", "group": "fact", "utterance": "오유나는 판교에 있는 게임 회사에 다녀", "intent": "record", "expected_tools": ["update_person"], "expected_type": null, "note": "직장"}
+{"id": "f06", "group": "fact", "utterance": "임채원은 평일엔 바빠서 주말에만 연락이 돼", "intent": "record", "expected_tools": ["update_person"], "expected_type": null, "note": "연락 습관"}
+{"id": "f07", "group": "fact", "utterance": "정다은 선배가 내년 봄에 결혼한다고 하더라", "intent": "record", "expected_tools": ["update_person", "add_event"], "expected_type": "personal_share", "note": "근황 전언 '-더라'. P1 결정 J(c) 인물 소식=personal_share + 사실(life_event)"}
+{"id": "f08", "group": "fact", "utterance": "송민재가 지난달에 분당으로 이사했대", "intent": "record", "expected_tools": ["update_person", "add_event"], "expected_type": "personal_share", "note": "근황 전언 '-대'. P1 결정 J(c)"}
+{"id": "e01", "group": "event", "utterance": "어제 홍지훈이랑 여행 경비 정산 문제로 크게 싸웠어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "conflict", "note": "갈등 단독"}
+{"id": "e02", "group": "event", "utterance": "오늘 주간 회의에서 윤하준 부장님이 내 기획안을 계속 반대하셔서 언성이 높아졌어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "conflict", "note": "겹침: 회의 자리의 갈등 -> conflict 우선(FIX-037 수정안 1)"}
+{"id": "e03", "group": "event", "utterance": "점심 먹다가 강서준 과장님이랑 휴가 일정 때문에 말다툼을 했어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "conflict", "note": "겹침: 식사 자리의 갈등 -> conflict 우선"}
+{"id": "e04", "group": "event", "utterance": "정다은 선배가 내 포트폴리오를 보고 정말 잘 만들었다고 칭찬해 줬어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "praise", "note": "칭찬"}
+{"id": "e05", "group": "event", "utterance": "강서준 과장님이 이번 분기 실적 정리를 잘했다고 다른 팀 앞에서 인정해 주셨어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "praise", "note": "인정"}
+{"id": "e06", "group": "event", "utterance": "토요일에 한도윤이랑 을지로에서 냉면 먹었어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "meal", "note": "식사"}
+{"id": "e07", "group": "event", "utterance": "어제 저녁에 최지우랑 회사 근처에서 삼겹살을 먹었어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "meal", "note": "식사"}
+{"id": "e08", "group": "event", "utterance": "오늘 오후에 오유나랑 신규 프로젝트 킥오프 회의를 했어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "meeting", "note": "회의"}
+{"id": "e09", "group": "event", "utterance": "지난 금요일에 송민재랑 스터디 모임에서 만났어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "meeting", "note": "만남"}
+{"id": "e10", "group": "event", "utterance": "최지우가 밤에 전화해서 요즘 이직 고민이 많다고 털어놨어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "personal_share", "note": "고민을 털어놓음(사용자에게 한 행위)"}
+{"id": "e11", "group": "event", "utterance": "홍지훈이 산책하면서 자기 어릴 적 이야기를 처음으로 들려줬어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "personal_share", "note": "신상 이야기"}
+{"id": "e12", "group": "event", "utterance": "오유나가 이사할 때 차를 빌려줘서 짐 옮기는 걸 도와줬어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "favor", "note": "도움 받음"}
+{"id": "e13", "group": "event", "utterance": "내가 송민재 대신 발표 자료를 만들어 줬어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "favor", "note": "도움 줌"}
+{"id": "e14", "group": "event", "utterance": "강서준 과장님이랑 같이 엘리베이터에 갇혀서 30분 동안 기다렸어", "intent": "record", "expected_tools": ["add_event"], "expected_type": "other", "note": "어느 유형도 아님"}
+{"id": "q01", "group": "query", "utterance": "홍지훈 요즘 어때?", "intent": "query", "expected_tools": [], "expected_type": null, "note": "근황 문형"}
+{"id": "q02", "group": "query", "utterance": "최지우랑 최근에 무슨 일 있었지?", "intent": "query", "expected_tools": [], "expected_type": null, "note": "근황 문형"}
+{"id": "q03", "group": "query", "utterance": "윤하준 부장님 근황 좀 알려줘", "intent": "query", "expected_tools": [], "expected_type": null, "note": "근황, 물음표 없는 요청형"}
+{"id": "q04", "group": "query", "utterance": "강서준 과장님 커피 좋아하셔?", "intent": "query", "expected_tools": [], "expected_type": null, "note": "사실 확인 질문"}
+{"id": "q05", "group": "query", "utterance": "오유나 어느 회사 다닌다고 했지?", "intent": "query", "expected_tools": [], "expected_type": null, "note": "사실 질문"}
+{"id": "q06", "group": "query", "utterance": "한도윤이랑 마지막으로 만난 게 언제였더라?", "intent": "query", "expected_tools": [], "expected_type": null, "note": "사건 시점 질문"}
+{"id": "m01", "group": "mixed", "utterance": "어제 정다은 선배랑 저녁 먹었는데 선배가 해산물 알레르기가 있더라", "intent": "record", "expected_tools": ["add_event", "update_person"], "expected_type": "meal", "note": "사건+건강 사실"}
+{"id": "m02", "group": "mixed", "utterance": "오늘 강서준 과장님이 내 엑셀 작업을 도와주셨는데, 과장님은 원래 새벽 6시에 출근하신대", "intent": "record", "expected_tools": ["add_event", "update_person"], "expected_type": "favor", "note": "사건+습관 사실"}
+{"id": "s01", "group": "schedule", "utterance": "다음 주 화요일 저녁 7시에 홍지훈이랑 저녁 약속 있어", "intent": "record", "expected_tools": ["add_schedule"], "expected_type": null, "note": "미래 약속은 사건이 아니다(P1 결정 C)"}
+{"id": "s02", "group": "schedule", "utterance": "모레 오전 10시에 윤하준 부장님이랑 면담이 잡혔어", "intent": "record", "expected_tools": ["add_schedule"], "expected_type": null, "note": "일정"}

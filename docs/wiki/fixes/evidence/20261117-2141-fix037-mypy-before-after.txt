@@ -1,0 +1,10 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037-impl/mypy_cmp.sh
+# 시각: 2026-11-17T21:41:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# ---
+Found 39 errors in 15 files (checked 65 source files)
+Found 39 errors in 15 files (checked 65 source files)
+--- diff (before vs after, 줄 번호 제거)
+차이 없음

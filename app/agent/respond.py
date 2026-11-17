@@ -75,6 +75,8 @@ if TYPE_CHECKING:  # 타입 힌트 전용 -- `app.api` 초기화가 `app.agent` 
 
 #: 아무것도 기억하지 못한 턴(제안이 없거나 전부 거부됨)의 기본 문장.
 _NOTHING_STORED = "이번 발화에서는 새로 기억한 것이 없어요."
+#: FIX-037 -- 저장된 것이 없고 게이트가 기록 제안을 `bad_args` 로 버린 턴의 문장.
+_REJECTED_BAD_ARGS = "말씀하신 내용을 기록하지 못했어요. 다시 한 번 말씀해 주시겠어요?"
 
 
 def build_reply(
@@ -85,6 +87,7 @@ def build_reply(
     failed_count: int = 0,
     limit_hit: bool = False,
     pending_question: PendingQuestionOut | None = None,
+    rejected_bad_args: bool = False,
 ) -> str:
     """그 턴의 결과를 결정적 한국어 문장 하나로 조립한다(결정 B(i)).
 
@@ -102,6 +105,8 @@ def build_reply(
 
     if parts:
         sentence = "기억했어요: " + ", ".join(parts) + "."
+    elif rejected_bad_args and pending_question is None:
+        sentence = _REJECTED_BAD_ARGS
     else:
         sentence = _NOTHING_STORED
 
@@ -158,6 +163,7 @@ _QUERY_SYSTEM_PROMPT = (
     "평가·조언·감정 대화는 하지 않는다"
     f" 아래 인물 카드 자료만 근거로 1~{QUERY_ANSWER_MAX_LINES}줄 한국어로 답하고, "
     "관계나 위계를 물으면 [인물 카드]의 '관계' 줄을 그대로 답하라 — 그것도 기록된 사실이다. "
+    "'요즘·최근·어때·근황'처럼 근황을 묻는 질문에는 자료의 최근 사건·일정을 날짜와 함께 그대로 재진술하라. "
     "자료에 없는 것은 '기록이 없어요'라고 답하라. 추측하거나 새 사실을 만들지 마라. "
     "다른 인물과의 관계는 말하지 마라. 위로·조언·감정 표현을 쓰지 마라. "
     f"{QUERY_ANSWER_TOOL_NAME} 도구로만 답하라."

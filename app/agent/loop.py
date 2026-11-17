@@ -195,6 +195,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from app import tools as app_tools
+from app.agent.gate import REASON_BAD_ARGS
 from app.agent.gate import check as gate_check
 from app.agent.propose import Proposer, proposer_from_env
 from app.agent.respond import (
@@ -1167,6 +1168,7 @@ def run_turn(
         failed_count=len(record.failed),
         limit_hit=verdict.stop_reason == "limit",
         pending_question=pending_question,
+        rejected_bad_args=any(r.reason == REASON_BAD_ARGS for r in verdict.rejected),
     )
 
     turn = TurnResult(

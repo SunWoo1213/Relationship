@@ -1,0 +1,37 @@
+# 명령: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/extract-quality/dbq.sh /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/extract-quality/probe.sql
+# 시각: 2026-11-17T21:21:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8404fc3 (dev2)
+# exit: 0
+# ---
+ id  |                        utt                         |    intent     |          calls           
+-----+----------------------------------------------------+---------------+--------------------------
+ 782 | 지난주에도 김민수 팀장님이 내 보고서를 사람들 앞에 | record        | add_event:praise
+ 848 | 지난주에도 김민수 팀장님이 내 보고서를 사람들 앞에 | record        | add_event:praise
+ 906 | 지난주에도 김민수 팀장님이 내 보고서를 사람들 앞에 | query         | 
+ 818 | 이서연은 매운 음식을 못 먹어                       | query         | update_person:dislikes
+ 882 | 이서연은 매운 음식을 못 먹어                       | query         | update_person:dislikes
+ 940 | 이서연은 매운 음식을 못 먹어                       | query         | update_person:dislikes
+ 812 | 이서연이 다음 달에 이직한다고 하더라               | query         | 
+ 876 | 이서연이 다음 달에 이직한다고 하더라               | query         | 
+ 932 | 이서연이 다음 달에 이직한다고 하더라               | record        | update_person:life_event
+ 824 | 엄마가 지난주에 허리 병원 다녀오셨대               | record        | update_person:health
+ 888 | 엄마가 지난주에 허리 병원 다녀오셨대               | record        | add_event:health
+ 946 | 엄마가 지난주에 허리 병원 다녀오셨대               | record        | add_event:health
+ 790 | 김민수 팀장님은 아침 일찍 보고받는 걸 좋아하셔     | query         | 
+ 856 | 김민수 팀장님은 아침 일찍 보고받는 걸 좋아하셔     | query         | 
+ 912 | 김민수 팀장님은 아침 일찍 보고받는 걸 좋아하셔     | query         | 
+ 804 | 그래도 김민수 팀장님이 이번 발표는 잘했다고 칭찬해 | record        | add_event:praise
+ 870 | 그래도 김민수 팀장님이 이번 발표는 잘했다고 칭찬해 | query         | add_event:praise
+ 926 | 그래도 김민수 팀장님이 이번 발표는 잘했다고 칭찬해 | query         | update_person:job
+ 832 | 박준호 대리가 내 자료 정리를 도와줘서 일이 일찍    | record        | update_person:job
+ 893 | 박준호 대리가 내 자료 정리를 도와줘서 일이 일찍    | record        | 
+ 951 | 박준호 대리가 내 자료 정리를 도와줘서 일이 일찍    | record        | add_event:favor
+ 774 | 오늘 김민수 팀장님이랑 회의하다가 일정 문제로 또   | (intent 없음) | add_event:meeting
+ 840 | 오늘 김민수 팀장님이랑 회의하다가 일정 문제로 또   | record        | add_event:meeting
+ 898 | 오늘 김민수 팀장님이랑 회의하다가 일정 문제로 또   | record        | add_event:meeting
+ 796 | 어제 김민수 팀장님이랑 예산 건으로 한 번 더 언쟁   | record        | add_event:other
+ 862 | 어제 김민수 팀장님이랑 예산 건으로 한 번 더 언쟁   | record        | add_event:conflict
+ 918 | 어제 김민수 팀장님이랑 예산 건으로 한 번 더 언쟁   | record        | add_event:other
+(27 rows)
+

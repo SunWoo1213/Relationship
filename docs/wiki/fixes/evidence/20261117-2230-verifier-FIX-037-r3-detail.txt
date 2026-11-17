@@ -1,0 +1,108 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037-review/r3_detail.py
+# 시각: 2026-11-17T22:30:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# ---
+== 0. 원자료 정합
+  [before] TRIAL 160 · id 32 · 횟수 {5} · 표본 id 일치 True · label {'before'} · status!=200 0
+  [after] TRIAL 160 · id 32 · 횟수 {5} · 표본 id 일치 True · label {'after'} · status!=200 0
+  [after3] TRIAL 160 · id 32 · 횟수 {5} · 표본 id 일치 True · label {'after3'} · status!=200 0
+  [after4] TRIAL 160 · id 32 · 횟수 {5} · 표본 id 일치 True · label {'after4'} · status!=200 0
+
+== 1. 지표 (독립 계산)
+  지표 | before | after | after3 | after4
+  의도 일치 전체 | 139/160 | 160/160 | 160/160 | 160/160
+  실제 질문 query | 30/30 | 30/30 | 30/30 | 30/30
+  질문 묶음에서 기록 도구 제안 | 0/30 | 0/30 | 0/30 | 2/30
+  raw intent 누락 | 6/160 | 35/160 | 0/160 | 2/160
+  일정 묶음 add_schedule 포함 | 10/10 | 5/10 | 10/10 | 10/10
+  일정 묶음에 add_event | 0/10 | 5/10 | 0/10 | 0/10
+  기대 type 있는 발화에서 add_event 없음 | 28/90 | 5/90 | 22/90 | 10/90
+  e10 personal_share | 3/5 | 5/5 | 1/5 | 5/5
+  e04 praise | 0/5 | 5/5 | 2/5 | 5/5
+  기대 밖 update_person (전체 시도) | 4/160 | 43/160 | 23/160 | 0/160
+    └ 사건 묶음 | 4/70 | 43/70 | 23/70 | 0/70
+  기대 밖 add_event (fact·schedule) | 0/70 | 7/70 | 0/70 | 2/70
+  conflict 라벨 유형 일치 | 2/15 | 15/15 | 15/15 | 15/15
+  conflict 아닌 발화에 conflict | 0/145 | 1/145 | 0/145 | 0/145
+  유형 일치 | 48/90 | 79/90 | 68/90 | 80/90
+  끝까지 기록(기록 라벨) | 91/130 | 120/130 | 108/130 | 120/130
+  mixed 두 도구 모두 | 5/10 | 10/10 | 9/10 | 10/10
+  fact 묶음 update_person 포함 | 30/40 | 40/40 | 40/40 | 40/40
+  도구 집합 정확 일치 | 126/160 | 105/160 | 125/160 | 148/160
+  enum 이탈 | 0/62 | 0/92 | 0/68 | 0/82
+  bad_args 거부 | 4 | 0 | 0 | 0
+  답에 '기록하지 못했어요' | 0 | 0 | 0 | 0
+  query_turn_no_write 로 버려진 기록 턴 | 10/130 | 0/130 | 0/130 | 0/130
+
+== 2. 조회 답
+  [before] 답 18 · 근황 답변 10/12 · 없는 것 '기록이 없' 6/6
+  [after4] 답 18 · 근황 답변 12/12 · 없는 것 '기록이 없' 6/6
+     a01 rep0 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 주었고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했습니다. 또한, 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a02 rep0 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 줬고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했으며, 11월 14일에는 광화문에서 점심을 먹었어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a03 rep0 '배성훈은 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 주었고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했습니다. 또한 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a04 rep0 '배성훈 선배와는 11월 17일에 내 발표 준비가 잘됐다고 칭찬을 받았고, 11월 15일에 스터디 진행 방식 때문에 말다툼을 했으며, 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a05 rep0 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a06 rep0 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a01 rep1 '배성훈은 11월 17일에 내 발표 준비가 잘됐다고 칭찬해줬고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했으며, 11월 14일에는 광화문에서 점심을 먹었어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a02 rep1 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 줬고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했으며, 11월 14일에는 광화문에서 점심을 먹었어.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a03 rep1 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 주셨고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했습니다. 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a04 rep1 '11월 17일에 배성훈 선배가 내 발표 준비가 잘됐다고 칭찬해 줬어. 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했고, 11월 14일에는 광화문에서 점심을 먹었어.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a05 rep1 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a06 rep1 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a01 rep2 '배성훈은 11월 17일에 내가 발표 준비가 잘 됐다고 칭찬해 주었고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했습니다. 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a02 rep2 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 주었고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했습니다. 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a03 rep2 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 주었고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했으며, 11월 14일에는 광화문에서 점심을 먹었습니다. 예정된 일정은 없습니다.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a04 rep2 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 주었고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했으며, 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a05 rep2 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a06 rep2 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+
+== 3. after4 발화별 (도구 조합 · 유형)
+  f01 기대 update_person/None | 도구 {'update_person': 5} | 유형 {'-': 5} | intent {'record': 5}
+  f02 기대 update_person/None | 도구 {'update_person': 5} | 유형 {'-': 5} | intent {'record': 5}
+  f03 기대 update_person/None | 도구 {'update_person': 5} | 유형 {'-': 5} | intent {'record': 5}
+  f04 기대 update_person/None | 도구 {'update_person': 5} | 유형 {'-': 5} | intent {'record': 5}
+  f05 기대 update_person/None | 도구 {'update_person': 5} | 유형 {'-': 5} | intent {'record': 5}
+  f06 기대 update_person/None | 도구 {'update_person': 5} | 유형 {'-': 5} | intent {'record': 5}
+  f07 기대 update_person+add_event/personal_share | 도구 {'update_person': 5} | 유형 {'-': 5} | intent {'record': 5}
+  f08 기대 update_person+add_event/personal_share | 도구 {'update_person': 5} | 유형 {'-': 5} | intent {'record': 5}
+  e01 기대 add_event/conflict | 도구 {'add_event': 5} | 유형 {'conflict': 5} | intent {'record': 5}
+  e02 기대 add_event/conflict | 도구 {'add_event': 5} | 유형 {'conflict': 5} | intent {'record': 5}
+  e03 기대 add_event/conflict | 도구 {'add_event': 5} | 유형 {'conflict': 5} | intent {'record': 5}
+  e04 기대 add_event/praise | 도구 {'add_event': 5} | 유형 {'praise': 5} | intent {'record': 5}
+  e05 기대 add_event/praise | 도구 {'add_event': 5} | 유형 {'praise': 5} | intent {'record': 5}
+  e06 기대 add_event/meal | 도구 {'add_event': 5} | 유형 {'meal': 5} | intent {'record': 5}
+  e07 기대 add_event/meal | 도구 {'add_event': 5} | 유형 {'meal': 5} | intent {'record': 5}
+  e08 기대 add_event/meeting | 도구 {'add_event': 5} | 유형 {'meeting': 5} | intent {'record': 5}
+  e09 기대 add_event/meeting | 도구 {'add_event': 5} | 유형 {'meeting': 5} | intent {'record': 5}
+  e10 기대 add_event/personal_share | 도구 {'add_event': 5} | 유형 {'personal_share': 5} | intent {'record': 5}
+  e11 기대 add_event/personal_share | 도구 {'add_event': 5} | 유형 {'personal_share': 5} | intent {'record': 5}
+  e12 기대 add_event/favor | 도구 {'add_event': 5} | 유형 {'favor': 5} | intent {'record': 5}
+  e13 기대 add_event/favor | 도구 {'add_event': 5} | 유형 {'favor': 5} | intent {'record': 5}
+  e14 기대 add_event/other | 도구 {'add_event': 5} | 유형 {'other': 5} | intent {'record': 5}
+  q01 기대 -/None | 도구 {'-': 5} | 유형 {'-': 5} | intent {'query': 5}
+  q02 기대 -/None | 도구 {'-': 5} | 유형 {'-': 5} | intent {'query': 5}
+  q03 기대 -/None | 도구 {'-': 5} | 유형 {'-': 5} | intent {'query': 5}
+  q04 기대 -/None | 도구 {'-': 5} | 유형 {'-': 5} | intent {'query': 5}
+  q05 기대 -/None | 도구 {'-': 5} | 유형 {'-': 5} | intent {'query': 5}
+  q06 기대 -/None | 도구 {'-': 3, 'add_event': 2} | 유형 {'-': 3, 'meeting': 2} | intent {'query': 5}
+  m01 기대 add_event+update_person/meal | 도구 {'add_event+update_person': 5} | 유형 {'meal': 5} | intent {'record': 5}
+  m02 기대 add_event+update_person/favor | 도구 {'add_event+update_person': 5} | 유형 {'favor': 5} | intent {'record': 5}
+  s01 기대 add_schedule/None | 도구 {'add_schedule': 5} | 유형 {'-': 5} | intent {'record': 5}
+  s02 기대 add_schedule/None | 도구 {'add_schedule': 5} | 유형 {'-': 5} | intent {'record': 5}
+
+== 4. after4 trace 값: 기대 밖 update_person 전부 · add_event 가 빠진 시도 · 기대 밖 add_event
+  f07 rep0 [정다은 선배가 내년 봄에 결혼한다고 하더라] 통과 ['update_person'] -> update_person [{"key": "life_event", "value": "결혼 예정"}]
+  f08 rep0 [송민재가 지난달에 분당으로 이사했대] 통과 ['update_person'] -> update_person [{"key": "life_event", "value": "이사"}]
+  f07 rep1 [정다은 선배가 내년 봄에 결혼한다고 하더라] 통과 ['update_person'] -> update_person [{"key": "life_event", "value": "결혼 예정"}]
+  f08 rep1 [송민재가 지난달에 분당으로 이사했대] 통과 ['update_person'] -> update_person [{"key": "life_event", "value": "이사"}]
+  f07 rep2 [정다은 선배가 내년 봄에 결혼한다고 하더라] 통과 ['update_person'] -> update_person [{"key": "life_event", "value": "결혼 예정"}]
+  f08 rep2 [송민재가 지난달에 분당으로 이사했대] 통과 ['update_person'] -> update_person [{"key": "life_event", "value": "이사"}]
+  q06 rep2 [한도윤이랑 마지막으로 만난 게 언제였더라?] 통과 [] -> search_person ; add_event {"type": "meeting", "content": "마지막으로 만난 날", "occurred_at": "2026-11-16T22:26:09.631112+09:00"}
+  f07 rep3 [정다은 선배가 내년 봄에 결혼한다고 하더라] 통과 ['update_person'] -> update_person [{"key": "life_event", "value": "결혼 예정"}]
+  f08 rep3 [송민재가 지난달에 분당으로 이사했대] 통과 ['update_person'] -> update_person [{"key": "life_event", "value": "이사"}]
+  q06 rep3 [한도윤이랑 마지막으로 만난 게 언제였더라?] 통과 [] -> search_person ; add_event {"type": "meeting", "content": "마지막으로 만난 시점 확인", "occurred_at": "2026-11-17T22:26:59.862796+09:00"}
+  f07 rep4 [정다은 선배가 내년 봄에 결혼한다고 하더라] 통과 ['update_person'] -> update_person [{"key": "life_event", "value": "결혼 예정"}]
+  f08 rep4 [송민재가 지난달에 분당으로 이사했대] 통과 ['update_person'] -> update_person [{"key": "life_event", "value": "이사"}]
+  (대상 시도 12건)

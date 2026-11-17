@@ -1,0 +1,37 @@
+# 명령: /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/extract-quality/dbq.sh /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/extract-quality/gate.sql
+# 시각: 2026-11-17T21:23:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8404fc3 (dev2)
+# exit: 0
+# ---
+ id  | intent |                             acc                              |                                                                       rej                                                                        
+-----+--------+--------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------
+ 775 | record | [{"name": "add_event", "index": 0, "bucket": "execute"}]     | [{"name": "search_person", "index": 1, "reason": "not_callable_by_llm"}]
+ 783 | record | [{"name": "add_event", "index": 1, "bucket": "execute"}]     | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 791 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 797 | record | [{"name": "add_event", "index": 1, "bucket": "execute"}]     | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 805 | record | [{"name": "add_event", "index": 1, "bucket": "execute"}]     | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 813 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 819 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}, {"name": "update_person", "index": 1, "reason": "query_turn_no_write"}]
+ 825 | record | [{"name": "update_person", "index": 0, "bucket": "execute"}] | []
+ 833 | record | [{"name": "update_person", "index": 0, "bucket": "execute"}] | []
+ 841 | record | [{"name": "add_event", "index": 0, "bucket": "execute"}]     | []
+ 849 | record | [{"name": "add_event", "index": 1, "bucket": "execute"}]     | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 857 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 863 | record | [{"name": "add_event", "index": 1, "bucket": "execute"}]     | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 871 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}, {"name": "add_event", "index": 1, "reason": "query_turn_no_write"}]
+ 877 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 883 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}, {"name": "update_person", "index": 1, "reason": "query_turn_no_write"}]
+ 889 | record | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}, {"name": "add_event", "index": 1, "reason": "bad_args"}]
+ 894 | record | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 899 | record | [{"name": "add_event", "index": 1, "bucket": "execute"}]     | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 907 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 913 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 919 | record | [{"name": "add_event", "index": 1, "bucket": "execute"}]     | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 927 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}, {"name": "update_person", "index": 1, "reason": "query_turn_no_write"}]
+ 933 | record | [{"name": "update_person", "index": 1, "bucket": "execute"}] | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+ 941 | query  | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}, {"name": "update_person", "index": 1, "reason": "query_turn_no_write"}]
+ 947 | record | []                                                           | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}, {"name": "add_event", "index": 1, "reason": "bad_args"}]
+ 952 | record | [{"name": "add_event", "index": 1, "bucket": "execute"}]     | [{"name": "search_person", "index": 0, "reason": "not_callable_by_llm"}]
+(27 rows)
+

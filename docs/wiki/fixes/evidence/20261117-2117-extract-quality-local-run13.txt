@@ -1,0 +1,21 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/extract-quality/run13.py
+# 시각: 2026-11-17T21:17:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 8404fc3 (dev2)
+# exit: 0
+# ---
+signup 201 {'id': '52892f2275bc45a99702de51064a110a', 'username': 'extq917856', 'nickname': 'extq917856'}
+{"n": 1, "utt": "오늘 김민수 팀장님이랑 회의하다가 일정 문제로 또 부딪혔어", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 2, "utt": "지난주에도 김민수 팀장님이 내 보고서를 사람들 앞에서 지적해서 좀 그랬어", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 3, "utt": "김민수 팀장님은 아침 일찍 보고받는 걸 좋아하셔", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 4, "utt": "어제 김민수 팀장님이랑 예산 건으로 한 번 더 언쟁이 있었어", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 5, "utt": "그래도 김민수 팀장님이 이번 발표는 잘했다고 칭찬해 주셨어", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 6, "utt": "대학 동기 이서연이랑 주말에 저녁 먹었어", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 7, "utt": "이서연이 다음 달에 이직한다고 하더라", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 8, "utt": "이서연은 매운 음식을 못 먹어", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 9, "utt": "엄마가 지난주에 허리 병원 다녀오셨대", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 10, "utt": "박준호 대리가 내 자료 정리를 도와줘서 일이 일찍 끝났어", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 11, "utt": "팀장님이 오늘은 회의를 일찍 끝내 주셨어", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 12, "utt": "김민수 팀장님 요즘 어때?", "status": 401, "reply": null, "stored": null, "steps": []}
+{"n": 13, "utt": "내일 오후 4시에 김민수 팀장님이랑 분기 리뷰 회의 일정 있어", "status": 401, "reply": null, "stored": null, "steps": []}
+ME {'detail': {'code': 'unauthenticated'}}

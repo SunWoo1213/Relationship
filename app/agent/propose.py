@@ -99,6 +99,22 @@ from app.settings import ER_JUDGE_MAX_RETRIES, ER_JUDGE_TIMEOUT
 
 TOOL_NAMES = app_tools.TOOL_NAMES
 
+#: FIX-037 -- `events.type` 7종 각각의 뜻과 겹칠 때의 우선순위를 LLM 에게
+#: 보여 줄 한국어 설명. 키는 `EVENT_TYPES` 와 정확히 같은 7종이어야 한다
+#: (테스트가 확인). 프롬프트(`build_propose_prompt`)가 이 상수에서 만들어진다
+#: (`FACT_KEY_DESCRIPTIONS` 와 같은 방식). 유형 enum 은 함수 스키마에
+#: `strict` 가 없어 강제되지 않으므로 설명으로 유도할 뿐, 7종 밖 값의 거부는
+#: 여전히 게이트(`bad_args`)가 한다.
+EVENT_TYPE_DESCRIPTIONS: dict[str, str] = {
+    "conflict": "다툼·언쟁·지적받음·의견 충돌·부딪힘. 회의나 식사 자리에서 생겼어도 이 유형",
+    "praise": "칭찬·인정·감사를 받거나 한 일",
+    "meal": "이미 있었던 식사·술·커피처럼 함께 먹고 마신 일(그 자리에서 다툼이 있었다면 conflict)",
+    "meeting": "이미 있었던 만남·회의·면담처럼 함께 모인 일(그 자리에서 다툼이 있었다면 conflict)",
+    "personal_share": "상대가 본인의 신상·근황·사정을 털어놓은 일",
+    "favor": "도움이나 부탁을 주고받은 일",
+    "other": "위 여섯 가지 어느 것도 아닐 때",
+}
+
 #: 프롬프트가 "제안하지 마라"고 안내하는 목록일 뿐 -- 실제 거부의 단일
 #: 출처는 게이트(U3, 01-plan 60행)다(모듈 docstring "인식 vs 게이트").
 _LLM_NOT_CALLABLE: tuple[str, ...] = ("search_person", "ask_user", "get_briefing")
@@ -242,9 +258,26 @@ def build_propose_prompt(utterance: str, now: datetime) -> tuple[str, str]:
         "단, intent 가 query 일 때만 예외로, 물어본 인물마다 search_person 을 "
         "하나씩 제안하고 그 언급을 query 필드에 써라(person 필드에 써도 "
         "받아들인다). 이 제안은 실행되지 않고 대상 표시로만 쓰인다. "
-        "발화가 이미 기록된 인물 정보를 묻는 질문이면 intent 를 query, 새 "
-        "사실·사건·일정을 알려주는 말이면 record 로 답하라. 둘이 섞이면 "
-        "query 다. "
+        "발화가 묻는 형태(의문형·물음표·알려 달라는 요청)이고 이미 기록된 "
+        "인물 정보를 묻는 것일 때만 intent 를 query 로, 인물에 대해 새 "
+        "사실·사건·일정을 알려 주는 평서문은 물음표가 없으면 record 로 "
+        "답하라. 둘이 섞이면 query 다. "
+        "intent 는 반드시 채워라(query 또는 record). "
+        "아직 일어나지 않은 약속·회의·면담처럼 앞으로 있을 일은 add_event 가 "
+        "아니라 add_schedule 로만 제안한다. add_event 는 이미 일어난 일에만 쓴다. "
+        "일어난 일(누가 무엇을 했다·말했다·털어놓았다)을 말하는 발화는 "
+        "반드시 add_event 로 제안한다. 인물 사실은 사건을 대신하지 못한다 -- "
+        "사건의 내용을 사실로 옮겨 적지 마라. 사실(update_person 의 facts)은 "
+        "사건과 별개로, 그 인물에 대해 계속 참인 정보(선호·직업·가족·사는 곳 "
+        "등)가 발화에 명시돼 있을 때에만 더한다. 일어난 일 없이 그런 정보만 "
+        "말하는 평서문은 update_person 만 제안한다. 호칭·직함만 보고 사실을 만들지 말고, 사건 내용을 사실로 "
+        "다시 적지 마라. 값이 비었거나 '기타'·'모름' 같은 자리 채우기이거나 "
+        "호칭·직함·역할 이름뿐이면 그 사실은 제안하지 않는다. 사실이 없으면 "
+        "update_person 을 제안하지 마라. "
+        "add_event 의 type 은 아래 일곱 가지 중 하나만 쓰고, 이 일곱 개 밖의 "
+        "값은 쓰지 마라. 둘 이상에 걸치면 conflict, favor, praise, "
+        "personal_share 를 meeting·meal 보다 먼저 고르고, 어느 것도 아니면 "
+        "other 를 쓴다. "
         "'나'·'저'·'내'·'제' 처럼 말하는 사용자 자신을 가리키는 말은 인물로 "
         "제안하지 마라. "
         f"{PROPOSAL_TOOL_NAME} 도구로만 답하라."
@@ -263,6 +296,9 @@ def build_propose_prompt(utterance: str, now: datetime) -> tuple[str, str]:
         "\n\n인물에 관한 사실(update_person 의 facts)을 제안할 때 key 는 "
         "아래 뜻에 맞는 것을 고른다(FIX-017):\n"
         + "\n".join(f"- {key}: {desc}" for key, desc in FACT_KEY_DESCRIPTIONS.items())
+        + "\n\n사건(add_event)을 제안할 때 type 은 아래 일곱 가지 중 뜻에 "
+        "맞는 하나만 고른다(FIX-037):\n"
+        + "\n".join(f"- {key}: {desc}" for key, desc in EVENT_TYPE_DESCRIPTIONS.items())
     )
     return system, user_text
 

@@ -1,0 +1,56 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037/extra.py docs/wiki/fixes/evidence/20261117-2133-fix037-probe-before-recognition.txt docs/wiki/fixes/evidence/20261117-2144-fix037-probe-after-recognition.txt docs/wiki/fixes/evidence/20261117-2150-fix037-probe-after2-recognition.txt
+# 시각: 2026-11-17T21:56:11+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# 메모: 보조 집계: 거부 알림 문장 횟수, raw.intent 누락 분포, 기대 밖 update_person, s01 제안 (스크래치 extra.py, 읽기 전용)
+# ---
+== 20261117-2133-fix037-probe-before-recognition.txt trials 160
+거부 알림 문장: 0
+raw.intent 누락(묶음별): {'fact': 4, 'mixed': 1, 'event': 1}
+명시적 intent 일치(누락 제외): 133 / 160
+기대에 없는 update_person (발화, 사실 키): 횟수
+   ('e10', ('life_event',)) 2
+   ('e13', ('job',)) 2
+s01 제안: {'[["search_person", null], ["add_schedule", null]]': 5}
+== 20261117-2144-fix037-probe-after-recognition.txt trials 160
+거부 알림 문장: 0
+raw.intent 누락(묶음별): {'fact': 8, 'event': 16, 'mixed': 7, 'schedule': 4}
+명시적 intent 일치(누락 제외): 125 / 160
+기대에 없는 update_person (발화, 사실 키): 횟수
+   ('e02', ('job', 'workplace')) 5
+   ('e03', ('job',)) 1
+   ('e04', ('job',)) 4
+   ('e04', ('likes',)) 1
+   ('e05', ('job',)) 4
+   ('e05', ('job', 'workplace')) 1
+   ('e06', ()) 1
+   ('e06', ('likes',)) 1
+   ('e07', ('hobby',)) 1
+   ('e09', ('life_event',)) 1
+   ('e10', ('life_event',)) 5
+   ('e11', ('life_event',)) 5
+   ('e12', ('life_event',)) 5
+   ('e13', ('job',)) 5
+   ('e14', ('job',)) 3
+s01 제안: {'[["add_event", "meal"]]': 5}
+== 20261117-2150-fix037-probe-after2-recognition.txt trials 160
+거부 알림 문장: 0
+raw.intent 누락(묶음별): {'fact': 9, 'event': 18, 'mixed': 7, 'schedule': 5}
+명시적 intent 일치(누락 제외): 121 / 160
+기대에 없는 update_person (발화, 사실 키): 횟수
+   ('e02', ('job', 'workplace')) 4
+   ('e03', ('job',)) 1
+   ('e03', ('job', 'workplace')) 1
+   ('e04', ('job',)) 5
+   ('e05', ('job',)) 2
+   ('e05', ('job', 'workplace')) 3
+   ('e07', ('hobby',)) 2
+   ('e10', ('life_event',)) 5
+   ('e11', ('life_event',)) 4
+   ('e12', ('life_event',)) 5
+   ('e13', ('job',)) 3
+   ('e13', ('job', 'workplace')) 1
+   ('e13', ('life_event',)) 1
+   ('e14', ('job',)) 4
+s01 제안: {'[["add_event", "meal"]]': 4, '[["add_event", "meal"], ["search_person", null]]': 1}

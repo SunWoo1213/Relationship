@@ -1,0 +1,102 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037-review/mutate.py control
+# 시각: 2026-11-17T21:49:28+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# 메모: 대조군 + 관찰 시나리오
+# ---
+대조군(변이 없음, 사본 전체 pytest)
+  -> 잡힘 | 실패 2건 | 2 failed, 2632 passed, 1 warning in 40.51s
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+
+# ===== append 2026-11-17T21:50:14+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037-review/mutate.py scenario
+# 시각: 2026-11-17T21:50:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# ---
+S1 reply= '말씀하신 내용을 기록하지 못했어요. 다시 한 번 말씀해 주시겠어요?\n"오유나"을(를) 새 인물로 기억해둘까요?'
+S1 pending= new_person stop_reason= ask_user stored= StoredSummary(persons=0, events=0, schedules=0)
+S2 reply= '말씀하신 내용을 기록하지 못했어요. 다시 한 번 말씀해 주시겠어요?\n"누구"을(를) 새 인물로 기억해둘까요?'
+S2 pending= new_person stop_reason= ask_user stored= StoredSummary(persons=0, events=0, schedules=0)
+S3 default= '이번 발화에서는 새로 기억한 것이 없어요. (1건은 저장하지 못했어요.) 한 번에 너무 많아 일부만 기억했어요.'
+S3 flagged= '말씀하신 내용을 기록하지 못했어요. 다시 한 번 말씀해 주시겠어요? (1건은 저장하지 못했어요.) 한 번에 너무 많아 일부만 기억했어요.'
+3 passed in 0.24s
+
+# ===== append 2026-11-17T21:50:23+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037-review/mutate.py a
+# 시각: 2026-11-17T21:50:23+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# ---
+V1 [요청 예시] bad_args 가 아닌 거부에도 알림 (모든 거부)
+  -> 잡힘 | 실패 3건 | 3 failed, 2631 passed, 1 warning in 40.46s
+     FAILED tests/test_agent_fix037.py::test_run_turn_non_bad_args_rejection_keeps_nothing_stored_sentence - AssertionError: assert '말씀하신 내용을 기록하... 번 말씀해 주시겠어요?' == '이번 발화에서는 새로 기억한 것이 없어요.'
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V2 [요청 예시] 저장된 것이 있는데 거부 문장
+  -> 잡힘 | 실패 3건 | 3 failed, 2631 passed, 1 warning in 40.03s
+     FAILED tests/test_agent_fix037.py::test_build_reply_bad_args_flag_replaces_sentence_only_when_nothing_stored - AssertionError: assert '말씀하신 내용을 기록하... 번 말씀해 주시겠어요?' == '기억했어요: 이벤트 1건.'
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V3 [요청 예시] 유형 설명에서 other 한 종 삭제
+  -> 잡힘 | 실패 3건 | 3 failed, 2631 passed, 1 warning in 41.26s
+     FAILED tests/test_agent_fix037.py::test_event_type_descriptions_keys_equal_event_types_exactly - AssertionError: assert ('conflict', ...are', 'favor') == ('conflict', ... 'favor', ...)
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V4 [요청 예시] 근황 재진술 문장 삭제
+  -> 잡힘 | 실패 3건 | 3 failed, 2631 passed, 1 warning in 39.56s
+     FAILED tests/test_agent_query_answer.py::test_prompt_system_exact_sentences - AssertionError: assert '너는 사용자가 기록해 ...wer 도구로만 답하라.' == '너는 사용자가 기록해 ...wer 도구로만 답하라.'
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V5 [새] not_callable_by_llm 거부(record 턴의 search_person)에도 알림
+  -> 잡힘 | 실패 2건 | 2 failed, 2632 passed, 1 warning in 39.95s
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V6 [새] person_id_from_llm · limit · needs_confirmation 거부에도 알림
+  -> 잡힘 | 실패 2건 | 2 failed, 2632 passed, 1 warning in 40.43s
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+
+# ===== append 2026-11-17T21:55:01+09:00 =====
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037-review/mutate.py b
+# 시각: 2026-11-17T21:55:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# ---
+V7 [새] praise 와 favor 의 설명을 서로 바꿈
+  -> 잡힘 | 실패 2건 | 2 failed, 2632 passed, 1 warning in 41.03s
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V8 [새] 대기 질문이 있으면 거부 문장을 쓰지 않음 (계약이 어느 쪽인지 테스트가 고정하는가)
+  -> 잡힘 | 실패 2건 | 2 failed, 2632 passed, 1 warning in 39.86s
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V9 [새] add_event 의 bad_args 만 알림 (update_person·add_schedule·create_person 제외)
+  -> 잡힘 | 실패 2건 | 2 failed, 2632 passed, 1 warning in 41.03s
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V10 [새] 의도 문장에서 '이미 기록된 인물 정보를 묻는 것' 조건 삭제
+  -> 잡힘 | 실패 2건 | 2 failed, 2632 passed, 1 warning in 41.89s
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V11 [새] 근황 문장을 '기록이 없어요' 규칙 뒤로 옮김(우선순위 뒤집힘)
+  -> 잡힘 | 실패 3건 | 3 failed, 2631 passed, 1 warning in 47.94s
+     FAILED tests/test_agent_query_answer.py::test_prompt_system_exact_sentences - AssertionError: assert '너는 사용자가 기록해 ...wer 도구로만 답하라.' == '너는 사용자가 기록해 ...wer 도구로만 답하라.'
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V12 [새] 유형 설명 블록을 시스템 프롬프트 우선순위 문장과 어긋나게: 우선순위 문장 삭제
+  -> 잡힘 | 실패 3건 | 3 failed, 2631 passed, 1 warning in 41.44s
+     FAILED tests/test_agent_fix037.py::test_prompt_event_type_priority_and_closed_set_sentences - assert 'conflict, favor, praise, personal_share 를 meeting·meal 보다 먼저' in "너는 한국어 대화 한 문장을 보고, 그 문장을 기억하는 데 필요한 툴 호출을 제안하는 보조 도구다. 아래 툴 목
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git
+V13 [새] 조회 턴(query)에도 플래그가 새는지: build_reply 기본값을 True 로
+  -> 잡힘 | 실패 4건 | 4 failed, 2630 passed, 1 warning in 40.26s
+     FAILED tests/test_agent_fix037.py::test_build_reply_bad_args_flag_replaces_sentence_only_when_nothing_stored - AssertionError: assert '말씀하신 내용을 기록하... 번 말씀해 주시겠어요?' == '이번 발화에서는 새로 기억한 것이 없어요.'
+     FAILED tests/test_agent_loop.py::test_build_reply_without_facts_is_unchanged - AssertionError: assert '말씀하신 내용을 기록하... 번 말씀해 주시겠어요?' == '이번 발화에서는 새로 기억한 것이 없어요.'
+     FAILED tests/test_deploy_files.py::test_env_example_has_empty_site_address - FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca
+     FAILED tests/test_infra_files.py::test_no_state_or_vars_files_are_tracked_by_git - AssertionError: git ls-files 실패(git 없음·저장소 아님?): fatal: (현재 폴더 또는 상위 폴더 중 일부가) 깃 저장소가 아닙니다: .git

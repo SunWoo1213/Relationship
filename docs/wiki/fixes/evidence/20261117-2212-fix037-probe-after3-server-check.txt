@@ -1,0 +1,26 @@
+# 명령: sh /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037/server_check.sh
+# 시각: 2026-11-17T22:12:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# ---
+== git HEAD / 작업 트리 변경(app, tests)
+9fce41d
+ M app/agent/loop.py
+ M app/agent/propose.py
+ M app/agent/respond.py
+ M tests/test_agent_query_answer.py
+?? tests/test_agent_fix037.py
+ app/agent/loop.py    |  2 ++
+ app/agent/propose.py | 39 ++++++++++++++++++++++++++++++++++++---
+ app/agent/respond.py |  6 ++++++
+ 3 files changed, 44 insertions(+), 3 deletions(-)
+== 수정 파일 mtime
+-rw-r--r--@ 1 sunwoo  staff  90451 2026-11-17 21:39:51 app/agent/loop.py
+-rw-r--r--@ 1 sunwoo  staff  31621 2026-11-17 22:04:26 app/agent/propose.py
+-rw-r--r--@ 1 sunwoo  staff  23061 2026-11-17 22:02:46 app/agent/respond.py
+== uvicorn 프로세스 시작 시각 (reloader + 워커)
+31961 2026년 11월  8일 일요일 20시 02분 08초 /Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -m uvicorn app.main:app --env-file .env --host 127.0.0.1 --port 8000 --reload
+84022 2026년 11월 17일 화요일 22시 11분 49초 /Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=5, pipe_handle=7) --multiprocessing-fork
+== /health
+{"status":"ok","db":"up","alembic_revision":"0004"}

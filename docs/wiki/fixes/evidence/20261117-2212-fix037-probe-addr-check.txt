@@ -1,0 +1,24 @@
+# 명령: sh /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037/addr_check.sh
+# 시각: 2026-11-17T22:12:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# 메모: R-37-9 주소 검사 정확 일치 확인(거부 주소 5개)
+# ---
+== http://localhost.example.com:8000
+로컬 서버만 잰다(--base 는 localhost)
+exit=1
+== http://127.0.0.1.nip.io:8000
+로컬 서버만 잰다(--base 는 localhost)
+exit=1
+== https://localhost:8000
+로컬 서버만 잰다(--base 는 localhost)
+exit=1
+== http://54-79-202-221.sslip.io
+로컬 서버만 잰다(--base 는 localhost)
+exit=1
+== http://evil.com/http://localhost
+로컬 서버만 잰다(--base 는 localhost)
+exit=1
+== ruff
+All checks passed!

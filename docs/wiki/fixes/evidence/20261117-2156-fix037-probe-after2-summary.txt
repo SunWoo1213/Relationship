@@ -1,0 +1,65 @@
+# 명령: .venv/bin/python evaluation/recognition/probe.py summarize docs/wiki/fixes/evidence/20261117-2150-fix037-probe-after2-recognition.txt
+# 시각: 2026-11-17T21:56:11+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# 메모: FIX-037 after 2회차 인식 단독 집계(변동 폭)
+# ---
+== recognition [after]
+  label: after
+  trials: 160
+  http_errors: 0
+  intent_match: 160/160 (100.0%)
+  intent_match_fact: 40/40 (100.0%)
+  intent_match_event: 70/70 (100.0%)
+  intent_match_query: 30/30 (100.0%)
+  intent_match_mixed: 10/10 (100.0%)
+  intent_match_schedule: 10/10 (100.0%)
+  intent_match_record_labeled: 130/130 (100.0%)
+  intent_missing_raw: 39/160 (24.4%)
+  type_match: 78/90 (86.7%)
+  type_match_event_group: 68/70 (97.1%)
+  type_match_conflict: 15/15 (100.0%)
+  type_no_add_event: 9/90 (10.0%)
+  enum_violation: 0/90 (0.0%)
+  enum_violation_values: {}
+  bad_args_rejections: 0
+  tool_exact: 102/160 (63.8%)
+  tool_cover_record_labeled: 116/130 (89.2%)
+  tool_cover_mixed: 10/10 (100.0%)
+  record_end_to_end: 116/130 (89.2%)
+  query_turn_no_write_turns: 0/130 (0.0%)
+  -- per_item
+  f01: {"accepted": {"update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"update_person": 5}, "types": {"-": 5}}
+  f02: {"accepted": {"update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"update_person": 5}, "types": {"-": 5}}
+  f03: {"accepted": {"update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"update_person": 5}, "types": {"-": 5}}
+  f04: {"accepted": {"add_event+update_person": 2, "update_person": 3}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 2, "update_person": 3}, "types": {"-": 3, "other": 2}}
+  f05: {"accepted": {"update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"update_person": 5}, "types": {"-": 5}}
+  f06: {"accepted": {"add_event+update_person": 1, "update_person": 4}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 1, "update_person": 4}, "types": {"-": 4, "other": 1}}
+  f07: {"accepted": {"add_event+update_person": 2, "update_person": 3}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 2, "update_person": 3}, "types": {"-": 3, "other": 2}}
+  f08: {"accepted": {"update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"update_person": 5}, "types": {"-": 5}}
+  e01: {"accepted": {"add_event": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 5}, "types": {"conflict": 5}}
+  e02: {"accepted": {"add_event": 1, "add_event+update_person": 4}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 1, "add_event+update_person": 4}, "types": {"conflict": 5}}
+  e03: {"accepted": {"add_event": 3, "add_event+update_person": 2}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 3, "add_event+update_person": 2}, "types": {"conflict": 5}}
+  e04: {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"praise": 5}}
+  e05: {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"praise": 5}}
+  e06: {"accepted": {"add_event": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 5}, "types": {"meal": 5}}
+  e07: {"accepted": {"add_event": 3, "add_event+update_person": 2}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 3, "add_event+update_person": 2}, "types": {"meal": 5}}
+  e08: {"accepted": {"add_event": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 5}, "types": {"meeting": 5}}
+  e09: {"accepted": {"add_event": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 5}, "types": {"meeting": 5}}
+  e10: {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"personal_share": 5}}
+  e11: {"accepted": {"add_event": 1, "add_event+update_person": 3, "update_person": 1}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 1, "add_event+update_person": 3, "update_person": 1}, "types": {"-": 1, "personal_share": 4}}
+  e12: {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"favor": 5}}
+  e13: {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"favor": 5}}
+  e14: {"accepted": {"add_event": 1, "add_event+update_person": 4}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 1, "add_event+update_person": 4}, "types": {"conflict": 1, "other": 4}}
+  q01: {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {}, "tools": {"-": 5}, "types": {"-": 5}}
+  q02: {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {}, "tools": {"-": 5}, "types": {"-": 5}}
+  q03: {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {}, "tools": {"-": 5}, "types": {"-": 5}}
+  q04: {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {}, "tools": {"-": 5}, "types": {"-": 5}}
+  q05: {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {}, "tools": {"-": 5}, "types": {"-": 5}}
+  q06: {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {"query_turn_no_write": 1}, "tools": {"-": 4, "add_event": 1}, "types": {"-": 4, "meeting": 1}}
+  m01: {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"meal": 5}}
+  m02: {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"favor": 5}}
+  s01: {"accepted": {"add_event": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 5}, "types": {"meal": 5}}
+  s02: {"accepted": {"add_schedule": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_schedule": 5}, "types": {"-": 5}}
+SUMMARY_JSON {"answer": {}, "recognition": {"after": {"bad_args_rejections": 0, "enum_violation": [0, 90], "enum_violation_values": {}, "http_errors": 0, "intent_match": [160, 160], "intent_match_event": [70, 70], "intent_match_fact": [40, 40], "intent_match_mixed": [10, 10], "intent_match_query": [30, 30], "intent_match_record_labeled": [130, 130], "intent_match_schedule": [10, 10], "intent_missing_raw": [39, 160], "label": "after", "per_item": {"e01": {"accepted": {"add_event": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 5}, "types": {"conflict": 5}}, "e02": {"accepted": {"add_event": 1, "add_event+update_person": 4}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 1, "add_event+update_person": 4}, "types": {"conflict": 5}}, "e03": {"accepted": {"add_event": 3, "add_event+update_person": 2}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 3, "add_event+update_person": 2}, "types": {"conflict": 5}}, "e04": {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"praise": 5}}, "e05": {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"praise": 5}}, "e06": {"accepted": {"add_event": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 5}, "types": {"meal": 5}}, "e07": {"accepted": {"add_event": 3, "add_event+update_person": 2}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 3, "add_event+update_person": 2}, "types": {"meal": 5}}, "e08": {"accepted": {"add_event": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 5}, "types": {"meeting": 5}}, "e09": {"accepted": {"add_event": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 5}, "types": {"meeting": 5}}, "e10": {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"personal_share": 5}}, "e11": {"accepted": {"add_event": 1, "add_event+update_person": 3, "update_person": 1}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 1, "add_event+update_person": 3, "update_person": 1}, "types": {"-": 1, "personal_share": 4}}, "e12": {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"favor": 5}}, "e13": {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"favor": 5}}, "e14": {"accepted": {"add_event": 1, "add_event+update_person": 4}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 1, "add_event+update_person": 4}, "types": {"conflict": 1, "other": 4}}, "f01": {"accepted": {"update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"update_person": 5}, "types": {"-": 5}}, "f02": {"accepted": {"update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"update_person": 5}, "types": {"-": 5}}, "f03": {"accepted": {"update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"update_person": 5}, "types": {"-": 5}}, "f04": {"accepted": {"add_event+update_person": 2, "update_person": 3}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 2, "update_person": 3}, "types": {"-": 3, "other": 2}}, "f05": {"accepted": {"update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"update_person": 5}, "types": {"-": 5}}, "f06": {"accepted": {"add_event+update_person": 1, "update_person": 4}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 1, "update_person": 4}, "types": {"-": 4, "other": 1}}, "f07": {"accepted": {"add_event+update_person": 2, "update_person": 3}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 2, "update_person": 3}, "types": {"-": 3, "other": 2}}, "f08": {"accepted": {"update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"update_person": 5}, "types": {"-": 5}}, "m01": {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"meal": 5}}, "m02": {"accepted": {"add_event+update_person": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event+update_person": 5}, "types": {"favor": 5}}, "q01": {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {}, "tools": {"-": 5}, "types": {"-": 5}}, "q02": {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {}, "tools": {"-": 5}, "types": {"-": 5}}, "q03": {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {}, "tools": {"-": 5}, "types": {"-": 5}}, "q04": {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {}, "tools": {"-": 5}, "types": {"-": 5}}, "q05": {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {}, "tools": {"-": 5}, "types": {"-": 5}}, "q06": {"accepted": {"-": 5}, "intent": {"query": 5}, "rejects": {"query_turn_no_write": 1}, "tools": {"-": 4, "add_event": 1}, "types": {"-": 4, "meeting": 1}}, "s01": {"accepted": {"add_event": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_event": 5}, "types": {"meal": 5}}, "s02": {"accepted": {"add_schedule": 5}, "intent": {"record": 5}, "rejects": {}, "tools": {"add_schedule": 5}, "types": {"-": 5}}}, "query_turn_no_write_turns": [0, 130], "record_end_to_end": [116, 130], "tool_cover_mixed": [10, 10], "tool_cover_record_labeled": [116, 130], "tool_exact": [102, 160], "trials": 160, "type_match": [78, 90], "type_match_conflict": [15, 15], "type_match_event_group": [68, 70], "type_no_add_event": [9, 90]}}}

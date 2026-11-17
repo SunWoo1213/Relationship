@@ -1,0 +1,92 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037-review/summ.sh
+# 시각: 2026-11-17T21:48:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# ---
+summarize exit=0
+== recognition [before]
+  label: before
+  trials: 160
+  http_errors: 0
+  intent_match: 139/160 (86.9%)
+  intent_match_fact: 30/40 (75.0%)
+  intent_match_event: 63/70 (90.0%)
+  intent_match_query: 30/30 (100.0%)
+  intent_match_mixed: 6/10 (60.0%)
+  intent_match_schedule: 10/10 (100.0%)
+  intent_match_record_labeled: 109/130 (83.8%)
+  intent_missing_raw: 6/160 (3.8%)
+  type_match: 48/90 (53.3%)
+  type_match_event_group: 43/70 (61.4%)
+  type_match_conflict: 2/15 (13.3%)
+  type_no_add_event: 28/90 (31.1%)
+  enum_violation: 0/62 (0.0%)
+  enum_violation_values: {}
+  bad_args_rejections: 4
+  tool_exact: 126/160 (78.8%)
+  tool_cover_record_labeled: 97/130 (74.6%)
+  tool_cover_mixed: 5/10 (50.0%)
+  record_end_to_end: 91/130 (70.0%)
+  query_turn_no_write_turns: 10/130 (7.7%)
+  -- per_item
+== answer [before]
+  label: before
+  answers: 18
+  http_errors: 0
+  recent_answered: 10/12 (83.3%)
+  absent_no_record_strict: 6/6 (100.0%)
+  absent_no_record_broad: 6/6 (100.0%)
+  query_route: 18/18 (100.0%)
+  -- per_item
+== 구현자 집계 파일(머리줄 제외)과 내 재실행 출력의 diff
+차이 없음 (전체 줄 동일)
+== 독립 재계산 (probe.py 를 쓰지 않고 TRIAL/ANSWER 줄에서 직접)
+  시도 160 · status!=200: 0
+  의도 일치(전체): 139/160
+  의도 일치(fact): 30/40
+  의도 일치(event): 63/70
+  의도 일치(query): 30/30
+  의도 일치(mixed): 6/10
+  의도 일치(schedule): 10/10
+  유형 일치: 48/90
+  conflict 라벨 유형 일치: 2/15
+  enum 이탈: 0/62
+  bad_args 거부: 4 [('f05', 'create_person')]
+  query_turn_no_write 로 버려진 기록 턴: 10/130
+  조회 답 수: 18
+  근황 답변(기록이 없 미포함 + person_id): 10/12
+  없는 것 -> '기록이 없': 6/6
+     a05 0 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a06 0 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a05 1 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a06 1 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a05 2 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a06 2 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a01 0 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a02 0 '배성훈 선배는 최근 발표 준비가 잘됐다고 칭찬해 주었고, 스터디 진행 방식 때문에 말다툼을 했습니다. 또한, 11월 14일 광화문에서 점심을 먹었습니다.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a03 0 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 줬고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했으며, 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 화'
+     a04 0 '배성훈 선배와는 11월 17일에 발표 준비가 잘됐다고 칭찬을 받았고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했습니다. 11월 14일에는 함께 광화문에서 점심을 먹었습니다.\n자세한 건 '
+     a01 1 '기록이 없어요.\n자세한 건 인물 화면에서 볼 수 있어요.'
+     a02 1 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 줬고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했으며, 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 화'
+     a03 1 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 줬고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했습니다. 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 '
+     a04 1 '배성훈 선배와 최근에 있었던 일로는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 준 일과, 11월 15일에 스터디 진행 방식 때문에 말다툼을 했던 일이 있습니다.\n자세한 건 인물 화면에서 볼 수'
+     a01 2 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 줬고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했습니다. 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물 '
+     a02 2 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 주었고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했습니다. 11월 14일에는 광화문에서 점심을 먹었습니다.\n자세한 건 인물'
+     a03 2 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 주었고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했으며, 11월 14일에는 광화문에서 점심을 먹었습니다. 현재 예정된 일정'
+     a04 2 '배성훈 선배는 11월 17일에 내 발표 준비가 잘됐다고 칭찬해 줬고, 11월 15일에는 스터디 진행 방식 때문에 말다툼을 했어. 또한 11월 14일에 광화문에서 점심을 먹었어.\n자세한 건 인물 화면'
+== bad_args 거부가 있던 before 시도: 발화 id · 거부 · 통과 · 대기 질문 · 답 첫 줄
+  f05 rep 0 | intent record | 거부 [('create_person', 'bad_args')] | 통과 [] | 대기 None | stored {'events': 0, 'persons': 0, 'schedules': 0} | 답 '이번 발화에서는 새로 기억한 것이 없어요.'
+  f05 rep 1 | intent record | 거부 [('create_person', 'bad_args')] | 통과 ['update_person'] | 대기 new_person | stored {'events': 0, 'persons': 0, 'schedules': 0} | 답 '이번 발화에서는 새로 기억한 것이 없어요.\n"오유나"을(를) 새 인물로 기억해둘까요?'
+  f05 rep 2 | intent record | 거부 [('create_person', 'bad_args')] | 통과 ['update_person'] | 대기 new_person | stored {'events': 0, 'persons': 0, 'schedules': 0} | 답 '이번 발화에서는 새로 기억한 것이 없어요.\n"오유나"을(를) 새 인물로 기억해둘까요?'
+  f05 rep 3 | intent record | 거부 [('create_person', 'bad_args')] | 통과 ['update_person'] | 대기 new_person | stored {'events': 0, 'persons': 0, 'schedules': 0} | 답 '이번 발화에서는 새로 기억한 것이 없어요.\n"오유나"을(를) 새 인물로 기억해둘까요?'
+== 표본·프로브 파일 mtime 과 측정 시작 시각
+2026-11-17 21:31:48 evaluation/recognition/heldout.jsonl
+2026-11-17 21:33:36 evaluation/recognition/query_answer.json
+2026-11-17 21:34:58 evaluation/recognition/probe.py
+2026-11-17 21:39:31 reports/recognition-probe.md
+# 시각: 2026-11-17T21:33:57+09:00
+# 시각: 2026-11-17T21:33:57+09:00
+10
+20261117-2144-fix037-probe-after-answer.txt
+20261117-2144-fix037-probe-after-server-check.txt

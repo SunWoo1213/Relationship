@@ -1,0 +1,66 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix037/extra.py docs/wiki/fixes/evidence/20261117-2133-fix037-probe-before-recognition.txt docs/wiki/fixes/evidence/20261117-2144-fix037-probe-after-recognition.txt docs/wiki/fixes/evidence/20261117-2212-fix037-probe-after3-recognition.txt
+# 시각: 2026-11-17T22:16:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# 메모: 보조 집계: before / after / after3 (스크래치 extra.py, 읽기 전용)
+# ---
+== 20261117-2133-fix037-probe-before-recognition.txt trials 160
+거부 알림 문장: 0
+raw.intent 누락(묶음별): {'fact': 4, 'mixed': 1, 'event': 1} 합 6
+명시적 intent 일치(누락 제외): 133 / 160
+기대에 없는 update_person 합(사건·일정·질문 발화): 4
+   ('e10', ('life_event',)) 2
+   ('e13', ('job',)) 2
+s01 제안 분포: {'["add_schedule"]': 5}
+s02 제안 분포: {'["add_schedule"]': 5}
+f07 제안 분포: {'[]': 5}
+f08 제안 분포: {'["update_person"]': 5}
+f04 제안 분포: {'["update_person"]': 4, '["create_person", "update_person"]': 1}
+e14 제안 분포: {'["add_event:meeting"]': 1, '["add_event:other"]': 4}
+== 20261117-2144-fix037-probe-after-recognition.txt trials 160
+거부 알림 문장: 0
+raw.intent 누락(묶음별): {'fact': 8, 'event': 16, 'mixed': 7, 'schedule': 4} 합 35
+명시적 intent 일치(누락 제외): 125 / 160
+기대에 없는 update_person 합(사건·일정·질문 발화): 43
+   ('e02', ('job', 'workplace')) 5
+   ('e03', ('job',)) 1
+   ('e04', ('job',)) 4
+   ('e04', ('likes',)) 1
+   ('e05', ('job',)) 4
+   ('e05', ('job', 'workplace')) 1
+   ('e06', ()) 1
+   ('e06', ('likes',)) 1
+   ('e07', ('hobby',)) 1
+   ('e09', ('life_event',)) 1
+   ('e10', ('life_event',)) 5
+   ('e11', ('life_event',)) 5
+   ('e12', ('life_event',)) 5
+   ('e13', ('job',)) 5
+   ('e14', ('job',)) 3
+s01 제안 분포: {'["add_event:meal"]': 5}
+s02 제안 분포: {'["add_schedule"]': 5}
+f07 제안 분포: {'["add_event:other", "update_person"]': 5}
+f08 제안 분포: {'["update_person"]': 5}
+f04 제안 분포: {'["update_person"]': 3, '["add_event:other", "update_person"]': 2}
+e14 제안 분포: {'["add_event:conflict", "update_person"]': 1, '["add_event:other"]': 2, '["add_event:other", "update_person"]': 2}
+== 20261117-2212-fix037-probe-after3-recognition.txt trials 160
+거부 알림 문장: 0
+raw.intent 누락(묶음별): {} 합 0
+명시적 intent 일치(누락 제외): 160 / 160
+기대에 없는 update_person 합(사건·일정·질문 발화): 23
+   ('e02', ('job',)) 1
+   ('e03', ('job',)) 1
+   ('e04', ('job',)) 2
+   ('e04', ('life_event',)) 3
+   ('e05', ('job',)) 1
+   ('e10', ('life_event',)) 5
+   ('e11', ('life_event',)) 1
+   ('e12', ('life_event',)) 5
+   ('e13', ('job',)) 4
+s01 제안 분포: {'["add_schedule"]': 5}
+s02 제안 분포: {'["add_schedule"]': 5}
+f07 제안 분포: {'["update_person"]': 5}
+f08 제안 분포: {'["update_person"]': 5}
+f04 제안 분포: {'["update_person"]': 5}
+e14 제안 분포: {'["add_event:other"]': 4, '[]': 1}
