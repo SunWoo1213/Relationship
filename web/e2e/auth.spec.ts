@@ -29,7 +29,8 @@ test('로그인 화면에서 로그인하면 앱 틀이 열리고, 로그아웃�
   await page.getByRole('button', { name: '로그인' }).click()
 
   await expect(page.locator('[data-screen="chat"]')).toBeVisible()
-  await expect(page.getByTestId('sidebar-username')).toHaveText('minji_01')
+  await expect(page.getByTestId('sidebar-nickname')).toHaveText('민지')
+  await expect(page.getByTestId('sidebar-username')).toHaveCount(0)
   expect(api.callsTo('POST /api/auth/login')[0].body).toEqual({ username: 'minji_01', password: 'correct-horse-9' })
 
   await page.getByRole('button', { name: '로그아웃' }).click()

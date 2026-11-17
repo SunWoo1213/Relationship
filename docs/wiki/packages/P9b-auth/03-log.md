@@ -249,3 +249,11 @@
 - 범위 밖 관찰(추출 품질, 원인 미확인 — P9b 가 바꾼 코드가 아님): 13발화 중 3·5·8 은 조회로 처리돼 미기록, 7·9 미기록(가족 인물 미생성), 갈등 3건의 유형이 `meeting`·`other`·`praise` 로 갈려 반복 패턴 0, 12번 조회 답 "기록이 없어요", 위계 "동". 사용자에게 보고하고 판단을 기다린다(FIX 로 원인 조사 / 시연 발화 조정).
 - 남은 것 · 다음 단위: 사용자 리허설 두 갈래 → `/devlog done`.
 - Refs: P9b-auth CR-007 D18
+
+## 2026-11-17 22:40 · fix(P9b-auth): 로그인한 화면의 사이드바에서 아이디를 보이지 않는다 · pending
+- 변경: `web/src/components/AppShell.tsx`(계정 줄 `<닉네임> · 로그아웃`) · `web/src/__tests__/auth.test.tsx` · `web/e2e/auth.spec.ts` · `fixes/FIX-038.md`·`review-FIX-038.md` · 01-plan 결정 AF 줄 · 증거 11개. 앞 항목 해시 `8404fc3`.
+- 이유(기획서·카드 연결): 사용자 2026-11-17 "로그인을 하고 들어가 있는 페이지에서 아이디는 보이지 않았으면 좋겠어" — 계획 결정 AF 를 (i) 에서 (ii) 로.
+- 정합성 확인: 원칙 5(요소 하나 제거) · D18 결정 10(닉네임이 표시 이름, 응답 계약 무변경) — 위반 없음.
+- 결과: Vitest 212 passed · lint·typecheck·build exit 0 · e2e auth 1 passed · 변이 2종 검출. verifier 통과([필수] 0).
+- 남은 것 · 다음 단위: FIX-037 커밋 → 서버 재배포 → 시연 계정 준비·리허설 → `/devlog done`.
+- Refs: FIX-038 P9b-auth CR-007 D18

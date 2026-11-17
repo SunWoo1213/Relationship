@@ -96,13 +96,13 @@ describe('관문 — GET /auth/me 두 갈래 (결정 L)', () => {
     expect(fetchFn.mock.calls.map(([u]) => String(u))).toEqual(['/api/auth/me'])
   })
 
-  it('me 200 이면 앱 틀(채팅)이 열리고 사이드바에 "<아이디> · 로그아웃" 한 줄이 있다', async () => {
+  it('me 200 이면 앱 틀(채팅)이 열리고 사이드바에 "<닉네임> · 로그아웃" 한 줄이 있다', async () => {
     install({ 'GET /api/auth/me': () => json(ME) })
     render(<App />)
     await screen.findByRole('textbox', { name: '메시지 입력' })
     expect(document.querySelector('[data-screen="auth"]')).toBeNull()
     const row = screen.getByTestId('sidebar-account')
-    expect(within(row).getByTestId('sidebar-username')).toHaveTextContent('minji_01')
+    expect(within(row).getByTestId('sidebar-nickname')).toHaveTextContent('민지')
     expect(within(row).getByRole('button', { name: ACCOUNT_NOTICE.logout })).toBeInTheDocument()
     // 채팅방 목록은 없다 (원칙7) — 사이드바 링크는 화면 3개 + 인물 목록 자리뿐
     const nav = screen.getByRole('navigation', { name: '주 메뉴' })
@@ -151,7 +151,8 @@ describe('로그인 (POST /auth/login)', () => {
     await fillAndSubmit({ username: 'minji_01', password: 'correct-horse-9', submit: AUTH_NOTICE.submitLogin })
 
     await screen.findByRole('textbox', { name: '메시지 입력' })
-    expect(screen.getByTestId('sidebar-username')).toHaveTextContent('minji_01')
+    expect(screen.queryByTestId('sidebar-username')).toBeNull()
+    expect(screen.getByTestId('sidebar-account')).not.toHaveTextContent('minji_01')
     const login = callsTo(fetchFn, 'POST /api/auth/login')
     expect(login).toHaveLength(1)
     expect(bodyOf(login[0])).toEqual({ username: 'minji_01', password: 'correct-horse-9' })
@@ -449,15 +450,20 @@ describe('가입 화면 — 닉네임 칸·중복 확인·사이드바 닉네임
     expect(document.querySelector('[data-screen="auth"]')).not.toBeNull()
   })
 
-  it('me 200 이면 사이드바에 닉네임(굵게 자리)과 아이디가 따로 보인다 — 닉네임은 아이디와 다른 값', async () => {
+  it('me 200 이면 사이드바 계정 줄은 닉네임과 로그아웃뿐이고 아이디는 없다 — 닉네임은 아이디와 다른 값 (FIX-038)', async () => {
     install({ 'GET /api/auth/me': () => json(ME) })
     render(<App />)
     await screen.findByRole('textbox', { name: '메시지 입력' })
     const row = screen.getByTestId('sidebar-account')
+    // ① 아이디 칸이 없다
+    expect(screen.queryByTestId('sidebar-username')).toBeNull()
+    // ② 계정 줄 글자에 아이디 문자열이 없다
+    expect(row.textContent).not.toContain('minji_01')
+    // ③ 닉네임·로그아웃은 그대로 — 사이 간격은 flex gap 이라 DOM 글자에는 공백이 없다
     expect(within(row).getByTestId('sidebar-nickname')).toHaveTextContent('민지')
-    expect(within(row).getByTestId('sidebar-username')).toHaveTextContent('minji_01')
-    // 사이 간격은 flex gap 이라 DOM 글자에는 공백이 없다 — 순서와 구분점만 본다
-    expect(row).toHaveTextContent('민지·minji_01·로그아웃')
+    expect(within(row).getByRole('button', { name: ACCOUNT_NOTICE.logout })).toBeInTheDocument()
+    expect(row).toHaveTextContent('민지·로그아웃')
+    expect(row.textContent).toBe('민지·로그아웃')
   })
 
   it('가입 직후(201 응답의 닉네임)에도 사이드바에 그 닉네임이 보인다', async () => {
@@ -469,7 +475,8 @@ describe('가입 화면 — 닉네임 칸·중복 확인·사이드바 닉네임
     await user.click(screen.getByRole('button', { name: AUTH_NOTICE.submitSignup }))
     await screen.findByRole('textbox', { name: '메시지 입력' })
     expect(screen.getByTestId('sidebar-nickname')).toHaveTextContent('심사위원')
-    expect(screen.getByTestId('sidebar-username')).toHaveTextContent('judge01')
+    expect(screen.queryByTestId('sidebar-username')).toBeNull()
+    expect(screen.getByTestId('sidebar-account').textContent).not.toContain('judge01')
   })
 })
 
@@ -557,7 +564,7 @@ describe('로그아웃 (POST /auth/logout)', () => {
     render(<App />)
     await userEvent.setup().click(await screen.findByRole('button', { name: ACCOUNT_NOTICE.logout }))
     expect(await screen.findByText(ACCOUNT_NOTICE.logoutFailed)).toBeInTheDocument()
-    expect(screen.getByTestId('sidebar-username')).toBeInTheDocument()
+    expect(screen.getByTestId('sidebar-nickname')).toHaveTextContent('민지')
     expect(screen.getByRole('button', { name: ACCOUNT_NOTICE.logout })).toBeEnabled()
   })
 
@@ -579,7 +586,9 @@ describe('로그아웃 (POST /auth/logout)', () => {
     await screen.findByRole('heading', { level: 1, name: AUTH_NOTICE.titleLogin })
     await fillAndSubmit({ username: 'second_user', password: 'password-2', submit: AUTH_NOTICE.submitLogin })
     await screen.findByRole('textbox', { name: '메시지 입력' })
-    expect(screen.getByTestId('sidebar-username')).toHaveTextContent('second_user')
+    expect(screen.getByTestId('sidebar-nickname')).toHaveTextContent('두번째')
+    expect(screen.queryByTestId('sidebar-username')).toBeNull()
+    expect(screen.getByTestId('sidebar-account').textContent).not.toContain('second_user')
     expect(screen.queryByText('첫 계정의 발화')).toBeNull()
   })
 })

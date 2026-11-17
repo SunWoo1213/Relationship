@@ -1,0 +1,18 @@
+# 명령: npm --prefix web run e2e -- e2e/auth.spec.ts
+# 시각: 2026-11-17T22:30:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# ---
+
+> web@0.0.0 e2e
+> playwright test e2e/auth.spec.ts
+
+
+Running 1 test using 1 worker
+
+(node:646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/auth.spec.ts:6:1 › 로그인 화면에서 로그인하면 앱 틀이 열리고, 로그아웃하면 다시 로그인 화면이 된다 (393ms)
+
+  1 passed (2.8s)

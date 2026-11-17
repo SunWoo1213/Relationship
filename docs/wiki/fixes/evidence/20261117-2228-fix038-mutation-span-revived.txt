@@ -1,0 +1,126 @@
+# 명령: npm --prefix /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix038/web run test -- --run src/__tests__/auth.test.tsx
+# 시각: 2026-11-17T22:28:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 1
+# ---
+
+> web@0.0.0 test
+> vitest --run src/__tests__/auth.test.tsx
+
+
+ RUN  v5.0.4 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix038/web
+
+ ❯ src/__tests__/auth.test.tsx (44 tests | 4 failed) 3319ms
+   ❯ 로그인 (POST /auth/login) (5)
+     × 성공하면 앱 틀이 열린다 — 본문은 {username, password}, 예전 세션 키는 지워진다, 비밀번호는 저장·로그되지 않는다 107ms
+   ❯ 가입 화면 — 닉네임 칸·중복 확인·사이드바 닉네임 (P9b U10, CR-007) (19)
+     × me 200 이면 사이드바 계정 줄은 닉네임과 로그아웃뿐이고 아이디는 없다 — 닉네임은 아이디와 다른 값 (FIX-038) 8ms
+     × 가입 직후(201 응답의 닉네임)에도 사이드바에 그 닉네임이 보인다 151ms
+   ❯ 로그아웃 (POST /auth/logout) (6)
+     × 로그아웃 뒤 다시 로그인하면 이전 계정의 화면 상태가 남지 않는다 (같은 브라우저 두 계정) 96ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/auth.test.tsx > 로그인 (POST /auth/login) > 성공하면 앱 틀이 열린다 — 본문은 {username, password}, 예전 세션 키는 지워진다, 비밀번호는 저장·로그되지 않는다
+AssertionError: expected <span …(2)></span> to be null
+
+- Expected:
+null
+
++ Received:
+<span
+  class="min-w-0 truncate text-muted-foreground"
+  data-testid="sidebar-username"
+>
+  minji_01
+</span>
+
+ ❯ src/__tests__/auth.test.tsx:154:54
+    152|
+    153|     await screen.findByRole('textbox', { name: '메시지 입력' })
+    154|     expect(screen.queryByTestId('sidebar-username')).toBeNull()
+       |                                                      ^
+    155|     expect(screen.getByTestId('sidebar-account')).not.toHaveTextConten…
+    156|     const login = callsTo(fetchFn, 'POST /api/auth/login')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/__tests__/auth.test.tsx > 가입 화면 — 닉네임 칸·중복 확인·사이드바 닉네임 (P9b U10, CR-007) > me 200 이면 사이드바 계정 줄은 닉네임과 로그아웃뿐이고 아이디는 없다 — 닉네임은 아이디와 다른 값 (FIX-038)
+AssertionError: expected <span …(2)></span> to be null
+
+- Expected:
+null
+
++ Received:
+<span
+  class="min-w-0 truncate text-muted-foreground"
+  data-testid="sidebar-username"
+>
+  minji_01
+</span>
+
+ ❯ src/__tests__/auth.test.tsx:459:54
+    457|     const row = screen.getByTestId('sidebar-account')
+    458|     // ① 아이디 칸이 없다
+    459|     expect(screen.queryByTestId('sidebar-username')).toBeNull()
+       |                                                      ^
+    460|     // ② 계정 줄 글자에 아이디 문자열이 없다
+    461|     expect(row.textContent).not.toContain('minji_01')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/__tests__/auth.test.tsx > 가입 화면 — 닉네임 칸·중복 확인·사이드바 닉네임 (P9b U10, CR-007) > 가입 직후(201 응답의 닉네임)에도 사이드바에 그 닉네임이 보인다
+AssertionError: expected <span …(2)></span> to be null
+
+- Expected:
+null
+
++ Received:
+<span
+  class="min-w-0 truncate text-muted-foreground"
+  data-testid="sidebar-username"
+>
+  judge01
+</span>
+
+ ❯ src/__tests__/auth.test.tsx:478:54
+    476|     await screen.findByRole('textbox', { name: '메시지 입력' })
+    477|     expect(screen.getByTestId('sidebar-nickname')).toHaveTextContent('…
+    478|     expect(screen.queryByTestId('sidebar-username')).toBeNull()
+       |                                                      ^
+    479|     expect(screen.getByTestId('sidebar-account').textContent).not.toCo…
+    480|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/__tests__/auth.test.tsx > 로그아웃 (POST /auth/logout) > 로그아웃 뒤 다시 로그인하면 이전 계정의 화면 상태가 남지 않는다 (같은 브라우저 두 계정)
+AssertionError: expected <span …(2)></span> to be null
+
+- Expected:
+null
+
++ Received:
+<span
+  class="min-w-0 truncate text-muted-foreground"
+  data-testid="sidebar-username"
+>
+  second_user
+</span>
+
+ ❯ src/__tests__/auth.test.tsx:590:54
+    588|     await screen.findByRole('textbox', { name: '메시지 입력' })
+    589|     expect(screen.getByTestId('sidebar-nickname')).toHaveTextContent('…
+    590|     expect(screen.queryByTestId('sidebar-username')).toBeNull()
+       |                                                      ^
+    591|     expect(screen.getByTestId('sidebar-account').textContent).not.toCo…
+    592|     expect(screen.queryByText('첫 계정의 발화')).toBeNull()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 40 passed (44)
+   Start at  22:28:35
+   Duration  3.89s (tests 87%, environment 6%, import 4%, transform 3%, setup 1%)
+
