@@ -1,0 +1,61 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u13-verifier/mutate.py M7-get-renders-token
+# 시각: 2026-11-17T23:32:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+[M7-get-renders-token] GET 응답의 token 을 화면에 그림 → exit=1 (검출)
+  × P1 GET 응답에 token 이 섞여 와도 화면 어디에도 그리지 않는다 68ms
+  Test Files  1 failed | 11 passed (12)
+  Tests  1 failed | 230 passed (231)
+  FAIL  src/__tests__/probe.test.tsx > verifier 탐침 U13 > P1 GET 응답에 token 이 섞여 와도 화면 어디에도 그리지 않는다
+
+# ===== append 2026-11-17T23:32:16+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u13-verifier/mutate.py M8-get-fail-stuck
+# 시각: 2026-11-17T23:32:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+[M8-get-fail-stuck] GET 실패 때 로딩에서 멈춤 → exit=1 (검출)
+  × P2 GET 500 — failed 한 줄, 상태 없음, create 버튼으로 다시 만들 수 있다 33ms
+  Test Files  1 failed | 11 passed (12)
+  Tests  1 failed | 230 passed (231)
+  FAIL  src/__tests__/probe.test.tsx > verifier 탐침 U13 > P2 GET 500 — failed 한 줄, 상태 없음, create 버튼으로 다시 만들 수 있다
+
+# ===== append 2026-11-17T23:32:22+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u13-verifier/mutate.py M9-no-gate-signal
+# 시각: 2026-11-17T23:32:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+[M9-no-gate-signal] GET 401 이 관문 신호를 올리지 않음 → exit=1 (검출)
+  × P3 GET 401 — 관문으로 돌아가고 연결 화면이 내려간다 1010ms
+  Test Files  1 failed | 11 passed (12)
+  Tests  1 failed | 230 passed (231)
+  FAIL  src/__tests__/probe.test.tsx > verifier 탐침 U13 > P3 GET 401 — 관문으로 돌아가고 연결 화면이 내려간다
+
+# ===== append 2026-11-17T23:32:27+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u13-verifier/mutate.py M10-token-in-title
+# 시각: 2026-11-17T23:32:27+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+[M10-token-in-title] 토큰을 title 속성에도 둠 → exit=1 (검출)
+  × P5 만든 뒤 문서 전체에서 토큰은 mcp-token·mcp-command 글자 두 곳뿐(속성 0) 58ms
+  Test Files  1 failed | 11 passed (12)
+  Tests  1 failed | 230 passed (231)
+  FAIL  src/__tests__/probe.test.tsx > verifier 탐침 U13 > P5 만든 뒤 문서 전체에서 토큰은 mcp-token·mcp-command 글자 두 곳뿐(속성 0)
+
+# ===== append 2026-11-17T23:32:32+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u13-verifier/mutate.py M5-no-ref-guard
+# 시각: 2026-11-17T23:32:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+[M5-no-ref-guard] useRef 동기 가드만 제거(disabled 는 유지) → exit=0 (생존)
+  Test Files  12 passed (12)
+  Tests  231 passed (231)

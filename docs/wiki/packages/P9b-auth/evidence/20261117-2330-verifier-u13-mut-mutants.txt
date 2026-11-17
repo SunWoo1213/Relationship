@@ -1,0 +1,55 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u13-verifier/mutate.py all
+# 시각: 2026-11-17T23:30:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+[M1-localStorage] 토큰을 localStorage 에 저장 → exit=1 (검출)
+  × ⑤ 만든 뒤 localStorage·sessionStorage 의 어떤 키·값에도 토큰이 없고, 콘솔·주소에도 없다 39ms
+  Test Files  1 failed | 10 passed (11)
+  Tests  1 failed | 223 passed (224)
+  FAIL  src/__tests__/connect.test.tsx > AI 연결 화면 (CR-008 U13) > ⑤ 만든 뒤 localStorage·sessionStorage 의 어떤 키·값에도 토큰이 없고, 콘솔·주소에도 없다
+[M2-url] 토큰을 주소(해시)에 씀 → exit=1 (검출)
+  × ⑤ 만든 뒤 localStorage·sessionStorage 의 어떤 키·값에도 토큰이 없고, 콘솔·주소에도 없다 45ms
+  Test Files  1 failed | 10 passed (11)
+  Tests  1 failed | 223 passed (224)
+  FAIL  src/__tests__/connect.test.tsx > AI 연결 화면 (CR-008 U13) > ⑤ 만든 뒤 localStorage·sessionStorage 의 어떤 키·값에도 토큰이 없고, 콘솔·주소에도 없다
+[M3-console] 발급 응답을 콘솔에 찍음 → exit=1 (검출)
+  × ⑤ 만든 뒤 localStorage·sessionStorage 의 어떤 키·값에도 토큰이 없고, 콘솔·주소에도 없다 47ms
+  Test Files  1 failed | 10 passed (11)
+  Tests  1 failed | 223 passed (224)
+  FAIL  src/__tests__/connect.test.tsx > AI 연결 화면 (CR-008 U13) > ⑤ 만든 뒤 localStorage·sessionStorage 의 어떤 키·값에도 토큰이 없고, 콘솔·주소에도 없다
+[M4-revoke-when-expired] 만료 상태에서도 폐기 버튼 → exit=1 (검출)
+  × ② 만료 — statusExpired, create 버튼만(폐기 없음) 34ms
+  Test Files  1 failed | 10 passed (11)
+  Tests  1 failed | 223 passed (224)
+  FAIL  src/__tests__/connect.test.tsx > AI 연결 화면 (CR-008 U13) > ② 만료 — statusExpired, create 버튼만(폐기 없음)
+[M5-no-ref-guard] useRef 동기 가드만 제거(disabled 는 유지) → exit=0 (생존)
+  Test Files  11 passed (11)
+  Tests  224 passed (224)
+[M6-keep-token-on-revoke] 폐기 뒤 토큰 표시를 지우지 않음 → exit=1 (검출)
+  × ⑦ 폐기 — DELETE 정확히 1회, revoked·토큰 사라짐·상태 statusNone 128ms
+  Test Files  1 failed | 10 passed (11)
+  Tests  1 failed | 223 passed (224)
+  FAIL  src/__tests__/connect.test.tsx > AI 연결 화면 (CR-008 U13) > ⑦ 폐기 — DELETE 정확히 1회, revoked·토큰 사라짐·상태 statusNone
+[M7-get-renders-token] GET 응답의 token 을 화면에 그림 → exit=0 (생존)
+  Test Files  11 passed (11)
+  Tests  224 passed (224)
+[M8-get-fail-stuck] GET 실패 때 로딩에서 멈춤 → exit=0 (생존)
+  Test Files  11 passed (11)
+  Tests  224 passed (224)
+[M9-no-gate-signal] GET 401 이 관문 신호를 올리지 않음 → exit=0 (생존)
+  Test Files  11 passed (11)
+  Tests  224 passed (224)
+[M10-token-in-title] 토큰을 title 속성에도 둠 → exit=0 (생존)
+  Test Files  11 passed (11)
+  Tests  224 passed (224)
+[M11-status-stale-after-create] 발급 뒤 상태 줄을 갱신하지 않음 → exit=1 (검출)
+  × ③ 만들기 — POST 정확히 1회, 토큰·명령 정확 일치, onceNotice, 상태 statusActive(아직 쓰지 않음) 66ms
+  × ⑦ 폐기 — DELETE 정확히 1회, revoked·토큰 사라짐·상태 statusNone 91ms
+  × ⑨ 진행 중 두 번 눌러도 POST 는 1회(버튼 disabled) 115ms
+  Test Files  1 failed | 10 passed (11)
+  Tests  3 failed | 221 passed (224)
+  FAIL  src/__tests__/connect.test.tsx > AI 연결 화면 (CR-008 U13) > ③ 만들기 — POST 정확히 1회, 토큰·명령 정확 일치, onceNotice, 상태 statusActive(아직 쓰지 않음)
+  FAIL  src/__tests__/connect.test.tsx > AI 연결 화면 (CR-008 U13) > ⑦ 폐기 — DELETE 정확히 1회, revoked·토큰 사라짐·상태 statusNone
+  FAIL  src/__tests__/connect.test.tsx > AI 연결 화면 (CR-008 U13) > ⑨ 진행 중 두 번 눌러도 POST 는 1회(버튼 disabled)

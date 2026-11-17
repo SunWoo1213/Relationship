@@ -6,6 +6,7 @@ import { useAuth } from '@/auth'
 import PersonList from '@/components/PersonList'
 import { PersonsProvider } from '@/components/PersonsProvider'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { CONNECT_NOTICE } from '@/screens/ConnectScreen'
 import { briefingHref, HREF, type Route } from '@/routes'
 
 /** 결정 N: 데스크톱은 이 너비부터 사이드바가 항상 보인다. */
@@ -91,6 +92,18 @@ function SidebarContent({ route, onNavigate }: { route: Route; onNavigate: () =>
       <div aria-label="인물 목록" data-testid="sidebar-persons" className="min-h-0 flex-1 overflow-y-auto">
         <PersonList onNavigate={onNavigate} limit={SIDEBAR_RECENT_LIMIT} />
       </div>
+      {/* "AI 연결" 진입점 (CR-008) — <a> 가 아니라 버튼이고 sidebar-account 블록 밖이다(nav 링크 목록·계정 줄 단언 보존). */}
+      <button
+        type="button"
+        data-testid="sidebar-connect"
+        onClick={() => {
+          window.location.hash = HREF.connect
+          onNavigate()
+        }}
+        className="rounded-md px-3 py-2 text-left text-body hover:bg-sidebar-accent"
+      >
+        {CONNECT_NOTICE.entry}
+      </button>
       <AccountRow />
     </nav>
   )

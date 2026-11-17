@@ -265,3 +265,13 @@
 - 결과: pytest 2651 passed · ruff·mypy 새 오류 0 · 변이 13종 검출 · 표본 측정 수정 전 대비 개선(FIX-037 결과 절). verifier 3차 뒤 통과([필수] 0).
 - 남은 것 · 다음 단위: 서버 재배포 → 시연 계정 준비(13번 일정·12번 근황 답 눈으로 확인) → 리허설 → `/devlog done`.
 - Refs: FIX-037 P5-agent-loop P5b-query-turn D16
+
+## 2026-11-18 00:30 · feat(P9b-auth): 로그인한 화면에 "AI 연결" 화면을 더한다 (U13) · pending
+- 변경(frontend-agent): `web/src/screens/ConnectScreen.tsx`(새) · `#/connect` 경로(`routes.ts`·`App.tsx`) · 사이드바 `<button data-testid="sidebar-connect">`(계정 줄 밖, `AppShell.tsx`) · `api/client.ts` 의 `getMcpToken`/`createMcpToken`/`deleteMcpToken`(+ `DELETE` 메서드) · `api/types.ts` 타입 2개 · 시험 `connect.test.tsx` 11건 + `api.test.ts` 1건 · `review-u13.md` · 증거 `…-u13-*`, `…-verifier-u13-*`.
+- 이유(기획서·카드 연결): CR-008 축소안(사용자 "토큰 방식 축소안") — 계정에서 연결 토큰을 만들어 Claude Code 에 붙인다(D19). 01-plan 개정 4 U13.
+- 정합성 확인: 원칙 5(필요한 화면을 근거와 함께 — 기존 컴포넌트·스타일 그대로) · D19(토큰은 발급 응답에서 한 번만, 외부 전송 고지 문구) · security §1(토큰을 storage·주소·콘솔에 남기지 않음) — 위반 없음. 문구 27개는 계획 표와 글자 그대로(verifier 스크립트 대조 불일치 0).
+- 결과: Vitest 212 → 224 passed · typecheck·lint·build exit 0 · e2e 5 passed · 구현자 변이 V13-1~8 + 3종 검출 · verifier 리뷰 **통과**([필수] 0, [권고] R-1~R-6).
+- 계획과 달라진 점(verifier 가 계획 범위 안으로 판정): 로딩 중 버튼 숨김 · `GET` 실패 시 `failed` 한 줄 + 상태 "없음"(R-3 — 실제 토큰이 있을 때는 사실과 다른 문장, 계획이 정하지 않은 동작이라 그대로 둠) · `revoke` 는 `active` 일 때만 · `useRef` 동기 가드 · lint 증거 추가.
+- 남긴 권고: R-1·R-2(토큰 누출·`GET` 실패 갈래 시험 보강 — verifier 탐침 초안이 스크래치패드에 있음) · R-3 · R-4 · R-6. 실제 백엔드와의 맞물림(201 본문 키·204·Origin)은 U14 로컬 Caddy 스모크가 판정한다.
+- 남은 것 · 다음 단위: U12(backend-agent 구현 중) → verifier 리뷰 → U14.
+- Refs: P9b-auth CR-008 D19 D18 원칙5

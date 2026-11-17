@@ -17,6 +17,8 @@ import type {
   EventRawOut,
   FactSourcesOut,
   LogoutIn,
+  McpTokenCreatedOut,
+  McpTokenStatusOut,
   MeOut,
   PersonCardOut,
   PersonListItemOut,
@@ -46,7 +48,7 @@ export class ApiError extends Error {
 }
 
 export interface RequestOptions {
-  method?: 'GET' | 'POST'
+  method?: 'GET' | 'POST' | 'DELETE'
   /** JSON 으로 직렬화해 보낸다. */
   body?: unknown
   signal?: AbortSignal
@@ -219,4 +221,22 @@ export async function logout(endpoint?: string): Promise<void> {
     if (error instanceof ApiError && error.status === 401) return
     throw error
   }
+}
+
+// --- MCP 연결 토큰 (GET·POST·DELETE /auth/mcp-token — CR-008) ---
+// 셋 다 로그인 필수라 401 이면 기본 관문 신호가 오른다.
+
+/** 토큰이 있는지·만료·마지막 사용. 토큰 값은 오지 않는다. */
+export function getMcpToken(): Promise<McpTokenStatusOut> {
+  return apiFetch<McpTokenStatusOut>('/auth/mcp-token')
+}
+
+/** 새 토큰 발급(201, 본문 없음). 이전 토큰은 즉시 무효. 원문은 이 응답에서만 받는다. */
+export function createMcpToken(): Promise<McpTokenCreatedOut> {
+  return apiFetch<McpTokenCreatedOut>('/auth/mcp-token', { method: 'POST' })
+}
+
+/** 토큰 폐기(204, 멱등). */
+export function deleteMcpToken(): Promise<void> {
+  return apiFetch<void>('/auth/mcp-token', { method: 'DELETE' })
 }

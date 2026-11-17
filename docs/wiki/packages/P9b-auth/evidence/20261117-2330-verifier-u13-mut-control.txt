@@ -1,0 +1,9 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u13-verifier/mutate.py control
+# 시각: 2026-11-17T23:30:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+[control] exit=0
+  Test Files  11 passed (11)
+  Tests  224 passed (224)

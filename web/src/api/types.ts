@@ -273,6 +273,21 @@ export interface PushSubscriptionIn {
   expirationTime?: number | null
 }
 
+/** `POST /auth/mcp-token` 201 — 토큰 원문은 이 응답에서만 나온다 (CR-008 · D19). */
+export interface McpTokenCreatedOut {
+  token: string
+  created_at: string
+  expires_at: string
+}
+
+/** `GET /auth/mcp-token` — 토큰 값은 없다. */
+export interface McpTokenStatusOut {
+  active: boolean
+  created_at: string | null
+  expires_at: string | null
+  last_used_at: string | null
+}
+
 export interface PushSubscriptionOut {
   id: number
   created: boolean

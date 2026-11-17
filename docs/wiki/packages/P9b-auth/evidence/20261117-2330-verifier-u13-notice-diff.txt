@@ -1,0 +1,10 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u13-verifier/notice_diff.py docs/wiki/packages/P9b-auth/01-plan.md web/src/screens/ConnectScreen.tsx
+# 시각: 2026-11-17T23:30:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+계획 키 27개 · 구현 키 27개
+키 순서 같음: True
+불일치 0건
+명령 문자열 템플릿이 구현에 글자 그대로 있음: True

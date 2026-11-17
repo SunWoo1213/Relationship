@@ -6,6 +6,7 @@ import { useRoute } from '@/routes'
 import AuthScreen from '@/screens/AuthScreen'
 import BriefingScreen from '@/screens/BriefingScreen'
 import ChatScreen from '@/screens/ChatScreen'
+import ConnectScreen from '@/screens/ConnectScreen'
 import PersonCardScreen from '@/screens/PersonCardScreen'
 
 /** 프론트가 만드는 고정 문구(오류 안내). 서버 문장이 아니다. */
@@ -24,6 +25,7 @@ function SignedInApp() {
       {route.name === 'chat' && <ChatScreen />}
       {route.name === 'persons' && <PersonCardScreen personId={route.personId} />}
       {route.name === 'briefings' && <BriefingScreen />}
+      {route.name === 'connect' && <ConnectScreen />}
       <Toaster />
     </AppShell>
   )

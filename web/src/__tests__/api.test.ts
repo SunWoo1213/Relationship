@@ -1,5 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, apiFetch, CHAT_HISTORY_LIMIT, checkAvailability, getChatHistory, login, logout, onUnauthorized } from '@/api/client'
+import {
+  ApiError,
+  apiFetch,
+  CHAT_HISTORY_LIMIT,
+  checkAvailability,
+  createMcpToken,
+  deleteMcpToken,
+  getChatHistory,
+  getMcpToken,
+  login,
+  logout,
+  onUnauthorized,
+} from '@/api/client'
 
 function jsonResponse(status: number, body: unknown) {
   return new Response(JSON.stringify(body), {
@@ -158,6 +170,24 @@ describe('API 클라이언트 래퍼 (결정 C (ii))', () => {
     const e500 = await failureOf(apiFetch('/chat'))
     expect(e500.status).toBe(500)
     expect(e500.code).toBeNull()
+  })
+
+  it('MCP 토큰 함수 셋 — URL·메서드·credentials 와 204 처리 (CR-008)', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(200, { active: false, created_at: null, expires_at: null, last_used_at: null }))
+      .mockResolvedValueOnce(jsonResponse(201, { token: 'tok', created_at: 'a', expires_at: 'b' }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }))
+    vi.stubGlobal('fetch', fetchMock)
+    expect((await getMcpToken()).active).toBe(false)
+    expect((await createMcpToken()).token).toBe('tok')
+    expect(await deleteMcpToken()).toBeUndefined()
+    const calls = fetchMock.mock.calls.map(([url, init]) => [url, init.method, init.credentials, init.body])
+    expect(calls).toEqual([
+      ['/api/auth/mcp-token', 'GET', 'same-origin', undefined],
+      ['/api/auth/mcp-token', 'POST', 'same-origin', undefined],
+      ['/api/auth/mcp-token', 'DELETE', 'same-origin', undefined],
+    ])
   })
 
   it('테스트 환경의 기본 fetch 는 실제 네트워크를 쓰지 않고 실패한다 (결정 J)', async () => {
