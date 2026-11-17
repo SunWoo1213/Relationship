@@ -276,7 +276,7 @@
 - 남은 것 · 다음 단위: U12(backend-agent 구현 중) → verifier 리뷰 → U14.
 - Refs: P9b-auth CR-008 D19 D18 원칙5
 
-## 2026-11-17 23:58 · feat(P9b-auth): 읽기 전용 MCP 서버와 계정별 연결 토큰을 더한다 (U12) · pending
+## 2026-11-17 23:58 · feat(P9b-auth): 읽기 전용 MCP 서버와 계정별 연결 토큰을 더한다 (U12) · c85a0e8
 (위 U13 항목의 시각 "11-18 00:30" 은 어림으로 적은 것이다 — 실제 커밋은 11-17 밤.)
 - 변경(backend-agent): 리비전 `0005_mcp_tokens` · `app/auth/mcp_tokens.py`(발급·조회·폐기, 해시만 저장) · `POST`/`GET`/`DELETE /auth/mcp-token` · `app/mcp_server/`(`tools.py` 도구 4개 · `auth.py` Bearer 래퍼 · `server.py`) · `app/main.py`(스위치 켜졌을 때만 `/mcp` 라우트와 세션 관리자) · `app/settings.py` `mcp_enabled()` · `Caddyfile` `handle /mcp` · compose `MCP_ENABLED: ${MCP_ENABLED:-1}` · `requirements.txt` `mcp==2.3.0` · 시험 4파일(18+31+48+8) + `test_deploy_files` ⑱⑲ + `test_auth_required_routes` 1 · 닫힌 목록 M1~M11 · `review-u12.md` · 증거 `…-u12-*`, `…-u12-review-*`.
 - 이유(기획서·카드 연결): CR-008 축소안 · D19 — 쌓인 기억을 다른 AI 도구에서 읽기 전용으로 꺼내 쓴다. 자격은 세션 쿠키가 아니라 계정별 개인 접근 토큰.
@@ -290,3 +290,20 @@
 - 남긴 권고: R-1(토큰 API 시험 ④⑧ 이 "계정으로 거르지 않는 GET"·"재발급이 만료를 새로 쓰지 않음" 변이를 놓침) · R-2(사용자 id 없음 갈래와 `last_used_at` commit 을 지나는 시험 없음) · R-3(두 스위치를 함께 켠 lifespan 시험 없음 — 운영은 둘 다 켠다) · R-5 · R-6(구현자 `u12-live-server-log` 증거가 비어 있음 → U14 의 `docker compose logs backend` 발췌로 메움) · R-7 · R-8(`/mcp/` 끝 슬래시는 Caddy 가 넘기지 않음). 평가 뒤 FIX 후보.
 - 남은 것 · 다음 단위: U14(로컬 Caddy 스모크·끄기 예행·Claude Code 로컬 연결은 미커밋 트리로 먼저 통과 — 커밋 해시로 한 번 더 → 재배포 → 바깥 GET).
 - Refs: P9b-auth CR-008 D19 D18 S3.1 security 원칙7 원칙9
+
+## 2026-11-18 00:05 · docs(P9b-auth): MCP 를 서버에 반영하고 연결 안내와 점검 결과를 남긴다 (U14) · pending
+- 변경(메인): `docs/user-setup/15-mcp-connect.md`(새 — 무엇이 열리나·토큰 만들기·Claude Code 붙이기·폐기·주의·Codex 는 미시험) · `13-user-todo-deploy.md` I 절(반영 기록·MCP 만 끄기·되돌리기 순서) · `docs/RUNNING.md` MCP 한 줄 · `u8-demo-script.md` 아침 절차 · 증거 `…-u14-*`.
+- 이유: 01-plan 개정 4 U14 — 반영 전 관문(로컬 Caddy 스모크)과 재배포, 사용자가 직접 할 연결 절차를 문서로.
+- 정합성 확인: D19 · D17(SSH `git checkout` + `compose up -d --build`) · security §1(운영 토큰을 메인이 보지 않음, 스크립트는 출력 안 토큰 0 일 때만 내보냄, `--scope project` 미사용) — 위반 없음.
+- 결과(전부 `c85a0e8` 기준, 처음 한 벌은 커밋 전 트리로 먼저):
+  - 로컬 운영 구성 빌드·기동: `mcp 2.3.0` 설치된 ARM 이미지 빌드 성공, `Running upgrade 0004 -> 0005`, users 10 그대로, Traceback 0, 컨테이너 `MCP_ENABLED=1`(더미 env 에 줄 없음 → compose 기본값)(`2347-u14-caddy-up`, `u14-caddy-up-c85a0e8`).
+  - 스모크 ①~⑤(`2348-u14-caddy-smoke`, `u14-caddy-smoke-c85a0e8`): 자격 없는 `/mcp` 401 JSON + `WWW-Authenticate: Bearer`(3xx 아님) · 쿼리 토큰 401 · 발급 201(키 3개, 43자, `no-store`, 만료 = 발급 + 7일) · 다른 Origin 발급 403 · DB 에 해시(64자)만 · `initialize`/`tools/list`(도구 4개, `readOnlyHint` 전부 참)/`tools/call` 200 · 없는 id `not_found` · 다른 Origin 을 붙인 `/mcp` 403 · `last_used_at` 채워짐 · 로그에 토큰 0, `mcp_tool` 3줄(verifier R-6 을 메움) · 회귀(health `0005`, `/` 200, 보호 경로 401, `/api/docs` 404) · 폐기 204 뒤 그 토큰 401.
+  - ⑥ 끄기 예행(`2349-u14-caddy-off-drill`): env 에 `MCP_ENABLED=0` → backend healthy, `/mcp` 404, 나머지 정상 → 줄을 빼면 401 로 복귀.
+  - Claude Code 로컬 연결(`2349-u14-claude-code-local`, R5-2): Caddy 로컬 루트 인증서를 `NODE_EXTRA_CA_CERTS` 로 주고 `claude mcp add --transport http … https://localhost:8443/mcp --header …`(로컬 더미 계정 토큰) → `claude mcp list` **✔ Connected**, 서버 로그 `POST /mcp 200` 여러 줄 → `remove`·토큰 폐기. **Claude Code(2.1.326)는 Origin 문제 없이 붙는다**(계획 위험 "Origin 헤더" 해소). 저장소에 `.mcp.json` 안 생김.
+  - 되돌리기 예행(`20261118-0000-u14-rollback-drill`): stop → `downgrade 0004` → 0004 시절 이미지(`bd0e061`)로 기동 → health `0004`·로그인 200·users 10 → 다시 `c85a0e8` 로 `0005`. ①~④ 9초.
+  - **운영 재배포**(`2359-u14-deploy-c85a0e8-output`): `935aa4a` → `c85a0e8`, 빌드·기동 45초, `Running upgrade 0004 -> 0005`, Traceback 0, 전후 `users 1 · persons 7 · events 100 · chat 278 · schedules 2` 같음.
+  - 바깥 GET(`2359-u14-public-get`, 두 호스트): health `0005` · `/` 200 · 번들에 "AI 연결" · `/api/persons`·`/api/auth/me`·`/api/auth/mcp-token` 401 · `/mcp` 401 JSON(헤더 없음·틀린 토큰) · http 308.
+  - 사용자 탭(test 계정, 조회만): 새로고침 뒤 인물 카드 정상, 사이드바 "AI 연결", 화면 상태 "연결 토큰이 없어요." — **토큰 만들기 버튼은 누르지 않았다**(운영 토큰은 사용자 몫).
+- 계획과 달라진 점: ① 로컬 브라우저 점검(개발 서버 + Chrome)은 하지 않고 Vitest·로컬 Caddy 스모크·운영 화면 조회로 갈음(계획이 허용한 축소 3). ② R5-2 를 개발 서버가 아니라 로컬 운영 구성(Caddy 경유)에 붙였다 — 운영과 더 가깝고 개발 DB 를 건드리지 않는다. ③ `u14-deploy` 이름의 증거 3개(23:5x)는 첫 줄에서 끊긴 실패 기록이다 — 원격 스크립트를 표준 입력으로 넘기는 방식이 끊겼고(서버는 그때 `935aa4a` 그대로였음을 따로 확인), 직접 실행한 출력을 `…-u14-deploy-c85a0e8-output` 으로 보존했다. ④ 조사 보고서 보존본(`cr008-clients-report.md`)은 만들지 않았다(원문이 세션 스크래치패드 `mcp-research/` 에만 있음 — 평가 뒤). ⑤ 관찰: `/api/mcp` 도 같은 401 로 닿는다(`/api/*` 접두 제거 프록시 때문, 같은 인증이라 해 없음), `/mcp/` 는 SPA HTML.
+- 남은 것: **사용자 실제 연결**(운영 토큰 → 자기 터미널 → 결과를 토큰 없이 알려 주면 `u14-user-claude-code.txt` 로 남김) · 판정 #27 의 사람 몫 · 평가 뒤 `/devlog done`.
+- Refs: P9b-auth CR-008 D19 D17 security

@@ -1,0 +1,45 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u14/claude-local.sh
+# 시각: 2026-11-17T23:49:59+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+claude 버전: 2.1.326 (Claude Code)
+Caddy 로컬 루트 인증서: 1 개
+[login] -> 200  ct: application/json  body: {"id":"f9d413b2c2a24832b931e914dfe6c53d","username":"u7a760623","nickname":"u7a760623"}
+[POST mcp-token] -> 201  token 길이: 43
+== 이미 같은 이름이 있는가: 0
+== claude mcp add (기본 범위 local)
+Added HTTP MCP server relmemo-localcheck with URL: https://localhost:8443/mcp to local config
+Headers: {
+  "Authorization": "[REDACTED]"
+}
+File modified: /Users/sunwoo/.claude.json [project: /Users/sunwoo/Desktop/Portfolio/Relationship]
+== claude mcp list 중 이 서버 줄
+relmemo-localcheck: https://localhost:8443/mcp (HTTP) - ✔ Connected
+== claude mcp get
+relmemo-localcheck:
+  Scope: Local config (private to you in this project)
+  Status: ✔ Connected
+  Type: http
+  URL: https://localhost:8443/mcp
+  Headers:
+
+To remove this server, run: claude mcp remove relmemo-localcheck -s local
+== 서버 로그의 /mcp 요청(최근)
+backend-1  | INFO:     172.21.0.4:55298 - "GET /mcp HTTP/1.1" 401 Unauthorized
+backend-1  | INFO:     172.21.0.4:46706 - "POST /auth/mcp-token HTTP/1.1" 201 Created
+backend-1  | INFO:     172.21.0.4:41256 - "POST /mcp HTTP/1.1" 200 OK
+backend-1  | INFO:     172.21.0.4:41256 - "POST /mcp HTTP/1.1" 200 OK
+backend-1  | INFO:     172.21.0.4:41262 - "POST /mcp HTTP/1.1" 200 OK
+backend-1  | INFO:     172.21.0.4:41262 - "POST /mcp HTTP/1.1" 200 OK
+backend-1  | INFO:     172.21.0.4:41262 - "POST /mcp HTTP/1.1" 200 OK
+backend-1  | INFO:     172.21.0.4:59520 - "POST /mcp HTTP/1.1" 200 OK
+== claude mcp remove
+Removed MCP server "relmemo-localcheck" from local config
+File modified: /Users/sunwoo/.claude.json [project: /Users/sunwoo/Desktop/Portfolio/Relationship]
+남은 이름 수: 0
+[DELETE mcp-token (204 기대)] -> 204  ct:   body: 
+DB mcp_tokens 행 수: 0
+저장소에 .mcp.json 이 생겼는가: 아니오
+출력 안 토큰 값 수: 0 (검사 통과)

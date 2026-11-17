@@ -1,0 +1,49 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u14/off-drill.sh
+# 시각: 2026-11-17T23:49:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== 끄기: env 사본의 MCP_ENABLED 줄: MCP_ENABLED=0
+ Container relationship-prod-backend-1 Starting 
+ Container relationship-prod-backend-1 Started 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-backend-1 Waiting 
+ Container relationship-prod-caddy-1 Waiting 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-caddy-1 Healthy 
+ Container relationship-prod-backend-1 Healthy 
+NAME                           IMAGE                          COMMAND                   SERVICE    CREATED          STATUS                        PORTS
+relationship-prod-backend-1    relationship-backend:1be2cf4   "sh /app/docker/entr…"   backend    7 seconds ago    Up 5 seconds (healthy)        8000/tcp
+relationship-prod-caddy-1      relationship-caddy:1be2cf4     "caddy run --config …"   caddy      35 seconds ago   Up 34 seconds                 0.0.0.0:8088->80/tcp, [::]:8088->80/tcp, 0.0.0.0:8443->443/tcp, [::]:8443->443/tcp
+relationship-prod-postgres-1   pgvector/pgvector:pg16         "docker-entrypoint.s…"   postgres   40 hours ago     Up About a minute (healthy)   5432/tcp
+컨테이너 안 MCP_ENABLED: 0
+health: {"status":"ok","db":"up","alembic_revision":"0005"}
+[GET /mcp (404 기대)] -> 404  ct: application/json  body: {"detail":"Not Found"}
+[POST /mcp (404 기대)] -> 404  ct: application/json  body: {"detail":"Not Found"}
+[/ (200 기대)] -> 200  ct: text/html; charset=utf-8  body: <!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <me
+[/api/persons 쿠키 없음 (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[/api/auth/mcp-token 쿠키 없음 (401 기대 — 스위치와 무관)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+Traceback(끈 뒤 로그): 0
+users: 10
+
+=== 다시 켜기: 원래 env(MCP_ENABLED 줄 없음)
+원래 env 의 MCP_ENABLED 줄 수: 0
+ Container relationship-prod-backend-1 Starting 
+ Container relationship-prod-backend-1 Started 
+ Container relationship-prod-postgres-1 Waiting 
+ Container relationship-prod-backend-1 Waiting 
+ Container relationship-prod-caddy-1 Waiting 
+ Container relationship-prod-caddy-1 Healthy 
+ Container relationship-prod-postgres-1 Healthy 
+ Container relationship-prod-backend-1 Healthy 
+컨테이너 안 MCP_ENABLED: 1
+health: {"status":"ok","db":"up","alembic_revision":"0005"}
+[GET /mcp (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+users: 10

@@ -349,6 +349,7 @@ npm run dev
 
 **로그인 (CR-006 · P9b-auth, 2026-11-16)** — 처음 열면 로그인 화면이 뜬다. "계정 만들기" 로 아이디(3~20자 영문 소문자·숫자·밑줄)·비밀번호(8자 이상)를 정해 가입하면 바로 로그인된다. 계정마다 인물·일정·대화 기록이 따로다. 알아 둘 것:
 - **로컬 http 에서는 백엔드를 `AUTH_COOKIE_SECURE=0` 으로 띄운다**(예: `AUTH_COOKIE_SECURE=0 POSTGRES_PORT=5433 python -m uvicorn app.main:app --reload`). 기본값은 켜짐(운영 HTTPS 용, 쿠키 이름 `__Host-rel_session`)이라 http 에서는 브라우저가 쿠키를 돌려보내지 않아 로그인이 유지되지 않는다. 끄면 쿠키 이름은 `rel_session`.
+- **로컬에서 MCP 서버(`/mcp`)를 켜려면 `MCP_ENABLED=1`** 을 같이 준다(코드 기본값은 꺼짐 — 꺼져 있으면 `/mcp` 는 404 이고 SDK 를 불러오지 않는다. 운영은 `docker-compose.prod.yml` 이 기본으로 켠다). 토큰 발급 API(`/auth/mcp-token`)는 이 스위치와 무관하게 있다. 연결 방법은 `docs/user-setup/15-mcp-connect.md`(CR-008 · D19).
 - **리비전 0003 을 처음 올리면(`alembic upgrade head`) 그 DB 의 기존 인물·사건·일정·질문·푸시 구독·판단 기록이 한 번 비워진다**(사용자 결정 2026-11-15). 다시 올려도 또 비우지 않는다.
 - 옛 `APP_USER_ID` 환경변수는 폐지됐다 — `.env` 에 남아 있어도 무시된다.
 - 다른 주소에서 온 요청(`Origin` 이 접속 주소와 다른 POST)은 403 `bad_origin` 으로 막힌다. 개발 서버 프록시가 원래 주소를 넘기므로(`xfwd`) `localhost:5173` 에서는 그대로 된다.

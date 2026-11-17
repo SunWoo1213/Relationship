@@ -703,3 +703,5 @@
 - 2026-11-17 23:36 | COMMIT | 1be2cf4 feat(P9b-auth): 로그인한 화면에 "AI 연결" 화면을 더한다 (U13)
 - 2026-11-17 23:36 | PUSH-dev2 | origin dev2 1be2cf4 (실험 푸시)
 - 2026-11-17 23:43 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
+- 2026-11-17 23:55 | COMMIT | c85a0e8 feat(P9b-auth): 읽기 전용 MCP 서버와 계정별 연결 토큰을 더한다 (U12)
+- 2026-11-17 23:55 | PUSH-dev2 | origin dev2 c85a0e8 (실험 푸시)

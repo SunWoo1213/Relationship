@@ -1,0 +1,40 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u14/u14-public-get.sh
+# 시각: 2026-11-17T23:59:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: c85a0e8 (dev2)
+# exit: 0
+# ---
+===== relmemo.com
+[health (0005 기대)] -> 200  ct: application/json  body: {"status":"ok","db":"up","alembic_revision":"0005"}
+[/ (200 기대)] -> 200  ct: text/html; charset=utf-8  body: <!doctype html> <html lang="ko">   <head>     <meta charset="UTF-8" />     <link rel="icon" type="image/svg+xml" href="/
+번들 /assets/index-Dl0JXmj-.js http=200 bytes=378124
+번들 grep 'AI 연결': 1 줄
+번들 grep '연결 토큰 만들기': 1 줄
+번들 grep 'auth/mcp-token': 1 줄
+[/api/persons (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[/api/auth/me (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[/api/auth/mcp-token (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[/api/auth/availability?username=test (taken 기대)] -> 200  ct: application/json  body: {"username":"taken","nickname":null}
+[/api/docs (404 기대)] -> 404  ct:   body: 
+[/mcp 헤더 없음 (401 JSON 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+www-authenticate: Bearer
+[/mcp 틀린 토큰 (401 JSON 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+http → 308 https://relmemo.com/
+인증서 만료: notAfter=Feb 15 12:23:55 2027 GMT
+===== 54-79-202-221.sslip.io
+[health (0005 기대)] -> 200  ct: application/json  body: {"status":"ok","db":"up","alembic_revision":"0005"}
+[/ (200 기대)] -> 200  ct: text/html; charset=utf-8  body: <!doctype html> <html lang="ko">   <head>     <meta charset="UTF-8" />     <link rel="icon" type="image/svg+xml" href="/
+번들 /assets/index-Dl0JXmj-.js http=200 bytes=378124
+번들 grep 'AI 연결': 1 줄
+번들 grep '연결 토큰 만들기': 1 줄
+번들 grep 'auth/mcp-token': 1 줄
+[/api/persons (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[/api/auth/me (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[/api/auth/mcp-token (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[/api/auth/availability?username=test (taken 기대)] -> 200  ct: application/json  body: {"username":"taken","nickname":null}
+[/api/docs (404 기대)] -> 404  ct:   body: 
+[/mcp 헤더 없음 (401 JSON 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+www-authenticate: Bearer
+[/mcp 틀린 토큰 (401 JSON 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+http → 308 https://54-79-202-221.sslip.io/
+인증서 만료: notAfter=Feb 13 09:50:08 2027 GMT

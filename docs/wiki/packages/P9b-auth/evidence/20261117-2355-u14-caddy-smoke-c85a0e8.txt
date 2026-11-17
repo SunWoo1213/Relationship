@@ -1,0 +1,85 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/p9b-u14/smoke.sh
+# 시각: 2026-11-17T23:55:28+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: c85a0e8 (dev2)
+# exit: 0
+# ---
+=== 0. health: {"status":"ok","db":"up","alembic_revision":"0005"}
+users 행 수(시작): 10
+
+=== ① 자격 없는 /mcp (401 · application/json · 3xx 아님 기대)
+[GET /mcp 헤더 없음] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+www-authenticate: Bearer
+[POST /mcp 본문 없음] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+www-authenticate: Bearer
+[POST /mcp 틀린 토큰] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[GET /mcp?token=invalid-probe (쿼리는 자격 아님)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[GET /mcp/ (끝 슬래시 — 참고)] -> 200  ct: text/html; charset=utf-8  body: <!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <me
+[GET /api/mcp (접두 붙인 경로 — 참고)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+
+=== ② 기존 계정(u7a760623) 로그인 → 토큰 발급
+[login (200 기대)] -> 200  ct: application/json  body: {"id":"f9d413b2c2a24832b931e914dfe6c53d","username":"u7a760623","nickname":"u7a760623"}
+[GET mcp-token 발급 전 (active false 기대)] -> 200  ct: application/json  body: {"active":false,"created_at":null,"expires_at":null,"last_used_at":null}
+[POST mcp-token] -> 201  keys: ['created_at', 'expires_at', 'token']  token 길이: 43  created_at: 2026-11-17T14:55:28.485299Z  expires_at: 2026-11-24T14:55:28.485299Z
+cache-control: no-store
+[POST mcp-token 다른 Origin (403 기대)] -> 403  ct: application/json  body: {"detail":{"code":"bad_origin"}}
+[POST mcp-token 쿠키 없음 (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[GET mcp-token 발급 후 (키 4개 · active true 기대)] -> 200  ct: application/json  body: {"active":true,"created_at":"2026-11-17T14:55:28.485299Z","expires_at":"2026-11-24T14:55:28.485299Z","last_used_at":null}
+DB: mcp_tokens 행 수 1  · token_hash 길이 64  · 원문과 같은 행 수 0
+
+=== ③ 토큰으로 /mcp JSON-RPC (Origin 헤더 없음 — CLI 와 같게)
+[initialize] -> 200  ct: application/json
+   serverInfo: {'name': 'relmemo', 'version': ''}  protocolVersion: 2025-06-18  error: None
+[tools/list] -> 200  ct: application/json
+   도구: ['find_person', 'get_person_card', 'list_briefings', 'list_people']  개수: 4
+   readOnlyHint: ['True']  error: None
+[tools/call list_people] -> 200  ct: application/json
+   isError: False  structuredContent 키: ['people', 'total', 'truncated']  total: 0  error: None
+[tools/call list_briefings] -> 200  ct: application/json
+   isError: False  trace_id 문자열 수: 0  raw_utterance 문자열 수: 0
+[tools/call get_person_card 없는 id (not_found 기대)] -> 200  ct: application/json
+   isError: True  content: ['not_found']  error: None
+[tools/list + 같은 Origin 헤더] -> 200  ct: application/json
+[tools/list + 다른 Origin 헤더 (403 bad_origin 기대)] -> 403  ct: application/json
+[GET mcp-token (last_used_at 채워짐 기대)] -> 200  ct: application/json  body: {"active":true,"created_at":"2026-11-17T14:55:28.485299Z","expires_at":"2026-11-24T14:55:28.485299Z","last_used_at":"2026-11-17T14:55:28.964269Z"}
+
+=== ④ backend 로그
+로그의 토큰 문자열 수: 0
+mcp_tool 줄 수: 3
+backend-1  | INFO:     mcp_tool name=list_people user=f9d413b2c2a24832b931e914dfe6c53d items=0
+backend-1  | INFO:     mcp_tool name=list_briefings user=f9d413b2c2a24832b931e914dfe6c53d items=0
+backend-1  | INFO:     mcp_tool name=get_person_card user=f9d413b2c2a24832b931e914dfe6c53d items=0
+Traceback count: 0
+
+=== ⑤ 회귀
+health: {"status":"ok","db":"up","alembic_revision":"0005"}
+[/ (200 기대)] -> 200  ct: text/html; charset=utf-8  body: <!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <me
+번들 /assets/index-Dl0JXmj-.js http=200 bytes=378124
+번들 grep 'AI 연결': 1 줄
+번들 grep '연결 토큰 만들기': 1 줄
+번들 grep 'auth/mcp-token': 1 줄
+[/api/persons 쿠키 없음 (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[/api/auth/me 쿠키 없음 (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[/api/auth/mcp-token 쿠키 없음 (401 기대)] -> 401  ct: application/json  body: {"detail":{"code":"unauthenticated"}}
+[/api/docs (404 기대)] -> 404  ct:   body: 
+[/api/persons 로그인 쿠키 (200 기대)] -> 200  ct: application/json  body: []
+[다른 Origin 가입 (403 기대)] -> 403  ct: application/json  body: {"detail":{"code":"bad_origin"}}
+
+=== 폐기
+[DELETE mcp-token (204 기대)] -> 204  ct:   body: 
+[폐기한 토큰으로 tools/list (401 기대)] -> 401  ct: application/json
+DB: mcp_tokens 행 수 0   users 행 수(끝): 10
+
+출력 안 토큰 값 수: 0 (검사 통과)

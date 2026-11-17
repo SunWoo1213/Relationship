@@ -121,6 +121,28 @@ SQL
   - 1~4 사이에는 사이트가 잠깐 열리지 않는다(502). 되돌린 뒤 나중에 다시 닉네임 버전을 올리면 **모든 계정의 닉네임이 아이디 값으로 다시 채워진다**(그 전에 정한 닉네임은 남지 않는다).
   - 에이전트는 이 명령을 운영 서버에서 실행해 보지 않았다(로컬 운영 구성에서만 확인).
 
+## I. MCP 버전 반영 (P9b-auth U14, CR-008 — 2026-11-17 밤, 해시 `c85a0e8`) — **에이전트가 SSH 로 반영함**
+
+> 로그인한 화면에 "AI 연결" 이 생기고, `https://relmemo.com/mcp` 에 읽기 전용 도구 4개가 열린다. **데이터를 지우지 않는다** — 토큰 표(`mcp_tokens`) 하나만 더한다(리비전 0005). 서버 `.env` 는 고치지 않았다(compose 가 MCP 를 기본으로 켠다).
+> 반영 전후 운영 DB 행 수가 같다: 계정 1 · 인물 7 · 사건 100 · 대화 278 · 일정 2 (`evidence/20261117-2359-u14-deploy-c85a0e8-output.txt`). 바깥 확인: `/api/health` `0005`, `/mcp` 는 토큰 없이 401(`evidence/20261117-2359-u14-public-get.txt`).
+
+- [ ] **I-1 (사용자)** 열려 있던 탭을 **새로고침** → 사이드바에 "AI 연결" 이 보이는지, 채팅·인물 카드·브리핑이 평소대로인지.
+- [ ] **I-2 (사용자)** 토큰 만들기와 Claude Code 연결 — `15-mcp-connect.md` 2·3절. 토큰 값은 에이전트에게 주지 않는다.
+- [ ] **I-3 (사용자)** 결과를 **토큰 없이** 말로 알려 준다("연결됨, 인물 7명 나옴" 정도).
+
+### MCP 만 급히 끌 때
+
+서버에서 `.env` 에 `MCP_ENABLED=0` 한 줄을 넣고 `docker compose -f docker-compose.prod.yml up -d`. `/mcp` 만 404 가 되고 나머지는 그대로다. 다시 켜려면 그 줄을 지우고 같은 명령. 로컬 운영 구성에서 예행했다(`evidence/20261117-2349-u14-caddy-off-drill.txt`).
+
+### I 가 잘못됐을 때 — 이전 버전(`935aa4a`)으로 되돌리기
+
+**`git checkout 935aa4a` 만 하면 backend 가 뜨지 않는다**(옛 코드는 리비전 `0005` 를 모른다). 아래 순서를 바꾸지 않는다. 계정·기억 데이터는 그대로 남고 **연결 토큰만 사라진다**. 로컬 운영 구성에서 예행한 순서다(①~④ 9초, `evidence/20261118-0000-u14-rollback-drill.txt`) — 운영 서버에서는 실행해 보지 않았다.
+
+1. `docker compose -f docker-compose.prod.yml stop backend`
+2. `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml run --rm --entrypoint python backend -m alembic downgrade 0004` → `Running downgrade 0005 -> 0004` 한 줄
+3. `git checkout 935aa4a`
+4. `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build`
+
 ## F. 로컬 정리 (언제든, 에이전트는 못 함)
 - [ ] 로컬 Postgres 의 시험용 DB 2개(P9b-auth U1 이 만든 빈 DB, 지워도 다음 테스트 때 하나는 다시 생긴다): `relationship_test_mig`, `relationship_test_mig_v15` — 원하면 `dropdb` 로 직접.
 - [ ] 로컬 Docker 의 스모크 볼륨 3개: `docker volume rm relationship-prod_pgdata relationship-prod_caddy_data relationship-prod_caddy_config`
