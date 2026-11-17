@@ -694,3 +694,5 @@
 - 2026-11-17 22:32 | PUSH-dev2 | origin dev2 a2821e2 (실험 푸시)
 - 2026-11-17 22:36 | COMMIT | 935aa4a fix(agent): 기록 발화를 질문으로 오인하거나 유형을 틀리게 적던 추출 품질을 고친다
 - 2026-11-17 22:36 | PUSH-dev2 | origin dev2 935aa4a (실험 푸시)
+- 2026-11-17 22:38 | COMMIT | e6f1766 docs(P9b-auth): 도메인 relmemo.com 적용과 두 수정의 서버 반영 결과를 남긴다
+- 2026-11-17 22:38 | PUSH-dev2 | origin dev2 e6f1766 (실험 푸시)

@@ -53,6 +53,7 @@
 - 임베딩: 별도 공급자 필요(Claude API에는 임베딩 엔드포인트가 없다). 공급자·차원은 임베딩 파일럿(D4) 후 확정.
 - 인프라(CR-005 · D17 개정 ②, 2026-11-14): **AWS 최소 구성** — EC2 1대에 Docker Compose 서비스 3개(`caddy` 자동 HTTPS + `/api/*` 접두 제거 프록시 + 프론트 정적 서빙 · `backend` FastAPI, 기동 시 `alembic upgrade head` · `postgres` pgvector 볼륨). DB 는 RDS 가 아니라 **compose 안 Postgres**. 브리핑 주기 작업은 컨테이너 안 1분 루프(`BRIEFING_SCHEDULER_ENABLED=1`). 비밀은 사용자가 EC2 에 올린 `.env`. 갱신은 SSH `git pull` + `compose up -d --build`. **공개 기간 한정(~2026-11-19, 졸업평가 11-18) 뒤 인스턴스 종료.** 원안(Terraform·SSM·CloudFront·RDS, D7)과 1차 CR-005 안(Vercel + Neon)은 폐기. **실제 기동은 사용자가 따로 지시할 때.**
 - 인증(CR-006 · D18, 2026-11-15): 서비스 안 **아이디 + 비밀번호** 가입·로그인(비밀번호는 해시로만). 같은 출처 **HttpOnly 쿠키** + 서버 세션 테이블(`auth_sessions`, 토큰 해시만 저장). `/health`·`/auth/signup`·`/auth/login` 밖의 API 는 로그인 필수(401). 모든 데이터는 로그인 계정 기준으로 격리, 계정마다 채팅방 하나. `APP_USER_ID` 고정 사용자는 폐지. (CR-007 · D18 결정 10·11, 2026-11-16) 가입 때 **닉네임 필수**(사용자 자신의 표시 이름 — 사이드바·`/auth/*` 응답에만, 에이전트 답·브리핑에는 쓰지 않음), 아이디·닉네임 **중복검사**(가입 409 `username_taken`/`nickname_taken` + 가입 전 조회 `GET /auth/availability` — 로그인 없이 열린 네 번째 예외).
+- MCP(CR-008 · D19, 2026-11-17): `https://relmemo.com/mcp` 에 **읽기 전용 도구 4개**(`list_people`·`find_person`·`get_person_card`·`list_briefings` — LLM 0·원문 0)를 연다. 자격은 세션 쿠키가 아니라 **계정별 개인 접근 토큰**(`Authorization: Bearer`, 웹 "AI 연결" 화면에서 발급·한 번만 표시·폐기, 계정당 1개·7일, DB 에는 해시만). 같은 FastAPI 앱·공식 MCP Python SDK·Caddy `handle /mcp`·`MCP_ENABLED`(코드 기본 꺼짐, 운영 compose 가 켬). MCP 도구는 툴 7종과 다른 어댑터다(툴 7종 불변). OAuth 로그인 연결·Claude 앱·ChatGPT·쓰기 도구는 다음 단계.
 - 배포 전 필수: AWS Budgets 알림($10 / $30 / $50 — 계정 무료 자격에 따라 EC2 비용 발생 가능) + **OpenAI 대시보드 월 지출 한도**(공개 기간 중 LLM 비용 상한). 둘 다 사용자 몫.
 
 ## 툴 7종 (제품 속 에이전트가 호출) — 시그니처 v2
@@ -85,6 +86,7 @@ push_subscriptions(id, user_id, endpoint, keys, created_at)
 agent_traces(id, session_id, step, tool_name, input, output, tokens_in, tokens_out, created_at)
 -- CR-006 · D18 (리비전 0003): 계정과 계정별 격리
 users(id, username, nickname, password_hash, created_at)  -- nickname: CR-007 · 리비전 0004 (필수, UNIQUE, 표시 이름 — 인물이 아님)
+mcp_tokens(id, user_id, token_hash, created_at, expires_at, last_used_at)  -- CR-008 · D19 · 리비전 0005: user_id UNIQUE(계정당 1개)·users FK CASCADE, 토큰은 해시만
 auth_sessions(id, user_id, token_hash, created_at, expires_at)
 chat_messages(id, user_id, role, content, question_id, created_at)
 ```

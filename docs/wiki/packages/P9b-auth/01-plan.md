@@ -1,7 +1,7 @@
 # P9b-auth · 계획 (01-plan)
 
-상태: 개정 2(2026-11-15, architect — verifier 02-plan-verify 1차 보류 F-1~F-7·R-1~R-13, 2차 보류 N-1~N-4·R2-1~R2-4 반영, 처리표는 맨 끝 "개정 이력") — 사용자 결정 표는 **권장안을 기본값으로 채택**(사용자 지시 "계획하고 실행하고 독립 검토까지 진행, 검토할 수 없는 부분만 말해 달라", 2026-11-15) → verify-plan → verifier 재검증 → 활성화 | 담당: backend-agent(sonnet, U1·U2·U3a·U3b·U4·U5) · frontend-agent(sonnet, U6) · 메인 세션(U7 문서·로컬 통합 스모크·증거 저장, U8 진행) · 사용자(U7 서버 반영 SSH·U8 시연 계정 대화·브라우저 점검) · 검증 verifier(fable, 02-plan-verify·단위 리뷰·04-review) | 작성: 2026-11-15 | **개정 3: 2026-11-16(architect, CR-007 — 가입 닉네임·아이디·닉네임 중복검사. 새 단위 U9 backend-agent · U10 frontend-agent · U11 메인+사용자 재배포를 더한다. 기존 단위·문장은 그대로 두고 덧붙였다. 사용자 결정 표 W~AH 는 권장안 채택(사용자 위임 2026-11-15, 메인 지시 2026-11-16). 처리표는 맨 끝 "개정 이력" 개정 3) → verify-plan → verifier 02-plan-verify 재검증(개정분) → U9∥U10 위임**
-태그 — 패키지: P9b-auth · 닫는 검증: (직접 R 없음) F-fbaaae · R-U10D-3 · 관련 R12·R14 · 기대는 결정: D18(신설) · D17(결정 6 개정) · D2 · D16 · 구현하는 명세: S3.1(보충 0003) · S3.4(답변 소유) · S3.6(사용자별 루프·endpoint 하나) · 관련 원칙: 원칙1 원칙5(폐지 문장) 원칙7 원칙8 원칙9 · 출처 CR: CR-006 · **(개정 3) 출처 CR: CR-007 · 기대는 결정: D18 결정 10·11(CR-007 갱신) · 구현하는 명세: S3.1(보충 0004) · 관련 원칙: 원칙5 원칙7 원칙9**
+상태: 개정 2(2026-11-15, architect — verifier 02-plan-verify 1차 보류 F-1~F-7·R-1~R-13, 2차 보류 N-1~N-4·R2-1~R2-4 반영, 처리표는 맨 끝 "개정 이력") — 사용자 결정 표는 **권장안을 기본값으로 채택**(사용자 지시 "계획하고 실행하고 독립 검토까지 진행, 검토할 수 없는 부분만 말해 달라", 2026-11-15) → verify-plan → verifier 재검증 → 활성화 | 담당: backend-agent(sonnet, U1·U2·U3a·U3b·U4·U5) · frontend-agent(sonnet, U6) · 메인 세션(U7 문서·로컬 통합 스모크·증거 저장, U8 진행) · 사용자(U7 서버 반영 SSH·U8 시연 계정 대화·브라우저 점검) · 검증 verifier(fable, 02-plan-verify·단위 리뷰·04-review) | 작성: 2026-11-15 | **개정 3: 2026-11-16(architect, CR-007 — 가입 닉네임·아이디·닉네임 중복검사. 새 단위 U9 backend-agent · U10 frontend-agent · U11 메인+사용자 재배포를 더한다. 기존 단위·문장은 그대로 두고 덧붙였다. 사용자 결정 표 W~AH 는 권장안 채택(사용자 위임 2026-11-15, 메인 지시 2026-11-16). 처리표는 맨 끝 "개정 이력" 개정 3) → verify-plan → verifier 02-plan-verify 재검증(개정분) → U9∥U10 위임** | **개정 4: 2026-11-17 밤(architect, CR-008 축소안 — MCP 읽기 전용 서버 + 계정별 개인 접근 토큰. 새 단위 U12 backend-agent · U13 frontend-agent · U14 메인+사용자(로컬 Caddy 스모크·재배포·Claude Code 실제 연결). 기존 단위·문장·수용 기준 구절은 그대로 두고 덧붙였다. 결정 AI~BB 는 메인 결정(사용자 위임 범위, 시간 때문에 권장안으로 닫음). 처리표는 맨 끝 "개정 이력" 개정 4) → verify-plan → verifier 02-plan-verify(개정 4분) → `frozen: none` → U12 ∥ U13 위임**
+태그 — 패키지: P9b-auth · 닫는 검증: (직접 R 없음) F-fbaaae · R-U10D-3 · 관련 R12·R14 · 기대는 결정: D18(신설) · D17(결정 6 개정) · D2 · D16 · 구현하는 명세: S3.1(보충 0003) · S3.4(답변 소유) · S3.6(사용자별 루프·endpoint 하나) · 관련 원칙: 원칙1 원칙5(폐지 문장) 원칙7 원칙8 원칙9 · 출처 CR: CR-006 · **(개정 3) 출처 CR: CR-007 · 기대는 결정: D18 결정 10·11(CR-007 갱신) · 구현하는 명세: S3.1(보충 0004) · 관련 원칙: 원칙5 원칙7 원칙9** · **(개정 4) 출처 CR: CR-008 · 기대는 결정: D19(신설) · D18(결정 3·지킬 것 2·3·4 보충) · D17(지킬 것 2·5b 보충) · 구현하는 명세: S3.1(보충 0005) · S3.2(무변경 확인) · 관련 원칙: 원칙1 원칙4 원칙5 원칙7 원칙9**
 의존: P8-frontend(완료 2026-10-21) — 충족 · P5b-query-turn(완료 2026-11-09, `f67d8e4`) — 충족 · P4 게이트(P4b 통과 2026-09-23) — 충족.
 관련(선행 완료 조건이 아님): **배포 패키지(P9 인프라)는 U4 기동·바깥 스모크(`7830f6c`)까지, 04-review 보류.** U1~U6 코드는 배포 패키지 산출물에 기대지 않는다. **U7·U8 과 수용 기준 9번은 P9 인프라 U4 산출물(`7830f6c`, 떠 있는 서버 `54-79-202-221.sslip.io`·`docker-compose.prod.yml`·entrypoint)에 기댄다 — 충족**(backlog 99행 "의존: P9-infra U4" 와 같은 말, R-1). 반영 뒤 배포 패키지 04-review 를 함께 닫는다(CURRENT 메모, 사용자 결정 "반드시 평가 전에") · P2b-person-delete 보류(U2 `3a1bcec`) — 영향 없음(라우트 없음), 재개 시 `chat_messages` 재검토.
 
@@ -40,11 +40,26 @@
 21. **운영·로컬 데이터**: 서버는 `4be331b`(0003) 가동 중이고 사용자 계정 `test` 가 있다(`evidence/20261116-0625-u7-public-smoke.txt`·`…0640-u7-server-ps-user.txt`). 로컬에는 0003 상태 운영 compose 볼륨 `relationship-prod_pgdata`(스모크 계정 9개, 03-log U7 메모)와 개발 DB 계정 3개(`u7la760694`·`u7lb760694`·`u7browser01`)가 있다 — **0004 백필을 실제 0003 데이터에서 볼 수 있다**. 기존 아이디는 모두 결정 A(`[a-z0-9_]{3,20}`, 소문자) — 결정 X 의 닉네임 규칙에도 맞는다(길이 3~20 ⊂ 2~20, 문자 집합 ⊂). 시험 DB 의 도우미 계정 아이디(`helper-…`)는 하이픈이 있어 닉네임 규칙 밖이지만 DB 에는 CHECK 가 없어 백필이 막히지 않는다(시험 전용 값).
 22. **기준선(U9 시작 전 재측정)**: 마지막 전체 pytest **2515 passed · 0 failed · skip 0**(U5 `ca539a1`, `evidence/20261116-0101-u5-pytest-all.txt` — 그 뒤 커밋은 문서뿐). Vitest·typecheck 수는 U10 시작 전 `--root web` 명령(review-u6 R-5)으로 재어 03-log 에.
 
+### 코드에서 확인한 사실 — 개정 4(CR-008, architect 2026-11-17 밤, HEAD `e6f1766`)
+
+23. **조회 함수(도구가 감쌀 것)**: `app/api/read.py` — `list_persons(session, user_id)`(149, 상한 없음, `last_contact_at` 내림차순·null 뒤·`id` 오름차순) · `get_person_card(session, user_id, person_id, now)`(183, 없거나 남의 것 → `PersonNotFound`) · `list_briefings(session, user_id, now, schedule_id=None)`(268, 남의/없는 일정 → `ScheduleNotFound`). 상한 상수 `TIMELINE_LIMIT = 20`(55)·`UPCOMING_SCHEDULES_LIMIT = 10`(59)·`BRIEFINGS_LOOKBACK_DAYS = 7`(74)·`BRIEFINGS_LIMIT = 20`(78). 응답 모델 `PersonListItemOut`(`app/api/schemas.py:334`)·`PersonCardOut`(381 — `TimelineEventOut` 은 `id, type, content, occurred_at`, `content` 는 추출 요약이지 원문이 아니다)·`BriefingRecordOut`(219) 에 `raw_utterance` 필드가 없다. 원문을 싣는 모델은 `EventRawOut`(400)·`FactSourceEventOut`(417) 둘뿐 — 도구는 이 둘을 쓰지 않는다.
+24. **토큰·로그인 재사용**: `app/auth/sessions.py` `new_token()`(45, `secrets.token_urlsafe(32)`)·`hash_token()`(49, sha256 hex)·만료 규약 `expires_at > now`(79). `app/auth/deps.py:40` `current_user`(쿠키만 읽음, 401 `{"code":"unauthenticated"}`)·`get_auth_now`(31, 시험이 덮어쓰는 시계). `app/auth/routes.py:77` `router = APIRouter(prefix="/auth", route_class=_NoInputEchoRoute)`. 모델 `AuthSession` 이 `UniqueConstraint` 를 `__table_args__` 로 두고 `created_at` 은 `server_default=func.now()`(`app/db/models.py`).
+25. **앱 골격**: `app/main.py` `_lifespan(app)`(158 — 브리핑 스위치만), `create_app()`(177 — `OriginCheckMiddleware` · `router`·`auth_router` · `_register_push_dev_page`). 스위치 관례 `app/settings.py:396` `push_dev_page_enabled(env)`(`"1"`/`"true"` 켬, 비었/없음 꺼짐, 그 밖 `InvalidValue`). DB 세션 `app/db/session.py` — `get_session`(78)·`session_scope`(99)·`SessionLocal`(75). `OriginCheckMiddleware` 는 `Origin` 이 없는 POST 를 통과시킨다(사실 14 결정 T) — CLI MCP 클라이언트는 `Origin` 을 보내지 않는다고 본다(**미확인** — U12 로컬 실제 클라이언트 왕복이 판정).
+26. **배포 파일**: `Caddyfile` — `encode gzip`(6) · `handle_path /api/*`(12-16) · 나머지 `handle { … try_files {path} /index.html … }`(28-32) → **지금 `/mcp` 는 SPA 의 HTML 200 이 된다**. `docker-compose.prod.yml` backend `env_file: ${APP_ENV_FILE:-.env}`(45-46) · `environment`(47-51 — `DATABASE_URL`·`POSTGRES_PASSWORD`, "아래 environment 가 같은 이름을 덮어쓴다" 주석). `tests/test_deploy_files.py` Caddyfile 단언(240-261 `handle_path /api/*` 블록·docs 404 순서), `.env.example` 단언(344 `SITE_ADDRESS=`). `requirements.txt` 는 `==` 고정 9줄 — 고정 버전을 단언하는 시험은 없다(grep `requirements` tests).
+27. **스키마 단언 — 개정 4 가 깨뜨리는 곳(architect grep 2026-11-17)**: `tests/test_schema_models.py` — `S3_1_TABLE_COLUMNS`(18~84) · `NULLABLE_COLUMNS`(86~93, **컬럼 이름 집합** — 새 `last_used_at` 이 nullable) · `EXPECTED_FKS`(119~129) · 136~141 `len(names) == 12` · 154~161 컬럼 합 `73` · 222~230 FK `== 8` · 250~258 nullable 집합 등식(함수 이름 `…six_deferred_fields`). `tests/test_schema_check.py:24` `len(sc.EXPECTED_TABLES) == 12`(목록 자체는 모델에서 읽는다 — `scripts/schema_check.py:47`) · `:63-75` UNIQUE 집합 6. `scripts/schema_check.py:237` FK `== 8`. `tests/test_api.py:93` `alembic_revision == "0004"`. `tests/test_migration_0004.py:97-102` head 리터럴 `"0004"`·`:163` 왕복 뒤 `_version == "0004"`. **깨지지 않는 것**: `test_schema_check.py:58`·`test_schema_models.py:331` 인덱스 13(새 인덱스를 만들지 않는다 — UNIQUE 제약은 `table.indexes` 가 아니다, 사실 16) · CHECK 총수 5(새 CHECK 없음) · JSONB 5 · `TIMESTAMP_COLUMNS`(부분 목록 — 새 컬럼을 넣지 않아도 선다) · `scripts/schema_check.py:286` 인덱스 `>= 10`(하한) · `tests/test_migration_0003.py`(head 리터럴 없음, 개정 3 B6·B7) · `tests/helpers_read_api.py` `_COUNTED_MODELS`(9모델 고정).
+28. **라우트 열거 계약**: `tests/test_auth_required_routes.py` `_routes(app)` 는 `path`·`methods` 가 있는 모든 라우트(Starlette `Route` 포함)를 열거하고, 면제 밖이면 쿠키 없이 `json={}` 로 불러 401 `UNAUTHENTICATED` 를 단언한다(117-128). `_MUST_REQUIRE_LOGIN`(47-61). → `/mcp` 를 정확 경로 `Route` 로 두고 `MCP_ENABLED` 를 켠 앱으로 이 시험을 돌리면, 헤더 없는 요청이 DB 없이 같은 401 본문을 받아야 선다(결정 AN).
+29. **프론트**: `web/src/routes.ts` — `Route` 3종·`HREF` 3개·`parseHash`(모르는 해시 → `#/chat`). `web/src/App.tsx:24-26` 라우트별 화면. `web/src/components/AppShell.tsx` — `SidebarContent` 전체가 `<nav aria-label="주 메뉴">`(75) 이고 **`auth.test.tsx:109` 가 그 nav 안의 `<a>` href 목록을 정확히 `['#/chat','#/persons','#/briefings']` 로 단언**한다(인물 목록은 `sidebar-persons` 안 — 그 시험에서는 비어 있음) → 진입점은 `<a>` 가 아니라 `<button>` 이어야 한다. **`auth.test.tsx:466` 이 `sidebar-account` 의 `textContent` 를 정확히 `'민지·로그아웃'` 으로 단언**한다 → 진입점은 `sidebar-account` 블록 **밖**에 둔다. `card.test.tsx:569·590·605` 의 링크 수 단언은 `sidebar-persons` 안만 센다(영향 없음). UI 부품은 `web/src/components/ui/` 에 `button`·`card`·`badge`·`collapsible`·`skeleton`·`tabs`·`sonner`·`sheet` — 대화상자(dialog) 없음. `web/src/api/client.ts` `apiFetch`(80, 401 이면 관문 신호 — `signalUnauthorized` 기본 켬, 204 무본문 처리는 사실 12·R-3 로 이미 있음).
+30. **registry**: grep `mcp|MCP|oauth` → 0행(2026-11-17). 새로 만든다.
+31. **기준선(U12·U13 시작 전 재측정)**: 마지막 전체 pytest 는 FIX-037 `935aa4a` 뒤 03-log 값 — U12 시작 전 `POSTGRES_PORT=5433 … u12-pytest-before -- .venv/bin/python -m pytest -q` 로 다시 재어 03-log 에(실패 0·skip 0 이어야 시작). Vitest·typecheck 는 U13 시작 전 `--root web` 명령으로.
+32. **운영**: 서버는 `935aa4a`(리비전 0004) 가동, 주소 `https://relmemo.com`(Cloudflare DNS, 프록시 끔)과 옛 `https://54-79-202-221.sslip.io` 가 함께 열린다(`SITE_ADDRESS` 에 둘, HANDOFF·`evidence/20261117-2237-fix037-038-deployed-get.txt`).
+
 ## 목표
 
 CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가하고 싶어 그 로그인에 따라서 채팅방이 나오도록 그리고 로그인을 한 계정마다 세션을 별개로 해서 하고싶은데" 를 실현한다. 목적(사용자 원문): "졸업종합평가 날에 시연을 해야하는데 서비스의 구조상 아예 백지인 상태에서 우리의 성능을 보여주긴 어려울 것 같아서 그래 그래서 새로운 계정을 생성하는 모습을 보이고 그리고 이미 데이터가 들어가있으면 어떻게 해주는지 보여주려고 하는거야". 즉 **(가) 새 계정 가입 → 빈 상태에서 첫 언급**, **(나) 데이터가 쌓인 시연 계정으로 로그인 → 인물 카드·브리핑·지난 대화가 그대로**, 그리고 **두 계정의 기억이 섞이지 않음**을 배포 URL 에서 보인다. 구현은 아이디·비밀번호 가입·로그인(HttpOnly 쿠키 + 서버 세션 테이블), 모든 API 의 사용자 출처를 환경변수에서 로그인 계정으로 바꾸기, 계정당 채팅방 하나(서버가 정하는 `session_id = chat:<user_id>` + `chat_messages` 기록), 스케줄러·푸시 사용자별, 리비전 0003(기존 데이터 비우기), 프론트 로그인·가입 화면. 예: 심사자 앞에서 "새 계정 만들기" 로 `judge01` 을 만들면 인물 화면이 비어 있고, 로그아웃 뒤 `demo` 로 로그인하면 김 대리 카드·내일 점심 브리핑·어제 대화가 보인다. `judge01` 의 쿠키로 `GET /api/persons/<demo 의 인물 id>` 를 부르면 404.
 
 **개정 3 목표(CR-007 · D18 결정 10·11)** — 사용자 원문 "그리고 계정가입을 할 때 닉네임도 입력받게 해줘" · "아이디, 닉네임은 중복검사를 하도록 하고" 를 실현한다. 가입 화면에 닉네임 칸(필수)과 아이디·닉네임 칸마다 "중복 확인" 을 더하고, 서버는 가입 때 409 두 코드로 중복을 거부하며 로그인 없이 부르는 조회 API 1개를 둔다. 가입·로그인·내 정보 응답과 사이드바에 닉네임이 보인다. 기존 계정은 리비전 0004 가 닉네임을 아이디로 채워 **그대로 쓸 수 있다**. 예: 심사자 앞에서 가입 화면에 아이디 `judge01`·닉네임 `심사위원` 을 넣고 "중복 확인" 을 누르면 "사용할 수 있어요" 가 뜨고, 이미 있는 `test` 를 넣으면 "이미 쓰고 있는 아이디예요" 가 뜬다. 가입하면 사이드바에 "심사위원 · judge01 · 로그아웃" 이 보인다. 운영의 `test` 계정은 재배포 뒤에도 같은 비밀번호로 로그인되고 사이드바에 닉네임 `test` 가 보인다.
+
+**개정 4 목표(CR-008 축소안 · D19)** — 사용자 결정 "토큰 방식 축소안" · "그래서 Mcp는 당장 내일 시연을 위해서 필요한거라서" 를 실현한다. 로그인한 사용자가 사이드바의 "AI 연결" 을 눌러 연결 토큰을 만들면 토큰과 Claude Code 에 붙이는 명령이 **한 번만** 보이고, 사용자가 자기 터미널에서 그 명령을 실행하면 Claude Code 가 `https://relmemo.com/mcp` 의 읽기 전용 도구 4개로 **그 계정의** 인물 목록·인물 카드·저장된 브리핑을 조회한다. 예: 시연 계정으로 토큰을 만들어 붙인 뒤 Claude Code 에서 "relmemo 에서 김 대리 카드 보여줘" 라고 하면 `find_person` → `get_person_card` 가 불려 김 대리의 사실·최근 사건·내일 점심 일정이 나온다. 새 계정 `judge01` 의 토큰으로는 시연 계정의 인물이 하나도 보이지 않는다. 원문 대화는 나오지 않고, 기록·수정은 할 수 없다. 기존 채팅·인물·브리핑 화면과 `/api/*` 는 그대로다.
 
 ## 범위
 
@@ -58,6 +73,7 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
   - 프론트 로그인·가입 화면, 로그아웃, 대화 기록 불러오기, 401 처리, `X-Session-Id` 제거, E2E `/auth/me` 목, Vite 프록시 `xfwd`(U6).
   - 문서·로컬 통합 스모크·배포 반영 절차와 스모크(U7). 시연 계정 데이터 쌓기·시연 두 갈래 리허설(U8).
   - **(개정 3, CR-007)** 리비전 0004 `users.nickname`(기존 계정 백필, 삭제 없음)·가입 계약 `{username, password, nickname}`·409 `nickname_taken`·422 `invalid_nickname`·로그인 없이 부르는 `GET /auth/availability`·`MeOut.nickname`(U9). 가입 화면 닉네임 칸·칸마다 "중복 확인"·`nickname_taken`/`invalid_nickname` 안내·사이드바 닉네임 표시(U10). 0004 재배포·스모크(U11).
+  - **(개정 4, CR-008)** 리비전 0005 `mcp_tokens` · `POST`·`GET`·`DELETE /auth/mcp-token` · 정확 경로 `/mcp` MCP 서버(공식 Python SDK, 무상태·JSON)와 Bearer 인증 · 읽기 전용 도구 4개 · `MCP_ENABLED` · Caddy `handle /mcp` · compose 스위치 줄(U12). "AI 연결" 화면(`#/connect`)·사이드바 진입 버튼·토큰 한 번 표시·복사·폐기(U13). 로컬 Caddy 경유 스모크·비상 되돌리기 예행·재배포·바깥 GET 스모크·Claude Code 실제 연결·사용자 문서(U14).
 - 이 패키지에서 하지 않는 것 (각 줄 끝이 "왜 안 하는가"):
   - **비밀번호 재설정·이메일 인증** — 메일 발송 인프라·이메일 수집이 필요하고 평가 전 3일에 맞지 않는다. 시연 계정은 사용자가 비밀번호를 안다.
   - **소셜(구글) 로그인** — CR-006 결정 1. OAuth 클라이언트 등록·콜백 도메인·비밀 값이 필요.
@@ -74,6 +90,13 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
   - **(개정 3) 닉네임으로 로그인** — 로그인은 아이디만(D18 결정 10). 두 이름으로 로그인하면 "없는 아이디·틀린 비밀번호 같은 401" 설계를 다시 따져야 한다.
   - **(개정 3) 중복 조회 시도 제한·CAPTCHA** — 결정 AC(결정 H 와 같은 근거).
   - **(개정 3) 닉네임을 다른 사용자에게 보이는 곳(공개 프로필·계정 목록)** — 범위 밖 "관리자 화면·계정 목록" 그대로, 원칙7.
+  - **(개정 4) OAuth 로그인 연결**(보호 리소스 메타데이터·인가 서버·DCR·동의 화면·PKCE·갱신 토큰) — 사용자 결정 "토큰 방식 축소안". 설계는 CR-008 4.3·11장에 기록만, 다음 단계 `P12-mcp`. 그래서 **Claude 앱·ChatGPT·Gemini 앱에는 붙지 않는다**(이 화면·문서에도 그렇게 적는다).
+  - **(개정 4) 쓰기 도구**(발화 기록·답변·인물 생성) · 브리핑 생성 · 채팅 조회 턴 · 원문 조회(`get_event_raw`·`get_fact_sources`) · 대기 질문 · 대화 기록 · 툴 7종 직접 노출 — 원칙1·4·7, D19 결정 1.
+  - **(개정 4) 계정당 여러 토큰·토큰 이름 붙이기·연결된 앱 목록** — 결정 AK. 계정당 1개.
+  - **(개정 4) 토큰 접두·`secret-guard` 패턴 추가** — 하네스 변경(L-nnn)이라 이번에 하지 않는다(결정 AJ).
+  - **(개정 4) MCP 리소스·프롬프트·되묻기(elicitation)** — 도구만.
+  - **(개정 4) 공개 기간 연장** — 사용자 "11-19까지만 서버를 켜둘거야". D17 그대로.
+  - **(개정 4) 로그아웃 때 MCP 토큰 폐기** — 별개 자격(결정 BB). "AI 연결" 화면의 폐기로만.
 
 ## 산출물 (파일 경로)
 
@@ -135,6 +158,31 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | `web/src/api/types.ts` · `web/src/api/client.ts` · `web/src/auth.tsx` · `web/src/screens/AuthScreen.tsx` · `web/src/components/AppShell.tsx` · `web/src/__tests__/auth.test.tsx` · `web/src/__tests__/api.test.ts`(조회 URL 시험 추가) · (바꿔도 되는 목 데이터) `web/e2e/fixtures.ts`·`web/e2e/auth.spec.ts`·`routes.test.tsx`·`push.test.ts`·`card.test.tsx` | 가입 본문·`SignupIn`·`MeOut.nickname`·`AvailabilityOut`·`checkAvailability`·닉네임 칸·중복 확인·안내 문구·사이드바 | U10 |
 | `docs/user-setup/13-user-todo-deploy.md`(0004 재배포 절) · `docs/RUNNING.md`(가입 닉네임 한 줄) · `SERVER-CHECKLIST.md` §5-1·`packages/P9b-auth/u8-demo-script.md`(가입 장면에 닉네임) · `docs/wiki/registry.md`(U9·U10 산출물 행) | 문서 | U11 |
 
+**개정 4 산출물(CR-008)** — 단위 시작 전 `registry.md` grep(이 개정 작성 시 `mcp|MCP|oauth` 0행 — 사실 30). 이름은 권장이며 바꾸면 03-log 에. 패키지 이름을 `app/mcp/` 로 하지 않는다(PyPI 패키지 `mcp` 와 이름이 겹쳐 읽는 사람이 헷갈린다).
+
+새로 만드는 파일
+- U12: `alembic/versions/0005_mcp_tokens.py` · `app/auth/mcp_tokens.py`(발급 upsert·토큰→사용자 조회와 `last_used_at` 갱신·상태·폐기) · `app/mcp_server/__init__.py` · `app/mcp_server/auth.py`(Bearer 인증 ASGI 래퍼·사용자 id 전달) · `app/mcp_server/tools.py`(SDK 없이 시험할 수 있는 도구 본체 4개·이름 키 함수) · `app/mcp_server/server.py`(SDK import·서버 생성·도구 등록·라우트 하나와 세션 관리자 반환)
+- U12 시험: `tests/test_mcp_tokens_api.py` · `tests/test_mcp_tools.py` · `tests/test_mcp_server.py` · `tests/test_migration_0005.py`
+- U13: `web/src/screens/ConnectScreen.tsx` · 시험 `web/src/__tests__/connect.test.tsx`
+- U14(메인): `docs/user-setup/15-mcp-connect.md`(AI 도구 연결 안내) · `packages/P9b-auth/evidence/<시각>-cr008-clients-report.md`(조사 보고서 보존본 — CR-008 0-b ⑥)
+
+고치는 기존 파일
+
+| 파일 | 고치는 내용 | 단위 |
+|---|---|---|
+| `app/db/models.py` | `McpToken`(S3.1 0005 보충 그대로 — 아래 U12) · 모듈 docstring "보충" 줄 | U12 |
+| `app/settings.py` | `MCP_TOKEN_DAYS = 7` · `MCP_LIST_PEOPLE_LIMIT = 200` · `MCP_FIND_PERSON_LIMIT = 50` · `MCP_FIND_NAME_MAX_LEN = 50` · `mcp_enabled(env)`(관례는 `push_dev_page_enabled`) | U12 |
+| `app/api/schemas.py` | `McpTokenCreatedOut` · `McpTokenStatusOut` | U12 |
+| `app/auth/routes.py` · `app/auth/__init__.py`(docstring 라우트 목록) | `/auth/mcp-token` 3개 · 모듈 docstring 계약 표 | U12 |
+| `app/main.py` | 스위치가 켜졌을 때만 `app.mcp_server.server` 를 import 해 `/mcp` 라우트 등록 + `_lifespan` 에서 세션 관리자 `run()` | U12 |
+| `requirements.txt` | `mcp==<U12 가 PyPI 에서 확인한 버전>` 한 줄(+ Refs 주석) — 기존 줄 변경 0 | U12 |
+| `Caddyfile` | `handle /mcp { reverse_proxy backend:8000 }` 블록 + 주석 | U12 |
+| `docker-compose.prod.yml` | `backend.environment` 에 `MCP_ENABLED: ${MCP_ENABLED:-1}` 한 줄 + 주석 | U12 |
+| `.env.example` | 주석 줄 `# MCP_ENABLED=1` 과 설명(운영 compose 기본 켬, 로컬 기본 꺼짐) — 값 없음 | U12 |
+| U12 닫힌 목록의 기존 시험(M1~M11) | S3.1 0005 보충·D18 지킬 것 4 보충 반영 | U12 |
+| `web/src/routes.ts` · `web/src/App.tsx` · `web/src/components/AppShell.tsx` · `web/src/api/types.ts` · `web/src/api/client.ts` · `web/src/__tests__/api.test.ts`(새 시험 추가만) | `#/connect` 경로·화면 연결·사이드바 "AI 연결" 버튼·타입 2개·클라이언트 함수 3개 | U13 |
+| `docs/user-setup/13-user-todo-deploy.md`(0005 재배포 절) · `docs/RUNNING.md`(MCP 한 줄) · `packages/P9b-auth/u8-demo-script.md`(MCP 장면) · `docs/wiki/registry.md`(U12·U13 산출물 행) | 문서 | U14 |
+
 ### API 계약 (U2~U5 백엔드 ↔ U6 프론트 — U6 이 동시에 시작할 수 있도록 여기서 고정)
 
 | 메서드·경로 | 요청 | 성공 | 실패 |
@@ -179,6 +227,75 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | 중복 판정 | **정규화 최종 값의 완전 일치**. DB UNIQUE `uq_users_nickname` 이 바로 그 값(`users.nickname`)에 걸린다 — 앱 정규화 값 = DB 비교 대상(함수 인덱스 없음, S3.1 0004 보충) |
 | 이름 공간(결정 Z) | 아이디와 **별개** — 내 닉네임이 남의 아이디와 같아도, 내 아이디와 같아도 된다(0004 백필이 닉네임 = 아이디) |
 | 아이디 규칙 | 결정 A 그대로(변경 없음) |
+
+### API 계약 — 개정 4(CR-008 · D19. U12 백엔드 ↔ U13 프론트 — U13 이 U12 커밋 전에 목 응답으로 시작할 수 있도록 값으로 고정)
+
+| 메서드·경로 | 요청 | 성공 | 실패 |
+|---|---|---|---|
+| **`POST /auth/mcp-token`**(새) | 본문 없음(보내도 무시) · **로그인 쿠키 필수**(`current_user`) · 상태 변경이라 Origin 검사 대상(결정 T 그대로) | **201** `{"token": T, "created_at": C, "expires_at": E}` — T = `new_token()` 원문(URL-safe 43자), C = 발급 시각(`get_auth_now()`), **E = C + 7일**(`MCP_TOKEN_DAYS`), 둘 다 ISO 8601(타임존 포함). 그 계정의 **이전 토큰은 이 응답 시점에 무효**(행 upsert). 헤더 `Cache-Control: no-store` | 401 `{"detail":{"code":"unauthenticated"}}` · 403 `{"detail":{"code":"bad_origin"}}` |
+| **`GET /auth/mcp-token`**(새) | 로그인 필수 | 200 `{"active": A, "created_at": C\|null, "expires_at": E\|null, "last_used_at": L\|null}` — 행 없음 → `{"active": false, "created_at": null, "expires_at": null, "last_used_at": null}` · 행 있음·`expires_at > now` → `active: true` · 행 있음·만료(`expires_at <= now`) → `active: false` 이고 세 값은 행 값 그대로. **응답 키는 정확히 이 4개 — `token` 없음**. 헤더 `Cache-Control: no-store` | 401 `unauthenticated` |
+| **`DELETE /auth/mcp-token`**(새) | 로그인 필수 · Origin 검사 대상 | **204** 본문 없음 — 그 계정 행 삭제. 행이 없어도 204(멱등) | 401 · 403 `bad_origin` |
+| **`/mcp`**(새, `POST`·`GET`·`DELETE`, **정확 경로 — `/mcp/` 로 307 리디렉트하지 않는다**) | 헤더 `Authorization: Bearer <T>` — 스킴 이름은 대소문자 무시, 값은 앞뒤 공백 제거, 빈 값은 "없음". MCP Streamable HTTP JSON-RPC 본문(SDK 규약 — 클라이언트가 `Accept: application/json, text/event-stream` 을 보낸다) | 인증 통과 → SDK 가 처리(무상태·JSON 응답, 결정 AR). 도구는 아래 "도구 계약" | **401** 본문 `{"detail":{"code":"unauthenticated"}}` + 헤더 `WWW-Authenticate: Bearer` — 헤더 없음 · `Bearer` 가 아닌 스킴 · 모르는 토큰 · 만료(`expires_at <= now`) · 폐기 · 재발급으로 밀려난 토큰 **모두 같은 응답**(이유를 구별하지 않는다). **헤더가 없거나 `Bearer` 가 아니면 DB 조회 0.** 로그인 쿠키·쿼리 문자열(`?token=`·`?access_token=` 등)은 **자격이 아니다**(있어도 무시 → 헤더 없으면 401). `Origin` 이 있고 호스트와 다르면 기존 미들웨어가 403 `bad_origin`(POST·DELETE). **`MCP_ENABLED` 꺼짐 → 404**(라우트 없음) |
+| 기존 라우트 전부 | 변경 없음 — **`Authorization: Bearer` 를 자격으로 받지 않는다** | 변경 없음 | 변경 없음 |
+
+- **발급 판정 순서(U12 가 이 순서 그대로)**: ① `current_user`(쿠키) ② `now = get_auth_now()()` ③ `T = new_token()` ④ PostgreSQL `INSERT … ON CONFLICT (user_id) DO UPDATE SET token_hash, created_at, expires_at, last_used_at = NULL`(제약 `uq_mcp_tokens_user_id` — 연속 두 번 눌러도 행 1개, 경합에서 500 없음) ⑤ commit ⑥ 201. `agent_traces`·다른 테이블 쓰기 0.
+- **`/mcp` 인증 순서(U12 가 이 순서 그대로)**: ① `Authorization` 헤더를 읽는다(여러 개면 첫 값) ② `scheme, _, value = header.partition(" ")` — `scheme.lower() != "bearer"` 또는 `value.strip() == ""` → 401(DB 0) ③ `hash_token(value.strip())` 로 `mcp_tokens` 를 찾고 `expires_at > now` 일 때만 사용자 id ④ 없으면 401 ⑤ 있으면 `last_used_at = now` 갱신·commit ⑥ 사용자 id 를 도구에 넘기고(결정 AT) SDK 로. 시계는 `get_auth_now()` 와 같은 UTC 시계 — 시험이 덮어쓸 수 있게 래퍼에 주입한다.
+- **호환**: 프론트와 백엔드는 한 해시로 같이 배포된다(결정 W 와 같은 이유) — 과도기 호환 없음.
+
+### 도구 계약 — 개정 4(D19 결정 4, 닫힌 값)
+
+공통: MCP 서버 이름 `relmemo`. 도구는 **정확히 4개**. 모든 도구 표시(annotations) `readOnlyHint=true`·`destructiveHint=false`·`idempotentHint=true`·`openWorldHint=false`, 제목(`title`)은 한국어. 입력 스키마에 사용자 id·아이디 인자 **없음**. 결과는 JSON 객체 하나 — SDK 가 구조화 결과와 텍스트를 함께 내면 둘 다 같은 객체(텍스트는 그 JSON 문자열). 시각은 `model_dump(mode="json")` 의 ISO 8601. 오류는 MCP 도구 오류 결과(`isError: true`)이고 텍스트는 **아래 코드 문자열 하나뿐**(예외 원문·SQL·스택 0 — 예상 밖 예외는 전부 `internal_error`). `now = datetime.now(timezone.utc)`. 상한 상수는 **호출 시점에 `app.settings` 모듈 속성을 읽는다**(시험이 `monkeypatch` 로 줄인다).
+
+| 도구 | 제목 | 입력 | 결과 | 오류 코드 |
+|---|---|---|---|---|
+| `list_people` | 인물 목록 | 없음 | `{"people": [P…], "total": N, "truncated": B}` — P = `PersonListItemOut` JSON(`id, display_name, relation_tag, hierarchy, last_contact_at, aliases`), 순서 = `list_persons()` 그대로, 앞 `MCP_LIST_PEOPLE_LIMIT`(200)명, N = 자르기 전 수, B = `N > 200` | `internal_error` |
+| `find_person` | 이름으로 인물 찾기 | `name: string`(필수) | `{"matches": [P…], "total": N, "truncated": B}` — 아래 이름 규칙으로 **일치하는 인물 전부**(하나로 고르지 않는다 — 원칙1), 순서 `list_persons()` 그대로, 앞 `MCP_FIND_PERSON_LIMIT`(50)명. 0명이면 `matches: []`·`total: 0`(오류 아님) | `invalid_name` · `internal_error` |
+| `get_person_card` | 인물 카드 | `person_id: integer`(필수) | `PersonCardOut` JSON 그대로(`person, aliases, last_contact_at, facts, patterns, timeline`(최근 20) `, upcoming_schedules`(10)) | `not_found`(`PersonNotFound` — 없음·남의 것 같은 결과) · `internal_error` |
+| `list_briefings` | 저장된 브리핑 | `schedule_id: integer`(선택 — 생략하면 전체) | `{"briefings": [B…]}` — B = `BriefingRecordOut` JSON, `list_briefings(session, user_id, now, schedule_id)` 그대로(지정 없으면 최근 7일 이후 일정·최대 20) | `not_found`(`ScheduleNotFound`) · `internal_error` |
+
+- **이름 규칙(`find_person`, 결정 AV)**: `key(s) = "".join(unicodedata.normalize("NFC", s).casefold().split())`(NFC → 대소문자 접기 → **모든 공백 제거**). `len(name.strip()) > MCP_FIND_NAME_MAX_LEN`(50) 이면 `invalid_name`. `k = key(name)` 이 빈 문자열이면 `invalid_name`. 인물은 `k in key(display_name)` 이거나 별칭 중 하나라도 `k in key(alias)` 이면 일치. 예: `"박과장"` 은 `박 과장`·`박과장님` 둘 다, `"PARK"` 은 별칭 `park` 에 일치. NUL·제어문자가 든 이름도 500 이 아니다(DB 에 묻지 않는 문자열 비교라 — 시험으로 박는다).
+- **설명(description) 문구 — 이 값 그대로**(바꾸면 03-log 에 이유). 모든 도구 끝에 공통 꼬리 **"사용자가 대화로 기록한 사실의 조회입니다. 기록에 없는 것은 없다고 말하세요."**
+  - `list_people`: "내 관계 메모리에 기록된 인물 목록입니다(최근 접촉 순, 최대 200명). " + 꼬리
+  - `find_person`: "이름이나 별칭에 이 글자가 들어간 인물을 모두 찾습니다(띄어쓰기·대소문자 무시, 최대 50명). 여러 명이면 하나로 고르지 말고 사용자에게 누구인지 물으세요. " + 꼬리
+  - `get_person_card`: "인물 한 명의 카드입니다 — 기록된 사실, 반복 패턴, 최근 사건 20개, 다가오는 일정 10개. person_id 는 list_people·find_person 결과의 id 입니다. " + 꼬리
+  - `list_briefings`: "만남 전에 만들어 둔 브리핑 목록입니다(최근 7일 이후 일정, 최대 20개). schedule_id 를 주면 그 일정의 브리핑만 돌려줍니다. 새 브리핑을 만들지 않습니다. " + 꼬리
+- **도구 호출 로그 한 줄(결정 AW)**: 성공·오류 모두 `logging.getLogger("uvicorn.error.mcp").info("mcp_tool name=%s user=%s items=%d", <도구 이름>, <user_id>, <결과 개수 — 카드는 1, 오류는 0>)` — uvicorn 이 이미 설정한 처리기로 `docker compose logs backend` 에 보인다. **도구 인자 값(인물 이름·id)·토큰은 넣지 않는다.**
+- **DB 세션**: 도구 호출마다 `SessionLocal()` 로 열고 읽은 뒤 닫는다(쓰기 0 — commit 하지 않는다). 동기 DB 호출은 이벤트 루프를 막지 않게 `anyio.to_thread.run_sync` 로 돌린다 — **사용자 id 는 비동기 쪽에서 먼저 읽어 인자로 넘긴다**(스레드로 컨텍스트가 넘어가는지에 기대지 않는다).
+
+### "AI 연결" 화면 고정 문구 — 개정 4(U13, `CONNECT_NOTICE` — 이 값 그대로, 바꾸면 03-log 에 이유)
+
+| 키 | 값 |
+|---|---|
+| `entry` | `AI 연결` |
+| `title` | `AI 연결` |
+| `intro` | `Claude Code 같은 AI 도구에서 내 관계 메모리를 읽기 전용으로 조회할 수 있어요. 인물 목록·인물 카드·저장된 브리핑만 열리고, 기록·수정·원문 대화는 열리지 않아요.` |
+| `privacy` | `조회한 내용은 연결한 AI 도구의 회사로 전송돼요.` |
+| `scope` | `Claude Code·Codex CLI 처럼 연결 토큰을 헤더로 넣는 도구에만 연결돼요. Claude 앱·ChatGPT 앱은 아직 연결할 수 없어요.` |
+| `loading` | `불러오는 중…` |
+| `statusNone` | `연결 토큰이 없어요.` |
+| `statusActive` | `연결 토큰이 있어요.` |
+| `statusExpired` | `연결 토큰이 만료됐어요. 새로 만들어 주세요.` |
+| `expiresAt` | `만료` |
+| `lastUsedAt` | `마지막 사용` |
+| `neverUsed` | `아직 쓰지 않았어요.` |
+| `validity` | `토큰은 만든 뒤 7일 동안 쓸 수 있어요.` |
+| `create` | `연결 토큰 만들기` |
+| `recreate` | `새 토큰 만들기` |
+| `recreateWarn` | `새로 만들면 지금 토큰은 바로 쓸 수 없게 돼요.` |
+| `onceNotice` | `이 토큰은 지금 한 번만 보여요. 화면을 벗어나면 다시 볼 수 없으니 바로 복사해 두세요.` |
+| `tokenLabel` | `연결 토큰` |
+| `commandLabel` | `Claude Code 에 붙이는 명령 (내 컴퓨터 터미널에서 실행)` |
+| `copy` | `복사` |
+| `copyToken` | `토큰 복사`(버튼 접근 이름 — `aria-label`) |
+| `copyCommand` | `명령 복사`(버튼 접근 이름) |
+| `copied` | `복사했어요.` |
+| `copyFailed` | `복사하지 못했어요. 직접 선택해 복사해 주세요.` |
+| `revoke` | `토큰 폐기` |
+| `revoked` | `토큰을 폐기했어요. 이 토큰으로 연결한 도구는 더 이상 조회할 수 없어요.` |
+| `failed` | `처리하지 못했어요. 잠시 후 다시 시도해 주세요.` |
+
+- **명령 문자열(결정 AY — 글자 그대로)**: `` `claude mcp add --transport http relmemo ${window.location.origin}/mcp --header "Authorization: Bearer ${token}"` `` — 호스트를 코드에 박지 않는다(운영에서 `https://relmemo.com/mcp`, 옛 sslip 주소로 열면 그 주소).
+- 시각 표기: 만료·마지막 사용은 `new Date(x).toLocaleString('ko-KR')`(이 화면 안에서만 — 기존 화면의 표기 함수는 건드리지 않는다).
 
 ## 작업 단위 (단위 하나 = 커밋 하나. 끝나면 /commit. 단위마다 verifier 커밋 전 리뷰 + 핵심 계약 변이 시험 최소 1개)
 
@@ -401,6 +518,115 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 - **R4-10 (U9 판정 추가, 원칙7)**: `grep -rln nickname app --include='*.py'` 결과가 `app/db/models.py`·`app/api/schemas.py` 또는 인증 스키마 파일·`app/auth/routes.py`·`app/auth/names.py`(와 필요 시 `app/auth/__init__.py`) 밖의 파일을 포함하지 않는다 — 에이전트 루프·툴·브리핑·프롬프트 파일에 `nickname` 이 없어야 한다.
 - **R4-11**: 영문 닉네임이 소문자로 보이는 것(결정 Y)은 사용자에게 알린다(메인, 2026-11-16 알림).
 
+### 개정 4 단위(CR-008) — 순서·병렬
+
+**(CR-008 문서 이행 + 이 개정 verify-plan·verifier 02-plan-verify 통과 → 메인이 `frozen: none`) → U12 ∥ U13 → U14 → (P9b verify-impl·04-review 는 평가 뒤 또는 메인 판단).** U12·U13 은 파일이 겹치지 않는다(`app/`·`alembic/`·`tests/`·`Caddyfile`·`docker-compose.prod.yml`·`requirements.txt`·`.env.example` ↔ `web/`). U13 은 "API 계약 — 개정 4" 표와 목 응답으로 U12 커밋 전에도 시작한다(U6·U10 선례). **배포 해시는 U12·U13 이 모두 들어간 해시뿐**(U13 만 있으면 화면이 404 를 받고, U12 만 있으면 토큰을 만들 화면이 없다). U12·U13 의 `03-log.md`·`tests.md` 초안은 에이전트가 직접 고치지 않고 **보고문에** 돌려준다(R4-7 과 같음). 위임 프롬프트에는 이 개정의 해당 U 원문을 인용하고 임의 제한을 덧붙이지 않는다. 계획에 없는 상수·정렬·상한·방어가 필요하면 구현 전에 멈추고 보고한다(FIX-033 (b)). **SDK 실물 때문에 계획 문장과 다르게 해야 하는 곳(결정 AQ·AS·AT 에 미리 적은 갈림길 밖)이 나오면 멈추고 보고한다.**
+
+**각 단위 커밋 시점에 전체 시험이 서는가**: ① U12 커밋 — 스키마·리비전·라우트·배포 파일을 바꾸는 커밋에 닫힌 목록 M1~M11 을 같이 넣는다 → 전체 pytest 통과 가능. 프론트 무변경. ② U13 커밋 — `web/` 만 → Vitest·typecheck·build·E2E 통과 가능. ③ U12·U13 계약 어긋남은 단위 시험이 못 잡는다 → U14 로컬 Caddy 경유 스모크(실제 백엔드 + 실제 빌드)와 로컬 브라우저 점검이 반영 전 관문.
+
+- [ ] U12 **[backend-agent] MCP 백엔드 — 리비전 0005 `mcp_tokens`, `POST`·`GET`·`DELETE /auth/mcp-token`, 정확 경로 `/mcp` 의 Bearer 인증과 MCP 서버(공식 Python SDK, 무상태·JSON), 읽기 전용 도구 4개, `MCP_ENABLED`, Caddy `handle /mcp`, compose 스위치 줄** / Refs: P9b-auth CR-008 D19 D18 D17 S3.1 security 원칙1 원칙4 원칙7 원칙9 / 의존: CR-008 문서 이행 + 개정 4 계획 검증 통과(`frozen: none`) · U9 커밋(`bd0e061` — 0004, 충족) · FIX-037 `935aa4a`(충족)
+  - **SDK 의존(결정 BA)**: 시작 전에 PyPI 의 공식 MCP Python SDK 패키지(이름 `mcp` — 조사 보고 [G1] 의 공식 문서 기준)의 **현재 안정판 버전을 확인**해 `requirements.txt` 에 `==` 로 고정하고 03-log 에 버전·확인 날짜·라이선스를 적는다. 그 버전에서 고수준 서버 클래스 이름(문서 v2 `MCPServer` / v1 `FastMCP`), 무상태·JSON 응답 옵션, 도구 표시(annotations) 지정 방법, 세션 관리자 `run()`·`handle_request` 의 실제 이름을 **설치한 소스에서 확인**해 03-log 에 파일:줄로 적는다. 증거: `… u12-pip-freeze-before` → `.venv/bin/python -m pip install mcp==<버전>` → `… u12-pip-freeze-after`(`pip freeze` 두 벌 — 바뀐 전이 의존성이 보인다). **`requirements.txt` 의 기존 고정 줄(`fastapi`·`uvicorn`·`pydantic` 계열 포함)을 바꿔야만 설치되면 멈추고 보고**(버전을 낮추거나 올리지 않는다). Docker 이미지(`Dockerfile` 은 `requirements.txt` 로 설치)는 U14 로컬 빌드가 판정.
+  - **모델(`app/db/models.py`, S3.1 0005 보충 그대로)**: `McpToken(__tablename__="mcp_tokens")` — `id` BIGINT PK(기존 BIGINT PK 와 같은 방식) · `user_id: Text NOT NULL, ForeignKey("users.id", ondelete="CASCADE")` · `token_hash: Text NOT NULL` · `created_at: DateTime(timezone=True) NOT NULL, server_default=func.now()` · `expires_at: DateTime(timezone=True) NOT NULL` · `last_used_at: DateTime(timezone=True) NULL` · `__table_args__ = (UniqueConstraint("user_id"), UniqueConstraint("token_hash"))`(이름은 naming_convention → `uq_mcp_tokens_user_id`·`uq_mcp_tokens_token_hash`). **별도 `Index` 를 만들지 않는다**(인덱스 총수 13 유지 — 사실 27). CHECK 없음.
+  - **리비전 `0005`**(`alembic/versions/0005_mcp_tokens.py`, `down_revision = "0004"`): upgrade = `op.create_table("mcp_tokens", …)` + 두 UNIQUE + FK(CASCADE) — **`DELETE`·`TRUNCATE`·`UPDATE` 0, 기존 데이터를 건드리지 않는다**(docstring 에 명시). downgrade = `op.drop_table("mcp_tokens")` — 발급한 토큰만 사라지고 계정·기록 불변(docstring 에 명시).
+  - **`app/settings.py`**: `MCP_TOKEN_DAYS = 7` · `MCP_LIST_PEOPLE_LIMIT = 200` · `MCP_FIND_PERSON_LIMIT = 50` · `MCP_FIND_NAME_MAX_LEN = 50` · `mcp_enabled(env: dict[str, str] | None = None) -> bool` — `MCP_ENABLED` 가 비었거나 없으면 `False`, `"1"`/`"true"` 만 `True`, 그 밖은 `InvalidValue`(`push_dev_page_enabled()` 와 같은 관례·docstring). 새 상수는 이 다섯뿐.
+  - **`app/api/schemas.py`**: `McpTokenCreatedOut{token: str, created_at: datetime, expires_at: datetime}` · `McpTokenStatusOut{active: bool, created_at: datetime | None, expires_at: datetime | None, last_used_at: datetime | None}` — docstring 에 "`token` 은 생성 응답 하나에만 — 상태 응답 모델에 필드 자체가 없다".
+  - **`app/auth/mcp_tokens.py`**: `issue_mcp_token(session, user_id, now) -> tuple[str, datetime, datetime]`(위 "발급 판정 순서" ③④, `hash_token`·`new_token` 재사용, commit 은 라우트가) · `user_id_for_mcp_token(session, token, now) -> str | None`(해시 조회·`expires_at > now`·찾으면 `last_used_at = now` — commit 은 호출자) · `mcp_token_status(session, user_id, now) -> McpTokenStatusOut` · `revoke_mcp_token(session, user_id) -> None`. 토큰 값을 로그·예외 메시지에 넣지 않는다.
+  - **`app/auth/routes.py`**: 같은 `router` 에 `POST /mcp-token`(201, `response_model=McpTokenCreatedOut`) · `GET /mcp-token`(200, `McpTokenStatusOut`) · `DELETE /mcp-token`(204, `response_class=Response`) — 셋 다 `Depends(current_user)` · 시계는 `get_auth_now` · 응답 헤더 `Cache-Control: no-store`(POST·GET). 모듈 docstring 계약 표에 세 줄. `agent_traces` 쓰기 0.
+  - **`app/mcp_server/tools.py`(SDK import 0 — 순수 함수)**: `name_key(s) -> str`(이름 규칙) · `tool_list_people(session, user_id) -> dict` · `tool_find_person(session, user_id, name) -> dict`(위반 시 `McpToolError("invalid_name")`) · `tool_get_person_card(session, user_id, person_id, now) -> dict`(`PersonNotFound` → `McpToolError("not_found")`) · `tool_list_briefings(session, user_id, now, schedule_id) -> dict`(`ScheduleNotFound` → `McpToolError("not_found")`). `McpToolError(code)` 는 이 모듈의 예외 클래스(메시지 = 코드). 조회는 **`app.api.read` 의 세 함수만** 부른다(새 SQL 0). 상한은 호출 시점에 `app.settings` 속성을 읽는다.
+  - **`app/mcp_server/auth.py`**: ASGI 래퍼 `BearerAuthApp(inner, session_factory, now)` — "`/mcp` 인증 순서" ①~⑥ 그대로. 401 응답은 `JSONResponse(status_code=401, content={"detail":{"code":"unauthenticated"}}, headers={"WWW-Authenticate": "Bearer"})`. 쿠키·쿼리 문자열을 읽는 코드 0(D19 지킬 것 3).
+  - **`app/mcp_server/server.py`(SDK import 는 이 파일에만)**: `build_mcp_endpoint(session_factory, now) -> tuple[<ASGI app>, <세션 관리자>]` — SDK 서버(이름 `relmemo`, 무상태·JSON 응답 — 결정 AR)를 **호출마다 새로** 만든다(세션 관리자의 `run()` 은 인스턴스당 한 번만 되므로 `create_app()` 이 여러 번 불리는 시험에서도 서로 섞이지 않게). 도구 4개를 위 "도구 계약" 의 이름·제목·설명·표시·입력 그대로 등록하고, 각 도구는 `async def` 로 ① 사용자 id 를 읽고(결정 AT) ② `anyio.to_thread.run_sync` 로 `SessionLocal()` 을 열어 `tools.py` 함수를 부르고 닫고 ③ 로그 한 줄 ④ 결과 dict 를 돌려준다. `McpToolError` 는 SDK 의 도구 오류 결과(`isError`)로 코드 문자열만, 그 밖의 `Exception` 은 `internal_error`. **SDK 의 호스트 검사(DNS 재바인딩 보호)는 끈다**(결정 AS — 끄는 방법은 설치한 SDK 실물로, 03-log 에 파일:줄). SDK 의 인증 기능(`TokenVerifier`·`AuthSettings`·보호 리소스 메타데이터)은 **쓰지 않는다**(결정 AN — OAuth 메타데이터가 없는 축소안).
+  - **`app/main.py`**: `create_app()` 에서 `mcp_enabled()` 가 참일 때만 `from app.mcp_server.server import build_mcp_endpoint` → `BearerAuthApp` 으로 감싼 ASGI 앱을 **정확 경로 라우트** `Route("/mcp", endpoint=<그 ASGI 앱>, methods=["GET","POST","DELETE"])` 로 `app.router.routes` 에 더하고(결정 AQ (i)) 세션 관리자를 `app.state.mcp_session_manager` 에 둔다. `_lifespan(app)` 은 `app.state` 에 세션 관리자가 있으면 `async with <세션 관리자>.run():` 안에서 `yield`(기존 브리핑 작업과 함께 — 순서: 세션 관리자 열기 → 브리핑 작업 시작, 종료는 역순). 꺼져 있으면 지금과 **완전히 같다**(SDK import 0, lifespan 동작 같음 — 리스크 A 유지). 잘못된 스위치 값 → `InvalidValue` 로 앱 시작 실패(원칙8). 만약 설치한 SDK 로 정확 경로 라우트가 동작하지 않으면 (ii) `Mount("/mcp", …)` + SDK 경로 `"/"` 를 쓰되 **`POST /mcp` 가 3xx 없이 처리되는 방법**을 03-log 에 근거와 함께 — 판정 기준은 같다.
+  - **배포 파일**: `Caddyfile` 의 `handle_path /api/*` 블록 **뒤**, 정적 `handle {}` **앞**에 `handle /mcp { reverse_proxy backend:8000 }`(경로 매처는 정확 `/mcp` — 와일드카드 없음, 접두 제거 없음) + 주석("Refs: P9b-auth CR-008 D19 — handle_path 가 아니라 handle: 백엔드 경로도 /mcp"). `docker-compose.prod.yml` `backend.environment` 에 `MCP_ENABLED: ${MCP_ENABLED:-1}` + 주석("서버 .env 를 고치지 않아도 켜진다. 끄려면 서버 .env 에 MCP_ENABLED=0"). `.env.example` 에 주석 줄 `# MCP_ENABLED=1` + 설명 한 줄. 서비스 수·포트·볼륨 무변경.
+  - **깨뜨릴 기존 단언 — 닫힌 목록(architect grep 2026-11-17, 6파일 11항목)**. 값은 S3.1 0005 보충·D18 지킬 것 4 보충에서 나온다 → 카드 반영이지 단언 의미 변경이 아니다. **목록 밖 시험이 깨지면 멈추고 보고.**
+
+    | # | 파일:줄 | 지금 | 바꾼 뒤 | 종류 |
+    |---|---|---|---|---|
+    | M1 | `tests/test_schema_models.py:18~84` `S3_1_TABLE_COLUMNS` | 12 테이블 | `"mcp_tokens": {"id","user_id","token_hash","created_at","expires_at","last_used_at"}` 추가(주석 "0005 보충(CR-008)") | 단언 상수 |
+    | M2 | `tests/test_schema_models.py:86~93`·`250~258` | `NULLABLE_COLUMNS` 6 이름 · 함수 `…six_deferred_fields` | `"last_used_at"` 추가 → 7, 함수 이름·docstring `…seven_deferred_fields`(+ "0005 보충 `mcp_tokens.last_used_at`") | 단언 |
+    | M3 | `tests/test_schema_models.py:119~129`·`222~230` | `EXPECTED_FKS` 8 · `len(found) == 8` · 함수 `…all_eight…` | `("mcp_tokens","user_id","users","id")` 추가 → 9, `== 9`, 함수 이름·docstring `…all_nine…` | 단언 |
+    | M4 | `tests/test_schema_models.py:136~141` | `len(names) == 12`(docstring "12개") | `13` | 단언 |
+    | M5 | `tests/test_schema_models.py:154~161` | 컬럼 합 `73`(함수 이름·docstring) | `79`(73 + 0005 보충 6), 함수 이름 `…_79_…` | 단언 |
+    | M6 | `tests/test_schema_check.py:24` | `len(sc.EXPECTED_TABLES) == 12` | `13` | 단언 |
+    | M7 | `tests/test_schema_check.py:63~75` | UNIQUE 집합 6 · 함수 `…plus_0004_one` | `("mcp_tokens","uq_mcp_tokens_user_id")`·`("mcp_tokens","uq_mcp_tokens_token_hash")` 추가 → 8, 함수 이름·docstring `…plus_0005_two` | 단언 |
+    | M8 | `scripts/schema_check.py:237` | FK `len(rows) == 8`(+ 그 줄의 라벨) | `== 9`(라벨에 숫자가 있으면 같이) | 점검 스크립트 단언 |
+    | M9 | `tests/test_api.py:93` | `alembic_revision == "0004"` | `"0005"`(주석 "P9b-auth U12 — 0005(CR-008)") | 단언 |
+    | M10 | `tests/test_migration_0004.py:97~102`·`163` | ① `head == "0004"`·`_version == "0004"` ② 왕복 뒤 `_version == "0004"` | ① "DB 버전 == 스크립트 head" + "`0004` 가 head 의 이력(`ScriptDirectory.walk_revisions()`)에 있다", 함수 이름 `test_db_is_at_head_and_0004_is_in_history` ② `_version == <스크립트 head>` — head 리터럴은 `test_migration_0005.py` 가 본다(개정 3 B6·B7 과 같은 방식) | 단언 |
+    | M11 | `tests/test_auth_required_routes.py:47~61`(+ 모듈 docstring) | `_MUST_REQUIRE_LOGIN` 13 | `("POST","/auth/mcp-token")`·`("GET","/auth/mcp-token")`·`("DELETE","/auth/mcp-token")` 추가 → 16. docstring 에 "`/mcp` 는 면제가 아니라 다른 자격(D18 결정 3 CR-008 보충) — 스위치 켠 앱 시험은 아래 새 시험". `_EXEMPT`·면제 등식(105~114)은 **바꾸지 않는다** | 계약 단언 |
+
+    **깨지지 않음을 확인한 것(고치지 않는다)**: 사실 27 의 "깨지지 않는 것" 전부 · `tests/test_deploy_files.py` 기존 단언(새 시험은 덧붙임 — 아래) · `tests/test_migration_0003.py` · `tests/test_auth_api.py`·`test_auth_nickname.py`·`test_auth_availability.py`(새 라우트를 부르지 않는다). 위 목록은 grep(`== 12|== 13|== 8|73|0004|_MUST_REQUIRE_LOGIN|NULLABLE_COLUMNS|EXPECTED_FKS|EXPECTED_TABLES|handle_path|env.example|requirements`, `tests/`·`scripts/`) 결과 전부다.
+  - **새 시험(값으로 단언)**:
+    - `tests/test_mcp_tokens_api.py` — ① 쿠키 없이 세 메서드 401 `unauthenticated` ② `POST` 201·응답 키 정확히 `{token, created_at, expires_at}`·`expires_at - created_at == 7일`(시계 고정 — `get_auth_now` 덮어쓰기)·`Cache-Control: no-store` ③ DB 행의 `token_hash == hash_token(token)` 이고 **행의 어느 컬럼 값도 토큰 원문과 같지 않다** ④ 두 번 `POST` → 행 1개·`token_hash` 가 새 토큰 것·이전 토큰으로 `user_id_for_mcp_token` 가 `None` ⑤ `GET`: 행 없음 → `{"active": false, …null 셋}` · 발급 뒤 → `active: true`·응답 키 정확히 4개(`token` 없음)·`no-store` · 시계를 `expires_at` 과 **같은 순간**으로 → `active: false`(경계) ⑥ `DELETE` 204 → 행 0 → 다시 `DELETE` 204 ⑦ 다른 `Origin` 의 `POST`·`DELETE` → 403 `bad_origin`·행 변화 0 ⑧ 계정 A 의 `DELETE` 가 계정 B 의 행을 지우지 않는다 · A 의 `GET` 이 B 의 시각을 보이지 않는다 ⑨ 발급·조회·폐기 전후 `persons`·`events`·`agent_traces`·`chat_messages` 행 수 불변 ⑩ 로그(`caplog`)·응답 본문(`POST` 제외)에 토큰 문자열 0.
+    - `tests/test_mcp_tools.py`(SDK 없이 `tools.py` 직접) — ① `tool_list_people` 결과 `people` 이 `list_persons()` 의 `model_dump(mode="json")` 목록과 같고 `total`·`truncated` · `MCP_LIST_PEOPLE_LIMIT` 를 2 로 줄이면 앞 2명·`truncated: true`·`total` 은 전체 수 ② `find_person`: `박 과장`·`박과장님` 두 인물 + 무관 1명 → `"박과장"` 이 **두 명 모두**(순서 `list_persons`) · 같은 표시 이름 `박 과장` 2명 → 둘 다 · 별칭 `park` 에 `"PARK"` 일치 · NFD 입력 일치 · 없는 이름 → `matches: []`·오류 아님 · `"   "`·`""` → `invalid_name` · 51자 → `invalid_name`, 50자 → 정상 · `"a\x00b"`·제어문자 → 예외 없이 정상 결과 · `MCP_FIND_PERSON_LIMIT` 를 1 로 줄이면 `truncated: true` ③ `get_person_card` 결과가 `read.get_person_card()` 의 dump 와 같다 · 남의 인물 id·없는 id → `not_found` ④ `list_briefings` 결과가 `read.list_briefings()` dump 와 같다 · 남의 일정 → `not_found` ⑤ **원문 표식**: 사건 `raw_utterance` 에 `RAWMARK-7f3`(요약 `content` 와 다른 문자열), 사용자 닉네임에 `닉표식` 을 넣고 네 도구 결과를 `json.dumps` 한 문자열에 두 표식·`"raw_utterance"` 키가 0 ⑥ 네 도구 호출 전후 `persons`·`person_aliases`·`person_facts`·`fact_sources`·`events`·`schedules`·`pending_questions`·`push_subscriptions`·`agent_traces`·`chat_messages`·`mcp_tokens` 행 수 불변(이하 "데이터·trace 표") ⑦ **import 금지**: `app/mcp_server/*.py` 원문에 `^\s*(from|import)\s+(app\.(tools|agent|er|briefing|embedding)|openai|anthropic|google)\b` 일치 0(D19 지킬 것 5) ⑧ 세 도구의 입력 매개변수에 `user_id`·`username` 이름 0(함수 시그니처가 아니라 아래 서버 시험의 입력 스키마로도).
+    - `tests/test_mcp_server.py`(HTTP 왕복 — `MCP_ENABLED=1` 을 `monkeypatch.setenv` 한 뒤 `with TestClient(create_app(), base_url="https://testserver") as c:` 로 lifespan 을 돌린다, `follow_redirects=False`) — ① **꺼짐**: 환경값 없이 만든 앱에서 `POST /mcp`·`GET /mcp` → 404 · 새 인터프리터 `python -c "import app.main, sys; print('mcp' in sys.modules)"`(환경에 `MCP_ENABLED` 없음) → `False` · `MCP_ENABLED=yes` → `create_app()` 이 `InvalidValue` ② **401 전부 같은 응답**: 헤더 없음 · `Authorization: Basic …` · `Bearer `(빈 값) · 모르는 토큰 · 만료(시계를 `expires_at` 으로) · `DELETE /auth/mcp-token` 뒤 · 재발급으로 밀려난 이전 토큰 → 각각 401·본문 정확히 `{"detail":{"code":"unauthenticated"}}`·`WWW-Authenticate` 가 `Bearer` 로 시작 · 헤더 없음 경우는 엔진에 묶이지 않은 세션 팩토리로도 401(DB 조회 0) ③ **쿠키·쿼리는 자격 아님**: 로그인 쿠키만 있고 헤더 없음 → 401 · `?token=<유효>`·`?access_token=<유효>` 만 → 401 ④ **정확 경로**: 유효 토큰으로 `POST /mcp` 응답이 3xx 가 아니다(`follow_redirects=False`) ⑤ **도구 목록**: SDK 가 요구하는 순서(설치한 SDK 의 무상태 동작 — `initialize` 가 필요하면 먼저) 로 `tools/list` → 이름 집합이 정확히 `{list_people, find_person, get_person_card, list_briefings}` · 각 도구 `annotations` 의 `readOnlyHint is True`·`destructiveHint is False`·`openWorldHint is False` · 각 입력 스키마 `properties` 에 `user_id`·`username` 없음 · `find_person` 은 `name` 필수, `get_person_card` 는 `person_id` 필수, `list_briefings` 의 `schedule_id` 는 선택 ⑥ **격리**: 계정 A·B 에 서로 다른 인물을 넣고 A 토큰으로 `list_people` → A 의 인물만 · B 토큰 → B 의 인물만 · A 토큰으로 `get_person_card(B 의 인물 id)` → `isError`·텍스트 `not_found` · A 토큰으로 `find_person(B 인물 이름)` → `matches: []` ⑦ `last_used_at`: 성공 호출 뒤 `now`, 401 요청 뒤 변화 0 ⑧ 로그: 도구 호출마다 `uvicorn.error.mcp` 에 `mcp_tool name=<도구>` 줄 · 모든 로그 레코드에 토큰 문자열 0 · `find_person` 의 이름 인자 값 0 ⑨ 도구 호출 전후 "데이터·trace 표"(`test_mcp_tools` ⑥) 행 수 불변 — `mcp_tokens` 는 `last_used_at` 갱신뿐이라 행 수가 같다 ⑩ **스위치 켠 앱의 라우트 열거**: `test_auth_required_routes` 의 열거 루프를 `MCP_ENABLED=1` 앱으로 한 번 더 — `/mcp` 세 메서드도 쿠키·헤더 없이 401 `UNAUTHENTICATED` 이고 면제 등식은 그대로(이 단언은 `tests/test_auth_required_routes.py` 에 **새 시험 함수**로 더한다 — M11 의 `_MUST_REQUIRE_LOGIN` 변경과 별개).
+    - `tests/test_migration_0005.py`(`dbtest`, 전용 DB `relationship_test_mig` 재사용 — `CREATE DATABASE` 는 없으면만, `DROP DATABASE` 0, `test_migration_0004.py` 의 헬퍼를 import 하거나 같은 방식): 모듈 픽스처 `downgrade base` → `upgrade 0004` → 원시 SQL 로 계정 2행(`nickname` 포함)·`auth_sessions` 1행·`chat_messages` 1행 → `upgrade head`. ① head == `0005`·DB 버전 `0005` ② `mcp_tokens` 컬럼 집합 = S3.1 0005 보충(6) ③ **삭제 0**: `users`·`auth_sessions`·`chat_messages` 행 수 불변 ④ UNIQUE: 같은 `user_id` 두 번째 INSERT → 제약 이름 `uq_mcp_tokens_user_id` · 같은 `token_hash` → `uq_mcp_tokens_token_hash` ⑤ FK CASCADE: 토큰 행이 있는 계정을 원시 SQL 로 지우면 그 토큰 행도 0(시험 전용 DB 안에서만) ⑥ `alembic check` 무변경 ⑦ `downgrade 0004` → `mcp_tokens` 없음 + `users` 행 수 그대로 → `upgrade head` → 테이블 다시 있음(빈 테이블).
+    - `tests/test_deploy_files.py`(새 시험 함수 2개, 기존 단언 무변경) — Caddyfile 에 `handle /mcp {` 블록이 있고 그 안에 `reverse_proxy backend:8000` · `handle_path /mcp` 가 **없다** · 그 블록이 정적 `handle {` 블록보다 앞 · compose `backend` 의 `environment` 에 `MCP_ENABLED: ${MCP_ENABLED:-1}` 줄.
+  - 판정(이 단위): `POSTGRES_PORT=5433 … u12-mcp-tests -- .venv/bin/python -m pytest tests/test_mcp_tokens_api.py tests/test_mcp_tools.py tests/test_mcp_server.py tests/test_migration_0005.py tests/test_deploy_files.py tests/test_auth_required_routes.py -q` 전부 passed · `POSTGRES_PORT=5433 … u12-pytest-all -- .venv/bin/python -m pytest -q` 실패 0·skip 0(통과 수 = 시작 전 재측정 + 새 시험, 03-log 에 수식) · `… u12-dev-before-counts`/`u12-dev-after-counts`(개발 DB `users`·`persons`·`events` 행 수 — 스크래치패드 스크립트, 읽기 전용 `SELECT`) 사이에 `… u12-upgrade -- .venv/bin/python -m alembic upgrade head` → 행 수 같음 · `… u12-check -- .venv/bin/python -m alembic check` → `No new upgrade operations detected.` · `… u12-schema-check -- .venv/bin/python scripts/schema_check.py` 전부 PASS · `POSTGRES_PORT=5433 … u12-tools-check -- .venv/bin/python scripts/tools_check.py` → 7/7 · `… u12-forbidden-imports -- bash <SCR>/u12-forbidden-imports.sh`(스크립트 안: `grep -rnE '^\s*(from|import)\s+(app\.(tools|agent|er|briefing|embedding)|openai|anthropic|google)' app/mcp_server --include='*.py'` — 기대 exit 1, exit 2 는 실패) · **로컬 실제 클라이언트 왕복** `… u12-live-client -- bash <SCR>/u12-live-client.sh`(스크립트 안: 개발 DB 로 `MCP_ENABLED=1 AUTH_COOKIE_SECURE=0 .venv/bin/python -m uvicorn app.main:app --port 8765 --env-file .env` 를 백그라운드로 띄우고(L-007 예외 형태 그대로), 개발 계정 로그인 → `POST /auth/mcp-token` 으로 받은 토큰을 스크래치패드 파일에만 쓰고, ① `curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8765/mcp` → `401`(3xx 아님) ② **설치한 SDK 의 클라이언트**(Streamable HTTP 클라이언트)로 같은 주소에 헤더를 넣어 연결 → 도구 이름 4개 출력 → `list_people` 호출 → `total` 출력 ③ 토큰 값은 출력하지 않고 "set" 만 ④ 서버 종료). 계정 비밀번호·토큰은 스크래치패드 파일로만 · 범위 `… u12-scope -- git diff --name-only <U12 직전 해시>..HEAD` → 개정 4 산출물 표의 U12 행·닫힌 목록 파일·새 시험만(+ `docs/wiki/**`) · ER·평가 무변경(단위 공통 회귀).
+  - **변이 → 잡는 시험**(저장소 밖 사본 또는 런타임 치환, 저장소 무수정. 실제 커밋형 시험 제외. 마이그레이션 변이는 전용 DB `relationship_test_mig_v15`(있음 — 새 DB 를 만들지 않는다)):
+    | 변이 | 잡는 시험 |
+    |---|---|
+    | V12-1 해시 대신 원문 저장(`token_hash = token`) | `test_mcp_tokens_api` ③ |
+    | V12-2 만료 비교 `expires_at > now` → `>=` | `test_mcp_tokens_api` ⑤ 경계 · `test_mcp_server` ② 만료 |
+    | V12-3 재발급이 upsert 대신 새 행 INSERT(이전 행 남김) | `test_mcp_tokens_api` ④(UNIQUE 위반 500 또는 행 2) · `test_mcp_server` ② 밀려난 토큰 |
+    | V12-4 `DELETE` 가 행을 지우지 않음 | `test_mcp_tokens_api` ⑥ · `test_mcp_server` ② 폐기 뒤 |
+    | V12-5 래퍼가 로그인 쿠키를 자격으로 받음 | `test_mcp_server` ③ 쿠키만 |
+    | V12-6 래퍼가 `?token=` 쿼리를 자격으로 받음 | `test_mcp_server` ③ 쿼리만 |
+    | V12-7 도구가 인증된 사용자 대신 첫 계정(또는 입력 인자)의 `user_id` 를 씀 | `test_mcp_server` ⑥ 격리 |
+    | V12-8 `find_person` 이 첫 일치 1명만 | `test_mcp_tools` ② 두 명 |
+    | V12-9 카드 결과에 사건 원문을 덧붙임(`raw_utterance`) | `test_mcp_tools` ⑤ 표식 |
+    | V12-10 도구 하나의 `readOnlyHint` 를 뺌 | `test_mcp_server` ⑤ |
+    | V12-11 다섯 번째 도구(예: 툴 7종 `create_person` 래퍼) 등록 | `test_mcp_server` ⑤ 이름 집합 |
+    | V12-12 `mcp_enabled()` 를 무시하고 항상 등록 | `test_mcp_server` ① 꺼짐 404·SDK 미 import |
+    | V12-13 Caddyfile `handle /mcp` → `handle_path /mcp` | `test_deploy_files` 새 시험 |
+    | V12-14 로그 줄에 토큰(또는 이름 인자) 포함 | `test_mcp_server` ⑧ |
+    | V12-15 `GET /auth/mcp-token` 응답에 `token` 필드 | `test_mcp_tokens_api` ⑤ 키 4개 |
+    | V12-16 `/auth/mcp-token` 하나에서 `current_user` 의존성 제거 | `test_auth_required_routes`(M11) · `test_mcp_tokens_api` ① |
+    | V12-17 0005 upgrade 에 `DELETE FROM users` 한 줄 | `test_migration_0005` ③ |
+    | V12-18 헤더 없음에서도 DB 조회 | `test_mcp_server` ② 엔진 없는 세션 팩토리(500 이 남) |
+    | V12-19 0005 downgrade 가 테이블을 남김 | **실행하지 않는다**(V9-12 와 같은 이유 — 전용 DB 를 복구할 수 없게 남긴다). `test_migration_0005` ⑦ 과 리뷰가 코드를 읽어 확인 |
+
+- [ ] U13 **[frontend-agent] "AI 연결" 화면(`#/connect`) — 사이드바 진입 버튼, 토큰 상태·만들기(한 번만 표시)·복사·Claude Code 명령·폐기** / Refs: P9b-auth CR-008 D19 원칙5 원칙7 / 의존: 개정 4 계획 검증 통과("API 계약 — 개정 4" 표·"AI 연결 화면 고정 문구" 표 고정) — **U12 와 동시**(목 응답)
+  - `web/src/api/types.ts`: `McpTokenCreatedOut{token: string; created_at: string; expires_at: string}` · `McpTokenStatusOut{active: boolean; created_at: string | null; expires_at: string | null; last_used_at: string | null}`.
+  - `web/src/api/client.ts`: `getMcpToken(): Promise<McpTokenStatusOut>`(`GET /auth/mcp-token`) · `createMcpToken(): Promise<McpTokenCreatedOut>`(`POST /auth/mcp-token`, 본문 없음) · `deleteMcpToken(): Promise<void>`(`DELETE /auth/mcp-token`, 204). 셋 다 기본 `apiFetch` — 401 이면 관문 신호(다른 로그인 필수 API 와 같다). `apiFetch` 의 메서드 타입에 `DELETE` 가 없으면 더한다(그 밖의 `apiFetch` 동작 변경 0).
+  - `web/src/routes.ts`: `Route` 에 `{ name: 'connect' }` · `HREF.connect = '#/connect'` · `parseHash` 가 `/connect` 를 읽는다 · 머리 주석 "해시 라우팅 3경로" → "4경로(…·#/connect — CR-008)". `web/src/App.tsx`: `route.name === 'connect' && <ConnectScreen />`.
+  - `web/src/components/AppShell.tsx`: `SidebarContent` 에서 **`<AccountRow />` 바로 위**, `sidebar-account` 블록 **밖**에 `<button type="button" data-testid="sidebar-connect">` 글자 `CONNECT_NOTICE.entry` — 누르면 `window.location.hash = HREF.connect` 후 `onNavigate()`(모바일 서랍 닫기). **`<a>` 로 만들지 않는다**(사실 29 — `auth.test.tsx:109` 의 nav 링크 목록 단언) · 로그인한 틀에서만 보인다(AppShell 자체가 로그인 뒤에만 그려진다). `NAV_ITEMS` 는 바꾸지 않는다.
+  - `web/src/screens/ConnectScreen.tsx`(`data-screen="connect"`, 새 화면 — 원칙5 근거: 토큰 43자·명령 약 150자를 복사할 자리. 256px 사이드바·대화상자 없음(사실 29)): 제목 `title` · `intro`·`privacy`·`scope`·`validity` 문단 · 들어오면 `getMcpToken()` 1회(그동안 `loading`) → 상태 줄 `data-testid="mcp-status"`: 행 없음 → `statusNone` / `active` → `statusActive` + `expiresAt`·`lastUsedAt`(없으면 `neverUsed`) / `active:false` 인데 `expires_at` 있음 → `statusExpired`. 버튼: 활성 토큰이 없으면 `create`, 있으면 `recreate` + 그 옆 `recreateWarn` 문장. 누르면 `createMcpToken()` 1회(진행 중 버튼 `disabled`) → 성공하면 **이 컴포넌트 상태에만** 토큰을 두고 `onceNotice` · `tokenLabel` + `<code data-testid="mcp-token">` 토큰 · `copyToken` 버튼 · `commandLabel` + `<code data-testid="mcp-command">` 위 "명령 문자열" · `copyCommand` 버튼 · 상태 줄은 응답의 시각으로 `statusActive`(`last_used_at` 없음). 복사는 `navigator.clipboard.writeText(<그 문자열>)` → `copied` / 실패·없음 → `copyFailed`(`role="status"` 한 줄). 활성 토큰이 있거나 방금 만들었으면 `revoke` 버튼 → `deleteMcpToken()` 1회 → 토큰·명령 표시를 지우고 `revoked` + 상태 `statusNone`. 실패(401 제외 — 관문이 처리) → `failed`(`role="alert"` 한 줄). **토큰을 `localStorage`·`sessionStorage`·URL·콘솔에 쓰지 않는다**(결정 AZ) — 화면을 벗어났다 돌아오면 `getMcpToken()` 만 다시 부르고 토큰은 보이지 않는다.
+  - **깨뜨릴 기존 단언 — 닫힌 목록: 없음(0)**. 기존 Vitest·E2E 단언을 바꿔야 통과하면 멈추고 보고(특히 `auth.test.tsx:109`·`:466`·`card.test.tsx:569~605`). E2E 목(`web/e2e/fixtures.ts`)은 `#/connect` 를 열지 않으므로 바꾸지 않는다.
+  - 새 시험(Vitest `web/src/__tests__/connect.test.tsx`, `api.test.ts` 추가): ① `#/connect` 에서 `data-screen="connect"` · 사이드바 `sidebar-connect` 버튼을 누르면 해시가 `#/connect` · 그 버튼은 `sidebar-account` 밖이고 nav 안의 `<a>` 목록은 그대로 3개 ② 상태 세 갈래(없음·활성·만료) 문구 · 활성이면 `recreate`·`recreateWarn`·`revoke` 보임, 없음이면 `create` 만 ③ `create` 누르면 `POST /api/auth/mcp-token` 정확히 1회 → `mcp-token` 글자 = 목 토큰 · `mcp-command` 글자 = `` `claude mcp add --transport http relmemo ${window.location.origin}/mcp --header "Authorization: Bearer <목 토큰>"` `` 정확 일치 · `onceNotice` 보임 ④ `copyToken`·`copyCommand` → `navigator.clipboard.writeText` 가 각각 토큰·명령 문자열로 1회 · 거부되면 `copyFailed` ⑤ 만든 뒤 `localStorage`·`sessionStorage` 의 모든 키·값에 토큰 부분 문자열 0 ⑥ 다른 화면으로 갔다가 `#/connect` 로 돌아오면 `mcp-token` 없음·`GET /api/auth/mcp-token` 다시 1회 ⑦ `revoke` → `DELETE /api/auth/mcp-token` 정확히 1회 → `revoked`·`mcp-token` 사라짐·상태 `statusNone` ⑧ `POST` 500 → `failed`, 토큰 표시 0 ⑨ 진행 중 두 번 눌러도 `POST` 1회. `api.test.ts`: 세 함수의 URL·메서드·`credentials: 'same-origin'`.
+  - 판정: `… u13-typecheck -- npm --prefix web run typecheck` · `… u13-vitest -- npm --prefix web exec -- vitest run --root web` · `… u13-build -- npm --prefix web run build` · `… u13-e2e -- npm --prefix web run e2e` 전부 통과(시험 수 = 시작 전 같은 명령 기준선 + 새 시험, 03-log). 범위 `… u13-scope -- git diff --name-only <U13 직전 해시>..HEAD` → `web/` 의 위 파일 + `docs/wiki/**`.
+  - 변이 → 잡는 시험:
+    | 변이 | 잡는 시험 |
+    |---|---|
+    | V13-1 토큰을 `sessionStorage` 에 저장 | ⑤ |
+    | V13-2 명령의 주소를 `https://relmemo.com` 으로 박음 | ③ 정확 일치(jsdom origin) |
+    | V13-3 다시 들어와도 토큰을 보여 줌(모듈 전역 변수에 보관) | ⑥ |
+    | V13-4 폐기가 `POST` 로 감(또는 요청 0) | ⑦ |
+    | V13-5 명령에서 `Bearer ` 빠짐 | ③ · ④ |
+    | V13-6 진입점을 `<a href="#/connect">` 로 | 기존 `auth.test.tsx:109` · ① |
+    | V13-7 진입점을 `sidebar-account` 안에 | 기존 `auth.test.tsx:466` · ① |
+    | V13-8 진행 중 버튼을 막지 않음 | ⑨ |
+
+- [ ] U14 **[메인 세션 + 사용자] 0005 재배포와 실제 연결 — 문서, 로컬 Caddy 경유 스모크(0004 데이터에서 `0004 -> 0005`), 비상 되돌리기 예행, 로컬 브라우저 점검, 재배포, 바깥 GET 스모크, 사용자가 만든 토큰으로 Claude Code 실제 연결** / Refs: P9b-auth CR-008 D19 D18 D17 security / 의존: **U12·U13 각 verifier 리뷰 통과 + 반영할 해시(U12·U13 이 모두 들어간 dev2 해시)에서의 전체 pytest·Vitest 증거**(U11 과 같은 관문)
+  - **문서(메인)**: 새 `docs/user-setup/15-mcp-connect.md` — ① 무엇이 열리는가(도구 4개·읽기 전용·원문 없음) ② 토큰 만들기(사이드바 "AI 연결" → "연결 토큰 만들기" → 복사) ③ Claude Code: 화면의 명령을 **자기 컴퓨터 터미널**에서 실행 → `claude mcp list` 에 `relmemo` 가 연결됨으로 보이는지 → Claude Code 에서 "relmemo 에서 내 인물 목록 보여줘" · **`--scope project` 를 붙이지 않는다**(저장소의 `.mcp.json` 에 헤더가 적힌다 — security §1) ④ Codex CLI(시험하지 않음 — 조사 보고 [D1] 근거, "확인 필요"로 표시): `~/.codex/config.toml` 의 `[mcp_servers.relmemo]` `url = "https://relmemo.com/mcp"` · `bearer_token_env_var = "RELMEMO_MCP_TOKEN"` 와 셸에서 그 환경변수 설정 ⑤ 폐기·다시 만들기·7일 만료 ⑥ 외부 공급자 전송 고지·Claude 앱·ChatGPT 는 아직 안 됨 ⑦ 토큰을 채팅·문서·저장소에 붙여 넣지 않는다(메인 세션에게도). `docs/user-setup/13-user-todo-deploy.md` 에 **0005 재배포 절**(G 절 명령 재사용 — 해시만 새 값, ".env 변경 없음 — compose 가 MCP 를 켠다, 끄려면 .env 에 `MCP_ENABLED=0` 뒤 `up -d`", "0005 반영 뒤 옛 해시로 checkout 만 하면 backend 가 뜨지 않는다(모르는 리비전 `0005`) — 기본은 앞으로 고치기, 비상시 아래 예행한 순서"). `docs/RUNNING.md` 에 로컬에서 MCP 켜는 한 줄(`MCP_ENABLED=1`). `u8-demo-script.md` 에 MCP 장면(시연 계정으로 토큰 → Claude Code 질문 2개 → "다른 계정 토큰으로는 안 보인다" 는 말로만 또는 `judge01` 토큰으로). `registry.md` 행(U12: `app/auth/mcp_tokens.py`·`app/mcp_server/*`·`/auth/mcp-token`·`/mcp`·리비전 0005·시험 4파일 / U13: `ConnectScreen`·`#/connect`·클라이언트 함수 3개). 조사 보고서 보존본(개정 4 산출물).
+  - **로컬 Caddy 경유 스모크(메인 — 반영 전 필수)**: U11 과 같은 구성(`docker-compose.prod.yml`, 프로젝트 `relationship-prod`, `SITE_ADDRESS=localhost`, 스크래치패드 더미 env, **0004 상태 볼륨 `relationship-prod_pgdata` 재사용 — 볼륨 삭제·`down -v` 0**, 더미 env 에 `MCP_ENABLED` 를 **넣지 않는다** — compose 기본값으로 켜지는지 보는 것이 목적) → 새 해시 이미지 빌드(ARM — `mcp` 와 전이 의존성 설치 성공이 여기서 판정)·기동 → backend 로그 `Running upgrade 0004 -> 0005`·Traceback 0 → 읽기 전용 `SELECT` 로 `users` 행 수가 기동 전과 같음 → `curl -k` 로컬: ① `GET https://localhost/mcp`·`POST https://localhost/mcp`(본문 없음) → `401`·`Content-Type: application/json`(HTML 아님)·3xx 아님 ② 기존 스모크 계정으로 `POST /api/auth/login` → 같은 Origin 으로 `POST /api/auth/mcp-token` 201(토큰은 스크래치패드 파일로만) → `GET /api/auth/mcp-token` 의 키 4개·`active: true` ③ 그 토큰으로 `POST https://localhost/mcp` JSON-RPC(`initialize` → `tools/list`, SDK 가 무상태에서 요구하는 그대로 — U12 03-log 의 순서) → 도구 이름 4개 · `tools/call list_people` → 결과 JSON 의 `total` ④ `docker compose … logs backend` 에 토큰 문자열 0(스크립트가 토큰 파일 값으로 `grep -c` → `0` 만 출력) · `mcp_tool name=list_people` 줄 1 이상 ⑤ 회귀: `/api/health` `alembic_revision` `0005` · `/` 200 · `/api/persons` 쿠키 없이 401 · `/api/docs` 404 · 다른 Origin 가입 403. 증거 `u14-caddy-*`(토큰·비밀번호는 "set"). **이 스모크가 실패하면 재배포하지 않는다.**
+  - **비상 되돌리기 예행(메인 — 로컬 볼륨, R4-3 과 같은 방식)**: ① `docker compose -f docker-compose.prod.yml stop backend` ② `GIT_SHA=<새 해시> docker compose -f docker-compose.prod.yml run --rm --entrypoint python backend -m alembic downgrade 0004` ③ `git checkout 935aa4a` ④ `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build` → `/api/health` `0004` ⑤ 새 해시로 돌아와 다시 `up -d --build` → `0005`. 예행이 실패하거나 못 하면 13 문서에는 "앞으로 고쳐 다시 올린다" 와 "`/mcp` 만 문제면 `.env` 에 `MCP_ENABLED=0`" 만 적는다.
+  - **로컬 브라우저 점검(메인 — 실제 Chrome)**: 개발 DB(U12 에서 0005) + `npm --prefix web run dev` → 로그인 → 사이드바 "AI 연결" → 상태 "없음" → 만들기 → 토큰·명령 표시·복사 → 다른 화면 갔다 오기(토큰 안 보임·상태 "있음") → 폐기 → 상태 "없음". 증거 `u14-local-browser-check.txt`(메인이 Write, 토큰 값 없이).
+  - **재배포(메인이 SSH 로 — SSH 를 쓸 수 없으면 사용자 할 일 1 과 같은 명령을 사용자가)**: `cd Relationship && git fetch && git checkout <U12·U13 이 든 dev2 해시>` → `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build` → `ps`(세 서비스 running/healthy) → `logs --tail=200 backend` 에 `Running upgrade 0004 -> 0005`·Traceback 0. **서버 `.env` 는 열지도 고치지도 않는다**(compose 기본값이 MCP 를 켠다). 데이터 삭제 0.
+  - **바깥 스모크(메인, 본문 없는 GET 만 — security §4)**: `https://relmemo.com/api/health` → `0005` · `https://relmemo.com/` 200 · `/api/persons`·`/api/auth/me`·`/api/auth/mcp-token` 쿠키 없이 401 · `https://relmemo.com/mcp` GET 헤더 없음 → `401`·`application/json` · 같은 GET 에 `Authorization: Bearer invalid-probe` → `401`(헤더만, 본문 없음).
+  - **실제 연결(사용자 — 메인은 토큰 값을 보지 않는다)**: 사용자가 `https://relmemo.com` 에 시연 계정으로 로그인 → "AI 연결" → 토큰 만들기 → 명령 복사 → **자기 터미널**에서 실행 → `claude mcp list` 에서 `relmemo` 연결 확인 → Claude Code 에서 "relmemo 에서 내 인물 목록 보여줘" · "○○ 카드 보여줘" → 도구 호출과 결과가 보이는지. 사용자는 결과를 **토큰 없이** 말로(또는 토큰이 없는 화면 문장으로) 메인에게 알려 주고, 메인은 `evidence/<시각>-u14-user-claude-code.txt` 로 Write. 메인은 SSH 로 `docker compose … logs backend | grep mcp_tool | tail -n 5`(토큰이 찍히지 않는 줄)를 증거로. (선택) `judge01` 같은 다른 계정 토큰으로 시연 계정 인물이 안 보이는지.
+  - 판정: 아래 판정 표 #21~#28.
+
+### 범위 축소 순서 — 개정 4(CR-008)
+
+일정: 오늘 11-17(화) 밤, 평가 **11-18(수) 시연 09~17시 사이**. 목표 **11-18 03:00 까지 U12·U13 커밋(각 verifier 리뷰 통과) → 06:00 까지 U14 로컬 스모크·예행 → 07:30 까지 재배포·바깥 스모크 → 사용자 실제 연결은 시연 전**. 판단 시점은 **메인 결정 기본값**(사용자에게 알린다):
+① **11-18 03:00** 까지 U12·U13 이 리뷰를 통과하지 못하면 → **MCP 를 이번 평가에서 뺀다**. 재배포하지 않고 지금 배포본(`935aa4a`)으로 시연한다. 발표에서는 "MCP 읽기 서버는 계획·구현 중"으로 말한다(사실대로). 0005 가 운영에 가지 않았으니 되돌릴 것 없음.
+② **11-18 06:00** 까지 U14 로컬 Caddy 스모크를 통과하지 못하면 → 재배포하지 않는다(①과 같음).
+③ 재배포 뒤 바깥 스모크에서 `/api/*`·`/` 회귀가 보이면 → 즉시 비상 되돌리기(예행한 순서, 08:30 전 마감). `/mcp` 만 문제면 → 사용자가 서버 `.env` 에 `MCP_ENABLED=0` 을 넣고 `up -d`(메인은 `.env` 를 만지지 않는다).
+축소(일정이 밀릴 때 — 위 판단 전에 메인이 적용할 수 있는 것):
+1. U13 의 복사 버튼 둘을 뺀다(토큰·명령은 보이고 사용자가 직접 선택해 복사) — 시험 ④ 도 함께 뺀다.
+2. U13 의 `statusExpired`·`lastUsedAt` 줄을 뺀다(없음/있음 두 갈래만).
+3. U14 의 로컬 브라우저 점검을 Vitest·로컬 Caddy 스모크로 갈음한다(03-log 에 축소로 적는다).
+**빼지 않는 것**: 토큰 해시 저장 · 401 부정 케이스 전부 · 계정 격리 · 원문 미노출 · 도구 4개 정확 집합·읽기 전용 표시 · `MCP_ENABLED` 꺼짐 404 · U14 로컬 Caddy 경유 스모크 · 바깥 회귀 GET. 줄이면 03-log 와 04-review 에 "범위 축소" 로 적고 사용자에게 보고.
+
 ## 판정 방법
 
 명령은 저장소 루트에서, 증거는 `python3 .claude/scripts/save_evidence.py P9b-auth <이름> -- <명령>`(FIX-034). 환경변수는 래퍼 앞. **따옴표·`$`·`|` 가 든 안쪽 명령은 스크래치패드 `<SCR>/<이름>.sh` 로 Write 해 `-- bash <SCR>/<이름>.sh`**(P9 F-P9V-2 와 같은 우회 — `save_evidence.py` 는 `--` 뒤 인자를 공백으로 이어 `bash -c` 로 돌려 따옴표가 사라지고 `|` 가 파이프가 된다, 02-plan-verify F-4 `evidence/20261115-2019-planverify-cmd4-probe.txt`). `alembic` 은 `.venv/bin/python -m alembic`. `<URL>` = `https://54-79-202-221.sslip.io`.
@@ -429,6 +655,14 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | 18 | (CR-007 회귀) U9·U10 의 깨뜨릴 기존 단언은 닫힌 목록(B1~B17·F1~F4) 안에서만 바뀌었다 | 기계 + 리뷰 | `… u9-test-diff -- git diff --stat <U9 직전 해시>..<U9 해시> -- tests` 와 `… u10-test-diff -- git diff --stat <U10 직전 해시>..<U10 해시> -- web/src/__tests__ web/e2e` 의 파일 목록이 닫힌 목록 파일 + 새 시험 파일뿐 · verifier 가 단언 줄 diff 를 목록 번호와 대조 | 에이전트 + verifier | U9·U10 |
 | 19 | (CR-007) 배포 URL 에서 반영 전 계정이 그대로 로그인되고 닉네임이 보인다 | 기계 + 사람 | `… u11-public-health -- curl -fsS <URL>/api/health` → `alembic_revision` `0004` · `… u11-public-availability -- bash <SCR>/u11-availability.sh`(스크립트 안: `curl -fsS '<URL>/api/auth/availability?username=test'` → `{"username":"taken","nickname":null}`, `?username=zz_probe_u11` → `available`) · `… u11-public-401 -- bash <SCR>/u11-401.sh`(`/api/persons`·`/api/auth/me` → 401, `/` → 200) · 사용자 화면 확인(`test` 로그인 → 사이드바 닉네임) → `evidence/<시각>-u11-user-browser.txt` | 에이전트 + 사용자 | U11 |
 | 20 | (CR-007 배포 관문) 로컬 Caddy 경유 스모크 — `0003 -> 0004` 적용 줄·계정 행 수 불변·로그인 응답 닉네임·조회·가입 201·409 `nickname_taken`·다른 Origin 403 | 기계 | `… u11-caddy-* -- bash <SCR>/u11-caddy-*.sh`(U11 본문 목록) · backend 로그 `Running upgrade 0003 -> 0004` · Traceback 0 | 에이전트 | U11 |
+| 21 | (CR-008) 로그인한 사용자가 웹 AI 연결 화면에서 MCP 연결 토큰을 만들고(원문은 한 번만 표시, 다시 만들면 이전 토큰 즉시 무효, 7일 만료) 폐기할 수 있으며, DB 에는 토큰 해시만 저장된다 | 기계 + 사람 | `POSTGRES_PORT=5433 … u12-mcp-tokens -- .venv/bin/python -m pytest tests/test_mcp_tokens_api.py -q` 전부 passed(①~⑩) · `u13-vitest`(connect ②~⑨) · U14 로컬 브라우저 점검 · U14 사용자 실제 연결(운영에서 토큰 만들기) | 에이전트 + 사용자 | U12·U13·U14 |
+| 22 | (CR-008) `/mcp` 는 `Authorization: Bearer` 토큰으로만 인증해 토큰 없음·틀림·만료·폐기면 401 이고 | 기계 | `POSTGRES_PORT=5433 … u12-mcp-server -- .venv/bin/python -m pytest tests/test_mcp_server.py -q`(②③④) · U14 로컬 Caddy ①·바깥 GET(헤더 없음·`invalid-probe` → 401 JSON) | 에이전트 | U12·U14 |
+| 23 | (CR-008) 그 토큰 계정의 데이터만 읽기 전용 도구 4개(인물 목록·이름으로 찾기·인물 카드·브리핑 목록)로 돌려주며, 쓰기 도구 0개·원문(`raw_utterance`) 미노출·LLM 호출 0 이다 | 기계 | `u12-mcp-server`(⑤ 이름 집합·표시 ⑥ 격리 ⑨ 행 수) · `POSTGRES_PORT=5433 … u12-mcp-tools -- .venv/bin/python -m pytest tests/test_mcp_tools.py -q`(② 전부 일치 ⑤ 원문 표식 ⑥ 행 수 ⑦ import 금지) · `u12-forbidden-imports`(exit 1) · `u12-tools-check` 7/7 | 에이전트 | U12 |
+| 24 | (CR-008) `MCP_ENABLED` 가 꺼지면 `/mcp` 는 404 이고 | 기계 | `u12-mcp-server` ①(404·SDK 미 import·잘못된 값 `InvalidValue`) | 에이전트 | U12 |
+| 25 | (CR-008) 리비전 0005 가 기존 데이터를 지우지 않으며 `alembic upgrade head`·`alembic check` 통과 | 기계 | `POSTGRES_PORT=5433 … u12-migration -- .venv/bin/python -m pytest tests/test_migration_0005.py tests/test_migration_0004.py -q` · `u12-dev-before-counts`/`u12-upgrade`/`u12-dev-after-counts` · `u12-check` · `u12-schema-check` · U14 로컬 Caddy(0004 볼륨 → 0005, 행 수 같음) · 바깥 `/api/health` `0005` | 에이전트 | U12·U14 |
+| 26 | (CR-008) 배포 URL 에서 기존 `/api/*`·프론트가 그대로 동작하고 | 기계 + 사람 | U14 로컬 Caddy ⑤ · `… u14-public-get -- bash <SCR>/u14-public-get.sh`(스크립트 안: `https://relmemo.com/api/health` → `0005` · `/` 200 · `/api/persons`·`/api/auth/me`·`/api/auth/mcp-token` → 401 · `/mcp` → 401 `application/json`) · 사용자 화면(로그인·채팅·카드·브리핑 평소대로) | 에이전트 + 사용자 | U14 |
+| 27 | (CR-008) Claude Code 에 연결해 도구 4개가 보이고 호출된다 | 사람 + 기계 | 사용자 실제 연결 보고(토큰 없이) → `evidence/<시각>-u14-user-claude-code.txt` · 서버 로그 `mcp_tool name=` 줄 발췌(SSH, 토큰 0) · 로컬 사전 판정 `u12-live-client`(SDK 클라이언트 왕복)·U14 로컬 Caddy ③ | 사용자 + 에이전트 | U12·U14 |
+| 28 | (CR-008 회귀) U12·U13 의 깨뜨릴 기존 단언은 닫힌 목록(M1~M11, 프론트 0) 안에서만 바뀌었다 | 기계 + 리뷰 | `… u12-test-diff -- git diff --stat <U12 직전 해시>..<U12 해시> -- tests scripts` · `… u13-test-diff -- git diff --stat <U13 직전 해시>..<U13 해시> -- web/src/__tests__ web/e2e` → 닫힌 목록 파일 + 새 시험 파일뿐 · verifier 가 단언 줄 diff 를 목록 번호와 대조 | 에이전트 + verifier | U12·U13 |
 
 ### 단위 공통 회귀 (단위마다, 리뷰 전)
 
@@ -443,10 +677,13 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | 비밀 0 | Write 단계 `secret-guard`·`save_evidence.py` 내장 검사 통과 · 증거에 비밀번호·쿠키 값 0(저장 전 메인이 읽는다) | — |
 | (개정 3) 프론트 단위(U10) | `… u10-typecheck`·`u10-vitest`(`--root web`)·`u10-build`·`u10-e2e`(U10 판정 그대로) | 통과 |
 | (개정 3) 공통 규칙 | 판정은 **Mac 로컬**에서 한다(Windows CI 는 확인하지 않음 — 사용자 지시 2026-11-15, 03-log `fa7ad82`). **`ruff --fix` 금지**(U3a 사고 — 무관한 파일 import 재배열). 단언은 닫힌 목록(B1~B17·F1~F4) 안에서만 바꾼다. 재귀 grep 판정은 `--include='*.py'`(R3-2). 변이 실행에 실제 커밋형 시험 제외. `alembic` 은 `.venv/bin/python -m alembic`, 전체 pytest 는 `POSTGRES_PORT=5433` | — |
+| (개정 4) 공통 | 위 공통 규칙 그대로 + 프론트 단위(U13)는 `u13-typecheck`·`u13-vitest`(`--root web`)·`u13-build`·`u13-e2e` · 단언은 닫힌 목록(M1~M11 · 프론트 0) 안에서만 · **토큰·비밀번호 값은 스크래치패드 파일로만, 증거에는 "set"**(security §1 CR-008 행) · 개정 4 의 `<URL>` 은 `https://relmemo.com` | — |
 
 ## 수용 기준 (`docs/backlog.md`의 해당 항목과 글자 그대로 같아야 한다)
 
-- 가입·로그인·로그아웃·내 정보 API 가 동작하고 비밀번호는 해시로만 저장된다 + `/health`·`/auth/signup`·`/auth/login` 밖의 모든 API 가 로그인 없이 401 + 계정 A 로 계정 B 의 인물·사건 원문·사실 근거·일정 브리핑·대기 질문에 접근하면 404 이고 B 의 질문에 답할 수 없다(F-fbaaae 닫힘) + 요청 경로의 `app_user_id()` 호출 0·`ToolContext.user_id` 기본값 없음 + 계정마다 채팅방 하나 — 대화 기록이 서버에 저장되고 다시 로그인하면 이어서 보이며 session_id 는 계정에 묶인다 + 브리핑 주기 작업과 푸시가 사용자마다 돌고 다른 계정의 일정 알림이 내 브라우저로 오지 않는다 + 리비전 0003 이 기존 데이터를 비우고 `alembic upgrade head`·`alembic check` 통과 + 프론트 로그인·가입 화면·로그아웃·대화 기록 불러오기·401 시 로그인 화면 복귀 + 배포 URL 에서 시연 두 갈래 재현 — (가) 새 계정 가입 뒤 빈 상태 (나) 데이터가 쌓인 시연 계정으로 로그인해 인물 카드·브리핑·대화 기록이 보이고, 새 계정에는 시연 계정의 인물이 보이지 않는다 + 툴 7종 불변(`tools_check` 7/7) + pytest 전체 통과 skip 0 + (CR-007) 가입 때 닉네임을 필수로 입력받아 저장하고 규칙 위반은 422 `invalid_nickname` 이며, 가입·로그인·내 정보 응답과 사이드바에 닉네임이 보인다 + (CR-007) 아이디·닉네임이 이미 쓰이면 가입이 409(`username_taken`·`nickname_taken`)로 거부되고, 가입 화면에서 로그인 없이 중복 확인(`GET /auth/availability`)을 할 수 있다 — 이 조회는 `/health`·`/auth/signup`·`/auth/login` 과 함께 로그인 없이 열린 예외다 + (CR-007) 리비전 0004 가 기존 계정을 지우지 않고 닉네임을 아이디 값으로 채우며 `alembic upgrade head`·`alembic check` 통과, 배포 URL 에서 반영 전 계정이 그대로 로그인되고 닉네임이 보인다
+- 가입·로그인·로그아웃·내 정보 API 가 동작하고 비밀번호는 해시로만 저장된다 + `/health`·`/auth/signup`·`/auth/login` 밖의 모든 API 가 로그인 없이 401 + 계정 A 로 계정 B 의 인물·사건 원문·사실 근거·일정 브리핑·대기 질문에 접근하면 404 이고 B 의 질문에 답할 수 없다(F-fbaaae 닫힘) + 요청 경로의 `app_user_id()` 호출 0·`ToolContext.user_id` 기본값 없음 + 계정마다 채팅방 하나 — 대화 기록이 서버에 저장되고 다시 로그인하면 이어서 보이며 session_id 는 계정에 묶인다 + 브리핑 주기 작업과 푸시가 사용자마다 돌고 다른 계정의 일정 알림이 내 브라우저로 오지 않는다 + 리비전 0003 이 기존 데이터를 비우고 `alembic upgrade head`·`alembic check` 통과 + 프론트 로그인·가입 화면·로그아웃·대화 기록 불러오기·401 시 로그인 화면 복귀 + 배포 URL 에서 시연 두 갈래 재현 — (가) 새 계정 가입 뒤 빈 상태 (나) 데이터가 쌓인 시연 계정으로 로그인해 인물 카드·브리핑·대화 기록이 보이고, 새 계정에는 시연 계정의 인물이 보이지 않는다 + 툴 7종 불변(`tools_check` 7/7) + pytest 전체 통과 skip 0 + (CR-007) 가입 때 닉네임을 필수로 입력받아 저장하고 규칙 위반은 422 `invalid_nickname` 이며, 가입·로그인·내 정보 응답과 사이드바에 닉네임이 보인다 + (CR-007) 아이디·닉네임이 이미 쓰이면 가입이 409(`username_taken`·`nickname_taken`)로 거부되고, 가입 화면에서 로그인 없이 중복 확인(`GET /auth/availability`)을 할 수 있다 — 이 조회는 `/health`·`/auth/signup`·`/auth/login` 과 함께 로그인 없이 열린 예외다 + (CR-007) 리비전 0004 가 기존 계정을 지우지 않고 닉네임을 아이디 값으로 채우며 `alembic upgrade head`·`alembic check` 통과, 배포 URL 에서 반영 전 계정이 그대로 로그인되고 닉네임이 보인다 + (CR-008) 로그인한 사용자가 웹 AI 연결 화면에서 MCP 연결 토큰을 만들고(원문은 한 번만 표시, 다시 만들면 이전 토큰 즉시 무효, 7일 만료) 폐기할 수 있으며, DB 에는 토큰 해시만 저장된다 + (CR-008) `/mcp` 는 `Authorization: Bearer` 토큰으로만 인증해 토큰 없음·틀림·만료·폐기면 401 이고, 그 토큰 계정의 데이터만 읽기 전용 도구 4개(인물 목록·이름으로 찾기·인물 카드·브리핑 목록)로 돌려주며, 쓰기 도구 0개·원문(`raw_utterance`) 미노출·LLM 호출 0 이다 + (CR-008) `MCP_ENABLED` 가 꺼지면 `/mcp` 는 404 이고, 리비전 0005 가 기존 데이터를 지우지 않으며 `alembic upgrade head`·`alembic check` 통과, 배포 URL 에서 기존 `/api/*`·프론트가 그대로 동작하고 Claude Code 에 연결해 도구 4개가 보이고 호출된다
+
+(개정 4 주: 앞 구절 "`/health`·`/auth/signup`·`/auth/login` 밖의 모든 API 가 로그인 없이 401" 은 글자 그대로 두고, CR-008 구절이 `/mcp` 를 "쿠키가 아니라 Bearer 토큰" 인 다른 자격으로 명시한다 — 토큰 없으면 역시 401 이라 앞 구절과 모순이 없다(D18 결정 3 CR-008 보충). 판정 #12 의 통과 수 기대는 U12 시작 전 재측정값 + U12 새 시험으로 이어 센다.)
 
 (개정 3 주: 앞 구절 "`/health`·`/auth/signup`·`/auth/login` 밖의 모든 API 가 로그인 없이 401" 은 글자 그대로 두고, 뒤에 더한 CR-007 구절이 예외 하나(`GET /auth/availability`)를 명시한다 — 판정 #2 는 #16 과 함께 읽는다. 판정 #12 의 통과 수 기대는 U9 시작 전 재측정값 + U9 새 시험으로 이어 센다.)
 
@@ -495,6 +732,31 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | AG | 닉네임 변경 기능 | (i) 없음 (ii) 내 정보 수정 API·화면 | **(i)** | 요청에 없다. 대가: 0004 반영 전에 만든 계정은 닉네임이 아이디로 고정(사용자 할 일 9) |
 | AH | 반영 뒤 문제가 생겼을 때 | (i) 앞으로 고쳐 다시 올림(기본) + 비상시 `alembic downgrade 0003` 뒤 옛 해시(닉네임 값만 잃음) (ii) 앞으로만 | **(i)** | 0004 는 0003 과 달리 되돌림 리비전이 계정을 지우지 않아 비상 경로가 실제로 있다. 기본은 0003 때와 같이 앞으로 고치기(U11) |
 
+**개정 4(CR-008) 결정 AI~BB** — **사용자가 정한 것**은 AI(토큰 방식)·공개 기간 유지·OAuth 제외뿐이다(CR-008 0-b). 나머지는 **메인 결정(사용자 위임 범위 — 시간 때문에 권장안으로 닫음)** 이며 architect 가 근거를 붙였다. 메인 기본값과 다르게 둔 곳은 "메인 기본값과 다름" 으로 표시했다. 사용자가 다르게 정하면 그 값으로 바꾼다.
+
+| # | 항목 | 후보 | **채택** | 이유 |
+|---|---|---|---|---|
+| AI | MCP 자격 방식 | (i) 계정별 개인 접근 토큰(Bearer 헤더) (ii) OAuth 로그인 연결 | **(i)** — 사용자 결정 | "토큰 방식 축소안". (ii) 는 평가 전에 불가(CR-008 9.2), 다음 단계 |
+| AJ | 토큰 값·저장 | (i) `new_token()`(`secrets.token_urlsafe(32)`) + `hash_token()` sha256, 접두 없음 (ii) 접두 `rm_` + `secret-guard` 패턴 추가 | **(i)** | `auth_sessions` 코드를 그대로 재사용(새 비밀 값 0, 새 함수 0). (ii) 는 하네스 변경(L-nnn·훅 시험)이라 오늘 밤 범위를 넘는다 — 다음 단계 후보 |
+| AK | 계정당 토큰 수 | (i) 1개, 다시 만들면 이전 것 즉시 무효(`user_id` UNIQUE + upsert) (ii) 여러 개·이름 붙이기·목록 | **(i)** — 메인 기본값 | 화면이 "있다/없다" 한 줄이 되고 폐기가 한 버튼이다. DB UNIQUE 로 강제해 경합에서도 1개 |
+| AL | 만료 | (i) 발급 뒤 7일 고정(`MCP_TOKEN_DAYS = 7`), 연장 없음 (ii) 만료 없음 (iii) 30일 | **(i)** — 메인 기본값 | 11-18 시연·11-19 종료를 덮고 유출 피해 기간을 짧게. 로그인 유지 기간(결정 E 7일)과 같은 값 |
+| AM | 토큰을 받는 곳 | (i) `Authorization: Bearer` 헤더만(스킴 대소문자 무시, 값 strip) (ii) 쿼리 문자열도 | **(i)** — 메인 기본값 | 쿼리 문자열은 uvicorn 접근 로그·브라우저 기록에 남는다(MCP 규격도 금지 — CR-008 4.3 (가) 3) |
+| AN | `/mcp` 401 모양·메타데이터 | (i) `{"detail":{"code":"unauthenticated"}}` + `WWW-Authenticate: Bearer`(이유 구별 없음, `resource_metadata` 없음), SDK 인증 기능 미사용 (ii) SDK `TokenVerifier`/`AuthSettings` + 보호 리소스 메타데이터 | **(i)** | 기존 401 본문과 같아 라우트 열거 계약 시험이 스위치 켠 앱에서도 그대로 선다(사실 28). (ii) 는 OAuth 인가 서버 주소(`issuer`)를 요구하는 틀이라 인가 서버가 없는 축소안에서 거짓 메타데이터를 내보내게 되고, SDK 의 `AccessToken` 에 사용자 id 칸이 있는지도 미확인(CR-008 4.3 (가) 5). 우리 래퍼는 약 30줄·시험이 SDK 내부에 기대지 않는다 |
+| AO | 발급 API 모양 | (i) `POST`·`GET`·`DELETE /auth/mcp-token`(로그인 필수, 위 계약) (ii) 발급만 | **(i)** — 메인 기본값 | 화면이 "있는지·만료" 를 보여야 하고(값은 안 줌) 사용자가 스스로 끊을 수 있어야 한다(남의 앱에 기록을 여는 기능) |
+| AP | `MCP_ENABLED` 기본값 | (i) **코드 기본 꺼짐** + 운영 compose `MCP_ENABLED: ${MCP_ENABLED:-1}` (ii) 코드 기본 켬 (iii) 사용자가 서버 `.env` 에 넣기 | **(i)** | 메인 조건 "서버 `.env` 를 고치지 않아도 켜지도록" 을 compose 기본값으로 만족한다. 코드 기본 꺼짐이라 로컬·시험(2600여 건)에서 SDK import·lifespan 변화 0(리스크 A 유지), `PUSH_DEV_PAGE_ENABLED` 관례와 같다. 끄기는 사용자가 `.env` 에 `0`(compose 보간이 `.env` 를 읽는다). (ii) 는 시험마다 SDK 세션 관리자가 뜨거나(lifespan 없는 `TestClient` 에서 "Task group is not initialized" 오류 위험) 모든 시험이 스위치를 꺼야 한다 |
+| AQ | 경로 붙이는 방법 | (i) 정확 경로 `Route("/mcp", endpoint=<인증 래퍼로 감싼 SDK ASGI>)` (ii) `Mount("/mcp", …)` + SDK 경로 `"/"` | **(i)**, SDK 실물로 안 되면 (ii) + 3xx 없음 보장 | Starlette `Mount` 는 `/mcp` 요청을 `/mcp/` 로 307 돌릴 수 있고 클라이언트가 POST 를 다시 보내는지 미확인(CR-008 6.2 작성자 추정). 판정은 방법이 아니라 "`POST /mcp` 가 3xx 없이" |
+| AR | 전송 모드 | (i) 무상태 + JSON 응답(SSE 스트림 없음) (ii) 세션 + SSE | **(i)** | 도구가 짧은 읽기라 스트림이 필요 없고, Caddy `encode gzip`·버퍼링이 SSE 를 늦추는 문제(CR-008 6.3 미확인)를 피한다. `--workers 1` 재기동에도 잃을 세션이 없다. SDK 가 구형 핸드셰이크 클라이언트도 같은 엔드포인트에서 받는다(조사 [G3]) |
+| AS | SDK 호스트 검사(DNS 재바인딩 보호) | (i) 끈다 (ii) `allowed_hosts=["relmemo.com", …]` 하드코딩 (iii) `MCP_ALLOWED_HOSTS` 설정 | **(i)** — 메인 기본값("`allowed_hosts` 주의")과 다름 | 재바인딩 공격은 브라우저가 자동으로 싣는 자격(쿠키·로컬 무인증)을 노린다 — 이 경로의 자격은 브라우저가 싣지 않는 Bearer 헤더라 얻을 것이 없고, 쿠키는 자격이 아니다(결정 AM·지킬 것 3). Caddy 는 `SITE_ADDRESS` 호스트만 받는다. (ii) 는 D17 "호스트명 하드코딩 없음" 과 어긋나고 옛 sslip 주소·로컬 스모크(`localhost`)·시험(`testserver`)을 따로 넣어야 하며, (iii) 은 서버 `.env` 수정이 필요해 메인 조건과 부딪힌다. 끄는 방법은 설치한 SDK 실물로(03-log 에 파일:줄) |
+| AT | 도구에 사용자 id 넘기기 | (i) 인증 래퍼가 요청 범위(contextvar 또는 SDK 요청 컨텍스트의 ASGI `scope`)에 싣고 도구가 읽는다 | **(i)** — 둘 중 무엇을 쓸지는 설치한 SDK 실물로, 03-log 에 근거 | 어느 쪽이든 도구 입력에 사용자 인자 0. 판정은 방법이 아니라 두 계정 격리 시험(`test_mcp_server` ⑥, 변이 V12-7) |
+| AU | 도구 이름·결과 모양·상한 | (i) 위 "도구 계약" — 목록 200·찾기 50·이름 50자, 카드·브리핑은 기존 상한(20·10·20) (ii) 상한 없음 | **(i)** | Claude Code 결과 상한 25,000 토큰(조사 [A3]). 200명 × 한 줄 약 150자 ≈ 3만 자로 그 안. 시연 계정은 수 명이라 잘림은 실제로 나지 않지만 `truncated` 로 거짓 완전성을 막는다(원칙8) |
+| AV | 이름 찾기 규칙 | (i) NFC·대소문자 접기·**모든 공백 제거** 뒤 포함 일치, 전부 반환 (ii) 공백 유지 포함 일치 (iii) `search_person`(임베딩) 재사용 | **(i)** | 한국어 직함 표기 흔들림(`박 과장`/`박과장님`)을 한 규칙으로 덮는다. (iii) 은 임베딩 API 호출·trace 기록이 생긴다(LLM·쓰기 0 위반, CR-008 결정 Q10). 하나로 고르지 않는 것은 원칙1 의 읽기 쪽 비대칭(CR-008 3장) |
+| AW | 근거 기록(원칙9) | (i) `mcp_tokens.last_used_at` + 도구 호출 로그 한 줄(`uvicorn.error.mcp`, 이름·user·개수) + uvicorn 접근 로그 (ii) `agent_traces` 에 MCP 행 (iii) 호출 로그 테이블 | **(i)** — 메인 기본값 + 로그 줄 위치 확정 | 도구 호출은 에이전트 판정이 아니다(기존 읽기 API 규약 trace 0). `agent_traces` 는 세션 단위 판정 재생용이고 `list_briefings` 가 그 표를 원천으로 읽어 섞으면 위험이 생긴다. `uvicorn.error` 의 자식 로거는 uvicorn 이 이미 단 처리기로 나가 `docker compose logs` 에 보인다(새 로깅 설정 0). 인자 값은 제3자 이름이라 남기지 않는다(저장 최소화) |
+| AX | 진입점·화면 | (i) 새 해시 경로 `#/connect` "AI 연결" 화면 + 사이드바 버튼 (ii) 사이드바 안 접이식 (iii) 대화상자 | **(i)** | 토큰 43자·명령 약 150자를 사이드바 256px 에 넣기 어렵고 대화상자 부품이 없다(사실 29, 새 의존성 0). 원칙5 폐지(CR-006)로 근거를 적어 더한다. 진입점은 `<a>` 가 아니라 버튼(기존 단언 보존) |
+| AY | 명령 예시의 주소 | (i) `window.location.origin + '/mcp'` (ii) `https://relmemo.com/mcp` 고정 | **(i)** | 하드코딩 0(D17 관례). 운영에서는 같은 값이 나온다 |
+| AZ | 프론트의 토큰 보관 | (i) 화면 컴포넌트 상태에만 — 저장소·URL·콘솔 0, 화면을 벗어나면 사라짐 (ii) `sessionStorage` 에 잠깐 | **(i)** | "한 번만 보여 준다" 를 코드로 지킨다. XSS·공용 컴퓨터에서 남지 않는다 |
+| BA | SDK 패키지·버전 | (i) PyPI 공식 `mcp` — U12 가 현재 안정판을 확인해 `==` 고정, 기존 고정 줄 변경 0 (ii) 직접 JSON-RPC 구현 | **(i)** — "확인 뒤 고정" | 프로토콜 판(2025-11-25·2026-07-28) 차이를 SDK 가 흡수한다(조사 [G3]). 버전 숫자는 이 계획에서 정하지 않는다(조사에서 확인하지 못했다 — CR-008 7.1 #5) |
+| BB | 로그아웃과 MCP 토큰 | (i) 별개 — 로그아웃해도 MCP 토큰은 남는다 (ii) 로그아웃하면 MCP 토큰도 폐기 | **(i)** | 시연 노트북에서 웹은 로그아웃하고 Claude Code 연결은 유지하는 흐름이 자연스럽다. 끊기는 "AI 연결" 화면의 폐기(즉시 무효). (ii) 는 로그아웃 API(U5)를 다시 바꿔야 한다 |
+
 ## 기획서 원칙과 부딪히는 곳
 
 - **원칙5**: 원문 "화면 3개 고정" 은 CR-006 으로 폐지됐다(사용자 2026-11-15). 이 패키지는 로그인·가입 화면 1개(관문)를 더한다 — 근거는 시연 (가). 채팅·인물·브리핑 핵심 화면은 그대로. 하네스 `frontend-agent.md` 25행은 기준 해시 `5c0f26d` 에서 메인이 처리했다.
@@ -505,6 +767,7 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 - **security §5 "전체 대화 이력 저장 금지"** 와 대화 기록 저장 — CR-006 에서 "context 에는 넣지 않고, `chat_messages` 에 계정 소유로만" 으로 개정했다.
 - **(개정 3) 원칙7**: 닉네임은 사용자 자신의 표시 이름 — 인물(`persons`·`person_aliases`)이 아니고, 인물 간 관계를 만들지 않으며, 다른 사용자에게 보이는 곳이 없다. 에이전트 답·브리핑에 쓰지 않는다(결정 AE — 경계 문장). U9 시험이 "가입이 `persons`·`person_aliases`·`agent_traces` 행을 만들지 않는다" 를 박는다.
 - **(개정 3) 원칙5**: 새 화면 없음 — 관문 화면에 칸·버튼을 더할 뿐(UI 에 시간을 쓰지 않는다 — 문구·배치는 고정값, 디자인 수정 없음).
+- **(개정 4) 원칙1·4**: 쓰기 0 → 병합 경로 없음. 툴 7종을 MCP 로 노출하지 않는다(정확 4개 이름 집합 시험·import 금지 grep). 읽기 쪽 비대칭은 `find_person` 이 하나로 고르지 않는 것으로 막는다(설명 문구도 "여러 명이면 물어보라"). **원칙7**: 내보내는 것은 기록된 사실(카드·저장된 브리핑)뿐이고 제품 쪽 문장 생성 0. 외부 LLM 이 그 사실로 상담을 하는 것은 제품이 막을 수 없다 — 도구 설명·화면 문구(`intro`·`privacy`)로 범위만 밝힌다(통제가 아니라 범위 경계). **원칙5**: 새 화면 "AI 연결" 1개(결정 AX 근거). **원칙9**: 도구 호출은 판정이 아니라 `agent_traces` 0 — 근거는 `last_used_at`·로그 한 줄(결정 AW). **원칙8**: 평가 러너는 MCP 를 타지 않는다(ER·평가 무변경 회귀 그대로).
 - **(개정 3) 원칙9**: 조회 API·가입은 판정이 아니라 trace 0(D18 지킬 것 11). **원칙1~4·8**: ER·평가 경로 무변경(`git diff --stat <기준>..HEAD -- app/er evaluation reports data` 빈 출력 — 단위 공통 회귀 그대로).
 
 ## 리스크 · 미결
@@ -533,6 +796,13 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 - **[개정 3 · 영문 닉네임 표기]** 결정 Y 로 영문 닉네임은 소문자로 보인다(`SunWoo` → `sunwoo`). 시연에서 영문 대문자 닉네임을 쓰면 표기가 바뀌는 것을 미리 안다(한글은 영향 없음).
 - **[개정 3 · 시연 계정 가입 시점]** 닉네임 변경 기능이 없어(결정 AG) U11 반영 전에 가입한 계정은 닉네임 = 아이디로 고정된다 — 시연 계정은 U11 뒤 가입(사용자 할 일 9).
 - **[개정 3 · `unicodedata.normalize` 와 짝 없는 서로게이트]** 서로게이트가 든 문자열을 NFC 정규화할 때 예외가 나지 않는다고 보지만 이 계획에서 실행해 확인하지 않았다 — U9 의 문자열 전수 시험(500 0)이 판정한다. 예외가 나면 그 경우를 위반(`None`)으로 처리하는 것은 계획 안(새 상수·새 정책 아님 — 규칙 표 "500 0" 의 구현).
+- **[개정 4 · 평가 전날 밤 운영 반영]** 새 리비전(0005)과 새 공개 경로(`/mcp`)를 시연 몇 시간 전에 올린다. 0005 는 테이블 생성뿐이라 데이터 위험은 작지만, 새 SDK 의존성이 이미지 빌드·앱 시작을 깨면 채팅·카드·브리핑 시연 전체가 멈춘다 → U14 로컬 Caddy 경유 스모크(같은 ARM 이미지 빌드)·비상 되돌리기 예행이 반영 전 관문, 판단 시점 ①②③(범위 축소 개정 4).
+- **[개정 4 · SDK 실물 불확실]** SDK 의 서버 클래스 이름·무상태 옵션·호스트 검사 끄기·도구 표시 지정·`handle_request` 이름은 조사 문서(v2 기준)와 PyPI 안정판이 다를 수 있다(CR-008 7.1 #5 미확인). 결정 AQ·AS·AT 에 갈림길을 적어 두었고, 그 밖이면 U12 가 멈추고 보고한다. 전이 의존성이 `starlette`·`pydantic` 을 올리면 전체 pytest 가 판정(pip freeze 두 벌 증거).
+- **[개정 4 · Claude Code 의 401 처리]** 토큰이 틀리면 Claude Code 가 OAuth 발견(`/.well-known/oauth-protected-resource`)을 시도할 수 있다 — 우리는 메타데이터가 없어 그 경로는 SPA HTML 200 이 된다. 연결 실패로 보일 뿐 보안 문제는 아니지만, 시연 중 토큰을 잘못 붙이면 원인이 헷갈린다 → 사용자 문서에 "연결 실패면 토큰을 다시 만들어 명령을 다시" 한 줄. (미확인 — 실제 동작은 U14 에서 보이면 03-log 에)
+- **[개정 4 · Origin 헤더]** CLI 클라이언트가 `Origin` 을 보내면 기존 미들웨어가 다른 호스트로 보고 403 을 줄 수 있다(사실 25 미확인). U12 `u12-live-client` 와 U14 사용자 연결이 판정. 403 이 보이면 `/mcp` 를 Origin 검사에서 빼는 것이 해법(쿠키를 자격으로 쓰지 않으므로 교차 요청 위조 대상이 아니다) — 그때는 멈추고 보고(계획 변경).
+- **[개정 4 · 토큰 노출 경로]** 토큰은 화면에 보이고 클립보드·사용자 셸 기록·`~/.claude.json` 에 남는다. 서버 쪽은 해시만이지만 클라이언트 쪽 보관은 제품이 통제할 수 없다 → 7일 만료·즉시 폐기·`--scope project` 금지 안내(security §1). 메인 세션은 운영 토큰을 보지 않는다(U14).
+- **[개정 4 · 제3자 개인정보]** 조회한 카드가 Anthropic(Claude Code)으로 간다 — 시연 계정 데이터는 가상 인물이어야 한다(사용자 할 일 13).
+- **[개정 4 · 같은 패키지에 덧붙임]** MCP 를 새 패키지가 아니라 P9b 개정 4 로 넣었다(한 번에 활성 하나 규칙·일정, 메인 지시). P9b 04-review 범위가 U12~U14 까지 커진다 — 평가 뒤 04-review 에서 함께 판정.
 
 ## 사용자만 할 수 있는 일 · 에이전트가 검증할 수 없는 것 (메인 세션이 모아 전한다)
 
@@ -549,6 +819,9 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 10. **(개정 3) 달력(P9c)의 평가 전 포기 확인** — 닉네임·중복검사를 먼저 하면 P9c 포기 시점(11-17 12:00)을 넘길 가능성이 크다. 달력이 닉네임보다 중요하면 순서를 바꿔야 하므로 사용자 판단.
 11. **(개정 3) 일정이 밀릴 때** — (a) 범위 축소 3(조회 API·중복 확인 버튼을 빼고 가입 409 만 — 요청 문장의 일부를 빼는 것)을 쓸지 (b) 11-17 18:00 까지 재배포를 못 하면 평가를 `4be331b`(닉네임 없음)로 할지. 둘 다 기본값은 "메인이 묻기 전에는 적용하지 않음 / 18:00 기준".
 12. (개정 3) U11 재배포 SSH(사용자 할 일 1 과 같은 명령, 해시만 새 값) · 반영 뒤 `test` 로그인·사이드바 닉네임 화면 확인.
+13. **(개정 4) 실제 연결** — `https://relmemo.com` 에서 시연 계정으로 "AI 연결" → 토큰 만들기 → 명령을 **자기 터미널**에서 실행(`--scope project` 금지) → Claude Code 에서 도구 호출 확인 → 결과를 토큰 없이 메인에게. 토큰은 메인을 포함해 누구에게도 붙여 넣지 않는다. 시연 계정 인물이 가상 인물인지 확인(조회 내용이 Anthropic 으로 간다).
+14. **(개정 4) 판단 시점 기본값 확인** — ① 03:00 U12·U13 리뷰 미통과 → MCP 제외 ② 06:00 로컬 스모크 미통과 → 재배포 안 함 ③ 배포 뒤 회귀 → 비상 되돌리기. 다르게 원하면 메인에게.
+15. **(개정 4, 필요할 때만)** `/mcp` 만 끄기 — 서버 `.env` 에 `MCP_ENABLED=0` 을 넣고 `docker compose -f docker-compose.prod.yml up -d`(메인은 `.env` 를 열지 않는다). 메인이 SSH 를 쓸 수 없으면 U14 재배포 명령도 사용자 몫.
 
 **에이전트가 검증할 수 없는 것**
 1. 배포 URL 의 POST(가입·로그인·채팅) — security §4(로컬 밖 `curl -d` 금지). 에이전트는 본문 없는 GET 으로 401·health 만 본다.
@@ -558,6 +831,8 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 5. 시연 계정 데이터의 내용이 시연에 적절한지(인물·사건 선택) — 사용자 판단.
 6. (개정 3) 배포 URL 의 가입(닉네임 포함)·409 화면 — POST 라 에이전트는 로컬 Caddy 스모크로 근사하고, 배포 URL 은 본문 없는 GET(조회 API·health·401)만 본다.
 7. (개정 3) 운영 DB 의 백필 결과(계정 행 수·닉네임 = 아이디)를 직접 `SELECT` 할 수 없다 — 바깥 조회 `?username=test` → `taken` 과 사용자 화면(사이드바 닉네임 `test`)으로만 확인한다.
+8. (개정 4) 운영에서 유효 토큰으로 `/mcp` 를 부르는 것 — 메인은 운영 토큰을 보지 않고, 배포 URL 에 본문 있는 POST 를 보내지 않는다(security §4). 운영 쪽 성공은 사용자 보고 + 서버 로그 `mcp_tool` 줄로만, 기계 판정은 로컬 Caddy 스모크(같은 이미지)로 근사한다.
+9. (개정 4) Codex CLI 연결 — 시험하지 않는다(문서 안내만, "확인 필요").
 
 ## 읽은 카드
 
@@ -573,6 +848,8 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 - 코드: `app/db/models.py` 전문 · `app/settings.py` 495~518 · `app/briefing/scheduler.py` 80~119 · `app/api/read.py` 260~349 · `app/api/routes.py` 라우트 데코레이터 grep·486~498 · `app/api/schemas.py` 필드 grep · grep `user_id|session_id`(`app/api/read.py`·`deps.py`·`briefing/select.py`·`run.py`·`scheduler.py`·`tools/questions.py`·`context.py`) · `web/src/routes.ts` 전문 · `web/src/api/client.ts` grep · `web/vite.config.ts` grep(`changeOrigin`) · Glob `web/src/**` · grep `tests/` (`TestClient(`·`X-Session-Id`·`APP_USER_ID` 개수, `ToolContext(` 개수) · `tests/db_bootstrap.py` grep · Glob `alembic/versions` · grep `원칙5|화면 3개|3화면` 저장소 전체
 - 열지 않은 것: `web/src/screens/ChatScreen.tsx`·`AppShell.tsx`·`push.ts`·`sw.js`·`web/e2e/fixtures.ts` 본문(U6 에서 frontend-agent 가 확인) · `app/push/subscriptions.py` 본문(U5) · `app/tools/questions.py` 본문(행 번호는 grep·verifier 대조) · `scripts/schema_check.py`(존재·단언 확인은 U1)
 - **개정 3(2026-11-16) 에 읽은 것**: `docs/wiki/changes/CR-006.md` 전문(형식)·`templates/change-request.md` · `.claude/skills/devlog/SKILL.md` `/devlog change` 절 · `decisions/D18-login-user-isolation.md` 전문 · `specs/S3.1-schema-v2.md` 전문 · `security.md` 전문 · `docs/backlog.md` 95~122 · `INDEX.md` grep · `review-index.md` grep(R12·R14) · `CURRENT.md` · `packages/P9b-auth/03-log.md` 1~119·145~184 · `review-u6.md` R-5 · `packages/P9c-briefing-calendar/01-plan.md` grep(포기 시점) · `.claude/gitlog.md`(2026-11-16 06:27, HEAD `f93e7e6`) · `.claude/scripts/verify-plan.sh` 52~59(수용 기준은 `## 수용 기준` 절의 `- ` 줄을 backlog 에서 `grep -F`). 코드: `app/auth/routes.py` 전문 · `app/auth/passwords.py` 전문 · `app/api/schemas.py` 430~467 · `app/db/models.py` 290~330 · `app/settings.py` grep(`USERNAME|PASSWORD_M`) · `alembic/versions/0003_auth_users.py` 전문 · `tests/auth_helpers.py` 전문 · `tests/test_auth_required_routes.py` 전문 · `tests/test_auth_api.py` grep + 460~629 · `tests/test_auth_origin.py` 100~159 · `tests/test_auth_helpers.py` grep · `tests/test_migration_0003.py` 40~109·195~362 · `tests/test_schema_models.py` grep + 140~159·245~329 · `tests/test_schema_check.py` grep + 56~74 · `scripts/schema_check.py` 55~94·245~266 + grep · grep `0003`(`tests/`·`app/`·`scripts/`·`.github/`·`web/`) · grep `User\(|INSERT INTO users` · `web/src/screens/AuthScreen.tsx` 전문 · `web/src/components/AppShell.tsx` 25~64 · `web/src/api/types.ts` 1~30 · `web/src/__tests__/auth.test.tsx` 60~104·205~224 + grep · grep `username|AccountRow|MeOut|signup`(`web/`) · `docs/wiki/registry.md` grep(`nickname|availability|닉네임`, `app/auth|AuthScreen|auth.tsx`)
+- **개정 4(2026-11-17 밤) 에 읽은 것**: `docs/wiki/changes/CR-008.md`(1~250·316~503행) · 조사 보고서 `…/scratchpad/mcp-research/clients-report.md` 전문 · `decisions/D18-login-user-isolation.md` 전문 · `D17-vercel-deploy.md` grep + 20~35 · `specs/S3.1-schema-v2.md` 25~44 · `security.md` 6~71 · `docs/backlog.md` 95~124 · `INDEX.md` grep · `CURRENT.md` · `templates/decision.md` · `.claude/gitlog.md`(2026-11-17 22:38, HEAD `e6f1766`) · `proposal.md` grep · `CLAUDE.md` grep. 코드: `Caddyfile` 전문 · `docker-compose.prod.yml` 전문 · `requirements.txt` 전문 · `app/main.py` 전문 · `app/auth/sessions.py` 전문 · `app/auth/deps.py` 전문 · `app/auth/routes.py` grep · `app/settings.py` grep(스위치·`AUTH_SESSION_DAYS`·패턴) · `app/api/read.py` 140~339 + grep · `app/api/schemas.py` grep + 367~476 · `app/db/session.py` grep · `app/db/models.py` grep · `tests/test_auth_required_routes.py` 1~160 · `tests/test_schema_models.py` 60~339 · `tests/test_schema_check.py` 15~76 · `tests/test_migration_0004.py` 90~167 · `tests/test_deploy_files.py` grep · `scripts/schema_check.py` grep · grep `0004|== 12|== 13|== 8|73`(tests) · grep `env.example`·`walk_packages|rglob`(tests) · `web/src/components/AppShell.tsx` 전문 · `web/src/routes.ts` 전문 · `web/src/api/client.ts` grep · `web/src/App.tsx` grep · Glob `web/src/components/ui/*` · `web/src/__tests__/auth.test.tsx` grep(`sidebar-account`) · `card.test.tsx` 408~432·560~610 · grep 링크·길이 단언(`web/src/__tests__`·`web/e2e`) · `docs/wiki/registry.md` grep(`mcp|MCP|oauth` 0행)
+- 개정 4 에서 열지 않은 것: `app/auth/routes.py`·`app/auth/origin.py` 본문(U12 가 확인) · `docker/entrypoint.sh`(uvicorn 로그 설정 — U12·U14 가 `uvicorn.error` 처리기 동작을 실물로 확인) · `web/src/api/client.ts` 본문(`apiFetch` 메서드 타입 — U13 이 확인) · 설치 전 MCP SDK 소스(U12) · `docs/user-setup/13-user-todo-deploy.md` G 절 본문(U14 에서 메인이 재사용)
 - 개정 3 에서 열지 않은 것: `web/src/auth.tsx`·`web/src/api/client.ts` 본문(grep 줄만 — U10 이 확인) · `app/auth/sessions.py`·`deps.py` 본문(바꾸지 않는다) · `docs/user-setup/13-user-todo-deploy.md` G 절 본문(U11 에서 메인이 재사용) · `web/e2e/auth.spec.ts`·`fixtures.ts` 본문(grep 줄만)
 
 ## 개정 이력
@@ -635,3 +912,21 @@ CR-006 · D18 — 사용자 원문 "이 서비스에 로그인 기능도 추가�
 | 원칙·리스크·사용자 | 원칙 절 3줄 · 리스크 9줄 · 사용자만 할 수 있는 일 9~12 · 에이전트가 검증할 수 없는 것 6·7 · 읽은 카드 |
 
 **개정 3 명령 점검(N-3·R3-2 종류)**: ① 개정 3 판정에는 재귀 grep 판정이 없다(닫힌 목록 대조는 `git diff --stat`·verifier 리뷰) ② 따옴표·`|`·`?`·`&` 가 든 명령(`curl '<URL>/api/auth/availability?…'`, Caddy 스모크, `psql -c "SELECT …"`)은 전부 스크래치패드 `<SCR>/<이름>.sh` 로 Write 해 `-- bash <SCR>/<이름>.sh`(판정 방법 머리 문장) ③ 따옴표 든 pytest `-k` 를 쓰지 않는다(#15 에서 뺐다) ④ Vitest 는 `--root web`(review-u6 R-5) ⑤ pytest·alembic 은 `.venv/bin/python`, 전체 pytest 는 `POSTGRES_PORT=5433`.
+
+- **개정 4(2026-11-17 밤, architect — CR-008 축소안: MCP 읽기 전용 + 계정별 토큰)** — 기존 단위(U1~U11)·문장·수용 기준 구절은 바꾸지 않고 덧붙였다. 다음 verifier 02-plan-verify 는 개정분(아래 표의 "반영한 곳")을 본다.
+
+| 무엇 | 반영한 곳 |
+|---|---|
+| 출처 CR·카드 | 3·4행(상태·태그에 개정 4) · CR-008 0-b(수용)·머리 안내·4.3/11/13 머리 · D19 신설 · D18 결정 3·지킬 것 2·3·4 보충 · D17 지킬 것 2·5b 보충 · S3.1 0005 보충 · CLAUDE.md 기술 스택(MCP)·데이터 모델(`mcp_tokens`) · security §1 행·§5 줄 · proposal 상단 · INDEX(D19·P9b 행) · backlog P9b 수용 기준 끝 구절·세분화 줄·리스크 줄 · CURRENT `frozen: CR-008`·메모 |
+| 코드 사실 | 사실 23~32(조회 함수·토큰 재사용·앱 골격·배포 파일·스키마 단언·라우트 열거·프론트 nav/계정 줄 단언·registry·기준선·운영) |
+| 목표·범위 | "개정 4 목표" 단락 · 포함 1줄 · 하지 않는 것 7줄 |
+| 산출물 | "개정 4 산출물" 새 파일·고치는 파일 표 |
+| 계약 | "API 계약 — 개정 4"(`/auth/mcp-token` 3개·`/mcp`·기존 불변 + 발급 순서·인증 순서·호환) · "도구 계약 — 개정 4"(이름·제목·입력·결과·오류 코드·이름 규칙·설명 문구·로그 줄·DB 세션) · "AI 연결 화면 고정 문구"(`CONNECT_NOTICE` 표·명령 문자열·시각 표기) |
+| 작업 단위 | "개정 4 단위 — 순서·병렬"(U12 ∥ U13 → U14, 커밋 시점 전체 시험 ①~③) · U12(SDK 확인·모델·0005·설정·스키마·토큰 함수·라우트·도구·래퍼·서버·main·배포 파일·닫힌 목록 M1~M11·새 시험 5파일·판정·변이 V12-1~V12-19) · U13(타입·클라이언트·경로·사이드바 버튼·화면·닫힌 목록 0·새 시험·판정·변이 V13-1~V13-8) · U14(문서·로컬 Caddy 스모크·비상 되돌리기 예행·브라우저 점검·재배포·바깥 GET·사용자 실제 연결) |
+| 일정·축소 | "범위 축소 순서 — 개정 4"(판단 시점 03:00·06:00·배포 뒤, 축소 1~3, 빼지 않는 것) |
+| 판정 | 판정 표 #21~#28 · 단위 공통 회귀 "(개정 4) 공통" 행 |
+| 수용 기준 | 끝에 CR-008 구절 3개(backlog 와 글자 그대로) + 개정 4 주 |
+| 결정 | 결정 AI~BB(AI 는 사용자, 나머지 메인 위임 권장안 — AS 는 메인 기본값과 다름, 이유 기재) |
+| 원칙·리스크·사용자 | 원칙 절 1줄 · 리스크 7줄 · 사용자만 할 수 있는 일 13~15 · 에이전트가 검증할 수 없는 것 8·9 · 읽은 카드 |
+
+**개정 4 명령 점검(N-3·R3-2 종류)**: ① 재귀 grep 판정은 `u12-forbidden-imports.sh` 하나 — `grep -rnE … --include='*.py'`, 스크립트, 기대 exit 1(exit 2 는 실패) ② 따옴표·`|`·`?`·`&`·`$` 가 든 명령(uvicorn 백그라운드·SDK 클라이언트 스크립트·Caddy 스모크·바깥 GET·`psql -c`·`grep -c <토큰>`)은 전부 스크래치패드 `<SCR>/<이름>.sh` 로 Write 해 `-- bash <SCR>/<이름>.sh` ③ 따옴표 든 pytest `-k` 없음 ④ Vitest 는 `--root web` ⑤ pytest·alembic 은 `.venv/bin/python`, 전체 pytest 는 `POSTGRES_PORT=5433` ⑥ 토큰은 스크립트가 스크래치패드 파일에서 읽고 출력하지 않는다.

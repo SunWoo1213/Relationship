@@ -23,7 +23,8 @@
 
 **코드에서 지켜야 할 것**
 1. 제품 코드(`app/`·`web/src/`·`alembic/`)는 이 결정으로 바뀌지 않는다 — `git diff --stat <기준>..HEAD -- app web/src alembic` 빈 출력.
-2. `Caddyfile` 의 `/api/*` 는 `handle_path`(접두 제거)로 `backend:8000` 에 프록시하고, 나머지는 `web/dist` 정적 `file_server`(SPA fallback `try_files … /index.html`).
+2. `Caddyfile` 의 `/api/*` 는 `handle_path`(접두 제거)로 `backend:8000` 에 프록시하고, 나머지는 `web/dist` 정적 `file_server`(SPA fallback `try_files … /index.html`). **(CR-008 · D19 보충, 2026-11-17)** 정확 경로 `/mcp` 는 **`handle /mcp`(접두를 떼지 않는 `handle` — `handle_path` 아님)** 블록으로 `backend:8000` 에 그대로 넘긴다(백엔드 경로도 `/mcp`). 이 블록이 없으면 `/mcp` 가 SPA fallback 으로 떨어져 HTML 이 돌아간다. `/api/*` 블록·정적 서빙·헤더 줄은 바꾸지 않는다.
+5b. **(CR-008 · D19 보충)** `docker-compose.prod.yml` 의 `backend.environment` 에 `MCP_ENABLED: ${MCP_ENABLED:-1}` 한 줄 — 서버 `.env` 를 고치지 않아도 운영에서 MCP 가 켜지고, 사용자가 `.env` 에 `MCP_ENABLED=0` 을 넣으면 꺼진다. 비밀 값이 아니다. 서비스 수(3)·볼륨·포트는 그대로.
 3. `docker-compose.prod.yml` 의 `postgres` 는 호스트 포트를 노출하지 않고(`ports` 없음), 볼륨 `pgdata` 를 쓴다. `backend` 의 `DATABASE_URL` 은 compose 네트워크 이름(`postgres:5432`)을 가리킨다.
 4. `backend` 컨테이너는 기동 시 `alembic upgrade head` 를 먼저 실행하고 실패하면 죽는다(`docker compose ps` 로 보임).
 5. 저장소·이미지·compose 파일에 비밀 값이 없다(`.env` 는 `env_file` 로 참조만). `BRIEFING_SCHEDULER_ENABLED=1` 은 운영 `.env` 에서 켠다(기본값 off 유지).
@@ -32,3 +33,4 @@
 **갱신 이력**
 - 2026-11-14 신설(CR-005 1차: Vercel Python 함수 + Neon Free + GitHub Actions 5분 스케줄, 공개 ~11-18). 같은 날 **개정 ②**: 사용자 선택으로 AWS 최소 구성(EC2 1대 + Compose, 코드 변경 0, 1분 루프 유지, 공개 ~11-19)으로 전면 교체. Vercel 조사 사실은 CR-005 §2-1 에 기록으로 남김. 구현은 P9-infra 재계획 — 완료 해시는 그때 적는다. 파일명 `D17-vercel-deploy.md` 는 링크 유지를 위해 그대로 둔다.
 - 2026-11-15 결정 6 한 문장 개정(CR-006): "로그인 없음" → D18. 구성·공개 기간·종료 절차는 그대로.
+- 2026-11-17 밤 보충(CR-008 3차 · D19): 지킬 것 2 에 Caddy `handle /mcp` 블록, 지킬 것 5b 에 compose `MCP_ENABLED: ${MCP_ENABLED:-1}`. 지킬 것 1 의 "이 결정으로 제품 코드가 바뀌지 않는다" 는 그대로 참이다(MCP 코드는 D19 의 산출물). **결정 1(서비스 3개)·공개 기간(~11-19 뒤 종료)·종료 절차는 무변경** — 사용자 "11-19까지만 서버를 켜둘거야 그 이후에는 닫을거고". 구현은 P9b-auth U12(01-plan 개정 4).
