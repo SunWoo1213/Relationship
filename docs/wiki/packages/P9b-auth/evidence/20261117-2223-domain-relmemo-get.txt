@@ -1,0 +1,22 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/domain-check.sh
+# 시각: 2026-11-17T22:23:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 9fce41d (dev2)
+# exit: 0
+# ---
+=== relmemo.com
+dig: 54.79.202.221 
+GET https://relmemo.com/api/health -> {"status":"ok","db":"up","alembic_revision":"0004"}
+GET https://relmemo.com/ -> 200
+GET http://relmemo.com/ -> 308 https://relmemo.com/
+GET https://relmemo.com/api/persons (no login) -> 401
+GET https://relmemo.com/api/docs -> 404
+cert: subject=CN=relmemo.com issuer=C=US, O=Let's Encrypt, CN=YE1 notAfter=Feb 15 12:23:55 2027 GMT 
+=== 54-79-202-221.sslip.io
+dig: 54.79.202.221 
+GET https://54-79-202-221.sslip.io/api/health -> {"status":"ok","db":"up","alembic_revision":"0004"}
+GET https://54-79-202-221.sslip.io/ -> 200
+GET http://54-79-202-221.sslip.io/ -> 308 https://54-79-202-221.sslip.io/
+GET https://54-79-202-221.sslip.io/api/persons (no login) -> 401
+GET https://54-79-202-221.sslip.io/api/docs -> 404
+cert: subject=CN=54-79-202-221.sslip.io issuer=C=US, O=Let's Encrypt, CN=YE2 notAfter=Feb 13 09:50:08 2027 GMT 

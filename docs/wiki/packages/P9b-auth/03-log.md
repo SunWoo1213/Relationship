@@ -258,7 +258,7 @@
 - 남은 것 · 다음 단위: FIX-037 커밋 → 서버 재배포 → 시연 계정 준비·리허설 → `/devlog done`.
 - Refs: FIX-038 P9b-auth CR-007 D18
 
-## 2026-11-17 22:50 · fix(agent): 기록 발화를 질문으로 오인하거나 유형을 틀리게 적던 추출 품질을 고친다 · pending
+## 2026-11-17 22:50 · fix(agent): 기록 발화를 질문으로 오인하거나 유형을 틀리게 적던 추출 품질을 고친다 · 935aa4a
 - 변경: `app/agent/propose.py`(유형 설명·의도 문장·일정/사건/사실 구분 문구) · `app/agent/respond.py`(기록 실패 안내 문장, 근황 질문 답 문구) · `app/agent/loop.py`(안내 문장 연결) · `tests/test_agent_fix037.py`(27건)·`tests/test_agent_query_answer.py` · `evaluation/recognition/`·`reports/recognition-probe.md` · `fixes/FIX-037.md`·`review-FIX-037.md` · 증거.
 - 이유(기획서·카드 연결): 11-16 배포 주소 시연 발화에서 본 추출 품질 문제(조회로 오인돼 미기록, 갈등 유형이 갈림, 근황 질문에 "기록이 없어요"). 사용자 "원인조사부터 시작해서 해결해줘". P9b 범위 밖이지만 활성 패키지 중이라 여기에 적는다.
 - 정합성 확인: 원칙 1·2·4(게이트 규칙·임계치·ER 무변경) · 원칙 7(조회 답은 기록 재진술) · 원칙 8(시연 문장을 프롬프트·표본에 넣지 않음, 남은 문제 그대로 기록) · D16 결정 6 유지 — 위반 없음.

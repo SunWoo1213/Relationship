@@ -686,3 +686,11 @@
 - 2026-11-16 21:40 | PUSH-dev2 | origin dev2 b4b5e43 (실험 푸시)
 - 2026-11-16 21:50 | COMMIT | 8404fc3 docs(P9b-auth): 배포 주소에 시연 발화 13개를 넣어 본 결과를 남긴다
 - 2026-11-16 21:50 | PUSH-dev2 | origin dev2 8404fc3 (실험 푸시)
+- 2026-11-17 21:23 | COMMIT | 9fce41d docs(wiki): MCP 도입 계획을 변경 요청 문서(CR-008)로 정리한다 — 제안 상태
+- 2026-11-17 21:23 | PUSH-dev2 | origin dev2 9fce41d (실험 푸시)
+- 2026-11-17 21:25 | NOTE | 컨텍스트 압축(manual). 재개 시 HANDOFF.md 확인 |
+- 2026-11-17 22:23 | NOTE | 컨텍스트 압축(manual). 재개 시 HANDOFF.md 확인 |
+- 2026-11-17 22:32 | COMMIT | a2821e2 fix(P9b-auth): 로그인한 화면의 사이드바에서 아이디를 보이지 않는다
+- 2026-11-17 22:32 | PUSH-dev2 | origin dev2 a2821e2 (실험 푸시)
+- 2026-11-17 22:36 | COMMIT | 935aa4a fix(agent): 기록 발화를 질문으로 오인하거나 유형을 틀리게 적던 추출 품질을 고친다
+- 2026-11-17 22:36 | PUSH-dev2 | origin dev2 935aa4a (실험 푸시)
