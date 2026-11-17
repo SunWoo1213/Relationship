@@ -110,7 +110,7 @@ describe('브리핑 목록', () => {
     render(<BriefingScreen />)
     const first = await screen.findByTestId('briefing-5')
     const texts = Array.from(first.querySelectorAll('[data-field="pattern"], [data-field="line"]')).map((n) => n.textContent)
-    expect(texts).toEqual([PATTERN, LINE_1, LINE_2])
+    expect(texts).toEqual([`갈등 ${PATTERN}`, LINE_1, LINE_2]) // FIX-039: <한글 이름> + 서버 문장 그대로
     expect(first.querySelector('[data-field="suggestion"]')?.textContent).toBe(SUGGESTION)
     expect(within(first).getByRole('heading', { level: 3 })).toHaveTextContent(BRIEFING_NOTICE.suggestionTitle)
   })

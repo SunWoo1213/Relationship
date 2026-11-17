@@ -1,6 +1,6 @@
 // 인물 카드 화면 (U6, 결정 F·L·N) — `#/persons`(목록) 와 `#/persons/:id`(카드) 가 이 화면 하나를 쓴다.
 // 섹션 순서는 기획서 부록 A ② 그대로: 머리 → 별칭 → 마지막 접촉 → 알고 있는 것 → 반복 패턴 → 타임라인 → 다가오는 일정.
-// 서버 문자열(key · value · content · raw_utterance · title)은 고치지 않고 그대로 보여 준다 (원칙7).
+// 키·사건 종류는 표시 이름으로 바꿔 보여 주고(FIX-039), value · content · raw_utterance · title 은 고치지 않고 그대로 보여 준다 (원칙7).
 // 원문(raw_utterance)은 펼칠 때만 가져오고(1회), 같은 항목을 다시 펼쳐도 다시 요청하지 않는다 — 항목 컴포넌트 상태에 캐시.
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { ChevronDownIcon, TriangleAlertIcon } from 'lucide-react'
@@ -19,6 +19,7 @@ import { Card } from '@/components/ui/card'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate, formatDateTime } from '@/lib/format'
+import { eventTypeLabel, factKeyLabel } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 import { HREF } from '@/routes'
 
@@ -117,7 +118,7 @@ function TimelineItem({ event }: { event: TimelineEventOut }) {
       <Collapsible open={open}>
         <div className="flex items-start gap-2">
           <span className="w-28 shrink-0 text-sm text-muted-foreground">{formatDate(event.occurred_at)}</span>
-          <Badge variant="outline">{event.type}</Badge>
+          <Badge variant="outline">{eventTypeLabel(event.type)}</Badge>
           <span className="min-w-0 flex-1">{event.content}</span>
           <CollapsibleTrigger asChild>
             <Button
@@ -214,7 +215,7 @@ function Empty({ children }: { children: ReactNode }) {
 function FactRow({ personId, fact }: { personId: number; fact: PersonFactOut | PersonPatternOut }) {
   return (
     <li data-testid={`fact-${fact.id}`}>
-      <span className="text-sm text-muted-foreground">{fact.key}</span> <span>{fact.value}</span>
+      <span className="text-sm text-muted-foreground">{factKeyLabel(fact.key)}</span> <span>{fact.value}</span>
       <SourcesToggle personId={personId} factId={fact.id} sourceCount={fact.source_count} />
     </li>
   )

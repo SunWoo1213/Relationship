@@ -9,6 +9,7 @@ import type { BriefingRecordOut } from '@/api/types'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { formatDateTime } from '@/lib/format'
+import { factKeyLabel } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 import { getPushStatus, subscribeToPush, type SubscribeOutcome } from '@/push'
 import { useScheduleIdParam } from '@/routes'
@@ -110,7 +111,7 @@ function BriefingItem({
             {record.pattern_sentences.map((p) => (
               <li key={p.key} className="flex gap-2">
                 <span aria-hidden="true">·</span>
-                <span data-field="pattern">{p.sentence}</span>
+                <span data-field="pattern">{`${factKeyLabel(p.key)} ${p.sentence}`}</span>
               </li>
             ))}
             {record.lines.map((l, i) => (

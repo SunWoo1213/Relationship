@@ -610,3 +610,20 @@
 | 로컬 실제 SDK 클라이언트 왕복(두 모드 `auto`·`legacy`) | 도구 4개·`list_people` total 1·카드·`not_found`, 로그인 쿠키만 401, 토큰 출력 0 | `u12-live-client` · `u12-live-server-log` |
 | ruff · mypy 기준선 | `All checks passed!` · 새 오류 없음(38건 = 기준선 38건) | `u12-ruff-final` · `u12-mypy-final`(`u12-mypy`·`u12-ruff` 는 첫 실행 — mypy 가 `ToolAnnotations` 키워드 4건으로 FAIL 한 뒤 고침) |
 | 변이 35종(V12-1~V12-34, V12-19 미실행) | 전부 실패 ≥ 1 로 잡힘 | `u12-mutations` |
+
+## FIX-039 — 인물 카드·브리핑의 영문 키를 한글 이름으로 (frontend-agent, 2026-11-18)
+
+새 파일 `web/src/__tests__/labels.test.tsx` 22건(함수 17 + 화면 5) + 기존 `card.test.tsx`·`briefing.test.tsx` 영문 단언 4곳을 한글로 수정. 명령은 `npm --prefix web run test -- --run`. 증거는 `docs/wiki/fixes/evidence/20261118-0850-FIX-039-*`.
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| `test_fix039_fact_key_labels` — 사실 키 9종 각각 `job`→직업 … `contact_note`→연락·만남 메모 (`it.each` 9건) | 위 명령 | passed | `FIX-039-vitest` · 변이 `FIX-039-mutations-run2` M1 |
+| 사건 종류 7종 각각 한글 + `pattern:<type>` 도 같은 한글 (`it.each` 7건) | 위 명령 | passed | 같음 M4·M6 |
+| 표에 없는 키·`pattern:zzz`·종류·상속 키(`toString`·`constructor`)·빈 문자열은 원문 그대로 | 위 명령 | passed | 같음 M2·M3·M5·M7 |
+| 카드 화면: 사실 줄 9종이 `<한글> <value>` 이고 키 칸에 영문이 없다 | 위 명령 | passed | 같음 M1·M11 |
+| 카드 화면: 타임라인 7종 한글 배지, 영문 배지 없음, content 한 글자도 안 바뀜 | 위 명령 | passed | 같음 M6·M10 |
+| 카드 화면: 패턴 줄에 `pattern:` 없음, `만남  5회 (…) `(value 앞뒤 공백 그대로) | 위 명령 | passed | 같음 M4·M12 |
+| 카드 화면: 표에 없는 키·종류·패턴 원문 그대로 | 위 명령 | passed | 같음 M2·M3·M5 |
+| 브리핑 화면: 패턴 줄 `만남 3회 (…)`·`pattern:zzz 2회`, `lines` 는 그대로 | 위 명령 | passed | 같음 M8·M9 |
+| 기존 `card.test.tsx`(섹션 값·타임라인)·`briefing.test.tsx`(패턴 줄) 한글 단언으로 수정 | 위 명령 | passed | 같음 |
+| Vitest 전체 246 passed(기준선 224) · build · typecheck · lint exit 0 | `npm --prefix web run test/build/typecheck/lint` | 통과 | `FIX-039-vitest` · `-build` · `-typecheck` · `-lint` |

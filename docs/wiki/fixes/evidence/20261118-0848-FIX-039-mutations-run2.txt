@@ -1,0 +1,73 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039/run.sh
+# 시각: 2026-11-18T08:48:57+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== M1 표 항목 글자 변경(hobby 취미->취향)
+      Tests  3 failed | 243 passed (246)
+ FAIL  src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 각 섹션의 값이 서버가 준 그대로 나온다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 사실 키 9종이 각각 정해진 한글로 보이고 영문 키는 보이지 않는다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 사실 키 hobby → 취미
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+=== M2 모르는 키를 빈 문자열
+      Tests  4 failed | 242 passed (246)
+ FAIL  src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 각 섹션의 값이 서버가 준 그대로 나온다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 브리핑 화면 > 패턴 줄이 `<한글 이름> <sentence>` 이고 sentence 는 그대로, lines 는 건드리지 않는다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 표에 없는 키·종류·패턴은 받은 문자열 그대로 보인다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 표에 없는 키·종류·패턴은 받은 문자열 그대로(상속 키 포함)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+=== M3 모르는 사건 종류를 빈 문자열
+      Tests  2 failed | 244 passed (246)
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 표에 없는 키·종류·패턴은 받은 문자열 그대로 보인다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 표에 없는 키·종류·패턴은 받은 문자열 그대로(상속 키 포함)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+=== M4 pattern: 접두사 처리 제거
+      Tests  11 failed | 235 passed (246)
+ FAIL  src/__tests__/briefing.test.tsx > 브리핑 목록 > 패턴 문장·요약 줄·제안이 서버 문자열 그대로이고 순서(패턴 → 줄 → 제안)를 지킨다
+ FAIL  src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 각 섹션의 값이 서버가 준 그대로 나온다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 브리핑 화면 > 패턴 줄이 `<한글 이름> <sentence>` 이고 sentence 는 그대로, lines 는 건드리지 않는다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 패턴 줄에 pattern: 글자가 없고 한글 이름 + 서버 value 그대로다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 사건 종류 conflict → 갈등
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 사건 종류 favor → 도움
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 사건 종류 meal → 식사
+=== M5 모르는 pattern:type 이 type 만 돌려줌
+      Tests  3 failed | 243 passed (246)
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 브리핑 화면 > 패턴 줄이 `<한글 이름> <sentence>` 이고 sentence 는 그대로, lines 는 건드리지 않는다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 표에 없는 키·종류·패턴은 받은 문자열 그대로 보인다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 표에 없는 키·종류·패턴은 받은 문자열 그대로(상속 키 포함)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+=== M6 사건 종류 meal 글자 변경
+      Tests  3 failed | 243 passed (246)
+ FAIL  src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 타임라인은 서버 순서 그대로, 항목마다 날짜·type·content
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 타임라인 사건 종류 7종이 각각 정해진 한글 배지로 보이고 content 는 그대로다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 사건 종류 meal → 식사
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+=== M7 hasOwnProperty 제거(상속 키)
+      Tests  1 failed | 245 passed (246)
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 표에 없는 키·종류·패턴은 받은 문자열 그대로(상속 키 포함)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+=== M8 브리핑 패턴 줄에서 한글 이름 제거
+      Tests  2 failed | 244 passed (246)
+ FAIL  src/__tests__/briefing.test.tsx > 브리핑 목록 > 패턴 문장·요약 줄·제안이 서버 문자열 그대로이고 순서(패턴 → 줄 → 제안)를 지킨다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 브리핑 화면 > 패턴 줄이 `<한글 이름> <sentence>` 이고 sentence 는 그대로, lines 는 건드리지 않는다
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+=== M9 브리핑 sentence trim
+      Tests  1 failed | 245 passed (246)
+ FAIL  src/__tests__/briefing.test.tsx > 브리핑 목록 > 패턴 문장·요약 줄·제안이 서버 문자열 그대로이고 순서(패턴 → 줄 → 제안)를 지킨다
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+=== M10 타임라인 배지가 영문 type
+      Tests  2 failed | 244 passed (246)
+ FAIL  src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 타임라인은 서버 순서 그대로, 항목마다 날짜·type·content
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 타임라인 사건 종류 7종이 각각 정해진 한글 배지로 보이고 content 는 그대로다
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+=== M11 사실 줄이 영문 key
+      Tests  3 failed | 243 passed (246)
+ FAIL  src/__tests__/card.test.tsx > 인물 카드 — 섹션과 값 > 각 섹션의 값이 서버가 준 그대로 나온다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 사실 키 9종이 각각 정해진 한글로 보이고 영문 키는 보이지 않는다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 패턴 줄에 pattern: 글자가 없고 한글 이름 + 서버 value 그대로다
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+=== M12 value trim
+      Tests  1 failed | 245 passed (246)
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 패턴 줄에 pattern: 글자가 없고 한글 이름 + 서버 value 그대로다
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯

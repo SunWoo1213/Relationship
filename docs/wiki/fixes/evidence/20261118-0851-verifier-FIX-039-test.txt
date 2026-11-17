@@ -1,0 +1,23 @@
+# 명령: npm --prefix web run test -- --run
+# 시각: 2026-11-18T08:51:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+
+> web@0.0.0 test
+> vitest --run
+
+
+ RUN  v5.0.4 /Users/sunwoo/Desktop/Portfolio/Relationship/web
+
+
+ Test Files  12 passed (12)
+      Tests  246 passed (246)
+   Start at  08:51:22
+   Duration  5.18s (tests 50%, environment 28%, import 12%, setup 6%, transform 5%)
+
+Environment  jsdom was created 12 times · 5.40s total, 28% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

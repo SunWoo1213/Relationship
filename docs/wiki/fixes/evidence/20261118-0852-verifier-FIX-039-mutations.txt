@@ -1,0 +1,135 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh base
+# 시각: 2026-11-18T08:52:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# 메모: 대조군 + 변이 V1~V10, 스크래치패드 사본
+# ---
+=== 대조군(변이 없음)
+      Tests  91 passed (91)
+ Test Files  3 passed (3)
+
+# ===== append 2026-11-18T08:52:33+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh V1
+# 시각: 2026-11-18T08:52:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== V1 표 글자 한 자 변경(가운뎃점 -> 빗금) [src/lib/labels.ts]
+      Tests  2 failed | 89 passed (91)
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 사실 키 9종이 각각 정해진 한글로 보이고 영문 키는 보이지 않는다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 사실 키 contact_note → 연락·만남 메모
+ Test Files  1 failed | 2 passed (3)
+AssertionError: expected '연락/만남 메모 값-contact_note' to be '연락·만남 메모 값-contact_note' // Object.is equality
+AssertionError: expected '연락/만남 메모' to be '연락·만남 메모' // Object.is equality
+
+# ===== append 2026-11-18T08:52:35+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh V2
+# 시각: 2026-11-18T08:52:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== V2 사건 종류 표 글자 변경(other) [src/lib/labels.ts]
+      Tests  2 failed | 89 passed (91)
+ ❯ Object.getElementError ../../../../../../../../Users/sunwoo/Desktop/Portfolio/Relationship/web/node_modules/@testing-library/dom/dist/config.js:37:19
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 인물 카드 화면 > 타임라인 사건 종류 7종이 각각 정해진 한글 배지로 보이고 content 는 그대로다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 표시 이름 함수 > 사건 종류 other → 기타
+ Test Files  1 failed | 2 passed (3)
+AssertionError: expected '그 외' to be '기타' // Object.is equality
+TestingLibraryElementError: Unable to find an element with the text: 기타. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+# ===== append 2026-11-18T08:52:38+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh V3
+# 시각: 2026-11-18T08:52:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== V3 value 를 표시 이름 함수에 통과(value 가 키와 같은 글자면 바뀜) [src/screens/PersonCardScreen.tsx]
+      Tests  91 passed (91)
+ Test Files  3 passed (3)
+
+# ===== append 2026-11-18T08:52:40+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh V4
+# 시각: 2026-11-18T08:52:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== V4 대소문자 무시 조회(표에 없는 `JOB` 이 한글로 바뀜) [src/lib/labels.ts]
+      Tests  91 passed (91)
+ Test Files  3 passed (3)
+
+# ===== append 2026-11-18T08:52:42+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh V5
+# 시각: 2026-11-18T08:52:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== V5 브리핑 패턴 줄 사이 공백 제거 [src/screens/BriefingScreen.tsx]
+      Tests  2 failed | 89 passed (91)
+ FAIL  src/__tests__/briefing.test.tsx > 브리핑 목록 > 패턴 문장·요약 줄·제안이 서버 문자열 그대로이고 순서(패턴 → 줄 → 제안)를 지킨다
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 브리핑 화면 > 패턴 줄이 `<한글 이름> <sentence>` 이고 sentence 는 그대로, lines 는 건드리지 않는다
+ Test Files  2 failed | 1 passed (3)
+AssertionError: expected [ …(2) ] to deeply equal [ …(2) ]
+AssertionError: expected [ …(3) ] to deeply equal [ …(3) ]
+
+# ===== append 2026-11-18T08:52:44+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh V6
+# 시각: 2026-11-18T08:52:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== V6 브리핑 lines 글자를 건드림 [src/screens/BriefingScreen.tsx]
+      Tests  1 failed | 90 passed (91)
+ FAIL  src/__tests__/labels.test.tsx > FIX-039 브리핑 화면 > 패턴 줄이 `<한글 이름> <sentence>` 이고 sentence 는 그대로, lines 는 건드리지 않는다
+ Test Files  1 failed | 2 passed (3)
+AssertionError: expected [ 'conflict 줄은 그대로' ] to deeply equal [ 'pattern:conflict 줄은 그대로' ]
+
+# ===== append 2026-11-18T08:52:47+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh V7
+# 시각: 2026-11-18T08:52:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== V7 pattern:<사실 키> 를 사실 키 한글로 지어냄(pattern:job -> 직업) [src/lib/labels.ts]
+      Tests  91 passed (91)
+ Test Files  3 passed (3)
+
+# ===== append 2026-11-18T08:52:49+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh V8
+# 시각: 2026-11-18T08:52:49+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== V8 content 를 표시 이름 함수에 통과 [src/screens/PersonCardScreen.tsx]
+      Tests  91 passed (91)
+ Test Files  3 passed (3)
+
+# ===== append 2026-11-18T08:52:51+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh V9
+# 시각: 2026-11-18T08:52:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== V9 사건 종류 조회가 사실 키 표로 넘어감(type=job -> 직업) [src/lib/labels.ts]
+      Tests  91 passed (91)
+ Test Files  3 passed (3)
+
+# ===== append 2026-11-18T08:52:54+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/fix-039-review/run.sh V10
+# 시각: 2026-11-18T08:52:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: e4a7fc0 (dev2)
+# exit: 0
+# ---
+=== V10 사실 키 조회가 사건 종류 표로 넘어감(key=meal -> 식사) [src/lib/labels.ts]
+      Tests  91 passed (91)
+ Test Files  3 passed (3)
