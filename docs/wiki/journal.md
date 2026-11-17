@@ -684,3 +684,5 @@
 - 2026-11-16 21:34 | PUSH-dev2 | origin dev2 cca42f6 (실험 푸시)
 - 2026-11-16 21:40 | COMMIT | b4b5e43 docs(P9b-auth): 미리 만든 계정을 서버에서 지우는 방법을 사용자 문서에 적는다
 - 2026-11-16 21:40 | PUSH-dev2 | origin dev2 b4b5e43 (실험 푸시)
+- 2026-11-16 21:50 | COMMIT | 8404fc3 docs(P9b-auth): 배포 주소에 시연 발화 13개를 넣어 본 결과를 남긴다
+- 2026-11-16 21:50 | PUSH-dev2 | origin dev2 8404fc3 (실험 푸시)
