@@ -1,7 +1,7 @@
 # CURRENT — 지금 하는 일
 
 active: P9b-auth
-frozen: CR-008
+frozen: none
 
 <!--
   "active" — 패키지 id (예: P1-schema) 또는 FIX-nnn. 없으면 none.

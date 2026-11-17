@@ -1,0 +1,18 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/r4_switch_probe.py
+# 시각: 2026-11-17T23:13:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: b5edf42 (dev2)
+# exit: 0
+# ---
+push_dev_page_enabled(PUSH_DEV_PAGE_ENABLED=None) -> False
+push_dev_page_enabled(PUSH_DEV_PAGE_ENABLED='') -> False
+push_dev_page_enabled(PUSH_DEV_PAGE_ENABLED='1') -> True
+push_dev_page_enabled(PUSH_DEV_PAGE_ENABLED='true') -> True
+push_dev_page_enabled(PUSH_DEV_PAGE_ENABLED='0') -> RAISES InvalidValue: environment variable 'PUSH_DEV_PAGE_ENABLED' must be '1' or 'true' to enable, or empty to disable (got '0')
+push_dev_page_enabled(PUSH_DEV_PAGE_ENABLED='false') -> RAISES InvalidValue: environment variable 'PUSH_DEV_PAGE_ENABLED' must be '1' or 'true' to enable, or empty to disable (got 'false')
+briefing_scheduler_enabled(BRIEFING_SCHEDULER_ENABLED=None) -> False
+briefing_scheduler_enabled(BRIEFING_SCHEDULER_ENABLED='') -> False
+briefing_scheduler_enabled(BRIEFING_SCHEDULER_ENABLED='1') -> True
+briefing_scheduler_enabled(BRIEFING_SCHEDULER_ENABLED='true') -> True
+briefing_scheduler_enabled(BRIEFING_SCHEDULER_ENABLED='0') -> RAISES InvalidValue: environment variable 'BRIEFING_SCHEDULER_ENABLED' must be '1' or 'true' to enable, or empty to disable (got '0')
+briefing_scheduler_enabled(BRIEFING_SCHEDULER_ENABLED='false') -> RAISES InvalidValue: environment variable 'BRIEFING_SCHEDULER_ENABLED' must be '1' or 'true' to enable, or empty to disable (got 'false')

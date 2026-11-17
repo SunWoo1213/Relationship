@@ -1,14 +1,231 @@
 # P9b-auth · 계획 검증 (02-plan-verify)
 
-대상: 01-plan.md (개정 3 — CR-007 가입 닉네임·아이디·닉네임 중복검사) | 검증자: verifier (fable) — 계획 작성자와 다른 모델·컨텍스트(L-002) | 날짜: 2026-11-16 (4차)
+대상: 01-plan.md (개정 4 — CR-008 축소안: 계정별 토큰 방식 MCP 읽기 서버, U12·U13·U14) | 검증자: verifier (fable) — 계획 작성자와 다른 모델·컨텍스트(L-002) | 날짜: 2026-11-17 밤 (5차 → 6차 재검증)
 
-**이 문서의 현재 판정은 4차(아래 1~4절)다.** 3차(개정 2 대상, 2026-11-15, 통과) 기록은 지우지 않고 4절 뒤 "3차 기록" 에 그대로 두었다 — `verify-plan.sh` 가 점검표 행을 `| 1 |`~`| 8 |` 로 세므로 3차 표의 행 번호에만 "3차-" 를 붙였고, 3차의 결과 줄은 "3차 결과:" 로 바꿨다(내용 불변).
+**6차(2026-11-17 23:20, 같은 밤)**: 5차의 [필수] F5-1 을 메인이 01-plan 에 반영해(미커밋 작업 트리, HEAD `b5edf42` 위) 그 변경분만 다시 보았다 — F5-1 닫힘, 3행을 통과로 고치고 결과를 통과로 바꿨다. 5차 본문은 그대로 두고 3절 끝 "6차 재검증" 과 4절에 덧붙였다. 5차 본문의 행 번호는 `b5edf42` 기준이고(6차 변경으로 263행 아래가 1~2행씩 밀렸다), 6차 절의 행 번호는 고친 뒤 작업 트리 기준이다.
+
+**이 문서의 현재 판정은 5차 + 6차(아래 1~4절)다.** 4차(개정 3 대상, 2026-11-16, 통과)와 3차(개정 2 대상, 2026-11-15, 통과) 기록은 지우지 않고 4절 뒤에 그대로 두었다 — `verify-plan.sh` 가 점검표 행을 `| 1 |`~`| 8 |` 로 세므로 4차 표의 행 번호·절 머리에만 "4차-" 를 붙였고 4차의 결과 줄은 "4차 결과:" 로 바꿨다(내용 불변, 3차 때와 같은 방식).
+
+5차 기준: 검증을 시작할 때 HEAD `e6f1766`(dev2)이고 카드·계획의 개정 4 분은 커밋 전 작업 트리였다. 검증 도중 메인이 그 문서를 `b5edf42`("cr(wiki): MCP 를 토큰 방식 축소안으로 받아들이고 계획에 넣는다", 15파일)로 커밋했다 — 커밋 뒤 `git status` 에 `01-plan.md`·카드 변경이 없으므로 내가 읽은 내용 = `b5edf42` 이다(F5-1 의 531행은 커밋 뒤 다시 읽어 같음을 확인). 아래 행 번호는 `b5edf42` 의 `01-plan.md`(932행) 기준이다. `CURRENT.md` `active: P9b-auth` · `frozen: CR-008`(문서 이행 중 — 정상). 제품 코드에 MCP 관련 파일은 없다(registry·`app/` 에 `mcp` 0).
+
+5차에서 본 것 — `01-plan.md` 3~5행, 43~54행(사실 23~32), 62행, 76행, 93~99행, 161~184행, 231~298행(API 계약·도구 계약·문구 표), 521~628행(U12·U13·U14·축소 순서), 658~665행(판정 #21~#28), 680~686행, 735~758행(결정 AI~BB), 770행, 799~805행 · `changes/CR-008.md` 0-b(29~58행)·4.4(197~203행) · `decisions/D19-mcp-read-token.md` 전문 · `decisions/D18-login-user-isolation.md` 결정 3·지킬 것 2·3·4 · `decisions/D17-vercel-deploy.md` 지킬 것 2·5b · `specs/S3.1-schema-v2.md` 43~50행 · `security.md` §1 17행·§5 71행 · `docs/backlog.md` 99행 · `CLAUDE.md` 불변 원칙 · 코드 대조: `app/auth/origin.py` 전문, `app/main.py` 157~204, `app/settings.py` 338~418, `app/auth/deps.py` 25~55, `app/auth/sessions.py` 40~90, `app/api/read.py` 시그니처·상한, `app/api/schemas.py` 219~245, `app/db/session.py`, `tests/test_auth_required_routes.py` 30~135, `tests/test_schema_models.py` 136~161, `Caddyfile` 전문, `docker-compose.prod.yml` 38~60, `docker/entrypoint.sh`, `Dockerfile` 32·37, `requirements.txt`, `web/src/api/client.ts`(접두·메서드 타입).
+
+## 1. 기계 검증 출력 (그대로 붙인다 — 요약 금지)
+명령: `python3 .claude/scripts/save_evidence.py P9b-auth verify-plan-r4 -- bash .claude/scripts/verify-plan.sh P9b-auth` → `evidence/20261117-2307-verify-plan-r4.txt`(exit 0, HEAD `e6f1766`)
+```
+== verify-plan P9b-auth  (2026-11-17 23:07) ==
+PASS  존재: docs/wiki/packages/P9b-auth/01-plan.md
+PASS  존재: docs/wiki/packages/P9b-auth/02-plan-verify.md
+PASS  카드 존재: D16
+PASS  카드 존재: D17
+PASS  카드 존재: D18
+PASS  카드 존재: D19
+PASS  카드 존재: D2
+PASS  패키지 id 등록됨: P9-infra
+PASS  검증 항목 존재: R12
+PASS  검증 항목 존재: R14
+PASS  Refs 있음: - [x] U1 **[backend-agent] 스키마·리비전 0003 — `users`·`auth_sess
+PASS  Refs 있음: - [x] U2 **[backend-agent] 인증 코어 — 비밀번호 해시·세션 토큰·쿠키 이름 규칙·`c
+PASS  Refs 있음: - [x] U3a **[backend-agent] 기존 테스트 이관(동작 불변) — `ToolContext(
+PASS  Refs 있음: - [x] U3b **[backend-agent] 모든 API 를 로그인 사용자 기준으로 — 401·남의 자
+PASS  Refs 있음: - [x] U4 **[backend-agent] 계정당 채팅방 하나 — 대화 기록 저장과 `GET /chat
+PASS  Refs 있음: - [x] U5 **[backend-agent] 스케줄러·푸시 사용자별 — 사용자마다 브리핑 루프(0명이면 
+PASS  Refs 있음: - [x] U6 **[frontend-agent] 로그인·가입 화면(관문), 로그아웃, 대화 기록 불러오기,
+PASS  Refs 있음: - [x] U7 **[메인 세션 + 사용자] 문서·로컬 통합 스모크·배포 반영·바깥 스모크** / Refs:
+PASS  Refs 있음: - [ ] U8 **[사용자 + 메인 세션] 시연 계정 데이터 쌓기와 시연 두 갈래 리허설(배포 URL)**
+PASS  Refs 있음: - [x] U9 **[backend-agent] 닉네임·중복검사 백엔드 — 리비전 0004 `users.ni
+PASS  Refs 있음: - [x] U10 **[frontend-agent] 가입 화면 닉네임 칸·아이디·닉네임 "중복 확인"·`ni
+PASS  Refs 있음: - [x] U11 **[메인 세션 + 사용자] 0004 재배포 — 문서·로컬 Caddy 경유 스모크(0003
+PASS  Refs 있음: - [ ] U12 **[backend-agent] MCP 백엔드 — 리비전 0005 `mcp_tokens`,
+PASS  Refs 있음: - [ ] U13 **[frontend-agent] "AI 연결" 화면(`#/connect`) — 사이드바 
+PASS  Refs 있음: - [ ] U14 **[메인 세션 + 사용자] 0005 재배포와 실제 연결 — 문서, 로컬 Caddy 경유 
+PASS  backlog 일치: 가입·로그인·로그아웃·내 정보 API 가 동작하고 비밀번호는 해시로만 저장된다 + `/health`·`/au
+PASS  의존 완료: P8-frontend
+PASS  검증자 = verifier (L-002)
+PASS  점검표 8행 존재
+PASS  점검표 모든 행에 판정(통과/보류) 있음
+PASS  보류 0건
+PASS  결과: 줄 존재
+PASS  점검표 모든 행에 근거 있음
+PASS  registry 중복 없음: alembic/versions/0003_auth_users.py
+PASS  registry 중복 없음: app/auth/__init__.py
+PASS  registry 중복 없음: app/auth/passwords.py
+PASS  registry 중복 없음: app/auth/sessions.py
+PASS  registry 중복 없음: app/auth/deps.py
+PASS  registry 중복 없음: app/auth/routes.py
+PASS  registry 중복 없음: app/auth/origin.py
+PASS  registry 중복 없음: app/chat/history.py
+PASS  registry 중복 없음: tests/test_migration_0003.py
+PASS  registry 중복 없음: tests/test_auth_passwords.py
+PASS  registry 중복 없음: tests/test_auth_api.py
+PASS  registry 중복 없음: tests/test_auth_origin.py
+PASS  registry 중복 없음: tests/auth_helpers.py
+PASS  registry 중복 없음: tests/test_auth_required_routes.py
+PASS  registry 중복 없음: tests/test_user_isolation.py
+PASS  registry 중복 없음: tests/test_chat_history.py
+PASS  registry 중복 없음: tests/test_briefing_scheduler_users.py
+PASS  registry 중복 없음: tests/test_push_endpoint_owner.py
+PASS  registry 중복 없음: web/src/screens/AuthScreen.tsx
+PASS  registry 중복 없음: web/src/auth.ts
+PASS  registry 중복 없음: web/src/__tests__/auth.test.tsx
+PASS  registry 중복 없음: docs/wiki/packages/P9b-auth/tests.md
+PASS  registry 중복 없음: 03-log.md
+PASS  registry 중복 없음: alembic/versions/0004_users_nickname.py
+PASS  registry 중복 없음: app/auth/names.py
+PASS  registry 중복 없음: tests/test_migration_0004.py
+PASS  registry 중복 없음: tests/test_auth_nickname.py
+PASS  registry 중복 없음: tests/test_auth_availability.py
+PASS  registry 중복 없음: alembic/versions/0005_mcp_tokens.py
+PASS  registry 중복 없음: app/auth/mcp_tokens.py
+PASS  registry 중복 없음: app/mcp_server/__init__.py
+PASS  registry 중복 없음: app/mcp_server/auth.py
+PASS  registry 중복 없음: app/mcp_server/tools.py
+PASS  registry 중복 없음: app/mcp_server/server.py
+PASS  registry 중복 없음: tests/test_mcp_tokens_api.py
+PASS  registry 중복 없음: tests/test_mcp_tools.py
+PASS  registry 중복 없음: tests/test_mcp_server.py
+PASS  registry 중복 없음: tests/test_migration_0005.py
+PASS  registry 중복 없음: web/src/screens/ConnectScreen.tsx
+PASS  registry 중복 없음: web/src/__tests__/connect.test.tsx
+PASS  registry 중복 없음: docs/user-setup/15-mcp-connect.md
+PASS  registry 중복 없음: -cr008-clients-report.md
+PASS  registry 중복 없음: users.usern
+PASS  registry 중복 없음: users.nickn
+PASS  registry 중복 없음: err.orig.diag.const
+PASS  registry 중복 없음: app/auth/names.py
+PASS  registry 중복 없음: header.parti
+PASS  registry 중복 없음: scheme.lower
+PASS  registry 중복 없음: value.strip
+PASS  registry 중복 없음: value.strip
+PASS  registry 중복 없음: unicodedata.norma
+PASS  registry 중복 없음: name.strip
+PASS  registry 중복 없음: logging.get
+PASS  registry 중복 없음: uvicorn.error.mcp
+PASS  registry 중복 없음: anyio.to_thread.run
+PASS  registry 중복 없음: window.location.origi
+PASS  registry 중복 없음: //relmemo.com
+== 결과: FAIL=0 WARN=0 ==
+```
+기계 검증이 **보지 못한 것**: ① 이 출력의 "PASS 검증자 / 점검표 8행 / 보류 0건 / 결과" 줄은 실행 시점의 **4차 표**를 읽은 것이다 — 5차 표로 고친 뒤 재실행한 출력은 `evidence/` 의 `…-verify-plan-r4-after2.txt`(아래 3절 "증거 파일"에 경로). ② R-12(하네스, 그대로 열려 있음): "의존 완료" 줄이 `P8-frontend` 하나뿐이고 P4 게이트 줄이 없다. 손 확인 — `packages/P8-frontend/04-review.md:296`·`packages/P5b-query-turn/04-review.md:244`·`packages/P4b-er-redesign/04-review.md:144` 가 각각 "결과: 완료". ③ 기계 검증은 카드와 계획이 **서로 다른 말을 하는지**를 보지 않는다 — 3절 F5-1 이 그런 곳이다.
+
+## 2. 정합성 점검표 (기준: `.claude/skills/devlog/SKILL.md` "정합성 점검표") — 5차, 개정 4 대상
+근거 열에는 **카드 파일명 + 인용 문장**을 쓴다. 행 번호는 작업 트리의 `01-plan.md` 기준.
+
+| # | 항목 | 결과 | 근거(카드·절·인용) |
+|---|------|------|--------------------|
+| 1 | 범위 — 기획서 2장 제외 목록(상담·A–B·음성·네이티브·페르소나·태그 필터) 침범 없음 | 통과 | `decisions/D19-mcp-read-token.md` 결정 1 "쓰기(발화 기록·답변·인물 생성)·브리핑 생성·채팅 조회 턴·원문 조회는 열지 않는다"·결정 9 "이번에 하지 않는 것 … OAuth 로그인 연결 … Claude 앱·ChatGPT·Gemini 앱 연결, 쓰기 도구, 공개 기간 연장(11-19 종료 유지)" ↔ 01-plan 93~99행 "하지 않는 것" 7줄(OAuth · 쓰기 도구·브리핑 생성·채팅 조회 턴·원문 조회·대기 질문·대화 기록·툴 7종 직접 노출 · 계정당 여러 토큰 · 토큰 접두·`secret-guard` 패턴 · 리소스·프롬프트·되묻기 · 공개 기간 연장 · 로그아웃 때 폐기). `changes/CR-008.md` 0-b "N7 공개 기간 — **연장 없음 — 11-19 종료 유지**" ↔ 98행 "사용자 '11-19까지만 서버를 켜둘거야'. D17 그대로". `CLAUDE.md` 원칙7 "의도적으로 제외한 것: 고민 상담, 인물 간(A–B) 관계 저장 …" — 도구 4개는 기존 조회 함수의 결과만 돌려주고(535행 "조회는 **`app.api.read` 의 세 함수만** 부른다(새 SQL 0)") 인물 간 관계·상담 문장을 만들지 않는다. |
+| 2 | 불변 원칙 1~9 위반 없음 | 통과 | 원칙7 — `CLAUDE.md` "채팅의 조회 답(CR-004 · D16)도 기록된 사실의 재진술로 한정한다 — 평가·조언·감정 대화는 하지 않는다" ↔ 770행 "내보내는 것은 기록된 사실(카드·저장된 브리핑)뿐이고 제품 쪽 문장 생성 0", D19 지킬 것 5 "MCP 모듈(`app/mcp_server/`)은 `app.tools`(툴 7종)·`app.agent`·`app.er`·`app.briefing`·`app.embedding`·LLM 공급자 SDK 를 import 하지 않는다" ↔ 559행 시험 ⑦ import 금지 정규식 + 563행 `u12-forbidden-imports`(기대 exit 1). `list_briefings` 는 **이미 저장된** 브리핑을 읽을 뿐이다(261행 설명 "새 브리핑을 만들지 않습니다", 실물 `app/api/read.py:268`). 외부 LLM 이 받은 사실로 무엇을 말하는지는 제품 밖이라는 한계를 770행이 "통제가 아니라 범위 경계" 로 사실대로 적었다. 원칙9 — `CLAUDE.md` "모든 판정에는 근거를 남긴다" ↔ D19 결정 7 "MCP 도구 호출은 에이전트 판정이 아니다 → `agent_traces` 에 남기지 않는다(기존 읽기 API 규약 …). 대신 ① `mcp_tokens.last_used_at` ② 서버 로그 한 줄 ③ uvicorn 접근 로그" ↔ 262행 로그 줄·560행 시험 ⑦⑧⑨(행 수 불변에 `agent_traces` 포함). 도구는 ER·병합·분류를 하지 않으므로 "판정" 이 없다는 분류가 맞다(`find_person` 은 일치 전부를 돌려준다 — 252행). 원칙1·4 — 770행 "쓰기 0 → 병합 경로 없음", 252행 "**일치하는 인물 전부**(하나로 고르지 않는다 — 원칙1)", 변이 V12-8·V12-11. 원칙5 — `CLAUDE.md` "필요한 화면 … 은 계획에서 근거와 함께 더한다" ↔ 결정 AX(754행) 근거(토큰 43자·명령 약 150자, 대화상자 부품 없음). 원칙8 — 단위 공통 회귀 675행 `git diff --stat <기준>..HEAD -- app/er evaluation reports data` 빈 출력. |
+| 3 | 인용한 D 카드의 "코드에서 지켜야 할 것"과 충돌 없음 | 통과 | **(6차에 통과로 고침 — 5차에는 F5-1 때문에 통과가 아니었다. 고친 뒤 01-plan 532행 "`MCP_ENABLED` 가 비었거나 없거나 **`"0"`/`"false"` 이면 `False`**, `"1"`/`"true"` 이면 `True`, 그 밖은 `InvalidValue`" 가 D19 결정 6·D17 지킬 것 5b 와 맞는다 — 3절 "6차 재검증". 아래는 5차 때 적은 충돌 내용 그대로다.)** 5차의 충돌 1곳(F5-1): `decisions/D19-mcp-read-token.md` 결정 6 "끄려면 사용자가 서버 `.env` 에 `MCP_ENABLED=0` 을 넣고 재기동한다. 꺼지면 `/mcp` 는 404" · `decisions/D17-vercel-deploy.md` 지킬 것 5b "사용자가 `.env` 에 `MCP_ENABLED=0` 을 넣으면 꺼진다" ↔ 01-plan 531행 "`MCP_ENABLED` 가 비었거나 없으면 `False`, `"1"`/`"true"` 만 `True`, **그 밖은 `InvalidValue`**(`push_dev_page_enabled()` 와 같은 관례·docstring)" + 538행 "잘못된 스위치 값 → `InvalidValue` 로 앱 시작 실패". 이 두 문장대로 만들면 `"0"` 은 "그 밖" 이라 **꺼지는 것이 아니라 backend 가 시작하지 못한다**(실측 `evidence/20261117-2313-verify-plan-r4-switch-probe.txt` — 관례 함수 둘 다 `'0'`·`'false'` 에 `RAISES InvalidValue`). 3절 F5-1. **나머지 지킬 것은 맞다**: D19 지킬 것 1 "`token_hash` 만 … `GET` 응답 키에 `token` 이 없다. 두 응답 모두 `Cache-Control: no-store`" ↔ 235·236행, 시험 `test_mcp_tokens_api` ②③⑤, 변이 V12-1·V12-15. 지킬 것 2 "`user_id` UNIQUE, 발급은 그 사용자 행의 upsert … 유효 조건은 `expires_at > now`(같은 순간은 만료)" ↔ 241행 `INSERT … ON CONFLICT (user_id) DO UPDATE`, 시험 ④⑤ 경계, V12-2·V12-3. 지킬 것 3 "쿼리 문자열·쿠키를 읽는 코드 0. 헤더가 없으면 **DB 에 묻기 전에** 401" ↔ 242행 ①②, 시험 `test_mcp_server` ②③, V12-5·V12-6·V12-18. 지킬 것 4 "도구 입력 스키마에 `user_id`·`username` 인자 0. 남의 `person_id`·`schedule_id` 는 … `not_found`" ↔ 247행·253·254행, 시험 ⑤⑥, V12-7. 지킬 것 5 ↔ 247행 "정확히 4개" + 시험 ⑤ 이름 집합 등식, V12-10·V12-11. 지킬 것 6·7 ↔ 시험 `test_mcp_tools` ⑤(원문 표식·닉네임 표식)·`test_mcp_server` ⑧, V12-9·V12-14. D18 지킬 것 4 "(CR-008 보충) `/auth/mcp-token` 세 메서드는 로그인 필수 목록(`_MUST_REQUIRE_LOGIN`)에 든다. `/mcp` 는 면제 목록에 넣지 않는다" ↔ M11(554행)·시험 ⑩(560행). D17 지킬 것 2 "**`handle /mcp`(접두를 떼지 않는 `handle` — `handle_path` 아님)** … `/api/*` 블록·정적 서빙·헤더 줄은 바꾸지 않는다" ↔ 539행, `test_deploy_files` 새 시험(562행), V12-13. |
+| 4 | S 카드와 일치 (스키마·시그니처 v2, 임계치 2개, ask_user 비동기) | 통과 | `specs/S3.1-schema-v2.md` 47행 "`id` BIGINT PK · `user_id` Text NOT NULL → `users.id` FK **ON DELETE CASCADE**, UNIQUE `uq_mcp_tokens_user_id` · `token_hash` Text NOT NULL, UNIQUE `uq_mcp_tokens_token_hash` … `created_at`·`expires_at` timestamptz NOT NULL · `last_used_at` timestamptz **NULL** … 별도 인덱스 없음 … CHECK 없음" ↔ 529행 모델 문장이 컬럼·제약·이름까지 같다(`users.id` 는 실물 `app/db/models.py:310` `Text` PK). 49행 "0005 upgrade 는 테이블 생성뿐 — **기존 데이터를 지우지 않는다**. downgrade 는 `mcp_tokens` 만 지운다" ↔ 530행 "`DELETE`·`TRUNCATE`·`UPDATE` 0"·`down_revision = "0004"`(실물 `alembic/versions/0004_users_nickname.py` 가 head), 시험 `test_migration_0005` ③⑦, V12-17. 50행 "최종 테이블 13개 … FK 총 9" ↔ M4(12→13)·M3·M8(8→9)·M5(73→79 = 73 + 6); 실물 `tests/test_schema_models.py:140` `== 12`·`:159` `== 73`·`scripts/schema_check.py:237` `== 8`·`tests/test_api.py:93` `"0004"` 가 계획의 "지금" 값과 같다. 툴 7종·임계치·`ask_user` 는 건드리지 않는다 — D19 파급 "S3.2 툴 7종 **무변경**(MCP 도구는 어댑터 — 툴 7종 등록표에 섞지 않는다, `tools_check` 7/7)" ↔ 판정 #23(660행) `u12-tools-check` 7/7. |
+| 5 | 의존성 순서 — 선행 P 완료, P4 게이트 | 통과 | 01-plan 5행 "의존: P8-frontend(완료 2026-10-21) — 충족 · P5b-query-turn(완료 2026-11-09, `f67d8e4`) — 충족 · P4 게이트(P4b 통과 2026-09-23) — 충족" — 세 `04-review.md` "결과: 완료"(1절 손 확인). U12 의존(527행) "U9 커밋(`bd0e061` — 0004, 충족) · FIX-037 `935aa4a`(충족)" — `git log --oneline -1 bd0e061` "feat(P9b-auth): 가입 때 닉네임을 저장하고 …"·`935aa4a` "fix(agent): 기록 발화를 질문으로 오인하거나 …" 둘 다 dev2 이력에 있다. 순서 523행 "U12 ∥ U13 → U14" — 파일이 겹치지 않고(`app/`·`alembic/`·`tests/`·배포 파일 ↔ `web/`), 525행 ①~③ 이 커밋 시점마다 전체 시험이 서는지를 따졌다. U14 의존(608행) "U12·U13 각 verifier 리뷰 통과 + 반영할 해시 … 에서의 전체 pytest·Vitest 증거". 523행 첫 조건 "CR-008 문서 이행" 은 검증 도중 `b5edf42` 로 커밋됐다(위 "5차 기준"). 동결 해제는 이 문서의 결과가 통과가 된 뒤다(CR-008 0-b 이행 순서 5). |
+| 6 | 수용 기준이 backlog 와 글자 그대로 동일 | 통과 | `docs/backlog.md` 99행 "… + (CR-008) 로그인한 사용자가 웹 AI 연결 화면에서 MCP 연결 토큰을 만들고(원문은 한 번만 표시, 다시 만들면 이전 토큰 즉시 무효, 7일 만료) 폐기할 수 있으며, DB 에는 토큰 해시만 저장된다 + (CR-008) `/mcp` 는 `Authorization: Bearer` 토큰으로만 인증해 … LLM 호출 0 이다 + (CR-008) `MCP_ENABLED` 가 꺼지면 `/mcp` 는 404 이고, … Claude Code 에 연결해 도구 4개가 보이고 호출된다" ↔ 01-plan 684행 — CR-008 세 구절 전체 문자열을 `grep -cF` 로 두 파일에 넣어 각각 1(3절 명령 ③), `verify-plan` "PASS backlog 일치". 앞 구절 "밖의 모든 API 가 로그인 없이 401" 과의 관계는 686행 주 + `decisions/D18-login-user-isolation.md` 결정 3 "(CR-008 보충) `/mcp` … 는 예외가 아니라 **자격이 다른 경로**다 … 없거나 틀리면 401" 로 모순이 없다. 판정 #21~#28(658~665행)은 전부 명령·기대값·담당이 있다. 단 구절 "`MCP_ENABLED` 가 꺼지면 `/mcp` 는 404" 를 판정 #24 가 "환경값 **없음**" 으로만 본다 — 운영에서 끄는 유일한 값 `0` 은 판정에 없다(F5-1 과 같은 뿌리 — 판정은 3행에서 한다). |
+| 7 | 작업 단위마다 Refs 태그 | 통과 | 527행 U12 "/ Refs: P9b-auth CR-008 D19 D18 D17 S3.1 security 원칙1 원칙4 원칙7 원칙9" · 587행 U13 "/ Refs: P9b-auth CR-008 D19 원칙5 원칙7" · 608행 U14 "/ Refs: P9b-auth CR-008 D19 D18 D17 security"(`verify-plan` "PASS Refs 있음" 15줄 — U1~U14). |
+| 8 | 보안 카드(`security.md`) — 비밀·외부 전송·삭제 규칙 위반 없음 | 통과 | §1 17행 "**MCP 개인 접근 토큰은 비밀이다** — 값을 문서·채팅(메인 세션·서브에이전트와의 대화 포함)·저장소·커밋·증거 파일·이슈에 쓰지 않는다 … 메인 세션·에이전트는 운영 토큰 값을 보지 않는다 … `--scope project` … 금지 … 로컬 시험 토큰은 스크래치패드 파일로만 다루고 증거에는 'set'" ↔ 615행 "사용자 — 메인은 토큰 값을 보지 않는다 … 결과를 **토큰 없이** 말로", 609행 ③ "`--scope project` 를 붙이지 않는다", 680행 "토큰·비밀번호 값은 스크래치패드 파일로만, 증거에는 'set'", 610행 ④ 로그에 토큰 문자열 0(`grep -c` → `0` 만 출력). §5 71행 "원문(`raw_utterance`)·대화 기록·대기 질문·닉네임·trace 는 내보내지 않는다. **조회한 카드 내용은 연결한 클라이언트의 LLM 공급자로 전송된다** … 'AI 연결' 화면과 사용자 문서에 고지 … 토큰은 `Authorization: Bearer` 헤더로만(쿼리 문자열 금지 — 접근 로그에 남는다)" ↔ 문구 표 `privacy`(272행) "조회한 내용은 연결한 AI 도구의 회사로 전송돼요."·`intro`(271행), 결정 AM(743행), 실물 `app/api/schemas.py` `PersonCardOut`·`BriefingRecordOut` 에 원문 필드 없음(사실 23, `app/api/read.py:230` "raw_utterance 는 컬럼 자체를 고르지 않는다"). §4(삭제·바깥 전송) ↔ 530행 리비전 안 삭제문 0, 561행 "`DROP DATABASE` 0", 610행 "볼륨 삭제·`down -v` 0", 614행 "바깥 스모크(메인, 본문 없는 GET 만 — security §4)", 613행 "서버 `.env` 는 열지도 고치지도 않는다". 열린 한계 하나: 토큰에 접두가 없어(결정 AJ) `secret-guard`·`save_evidence.py` 가 증거 속 토큰을 기계로 잡지 못한다 — 절차(스크래치패드·"set")에만 기댄다. 범위 밖으로 명시돼 있어(96행) 통과로 두되 R5-9 로 남긴다. |
+
+## 3. 소견과 조치 — 5차
+
+증거 파일: `evidence/20261117-2307-verify-plan-r4.txt`(기계 검증, 5차 표로 고치기 전) · `evidence/20261117-2313-verify-plan-r4-switch-probe.txt`(스위치 관례 함수 실측 — 저장소 무수정, DB·네트워크 접근 0) · `evidence/20261117-2310-verify-plan-r4-sdk-dryrun.txt`(`pip install --dry-run mcp` — 설치하지 않음) · 5차 표로 고친 뒤 재실행 `evidence/20261117-2317-verify-plan-r4-after2.txt`(HEAD `b5edf42`, exit 0, `FAIL=0 WARN=1` — WARN 은 "보류 1 건 — 결과는 통과가 될 수 없다" 한 줄이고 나머지 PASS 줄은 1절 출력과 같다. 바로 앞 `…-2317-verify-plan-r4-after.txt` 는 6행 근거 문장에 "보류" 라는 낱말이 들어 2건으로 세어진 출력이라 문장을 고치고 다시 돌렸다).
+
+### 직접 실행한 명령(읽기 전용)
+① `bash .claude/scripts/gitlog.sh P9b-auth D18 D17` ② 위 증거 3개의 명령 ③ 수용 기준 CR-008 세 구절을 `grep -cF` 로 `docs/backlog.md`·`01-plan.md` 에(각 1) ④ `grep -n '^결과:'` 로 세 선행 패키지 `04-review.md` ⑤ `git log --oneline -1 bd0e061`·`935aa4a` ⑥ `.venv/lib/python3.14/site-packages` 의 dist-info 이름(`starlette 1.7.0`·`fastapi 0.135.1`·`pydantic 2.13.5`·`anyio 4.15.1`·`uvicorn 0.41.0`·`httpx 0.28.1`) ⑦ `grep -n` 으로 `tests/test_deploy_files.py` 의 compose·`.env.example` 단언, `tests/` 의 라우트 수 단언(0건). 그 밖은 파일 읽기.
+
+### 따져 본 14가지(요청받은 항목 순)
+
+1. **원칙7 — 도구가 LLM 을 부르지 않고 평가·조언을 만들지 않는다.** 도구 본체는 `app.api.read` 세 함수의 dump 를 그대로 돌려주고(535행), 금지 import 를 시험과 grep 두 겹으로 본다. 설명 문구 4개(258~261행)는 "기록에 없는 것은 없다고 말하세요" 꼬리뿐이고 조언을 시키는 문장이 없다. `find_person` 이 임베딩 검색을 쓰지 않는 것도 결정 AV(752행)로 막혀 있다. 통과.
+2. **원칙9.** 점검표 2행. 도구는 판정을 하지 않는다. 통과.
+3. **계정 격리(토큰 → user_id).** 사용자 id 의 유일한 출처는 토큰 행이고(242행 ③⑥), 입력 스키마에 사용자 인자가 없다는 것을 시험 ⑤ 가 스키마에서 직접 본다. 조회 함수는 이미 `user_id` 로 좁혀져 있고 남의 id 는 `PersonNotFound`(실물 `read.py:183`). 시험 ⑥ 이 두 계정·네 방향을 본다. 전달 방법(결정 AT)이 "실물로 정한다" 로 열려 있는 것이 유일한 빈칸 — R5-1.
+4. **`raw_utterance` 미노출.** 도구가 쓰는 응답 모델 셋에 원문 필드가 없고(사실 23), 시험 `test_mcp_tools` ⑤ 가 원문·닉네임 표식을 네 도구 결과 전체 문자열에서 찾는다. 통과. `BriefingRecordOut.trace_id`(정수) 하나가 결과에 실린다 — R5-7.
+5. **토큰 해시 저장·1회 표시.** `new_token()`·`hash_token()` 은 실물 `app/auth/sessions.py:45·49` 에 있다. 시험 ③("행의 어느 컬럼 값도 토큰 원문과 같지 않다")이 항상 통과하는 시험이 아니다(V12-1 이 깨뜨린다). 프론트는 컴포넌트 상태에만(결정 AZ), 시험 ⑤⑥·V13-1·V13-3. 통과.
+6. **쓰기 도구 0.** 이름 집합 **등식**(부분집합이 아님)·`readOnlyHint`·행 수 불변 11표. `/mcp` 요청이 하는 유일한 쓰기는 `mcp_tokens.last_used_at` 갱신이며 D19 결정 7 ① 에 적혀 있다. 통과.
+7. **`MCP_ENABLED` 기본값과 운영 compose.** 코드 기본 꺼짐·compose `${MCP_ENABLED:-1}` 조합 자체는 맞다(시험·로컬에서 SDK import 0). **끄는 쪽이 틀렸다 — F5-1.**
+8. **Caddy `/mcp` 블록.** 실물 `Caddyfile` 은 `handle_path /api/*`(12~16행)와 매처 없는 `handle {}`(28~32행)가 이미 함께 있고 운영에서 `/api/*` 가 정적 블록에 먹히지 않는다. 새 블록은 정확 경로 `/mcp` 하나라 `/api/*` 와 겹치지 않고, 매처 없는 `handle` 보다 구체적이다. 최상위 `header` 줄 중 `/mcp` 에 걸리는 것은 `header -Server` 뿐이다. **Caddy 를 실행해 보지는 않았다** — 판정은 U14 로컬 Caddy 스모크 ①("`401`·`Content-Type: application/json`(HTML 아님)·3xx 아님", 610행)과 `test_deploy_files` 새 시험이 한다. `/mcp/`(끝 슬래시)는 SPA 로 간다 — 명령 문자열이 `/mcp` 정확 경로라 영향 없음.
+9. **기존 Origin 검사(`bad_origin`).** 실물 `app/auth/origin.py:67` — POST·PUT·PATCH·DELETE 만, `Origin` 이 **있을 때만** 비교(80행). 토큰 API: 브라우저의 같은 출처 `POST`·`DELETE` 는 `Origin` 을 보내고 호스트가 같아 통과, 다른 출처는 403(시험 ⑦) — 발급·폐기가 쿠키 자격이라 이 검사가 그대로 위조 방어가 된다. `/mcp`: 미들웨어가 래퍼보다 바깥이라 `Origin` 이 있고 다르면 인증 전에 403, 없으면 통과. CLI 가 `Origin` 을 보내는지는 계획도 "미확인"(802행)으로 적었고 `u12-live-client` 는 **SDK 의 파이썬 클라이언트**라 Claude Code 실물을 대신하지 못한다 — R5-2.
+10. **결정 AS(SDK 호스트 검사를 끈다) — 안전하다.** DNS 재바인딩은 브라우저가 피해자 자격을 **자동으로** 싣는 경우(쿠키·무인증 로컬 서버)를 노린다. 이 경로의 자격은 브라우저가 스스로 붙이지 않는 `Authorization` 헤더뿐이고 쿠키·쿼리는 자격이 아니다(시험 ③, V12-5·V12-6). 공격자 페이지가 호스트 검사를 통과해도 토큰 없이는 401 이다. `/mcp` 가 쿠키를 받게 되는 순간 이 근거가 무너지므로 V12-5 는 빼면 안 되는 변이다(628행 "빼지 않는 것" 의 "401 부정 케이스 전부" 에 든다).
+11. **결정 AN(자체 ASGI 래퍼) — 안전하고, 구조 제약 하나.** 401 이 SDK 에 닿기 전에 나가므로 스위치 켠 앱에서도 라우트 열거 계약(실물 `test_auth_required_routes.py:117-128` — `json={}`·쿠키 없음·401·본문 등식)이 그대로 선다. 열거는 `HEAD`·`OPTIONS` 를 뺀다(69행) — Starlette 가 `GET` 에 붙이는 `HEAD` 는 걸리지 않는다. 구조 제약은 R5-3.
+12. **0005 마이그레이션 — 운영 DB(0004)에서 삭제 없이 올라간다.** 테이블 생성 + UNIQUE 2 + FK 1 뿐이고 기존 테이블에 손대지 않는다. `docker/entrypoint.sh` 가 기동 때 `alembic upgrade head` 를 돌린다. U14 스모크가 실제 0004 볼륨에서 `Running upgrade 0004 -> 0005`·`users` 행 수 불변을 보고, 비상 되돌리기 예행(611행)이 4차 R4-3 의 순서 그대로다. 통과.
+13. **U12 ∥ U13 계약 표 — 서로 맞다.** 경로(프론트 `API_BASE = '/api'` + `/auth/mcp-token` ↔ Caddy 가 `/api` 를 떼고 백엔드 `/auth/mcp-token`) · 201 본문 3키 ↔ `McpTokenCreatedOut` 양쪽 · 상태 4키 ↔ `McpTokenStatusOut` 양쪽 · "행 있음·만료 → `active:false` + 시각 그대로" ↔ 프론트 "`active:false` 인데 `expires_at` 있음 → `statusExpired`" · 204 무본문 ↔ `apiFetch<void>`(로그아웃이 이미 204 를 받는다) · `DELETE` 메서드 타입 추가(589행 — 실물 `client.ts:49` 는 `'GET' \| 'POST'` 뿐이라 필요하다). 어긋난 곳을 찾지 못했다.
+14. **수용 기준 = backlog 글자 그대로.** 점검표 6행.
+
+### [필수] — 1건
+
+- **F5-1 (`MCP_ENABLED=0` 이 MCP 를 끄지 않고 backend 전체를 죽인다 — 531행·538행 ↔ D19 결정 6·D17 지킬 것 5b·539·609·623·824행)**
+  - 사실: 531행은 `mcp_enabled()` 를 "`"1"`/`"true"` 만 `True`, 비었거나 없으면 `False`, **그 밖은 `InvalidValue`**" 로, 538행은 그 예외를 "앱 시작 실패" 로 정했다. 같은 계획과 카드는 끄는 방법을 일곱 곳에서 "서버 `.env` 에 `MCP_ENABLED=0`" 이라고 적었다. `"0"` 은 "그 밖" 이다. 관례 함수 실측: `push_dev_page_enabled(PUSH_DEV_PAGE_ENABLED='0') -> RAISES InvalidValue`(증거 `…-switch-probe.txt`). `create_app()` 은 `app/main.py:204` 에서 import 시점에 불리므로 uvicorn 이 뜨지 못하고, `restart: unless-stopped` 로 재시작만 반복한다 → `/api/*` 전부 502.
+  - 빈 값으로도 꺼지지 않는다: `.env` 에 `MCP_ENABLED=` 를 넣으면 compose 의 `${MCP_ENABLED:-1}` 은 **빈 값도 기본값으로 바꾸는** 꼴(`:-`)이라 `1` 이 된다. 즉 이 계획대로면 운영에서 MCP 만 끄는 값이 **하나도 없다**.
+  - 왜 위험한가: 이 스위치는 축소 순서 ③(623행 "`/mcp` 만 문제면 → 사용자가 서버 `.env` 에 `MCP_ENABLED=0` 을 넣고 `up -d`")의 유일한 수단이고, 쓰이는 때가 평가 당일 아침이다. 그때 쓰면 채팅·카드·브리핑 시연까지 함께 내려간다. 시험도 못 잡는다 — `test_mcp_server` ①(560행)은 "환경값 **없이** 만든 앱 → 404" 와 "`yes` → `InvalidValue`" 만 보고, U14 스모크(610행)는 켜진 상태만 본다.
+  - **닫는 방법(계획 문장 세 곳)**:
+    1. 531행 — "`MCP_ENABLED` 가 비었거나 없으면 `False`, `"1"`/`"true"` 만 `True`, 그 밖은 `InvalidValue`(`push_dev_page_enabled()` 와 같은 관례·docstring)" 를 → "비었거나 없거나 **`"0"`/`"false"` 이면 `False`**, `"1"`/`"true"` 이면 `True`, 그 밖은 `InvalidValue`. `push_dev_page_enabled()` 관례에 **명시적 끄기 값 둘을 더한 것**이다 — 운영 compose 가 기본값을 `1` 로 넣으므로 끄는 값이 따로 있어야 한다(D19 결정 6). docstring 에 이 차이를 적는다" 로.
+    2. 560행 `test_mcp_server` ① — "**꺼짐**: 환경값 없이 만든 앱에서 …" 뒤에 "· `MCP_ENABLED=0`·`MCP_ENABLED=false` 로 만든 앱도 `create_app()` 이 예외 없이 뜨고 `POST /mcp`·`GET /mcp` → 404" 를 더하고, 변이 표(564행 아래)에 "V12-20 `mcp_enabled()` 가 `"0"` 을 `InvalidValue` 로 → `test_mcp_server` ①" 한 줄.
+    3. 610행 U14 로컬 Caddy 스모크 ⑤ 뒤에 "⑥ **끄기 예행**: 더미 env 에 `MCP_ENABLED=0` 을 넣고 `up -d` → backend healthy · `/api/health` 200 · `https://localhost/mcp` → `404`(JSON) → 그 줄을 지우고 `up -d` → ① 의 `401` 로 돌아옴" 을 더한다(compose 보간이 그 env 파일에서 `0` 을 실제로 읽는지가 여기서 판정된다 — 읽지 못하면 13 문서의 끄기 안내를 그 결과대로 고친다).
+  - 판정 #24(661행) 근거 열에 "`MCP_ENABLED=0` → 404" 를 더하면 수용 기준 구절 "꺼지면 404" 가 운영에서 쓰는 값으로 판정된다. 카드(D19·D17)는 고칠 필요가 없다 — 카드가 옳고 계획의 함수 정의가 어긋났다.
+
+### [권고] — R5-1·R5-2 는 U12 위임 프롬프트(또는 01-plan 에 메인이 덧붙이는 줄)에 넣기를 강하게 권한다. 판정에 영향이 없어 재검증 없이 해도 된다
+
+- **R5-1 (사용자 id 전달 — 없으면 닫힌 쪽으로, 교차 호출 시험 하나 — 결정 AT·537행)** 537행 "① 사용자 id 를 읽고" 는 **읽지 못했을 때**를 정하지 않았다. → "사용자 id 를 읽지 못하면(값 없음) 조회하지 않고 `internal_error` — 기본 사용자·첫 계정·빈 문자열로 내려가지 않는다" 한 문장. 그리고 시험 ⑥ 은 A 다음 B 를 **차례로** 부르므로, 요청 범위가 아닌 곳(모듈 전역·서버 객체 속성)에 id 를 두는 구현을 못 잡을 수 있다(차례로는 맞게 보인다). → 두 계정 토큰으로 `list_people` 를 **번갈아 여러 번**(예: 스레드 2개 × 20회) 부르고 모든 응답이 자기 계정 인물만임을 보는 시험 하나. 둘 중 고르라면 SDK 요청 컨텍스트의 ASGI `scope` 쪽이 contextvar 보다 덜 미묘하다(무상태 모드에서 도구가 SDK 의 다른 태스크에서 돌기 때문).
+- **R5-2 (Claude Code 실물을 배포 전에 로컬에서 한 번 — 판정 #27·802행)** 지금 계획에서 Claude Code 가 서버에 처음 닿는 것은 재배포 뒤 사용자 연결(615행)이다. `Origin` 헤더·`GET /mcp` 스트림 시도·프로토콜 판 협상 같은 실물 차이는 `u12-live-client`(SDK 파이썬 클라이언트)로는 드러나지 않고, 드러났을 때의 해법("`/mcp` 를 Origin 검사에서 뺀다" — 802행)은 코드 변경 + 재배포다. → U12 의 `u12-live-client` 서버(`localhost:8765`)가 떠 있는 동안 메인이 **로컬 개발 계정의 토큰**으로 `claude mcp add --transport http relmemo-local http://localhost:8765/mcp --header …` → `claude mcp list` 의 연결 표시 → `claude mcp remove relmemo-local` 를 한 번 한다(토큰은 스크래치패드 파일에서 셸 변수로, 출력·증거에는 "set". `--scope project` 금지). 03:00 판단 시점 전에 #27 의 실물 위험이 닫힌다.
+- **R5-3 (래퍼는 클래스 인스턴스로, DB 조회는 스레드로 — 536·538행)** Starlette `Route` 는 `endpoint` 가 **함수나 바운드 메서드**면 `request -> response` 핸들러로 감싸고, 그 밖의 호출 가능 객체만 ASGI 앱으로 쓴다. 계획의 `BearerAuthApp(...)` 인스턴스는 맞지만, 클로저 함수로 바꾸거나 SDK 세션 관리자의 `handle_request`(바운드 메서드)를 `Route` 에 직접 주면 500 이 난다 — 위임 프롬프트에 한 줄. 또 242행 ③⑤ 의 토큰 조회·`last_used_at` 갱신·commit 은 동기 DB 호출인데 래퍼는 이벤트 루프에서 돈다(도구 쪽은 263행이 스레드로 돌리라고 정했다) — 같은 `anyio.to_thread.run_sync` 로 돌린다고 적는다(워커 1개에 브리핑 주기 작업이 같은 루프를 쓴다).
+- **R5-4 (SDK 실측 — 결정 BA 의 빈칸을 미리 좁힌다)** `pip install --dry-run mcp`(로컬 venv, Python 3.14) 결과: `Would install PyJWT-2.15.1 mcp-2.3.0 mcp-types-2.3.0 opentelemetry-api-1.45.2 python-multipart-0.0.34 sse-starlette-3.7.0` — **기존 고정 줄을 바꾸지 않고 설치된다**(새 패키지 6개). 요구 조건은 `starlette>=0.48`(3.14)·`pydantic>=2.12`·`uvicorn>=0.31.1`·`anyio>=4.10` 으로 지금 설치본 안이다. 현재 안정판이 **2.x** 이므로 조사 문서의 v2 이름(`MCPServer`) 쪽일 가능성이 높다 — 그래도 528행대로 설치한 소스에서 확인한다. 두 가지 주의: ① 운영 이미지는 `python:3.13-slim`(`Dockerfile:32`)이고 `requirements.txt` 는 전이 의존성을 고정하지 않는다 → 로컬 `pip freeze` 와 이미지 안 버전이 다를 수 있다. U14 스모크에서 `docker compose … exec backend python -m pip freeze` 한 벌을 증거로 더하면 차이가 보인다 ② `python-multipart` 가 새로 깔린다 — 폼 본문을 4xx 로 돌려주는 기존 시험(`test_auth_api.py`)은 전체 pytest 가 판정한다.
+- **R5-5 (DB 세션 문장 두 곳이 다르다 — 263행 ↔ 537행)** 263행 "도구 호출마다 `SessionLocal()` 로 열고" ↔ 537행 `build_mcp_endpoint(session_factory, now)`. 시험이 시험 DB 를 끼우려면 주입된 팩토리여야 한다 → 263행을 "주입된 `session_factory()`(운영 기본값 `SessionLocal`)" 로 맞춘다.
+- **R5-6 (SDK 가 먼저 내는 입력 검증 오류 — 247행)** "오류 텍스트는 코드 문자열 하나뿐" 은 **우리 핸들러에 닿은 뒤**에만 참이다. `person_id: "abc"` 같은 형 오류는 SDK 가 먼저 거르고 그 문구(호출자가 보낸 값이 되돌아갈 수 있다)는 우리가 정하지 못한다. 새는 정보는 호출자 자신의 입력뿐이라 결함은 아니다 → 시험·리뷰의 판정 범위를 "핸들러가 낸 오류" 로 적어 두고, SDK 검증 오류에 **예외 원문·스택·SQL 이 없음**만 한 번 본다.
+- **R5-7 (`trace_id` — D19 결정 4 문장과의 거리)** `BriefingRecordOut` 에 `trace_id: int` 가 있다(`app/api/schemas.py`). D19 결정 4 "결과에 … `agent_traces` 가 없다" 는 trace **내용**을 말하는 것으로 읽히지만 정수 id 하나는 나간다(기존 `/api/briefings` 도 같다). 그대로 두면 03-log 에 한 줄, 빼려면 도구가 dump 에서 그 키를 지운다고 계약 표 254행에 적는다 — 어느 쪽인지 위임 전에 정한다.
+- **R5-8 (U12 가 커밋 하나로는 크다 — 525·527행)** 리비전·모델·토큰 API 3개·MCP 서버·배포 파일 3개·새 시험 4파일·기존 단언 11곳이 한 커밋이다. 배포 해시 규칙("U12·U13 이 모두 든 해시뿐")은 그대로 두고, 구현 순서만 "(가) 0005·모델·토큰 API·M1~M11 → 전체 pytest → (나) `app/mcp_server/`·`main.py`·배포 파일" 로 정해 두면 03:00 판단 때 어디까지 섰는지가 분명하고 U13 의 실제 백엔드 대조도 (가)에서 가능하다. 커밋을 둘로 나눌지는 메인 판단.
+- **R5-9 (토큰을 기계가 못 잡는다 — 결정 AJ)** 접두가 없어 증거·로그에 토큰이 섞여도 `save_evidence.py`·`secret-guard` 가 통과시킨다. → 토큰을 다루는 스크립트(`u12-live-client`·`u14-caddy-*`)는 끝에서 **자기 출력 전체**를 토큰 파일 값으로 `grep -c` 해 `0` 일 때만 성공으로 끝나게 한다(610행 ④ 가 backend 로그에 하는 것과 같은 검사를 스크립트 표준 출력에도).
+- **R5-10 (`u12-live-client` 의 서버 기동 — 563행)** `security.md` §1 11행의 L-007 예외는 "이 프로젝트 서버 기동 `uvicorn app.main:app … --env-file .env`" **명령 형태**에 준 것이다. 그 줄을 스크립트 안에 넣으면 훅이 보지 못하는 곳에서 비밀 파일을 가리키게 된다. → 서버 기동은 예외 형태 그대로 Bash 명령으로 따로 띄우고(백그라운드), 스크립트는 클라이언트 쪽만 한다.
+- **R5-11 (화면 문구 `scope` — 273행)** "Claude Code·Codex CLI 처럼 … 에만 연결돼요" — Codex CLI 는 이번에 시험하지 않는다(609행 ④ "확인 필요", 835행). 화면이 확인하지 않은 연결을 단정한다 → "Claude Code 처럼 연결 토큰을 헤더로 넣는 도구에 연결돼요(Codex CLI 는 확인 전)" 정도로 낮추거나 Codex 를 뺀다. 문구는 닫힌 값이라 U13 위임 전에 정한다.
+- **R5-12 (개발 서버에서의 명령 주소·잘못된 토큰 때의 표시)** ① `npm run dev`(5173)에서는 `window.location.origin + '/mcp'` 가 Vite 주소라 그 명령은 동작하지 않는다 — U14 로컬 브라우저 점검(612행)에서 명령을 **실행하지는 않는다**고 적어 둔다 ② 801행대로 토큰이 틀리면 Claude Code 가 `/.well-known/…` 를 찾고 SPA HTML 200 을 받아 엉뚱한 오류를 낼 수 있다. 시연 중 혼동을 줄이려면 사용자 문서의 "연결 실패면 토큰을 다시" 한 줄로 충분하다(계획대로).
+- **R-12 (1차, 하네스)** `verify-plan.sh` 62·68행 — 이 패키지 밖, 그대로 열려 있다.
+
+### 사용자에게 알릴 것
+계획은 사용자 할 일 13~15(822~824행)로 옳게 분류했다. 새로 물을 결정은 없다. F5-1 이 닫히기 전에는 사용자 문서·안내에 "`.env` 에 `MCP_ENABLED=0`" 을 **적지 않는다**(지금 문장대로 만들어진 서버에서 그 줄은 서비스를 내린다).
+
+### 검증하지 못한 것
+- SDK 를 설치하지 않았다(dry-run 만). 서버 클래스·무상태 옵션·호스트 검사 끄기·요청 컨텍스트의 실제 이름과 동작은 보지 못했다 — 528행 "설치한 소스에서 확인" 과 "갈림길 밖이면 멈추고 보고"(523행)가 받는다.
+- Caddy·Docker 를 실행하지 않았다 — `handle /mcp` 의 실제 우선순위, compose 보간이 `.env` 의 `MCP_ENABLED` 를 읽는지는 읽어서만 판단했다(F5-1 닫는 방법 3 의 예행이 판정한다).
+- Claude Code 가 `Origin` 을 보내는지, `GET /mcp` 를 어떻게 다루는지 확인하지 못했다(R5-2).
+- 전체 pytest·Vitest 를 돌리지 않았다. 닫힌 목록 M1~M11 은 표본(M3·M4·M5·M6·M8·M9·M11)만 실물과 대조했고 전수 검색은 하지 않았다 — "목록 밖 시험이 깨지면 멈추고 보고"(540행)가 받는다.
+- DB 에 접속하지 않았고 배포 서버에 요청을 보내지 않았다.
+
+### 6차 재검증 (2026-11-17 23:20 — 범위: F5-1 반영분이 F5-1 을 닫는지, 새로 어긋난 곳이 없는지)
+
+본 것: `git diff -U0 -- docs/wiki/packages/P9b-auth/01-plan.md`(HEAD `b5edf42` 대비 7곳) · `git diff --stat -- docs/backlog.md docs/wiki/decisions docs/wiki/specs`(빈 출력 — 카드·backlog 무변경) · 기계 검증 `evidence/20261117-2320-verify-plan-r4b.txt`(이 문서를 고치기 전, `FAIL=0 WARN=1` — WARN 은 그때의 5차 표 3행) → 고친 뒤 재실행 `evidence/20261117-2320-verify-plan-r4b-after.txt`(exit 0, `FAIL=0 WARN=0`, "PASS 보류 0건").
+
+**F5-1 — 닫힘.** 닫는 방법 세 곳이 모두 들어갔다.
+1. 532행(`app/settings.py`) — "`MCP_ENABLED` 가 비었거나 없거나 **`"0"`/`"false"` 이면 `False`**, `"1"`/`"true"` 이면 `True`, 그 밖은 `InvalidValue`. `push_dev_page_enabled()` 관례에 **명시적 끄기 값 둘을 더한 것**이다 … docstring 에 이 차이를 적는다". D19 결정 6 "끄려면 … `MCP_ENABLED=0`"·D17 지킬 것 5b 와 맞고, D19 지킬 것 8 "잘못된 값은 `InvalidValue`" 도 그대로 참이다(`yes` 등).
+2. 561행 `test_mcp_server` ① — "**`MCP_ENABLED=0`·`MCP_ENABLED=false` 로 만든 앱도 `create_app()` 이 예외 없이 뜨고 `POST /mcp`·`GET /mcp` → 404**" + 변이 V12-20(586행). 이 시험은 5차 문장대로 만든 함수에서 실패한다(항상 통과가 아니다).
+3. 612행 U14 스모크 ⑥ "끄기 예행" — `0` 을 넣고 `up -d` → healthy·`/api/health` 200·`/mcp` 404 → 지우고 → 401. 판정 #24(663행) 근거 열에도 들어갔다.
+수용 기준 문장(686행 부근)과 `docs/backlog.md` 는 바뀌지 않았다 — `verify-plan` "PASS backlog 일치".
+
+**권고 반영 확인**: R5-1·R5-2·R5-3·R5-6·R5-8·R5-9·R5-10·R5-12 는 263행 묶음 불릿에, R5-5 는 264행("주입된 `session_factory()`(운영 기본 `SessionLocal`)")에, R5-11 은 문구 표 `scope`(274행 — "Claude Code 처럼 … 도구에만 연결돼요", Codex CLI 삭제)에 들어갔다. R5-4(SDK 실측·컨테이너 안 `pip freeze`)는 계획에 문장이 없다 — 03-log 로 흡수돼도 된다.
+
+**새로 어긋난 곳 1건 — [권고]**
+- **R6-1 (`trace_id` 를 빼기로 했는데 계약 표·시험 문장은 "그대로" 로 남았다)** 263행 "R5-7: `list_briefings` 결과에서 **`trace_id` 키를 뺀다**" ↔ 254행 도구 계약 "B = `BriefingRecordOut` JSON, `list_briefings(…)` **그대로**" ↔ 560행 `test_mcp_tools` ④ "`list_briefings` 결과가 `read.list_briefings()` dump 와 **같다**". 세 문장을 글자대로 함께 만족할 수 없다. 뜻은 분명하므로(나중에 적힌 263행이 결정) 판정을 바꾸지는 않지만, backend-agent 가 "계획 문장과 다르면 멈추고 보고"(523행)로 멈출 수 있다. → U12 위임 프롬프트에 한 줄: "254행 B = `BriefingRecordOut` JSON 에서 `trace_id` 키를 뺀 것, 560행 ④ 는 '`read.list_briefings()` dump 에서 `trace_id` 를 뺀 것과 같다' + 결과 문자열에 `"trace_id"` 키 0". 재검증 없이 해도 된다.
+
+그 밖에 6차 변경이 기존 문장과 부딪히는 곳은 찾지 못했다(263행 R5-3 "래퍼의 토큰 조회도 스레드로" 는 242행 인증 순서와 순서가 같고, R5-10 은 563행 `u12-live-client` 의 서버 기동 부분만 스크립트 밖으로 옮긴다).
+
+6차에서 검증하지 못한 것: 5차 "검증하지 못한 것" 그대로(SDK 미설치 · Caddy·Docker 미실행 — compose 보간이 `0` 을 읽는지는 U14 ⑥ 이 판정 · Claude Code 실물 미확인 · 전체 시험 미실행).
+
+## 4. 결정
+결과: 통과
+사유(6차): 5차의 유일한 [필수] F5-1 이 계획 532·561·586·612·663행에 반영돼 닫혔고, 카드·backlog·수용 기준은 바뀌지 않았다. 점검표 8행 통과, [필수] 0건. 남은 것은 [권고] R6-1(`trace_id` 문장 맞추기 — 위임 프롬프트 한 줄)과 5차 [권고] 중 계획에 문장이 없는 R5-4, 하네스 R-12 다. 6차 변경분은 **미커밋**이다 — 메인이 01-plan·이 문서를 커밋한 뒤 동결을 푼다.
+(L-006: 사용자 승인 줄은 쓰지 않는다. `결과: 통과` 면 메인 세션이 바로 활성화한다 — 이번에는 `frozen: none` 으로 동결을 푼다.)
+
+**아래는 5차(같은 밤, F5-1 반영 전)의 결정 문장 그대로다 — 당시 판정은 통과가 아니었다.**
+5차 사유: 점검표 8행 중 7행 통과, 3행(D 카드 "코드에서 지켜야 할 것")이 통과하지 못함 — [필수] 1건(F5-1). 계획의 스위치 함수 정의(531행)가 카드 D19 결정 6·D17 지킬 것 5b 와 어긋나 `MCP_ENABLED=0` 이 MCP 를 끄는 대신 backend 시작을 실패시키고, 빈 값은 compose 기본값 때문에 켜진 채로 남는다 — 평가 당일 쓰게 될 유일한 끄기 수단이 서비스 전체를 내린다(실측 증거 `…-switch-probe.txt`). 그 밖에는 이대로 구현하면 틀리거나 위험한 곳을 찾지 못했다: 격리·원문 미노출·해시 저장·쓰기 0·읽기 전용 표시·401 부정 케이스·0005 무삭제·U12 ∥ U13 계약·수용 기준 글자 일치가 카드와 맞고 각각 깨뜨릴 수 있는 시험과 변이가 붙어 있으며, 결정 AS·AN 은 "쿠키·쿼리는 자격이 아니다" 가 시험으로 박혀 있는 한 안전하다.
+**재검증 범위는 좁다**: 531행(`"0"`/`"false"` → `False`), 560행 ①(그 값으로 404 시험 + 변이 한 줄), 610행(끄기 예행 한 줄) 세 곳만 고치면 3행이 통과가 된다 — 다른 행은 다시 보지 않아도 된다. [권고] R5-1(없으면 닫힌 쪽·교차 호출 시험)·R5-2(Claude Code 실물 로컬 확인)는 같은 개정에 넣기를 권한다.
+(5차 당시 문장: 통과가 아니라 메인 세션은 `frozen: CR-008` 을 풀지 않는다 — 위 세 곳을 고친 뒤 재검증. → 6차에서 재검증해 닫혔다.)
+
+---
+
+# 4차 기록 (2026-11-16, 개정 3 대상 — 결과 통과. 아래는 그때의 문서 그대로이며 절 머리·표 행 번호·결과 줄에만 "4차" 를 붙였다)
+
+4차 대상: 01-plan.md (개정 3 — CR-007 가입 닉네임·아이디·닉네임 중복검사) · 검증자 verifier (fable) · 날짜 2026-11-16 (4차)
+
+**(4차 당시 문장) 이 문서의 현재 판정은 4차(아래 1~4절)다.** 3차(개정 2 대상, 2026-11-15, 통과) 기록은 지우지 않고 4절 뒤 "3차 기록" 에 그대로 두었다 — `verify-plan.sh` 가 점검표 행을 `| 1 |`~`| 8 |` 로 세므로 3차 표의 행 번호에만 "3차-" 를 붙였고, 3차의 결과 줄은 "3차 결과:" 로 바꿨다(내용 불변).
 
 4차 기준: HEAD `bfbcdb1`(dev2, `cr(CR-007)` 문서 커밋). `git diff --stat 4be331b..HEAD -- app alembic web tests` 빈 출력 — 운영 반영 해시 뒤로 제품 코드 변경 0. `CURRENT.md` `active: P9b-auth` · `frozen: CR-007`.
 
 4차에서 본 것 — `01-plan.md` 3·4행, 32~47행(사실 15~22·개정 3 목표), 60·72~76행, 120~136행, 152~181행(API 계약 개정 3·닉네임 규칙), 275~362행(U9·U10·U11), 380~388행, 411~417·430~437행, 467~482행(결정 W~AH), 492~494행, 514~521행, 534~546행, 606~623행 · `changes/CR-007.md` 전문 · `decisions/D18-login-user-isolation.md` 결정 3·10·11, 지킬 것 4·10·11 · `specs/S3.1-schema-v2.md` 36~42행 · `security.md` §4·§5 69행 · `CLAUDE.md` 55·87행 · `docs/backlog.md` 99·100·105·122·123행 · 코드 대조: `app/auth/routes.py` 전문, `app/auth/deps.py`, `app/auth/origin.py`, `app/db/models.py` 298~315, `app/db/base.py` naming_convention, `alembic/versions/0003_auth_users.py`, `alembic/env.py`, `app/api/schemas.py` 436~467, `tests/auth_helpers.py` 50~100, `tests/test_auth_helpers.py` 55~110, `tests/test_auth_api.py` 60~90·440~640, `tests/test_auth_required_routes.py` 1~145, `tests/test_migration_0003.py` 100~125·195~236·339~358, `tests/conftest.py`(시험 DB 준비), `web/src/screens/AuthScreen.tsx` 전문, `web/src/auth.tsx`, `web/src/components/AppShell.tsx` 25~58, `web/src/api/client.ts` 40~110·183~197, `web/src/__tests__/auth.test.tsx` 74~108·205~272, `web/e2e/auth.spec.ts` 전문, `web/e2e/fixtures.ts` 30~110, `Caddyfile`, `docker/entrypoint.sh`, `docker-compose.prod.yml`, `Dockerfile` 28~47 · 전수 검색(확장자 지정)은 3절 "닫힌 목록 대조" 에 명령과 결과.
 
-## 1. 기계 검증 출력 (그대로 붙인다 — 요약 금지)
+## 4차-1. 기계 검증 출력 (그대로 붙인다 — 요약 금지)
 명령: `python3 .claude/scripts/save_evidence.py P9b-auth verify-plan-r3-v4 -- bash .claude/scripts/verify-plan.sh P9b-auth`
 저장: `evidence/20261116-0702-verify-plan-r3-v4.txt`(HEAD `bfbcdb1`, exit 0 — 이 문서를 4차로 고치기 **전** 실행). architect 실행분: `evidence/20261116-0656-verify-plan-r3.txt`(HEAD `10872b7`, 같은 PASS 줄). 4차로 고친 **뒤** 다시 실행한 것은 이 절 끝에 파일 이름을 적는다.
 ```
@@ -79,21 +296,21 @@ PASS  registry 중복 없음: app/auth/names.py
 기계 검증이 **보지 못한 것**(R-12, 그대로 열려 있음): "의존 완료" 줄이 `P8-frontend` 하나뿐이고 P4 게이트 줄이 없다(`verify-plan.sh` 62·68행이 `P5b-`·`P9b-` 형 id 를 못 읽는다). 손 확인 — `packages/P8-frontend/04-review.md:296`·`packages/P5b-query-turn/04-review.md:244`·`packages/P4b-er-redesign/04-review.md:144` 가 각각 "결과: 완료". 이 출력의 "PASS 검증자 / 점검표 / 결과" 6줄은 실행 시점의 3차 표를 읽은 것이다 — 4차 표로 고친 뒤 재실행: (아래 한 줄)
 - 4차 갱신 뒤 재실행: `evidence/20261116-0707-verify-plan-r3-v4-after.txt`(exit 0, FAIL=0 WARN=0 — PASS 줄이 위 출력과 한 줄도 다르지 않다. 4차 점검표 8행·`결과:` 줄을 읽은 결과다)
 
-## 2. 정합성 점검표 (기준: `.claude/skills/devlog/SKILL.md` "정합성 점검표") — 4차, 개정 3 대상
+## 4차-2. 정합성 점검표 (기준: `.claude/skills/devlog/SKILL.md` "정합성 점검표") — 4차, 개정 3 대상
 근거 열에는 **카드 파일명 + 인용 문장**을 쓴다. "확인함" 같은 문구는 빈 것으로 간주한다. 아래 행 번호(275행 등)는 `bfbcdb1` 의 `01-plan.md` 기준이다.
 
 | # | 항목 | 결과 | 근거(카드·절·인용) |
 |---|------|------|--------------------|
-| 1 | 범위 — 기획서 2장 제외 목록(상담·A–B·음성·네이티브·페르소나·태그 필터) 침범 없음 | 통과 | `changes/CR-007.md` 15행 "제외 칸 변동 없음 — 닉네임은 **사람(인물)이 아니라 계정의 표시 이름**이라 인물 간(A–B) 관계·고민 상담과 무관하다" ↔ 01-plan 73행 "**제품 속 에이전트가 답·브리핑에서 닉네임으로 사용자를 부르기** — 원칙7 경계 … 밖", 76행 "닉네임을 다른 사용자에게 보이는 곳(공개 프로필·계정 목록) — 범위 밖", 72행 닉네임 변경 없음, 74행 닉네임 로그인 없음, 75행 시도 제한 없음. `CLAUDE.md` 원칙7 "채팅방 목록(여러 대화방) — 계정마다 채팅방은 하나다" ↔ 339행 "채팅방 목록은 여전히 없다(원칙7)". 하지 않는 것 5줄이 명시돼 있다. |
-| 2 | 불변 원칙 1~9 위반 없음 | 통과 | 원칙7 경계 — `CLAUDE.md` "채팅의 조회 답(CR-004 · D16)도 기록된 사실의 재진술로 한정한다" ↔ 결정 AE(479행) "`/auth/*` 응답과 사이드바뿐 — 에이전트 답·브리핑·툴 입력에 쓰지 않음". 실물: `app/` 에서 `username` 을 읽는 곳은 `app/auth/*`·`app/api/schemas.py`·`app/db/models.py`·`app/settings.py` 뿐이고 `Depends(current_user)` 15곳은 `user.id` 만 넘긴다(3절 명령 ⑥) → U9 범위 판정(315행 `u9-scope` "산출물 표의 U9 행과 닫힌 목록 파일만")이 지켜지면 닉네임이 프롬프트·툴로 갈 길이 없다. 원칙5 — `CLAUDE.md` "화면 수를 고정하지 않는다 … UI에 시간을 쓰지 않는다" ↔ 493행 "새 화면 없음 — 관문 화면에 칸·버튼을 더할 뿐". 원칙9 — 494행 "조회 API·가입은 판정이 아니라 trace 0", 312행 시험 "가입이 `persons`·`person_aliases`·`agent_traces` 행을 만들지 않는다", 313행 "쓰기 0". 원칙1~4·8 — 494행 `git diff --stat <기준>..HEAD -- app/er evaluation reports data` 빈 출력(공통 회귀 427행). |
-| 3 | 인용한 D 카드의 "코드에서 지켜야 할 것"과 충돌 없음 | 통과 | `decisions/D18-login-user-isolation.md` 지킬 것 4 "**(CR-007 보충)** 예외에 `GET /auth/availability` 하나를 더한다 — 계약 테스트(`tests/test_auth_required_routes.py`)의 면제 목록도 이름으로 함께 고친다" ↔ B15(306행) "`("GET", "/auth/availability")` 를 **두 곳 모두**에 추가 → 8"; 실물 `tests/test_auth_required_routes.py:34-42`(`_EXEMPT`)·`103-111`(등식) 두 곳이 맞다. 지킬 것 10 "가입과 조회는 같은 정규화 함수 하나를 쓰고, DB UNIQUE 는 그 함수가 돌려준 값에 건다" ↔ 285행 `normalize_nickname(raw) -> str \| None` "가입·조회가 이 함수 하나만 쓴다", 179행 "앱 정규화 값 = DB 비교 대상(함수 인덱스 없음)". 지킬 것 10 "형식 위반(NUL·제어문자·짝 없는 서로게이트 포함)은 **DB 에 묻기 전에** 422" ↔ 162행 "①~③ 은 **DB 조회 0**"; 실측 `evidence/20261116-0704-planverify4-nickname-probe.txt` — NUL·짝 없는 서로게이트·10만 자 모두 예외 없이 `None`(단 앞뒤의 공백류 제어문자는 정규화가 지운다 — R4-1). 지킬 것 11 "중복 조회 API 는 읽기 전용이다(쓰기·`agent_traces`·LLM 호출 0). 로그인 응답(…같은 401)은 바꾸지 않는다" ↔ 163행·157행 "401 `invalid_credentials` — 변경 없음". 결정 11 "둘 다 겹치면 `username_taken`" ↔ 162행 ④→⑤ 순서, 변이 V9-7. |
-| 4 | S 카드와 일치 (스키마·시그니처 v2, 임계치 2개, ask_user 비동기) | 통과 | `specs/S3.1-schema-v2.md` 38행 "users(+ nickname) -- Text NOT NULL, UNIQUE uq_users_nickname(정규화한 값: NFC·앞뒤 공백 제거·영문 소문자)" ↔ 282행 `mapped_column(Text, nullable=False)`·`UniqueConstraint("nickname")`; 이름은 실물 `app/db/base.py` naming_convention `uq_%(table_name)s_%(column_0_N_name)s` → `uq_users_nickname`. 42행 "① `nickname` 을 nullable 로 추가 ② 기존 행을 `nickname = username` 으로 채움 … ③ NOT NULL ④ UNIQUE. **데이터를 지우지 않는다**" ↔ 283행 upgrade ①~④ 같은 순서·"`DELETE`·`TRUNCATE`·`DROP` 0", downgrade "계정 행은 남고 닉네임 값만 사라진다". 41행 "DB CHECK 는 두지 않는다" ↔ 282행. 툴 7종·임계치·`ask_user` 는 건드리지 않는다(`CR-007.md` 26행 "S3.2 … S3.7 **무변경**", 판정 #11 `tools_check` 7/7). |
-| 5 | 의존성 순서 — 선행 P 완료, P4 게이트 | 통과 | 01-plan 5행 "의존: P8-frontend(완료 …) — 충족 · P5b-query-turn(완료 2026-11-09, `f67d8e4`) — 충족 · P4 게이트(P4b 통과 2026-09-23) — 충족" — 세 `04-review.md` "결과: 완료"(1절 손 확인). U9 의존(281행) "U5 커밋(`ca539a1` — 충족)" — `git cat-file -t ca539a1` = commit, `4be331b`(운영 반영)·`f93e7e6`(바깥 스모크)도 존재하고 `4be331b` 는 HEAD 의 조상. 단위 순서 277행 "U9 ∥ U10 → U11 → U8" — U9(`app/`·`alembic/`·`tests/`)와 U10(`web/`)은 파일이 겹치지 않고(120~136행 표), 279행 ①~④ 가 커밋 시점마다 전체 시험이 서는지를 따졌다(3절 "U9 ∥ U10" 에서 대조). U11 의존(356행) "U9·U10 각 verifier 리뷰 통과 + 반영할 해시 … 에서의 전체 pytest·Vitest 증거". |
-| 6 | 수용 기준이 backlog 와 글자 그대로 동일 | 통과 | `docs/backlog.md` 99행 "수용기준: 가입·로그인·로그아웃·내 정보 API 가 동작하고 … + (CR-007) 리비전 0004 가 기존 계정을 지우지 않고 닉네임을 아이디 값으로 채우며 `alembic upgrade head`·`alembic check` 통과, 배포 URL 에서 반영 전 계정이 그대로 로그인되고 닉네임이 보인다" ↔ 01-plan 435행 — 두 문자열을 스크립트로 비교해 `True`(각 1092자, 3절 명령 ⑦). `verify-plan` "PASS backlog 일치". 앞 구절 "`/health`·`/auth/signup`·`/auth/login` 밖의 모든 API 가 로그인 없이 401" 과 뒤 구절 "이 조회는 … 함께 로그인 없이 열린 예외다" 는 437행 주("판정 #2 는 #16 과 함께 읽는다")와 판정 #16(413행 "면제 8 = 공개 4 + 문서 4, 그 밖 전부 401")으로 한 판정이 된다. 판정 #14~#20 은 전부 명령·기대값이 있다(411~417행). |
-| 7 | 작업 단위마다 Refs 태그 | 통과 | 281행 U9 "/ Refs: P9b-auth CR-007 D18 S3.1 security 원칙7 원칙9" · 333행 U10 "/ Refs: P9b-auth CR-007 D18 원칙5 원칙7" · 356행 U11 "/ Refs: P9b-auth CR-007 D18 D17 security"(`verify-plan` "PASS Refs 있음" 12줄 — U1~U11). |
-| 8 | 보안 카드(`security.md`) — 비밀·외부 전송·삭제 규칙 위반 없음 | 통과 | §5 69행 "닉네임은 계정 표시용으로만 저장한다 — 다른 계정에 보이는 곳 0, `agent_traces`·툴 입력·`pending_questions.context` 에 넣지 않는다 … 가입 409 가 이미 같은 정보를 주므로 새로 드러나는 정보는 없지만 묻는 비용이 낮아진다" ↔ 164행 "계정 열거와의 관계(사실)" — 실물 `app/auth/routes.py:108-114` 가 지금도 409 `username_taken` 을 낸다(형식·비밀번호 검사 뒤라 유효한 비밀번호가 필요하고, 안 쓰이는 아이디면 계정이 만들어진다 — "비용만 낮춘다" 는 서술과 맞다). §4 "셸에서 `DROP`/`TRUNCATE` 금지 → Alembic 마이그레이션 파일로" ↔ 283행(리비전 안에서도 삭제문 0), 314행 "`DROP DATABASE` 0", 358행 "볼륨 삭제·`down -v` 0". §4 "로컬 서버 이외로 데이터 전송(`curl -d/-F/-T` …) 금지" ↔ 361행 "바깥 스모크(메인, 본문 없는 GET 만 — security §4)", 가입 POST 는 로컬 Caddy 스모크(358행)로만. §1 ↔ 358행 "비밀번호는 스크래치패드 파일로만, 증거에는 `***`", 429행 "증거에 비밀번호·쿠키 값 0". 422 본문 되울림 — 287행 "같은 `router` — `_NoInputEchoRoute` 가 쿼리 422 에도 적용"(실물 `routes.py:51-75`). |
+| 4차-1 | 범위 — 기획서 2장 제외 목록(상담·A–B·음성·네이티브·페르소나·태그 필터) 침범 없음 | 통과 | `changes/CR-007.md` 15행 "제외 칸 변동 없음 — 닉네임은 **사람(인물)이 아니라 계정의 표시 이름**이라 인물 간(A–B) 관계·고민 상담과 무관하다" ↔ 01-plan 73행 "**제품 속 에이전트가 답·브리핑에서 닉네임으로 사용자를 부르기** — 원칙7 경계 … 밖", 76행 "닉네임을 다른 사용자에게 보이는 곳(공개 프로필·계정 목록) — 범위 밖", 72행 닉네임 변경 없음, 74행 닉네임 로그인 없음, 75행 시도 제한 없음. `CLAUDE.md` 원칙7 "채팅방 목록(여러 대화방) — 계정마다 채팅방은 하나다" ↔ 339행 "채팅방 목록은 여전히 없다(원칙7)". 하지 않는 것 5줄이 명시돼 있다. |
+| 4차-2 | 불변 원칙 1~9 위반 없음 | 통과 | 원칙7 경계 — `CLAUDE.md` "채팅의 조회 답(CR-004 · D16)도 기록된 사실의 재진술로 한정한다" ↔ 결정 AE(479행) "`/auth/*` 응답과 사이드바뿐 — 에이전트 답·브리핑·툴 입력에 쓰지 않음". 실물: `app/` 에서 `username` 을 읽는 곳은 `app/auth/*`·`app/api/schemas.py`·`app/db/models.py`·`app/settings.py` 뿐이고 `Depends(current_user)` 15곳은 `user.id` 만 넘긴다(3절 명령 ⑥) → U9 범위 판정(315행 `u9-scope` "산출물 표의 U9 행과 닫힌 목록 파일만")이 지켜지면 닉네임이 프롬프트·툴로 갈 길이 없다. 원칙5 — `CLAUDE.md` "화면 수를 고정하지 않는다 … UI에 시간을 쓰지 않는다" ↔ 493행 "새 화면 없음 — 관문 화면에 칸·버튼을 더할 뿐". 원칙9 — 494행 "조회 API·가입은 판정이 아니라 trace 0", 312행 시험 "가입이 `persons`·`person_aliases`·`agent_traces` 행을 만들지 않는다", 313행 "쓰기 0". 원칙1~4·8 — 494행 `git diff --stat <기준>..HEAD -- app/er evaluation reports data` 빈 출력(공통 회귀 427행). |
+| 4차-3 | 인용한 D 카드의 "코드에서 지켜야 할 것"과 충돌 없음 | 통과 | `decisions/D18-login-user-isolation.md` 지킬 것 4 "**(CR-007 보충)** 예외에 `GET /auth/availability` 하나를 더한다 — 계약 테스트(`tests/test_auth_required_routes.py`)의 면제 목록도 이름으로 함께 고친다" ↔ B15(306행) "`("GET", "/auth/availability")` 를 **두 곳 모두**에 추가 → 8"; 실물 `tests/test_auth_required_routes.py:34-42`(`_EXEMPT`)·`103-111`(등식) 두 곳이 맞다. 지킬 것 10 "가입과 조회는 같은 정규화 함수 하나를 쓰고, DB UNIQUE 는 그 함수가 돌려준 값에 건다" ↔ 285행 `normalize_nickname(raw) -> str \| None` "가입·조회가 이 함수 하나만 쓴다", 179행 "앱 정규화 값 = DB 비교 대상(함수 인덱스 없음)". 지킬 것 10 "형식 위반(NUL·제어문자·짝 없는 서로게이트 포함)은 **DB 에 묻기 전에** 422" ↔ 162행 "①~③ 은 **DB 조회 0**"; 실측 `evidence/20261116-0704-planverify4-nickname-probe.txt` — NUL·짝 없는 서로게이트·10만 자 모두 예외 없이 `None`(단 앞뒤의 공백류 제어문자는 정규화가 지운다 — R4-1). 지킬 것 11 "중복 조회 API 는 읽기 전용이다(쓰기·`agent_traces`·LLM 호출 0). 로그인 응답(…같은 401)은 바꾸지 않는다" ↔ 163행·157행 "401 `invalid_credentials` — 변경 없음". 결정 11 "둘 다 겹치면 `username_taken`" ↔ 162행 ④→⑤ 순서, 변이 V9-7. |
+| 4차-4 | S 카드와 일치 (스키마·시그니처 v2, 임계치 2개, ask_user 비동기) | 통과 | `specs/S3.1-schema-v2.md` 38행 "users(+ nickname) -- Text NOT NULL, UNIQUE uq_users_nickname(정규화한 값: NFC·앞뒤 공백 제거·영문 소문자)" ↔ 282행 `mapped_column(Text, nullable=False)`·`UniqueConstraint("nickname")`; 이름은 실물 `app/db/base.py` naming_convention `uq_%(table_name)s_%(column_0_N_name)s` → `uq_users_nickname`. 42행 "① `nickname` 을 nullable 로 추가 ② 기존 행을 `nickname = username` 으로 채움 … ③ NOT NULL ④ UNIQUE. **데이터를 지우지 않는다**" ↔ 283행 upgrade ①~④ 같은 순서·"`DELETE`·`TRUNCATE`·`DROP` 0", downgrade "계정 행은 남고 닉네임 값만 사라진다". 41행 "DB CHECK 는 두지 않는다" ↔ 282행. 툴 7종·임계치·`ask_user` 는 건드리지 않는다(`CR-007.md` 26행 "S3.2 … S3.7 **무변경**", 판정 #11 `tools_check` 7/7). |
+| 4차-5 | 의존성 순서 — 선행 P 완료, P4 게이트 | 통과 | 01-plan 5행 "의존: P8-frontend(완료 …) — 충족 · P5b-query-turn(완료 2026-11-09, `f67d8e4`) — 충족 · P4 게이트(P4b 통과 2026-09-23) — 충족" — 세 `04-review.md` "결과: 완료"(1절 손 확인). U9 의존(281행) "U5 커밋(`ca539a1` — 충족)" — `git cat-file -t ca539a1` = commit, `4be331b`(운영 반영)·`f93e7e6`(바깥 스모크)도 존재하고 `4be331b` 는 HEAD 의 조상. 단위 순서 277행 "U9 ∥ U10 → U11 → U8" — U9(`app/`·`alembic/`·`tests/`)와 U10(`web/`)은 파일이 겹치지 않고(120~136행 표), 279행 ①~④ 가 커밋 시점마다 전체 시험이 서는지를 따졌다(3절 "U9 ∥ U10" 에서 대조). U11 의존(356행) "U9·U10 각 verifier 리뷰 통과 + 반영할 해시 … 에서의 전체 pytest·Vitest 증거". |
+| 4차-6 | 수용 기준이 backlog 와 글자 그대로 동일 | 통과 | `docs/backlog.md` 99행 "수용기준: 가입·로그인·로그아웃·내 정보 API 가 동작하고 … + (CR-007) 리비전 0004 가 기존 계정을 지우지 않고 닉네임을 아이디 값으로 채우며 `alembic upgrade head`·`alembic check` 통과, 배포 URL 에서 반영 전 계정이 그대로 로그인되고 닉네임이 보인다" ↔ 01-plan 435행 — 두 문자열을 스크립트로 비교해 `True`(각 1092자, 3절 명령 ⑦). `verify-plan` "PASS backlog 일치". 앞 구절 "`/health`·`/auth/signup`·`/auth/login` 밖의 모든 API 가 로그인 없이 401" 과 뒤 구절 "이 조회는 … 함께 로그인 없이 열린 예외다" 는 437행 주("판정 #2 는 #16 과 함께 읽는다")와 판정 #16(413행 "면제 8 = 공개 4 + 문서 4, 그 밖 전부 401")으로 한 판정이 된다. 판정 #14~#20 은 전부 명령·기대값이 있다(411~417행). |
+| 4차-7 | 작업 단위마다 Refs 태그 | 통과 | 281행 U9 "/ Refs: P9b-auth CR-007 D18 S3.1 security 원칙7 원칙9" · 333행 U10 "/ Refs: P9b-auth CR-007 D18 원칙5 원칙7" · 356행 U11 "/ Refs: P9b-auth CR-007 D18 D17 security"(`verify-plan` "PASS Refs 있음" 12줄 — U1~U11). |
+| 4차-8 | 보안 카드(`security.md`) — 비밀·외부 전송·삭제 규칙 위반 없음 | 통과 | §5 69행 "닉네임은 계정 표시용으로만 저장한다 — 다른 계정에 보이는 곳 0, `agent_traces`·툴 입력·`pending_questions.context` 에 넣지 않는다 … 가입 409 가 이미 같은 정보를 주므로 새로 드러나는 정보는 없지만 묻는 비용이 낮아진다" ↔ 164행 "계정 열거와의 관계(사실)" — 실물 `app/auth/routes.py:108-114` 가 지금도 409 `username_taken` 을 낸다(형식·비밀번호 검사 뒤라 유효한 비밀번호가 필요하고, 안 쓰이는 아이디면 계정이 만들어진다 — "비용만 낮춘다" 는 서술과 맞다). §4 "셸에서 `DROP`/`TRUNCATE` 금지 → Alembic 마이그레이션 파일로" ↔ 283행(리비전 안에서도 삭제문 0), 314행 "`DROP DATABASE` 0", 358행 "볼륨 삭제·`down -v` 0". §4 "로컬 서버 이외로 데이터 전송(`curl -d/-F/-T` …) 금지" ↔ 361행 "바깥 스모크(메인, 본문 없는 GET 만 — security §4)", 가입 POST 는 로컬 Caddy 스모크(358행)로만. §1 ↔ 358행 "비밀번호는 스크래치패드 파일로만, 증거에는 `***`", 429행 "증거에 비밀번호·쿠키 값 0". 422 본문 되울림 — 287행 "같은 `router` — `_NoInputEchoRoute` 가 쿼리 422 에도 적용"(실물 `routes.py:51-75`). |
 
-## 3. 소견과 조치 — 4차
+## 4차-3. 소견과 조치 — 4차
 
 증거 파일: `evidence/20261116-0702-verify-plan-r3-v4.txt`(기계 검증) · `evidence/20261116-0704-planverify4-nickname-probe.txt`(닉네임 규칙 실측 — 저장소 무수정, DB·네트워크 접근 0). 그 밖의 근거는 코드·테스트 파일:줄과 아래 명령.
 
@@ -150,8 +367,8 @@ PASS  registry 중복 없음: app/auth/names.py
 - jsdom 이 `required` 빈 칸에서 제출을 막는지는 실행해 보지 않았다 — F2 가 네 시험 모두에 닉네임을 넣으므로 어느 쪽이든 선다.
 - 배포 서버에는 요청을 보내지 않았다.
 
-## 4. 결정
-결과: 통과
+## 4차-4. 결정
+4차 결과: 통과
 사유: 점검표 8행 통과, [필수] 0건. 개정 3(U9·U10·U11)이 3차까지 통과한 기존 부분과 부딪히는 곳을 찾지 못했다 — 닫힌 목록 B1~B17·F1~F4 는 전수 검색에서 빠진 곳이 없고, 리비전 0004 의 순서·백필 값·UNIQUE·downgrade 가 S3.1 보충과 같으며, 제약 이름은 이 프로젝트의 드라이버(psycopg 3)에서 이미 시험으로 읽히고 있고, 닉네임 정규화는 NUL·짝 없는 서로게이트·10만 자에서 예외 없이 위반으로 끝난다(실측 증거). 남은 것은 [권고] R4-1~R4-11 과 하네스 R-12 이며, R4-1(제어문자 시험 값)·R4-2(`bare_client` 에서 조회 API 를 부르는 방식)·R4-3(비상 되돌리기 명령과 예행)은 위임·U11 전에 한 줄씩 더하기를 권한다. 사용자에게 올릴 것 1·2 는 U9 위임 전에 묻는다.
 (L-006: 사용자 승인 줄은 쓰지 않는다. `결과: 통과` 면 메인 세션이 바로 활성화한다 — 이번에는 `frozen: none` 으로 동결을 푼다.)
 

@@ -696,3 +696,5 @@
 - 2026-11-17 22:36 | PUSH-dev2 | origin dev2 935aa4a (실험 푸시)
 - 2026-11-17 22:38 | COMMIT | e6f1766 docs(P9b-auth): 도메인 relmemo.com 적용과 두 수정의 서버 반영 결과를 남긴다
 - 2026-11-17 22:38 | PUSH-dev2 | origin dev2 e6f1766 (실험 푸시)
+- 2026-11-17 23:07 | COMMIT | b5edf42 cr(wiki): MCP 를 토큰 방식 축소안으로 받아들이고 계획에 넣는다
+- 2026-11-17 23:08 | PUSH-dev2 | origin dev2 b5edf42 (실험 푸시)
