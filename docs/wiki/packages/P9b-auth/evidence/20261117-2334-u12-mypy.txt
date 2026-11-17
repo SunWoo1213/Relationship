@@ -1,0 +1,14 @@
+# 명령: .venv/bin/python scripts/mypy_check.py --run
+# 시각: 2026-11-17T23:34:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 1
+# ---
+[new] 기준선에 없는 새 오류:
+  + app/mcp_server/server.py: [call-arg] Unexpected keyword argument "destructiveHint" for "ToolAnnotations"; did you mean "destructive_hint"? (x1)
+  + app/mcp_server/server.py: [call-arg] Unexpected keyword argument "idempotentHint" for "ToolAnnotations"; did you mean "idempotent_hint"? (x1)
+  + app/mcp_server/server.py: [call-arg] Unexpected keyword argument "openWorldHint" for "ToolAnnotations"; did you mean "open_world_hint"? (x1)
+  + app/mcp_server/server.py: [call-arg] Unexpected keyword argument "readOnlyHint" for "ToolAnnotations"; did you mean "read_only_hint"? (x1)
+
+[FAIL] 새 오류 4건 -- scripts/mypy_baseline.txt 와 비교해 결함이면 고치고,
+기준선에 넣을 것이면 --update-baseline 로 재생성 후 사람이 검토하고 커밋한다.

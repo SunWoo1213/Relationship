@@ -15,6 +15,13 @@
 		reverse_proxy backend:8000
 	}
 
+	# Refs: P9b-auth CR-008 D19 — MCP 읽기 서버. handle_path 가 아니라 handle 이다: 백엔드의 경로도 /mcp 라
+	# 접두를 떼지 않는다. 정확 경로(와일드카드 없음) — 백엔드가 /mcp/ 로 307 돌리지 않는 정확 경로 라우트다.
+	# 반드시 정적 `handle {}` 앞에 둔다(그렇지 않으면 /mcp 가 SPA 의 HTML 200 이 된다).
+	handle /mcp {
+		reverse_proxy backend:8000
+	}
+
 	header /sw.js Cache-Control "no-cache"
 	# `header` 의 경로 매처는 요청 경로 기준이다 — `/` 로 받은 index.html 은 `/index.html` 줄에 안 걸린다(R-U1-4).
 	# 사라진 해시 자산을 가리키는 낡은 index.html 이 캐시되면 흰 화면이 되므로 `/` 도 no-cache.

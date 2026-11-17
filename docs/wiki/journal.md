@@ -698,3 +698,8 @@
 - 2026-11-17 22:38 | PUSH-dev2 | origin dev2 e6f1766 (실험 푸시)
 - 2026-11-17 23:07 | COMMIT | b5edf42 cr(wiki): MCP 를 토큰 방식 축소안으로 받아들이고 계획에 넣는다
 - 2026-11-17 23:08 | PUSH-dev2 | origin dev2 b5edf42 (실험 푸시)
+- 2026-11-17 23:21 | COMMIT | f9f0097 docs(P9b-auth): MCP 계획이 검증을 통과해 동결을 풀고, 소개 대본을 더한다
+- 2026-11-17 23:22 | PUSH-dev2 | origin dev2 f9f0097 (실험 푸시)
+- 2026-11-17 23:36 | COMMIT | 1be2cf4 feat(P9b-auth): 로그인한 화면에 "AI 연결" 화면을 더한다 (U13)
+- 2026-11-17 23:36 | PUSH-dev2 | origin dev2 1be2cf4 (실험 푸시)
+- 2026-11-17 23:43 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |

@@ -1,0 +1,59 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12-review/mutate.py
+# 시각: 2026-11-17T23:48:17+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== CONTROL -- 무변이 대조군
+    app 위치가 사본인가: True
+    결과: 114 passed in 6.50s
+=== R1 -- 토큰 조회가 해시를 비교하지 않음(아무 Bearer 값이나 첫 행의 계정으로 통과)
+    app 위치가 사본인가: True
+    결과: 6 failed, 108 passed in 5.92s
+      잡은 시험: tests/test_mcp_server.py::test_last_used_at_is_set_on_success_and_not_touched_by_a_401
+      잡은 시험: tests/test_mcp_server.py::test_list_briefings_other_accounts_schedule_is_not_found_and_overall_is_empty
+      잡은 시험: tests/test_mcp_server.py::test_other_accounts_card_is_not_found_and_find_person_is_empty
+      잡은 시험: tests/test_mcp_server.py::test_superseded_token_is_401_and_new_one_works
+      잡은 시험: tests/test_mcp_server.py::test_unknown_token_is_401
+      잡은 시험: tests/test_mcp_tokens_api.py::test_second_post_keeps_one_row_and_invalidates_the_previous_token
+    판정: 검출
+=== R2 -- GET 상태가 계정으로 거르지 않음(남의 토큰 시각이 보임)
+    app 위치가 사본인가: True
+    결과: 114 passed in 6.05s
+    판정: 생존
+=== R3 -- 사용자 id 를 못 읽으면 고정(첫) 계정으로 내려감(R5-1 위반)
+    app 위치가 사본인가: True
+    결과: 114 passed in 5.72s
+    판정: 생존
+=== R5 -- 재발급이 만료 시각을 새로 잡지 않음(이전 만료 유지)
+    app 위치가 사본인가: True
+    결과: 114 passed in 5.92s
+    판정: 생존
+=== R6 -- 폐기가 계정으로 거르지 않음(모든 계정 토큰 삭제)
+    app 위치가 사본인가: True
+    결과: 1 failed, 113 passed in 5.81s
+      잡은 시험: tests/test_mcp_tokens_api.py::test_delete_and_get_are_scoped_to_the_logged_in_account
+    판정: 검출
+=== R7 -- MCP 가 켜지면 브리핑 스케줄러가 시작되지 않음
+    app 위치가 사본인가: True
+    결과: 114 passed in 5.67s
+    판정: 생존
+=== R10 -- 래퍼가 last_used_at 갱신을 commit 하지 않음
+    app 위치가 사본인가: True
+    결과: 114 passed in 5.85s
+    판정: 생존
+=== R15 -- GET /auth/mcp-token 응답에 no-store 없음
+    app 위치가 사본인가: True
+    결과: 2 failed, 112 passed in 5.83s
+      잡은 시험: tests/test_mcp_tokens_api.py::test_get_after_issue_is_active_with_exactly_four_keys_and_no_token
+      잡은 시험: tests/test_mcp_tokens_api.py::test_get_without_row_is_inactive_with_three_nulls
+    판정: 검출
+=== R16 -- 래퍼가 다른 헤더(x-mcp-token)도 자격으로 받음
+    app 위치가 사본인가: True
+    결과: 114 passed in 5.81s
+    판정: 생존
+=== R17 -- 브리핑 결과에 계획에 없는 키(owner=user_id)를 덧붙임
+    app 위치가 사본인가: True
+    결과: 1 failed, 113 passed in 5.72s
+      잡은 시험: tests/test_mcp_tools.py::test_list_briefings_equals_read_dump_without_trace_id
+    판정: 검출

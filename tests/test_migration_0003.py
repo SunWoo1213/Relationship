@@ -298,6 +298,8 @@ def test_only_new_tables_have_users_foreign_key_with_cascade(mig):
     assert [(r[0], r[1], r[2]) for r in rows] == [
         ("auth_sessions", "fk_auth_sessions_user_id_users", "c"),
         ("chat_messages", "fk_chat_messages_user_id_users", "c"),
+        # 0005 보충(CR-008) -- head 에서 읽는 시험이라 새 테이블의 users FK 도 여기에 든다(계획 목록 밖 수정, 03-log 보고).
+        ("mcp_tokens", "fk_mcp_tokens_user_id_users", "c"),
     ]
     with mig["engine"].connect() as c:
         for table in ("persons", "push_subscriptions", "pending_questions"):

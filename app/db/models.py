@@ -36,6 +36,9 @@
 "`users` 를 추가하지 않는다" 는 0003 이전(스키마 v2 원본) 기준이다. 새 `question_id`
 는 나중에 채워지는 nullable 컬럼이다(칩이 달린 답에만 값).
 
+(보충 CR-008 · D19, 리비전 0005) `mcp_tokens` 1개가 더해졌다(MCP 개인 접근 토큰 —
+해시만 저장, 계정당 1행). `last_used_at` 은 토큰을 쓰기 전에는 값이 없는 nullable 컬럼이다.
+
 `pending_questions.status` 컬럼은 만들지 않는다(S3.1 에 없음, 미결 항목).
 S3.2 의 `{question_id, status:"pending"}` 은 `answered_at IS NULL` 에서
 애플리케이션이 파생시키는 값이다.
@@ -335,6 +338,25 @@ class AuthSession(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     expires_at: Mapped[object] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class McpToken(Base):
+    """MCP 개인 접근 토큰(0005 보충, CR-008 · D19). 계정당 1행(`user_id` UNIQUE — 다시
+    만들면 이전 토큰은 행 덮어쓰기로 즉시 무효). 토큰 원문은 저장하지 않고 해시만 둔다."""
+
+    __tablename__ = "mcp_tokens"
+    __table_args__ = (UniqueConstraint("user_id"), UniqueConstraint("token_hash"))
+
+    id: Mapped[int] = _pk()
+    user_id: Mapped[str] = mapped_column(
+        Text, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    token_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[object] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    expires_at: Mapped[object] = mapped_column(DateTime(timezone=True), nullable=False)
+    last_used_at: Mapped[object] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class ChatMessage(Base):

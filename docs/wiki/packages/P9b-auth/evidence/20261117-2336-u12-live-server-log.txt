@@ -1,0 +1,8 @@
+# 명령: grep -E mcp_tool|/mcp|manager /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/server.log
+# 시각: 2026-11-17T23:36:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 127
+# ---
+/bin/bash: /mcp: No such file or directory
+/bin/bash: manager: command not found

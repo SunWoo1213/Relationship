@@ -24,3 +24,7 @@ tzdata==2025.3
 # (app/push/sender.py 가 import 하는 유일한 모듈). VAPID 키 생성(py-vapid)·
 # 암호 구현을 직접 쓰지 않는다. 전이 의존성 목록은 U1 03-log 참고.
 pywebpush==2.5.0
+# Refs: P9b-auth U12 CR-008 D19 결정 BA -- MCP 읽기 서버(app/mcp_server/server.py 가 import 하는 유일한
+# 모듈, MCP_ENABLED 가 켜졌을 때만 지연 import). PyPI 공식 SDK 2.3.0(MIT, 2026-11-17 확인).
+# 새 전이 의존성 5개(mcp-types·PyJWT·opentelemetry-api·python-multipart·sse-starlette) — 03-log 참고.
+mcp==2.3.0

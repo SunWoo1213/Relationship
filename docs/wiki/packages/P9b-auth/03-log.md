@@ -266,7 +266,7 @@
 - 남은 것 · 다음 단위: 서버 재배포 → 시연 계정 준비(13번 일정·12번 근황 답 눈으로 확인) → 리허설 → `/devlog done`.
 - Refs: FIX-037 P5-agent-loop P5b-query-turn D16
 
-## 2026-11-18 00:30 · feat(P9b-auth): 로그인한 화면에 "AI 연결" 화면을 더한다 (U13) · pending
+## 2026-11-18 00:30 · feat(P9b-auth): 로그인한 화면에 "AI 연결" 화면을 더한다 (U13) · 1be2cf4
 - 변경(frontend-agent): `web/src/screens/ConnectScreen.tsx`(새) · `#/connect` 경로(`routes.ts`·`App.tsx`) · 사이드바 `<button data-testid="sidebar-connect">`(계정 줄 밖, `AppShell.tsx`) · `api/client.ts` 의 `getMcpToken`/`createMcpToken`/`deleteMcpToken`(+ `DELETE` 메서드) · `api/types.ts` 타입 2개 · 시험 `connect.test.tsx` 11건 + `api.test.ts` 1건 · `review-u13.md` · 증거 `…-u13-*`, `…-verifier-u13-*`.
 - 이유(기획서·카드 연결): CR-008 축소안(사용자 "토큰 방식 축소안") — 계정에서 연결 토큰을 만들어 Claude Code 에 붙인다(D19). 01-plan 개정 4 U13.
 - 정합성 확인: 원칙 5(필요한 화면을 근거와 함께 — 기존 컴포넌트·스타일 그대로) · D19(토큰은 발급 응답에서 한 번만, 외부 전송 고지 문구) · security §1(토큰을 storage·주소·콘솔에 남기지 않음) — 위반 없음. 문구 27개는 계획 표와 글자 그대로(verifier 스크립트 대조 불일치 0).
@@ -275,3 +275,18 @@
 - 남긴 권고: R-1·R-2(토큰 누출·`GET` 실패 갈래 시험 보강 — verifier 탐침 초안이 스크래치패드에 있음) · R-3 · R-4 · R-6. 실제 백엔드와의 맞물림(201 본문 키·204·Origin)은 U14 로컬 Caddy 스모크가 판정한다.
 - 남은 것 · 다음 단위: U12(backend-agent 구현 중) → verifier 리뷰 → U14.
 - Refs: P9b-auth CR-008 D19 D18 원칙5
+
+## 2026-11-17 23:58 · feat(P9b-auth): 읽기 전용 MCP 서버와 계정별 연결 토큰을 더한다 (U12) · pending
+(위 U13 항목의 시각 "11-18 00:30" 은 어림으로 적은 것이다 — 실제 커밋은 11-17 밤.)
+- 변경(backend-agent): 리비전 `0005_mcp_tokens` · `app/auth/mcp_tokens.py`(발급·조회·폐기, 해시만 저장) · `POST`/`GET`/`DELETE /auth/mcp-token` · `app/mcp_server/`(`tools.py` 도구 4개 · `auth.py` Bearer 래퍼 · `server.py`) · `app/main.py`(스위치 켜졌을 때만 `/mcp` 라우트와 세션 관리자) · `app/settings.py` `mcp_enabled()` · `Caddyfile` `handle /mcp` · compose `MCP_ENABLED: ${MCP_ENABLED:-1}` · `requirements.txt` `mcp==2.3.0` · 시험 4파일(18+31+48+8) + `test_deploy_files` ⑱⑲ + `test_auth_required_routes` 1 · 닫힌 목록 M1~M11 · `review-u12.md` · 증거 `…-u12-*`, `…-u12-review-*`.
+- 이유(기획서·카드 연결): CR-008 축소안 · D19 — 쌓인 기억을 다른 AI 도구에서 읽기 전용으로 꺼내 쓴다. 자격은 세션 쿠키가 아니라 계정별 개인 접근 토큰.
+- 정합성 확인: 원칙 7(조회는 기록된 사실의 재진술 — LLM 0) · 원칙 9 · D19 지킬 것(원문 0·`trace_id` 0·`app.tools` import 0·툴 7종 불변) · D18(쿠키는 `/mcp` 자격 아님) · S3.1(0005 보충, `users` FK 3곳) · security §1(토큰 해시만, 로그·증거에 값 0) — 위반 없음.
+- 결과: 전체 pytest 2651 → **2759 passed** = 2651 + 18 + 31 + 48 + 8 + 2 + 1, 실패 0·skip 0(구현자 `u12-pytest-all`, verifier `u12-review-pytest-all`). ruff 통과, mypy 새 오류 0(38/38). 개발 DB `0004 → 0005` 전후 users 12·persons 4·events 10 같음, `alembic check` 무변경, schema_check 13 테이블·FK 9·UNIQUE 8, tools_check 7/7, 금지 import 0. 구현자 변이 35종 검출(V12-19 미실행). verifier 리뷰 **통과**([필수] 0, [권고] R-1~R-8) — verifier 변이 10건 중 검출 4·생존 6(무변이 구현은 탐침 6/6 통과 → 구현 결함이 아니라 시험 빈틈, R-1~R-3).
+- SDK(결정 BA): PyPI `mcp==2.3.0`(MIT, 2026-11-17 확인). 새 전이 의존성 5개 — mcp-types 2.3.0 · PyJWT 2.15.1 · opentelemetry-api 1.45.2 · python-multipart 0.0.34 · sse-starlette 3.7.0. 기존 고정 줄 변경 0, `pip check` 정상.
+- SDK 실물(`.venv/lib/python3.14/site-packages/mcp/`): 서버 클래스 `server/mcpserver/server.py:157 MCPServer`(v1 `FastMCP` 는 v2 에서 제거) · 도구 등록 `:618 add_tool` · 무상태·JSON `:1288 streamable_http_app(stateless_http=True, json_response=True, transport_security=…)` → `server/lowlevel/server.py:732` · 세션 관리자 `server/streamable_http_manager.py:45`·`:86`·`:131 run()`(인스턴스당 한 번) · ASGI 앱 `:420 StreamableHTTPASGIApp` · `ToolAnnotations` `mcp_types/_types.py:1365`(키워드 snake_case, 선에서는 camelCase) · 결과 통과 `utilities/func_metadata.py:204` · 오류 감싸기 `tools/base.py:208-224`.
+- 갈림길: AQ (i) 정확 경로 `Route("/mcp")` 동작(POST 200, Location 없음) · AS `TransportSecuritySettings(enable_dns_rebinding_protection=False)`(`server/transport_security.py:20` — 안 넘기면 `lowlevel/server.py:753-758` 이 localhost 전용 검사를 켠다) · AT 요청 범위 `scope["state"]["relmemo_mcp_user_id"]` 를 도구가 `ctx.request_context.request.scope` 에서 읽음(SDK 태스크 구조에 기대지 않으려고). 핸들러 오류는 `CallToolResult(is_error=True, content=[코드 하나])` 를 직접 반환(SDK 가 `ToolError` 문구를 감싸므로), 형 오류는 SDK 문구(R5-6).
+- 계획과 달라진 점(verifier 판정: 받아들임): ① **닫힌 목록 밖 M12** — `tests/test_migration_0003.py::test_only_new_tables_have_users_foreign_key_with_cascade` 에 `("mcp_tokens","fk_mcp_tokens_user_id_users","c")` 한 줄. 정확 일치 목록이라 0005 가 FK 를 더하면 반드시 늘어야 하고 단언은 약해지지 않았다(S3.1 50행). 원인은 계획 557행이 이 파일을 "깨지지 않음" 에 넣은 것 — 다음 개정에서 541·557행을 M12 로 바로잡는다. ② `PersonNotFound`·`ScheduleNotFound` 를 `app.tools.types` 가 아니라 `app.api.read` 속성으로 참조(D19 지킬 것 5 의 금지 import 와 충돌 회피, R-5). ③ 계획에 글자로 없으나 동작을 넓히지 않는 것 넷: `http` 가 아닌 scope 조기 반환 · 사용자 id 없을 때 로그 `user=-` · `structured_output=False` + 직접 만든 `CallToolResult` · 시계가 `dependency_overrides` 를 요청 시점에 읽음. ④ `_lifespan` 을 `AsyncExitStack` 으로(꺼져 있으면 이전과 같은 순서). ⑤ 로컬 서버 기동에 env 파일 미사용(DB 기본값), `u12-scope` 는 미커밋이라 `git status --short`. ⑥ R6-1 은 "`trace_id` 를 뺀 dump 와 같다" 로 읽음.
+- 로컬 실제 클라이언트(`u12-live-client`, 포트 8765, 종료 확인): 헤더 없음·틀린 토큰·쿠키만 → 401(JSON, `WWW-Authenticate: Bearer`). SDK 클라이언트 `auto`·`legacy` 둘 다 도구 4개·`list_people`·`find_person`·`get_person_card`·없는 id `not_found`. 토큰 출력 0. 임시 계정 정리. SDK 클라이언트는 `Origin` 을 보내지 않았다.
+- 남긴 권고: R-1(토큰 API 시험 ④⑧ 이 "계정으로 거르지 않는 GET"·"재발급이 만료를 새로 쓰지 않음" 변이를 놓침) · R-2(사용자 id 없음 갈래와 `last_used_at` commit 을 지나는 시험 없음) · R-3(두 스위치를 함께 켠 lifespan 시험 없음 — 운영은 둘 다 켠다) · R-5 · R-6(구현자 `u12-live-server-log` 증거가 비어 있음 → U14 의 `docker compose logs backend` 발췌로 메움) · R-7 · R-8(`/mcp/` 끝 슬래시는 Caddy 가 넘기지 않음). 평가 뒤 FIX 후보.
+- 남은 것 · 다음 단위: U14(로컬 Caddy 스모크·끄기 예행·Claude Code 로컬 연결은 미커밋 트리로 먼저 통과 — 커밋 해시로 한 번 더 → 재배포 → 바깥 GET).
+- Refs: P9b-auth CR-008 D19 D18 S3.1 security 원칙7 원칙9

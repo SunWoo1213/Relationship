@@ -9,12 +9,18 @@
 | `POST /auth/logout` | 204(본문 없음) + 쿠키 삭제 | 미로그인 401 `unauthenticated`(F-3) |
 | `GET /auth/me` | 200 `{id, username, nickname}` | 401 `unauthenticated` |
 | `GET /auth/availability` | 200 `{username, nickname}`(각 `available`/`taken`/`invalid`/`null`) · 로그인 불필요 · `Cache-Control: no-store` | 두 쿼리가 모두 없으면 422 `missing_query` |
+| `POST /auth/mcp-token` | 201 `{token, created_at, expires_at}`(`expires_at` = 발급 + 7일) · 로그인 필수 · 이전 토큰은 즉시 무효 · `Cache-Control: no-store` | 401 `unauthenticated` · 403 `bad_origin` |
+| `GET /auth/mcp-token` | 200 `{active, created_at, expires_at, last_used_at}`(`token` 없음) · 로그인 필수 · `Cache-Control: no-store` | 401 |
+| `DELETE /auth/mcp-token` | 204(없어도 204, 멱등) · 로그인 필수 | 401 · 403 `bad_origin` |
 
 - 아이디는 소문자로 정규화한 뒤 `^[a-z0-9_]{3,20}$`(결정 A), 비밀번호는 8~128자(결정 B).
 - 로그인 실패는 없는 아이디도 **더미 해시 검증을 한 번 돌려** 응답 시간 차를 줄인다.
 - 로그·trace·응답·예외 메시지에 비밀번호·토큰 0(D18 지킬 것 3). `/auth/*` 는
   `agent_traces` 를 쓰지 않는다(판정이 아니다, 원칙9 절).
 - `/auth/logout` 의 `endpoint` 가 있으면 그 사용자의 그 푸시 구독 행을 지운다(U5).
+- `/auth/mcp-token`(CR-008 · D19, U12)은 쿠키 로그인이 자격이고, 토큰 값은 `POST` 201 응답
+  본문에만 있다. `agent_traces`·다른 테이블 쓰기 0, 로그에 토큰 0. 로그아웃해도 토큰은
+  남는다(결정 BB).
 """
 
 from __future__ import annotations
@@ -33,8 +39,17 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.api.schemas import AvailabilityOut, LoginIn, LogoutIn, MeOut, SignupIn
+from app.api.schemas import (
+    AvailabilityOut,
+    LoginIn,
+    LogoutIn,
+    McpTokenCreatedOut,
+    McpTokenStatusOut,
+    MeOut,
+    SignupIn,
+)
 from app.auth.deps import current_user, get_auth_now
+from app.auth.mcp_tokens import issue_mcp_token, mcp_token_status, revoke_mcp_token
 from app.auth.names import normalize_nickname
 from app.auth.passwords import dummy_hash, hash_password, is_utf8_encodable, verify_password
 from app.auth.sessions import (
@@ -246,3 +261,42 @@ def availability(
         username=_availability(session, username, "username"),
         nickname=_availability(session, nickname, "nickname"),
     )
+
+
+# ---------------------------------------------------------------------------
+# MCP 개인 접근 토큰(CR-008 · D19, U12) -- 발급·상태·폐기. 쿠키 로그인 필수.
+# ---------------------------------------------------------------------------
+
+
+@router.post("/mcp-token", response_model=McpTokenCreatedOut, status_code=201)
+def create_mcp_token(
+    response: Response,
+    user: User = Depends(current_user),
+    session: Session = Depends(get_session),
+    now: Callable[[], datetime] = Depends(get_auth_now),
+) -> McpTokenCreatedOut:
+    """발급 판정 순서: ① `current_user` ② `now` ③ 새 토큰 ④ upsert ⑤ commit ⑥ 201."""
+    token, created_at, expires_at = issue_mcp_token(session, user.id, now())
+    session.commit()
+    response.headers["Cache-Control"] = "no-store"
+    return McpTokenCreatedOut(token=token, created_at=created_at, expires_at=expires_at)
+
+
+@router.get("/mcp-token", response_model=McpTokenStatusOut)
+def get_mcp_token_status(
+    response: Response,
+    user: User = Depends(current_user),
+    session: Session = Depends(get_session),
+    now: Callable[[], datetime] = Depends(get_auth_now),
+) -> McpTokenStatusOut:
+    response.headers["Cache-Control"] = "no-store"
+    return mcp_token_status(session, user.id, now())
+
+
+@router.delete("/mcp-token", status_code=204, response_class=Response)
+def delete_mcp_token(
+    user: User = Depends(current_user),
+    session: Session = Depends(get_session),
+) -> Response:
+    revoke_mcp_token(session, user.id)
+    return Response(status_code=204)

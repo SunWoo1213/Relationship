@@ -94,12 +94,15 @@ def mig(db_engine: Engine) -> Iterator[dict[str, Any]]:
         engine.dispose()
 
 
-# ① head == 0004 · DB 버전 0004
-def test_head_is_0004_and_db_is_at_0004(mig):
+# ① DB 버전 == 스크립트 head · 0004 는 head 의 이력에 있다(head 리터럴은 후속 리비전 시험이 본다 --
+#    0005 가 생겨 head 가 `0004` 가 아니다, 개정 3 B6·B7 과 같은 방식)
+def test_db_is_at_head_and_0004_is_in_history(mig):
     with _in_mig_env(mig["env"]):
-        head = ScriptDirectory.from_config(mig["cfg"]).get_current_head()
-    assert head == "0004"
-    assert _version(mig["engine"]) == "0004"
+        script = ScriptDirectory.from_config(mig["cfg"])
+        head = script.get_current_head()
+        history = {rev.revision for rev in script.walk_revisions()}
+    assert "0004" in history
+    assert _version(mig["engine"]) == head
 
 
 # ② users 컬럼 집합 = S3.1 0004 보충(5). 시작 상태(0003)는 nickname 이 없었다.
@@ -160,7 +163,9 @@ def test_downgrade_to_0003_keeps_rows_and_upgrade_backfills_again(mig):
             assert _counts(engine) == mig["before"]  # 계정 행은 그대로
         finally:
             command.upgrade(mig["cfg"], "head")
-    assert _version(engine) == "0004"
+    with _in_mig_env(mig["env"]):
+        head = ScriptDirectory.from_config(mig["cfg"]).get_current_head()
+    assert _version(engine) == head  # head 리터럴은 후속 리비전 시험이 본다(개정 3 B6·B7)
     assert _columns(engine, "users") == USERS_COLUMNS
     assert _nicknames(engine) == {"test": "test", "demo_01": "demo_01"}
     assert _counts(engine) == mig["before"]

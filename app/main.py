@@ -28,6 +28,13 @@ DB 접속을 확인하는 것은 아니다(접속 확인은 여전히 `GET /heal
 여기서 잡지 않는다 -- **앱 시작 자체가 실패한다**(원칙8 "조용히 꺼진
 채로 넘어가지 않는다", 02-plan-verify 위임 지시).
 
+## MCP 읽기 서버 (P9b-auth U12, CR-008 · D19)
+
+`MCP_ENABLED`(`mcp_enabled()`)가 켜졌을 때만 `_register_mcp()` 가 정확 경로 `/mcp` 라우트를 더하고
+MCP SDK 를 **지연 import** 한다 -- 꺼져 있으면(코드 기본) 라우트가 없어 404 이고 SDK 를 import 하지 않아
+리스크 A 와 lifespan 동작이 그대로다. 켜져 있으면 `_lifespan` 이 SDK 세션 관리자 `run()` 안에서 브리핑
+작업을 시작한다(종료는 역순). 잘못된 값은 `InvalidValue` 로 앱 시작이 실패한다(원칙8).
+
 예외 매핑 표(01-plan U8 지시):
 
 | 예외 | 상태 | 본문 |
@@ -60,16 +67,20 @@ import contextlib
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
+from starlette.routing import Route
 
 from app.api import router
+from app.auth.deps import get_auth_now
 from app.auth.origin import OriginCheckMiddleware
 from app.auth.routes import router as auth_router
 from app.briefing.scheduler import start_scheduler_task
-from app.settings import briefing_scheduler_enabled, push_dev_page_enabled
+from app.db.session import SessionLocal
+from app.settings import briefing_scheduler_enabled, mcp_enabled, push_dev_page_enabled
 from app.tools.types import (
     ConfirmationRequired,
     InvalidValue,
@@ -108,6 +119,28 @@ def _register_push_dev_page(app: FastAPI) -> None:
             return FileResponse(file_path, media_type=media_type)
 
         app.add_api_route(route_path, _serve, methods=["GET"], include_in_schema=False)
+
+
+def _register_mcp(app: FastAPI) -> None:
+    """`MCP_ENABLED` 가 켜졌을 때만 정확 경로 `/mcp` 를 등록한다(P9b-auth U12, D19 결정 5·6).
+
+    꺼져 있으면(코드 기본) 라우트가 없어 404 이고 **MCP SDK 를 import 하지 않는다**(지연 import --
+    `import app.main` 이 SDK 없이도 된다). 잘못된 스위치 값은 `InvalidValue` 로 앱 시작이 실패한다(원칙8).
+    정확 경로 `Route` 라 `/mcp/` 로 307 리디렉트하지 않는다(결정 AQ (i)).
+
+    시계는 `get_auth_now` 와 같은 UTC 시계이며 `app.dependency_overrides` 로 덮어쓸 수 있다
+    (토큰 API 시험과 같은 방식). 세션은 운영 기본 `SessionLocal`.
+    """
+    if not mcp_enabled():
+        return
+    from app.mcp_server.server import build_mcp_endpoint  # 지연 import -- 꺼져 있으면 SDK 0
+
+    def _now() -> datetime:
+        return app.dependency_overrides.get(get_auth_now, get_auth_now)()()
+
+    endpoint, manager = build_mcp_endpoint(SessionLocal, _now)
+    app.router.routes.append(Route("/mcp", endpoint=endpoint, methods=["GET", "POST", "DELETE"]))
+    app.state.mcp_session_manager = manager
 
 
 def _not_found_handler(request: Request, exc: Exception) -> JSONResponse:
@@ -162,16 +195,22 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
     없는 리스크 A 를 그대로 유지한다. `briefing_scheduler_enabled()` 가
     `InvalidValue` 를 던지면 여기서 잡지 않고 그대로 올려 앱 시작을
     실패시킨다(원칙8)."""
-    task: asyncio.Task[None] | None = None
-    if briefing_scheduler_enabled():
-        task = start_scheduler_task()
-    try:
-        yield
-    finally:
-        if task is not None:
-            task.cancel()
-            with contextlib.suppress(asyncio.CancelledError):
-                await task
+    # (P9b-auth U12, CR-008) MCP 세션 관리자가 있으면(`MCP_ENABLED` 켬) 먼저 열고 브리핑 작업을
+    # 그 안에서 시작한다 -- 종료는 역순(작업 취소 -> 세션 관리자 닫기). 없으면 지금과 완전히 같다.
+    manager = getattr(app.state, "mcp_session_manager", None)
+    async with contextlib.AsyncExitStack() as stack:
+        if manager is not None:
+            await stack.enter_async_context(manager.run())
+        task: asyncio.Task[None] | None = None
+        if briefing_scheduler_enabled():
+            task = start_scheduler_task()
+        try:
+            yield
+        finally:
+            if task is not None:
+                task.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await task
 
 
 def create_app() -> FastAPI:
@@ -185,6 +224,7 @@ def create_app() -> FastAPI:
     app.include_router(router)
     app.include_router(auth_router)
     _register_push_dev_page(app)
+    _register_mcp(app)
 
     app.add_exception_handler(PersonNotFound, _not_found_handler)
     app.add_exception_handler(QuestionNotFound, _not_found_handler)

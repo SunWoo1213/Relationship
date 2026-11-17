@@ -435,6 +435,27 @@
 
 기존 시험 갱신(닫힌 목록 F1~F4): 가입 본문 단언 `{username, nickname, password}`, `ME.nickname='민지'`. E2E 5 passed(목 데이터만 갱신, 가입 화면 새 E2E 는 없음).
 
+## U13 — "AI 연결" 화면 (frontend-agent, 2026-11-17, CR-008)
+
+실행: `npm --prefix web exec -- vitest run --root web` → 224 passed(기준선 212, 새 12). 증거 `evidence/20261117-2324-u13-vitest.txt` · typecheck/lint/build/e2e(5 passed) `…-u13-*.txt` · 변이 `…-u13-mutations.txt`.
+
+| 시험 (`web/src/__tests__/connect.test.tsx`, `api.test.ts`) | 단언 | 결과 |
+|---|---|---|
+| ① 진입점 | `sidebar-connect` 는 `<button>`·`sidebar-account` 밖·글자 `AI 연결`, nav `<a>` href `['#/chat','#/persons','#/briefings']`, 누르면 해시 `#/connect`·화면 `data-screen="connect"`, 제목·intro·privacy·scope·validity 문구 | 통과 |
+| ② 없음 | `statusNone`, `create` 만(`recreate`·`recreateWarn`·`revoke` 없음), `GET` 1회 | 통과 |
+| ② 활성 | `statusActive` · `만료: <ko-KR 시각>` · `마지막 사용: 아직 쓰지 않았어요.`, `recreate`·`recreateWarn`·`revoke` 보임, `create` 없음 | 통과 |
+| ② 만료 | `statusExpired`, `create` 만(`revoke`·`statusActive` 없음) | 통과 |
+| ③ 만들기 | `POST /api/auth/mcp-token` 정확히 1회, `mcp-token` 글자 = 목 토큰, `mcp-command` = `claude mcp add --transport http relmemo ${origin}/mcp --header "Authorization: Bearer <토큰>"` 정확 일치, `onceNotice`·`tokenLabel`·`commandLabel`, 상태 `statusActive`·만료(응답 값)·`neverUsed`, 이어서 `recreate`·`revoke` | 통과 |
+| ④ 복사 | `writeText` 가 토큰·명령 문자열로 1회씩(총 2회), `copied`(`role=status`), 거부되면 `copyFailed` | 통과 |
+| ⑤ 저장소·콘솔·주소 | 만든 뒤 `localStorage`·`sessionStorage` 모든 키·값, `location.href`, console 5종 호출 인자에 토큰 부분 문자열 0 | 통과 |
+| ⑥ 재방문 | 채팅으로 갔다 `sidebar-connect` 로 돌아오면 `mcp-token`·`mcp-command` 없음, `GET` 누적 2회 | 통과 |
+| ⑦ 폐기 | `DELETE` 정확히 1회(`POST` 는 1회 그대로), `revoked`, 토큰·명령 사라짐, 상태 `statusNone`, `revoke` 사라지고 `create` | 통과 |
+| ⑧ 발급 실패 | `POST` 500 → `role=alert` `failed`, 토큰·명령 0, 상태 `statusNone` | 통과 |
+| ⑨ 중복 누름 | 진행 중 두 번 눌러도 `POST` 1회, 버튼 `disabled`, 끝나면 `recreate` 활성 | 통과 |
+| `api.test.ts` MCP 토큰 함수 셋 | `/api/auth/mcp-token` 에 `GET`·`POST`·`DELETE`, `credentials: 'same-origin'`, 본문 없음, 204 → `undefined` | 통과 |
+
+기존 단언 변경 0개(`auth.test.tsx`·`card.test.tsx`·`routes.test.tsx` 그대로 통과). 변이 V13-1~8 + 추가 3종 전부 실패 ≥ 1(보고 표 참조).
+
 ## U9 — 닉네임·중복검사 백엔드 (backend-agent, 2026-11-16, CR-007)
 
 실행: `POSTGRES_PORT=5433 .venv/bin/python -m pytest -q` → **2624 passed · 0 failed · skip 0**(= 기준선 2515 + 새 109: 63 + 38 + 8). 증거 `evidence/20261116-0721-u9-pytest-all-final.txt`, verifier 재실행 `evidence/20261116-0724-review-u9-pytest-all.txt`. 파라미터 시험은 한 줄에 케이스 수를 적는다.
@@ -466,3 +487,126 @@
 | 〃 | `test_lookup_writes_nothing` · `test_response_is_no_store_and_keys_are_exact` · `test_get_with_foreign_origin_is_not_403` | 4개 테이블 행 수 불변, `cache-control: no-store`, 키 `{username,nickname}`, 다른 Origin GET 200 | 통과 |
 | test_migration_0004 | ① `test_head_is_0004_and_db_is_at_0004` ② `test_users_columns_match_s3_1_0004` ③ `test_backfill_sets_nickname_to_username` ④ `test_upgrade_deletes_nothing` ⑤ `test_nickname_is_not_null` ⑥ `test_nickname_is_unique` ⑦ `test_alembic_check_reports_no_new_operations` ⑧ `test_downgrade_to_0003_keeps_rows_and_upgrade_backfills_again` | head `0004`, 컬럼 5개, 닉네임 = 아이디, 행 수 불변, NOT NULL, `uq_users_nickname`, check 무변경, downgrade 뒤 행 유지 + 재 upgrade 재백필 | 통과 |
 | (기존 시험 수정) | 닫힌 목록 B1~B17 — 9파일 | 03-log U9 항목 | 통과 |
+
+## U12 — MCP 백엔드: 리비전 0005·토큰 API·`/mcp` 서버·도구 4개 (backend-agent, 2026-11-17, CR-008 · D19)
+
+새 시험 4파일 + 기존 파일 새 시험 3건. 전체 pytest 2651(시작 전, `u12-pytest-before`) → **2759**(`u12-pytest-all`) = 2651 + 18(`test_mcp_tokens_api`) + 31(`test_mcp_tools`) + 48(`test_mcp_server`) + 8(`test_migration_0005`) + 2(`test_deploy_files` ⑱⑲) + 1(`test_auth_required_routes` 새 함수). 한 줄의 pytest 파라미터 확장은 한 줄로 묶었다. 명령은 모두 `POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/<파일> -q`. 증거 이름의 `20261117-HHMM-` 접두는 시각.
+
+### `tests/test_mcp_tokens_api.py` (롤백 픽스처, 시계 고정 `T0`)
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| `test_three_methods_without_cookie_are_401_unauthenticated` ×3 — 쿠키 없이 POST·GET·DELETE | 위 명령 | 401 `{"detail":{"code":"unauthenticated"}}` | `u12-mcp-tests` |
+| `test_post_returns_201_with_exact_keys_seven_day_expiry_and_no_store` | 〃 | 키 `{token,created_at,expires_at}`·토큰 43자·`expires-created == 7일`·`created == T0`·`Cache-Control: no-store` | 〃 |
+| `test_row_stores_only_the_hash_never_the_token` | 〃 | `token_hash == hash_token(토큰)`·어느 컬럼 값도 토큰 원문 아님·`last_used_at` null | 〃 |
+| `test_second_post_keeps_one_row_and_invalidates_the_previous_token` | 〃 | 행 1·새 해시·이전 토큰 조회 `None`·두 번째 발급 시각 | 〃 |
+| `test_reissue_resets_last_used_at_to_null` | 〃 | 재발급 뒤 `last_used_at` null | 〃 |
+| `test_get_without_row_is_inactive_with_three_nulls` | 〃 | `{"active":false,…null 셋}`·`no-store` | 〃 |
+| `test_get_after_issue_is_active_with_exactly_four_keys_and_no_token` | 〃 | 키 정확히 4·`active true`·응답에 토큰 문자열 0 | 〃 |
+| `test_get_expiry_boundary_same_instant_is_inactive_one_second_before_is_active` | 〃 | `expires−1초` active·`expires` 같은 순간 inactive·세 값은 행 값 그대로 | 〃 |
+| `test_get_shows_last_used_at_after_the_token_is_used` | 〃 | 사용 뒤 `last_used_at` 값 | 〃 |
+| `test_delete_returns_204_removes_the_row_and_is_idempotent` | 〃 | 204·행 0·두 번째도 204 | 〃 |
+| `test_foreign_origin_post_and_delete_are_403_bad_origin_and_change_nothing` | 〃 | 403 `bad_origin`·행 불변 | 〃 |
+| `test_same_origin_post_is_allowed` | 〃 | 같은 출처 201 | 〃 |
+| `test_delete_and_get_are_scoped_to_the_logged_in_account` | 〃 | A 의 DELETE 가 B 행 안 지움·A 의 GET 이 B 시각 안 보임 | 〃 |
+| `test_issue_status_revoke_do_not_touch_other_tables` | 〃 | `persons·events·agent_traces·chat_messages` 행 수 불변 | 〃 |
+| `test_token_never_appears_in_logs_or_non_issue_responses` | 〃 | caplog·GET·DELETE 본문에 토큰 0 | 〃 |
+| `test_unique_constraint_names_exist_in_the_database` | 〃 | `uq_mcp_tokens_user_id`·`uq_mcp_tokens_token_hash` | 〃 |
+
+### `tests/test_mcp_tools.py` (SDK 없이 `tools.py` 직접)
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| `test_list_people_equals_read_list_persons_dump_with_total_and_flag` | 위 명령 | `people` == `list_persons()` dump·순서 그대로·`total 2`·`truncated false`·남의 인물 제외 | `u12-mcp-tests` |
+| `test_list_people_limit_cuts_to_first_n_keeps_total_and_sets_truncated` | 〃 | 한도 2 → 앞 2명·`total 3`·`truncated true` | 〃 |
+| `test_list_people_exactly_at_limit_is_not_truncated` | 〃 | 한도와 같으면 `truncated false`(경계) | 〃 |
+| `test_find_person_returns_every_match_in_list_persons_order` | 〃 | `박 과장`·`박과장님` 둘 다·최근 접촉 순 | 〃 |
+| `test_find_person_same_display_name_returns_both_not_one` | 〃 | 같은 표시 이름 2명 → 둘 다 | 〃 |
+| `test_find_person_matches_alias_case_insensitively` | 〃 | `PARK` ↔ 별칭 `park` | 〃 |
+| `test_find_person_nfd_input_matches_nfc_name` | 〃 | NFD 입력 일치 | 〃 |
+| `test_find_person_without_match_is_empty_not_an_error` | 〃 | `{"matches":[],"total":0,"truncated":false}` | 〃 |
+| `test_find_person_never_returns_another_accounts_person` | 〃 | 남의 인물 0 | 〃 |
+| `test_find_person_rejects_blank_or_too_long_name` ×5 | 〃 | `""`·공백·탭줄바꿈·51자·공백 낀 51자 → `invalid_name` | 〃 |
+| `test_find_person_name_length_boundary_50_ok_51_invalid` | 〃 | 50자(앞뒤 공백 무시) 정상·51자 오류 | 〃 |
+| `test_find_person_control_characters_are_not_a_500` ×5 | 〃 | NUL·제어문자·U+200B 도 예외 없이 `matches: []` | 〃 |
+| `test_find_person_limit_truncates_but_keeps_total` | 〃 | 한도 1 → 1명·`total 2`·`truncated true` | 〃 |
+| `test_find_person_name_max_len_is_read_at_call_time` | 〃 | `MCP_FIND_NAME_MAX_LEN` 을 줄이면 반영(호출 시점 읽기) | 〃 |
+| `test_name_key_removes_all_whitespace_folds_case_and_normalizes` | 〃 | `" 박 \t과\n장 "` → `박과장`·`PaRk` → `park`·NFD → NFC | 〃 |
+| `test_get_person_card_equals_read_dump` | 〃 | 결과 == `read.get_person_card()` dump | 〃 |
+| `test_get_person_card_other_accounts_and_missing_ids_are_not_found` | 〃 | 남의 id·없는 id → `not_found` | 〃 |
+| `test_list_briefings_equals_read_dump_without_trace_id` | 〃 | `trace_id` 만 뺀 dump 와 같음·결과 문자열에 `"trace_id"` 0 | 〃 |
+| `test_list_briefings_by_schedule_id_and_other_accounts_schedule_is_not_found` | 〃 | 지정 일정만·남의/없는 일정 `not_found` | 〃 |
+| `test_no_tool_result_contains_raw_utterance_or_nickname` | 〃 | `RAWMARK-7f3`·`닉표식`·`"raw_utterance"` 키 0, 요약 `content` 는 나감 | 〃 |
+| `test_tools_do_not_change_any_table_row_counts` | 〃 | 11개 모델 행 수 불변 | 〃 |
+| `test_mcp_server_modules_do_not_import_agent_tools_or_llm_providers` | 〃 | `app/mcp_server/*.py` 금지 import 정규식 0 | 〃 · `u12-forbidden-imports` |
+| `test_tools_module_does_not_import_the_sdk` | 〃 | `__init__`·`tools`·`auth` 에 `mcp` import 0 | 〃 |
+
+### `tests/test_mcp_server.py` (`MCP_ENABLED=1`, lifespan, `follow_redirects=False`)
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| `test_disabled_app_has_no_mcp_route` ×4 — 값 없음·빈값·`0`·`false` | 위 명령 | 앱 생성 성공·`POST/GET /mcp` 404·세션 관리자 없음 | `u12-mcp-tests` |
+| `test_import_app_main_does_not_import_the_sdk_when_disabled` | 〃 | 새 인터프리터 `import app.main` 뒤 `mcp` 모듈 0 (`False`) | 〃 |
+| `test_invalid_switch_value_fails_app_start` | 〃 | `MCP_ENABLED=yes` → `InvalidValue` | 〃 |
+| `test_mcp_enabled_values` ×6 · `test_mcp_enabled_rejects_other_values` ×5 | 〃 | 켬 `1`·`true`, 끔 없음·빈값·`0`·`false`, 그 밖(`yes`·`TRUE`·`on`·`2`·` 1`) 오류 | 〃 |
+| `test_no_header_is_401` | 〃 | POST·GET 401·본문 정확·`WWW-Authenticate: Bearer`·JSON | 〃 |
+| `test_non_bearer_or_empty_value_is_401` ×5 | 〃 | `Basic`·`Bearer`·`Bearer `·공백들·`Token` 스킴 | 〃 |
+| `test_unknown_token_is_401` | 〃 | 모르는 토큰 | 〃 |
+| `test_expired_token_is_401_but_one_second_before_is_ok` | 〃 | 만료 경계(`expires` 같은 순간 401, 1초 전 200) | 〃 |
+| `test_revoked_token_is_401` | 〃 | 폐기 뒤 | 〃 |
+| `test_superseded_token_is_401_and_new_one_works` | 〃 | 재발급으로 밀려난 토큰 401·새 토큰 200 | 〃 |
+| `test_scheme_is_case_insensitive_and_value_is_stripped` ×3 | 〃 | `bearer`·`BEARER`·값 앞뒤 공백 | 〃 |
+| `test_missing_or_non_bearer_header_never_queries_the_database` | 〃 | 엔진 없는 세션 팩토리로도 401(DB 조회 0) | 〃 |
+| `test_login_cookie_alone_is_not_a_credential` | 〃 | 유효한 로그인 쿠키만 → 401 | 〃 |
+| `test_query_string_token_is_not_a_credential` ×2 | 〃 | `?token=`·`?access_token=` 만 → 401 | 〃 |
+| `test_bearer_header_is_not_a_credential_for_other_routes` | 〃 | `GET /persons` + Bearer → 401 | 〃 |
+| `test_exact_path_is_served_without_redirect` | 〃 | `POST /mcp` 200·`Location` 없음 | 〃 |
+| `test_foreign_origin_post_is_rejected_by_the_existing_middleware` | 〃 | 다른 Origin → 403 `bad_origin` | 〃 |
+| `test_tools_list_is_exactly_the_four_read_only_tools` | 〃 | 이름 집합 4·표시 3값·`idempotentHint`·입력 스키마에 `user_id`·`username` 0·필수 인자·제목·설명 앞부분·꼬리 | 〃 |
+| `test_initialize_reports_server_name_relmemo` | 〃 | `serverInfo.name == "relmemo"` | 〃 |
+| `test_each_token_sees_only_its_own_accounts_people_across_alternating_calls` | 〃 | A·B 토큰 번갈아 3회 — 각자 자기 인물만 | 〃 |
+| `test_other_accounts_card_is_not_found_and_find_person_is_empty` | 〃 | 남의 카드 `isError`·텍스트 `not_found`, 남의 이름 `matches: []` | 〃 |
+| `test_result_text_and_structured_content_are_the_same_json_object` | 〃 | 텍스트 JSON == `structuredContent` | 〃 |
+| `test_list_briefings_other_accounts_schedule_is_not_found_and_overall_is_empty` | 〃 | 남의 일정 `not_found`·전체는 `{"briefings":[]}` | 〃 |
+| `test_find_person_blank_name_is_invalid_name_error_result` | 〃 | `isError`·텍스트 정확히 `invalid_name` | 〃 |
+| `test_unexpected_exception_becomes_internal_error_without_leaking` | 〃 | 텍스트 `internal_error`·예외 원문 0 | 〃 |
+| `test_missing_user_id_in_request_scope_is_internal_error_not_a_default_user` | 〃 | 사용자 id 못 읽으면 `None`(R5-1) | 〃 |
+| `test_last_used_at_is_set_on_success_and_not_touched_by_a_401` | 〃 | 성공 뒤 `now`·401 뒤 변화 0 | 〃 |
+| `test_one_log_line_per_tool_call_without_token_or_argument_values` | 〃 | `mcp_tool name=… user=… items=…` 5줄 정확·토큰·이름 인자 값 0 | 〃 |
+| `test_tool_calls_do_not_change_row_counts` | 〃 | 11개 모델 행 수 불변 | 〃 |
+| `test_each_create_app_gets_its_own_session_manager_and_both_lifespans_run` | 〃 | 앱마다 세션 관리자·둘 다 lifespan 통과 | 〃 |
+
+### `tests/test_migration_0005.py` (전용 DB `relationship_test_mig`)
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| ① `test_head_is_0005_and_db_is_at_0005` | `POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_migration_0005.py -q` | head·DB `0005`, 시작 상태 테이블 없음 | `u12-mcp-tests` |
+| ② `test_mcp_tokens_columns_match_s3_1` | 〃 | 컬럼 6 | 〃 |
+| ③ `test_upgrade_deletes_nothing` | 〃 | `users`·`auth_sessions`·`chat_messages` 행 수 불변 | 〃 |
+| ④ `test_user_id_is_unique_with_named_constraint` · `test_token_hash_is_unique_with_named_constraint` | 〃 | 제약 이름 `uq_mcp_tokens_user_id`·`uq_mcp_tokens_token_hash` | 〃 |
+| ⑤ `test_deleting_the_user_cascades_to_the_token_row` | 〃 | 계정 삭제 시 토큰 행 0(롤백) | 〃 |
+| ⑥ `test_alembic_check_reports_no_new_operations` | 〃 | 모델 == DB | 〃 |
+| ⑦ `test_downgrade_to_0004_drops_only_the_table_and_upgrade_restores_it_empty` | 〃 | 테이블만 사라지고 행 수 그대로 → 다시 올리면 빈 테이블 | 〃 |
+
+### 기존 파일에 더한 새 시험 · 단언을 바꾼 기존 시험
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| `test_deploy_files::test_caddyfile_mcp_handle_block_is_exact_proxy_before_the_static_handle` (⑱) | `… pytest tests/test_deploy_files.py -q` | `handle /mcp {` + `reverse_proxy backend:8000`·`handle_path /mcp` 없음·와일드카드 없음·정적 `handle {` 보다 앞 | `u12-mcp-tests` |
+| `test_deploy_files::test_compose_backend_enables_mcp_by_default_with_an_env_override` (⑲) | 〃 | compose `MCP_ENABLED: ${MCP_ENABLED:-1}`·`.env.example` 주석 줄 `# MCP_ENABLED=1`(값 줄 없음) | 〃 |
+| `test_auth_required_routes::test_mcp_route_when_enabled_is_401_without_credentials` | `… pytest tests/test_auth_required_routes.py -q` | `MCP_ENABLED=1` 앱의 열거에 `/mcp` 세 메서드·DB 없이 401 `unauthenticated`·면제 등식 그대로 | 〃 |
+| (기존 시험 수정) 닫힌 목록 M1~M11 | `… pytest -q` | 03-log U12 항목 | `u12-pytest-all` |
+| (기존 시험 수정, **계획 목록 밖** M12) `test_migration_0003::test_only_new_tables_have_users_foreign_key_with_cascade` | 〃 | head 에서 읽는 `users` FK 목록에 `mcp_tokens` 행 하나 추가(계획이 "깨지지 않음" 으로 본 곳이 실제로는 깨짐) | 〃 |
+
+### 그 밖 — 판정 표 증거
+
+| 확인 항목 | 결과 | evidence |
+|---|---|---|
+| 개발 DB `0004 → 0005` 전후 행 수(`users 12`·`persons 4`·`events 10`) 같음 | 같음 | `u12-dev-before-counts` · `u12-upgrade` · `u12-dev-after-counts` |
+| `alembic check` | `No new upgrade operations detected.` | `u12-check` |
+| `scripts/schema_check.py` | 13 테이블·FK 9·UNIQUE 8 전부 PASS | `u12-schema-check` |
+| `scripts/tools_check.py` | 7/7 | `u12-tools-check` |
+| 금지 import grep | exit 1(일치 0) | `u12-forbidden-imports` |
+| 로컬 실제 SDK 클라이언트 왕복(두 모드 `auto`·`legacy`) | 도구 4개·`list_people` total 1·카드·`not_found`, 로그인 쿠키만 401, 토큰 출력 0 | `u12-live-client` · `u12-live-server-log` |
+| ruff · mypy 기준선 | `All checks passed!` · 새 오류 없음(38건 = 기준선 38건) | `u12-ruff-final` · `u12-mypy-final`(`u12-mypy`·`u12-ruff` 는 첫 실행 — mypy 가 `ToolAnnotations` 키워드 4건으로 FAIL 한 뒤 고침) |
+| 변이 35종(V12-1~V12-34, V12-19 미실행) | 전부 실패 ≥ 1 로 잡힘 | `u12-mutations` |

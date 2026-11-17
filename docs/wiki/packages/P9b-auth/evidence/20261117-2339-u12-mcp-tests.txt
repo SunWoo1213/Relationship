@@ -1,0 +1,9 @@
+# 명령: .venv/bin/python -m pytest tests/test_mcp_tokens_api.py tests/test_mcp_tools.py tests/test_mcp_server.py tests/test_migration_0005.py tests/test_deploy_files.py tests/test_auth_required_routes.py -q
+# 시각: 2026-11-17T23:39:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+........................................................................ [ 52%]
+..................................................................       [100%]
+138 passed in 4.51s

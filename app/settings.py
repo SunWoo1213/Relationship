@@ -548,3 +548,48 @@ def auth_cookie_secure(env: dict[str, str] | None = None) -> bool:
         "environment variable 'AUTH_COOKIE_SECURE' must be '1'/'true' (secure, default), "
         f"'0'/'false' (local http only), or empty (got {raw!r})"
     )
+
+
+# ---------------------------------------------------------------------------
+# MCP 읽기 서버(P9b-auth U12, CR-008 · D19 결정 2·4·6)
+# ---------------------------------------------------------------------------
+
+#: MCP 개인 접근 토큰 유효 기간(일) -- 발급 뒤 고정, 연장 없음(결정 AL).
+MCP_TOKEN_DAYS = 7
+
+#: `list_people` 결과의 인물 수 상한(결정 AU). 도구는 호출 시점에 이 속성을 읽는다.
+MCP_LIST_PEOPLE_LIMIT = 200
+
+#: `find_person` 결과의 인물 수 상한(결정 AU).
+MCP_FIND_PERSON_LIMIT = 50
+
+#: `find_person` 입력 이름의 최대 길이(앞뒤 공백 제거 뒤 문자 수, 결정 AV).
+MCP_FIND_NAME_MAX_LEN = 50
+
+
+def mcp_enabled(env: dict[str, str] | None = None) -> bool:
+    """`MCP_ENABLED` 를 읽는다(D19 결정 6). 비었거나 없으면 `False`(코드 기본 꺼짐 --
+    `/mcp` 라우트가 없고 MCP SDK 를 import 하지 않는다). `"1"`/`"true"` 는 켬,
+    `"0"`/`"false"` 는 끔. 그 밖의 값은 `InvalidValue`(원칙8).
+
+    `push_dev_page_enabled()` 관례에 **명시적 끄기 값 둘(`"0"`/`"false"`)을 더한 것**이다 --
+    운영 compose 가 `MCP_ENABLED: ${MCP_ENABLED:-1}` 로 기본값을 `1` 로 넣으므로, 서버 `.env`
+    에서 끌 수 있는 값이 따로 있어야 한다(계획 검증 5차 F5-1).
+
+    `env` 를 생략하면 `os.environ` 을 읽는다. `.env` 파일은 읽지 않는다(security §1).
+    """
+    from app.tools.types import InvalidValue  # 지연 import -- 다른 settings 함수와 같은 관례.
+
+    if env is None:
+        env = dict(os.environ)
+    raw = env.get("MCP_ENABLED")
+    if raw is None or raw == "":
+        return False
+    if raw in ("1", "true"):
+        return True
+    if raw in ("0", "false"):
+        return False
+    raise InvalidValue(
+        "environment variable 'MCP_ENABLED' must be '1'/'true' (on), '0'/'false' or empty "
+        f"(off, default) (got {raw!r})"
+    )

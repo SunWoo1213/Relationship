@@ -234,11 +234,11 @@ def _check_foreign_keys(cur, results: list[CheckResult]) -> None:
     )
     rows = cur.fetchall()
     bad = [r for r in rows if r[2] != "c"]
-    ok = len(rows) == 8 and not bad
+    ok = len(rows) == 9 and not bad
     detail = "; ".join(f"{t}.{n}={d}" for t, n, d in rows)
     _emit(
         results,
-        "8 foreign keys all confdeltype='c' (ON DELETE CASCADE)",
+        "9 foreign keys all confdeltype='c' (ON DELETE CASCADE)",
         "PASS" if ok else "FAIL",
         f"count={len(rows)} {detail}",
     )

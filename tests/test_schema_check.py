@@ -21,7 +21,7 @@ from app.db.base import Base  # noqa: E402
 def test_expected_tables_matches_base_metadata_exactly():
     """`EXPECTED_TABLES` 는 하드코딩이 아니라 `Base.metadata.tables` 에서 그대로 가져온 것이다."""
     assert set(sc.EXPECTED_TABLES) == set(Base.metadata.tables.keys())
-    assert len(sc.EXPECTED_TABLES) == 12
+    assert len(sc.EXPECTED_TABLES) == 13  # 0005 보충(CR-008) -- mcp_tokens 추가
 
 
 def test_expected_tables_excludes_person_embeddings_and_relation_tables():
@@ -60,10 +60,10 @@ def test_model_index_expectations_returns_thirteen_names_and_the_partial_index()
     assert partial_name in names
 
 
-def test_model_unique_constraint_expectations_returns_fix_020_three_plus_0003_two_plus_0004_one():
-    """Refs: FIX-020 P9b-auth -- UniqueConstraint 6개(FIX-020 세 개 + 0003 보충
-    users.username·auth_sessions.token_hash + 0004 보충 users.nickname)가
-    `Base.metadata` 에서 그대로 나온다."""
+def test_model_unique_constraint_expectations_returns_fix_020_three_plus_0003_two_plus_0004_one_plus_0005_two():
+    """Refs: FIX-020 P9b-auth -- UniqueConstraint 8개(FIX-020 세 개 + 0003 보충
+    users.username·auth_sessions.token_hash + 0004 보충 users.nickname + 0005 보충
+    mcp_tokens.user_id·token_hash)가 `Base.metadata` 에서 그대로 나온다."""
     expected = sc.model_unique_constraint_expectations()
     assert expected == {
         ("person_facts", "uq_person_facts_person_id_key"),
@@ -72,6 +72,8 @@ def test_model_unique_constraint_expectations_returns_fix_020_three_plus_0003_tw
         ("users", "uq_users_username"),
         ("users", "uq_users_nickname"),
         ("auth_sessions", "uq_auth_sessions_token_hash"),
+        ("mcp_tokens", "uq_mcp_tokens_user_id"),
+        ("mcp_tokens", "uq_mcp_tokens_token_hash"),
     }
 
 

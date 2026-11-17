@@ -49,6 +49,9 @@ services:
       # 특수문자 비밀번호도 안전하고, 비밀번호가 든 URL 꼴을 파일에 두지 않는다.
       DATABASE_URL: postgresql://${POSTGRES_USER}@postgres:5432/${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required (.env)}
+      # Refs: P9b-auth CR-008 D19 — MCP 읽기 서버(`/mcp`). 서버 .env 를 고치지 않아도 켜진다.
+      # 끄려면 서버 .env 에 MCP_ENABLED=0 을 넣고 `up -d`(꺼지면 /mcp 는 404).
+      MCP_ENABLED: ${MCP_ENABLED:-1}
     # 호스트 포트를 노출하지 않는다 — caddy 만 backend:8000 으로 프록시한다.
     depends_on:
       postgres:

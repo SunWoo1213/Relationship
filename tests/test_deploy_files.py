@@ -462,3 +462,29 @@ def test_compose_backend_dependencies_logging_and_tags():
     assert "${APP_ENV_FILE:-.env}" in backend
     assert re.search(r"target:\s*backend", backend)
     assert re.search(r"target:\s*caddy", blocks["caddy"])
+
+
+# ⑱·⑲ (P9b-auth U12, CR-008 · D19) -------------------------------------------------------------
+def test_caddyfile_mcp_handle_block_is_exact_proxy_before_the_static_handle():
+    """⑱ `handle /mcp { reverse_proxy backend:8000 }` -- 접두를 떼는 `handle_path` 가 아니다(백엔드 경로도
+    `/mcp`), 와일드카드 없음, 정적 `handle {` 블록보다 앞이다(뒤면 /mcp 가 SPA 의 HTML 200 이 된다)."""
+    code = _code_text(CADDYFILE)
+
+    block = _brace_block(code, r"handle\s+/mcp")
+    assert block, "handle /mcp 블록이 없다"
+    assert re.search(r"reverse_proxy\s+backend:8000\b", block)
+    assert not re.search(r"handle_path\s+/mcp", code)
+    assert not re.search(r"handle\s+/mcp\S", code)  # `/mcp*`·`/mcp/` 같은 와일드카드·접미 없음
+    mcp_at = re.search(r"handle\s+/mcp\s*\{", code).start()
+    static_at = re.search(r"^\s*handle\s*\{", code, re.M).start()
+    assert mcp_at < static_at
+
+
+def test_compose_backend_enables_mcp_by_default_with_an_env_override():
+    """⑲ backend `environment` 에 `MCP_ENABLED: ${MCP_ENABLED:-1}` -- 서버 .env 를 고치지 않아도 켜지고,
+    `.env` 의 값(`0`)으로 끌 수 있다."""
+    backend = _service_blocks(_read(COMPOSE))["backend"]
+
+    assert re.search(r"^\s*MCP_ENABLED:\s*\$\{MCP_ENABLED:-1\}\s*$", backend, re.M)
+    assert re.search(r"^# MCP_ENABLED=1\s*$", _read(ENV_EXAMPLE), re.M)
+    assert not re.search(r"^MCP_ENABLED=\S", _read(ENV_EXAMPLE), re.M)  # 이름 줄에 값을 박지 않는다

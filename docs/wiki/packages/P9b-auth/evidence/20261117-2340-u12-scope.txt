@@ -1,0 +1,63 @@
+# 명령: git status --short
+# 시각: 2026-11-17T23:40:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+ M .env.example
+ M Caddyfile
+ M app/api/schemas.py
+ M app/auth/__init__.py
+ M app/auth/routes.py
+ M app/db/models.py
+ M app/main.py
+ M app/settings.py
+ M docker-compose.prod.yml
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M docs/wiki/packages/P9b-auth/tests.md
+ M docs/wiki/packages/P9b-auth/u8-demo-script.md
+ M docs/wiki/registry.md
+ M requirements.txt
+ M scripts/schema_check.py
+ M tests/test_api.py
+ M tests/test_auth_required_routes.py
+ M tests/test_deploy_files.py
+ M tests/test_migration_0003.py
+ M tests/test_migration_0004.py
+ M tests/test_schema_check.py
+ M tests/test_schema_models.py
+?? alembic/versions/0005_mcp_tokens.py
+?? app/auth/mcp_tokens.py
+?? app/mcp_server/
+?? docs/wiki/fixes/evidence/20261108-2000-L-007-test-guards.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261107-1455-u7fix-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261108-2009-u7fix3-review-baseline.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1512-u3b-mutations-names.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-2132-u11-deployed-get.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-2132-u11-deployed-get2.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2322-u12-pytest-before.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2323-u12-pip-freeze-after.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2323-u12-pip-freeze-before.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2323-u12-pip-install-mcp.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2334-u12-mypy.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2334-u12-ruff.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2335-u12-check.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2335-u12-dev-after-counts.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2335-u12-dev-before-counts.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2335-u12-forbidden-imports.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2335-u12-schema-check.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2335-u12-tools-check.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2335-u12-upgrade.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2336-u12-live-client.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2336-u12-live-server-log.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2338-u12-mutations.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2339-u12-mcp-tests.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2339-u12-pytest-all.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2340-u12-mypy-final.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2340-u12-pip-freeze-final.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261117-2340-u12-ruff-final.txt
+?? tests/test_mcp_server.py
+?? tests/test_mcp_tokens_api.py
+?? tests/test_mcp_tools.py
+?? tests/test_migration_0005.py

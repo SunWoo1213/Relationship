@@ -9,6 +9,10 @@
   켜진 경우의 정적 개발 페이지는 고정 사용자를 쓰지 않는 파일 서빙이라 이 계약의 대상이 아니다(R-4 ③)
   -- 켜진 앱에서는 그 세 경로만 면제임을 `test_push_dev_page_routes_are_the_only_other_exempt` 가 이름으로 본다.
 
+(CR-008) **`/mcp` 는 면제가 아니라 다른 자격이다**(D18 결정 3 CR-008 보충 -- `Authorization: Bearer`
+토큰). `/mcp` 는 `MCP_ENABLED` 를 켠 앱에만 있어 이 열거(스위치 꺼짐)에는 나오지 않는다 -- 켠 앱의 열거는
+아래 `test_mcp_route_when_enabled_is_401_without_credentials` 가 본다. `_EXEMPT`·면제 등식은 그대로다.
+
 `import app.auth.deps` 를 **맨 먼저** 해도 순환 import 가 나지 않는지도 새 인터프리터로 본다(U2 인계 —
 `app.api.*` → `app.auth.deps` → `app.db.session` 한 방향이어야 한다).
 """
@@ -58,6 +62,10 @@ _MUST_REQUIRE_LOGIN = {
     ("GET", "/briefings"),
     ("POST", "/auth/logout"),  # F-3 -- 로그아웃도 미로그인 401
     ("GET", "/auth/me"),
+    # CR-008 -- MCP 토큰 발급 API 는 쿠키 로그인이 자격이다(`/mcp` 자체는 면제가 아니라 다른 자격).
+    ("POST", "/auth/mcp-token"),
+    ("GET", "/auth/mcp-token"),
+    ("DELETE", "/auth/mcp-token"),
 }
 
 
@@ -126,6 +134,28 @@ def test_every_non_exempt_route_requires_login(bare_client):
         checked.append((method, path))
     # 열거가 비어 헛통과하지 않는다 -- 보호 대상 13개가 전부 검사됐다.
     assert _MUST_REQUIRE_LOGIN <= set(checked)
+
+
+def test_mcp_route_when_enabled_is_401_without_credentials(monkeypatch):
+    """(CR-008, 결정 AN) `MCP_ENABLED=1` 인 앱의 열거에는 `/mcp` 세 메서드가 있고, 쿠키·헤더 없이는 DB 조회
+    없이 같은 401 `unauthenticated` 다. 면제 등식(`_EXEMPT`)·보호 목록은 그대로다."""
+    from sqlalchemy.orm import Session
+
+    monkeypatch.setenv("MCP_ENABLED", "1")
+    monkeypatch.setattr("app.main.SessionLocal", lambda: Session())  # DB 에 가면 오류(500)
+    app = create_app()
+    app.dependency_overrides[get_session] = lambda: Session()
+    enumerated = set(_routes(app))
+
+    assert {("GET", "/mcp"), ("POST", "/mcp"), ("DELETE", "/mcp")} <= enumerated
+    assert _MUST_REQUIRE_LOGIN <= enumerated
+    client = TestClient(app, base_url="https://testserver")
+    for method, path in sorted(enumerated):
+        if (method, path) in _EXEMPT:
+            continue
+        resp = client.request(method, _fill_path(path), json={})
+        assert resp.status_code == 401, f"{method} {path} -> {resp.status_code}"
+        assert resp.json() == UNAUTHENTICATED, f"{method} {path}"
 
 
 def test_logout_without_login_is_401_not_exempt(bare_client):

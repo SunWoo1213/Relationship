@@ -1,0 +1,33 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12-review/probe.py
+# 시각: 2026-11-17T23:51:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== 탐침 6건 vs CONTROL -- 무변이 대조군
+    6 passed in 0.77s
+=== 탐침 6건 vs R2 -- GET 상태가 계정으로 거르지 않음(남의 토큰 시각이 보임)
+    E   AssertionError: assert {'active': Tr...sed_at': None} == {'active': Fa...sed_at': None}
+    /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12-review/copy/tests/test_probe_verifier.py:53: AssertionError: assert {'active': Tr...sed_at': None} == {'active': Fa...sed_at': None}
+    FAILED tests/test_probe_verifier.py::test_p1_status_is_scoped_even_when_only_the_other_account_has_a_row - AssertionError: assert {'active': Tr...sed_at': None} == {'active': Fa...sed_at': None}
+    1 failed, 5 passed in 0.77s
+=== 탐침 6건 vs R5 -- 재발급이 만료 시각을 새로 잡지 않음(이전 만료 유지)
+    E   AssertionError: assert datetime.datetime(2026, 11, 25, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')) == (datetime.datetime(2026, 11, 18, 9, 0, tzinfo=datetime.timezone.utc) + datetime.timedelta(days=7, seconds=3600))
+    /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12-review/copy/tests/test_probe_verifier.py:69: AssertionError: assert datetime.datetime(2026, 11, 25, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')) == (datetime.datetime(2026, 11, 
+    FAILED tests/test_probe_verifier.py::test_p2_reissue_rewrites_row_expiry - AssertionError: assert datetime.datetime(2026, 11, 25, 9, 0, tzinfo=zoneinfo.ZoneInfo(key='Etc/UTC')) == (datetime.datetime(2026, 11, 18, 9, 0, tzinfo=datetime.timezone.utc) + datetime.timedelta(days=7, seconds=3600))
+    1 failed, 5 passed in 0.78s
+=== 탐침 6건 vs R3 -- 사용자 id 를 못 읽으면 고정(첫) 계정으로 내려감(R5-1 위반)
+    E   assert [1, 1, 1, 1] == []
+    FAILED tests/test_probe_verifier.py::test_p3_tool_without_user_id_never_opens_a_session - assert [1, 1, 1, 1] == []
+    1 failed, 5 passed in 0.77s
+=== 탐침 6건 vs R7 -- MCP 가 켜지면 브리핑 스케줄러가 시작되지 않음
+    E   KeyError: 't'
+    /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12-review/copy/tests/test_probe_verifier.py:139: KeyError: 't'
+    FAILED tests/test_probe_verifier.py::test_p4_lifespan_with_both_switches_starts_and_cancels_scheduler_in_order - KeyError: 't'
+    1 failed, 5 passed in 0.78s
+=== 탐침 6건 vs R10 -- 래퍼가 last_used_at 갱신을 commit 하지 않음
+    E   assert [] == [1]
+    FAILED tests/test_probe_verifier.py::test_p5_wrapper_commits_last_used_at - assert [] == [1]
+    1 failed, 5 passed in 0.77s
+=== 탐침 6건 vs R16 -- 래퍼가 다른 헤더(x-mcp-token)도 자격으로 받음
+    6 passed in 0.78s

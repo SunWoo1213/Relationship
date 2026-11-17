@@ -471,6 +471,24 @@ class MeOut(BaseModel):
     nickname: str
 
 
+class McpTokenCreatedOut(BaseModel):
+    """`POST /auth/mcp-token` 201 응답(CR-008 · D19). `token` 은 이 응답 하나에만 실린다 --
+    상태 응답(`McpTokenStatusOut`)에는 필드 자체가 없다."""
+
+    token: str
+    created_at: datetime
+    expires_at: datetime
+
+
+class McpTokenStatusOut(BaseModel):
+    """`GET /auth/mcp-token` 응답. 토큰 값은 담지 않는다(필드 자체가 없다)."""
+
+    active: bool
+    created_at: datetime | None
+    expires_at: datetime | None
+    last_used_at: datetime | None
+
+
 class AvailabilityOut(BaseModel):
     """`GET /auth/availability` 응답(CR-007). 묻지 않은 필드는 `None`(JSON `null`).
     id·다른 필드는 담지 않는다."""

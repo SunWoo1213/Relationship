@@ -1,0 +1,493 @@
+
+# ===== append 2026-11-17T23:38:09+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-1
+# 시각: 2026-11-17T23:38:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-1 -- 해시 대신 원문 저장
+    결과: 22 failed, 44 passed in 1.94s
+      잡은 테스트: tests/test_mcp_server.py::test_each_create_app_gets_its_own_session_manager_and_both_lifespans_run
+      잡은 테스트: tests/test_mcp_server.py::test_each_token_sees_only_its_own_accounts_people_across_alternating_calls
+      잡은 테스트: tests/test_mcp_server.py::test_exact_path_is_served_without_redirect
+      잡은 테스트: tests/test_mcp_server.py::test_expired_token_is_401_but_one_second_before_is_ok
+      잡은 테스트: tests/test_mcp_server.py::test_find_person_blank_name_is_invalid_name_error_result
+      잡은 테스트: tests/test_mcp_server.py::test_initialize_reports_server_name_relmemo
+      잡은 테스트: tests/test_mcp_server.py::test_last_used_at_is_set_on_success_and_not_touched_by_a_401
+      잡은 테스트: tests/test_mcp_server.py::test_list_briefings_other_accounts_schedule_is_not_found_and_overall_is_empty
+      잡은 테스트: tests/test_mcp_server.py::test_one_log_line_per_tool_call_without_token_or_argument_values
+      잡은 테스트: tests/test_mcp_server.py::test_other_accounts_card_is_not_found_and_find_person_is_empty
+      잡은 테스트: tests/test_mcp_server.py::test_result_text_and_structured_content_are_the_same_json_object
+      잡은 테스트: tests/test_mcp_server.py::test_revoked_token_is_401
+      잡은 테스트: tests/test_mcp_server.py::test_scheme_is_case_insensitive_and_value_is_stripped
+      잡은 테스트: tests/test_mcp_server.py::test_superseded_token_is_401_and_new_one_works
+      ... 외 8개 테스트
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:12+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-2a
+# 시각: 2026-11-17T23:38:12+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-2a -- 인증 만료 비교 > -> >=
+    결과: 1 failed, 47 passed in 1.77s
+      잡은 테스트: tests/test_mcp_server.py::test_expired_token_is_401_but_one_second_before_is_ok
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:14+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-2b
+# 시각: 2026-11-17T23:38:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-2b -- 상태 만료 비교 > -> >=
+    결과: 1 failed, 17 passed in 0.78s
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_get_expiry_boundary_same_instant_is_inactive_one_second_before_is_active
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:16+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-3
+# 시각: 2026-11-17T23:38:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-3 -- 재발급이 user_id 충돌을 처리하지 않음(새 행 INSERT)
+    결과: 3 failed, 63 passed in 2.10s
+      잡은 테스트: tests/test_mcp_server.py::test_superseded_token_is_401_and_new_one_works
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_reissue_resets_last_used_at_to_null
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_second_post_keeps_one_row_and_invalidates_the_previous_token
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:19+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-4
+# 시각: 2026-11-17T23:38:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-4 -- DELETE 가 행을 지우지 않음
+    결과: 3 failed, 63 passed in 2.10s
+      잡은 테스트: tests/test_mcp_server.py::test_revoked_token_is_401
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_delete_and_get_are_scoped_to_the_logged_in_account
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_delete_returns_204_removes_the_row_and_is_idempotent
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:21+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-5
+# 시각: 2026-11-17T23:38:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-5 -- 래퍼가 로그인 쿠키를 자격으로 받음
+    결과: 1 failed, 47 passed in 1.81s
+      잡은 테스트: tests/test_mcp_server.py::test_login_cookie_alone_is_not_a_credential
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:24+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-6
+# 시각: 2026-11-17T23:38:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-6 -- 래퍼가 ?token= 쿼리를 자격으로 받음
+    결과: 2 failed, 46 passed in 1.78s
+      잡은 테스트: tests/test_mcp_server.py::test_query_string_token_is_not_a_credential
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:26+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-7
+# 시각: 2026-11-17T23:38:26+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-7 -- 도구가 인증된 사용자 대신 첫 계정 id 를 씀
+    결과: 1 failed, 47 passed in 1.79s
+      잡은 테스트: tests/test_mcp_server.py::test_each_token_sees_only_its_own_accounts_people_across_alternating_calls
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:29+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-8
+# 시각: 2026-11-17T23:38:29+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-8 -- find_person 이 첫 일치 1명만
+    결과: 2 failed, 77 passed in 2.00s
+      잡은 테스트: tests/test_mcp_tools.py::test_find_person_returns_every_match_in_list_persons_order
+      잡은 테스트: tests/test_mcp_tools.py::test_find_person_same_display_name_returns_both_not_one
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:32+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-9
+# 시각: 2026-11-17T23:38:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-9 -- 카드 결과에 사건 원문 덧붙임
+    결과: 2 failed, 29 passed in 0.64s
+      잡은 테스트: tests/test_mcp_tools.py::test_get_person_card_equals_read_dump
+      잡은 테스트: tests/test_mcp_tools.py::test_no_tool_result_contains_raw_utterance_or_nickname
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:33+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-10
+# 시각: 2026-11-17T23:38:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-10 -- readOnlyHint 를 뺌
+    결과: 1 failed, 47 passed in 1.80s
+      잡은 테스트: tests/test_mcp_server.py::test_tools_list_is_exactly_the_four_read_only_tools
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:36+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-11
+# 시각: 2026-11-17T23:38:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-11 -- 다섯 번째 도구 등록
+    결과: 1 failed, 47 passed in 1.82s
+      잡은 테스트: tests/test_mcp_server.py::test_tools_list_is_exactly_the_four_read_only_tools
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:38+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-12
+# 시각: 2026-11-17T23:38:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-12 -- mcp_enabled() 무시하고 항상 등록
+    결과: 7 failed, 41 passed in 2.05s
+      잡은 테스트: tests/test_mcp_server.py::test_disabled_app_has_no_mcp_route
+      잡은 테스트: tests/test_mcp_server.py::test_import_app_main_does_not_import_the_sdk_when_disabled
+      잡은 테스트: tests/test_mcp_server.py::test_invalid_switch_value_fails_app_start
+      잡은 테스트: tests/test_mcp_server.py::test_one_log_line_per_tool_call_without_token_or_argument_values
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:41+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-13
+# 시각: 2026-11-17T23:38:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-13 -- Caddyfile handle -> handle_path
+    결과: 2 failed, 19 deselected in 0.09s
+      잡은 테스트: tests/test_deploy_files.py::test_caddyfile_mcp_handle_block_is_exact_proxy_before_the_static_handle
+      잡은 테스트: tests/test_deploy_files.py::test_compose_backend_enables_mcp_by_default_with_an_env_override
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:41+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-14a
+# 시각: 2026-11-17T23:38:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-14a -- 로그에 토큰 포함
+    결과: 1 failed, 47 passed in 1.80s
+      잡은 테스트: tests/test_mcp_server.py::test_one_log_line_per_tool_call_without_token_or_argument_values
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:44+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-14b
+# 시각: 2026-11-17T23:38:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-14b -- 로그에 이름 인자 포함
+    결과: 1 failed, 47 passed in 1.80s
+      잡은 테스트: tests/test_mcp_server.py::test_one_log_line_per_tool_call_without_token_or_argument_values
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:47+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-15
+# 시각: 2026-11-17T23:38:47+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-15 -- GET 응답에 token 필드
+    결과: 2 failed, 16 passed in 0.79s
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_get_after_issue_is_active_with_exactly_four_keys_and_no_token
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_get_without_row_is_inactive_with_three_nulls
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:48+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-16
+# 시각: 2026-11-17T23:38:48+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-16 -- GET /auth/mcp-token 에서 current_user 제거
+    결과: 5 failed, 25 passed in 2.96s
+      잡은 테스트: tests/test_auth_required_routes.py::test_every_api_route_declares_current_user_dependency
+      잡은 테스트: tests/test_auth_required_routes.py::test_every_non_exempt_route_requires_login
+      잡은 테스트: tests/test_auth_required_routes.py::test_mcp_route_when_enabled_is_401_without_credentials
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_delete_and_get_are_scoped_to_the_logged_in_account
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_three_methods_without_cookie_are_401_unauthenticated
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:52+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-17
+# 시각: 2026-11-17T23:38:52+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-17 -- 0005 upgrade 에 DELETE FROM users
+    결과: 4 failed, 4 passed in 0.46s
+      잡은 테스트: tests/test_migration_0005.py::test_downgrade_to_0004_drops_only_the_table_and_upgrade_restores_it_empty
+      잡은 테스트: tests/test_migration_0005.py::test_token_hash_is_unique_with_named_constraint
+      잡은 테스트: tests/test_migration_0005.py::test_upgrade_deletes_nothing
+      잡은 테스트: tests/test_migration_0005.py::test_user_id_is_unique_with_named_constraint
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:53+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-18
+# 시각: 2026-11-17T23:38:53+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-18 -- 헤더 없음에서도 DB 조회
+    결과: 1 failed, 47 passed in 1.82s
+      잡은 테스트: tests/test_mcp_server.py::test_missing_or_non_bearer_header_never_queries_the_database
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:55+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-20
+# 시각: 2026-11-17T23:38:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-20 -- mcp_enabled() 가 0 을 InvalidValue 로
+    결과: 4 failed, 44 passed in 1.78s
+      잡은 테스트: tests/test_mcp_server.py::test_disabled_app_has_no_mcp_route
+      잡은 테스트: tests/test_mcp_server.py::test_mcp_enabled_values
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:58+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-21
+# 시각: 2026-11-17T23:38:58+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-21 -- name_key 공백 제거 빠짐
+    결과: 4 failed, 27 passed in 0.64s
+      잡은 테스트: tests/test_mcp_tools.py::test_find_person_rejects_blank_or_too_long_name
+      잡은 테스트: tests/test_mcp_tools.py::test_find_person_returns_every_match_in_list_persons_order
+      잡은 테스트: tests/test_mcp_tools.py::test_name_key_removes_all_whitespace_folds_case_and_normalizes
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:38:59+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-22
+# 시각: 2026-11-17T23:38:59+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-22 -- 브리핑 결과에서 trace_id 안 뺌
+    결과: 1 failed, 78 passed in 2.01s
+      잡은 테스트: tests/test_mcp_tools.py::test_list_briefings_equals_read_dump_without_trace_id
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:02+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-23
+# 시각: 2026-11-17T23:39:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-23 -- 토큰 유효 7 -> 8일
+    결과: 4 failed, 14 passed in 0.78s
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_get_after_issue_is_active_with_exactly_four_keys_and_no_token
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_get_expiry_boundary_same_instant_is_inactive_one_second_before_is_active
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_post_returns_201_with_exact_keys_seven_day_expiry_and_no_store
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_second_post_keeps_one_row_and_invalidates_the_previous_token
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:03+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-24
+# 시각: 2026-11-17T23:39:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-24 -- 이름 길이 경계 > -> >=
+    결과: 2 failed, 29 passed in 0.64s
+      잡은 테스트: tests/test_mcp_tools.py::test_find_person_name_length_boundary_50_ok_51_invalid
+      잡은 테스트: tests/test_mcp_tools.py::test_find_person_name_max_len_is_read_at_call_time
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:04+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-25
+# 시각: 2026-11-17T23:39:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-25 -- list_people truncated > -> >=
+    결과: 1 failed, 30 passed in 0.64s
+      잡은 테스트: tests/test_mcp_tools.py::test_list_people_exactly_at_limit_is_not_truncated
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:06+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-26
+# 시각: 2026-11-17T23:39:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-26 -- 스킴 대소문자 구분
+    결과: 1 failed, 47 passed in 1.80s
+      잡은 테스트: tests/test_mcp_server.py::test_scheme_is_case_insensitive_and_value_is_stripped
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:08+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-27
+# 시각: 2026-11-17T23:39:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-27 -- 토큰 값 strip 빠짐
+    결과: 1 failed, 47 passed in 1.81s
+      잡은 테스트: tests/test_mcp_server.py::test_scheme_is_case_insensitive_and_value_is_stripped
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:11+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-28
+# 시각: 2026-11-17T23:39:11+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-28 -- last_used_at 갱신 빠짐
+    결과: 3 failed, 63 passed in 2.17s
+      잡은 테스트: tests/test_mcp_server.py::test_last_used_at_is_set_on_success_and_not_touched_by_a_401
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_get_shows_last_used_at_after_the_token_is_used
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_reissue_resets_last_used_at_to_null
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:14+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-29
+# 시각: 2026-11-17T23:39:14+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-29 -- POST 응답 no-store 빠짐
+    결과: 1 failed, 17 passed in 0.78s
+      잡은 테스트: tests/test_mcp_tokens_api.py::test_post_returns_201_with_exact_keys_seven_day_expiry_and_no_store
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:15+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-30
+# 시각: 2026-11-17T23:39:15+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-30 -- SDK 호스트 검사를 끄지 않음
+    결과: 17 failed, 31 passed in 1.72s
+      잡은 테스트: tests/test_mcp_server.py::test_each_create_app_gets_its_own_session_manager_and_both_lifespans_run
+      잡은 테스트: tests/test_mcp_server.py::test_each_token_sees_only_its_own_accounts_people_across_alternating_calls
+      잡은 테스트: tests/test_mcp_server.py::test_exact_path_is_served_without_redirect
+      잡은 테스트: tests/test_mcp_server.py::test_expired_token_is_401_but_one_second_before_is_ok
+      잡은 테스트: tests/test_mcp_server.py::test_find_person_blank_name_is_invalid_name_error_result
+      잡은 테스트: tests/test_mcp_server.py::test_initialize_reports_server_name_relmemo
+      잡은 테스트: tests/test_mcp_server.py::test_last_used_at_is_set_on_success_and_not_touched_by_a_401
+      잡은 테스트: tests/test_mcp_server.py::test_list_briefings_other_accounts_schedule_is_not_found_and_overall_is_empty
+      잡은 테스트: tests/test_mcp_server.py::test_one_log_line_per_tool_call_without_token_or_argument_values
+      잡은 테스트: tests/test_mcp_server.py::test_other_accounts_card_is_not_found_and_find_person_is_empty
+      잡은 테스트: tests/test_mcp_server.py::test_result_text_and_structured_content_are_the_same_json_object
+      잡은 테스트: tests/test_mcp_server.py::test_revoked_token_is_401
+      잡은 테스트: tests/test_mcp_server.py::test_scheme_is_case_insensitive_and_value_is_stripped
+      잡은 테스트: tests/test_mcp_server.py::test_superseded_token_is_401_and_new_one_works
+      ... 외 3개 테스트
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:18+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-31
+# 시각: 2026-11-17T23:39:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-31 -- list_people total 을 자른 수로
+    결과: 1 failed, 30 passed in 0.65s
+      잡은 테스트: tests/test_mcp_tools.py::test_list_people_limit_cuts_to_first_n_keeps_total_and_sets_truncated
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:19+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-32
+# 시각: 2026-11-17T23:39:19+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-32 -- 카드 not_found 코드 바뀜
+    결과: 2 failed, 77 passed in 1.96s
+      잡은 테스트: tests/test_mcp_server.py::test_other_accounts_card_is_not_found_and_find_person_is_empty
+      잡은 테스트: tests/test_mcp_tools.py::test_get_person_card_other_accounts_and_missing_ids_are_not_found
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:21+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-33
+# 시각: 2026-11-17T23:39:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-33 -- 오류 결과 isError false
+    결과: 4 failed, 44 passed in 1.77s
+      잡은 테스트: tests/test_mcp_server.py::test_find_person_blank_name_is_invalid_name_error_result
+      잡은 테스트: tests/test_mcp_server.py::test_list_briefings_other_accounts_schedule_is_not_found_and_overall_is_empty
+      잡은 테스트: tests/test_mcp_server.py::test_other_accounts_card_is_not_found_and_find_person_is_empty
+      잡은 테스트: tests/test_mcp_server.py::test_unexpected_exception_becomes_internal_error_without_leaking
+    판정: 잡힘(KILLED)
+
+# ===== append 2026-11-17T23:39:24+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/run_mutant.py V12-34
+# 시각: 2026-11-17T23:39:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+=== V12-34 -- 라우트가 /mcp/ (정확 경로 아님)
+    결과: 28 failed, 20 passed in 1.70s
+      잡은 테스트: tests/test_mcp_server.py::test_each_create_app_gets_its_own_session_manager_and_both_lifespans_run
+      잡은 테스트: tests/test_mcp_server.py::test_each_token_sees_only_its_own_accounts_people_across_alternating_calls
+      잡은 테스트: tests/test_mcp_server.py::test_exact_path_is_served_without_redirect
+      잡은 테스트: tests/test_mcp_server.py::test_expired_token_is_401_but_one_second_before_is_ok
+      잡은 테스트: tests/test_mcp_server.py::test_find_person_blank_name_is_invalid_name_error_result
+      잡은 테스트: tests/test_mcp_server.py::test_initialize_reports_server_name_relmemo
+      잡은 테스트: tests/test_mcp_server.py::test_last_used_at_is_set_on_success_and_not_touched_by_a_401
+      잡은 테스트: tests/test_mcp_server.py::test_list_briefings_other_accounts_schedule_is_not_found_and_overall_is_empty
+      잡은 테스트: tests/test_mcp_server.py::test_login_cookie_alone_is_not_a_credential
+      잡은 테스트: tests/test_mcp_server.py::test_missing_or_non_bearer_header_never_queries_the_database
+      잡은 테스트: tests/test_mcp_server.py::test_no_header_is_401
+      잡은 테스트: tests/test_mcp_server.py::test_non_bearer_or_empty_value_is_401
+      잡은 테스트: tests/test_mcp_server.py::test_one_log_line_per_tool_call_without_token_or_argument_values
+      잡은 테스트: tests/test_mcp_server.py::test_other_accounts_card_is_not_found_and_find_person_is_empty
+      ... 외 9개 테스트
+    판정: 잡힘(KILLED)

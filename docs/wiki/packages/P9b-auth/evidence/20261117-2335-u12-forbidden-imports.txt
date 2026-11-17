@@ -1,0 +1,7 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/u12-forbidden-imports.sh
+# 시각: 2026-11-17T23:35:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+grep exit=1 (1 = 금지 import 없음)

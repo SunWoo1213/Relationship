@@ -5,7 +5,9 @@
 - `deps`      -- `current_user` 로그인 의존성
 - `origin`    -- 상태 변경 요청의 Origin 검사(결정 T)
 - `names`     -- 닉네임 정규화(가입·중복 조회 공용, CR-007)
-- `routes`    -- `/auth/signup`·`/auth/login`·`/auth/logout`·`/auth/me`·`GET /auth/availability`
+- `routes`    -- `/auth/signup`·`/auth/login`·`/auth/logout`·`/auth/me`·`GET /auth/availability`·
+                `POST·GET·DELETE /auth/mcp-token`(CR-008)
+- `mcp_tokens` -- MCP 개인 접근 토큰 발급(upsert)·조회·상태·폐기(CR-008 · D19)
 
 이 `__init__` 은 아무것도 import 하지 않는다 -- 서브모듈이 `app.api.deps`
 (→ `app.api` 패키지 초기화)를 끌어오므로, 여기서 모으면 순환 import 가 생긴다.

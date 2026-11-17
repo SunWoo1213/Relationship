@@ -1,0 +1,9 @@
+# 명령: .venv/bin/python -m alembic upgrade head
+# 시각: 2026-11-17T23:35:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0004 -> 0005, Refs: P9b-auth U12 CR-008 D19 S3.1 -- `mcp_tokens`(MCP 개인 접근 토큰).

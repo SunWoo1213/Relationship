@@ -1,0 +1,11 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/dev_counts.py
+# 시각: 2026-11-17T23:35:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: f9f0097 (dev2)
+# exit: 0
+# ---
+alembic_version: 0004
+users rows: 12
+persons rows: 4
+events rows: 10
+mcp_tokens table present: False

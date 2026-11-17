@@ -1,0 +1,26 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/1f888faf-f134-4b54-95c3-8ca7d22d83a7/scratchpad/u12/u12-live-client.sh
+# 시각: 2026-11-17T23:36:26+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 1be2cf4 (dev2)
+# exit: 0
+# ---
+토큰 값이 출력에 나온 횟수: 0
+signup: 201
+mcp-token POST: 201 keys= ['created_at', 'expires_at', 'token'] Cache-Control= no-store
+token: set (len 43 )
+POST /mcp (no header): 401 application/json Bearer {'detail': {'code': 'unauthenticated'}}
+GET /mcp (no header): 401
+POST /mcp (bad token): 401
+POST /mcp (cookie only): 401
+[sdk mode=auto] tools: ['find_person', 'get_person_card', 'list_briefings', 'list_people']
+[sdk mode=auto] list_people isError=False total=1 names=['라이브 팀장']
+[sdk mode=auto] find_person total=1
+[sdk mode=auto] get_person_card isError=False person=라이브 팀장
+[sdk mode=auto] get_person_card(missing) isError=True text=not_found
+[sdk mode=legacy] tools: ['find_person', 'get_person_card', 'list_briefings', 'list_people']
+[sdk mode=legacy] list_people isError=False total=1 names=['라이브 팀장']
+[sdk mode=legacy] find_person total=1
+[sdk mode=legacy] get_person_card isError=False person=라이브 팀장
+[sdk mode=legacy] get_person_card(missing) isError=True text=not_found
+mcp-token GET: 200 keys= ['active', 'created_at', 'expires_at', 'last_used_at'] active= True last_used_at set= True
+cleanup: users left=0 mcp_tokens left=0

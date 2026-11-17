@@ -81,6 +81,8 @@ S3_1_TABLE_COLUMNS = {
     "users": {"id", "username", "password_hash", "nickname", "created_at"},
     "auth_sessions": {"id", "user_id", "token_hash", "created_at", "expires_at"},
     "chat_messages": {"id", "user_id", "role", "content", "question_id", "created_at"},
+    # 0005 보충(CR-008): MCP 개인 접근 토큰.
+    "mcp_tokens": {"id", "user_id", "token_hash", "created_at", "expires_at", "last_used_at"},
 }
 
 NULLABLE_COLUMNS = {
@@ -90,6 +92,7 @@ NULLABLE_COLUMNS = {
     "answer",
     "answered_at",
     "question_id",
+    "last_used_at",  # 0005 보충(CR-008) -- 토큰을 쓰기 전에는 값이 없다.
 }
 
 JSONB_COLUMNS = {
@@ -126,6 +129,7 @@ EXPECTED_FKS = {
     # 보충(0003) — 새 테이블 두 곳만 users FK. 기존 user_id 컬럼에는 FK 가 없다(결정 O).
     ("auth_sessions", "user_id", "users", "id"),
     ("chat_messages", "user_id", "users", "id"),
+    ("mcp_tokens", "user_id", "users", "id"),  # 0005 보충(CR-008)
 }
 
 
@@ -134,10 +138,10 @@ def _table(name: str):
 
 
 def test_table_name_set_matches_s3_1_exactly_and_person_embeddings_absent():
-    """12개 테이블 이름이 S3.1(+0003 보충)과 정확히 같고 person_embeddings 는 없다(D5 R9)."""
+    """13개 테이블 이름이 S3.1(+0003·0005 보충)과 정확히 같고 person_embeddings 는 없다(D5 R9)."""
     names = set(Base.metadata.tables.keys())
     assert names == set(S3_1_TABLE_COLUMNS.keys())
-    assert len(names) == 12
+    assert len(names) == 13
     assert "person_embeddings" not in names
 
 
@@ -151,14 +155,14 @@ def test_each_table_column_set_matches_s3_1_exactly():
         )
 
 
-def test_total_column_count_equals_73_verified_by_literal_transcription_of_s3_1():
-    """S3.1 컬럼을 테이블별로 세어 합산하면 73개다. 원본 56 + 0003 보충 16
+def test_total_column_count_equals_79_verified_by_literal_transcription_of_s3_1():
+    """S3.1 컬럼을 테이블별로 세어 합산하면 79개다. 원본 56 + 0003 보충 16
     (users 4 + auth_sessions 5 + chat_messages 6 + pending_questions.user_id 1)
-    + 0004 보충 1(users.nickname)."""
+    + 0004 보충 1(users.nickname) + 0005 보충 6(mcp_tokens)."""
     total = sum(len(cols) for cols in S3_1_TABLE_COLUMNS.values())
     actual_total = sum(len(t.columns) for t in Base.metadata.tables.values())
-    assert total == 73
-    assert actual_total == 73
+    assert total == 79
+    assert actual_total == 79
 
 
 def _check_constraints(table_name: str) -> list[CheckConstraint]:
@@ -219,15 +223,15 @@ def test_exactly_five_check_constraints_exist_total():
     assert total == 5
 
 
-def test_all_eight_foreign_keys_have_ondelete_cascade():
-    """FK 8개 모두 ondelete='CASCADE' 이고 기대한 (table, col, ref_table, ref_col) 집합과 같다."""
+def test_all_nine_foreign_keys_have_ondelete_cascade():
+    """FK 9개 모두 ondelete='CASCADE' 이고 기대한 (table, col, ref_table, ref_col) 집합과 같다."""
     found = set()
     for table in Base.metadata.tables.values():
         for fk in table.foreign_keys:
             assert fk.ondelete == "CASCADE", f"{table.name}.{fk.parent.name} ondelete={fk.ondelete}"
             found.add((table.name, fk.parent.name, fk.column.table.name, fk.column.name))
     assert found == EXPECTED_FKS
-    assert len(found) == 8
+    assert len(found) == 9
 
 
 def test_fact_sources_has_composite_primary_key_and_no_surrogate_id_column():
@@ -247,9 +251,10 @@ def test_person_aliases_embedding_is_nullable_vector_of_dimension_1536():
     assert column.nullable is True
 
 
-def test_nullable_columns_are_exactly_the_six_deferred_fields():
+def test_nullable_columns_are_exactly_the_seven_deferred_fields():
     """nullable 컬럼이 정확히 {embedding, confirmed_at, briefed_at, answer, answered_at,
-    question_id} 뿐이다(F-08e812 + 0003 보충 `chat_messages.question_id`)."""
+    question_id, last_used_at} 뿐이다(F-08e812 + 0003 보충 `chat_messages.question_id`
+    + 0005 보충 `mcp_tokens.last_used_at`)."""
     nullable_found = set()
     for table in Base.metadata.tables.values():
         for column in table.columns:
