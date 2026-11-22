@@ -1,6 +1,6 @@
 # P9d-sensitive-guard · 계획 (01-plan)
 
-상태: **개정 2(2026-11-22, architect — 02-plan-verify 2회차 보류 [필수] M2-잔여·M5·[권고] N-R1~N-R8 반영 + 고정 단언 전수 확인. 개정 1 은 1차 보류 M1~M4·R-1~R-13 반영. 처리표는 맨 끝 "개정 이력")** → verify-plan → verifier 02-plan-verify 재검증 → `active: P9d-sensitive-guard` | 담당: backend-agent(sonnet — U2·U3·U4·U5a·U5b·U5c·U6·U7a·U7b·U8) · frontend-agent(sonnet — U9a·U9b) · eval-agent(opus — U1·U10) · verifier(fable — 02-plan-verify·단위 커밋 전 리뷰·U1 라벨 검수 판정·U11 04-review) · 메인 세션(U0 완료·U12 운영 반영 SSH·증거 저장) · 사용자(낱말 목록 검토·U12 화면 확인·완성 확인) | 작성: 2026-11-22
+상태: **U9a 개정(2026-11-22, architect — U9a 커밋 전 리뷰 `review-u9a.md` 1차 보류 뒤 사용자 결정 27·28 반영: 재고지 모달 → 채팅 화면 안 안내 영역 + 전송 자리 세 곳 잠금, 맨 끝 "개정 이력" 마지막 표)** · 활성 중 · 이전: **개정 2(2026-11-22, architect — 02-plan-verify 2회차 보류 [필수] M2-잔여·M5·[권고] N-R1~N-R8 반영 + 고정 단언 전수 확인. 개정 1 은 1차 보류 M1~M4·R-1~R-13 반영. 처리표는 맨 끝 "개정 이력")** → verify-plan → verifier 02-plan-verify 재검증 → `active: P9d-sensitive-guard` | 담당: backend-agent(sonnet — U2·U3·U4·U5a·U5b·U5c·U6·U7a·U7b·U8) · frontend-agent(sonnet — U9a·U9b) · eval-agent(opus — U1·U10) · verifier(fable — 02-plan-verify·단위 커밋 전 리뷰·U1 라벨 검수 판정·U11 04-review) · 메인 세션(U0 완료·U12 운영 반영 SSH·증거 저장) · 사용자(낱말 목록 검토·U12 화면 확인·완성 확인) | 작성: 2026-11-22
 태그 — 패키지: P9d-sensitive-guard · 닫는 검증: (직접 R 없음 — 간접 R7 R10 R12 R19) · 기대는 결정: D20(신설) · D1 · D2 · D14 · D16 · D17 · D18 · D19 · D5 · 구현하는 명세: S3.1(보충 0006) · S3.2 · S3.4 · S3.5 · S3.6 · S3.7 · 관련 원칙: 원칙1 원칙2 원칙4 원칙5 원칙6 원칙7 원칙8 원칙9 · 출처 CR: CR-009(개정 3 + 사용자 결정 22)
 의존: P5-loop · P5b-query-turn · P6-memory · P6-briefing · P7-push(모두 04-review `결과: 완료`) · P4 게이트(P4b-er-redesign 통과)
 관련(선행 완료 조건이 아님): CR-009 문서 이행 커밋 `6d97217`(D20·카드 보충·CLAUDE.md·backlog) — 충족. P9b-auth 는 **보류**(메인 세션 결정, 04-review 열림 — 이 패키지는 P9b 산출물 위에 더하고 P9b 를 닫는 조건으로 삼지 않는다). P9-infra 04-review 도 열림(영향 없음). P9c-briefing-calendar 는 이 패키지 뒤(사용자 "가드레일 본작업 먼저").
@@ -28,7 +28,7 @@
 
 ## 범위
 - 포함: CR-009 4.2 의 U1~U12(아래 작업 단위) — D20 결정 1~7·R-1~R-12·사용자 결정 1~22.
-- 이 패키지에서 하지 않는 것: 기존 데이터 소급(사용자 결정 9 — 배포 전 데이터·저장 브리핑·식별 원문은 그대로, CR-009 W14) · 새 화면(재고지는 기존 화면 위 모달 — 원칙5, G14) · 법적 판단·약관 내용 단정 · 낱말 목록의 설정값화(코드 상수 한 파일) · 감지율 목표치(G21) · 인물 간 관계·상담(원칙7) · 툴 7종의 개수·시그니처 변경 · `app/er/` 판정 로직 변경 · 계정 삭제 · MCP 도구 추가.
+- 이 패키지에서 하지 않는 것: 기존 데이터 소급(사용자 결정 9 — 배포 전 데이터·저장 브리핑·식별 원문은 그대로, CR-009 W14) · 새 화면(재고지는 채팅 화면 안 안내 영역 — 사용자 결정 27, 옛 "기존 화면 위 모달". 원칙5, G14) · 법적 판단·약관 내용 단정 · 낱말 목록의 설정값화(코드 상수 한 파일) · 감지율 목표치(G21) · 인물 간 관계·상담(원칙7) · 툴 7종의 개수·시그니처 변경 · `app/er/` 판정 로직 변경 · 계정 삭제 · MCP 도구 추가.
 
 ## 산출물 (파일 경로)
 - 평가 세트·도구(새): `evaluation/sensitive_guard/dev.jsonl` · `evaluation/sensitive_guard/test.jsonl` · `evaluation/sensitive_guard/README.md` · `evaluation/sensitive_guard/run.py` · `scripts/validate_sensitive_set.py`
@@ -42,7 +42,7 @@
 - 시험(닫힌 목록 안에서 고침 — U8): `tests/test_api_read_persons.py`(189행 다가오는 일정 항목 키 집합) · `tests/test_mcp_tools.py`(6행 docstring·293행 카드 동등 비교)
 - 시험·도구(닫힌 목록 안에서 고침 — U4): `tests/auth_helpers.py` · `tests/test_auth_helpers.py`(105행 `MeOut` 사전 동등 비교 — P3-R1) · `tests/test_auth_api.py` · `tests/test_auth_nickname.py` · `tests/test_auth_availability.py` · `tests/test_auth_origin.py` · `tests/test_auth_required_routes.py` · `tests/test_briefing_scheduler_users.py` · `tests/test_push_wiring.py` · `evaluation/recognition/probe.py`
 - 시험(닫힌 목록 안에서 고침 — U7b): `tests/test_agent_loop.py`(426·483·600행의 제안 인덱스 등식에 "이름 규칙으로 버린 인덱스" 항 — R-1)
-- 프론트: `web/src/lib/privacyNotice.ts`(새) · `web/src/screens/AuthScreen.tsx` · `web/src/components/AppShell.tsx` · `web/src/api/types.ts` · `web/src/api/client.ts` · `web/src/screens/ChatScreen.tsx` · `web/src/screens/PersonCardScreen.tsx` · `web/src/lib/labels.ts` · `web/src/__tests__/auth.test.tsx` · `web/src/__tests__/chat.test.tsx` · `web/src/__tests__/card.test.tsx` · `web/src/__tests__/labels.test.tsx` · `web/src/__tests__/notice.test.tsx`(새)
+- 프론트: `web/src/lib/privacyNotice.ts`(새) · `web/src/components/NoticePanel.tsx`(새 — U9a 개정) · `web/src/screens/AuthScreen.tsx` · `web/src/components/AppShell.tsx`(U9a 개정 뒤 최종 diff 0 이 기대값 — 모달·`inert` 제거) · `web/src/auth.tsx`(U9a — review-u9a 목록 확장 승인) · `web/src/api/types.ts` · `web/src/api/client.ts` · `web/src/screens/ChatScreen.tsx`(U9a 잠금·R-2, U9b 표시) · `web/src/screens/BriefingScreen.tsx`(U9a "지금 브리핑" 잠금·R-2) · `web/src/screens/PersonCardScreen.tsx` · `web/src/lib/labels.ts` · `web/src/__tests__/auth.test.tsx` · `web/src/__tests__/chat.test.tsx` · `web/src/__tests__/card.test.tsx` · `web/src/__tests__/labels.test.tsx` · `web/src/__tests__/notice.test.tsx`(새) · `web/e2e/notice.spec.ts`(새 — U9a 개정, review-u9a M-1 목록 확장 승인)
 - 보고서: `reports/sensitive_guard.md` · `reports/sensitive_guard_metrics.json`
 - 문서: `docs/RUNNING.md`(만료 정리·스위치 한 줄) · `docs/user-setup/13-user-todo-deploy.md`(J 절 — 0006 반영·되돌리기) · `docs/wiki/packages/P9d-sensitive-guard/03-log.md`·`tests.md`·`04-review.md`·`evidence/`
 
@@ -61,7 +61,7 @@
 
 ### 가드 문구 상수의 주인 (재검토 VR5 닫음)
 - **서버(`app/guard/messages.py`)**: 채팅에 나가는 문구 — ① 사전 동의 칩(U5b) · ② 사후 확인 칩·⑥ 사후 조회 칩(U6) · ③ 차단 안내(U5a) · 부속 거절 뒤 답·대체 줄(U5c) · 민감 일정(U7a) · 이름 거부(U7b) · 조회 안내(U8). **파일과 `tests/test_guard_messages.py` 는 U5a 가 만들고**, 뒤 단위가 자기 문구 상수와 단언을 더한다. 단언 = D20 "확정 문구" 와 글자 일치 + `BRIEFING_FORBIDDEN_EXPRESSIONS` 어느 항목도 포함하지 않음(목록은 검사 도구로만 import, 합치지 않음).
-- **프론트(`web/src/lib/privacyNotice.ts`)**: ④ 가입 고지 문단·체크 문구 · ⑤ 재고지 모달 제목·문단·안내·버튼. 서버는 문구를 갖지 않고 판 번호만 갖는다. **U9a 가 만든다.** 단언 = `web/src/__tests__/notice.test.tsx` 가 D20 문장과 글자 일치.
+- **프론트(`web/src/lib/privacyNotice.ts`)**: ④ 가입 고지 문단·체크 문구 · ⑤ 재고지 안내 영역(옛 이름 재고지 모달 — 사용자 결정 27) 제목·문단·안내·버튼. 동의 실패 안내(결정 28)는 새 상수가 아니라 기존 `AUTH_NOTICE.failed`(`web/src/screens/AuthScreen.tsx:39`)를 import 한다. 서버는 문구를 갖지 않고 판 번호만 갖는다. **U9a 가 만든다.** 단언 = `web/src/__tests__/notice.test.tsx` 가 D20 문장과 글자 일치.
 - **판 번호와 문구 묶기**: 문구 ④⑤ 를 바꾸는 커밋은 `PRIVACY_NOTICE_VERSION` 을 같은 커밋에서 올린다. 판정: U4 `test_privacy_notice.py` 가 `PRIVACY_NOTICE_VERSION == 1` 을, U9a `notice.test.tsx` 가 문구 전문을 단언 — 둘 중 하나만 바꾸면 다른 쪽이 그대로라 리뷰에서 드러난다(기계적 묶기는 아니다 — 한계로 리스크 절에).
 
 ### 재검토 VR1~VR8 · CR-009 8.6 닫기 (이 계획이 정한 것)
@@ -120,7 +120,7 @@
 | `tests/test_mcp_tools.py:6·293` 카드 = `read.get_person_card(...).model_dump()` | MCP 는 `sensitive_category` 키를 뺀다 | **U8 닫힌 목록** — 비교 대상을 "그 키를 뺀 덤프" 로. 137행(인물 목록)은 `PersonListItemOut` 이 바뀌지 않아 그대로 |
 | `tests/test_tools_briefing.py:257~263` `get_briefing` 키 집합 | 반환 모양 그대로(거른 항목만) | 고치지 않음 |
 | `tests/test_chat_history.py:155`·`test_api_read_raw.py:89·143`·`test_api_read_briefings.py:142·143`·`test_mcp_tokens_api.py:95·173` | 모양 그대로 | 고치지 않음 |
-| `web/src`·`web/e2e` | `kind` 는 `string`(`types.ts:68`), 리비전·kind 집합 리터럴 0. 가입 본문 단언 `auth.test.tsx:272` | **U9a** — 272행 단언 + 가입 제출 시험의 체크 클릭 준비 줄(N-R6). E2E 는 가입 흐름 0(고치지 않음) |
+| `web/src`·`web/e2e` | `kind` 는 `string`(`types.ts:68`), 리비전·kind 집합 리터럴 0. 가입 본문 단언 `auth.test.tsx:272` | **U9a** — 272행 단언 + 가입 제출 시험의 체크 클릭 준비 줄(N-R6). 기존 E2E 는 가입 흐름 0(고치지 않음 — `fixtures.ts`·`auth.spec.ts` 등 기존 파일 diff 0). U9a 개정: 새 E2E `web/e2e/notice.spec.ts` 하나를 더한다(표는 spec 안에서 덮어씀). `chat.test.tsx`·`briefing.test.tsx` 는 공급자 없이 화면을 그리므로(`render(<ChatScreen />)` `chat.test.tsx:96`·`render(<BriefingScreen />)` `briefing.test.tsx:97`) 화면은 공급자 밖에서 `false` 인 `useNoticeRequired()` 를 읽어 두 파일 diff 0 |
 | `scripts/schema_check.py`·`scripts/tools_check.py` | 값 집합을 모델에서 읽음·시그니처만 봄 | 고치지 않음 |
 
 ## 작업 단위 (단위 하나 = 커밋 하나. 끝나면 /commit. 단위마다 verifier 커밋 전 리뷰 + 핵심 계약 변이 시험 최소 1개)
@@ -139,7 +139,7 @@ U2 와 U3 은 파일이 겹치지 않아 동시 가능(둘 다 backend-agent 라
 
 - [x] U0 **[메인 세션 + architect] CR-009 문서 이행 — D20 신설, D2·D14·D16·D17·D18·D19, S3.1·S3.2·S3.4·S3.5·S3.6·S3.7 보충, CLAUDE.md, backlog P9d 행, review-index, security §5, INDEX, proposal 상단** / Refs: P9d-sensitive-guard CR-009 D20 D2 D14 D16 D17 D18 D19 S3.1 S3.2 S3.4 S3.5 S3.6 S3.7 원칙6 원칙7 원칙9 / 완료 `6d97217`(사용자 결정 22 보충은 이 계획과 같은 문서 커밋)
 
-- [ ] U1 **[eval-agent] 민감 가드 시험 세트·라벨 규칙·형식 검사기 — test 는 U2 착수 전 동결** / Refs: P9d-sensitive-guard D20 S3.7 CR-009 원칙8 / 의존: U0
+- [x] U1 **[eval-agent] 민감 가드 시험 세트·라벨 규칙·형식 검사기 — test 는 U2 착수 전 동결** / Refs: P9d-sensitive-guard D20 S3.7 CR-009 원칙8 / 의존: U0
   - 파일: `evaluation/sensitive_guard/dev.jsonl`·`test.jsonl`·`README.md` · `scripts/validate_sensitive_set.py`(저장소 루트를 `sys.path` 에 넣는 `scripts/tools_check.py:43` 방식).
   - 방식: 한 줄 `{id, text, label: "none"|"block:<type>"|"consent:<category>", group: "sensitive"|"plain"|"trap"|"evasion", trap?, note}`. 차단 유형 6(`rrn`·`passport`·`driver_license`·`account`·`card`·`password`), 범주 5(`crime`·`health`·`sex`·`politics_religion`·`finance`). 크기(사용자 결정 12, **dev·test 각각**): 11개 범주·유형마다 15~20 + 평범 100 + 함정 30(호칭형 이름 "교회 오빠"·"정신과 선생님" 포함, "감기 걸렸대"·전화번호·주소는 `none`) + 우회 20. 조회형 민감 문장을 범주마다 1건 이상(`form: "query"`, 범주 셈에 든다 — 빈자리 ⑧). 우회 20 은 범주 셈 밖. README 에 범주 정의(프로젝트 정의, "법령상 분류가 아니다"), dev 를 본 작성자가 test 도 쓴다는 누출 경로, test 동결 커밋 해시·sha256. **식별번호 모양 문자열은 전부 지어낸 값**(개정 1 — R-12): 주민등록번호 모양은 끝 검증 숫자가 맞지 않게, 카드번호 모양은 공개된 결제 시험용 번호만(Luhn 은 맞으므로 규칙이 잡을 수 있다), 계좌번호는 은행 형식이 아닌 숫자열, 비밀번호 예문은 뜻 없는 낱말. 검사기가 주민등록번호 검증 숫자 불일치와 카드번호의 공개 시험 번호 목록 소속을 확인한다. Write 단계 `secret-guard`·`save_evidence` 비밀 패턴에 걸리면 우회하지 않고 문장을 바꾼다(`security.md` 6절).
   - 역할: 라벨을 만들고 고치는 것은 eval-agent 뿐. verifier 는 `review-u1.md` 에 검수 판정만 쓰고 소견은 `findings.py` 로(라벨을 고치지 않는다).
@@ -224,14 +224,57 @@ U2 와 U3 은 파일이 겹치지 않아 동시 가능(둘 다 backend-agent 라
   - 검증: `POSTGRES_PORT=5433 … u8-export -- .venv/bin/python -m pytest tests/test_guard_export.py tests/test_tools_briefing.py tests/test_briefing_inputs.py tests/test_briefing_select.py tests/test_briefing_run.py tests/test_briefing_compose.py tests/test_push_payload.py tests/test_mcp_tools.py tests/test_mcp_server.py tests/test_api_read_persons.py tests/test_api_read_raw.py tests/test_api_read_briefings.py tests/test_agent_query_answer.py tests/test_guard_messages.py -q` · tools_check.
   - 변이 후보: `get_person_card` 기본값을 `True` 로 → 열거 계약 FAILED · `get_briefing` 의 사건 필터 빼기 → 브리핑 프롬프트 0 FAILED.
 
-- [ ] U9a **[frontend-agent] 가입 고지 체크·재고지 모달·403 `notice_required` 처리(`web/` 만)** / Refs: P9d-sensitive-guard D20 D18 원칙5 원칙7 / 의존: U4 커밋(계약 확정) — U5a~U8 과 동시
-  - 파일: `web/src/lib/privacyNotice.ts`(④⑤ — 단일 출처) · `web/src/screens/AuthScreen.tsx` · `web/src/components/AppShell.tsx` · `web/src/api/types.ts`(`MeOut.notice_required?: boolean` — **선택 필드**로 둔다, 3회차 P3-R7: 기존 목 응답 `ME`·E2E 픽스처가 그 키 없이도 타입이 맞고 "`true` 일 때만 모달" 과 같은 뜻)·`client.ts`(가입 본문 `SignupIn` 에 `privacy_notice_accepted: boolean`) · `web/src/__tests__/notice.test.tsx`(새) · `web/src/__tests__/auth.test.tsx`(닫힌 목록 F1 — **단언 변경은 272행 가입 본문 하나**, 준비 줄은 가입을 제출하는 시험 전부에 고지 체크 클릭 한 줄(체크 없이는 버튼이 비활성이므로), 개정 2 — N-R6).
-  - 수용 기준: 체크 없이 가입 버튼 비활성 · 모달 동의 전 `POST /chat` 호출 0 · 로그인 상태에서 `notice_required: true` 면 바로 모달 · **`notice_required` 가 `true` 일 때만 모달**(필드가 없거나 `false` 면 모달 0 — 기존 Vitest·E2E 목 응답 `web/e2e/fixtures.ts:45`·`auth.spec.ts:10` 은 고치지 않는다, R-6) · `/briefings/run`·`/answers` 403 도 같은 모달 · 새 라우트(화면) 0 · 문구 ④⑤ 글자 일치 · `u9a-test-diff` 파일 목록 ⊆ `auth.test.tsx`·`notice.test.tsx`.
-  - 검증: `… u9a-vitest -- npm --prefix web exec -- vitest run --root web` · `… u9a-typecheck -- npm --prefix web run typecheck` · `… u9a-build -- npm --prefix web run build` · `… u9a-lint -- npm --prefix web run lint` · `… u9a-test-diff -- git diff --stat <U4 해시> -- web/src/__tests__`.
-  - 변이 후보: 모달의 전송 잠금 빼기 → "동의 전 호출 0" FAILED.
+- [ ] U9a **[frontend-agent] 가입 고지 체크·재고지 안내 영역(전송 자리 세 곳 잠금)·403 `notice_required` 처리(`web/` 만)** / Refs: P9d-sensitive-guard D20 D18 원칙5 원칙7 / 의존: U4 커밋(계약 확정) — U5a~U8 과 동시
+  - **개정(2026-11-22 — review-u9a 1차 보류 뒤 사용자 결정 27·28)**: 재고지는 **화면을 덮는 모달이 아니라 채팅 화면 안 안내 영역**이고, 잠그는 것은 화면 전체가 아니라 **전송 자리 세 곳**이다(D20 결정 27). 확정 문구 ⑤ 의 글자는 그대로, 놓이는 자리만 바뀐다. 서버 계약(위 "값으로 고정하는 계약" 표)은 그대로다. 옛 수용 기준은 이 항목 끝 "이력" 한 줄.
+  - 파일: `web/src/lib/privacyNotice.ts`(④⑤ — 단일 출처, 글자 무변경) · `web/src/components/NoticePanel.tsx`(새 — 안내 영역) · `web/src/screens/ChatScreen.tsx`(입력·칩 잠금, R-2) · `web/src/screens/BriefingScreen.tsx`("지금 브리핑" 잠금, R-2) · `web/src/screens/AuthScreen.tsx` · `web/src/components/AppShell.tsx`(모달·`inert` 를 걷어 **`<U4 해시>` 대비 diff 0** 이 기대값) · `web/src/auth.tsx`(review-u9a §4 목록 확장 승인 — `/auth/me`·로그인·가입 응답과 403 신호를 받는 곳이 `AuthProvider` 하나) · `web/src/api/types.ts`(`MeOut.notice_required?: boolean` — **선택 필드**로 둔다, 3회차 P3-R7: 기존 목 응답 `ME`·E2E 픽스처가 그 키 없이도 타입이 맞고 "`true` 일 때만" 과 같은 뜻)·`client.ts`(가입 본문 `SignupIn` 에 `privacy_notice_accepted: boolean`, 403 신호 `onNoticeRequired`, `postPrivacyNotice`) · `web/src/__tests__/notice.test.tsx`(새) · `web/src/__tests__/auth.test.tsx`(닫힌 목록 F1 — **단언 변경은 272행 가입 본문 하나**, 준비 줄은 가입을 제출하는 시험 전부에 고지 체크 클릭 한 줄(체크 없이는 버튼이 비활성이므로), 개정 2 — N-R6. 266행 시험 **이름**만 네 키로 고치는 것은 단언 변경이 아니다 — R-5, 03-log 한 줄) · `web/e2e/notice.spec.ts`(새 — review-u9a M-1 목록 확장 승인. `web/e2e/fixtures.ts`·`auth.spec.ts` 등 기존 E2E 파일은 고치지 않고 표는 spec 안에서 덮어쓴다).
+  - `<U4 해시>` = `5fc2b79`(`2a9b65d` 와 `web/` 상태가 같다 — review-u9a 4행).
+  - **이미 만든 구현(미커밋, review-u9a 대상) 중 남기는 것 · 버리는 것**
+    - 남김: `privacyNotice.ts`(문자열 5개 그대로 — 키 이름 `modalTitle`·`modalLock`·`modalButton` 은 바꿔도 되고 글자는 바꾸지 않는다, 머리 주석의 "모달" 은 "안내 영역" 으로) · `auth.tsx` 의 `noticeRequired` 상태·`noticeAccepted`·`onNoticeRequired` 구독·`userState` 의 `=== true` 판정 · `client.ts` 의 403 `notice_required` 신호·`postPrivacyNotice`(204 분기) · `types.ts` · `AuthScreen.tsx` 의 가입 고지 문단·체크·폼 밖 버튼 `form="auth-form"` 구조(review-u9a §4 — 실제 브라우저에서 체크 없이 Enter 가입 0) · `auth.test.tsx` 변경 · `notice.test.tsx` 의 가입·문구·403 신호·판정(`=== true`) 시험.
+    - 버림: `AppShell.tsx` 의 `NoticeModal` 전체와 뒤 화면 `inert` 감싸기(`AppShell.tsx:208~209·237·242~281`) — `AppShell.tsx` 는 `<U4 해시>` 상태로 돌아간다 · `notice.test.tsx` 의 모달 시험(`inert` 속성·Esc·배경 단언, `notice.test.tsx:181~194` 의 공허한 "호출 0" 단언 포함 — review-u9a M-1 ②).
+  - **방식**
+    1. **상태 출처**(남김): `AuthState.user.noticeRequired` — `/auth/me`·로그인·가입 응답의 `notice_required === true` 이면 `true`(필드가 없거나 `false` 면 `false` — R-6), 어느 호출이든 403 `{"detail":{"code":"notice_required"}}` 를 받으면(`client.ts` 신호) `true`, `POST /auth/privacy-notice` 204 뒤 `false`. 401 은 기존 전역 신호로 관문(로그인 화면).
+    2. **화면이 읽는 길**: `auth.tsx` 에 `useNoticeRequired(): boolean` 을 더한다 — `AuthProvider` 안이면 `state.status === 'user' && state.noticeRequired`, **공급자 밖이면 `false`**. 이유: `useAuth()` 는 공급자 밖에서 던지고(`auth.tsx:39`), 기존 `chat.test.tsx`·`briefing.test.tsx` 는 공급자 없이 화면만 그린다(`chat.test.tsx:96`·`briefing.test.tsx:97`) — 이 길이면 두 시험 파일 diff 0 으로 닫힌 목록이 유지된다. 공급자 밖 `false` 는 시험에서만 생기고(실제 앱은 언제나 `App` 의 `AuthProvider` 안), 그때도 서버 403 이 전송을 막는다.
+    3. **잠그는 자리 — 닫힌 목록 3곳**(서버가 403 `notice_required` 로 막는 세 라우트의 화면 자리와 1:1. 잠금 = 그 요소의 `disabled` + 처리 함수 맨 앞 가드 `if (locked) return` 두 겹):
+       | 자리 | 코드 근거 | 부르는 API | 잠금 |
+       |---|---|---|---|
+       | 채팅 입력 칸·보내기 버튼·Enter | `ChatScreen.tsx` textarea 298~312 · 보내기 `Button` 313~321 · `send()` 188 · `onKeyDown` 248 | `postChat` → `POST /chat`(`client.ts:130`) | textarea·버튼 `disabled`, `send()` 가드. 입력 중이던 글자(`draft`)는 지우지 않는다 |
+       | 칩 답변 | `QuestionChips` 88~124(`disabled={locked}` 108) · `pick()` 218 | `postAnswer` → `POST /answers/{id}`(`client.ts:144`) | `locked` 에 잠금 값을 더함(잠금 한 줄 — 칩 DOM·`kind` 무관 동작은 그대로), `pick()` 가드. 잠금이 풀리면 답하지 않은 칩은 다시 활성(D18 "동의하면 떠 있던 칩에 그대로 답할 수 있다") |
+       | "지금 브리핑" | `BriefingScreen.tsx` `BriefingItem` 버튼 132~140 · `run()` 207 | `postBriefingRun` → `POST /briefings/run`(`client.ts:181`) | 버튼 `disabled`, `run()` 가드 |
+    4. **여는 자리 — 닫힌 목록**(기준: 지금 코드에서 LLM 호출·푸시 발송으로 이어지지 않는 것. 서버도 막지 않는다 — review-u4 N-4):
+       | 자리 | 코드 근거 | 부르는 API |
+       |---|---|---|
+       | 사이드바 이동(채팅·인물·브리핑) | `AppShell.tsx` `NAV_ITEMS` 20~24 | 해시 이동만 |
+       | 사이드바 최근 인물 5명 | `AppShell.tsx` 95 `PersonList` | `GET /persons`(`client.ts:152`) |
+       | 인물 목록·인물 카드·사건 원문·근거 원문 | `PersonCardScreen` 등 | `GET /persons`·`GET /persons/{id}`·`GET /events/{id}/raw`·`GET /persons/{id}/facts/{fid}/sources`(`client.ts:152~165`) |
+       | 대화 기록·미답 질문 읽기 | `ChatScreen.tsx` 148~173 | `GET /chat/history`·`GET /questions/pending`(`client.ts:139·198`) |
+       | 브리핑 목록 읽기 | `BriefingScreen.tsx` `load` | `GET /briefings`(`client.ts:175`) |
+       | 알림 받기 | `BriefingScreen.tsx` `PushSubscribe` 47~85 | `POST /push/subscriptions`(`client.ts:193`) — 구독 저장만, 발송은 미동의 동안 주기 작업이 건너뜀(U4) |
+       | "AI 연결"(토큰 발급·폐기) | `AppShell.tsx` 98~108 · `ConnectScreen.tsx` 98·105 | `POST`·`DELETE /auth/mcp-token`(`client.ts:255·260`) — MCP 읽기 도구는 LLM 0(D19) |
+       | 로그아웃 | `AppShell.tsx` `AccountRow` 33~74 | `POST /auth/logout`(`client.ts:239`) |
+       | 인앱 배너·알림 클릭 이동 | `AppShell.tsx` `WorkerMessages`·`OpenBriefingListener` | 해시 이동만 |
+       - `client.ts` 의 쓰기 호출(`method: 'POST'`·`'DELETE'`)은 위 두 표 + 로그인 전 호출(`signup`·`login`) + 동의 자체(`postPrivacyNotice`)가 전부다(2026-11-22 Grep). 새 쓰기 호출이 생기면 어느 표에 넣을지 계획에서 정한다.
+    5. **안내 영역**(`NoticePanel`): 채팅 화면(`ChatScreen`) 안 **대화 목록과 입력 칸 사이**, 잠금 값이 `true` 일 때만. 구성 = D20 ⑤ 글자 그대로 — 제목 "대화 전송 안내"(제목 요소) + ④ 문단 + 잠금 안내 "동의하기 전에는 대화를 보낼 수 없어요." + [동의하고 계속하기]. 닫기·Esc 없음, 배경 덮기 0, `inert` 0. 대화 목록은 그대로 보이고 읽을 수 있다. 좁은 화면(390px 너비)에서도 버튼이 화면 안에 보이게 영역 안 스크롤. 다른 화면에는 그리지 않는다 — 빈자리 BZ-1 답이 (b) 면 브리핑 화면에도 같은 컴포넌트를 둔다(컴포넌트를 따로 뺀 이유).
+    6. **동의**: 버튼 → `postPrivacyNotice()` 1회(요청 중 다시 눌러도 1회) → 204 → `noticeAccepted()` → 안내 영역 사라짐 · 세 자리 잠금 풀림(입력 칸에 남아 있던 글자 그대로, 답하지 않은 칩 활성). **자동 재전송 0**(review-u9a §4 — 사용자 조작 없이 문장이 OpenAI 로 가지 않는다).
+    7. **동의 실패(결정 28)**: 요청이 실패하면(401 밖 — 5xx·네트워크) 안내 영역 그대로, 버튼 **위에** `<p role="alert">` 한 줄 = `AUTH_NOTICE.failed`(`AuthScreen.tsx:39`, "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요." — 상수를 import, 새 리터럴 0). 버튼은 다시 누를 수 있고, 다시 누르면 그 줄을 지운 뒤 요청한다. 401 이면 기존 전역 신호로 관문.
+    8. **R-2 를 여기서 닫는다**(채팅 입력 잠금이 U9a 이고 `ChatScreen.tsx`·`BriefingScreen.tsx` 를 이 단위가 고치므로): `send()` 가 403 `notice_required`(`ApiError.status === 403 && code === 'notice_required'`)를 받으면 일반 실패 안내 `NOTICE.failed` 를 띄우지 않고, 낙관적으로 붙인 사용자 줄을 걷고, 보낸 문장을 입력 칸에 되돌린다(서버 저장 0 이므로 화면에만 남는 줄을 없앤다). `pick()` 은 선택을 풀고 일반 실패 안내 0(칩은 잠금 상태로 남았다가 동의 뒤 다시 누른다). `run()` 은 그 일정의 `runState` 를 지운다(`runFailed` 0). 그 밖의 오류 처리는 그대로.
+    9. **접근성(R-3 을 새 형태로)**: ① 안내 영역은 이름 있는 영역(`aria-labelledby` = 제목, `aria-describedby` = ④ 문단) ② 안내 영역이 나타날 때(채팅 화면 첫 그림에서 이미 잠금이거나, 잠금이 `false → true` 로 바뀔 때) 동의 버튼으로 포커스를 옮긴다 — 잠긴 입력 칸에 있던 포커스가 `BODY` 로 떨어지지 않게(review-u9a P3·B2) ③ 잠긴 입력 칸의 `aria-describedby` = 잠금 안내 문장 ④ 가입 체크 상자 `aria-required="true"`(네이티브 `required` 는 쓰지 않는다 — 폼 밖이라 효과가 없고 폼에 이으면 카드에 없는 문구의 브라우저 말풍선이 뜬다).
+    10. **R-1**: `AuthScreen.tsx::onSubmit` 맨 앞 `if (pending) return` 다음에 `if (isSignup && !agreed) return` — 체크 없이 `submit` 이벤트가 와도 가입 0.
+  - **함께 처리(review-u9a R-5 · R-4)**: ① `AuthScreen.tsx:170` 주석을 네 키로 ② `auth.test.tsx:266` 시험 이름을 네 키로(단언 변경 아님 — 03-log 한 줄) ③ 옛 `AppShell.tsx:244` 주석은 모달과 함께 사라지고, `NoticePanel` 주석에 결정 28 을 적는다 ④ `client.ts:75` 주석 "같은 모달" → "안내 영역" ⑤ 커밋 때 `tests.md`(새 시험 1건 = 표 1줄, E2E 포함)·`03-log.md`(계획 밖에서 정한 것·jsdom 한계·목록 확장 2건 `auth.tsx`·`web/e2e/notice.spec.ts`)·`registry.md`(`privacyNotice`·`NoticePanel`·`useNoticeRequired`·`onNoticeRequired`·`postPrivacyNotice`) — R-4.
+  - **수용 기준**
+    - 가입: 체크 없이 가입 버튼 비활성 · 체크 없이 폼 `submit` 이벤트(`fireEvent.submit`)가 와도 `POST /auth/signup` 0(R-1) · 가입 본문 `privacy_notice_accepted` 는 JSON 불리언 `true` · 체크 상자 `aria-required="true"` · 로그인 화면에는 고지 문단·체크가 없다.
+    - 표시 조건: `/auth/me` 또는 로그인·가입 응답의 `notice_required === true` 면 채팅 화면에 안내 영역 · **`true` 일 때만**(필드가 없거나 `false` 면 안내 영역 0·잠금 0 — 기존 Vitest·E2E 목 응답 `web/e2e/fixtures.ts:45`·`auth.spec.ts:10` 은 고치지 않는다, R-6) · `POST /chat`·`POST /answers/{id}`·`POST /briefings/run` 중 어느 것이든 403 `notice_required` 면 같은 상태(채팅 화면이면 안내 영역이 바로 보임) · 403 이어도 코드가 `notice_required` 가 아니면 잠금 0.
+    - **잠금(실제 브라우저 — E2E `web/e2e/notice.spec.ts`, review-u9a M-1)**: (가) `/auth/me` `notice_required:true` → 채팅 화면 안내 영역 4요소 글자 보임 · 입력 칸 강제 클릭 + 키보드 입력 + Enter · 보내기 버튼·칩 강제 클릭(`force: true`) → `POST /api/chat` 0 · `POST /api/answers/{id}` 0 (나) 잠금 없이 시작 → 대화 전송 → 403 `notice_required` → **포커스를 옮기지 않고** 다시 입력·Enter → `POST /api/chat` 호출 수 1 그대로 · 입력 칸에 보낸 문장이 돌아와 있음 · 일반 실패 문구 0 · 포커스가 동의 버튼(R-2·R-3) (다) `#/briefings` → "지금 브리핑" 비활성 · 강제 클릭 → `POST /api/briefings/run` 0 (라) 잠금 중에도 열린 자리 — 인물 카드가 열리고(`GET` 나감) "AI 연결" 화면으로 이동되며 로그아웃 누르면 `POST /api/auth/logout` 1 → 로그인 화면 (마) 동의 → `POST /api/auth/privacy-notice` 1 → 안내 영역 0 → 문장을 보내면 `POST /api/chat` 1. **변이**: 잠금 값을 각 자리에서 `false` 로 바꾸면(아래 V-a·V-b·V-c) 해당 E2E 가 실패해야 한다.
+    - Vitest(`notice.test.tsx`): 안내 영역 4요소 글자 일치·잠금 자리 3곳의 `disabled` 속성·처리 함수 가드(`fireEvent` 로 처리기를 직접 불러도 호출 0)·동의 성공 뒤 안내 영역 0·잠금 해제·자동 재전송 0·동의 실패 때 `role="alert"` 로 `AUTH_NOTICE.failed` 와 같은 문자열·안내 영역 유지·다시 누르면 그 줄이 지워짐·403 신호 판정(코드 검사)·R-2 세 갈래(일반 실패 문구 0, 입력 칸 복원·사용자 줄 걷음, `runFailed` 0)·포커스 이동.
+    - **Vitest 가 주장하는 것과 실제 보장의 차이(jsdom)**: jsdom 에서 `disabled` 는 user-event 가 흉내 내는 규칙일 뿐이고(`user.click`·`user.type` 은 비활성 요소를 건너뛰지만 `fireEvent` 는 처리기를 그대로 부른다), review-u9a P1 처럼 브라우저가 지키는 잠금(`inert` 등)을 jsdom 은 지키지 않는다. 그래서 Vitest 가 보장하는 것은 "잠금 속성이 붙는다" 와 "처리 함수 가드가 직접 불린 경우에도 호출 0" 까지이고, **"사용자 조작으로 실제 전송이 나가지 않는다" 는 E2E 만 판정한다.** Vitest 시험의 이름·주석은 그 범위만 말한다("전송이 나가지 않는다" 같은 행동 문장은 E2E 시험 이름에만 — review-u9a M-1 ②).
+    - 화면 수: 새 라우트(화면) 0 · `inert`·모달(`role="dialog"`·`aria-modal`) 0 · `AppShell.tsx` `<U4 해시>` 대비 diff 0.
+    - 문구: ④⑤ 글자 일치(`notice.test.tsx` — 구현 상수를 import 하지 않고 옮겨 적은 리터럴로) · 화면에 새로 생긴 글자 = ④⑤ 5개 문자열뿐(실패 안내는 기존 상수 재사용) · `BRIEFING_FORBIDDEN_EXPRESSIONS` 0.
+    - 범위: `u9a-test-diff` 파일 목록 ⊆ `auth.test.tsx`·`notice.test.tsx`(`chat.test.tsx`·`briefing.test.tsx` 무변경) · `web/e2e` 는 새 파일 `notice.spec.ts` 하나뿐(기존 파일 diff 0) · 기존 E2E 5건 그대로 통과 · Vitest·typecheck·build·lint 통과.
+  - 검증: `… u9a-vitest -- npm --prefix web exec -- vitest run --root web` · `… u9a-typecheck -- npm --prefix web run typecheck` · `… u9a-build -- npm --prefix web run build` · `… u9a-lint -- npm --prefix web run lint` · `… u9a-test-diff -- git diff --stat <U4 해시> -- web/src/__tests__` · **`… u9a-e2e -- npm --prefix web run e2e`**(기존 Playwright 설정 그대로 — 기존 5건 + `notice.spec.ts`) · `… u9a-e2e-status -- git status --short -- web/e2e`(`?? web/e2e/notice.spec.ts` 한 줄) · `… u9a-appshell-diff -- git diff --stat <U4 해시> -- web/src/components/AppShell.tsx`(빈 출력) · `… u9a-no-modal -- grep -rnE "inert|aria-modal|role=\"dialog\"" web/src --include=*.tsx`(따옴표가 있으므로 스크래치패드 `.sh` 로 — 판정 규칙. `components/ui/sheet.tsx` 등 기존 shadcn 파일에서 나온 줄은 U4 해시에도 있던 줄인지 대조해 제외한다).
+  - 변이 후보(저장소 밖 사본에서 — review-u9a 방식): **V-a** `ChatScreen` 의 입력 잠금 값을 `false` 로(`disabled`·`send()` 가드 둘 다) → E2E (가)·(나) FAILED(호출 수 > 0 / > 1) · **V-b** 칩 잠금 값을 `false` 로 → E2E (가) 칩 단언 FAILED · **V-c** "지금 브리핑" 잠금 값을 `false` 로 → E2E (다) FAILED · V-d 동의 실패 때 alert 를 띄우지 않음 → Vitest FAILED · V-e `onSubmit` 의 체크 가드 제거 → `fireEvent.submit` 시험 FAILED · V-f 403 `notice_required` 를 일반 실패로 처리 → R-2 Vitest FAILED. V-a~V-c 는 verifier 2회차가 직접 돌린다.
+  - 이력(개정 전 수용 기준 — 모달 형태): 체크 없이 가입 버튼 비활성 · 모달 동의 전 `POST /chat` 호출 0 · 로그인 상태에서 `notice_required: true` 면 바로 모달 · `true` 일 때만 모달 · `/briefings/run`·`/answers` 403 도 같은 모달 · 새 라우트(화면) 0 · 문구 ④⑤ 글자 일치 · `u9a-test-diff` ⊆ `auth.test.tsx`·`notice.test.tsx`. 변이 후보: 모달의 전송 잠금 빼기.
 
 - [ ] U9b **[frontend-agent] 채팅 차단 안내·거절 줄 표시, 인물 카드 민감 배지·기본 가림, 범주 한글 이름** / Refs: P9d-sensitive-guard D20 원칙5 원칙7 / 의존: U5b·U5c·U6·U8 커밋
-  - 파일: `web/src/screens/ChatScreen.tsx`(칩 컴포넌트 무변경) · `web/src/screens/PersonCardScreen.tsx` · `web/src/lib/labels.ts` · `web/src/__tests__/chat.test.tsx`·`card.test.tsx`·`labels.test.tsx`.
+  - 파일: `web/src/screens/ChatScreen.tsx`(칩 컴포넌트 무변경 — U9a 개정이 더한 잠금 한 줄·안내 영역 자리·403 `notice_required` 처리(R-2)를 기준선으로 그 위에 더한다. 재고지 잠금·R-2 는 U9a 에서 닫혔으므로 이 단위는 건드리지 않는다) · `web/src/screens/PersonCardScreen.tsx` · `web/src/lib/labels.ts` · `web/src/__tests__/chat.test.tsx`·`card.test.tsx`·`labels.test.tsx`.
   - 수용 기준: `kind="sensitive"` 칩이 기존 칩과 같은 DOM · 차단 안내는 `reply` 문자열 그대로 보임 · `content` 가 "(기억하지 않은 민감한 내용)" 인 사용자 줄은 흐린 글씨 · 민감 항목 기본 가림 — 가린 상태에서 배지 "민감"·범주 이름·(사건) 날짜·종류 이름·(사실) 키 이름만 보이고 값·사건 내용·일정 제목은 0, "눌러서 보기" 로 펼침(빈자리 ⑦) · 범주 키 한글 이름(D-2 확정 (a): "범죄·불법"·"건강"·"성"·"정치·종교"·"금융") · Vitest·typecheck·build·lint 통과.
   - 검증: 위 U9a 와 같은 4개 명령(`u9b-*`).
   - 변이 후보: 가림 기본값을 `false` 로 → 카드 시험 FAILED.
@@ -248,7 +291,7 @@ U2 와 U3 은 파일이 겹치지 않아 동시 가능(둘 다 backend-agent 라
 - [ ] U12 **[메인 세션 SSH + 사용자] 운영 반영 — 백업 → 0006 → 재배포 → 바깥 확인 → 기존 가입자 재고지 실제 확인** / Refs: P9d-sensitive-guard D17 D18 D20 / 의존: U11 `결과: 완료`
   - 파일: `docs/user-setup/13-user-todo-deploy.md` J 절(I 절 형식 인용).
   - **사전 예행(로컬 운영 구성 — 운영 반영 전, P9b U14 와 같은 모양)**: 0005 데이터 볼륨 → `0005 -> 0006`(행 수 같음) · 민감 행이 없을 때 downgrade 0005 성공 · **민감 질문 행 1개를 만든 뒤 downgrade 가 실패하고 데이터 불변** · `upgrade` 실패 분기(DDL 이 트랜잭션 안이라 0005 그대로) 확인. 증거 이름: `u12-local-upgrade`·`u12-local-downgrade-ok`·`u12-local-downgrade-blocked`·`u12-local-smoke`.
-  - 절차(R-10 반영): ① 백업 — `docker compose -f docker-compose.prod.yml exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB"' > ~/backup-<시각>-pre-0006.sql`(서버 홈, 파일은 서버에만 — 11-18 선례 `P9b-auth/03-log.md:316` 과 같은 방식). 확인: `ls -l ~/backup-<시각>-pre-0006.sql`(0바이트 아님) · `tail -n 3 …`(`PostgreSQL database dump complete` 줄) ② 전 행 수(계정·인물·사건·사실·일정·대화·대기 질문·별칭) ③ 미답·미만료 대기 질문 수 ④ `git pull` → `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build`(`docker/entrypoint.sh:10` 이 `alembic upgrade head` → `Running upgrade 0005 -> 0006`) ⑤ 후 행 수 = 전 · `/api/health` `alembic_revision` `0006` · backend 로그 Traceback 0 ⑥ 바깥 GET: `/` 200 · `/api/persons`·`/api/auth/me` 401 · `/mcp` 401 JSON → **되돌릴지 판단하는 시점은 여기(⑥ 뒤·⑦ 앞)** ⑦ 사용자: 열려 있던 탭 **새로고침**(옛 화면은 403 에 모달이 없다) → 기존 계정 접속 → 모달 → 동의 전 전송 막힘 → 동의 뒤 전송 → 민감 문장 칩 확인.
+  - 절차(R-10 반영): ① 백업 — `docker compose -f docker-compose.prod.yml exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB"' > ~/backup-<시각>-pre-0006.sql`(서버 홈, 파일은 서버에만 — 11-18 선례 `P9b-auth/03-log.md:316` 과 같은 방식). 확인: `ls -l ~/backup-<시각>-pre-0006.sql`(0바이트 아님) · `tail -n 3 …`(`PostgreSQL database dump complete` 줄) ② 전 행 수(계정·인물·사건·사실·일정·대화·대기 질문·별칭) ③ 미답·미만료 대기 질문 수 ④ `git pull` → `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml up -d --build`(`docker/entrypoint.sh:10` 이 `alembic upgrade head` → `Running upgrade 0005 -> 0006`) ⑤ 후 행 수 = 전 · `/api/health` `alembic_revision` `0006` · backend 로그 Traceback 0 ⑥ 바깥 GET: `/` 200 · `/api/persons`·`/api/auth/me` 401 · `/mcp` 401 JSON → **되돌릴지 판단하는 시점은 여기(⑥ 뒤·⑦ 앞)** ⑦ 사용자: 열려 있던 탭 **새로고침**(옛 화면은 403 에 재고지 안내가 없다) → 기존 계정 접속 → 채팅 화면 안내 영역·입력 칸 잠김(사용자 결정 27) → 동의 전 전송 막힘(칩·"지금 브리핑" 포함) · 인물 카드 읽기·로그아웃은 열림 → 동의 뒤 전송 → 민감 문장 칩 확인.
   - 되돌리기(J 절에 적는다): (가) ④ 에서 `alembic upgrade` 자체가 실패해 backend 가 뜨지 않으면 — DB 는 0005 그대로(트랜잭션 롤백) → `git checkout <이전 해시>` → `up -d --build`, downgrade 불필요. (나) ⑥ 뒤·⑦ 전(민감 행 0)이면 I 절과 같은 순서 — `stop backend` → `GIT_SHA=$(git rev-parse --short HEAD) docker compose -f docker-compose.prod.yml run --rm --entrypoint python backend -m alembic downgrade 0005` → `git checkout <이전 해시>` → `up -d --build`. 이때 `users.privacy_notice_*` 두 컬럼(고지 동의 기록)도 사라진다. (다) ⑦ 에서 사용자가 민감 칩에 답한 뒤에는 `kind='sensitive'` 행이 생겨 **downgrade 가 설계대로 실패**한다 — 멈추고 사용자에게 묻는다. 백업 복원은 마지막 수단이고 그 뒤 입력이 사라지며 데이터 삭제를 동반하므로 **사용자가 직접 실행**한다(`security.md` 6절): `stop backend` → DB 비우고 다시 만들기 → `docker compose … exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < ~/backup-<시각>-pre-0006.sql` → `git checkout <이전 해시>` → `up -d --build`(명령 전문은 J 절에, 에이전트는 실행하지 않는다).
   - 수용 기준: 사전 예행 증거 4개 · ①~⑦ 증거(`evidence/<시각>-u12-*.txt`, 값·토큰 0) · verifier 가 04-review 부록에서 대조 · 사용자 화면 확인.
 
@@ -313,7 +356,8 @@ U2 와 U3 은 파일이 겹치지 않아 동시 가능(둘 다 backend-agent 라
 - D-4 답 — **확정(사용자 2026-11-22, AskUserQuestion)**: **(a) 언제나 이름 거부.** 결정 22 로 통과한 기존 별칭 표현이 별칭 주인이 아닌 인물로 해석되면(다른 인물로 자동 연결 · identity 답이 다른 후보 · 새 인물 밴드 · identity 거절) 기록하지 않고 이름 거부 안내로 답한다. 위 표 D-4 행과 U7b 의 "D-4 확정안" 은 이 (a) 를 가리킨다.
 - 위 D-1~D-3 답 — **확정(사용자 2026-11-22, AskUserQuestion)**: D-1 = (a) 고정 순서(`crime`·`health`·`sex`·`politics_religion`·`finance`)의 첫 범주 하나 · D-2 = (a) 배지 "민감" + 범주 이름 + "눌러서 보기" · D-3 = (a) $1(넘으면 멈추고 보고).
 - U6 실 LLM 대조·U10 실 LLM 측정 실행 지시(OpenAI 비용).
-- U12: 운영 화면에서 기존 계정 재고지 모달·민감 문장 칩 확인, 완성 확인 뒤 서버 종료일 결정(사용자 결정 11).
+- U12: 운영 화면에서 기존 계정 재고지(채팅 화면 안내 영역·전송 자리 잠금 — 사용자 결정 27)·민감 문장 칩 확인, 완성 확인 뒤 서버 종료일 결정(사용자 결정 11).
+- **빈자리 BZ-1 — 답 받음(사용자 2026-11-22, D20 결정 29): (a) 알리지 않는다, 버튼 비활성만.** 아래는 물었던 내용이다: "지금 브리핑" 이 잠긴 이유를 브리핑 화면에서 알리는 말 — 확정 문구로 표현할 수 없다(⑤ 잠금 안내는 "대화" 만 말함). 후보 (a) 알리지 않는다 — 버튼 비활성만, 안내·동의는 채팅 화면(새 문구 0) **권장** (b) 브리핑 화면에도 같은 안내 영역(새 문구 0, 잠금 안내 글자가 버튼과 맞지 않고 301자 문단이 두 화면에) (c) 브리핑 화면용 새 문구를 사용자가 정한다. U9a 방식 5 는 (a) 로 적었다. (a) 권장 이유: 기존 가입자는 접속하면 기본 라우트인 채팅 화면(`DEFAULT_HASH = HREF.chat`, `web/src/routes.ts:18`)에서 안내를 먼저 본다. 브리핑 화면에서 잠김을 처음 만나는 길은 판 번호가 올라간 배포 뒤 열어 둔 탭이 "지금 브리핑" 을 눌러 403 을 받는 경우뿐이다.
 - 고지 문구의 법적 충분성·OpenAI 약관 확인(이 계획은 판단하지 않는다).
 
 ## 읽은 카드
@@ -373,3 +417,19 @@ U2 와 U3 은 파일이 겹치지 않아 동시 가능(둘 다 backend-agent 라
 | P3-R5 | D20 R-7 · CR-009 4.2 U6·9절 | D-4 를 확정 (a) 로 · `PROPOSAL_SCHEMA` 최상위 선택 속성 |
 | P3-R6 | U7b 방식 | `name_rule_dropped` 는 언급 인덱스(문자열 0), 시험 1건 |
 | P3-R7 | U9a 파일 | `MeOut.notice_required` 는 선택 필드 |
+
+### U9a 리뷰 1차 보류 뒤 사용자 결정 27·28 반영 (2026-11-22, architect — `review-u9a.md` 결과: 보류. 단위 줄 형식·Refs 유지)
+| 소견·결정 | 고친 자리 | 한 줄 |
+|---|---|---|
+| **UD-2 → 사용자 결정 27** "전송만 잠그고 나머지는 열기" | 머리 상태 줄·범위(하지 않는 것)·산출물(프론트)·"가드 문구 상수의 주인"·U9a 단위 줄 제목·파일·방식 1~5·수용 기준·검증·변이·U9b 파일·U12 ⑦·사용자만 할 수 있는 일 · D20 결정 1·5·21·⑤·보충 · CR-009 · D18 · backlog | 재고지는 모달이 아니라 채팅 화면 안 안내 영역. 잠금은 채팅 입력·칩 답변·"지금 브리핑" 세 곳(닫힌 목록 + 코드 근거), 읽기·"AI 연결"·알림 받기·로그아웃·이동은 열림(닫힌 목록). 확정 문구 글자 그대로, 서버 계약 그대로. verifier 권장안(모달 안 로그아웃)과 다른 선택 |
+| **UD-1 → 사용자 결정 28** 기존 문구 재사용 | U9a 방식 7·수용 기준·"가드 문구 상수의 주인" | 동의 실패 때 버튼 위 `role="alert"` 로 `AUTH_NOTICE.failed` 를 import(새 리터럴 0) |
+| **[필수] M-1** | U9a 파일(`web/e2e/notice.spec.ts`)·수용 기준(E2E (가)~(마))·"Vitest 와 실제 보장의 차이"·검증 `u9a-e2e`·`u9a-e2e-status`·변이 V-a~V-c | 잠금이 실제 브라우저에서 전송을 막는지는 E2E 로, 잠금 값을 `false` 로 바꾸는 변이에서 E2E 가 실패해야 한다. Vitest 는 속성·가드까지만 주장(시험 이름도 그 범위) |
+| [권고] R-1 | U9a 방식 10·수용 기준·변이 V-e | `onSubmit` 이 체크를 다시 확인, `fireEvent.submit` 시험 |
+| [권고] R-2 | U9a 방식 8·수용 기준·변이 V-f · U9b 파일 | **U9b 에서 U9a 로 당김** — 채팅 입력·"지금 브리핑" 잠금이 이 단위이고 `ChatScreen.tsx`·`BriefingScreen.tsx` 를 이 단위가 고치므로 같은 곳에서 닫는 편이 재작업이 적다. 403 `notice_required` 는 일반 실패가 아니라 잠금 신호로 처리(문장 복원·화면 줄 걷음·`runFailed` 0, 자동 재전송 0) |
+| [권고] R-3 | U9a 방식 9·수용 기준 | 모달 대상이던 포커스·`aria-describedby` 를 안내 영역·잠긴 입력 칸으로 옮김, 가입 체크 `aria-required` |
+| [권고] R-4 | U9a "함께 처리" ⑤ | 커밋 때 tests.md·03-log·registry |
+| [권고] R-5 | U9a "함께 처리" ①~④ | 낡은 주석·시험 이름(272행 밖 이름 변경은 단언 변경 아님) |
+| 파일 목록 | 산출물·U9a 파일 | `web/src/auth.tsx`(review-u9a 승인)·`web/e2e/notice.spec.ts`(M-1 승인)·`web/src/components/NoticePanel.tsx`(새)·`web/src/screens/ChatScreen.tsx`·`web/src/screens/BriefingScreen.tsx` 를 U9a 목록에. `AppShell.tsx` 는 `<U4 해시>` 대비 diff 0 이 기대값 |
+| 시험 닫힌 목록 | U9a 방식 2 · 전수 확인 표 `web/src` 행 | 화면은 공급자 밖에서 `false` 인 `useNoticeRequired()` 를 읽어 `chat.test.tsx`·`briefing.test.tsx` diff 0 유지 |
+| 남김·버림 | U9a "이미 만든 구현" | `NoticeModal`·`inert` 와 모달 시험은 버리고, 상태·신호·문구·가입 고지·`auth.test.tsx` 변경은 남긴다 |
+| 빈자리 BZ-1 | 사용자만 할 수 있는 일 · D20 보충 · CR-009 8.3 B7 | "지금 브리핑" 잠김 이유를 브리핑 화면에서 알리는 말 — 사용자 답 대기, 기본 (a) 알리지 않음 |

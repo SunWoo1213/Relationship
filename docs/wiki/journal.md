@@ -725,3 +725,6 @@
 - 2026-11-22 19:44 | PUSH-dev2 | origin dev2 5fc2b79 (실험 푸시)
 - 2026-11-22 19:55 | COMMIT | 2a9b65d fix(P9d-sensitive-guard): 가입 동의는 불리언 true 일 때만 받는다 (U4 보강)
 - 2026-11-22 19:55 | PUSH-dev2 | origin dev2 2a9b65d (실험 푸시)
+- 2026-11-22 20:31 | COMMIT | 1b19781 eval(P9d-sensitive-guard): 민감 가드 시험 세트를 만들고 test 를 동결한다 (U1)
+- 2026-11-22 20:31 | PUSH-dev2 | origin dev2 1b19781 (실험 푸시)
+- 2026-11-22 20:32 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
