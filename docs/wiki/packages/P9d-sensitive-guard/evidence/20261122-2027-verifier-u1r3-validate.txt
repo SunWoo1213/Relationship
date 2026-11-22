@@ -1,0 +1,54 @@
+# 명령: .venv/bin/python -I scripts/validate_sensitive_set.py evaluation/sensitive_guard/
+# 시각: 2026-11-22T20:27:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+[dev] 유효한 줄 315 / 전체 줄 315
+  sensitive 165 — 범주·유형별(group==sensitive 만, 기준 15~20):
+    consent:crime                 15 OK · 조회형 2
+    consent:health                15 OK · 조회형 2
+    consent:sex                   15 OK · 조회형 2
+    consent:politics_religion     15 OK · 조회형 2
+    consent:finance               15 OK · 조회형 2
+    block:rrn                     15 OK
+    block:passport                15 OK
+    block:driver_license          15 OK
+    block:account                 15 OK
+    block:card                    15 OK
+    block:password                15 OK
+  plain     100 (기준 100) OK
+  trap       30 (기준 30) OK
+  evasion    20 (기준 20) OK
+  조회형 합계 — sensitive 10 · plain 15
+  우회 라벨 분포 — block:account 1, block:card 1, block:password 1, block:rrn 2, consent:crime 5, consent:finance 3, consent:health 3, consent:politics_religion 2, consent:sex 2
+  함정 종류 — address 2, amount 3, date 2, honorific_name 4, keyword_lookalike 6, mid_health 2, mild_health 4, occupation 4, phone 2, place 1
+  함정 호칭형 이름 '교회 오빠' 1건 OK
+  함정 호칭형 이름 '정신과 선생님' 1건 OK
+[test] 유효한 줄 315 / 전체 줄 315
+  sensitive 165 — 범주·유형별(group==sensitive 만, 기준 15~20):
+    consent:crime                 15 OK · 조회형 2
+    consent:health                15 OK · 조회형 2
+    consent:sex                   15 OK · 조회형 2
+    consent:politics_religion     15 OK · 조회형 2
+    consent:finance               15 OK · 조회형 2
+    block:rrn                     15 OK
+    block:passport                15 OK
+    block:driver_license          15 OK
+    block:account                 15 OK
+    block:card                    15 OK
+    block:password                15 OK
+  plain     100 (기준 100) OK
+  trap       30 (기준 30) OK
+  evasion    20 (기준 20) OK
+  조회형 합계 — sensitive 10 · plain 15
+  우회 라벨 분포 — block:account 1, block:card 1, block:password 1, block:rrn 2, consent:crime 5, consent:finance 3, consent:health 3, consent:politics_religion 2, consent:sex 2
+  함정 종류 — address 2, amount 3, date 2, honorific_name 4, keyword_lookalike 6, mid_health 2, mild_health 4, occupation 4, phone 2, place 1
+  함정 호칭형 이름 '교회 오빠' 1건 OK
+  함정 호칭형 이름 '정신과 선생님' 1건 OK
+형식 오류: 0
+dev/test 문장 중복(한 파일 안 포함): 0
+주민등록번호 모양: 34건 · 검증 숫자 일치 0건(기준 0)
+카드번호 모양: 공개 시험 번호 32건 · 목록 밖 0건(기준 0)
+오류: 0
+결과: PASS

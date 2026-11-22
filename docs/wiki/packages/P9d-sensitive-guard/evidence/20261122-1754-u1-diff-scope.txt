@@ -1,0 +1,66 @@
+# 명령: git diff --stat 947c12c -- app/er reports data; echo '--- U1 파일(추적 안 됨 포함)'; git status --short -- evaluation/sensitive_guard scripts/validate_sensitive_set.py; echo '--- 작업 트리 전체(U3 동시 작업 포함)'; git status --short
+# 시각: 2026-11-22T17:54:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# ---
+--- U1 파일(추적 안 됨 포함)
+?? evaluation/sensitive_guard/
+?? scripts/validate_sensitive_set.py
+--- 작업 트리 전체(U3 동시 작업 포함)
+ M app/db/models.py
+ M docs/wiki/HANDOFF.md
+ M docs/wiki/journal.md
+ M tests/test_api.py
+ M tests/test_migration_0003.py
+ M tests/test_migration_0004.py
+ M tests/test_migration_0005.py
+ M tests/test_schema_check.py
+ M tests/test_schema_models.py
+?? alembic/versions/0006_sensitive_guard.py
+?? docs/wiki/fixes/evidence/20261108-2000-L-007-test-guards.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261107-1455-u7fix-ruff.txt
+?? docs/wiki/packages/P5b-query-turn/evidence/20261108-2009-u7fix3-review-baseline.txt
+?? docs/wiki/packages/P9-infra/evidence/20261114-1512-u3b-mutations-names.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-2132-u11-deployed-get.txt
+?? docs/wiki/packages/P9b-auth/evidence/20261116-2132-u11-deployed-get2.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1737-u3-dev-before-counts.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1740-u3-api.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1740-u3-check.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1740-u3-dev-after-counts.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1740-u3-schema-check.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1740-u3-schema-tests.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1740-u3-tools-check.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1740-u3-upgrade.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1743-u3-mutations.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1744-u3-full-pytest.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1744-u3-migration.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1744-u3-test-diff.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1747-verifier-u3-alembic-check.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1747-verifier-u3-full-pytest.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1747-verifier-u3-migration.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1747-verifier-u3-ruff.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1747-verifier-u3-schema-check.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1747-verifier-u3-schema-tests.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1747-verifier-u3-test-diff.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1747-verifier-u3-tools-check.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1749-verifier-u3-dev-counts-before.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1749-verifier-u3-dev-counts-pre.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1749-verifier-u3-mig-state-before.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1749-verifier-u3-mutations-names.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1749-verifier-u3-mutations.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1750-verifier-u3-restore.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1751-verifier-u3-dev-nulls.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1752-u1-freeze.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1752-u1-pytest.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1752-u1-validate.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1754-u1-mutations.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1754-u1-mypy-validator.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1754-u1-mypy.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1754-u1-ruff.txt
+?? docs/wiki/packages/P9d-sensitive-guard/evidence/20261122-1754-u1-tools-check.txt
+?? docs/wiki/packages/P9d-sensitive-guard/review-u3.md
+?? docs/wiki/packages/P9d-sensitive-guard/tests.md
+?? evaluation/sensitive_guard/
+?? scripts/validate_sensitive_set.py
+?? tests/test_migration_0006.py

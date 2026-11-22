@@ -1,0 +1,57 @@
+# 명령: shasum -a 256 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/../u1_mut/work/baseline/*.jsonl && .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/analyze.py /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/../u1_mut/work/baseline
+# 시각: 2026-11-22T19:57:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# 메모: 1차 판 사본(sha256 test eeaf7847… dev cc30eca8…)에서 검수 수치 재현
+# ---
+cc30eca88a7ea86c2c5c080c07cec295bd7bdc9b6ea7c189af62c11f04460592  /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/../u1_mut/work/baseline/dev.jsonl
+eeaf784796ec5d4c5343a0d891cc5a64d95dd08b4c9191a67b4681bce80aa915  /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/../u1_mut/work/baseline/test.jsonl
+유사도 ≥0.8: 5 ≥0.7: 25 ≥0.6: 58
+0.93 dev-256 test-256
+0.91 dev-263 test-263
+0.85 dev-253 test-253
+0.83 dev-189 test-189
+0.83 dev-248 test-248
+0.78 dev-169 test-169
+0.77 dev-252 test-252
+0.77 dev-230 test-230
+0.77 dev-197 test-197
+0.76 dev-191 test-191
+0.76 dev-243 test-243
+0.76 dev-192 test-192
+0.76 dev-182 test-182
+0.74 dev-074 test-074
+0.74 dev-044 test-044
+0.74 dev-262 test-262
+0.74 dev-255 test-255
+0.74 dev-254 test-254
+0.73 dev-240 test-240
+0.73 dev-184 test-184
+0.73 dev-242 test-242
+0.73 dev-179 test-179
+0.72 dev-251 test-251
+0.71 dev-281 test-281
+0.71 dev-233 test-233
+0.68 dev-192 test-171
+0.67 dev-247 test-195
+0.67 dev-242 test-179
+0.67 dev-214 test-214
+0.67 dev-210 test-210
+0.67 dev-180 test-180
+0.67 dev-176 test-176
+0.67 dev-075 test-075
+0.67 dev-029 test-060
+0.65 dev-203 test-203
+0.65 dev-265 test-265
+0.65 dev-175 test-175
+0.65 dev-286 test-286
+0.65 dev-033 test-039
+0.65 dev-223 test-223
+유사도 상위 40쌍 중 같은 줄 번호: 35
+같은 줄 번호 쌍 평균 0.468 / 같은 묶음 임의 쌍 평균 0.219
+plain 같은 번호 쌍 평균 0.561 ≥0.6: 37 / 100
+trap 같은 번호 쌍 평균 0.441 ≥0.6: 4 / 30
+evasion 같은 번호 쌍 평균 0.372 ≥0.6: 0 / 20
+consent 같은 번호 쌍 평균 0.324 ≥0.6: 5 / 75
+block 같은 번호 쌍 평균 0.515 ≥0.6: 20 / 90

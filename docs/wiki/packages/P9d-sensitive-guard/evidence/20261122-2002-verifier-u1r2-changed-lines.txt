@@ -1,0 +1,33 @@
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu1r2/diff.py /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/work/baseline evaluation/sensitive_guard
+# 시각: 2026-11-22T20:02:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+dev 315 315 raw-line diffs: 8 rawlen 316 316
+   dev-066 dev-066 ['note', 'text'] label consent:finance -> consent:finance group sensitive -> sensitive trap None -> None form None -> None
+   dev-069 dev-069 ['note', 'text'] label consent:finance -> consent:finance group sensitive -> sensitive trap None -> None form None -> None
+   dev-072 dev-072 ['note', 'text'] label consent:finance -> consent:finance group sensitive -> sensitive trap None -> None form None -> None
+   dev-073 dev-073 ['note', 'text'] label consent:finance -> consent:finance group sensitive -> sensitive trap None -> None form None -> None
+   dev-268 dev-268 ['note', 'text', 'trap'] label none -> none group trap -> trap trap keyword_lookalike -> mid_health form None -> None
+   dev-276 dev-276 ['note', 'text', 'trap'] label none -> none group trap -> trap trap honorific_name -> amount form None -> None
+   dev-289 dev-289 ['note', 'text', 'trap'] label none -> none group trap -> trap trap general_topic -> mid_health form None -> None
+   dev-290 dev-290 ['note', 'trap'] label none -> none group trap -> trap trap general_topic -> keyword_lookalike form None -> None
+test 315 315 raw-line diffs: 17 rawlen 316 316
+   test-025 test-025 ['note', 'text'] label consent:health -> consent:health group sensitive -> sensitive trap None -> None form None -> None
+   test-029 test-029 ['note', 'text'] label consent:health -> consent:health group sensitive -> sensitive trap None -> None form query -> query
+   test-044 test-044 ['text'] label consent:sex -> consent:sex group sensitive -> sensitive trap None -> None form query -> query
+   test-062 test-062 ['note', 'text'] label consent:finance -> consent:finance group sensitive -> sensitive trap None -> None form None -> None
+   test-066 test-066 ['note', 'text'] label consent:finance -> consent:finance group sensitive -> sensitive trap None -> None form None -> None
+   test-070 test-070 ['note', 'text'] label consent:finance -> consent:finance group sensitive -> sensitive trap None -> None form None -> None
+   test-072 test-072 ['note', 'text'] label consent:finance -> consent:finance group sensitive -> sensitive trap None -> None form None -> None
+   test-075 test-075 ['text'] label consent:finance -> consent:finance group sensitive -> sensitive trap None -> None form query -> query
+   test-253 test-253 ['text'] label none -> none group plain -> plain trap None -> None form query -> query
+   test-256 test-256 ['text'] label none -> none group plain -> plain trap None -> None form query -> query
+   test-263 test-263 ['text'] label none -> none group plain -> plain trap None -> None form query -> query
+   test-268 test-268 ['note', 'text', 'trap'] label none -> none group trap -> trap trap keyword_lookalike -> mid_health form None -> None
+   test-271 test-271 ['note', 'text'] label none -> none group trap -> trap trap occupation -> occupation form None -> None
+   test-274 test-274 ['note', 'text', 'trap'] label none -> none group trap -> trap trap honorific_name -> amount form None -> None
+   test-289 test-289 ['note', 'text', 'trap'] label none -> none group trap -> trap trap general_topic -> mid_health form None -> None
+   test-290 test-290 ['note', 'trap'] label none -> none group trap -> trap trap general_topic -> keyword_lookalike form None -> None
+   test-296 test-296 ['note', 'text'] label consent:crime -> consent:crime group evasion -> evasion trap None -> None form None -> None

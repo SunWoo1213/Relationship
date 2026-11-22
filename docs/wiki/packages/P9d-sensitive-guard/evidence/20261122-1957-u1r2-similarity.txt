@@ -1,0 +1,56 @@
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/analyze.py
+# 시각: 2026-11-22T19:57:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+유사도 ≥0.8: 2 ≥0.7: 21 ≥0.6: 53
+0.83 dev-189 test-189
+0.83 dev-248 test-248
+0.78 dev-169 test-169
+0.77 dev-252 test-252
+0.77 dev-230 test-230
+0.77 dev-197 test-197
+0.76 dev-191 test-191
+0.76 dev-243 test-243
+0.76 dev-192 test-192
+0.76 dev-182 test-182
+0.74 dev-074 test-074
+0.74 dev-262 test-262
+0.74 dev-255 test-255
+0.74 dev-254 test-254
+0.73 dev-240 test-240
+0.73 dev-184 test-184
+0.73 dev-242 test-242
+0.73 dev-179 test-179
+0.72 dev-251 test-251
+0.71 dev-281 test-281
+0.71 dev-233 test-233
+0.68 dev-192 test-171
+0.67 dev-247 test-195
+0.67 dev-242 test-179
+0.67 dev-214 test-214
+0.67 dev-210 test-210
+0.67 dev-180 test-180
+0.67 dev-176 test-176
+0.67 dev-029 test-060
+0.65 dev-203 test-203
+0.65 dev-265 test-265
+0.65 dev-175 test-175
+0.65 dev-286 test-286
+0.65 dev-033 test-039
+0.65 dev-223 test-223
+0.63 dev-200 test-200
+0.63 dev-264 test-264
+0.63 dev-177 test-193
+0.63 dev-053 test-053
+0.62 dev-249 test-224
+유사도 상위 40쌍 중 같은 줄 번호: 33
+같은 줄 번호 쌍 평균 0.457 / 같은 묶음 임의 쌍 평균 0.219
+plain 같은 번호 쌍 평균 0.544 ≥0.6: 34 / 100
+trap 같은 번호 쌍 평균 0.427 ≥0.6: 4 / 30
+evasion 같은 번호 쌍 평균 0.369 ≥0.6: 0 / 20
+consent 같은 번호 쌍 평균 0.31 ≥0.6: 3 / 75
+block 같은 번호 쌍 평균 0.515 ≥0.6: 20 / 90
+README 3~6절 낱말 중 test 문장에만 있는 것: ['값이', '같은', '정체성', '지향']
+README 7절 낱말 중 test 문장에만 있는 것: ['값이', '같은', '내연', '노동조합', '뇌졸중', '다른', '알코올', '옮겨', '있는', '정체성', '중독', '지향']

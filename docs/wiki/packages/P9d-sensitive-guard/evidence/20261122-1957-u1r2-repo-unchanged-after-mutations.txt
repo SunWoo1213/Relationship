@@ -1,0 +1,10 @@
+# 명령: shasum -a 256 scripts/validate_sensitive_set.py tests/test_validate_sensitive_set.py evaluation/sensitive_guard/*.jsonl
+# 시각: 2026-11-22T19:57:44+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+1525b5a0484650478c92d66f8ad6da8db4ac841ffcaa02e71f2b0f4f20d0507a  scripts/validate_sensitive_set.py
+5eaabf2cc36a15cedc1e6a9e66a775731776d2f0cde1577b4bc977f7170b50b8  tests/test_validate_sensitive_set.py
+d3d3d09c0cfd0c24e72fb7a7b17709507f72b98439747a7ef16bb36ccaff12a9  evaluation/sensitive_guard/dev.jsonl
+b0b2e1e8cfc2232846cd5b75f178bc108e6b7b053b62924edc73e206c3e7dd2b  evaluation/sensitive_guard/test.jsonl

@@ -1,0 +1,48 @@
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu1r3/check3.py /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r3/v2 evaluation/sensitive_guard
+# 시각: 2026-11-22T20:27:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== 1. 2차 판 사본 ↔ 지금: 바뀐 줄
+   dev: 3줄 [('dev-011', ['note', 'text']), ('dev-028', ['note', 'text']), ('dev-071', ['note', 'text'])]
+   dev: text·note 밖의 키(id·label·group·form·trap)가 바뀐 줄 0
+   test: 3줄 [('test-013', ['note', 'text']), ('test-023', ['note', 'text']), ('test-068', ['note', 'text'])]
+   test: text·note 밖의 키(id·label·group·form·trap)가 바뀐 줄 0
+
+== 2. 결정 25 줄(note 가 '결정 25 — 인물 없는 화제' 로 시작)
+    [('dev-011', 'consent:crime', 'sensitive', None), ('dev-028', 'consent:health', 'sensitive', None), ('test-013', 'consent:crime', 'sensitive', None), ('test-023', 'consent:health', 'sensitive', None)]
+   dev-011: 인물 표지 걸림 False · 물음 꼴 False · 글자 수 29
+   dev-028: 인물 표지 걸림 False · 물음 꼴 False · 글자 수 39
+   test-013: 인물 표지 걸림 False · 물음 꼴 False · 글자 수 32
+   test-023: 인물 표지 걸림 False · 물음 꼴 False · 글자 수 31
+
+== 3. test 결정 25 줄의 낱말이 dev 문장에 있나 (2자 이상 한글 낱말 가운데 dev 에 있는 것의 수 / 전체 — 낱말 자체는 찍지 않음)
+   test-013: 낱말 7 중 dev 문장에 통째로 있는 것 3
+   test-023: 낱말 7 중 dev 문장에 통째로 있는 것 2
+   test-013: 3자 토막을 함께 가진 같은 라벨 dev 줄(3차 판) [] · (2차 판) []
+   test-023: 3자 토막을 함께 가진 같은 라벨 dev 줄(3차 판) [] · (2차 판) []
+
+== 4. 틀 — 결정 25 줄끼리, 그리고 dev 전체와의 유사도
+   dev-011 ↔ test-013: 0.10
+   dev-028 ↔ test-013: 0.42
+   dev-011 ↔ test-023: 0.27
+   dev-028 ↔ test-023: 0.26
+   test-013: 같은 번호 dev 0.21 · dev 전체 최대 0.42 (dev-028)
+   test-023: 같은 번호 dev 0.18 · dev 전체 최대 0.34 (dev-298)
+   test-068: 같은 번호 dev 0.42 · dev 전체 최대 0.53 (dev-073)
+
+== 5. 범주마다 한 문장에 범주 하나 — 결정 25 줄에 다른 범주 라벨의 dev 낱말(3자 토막)이 있나
+   dev-011: 다른 동의 범주 dev 줄과 3자 토막이 겹치는 라벨 []
+   dev-028: 다른 동의 범주 dev 줄과 3자 토막이 겹치는 라벨 ['consent:crime']
+   test-013: 다른 동의 범주 dev 줄과 3자 토막이 겹치는 라벨 []
+   test-023: 다른 동의 범주 dev 줄과 3자 토막이 겹치는 라벨 ['consent:sex']
+
+== 6. none 줄(평범·함정)에 보도 둘레 낱말이 남았나
+   dev: []
+   test: []
+   consent 줄 가운데 걸리는 것: ['dev-011', 'dev-014', 'dev-028', 'test-013', 'test-014', 'test-023', 'test-047']
+
+== 7. 금융 경계 줄(연체·못 갚음 낱말 유무)
+   dev-071: label consent:finance · 빚·연체 낱말 걸림 True · note 에 '투자' False
+   test-068: label consent:finance · 빚·연체 낱말 걸림 True · note 에 '투자' False

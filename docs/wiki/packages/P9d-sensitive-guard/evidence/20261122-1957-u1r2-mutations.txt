@@ -1,0 +1,326 @@
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M00
+# 시각: 2026-11-22T19:57:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# 메모: 검사기 코드 변이 — 스크래치패드 사본, 저장소 파일 불변
+# ---
+== M00 대조군(변이 없음) (적용 0회)
+pytest rc=0 · 28 passed in 0.24s
+판정: 대조군 통과
+
+# ===== append 2026-11-22T19:57:31+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M01
+# 시각: 2026-11-22T19:57:31+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M01 문장 중복 판정을 파일별로 초기화(review-u1 C01) (적용 1회)
+pytest rc=1 · 2 failed, 26 passed in 0.25s
+  FAILED test_dev_sentence_copied_into_test_fails
+  FAILED test_duplicate_after_nfc_and_whitespace_normalisation_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:31+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M02
+# 시각: 2026-11-22T19:57:31+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M02 정규화에서 NFC 빼기 (적용 1회)
+pytest rc=1 · 1 failed, 27 passed in 0.25s
+  FAILED test_duplicate_after_nfc_and_whitespace_normalisation_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:32+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M03
+# 시각: 2026-11-22T19:57:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M03 범주 하한 15 → 14 (적용 1회)
+pytest rc=1 · 3 failed, 25 passed in 0.26s
+  FAILED test_category_count_bounds[14-False]
+  FAILED test_category_count_bounds[21-False]
+  FAILED test_sensitive_row_with_none_label_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:32+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M04
+# 시각: 2026-11-22T19:57:32+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M04 범주 상한 20 → 21 (적용 1회)
+pytest rc=1 · 3 failed, 25 passed in 0.26s
+  FAILED test_category_count_bounds[14-False]
+  FAILED test_category_count_bounds[21-False]
+  FAILED test_sensitive_row_with_none_label_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:33+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M05
+# 시각: 2026-11-22T19:57:33+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M05 범주 하한 비교 <= → < (적용 1회)
+pytest rc=1 · 27 failed, 1 passed in 0.58s
+  FAILED test_block_rrn_row_without_rrn_fails
+  FAILED test_category_count_bounds[14-False]
+  FAILED test_category_count_bounds[15-True]
+  FAILED test_category_count_bounds[20-True]
+  FAILED test_category_count_bounds[21-False]
+  FAILED test_dev_sentence_copied_into_test_fails
+  FAILED test_duplicate_after_nfc_and_whitespace_normalisation_fails
+  FAILED test_duplicate_id_across_files_fails
+  FAILED test_duplicate_within_one_file_fails
+  FAILED test_evasion_rows_are_not_counted_in_category
+  FAILED test_group_sizes_are_exact[evasion--1]
+  FAILED test_group_sizes_are_exact[evasion-1]
+  FAILED test_group_sizes_are_exact[plain--1]
+  FAILED test_group_sizes_are_exact[plain-1]
+  FAILED test_group_sizes_are_exact[trap--1]
+  FAILED test_group_sizes_are_exact[trap-1]
+  FAILED test_luhn_valid_number_outside_public_list_fails
+  FAILED test_missing_required_trap_phrase_fails
+  FAILED test_plain_row_with_consent_label_fails
+  FAILED test_query_minimum_per_category[0-False]
+  FAILED test_query_minimum_per_category[1-True]
+  FAILED test_rrn_split_into_word_separated_pieces_is_found
+  FAILED test_sensitive_row_with_none_label_fails
+  FAILED test_split_rrn_with_another_number[False-True]
+  FAILED test_split_rrn_with_another_number[True-False]
+  FAILED test_synthetic_control_passes
+  FAILED test_valid_rrn_in_trap_row_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:34+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M06
+# 시각: 2026-11-22T19:57:34+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M06 조회형 최소 비교 < → <= (적용 1회)
+pytest rc=1 · 2 failed, 26 passed in 0.36s
+  FAILED test_query_minimum_per_category[1-True]
+  FAILED test_sensitive_row_with_none_label_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:35+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M07
+# 시각: 2026-11-22T19:57:35+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M07 범주 셈 필터를 sensitive → none 아닌 모든 줄(우회 포함) (적용 1회)
+pytest rc=1 · 27 failed, 1 passed in 0.48s
+  FAILED test_block_rrn_row_without_rrn_fails
+  FAILED test_category_count_bounds[14-False]
+  FAILED test_category_count_bounds[15-True]
+  FAILED test_category_count_bounds[20-True]
+  FAILED test_category_count_bounds[21-False]
+  FAILED test_dev_sentence_copied_into_test_fails
+  FAILED test_duplicate_after_nfc_and_whitespace_normalisation_fails
+  FAILED test_duplicate_id_across_files_fails
+  FAILED test_duplicate_within_one_file_fails
+  FAILED test_evasion_rows_are_not_counted_in_category
+  FAILED test_group_sizes_are_exact[evasion--1]
+  FAILED test_group_sizes_are_exact[evasion-1]
+  FAILED test_group_sizes_are_exact[plain--1]
+  FAILED test_group_sizes_are_exact[plain-1]
+  FAILED test_group_sizes_are_exact[trap--1]
+  FAILED test_group_sizes_are_exact[trap-1]
+  FAILED test_luhn_valid_number_outside_public_list_fails
+  FAILED test_missing_required_trap_phrase_fails
+  FAILED test_plain_row_with_consent_label_fails
+  FAILED test_query_minimum_per_category[0-False]
+  FAILED test_query_minimum_per_category[1-True]
+  FAILED test_rrn_split_into_word_separated_pieces_is_found
+  FAILED test_sensitive_row_with_none_label_fails
+  FAILED test_split_rrn_with_another_number[False-True]
+  FAILED test_split_rrn_with_another_number[True-False]
+  FAILED test_synthetic_control_passes
+  FAILED test_valid_rrn_in_trap_row_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:36+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M08
+# 시각: 2026-11-22T19:57:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M08 평범·함정 줄의 none 강제 제거 (적용 1회)
+pytest rc=1 · 1 failed, 27 passed in 0.25s
+  FAILED test_plain_row_with_consent_label_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:36+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M09
+# 시각: 2026-11-22T19:57:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M09 이웃한 6·7자리 쌍 검사 제거(재작업에서 더한 것) (적용 1회)
+pytest rc=1 · 2 failed, 26 passed in 0.25s
+  FAILED test_split_rrn_with_another_number[False-True]
+  FAILED test_split_rrn_with_another_number[True-False]
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:37+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M10
+# 시각: 2026-11-22T19:57:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M10 이웃 쌍 길이를 7·6 으로 뒤바꿈 (적용 1회)
+pytest rc=1 · 2 failed, 26 passed in 0.25s
+  FAILED test_split_rrn_with_another_number[False-True]
+  FAILED test_split_rrn_with_another_number[True-False]
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:37+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M11
+# 시각: 2026-11-22T19:57:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M11 검증 숫자 일치 판정 뒤집기 (적용 1회)
+pytest rc=1 · 27 failed, 1 passed in 0.34s
+  FAILED test_block_rrn_row_without_rrn_fails
+  FAILED test_category_count_bounds[14-False]
+  FAILED test_category_count_bounds[15-True]
+  FAILED test_category_count_bounds[20-True]
+  FAILED test_category_count_bounds[21-False]
+  FAILED test_dev_sentence_copied_into_test_fails
+  FAILED test_duplicate_after_nfc_and_whitespace_normalisation_fails
+  FAILED test_duplicate_id_across_files_fails
+  FAILED test_duplicate_within_one_file_fails
+  FAILED test_evasion_rows_are_not_counted_in_category
+  FAILED test_group_sizes_are_exact[evasion--1]
+  FAILED test_group_sizes_are_exact[evasion-1]
+  FAILED test_group_sizes_are_exact[plain--1]
+  FAILED test_group_sizes_are_exact[plain-1]
+  FAILED test_group_sizes_are_exact[trap--1]
+  FAILED test_group_sizes_are_exact[trap-1]
+  FAILED test_luhn_valid_number_outside_public_list_fails
+  FAILED test_missing_required_trap_phrase_fails
+  FAILED test_plain_row_with_consent_label_fails
+  FAILED test_query_minimum_per_category[0-False]
+  FAILED test_query_minimum_per_category[1-True]
+  FAILED test_rrn_split_into_word_separated_pieces_is_found
+  FAILED test_sensitive_row_with_none_label_fails
+  FAILED test_split_rrn_with_another_number[False-True]
+  FAILED test_split_rrn_with_another_number[True-False]
+  FAILED test_synthetic_control_passes
+  FAILED test_valid_rrn_in_trap_row_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:38+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M12
+# 시각: 2026-11-22T19:57:38+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M12 목록 밖 Luhn 유효 번호 검사 제거 (적용 1회)
+pytest rc=1 · 1 failed, 27 passed in 0.25s
+  FAILED test_luhn_valid_number_outside_public_list_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:39+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M13
+# 시각: 2026-11-22T19:57:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M13 묶음 크기 == → >= (적용 1회)
+pytest rc=1 · 3 failed, 25 passed in 0.49s
+  FAILED test_group_sizes_are_exact[evasion-1]
+  FAILED test_group_sizes_are_exact[plain-1]
+  FAILED test_group_sizes_are_exact[trap-1]
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:40+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M14
+# 시각: 2026-11-22T19:57:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M14 필수 함정 문구에서 '교회 오빠' 빼기 (적용 1회)
+pytest rc=1 · 1 failed, 27 passed in 0.42s
+  FAILED test_missing_required_trap_phrase_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:41+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M15
+# 시각: 2026-11-22T19:57:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M15 id 중복 검사 제거 (적용 1회)
+pytest rc=1 · 1 failed, 27 passed in 0.44s
+  FAILED test_duplicate_id_across_files_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:42+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M16
+# 시각: 2026-11-22T19:57:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M16 입력 파일 없음 종료 코드 2 → 1 (적용 1회)
+pytest rc=1 · 1 failed, 27 passed in 0.25s
+  FAILED test_missing_input_file_returns_2
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:42+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M17
+# 시각: 2026-11-22T19:57:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M17 한 파일 안 중복은 보지 않음(파일 사이만) (적용 1회)
+pytest rc=1 · 1 failed, 27 passed in 0.25s
+  FAILED test_duplicate_within_one_file_fails
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:43+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M18
+# 시각: 2026-11-22T19:57:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M18 문장 전체 숫자 대안 제거 (적용 1회)
+pytest rc=1 · 1 failed, 27 passed in 0.24s
+  FAILED test_rrn_split_into_word_separated_pieces_is_found
+판정: 잡힘
+
+# ===== append 2026-11-22T19:57:43+09:00 =====
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/mutate.py M19
+# 시각: 2026-11-22T19:57:43+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== M19 block:rrn 줄의 번호 존재 검사 제거 (적용 1회)
+pytest rc=1 · 1 failed, 27 passed in 0.25s
+  FAILED test_block_rrn_row_without_rrn_fails
+판정: 잡힘

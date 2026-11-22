@@ -1,0 +1,315 @@
+{"id": "test-001", "text": "도윤이가 클럽에서 엑스터시 했다가 경찰에 잡혔대", "label": "consent:crime", "group": "sensitive", "note": "마약"}
+{"id": "test-002", "text": "한대리가 술 마시고 운전하다 사고 내서 벌금 나왔대", "label": "consent:crime", "group": "sensitive", "note": "음주운전 처벌"}
+{"id": "test-003", "text": "서준이 형이 중고나라에서 사기 쳐서 고소당했대", "label": "consent:crime", "group": "sensitive", "note": "사기 고소"}
+{"id": "test-004", "text": "옆 반 학부모가 아이 때려서 아동학대로 신고됐대", "label": "consent:crime", "group": "sensitive", "note": "아동학대 신고"}
+{"id": "test-005", "text": "강팀장 예전에 마약 전과가 있다는 얘기 들었어", "label": "consent:crime", "group": "sensitive", "note": "마약 전과"}
+{"id": "test-006", "text": "승우가 남의 차 긁고 도망가서 뺑소니로 조사받는대", "label": "consent:crime", "group": "sensitive", "note": "도주 혐의"}
+{"id": "test-007", "text": "재원이 아버지가 탈세로 국세청 조사 받으셨대", "label": "consent:crime", "group": "sensitive", "note": "탈세 조사"}
+{"id": "test-008", "text": "예린이 동생이 오토바이 훔치다 소년원 갔대", "label": "consent:crime", "group": "sensitive", "note": "절도·소년보호"}
+{"id": "test-009", "text": "오과장이 몰래카메라 찍다 걸려서 경찰서에 갔대", "label": "consent:crime", "group": "sensitive", "note": "불법 촬영"}
+{"id": "test-010", "text": "사촌 오빠가 불법 토토 하다가 벌금 300 맞았대", "label": "consent:crime", "group": "sensitive", "note": "불법 도박 처벌"}
+{"id": "test-011", "text": "건우가 싸움 붙어서 상대를 다치게 해 합의금 물어줬대", "label": "consent:crime", "group": "sensitive", "note": "상해"}
+{"id": "test-012", "text": "장차장 회사 기밀 빼돌린 혐의로 압수수색 당했대", "label": "consent:crime", "group": "sensitive", "note": "수사"}
+{"id": "test-013", "text": "요즘 10대 마약 사범이 많이 늘었다고 라디오에서 그러더라", "label": "consent:crime", "group": "sensitive", "note": "결정 25 — 인물 없는 화제(방송 속 마약 범죄 · dev 에도 있는 범주 낱말)"}
+{"id": "test-014", "text": "도윤이 엑스터시 사건 재판 날짜가 언제라고 했지?", "label": "consent:crime", "group": "sensitive", "form": "query", "note": "조회형 — 마약"}
+{"id": "test-015", "text": "한대리 음주 사고 벌금 얼마 나왔다고 했더라?", "label": "consent:crime", "group": "sensitive", "form": "query", "note": "조회형 — 음주운전"}
+{"id": "test-016", "text": "하은이 우울증이 심해져서 정신건강의학과에 입원했대", "label": "consent:health", "group": "sensitive", "note": "정신질환 입원"}
+{"id": "test-017", "text": "장인어른이 위암 수술 날짜 잡으셨어", "label": "consent:health", "group": "sensitive", "note": "중증 질환(암)"}
+{"id": "test-018", "text": "다현이 불안장애 때문에 약 먹으면서 상담 다닌대", "label": "consent:health", "group": "sensitive", "note": "정신질환 치료"}
+{"id": "test-019", "text": "이부장님 간이식 받으셨대", "label": "consent:health", "group": "sensitive", "note": "중증 질환(장기이식)"}
+{"id": "test-020", "text": "나연이 남자친구가 매독 걸렸다고 하더라", "label": "consent:health", "group": "sensitive", "note": "성병"}
+{"id": "test-021", "text": "시우가 강박증 진단 받았다고 털어놨어", "label": "consent:health", "group": "sensitive", "note": "정신질환 진단"}
+{"id": "test-022", "text": "외할아버지가 루게릭병 판정 받으셨어", "label": "consent:health", "group": "sensitive", "note": "난치 질환"}
+{"id": "test-023", "text": "거식증으로 치료받는 청소년이 많이 늘었다는 통계가 나왔대", "label": "consent:health", "group": "sensitive", "note": "결정 25 — 인물 없는 화제(통계 속 정신질환·섭식장애)"}
+{"id": "test-024", "text": "동현이 아버지가 뇌졸중으로 쓰러지셔서 중환자실에 계신대", "label": "consent:health", "group": "sensitive", "note": "중증 질환"}
+{"id": "test-025", "text": "채원이 임질 옮았다고 비뇨기과 다녀왔대", "label": "consent:health", "group": "sensitive", "note": "성병(뜻이 갈리지 않는 병명 — 검수 R-2)"}
+{"id": "test-026", "text": "혜진이 엄마가 갑상선암 진단 받으셨대", "label": "consent:health", "group": "sensitive", "note": "중증 질환(암)"}
+{"id": "test-027", "text": "최실장님 알코올 중독 치료 프로그램 들어가셨대", "label": "consent:health", "group": "sensitive", "note": "정신질환(중독)"}
+{"id": "test-028", "text": "정민이 희귀병이라 평생 약을 먹어야 한대", "label": "consent:health", "group": "sensitive", "note": "희귀·난치 질환"}
+{"id": "test-029", "text": "하은이 우울증으로 입원한 병원이 어디라고 했지?", "label": "consent:health", "group": "sensitive", "form": "query", "note": "조회형 — 정신질환 입원(문장만으로 범주가 선다 — 검수 M-1)"}
+{"id": "test-030", "text": "장인어른 위암 수술 언제로 잡혔다고 했어?", "label": "consent:health", "group": "sensitive", "form": "query", "note": "조회형 — 암"}
+{"id": "test-031", "text": "승우가 자기 성적 지향을 부모님께 털어놨대", "label": "consent:sex", "group": "sensitive", "note": "성적 지향"}
+{"id": "test-032", "text": "오과장 와이프가 다른 남자랑 바람났대", "label": "consent:sex", "group": "sensitive", "note": "외도"}
+{"id": "test-033", "text": "재원이가 자기 게이라고 동기들한테 밝혔대", "label": "consent:sex", "group": "sensitive", "note": "성적 지향"}
+{"id": "test-034", "text": "예린이 남친이랑 여행 가서 같이 잤대", "label": "consent:sex", "group": "sensitive", "note": "성관계"}
+{"id": "test-035", "text": "친구가 남편이랑 잠자리를 안 한 지 1년 됐대", "label": "consent:sex", "group": "sensitive", "note": "성생활"}
+{"id": "test-036", "text": "다현이 성전환 수술을 준비하고 있대", "label": "consent:sex", "group": "sensitive", "note": "성 정체성"}
+{"id": "test-037", "text": "건우가 소개팅 상대랑 첫날 모텔 갔다고 자랑하더라", "label": "consent:sex", "group": "sensitive", "note": "성생활"}
+{"id": "test-038", "text": "강팀장이 회사 후배랑 몰래 만나는 내연 관계래", "label": "consent:sex", "group": "sensitive", "note": "외도"}
+{"id": "test-039", "text": "시우가 자기는 바이라고 하더라", "label": "consent:sex", "group": "sensitive", "note": "성적 지향(양성애)"}
+{"id": "test-040", "text": "은지가 남자친구랑 성관계할 때 피임 문제로 싸웠대", "label": "consent:sex", "group": "sensitive", "note": "성생활"}
+{"id": "test-041", "text": "대학 선배가 동성 연인이랑 같이 산대", "label": "consent:sex", "group": "sensitive", "note": "성적 지향"}
+{"id": "test-042", "text": "동현이 여자친구 몰래 다른 사람이랑 잤다가 들켰대", "label": "consent:sex", "group": "sensitive", "note": "외도·성관계"}
+{"id": "test-043", "text": "채원이 자기 성 정체성이 논바이너리래", "label": "consent:sex", "group": "sensitive", "note": "성 정체성"}
+{"id": "test-044", "text": "재원이 게이라는 거 알고 있는 동기가 누구누구였지?", "label": "consent:sex", "group": "sensitive", "form": "query", "note": "조회형 — 성적 지향"}
+{"id": "test-045", "text": "오과장 와이프 바람난 상대가 누구였지?", "label": "consent:sex", "group": "sensitive", "form": "query", "note": "조회형 — 외도"}
+{"id": "test-046", "text": "장인어른이 진보 정당 후원회원이시래", "label": "consent:politics_religion", "group": "sensitive", "note": "정당 후원"}
+{"id": "test-047", "text": "도윤이는 보수 성향이 강해서 뉴스 보면서 화를 내", "label": "consent:politics_religion", "group": "sensitive", "note": "정치 성향"}
+{"id": "test-048", "text": "이부장님이 이번 지방선거에 구의원 후보로 나가신대", "label": "consent:politics_religion", "group": "sensitive", "note": "정치 활동"}
+{"id": "test-049", "text": "하은이가 성당에서 세례 받았대", "label": "consent:politics_religion", "group": "sensitive", "note": "종교"}
+{"id": "test-050", "text": "서준이 엄마는 원불교 신자셔", "label": "consent:politics_religion", "group": "sensitive", "note": "신앙"}
+{"id": "test-051", "text": "나연이가 교회 그만두고 절에 다니기 시작했대", "label": "consent:politics_religion", "group": "sensitive", "note": "개종"}
+{"id": "test-052", "text": "최실장님은 열성 당원이라 경선 투표도 하신대", "label": "consent:politics_religion", "group": "sensitive", "note": "당원 활동"}
+{"id": "test-053", "text": "혜진이 남편이 힌두교 신자라서 소고기를 안 먹는대", "label": "consent:politics_religion", "group": "sensitive", "note": "신앙"}
+{"id": "test-054", "text": "정민이가 탄핵 반대 집회에 나갔대", "label": "consent:politics_religion", "group": "sensitive", "note": "정치 집회"}
+{"id": "test-055", "text": "승우 부모님이 여호와의 증인이라 수혈을 안 받으신대", "label": "consent:politics_religion", "group": "sensitive", "note": "신앙"}
+{"id": "test-056", "text": "외삼촌은 매주 목사님 설교 들으러 기도원에 가셔", "label": "consent:politics_religion", "group": "sensitive", "note": "종교 활동"}
+{"id": "test-057", "text": "장차장이 회사 노동조합 위원장으로 뽑혔대", "label": "consent:politics_religion", "group": "sensitive", "note": "노동조합"}
+{"id": "test-058", "text": "예린이 아빠가 진보 쪽이라 가족끼리 정치 얘기 금지래", "label": "consent:politics_religion", "group": "sensitive", "note": "정치 성향"}
+{"id": "test-059", "text": "장인어른이 후원하시는 정당이 어디였지?", "label": "consent:politics_religion", "group": "sensitive", "form": "query", "note": "조회형 — 정당"}
+{"id": "test-060", "text": "나연이 새로 다니는 절 이름이 뭐였더라?", "label": "consent:politics_religion", "group": "sensitive", "form": "query", "note": "조회형 — 종교"}
+{"id": "test-061", "text": "건우가 대출 돌려막다 결국 신용회복위원회 갔대", "label": "consent:finance", "group": "sensitive", "note": "채무 조정"}
+{"id": "test-062", "text": "강팀장이 친척한테 진 빚 8천을 아직 못 갚았대", "label": "consent:finance", "group": "sensitive", "note": "채무 금액(사용자 결정 24)"}
+{"id": "test-063", "text": "예린이 아버지 사업이 부도나서 빚이 10억이래", "label": "consent:finance", "group": "sensitive", "note": "부도·채무"}
+{"id": "test-064", "text": "다현이 남편이 카드빚 때문에 개인파산 신청했대", "label": "consent:finance", "group": "sensitive", "note": "파산"}
+{"id": "test-065", "text": "한대리 월급에 가압류 들어왔대", "label": "consent:finance", "group": "sensitive", "note": "압류"}
+{"id": "test-066", "text": "시우네 부모님 가게가 빚을 못 갚아서 경매로 넘어갔대", "label": "consent:finance", "group": "sensitive", "note": "채무·경매(사용자 결정 24)"}
+{"id": "test-067", "text": "동현이 대부업체 대출 연체돼서 추심 전화가 온대", "label": "consent:finance", "group": "sensitive", "note": "연체·추심"}
+{"id": "test-068", "text": "외삼촌이 주식 담보 대출을 못 갚아서 반대매매 당하셨대", "label": "consent:finance", "group": "sensitive", "note": "담보 대출 상환 불이행·강제 처분(결정 24 — 빚)"}
+{"id": "test-069", "text": "은지가 전세 대출 이자를 석 달째 못 갚았대", "label": "consent:finance", "group": "sensitive", "note": "연체"}
+{"id": "test-070", "text": "최실장님이 리볼빙 쌓인 걸 못 막아서 카드사 추심이 들어왔대", "label": "consent:finance", "group": "sensitive", "note": "연체·추심(사용자 결정 24)"}
+{"id": "test-071", "text": "재원이 형이 친구 빚보증 섰다가 2억 떠안았대", "label": "consent:finance", "group": "sensitive", "note": "보증 채무"}
+{"id": "test-072", "text": "혜진이가 생활비 대출을 못 갚아서 연체 통보를 받았대", "label": "consent:finance", "group": "sensitive", "note": "연체(사용자 결정 24)"}
+{"id": "test-073", "text": "승우가 사업 자금 때문에 사채까지 끌어다 썼대", "label": "consent:finance", "group": "sensitive", "note": "채무"}
+{"id": "test-074", "text": "건우 신용회복 끝나는 게 언제라고 했지?", "label": "consent:finance", "group": "sensitive", "form": "query", "note": "조회형 — 채무"}
+{"id": "test-075", "text": "예린이네 부도로 진 빚 다 갚으려면 몇 년 걸린다고 했지?", "label": "consent:finance", "group": "sensitive", "form": "query", "note": "조회형 — 채무"}
+{"id": "test-076", "text": "아버지 주민등록번호 771106-1365384 보험 청구할 때 필요하대", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값, 검증 숫자 불일치)"}
+{"id": "test-077", "text": "아들 주민번호 060210-3498182 학교 서류에 적어야 해", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-078", "text": "장인어른 주민번호가 6108101611725 라고 하셨어", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호 붙여 쓴 모양(지어낸 값)"}
+{"id": "test-079", "text": "딸 주민등록번호 030324-4204641 장학금 신청서에 넣었어", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-080", "text": "어머니 주민번호 610319-2868039 기억해 둬 병원에서 자주 물어봐", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-081", "text": "조카 주민번호는 050204-4368064 래 언니가 알려줬어", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-082", "text": "할아버지 주민등록번호 540410 1155248 요양 신청할 때 써", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호 띄어 쓴 모양(지어낸 값)"}
+{"id": "test-083", "text": "막내 여동생 주민번호 060407-4284388 휴대폰 개통할 때 썼어", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-084", "text": "남자친구 주민등록번호가 940621-1839997 이래 여행자 보험에 넣어", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-085", "text": "둘째 딸 주민번호 0911284929362 어린이집에 냈어", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호 붙여 쓴 모양(지어낸 값)"}
+{"id": "test-086", "text": "아내 주민번호 910108-2410920 연말정산에 들어가", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-087", "text": "후배가 주민번호 011014-4932959 알려주면서 대신 접수해 달래", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-088", "text": "외삼촌 주민등록번호 670116-1432605 서류에 적어 드렸어", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-089", "text": "사촌 동생 주민번호가 030801-3703125 라는데 맞나 모르겠어", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-090", "text": "언니 주민번호 840708-2739604 은행 서류에 필요하대", "label": "block:rrn", "group": "sensitive", "note": "주민등록번호(지어낸 값)"}
+{"id": "test-091", "text": "어머니 여권번호 M57302864 크루즈 예약에 넣었어", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-092", "text": "남자친구 여권 번호가 M81046327 이래", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-093", "text": "딸 여권번호 M23679015 어학연수 서류에 썼어", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-094", "text": "강팀장 여권번호 M64918250 해외 전시회 등록에 필요하대", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-095", "text": "아내 여권번호는 M36057481 이야 저장해 둬", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-096", "text": "외삼촌 여권 M90273146 번호로 항공권 끊으셨대", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-097", "text": "동생 여권번호가 M15840693 인데 사진이 마음에 안 든대", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-098", "text": "오과장 여권번호 M72391508 출장 비자 서류에 들어가", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-099", "text": "아버지 여권번호 M48506279 패키지 여행사에 보냈어", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-100", "text": "친구 여권번호 M29164730 대신 체크인할 때 썼어", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-101", "text": "할아버지 여권 번호는 M07732951 이셔", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-102", "text": "언니 여권번호가 M613C2048 로 새로 나왔대", "label": "block:passport", "group": "sensitive", "note": "여권번호 새 모양(지어낸 값)"}
+{"id": "test-103", "text": "거래처 과장 여권번호 M53086174 행사 명단에 올려야 해", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-104", "text": "아들 새 여권번호 M907D5512 수학여행 신청서에 적었어", "label": "block:passport", "group": "sensitive", "note": "여권번호 새 모양(지어낸 값)"}
+{"id": "test-105", "text": "후배 여권번호 M34271096 워크숍 숙소 예약에 넣었어", "label": "block:passport", "group": "sensitive", "note": "여권번호(지어낸 값)"}
+{"id": "test-106", "text": "어머니 운전면허번호 11-15-283604-91 차 보험에 넣어야 해", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-107", "text": "남자친구 면허번호가 12-06-719352-44 래", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-108", "text": "아버지 운전면허 번호 13-18-052967-13 렌터카 회사에 보냈어", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-109", "text": "한대리 면허증 번호 14-23-846120-76 법인차 등록에 썼어", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-110", "text": "아내 운전면허번호 15-04-391578-52 이거 기억해 둬", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-111", "text": "외삼촌 면허번호 16-12-607834-29 라고 적어 달라셨어", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-112", "text": "딸 운전면허번호는 19-20-158243-60 이야", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-113", "text": "친구가 면허번호 20-09-934716-85 불러주면서 렌트 예약해 달래", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-114", "text": "언니 운전면허 21-01-270593-37 적성검사 기간이래", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-115", "text": "강팀장 면허번호 22-14-485062-18 출장 차량 신청에 넣었어", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-116", "text": "동생 운전면허번호 23-07-613928-90 카셰어링 앱에 등록했대", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-117", "text": "할아버지 면허증 번호가 24-11-042857-64 셔", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-118", "text": "장인어른 운전면허번호 25-21-798314-06 보험사에서 물어봤어", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-119", "text": "후배 면허번호 26-03-326490-73 대신 입력해 줬어", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-120", "text": "남편 운전면허번호는 28-16-951702-45 래", "label": "block:driver_license", "group": "sensitive", "note": "운전면허번호(지어낸 값)"}
+{"id": "test-121", "text": "어머니 계좌번호 46-2719-58-3301 로 용돈 보내 드려", "label": "block:account", "group": "sensitive", "note": "계좌번호(은행 형식이 아닌 숫자열)"}
+{"id": "test-122", "text": "도윤이가 빌려 간 돈 83-5042-17-6694 계좌로 보내준대", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-123", "text": "동창회비는 27-8863-40-1159 계좌로 내면 돼", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-124", "text": "남자친구 통장 계좌번호가 64-1305-92-7782 래", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-125", "text": "부조금은 상주 계좌 15-6697-33-0428 로 보내 달래", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-126", "text": "관리비 내는 계좌가 92-4118-76-5530 으로 바뀌었대", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-127", "text": "하은이한테 받을 돈은 38-7254-09-1867 계좌로 들어온대", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-128", "text": "장인어른 연금 계좌 71-0386-65-4493 이래", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-129", "text": "아내 계좌번호 59-9921-28-0715 저장해 둬", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-130", "text": "워크숍 비용은 한대리 계좌 24-3570-81-6649 로 모은대", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-131", "text": "할아버지 생활비 통장 계좌번호는 87-6203-14-3376 이야", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-132", "text": "당근 거래 상대가 43-1849-57-9902 계좌로 보내 달래", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-133", "text": "외삼촌 가게 계좌가 66-5532-90-2184 라고 하셨어", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-134", "text": "언니 비상금 계좌 19-7468-23-5051 로 매달 넣는대", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-135", "text": "동아리 회비 계좌 50-2097-46-8813 공지 올라왔어", "label": "block:account", "group": "sensitive", "note": "계좌번호(지어낸 값)"}
+{"id": "test-136", "text": "어머니 카드번호 4111 1111 1111 1111 로 장 봐 드렸어", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 결제 시험용 번호)"}
+{"id": "test-137", "text": "남자친구 카드 번호가 4242-4242-4242-4242 래 대신 결제해 줘", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-138", "text": "아내 신용카드 5105105105105100 으로 비행기표 샀어", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-139", "text": "강팀장 법인카드 번호 5555 5555 5555 4444 출장비 정산에 써", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-140", "text": "아버지 카드번호는 3714 496353 98431 이셔", "label": "block:card", "group": "sensitive", "note": "카드번호 15자리(공개 시험용)"}
+{"id": "test-141", "text": "동생 체크카드 번호 4012 8888 8888 1881 불러줬어", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-142", "text": "언니 카드 6011-0009-9013-9424 로 콘서트 예매했대", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-143", "text": "친구가 카드번호 4000056655665556 주면서 대신 주문해 달래", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-144", "text": "남편 카드 번호 5200 8282 8282 8210 배달 앱에 등록했어", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-145", "text": "외삼촌 신용카드번호 6011-1111-1111-1117 이라고 하셨어", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-146", "text": "오과장 카드번호 2223 0031 2200 3222 로 회식비 냈대", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-147", "text": "할아버지 카드 번호는 3622 720627 1667 이야", "label": "block:card", "group": "sensitive", "note": "카드번호 14자리(공개 시험용)"}
+{"id": "test-148", "text": "후배 카드번호가 3566 0020 2036 0505 래 정산할 때 써", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-149", "text": "장인어른 카드 3782 822463 10005 로 결제하셨대", "label": "block:card", "group": "sensitive", "note": "카드번호 15자리(공개 시험용)"}
+{"id": "test-150", "text": "딸 카드번호 6200 0000 0000 0005 학원비 자동이체에 걸었어", "label": "block:card", "group": "sensitive", "note": "카드번호(공개 시험용)"}
+{"id": "test-151", "text": "어머니 인터넷뱅킹 비밀번호가 flimbo27 이래", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-152", "text": "동생 유튜브 계정 비번은 rastuvek 야", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-153", "text": "사무실 와이파이 비밀번호 pomkiru5 로 바뀌었대", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-154", "text": "남자친구 카톡 비번이 wexdal92 래", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-155", "text": "아버지 이메일 비밀번호는 nobrinta 셔", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-156", "text": "친구가 자기 스팀 계정 패스워드 kelsuva3 알려줬어", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-157", "text": "현관 비밀번호 2694 라고 언니가 문자 보냈어", "label": "block:password", "group": "sensitive", "note": "비밀번호(숫자, 지어낸 값)"}
+{"id": "test-158", "text": "외삼촌 공동인증서 비밀번호가 trivolm8 이래", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-159", "text": "할아버지 휴대폰 잠금 비밀번호는 8051 이셔", "label": "block:password", "group": "sensitive", "note": "비밀번호(숫자, 지어낸 값)"}
+{"id": "test-160", "text": "팀 공용 계정 비번 garunex41 공유받았어", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-161", "text": "아내 카드 비밀번호 뒤 두 자리가 71 이래", "label": "block:password", "group": "sensitive", "note": "비밀번호 일부(지어낸 값)"}
+{"id": "test-162", "text": "후배 태블릿 비밀번호 yompelt 로 바꿨대", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-163", "text": "장인어른 쇼핑몰 비밀번호는 sudravi66 이라고 하셨어", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-164", "text": "남편 금고 비번 0738 로 바꿨대", "label": "block:password", "group": "sensitive", "note": "비밀번호(숫자, 지어낸 값)"}
+{"id": "test-165", "text": "동아리 공유 폴더 패스워드는 melkorap 이야", "label": "block:password", "group": "sensitive", "note": "비밀번호(뜻 없는 낱말)"}
+{"id": "test-166", "text": "강팀장이 회의 중에 내 말 끊어서 화났어", "label": "none", "group": "plain", "note": "갈등"}
+{"id": "test-167", "text": "하은이랑 점심에 쌀국수 먹었어", "label": "none", "group": "plain", "note": "식사"}
+{"id": "test-168", "text": "이부장님이 내 제안서 좋다고 하셨어", "label": "none", "group": "plain", "note": "칭찬"}
+{"id": "test-169", "text": "다음 주 수요일에 서준이랑 저녁 약속 있어", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-170", "text": "어머니가 반찬 잔뜩 싸 주셨어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-171", "text": "도윤이가 다음 달에 부산으로 이사 간대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-172", "text": "오과장이 내 실수를 회의에서 공개적으로 지적했어", "label": "none", "group": "plain", "note": "갈등"}
+{"id": "test-173", "text": "승우가 팀장으로 승진했대", "label": "none", "group": "plain", "note": "승진"}
+{"id": "test-174", "text": "예린이가 강아지를 새로 데려왔대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-175", "text": "일요일에 회사 사람들이랑 풋살 하기로 했어", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-176", "text": "장인어른 칠순이 다음 달 둘째 주야", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-177", "text": "재원이가 이삿짐 옮기는 거 도와줬어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-178", "text": "한대리가 아침에 샌드위치 사 왔어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-179", "text": "다현이랑 오랜만에 영상통화 했어", "label": "none", "group": "plain", "note": "연락"}
+{"id": "test-180", "text": "건우가 회사 그만두고 유튜버 한대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-181", "text": "이부장님이 이번 달 실적 좋다고 회식 쏘신대", "label": "none", "group": "plain", "note": "업무"}
+{"id": "test-182", "text": "나연이 결혼식이 10월 첫째 주 일요일이래", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-183", "text": "동생이랑 리모컨 때문에 싸웠어", "label": "none", "group": "plain", "note": "갈등"}
+{"id": "test-184", "text": "외할머니 댁에 추석 때 내려가기로 했어", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-185", "text": "혜진이가 둘째를 가졌대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-186", "text": "장차장이 내 대신 야근해 줬어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-187", "text": "시우가 철인삼종 경기 나갔대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-188", "text": "은지랑 전시회 보고 브런치 먹었어", "label": "none", "group": "plain", "note": "식사"}
+{"id": "test-189", "text": "최실장님이 갑자기 주말 출근하라고 해서 짜증났어", "label": "none", "group": "plain", "note": "갈등"}
+{"id": "test-190", "text": "동현이가 강릉 다녀와서 커피콩 선물로 줬어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-191", "text": "채원이가 요즘 수영 배우고 있대", "label": "none", "group": "plain", "note": "취미"}
+{"id": "test-192", "text": "정민이가 다음 주에 베트남으로 출장 간대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-193", "text": "대학 선배가 이력서 봐줘서 고마웠어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-194", "text": "외삼촌이 캠핑카 사셨대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-195", "text": "언니가 조카 운동회에 같이 가자고 했어", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-196", "text": "강팀장이 내 보고 방식 깔끔하다고 칭찬했어", "label": "none", "group": "plain", "note": "칭찬"}
+{"id": "test-197", "text": "입사 동기들이랑 퇴근하고 곱창 먹었어", "label": "none", "group": "plain", "note": "식사"}
+{"id": "test-198", "text": "서준이가 클라이밍 시작했는데 손이 다 까졌대", "label": "none", "group": "plain", "note": "취미"}
+{"id": "test-199", "text": "예린이 고양이가 새끼를 낳았대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-200", "text": "나연이가 내 생일에 꽃다발 보내줬어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-201", "text": "언니랑 어머니 환갑 선물 상의했어", "label": "none", "group": "plain", "note": "가족"}
+{"id": "test-202", "text": "후배가 내 발표 자료 대신 만들어 줬어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-203", "text": "거래처 팀장님이랑 다음 주 월요일 오전 10시 미팅이야", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-204", "text": "재원이가 공무원 시험 합격했대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-205", "text": "승우가 요즘 답장이 느려", "label": "none", "group": "plain", "note": "연락"}
+{"id": "test-206", "text": "외할머니가 직접 만든 식혜 보내주셨어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-207", "text": "도윤이랑 야구장 가서 맥주 마셨어", "label": "none", "group": "plain", "note": "만남"}
+{"id": "test-208", "text": "이부장님이 내 연차 쓰는 거 흔쾌히 허락해 주셨어", "label": "none", "group": "plain", "note": "업무"}
+{"id": "test-209", "text": "어머니가 요즘 수채화 그리기에 빠지셨어", "label": "none", "group": "plain", "note": "취미"}
+{"id": "test-210", "text": "시우가 새로 옮긴 회사가 여의도래", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-211", "text": "남편이 운전 연수 받기 시작했어", "label": "none", "group": "plain", "note": "개인 소식 — 면허 번호 없음"}
+{"id": "test-212", "text": "오과장이 어제 일 미안하다고 커피 사 줬어", "label": "none", "group": "plain", "note": "화해"}
+{"id": "test-213", "text": "건우가 다음 달에 결혼한다고 연락 왔어", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-214", "text": "회사 선배랑 산책하면서 이직 고민 얘기했어", "label": "none", "group": "plain", "note": "대화 — 상담 아님"}
+{"id": "test-215", "text": "아버지가 주말농장에서 상추 따 오셨어", "label": "none", "group": "plain", "note": "취미"}
+{"id": "test-216", "text": "하은이랑 다음 주 토요일에 뮤지컬 보기로 했어", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-217", "text": "장차장이 내 일정 확인도 안 하고 회의를 잡아서 곤란했어", "label": "none", "group": "plain", "note": "갈등"}
+{"id": "test-218", "text": "언니가 조카 첫 걸음마 영상 보내줬어", "label": "none", "group": "plain", "note": "가족"}
+{"id": "test-219", "text": "다현이가 필라테스 등록했대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-220", "text": "최실장님이 예전 프로젝트 비하인드 얘기해 주셨어", "label": "none", "group": "plain", "note": "대화"}
+{"id": "test-221", "text": "고등학교 친구들이랑 연말에 펜션 잡았어", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-222", "text": "아랫집 할머니가 귤 한 상자 주셨어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-223", "text": "재원이랑 당구 쳤는데 내가 이겼어", "label": "none", "group": "plain", "note": "만남"}
+{"id": "test-224", "text": "이부장님 딸이 대학 졸업했대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-225", "text": "나연이가 새 팀으로 옮겨서 적응 중이래", "label": "none", "group": "plain", "note": "업무"}
+{"id": "test-226", "text": "동생이 이번 설에 해외여행 간대", "label": "none", "group": "plain", "note": "가족"}
+{"id": "test-227", "text": "채원이가 쿠키 구워서 사무실에 돌렸어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-228", "text": "입사 동기가 지방으로 발령 나서 아쉬워", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-229", "text": "동현이가 자전거 빌려줬어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-230", "text": "정민이랑 금요일 저녁 8시에 홍대에서 보기로 했어", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-231", "text": "은지가 사내 공모전에서 1등 했대", "label": "none", "group": "plain", "note": "칭찬"}
+{"id": "test-232", "text": "선배가 내 이름을 자꾸 다른 사람이랑 헷갈려", "label": "none", "group": "plain", "note": "대화"}
+{"id": "test-233", "text": "외삼촌이 조카들한테 책 선물해 주셨어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-234", "text": "강팀장이 다른 팀 앞에서 우리 팀 칭찬했대", "label": "none", "group": "plain", "note": "칭찬"}
+{"id": "test-235", "text": "서준이랑 주말에 한강에서 자전거 탔어", "label": "none", "group": "plain", "note": "만남"}
+{"id": "test-236", "text": "혜진이가 요즘 야근이 많아서 피곤해 보여", "label": "none", "group": "plain", "note": "근황 — 질병 아님"}
+{"id": "test-237", "text": "예린이랑 동네 빵집에서 한참 얘기했어", "label": "none", "group": "plain", "note": "만남"}
+{"id": "test-238", "text": "장인어른이 은퇴하시고 바둑 두러 다니셔", "label": "none", "group": "plain", "note": "근황"}
+{"id": "test-239", "text": "후배가 내 승진 축하한다고 떡 돌렸어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-240", "text": "거래처 담당자가 새로 왔는데 이름이 박서윤이래", "label": "none", "group": "plain", "note": "업무"}
+{"id": "test-241", "text": "시우가 캐나다로 워킹홀리데이 간대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-242", "text": "건우랑 오랜만에 막걸리 한잔했어", "label": "none", "group": "plain", "note": "만남"}
+{"id": "test-243", "text": "외할머니가 우리 집 이사 도와주러 오셨어", "label": "none", "group": "plain", "note": "호의"}
+{"id": "test-244", "text": "도윤이가 약속을 또 미뤄서 서운했어", "label": "none", "group": "plain", "note": "갈등"}
+{"id": "test-245", "text": "이부장님이 내년 조직 개편 얘기 하셨어", "label": "none", "group": "plain", "note": "업무"}
+{"id": "test-246", "text": "어머니랑 시장 가서 이불 샀어", "label": "none", "group": "plain", "note": "만남"}
+{"id": "test-247", "text": "재원이가 같이 하프마라톤 나가자고 했어", "label": "none", "group": "plain", "note": "제안"}
+{"id": "test-248", "text": "강팀장이 다음 주 목요일 오후 2시에 평가 면담하재", "label": "none", "group": "plain", "note": "일정"}
+{"id": "test-249", "text": "오과장 아들이 중학교 들어갔대", "label": "none", "group": "plain", "note": "개인 소식"}
+{"id": "test-250", "text": "다현이가 요즘 골프 연습장 다닌대", "label": "none", "group": "plain", "note": "취미"}
+{"id": "test-251", "text": "하은이 요즘 뭐 하고 지낸다고 했지?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-252", "text": "강팀장이랑 마지막으로 얘기한 게 언제였어?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-253", "text": "나연이 신혼여행 어디로 간다고 했더라?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-254", "text": "서준이가 좋아하는 술이 뭐였더라?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-255", "text": "이부장님이랑 지난번에 무슨 얘기 했지?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-256", "text": "승우가 팀장 되고 처음 맡은 일이 뭐였지?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-257", "text": "예린이 강아지 이름 뭐였지?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-258", "text": "이번 주에 만나기로 한 사람 누구였지?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-259", "text": "건우 유튜브 채널 이름 기억나?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-260", "text": "오과장이랑 왜 사이가 틀어졌더라?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-261", "text": "어머니가 새로 시작한 취미가 뭐였지?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-262", "text": "동현이한테 뭐 빌렸었지?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-263", "text": "베트남 출장 같이 가는 사람이 정민이였나?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-264", "text": "채원이가 배우는 운동이 뭐였더라?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-265", "text": "재원이한테 고마웠던 게 무슨 일이었지?", "label": "none", "group": "plain", "form": "query", "note": "조회형 일반"}
+{"id": "test-266", "text": "마약떡볶이 집 앞에 줄이 엄청 길더라", "label": "none", "group": "trap", "trap": "keyword_lookalike", "note": "음식 이름 속 '마약'"}
+{"id": "test-267", "text": "대마도 가는 배편 예약했어", "label": "none", "group": "trap", "trap": "keyword_lookalike", "note": "지명 속 '대마'"}
+{"id": "test-268", "text": "장인어른 고혈압 약을 동네 내과에서 석 달 치씩 타 오셔", "label": "none", "group": "trap", "trap": "mid_health", "note": "만성질환 — 병명이 좁은 범위 밖(결정 2 에서 이은 것)"}
+{"id": "test-269", "text": "경찰 공무원인 사촌이 이번에 파출소로 옮겼대", "label": "none", "group": "trap", "trap": "occupation", "note": "직업 '경찰'"}
+{"id": "test-270", "text": "하은이는 증권사에서 일해서 아침이 빨라", "label": "none", "group": "trap", "trap": "occupation", "note": "직업 '증권사'"}
+{"id": "test-271", "text": "친구 남편이 변호사라서 전세 계약서 봐 주기로 했대", "label": "none", "group": "trap", "trap": "occupation", "note": "직업 '변호사' — 범죄·사건 낱말 없음(결정 25 로 '형사 사건' 같은 일반 화제 낱말이 none 이 아니게 되어 문장을 바꿈)"}
+{"id": "test-272", "text": "교회 오빠가 이번 주말에 이사한다고 도와 달래", "label": "none", "group": "trap", "trap": "honorific_name", "note": "호칭형 이름 — 이름 규칙 오탐 측정"}
+{"id": "test-273", "text": "정신과 선생님이랑 같은 아파트라 엘리베이터에서 자주 마주쳐", "label": "none", "group": "trap", "trap": "honorific_name", "note": "호칭형 이름(이웃인 의사) — 누구의 진료 사실도 없음"}
+{"id": "test-274", "text": "혜진이가 월급 220 받는데 생활비가 모자란대", "label": "none", "group": "trap", "trap": "amount", "note": "구체 소득·빚 아닌 생활고 — 사용자 결정 24 로 금융 아님(1차 판 test-072 문장을 옮김)"}
+{"id": "test-275", "text": "경찰 아저씨가 길 잃은 우리 강아지 찾아 주셨어", "label": "none", "group": "trap", "trap": "honorific_name", "note": "호칭형 이름"}
+{"id": "test-276", "text": "세무사 언니가 연말정산 팁 알려줬어", "label": "none", "group": "trap", "trap": "honorific_name", "note": "호칭형 이름"}
+{"id": "test-277", "text": "하은이가 목감기 걸려서 목소리가 안 나온대", "label": "none", "group": "trap", "trap": "mild_health", "note": "가벼운 질환(사용자 결정 2)"}
+{"id": "test-278", "text": "강팀장이 장염 걸려서 하루 쉬었어", "label": "none", "group": "trap", "trap": "mild_health", "note": "가벼운 질환"}
+{"id": "test-279", "text": "동생이 농구하다 손가락 접질렸대", "label": "none", "group": "trap", "trap": "mild_health", "note": "가벼운 부상"}
+{"id": "test-280", "text": "아버지가 치과에서 스케일링 받으셨대", "label": "none", "group": "trap", "trap": "mild_health", "note": "일반 진료"}
+{"id": "test-281", "text": "도윤이 번호 010-2468-1357 로 바뀌었대", "label": "none", "group": "trap", "trap": "phone", "note": "전화번호는 기억(사용자 결정 6, 지어낸 값)"}
+{"id": "test-282", "text": "거래처 한과장 연락처는 010-1111-2222 야", "label": "none", "group": "trap", "trap": "phone", "note": "전화번호(지어낸 값)"}
+{"id": "test-283", "text": "나연이 새 집 주소가 은하수길 7 302호래", "label": "none", "group": "trap", "trap": "address", "note": "주소는 기억(사용자 결정 6, 지어낸 주소)"}
+{"id": "test-284", "text": "외할머니 댁은 솔바람리 45번지야", "label": "none", "group": "trap", "trap": "address", "note": "주소(지어낸 값)"}
+{"id": "test-285", "text": "예린이 생일이 1995-12-25 라서 크리스마스랑 겹쳐", "label": "none", "group": "trap", "trap": "date", "note": "날짜 숫자 — 주민등록번호 아님"}
+{"id": "test-286", "text": "장인어른 생신은 1958년 9월 3일이셔", "label": "none", "group": "trap", "trap": "date", "note": "생년월일 문장 — 식별번호 아님"}
+{"id": "test-287", "text": "어제 팀 저녁 값이 41만 8천 원 나왔어", "label": "none", "group": "trap", "trap": "amount", "note": "금액 숫자 — 금융 범주 아님"}
+{"id": "test-288", "text": "서준이한테 커피값 4,500원 보냈어", "label": "none", "group": "trap", "trap": "amount", "note": "소액 송금 — 계좌번호 없음"}
+{"id": "test-289", "text": "오과장이 계단에서 넘어져 다리 골절로 2주 입원했대", "label": "none", "group": "trap", "trap": "mid_health", "note": "골절·입원 — 병명이 좁은 범위 밖(결정 2 에서 이은 것)"}
+{"id": "test-290", "text": "부활절이라 회사 앞 카페에 달걀 장식이 있더라", "label": "none", "group": "trap", "trap": "keyword_lookalike", "note": "절기 이름 속 낱말 — 누구의 신앙·종교 활동도 아님(결정 25 뒤 general_topic 폐지)"}
+{"id": "test-291", "text": "성당 앞 공원에서 도윤이랑 산책했어", "label": "none", "group": "trap", "trap": "place", "note": "종교 시설을 장소로만 언급"}
+{"id": "test-292", "text": "와이파이 비밀번호 몰라서 카페 직원한테 물어봤어", "label": "none", "group": "trap", "trap": "keyword_lookalike", "note": "비밀번호 낱말만, 값 없음"}
+{"id": "test-293", "text": "은지가 계좌 개설하러 은행 갔다가 사람이 많아서 그냥 왔대", "label": "none", "group": "trap", "trap": "keyword_lookalike", "note": "계좌 낱말만, 번호 없음"}
+{"id": "test-294", "text": "재원이가 운전면허증 잃어버려서 재발급 받았대", "label": "none", "group": "trap", "trap": "keyword_lookalike", "note": "면허 낱말만, 번호 없음"}
+{"id": "test-295", "text": "언니가 약사라서 영양제 추천해 줬어", "label": "none", "group": "trap", "trap": "occupation", "note": "직업 '약사' — '약' 낱말"}
+{"id": "test-296", "text": "도윤이 클럽 친구가 ㅍㄹㅍ 했다더라", "label": "consent:crime", "group": "evasion", "note": "초성 변형(필로폰) — dev-296 과 다른 낱말의 초성(검수 M-3)"}
+{"id": "test-297", "text": "승우 친구가 하얀 가루 하다가 잡혀갔대", "label": "consent:crime", "group": "evasion", "note": "완곡 표현(마약)"}
+{"id": "test-298", "text": "강팀장 젊을 때 빵에 다녀왔대 2년 살았다던데", "label": "consent:crime", "group": "evasion", "note": "은어 '빵'(교도소)"}
+{"id": "test-299", "text": "한대리 어제 음 주 운 전 걸렸대", "label": "consent:crime", "group": "evasion", "note": "띄어쓰기 변형"}
+{"id": "test-300", "text": "건우가 남의 지갑 슬쩍했다가 걸렸대", "label": "consent:crime", "group": "evasion", "note": "완곡 표현(절도)"}
+{"id": "test-301", "text": "하은이 마음 병원 다닌 지 1년 됐대", "label": "consent:health", "group": "evasion", "note": "완곡 표현(정신과)"}
+{"id": "test-302", "text": "장인어른 몸에 혹이 악성이래 항 암 시작하신대", "label": "consent:health", "group": "evasion", "note": "완곡 표현 + 띄어쓰기 변형(암)"}
+{"id": "test-303", "text": "다현이 ㅇㅇㅈ 약 먹는대", "label": "consent:health", "group": "evasion", "note": "초성 변형(우울증)"}
+{"id": "test-304", "text": "재원이 여자한테는 관심 없대 남자만 만난대", "label": "consent:sex", "group": "evasion", "note": "완곡 표현(성적 지향)"}
+{"id": "test-305", "text": "오과장 와이프 다른 남자랑 밤마다 연락하고 만난대", "label": "consent:sex", "group": "evasion", "note": "완곡 표현(외도)"}
+{"id": "test-306", "text": "외삼촌은 주일마다 꼭 성경책 들고 나가셔", "label": "consent:politics_religion", "group": "evasion", "note": "종교 이름 없이 활동만"}
+{"id": "test-307", "text": "장인어른은 파란색 쪽 아니면 절대 안 찍으신대", "label": "consent:politics_religion", "group": "evasion", "note": "완곡 표현(지지 정당)"}
+{"id": "test-308", "text": "건우 빗이 2억이래 매달 갚느라 허덕인대", "label": "consent:finance", "group": "evasion", "note": "오타 변형 '빗'(빚)"}
+{"id": "test-309", "text": "예린이 아버지 파 산 하셨대", "label": "consent:finance", "group": "evasion", "note": "띄어쓰기 변형"}
+{"id": "test-310", "text": "동현이 이번 달도 카드값 못 막아서 독촉 문자 왔대", "label": "consent:finance", "group": "evasion", "note": "완곡 표현(연체)"}
+{"id": "test-311", "text": "조카 주민 번호 0 9 1 0 0 2 - 4 7 4 2 9 9 2 래", "label": "block:rrn", "group": "evasion", "note": "숫자 사이 띄어쓰기(지어낸 값)"}
+{"id": "test-312", "text": "형 생년월일 831005 뒷번호 1035181 서류에 썼어", "label": "block:rrn", "group": "evasion", "note": "주민번호 낱말 없이 앞·뒷자리로 나눔(지어낸 값)"}
+{"id": "test-313", "text": "남편 카드 5555.5555.5555.4444 로 긁어 줘", "label": "block:card", "group": "evasion", "note": "마침표 구분(공개 시험용)"}
+{"id": "test-314", "text": "언니 계좌 사육-이칠일구-오팔-삼삼영일 로 보내래", "label": "block:account", "group": "evasion", "note": "숫자를 한글로 읽음(지어낸 값)"}
+{"id": "test-315", "text": "동생 패 스 워 드 는 rastuvek 에서 첫 글자만 대문자래", "label": "block:password", "group": "evasion", "note": "띄어쓰기 변형 + 일부만"}

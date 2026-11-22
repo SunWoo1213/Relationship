@@ -1,0 +1,7 @@
+# 명령: .venv/bin/python -m ruff check scripts/validate_sensitive_set.py tests/test_validate_sensitive_set.py evaluation
+# 시각: 2026-11-22T19:57:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+All checks passed!

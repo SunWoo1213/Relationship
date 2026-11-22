@@ -1,0 +1,36 @@
+# 명령: PYTHONDONTWRITEBYTECODE=1 .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu1r2/mutate.py
+# 시각: 2026-11-22T20:04:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== 데이터 변이(실데이터 사본, dev 줄만 고침)
+D00_control: rc=0 기대 rc=0 일치
+V09_split_valid_with_other_number: rc=1 기대 rc=1 일치
+      [ERROR] dev:166:dev-166: 주민등록번호 모양의 검증 숫자가 맞음(실존 가능 — 끝 자리를 바꿀 것)
+V09b_split_invalid_with_other_number: rc=0 기대 rc=0 일치
+V09c_other_number_first: rc=1 기대 rc=1 일치
+      [ERROR] dev:166:dev-166: 주민등록번호 모양의 검증 숫자가 맞음(실존 가능 — 끝 자리를 바꿀 것)
+V09d_number_between_halves(탐색): rc=0 기대 rc=1 불일치
+V09e_three_pieces_with_other_number(탐색): rc=0 기대 rc=1 불일치
+V01_dev_sentence_into_test: rc=1 기대 rc=1 일치
+      [ERROR] test:171:test-171: 문장 중복(먼저 dev:171:dev-171)
+
+== 코드 변이(검사기 사본) — 새 시험 파일이 잡는지
+C00_control: pytest rc=0 [28 passed in 0.23s] → 대조군 · 실데이터로는 rc=0
+C01_dedupe_per_file: pytest rc=1 [2 failed, 26 passed in 0.25s] → 잡힘 · 실데이터로는 rc=0
+C02_no_neighbour_pair: pytest rc=1 [2 failed, 26 passed in 0.24s] → 잡힘 · 실데이터로는 rc=0
+C03_min_14: pytest rc=1 [3 failed, 25 passed in 0.25s] → 잡힘 · 실데이터로는 rc=0
+C04_max_21: pytest rc=1 [3 failed, 25 passed in 0.25s] → 잡힘 · 실데이터로는 rc=0
+C05_evasion_counted: pytest rc=1 [27 failed, 1 passed in 0.32s] → 잡힘 · 실데이터로는 rc=0
+C06_rrn_check_never: pytest rc=1 [3 failed, 25 passed in 0.25s] → 잡힘 · 실데이터로는 rc=0
+C07_luhn_ignored: pytest rc=1 [1 failed, 27 passed in 0.24s] → 잡힘 · 실데이터로는 rc=0
+C08_query_min_0: pytest rc=1 [1 failed, 27 passed in 0.24s] → 잡힘 · 실데이터로는 rc=0
+C09_no_nfc: pytest rc=1 [1 failed, 27 passed in 0.24s] → 잡힘 · 실데이터로는 rc=0
+C10_plain_label_unchecked: pytest rc=1 [1 failed, 27 passed in 0.24s] → 잡힘 · 실데이터로는 rc=0
+C11_trap_size_31: pytest rc=1 [27 failed, 1 passed in 0.33s] → 잡힘 · 실데이터로는 rc=1
+C12_whole_digits_dropped: pytest rc=1 [1 failed, 27 passed in 0.25s] → 잡힘 · 실데이터로는 rc=0
+C13_missing_file_rc0: pytest rc=1 [1 failed, 27 passed in 0.24s] → 잡힘 · 실데이터로는 rc=0
+C14_no_ws_normalise: pytest rc=1 [1 failed, 27 passed in 0.23s] → 잡힘 · 실데이터로는 rc=0
+
+저장소 데이터 sha256 앞 16자리 전/후 같음: True {'dev.jsonl': 'd3d3d09c0cfd0c24', 'test.jsonl': 'b0b2e1e8cfc22328'}

@@ -1,0 +1,8 @@
+# 명령: shasum -a 256 evaluation/sensitive_guard/test.jsonl evaluation/sensitive_guard/dev.jsonl
+# 시각: 2026-11-22T19:57:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+b0b2e1e8cfc2232846cd5b75f178bc108e6b7b053b62924edc73e206c3e7dd2b  evaluation/sensitive_guard/test.jsonl
+d3d3d09c0cfd0c24e72fb7a7b17709507f72b98439747a7ef16bb36ccaff12a9  evaluation/sensitive_guard/dev.jsonl

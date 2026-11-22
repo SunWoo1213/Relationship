@@ -1,0 +1,488 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py baseline
+# 시각: 2026-11-22T17:54:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: baseline
+# ---
+[데이터] baseline: 기대 rc=0 실제 rc=0 → 잡힘/의도대로
+결과: PASS
+
+# ===== append 2026-11-22T17:54:03+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D01_dup_cross
+# 시각: 2026-11-22T17:54:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D01_dup_cross
+# ---
+[데이터] D01_dup_cross: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] test:316:test-999: 문장 중복(먼저 dev:1:dev-001)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:03+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D02_dup_ws
+# 시각: 2026-11-22T17:54:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D02_dup_ws
+# ---
+[데이터] D02_dup_ws: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] test:316:test-998: 문장 중복(먼저 dev:1:dev-001)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:03+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D03_crime14
+# 시각: 2026-11-22T17:54:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D03_crime14
+# ---
+[데이터] D03_crime14: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] test: consent:crime 14건 (기준 15~20)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:04+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D04_crime21
+# 시각: 2026-11-22T17:54:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D04_crime21
+# ---
+[데이터] D04_crime21: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev: consent:crime 21건 (기준 15~20)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:04+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py P01_crime20
+# 시각: 2026-11-22T17:54:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: P01_crime20
+# ---
+[데이터] P01_crime20: 기대 rc=0 실제 rc=0 → 잡힘/의도대로
+결과: PASS
+
+# ===== append 2026-11-22T17:54:04+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D05_plain99
+# 시각: 2026-11-22T17:54:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D05_plain99
+# ---
+[데이터] D05_plain99: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev: plain 99건 (기준 100)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:04+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D06_trap31
+# 시각: 2026-11-22T17:54:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D06_trap31
+# ---
+[데이터] D06_trap31: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev: plain 99건 (기준 100)
+  [ERROR] dev: trap 31건 (기준 30)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:04+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D07_evasion21
+# 시각: 2026-11-22T17:54:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D07_evasion21
+# ---
+[데이터] D07_evasion21: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev: evasion 21건 (기준 20)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:04+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D08_evasion_not_counted
+# 시각: 2026-11-22T17:54:04+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D08_evasion_not_counted
+# ---
+[데이터] D08_evasion_not_counted: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev: consent:crime 14건 (기준 15~20)
+  [ERROR] dev: evasion 21건 (기준 20)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:05+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D09_query0
+# 시각: 2026-11-22T17:54:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D09_query0
+# ---
+[데이터] D09_query0: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev: consent:crime 조회형 0건 (기준 ≥ 1)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:05+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D10_rrn_valid
+# 시각: 2026-11-22T17:54:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D10_rrn_valid
+# ---
+[데이터] D10_rrn_valid: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:76:dev-076: 주민등록번호 모양의 검증 숫자가 맞음(실존 가능 — 끝 자리를 바꿀 것)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:05+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D11_card_real
+# 시각: 2026-11-22T17:54:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D11_card_real
+# ---
+[데이터] D11_card_real: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:136:dev-136: 공개 시험용 목록 밖 카드번호 모양 숫자(16자리)
+  [ERROR] dev:136:dev-136: block:card 인데 공개 시험용 카드번호가 없음
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:05+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D12_label_vocab
+# 시각: 2026-11-22T17:54:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D12_label_vocab
+# ---
+[데이터] D12_label_vocab: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:1: 어휘 밖 label 'consent:drugs'
+  [ERROR] dev: consent:crime 14건 (기준 15~20)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:05+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D13_group_label
+# 시각: 2026-11-22T17:54:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D13_group_label
+# ---
+[데이터] D13_group_label: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:166: group=plain 은 label none 이어야 함(지금 consent:crime)
+  [ERROR] dev: plain 99건 (기준 100)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:05+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D14_trap_missing
+# 시각: 2026-11-22T17:54:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D14_trap_missing
+# ---
+[데이터] D14_trap_missing: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:266: group=trap 인데 trap 종류 없음
+  [ERROR] dev: trap 29건 (기준 30)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:05+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D15_unknown_key
+# 시각: 2026-11-22T17:54:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D15_unknown_key
+# ---
+[데이터] D15_unknown_key: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:1: 모르는 키 ['span']
+  [ERROR] dev: consent:crime 14건 (기준 15~20)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:06+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D16_dup_id
+# 시각: 2026-11-22T17:54:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D16_dup_id
+# ---
+[데이터] D16_dup_id: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:2:dev-001: id 중복(먼저 dev:1:dev-001)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:06+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D17_no_church
+# 시각: 2026-11-22T17:54:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D17_no_church
+# ---
+[데이터] D17_no_church: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev: 함정에 호칭형 이름 '교회 오빠' 없음
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:06+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D18_form_bad
+# 시각: 2026-11-22T17:54:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D18_form_bad
+# ---
+[데이터] D18_form_bad: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:1: 어휘 밖 form 'record'
+  [ERROR] dev: consent:crime 14건 (기준 15~20)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:06+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D19_bad_json
+# 시각: 2026-11-22T17:54:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D19_bad_json
+# ---
+[데이터] D19_bad_json: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:316: JSON 해석 실패 (Expecting property name enclosed in double quotes)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:06+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D20_luhn_in_plain
+# 시각: 2026-11-22T17:54:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D20_luhn_in_plain
+# ---
+[데이터] D20_luhn_in_plain: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:166:dev-166: 공개 시험용 목록 밖 카드번호 모양 숫자(16자리)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:06+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D21_card_missing
+# 시각: 2026-11-22T17:54:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D21_card_missing
+# ---
+[데이터] D21_card_missing: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:136:dev-136: block:card 인데 공개 시험용 카드번호가 없음
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:06+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D22_rrn_missing
+# 시각: 2026-11-22T17:54:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D22_rrn_missing
+# ---
+[데이터] D22_rrn_missing: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] dev:76:dev-076: block:rrn 인데 주민등록번호 모양 숫자가 없음
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:07+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py D23_dup_id_cross
+# 시각: 2026-11-22T17:54:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: D23_dup_id_cross
+# ---
+[데이터] D23_dup_id_cross: 기대 rc=1 실제 rc=1 → 잡힘/의도대로
+  [ERROR] test:1:dev-001: id 중복(먼저 dev:1:dev-001)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:07+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C01_min_15_to_14
+# 시각: 2026-11-22T17:54:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C01_min_15_to_14
+# ---
+[코드] C01_min_15_to_14: 'PER_LABEL_MIN = 15' → 'PER_LABEL_MIN = 14'
+  데이터 D03_crime14: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:07+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C02_max_20_to_21
+# 시각: 2026-11-22T17:54:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C02_max_20_to_21
+# ---
+[코드] C02_max_20_to_21: 'PER_LABEL_MAX = 20' → 'PER_LABEL_MAX = 21'
+  데이터 D04_crime21: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:07+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C03_max_le_to_lt
+# 시각: 2026-11-22T17:54:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C03_max_le_to_lt
+# ---
+[코드] C03_max_le_to_lt: 'PER_LABEL_MIN <= n <= PER_LABEL_MAX' → 'PER_LABEL_MIN <= n < PER_LABEL_MAX'
+  데이터 P01_crime20: 원래 rc=0 / 변이 rc=1 → 잡힘
+  [ERROR] dev: consent:crime 20건 (기준 15~20)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:07+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C04_plain_100_to_99
+# 시각: 2026-11-22T17:54:07+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C04_plain_100_to_99
+# ---
+[코드] C04_plain_100_to_99: '"plain": 100' → '"plain": 99'
+  데이터 baseline: 원래 rc=0 / 변이 rc=1 → 잡힘
+  [ERROR] dev: plain 100건 (기준 99)
+  [ERROR] test: plain 100건 (기준 99)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:08+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C05_count_evasion_in_category
+# 시각: 2026-11-22T17:54:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C05_count_evasion_in_category
+# ---
+[코드] C05_count_evasion_in_category: 'sensitive = [r for r in rows if r["group"] == "sensitive"]' → 'sensitive = [r for r in rows if r["group"] in ("sensitive", "evasion")]'
+  데이터 P01_crime20: 원래 rc=0 / 변이 rc=1 → 잡힘
+  [ERROR] dev: consent:crime 25건 (기준 15~20)
+결과: FAIL
+
+# ===== append 2026-11-22T17:54:08+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C06_query_min_1_to_0
+# 시각: 2026-11-22T17:54:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C06_query_min_1_to_0
+# ---
+[코드] C06_query_min_1_to_0: 'QUERY_MIN_PER_CATEGORY = 1' → 'QUERY_MIN_PER_CATEGORY = 0'
+  데이터 D09_query0: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:08+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C07_no_ws_normalize
+# 시각: 2026-11-22T17:54:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C07_no_ws_normalize
+# ---
+[코드] C07_no_ws_normalize: 'return _WS_RE.sub(" ", unicodedata.normalize("NFC", text)).strip()' → 'return unicodedata.normalize("NFC", text)'
+  데이터 D02_dup_ws: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:08+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C08_dedupe_per_split
+# 시각: 2026-11-22T17:54:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C08_dedupe_per_split
+# ---
+[코드] C08_dedupe_per_split: '        rows: list[dict[str, str]] = []\n' → '        rows: list[dict[str, str]] = []\n        seen_text.clear()\n'
+  데이터 D01_dup_cross: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:08+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C09_rrn_check_off
+# 시각: 2026-11-22T17:54:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C09_rrn_check_off
+# ---
+[코드] C09_rrn_check_off: 'return rrn_check_digit(digits) == int(digits[12])' → 'return False'
+  데이터 D10_rrn_valid: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:09+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C10_card_list_off
+# 시각: 2026-11-22T17:54:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C10_card_list_off
+# ---
+[코드] C10_card_list_off: '        elif label == "block:card" or luhn_ok(d):' → '        elif False:'
+  데이터 D20_luhn_in_plain: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:09+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C11_group_label_off
+# 시각: 2026-11-22T17:54:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C11_group_label_off
+# ---
+[코드] C11_group_label_off: 'if ok and group in NONE_GROUPS and label != "none":' → 'if False and group in NONE_GROUPS and label != "none":'
+  데이터 D13_group_label: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:09+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C12_trap_phrase_off
+# 시각: 2026-11-22T17:54:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C12_trap_phrase_off
+# ---
+[코드] C12_trap_phrase_off: '            if not hits:\n' → '            if False:\n'
+  데이터 D17_no_church: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:09+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C13_card_required_off
+# 시각: 2026-11-22T17:54:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C13_card_required_off
+# ---
+[코드] C13_card_required_off: 'if label == "block:card" and card_hits == 0:' → 'if False:'
+  데이터 D21_card_missing: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:09+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C14_rrn_required_off
+# 시각: 2026-11-22T17:54:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C14_rrn_required_off
+# ---
+[코드] C14_rrn_required_off: 'if label == "block:rrn" and not rrns:' → 'if False:'
+  데이터 D22_rrn_missing: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS
+
+# ===== append 2026-11-22T17:54:10+09:00 =====
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/mutate.py C15_ids_per_split
+# 시각: 2026-11-22T17:54:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: C15_ids_per_split
+# ---
+[코드] C15_ids_per_split: '        rows: list[dict[str, str]] = []\n' → '        rows: list[dict[str, str]] = []\n        seen_ids.clear()\n'
+  데이터 D23_dup_id_cross: 원래 rc=1 / 변이 rc=0 → 잡힘
+결과: PASS

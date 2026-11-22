@@ -1,0 +1,10 @@
+# 명령: shasum -a 256 evaluation/sensitive_guard/test.jsonl evaluation/sensitive_guard/dev.jsonl /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/work/baseline/test.jsonl /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/work/baseline/dev.jsonl
+# 시각: 2026-11-22T20:02:21+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+b0b2e1e8cfc2232846cd5b75f178bc108e6b7b053b62924edc73e206c3e7dd2b  evaluation/sensitive_guard/test.jsonl
+d3d3d09c0cfd0c24e72fb7a7b17709507f72b98439747a7ef16bb36ccaff12a9  evaluation/sensitive_guard/dev.jsonl
+eeaf784796ec5d4c5343a0d891cc5a64d95dd08b4c9191a67b4681bce80aa915  /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/work/baseline/test.jsonl
+cc30eca88a7ea86c2c5c080c07cec295bd7bdc9b6ea7c189af62c11f04460592  /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1_mut/work/baseline/dev.jsonl

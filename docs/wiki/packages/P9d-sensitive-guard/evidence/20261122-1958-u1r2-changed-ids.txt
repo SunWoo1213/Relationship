@@ -1,0 +1,33 @@
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r2/changed_ids.py
+# 시각: 2026-11-22T19:58:10+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+dev 8
+   dev-066(note,text)
+   dev-069(note,text)
+   dev-072(note,text)
+   dev-073(note,text)
+   dev-268(note,text,trap)
+   dev-276(note,text,trap)
+   dev-289(note,text,trap)
+   dev-290(note,trap)
+test 17
+   test-025(note,text)
+   test-029(note,text)
+   test-044(text)
+   test-062(note,text)
+   test-066(note,text)
+   test-070(note,text)
+   test-072(note,text)
+   test-075(text)
+   test-253(text)
+   test-256(text)
+   test-263(text)
+   test-268(note,text,trap)
+   test-271(note,text)
+   test-274(note,text,trap)
+   test-289(note,text,trap)
+   test-290(note,trap)
+   test-296(note,text)

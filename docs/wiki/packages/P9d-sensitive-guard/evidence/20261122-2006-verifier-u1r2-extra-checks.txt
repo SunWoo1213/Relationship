@@ -1,0 +1,22 @@
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu1r2/extra.py
+# 시각: 2026-11-22T20:06:50+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+== (다) id 접두와 파일 일치
+   dev: 접두·모양 어긋남 0 · 줄 번호와 id 번호 어긋남 0
+   test: 접두·모양 어긋남 0 · 줄 번호와 id 번호 어긋남 0
+== (가) 가림 줄(group=sensitive)의 값 존재 — README 4절 모양 기준
+   dev block:passport: 15줄 중 모양 없음 0 []
+   dev block:driver_license: 15줄 중 모양 없음 0 []
+   dev block:account: 15줄 중 모양 없음 0 []
+   dev block:password: 15줄 중 모양 없음 1 ['dev-161']
+   test block:passport: 15줄 중 모양 없음 0 []
+   test block:driver_license: 15줄 중 모양 없음 0 []
+   test block:account: 15줄 중 모양 없음 0 []
+   test block:password: 15줄 중 모양 없음 1 ['test-161']
+== (나) 끝 부호·공백·부호를 다 지우고 본 중복(두 파일 통틀어)
+   중복 0 []
+== test 문장이 그대로 들어 있는 파일(증거 u1r2·README·review-u1) — dev 에도 있는 문장은 제외
+   본 파일 39 · test 문장이 통째로 든 곳 0

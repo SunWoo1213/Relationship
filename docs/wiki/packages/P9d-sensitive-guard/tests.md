@@ -122,3 +122,45 @@ review-u4 의 R-2·R-3·R-4 를 닫는다. 위 U4 절의 "공백"(⑳)과 "R-2 �
 | 전체 회귀 | `.venv/bin/python -m pytest -q` | **2807 passed · skip 0** (2798 + 9) | `u4b-pytest-full` · `verifier-u4b-full-pytest` |
 | 저장소 잔재 없음(구현자가 저장소 파일을 고쳤다 되돌리는 방식으로 변이를 돌림 — 규칙 밖) | `git diff 5fc2b79 -- app/auth/deps.py app/auth/routes.py app/settings.py` · docstring 을 비운 AST 비교 | 0줄 · `schemas.py` 만 다름 | `verifier-u4b-residue` · `u4b-revert-diff` |
 | ruff · 툴 7종 · mypy | 단위 공통 | 통과 · 7/7 · 새 오류 없음(33, 기준선 38) | `verifier-u4b-ruff` · `verifier-u4b-tools-check` · `verifier-u4b-mypy` |
+
+## U1 — 민감 가드 시험 세트·검사기 (eval-agent, 2026-11-22)
+
+세트는 세 판을 거쳤다(1차 → 검수 보류 → 2차 → 보류 → 3차 = 동결 판). 아래 수치는 동결 판 기준이다. 검사기 시험 명령은 모두 `.venv/bin/python -m pytest tests/test_validate_sensitive_set.py -q`(28 passed, `tmp_path` 합성 세트만 — 저장소 jsonl 을 읽지 않는다 `u1r2-no-repo-set-read`). 증거에 test 문장은 없다(줄 id 만).
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| 세트 형식·크기 — 11개 라벨 각 15 · 동의 범주마다 조회형 2 · 평범 100 · 함정 30 · 우회 20 · 중복 0 · 형식 오류 0 · 주민번호 모양 34건 중 검증 숫자 일치 0 · 카드 32건 중 목록 밖 0 | `.venv/bin/python -I scripts/validate_sensitive_set.py evaluation/sensitive_guard/` | PASS (exit 0) | `u1r3-validate` · `verifier-u1r3-validate` |
+| test 동결 해시 | `shasum -a 256 evaluation/sensitive_guard/test.jsonl evaluation/sensitive_guard/dev.jsonl` | test `62be9136…2484223` · dev `7dc6f965…aac92c3` (README 8절과 같음) | `u1r3-sha256` · `verifier-u1r3-sha256` |
+| 라벨 검수(verifier) — 1차 630줄 전수, 2회차 바뀐 25줄 + 금융 묶음·결정 25 전수, 3회차 바뀐 6줄 | 리뷰 | 3회차 **통과**([필수] 0) | `review-u1.md` · `verifier-u1-*` · `verifier-u1r2-*` · `verifier-u1r3-*` |
+| dev·test 닮음(한계 공개) — 같은 번호 쌍 평균 0.456, 임의 쌍 0.218(식 A)/0.238(식 B), ≥0.6 이 평범 34/100 · 가림 20/90 · 동의 3/75 · 함정 4/30 · 우회 0/20 | 스크래치패드 분석 스크립트 | README 7절 수치 재현 | `u1r3-similarity` · `verifier-u1r3-analysis` |
+| ① `test_synthetic_control_passes` — 합성 대조군: 오류 0, 종료 코드 0 | 위 pytest 명령 | passed | `u1r2-pytest` · 변이 M05·M07·M11 |
+| ② `test_evasion_rows_are_not_counted_in_category` — 우회 20 이 한 범주여도 범주 셈은 15 | 위 명령 | passed | 변이 M07 |
+| ③ `test_dev_sentence_copied_into_test_fails` — dev 문장이 test 에 있으면 FAIL(정확한 오류 문구) | 위 명령 | passed | 변이 M01 |
+| ④ `test_duplicate_after_nfc_and_whitespace_normalisation_fails` — NFD·공백만 다른 같은 문장 | 위 명령 | passed | 변이 M01·M02 |
+| ⑤ `test_duplicate_within_one_file_fails` — 한 파일 안 중복 | 위 명령 | passed | 변이 M17 |
+| ⑥ `test_duplicate_id_across_files_fails` — 두 파일 사이 id 중복 | 위 명령 | passed | 변이 M15 |
+| ⑦ `test_category_count_bounds[14]` — 범주 14건은 FAIL | 위 명령 | passed | 변이 M03 |
+| ⑧ `…[15]` — 15건은 통과 | 위 명령 | passed | 변이 M05 |
+| ⑨ `…[20]` — 20건은 통과 | 위 명령 | passed | 같음 |
+| ⑩ `…[21]` — 21건은 FAIL | 위 명령 | passed | 변이 M04 |
+| ⑪ `test_query_minimum_per_category[0]` — 조회형 0 은 FAIL(`consent:sex 조회형 0건 (기준 ≥ 1)`) | 위 명령 | passed | `u1r2-pytest` |
+| ⑫ `…[1]` — 조회형 1 은 통과 | 위 명령 | passed | 변이 M06 |
+| ⑬ `test_group_sizes_are_exact[plain-1]` — 평범 99 는 FAIL | 위 명령 | passed | `u1r2-pytest` |
+| ⑭ `…[plain+1]` — 평범 101 은 FAIL | 위 명령 | passed | 변이 M13 |
+| ⑮ `…[trap-1]` — 함정 29 는 FAIL | 위 명령 | passed | `u1r2-pytest` |
+| ⑯ `…[trap+1]` — 함정 31 은 FAIL | 위 명령 | passed | 변이 M13 |
+| ⑰ `…[evasion-1]` — 우회 19 는 FAIL | 위 명령 | passed | `u1r2-pytest` |
+| ⑱ `…[evasion+1]` — 우회 21 은 FAIL | 위 명령 | passed | 변이 M13 |
+| ⑲ `test_missing_required_trap_phrase_fails` — 함정에 "교회 오빠" 가 없으면 FAIL | 위 명령 | passed | 변이 M14 |
+| ⑳ `test_plain_row_with_consent_label_fails` — 평범 줄에 consent 라벨(오류 2개 값 단언) | 위 명령 | passed | 변이 M08 |
+| ㉑ `test_sensitive_row_with_none_label_fails` — sensitive 줄에 none 라벨(오류 2개 값 단언) | 위 명령 | passed | 변이 M03 |
+| ㉒ `test_valid_rrn_in_trap_row_fails` — 함정 줄에 검증 숫자가 맞는 주민번호 모양 | 위 명령 | passed | 변이 M11 |
+| ㉓ `test_split_rrn_with_another_number[유효]` — 나눠 쓴 유효 번호 + 다른 숫자(1차 검수 변이 V09)는 FAIL | 위 명령 | passed | 변이 M09·M10 |
+| ㉔ `…[무효]` — 나눠 쓴 무효 번호는 통과하고 주민번호 모양으로 세어짐 | 위 명령 | passed | 같음 |
+| ㉕ `test_rrn_split_into_word_separated_pieces_is_found` — 낱말로 떨어진 토막(문장 전체 숫자 경로) | 위 명령 | passed | 변이 M18 |
+| ㉖ `test_block_rrn_row_without_rrn_fails` — block:rrn 줄에 번호가 없으면 FAIL | 위 명령 | passed | 변이 M19 |
+| ㉗ `test_luhn_valid_number_outside_public_list_fails` — 공개 시험 번호 목록 밖 Luhn 유효 번호 | 위 명령 | passed | 변이 M12 |
+| ㉘ `test_missing_input_file_returns_2` — 입력 파일이 없으면 종료 코드 2 | 위 명령 | passed | 변이 M16 |
+| 검사기 변이 | 저장소 밖 사본(구현자 19종 · verifier 14종) | 전부 잡힘 | `u1r2-mutations` · `verifier-u1r2-mutations` |
+| 전체 회귀 | `.venv/bin/python -m pytest -q` | **2835 passed · skip 0** (2807 + 28) | `verifier-u1r2-full-pytest` |
+| ruff · 검사기 `mypy --strict` | 단위 공통 | 통과 | `verifier-u1r3-ruff` · `verifier-u1r2-mypy` |

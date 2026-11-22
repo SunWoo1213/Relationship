@@ -1,0 +1,8 @@
+# 명령: grep -nE 'read_text|open\(|parent\.parent|sensitive_guard' tests/test_validate_sensitive_set.py
+# 시각: 2026-11-22T19:57:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+7:- 저장소의 `evaluation/sensitive_guard/test.jsonl`·`dev.jsonl` 은 **읽지 않는다**
+24:sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))

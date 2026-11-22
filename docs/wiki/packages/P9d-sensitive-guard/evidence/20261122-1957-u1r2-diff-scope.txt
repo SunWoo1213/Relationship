@@ -1,0 +1,17 @@
+# 명령: git status --short -- evaluation scripts tests app web alembic
+# 시각: 2026-11-22T19:57:22+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+ M web/src/__tests__/auth.test.tsx
+ M web/src/api/client.ts
+ M web/src/api/types.ts
+ M web/src/auth.tsx
+ M web/src/components/AppShell.tsx
+ M web/src/screens/AuthScreen.tsx
+?? evaluation/sensitive_guard/
+?? scripts/validate_sensitive_set.py
+?? tests/test_validate_sensitive_set.py
+?? web/src/__tests__/notice.test.tsx
+?? web/src/lib/privacyNotice.ts

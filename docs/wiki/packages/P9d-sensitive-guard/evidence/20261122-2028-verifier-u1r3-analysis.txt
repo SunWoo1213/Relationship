@@ -1,0 +1,89 @@
+# 명령: for R in /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r3/v2 evaluation/sensitive_guard; do echo "#### $R"; .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu1r2/analyze2.py $R | sed -n '1,30p'; done; echo '#### 범주 낱말(test-013 의 낱말 하나가 dev 동의 줄에 있나 — 참/거짓과 줄 id 만)'; .venv/bin/python -I -c "
+import json
+t={json.loads(l)['id']:json.loads(l) for l in open('evaluation/sensitive_guard/test.jsonl',encoding='utf-8')}
+d=[json.loads(l) for l in open('evaluation/sensitive_guard/dev.jsonl',encoding='utf-8')]
+w='마약'
+print('dev 에 공개된 낱말', w, '— test-013 에 있음', w in t['test-013']['text'], '· dev 동의 범주 줄', [r['id'] for r in d if w in r['text'] and r['label']!='none'], '· dev 함정 줄', [r['id'] for r in d if w in r['text'] and r['label']=='none'])
+"; echo '#### test 문장 누출'; .venv/bin/python -I -c "
+import json,glob
+t=[json.loads(l) for l in open('evaluation/sensitive_guard/test.jsonl',encoding='utf-8')]
+fs=glob.glob('docs/wiki/packages/P9d-sensitive-guard/evidence/*u1*')+['evaluation/sensitive_guard/README.md','docs/wiki/packages/P9d-sensitive-guard/review-u1.md','docs/wiki/decisions/D20-sensitive-guard.md']
+n=0
+for f in fs:
+    s=open(f,encoding='utf-8',errors='replace').read()
+    n+=any(r['text'] in s for r in t)
+print('본 파일', len(fs), '· test 문장이 통째로 든 파일', n)
+"; shasum -a 256 evaluation/sensitive_guard/test.jsonl evaluation/sensitive_guard/dev.jsonl
+# 시각: 2026-11-22T20:28:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+#### /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r3/v2
+== README 3~6절: 2자 이상 토막이 test 문장에 있고 dev 문장에 없는 README 한글 덩어리 16개
+    ['가려야', '간호사라는', '감지를', '값이', '같은', '공개된', '그대로', '글자가', '문장에서', '보이는', '아니다', '옮겼다', '있는지', '장소로만', '정체성', '지향']
+== README 7절: 2자 이상 토막이 test 문장에 있고 dev 문장에 없는 README 한글 덩어리 24개
+    ['값이', '값이다', '같은', '공개로', '그대로', '글자가', '나온다', '내연', '노동조합', '뇌졸중', '다른', '만든다', '문장에서', '문장으로', '아니다', '아니라', '알코올', '옮겨', '있는', '정의를', '정의에서', '정체성', '중독', '지향']
+== 1차 M-2 의 13개 낱말: README 3~6절에 남았나 / dev 문장에 있나
+    노동조합: 3~6절 없음 · dev 문장 없음
+    위원장: 3~6절 없음 · dev 문장 없음
+    뇌졸중: 3~6절 없음 · dev 문장 없음
+    중독: 3~6절 없음 · dev 문장 없음
+    희귀: 3~6절 없음 · dev 문장 없음
+    탈세: 3~6절 없음 · dev 문장 없음
+    성전환: 3~6절 없음 · dev 문장 없음
+    추심: 3~6절 있음 · dev 문장 있음
+    후원: 3~6절 없음 · dev 문장 없음
+    장염: 3~6절 없음 · dev 문장 없음
+    스케일링: 3~6절 없음 · dev 문장 없음
+    부활절: 3~6절 없음 · dev 문장 없음
+    장식: 3~6절 없음 · dev 문장 없음
+
+== 같은 번호 쌍 평균 0.457 쌍 315
+   plain: >=0.6 34/100  >=0.8 2
+   block: >=0.6 20/90  >=0.8 0
+   consent: >=0.6 3/75  >=0.8 0
+   trap: >=0.6 4/30  >=0.8 0
+   evasion: >=0.6 0/20  >=0.8 0
+   >=0.8 쌍: [(0.83, 'dev-189', 'test-189'), (0.83, 'dev-248', 'test-248')]
+   >=0.6 인 동의 범주·함정 쌍: [(0.63, 'dev-053', 'test-053'), (0.6, 'dev-059', 'test-059'), (0.74, 'dev-074', 'test-074'), (0.71, 'dev-281', 'test-281'), (0.65, 'dev-286', 'test-286'), (0.6, 'dev-287', 'test-287'), (0.62, 'dev-288', 'test-288')]
+== 같은 묶음 임의 쌍 평균 — (가) 1차 식(dev 쪽 가림 줄만 뺌) 0.219 쌍 23675 · (나) 양쪽 가림 줄을 다 뺌 0.239 쌍 16925
+   상위 40쌍 중 같은 줄 번호: 33
+   번호가 다른 쌍 중 >=0.7: []
+#### evaluation/sensitive_guard
+== README 3~6절: 2자 이상 토막이 test 문장에 있고 dev 문장에 없는 README 한글 덩어리 16개
+    ['가려야', '간호사라는', '감지를', '값이', '같은', '공개된', '그대로', '글자가', '문장에서', '보이는', '아니다', '옮겼다', '있는지', '장소로만', '정체성', '지향']
+== README 7절: 2자 이상 토막이 test 문장에 있고 dev 문장에 없는 README 한글 덩어리 28개
+    ['값이', '값이다', '같은', '공개로', '그대로', '글자가', '기준이다', '나온다', '내연', '노동조합', '뇌졸중', '다른', '만든다', '문장에서', '문장으로', '바꾸었다', '방식이', '아니다', '아니라', '알코올', '옮겨', '있는', '있었다', '정의를', '정의에서', '정체성', '중독', '지향']
+== 1차 M-2 의 13개 낱말: README 3~6절에 남았나 / dev 문장에 있나
+    노동조합: 3~6절 없음 · dev 문장 없음
+    위원장: 3~6절 없음 · dev 문장 없음
+    뇌졸중: 3~6절 없음 · dev 문장 없음
+    중독: 3~6절 없음 · dev 문장 없음
+    희귀: 3~6절 없음 · dev 문장 없음
+    탈세: 3~6절 없음 · dev 문장 없음
+    성전환: 3~6절 없음 · dev 문장 없음
+    추심: 3~6절 있음 · dev 문장 있음
+    후원: 3~6절 없음 · dev 문장 없음
+    장염: 3~6절 없음 · dev 문장 없음
+    스케일링: 3~6절 없음 · dev 문장 없음
+    부활절: 3~6절 없음 · dev 문장 없음
+    장식: 3~6절 없음 · dev 문장 없음
+
+== 같은 번호 쌍 평균 0.456 쌍 315
+   plain: >=0.6 34/100  >=0.8 2
+   block: >=0.6 20/90  >=0.8 0
+   consent: >=0.6 3/75  >=0.8 0
+   trap: >=0.6 4/30  >=0.8 0
+   evasion: >=0.6 0/20  >=0.8 0
+   >=0.8 쌍: [(0.83, 'dev-189', 'test-189'), (0.83, 'dev-248', 'test-248')]
+   >=0.6 인 동의 범주·함정 쌍: [(0.63, 'dev-053', 'test-053'), (0.6, 'dev-059', 'test-059'), (0.74, 'dev-074', 'test-074'), (0.71, 'dev-281', 'test-281'), (0.65, 'dev-286', 'test-286'), (0.6, 'dev-287', 'test-287'), (0.62, 'dev-288', 'test-288')]
+== 같은 묶음 임의 쌍 평균 — (가) 1차 식(dev 쪽 가림 줄만 뺌) 0.218 쌍 23675 · (나) 양쪽 가림 줄을 다 뺌 0.238 쌍 16925
+   상위 40쌍 중 같은 줄 번호: 33
+   번호가 다른 쌍 중 >=0.7: []
+#### 범주 낱말(test-013 의 낱말 하나가 dev 동의 줄에 있나 — 참/거짓과 줄 id 만)
+dev 에 공개된 낱말 마약 — test-013 에 있음 True · dev 동의 범주 줄 ['dev-001', 'dev-014'] · dev 함정 줄 ['dev-266']
+#### test 문장 누출
+본 파일 54 · test 문장이 통째로 든 파일 0
+62be9136f98ecc87b94f6791c07930c59bd1f4da3516b2a0ae045db492484223  evaluation/sensitive_guard/test.jsonl
+7dc6f96577265fb9469a46b1efdfd9e2dcb8e6aa204e73a591f35d2c0aac92c3  evaluation/sensitive_guard/dev.jsonl

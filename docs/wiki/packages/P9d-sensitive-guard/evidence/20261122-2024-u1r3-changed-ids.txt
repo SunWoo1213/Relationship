@@ -1,0 +1,16 @@
+# 명령: .venv/bin/python -I /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r3/changed_ids3.py
+# 시각: 2026-11-22T20:24:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+dev 3
+   dev-011(note,text) label=consent:crime group=sensitive form=-
+   dev-028(note,text) label=consent:health group=sensitive form=-
+   dev-071(note,text) label=consent:finance group=sensitive form=-
+   text·note 밖 키가 바뀐 줄: 0
+test 3
+   test-013(note,text) label=consent:crime group=sensitive form=-
+   test-023(note,text) label=consent:health group=sensitive form=-
+   test-068(note,text) label=consent:finance group=sensitive form=-
+   text·note 밖 키가 바뀐 줄: 0

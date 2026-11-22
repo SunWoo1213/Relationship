@@ -1,0 +1,17 @@
+# 명령: shasum -a 256 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r3/v2/test.jsonl /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r3/v2/dev.jsonl evaluation/sensitive_guard/test.jsonl evaluation/sensitive_guard/dev.jsonl scripts/validate_sensitive_set.py tests/test_validate_sensitive_set.py; stat -f '%Sm %N' scripts/validate_sensitive_set.py tests/test_validate_sensitive_set.py; git status --short -- app tests alembic scripts evaluation
+# 시각: 2026-11-22T20:27:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+b0b2e1e8cfc2232846cd5b75f178bc108e6b7b053b62924edc73e206c3e7dd2b  /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r3/v2/test.jsonl
+d3d3d09c0cfd0c24e72fb7a7b17709507f72b98439747a7ef16bb36ccaff12a9  /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/u1r3/v2/dev.jsonl
+62be9136f98ecc87b94f6791c07930c59bd1f4da3516b2a0ae045db492484223  evaluation/sensitive_guard/test.jsonl
+7dc6f96577265fb9469a46b1efdfd9e2dcb8e6aa204e73a591f35d2c0aac92c3  evaluation/sensitive_guard/dev.jsonl
+1525b5a0484650478c92d66f8ad6da8db4ac841ffcaa02e71f2b0f4f20d0507a  scripts/validate_sensitive_set.py
+5eaabf2cc36a15cedc1e6a9e66a775731776d2f0cde1577b4bc977f7170b50b8  tests/test_validate_sensitive_set.py
+Nov 22 19:50:44 2026 scripts/validate_sensitive_set.py
+Nov 22 19:56:38 2026 tests/test_validate_sensitive_set.py
+?? evaluation/sensitive_guard/
+?? scripts/validate_sensitive_set.py
+?? tests/test_validate_sensitive_set.py

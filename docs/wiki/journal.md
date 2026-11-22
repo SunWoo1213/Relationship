@@ -723,3 +723,5 @@
 - 2026-11-22 17:54 | PUSH-dev2 | origin dev2 61a5241 (실험 푸시)
 - 2026-11-22 19:44 | COMMIT | 5fc2b79 feat(P9d-sensitive-guard): 전송 고지에 동의해야 대화를 보낼 수 있게 한다 (U4)
 - 2026-11-22 19:44 | PUSH-dev2 | origin dev2 5fc2b79 (실험 푸시)
+- 2026-11-22 19:55 | COMMIT | 2a9b65d fix(P9d-sensitive-guard): 가입 동의는 불리언 true 일 때만 받는다 (U4 보강)
+- 2026-11-22 19:55 | PUSH-dev2 | origin dev2 2a9b65d (실험 푸시)

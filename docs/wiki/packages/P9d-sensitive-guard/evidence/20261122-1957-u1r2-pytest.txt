@@ -1,0 +1,44 @@
+# 명령: .venv/bin/python -m pytest tests/test_validate_sensitive_set.py -v -p no:cacheprovider
+# 시각: 2026-11-22T19:57:20+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+============================= test session starts ==============================
+platform darwin -- Python 3.14.7, pytest-9.0.3, pluggy-1.6.0 -- /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/bin/python
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True, suppress_health_check=(HealthCheck.too_slow,)
+rootdir: /Users/sunwoo/Desktop/Portfolio/Relationship
+configfile: pyproject.toml
+plugins: hypothesis-6.168.5, cov-7.1.0, anyio-4.15.1
+collecting ... collected 28 items
+
+tests/test_validate_sensitive_set.py::test_synthetic_control_passes PASSED [  3%]
+tests/test_validate_sensitive_set.py::test_evasion_rows_are_not_counted_in_category PASSED [  7%]
+tests/test_validate_sensitive_set.py::test_dev_sentence_copied_into_test_fails PASSED [ 10%]
+tests/test_validate_sensitive_set.py::test_duplicate_after_nfc_and_whitespace_normalisation_fails PASSED [ 14%]
+tests/test_validate_sensitive_set.py::test_duplicate_within_one_file_fails PASSED [ 17%]
+tests/test_validate_sensitive_set.py::test_duplicate_id_across_files_fails PASSED [ 21%]
+tests/test_validate_sensitive_set.py::test_category_count_bounds[14-False] PASSED [ 25%]
+tests/test_validate_sensitive_set.py::test_category_count_bounds[15-True] PASSED [ 28%]
+tests/test_validate_sensitive_set.py::test_category_count_bounds[20-True] PASSED [ 32%]
+tests/test_validate_sensitive_set.py::test_category_count_bounds[21-False] PASSED [ 35%]
+tests/test_validate_sensitive_set.py::test_query_minimum_per_category[0-False] PASSED [ 39%]
+tests/test_validate_sensitive_set.py::test_query_minimum_per_category[1-True] PASSED [ 42%]
+tests/test_validate_sensitive_set.py::test_group_sizes_are_exact[plain--1] PASSED [ 46%]
+tests/test_validate_sensitive_set.py::test_group_sizes_are_exact[plain-1] PASSED [ 50%]
+tests/test_validate_sensitive_set.py::test_group_sizes_are_exact[trap--1] PASSED [ 53%]
+tests/test_validate_sensitive_set.py::test_group_sizes_are_exact[trap-1] PASSED [ 57%]
+tests/test_validate_sensitive_set.py::test_group_sizes_are_exact[evasion--1] PASSED [ 60%]
+tests/test_validate_sensitive_set.py::test_group_sizes_are_exact[evasion-1] PASSED [ 64%]
+tests/test_validate_sensitive_set.py::test_missing_required_trap_phrase_fails PASSED [ 67%]
+tests/test_validate_sensitive_set.py::test_plain_row_with_consent_label_fails PASSED [ 71%]
+tests/test_validate_sensitive_set.py::test_sensitive_row_with_none_label_fails PASSED [ 75%]
+tests/test_validate_sensitive_set.py::test_valid_rrn_in_trap_row_fails PASSED [ 78%]
+tests/test_validate_sensitive_set.py::test_split_rrn_with_another_number[True-False] PASSED [ 82%]
+tests/test_validate_sensitive_set.py::test_split_rrn_with_another_number[False-True] PASSED [ 85%]
+tests/test_validate_sensitive_set.py::test_rrn_split_into_word_separated_pieces_is_found PASSED [ 89%]
+tests/test_validate_sensitive_set.py::test_block_rrn_row_without_rrn_fails PASSED [ 92%]
+tests/test_validate_sensitive_set.py::test_luhn_valid_number_outside_public_list_fails PASSED [ 96%]
+tests/test_validate_sensitive_set.py::test_missing_input_file_returns_2 PASSED [100%]
+
+============================== 28 passed in 0.23s ==============================

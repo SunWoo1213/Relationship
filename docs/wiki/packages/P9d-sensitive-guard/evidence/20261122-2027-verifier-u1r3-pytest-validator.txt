@@ -1,0 +1,8 @@
+# 명령: POSTGRES_PORT=5433 .venv/bin/python -m pytest -q -rs -p no:cacheprovider tests/test_validate_sensitive_set.py
+# 시각: 2026-11-22T20:27:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 2a9b65d (dev2)
+# exit: 0
+# ---
+............................                                             [100%]
+28 passed in 0.22s
