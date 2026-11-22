@@ -12,3 +12,4 @@
 - 1년 = 365일 고정(윤년 무관). 창 = `[now − PATTERN_WINDOW_DAYS일, now]`, `occurred_at` 기준.
 - 실제 쓴 기간·횟수를 패턴 trace(`memory_pattern`)에 기록한다 — 설정을 바꿔도 과거 판정을 재현할 수 있게(원칙8·9).
 - 적용은 P6-memory.
+- (보충 CR-009 · D20, 2026-11-22) **민감 표시된 사건(`events.sensitive_category IS NOT NULL`)은 패턴 횟수에 세지 않는다** — 패턴 줄이 카드 밖 브리핑으로 나가기 때문(D20 결정 5, G11). 기간·횟수 설정값은 그대로. 적용은 P9d-sensitive-guard U7.

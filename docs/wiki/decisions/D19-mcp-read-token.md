@@ -39,3 +39,4 @@
 
 **갱신 이력**
 - 2026-11-17 밤 신설(CR-008 3차 — 사용자 "토큰 방식 축소안"). 구현은 P9b-auth U12~U14(01-plan 개정 4) — 완료 해시는 그때 적는다. 파일명은 `D19-mcp-read-token.md`(CR-008 10장의 가칭 `D19-mcp-read-only.md` 대신 — 이번 결정의 핵심이 토큰 방식이라).
+- 2026-11-22 보충(CR-009 · D20): MCP 4개 도구는 **민감 표시된 사실·사건·일정과 민감 사건의 시각을 내보내지 않는다**(사용자 결정 3 — 외부 클라이언트의 LLM 공급자로 다시 나가는 경로). `get_person_card` 는 기본값(`include_sensitive=False`), `list_people`·`find_person` 의 `last_contact_at` 은 일반 사건으로만. 출력 모양은 불변 — 카드 항목의 `sensitive_category` 키는 빼서 낸다. 배포 전에 만든 저장 브리핑은 소급하지 않아 `list_briefings` 로 그대로 나간다(CR-009 W14). 결정 9 의 "공개 기간 연장(11-19 종료 유지)" 은 D17 보충으로 바뀌었다(가드레일 해결 때까지 유지). 구현은 P9d-sensitive-guard U8.

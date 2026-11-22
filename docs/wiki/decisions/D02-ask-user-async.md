@@ -9,3 +9,5 @@
 **파급** `pending_questions` 테이블 (S3.1). 프론트 확인 칩 = 미답변 pending_questions 렌더링. 미답변 24h 만료. 답 없이 새 발화가 오면 대기 질문 유지하고 새 발화 우선.
 
 **코드에서 지켜야 할 것** 동기 대기(sleep/poll) 금지. `ask_user`를 다른 툴에 합치지 않는다(원칙4 서사).
+
+**보충(CR-009 · D20, 2026-11-22)** `kind` 값 집합이 4종이 된다(`identity`·`new_person`·`schedule`·`sensitive`). 비동기 모델(저장 → 턴 종료 → 칩 → 재개)은 그대로. 질문을 만드는 쪽이 둘로 나뉜다: ① **사전 동의 질문**(LLM 전 서버 가드)은 라우트가 `ask_user` **툴을 부르지 않고** 같은 저장소(`pending_questions`)에 쓴다 — "에이전트가 모른다를 스스로 판단하는 행동" 이라는 툴 정의는 루프가 부르는 질문에만 남고, 툴의 `@traced` 가 원문을 trace 에 복제하지 않는다 ② **사후 확인 질문**(추출 LLM 이 민감 표시)은 루프가 `ask_user` 툴로 부른다. `sensitive` 는 긍정 답 규약(`_AFFIRMATIVE_REQUIRED_KINDS`)에 든다. 거절·만료 때의 원문 지우기는 D20 R-2·R-3.

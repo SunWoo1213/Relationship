@@ -1,7 +1,7 @@
 # CURRENT — 지금 하는 일
 
 active: P9b-auth
-frozen: none
+frozen: CR-009
 
 <!--
   "active" — 패키지 id (예: P1-schema) 또는 FIX-nnn. 없으면 none.
@@ -12,6 +12,7 @@ frozen: none
 -->
 
 ## 메모
+- **CR-009 수용(민감 정보 가드레일, 2026-11-22, 사용자)** — "11월 18일 것을 해결하려고 해" · "진행해주세요". 사용자 결정 21건(AskUserQuestion 6회)·verifier 재검토(개정 2) **이행 가능**(`changes/review-CR-009.md`). **문서 이행 중(`frozen: CR-009`)** — D20 신설, D2·D14·D16·D17·D18·D19·S3.1·S3.2·S3.4·S3.5·S3.6·S3.7 보충, CLAUDE.md·backlog·security §5·proposal 상단. 코드는 새 패키지 `P9d-sensitive-guard`. 문서 커밋 뒤 메인이 `frozen: none`, P9d 계획 검증 통과 뒤 `active: P9d-sensitive-guard`(그때 P9b-auth 는 보류 — 남은 것: verify-impl·04-review·사용자 완성 확인, P9-infra 04-review 와 함께).
 - **CR-008 수용(축소안: 토큰, 2026-11-17 밤, 사용자)** — "토큰 방식 축소안" · "11-19까지만 서버를 켜둘거야 그 이후에는 닫을거고" · "그래서 Mcp는 당장 내일 시연을 위해서 필요한거라서". 계정별 개인 접근 토큰 + `https://relmemo.com/mcp` 읽기 전용 도구 4개 + Claude Code 연결. OAuth·Claude 앱·ChatGPT·쓰기는 다음 단계. **문서 이행 중(`frozen: CR-008`)** — D19 신설, D18·D17·S3.1 보충, 코드는 P9b-auth 01-plan **개정 4**(U12 backend ∥ U13 frontend → U14 메인 재배포·사용자 실제 연결). 문서 커밋·verifier 계획 검증 통과 뒤 메인이 `frozen: none`.
 - **CR-007 제기(2026-11-16 아침, 사용자)** — "계정가입을 할 때 닉네임도 입력받게 해줘" · "아이디, 닉네임은 중복검사를 하도록 하고". P9b-auth(로그인) 배포 반영 뒤 화면 점검 중에 나온 요청. **문서 이행완료(`bfbcdb1`) · 계획 개정 3 verifier 4차 통과 → frozen 해제(11-16 07:50)**. 코드는 P9b-auth 에 단위를 더한다(architect 가 01-plan 개정). 같은 때 요청: 도메인 구매·적용 절차 문서(`docs/user-setup/` — 코드 변경 아님, 메인 작성).
 - **CR-006 제기·수용(2026-11-15 저녁, 사용자)** — "이 서비스에 로그인 기능도 추가하고 싶어 그 로그인에 따라서 채팅방이 나오도록 그리고 로그인을 한 계정마다 세션을 별개로". 결정(AskUserQuestion 4문): **아이디 + 비밀번호** · **계정마다 채팅방 하나**(목록 없음, 기록은 이어서 보임) · **반드시 평가(11-18) 전에 배포** · **기존 데이터는 모두 비운다**. 같은 날 저녁 추가: 원칙5 화면 수 고정 폐지 · 채팅방 목록 의도적 제외 · 브리핑 달력 보기. **문서 이행완료(D18 신설, frozen 해제)**. 코드는 `P9b-auth`(로그인, 먼저) → `P9c-briefing-calendar`(달력, P9b 완료 뒤).

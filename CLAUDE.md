@@ -39,11 +39,12 @@
 3. **확신도는 3신호 결합이다.** `confidence = Σ w_i·s_i / Σ w_i` — **관측된 신호만** 결합하며 가중치는 `w_llm=0.5 · w_emb=0.3 · w_rule=0.2`(D12, CR-001). 세 신호가 모두 있으면 `0.5·s_llm + 0.3·s_emb + 0.2·s_rule` 이고, `s_rule` 이 미측정(`rule_checked=0`)이면 0 으로 넣지 않고 분모에서 뺀다(`0.625·s_llm + 0.375·s_emb`). 2단계 규칙 충돌은 후보 배제가 아니라 `s_rule` 감점이다(D13). `s_llm`은 LLM이 **구조화 출력으로 자기보고한 0~1 점수**이며, **LLM 로그 확률은 쓰지 않는다**(Claude API가 제공하지 않는다). 자기보고 점수는 보정표(`reports/calibration.json`)로 뒷받침한다.
 4. **엔티티 해석은 LLM 단일 호출로 하지 않는다.** 반드시 4단계(후보검색 → 규칙필터 → LLM판정 → 확신도 미달 시 ask_user). 이유는 `.claude/skills/entity-resolution` 참조.
 5. **핵심 화면은 채팅 / 인물 카드 / 브리핑이다.** 화면 수를 고정하지 않는다 — 필요한 화면(로그인·가입 등)은 계획에서 근거와 함께 더한다(CR-006, 사용자 2026-11-15). UI에 시간을 쓰지 않는다.
-6. **포함 범위에 명시**: 반복 패턴 감지(규칙 기반, D14 — CR-002) — 같은 인물의 같은 `events.type`이 설정된 기간 내 설정된 횟수 이상(`PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`, 기본 365일·3회)이면 `person_facts(key="pattern:{type}")`를 생성한다. LLM은 패턴 문장화만 한다.
+6. **포함 범위에 명시**: 반복 패턴 감지(규칙 기반, D14 — CR-002) — 같은 인물의 같은 `events.type`이 설정된 기간 내 설정된 횟수 이상(`PATTERN_WINDOW_DAYS`·`PATTERN_MIN_COUNT`, 기본 365일·3회)이면 `person_facts(key="pattern:{type}")`를 생성한다. LLM은 패턴 문장화만 한다. 민감 표시된 사건은 세지 않는다(CR-009 · D20).
 7. **의도적으로 제외한 것**: 고민 상담, 인물 간(A–B) 관계 저장, 상담 페르소나, 음성 입력, 네이티브 앱, **채팅방 목록(여러 대화방)** — 계정마다 채팅방은 하나다. 기억 단위는 대화방이 아니라 인물이다(CR-006, 사용자 2026-11-15 "우리는 관계를 기억하는 것이 메인이니까"). "왜 안 했는가"를 설명할 수 있는 것이 범위 통제 능력이다.
    - 경계 문장: **브리핑의 "제안"은 기록된 사실에서 도출되는 한 줄 행동 제안으로 한정한다.** 감정·고민에 대한 대화는 하지 않는다 — 고민 상담이 아니다. **채팅의 조회 답(CR-004 · D16)도 기록된 사실의 재진술로 한정한다** — 평가·조언·감정 대화는 하지 않는다.
+   - 포함 범위(CR-009 · D20, 2026-11-22): **민감 정보 가드레일** — LLM 호출 전 서버 규칙 검사로 식별·인증 정보(주민등록번호·여권번호·운전면허번호·계좌번호·카드번호·비밀번호)는 가리고, 민감 범주(범죄·불법 / 건강(좁은 범위) / 성 / 정치·종교 / 금융)는 칩 동의 뒤에만 처리·저장하며, 동의하고 저장한 민감 항목은 인물 카드에서만 보인다. 경계 문장: **가드레일은 상담이 아니다 — 보낼지·저장할지만 묻는다.** 가드 문구에 감정·평가·조언 표현을 쓰지 않는다. 완화이며 기록 대상(제3자) 동의 문제는 풀지 않는다.
 8. **평가 수치는 재현 가능해야 한다.** 데이터셋·라벨·베이스라인을 조작하지 않는다. 성능 미달도 결과다 — 실패 케이스 분석을 산출물로 남긴다.
-9. **모든 판정에는 근거를 남긴다.** `agent_traces`에 step·입력·출력·툴·토큰(in/out)·후보·확신도 분해를 기록한다.
+9. **모든 판정에는 근거를 남긴다.** `agent_traces`에 step·입력·출력·툴·토큰(in/out)·후보·확신도 분해를 기록한다. (CR-009: 거절·만료된 민감 원문은 trace 에서도 지운다 — 판정 메타(step·툴·토큰·시각·범주·규칙 id)는 남긴다. 덮어쓰는 자리는 D20 R-3 의 함수 하나뿐)
 
 ## 기술 스택
 
@@ -51,8 +52,8 @@
 - 프론트: React + PWA — 정적 빌드를 **같은 EC2 의 Caddy 가 서빙**(CR-005 · D17 개정 ②, 2026-11-14. 원안 S3 + CloudFront 는 폐기)
 - DB: PostgreSQL + pgvector (RDS). 별도 벡터 DB 미도입 — 인물·별칭 테이블과 임베딩을 같은 DB에서 조인.
 - 임베딩: 별도 공급자 필요(Claude API에는 임베딩 엔드포인트가 없다). 공급자·차원은 임베딩 파일럿(D4) 후 확정.
-- 인프라(CR-005 · D17 개정 ②, 2026-11-14): **AWS 최소 구성** — EC2 1대에 Docker Compose 서비스 3개(`caddy` 자동 HTTPS + `/api/*` 접두 제거 프록시 + 프론트 정적 서빙 · `backend` FastAPI, 기동 시 `alembic upgrade head` · `postgres` pgvector 볼륨). DB 는 RDS 가 아니라 **compose 안 Postgres**. 브리핑 주기 작업은 컨테이너 안 1분 루프(`BRIEFING_SCHEDULER_ENABLED=1`). 비밀은 사용자가 EC2 에 올린 `.env`. 갱신은 SSH `git pull` + `compose up -d --build`. **공개 기간 한정(~2026-11-19, 졸업평가 11-18) 뒤 인스턴스 종료.** 원안(Terraform·SSM·CloudFront·RDS, D7)과 1차 CR-005 안(Vercel + Neon)은 폐기. **실제 기동은 사용자가 따로 지시할 때.**
-- 인증(CR-006 · D18, 2026-11-15): 서비스 안 **아이디 + 비밀번호** 가입·로그인(비밀번호는 해시로만). 같은 출처 **HttpOnly 쿠키** + 서버 세션 테이블(`auth_sessions`, 토큰 해시만 저장). `/health`·`/auth/signup`·`/auth/login` 밖의 API 는 로그인 필수(401). 모든 데이터는 로그인 계정 기준으로 격리, 계정마다 채팅방 하나. `APP_USER_ID` 고정 사용자는 폐지. (CR-007 · D18 결정 10·11, 2026-11-16) 가입 때 **닉네임 필수**(사용자 자신의 표시 이름 — 사이드바·`/auth/*` 응답에만, 에이전트 답·브리핑에는 쓰지 않음), 아이디·닉네임 **중복검사**(가입 409 `username_taken`/`nickname_taken` + 가입 전 조회 `GET /auth/availability` — 로그인 없이 열린 네 번째 예외).
+- 인프라(CR-005 · D17 개정 ②, 2026-11-14): **AWS 최소 구성** — EC2 1대에 Docker Compose 서비스 3개(`caddy` 자동 HTTPS + `/api/*` 접두 제거 프록시 + 프론트 정적 서빙 · `backend` FastAPI, 기동 시 `alembic upgrade head` · `postgres` pgvector 볼륨). DB 는 RDS 가 아니라 **compose 안 Postgres**. 브리핑 주기 작업은 컨테이너 안 1분 루프(`BRIEFING_SCHEDULER_ENABLED=1`). 비밀은 사용자가 EC2 에 올린 `.env`. 갱신은 SSH `git pull` + `compose up -d --build`. ~~공개 기간 한정(~2026-11-19, 졸업평가 11-18) 뒤 인스턴스 종료~~ → **가드레일(CR-009) 해결 때까지 유지, 종료일 미정**(사용자 2026-11-18, D17 보충 — 종료일은 CR-009 완료 확인 때 사용자가 정한다). 원안(Terraform·SSM·CloudFront·RDS, D7)과 1차 CR-005 안(Vercel + Neon)은 폐기. **실제 기동은 사용자가 따로 지시할 때.**
+- 인증(CR-006 · D18, 2026-11-15): 서비스 안 **아이디 + 비밀번호** 가입·로그인(비밀번호는 해시로만). 같은 출처 **HttpOnly 쿠키** + 서버 세션 테이블(`auth_sessions`, 토큰 해시만 저장). `/health`·`/auth/signup`·`/auth/login` 밖의 API 는 로그인 필수(401). 모든 데이터는 로그인 계정 기준으로 격리, 계정마다 채팅방 하나. `APP_USER_ID` 고정 사용자는 폐지. (CR-007 · D18 결정 10·11, 2026-11-16) 가입 때 **닉네임 필수**(사용자 자신의 표시 이름 — 사이드바·`/auth/*` 응답에만, 에이전트 답·브리핑에는 쓰지 않음), 아이디·닉네임 **중복검사**(가입 409 `username_taken`/`nickname_taken` + 가입 전 조회 `GET /auth/availability` — 로그인 없이 열린 네 번째 예외). (CR-009 · D20, 2026-11-22) 가입 때 **OpenAI API 전송 고지·필수 동의**, 기존 가입자는 다음 접속 때 모달 한 번(판 번호 `PRIVACY_NOTICE_VERSION`). 미동의 계정은 `POST /chat`·`POST /answers/{id}`·`POST /briefings/run` 403 `notice_required`, 주기 브리핑·푸시 건너뜀. 로그인 없이 열린 예외는 늘지 않는다.
 - MCP(CR-008 · D19, 2026-11-17): `https://relmemo.com/mcp` 에 **읽기 전용 도구 4개**(`list_people`·`find_person`·`get_person_card`·`list_briefings` — LLM 0·원문 0)를 연다. 자격은 세션 쿠키가 아니라 **계정별 개인 접근 토큰**(`Authorization: Bearer`, 웹 "AI 연결" 화면에서 발급·한 번만 표시·폐기, 계정당 1개·7일, DB 에는 해시만). 같은 FastAPI 앱·공식 MCP Python SDK·Caddy `handle /mcp`·`MCP_ENABLED`(코드 기본 꺼짐, 운영 compose 가 켬). MCP 도구는 툴 7종과 다른 어댑터다(툴 7종 불변). OAuth 로그인 연결·Claude 앱·ChatGPT·쓰기 도구는 다음 단계.
 - 배포 전 필수: AWS Budgets 알림($10 / $30 / $50 — 계정 무료 자격에 따라 EC2 비용 발생 가능) + **OpenAI 대시보드 월 지출 한도**(공개 기간 중 LLM 비용 상한). 둘 다 사용자 몫.
 
@@ -70,7 +71,7 @@
 
 - `Candidate` = `{person, similarity, aliases_matched, rule_flags}` — 3단계 LLM 판정의 입력.
 - `ask_user`는 "에이전트가 모른다를 스스로 판단하는 행동"이다. 반드시 별도 툴로 유지한다.
-- **`ask_user`는 비동기 대기 질문 모델이다**: 질문을 `pending_questions`에 저장하고 `{question_id, status:"pending"}`을 반환한 뒤 그 턴을 종료한다. 사용자가 칩을 누르면 `POST /answers/{question_id}`가 저장된 context로 루프를 재개한다. `kind`는 `identity` / `new_person` / `schedule`.
+- **`ask_user`는 비동기 대기 질문 모델이다**: 질문을 `pending_questions`에 저장하고 `{question_id, status:"pending"}`을 반환한 뒤 그 턴을 종료한다. 사용자가 칩을 누르면 `POST /answers/{question_id}`가 저장된 context로 루프를 재개한다. `kind`는 `identity` / `new_person` / `schedule` / `sensitive`(CR-009 · D20 — 민감 범주 동의. 사전 동의는 라우트가 툴을 부르지 않고 같은 저장소에 쓰고, 사후 확인은 루프가 툴로 부른다).
 
 ## 데이터 모델 (권위 있는 정의 — 스키마 v2)
 
@@ -89,6 +90,10 @@ users(id, username, nickname, password_hash, created_at)  -- nickname: CR-007 ·
 mcp_tokens(id, user_id, token_hash, created_at, expires_at, last_used_at)  -- CR-008 · D19 · 리비전 0005: user_id UNIQUE(계정당 1개)·users FK CASCADE, 토큰은 해시만
 auth_sessions(id, user_id, token_hash, created_at, expires_at)
 chat_messages(id, user_id, role, content, question_id, created_at)
+-- CR-009 · D20 (리비전 0006): 민감 표시·고지 동의
+events(+ sensitive_category, + consent_question_id)  person_facts(+ sensitive_category)  schedules(+ sensitive_category)  -- NULL = 일반
+users(+ privacy_notice_version, + privacy_notice_accepted_at)  -- NULL = 고지 미동의
+pending_questions.kind CHECK  -- identity / new_person / schedule / sensitive
 ```
 
 - (CR-006) `auth_sessions.user_id`·`chat_messages.user_id` 는 `users.id` FK(ON DELETE CASCADE). `persons`·`push_subscriptions`·`pending_questions` 의 `user_id` 는 `users.id` 값을 담지만 FK 는 두지 않는다(S3.1 보충, P9b 결정 O). 대화 `session_id` 는 서버가 계정에서 만든다(`chat:<user_id>`).
