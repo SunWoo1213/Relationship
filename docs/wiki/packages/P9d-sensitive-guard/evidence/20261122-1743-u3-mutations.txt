@@ -1,0 +1,34 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/mutate.py
+# 시각: 2026-11-22T17:43:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# ---
+M1 downgrade 의 민감 행 개수 검사 빼기
+  결과: 잡힘(FAIL)  | ["FAILED tests/test_migration_0006.py::test_downgrade_refuses_and_keeps_everything_when_sensitive_rows_exist[consent_ref_only] - Failed: DID NOT RAISE <class 'RuntimeError'>"] | 1 failed, 12 passed in 0.58s
+M2 downgrade 가 consent_question_id 행을 세지 않기
+  결과: 잡힘(FAIL)  | ["FAILED tests/test_migration_0006.py::test_downgrade_refuses_and_keeps_everything_when_sensitive_rows_exist[consent_ref_only] - Failed: DID NOT RAISE <class 'RuntimeError'>"] | 1 failed, 12 passed in 0.58s
+M3 downgrade 가 person_facts 표시를 세지 않기
+  결과: 잡힘(FAIL)  | ["FAILED tests/test_migration_0006.py::test_downgrade_refuses_and_keeps_everything_when_sensitive_rows_exist[consent_ref_only] - KeyError: 'person_facts'"] | 1 failed, 12 passed in 0.57s
+M4 upgrade 의 kind CHECK 가 3종 그대로
+  결과: 잡힘(FAIL)  | ['FAILED tests/test_migration_0006.py::test_check_sentences_are_the_contract_values - assert "CHECK ((kind...le\'::text])))" == "CHECK ((kind...ve\'::text])))"'] | 1 failed, 2 passed in 0.41s
+M5 범주 낱말 politics_religion -> politics (마이그레이션)
+  결과: 잡힘(FAIL)  | ['FAILED tests/test_migration_0006.py::test_check_sentences_are_the_contract_values - AssertionError: events'] | 1 failed, 2 passed in 0.41s
+M6 events.sensitive_category 타입 String -> Text (마이그레이션)
+  결과: 잡힘(FAIL)  | ["FAILED tests/test_migration_0006.py::test_new_columns_match_s3_1_by_value - AssertionError: ('events', 'sensitive_category', {'data_type': 'text', 'default': None, 'is_nullable': 'YES', 'max_len': None})"] | 1 failed, 1 passed in 0.40s
+M7 consent_question_id BigInteger -> Integer (마이그레이션)
+  결과: 잡힘(FAIL)  | ["FAILED tests/test_migration_0006.py::test_new_columns_match_s3_1_by_value - AssertionError: ('events', 'consent_question_id', {'data_type': 'integer', 'default': None, 'is_nullable': 'YES', 'max_len': None})"] | 1 failed, 1 passed in 0.40s
+M8 upgrade 가 기존 계정의 고지 판 번호를 채움(소급)
+  결과: 잡힘(FAIL)  | ['FAILED tests/test_migration_0006.py::test_upgrade_changes_no_existing_data - assert [(1, None)] == [(None, None)]'] | 1 failed, 7 passed in 0.43s
+M9 downgrade 가 kind CHECK 를 4종으로 둠
+  결과: 잡힘(FAIL)  | ['FAILED tests/test_migration_0006.py::test_downgrade_when_no_sensitive_rows_removes_columns_and_restores_three_kinds - assert "CHECK ((kind...ve\'::text])))" == "CHECK ((kind...le\'::text])))"'] | 1 failed, 11 passed in 0.51s
+M10 upgrade 가 schedules CHECK 를 만들지 않음
+  결과: 잡힘(FAIL)  | ['FAILED tests/test_migration_0006.py::test_check_sentences_are_the_contract_values - sqlalchemy.exc.NoResultFound: No row was found when one was required'] | 1 failed, 2 passed in 0.41s
+M11 모델 QUESTION_KINDS 에서 sensitive 빼기
+  결과: 잡힘(FAIL)  | ["FAILED tests/test_migration_0006.py::test_model_carries_the_same_contract_values - AssertionError: assert ('identity', ...', 'schedule') == ('identity', ..., 'sensitive')"] | 1 failed, 8 passed in 0.43s
+M12 모델 users.privacy_notice_accepted_at 빼기
+  결과: 잡힘(FAIL)  | ["FAILED tests/test_migration_0006.py::test_model_carries_the_same_contract_values - KeyError: 'privacy_notice_accepted_at'"] | 1 failed, 8 passed in 0.45s
+M13 모델 범주 순서·값 변경(finance 제거)
+  결과: 잡힘(FAIL)  | ["FAILED tests/test_migration_0006.py::test_model_carries_the_same_contract_values - AssertionError: assert ('crime', 'he...ics_religion') == ('crime', 'he...n', 'finance')"] | 1 failed, 8 passed in 0.44s
+M14 모델 schedules CHECK 제거
+  결과: 잡힘(FAIL)  | ['FAILED tests/test_migration_0006.py::test_model_carries_the_same_contract_values - AssertionError: schedules'] | 1 failed, 8 passed in 0.44s

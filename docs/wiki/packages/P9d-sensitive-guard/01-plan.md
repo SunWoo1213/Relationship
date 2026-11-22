@@ -154,7 +154,7 @@ U2 와 U3 은 파일이 겹치지 않아 동시 가능(둘 다 backend-agent 라
   - 검증: `… u2-rules -- .venv/bin/python -m pytest tests/test_guard_rules.py -q`(러너 `--split test` 거부 시험 포함) · `… u2-dev -- .venv/bin/python -I evaluation/sensitive_guard/run.py --split dev --rules-only` · `… u2-no-log -- bash <SCR>/u2-no-log.sh`(안: `grep -rnE "logger\.|print\(" app/guard`, 기대 0줄 = exit 1).
   - 변이 후보: 범주 낱말 하나 지우기 → 그 낱말 시험 FAILED · 허용 목록에서 "마약김밥" 지우기 → 함정 시험 FAILED · 러너의 `--split test` 거부 빼기 → 거부 시험 FAILED.
 
-- [ ] U3 **[backend-agent] 리비전 0006 + 모델 — 민감 표시 컬럼·고지 컬럼·`pending_questions.kind` CHECK 4종·downgrade 가드** / Refs: P9d-sensitive-guard D20 S3.1 / 의존: U0
+- [x] U3 **[backend-agent] 리비전 0006 + 모델 — 민감 표시 컬럼·고지 컬럼·`pending_questions.kind` CHECK 4종·downgrade 가드** / Refs: P9d-sensitive-guard D20 S3.1 / 의존: U0
   - 파일: `alembic/versions/0006_sensitive_guard.py` · `app/db/models.py`(`QUESTION_KINDS` 82행, CHECK 228~236행, 새 컬럼) · `tests/test_migration_0006.py`(`tests.test_migration_0003` 도우미·`relationship_test_mig` 재사용 — 0004·0005 관례).
   - 방식: S3.1 보충 그대로. downgrade 는 먼저 민감 질문 행·표시 행·`consent_question_id` 행 수를 세어 하나라도 있으면 개수만 담은 예외(원문 0, 삭제 0). `app/agent/types.py:434` 는 `QUESTION_KINDS` 를 그대로 읽으므로 수정 불필요(시험으로 확인). `relationship_test_mig` 는 0003~0006 시험이 나눠 쓰므로, 민감 행을 넣는 0006 시험은 끝에 그 행을 지워 다음 시험의 downgrade 를 막지 않는다.
   - **닫힌 목록(개정 1 — M2, 0005 선례 `c85a0e8` 과 같은 방식. 바꿀 값은 S3.1 보충 0006 의 컬럼 목록 — `events`(+`sensitive_category`, +`consent_question_id`)·`person_facts`(+`sensitive_category`)·`schedules`(+`sensitive_category`)·`users`(+`privacy_notice_version`, +`privacy_notice_accepted_at`) = 새 컬럼 6개, 새 CHECK 3개(세 표의 `sensitive_category`), 인덱스·UNIQUE·FK·테이블 0 — 에서 architect 가 다시 셌다)**:

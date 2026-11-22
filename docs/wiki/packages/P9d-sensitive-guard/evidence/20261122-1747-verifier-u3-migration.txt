@@ -1,0 +1,8 @@
+# 명령: POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_migration_0006.py tests/test_migration_0005.py tests/test_migration_0004.py tests/test_migration_0003.py -q -rs
+# 시각: 2026-11-22T17:47:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# ---
+..............................................                           [100%]
+46 passed in 1.71s

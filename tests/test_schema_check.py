@@ -41,7 +41,7 @@ def test_check_value_constants_are_the_same_object_as_models_not_redefined():
     assert len(sc.m.EVENT_TYPES) == 7
     assert len(sc.m.RELATION_TAGS) == 5
     assert len(sc.m.HIERARCHIES) == 3
-    assert len(sc.m.QUESTION_KINDS) == 3
+    assert len(sc.m.QUESTION_KINDS) == 4  # 0006(CR-009): sensitive 추가
 
 
 def test_missing_values_helper_finds_absent_entries():

@@ -1,0 +1,303 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu3/run_muts.sh control
+# 시각: 2026-11-22T17:49:09+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# 메모: 대조군
+# ---
+##### VU3_MUT=control
+19 passed in 0.74s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0006
+new columns: 6
+  SELECT count(*) FROM pending_questions WHERE kind='sensitive' -> 0
+  SELECT count(*) FROM events WHERE sensitive_category IS NOT NULL OR consent_question_id IS NOT NULL -> 0
+  SELECT count(*) FROM person_facts WHERE sensitive_category IS NOT NULL -> 0
+  SELECT count(*) FROM schedules WHERE sensitive_category IS NOT NULL -> 0
+  ck_events_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text, 'sensitive'::text])))
+  ck_person_facts_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_schedules_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+
+# ===== append 2026-11-22T17:49:16+09:00 =====
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu3/run_muts.sh skip_fact skip_event skip_schedule skip_kind skip_consent category_value category_extra upgrade_touch_briefed upgrade_touch_updated_at upgrade_touch_created_at message_leaks_raw guard_deletes_then_raises
+# 시각: 2026-11-22T17:49:16+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# ---
+##### VU3_MUT=skip_fact
+E           psycopg.errors.CheckViolation: new row for relation "pending_questions" violates check constraint "ck_pending_questions_kind_valid"
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) new row for relation "pending_questions" violates check constraint "ck_pending_questions_kind_valid"
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+E           psycopg.errors.UndefinedColumn: column "sensitive_category" of relation "schedules" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "sensitive_category" of relation "schedules" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+E           psycopg.errors.UndefinedColumn: column "privacy_notice_version" of relation "users" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "privacy_notice_version" of relation "users" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+4 failed, 15 passed in 0.88s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0005
+new columns: 0
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text])))
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=skip_event
+E           psycopg.errors.UndefinedColumn: column "sensitive_category" of relation "person_facts" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "sensitive_category" of relation "person_facts" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+E           psycopg.errors.CheckViolation: new row for relation "pending_questions" violates check constraint "ck_pending_questions_kind_valid"
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) new row for relation "pending_questions" violates check constraint "ck_pending_questions_kind_valid"
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+E           psycopg.errors.UndefinedColumn: column "sensitive_category" of relation "schedules" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "sensitive_category" of relation "schedules" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+E           psycopg.errors.UndefinedColumn: column "privacy_notice_version" of relation "users" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "privacy_notice_version" of relation "users" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+5 failed, 14 passed in 0.94s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0005
+new columns: 0
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text])))
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=skip_schedule
+E           psycopg.errors.UndefinedColumn: column "privacy_notice_version" of relation "users" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "privacy_notice_version" of relation "users" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+2 failed, 17 passed in 0.79s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0005
+new columns: 0
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text])))
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=skip_kind
+E           psycopg.errors.CheckViolation: check constraint "ck_pending_questions_kind_valid" of relation "pending_questions" is violated by some row
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) check constraint "ck_pending_questions_kind_valid" of relation "pending_questions" is violated by some row
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+1 failed, 18 passed in 0.85s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0006
+new columns: 6
+  SELECT count(*) FROM pending_questions WHERE kind='sensitive' -> 0
+  SELECT count(*) FROM events WHERE sensitive_category IS NOT NULL OR consent_question_id IS NOT NULL -> 0
+  SELECT count(*) FROM person_facts WHERE sensitive_category IS NOT NULL -> 0
+  SELECT count(*) FROM schedules WHERE sensitive_category IS NOT NULL -> 0
+  ck_events_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text, 'sensitive'::text])))
+  ck_person_facts_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_schedules_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=skip_consent
+E           psycopg.errors.UndefinedColumn: column "sensitive_category" of relation "events" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "sensitive_category" of relation "events" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+E           psycopg.errors.UndefinedColumn: column "sensitive_category" of relation "person_facts" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "sensitive_category" of relation "person_facts" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+E           psycopg.errors.CheckViolation: new row for relation "pending_questions" violates check constraint "ck_pending_questions_kind_valid"
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) new row for relation "pending_questions" violates check constraint "ck_pending_questions_kind_valid"
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+E           psycopg.errors.UndefinedColumn: column "sensitive_category" of relation "schedules" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "sensitive_category" of relation "schedules" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+E           psycopg.errors.UndefinedColumn: column "privacy_notice_version" of relation "users" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "privacy_notice_version" of relation "users" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+6 failed, 13 passed in 1.00s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0005
+new columns: 0
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text])))
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=category_value
+E           psycopg.errors.CheckViolation: new row for relation "events" violates check constraint "ck_events_sensitive_category_valid"
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) new row for relation "events" violates check constraint "ck_events_sensitive_category_valid"
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+E           psycopg.errors.CheckViolation: new row for relation "person_facts" violates check constraint "ck_person_facts_sensitive_category_valid"
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) new row for relation "person_facts" violates check constraint "ck_person_facts_sensitive_category_valid"
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+E           psycopg.errors.CheckViolation: new row for relation "schedules" violates check constraint "ck_schedules_sensitive_category_valid"
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) new row for relation "schedules" violates check constraint "ck_schedules_sensitive_category_valid"
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+E           psycopg.errors.CheckViolation: new row for relation "person_facts" violates check constraint "ck_person_facts_sensitive_category_valid"
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) new row for relation "person_facts" violates check constraint "ck_person_facts_sensitive_category_valid"
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+5 failed, 14 passed in 1.10s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0006
+new columns: 6
+  SELECT count(*) FROM pending_questions WHERE kind='sensitive' -> 0
+  SELECT count(*) FROM events WHERE sensitive_category IS NOT NULL OR consent_question_id IS NOT NULL -> 0
+  SELECT count(*) FROM person_facts WHERE sensitive_category IS NOT NULL -> 0
+  SELECT count(*) FROM schedules WHERE sensitive_category IS NOT NULL -> 0
+  ck_events_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'financial'::character varyi
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text, 'sensitive'::text])))
+  ck_person_facts_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'financial'::character varyi
+  ck_schedules_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'financial'::character varyi
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=category_extra
+1 failed, 18 passed in 0.74s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0006
+new columns: 6
+  SELECT count(*) FROM pending_questions WHERE kind='sensitive' -> 0
+  SELECT count(*) FROM events WHERE sensitive_category IS NOT NULL OR consent_question_id IS NOT NULL -> 0
+  SELECT count(*) FROM person_facts WHERE sensitive_category IS NOT NULL -> 0
+  SELECT count(*) FROM schedules WHERE sensitive_category IS NOT NULL -> 0
+  ck_events_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text, 'sensitive'::text])))
+  ck_person_facts_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_schedules_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=upgrade_touch_briefed
+2 failed, 17 passed in 0.74s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0006
+new columns: 6
+  SELECT count(*) FROM pending_questions WHERE kind='sensitive' -> 0
+  SELECT count(*) FROM events WHERE sensitive_category IS NOT NULL OR consent_question_id IS NOT NULL -> 0
+  SELECT count(*) FROM person_facts WHERE sensitive_category IS NOT NULL -> 0
+  SELECT count(*) FROM schedules WHERE sensitive_category IS NOT NULL -> 0
+  ck_events_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text, 'sensitive'::text])))
+  ck_person_facts_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_schedules_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=upgrade_touch_updated_at
+19 passed in 0.74s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0006
+new columns: 6
+  SELECT count(*) FROM pending_questions WHERE kind='sensitive' -> 0
+  SELECT count(*) FROM events WHERE sensitive_category IS NOT NULL OR consent_question_id IS NOT NULL -> 0
+  SELECT count(*) FROM person_facts WHERE sensitive_category IS NOT NULL -> 0
+  SELECT count(*) FROM schedules WHERE sensitive_category IS NOT NULL -> 0
+  ck_events_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text, 'sensitive'::text])))
+  ck_person_facts_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_schedules_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=upgrade_touch_created_at
+19 passed in 0.74s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0006
+new columns: 6
+  SELECT count(*) FROM pending_questions WHERE kind='sensitive' -> 0
+  SELECT count(*) FROM events WHERE sensitive_category IS NOT NULL OR consent_question_id IS NOT NULL -> 0
+  SELECT count(*) FROM person_facts WHERE sensitive_category IS NOT NULL -> 0
+  SELECT count(*) FROM schedules WHERE sensitive_category IS NOT NULL -> 0
+  ck_events_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text, 'sensitive'::text])))
+  ck_person_facts_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_schedules_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=message_leaks_raw
+5 failed, 14 passed in 0.66s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0006
+new columns: 6
+  SELECT count(*) FROM pending_questions WHERE kind='sensitive' -> 0
+  SELECT count(*) FROM events WHERE sensitive_category IS NOT NULL OR consent_question_id IS NOT NULL -> 0
+  SELECT count(*) FROM person_facts WHERE sensitive_category IS NOT NULL -> 0
+  SELECT count(*) FROM schedules WHERE sensitive_category IS NOT NULL -> 0
+  ck_events_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text, 'sensitive'::text])))
+  ck_person_facts_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_schedules_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+##### VU3_MUT=guard_deletes_then_raises
+E           psycopg.errors.CheckViolation: new row for relation "pending_questions" violates check constraint "ck_pending_questions_kind_valid"
+E           sqlalchemy.exc.IntegrityError: (psycopg.errors.CheckViolation) new row for relation "pending_questions" violates check constraint "ck_pending_questions_kind_valid"
+E           (Background on this error at: https://sqlalche.me/e/20/gkpj)
+E           psycopg.errors.UndefinedColumn: column "sensitive_category" of relation "schedules" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "sensitive_category" of relation "schedules" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+E           psycopg.errors.UndefinedColumn: column "privacy_notice_version" of relation "users" does not exist
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column "privacy_notice_version" of relation "users" does not exist
+E           (Background on this error at: https://sqlalche.me/e/20/f405)
+4 failed, 15 passed in 0.90s
+--- 복구 상태(시험 전용 DB, 읽기 전용 조회)
+db: relationship_test_mig
+version: 0005
+new columns: 0
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text])))
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1

@@ -1,0 +1,22 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/dev_counts.py
+# 시각: 2026-11-22T17:37:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# ---
+alembic_version: 0005
+persons rows: 4
+person_aliases rows: 5
+person_facts rows: 2
+fact_sources rows: 1
+events rows: 10
+schedules rows: 1
+pending_questions rows: 638
+push_subscriptions rows: 0
+agent_traces rows: 6903
+users rows: 12
+auth_sessions rows: 17
+chat_messages rows: 1864
+mcp_tokens rows: 0
+new columns present: []
+check constraints: ['ck_pending_questions_kind_valid']

@@ -1,0 +1,20 @@
+# 명령: PYTHONPATH=. POSTGRES_PORT=5433 .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu3/dev_nulls.py
+# 시각: 2026-11-22T17:51:18+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# ---
+db: relationship
+events.sensitive_category NOT NULL rows: 0
+events.consent_question_id NOT NULL rows: 0
+person_facts.sensitive_category NOT NULL rows: 0
+schedules.sensitive_category NOT NULL rows: 0
+users.privacy_notice_version NOT NULL rows: 0
+users.privacy_notice_accepted_at NOT NULL rows: 0
+kind=sensitive rows: 0
+events consent_question_id bigint YES
+events sensitive_category character varying YES
+person_facts sensitive_category character varying YES
+schedules sensitive_category character varying YES
+users privacy_notice_accepted_at timestamp with time zone YES
+users privacy_notice_version integer YES

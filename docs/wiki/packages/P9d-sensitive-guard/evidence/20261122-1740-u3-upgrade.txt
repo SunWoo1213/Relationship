@@ -1,0 +1,9 @@
+# 명령: .venv/bin/python -m alembic upgrade head
+# 시각: 2026-11-22T17:40:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# ---
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0005 -> 0006, Refs: P9d-sensitive-guard U3 CR-009 D20 S3.1 -- 민감 정보 가드레일(민감 표시·고지 컬럼, kind 4종).

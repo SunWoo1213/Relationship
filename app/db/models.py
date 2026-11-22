@@ -57,6 +57,7 @@ from sqlalchemy import (
     Index,
     Integer,
     PrimaryKeyConstraint,
+    String,
     Text,
     UniqueConstraint,
     func,
@@ -79,7 +80,14 @@ EVENT_TYPES = (
 )
 RELATION_TAGS = ("가족", "연인", "친구", "직장", "지인")
 HIERARCHIES = ("상", "동", "하")
-QUESTION_KINDS = ("identity", "new_person", "schedule")
+QUESTION_KINDS = ("identity", "new_person", "schedule", "sensitive")  # 0006(CR-009 · D20): sensitive 추가
+
+# 0006 보충(CR-009 · D20) -- 민감 범주 5종(순서 고정). 세 표의 `sensitive_category` CHECK 와 시험이
+# 같은 출처를 쓴다. NULL = 일반. 가드 모듈(U2)도 이 값을 그대로 따른다.
+SENSITIVE_CATEGORIES = ("crime", "health", "sex", "politics_religion", "finance")
+_SENSITIVE_CATEGORY_CHECK = "sensitive_category IN ({})".format(
+    ", ".join(f"'{c}'" for c in SENSITIVE_CATEGORIES)
+)
 
 # P2-tools 결정5 -- person_aliases.source 값 집합. 앱 검증만(DB CHECK 없음):
 # 값 집합이 P3-er(별칭 확정 경로)·P6(승격)에서 흔들릴 가능성이 남아 있고,
@@ -153,6 +161,7 @@ class PersonFact(Base):
         # 보충(FIX-020) -- 인물당 키 하나(결정 D-6). name 미지정 이유는
         # PersonAlias.__table_args__ 의 주석 참고(uq 템플릿 특성).
         UniqueConstraint("person_id", "key"),
+        CheckConstraint(_SENSITIVE_CATEGORY_CHECK, name="sensitive_category_valid"),
     )
 
     id: Mapped[int] = _pk()
@@ -168,6 +177,8 @@ class PersonFact(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+    # 0006(CR-009): NULL = 일반. 쓰기는 COALESCE(기존, 이번) -- 올라가기만(D20 R-5).
+    sensitive_category: Mapped[str | None] = mapped_column(String, nullable=True)
 
 
 class FactSource(Base):
@@ -195,6 +206,7 @@ class Event(Base):
             "'favor', 'other')",
             name="type_valid",
         ),
+        CheckConstraint(_SENSITIVE_CATEGORY_CHECK, name="sensitive_category_valid"),
         Index("ix_events_person_id_occurred_at", "person_id", "occurred_at"),
     )
 
@@ -209,11 +221,18 @@ class Event(Base):
     created_at: Mapped[object] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
+    # 0006(CR-009): NULL = 일반. consent_question_id 는 동의 기록(`pending_questions` 행)을 가리키지만
+    # FK 는 두지 않는다(P9b 결정 O — 질문 행이 지워져도 사건은 남는다).
+    sensitive_category: Mapped[str | None] = mapped_column(String, nullable=True)
+    consent_question_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
 
 
 class Schedule(Base):
     __tablename__ = "schedules"
-    __table_args__ = (Index("ix_schedules_scheduled_at", "scheduled_at"),)
+    __table_args__ = (
+        CheckConstraint(_SENSITIVE_CATEGORY_CHECK, name="sensitive_category_valid"),
+        Index("ix_schedules_scheduled_at", "scheduled_at"),
+    )
 
     id: Mapped[int] = _pk()
     person_id: Mapped[int] = mapped_column(
@@ -222,13 +241,15 @@ class Schedule(Base):
     title: Mapped[str] = mapped_column(Text, nullable=False)
     scheduled_at: Mapped[object] = mapped_column(DateTime(timezone=True), nullable=False)
     briefed_at: Mapped[object | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # 0006(CR-009): NULL = 일반.
+    sensitive_category: Mapped[str | None] = mapped_column(String, nullable=True)
 
 
 class PendingQuestion(Base):
     __tablename__ = "pending_questions"
     __table_args__ = (
         CheckConstraint(
-            "kind IN ('identity', 'new_person', 'schedule')",
+            "kind IN ('identity', 'new_person', 'schedule', 'sensitive')",
             name="kind_valid",
         ),
         Index("ix_pending_questions_session_id_created_at", "session_id", "created_at"),
@@ -317,6 +338,11 @@ class User(Base):
     nickname: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[object] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    # 0006 보충(CR-009 · D20): OpenAI 전송 고지에 동의한 판 번호·시각. NULL = 고지 미동의.
+    privacy_notice_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    privacy_notice_accepted_at: Mapped[object | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
     )
 
 

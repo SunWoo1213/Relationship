@@ -35,8 +35,22 @@ from tests.test_migration_0003 import (
 
 pytestmark = pytest.mark.dbtest
 
-#: S3.1 0004 보충 -- users 컬럼 집합(5).
-USERS_COLUMNS = {"id", "username", "password_hash", "nickname", "created_at"}
+#: head 기준 users 컬럼 집합(7) -- 0004 보충(nickname) + 0006 보충(고지 동의 두 컬럼).
+USERS_COLUMNS = {
+    "id",
+    "username",
+    "password_hash",
+    "nickname",
+    "created_at",
+    "privacy_notice_version",
+    "privacy_notice_accepted_at",
+}
+#: 0003 상태(nickname·0006 컬럼이 없던 때)의 users 컬럼 집합(4).
+USERS_COLUMNS_AT_0003 = USERS_COLUMNS - {
+    "nickname",
+    "privacy_notice_version",
+    "privacy_notice_accepted_at",
+}
 
 _COUNTED = ("users", "auth_sessions", "chat_messages")
 
@@ -107,7 +121,7 @@ def test_db_is_at_head_and_0004_is_in_history(mig):
 
 # ② users 컬럼 집합 = S3.1 0004 보충(5). 시작 상태(0003)는 nickname 이 없었다.
 def test_users_columns_match_s3_1_0004(mig):
-    assert mig["columns_before"] == USERS_COLUMNS - {"nickname"}
+    assert mig["columns_before"] == USERS_COLUMNS_AT_0003
     assert _columns(mig["engine"], "users") == USERS_COLUMNS
 
 
@@ -154,7 +168,7 @@ def test_downgrade_to_0003_keeps_rows_and_upgrade_backfills_again(mig):
         command.downgrade(mig["cfg"], "0003")
         try:
             assert _version(engine) == "0003"
-            assert _columns(engine, "users") == USERS_COLUMNS - {"nickname"}
+            assert _columns(engine, "users") == USERS_COLUMNS_AT_0003
             with engine.connect() as c:
                 leftover = c.execute(text(
                     "SELECT conname FROM pg_constraint WHERE conname = 'uq_users_nickname'"

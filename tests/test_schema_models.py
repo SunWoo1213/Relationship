@@ -40,6 +40,7 @@ S3_1_TABLE_COLUMNS = {
         "value",
         "confidence",
         "updated_at",
+        "sensitive_category",  # 0006 보충(CR-009)
     },
     "fact_sources": {"fact_id", "event_id"},
     "events": {
@@ -50,8 +51,11 @@ S3_1_TABLE_COLUMNS = {
         "raw_utterance",
         "occurred_at",
         "created_at",
+        "sensitive_category",  # 0006 보충(CR-009)
+        "consent_question_id",  # 0006 보충(CR-009)
     },
-    "schedules": {"id", "person_id", "title", "scheduled_at", "briefed_at"},
+    # 0006 보충(CR-009): schedules.sensitive_category.
+    "schedules": {"id", "person_id", "title", "scheduled_at", "briefed_at", "sensitive_category"},
     "pending_questions": {
         "id",
         "session_id",
@@ -77,8 +81,16 @@ S3_1_TABLE_COLUMNS = {
         "created_at",
     },
     # 보충(CR-006 · D18, S3.1 0003) — 계정과 계정별 격리.
-    # 0004 보충(CR-007): users.nickname 추가.
-    "users": {"id", "username", "password_hash", "nickname", "created_at"},
+    # 0004 보충(CR-007): users.nickname 추가. 0006 보충(CR-009): 고지 동의 판 번호·시각.
+    "users": {
+        "id",
+        "username",
+        "password_hash",
+        "nickname",
+        "created_at",
+        "privacy_notice_version",
+        "privacy_notice_accepted_at",
+    },
     "auth_sessions": {"id", "user_id", "token_hash", "created_at", "expires_at"},
     "chat_messages": {"id", "user_id", "role", "content", "question_id", "created_at"},
     # 0005 보충(CR-008): MCP 개인 접근 토큰.
@@ -93,6 +105,11 @@ NULLABLE_COLUMNS = {
     "answered_at",
     "question_id",
     "last_used_at",  # 0005 보충(CR-008) -- 토큰을 쓰기 전에는 값이 없다.
+    # 0006 보충(CR-009) -- 이름 집합이라 `sensitive_category` 는 세 표에 있어도 한 번 센다.
+    "sensitive_category",
+    "consent_question_id",
+    "privacy_notice_version",
+    "privacy_notice_accepted_at",
 }
 
 JSONB_COLUMNS = {
@@ -116,6 +133,7 @@ TIMESTAMP_COLUMNS = {
     ("pending_questions", "answered_at"),
     ("push_subscriptions", "created_at"),
     ("agent_traces", "created_at"),
+    ("users", "privacy_notice_accepted_at"),  # 0006 보충(CR-009)
 }
 
 # FK: (table, column, referred_table, referred_column)
@@ -155,14 +173,15 @@ def test_each_table_column_set_matches_s3_1_exactly():
         )
 
 
-def test_total_column_count_equals_79_verified_by_literal_transcription_of_s3_1():
-    """S3.1 컬럼을 테이블별로 세어 합산하면 79개다. 원본 56 + 0003 보충 16
+def test_total_column_count_equals_85_verified_by_literal_transcription_of_s3_1():
+    """S3.1 컬럼을 테이블별로 세어 합산하면 85개다. 원본 56 + 0003 보충 16
     (users 4 + auth_sessions 5 + chat_messages 6 + pending_questions.user_id 1)
-    + 0004 보충 1(users.nickname) + 0005 보충 6(mcp_tokens)."""
+    + 0004 보충 1(users.nickname) + 0005 보충 6(mcp_tokens)
+    + 0006 보충 6(events 2 + person_facts 1 + schedules 1 + users 2)."""
     total = sum(len(cols) for cols in S3_1_TABLE_COLUMNS.values())
     actual_total = sum(len(t.columns) for t in Base.metadata.tables.values())
-    assert total == 79
-    assert actual_total == 79
+    assert total == 85
+    assert actual_total == 85
 
 
 def _check_constraints(table_name: str) -> list[CheckConstraint]:
@@ -172,7 +191,8 @@ def _check_constraints(table_name: str) -> list[CheckConstraint]:
 
 def test_events_type_check_contains_all_seven_event_types():
     """events.type CHECK 이 EVENT_TYPES 7개 값을 모두 포함한다."""
-    checks = _check_constraints("events")
+    # 0006 보충 -- events 에는 `sensitive_category` CHECK 가 더해졌으므로 `type` CHECK 만 고른다.
+    checks = [c for c in _check_constraints("events") if "type" in str(c.sqltext)]
     assert len(checks) == 1
     sql_text = str(checks[0].sqltext)
     assert len(m.EVENT_TYPES) == 7
@@ -202,25 +222,26 @@ def test_persons_hierarchy_check_contains_all_three_values():
         assert value in sql_text
 
 
-def test_pending_questions_kind_check_contains_all_three_kinds():
-    """pending_questions.kind CHECK 이 QUESTION_KINDS 3개 값을 모두 포함한다."""
+def test_pending_questions_kind_check_contains_all_four_kinds():
+    """pending_questions.kind CHECK 이 QUESTION_KINDS 4개 값(0006: sensitive 추가)을 모두 포함한다."""
     checks = _check_constraints("pending_questions")
     assert len(checks) == 1
     sql_text = str(checks[0].sqltext)
-    assert len(m.QUESTION_KINDS) == 3
+    assert len(m.QUESTION_KINDS) == 4
     for value in m.QUESTION_KINDS:
         assert value in sql_text
 
 
-def test_exactly_five_check_constraints_exist_total():
-    """CHECK 제약이 정확히 5개(events, persons x2, pending_questions, chat_messages)다."""
+def test_exactly_eight_check_constraints_exist_total():
+    """CHECK 제약이 정확히 8개다 -- 원본 5(events, persons x2, pending_questions, chat_messages)
+    + 0006 보충 3(events·person_facts·schedules 의 `sensitive_category`)."""
     total = sum(
         len(_check_constraints(t))
         for t in ("events", "persons", "pending_questions", "person_aliases", "person_facts",
                    "fact_sources", "schedules", "push_subscriptions", "agent_traces",
                    "chat_messages")
     )
-    assert total == 5
+    assert total == 8
 
 
 def test_all_nine_foreign_keys_have_ondelete_cascade():
@@ -251,10 +272,12 @@ def test_person_aliases_embedding_is_nullable_vector_of_dimension_1536():
     assert column.nullable is True
 
 
-def test_nullable_columns_are_exactly_the_seven_deferred_fields():
-    """nullable 컬럼이 정확히 {embedding, confirmed_at, briefed_at, answer, answered_at,
-    question_id, last_used_at} 뿐이다(F-08e812 + 0003 보충 `chat_messages.question_id`
-    + 0005 보충 `mcp_tokens.last_used_at`)."""
+def test_nullable_columns_are_exactly_the_eleven_deferred_fields():
+    """nullable 컬럼 이름이 정확히 {embedding, confirmed_at, briefed_at, answer, answered_at,
+    question_id, last_used_at, sensitive_category, consent_question_id, privacy_notice_version,
+    privacy_notice_accepted_at} 11개뿐이다(F-08e812 + 0003 보충 `chat_messages.question_id`
+    + 0005 보충 `mcp_tokens.last_used_at` + 0006 보충 4개 이름 -- `sensitive_category` 는 세 표에 있어도
+    이름 집합이라 한 번)."""
     nullable_found = set()
     for table in Base.metadata.tables.values():
         for column in table.columns:

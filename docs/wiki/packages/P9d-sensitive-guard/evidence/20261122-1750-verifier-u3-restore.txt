@@ -1,0 +1,52 @@
+# 명령: POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_migration_0003.py tests/test_migration_0004.py tests/test_migration_0005.py tests/test_migration_0006.py -q -rs -p no:cacheprovider && POSTGRES_PORT=5433 .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu3/mig_state.py && PYTHONPATH=. POSTGRES_PORT=5433 .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/dev_counts.py && git status --short -- app alembic tests scripts evaluation
+# 시각: 2026-11-22T17:50:51+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# ---
+..............................................                           [100%]
+46 passed in 1.62s
+db: relationship_test_mig
+version: 0006
+new columns: 6
+  SELECT count(*) FROM pending_questions WHERE kind='sensitive' -> 0
+  SELECT count(*) FROM events WHERE sensitive_category IS NOT NULL OR consent_question_id IS NOT NULL -> 0
+  SELECT count(*) FROM person_facts WHERE sensitive_category IS NOT NULL -> 0
+  SELECT count(*) FROM schedules WHERE sensitive_category IS NOT NULL -> 0
+  ck_events_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text, 'sensitive'::text])))
+  ck_person_facts_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_schedules_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  users rows: 1
+  persons rows: 1
+  events rows: 1
+  person_facts rows: 1
+  schedules rows: 1
+  pending_questions rows: 1
+alembic_version: 0006
+persons rows: 4
+person_aliases rows: 5
+person_facts rows: 2
+fact_sources rows: 1
+events rows: 10
+schedules rows: 1
+pending_questions rows: 638
+push_subscriptions rows: 0
+agent_traces rows: 6903
+users rows: 12
+auth_sessions rows: 17
+chat_messages rows: 1864
+mcp_tokens rows: 0
+new columns present: [('events', 'consent_question_id'), ('events', 'sensitive_category'), ('person_facts', 'sensitive_category'), ('schedules', 'sensitive_category'), ('users', 'privacy_notice_accepted_at'), ('users', 'privacy_notice_version')]
+check constraints: ['ck_events_sensitive_category_valid', 'ck_pending_questions_kind_valid', 'ck_person_facts_sensitive_category_valid', 'ck_schedules_sensitive_category_valid']
+ M app/db/models.py
+ M tests/test_api.py
+ M tests/test_migration_0003.py
+ M tests/test_migration_0004.py
+ M tests/test_migration_0005.py
+ M tests/test_schema_check.py
+ M tests/test_schema_models.py
+?? alembic/versions/0006_sensitive_guard.py
+?? evaluation/sensitive_guard/
+?? scripts/validate_sensitive_set.py
+?? tests/test_migration_0006.py

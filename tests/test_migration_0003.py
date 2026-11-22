@@ -45,8 +45,16 @@ MIG_DB_NAME = "relationship_test_mig"
 
 # S3.1 보충(0003)에서 글자 그대로 옮긴 새 테이블 컬럼 집합.
 NEW_TABLE_COLUMNS = {
-    # head 기준 -- 0004 보충(nickname) 포함.
-    "users": {"id", "username", "password_hash", "nickname", "created_at"},
+    # head 기준 -- 0004 보충(nickname)·0006 보충(고지 동의 두 컬럼) 포함.
+    "users": {
+        "id",
+        "username",
+        "password_hash",
+        "nickname",
+        "created_at",
+        "privacy_notice_version",
+        "privacy_notice_accepted_at",
+    },
     "auth_sessions": {"id", "user_id", "token_hash", "created_at", "expires_at"},
     "chat_messages": {"id", "user_id", "role", "content", "question_id", "created_at"},
 }

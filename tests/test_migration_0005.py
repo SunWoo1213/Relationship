@@ -103,12 +103,15 @@ def mig(db_engine: Engine) -> Iterator[dict[str, Any]]:
         engine.dispose()
 
 
-# ① head == 0005 · DB 버전 0005
-def test_head_is_0005_and_db_is_at_0005(mig):
+# ① DB 버전 == 스크립트 head · 0005 는 head 의 이력에 있다(head 리터럴은 후속 리비전 시험이 본다 --
+#    0006 이 생겨 head 가 `0005` 가 아니다, 0004 시험과 같은 방식)
+def test_head_history_has_0005_and_db_is_at_head(mig):
     with _in_mig_env(mig["env"]):
-        head = ScriptDirectory.from_config(mig["cfg"]).get_current_head()
-    assert head == "0005"
-    assert _version(mig["engine"]) == "0005"
+        script = ScriptDirectory.from_config(mig["cfg"])
+        head = script.get_current_head()
+        history = {rev.revision for rev in script.walk_revisions()}
+    assert "0005" in history
+    assert _version(mig["engine"]) == head
     assert mig["had_table_before"] is False  # 시작 상태(0004)에는 테이블이 없었다
 
 
@@ -193,7 +196,9 @@ def test_downgrade_to_0004_drops_only_the_table_and_upgrade_restores_it_empty(mi
             assert _counts(engine) == mig["before"]  # 계정·세션·대화 행은 그대로
         finally:
             command.upgrade(mig["cfg"], "head")
-    assert _version(engine) == "0005"
+    with _in_mig_env(mig["env"]):
+        head = ScriptDirectory.from_config(mig["cfg"]).get_current_head()
+    assert _version(engine) == head  # head 리터럴은 후속 리비전 시험이 본다
     assert _table_exists(engine, "mcp_tokens") is True
     assert _columns(engine, "mcp_tokens") == MCP_TOKEN_COLUMNS
     with engine.connect() as c:

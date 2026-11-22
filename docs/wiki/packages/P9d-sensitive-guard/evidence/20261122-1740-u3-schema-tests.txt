@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_schema_models.py tests/test_schema_check.py -q
+# 시각: 2026-11-22T17:40:39+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# ---
+.............................                                            [100%]
+29 passed in 0.10s

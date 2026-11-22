@@ -1,0 +1,10 @@
+# 명령: POSTGRES_PORT=5433 .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/dev_counts.py
+# 시각: 2026-11-22T17:49:08+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 1
+# ---
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/dev_counts.py", line 4, in <module>
+    from app.db.session import get_engine
+ModuleNotFoundError: No module named 'app'

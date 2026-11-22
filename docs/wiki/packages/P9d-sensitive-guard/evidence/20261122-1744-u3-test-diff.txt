@@ -1,0 +1,13 @@
+# 명령: git diff --stat 947c12c -- tests scripts
+# 시각: 2026-11-22T17:44:28+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 947c12c (dev2)
+# exit: 0
+# ---
+ tests/test_api.py            |  2 +-
+ tests/test_migration_0003.py | 12 +++++++--
+ tests/test_migration_0004.py | 22 +++++++++++++---
+ tests/test_migration_0005.py | 17 +++++++-----
+ tests/test_schema_check.py   |  2 +-
+ tests/test_schema_models.py  | 61 ++++++++++++++++++++++++++++++--------------
+ 6 files changed, 83 insertions(+), 33 deletions(-)
