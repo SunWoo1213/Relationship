@@ -1,0 +1,52 @@
+# 명령: .venv/bin/python -m pytest -q
+# 시각: 2026-11-22T17:33:27+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 6d97217 (dev2)
+# exit: 0
+# ---
+..........sssssssssssss....................................sssss.sssssss [  2%]
+sssss................................................................... [  5%]
+........................................................................ [  7%]
+....................................ssssssssssssssssssssssssssssssssss.. [ 10%]
+......................s..ss........................sss.sssssss.sssssssss [ 13%]
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 15%]
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 18%]
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss.sss [ 20%]
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 23%]
+ssss......................sssssssssssssssssssssss....................... [ 26%]
+.............................ss..s...................................... [ 28%]
+.........................................ssssssssss..................... [ 31%]
+.............................ssssssssss................................. [ 33%]
+....................................................ssssss.............. [ 36%]
+...sssssssssssssssssssssssssssssssssssssssss...s........................ [ 39%]
+......................s..sssssssssssssss....ssssssssssssss.............. [ 41%]
+..ssssssssssssssssssssssssssssssssssssss......ss.........ssss........... [ 44%]
+..................................ssssss................................ [ 46%]
+........................................................................ [ 49%]
+.............................................................sssssssssss [ 52%]
+.sssssssss.............................................................. [ 54%]
+........................................................................ [ 57%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................ssssssssssssssss [ 65%]
+ss..................................................................ssss [ 67%]
+ssssssssssssssssssssss.ssssssssssssssssssssssssssssssssssssssssssss.ssss [ 70%]
+ss................................................................ssssss [ 73%]
+ssssss.......................ssssssssssss.ssssssssssssssssssssssssssssss [ 75%]
+ssssssssssssssssssssssssssssssssssss.................................... [ 78%]
+..................................................sssssssssssssss.....ss [ 80%]
+ss..sss............................................sssssssssssssssssssss [ 83%]
+sss.............................................................ssssssss [ 86%]
+s....................................................................... [ 88%]
+...................ssssssssssssss....................................... [ 91%]
+.....ssssssssssssssssssss...ssssssssssssssssssssssssssssssssssssssssssss [ 93%]
+ssssssssssssssssssssssss.ssssssssssssssssssssssssssssssssssss........... [ 96%]
+.sssssssssssssssssssssssss.............................................. [ 99%]
+.......................                                                  [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/google/genai/types.py:42
+  /Users/sunwoo/Desktop/Portfolio/Relationship/.venv/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1786 passed, 973 skipped, 1 warning in 11.75s

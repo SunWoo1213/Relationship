@@ -1,7 +1,7 @@
 # CURRENT — 지금 하는 일
 
-active: P9b-auth
-frozen: CR-009
+active: P9d-sensitive-guard
+frozen: none
 
 <!--
   "active" — 패키지 id (예: P1-schema) 또는 FIX-nnn. 없으면 none.
@@ -12,6 +12,7 @@ frozen: CR-009
 -->
 
 ## 메모
+- **P9b-auth 보류(2026-11-22, 메인 세션 — CR-009 가드레일 본작업 먼저, 사용자 "그대로 두고 가드레일 본작업 먼저 진행해줘")** — 구현·운영 반영은 `cef47d0` 까지 끝. 남은 것: verify-impl·04-review(verifier)·사용자 완성 확인·dev/main 승격(P9-infra 04-review 와 함께). **CR-009 문서 이행완료 `6d97217`, frozen 해제.** **`P9d-sensitive-guard` 활성(2026-11-22 17:35)** — 계획 검증 3회차 통과(1차 보류 M1~M4, 2차 보류 M2-잔여·M5), 사용자 결정 22건 + D-1~D-4. 사용자 결정 N7(11-22): 이미 저장된 별칭과 정확히 일치하는 언급은 이름 규칙을 통과시키고 그 턴 저장물에 민감 표시.
 - **CR-009 수용(민감 정보 가드레일, 2026-11-22, 사용자)** — "11월 18일 것을 해결하려고 해" · "진행해주세요". 사용자 결정 21건(AskUserQuestion 6회)·verifier 재검토(개정 2) **이행 가능**(`changes/review-CR-009.md`). **문서 이행 중(`frozen: CR-009`)** — D20 신설, D2·D14·D16·D17·D18·D19·S3.1·S3.2·S3.4·S3.5·S3.6·S3.7 보충, CLAUDE.md·backlog·security §5·proposal 상단. 코드는 새 패키지 `P9d-sensitive-guard`. 문서 커밋 뒤 메인이 `frozen: none`, P9d 계획 검증 통과 뒤 `active: P9d-sensitive-guard`(그때 P9b-auth 는 보류 — 남은 것: verify-impl·04-review·사용자 완성 확인, P9-infra 04-review 와 함께).
 - **CR-008 수용(축소안: 토큰, 2026-11-17 밤, 사용자)** — "토큰 방식 축소안" · "11-19까지만 서버를 켜둘거야 그 이후에는 닫을거고" · "그래서 Mcp는 당장 내일 시연을 위해서 필요한거라서". 계정별 개인 접근 토큰 + `https://relmemo.com/mcp` 읽기 전용 도구 4개 + Claude Code 연결. OAuth·Claude 앱·ChatGPT·쓰기는 다음 단계. **문서 이행 중(`frozen: CR-008`)** — D19 신설, D18·D17·S3.1 보충, 코드는 P9b-auth 01-plan **개정 4**(U12 backend ∥ U13 frontend → U14 메인 재배포·사용자 실제 연결). 문서 커밋·verifier 계획 검증 통과 뒤 메인이 `frozen: none`.
 - **CR-007 제기(2026-11-16 아침, 사용자)** — "계정가입을 할 때 닉네임도 입력받게 해줘" · "아이디, 닉네임은 중복검사를 하도록 하고". P9b-auth(로그인) 배포 반영 뒤 화면 점검 중에 나온 요청. **문서 이행완료(`bfbcdb1`) · 계획 개정 3 verifier 4차 통과 → frozen 해제(11-16 07:50)**. 코드는 P9b-auth 에 단위를 더한다(architect 가 01-plan 개정). 같은 때 요청: 도메인 구매·적용 절차 문서(`docs/user-setup/` — 코드 변경 아님, 메인 작성).

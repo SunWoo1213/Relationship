@@ -34,6 +34,7 @@
 19. 문구 세 곳 수정(사전 동의 칩·사후 확인 칩·가입 고지 문단 — CR-009 8.2 ①②④)
 20. 사후 표시된 조회 문장 칩 = 전용 문구(CR-009 8.2 ⑥)
 21. 수동 브리핑 `POST /briefings/run` 도 미동의면 403 `notice_required`, 고지 모달로 잇는다
+22. (N7) 배포 전에 이미 저장된 별칭에 민감 낱말이 있을 때 = **일치하면 통과 + 민감 표시** — 이미 저장된 별칭과 정확히 일치(**글자까지 같음** — 메인 세션 결정 2026-11-22, 공백·대소문자만 다른 변형은 이름 거부)하는 표현은 이름 규칙을 통과시켜 그 인물에 계속 기록한다. 동의 칩은 평소처럼 뜨고 저장물에는 민감 표시. 기존 별칭 자체는 인물 판정 때 OpenAI 로 계속 전송된다(사용자가 알고 고름)
 
 메인 세션 결정: P9b-auth 보류 → P9d 활성 · 만료 정리는 기존 1분 루프의 주기 작업 · 0006 downgrade 는 민감 행이 있으면 명시적 실패.
 
@@ -64,16 +65,16 @@
 | 3 | 규칙 검사는 `append_chat_message`·`run_turn` 보다 앞 | `pytest tests/test_guard_mask.py tests/test_guard_pre.py -q` + 변이 | U5a·U5b |
 | 4 | 거절·만료 뒤 원문(발화·제안 내용)이 DB 전 테이블(trace 포함)에 0, 질문 context 는 R-2 남기는 키만, 동의 기록은 남음 — 사전·사후(기록·조회) 모두 | `pytest tests/test_guard_resume.py tests/test_guard_posthoc.py -q` | U5c·U6 |
 | 5 | 사후 표시 턴은 기록이든 조회든 저장·ER 판정 LLM·임베딩·조회 답 LLM 전에 멈춤 | `pytest tests/test_guard_posthoc.py -q` | U6 |
-| 6 | 동의 턴 저장물 전부 표시, 후속 질문 사슬 끝까지, 바이트 절단 뒤에도 | `pytest tests/test_guard_storage.py -q -k chain` | U7 |
-| 7 | 사실 표시는 단조 규칙 하나(R-5) | `pytest tests/test_guard_storage.py -q -k monotone` | U7 |
+| 6 | 동의 턴 저장물 전부 표시, 후속 질문 사슬 끝까지, 바이트 절단 뒤에도 | `pytest tests/test_guard_storage.py -q -k chain`(선택 시험 수 > 0) | U7a |
+| 7 | 사실 표시는 단조 규칙 하나(R-5) | `pytest tests/test_guard_storage.py -q -k monotone`(선택 시험 수 > 0) | U7a |
 | 8 | 민감 항목은 카드 계층에서만, 제외 경로 열거 시험으로 0 | `pytest tests/test_guard_export.py -q` | U8 |
 | 9 | 카드 읽기 함수 기본값이 제외 | 같은 시험 + 변이 | U8 |
 | 10 | 가입 고지 필수, 기존 계정 `notice_required`, 미동의 `/chat`·`/answers`·`/briefings/run` 403·LLM 0, 미동의 계정 주기 브리핑·푸시 0 | `pytest tests/test_privacy_notice.py tests/test_briefing_scheduler*.py -q` | U4 |
-| 10b | 이름 규칙에 걸린 언급은 별칭·표시 이름 저장 0, identity·new_person 질문 생성 전에 멈춤 | `pytest tests/test_guard_storage.py -q -k name` | U7 |
+| 10b | 이름 규칙에 걸린 언급은 별칭·표시 이름 저장 0, identity·new_person 질문 생성 전에 멈춤 | `pytest tests/test_guard_names.py -q -k name_rule`(선택 시험 수 > 0) | U7b |
 | 11 | 로그인 없이 열린 경로 수 변화 0 | `pytest tests/test_auth_required_routes.py -q` | U4 |
 | 12 | 툴 7종 시그니처 불변, ER·임계치·확신도 무변경 | `python3 scripts/tools_check.py`(7/7) · `git diff --stat <U0 해시> -- app/er/` 0줄(작업 트리 포함 모양 — 재검토 VR3) | 전 단위 |
-| 13 | 가드 문구가 이 카드에 적힌 확정 문구와 문자열 일치, `BRIEFING_FORBIDDEN_EXPRESSIONS` 어느 항목도 포함 안 함(목록은 검사 도구로만 재사용, 합치지 않음) | `pytest tests/test_guard_messages.py -q` | U4·U5a·U5b·U6·U7·U8·U9a |
-| 14 | `pending_questions.kind` CHECK 4종, downgrade 는 민감 행이 있으면 실패하고 데이터 불변 | `pytest tests/test_schema_0006.py -q` | U3 |
+| 13 | 가드 문구가 이 카드에 적힌 확정 문구와 문자열 일치, `BRIEFING_FORBIDDEN_EXPRESSIONS` 어느 항목도 포함 안 함(목록은 검사 도구로만 재사용, 합치지 않음) | 채팅 문구: `pytest tests/test_guard_messages.py -q` · 가입 고지·재고지 문구(④⑤ — 프론트가 주인): `npm --prefix web exec -- vitest run --root web`(`notice.test.tsx`) | U5a·U5b·U5c·U6·U7a·U7b·U8·U9a |
+| 14 | `pending_questions.kind` CHECK 4종, downgrade 는 민감 행이 있으면 실패하고 데이터 불변 | `pytest tests/test_migration_0006.py -q`(기존 `test_migration_0003~0005.py` 관례에 맞춰 CR 의 가칭 `test_schema_0006.py` 대신 — 01-plan) | U3 |
 | 15 | 배포 전 모양의 대기 질문은 가드를 거치지 않고 재개되지 않음 | `pytest tests/test_guard_resume.py -q -k legacy` | U5c |
 | 16 | 감지율·오탐률·실패 사례가 test 세트(동결)로 재현 가능, 규칙·LLM 수치 분리 | `python3 -I evaluation/sensitive_guard/run.py --split test` | U1·U10 |
 | 17 | 완료 = 운영 반영 증거 + 평가 보고서 + verifier 완료 검토 `결과: 완료` + 사용자 화면 확인 | U12 증거 · `reports/sensitive_guard.md` · 04-review | U10·U11·U12 |
@@ -85,7 +86,7 @@
 - **R-4 남는 흔적**: 거절 뒤에도 범주·규칙 id·질문 행이 남는다 — 그 자체가 흔적이다(받아들인 위험).
 - **R-5 사실 표시 단일 규칙**: 사실의 민감 여부는 `person_facts.sensitive_category` 컬럼 하나. 모든 쓰기(`update_person` upsert·`direct_facts`·승격 `_upsert_fact`)는 `COALESCE(기존값, 이번 쓰기의 범주)` 로만 바꾼다 — 올라가기만 한다. `fact_sources` 링크를 끊지 않는다. 브리핑 근거 원문은 사건 표시로도 거른다.
 - **R-6 내보내는 경로**: 카드 계층(포함) = `GET /persons/{id}`(`include_sensitive=True`) · `GET /events/{id}/raw` · `GET /persons/{id}/facts/{fid}/sources` · `GET /chat/history`(자기 대화 기록). 제외 = `GET /persons`(`last_contact_at` 일반 사건만) · MCP 4도구(`sensitive_category` 키 제거, D19 모양 불변) · `get_briefing`(사실·최근 사건·다가오는 일정, 상한은 거른 뒤, 민감 대상 일정은 `ScheduleNotFound`) · 브리핑 입력 사실 재조회·`_fact_sources` · 브리핑 일정 선정(기본·수동, 수동은 skip 사유 `sensitive_schedule`) · 브리핑 LLM 프롬프트 · 푸시 · 조회 답 프롬프트·응답(민감만 있으면 카드 안내) · 승격 추출 LLM. 배포 전에 만든 저장 브리핑은 그대로 나간다(결정 9). `GET /questions/pending` 문구는 고정 문장.
-- **R-7 이름 규칙**: 별칭·표시 이름이 될 수 있는 문자열은 `name_allowed`(= `detect` 에 차단·동의 범주 0)를 거친다. 판정은 `app/agent/loop.py` 안이고 `app/er/`·툴 7종은 고치지 않는다 — 언급을 ER(`resolve()`)에 넘기기 **전**(`_resolve_mentions_impl` 안, `_ordered_mentions` 뒤), 재개 방어(identity 답 별칭·new_person 답 표시 이름 앞), `_execute_call` 의 LLM `update_person.new_alias`. 걸리면 그 별칭·인물 저장·임베딩 0, identity·new_person 질문 생성 0("새로운 사람인가요?" 전에 멈춤), 같은 턴의 다른 언급은 그대로, 답에 이름 거부 문구. 걸린 언급의 제안은 다른 언급의 되묻기 context 에도 실리지 않는다. 정확한 줄 자리는 01-plan. **원칙2 와의 관계**: 이것은 확신도 판정 **이전**의 제외이며 병합·생성·질문 어느 것도 하지 않는다 — "임계치 미만은 반드시 `ask_user`" 의 예외가 아니다(판정이 일어나지 않는다). 오병합이 생기지 않고(원칙1) ER 을 LLM 한 번으로 대신하지도 않는다(원칙4). **근거 trace**: 버린 판정마다 결정값·규칙 id·제안 인덱스를 남기는 행 하나(원문 0, 모양은 01-plan — 원칙9). **결과(사실대로)**: 배포 전에 이미 저장된 별칭에 민감 낱말이 있으면 그 별칭으로 부른 기록 턴은 ER 앞에서 잘려 그 인물에 더 기록되지 않는다(조회 턴은 별칭을 쌓지 않는 경로라 대상 아님). 사용자 결정 15 의 "저장되려 할 때" 보다 넓다 — 사용자 결정 대기(CR-009 8.4 N7).
+- **R-7 이름 규칙**: 별칭·표시 이름이 될 수 있는 문자열은 `name_allowed`(= `detect` 에 차단·동의 범주 0)를 거친다. 판정은 `app/agent/loop.py` 안이고 `app/er/`·툴 7종은 고치지 않는다 — 기록 의도 턴의 게이트 뒤·`resolve_mentions` 앞에서 걸린 언급의 제안을 게이트 판정의 거부 쪽(사유 `name_rule`)으로 옮기고(그래서 ER·되묻기 context·기록 어디에도 닿지 않는다), 재개 때 남은 보류 제안을 같은 판정으로 거르고, 재개 방어(identity 답 별칭·identity 거절·new_person 답 표시 이름 앞), `_execute_call` 의 LLM `update_person.new_alias`, 결정 22 로 통과한 언급의 ER 결과 검사(`resolve()` 뒤·적용 전) — 정확한 자리는 `packages/P9d-sensitive-guard/01-plan.md` VR2 행. 걸리면 그 별칭·인물 저장·임베딩 0, identity·new_person 질문 생성 0("새로운 사람인가요?" 전에 멈춤), 같은 턴의 다른 언급은 그대로, 답에 이름 거부 문구. 걸린 언급의 제안은 다른 언급의 되묻기 context 에도 실리지 않는다. 정확한 줄 자리는 01-plan. **원칙2 와의 관계**: 이것은 확신도 판정 **이전**의 제외이며 병합·생성·질문 어느 것도 하지 않는다 — "임계치 미만은 반드시 `ask_user`" 의 예외가 아니다(판정이 일어나지 않는다). **단 하나의 판정 뒤 갈래(사용자 결정 D-4)**: 결정 22 로 통과한 언급이 별칭 주인이 아닌 인물로 자동 연결되거나 새 인물(`< T_new`)로 판정되면, `resolve()` 가 확신도를 낸 **뒤** 그 언급을 `ask_user` 없이 버린다 — 병합·생성·질문이 모두 0 이라 오병합(원칙1)이 생기지 않고 미검출 쪽으로만 기운다. 원칙2 의 글자("그 미만은 반드시 `ask_user`")와 다른 이 갈래는 사용자가 고른 동작(D-4 (a))이며, 그 언급의 `er_resolve` trace 는 `applied` 가 거짓으로 남는다(조회 턴과 같은 모양). 오병합이 생기지 않고(원칙1) ER 을 LLM 한 번으로 대신하지도 않는다(원칙4). **근거 trace**: 버린 판정마다 결정값·규칙 id·제안 인덱스를 남기는 행 하나(원문 0, 모양은 01-plan — 원칙9). **기존 별칭(사용자 결정 22, 통과 조건은 메인 세션 결정)**: 언급이 그 사용자의 이미 저장된 별칭과 **글자까지 같으면**(정규화 없음 — 공백·대소문자만 다른 변형은 이름 거부) 이름 규칙을 통과한다. 별칭 저장(`_add_alias`)은 같은 글자 행이 있으면 새 행·임베딩을 만들지 않으므로 **새로 저장되는 이름이 없다**. 통과에는 그 턴의 동의 문맥이 있어야 한다 — 언급은 추출 LLM 이 낸 문자열이라 발화의 부분 문자열이라는 보장이 없어 "같은 낱말 목록이니 통과 턴은 늘 사전 검사에 걸린다" 가 성립하지 않으므로, 동의 문맥이 없으면 이름 거부한다. 동의 턴 저장물은 턴 단위로 민감 표시된다. 통과한 언급이 별칭 주인이 아닌 인물로 해석될 때(다른 인물로 자동 연결·identity 답이 다른 인물·새 인물 판정·identity 거절)는 **언제나 이름 거부**한다 — 사용자 결정 D-4 (a), 2026-11-22 확정. 별칭·인물 행 0, 그 언급의 기록 0. 기존 별칭은 ER 판정 프롬프트로 계속 간다(사용자가 알고 고름). 이름 규칙과 사전 검사는 **같은 낱말 목록 하나**를 쓴다(이름 규칙에만 걸리는 낱말은 없다). 가림 자리표시(`[주민등록번호]` 등)가 든 이름도 저장하지 않는다.
 - **R-8 승격 입력 제외**: 승격 추출 LLM 에 민감 사건 원문·민감 사실을 넣지 않고, 민감 사건은 최소 사건 수에도 세지 않는다(동의 뒤 재전송 0). 그 결과 동의한 민감 사건은 요약 사실로 이어지지 않는다.
 - **R-9 동의 문맥 사슬**: `ToolContext.consent` 로 싣고, 그 턴의 모든 후속 질문 context 에 예약 키 `consent = {question_id, categories}`. 재개는 이 키로 되살린다. `_apply_resume_byte_limit` 는 `consent` 를 자르지 않는다.
 - **R-10 배포 전 대기 질문**: 동의 문맥 없이 재개되는 질문은 저장된 `utterance` 에 `detect` 를 다시 돌려 걸리면 재개하지 않고 409 `expired` 와 같은 응답(LLM 0).
@@ -111,7 +112,9 @@
 6. VR7 미동의 건너뜀의 자리(대상 사용자는 `persons.user_id` 에서 나오고 `users` 를 읽지 않는다)와 `briefing_run` trace 빈도(1분마다 쌓이는지)
 7. VR8 사후 질문 context 의 `chat_message_id` 를 누가 싣는지(라우트 덧붙임 / ctx)
 8. 행 번호 재확인 · `gitlog.sh FIX-015` · `loop.py:1322` 직접 읽기 · `turn_trace_range` 동시 요청 겹침의 크기 · R-10 규칙 목록 변경 창
-9. 사용자 결정 대기: CR-009 8.4 **N7**(기존 별칭에 민감 낱말이 있을 때)
+9. ~~사용자 결정 대기 N7~~ → 사용자 결정 22 로 확정(2026-11-22). 위 1~8 은 `packages/P9d-sensitive-guard/01-plan.md` "VR·8.6 닫기" 절에서 닫는다.
 
 **갱신 이력**
-- 2026-11-22 신설(CR-009 문서 이행, U0). 구현은 `P9d-sensitive-guard` — 완료 해시는 그때 적는다.
+- 2026-11-22 신설(CR-009 문서 이행, U0 — 커밋 `6d97217`). 구현은 `P9d-sensitive-guard` — 완료 해시는 그때 적는다.
+- 2026-11-22 보충: 사용자 결정 22(N7 — 기존 별칭 정확히 일치하면 통과 + 민감 표시)를 결정 목록·R-7 에 반영, 수용 기준 #14 의 시험 파일 이름을 `test_migration_0006.py` 로.
+- 2026-11-22 보충(P9d 01-plan 개정 1 — 02-plan-verify 1차 보류 M4·R-1·R-11): 결정 22 의 "정확히 일치" = 글자까지 같음(메인 세션 결정, `name_key` 정규화 철회), 통과에 동의 문맥 필요, 비소유 해석은 01-plan D-4 — **확정(사용자 2026-11-22): 언제나 이름 거부**(통과한 기존 별칭 표현이 별칭 주인이 아닌 인물·새 인물로 해석되면 기록하지 않고 이름 거부 안내). R-7 의 자리 문장을 01-plan 에 맞춤. 표 #6·#7·#10b·#13 의 판정 명령·단위(U7 → U7a·U7b, #13 에 프론트 `notice.test.tsx`).
