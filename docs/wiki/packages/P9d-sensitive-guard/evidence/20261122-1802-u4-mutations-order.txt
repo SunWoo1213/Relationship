@@ -1,0 +1,12 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/mut_app/run_mut2.py
+# 시각: 2026-11-22T18:02:02+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 61a5241 (dev2)
+# exit: 0
+# ---
+=== M22 동의 검사를 409 사전 조회 뒤로 옮김
+    FAILED tests/test_privacy_notice.py::test_signup_check_order_format_then_notice_then_conflict | 1 failed, 5 passed in 0.60s
+=== M23 동의 검사를 형식 검사 앞으로 옮김
+    FAILED tests/test_privacy_notice.py::test_signup_check_order_format_then_notice_then_conflict | 1 failed, 5 passed in 0.60s
+=== 복원 확인(사본)
+208 passed in 8.45s

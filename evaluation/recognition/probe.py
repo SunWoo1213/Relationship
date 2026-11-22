@@ -107,7 +107,16 @@ def signup(c: httpx.Client, prefix: str, secrets_file: Path) -> str:
     username = prefix + time.strftime("%m%d%H%M%S")
     pw = secrets.token_urlsafe(12)
     secrets_file.write_text(f"{username}\n{pw}\n", encoding="utf-8")
-    r = c.post("/auth/signup", json={"username": username, "password": pw, "nickname": username})
+    # CR-009 · D20: 가입 본문에 OpenAI 전송 고지 동의가 없으면 422 `notice_required`.
+    r = c.post(
+        "/auth/signup",
+        json={
+            "username": username,
+            "password": pw,
+            "nickname": username,
+            "privacy_notice_accepted": True,
+        },
+    )
     r.raise_for_status()
     set_cookie(c, r)
     return username

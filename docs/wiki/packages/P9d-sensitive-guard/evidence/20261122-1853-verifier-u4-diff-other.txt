@@ -1,0 +1,6 @@
+# 명령: git diff --stat 61a5241 -- app/er reports data alembic web
+# 시각: 2026-11-22T18:53:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 61a5241 (dev2)
+# exit: 0
+# ---

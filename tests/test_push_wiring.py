@@ -53,7 +53,7 @@ from app.db.models import AgentTrace, Person, PushSubscription, Schedule
 from app.main import create_app
 from app.push.notifier import MisconfiguredNotifier, WebPushNotifier
 from app.push.types import PUSH_TRACE_TOOL_NAME, STEP_PUSH_SEND, FakePushSender, VapidConfig
-from tests.auth_helpers import logged_in_client
+from tests.auth_helpers import logged_in_client, make_user
 
 dbtest = pytest.mark.dbtest
 pytestmark = dbtest
@@ -170,6 +170,7 @@ def scheduler_env(db_session, monkeypatch):
     `ctx.now`(실제 시계)라 일정은 호출 쪽이 `datetime.now(utc)+3h` 로 둔다."""
     monkeypatch.setattr(scheduler_module, "session_scope", lambda: _scheduler_session(db_session))
     monkeypatch.setattr(scheduler_module, "composer_from_env", lambda: FakeBriefingComposer())
+    make_user(db_session, "local")  # 주기 작업이 `users` 를 조인한다(CR-009 U4)
     return db_session
 
 

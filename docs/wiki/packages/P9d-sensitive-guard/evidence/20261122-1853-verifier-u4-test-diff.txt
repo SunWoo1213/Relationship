@@ -1,0 +1,18 @@
+# 명령: git diff --stat 61a5241 -- tests scripts evaluation
+# 시각: 2026-11-22T18:53:54+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 61a5241 (dev2)
+# exit: 0
+# ---
+ evaluation/recognition/probe.py        | 11 ++++++++++-
+ tests/auth_helpers.py                  |  9 ++++++++-
+ tests/test_auth_api.py                 | 12 +++++++++---
+ tests/test_auth_availability.py        | 18 ++++++++++++++++--
+ tests/test_auth_helpers.py             |  7 ++++++-
+ tests/test_auth_nickname.py            | 26 ++++++++++++++++++++++----
+ tests/test_auth_origin.py              |  8 +++++++-
+ tests/test_auth_required_routes.py     |  1 +
+ tests/test_briefing_scheduler_users.py |  2 ++
+ tests/test_migration_0006.py           | 25 ++++++++++++++++++-------
+ tests/test_push_wiring.py              |  3 ++-
+ 11 files changed, 101 insertions(+), 21 deletions(-)

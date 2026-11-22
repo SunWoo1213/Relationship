@@ -1,0 +1,23 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu3/mig_state.py
+# 시각: 2026-11-22T18:59:24+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 61a5241 (dev2)
+# exit: 0
+# ---
+db: relationship_test_mig
+version: 0006
+new columns: 6
+  SELECT count(*) FROM pending_questions WHERE kind='sensitive' -> 0
+  SELECT count(*) FROM events WHERE sensitive_category IS NOT NULL OR consent_question_id IS NOT NULL -> 0
+  SELECT count(*) FROM person_facts WHERE sensitive_category IS NOT NULL -> 0
+  SELECT count(*) FROM schedules WHERE sensitive_category IS NOT NULL -> 0
+  ck_events_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_pending_questions_kind_valid CHECK ((kind = ANY (ARRAY['identity'::text, 'new_person'::text, 'schedule'::text, 'sensitive'::text])))
+  ck_person_facts_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  ck_schedules_sensitive_category_valid CHECK (((sensitive_category)::text = ANY ((ARRAY['crime'::character varying, 'health'::character varying, 'sex'::character varying, 'politics_religion'::character varying, 'finance'::character varying
+  users rows: 0
+  persons rows: 0
+  events rows: 0
+  person_facts rows: 0
+  schedules rows: 0
+  pending_questions rows: 0

@@ -719,3 +719,5 @@
 - 2026-11-22 17:33 | NOTE | 컨텍스트 압축(auto). 재개 시 HANDOFF.md 확인 |
 - 2026-11-22 17:36 | COMMIT | 947c12c docs(P9d-sensitive-guard): 민감 정보 가드레일 계획을 검증까지 마치고 활성화한다
 - 2026-11-22 17:36 | PUSH-dev2 | origin dev2 947c12c (실험 푸시)
+- 2026-11-22 17:54 | COMMIT | 61a5241 feat(P9d-sensitive-guard): 민감 표시와 고지 동의를 담을 컬럼을 더한다 (U3)
+- 2026-11-22 17:54 | PUSH-dev2 | origin dev2 61a5241 (실험 푸시)

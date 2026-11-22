@@ -1,0 +1,78 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu4/run_vu4.py
+# 시각: 2026-11-22T18:55:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 61a5241 (dev2)
+# exit: 0
+# ---
+=== 대조군(변이 없음)
+    213 passed in 10.15s
+=== V1 chat: require_notice -> current_user
+    FAILED tests/test_privacy_notice.py::test_unconsented_chat_is_403_and_touches_no_llm_no_rows
+    1 failed, 212 passed in 10.11s
+=== V2 answers: require_notice -> current_user
+    FAILED tests/test_privacy_notice.py::test_unconsented_answers_is_403_then_200_after_notice_accepted
+    1 failed, 212 passed in 10.31s
+=== V3 briefings/run: require_notice -> current_user
+    FAILED tests/test_privacy_notice.py::test_unconsented_briefings_run_is_403_and_composes_nothing
+    1 failed, 212 passed in 10.14s
+=== V4 chat: 고지 의존성을 LLM 의존성 뒤로(순서)
+    FAILED tests/test_privacy_notice.py::test_unconsented_chat_is_403_and_touches_no_llm_no_rows
+    1 failed, 212 passed in 10.25s
+=== V5 briefings/run: 고지 의존성을 composer 뒤로(순서)
+    FAILED tests/test_privacy_notice.py::test_unconsented_briefings_run_is_403_and_composes_nothing
+    FAILED tests/test_auth_required_routes.py::test_every_non_exempt_route_requires_login
+    FAILED tests/test_auth_required_routes.py::test_mcp_route_when_enabled_is_401_without_credentials
+    3 failed, 210 passed in 10.89s
+=== V6 scheduler: 판 번호 조건 제거(조인 유지)
+    FAILED tests/test_privacy_notice.py::test_scheduler_skips_unconsented_account_entirely[notice-null]
+    FAILED tests/test_privacy_notice.py::test_scheduler_skips_unconsented_account_entirely[notice-lower-version]
+    FAILED tests/test_privacy_notice.py::test_scheduler_briefs_only_consented_account_in_a_mixed_run
+    3 failed, 210 passed in 10.29s
+=== V7 scheduler: outer join(users 없는 인물 포함)
+    FAILED tests/test_privacy_notice.py::test_scheduler_skips_unconsented_account_entirely[no-users-row]
+    1 failed, 212 passed in 10.39s
+=== V8 scheduler: 판 번호 조건을 IS NOT NULL 로(낮은 판 통과)
+    FAILED tests/test_privacy_notice.py::test_scheduler_skips_unconsented_account_entirely[notice-lower-version]
+    1 failed, 212 passed in 10.30s
+=== V9 scheduler: >= 를 == 로(현재보다 높은 판 제외)
+    213 passed in 10.25s
+=== V10 deps: < 를 != 로(현재보다 높은 판을 미동의로)
+    213 passed in 10.33s
+=== V11 signup: 동의 검사를 409 사전 조회 뒤로
+    FAILED tests/test_privacy_notice.py::test_signup_check_order_format_then_notice_then_conflict
+    1 failed, 212 passed in 10.36s
+=== V12 signup: 동의 검사를 닉네임 형식 검사 앞으로
+    FAILED tests/test_privacy_notice.py::test_signup_check_order_format_then_notice_then_conflict
+    FAILED tests/test_auth_nickname.py::test_422_order_username_then_password_then_nickname
+    2 failed, 211 passed in 10.38s
+=== V13 signup: 동의 시각을 주입 시계가 아닌 실제 시계로
+    FAILED tests/test_privacy_notice.py::test_signup_with_acceptance_records_version_and_time_and_not_required
+    1 failed, 212 passed in 10.25s
+=== V14 reaccept: 현재 판 계정의 시각만 덮어씀
+    FAILED tests/test_privacy_notice.py::test_reaccept_on_current_version_is_204_and_changes_no_row
+    1 failed, 212 passed in 10.21s
+=== V15 reaccept: 라우트가 require_notice 를 요구(미동의는 동의도 못 함)
+    FAILED tests/test_privacy_notice.py::test_reaccept_null_account_flow_null_then_false_then_true_after_version_bump
+    FAILED tests/test_privacy_notice.py::test_reaccept_lower_version_overwrites_version_and_time
+    FAILED tests/test_privacy_notice.py::test_unconsented_answers_is_403_then_200_after_notice_accepted
+    3 failed, 210 passed in 10.22s
+=== V16 schemas: 필수 bool(없으면 FastAPI 목록 422)
+    FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[value0]
+    FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[None]
+    FAILED tests/test_auth_nickname.py::test_nickname_missing_is_default_422_list
+    FAILED tests/test_auth_nickname.py::test_422_order_username_then_password_then_nickname
+    4 failed, 209 passed in 10.14s
+=== V17 schemas: bool = False(null 이면 FastAPI 목록 422)
+    FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[None]
+    1 failed, 212 passed in 10.23s
+=== V18 MeOut: 로그인 응답만 notice_required 를 False 로 고정
+    FAILED tests/test_privacy_notice.py::test_login_response_carries_notice_required
+    1 failed, 212 passed in 10.22s
+=== V19 require_notice: 403 대신 통과하되 /auth/me 는 그대로
+    FAILED tests/test_privacy_notice.py::test_unconsented_chat_is_403_and_touches_no_llm_no_rows
+    FAILED tests/test_privacy_notice.py::test_unconsented_briefings_run_is_403_and_composes_nothing
+    FAILED tests/test_privacy_notice.py::test_unconsented_answers_is_403_then_200_after_notice_accepted
+    3 failed, 210 passed in 10.69s
+=== 복원 확인(사본, 변이 없음)
+    213 passed in 10.28s
+=== 사본 app/ 과 저장소 app/ 차이: 없음

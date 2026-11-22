@@ -66,17 +66,28 @@ _TABLES = (
     "chat_messages", "mcp_tokens",
 )
 
-#: 0005 상태의 기존 행 -- upgrade 가 이 값을 그대로 둬야 한다.
+#: 0005 상태의 기존 행 -- upgrade 가 이 값을 그대로 둬야 한다. 0005 시점의 컬럼을 **시각 컬럼까지
+#: 전부** 뽑는다(review-u3 R-2 -- 시각 컬럼이 빠지면 upgrade 가 `updated_at`/`created_at` 을 갱신해도
+#: 통과한다). `SELECT *` 는 쓰지 않는다 -- 0006 이 더한 컬럼이 head 쪽 스냅샷에만 생겨 비교가 어긋난다.
+#: `created_at`/`updated_at` 은 행 삽입 때 DB 가 정한 값이라 upgrade 가 건드리지 않으면 그대로다.
 _SNAPSHOT_SQL = {
-    "persons": "SELECT id, user_id, display_name, relation_tag, hierarchy FROM persons ORDER BY id",
-    "events": "SELECT id, person_id, type, content, raw_utterance, occurred_at FROM events ORDER BY id",
-    "person_facts": "SELECT id, person_id, key, value, confidence FROM person_facts ORDER BY id",
+    "persons": (
+        "SELECT id, user_id, display_name, relation_tag, hierarchy, created_at, updated_at "
+        "FROM persons ORDER BY id"
+    ),
+    "events": (
+        "SELECT id, person_id, type, content, raw_utterance, occurred_at, created_at "
+        "FROM events ORDER BY id"
+    ),
+    "person_facts": (
+        "SELECT id, person_id, key, value, confidence, updated_at FROM person_facts ORDER BY id"
+    ),
     "schedules": "SELECT id, person_id, title, scheduled_at, briefed_at FROM schedules ORDER BY id",
     "pending_questions": (
-        "SELECT id, session_id, user_id, kind, question, options, context, answer "
-        "FROM pending_questions ORDER BY id"
+        "SELECT id, session_id, user_id, kind, question, options, context, answer, "
+        "created_at, answered_at FROM pending_questions ORDER BY id"
     ),
-    "users": "SELECT id, username, nickname, password_hash FROM users ORDER BY id",
+    "users": "SELECT id, username, nickname, password_hash, created_at FROM users ORDER BY id",
 }
 
 

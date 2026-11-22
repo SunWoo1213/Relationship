@@ -52,7 +52,15 @@ def _post(client: TestClient, payload: object):
 
 
 def _signup(client: TestClient, username: str, nickname: object, password: str = PW):
-    return _post(client, {"username": username, "password": password, "nickname": nickname})
+    return _post(
+        client,
+        {
+            "username": username,
+            "password": password,
+            "nickname": nickname,
+            "privacy_notice_accepted": True,
+        },
+    )
 
 
 def _count(db_session, model) -> int:
@@ -67,7 +75,7 @@ def test_signup_201_has_exactly_id_username_nickname(client) -> None:
 
     assert resp.status_code == 201
     body = resp.json()
-    assert set(body) == {"id", "username", "nickname"}
+    assert set(body) == {"id", "username", "nickname", "notice_required"}
     assert body["username"] == "nickuser1"
     assert body["nickname"] == "민지"
 
@@ -80,9 +88,19 @@ def test_login_and_me_return_the_same_nickname(client) -> None:
     me = client.get("/auth/me")
 
     assert login.status_code == 200
-    assert login.json() == {"id": created["id"], "username": "nickuser2", "nickname": "심사위원"}
+    assert login.json() == {
+        "id": created["id"],
+        "username": "nickuser2",
+        "nickname": "심사위원",
+        "notice_required": False,
+    }
     assert me.status_code == 200
-    assert me.json() == {"id": created["id"], "username": "nickuser2", "nickname": "심사위원"}
+    assert me.json() == {
+        "id": created["id"],
+        "username": "nickuser2",
+        "nickname": "심사위원",
+        "notice_required": False,
+    }
 
 
 def test_login_ignores_a_nickname_in_the_body(client) -> None:

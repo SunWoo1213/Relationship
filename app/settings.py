@@ -524,6 +524,12 @@ NICKNAME_PATTERN = r"[가-힣A-Za-z0-9_]{2,20}"
 PASSWORD_MIN_LEN = 8
 PASSWORD_MAX_LEN = 128
 
+#: OpenAI API 전송 고지의 판 번호(CR-009 · D20, P9d U4). `users.privacy_notice_version` 이 이
+#: 값 이상이어야 고지에 동의한 계정이다. 고지 문구(가입 문단·재고지 모달)를 바꾸는 커밋은 이
+#: 값을 같은 커밋에서 올린다 -- 올리면 모든 기존 계정이 다시 `notice_required` 가 된다.
+#: 환경변수로 덮지 않는 코드 상수(원칙8).
+PRIVACY_NOTICE_VERSION = 1
+
 
 def auth_cookie_secure(env: dict[str, str] | None = None) -> bool:
     """`AUTH_COOKIE_SECURE` 를 읽는다(결정 F). 비었거나 없으면 `True`(기본 켜짐 --

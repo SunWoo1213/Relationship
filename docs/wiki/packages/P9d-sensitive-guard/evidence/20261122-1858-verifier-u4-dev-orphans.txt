@@ -1,0 +1,12 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu4/dev_orphans.py
+# 시각: 2026-11-22T18:58:25+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 61a5241 (dev2)
+# exit: 0
+# ---
+db: relationship
+persons rows: 4
+persons whose user_id has no users row: 0
+push_subscriptions whose user_id has no users row: 0
+users rows: 12
+users with privacy_notice_version IS NULL: 12

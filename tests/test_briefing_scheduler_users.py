@@ -24,6 +24,7 @@ import app.settings as settings_module
 from app.briefing.compose import FakeBriefingComposer
 from app.db.models import AgentTrace, Person, PushSubscription, Schedule
 from app.push.types import STEP_PUSH_SEND, FakePushSender
+from tests.auth_helpers import make_user
 from tests.test_push_wiring import _generate_vapid_key_pair
 
 pytestmark = pytest.mark.dbtest
@@ -53,6 +54,7 @@ def env(db_session, monkeypatch):
 
 
 def _person(db, user_id: str, name: str = "민수") -> Person:
+    make_user(db, user_id)  # 주기 작업이 `users` 를 조인한다(CR-009 U4) -- 동의한 계정 행을 둔다
     person = Person(user_id=user_id, display_name=name, relation_tag="친구", hierarchy="동")
     db.add(person)
     db.flush()

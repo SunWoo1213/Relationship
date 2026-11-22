@@ -4,10 +4,11 @@
 
 | 경로 | 성공 | 실패 |
 |---|---|---|
-| `POST /auth/signup` | 201 `{id, username, nickname}` + 로그인 쿠키(가입 즉시 로그인, 결정 G) | 422 `invalid_username` -> `invalid_password` -> `invalid_nickname`(첫 위반) · 409 `username_taken`/`nickname_taken`(둘 다 겹치면 `username_taken`) |
-| `POST /auth/login` | 200 `{id, username, nickname}` + 쿠키 | 401 `invalid_credentials`(없는 아이디·틀린 비밀번호 같은 응답) |
+| `POST /auth/signup` | 201 `{id, username, nickname, notice_required}` + 로그인 쿠키(가입 즉시 로그인, 결정 G) | 422 `invalid_username` -> `invalid_password` -> `invalid_nickname` -> `notice_required`(첫 위반 — 동의는 형식 검사 뒤·409 앞, CR-009) · 409 `username_taken`/`nickname_taken`(둘 다 겹치면 `username_taken`) |
+| `POST /auth/login` | 200 `{id, username, nickname, notice_required}` + 쿠키 | 401 `invalid_credentials`(없는 아이디·틀린 비밀번호 같은 응답) |
 | `POST /auth/logout` | 204(본문 없음) + 쿠키 삭제 | 미로그인 401 `unauthenticated`(F-3) |
-| `GET /auth/me` | 200 `{id, username, nickname}` | 401 `unauthenticated` |
+| `GET /auth/me` | 200 `{id, username, nickname, notice_required}` | 401 `unauthenticated` |
+| `POST /auth/privacy-notice` | 204(본문 없음) — 현재 판 미동의면 판 번호·시각 기록, 이미 동의면 행 변경 0 (CR-009 · D20) | 401 `unauthenticated` |
 | `GET /auth/availability` | 200 `{username, nickname}`(각 `available`/`taken`/`invalid`/`null`) · 로그인 불필요 · `Cache-Control: no-store` | 두 쿼리가 모두 없으면 422 `missing_query` |
 | `POST /auth/mcp-token` | 201 `{token, created_at, expires_at}`(`expires_at` = 발급 + 7일) · 로그인 필수 · 이전 토큰은 즉시 무효 · `Cache-Control: no-store` | 401 `unauthenticated` · 403 `bad_origin` |
 | `GET /auth/mcp-token` | 200 `{active, created_at, expires_at, last_used_at}`(`token` 없음) · 로그인 필수 · `Cache-Control: no-store` | 401 |
@@ -48,7 +49,7 @@ from app.api.schemas import (
     MeOut,
     SignupIn,
 )
-from app.auth.deps import current_user, get_auth_now
+from app.auth.deps import current_user, get_auth_now, notice_required
 from app.auth.mcp_tokens import issue_mcp_token, mcp_token_status, revoke_mcp_token
 from app.auth.names import normalize_nickname
 from app.auth.passwords import dummy_hash, hash_password, is_utf8_encodable, verify_password
@@ -63,7 +64,12 @@ from app.auth.sessions import (
 from app.db.models import User
 from app.push.subscriptions import delete_subscription
 from app.db.session import get_session
-from app.settings import PASSWORD_MAX_LEN, PASSWORD_MIN_LEN, USERNAME_PATTERN
+from app.settings import (
+    PASSWORD_MAX_LEN,
+    PASSWORD_MIN_LEN,
+    PRIVACY_NOTICE_VERSION,
+    USERNAME_PATTERN,
+)
 
 class _NoInputEchoRoute(APIRoute):
     """형식 오류 422 본문에서 `input`(요청 본문 -- 비밀번호 포함)을 뺀다.
@@ -119,7 +125,12 @@ def _exists(session: Session, column: Any, value: str) -> bool:
 
 
 def _me_out(user: User) -> MeOut:
-    return MeOut(id=user.id, username=user.username, nickname=user.nickname)
+    return MeOut(
+        id=user.id,
+        username=user.username,
+        nickname=user.nickname,
+        notice_required=notice_required(user),
+    )
 
 
 @router.post("/signup", response_model=MeOut, status_code=201)
@@ -141,6 +152,10 @@ def signup(
     nickname = normalize_nickname(body.nickname)
     if nickname is None:
         raise _invalid("invalid_nickname")
+    # ③' OpenAI API 전송 고지 동의(CR-009 · D20) -- 형식 검사 뒤·409 사전 조회 앞. 없음·false 모두
+    # 같은 422(`users` 행 0).
+    if body.privacy_notice_accepted is not True:
+        raise _invalid("notice_required")
 
     # ④⑤ 사전 조회 -- 아이디 먼저(둘 다 겹치면 `username_taken`, 결정 AB).
     if _exists(session, User.username, username):
@@ -148,11 +163,15 @@ def signup(
     if _exists(session, User.nickname, nickname):
         raise _taken("nickname_taken")
 
+    signed_at = now()
     user = User(
         id=new_user_id(),
         username=username,
         nickname=nickname,
         password_hash=hash_password(body.password),
+        # 가입이 고지 동의를 함께 기록한다(CR-009 · D20).
+        privacy_notice_version=PRIVACY_NOTICE_VERSION,
+        privacy_notice_accepted_at=signed_at,
     )
     try:
         # ⑥ 사전 조회와 INSERT 사이 경합 -- 세이브포인트로 격리하고 제약 이름으로 코드를 정한다.
@@ -221,6 +240,22 @@ def logout(
 @router.get("/me", response_model=MeOut)
 def me(user: User = Depends(current_user)) -> MeOut:
     return _me_out(user)
+
+
+@router.post("/privacy-notice", status_code=204, response_class=Response)
+def accept_privacy_notice(
+    user: User = Depends(current_user),
+    session: Session = Depends(get_session),
+    now: Callable[[], datetime] = Depends(get_auth_now),
+) -> Response:
+    """재고지 동의(CR-009 · D20) -- 판 번호가 현재보다 낮거나 NULL 이면 현재 판·지금 시각을 기록한다.
+    이미 현재 판에 동의한 계정이 다시 불러도 204 이고 **행을 바꾸지 않는다**(처음 동의 시각이
+    동의 기록으로 남는다). 로그인 필수·본문 없음·trace·LLM 0."""
+    if notice_required(user):
+        user.privacy_notice_version = PRIVACY_NOTICE_VERSION
+        user.privacy_notice_accepted_at = now()
+        session.flush()
+    return Response(status_code=204)
 
 
 def _availability(

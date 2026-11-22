@@ -41,6 +41,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.sessions import cookie_name, create_session
 from app.db.models import AuthSession, User
+from app.settings import PRIVACY_NOTICE_VERSION
 from app.tools.context import ToolContext
 
 #: 로그인에 쓸 수 없는 해시 자리표시자(`parse_hash` 형식이 아니라 `verify_password` 가 항상 False).
@@ -61,8 +62,12 @@ def make_user(
     username: str | None = None,
     *,
     nickname: str | None = None,
+    notice_accepted: bool = True,
 ) -> User:
-    """`id == user_id` 인 사용자 행을 보장한다(있으면 그대로, 없으면 flush 로 넣는다)."""
+    """`id == user_id` 인 사용자 행을 보장한다(있으면 그대로, 없으면 flush 로 넣는다).
+
+    `notice_accepted`(CR-009 · D20, P9d U4) -- 기본 True 면 현재 판 번호(`PRIVACY_NOTICE_VERSION`)
+    와 지금 시각을 OpenAI 전송 고지 동의로 채운다. False 면 NULL(미동의 계정)."""
     existing = session.get(User, user_id)
     if existing is not None:
         return existing
@@ -73,6 +78,8 @@ def make_user(
         # 0004 보충: 생략하면 그 행의 아이디 값(기존 호출 시그니처 불변).
         nickname=nickname if nickname is not None else resolved_username,
         password_hash=NO_LOGIN_HASH,
+        privacy_notice_version=PRIVACY_NOTICE_VERSION if notice_accepted else None,
+        privacy_notice_accepted_at=datetime.now(timezone.utc) if notice_accepted else None,
     )
     session.add(user)
     session.flush()

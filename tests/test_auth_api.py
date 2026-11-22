@@ -79,6 +79,7 @@ def _signup(
             "username": username,
             "password": password,
             "nickname": nickname if nickname is not None else username,
+            "privacy_notice_accepted": True,
         },
     )
 
@@ -93,7 +94,7 @@ def test_signup_201_body_and_cookie_attributes(client: TestClient) -> None:
 
     assert resp.status_code == 201
     body = resp.json()
-    assert set(body) == {"id", "username", "nickname"}
+    assert set(body) == {"id", "username", "nickname", "notice_required"}
     assert body["username"] == "alice"
     assert len(body["id"]) == 32 and int(body["id"], 16) >= 0  # uuid4 hex(결정 O)
 
@@ -223,7 +224,12 @@ def test_login_200_sets_cookie(client: TestClient) -> None:
     resp = client.post("/auth/login", json={"username": "loginuser", "password": PW})
 
     assert resp.status_code == 200
-    assert resp.json() == {"id": uid, "username": "loginuser", "nickname": "loginuser"}
+    assert resp.json() == {
+        "id": uid,
+        "username": "loginuser",
+        "nickname": "loginuser",
+        "notice_required": False,
+    }
     assert _set_cookie_headers(resp)[0].startswith(SECURE_NAME + "=")
     assert client.get("/auth/me").status_code == 200
 
@@ -561,7 +567,7 @@ def test_signup_with_unencodable_password_is_422_and_creates_no_user(app_, db_se
     client = TestClient(app_, base_url="https://testserver", raise_server_exceptions=False)
     before = db_session.scalar(select(func.count()).select_from(User))
 
-    resp = _post_json(client, "/auth/signup", {"username": "surro1", "password": LONE_SURROGATE + "aaaaaaaaaa", "nickname": "surro1"})
+    resp = _post_json(client, "/auth/signup", {"username": "surro1", "password": LONE_SURROGATE + "aaaaaaaaaa", "nickname": "surro1", "privacy_notice_accepted": True})
 
     assert resp.status_code == 422
     assert resp.json() == {"detail": {"code": "invalid_password"}}

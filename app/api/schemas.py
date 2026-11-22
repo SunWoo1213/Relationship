@@ -446,6 +446,10 @@ class SignupIn(BaseModel):
     # CR-007 결정 W: 필수 문자열. 규칙(`normalize_nickname`)은 라우트가 검사해
     # `invalid_nickname` 으로 422 를 낸다.
     nickname: str
+    # CR-009 · D20(U4): OpenAI API 전송 고지 동의. 선택 필드로 받고 라우트가 판정한다 --
+    # 필수로 두면 FastAPI 기본 검증 422(`detail` 이 목록)가 먼저 나가기 때문(없음·false 모두
+    # 422 `{"detail":{"code":"notice_required"}}`).
+    privacy_notice_accepted: bool | None = None
 
 
 class LoginIn(BaseModel):
@@ -469,6 +473,8 @@ class MeOut(BaseModel):
     id: str
     username: str
     nickname: str
+    # CR-009 · D20(U4): 현재 판(`PRIVACY_NOTICE_VERSION`)에 동의하지 않았으면 true.
+    notice_required: bool
 
 
 class McpTokenCreatedOut(BaseModel):

@@ -1,0 +1,21 @@
+# 명령: .venv/bin/python /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu4/coerce.py
+# 시각: 2026-11-22T18:58:36+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 61a5241 (dev2)
+# exit: 0
+# ---
+true       -> True   => 201 경로(동의로 처리)
+false      -> False  => 422 notice_required
+null       -> None   => 422 notice_required
+"true"     -> True   => 201 경로(동의로 처리)
+"yes"      -> True   => 201 경로(동의로 처리)
+"on"       -> True   => 201 경로(동의로 처리)
+"1"        -> True   => 201 경로(동의로 처리)
+1          -> True   => 201 경로(동의로 처리)
+1.0        -> True   => 201 경로(동의로 처리)
+"false"    -> False  => 422 notice_required
+0          -> False  => 422 notice_required
+"abc"      -> ValidationError(bool_parsing) => FastAPI 422(detail 목록)
+2          -> ValidationError(bool_parsing) => FastAPI 422(detail 목록)
+[]         -> ValidationError(bool_type) => FastAPI 422(detail 목록)
+{}         -> ValidationError(bool_type) => FastAPI 422(detail 목록)

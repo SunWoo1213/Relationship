@@ -1,0 +1,52 @@
+# 명령: python3 /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/mut_app/run_mut.py
+# 시각: 2026-11-22T18:01:03+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 61a5241 (dev2)
+# exit: 0
+# ---
+=== 기준선(변이 없음)
+208 passed in 8.46s
+=== M1 briefings/run 에서 require_notice 빼기
+    FAILED tests/test_privacy_notice.py::test_unconsented_briefings_run_is_403_and_composes_nothing | 1 failed, 13 passed in 0.79s
+=== M2 chat 에서 require_notice 빼기
+    FAILED tests/test_privacy_notice.py::test_unconsented_chat_is_403_and_touches_no_llm_no_rows | 1 failed, 12 passed in 0.76s
+=== M3 answers 에서 require_notice 빼기
+    FAILED tests/test_privacy_notice.py::test_unconsented_answers_is_403_then_200_after_notice_accepted | 1 failed, 14 passed in 0.96s
+=== M4 _due_user_ids 의 users 조인·조건 통째로 빼기
+    FAILED tests/test_privacy_notice.py::test_scheduler_skips_unconsented_account_entirely[notice-null] | 1 failed, 16 passed in 0.92s
+=== M5 _due_user_ids 의 버전 조건만 빼기(조인은 둠)
+    FAILED tests/test_privacy_notice.py::test_scheduler_skips_unconsented_account_entirely[notice-null] | 1 failed, 16 passed in 0.92s
+=== M6 _due_user_ids 의 >= 를 >
+    FAILED tests/test_privacy_notice.py::test_scheduler_briefs_only_consented_account_in_a_mixed_run | 1 failed, 19 passed in 0.92s
+=== M7 _due_user_ids 를 outer join(users 없는 인물 포함)
+    FAILED tests/test_privacy_notice.py::test_scheduler_skips_unconsented_account_entirely[no-users-row] | 1 failed, 18 passed in 0.91s
+=== M8 notice_required: 낮은 판을 미동의로 보지 않음
+    FAILED tests/test_privacy_notice.py::test_me_notice_required_is_true_for_null_and_lower_version_false_for_current | 1 failed, 6 passed in 0.64s
+=== M9 notice_required: < 를 <=
+    FAILED tests/test_privacy_notice.py::test_signup_with_acceptance_records_version_and_time_and_not_required | 1 failed, 4 passed in 0.57s
+=== M10 가입: false/없음 통과(is not True -> is False)
+    FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[value0] | 1 failed, 1 passed in 0.52s
+=== M11 가입: 동의 검사를 409 조회 뒤로
+    FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[value0] | 1 failed, 1 passed in 0.53s
+=== M12 가입: 판 번호 기록 안 함
+    FAILED tests/test_privacy_notice.py::test_signup_with_acceptance_records_version_and_time_and_not_required | 1 failed, 4 passed in 0.56s
+=== M13 가입: 동의 시각 기록 안 함
+    FAILED tests/test_privacy_notice.py::test_signup_with_acceptance_records_version_and_time_and_not_required | 1 failed, 4 passed in 0.56s
+=== M14 재고지: 현재 판이어도 덮어씀
+    FAILED tests/test_privacy_notice.py::test_reaccept_on_current_version_is_204_and_changes_no_row | 1 failed, 10 passed in 0.74s
+=== M15 재고지: 시각 기록 안 함
+    FAILED tests/test_privacy_notice.py::test_reaccept_null_account_flow_null_then_false_then_true_after_version_bump | 1 failed, 8 passed in 0.71s
+=== M16 재고지: 판 번호 기록 안 함
+    FAILED tests/test_privacy_notice.py::test_reaccept_null_account_flow_null_then_false_then_true_after_version_bump | 1 failed, 8 passed in 0.71s
+=== M17 MeOut.notice_required 를 항상 False
+    FAILED tests/test_privacy_notice.py::test_me_notice_required_is_true_for_null_and_lower_version_false_for_current | 1 failed, 6 passed in 0.63s
+=== M18 PRIVACY_NOTICE_VERSION 1 -> 2
+    FAILED tests/test_privacy_notice.py::test_notice_version_is_one | 1 failed in 0.36s
+=== M19 403 오류 코드 바꿈
+    FAILED tests/test_privacy_notice.py::test_unconsented_chat_is_403_and_touches_no_llm_no_rows | 1 failed, 12 passed in 0.77s
+=== M20 미동의를 403 대신 401
+    FAILED tests/test_privacy_notice.py::test_unconsented_chat_is_403_and_touches_no_llm_no_rows | 1 failed, 12 passed in 0.76s
+=== M21 가입 422 코드 바꿈
+    FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[value0] | 1 failed, 1 passed in 0.50s
+=== 복원 확인(사본)
+208 passed in 8.53s

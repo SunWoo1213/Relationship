@@ -88,9 +88,9 @@ from sqlalchemy.orm import Session
 import app.settings as settings_module
 from app.briefing.compose import composer_from_env
 from app.briefing.run import run_briefings
-from app.db.models import Person, Schedule
+from app.db.models import Person, Schedule, User
 from app.db.session import session_scope
-from app.settings import BRIEFING_INTERVAL_SECONDS
+from app.settings import BRIEFING_INTERVAL_SECONDS, PRIVACY_NOTICE_VERSION
 from app.tools.context import ToolContext
 
 logger = logging.getLogger(__name__)
@@ -108,12 +108,17 @@ def _due_user_ids(
     session: Session, now: datetime, lead_hours: float
 ) -> list[str]:
     """창 안(`now <= scheduled_at <= now + lead_hours`)에 미브리핑 일정이 있는
-    사용자 id(중복 없음, 순서 규정 없음). `users` 가 아니라 `persons.user_id` 에서 구한다."""
+    사용자 id(중복 없음, 순서 규정 없음). `persons.user_id` 에서 구하되 `users` 를 조인해
+    **현재 판의 OpenAI 전송 고지에 동의한 계정만** 고른다(CR-009 · D20, VR7) -- 미동의 계정과
+    `users` 행이 없는 `persons.user_id` 는 제외(실패는 닫는 쪽). 건너뛴 계정은 `_run_for_user`
+    에 들어가지 않아 LLM·푸시·`briefing_run` trace 가 모두 0 이다."""
 
     window_end = now + timedelta(hours=lead_hours)
     rows = session.execute(
         select(Person.user_id)
         .join(Schedule, Schedule.person_id == Person.id)
+        .join(User, User.id == Person.user_id)
+        .where(User.privacy_notice_version >= PRIVACY_NOTICE_VERSION)
         .where(Schedule.scheduled_at >= now)
         .where(Schedule.scheduled_at <= window_end)
         .where(Schedule.briefed_at.is_(None))

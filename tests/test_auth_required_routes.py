@@ -62,6 +62,7 @@ _MUST_REQUIRE_LOGIN = {
     ("GET", "/briefings"),
     ("POST", "/auth/logout"),  # F-3 -- 로그아웃도 미로그인 401
     ("GET", "/auth/me"),
+    ("POST", "/auth/privacy-notice"),  # CR-009 -- 재고지 동의도 로그인 필수
     # CR-008 -- MCP 토큰 발급 API 는 쿠키 로그인이 자격이다(`/mcp` 자체는 면제가 아니라 다른 자격).
     ("POST", "/auth/mcp-token"),
     ("GET", "/auth/mcp-token"),

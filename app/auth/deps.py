@@ -26,6 +26,7 @@ from sqlalchemy.orm import Session
 from app.auth.sessions import cookie_name, find_user_by_token
 from app.db.models import User
 from app.db.session import get_session
+from app.settings import PRIVACY_NOTICE_VERSION
 
 
 def get_auth_now() -> Callable[[], datetime]:
@@ -48,4 +49,20 @@ def current_user(
     user = find_user_by_token(session, token, now())
     if user is None:
         raise unauthenticated()
+    return user
+
+
+def notice_required(user: User) -> bool:
+    """현재 판(`PRIVACY_NOTICE_VERSION`)의 OpenAI 전송 고지에 동의하지 않았으면 True.
+    `privacy_notice_version` 이 NULL 이거나 현재 판보다 낮으면 미동의(CR-009 · D20)."""
+    version = user.privacy_notice_version
+    return version is None or version < PRIVACY_NOTICE_VERSION
+
+
+def require_notice(user: User = Depends(current_user)) -> User:
+    """`current_user` 위에 고지 동의를 요구한다. 미로그인은 401(`current_user`), 로그인했지만
+    미동의면 403 `{"detail":{"code":"notice_required"}}` -- LLM·임베딩을 부르는 라우트
+    (`POST /chat`·`POST /answers/{id}`·`POST /briefings/run`)가 쓴다(CR-009 · D20)."""
+    if notice_required(user):
+        raise HTTPException(status_code=403, detail={"code": "notice_required"})
     return user

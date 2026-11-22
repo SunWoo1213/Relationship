@@ -1,0 +1,15 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/mut_up/run_mut.sh
+# 시각: 2026-11-22T17:59:42+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 61a5241 (dev2)
+# exit: 0
+# ---
+=== MUT=facts_updated_at
+=== MUT=events_created_at
+=== MUT=persons_updated_at
+=== MUT=persons_created_at
+=== MUT=pq_created_at
+=== MUT=pq_answered_at
+=== MUT=users_created_at
+=== restore (no mutation)
+19 passed in 0.77s

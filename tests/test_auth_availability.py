@@ -44,7 +44,13 @@ def client(app_) -> TestClient:
 def seeded(client) -> TestClient:
     """계정 하나(아이디 `taken_user`, 닉네임 `민지`)를 가입시키고 쿠키는 비운다."""
     resp = client.post(
-        "/auth/signup", json={"username": "taken_user", "password": PW, "nickname": "민지"}
+        "/auth/signup",
+        json={
+            "username": "taken_user",
+            "password": PW,
+            "nickname": "민지",
+            "privacy_notice_accepted": True,
+        },
     )
     assert resp.status_code == 201
     client.cookies.clear()
@@ -122,7 +128,15 @@ def test_nickname_statuses(seeded, nickname: str, expected: str) -> None:
 
 
 def test_nickname_case_folded_taken_after_signup(client) -> None:
-    client.post("/auth/signup", json={"username": "caseowner", "password": PW, "nickname": "Demo"})
+    client.post(
+        "/auth/signup",
+        json={
+            "username": "caseowner",
+            "password": PW,
+            "nickname": "Demo",
+            "privacy_notice_accepted": True,
+        },
+    )
     client.cookies.clear()
 
     resp = client.get("/auth/availability", params={"nickname": "DEMO"})

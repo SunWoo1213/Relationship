@@ -154,7 +154,7 @@ from app.api.read import (
     list_briefings,
     list_persons,
 )
-from app.auth.deps import current_user
+from app.auth.deps import current_user, require_notice
 from app.briefing import BriefingComposer, Notifier, run_briefings
 from app.chat.history import (
     HISTORY_DEFAULT_LIMIT,
@@ -213,7 +213,7 @@ def health(session: Session = Depends(get_session)) -> HealthOut:
 def submit_answer(
     question_id: int,
     body: AnswerIn,
-    user: User = Depends(current_user),
+    user: User = Depends(require_notice),
     session: Session = Depends(get_session),
     judge: Judge | None = Depends(get_judge),
     embedder: EmbeddingProvider | None = Depends(get_embedder),
@@ -333,7 +333,7 @@ def _record_loop_error(ctx: ToolContext, utterance: str, exc: Exception) -> Agen
 @router.post("/chat", response_model=ChatOut)
 def chat(
     body: ChatIn,
-    user: User = Depends(current_user),
+    user: User = Depends(require_notice),
     session: Session = Depends(get_session),
     proposer: Proposer | None = Depends(get_proposer),
     judge: Judge | None = Depends(get_judge),
@@ -433,7 +433,7 @@ def read_chat_history(
 @router.post("/briefings/run", response_model=BriefingRunOut)
 def run_briefings_endpoint(
     body: BriefingRunIn | None = None,
-    user: User = Depends(current_user),
+    user: User = Depends(require_notice),
     session: Session = Depends(get_session),
     composer: BriefingComposer = Depends(get_briefing_composer),
     now: Callable[[], datetime] = Depends(get_now),

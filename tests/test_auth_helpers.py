@@ -102,7 +102,12 @@ def test_logged_in_client_session_row_matches_cookie(db_session) -> None:
 
     me = client.get("/auth/me")
     assert me.status_code == 200
-    assert me.json() == {"id": "u-helper-1", "username": "helper-one", "nickname": "helper-one"}
+    assert me.json() == {
+        "id": "u-helper-1",
+        "username": "helper-one",
+        "nickname": "helper-one",
+        "notice_required": False,
+    }
 
 
 def test_logged_in_client_default_user_is_local(db_session) -> None:
