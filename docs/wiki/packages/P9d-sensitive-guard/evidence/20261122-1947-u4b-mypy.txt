@@ -1,0 +1,13 @@
+# 명령: python3 scripts/mypy_check.py --run
+# 시각: 2026-11-22T19:47:41+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 0
+# ---
+[info] 기준선에 있었지만 이번엔 없는 오류(알림만, 실패 아님):
+  - app/main.py: [arg-type] Argument 1 to "int" has incompatible type "Any | None"; expected "str | Buffer | SupportsInt | SupportsIndex | SupportsTrunc" (x1)
+  - app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], ConfirmationRequired], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]" (x1)
+  - app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], InvalidValue], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]" (x1)
+  - app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], QuestionNotAnswerable], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]" (x1)
+  - app/main.py: [arg-type] Argument 2 to "add_exception_handler" of "Starlette" has incompatible type "Callable[[Request[State], ToolError], JSONResponse]"; expected "Callable[[Request[State], Exception], Response | Awaitable[Response]] | Callable[[WebSocket[State], Exception], Awaitable[None]]" (x1)
+[ok] 새 오류 없음 (현재 33건, 기준선 38건)

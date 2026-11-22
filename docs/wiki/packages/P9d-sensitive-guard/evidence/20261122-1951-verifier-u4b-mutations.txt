@@ -1,0 +1,62 @@
+# 명령: bash /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu4b/run_muts.sh control sched_ge_to_eq deps_lt_to_ne route_truthy route_eq_true schema_loose_bool schema_strict_bool control
+# 시각: 2026-11-22T19:51:06+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 0
+# ---
+################ MUT=control
+[mutplug] MUT=control
+183 passed in 6.08s
+################ MUT=sched_ge_to_eq
+[mutplug] MUT=sched_ge_to_eq
+FAILED tests/test_privacy_notice.py::test_scheduler_briefs_higher_notice_version_account - assert None is not None
+1 failed, 182 passed in 6.14s
+################ MUT=deps_lt_to_ne
+[mutplug] MUT=deps_lt_to_ne
+FAILED tests/test_privacy_notice.py::test_higher_notice_version_account_is_not_required_and_chat_passes - assert True is False
+1 failed, 182 passed in 6.13s
+################ MUT=route_truthy
+[mutplug] MUT=route_truthy
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-true] - assert 201 == 422
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-yes] - assert 201 == 422
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-1] - assert 201 == 422
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[float-1] - assert 201 == 422
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-abc] - assert 201 == 422
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-2] - assert 201 == 422
+6 failed, 177 passed in 6.32s
+################ MUT=route_eq_true
+[mutplug] MUT=route_eq_true
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-1] - assert 201 == 422
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[float-1] - assert 201 == 422
+2 failed, 181 passed in 6.19s
+################ MUT=schema_loose_bool
+[mutplug] MUT=schema_loose_bool
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-true] - assert 201 == 422
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-yes] - assert 201 == 422
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-1] - assert 201 == 422
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[float-1] - assert 201 == 422
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-abc] - AssertionError: assert {'detail': [{...ol_parsing'}]} == {'detail': {'...ce_required'}}
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-2] - AssertionError: assert {'detail': [{...ol_parsing'}]} == {'detail': {'...ce_required'}}
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[list] - AssertionError: assert {'detail': [{...'bool_type'}]} == {'detail': {'...ce_required'}}
+7 failed, 176 passed in 6.32s
+################ MUT=schema_strict_bool
+[mutplug] MUT=schema_strict_bool
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-true] - AssertionError: assert {'detail': [{...'bool_type'}]} == {'detail': {'...ce_required'}}
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-yes] - AssertionError: assert {'detail': [{...'bool_type'}]} == {'detail': {'...ce_required'}}
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-1] - AssertionError: assert {'detail': [{...'bool_type'}]} == {'detail': {'...ce_required'}}
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[float-1] - AssertionError: assert {'detail': [{...'bool_type'}]} == {'detail': {'...ce_required'}}
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-abc] - AssertionError: assert {'detail': [{...'bool_type'}]} == {'detail': {'...ce_required'}}
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-2] - AssertionError: assert {'detail': [{...'bool_type'}]} == {'detail': {'...ce_required'}}
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[list] - AssertionError: assert {'detail': [{...'bool_type'}]} == {'detail': {'...ce_required'}}
+7 failed, 176 passed in 6.16s
+################ MUT=control
+[mutplug] MUT=control
+183 passed in 6.07s
+################ 끝난 뒤 저장소 상태
+ app/api/routes.py            |  4 ++++
+ app/api/schemas.py           | 12 +++++++-----
+ app/auth/__init__.py         |  2 +-
+ app/briefing/scheduler.py    |  3 ++-
+ tests/test_privacy_notice.py | 40 ++++++++++++++++++++++++++++++++++++++--
+ 5 files changed, 52 insertions(+), 9 deletions(-)
+       0

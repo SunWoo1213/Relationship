@@ -20,7 +20,8 @@
 마다** 돈다: 창(`settings.BRIEFING_LEAD_HOURS` -- **호출 시점에** 모듈 전역을
 읽어 사용자 목록 질의와 `run_briefings(lead_hours=...)` 양쪽에 같은 값을
 넘긴다) 안에 미브리핑 일정이 있는 사용자 id 를 `persons.user_id` 에서
-구하고(`users` 테이블이 아니다), 사용자마다 `session_scope()`(`app/db/
+구하되 `users` 를 조인해 현재 판의 전송 고지에 동의한 계정만 고르고(미동의 계정과 `users`
+행이 없는 인물은 건너뛴다 -- CR-009 · D20), 사용자마다 `session_scope()`(`app/db/
 session.py`)를 따로 열어 `ToolContext(user_id=그 사용자)` 로 `run_briefings(
 ctx, composer=composer_from_env(), trigger="scheduler")` 를 부른다. 한 사용자
 에서 예외가 나면 그 사용자 것만 롤백하고(세션이 따로라 부분 쓰기가 남지 않는다)

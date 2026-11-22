@@ -1,0 +1,8 @@
+# 명령: .venv/bin/python -m pytest tests/test_privacy_notice.py -q
+# 시각: 2026-11-22T19:46:01+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 0
+# ---
+.............................                                            [100%]
+29 passed in 1.11s

@@ -44,7 +44,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -446,10 +446,12 @@ class SignupIn(BaseModel):
     # CR-007 결정 W: 필수 문자열. 규칙(`normalize_nickname`)은 라우트가 검사해
     # `invalid_nickname` 으로 422 를 낸다.
     nickname: str
-    # CR-009 · D20(U4): OpenAI API 전송 고지 동의. 선택 필드로 받고 라우트가 판정한다 --
-    # 필수로 두면 FastAPI 기본 검증 422(`detail` 이 목록)가 먼저 나가기 때문(없음·false 모두
-    # 422 `{"detail":{"code":"notice_required"}}`).
-    privacy_notice_accepted: bool | None = None
+    # CR-009 · D20(U4 보강 R-2): OpenAI API 전송 고지 동의. 타입을 걸지 않고 받아 라우트가
+    # `is True`(JSON 불리언 true 하나)로만 판정한다. `bool`/`StrictBool` 로 걸면 pydantic 검증이
+    # 라우트보다 먼저 돌아 (a) 불리언이 아닌 값이 detail 목록 422 로 나가고 (b) 형식 3종 -> 동의
+    # 순서가 깨진다. 그래서 없음·false·"true"·1 등 true 가 아닌 모든 값이 같은 422
+    # `{"detail":{"code":"notice_required"}}` 가 된다(기존 `invalid_*` 코드와 같은 방식).
+    privacy_notice_accepted: Any = None
 
 
 class LoginIn(BaseModel):

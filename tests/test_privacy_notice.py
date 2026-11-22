@@ -119,7 +119,11 @@ def test_notice_version_is_one() -> None:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("value", [_OMIT, False, None])
+@pytest.mark.parametrize(
+    "value",
+    [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+    ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+)  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
 def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
     client, db_session, value
 ) -> None:
@@ -392,6 +396,23 @@ def test_unconsented_answers_is_403_then_200_after_notice_accepted(
     assert _count(db_session, Person) == persons + 1
 
 
+def test_higher_notice_version_account_is_not_required_and_chat_passes(app_, db_session) -> None:
+    """현재보다 높은 판(배포를 되돌린 뒤 상태)은 동의한 것으로 본다 -- `<` 를 `!=` 로 바꾸면 실패."""
+    user = make_user(db_session, "u-high")
+    user.privacy_notice_version = PRIVACY_NOTICE_VERSION + 1
+    db_session.flush()
+    client = logged_in_client(app_, db_session, "u-high")
+    assert client.get("/auth/me").json()["notice_required"] is False
+    utterance = "그냥 안부 인사"
+    app_.dependency_overrides[get_proposer] = lambda: FakeProposer(table={utterance: []})
+    app_.dependency_overrides[get_judge] = lambda: FakeJudge(table={})
+    app_.dependency_overrides[get_embedder] = lambda: (lambda texts: [])
+
+    resp = client.post("/chat", json={"utterance": utterance})
+
+    assert resp.status_code == 200
+
+
 def test_consented_user_still_passes_the_notice_gate(app_, db_session) -> None:
     """403 시험이 헛돌지 않게 -- 같은 호출이 동의 계정에서는 403 이 아니다."""
     client = logged_in_client(app_, db_session, "u-ok")
@@ -437,10 +458,12 @@ def _clock() -> datetime:
 def _owner_with_schedule(db, user_id: str, *, user_row: bool, notice: str) -> Schedule:
     """`notice` = `current`(동의) | `null`(미동의) | `lower`(낮은 판). `user_row=False` 면 `users` 행 없음."""
     if user_row:
-        user = make_user(db, user_id, notice_accepted=(notice == "current"))
+        user = make_user(db, user_id, notice_accepted=(notice in ("current", "higher")))
         if notice == "lower":
             user.privacy_notice_version = PRIVACY_NOTICE_VERSION - 1
             user.privacy_notice_accepted_at = FIRST_ACCEPTED
+        if notice == "higher":
+            user.privacy_notice_version = PRIVACY_NOTICE_VERSION + 1
     person = Person(user_id=user_id, display_name=f"{user_id}-p", relation_tag="친구", hierarchy="동")
     db.add(person)
     db.flush()
@@ -482,6 +505,19 @@ def test_scheduler_skips_unconsented_account_entirely(sched, user_row, notice) -
     assert len(runs) == 1
     assert runs[0].output["selected"] == []
     assert runs[0].output["briefed"] == []
+
+
+def test_scheduler_briefs_higher_notice_version_account(sched) -> None:
+    """현재보다 높은 판 계정도 브리핑 대상이다 -- 주기 작업 조건 `>=` 를 `==` 로 바꾸면 실패."""
+    db, composer, sender = sched
+    schedule = _owner_with_schedule(db, "u-high", user_row=True, notice="higher")
+
+    scheduler_module.default_run_once(now=_clock)
+
+    db.refresh(schedule)
+    assert schedule.briefed_at is not None
+    assert composer.call_count == 1
+    assert [call["endpoint"] for call in sender.calls] == ["https://push.test/u-high"]
 
 
 def test_scheduler_briefs_only_consented_account_in_a_mixed_run(sched) -> None:

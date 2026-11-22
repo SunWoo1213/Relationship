@@ -1,0 +1,60 @@
+# 명령: echo "## deps.py routes.py diff 줄 수(0 이어야 함)"; git diff 5fc2b79 -- app/auth/deps.py app/auth/routes.py app/settings.py | wc -l; echo "## app tests 변경 파일"; git status --short -- app tests alembic; git diff --stat 5fc2b79 -- app tests alembic; echo "## app diff 에서 주석·docstring 이 아닌 바뀐 줄(schemas.py 의 import·필드 2쌍만 나와야 함)"; git diff -U0 5fc2b79 -- app | grep -E "^[+-]" | grep -vE "^(\+\+\+|---)" | grep -vE "^[+-]\s*#"; echo "## scheduler 실행 코드 비교(docstring 밖 diff 헝크 위치)"; git diff -U0 5fc2b79 -- app/briefing/scheduler.py app/api/routes.py app/auth/__init__.py | grep "^@@"; grep -n "privacy_notice_version >= PRIVACY_NOTICE_VERSION" app/briefing/scheduler.py; grep -n "version < PRIVACY_NOTICE_VERSION" app/auth/deps.py; grep -n "is not True" app/auth/routes.py; echo "## 모듈 docstring 끝 줄(헝크가 그 안인지)"; for f in app/briefing/scheduler.py app/api/routes.py app/auth/__init__.py; do .venv/bin/python -c "import ast,sys; t=ast.parse(open(sys.argv[1]).read()); print(sys.argv[1], \"모듈 docstring 끝 줄 =\", t.body[0].end_lineno)" $f; done; echo "## AST 비교(docstring 제외) 기준 커밋 vs 작업 트리"; for f in app/briefing/scheduler.py app/api/routes.py app/auth/__init__.py app/auth/deps.py app/auth/routes.py app/api/schemas.py; do git show 5fc2b79:$f | .venv/bin/python -c "
+import ast,sys
+def norm(src):
+    t=ast.parse(src)
+    for n in ast.walk(t):
+        if isinstance(n,(ast.Module,ast.FunctionDef,ast.ClassDef,ast.AsyncFunctionDef)) and n.body and isinstance(n.body[0],ast.Expr) and isinstance(getattr(n.body[0],\"value\",None),ast.Constant) and isinstance(n.body[0].value.value,str):
+            n.body[0].value.value=\"\"
+    return ast.dump(t)
+print(sys.argv[1], \"AST 같음\" if norm(sys.stdin.read())==norm(open(sys.argv[1]).read()) else \"AST 다름\")" $f; done; find app tests -name "*.orig" -o -name "*.bak" -o -name "*.rej" | head
+# 시각: 2026-11-22T19:50:50+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 0
+# ---
+## deps.py routes.py diff 줄 수(0 이어야 함)
+       0
+## app tests 변경 파일
+ M app/api/routes.py
+ M app/api/schemas.py
+ M app/auth/__init__.py
+ M app/briefing/scheduler.py
+ M tests/test_privacy_notice.py
+ app/api/routes.py            |  4 ++++
+ app/api/schemas.py           | 12 +++++++-----
+ app/auth/__init__.py         |  2 +-
+ app/briefing/scheduler.py    |  3 ++-
+ tests/test_privacy_notice.py | 40 ++++++++++++++++++++++++++++++++++++++--
+ 5 files changed, 52 insertions(+), 9 deletions(-)
+## app diff 에서 주석·docstring 이 아닌 바뀐 줄(schemas.py 의 import·필드 2쌍만 나와야 함)
++(CR-009 · D20, P9d U4) `POST /chat`·`POST /answers/{id}`·`POST /briefings/run` 은 현재 판의
++OpenAI 전송 고지에 동의하지 않은 계정에 403 `{"detail":{"code":"notice_required"}}` 를 낸다
++(`require_notice` 의존성 -- 루프·LLM·DB 쓰기 전에 거절). `GET /health` 는 해당 없음.
++
+-from typing import Literal
++from typing import Any, Literal
+-    privacy_notice_accepted: bool | None = None
++    privacy_notice_accepted: Any = None
+-- `routes`    -- `/auth/signup`·`/auth/login`·`/auth/logout`·`/auth/me`·`GET /auth/availability`·
++- `routes`    -- `/auth/signup`·`/auth/login`·`/auth/logout`·`/auth/me`·`POST /auth/privacy-notice`·`GET /auth/availability`·
+-구하고(`users` 테이블이 아니다), 사용자마다 `session_scope()`(`app/db/
++구하되 `users` 를 조인해 현재 판의 전송 고지에 동의한 계정만 고르고(미동의 계정과 `users`
++행이 없는 인물은 건너뛴다 -- CR-009 · D20), 사용자마다 `session_scope()`(`app/db/
+## scheduler 실행 코드 비교(docstring 밖 diff 헝크 위치)
+@@ -13,0 +14,4 @@
+@@ -8 +8 @@
+@@ -23 +23,2 @@
+122:        .where(User.privacy_notice_version >= PRIVACY_NOTICE_VERSION)
+59:    return version is None or version < PRIVACY_NOTICE_VERSION
+157:    if body.privacy_notice_accepted is not True:
+## 모듈 docstring 끝 줄(헝크가 그 안인지)
+app/briefing/scheduler.py 모듈 docstring 끝 줄 = 76
+app/api/routes.py 모듈 docstring 끝 줄 = 104
+app/auth/__init__.py 모듈 docstring 끝 줄 = 14
+## AST 비교(docstring 제외) 기준 커밋 vs 작업 트리
+app/briefing/scheduler.py AST 같음
+app/api/routes.py AST 같음
+app/auth/__init__.py AST 같음
+app/auth/deps.py AST 같음
+app/auth/routes.py AST 같음
+app/api/schemas.py AST 다름

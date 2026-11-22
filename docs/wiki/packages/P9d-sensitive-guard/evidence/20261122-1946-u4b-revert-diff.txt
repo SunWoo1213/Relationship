@@ -1,0 +1,12 @@
+# 명령: git diff --stat -- app tests
+# 시각: 2026-11-22T19:46:55+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 0
+# ---
+ app/api/routes.py            |  4 ++++
+ app/api/schemas.py           | 12 +++++++-----
+ app/auth/__init__.py         |  2 +-
+ app/briefing/scheduler.py    |  3 ++-
+ tests/test_privacy_notice.py | 40 ++++++++++++++++++++++++++++++++++++++--
+ 5 files changed, 52 insertions(+), 9 deletions(-)

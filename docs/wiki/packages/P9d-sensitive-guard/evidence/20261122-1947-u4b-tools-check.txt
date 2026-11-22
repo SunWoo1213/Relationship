@@ -1,0 +1,17 @@
+# 명령: python3 scripts/tools_check.py
+# 시각: 2026-11-22T19:47:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 1
+# ---
+Traceback (most recent call last):
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/scripts/tools_check.py", line 45, in <module>
+    from app.tools import TOOL_NAMES  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/tools/__init__.py", line 17, in <module>
+    from app.tools.briefing import get_briefing
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/tools/briefing.py", line 56, in <module>
+    from app.db.models import Event, PersonFact, Schedule
+  File "/Users/sunwoo/Desktop/Portfolio/Relationship/app/db/models.py", line 49, in <module>
+    from pgvector.sqlalchemy import Vector
+ModuleNotFoundError: No module named 'pgvector'

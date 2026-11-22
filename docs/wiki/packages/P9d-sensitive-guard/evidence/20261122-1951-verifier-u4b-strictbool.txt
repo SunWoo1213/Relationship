@@ -1,0 +1,83 @@
+# 명령: MUT=schema_strict_bool PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu4b PYTHONDONTWRITEBYTECODE=1 POSTGRES_PORT=5433 .venv/bin/python -m pytest /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu4b/test_probe_values.py -q -p mutplug -p tests.conftest -p no:cacheprovider --rootdir=. --tb=line -k probe_table 2>&1 | grep -v Deprecat | grep -v VersionedUnionType
+# 시각: 2026-11-22T19:51:05+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 0
+# ---
+[mutplug] MUT=schema_strict_bool
+
+=== 가입 동의 값 표 ===
+true      -> 201 {"id":"86b22dd5262645a199de2e2405ca20f5","username":"probeuser","nickname":"probeuser","no | users 증가 1 | version=1
+omit      -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+false     -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+null      -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+"true"    -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+"yes"     -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+"on"      -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+"1"       -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+1         -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+1.0       -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+"abc"     -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+2         -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+[]        -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+[true]    -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+{}        -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+"false"   -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+0         -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+"True"    -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul | users 증가 0 | version=None
+순서A 아이디 형식 위반 + "abc" -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul
+순서A2 비밀번호 형식 위반 + [] -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul
+순서B 이미 있는 아이디 + 1 -> 422 {"detail":[{"type":"bool_type","loc":["body","privacy_notice_accepted"],"msg":"Input shoul
+기대와 다른 값: ['"true"', '"yes"', '"on"', '"1"', '1', '1.0', '"abc"', '2', '[]', '[true]', '{}', '"false"', '0', '"True"']
+F                                                                        [100%]
+=================================== FAILURES ===================================
+E   assert ['"true"', '"...', '1.0', ...] == []
+      
+      Left contains 14 more items, first extra item: '"true"'
+      
+      Full diff:
+      - []
+      + [
+      +     '"true"',
+      +     '"yes"',
+      +     '"on"',
+      +     '"1"',
+      +     '1',
+      +     '1.0',
+      +     '"abc"',
+      +     '2',
+      +     '[]',
+      +     '[true]',
+      +     '{}',
+      +     '"false"',
+      +     '0',
+      +     '"True"',
+      + ]
+---------------------------- Captured stderr setup -----------------------------
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu4b/test_probe_values.py:103: assert ['"true"', '"...', '1.0', ...] == []
+=========================== short test summary info ============================
+FAILED ::test_probe_table - assert ['"true"', '"...', '1.0', ...] == []
+  
+  Left contains 14 more items, first extra item: '"true"'
+  
+  Full diff:
+  - []
+  + [
+  +     '"true"',
+  +     '"yes"',
+  +     '"on"',
+  +     '"1"',
+  +     '1',
+  +     '1.0',
+  +     '"abc"',
+  +     '2',
+  +     '[]',
+  +     '[true]',
+  +     '{}',
+  +     '"false"',
+  +     '0',
+  +     '"True"',
+  + ]
+1 failed, 1 deselected in 0.52s

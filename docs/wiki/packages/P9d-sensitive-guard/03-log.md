@@ -18,10 +18,18 @@
 - 남은 것 · 다음 단위: U4(backend-agent — 고지 API·403·주기 브리핑 건너뜀). 열린 권고(review-u3): **R-2** `test_upgrade_changes_no_existing_data` 스냅샷에 시각 컬럼이 없어 verifier 변이 2건 통과 → U4 위임에 함께 넣는다 · **R-3** U2 는 범주 상수를 따로 정의하지 않고 `app.db.models.SENSITIVE_CATEGORIES` 를 가져온다(동등 단언 포함) · **R-4** downgrade 가드의 세기와 DDL 사이 틈 → U12 문서 J절에 "백엔드를 내린 뒤 downgrade" 를 적는다. U1(eval-agent)은 진행 중이고 그 산출물(`evaluation/sensitive_guard/`·`scripts/validate_sensitive_set.py`·`evidence/*-u1-*`)은 이 커밋에 넣지 않는다.
 - Refs: P9d-sensitive-guard CR-009 D20 S3.1 원칙9
 
-## 2026-11-22 19:50 · feat(P9d-sensitive-guard): 전송 고지에 동의해야 대화를 보낼 수 있게 한다 (U4) · pending
+## 2026-11-22 19:50 · feat(P9d-sensitive-guard): 전송 고지에 동의해야 대화를 보낼 수 있게 한다 (U4) · 5fc2b79
 - 변경: `app/settings.py`(`PRIVACY_NOTICE_VERSION = 1`), `app/auth/deps.py`(`notice_required`·`require_notice` 403), `app/auth/routes.py`(가입 422 `notice_required` — 형식 3종 뒤·409 앞, 가입 때 판 번호·시각 기록, `POST /auth/privacy-notice` 204), `app/api/schemas.py`(`SignupIn.privacy_notice_accepted`·`MeOut.notice_required`), `app/api/routes.py`(`/chat`·`/answers/{id}`·`/briefings/run` 의존성을 `require_notice` 로), `app/briefing/scheduler.py`(`_due_user_ids` 가 `users` 조인 — 미동의·계정 없는 인물 건너뜀). 새 `tests/test_privacy_notice.py` 20건, 기존 단언 7줄(계획 VR3 예외)과 가입 본문·계정 준비 줄, `evaluation/recognition/probe.py` 가입 본문. 함께: `tests/test_migration_0006.py` 스냅샷에 시각 컬럼(review-u3 R-2 닫음). 사용자 결정 23~26(범주 경계)을 `D20` 에 기록.
 - 이유(기획서·카드 연결): D20 고지 행 · D18 CR-009 보충 · 사용자 결정 5·16·17·21 — 가입 때 OpenAI API 전송에 동의를 받고, 기존 가입자는 동의 전까지 대화·칩 답·수동 브리핑이 403 이며 주기 브리핑·푸시도 건너뛴다. 403 을 의존성으로 건 것은 LLM·임베딩 의존성보다 먼저 풀려 전송 0 을 구조로 보장하기 때문이다.
 - 정합성 확인: 원칙 7(가드 문구에 감정·평가 없음 — 이 단위는 문구를 싣지 않는다)·9(건너뛴 계정 trace 0 은 계획 VR7) / D20 · D18(로그인 없이 열린 예외 불변 — 새 라우트는 로그인 필수) / S3.4·S3.6 / S3.2(툴 7종 7/7, `app/er/` 무변경) / 보안 — 위반 없음. verifier `review-u4.md` **통과**([필수] 0 · [권고] 4).
 - 계획에 없이 구현자가 정한 것 2가지(verifier 타당 판정): ① 동의 시각은 `get_auth_now`(가입이 이미 받는 시계) ② `test_briefing_scheduler_users.py` 의 계정 준비를 `_person` 도우미 안 한 줄로.
 - 남은 것 · 다음 단위: **U4 보강**(backend-agent, review-u4 R-2 가입 동의 값을 엄격한 불리언으로 · R-3 "현재보다 높은 판" 계정 시험 · R-4 낡은 docstring 3곳) → verifier 확인 → 커밋. U9a(frontend-agent — 가입 고지 체크·재고지 모달). 이 커밋부터 U9a 전까지 로컬 프론트의 가입은 422 `notice_required` 다(운영은 끝난 뒤 한 번에 반영하므로 영향 없음). U1 은 리뷰 보류 — 사용자 결정 23~26 반영 재작업 뒤 2회차. U12 점검에 "계정 없는 인물 수" 질의 한 줄을 넣는다(review-u4 N-6).
 - Refs: P9d-sensitive-guard CR-009 D20 D18 S3.4 S3.6 원칙7 원칙9
+
+## 2026-11-22 20:35 · fix(P9d-sensitive-guard): 가입 동의는 불리언 true 일 때만 받는다 (U4 보강) · pending
+- 변경: `app/api/schemas.py`(`SignupIn.privacy_notice_accepted` 를 `bool | None` → `Any = None` — 값을 바꾸지 않고 받아 라우트의 `is not True` 가 판정), `tests/test_privacy_notice.py`(가입 "동의 없음" 매개변수 3 → 10, 높은 판 계정 시험 2건), docstring 3곳(`app/briefing/scheduler.py`·`app/api/routes.py`·`app/auth/__init__.py` — 동작 변경 없음).
+- 이유(기획서·카드 연결): D20 고지 행 — 동의는 사용자가 체크했다는 뜻이어야 하는데, 보강 전에는 문자열 `"true"`·숫자 `1` 도 동의로 기록됐다(review-u4 R-2). 메인 세션은 `StrictBool` 을 요청했으나 구현자가 `Any` 를 골랐다: `StrictBool` 이면 불리언이 아닌 값이 detail 목록 422 로 나가고 아이디 형식 오류보다 먼저 나가, 계획 U4 의 "목록 모양 detail 0"·"형식 → 동의 → 409 순서"가 깨진다. verifier 가 런타임 치환으로 확인(14종이 목록 422).
+- 정합성 확인: D20 · D18 · 계획 U4 가입 검사 순서 / S3.2(툴 7종 7/7) — 위반 없음. verifier `review-u4b.md` **통과**([필수] 0 · [권고] 2). review-u4 R-2·R-3·R-4 닫힘.
+- 하네스 메모: 구현자가 저장소 밖 사본을 만들지 못해(복사 명령 권한 거부) **변이 시험을 저장소 파일을 고쳤다 되돌리는 방식으로 돌렸다** — 규칙 밖. verifier 가 잔재 0 을 확인했다(`evidence/20261122-1950-verifier-u4b-residue.txt`). 뒤 단위 위임 프롬프트에 "복사가 안 되면 런타임 치환(import 시점 치환), 저장소 파일 수정 금지"를 넣는다.
+- 남은 것 · 다음 단위: U9a 리뷰 중 · U1 재작업 중. `app/auth/routes.py` 155~156행 주석("없음·false 모두")은 다음에 그 파일을 고칠 때 맞춘다(review-u4b N-3).
+- Refs: P9d-sensitive-guard CR-009 D20 D18

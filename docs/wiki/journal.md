@@ -721,3 +721,5 @@
 - 2026-11-22 17:36 | PUSH-dev2 | origin dev2 947c12c (실험 푸시)
 - 2026-11-22 17:54 | COMMIT | 61a5241 feat(P9d-sensitive-guard): 민감 표시와 고지 동의를 담을 컬럼을 더한다 (U3)
 - 2026-11-22 17:54 | PUSH-dev2 | origin dev2 61a5241 (실험 푸시)
+- 2026-11-22 19:44 | COMMIT | 5fc2b79 feat(P9d-sensitive-guard): 전송 고지에 동의해야 대화를 보낼 수 있게 한다 (U4)
+- 2026-11-22 19:44 | PUSH-dev2 | origin dev2 5fc2b79 (실험 푸시)

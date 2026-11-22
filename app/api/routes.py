@@ -11,6 +11,10 @@
 삼키지 않는다 -- `ScheduleNotFound` 도 `app/main.py` 의 공통 404 매핑에
 맡긴다(아래 "P6-briefing U6" 절 참고).
 
+(CR-009 · D20, P9d U4) `POST /chat`·`POST /answers/{id}`·`POST /briefings/run` 은 현재 판의
+OpenAI 전송 고지에 동의하지 않은 계정에 403 `{"detail":{"code":"notice_required"}}` 를 낸다
+(`require_notice` 의존성 -- 루프·LLM·DB 쓰기 전에 거절). `GET /health` 는 해당 없음.
+
 ## P6-briefing U6 -- `POST /briefings/run` (Refs: P6-briefing S3.6 R12 원칙9)
 
 `run_briefings(ctx, ...)`(U5, `app/briefing/run.py`)를 `trigger="manual"`

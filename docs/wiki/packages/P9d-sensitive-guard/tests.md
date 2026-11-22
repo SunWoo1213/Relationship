@@ -101,3 +101,24 @@
 | ruff · 툴 7종 · mypy | `ruff check` · `tools_check.py` · `mypy_check.py --run` | 통과 · 7/7 · 새 오류 없음(38 = 기준선 38) | `u4-ruff` · `u4-tools-check` · `u4-mypy` |
 | 변이 | 저장소 밖 사본(구현자 23 + 순서 2) · verifier 19종 | 구현자 전부 잡힘 · verifier 17 잡힘 / 2 통과(R-3) | `u4-mutations` · `u4-mutations-order` · `verifier-u4-mutations` |
 | 가입 동의 값 해석 | 문자열·숫자 본문으로 가입 | `"true"`·`1` 등이 동의로 기록됨(review-u4 R-2, 열림) | `verifier-u4-coerce` |
+
+## U4 보강 — 동의 값 좁히기·높은 판 계정 시험 (backend-agent, 2026-11-22)
+
+review-u4 의 R-2·R-3·R-4 를 닫는다. 위 U4 절의 "공백"(⑳)과 "R-2 열림"은 이 절에서 닫혔다. 명령은 모두 `POSTGRES_PORT=5433 .venv/bin/python -m pytest tests/test_privacy_notice.py -q`(29 passed).
+
+| 확인 항목 | 명령 | 결과 | evidence |
+|---|---|---|---|
+| `test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-true]` — 문자열 `"true"` 는 동의가 아님: 422 `notice_required`(detail dict), `users` 행 0 | 위 명령 | passed | `u4b-notice-pytest` · 변이(`is not True` → `not x`, 스키마 `bool \| None`) |
+| `…[str-yes]` — `"yes"` | 위 명령 | passed | 같음 |
+| `…[int-1]` — 숫자 `1` | 위 명령 | passed | 같음 (verifier 변이 `!= True`) |
+| `…[float-1]` — `1.0` | 위 명령 | passed | 같음 |
+| `…[str-abc]` — `"abc"` | 위 명령 | passed | 같음 |
+| `…[int-2]` — `2` | 위 명령 | passed | 같음 |
+| `…[list]` — `[]` | 위 명령 | passed | 변이(스키마 `bool \| None`·`StrictBool \| None`) |
+| `test_higher_notice_version_account_is_not_required_and_chat_passes` — 판 번호가 현재+1 인 계정: me `notice_required` false, `/chat` 200 | 위 명령 | passed | 변이 `deps.py` `<` → `!=` (review-u4 에서 통과하던 것) |
+| `test_scheduler_briefs_higher_notice_version_account` — 같은 계정의 일정이 브리핑됨(생성기 1회, 푸시 발송) | 위 명령 | passed | 변이 `scheduler.py` `>=` → `==` (review-u4 에서 통과하던 것) |
+| 실제 요청 18종(JSON 원문) — `true` 만 201, 나머지 17종 422 `notice_required` dict · 형식 위반이 함께 오면 `invalid_*` 가 먼저 · 이미 있는 아이디 + `1` 은 `notice_required` | verifier 스크래치패드 시험 | 전부 기대대로 | `verifier-u4b-values` |
+| `StrictBool` 로 바꾸면 계획과 어긋남(detail 목록 422, 검사 순서 깨짐) | 런타임 치환 | 14종이 목록 422 | `verifier-u4b-strictbool` |
+| 전체 회귀 | `.venv/bin/python -m pytest -q` | **2807 passed · skip 0** (2798 + 9) | `u4b-pytest-full` · `verifier-u4b-full-pytest` |
+| 저장소 잔재 없음(구현자가 저장소 파일을 고쳤다 되돌리는 방식으로 변이를 돌림 — 규칙 밖) | `git diff 5fc2b79 -- app/auth/deps.py app/auth/routes.py app/settings.py` · docstring 을 비운 AST 비교 | 0줄 · `schemas.py` 만 다름 | `verifier-u4b-residue` · `u4b-revert-diff` |
+| ruff · 툴 7종 · mypy | 단위 공통 | 통과 · 7/7 · 새 오류 없음(33, 기준선 38) | `verifier-u4b-ruff` · `verifier-u4b-tools-check` · `verifier-u4b-mypy` |

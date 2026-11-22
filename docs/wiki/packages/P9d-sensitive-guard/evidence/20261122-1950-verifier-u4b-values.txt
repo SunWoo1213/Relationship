@@ -1,0 +1,62 @@
+# 명령: MUT=control PYTHONPATH=/private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu4b PYTHONDONTWRITEBYTECODE=1 POSTGRES_PORT=5433 .venv/bin/python -m pytest /private/tmp/claude-501/-Users-sunwoo-Desktop-Portfolio-Relationship/f9fe5a3e-2130-409a-9746-f68fdd75e6f6/scratchpad/vu4b/test_probe_values.py -q -rs -p mutplug -p tests.conftest -p no:cacheprovider --rootdir=. 2>&1 | grep -v Deprecat | grep -v VersionedUnionType
+# 시각: 2026-11-22T19:50:57+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 0
+# ---
+[mutplug] MUT=control
+
+=== 가입 동의 값 표 ===
+true      -> 201 {"id":"3b9ee056e92b4e19ac06e37419a7d78d","username":"probeuser","nickname":"probeuser","no | users 증가 1 | version=1
+omit      -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+false     -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+null      -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+"true"    -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+"yes"     -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+"on"      -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+"1"       -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+1         -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+1.0       -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+"abc"     -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+2         -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+[]        -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+[true]    -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+{}        -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+"false"   -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+0         -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+"True"    -> 422 {"detail":{"code":"notice_required"}} | users 증가 0 | version=None
+순서A 아이디 형식 위반 + "abc" -> 422 {"detail":{"code":"invalid_username"}}
+순서A2 비밀번호 형식 위반 + [] -> 422 {"detail":{"code":"invalid_password"}}
+순서B 이미 있는 아이디 + 1 -> 422 {"detail":{"code":"notice_required"}}
+기대와 다른 값: []
+.
+=== OpenAPI SignupIn ===
+{
+ "properties": {
+  "username": {
+   "type": "string",
+   "title": "Username"
+  },
+  "password": {
+   "type": "string",
+   "title": "Password"
+  },
+  "nickname": {
+   "type": "string",
+   "title": "Nickname"
+  },
+  "privacy_notice_accepted": {
+   "title": "Privacy Notice Accepted"
+  }
+ },
+ "type": "object",
+ "required": [
+  "username",
+  "password",
+  "nickname"
+ ],
+ "title": "SignupIn",
+ "description": "`POST /auth/signup` 요청. 아이디·비밀번호 규칙(결정 A·B)은 라우트가 검사해\n`invalid_username`/`invalid_password` 코드로 422 를 낸다(형식만 여기서)."
+}
+.                                                                       [100%]
+2 passed in 0.71s

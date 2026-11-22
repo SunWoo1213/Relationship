@@ -1,0 +1,537 @@
+# 명령: .venv/bin/python -m pytest tests/test_privacy_notice.py -q -p no:cacheprovider
+# 시각: 2026-11-22T19:46:30+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 1
+# ---
+....FFFFFF...................                                            [100%]
+=================================== FAILURES ===================================
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-true] _
+
+client = <starlette.testclient.TestClient object at 0x10f11e780>
+db_session = <sqlalchemy.orm.session.Session object at 0x10f0c0180>
+value = 'true'
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+>       assert resp.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_privacy_notice.py:134: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-yes] _
+
+client = <starlette.testclient.TestClient object at 0x10f1c2b10>
+db_session = <sqlalchemy.orm.session.Session object at 0x10f11f6f0>
+value = 'yes'
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+>       assert resp.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_privacy_notice.py:134: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-1] _
+
+client = <starlette.testclient.TestClient object at 0x10eef57f0>
+db_session = <sqlalchemy.orm.session.Session object at 0x10eef5d90>, value = 1
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+>       assert resp.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_privacy_notice.py:134: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[float-1] _
+
+client = <starlette.testclient.TestClient object at 0x10f1ac8d0>
+db_session = <sqlalchemy.orm.session.Session object at 0x10ef9b020>, value = 1.0
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+>       assert resp.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_privacy_notice.py:134: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-abc] _
+
+client = <starlette.testclient.TestClient object at 0x10f24d8c0>
+db_session = <sqlalchemy.orm.session.Session object at 0x10f1ad590>
+value = 'abc'
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+>       assert resp.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_privacy_notice.py:134: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-2] _
+
+client = <starlette.testclient.TestClient object at 0x10f2c6250>
+db_session = <sqlalchemy.orm.session.Session object at 0x10f15a050>, value = 2
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+>       assert resp.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_privacy_notice.py:134: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-true] - assert 201 == 422
+ +  where 201 = <Response [201 Created]>.status_code
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-yes] - assert 201 == 422
+ +  where 201 = <Response [201 Created]>.status_code
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-1] - assert 201 == 422
+ +  where 201 = <Response [201 Created]>.status_code
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[float-1] - assert 201 == 422
+ +  where 201 = <Response [201 Created]>.status_code
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-abc] - assert 201 == 422
+ +  where 201 = <Response [201 Created]>.status_code
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-2] - assert 201 == 422
+ +  where 201 = <Response [201 Created]>.status_code
+6 failed, 23 passed in 1.19s
+
+# ===== append 2026-11-22T19:46:37+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_privacy_notice.py -q -p no:cacheprovider
+# 시각: 2026-11-22T19:46:37+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 1
+# ---
+....FFFFFFF..................                                            [100%]
+=================================== FAILURES ===================================
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-true] _
+
+client = <starlette.testclient.TestClient object at 0x11112a780>
+db_session = <sqlalchemy.orm.session.Session object at 0x1110d4180>
+value = 'true'
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+>       assert resp.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_privacy_notice.py:134: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-yes] _
+
+client = <starlette.testclient.TestClient object at 0x1111ceb10>
+db_session = <sqlalchemy.orm.session.Session object at 0x11112b6f0>
+value = 'yes'
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+>       assert resp.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_privacy_notice.py:134: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-1] _
+
+client = <starlette.testclient.TestClient object at 0x110f016d0>
+db_session = <sqlalchemy.orm.session.Session object at 0x110f01c70>, value = 1
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+>       assert resp.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_privacy_notice.py:134: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[float-1] _
+
+client = <starlette.testclient.TestClient object at 0x1111b08d0>
+db_session = <sqlalchemy.orm.session.Session object at 0x110fab020>, value = 1.0
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+>       assert resp.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/test_privacy_notice.py:134: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-abc] _
+
+client = <starlette.testclient.TestClient object at 0x11120d8c0>
+db_session = <sqlalchemy.orm.session.Session object at 0x1111b1590>
+value = 'abc'
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+        assert resp.status_code == 422
+>       assert resp.json() == NOTICE_REQUIRED_422  # `detail` 이 목록이 아니라 dict(N-R7)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert {'detail': [{...ol_parsing'}]} == {'detail': {'...ce_required'}}
+E         
+E         Differing items:
+E         {'detail': [{'loc': ['body', 'privacy_notice_accepted'], 'msg': 'Input should be a valid boolean, unable to interpret input', 'type': 'bool_parsing'}]} != {'detail': {'code': 'notice_required'}}
+E         
+E         Full diff:
+E           {
+E         -     'detail': {
+E         ?               ^
+E         +     'detail': [
+E         ?               ^
+E         -         'code': 'notice_required',
+E         +         {
+E         +             'loc': [
+E         +                 'body',
+E         +                 'privacy_notice_accepted',
+E         +             ],
+E         +             'msg': 'Input should be a valid boolean, unable to interpret input',
+E         +             'type': 'bool_parsing',
+E         -     },
+E         +         },
+E         ? ++++
+E         +     ],
+E           }
+
+tests/test_privacy_notice.py:135: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-2] _
+
+client = <starlette.testclient.TestClient object at 0x1112ce250>
+db_session = <sqlalchemy.orm.session.Session object at 0x111166050>, value = 2
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+        assert resp.status_code == 422
+>       assert resp.json() == NOTICE_REQUIRED_422  # `detail` 이 목록이 아니라 dict(N-R7)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert {'detail': [{...ol_parsing'}]} == {'detail': {'...ce_required'}}
+E         
+E         Differing items:
+E         {'detail': [{'loc': ['body', 'privacy_notice_accepted'], 'msg': 'Input should be a valid boolean, unable to interpret input', 'type': 'bool_parsing'}]} != {'detail': {'code': 'notice_required'}}
+E         
+E         Full diff:
+E           {
+E         -     'detail': {
+E         ?               ^
+E         +     'detail': [
+E         ?               ^
+E         -         'code': 'notice_required',
+E         +         {
+E         +             'loc': [
+E         +                 'body',
+E         +                 'privacy_notice_accepted',
+E         +             ],
+E         +             'msg': 'Input should be a valid boolean, unable to interpret input',
+E         +             'type': 'bool_parsing',
+E         -     },
+E         +         },
+E         ? ++++
+E         +     ],
+E           }
+
+tests/test_privacy_notice.py:135: AssertionError
+_ test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[list] _
+
+client = <starlette.testclient.TestClient object at 0x111348f30>
+db_session = <sqlalchemy.orm.session.Session object at 0x111165150>, value = []
+
+    @pytest.mark.parametrize(
+        "value",
+        [_OMIT, False, None, "true", "yes", 1, 1.0, "abc", 2, []],
+        ids=["omit", "false", "null", "str-true", "str-yes", "int-1", "float-1", "str-abc", "int-2", "list"],
+    )  # 동의는 JSON 불리언 true 하나뿐(U4 보강 R-2) -- 느슨한 값은 전부 같은 422
+    def test_signup_without_acceptance_is_422_notice_required_and_writes_no_user(
+        client, db_session, value
+    ) -> None:
+        before = _count(db_session, User)
+    
+        resp = _signup(client, privacy_notice_accepted=value)
+    
+        assert resp.status_code == 422
+>       assert resp.json() == NOTICE_REQUIRED_422  # `detail` 이 목록이 아니라 dict(N-R7)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert {'detail': [{...'bool_type'}]} == {'detail': {'...ce_required'}}
+E         
+E         Differing items:
+E         {'detail': [{'loc': ['body', 'privacy_notice_accepted'], 'msg': 'Input should be a valid boolean', 'type': 'bool_type'}]} != {'detail': {'code': 'notice_required'}}
+E         
+E         Full diff:
+E           {
+E         -     'detail': {
+E         ?               ^
+E         +     'detail': [
+E         ?               ^
+E         -         'code': 'notice_required',
+E         +         {
+E         +             'loc': [
+E         +                 'body',
+E         +                 'privacy_notice_accepted',
+E         +             ],
+E         +             'msg': 'Input should be a valid boolean',
+E         +             'type': 'bool_type',
+E         -     },
+E         +         },
+E         ? ++++
+E         +     ],
+E           }
+
+tests/test_privacy_notice.py:135: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-true] - assert 201 == 422
+ +  where 201 = <Response [201 Created]>.status_code
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-yes] - assert 201 == 422
+ +  where 201 = <Response [201 Created]>.status_code
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-1] - assert 201 == 422
+ +  where 201 = <Response [201 Created]>.status_code
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[float-1] - assert 201 == 422
+ +  where 201 = <Response [201 Created]>.status_code
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[str-abc] - AssertionError: assert {'detail': [{...ol_parsing'}]} == {'detail': {'...ce_required'}}
+  
+  Differing items:
+  {'detail': [{'loc': ['body', 'privacy_notice_accepted'], 'msg': 'Input should be a valid boolean, unable to interpret input', 'type': 'bool_parsing'}]} != {'detail': {'code': 'notice_required'}}
+  
+  Full diff:
+    {
+  -     'detail': {
+  ?               ^
+  +     'detail': [
+  ?               ^
+  -         'code': 'notice_required',
+  +         {
+  +             'loc': [
+  +                 'body',
+  +                 'privacy_notice_accepted',
+  +             ],
+  +             'msg': 'Input should be a valid boolean, unable to interpret input',
+  +             'type': 'bool_parsing',
+  -     },
+  +         },
+  ? ++++
+  +     ],
+    }
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[int-2] - AssertionError: assert {'detail': [{...ol_parsing'}]} == {'detail': {'...ce_required'}}
+  
+  Differing items:
+  {'detail': [{'loc': ['body', 'privacy_notice_accepted'], 'msg': 'Input should be a valid boolean, unable to interpret input', 'type': 'bool_parsing'}]} != {'detail': {'code': 'notice_required'}}
+  
+  Full diff:
+    {
+  -     'detail': {
+  ?               ^
+  +     'detail': [
+  ?               ^
+  -         'code': 'notice_required',
+  +         {
+  +             'loc': [
+  +                 'body',
+  +                 'privacy_notice_accepted',
+  +             ],
+  +             'msg': 'Input should be a valid boolean, unable to interpret input',
+  +             'type': 'bool_parsing',
+  -     },
+  +         },
+  ? ++++
+  +     ],
+    }
+FAILED tests/test_privacy_notice.py::test_signup_without_acceptance_is_422_notice_required_and_writes_no_user[list] - AssertionError: assert {'detail': [{...'bool_type'}]} == {'detail': {'...ce_required'}}
+  
+  Differing items:
+  {'detail': [{'loc': ['body', 'privacy_notice_accepted'], 'msg': 'Input should be a valid boolean', 'type': 'bool_type'}]} != {'detail': {'code': 'notice_required'}}
+  
+  Full diff:
+    {
+  -     'detail': {
+  ?               ^
+  +     'detail': [
+  ?               ^
+  -         'code': 'notice_required',
+  +         {
+  +             'loc': [
+  +                 'body',
+  +                 'privacy_notice_accepted',
+  +             ],
+  +             'msg': 'Input should be a valid boolean',
+  +             'type': 'bool_type',
+  -     },
+  +         },
+  ? ++++
+  +     ],
+    }
+7 failed, 22 passed in 1.13s
+
+# ===== append 2026-11-22T19:46:45+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_privacy_notice.py -q -p no:cacheprovider
+# 시각: 2026-11-22T19:46:45+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 1
+# ---
+...........................F.                                            [100%]
+=================================== FAILURES ===================================
+_____________ test_scheduler_briefs_higher_notice_version_account ______________
+
+sched = (<sqlalchemy.orm.session.Session object at 0x110939350>, FakeBriefingComposer(table={}, fail=None, call_count=0), FakePushSender(responses={}, calls=[]))
+
+    def test_scheduler_briefs_higher_notice_version_account(sched) -> None:
+        """현재보다 높은 판 계정도 브리핑 대상이다 -- 주기 작업 조건 `>=` 를 `==` 로 바꾸면 실패."""
+        db, composer, sender = sched
+        schedule = _owner_with_schedule(db, "u-high", user_row=True, notice="higher")
+    
+        scheduler_module.default_run_once(now=_clock)
+    
+        db.refresh(schedule)
+>       assert schedule.briefed_at is not None
+E       assert None is not None
+E        +  where None = <app.db.models.Schedule object at 0x11060dcd0>.briefed_at
+
+tests/test_privacy_notice.py:518: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_privacy_notice.py::test_scheduler_briefs_higher_notice_version_account - assert None is not None
+ +  where None = <app.db.models.Schedule object at 0x11060dcd0>.briefed_at
+1 failed, 28 passed in 1.01s
+
+# ===== append 2026-11-22T19:46:50+09:00 =====
+# 명령: .venv/bin/python -m pytest tests/test_privacy_notice.py -q -p no:cacheprovider
+# 시각: 2026-11-22T19:46:50+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 1
+# ---
+......................F......                                            [100%]
+=================================== FAILURES ===================================
+______ test_higher_notice_version_account_is_not_required_and_chat_passes ______
+
+app_ = <fastapi.applications.FastAPI object at 0x10e946270>
+db_session = <sqlalchemy.orm.session.Session object at 0x10eac9550>
+
+    def test_higher_notice_version_account_is_not_required_and_chat_passes(app_, db_session) -> None:
+        """현재보다 높은 판(배포를 되돌린 뒤 상태)은 동의한 것으로 본다 -- `<` 를 `!=` 로 바꾸면 실패."""
+        user = make_user(db_session, "u-high")
+        user.privacy_notice_version = PRIVACY_NOTICE_VERSION + 1
+        db_session.flush()
+        client = logged_in_client(app_, db_session, "u-high")
+>       assert client.get("/auth/me").json()["notice_required"] is False
+E       assert True is False
+
+tests/test_privacy_notice.py:405: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_privacy_notice.py::test_higher_notice_version_account_is_not_required_and_chat_passes - assert True is False
+1 failed, 28 passed in 1.03s

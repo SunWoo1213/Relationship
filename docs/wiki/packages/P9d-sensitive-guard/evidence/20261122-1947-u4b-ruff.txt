@@ -1,0 +1,7 @@
+# 명령: .venv/bin/ruff check app tests
+# 시각: 2026-11-22T19:47:40+09:00
+# cwd: /Users/sunwoo/Desktop/Portfolio/Relationship
+# HEAD: 5fc2b79 (dev2)
+# exit: 0
+# ---
+All checks passed!
